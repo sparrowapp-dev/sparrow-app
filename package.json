@@ -1,6 +1,8 @@
 {
   "name": "sparrow-app",
   "private": true,
+  "author": "Techdome",
+  "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and while making you a better programmer.",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -8,20 +10,28 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "lint:staged:fix": "npx lint-staged",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.4.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "@tauri-apps/cli": "^1.4.0",
     "@tsconfig/svelte": "^5.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.0",
+    "prettier": "3.0.2",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.6",
     "svelte-preprocess": "^5.0.0",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.4",
-    "@tauri-apps/cli": "^1.4.0"
+    "vite": "^4.4.4"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
