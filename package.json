@@ -11,22 +11,27 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri",
-    "lint:staged:fix": "npx lint-staged",
     "prepare": "husky install"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.4.0"
+    "@tauri-apps/api": "^1.4.0",
+    "bootstrap": "^5.3.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "@tauri-apps/cli": "^1.4.0",
     "@tsconfig/svelte": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.47.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.0",
+    "node-sass": "^9.0.0",
     "prettier": "3.0.2",
+    "sass": "^1.66.0",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.6",
-    "svelte-preprocess": "^5.0.0",
+    "svelte-preprocess": "^5.0.4",
     "tslib": "^2.6.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.4"
