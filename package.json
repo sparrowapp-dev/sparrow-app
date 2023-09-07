@@ -15,7 +15,12 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.4.0",
-    "bootstrap": "^5.3.1"
+    "axios": "^1.4.0",
+    "bootstrap": "^5.3.1",
+    "path": "^0.12.7",
+    "svelte-navigator": "^3.2.2",
+    "svelte-toasts": "^1.1.2",
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",

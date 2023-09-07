@@ -1,39 +1,36 @@
 <script lang="ts">
-  import Greet from './lib/Greet.svelte'
+  import { Router, Route } from "svelte-navigator";
+
+  import Toast from "$lib/components/notifications/Toast.svelte";
+  import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
+  import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
+  import HomePage from "./pages/home-page/HomePage.svelte";
+  import Authguard from "./routing/Authguard.svelte";
+  import Navigate from "./routing/Navigate.svelte";
+
+  export let url = "/";
+
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri!</h1>
+<Router {url}>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
+      <Authguard>
 
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
+          <section slot="authed">
+              <Route path="/" component={HomePage}/>
+          </section>
 
-  <div class="row">
-    <Greet />
-  </div>
+          <section slot="not_authed">
+              <Route path="/login" component={LoginPage}/>
+              <Route path="/register" component={RegisterPage}/>
+              <Route path="/*" component={Navigate} />
+          </section>
 
+      </Authguard>
+   
+</Router>
 
-</main>
+<Toast />
 
 <style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
 </style>
