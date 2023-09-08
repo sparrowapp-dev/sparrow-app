@@ -13,10 +13,12 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      }
+       "window":{
+         "close": true,
+         "maximize": true,
+         "minimize": true,
+         "unmaximize": true
+       }
     },
     "bundle": {
       "active": true,
@@ -35,6 +37,7 @@
     },
     "windows": [
       {
+        "decorations": false,
         "fullscreen": false,
         "resizable": true,
         "title": "sparrow-app",
