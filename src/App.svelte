@@ -9,25 +9,25 @@
   import Navigate from "./routing/Navigate.svelte";
 
   export let url = "/";
-
 </script>
 
 <Router {url}>
+  <Authguard>
+    <section slot="loggedIn">
+      <Route path="/" component={HomePage} />
+      <Route path="/*">
+        <Navigate to="/" />
+      </Route>
+    </section>
 
-      <Authguard>
-
-          <section slot="authed">
-              <Route path="/" component={HomePage}/>
-          </section>
-
-          <section slot="not_authed">
-              <Route path="/login" component={LoginPage}/>
-              <Route path="/register" component={RegisterPage}/>
-              <Route path="/*" component={Navigate} />
-          </section>
-
-      </Authguard>
-   
+    <section slot="unauthorized">
+      <Route path="/login" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
+      <Route path="/*">
+        <Navigate to="/login" />
+      </Route>
+    </section>
+  </Authguard>
 </Router>
 
 <Toast />

@@ -1,16 +1,16 @@
 <script>
-  import { authStore } from "$lib/store/auth.store";
+  import { authActions, authStore } from "$lib/store/auth.store";
 
-  let loggedIn = true;
+  let loggedIn = false;
 
-  authStore.subscribe(({ user }) => {
-    loggedIn = user || localStorage.getItem("AUTH_TOKEN") ? true : false;
-  });
-
+  $: {
+    $authStore;
+    loggedIn = authActions.checkAuthSatus();
+  }
 </script>
 
 {#if loggedIn}
-  <slot name="authed" />
+  <slot name="loggedIn" />
 {:else}
-  <slot name="not_authed" />
+  <slot name="unauthorized" />
 {/if}

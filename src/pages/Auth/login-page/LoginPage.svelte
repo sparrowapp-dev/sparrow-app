@@ -1,19 +1,17 @@
 <script lang="ts">
-  import "./login-page.scss";
   import { navigate } from "svelte-navigator";
   import authService from "$lib/services/auth.service";
   import { notifications } from "$lib/utils/notifications";
   import { checkValidation, loginSchema } from "$lib/utils/validation";
-  import { authActions, authStore } from "$lib/store/auth.store";
+  import { authActions } from "$lib/store/auth.store";
+  import constants from "$lib/utils/constants";
 
   //------------------------------ TOKEN -----------------------------------//
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
   if (token) {
-    localStorage.setItem("AUTH_TOKEN", token);
     authActions.setUser({ token });
     navigate("/");
-    console.log(token);
   }
 
   //------------------------------Navigation-------------------------------//
@@ -26,7 +24,7 @@
   };
 
   const authNavigate = () => {
-    navigate("http://localhost:9000/api/auth/google");
+    navigate(`${constants.API_URL}/api/auth/google`);
   };
 
   //------------------------------ Login State --------------------------//
@@ -73,12 +71,12 @@
   <h2>Create an account or Sign In</h2>
 
   {#if loginState}
-    <form class="login-form" on:submit|preventDefault={handleSubmit}>
-      <div class="form-group">
+    <form class="login-form w-100" on:submit|preventDefault={handleSubmit}>
+      <div class="form-group mt-2">
         <label for="exampleInputEmail1">Email address</label>
         <input
           type="email"
-          class="form-control"
+          class="form-control mt-1"
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           placeholder="Enter email"
@@ -89,11 +87,11 @@
         <small class="text-danger form-text">{validationErrors.email}</small>
       {/if}
 
-      <div class="form-group">
+      <div class="form-group mt-2">
         <label for="exampleInputPassword1">Password</label>
         <input
           type="password"
-          class="form-control"
+          class="form-control m-1"
           id="exampleInputPassword1"
           placeholder="Password"
           bind:value={loginCredentials.password}
@@ -103,12 +101,12 @@
         <small class="text-danger form-text">{validationErrors.password}</small>
       {/if}
 
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary">Login</button>
+      <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary w-100">Login</button>
       </div>
-      <div class="form-group">
+      <div class="form-group mt-2">
         <button
-          class="btn btn-primary googleBt"
+          class="btn googleBt w-100 bg-white text-dark"
           on:click|preventDefault={authNavigate}>Login with google</button
         >
       </div>
