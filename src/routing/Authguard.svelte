@@ -1,15 +1,14 @@
 <script>
   import { authActions, authStore } from "$lib/store/auth.store";
+  import { onMount } from "svelte";
 
-  let loggedIn = false;
-
-  $: {
-    $authStore;
-    loggedIn = authActions.checkAuthSatus();
-  }
+  onMount(() => {
+    authActions.checkAuthStatus();
+  });
+  
 </script>
 
-{#if loggedIn}
+{#if $authStore.user}
   <slot name="loggedIn" />
 {:else}
   <slot name="unauthorized" />

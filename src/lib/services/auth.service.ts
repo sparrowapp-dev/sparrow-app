@@ -1,6 +1,9 @@
 import authApi from "$lib/api/auth.api";
 import { authActions } from "$lib/store/auth.store";
-import type { loginUserPostBody, registerUserPostBody } from "$lib/utils/dto";
+import type {
+  loginUserPostBody,
+  registerUserPostBody,
+} from "$lib/utils/dto/auth-dto";
 
 const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await authApi.registerUser(userInfo);

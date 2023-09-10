@@ -1,6 +1,9 @@
 import constants from "$lib/utils/constants";
 import { post } from "$lib/api/api.common";
-import type { loginUserPostBody, registerUserPostBody } from "$lib/utils/dto";
+import type {
+  loginUserPostBody,
+  registerUserPostBody,
+} from "$lib/utils/dto/auth-dto";
 
 const apiUrl = constants.API_URL;
 
