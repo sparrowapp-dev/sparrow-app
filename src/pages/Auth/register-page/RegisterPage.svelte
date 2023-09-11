@@ -1,12 +1,6 @@
 <script lang="ts">
-  import authService from "$lib/services/auth.service";
-  import { notifications } from "$lib/utils/notifications";
   import { navigate } from "svelte-navigator";
-  import { checkValidation, registrationSchema } from "$lib/utils/validation";
-
-  const goBack = () => {
-    navigate(-1);
-  };
+  import { handleRegisterValidation } from "./register-page";
 
   let userData = {
     email: "",
@@ -19,48 +13,26 @@
 
   let validationErrors: any = {};
 
-  const handleFormSubmit = async () => {
-    const { isError, errorObject } = await checkValidation(
-      registrationSchema,
-      userData,
-    );
-    if (isError) {
-      validationErrors = errorObject;
-      return;
-    }else{
-      validationErrors = {}
-    }
-
-    try {
-        await authService.registerUser({
-        email: userData.email,
-        name: userData.fullName,
-        username: userData.username,
-        password: userData.password,
-      });
-      notifications.success("Registration successful!");
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-      notifications.error(error);
-    }
-  };
 </script>
 
 <div
   class="d-flex flex-column p-5 justify-content-center align-items-center vh-100 m-auto"
   style="max-width: 650px;"
+  data-tauri-drag-region
 >
-  <h1>Create Account</h1>
-  <p>Create an account to get started.</p>
+  <h1 data-tauri-drag-region>Create Account</h1>
+  <p data-tauri-drag-region>Create an account to get started.</p>
 
   <form
     class="form mt-4"
     novalidate
-    on:submit|preventDefault={handleFormSubmit}
+    on:submit|preventDefault={async () => {
+      validationErrors = await handleRegisterValidation(userData);
+    }}
+    data-tauri-drag-region
   >
-    <div class="form-group">
-      <label for="email">Email</label>
+    <div class="form-group" data-tauri-drag-region>
+      <label for="email" data-tauri-drag-region>Email</label>
       <input
         class="form-control mt-1"
         type="email"
@@ -73,8 +45,8 @@
         <small class="text-danger form-text">{validationErrors.email}</small>
       {/if}
     </div>
-    <div class="form-group mt-3">
-      <label for="username">Username</label>
+    <div class="form-group mt-3" data-tauri-drag-region>
+      <label for="username" data-tauri-drag-region>Username</label>
       <input
         class="form-control mt-1"
         type="text"
@@ -87,8 +59,8 @@
     {#if validationErrors.username}
       <small class="text-danger form-text">{validationErrors.username}</small>
     {/if}
-    <div class="form-group mt-3">
-      <label for="fullName">Full Name</label>
+    <div class="form-group mt-3" data-tauri-drag-region>
+      <label for="fullName" data-tauri-drag-region>Full Name</label>
       <input
         class="form-control mt-1"
         type="text"
@@ -101,8 +73,8 @@
     {#if validationErrors.fullName}
       <small class="text-danger form-text">{validationErrors.fullName}</small>
     {/if}
-    <div class="form-group mt-3">
-      <label for="password">Password</label>
+    <div class="form-group mt-3" data-tauri-drag-region>
+      <label for="password" data-tauri-drag-region>Password</label>
       <input
         class="form-control mt-1"
         type="password"
@@ -115,8 +87,10 @@
     {#if validationErrors.password}
       <small class="text-danger form-text">{validationErrors.password}</small>
     {/if}
-    <div class="form-group mt-3">
-      <label for="teamName">Team or Organization Name</label>
+    <div class="form-group mt-3" data-tauri-drag-region>
+      <label for="teamName" data-tauri-drag-region
+        >Team or Organization Name</label
+      >
       <input
         class="form-control mt-1"
         type="text"
@@ -124,19 +98,22 @@
         id="teamName"
         disabled
       />
-      <small class="text-muted form-text"
+      <small data-tauri-drag-region class="text-muted form-text"
         >Team name should be all small case and should not contain special
         characters and spaces. (disabled currently / coming soon)</small
       >
     </div>
-    <div class="form-group mt-4">
+    <div class="form-group mt-4" data-tauri-drag-region>
       <input
         type="checkbox"
         class="form-check-input"
         id="tnsCheckbox"
         bind:checked={userData.tnsCheckbox}
       />
-      <label class="form-check-label ms-2" for="tnsCheckbox"
+      <label
+        data-tauri-drag-region
+        class="form-check-label ms-2"
+        for="tnsCheckbox"
         >I agree to the <a href="#">Terms and Conditions</a></label
       >
     </div>
@@ -145,5 +122,7 @@
       >Create Free Account</button
     >
   </form>
-  <button class="btn btn-link mt-4 w-100" on:click={goBack}>Go Back</button>
+  <button class="btn btn-link mt-4 w-100" on:click={() => navigate(-1)}
+    >Go Back</button
+  >
 </div>

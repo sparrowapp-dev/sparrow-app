@@ -1,10 +1,11 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
-  import authService from "$lib/services/auth.service";
-  import { notifications } from "$lib/utils/notifications";
-  import { checkValidation, loginSchema } from "$lib/utils/validation";
   import { authActions } from "$lib/store/auth.store";
-  import constants from "$lib/utils/constants";
+  import {
+    navigateToRegister,
+    authNavigate,
+    handleLoginValidation,
+  } from "./login-page";
 
   //------------------------------ TOKEN -----------------------------------//
   const urlParams = new URLSearchParams(window.location.search);
@@ -14,51 +15,16 @@
     navigate("/");
   }
 
-  //------------------------------Navigation-------------------------------//
-  const navigateToRegister = () => {
-    navigate("/register");
-  };
-
-  const goBack = () => {
-    loginState = false;
-  };
-
-  const authNavigate = () => {
-    navigate(`${constants.API_URL}/api/auth/google`);
-  };
-
   //------------------------------ Login State --------------------------//
   let loginState = false;
-  const enableLogin = () => {
-    loginState = true;
-  };
+
+  //---------------- Login Validation --------------------//
+  let validationErrors: any = {};
 
   //------------ login Credentails ---------------//
   let loginCredentials = {
     email: "",
     password: "",
-  };
-
-  let validationErrors: any = {};
-
-  const handleSubmit = async () => {
-    const { isError, errorObject } = await checkValidation(
-      loginSchema,
-      loginCredentials,
-    );
-    if (isError) {
-      validationErrors = errorObject;
-      return;
-    } else {
-      validationErrors = {};
-    }
-    try {
-      await authService.loginUser(loginCredentials);
-      notifications.success("Login successful!");
-      navigate("/");
-    } catch (error) {
-      notifications.error("Something went wrong");
-    }
   };
 </script>
 
@@ -71,7 +37,12 @@
   <h2>Create an account or Sign In</h2>
 
   {#if loginState}
-    <form class="login-form w-100" on:submit|preventDefault={handleSubmit}>
+    <form
+      class="login-form w-100"
+      on:submit|preventDefault={async () => {
+        validationErrors = await handleLoginValidation(loginCredentials);
+      }}
+    >
       <div class="form-group mt-2">
         <label for="exampleInputEmail1">Email address</label>
         <input
@@ -111,7 +82,10 @@
         >
       </div>
     </form>
-    <button class="btn btn-link mt-4 w-100" on:click={goBack}>Go Back</button>
+    <button
+      class="btn btn-link mt-4 w-100"
+      on:click={() => (loginState = false)}>Go Back</button
+    >
   {:else}
     <input
       type="button"
@@ -123,7 +97,7 @@
       type="button"
       class="btn btn-primary mt-2 w-100"
       value="Sign In"
-      on:click={enableLogin}
+      on:click={() => (loginState = true)}
     />
   {/if}
 </div>
