@@ -5,6 +5,7 @@
     navigateToRegister,
     authNavigate,
     handleLoginValidation,
+    callRust,
   } from "./login-page";
 
   //------------------------------ TOKEN -----------------------------------//
@@ -90,7 +91,7 @@
     <input
       type="button"
       class="btn btn-primary w-100 mt-5"
-      on:click|preventDefault={navigateToRegister}
+      on:click|preventDefault={callRust}
       value="Create Free Account"
     />
     <input

@@ -5,9 +5,19 @@ import { notifications } from "$lib/utils/notifications";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 
+import { invoke } from "@tauri-apps/api";
+//------------------------------Navigation-------------------------------//
+
+export const callRust = async () => { 
+  console.log('check');
+  const url = "https://httpbin.org/ip";
+  const a:string = await invoke("make_http_request_command", {url});
+  console.log("RESULT ===>",JSON.parse(a))
+}
+
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
-  navigate("/register");
+  // navigate("/register");
 };
 
 export const authNavigate = () => {
