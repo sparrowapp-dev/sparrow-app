@@ -4,3 +4,13 @@
   box-sizing: border-box;
   user-select: none;
 }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #000000; /* Black */
+}
+
+* {
+  overflow-y: hidden;
+}
+

@@ -1,6 +1,11 @@
+<!-- SignIn.svelte -->
 <script lang="ts">
   import { navigate } from "svelte-navigator";
   import { authActions } from "$lib/store/auth.store";
+  import Header from "$lib/components/header/Header.svelte";
+  import logo from "$lib/assets/logo.svg";
+  import googleLogo from "$lib/assets/googlelogo.png";
+
   import {
     navigateToRegister,
     authNavigate,
@@ -21,36 +26,42 @@
   //---------------- Login Validation --------------------//
   let validationErrors: any = {};
 
-  //------------ login Credentails ---------------//
+  //------------ login Credentials ---------------//
   let loginCredentials = {
     email: "",
     password: "",
   };
+
+  // Handle sign-in with external providers
+  const handleSignInWithProvider = (provider: string) => {
+    // Handle sign-in with GitHub, Google, Microsoft, etc.
+    // You can implement the authentication logic here.
+    // Example: Redirect to OAuth authorization URL for the selected provider.
+    console.log(`Signing in with ${provider}`);
+  };
 </script>
 
-<div
-  class="d-flex flex-column p-5 justify-content-center align-items-center vh-100 m-auto"
-  style="max-width: 650px;"
->
-  <h1>Welcome to Sparrow App</h1>
+<div class="card-body">
+  <Header />
 
-  <h2>Create an account or Sign In</h2>
+  <div class="formControl">
+    <h1 class="card-title mb-4">Welcome to Sparrow!</h1>
 
-  {#if loginState}
     <form
-      class="login-form w-100"
+      class="login-form"
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
       }}
     >
-      <div class="form-group mt-2">
-        <label for="exampleInputEmail1">Email address</label>
+      <h2 class="card-subtitle">Sign In</h2>
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Email</label>
         <input
           type="email"
-          class="form-control mt-1"
+          class="form-control"
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
-          placeholder="Enter email"
+          placeholder="Please enter your registered email id"
           bind:value={loginCredentials.email}
         />
       </div>
@@ -58,13 +69,13 @@
         <small class="text-danger form-text">{validationErrors.email}</small>
       {/if}
 
-      <div class="form-group mt-2">
-        <label for="exampleInputPassword1">Password</label>
+      <div class="mb-3">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
         <input
           type="password"
-          class="form-control m-1"
+          class="form-control"
           id="exampleInputPassword1"
-          placeholder="Password"
+          placeholder="Please enter your Password"
           bind:value={loginCredentials.password}
         />
       </div>
@@ -72,32 +83,154 @@
         <small class="text-danger form-text">{validationErrors.password}</small>
       {/if}
 
-      <div class="form-group mt-4">
-        <button type="submit" class="btn btn-primary w-100">Login</button>
+      <a
+        href="/forgot"
+        class=" text-decoration-none mb-3 d-flex justify-content-end"
+        >Forgot Password?</a
+      >
+
+      <div class="mb-5 mt-3">
+        <button class="btn btn-gradient w-100">Sign In</button>
       </div>
-      <div class="form-group mt-2">
-        <button
-          class="btn googleBt w-100 bg-white text-dark"
-          on:click|preventDefault={authNavigate}>Login with google</button
-        >
+
+      <div class="d-flex flex-column align-items-center justify-content-center">
+        <p>or continue with</p>
+        <div class="gap-4">
+          <!-- <button
+                  class="w-8 rounded"
+                  on:click={() => handleSignInWithProvider("GitHub")}
+                >
+                  <i class="fab fa-github" />
+                </button> -->
+          <button
+            class="w-2 card rounded bg-light-black d-flex align-items-center justify-content-center"
+            on:click={() => handleSignInWithProvider("Google")}
+          >
+            <img src={googleLogo} alt="Google Logo" class="googleLogo" />
+          </button>
+
+          <!-- <button
+                  class="w-8 rounded"
+                  on:click={() => handleSignInWithProvider("Microsoft")}
+                >
+                  <i class="fab fa-microsoft" />
+                </button> -->
+        </div>
+        <p class="fs-6 gap-2 mt-3">
+          New to Sparrow? <a href="/register" class=" text-decoration-none"
+            >Create Account</a
+          >
+        </p>
       </div>
     </form>
-    <button
-      class="btn btn-link mt-4 w-100"
-      on:click={() => (loginState = false)}>Go Back</button
-    >
-  {:else}
-    <input
-      type="button"
-      class="btn btn-primary w-100 mt-5"
-      on:click|preventDefault={navigateToRegister}
-      value="Create Free Account"
-    />
-    <input
-      type="button"
-      class="btn btn-primary mt-2 w-100"
-      value="Sign In"
-      on:click={() => (loginState = true)}
-    />
-  {/if}
+  </div>
+
+  <!-- "New to the website? Create an account" link -->
+  <div class="BottomLogo"><img src={logo} alt="" /></div>
 </div>
+
+<style>
+  /* Add your custom styles here */
+
+  h2.card-subtitle {
+    font-size: 24px; /* Adjust the font size as needed */
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  h1.card-title {
+    font-size: 39px; /* Adjust the font size as needed */
+    color: white;
+    margin-left: 30px;
+    margin-top: 30px;
+  }
+
+  .card-body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: black;
+    margin: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    max-width: 500px;
+    overflow: hidden;
+  }
+
+  .login-form {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .btn-gradient {
+    background-image: linear-gradient(to right, hwb(211 0% 0%), #4930eec1);
+    color: white;
+  }
+
+  .googleLogo {
+    width: 23px;
+    height: 23px;
+  }
+
+  .bg-light-black {
+    background-color: #3333337a; /* You can adjust the color code as needed */
+  }
+
+  .BottomLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+
+  .BottomLogo > img {
+    width: 28vw;
+  }
+
+  @media (min-width: 600px) {
+    .card-body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: black;
+      margin: auto;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      max-width: 1500px;
+      overflow: hidden;
+    }
+
+    .BottomLogo > img {
+      width: 15vw;
+    }
+
+    .formControl {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-form {
+      height: 429px;
+      width: 408px;
+    }
+
+    h2.card-subtitle {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h1.card-title {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .BottomLogo {
+      margin-top: 90px;
+    }
+  }
+</style>

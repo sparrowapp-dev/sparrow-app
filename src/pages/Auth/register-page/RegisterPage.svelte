@@ -1,6 +1,7 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
   import { handleRegisterValidation } from "./register-page";
+  import Header from "$lib/components/header/Header.svelte";
 
   let userData = {
     email: "",
@@ -12,14 +13,14 @@
   };
 
   let validationErrors: any = {};
-
 </script>
 
 <div
-  class="d-flex flex-column p-5 justify-content-center align-items-center vh-100 m-auto"
-  style="max-width: 650px;"
+  class="d-flex bg-black flex-column p-5 justify-content-center align-items-center h-50 m-auto"
+  style="max-width: 500px;"
   data-tauri-drag-region
 >
+  <Header />
   <h1 data-tauri-drag-region>Create Account</h1>
   <p data-tauri-drag-region>Create an account to get started.</p>
 

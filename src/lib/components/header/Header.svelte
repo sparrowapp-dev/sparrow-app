@@ -26,26 +26,9 @@
 <section class="headerComponent">
   <div class="leftSection">
     <div class="logo"><img src={logo} alt="" /></div>
-    <div class="workSpace">Workspace</div>
-  </div>
-
-  <div class="middleSection">
-    <input type="text" name="" id="" />
   </div>
 
   <div class="rightSection">
-    <div class="features">
-      <button>
-        <img src={setting} alt="" />
-      </button>
-      <button>
-        <img src={notify} alt="" />
-      </button>
-      <button>
-        <img src={profile} alt="" />
-      </button>
-    </div>
-
     <div class="action">
       <button on:click={onMinimize}>
         <img src={minimizeIcon} alt="" />
@@ -59,62 +42,38 @@
     </div>
   </div>
 </section>
+<div class="borderBottom" />
 
 <style>
   .headerComponent {
     width: 100%;
-    height: 45px;
+    height: 5px;
     background-color: black;
-    display: grid;
-    grid-template-columns: 300px 1fr 400px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+  }
+
+  .borderBottom {
+    border-bottom: 0.5px solid rgba(128, 128, 128, 0.229);
+    margin-top: 20px;
   }
 
   .leftSection {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    font-size: 14px;
-  }
-
-  .leftSection .logo {
-    padding-left: 20px;
+    padding-left: 0px;
   }
 
   .leftSection .logo img {
-    width: 80%;
-    height: auto;
-  }
-
-  .leftSection .workSpace {
-    display: flex;
-    align-items: center;
-  }
-
-  .middleSection {
-    text-align: right;
-  }
-
-  .middleSection input {
-    width: 85%;
-    height: 25px;
-  }
-
-  .rightSection {
-    display: grid;
-    grid-template-columns: 1fr 130px;
-  }
-
-  .rightSection .features {
-    text-align: right;
-    padding-right: 30px;
+    width: 98px;
+    height: 36px;
+    padding: 8px, 0px, 8px, 0px;
   }
 
   .rightSection button {
     background-color: transparent;
     border: none;
-    min-width: 0px;
-    width: 35px;
-    padding: 0px;
-    height: 30px;
+    width: 30px;
   }
+
+
 </style>

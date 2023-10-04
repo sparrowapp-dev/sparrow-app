@@ -14,6 +14,6 @@
   }
   h1 {
     text-align: center;
-    margin-top: 45vh;
+    margin-top: 300px;
   }
 </style>
