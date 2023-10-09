@@ -46,8 +46,9 @@
         "fullscreen": false,
         "resizable": true,
         "title": "sparrow-app",
-        "width": 450,
-        "height": 900
+        "width": 488,
+        "height": 749,
+        "center": true
       }
     ]
   }

@@ -11,17 +11,43 @@
     authNavigate,
     handleLoginValidation,
   } from "./login-page";
+  import { error } from "$lib/api/api.common";
+
+  // Function to validate the email
+  let isEmailTouched = false;
+
+  // Function to validate the email
+  let isEmailValid = false;
+  const validateEmail = () => {
+    const emailRegex = /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/;
+    isEmailTouched = true;
+    isEmailValid = emailRegex.test(loginCredentials.email);
+    if (isEmailValid) {
+      validationErrors.email = "";
+    } else if (isEmailTouched) {
+      // Show an error only if the field has been touched and the email is not valid
+      // validationErrors.email = "";
+    }
+  };
 
   //------------------------------ TOKEN -----------------------------------//
+
+  // Use the window object to maximize the page
+  function maximizeWindow() {
+    window.innerWidth = screen.width;
+    window.innerHeight = screen.height;
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
   if (token) {
     authActions.setUser({ token });
     navigate("/");
+    maximizeWindow();
   }
 
   //------------------------------ Login State --------------------------//
-  let loginState = false;
+  // let loginState = false;
 
   //---------------- Login Validation --------------------//
   let validationErrors: any = {};
@@ -32,12 +58,32 @@
     password: "",
   };
 
+  let errorMessage = "";
+
+  const handleLogin = async () => {
+    // Check if the entered password matches the registered password
+
+    if (loginCredentials.password.length <= 0) {
+      errorMessage = "Please enter a password";
+    }
+
+    // isEmailValid = false;
+
+    if (validationErrors.password && loginCredentials.password.length > 0) {
+      errorMessage =
+        "The email and password combination you entered appears to be incorrect. Please try again."; // Set an error message
+    }
+    // Reset the password error message
+    validationErrors.password = "";
+  };
+
   // Handle sign-in with external providers
   const handleSignInWithProvider = (provider: string) => {
     // Handle sign-in with GitHub, Google, Microsoft, etc.
     // You can implement the authentication logic here.
     // Example: Redirect to OAuth authorization URL for the selected provider.
     console.log(`Signing in with ${provider}`);
+    maximizePage();
   };
 </script>
 
@@ -49,6 +95,7 @@
 
     <form
       class="login-form"
+      on:submit|preventDefault={handleLogin}
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
       }}
@@ -58,33 +105,47 @@
         <label for="exampleInputEmail1" class="form-label">Email</label>
         <input
           type="email"
-          class="form-control"
+          class="form-control bg-black"
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           placeholder="Please enter your registered email id"
           bind:value={loginCredentials.email}
+          on:input={validateEmail}
+          style="border:{validationErrors.email
+            ? '3px'
+            : '1px'} solid {isEmailValid
+            ? '#8DC599'
+            : validationErrors.email && validationErrors.password
+            ? '#E5ACB2'
+            : isEmailTouched
+            ? '#E5ACB2'
+            : '#45494D'}"
         />
+        {#if validationErrors.email}
+          <small class="form-text" style="color: #FE8C98;">
+            {validationErrors.email}</small
+          >
+        {/if}
       </div>
-      {#if validationErrors.email}
-        <small class="text-danger form-text">{validationErrors.email}</small>
-      {/if}
 
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">Password</label>
         <input
           type="password"
-          class="form-control"
+          class="form-control bg-black"
           id="exampleInputPassword1"
           placeholder="Please enter your Password"
           bind:value={loginCredentials.password}
+          style="border:{validationErrors.password
+            ? '3px'
+            : '1px'} solid {validationErrors.password ? ' #FE8C98' : '#313233'}"
         />
+        <small class="form-text" style="color: #FE8C98;">{errorMessage}</small>
       </div>
-      {#if validationErrors.password}
-        <small class="text-danger form-text">{validationErrors.password}</small>
-      {/if}
 
       <a
-        href="/forgot"
+        href="/reset/password"
+        style="color: #007BFF;"
         class=" text-decoration-none mb-3 d-flex justify-content-end"
         >Forgot Password?</a
       >
@@ -117,8 +178,10 @@
                 </button> -->
         </div>
         <p class="fs-6 gap-2 mt-3">
-          New to Sparrow? <a href="/register" class=" text-decoration-none"
-            >Create Account</a
+          New to Sparrow? <a
+            href="/register"
+            style="color: #007BFF;"
+            class=" text-decoration-none">Create Account</a
           >
         </p>
       </div>
@@ -140,22 +203,21 @@
   }
 
   h1.card-title {
-    font-size: 39px; /* Adjust the font size as needed */
+    font-size: 40px; /* Adjust the font size as needed */
     color: white;
     margin-left: 30px;
     margin-top: 30px;
   }
 
   .card-body {
-    height: 100vh;
+    height: 749px;
     display: flex;
     flex-direction: column;
-    background: black;
+    background: #000000;
     margin: auto;
-    padding-top: 10px;
-    padding-bottom: 10px;
     max-width: 500px;
     overflow: hidden;
+    border-radius: 14px;
   }
 
   .login-form {
@@ -182,10 +244,14 @@
     justify-content: center;
     align-items: center;
     color: white;
+    width: Hug (205px);
+    height: Hug (52px);
+    padding-top: 12px;
+    gap: 2px;
   }
 
   .BottomLogo > img {
-    width: 28vw;
+    width: 40vw;
   }
 
   @media (min-width: 600px) {
@@ -195,7 +261,7 @@
       flex-direction: column;
       background: black;
       margin: auto;
-      padding-top: 10px;
+      padding-top: 1px;
       padding-bottom: 10px;
       max-width: 1500px;
       overflow: hidden;
@@ -224,13 +290,16 @@
     }
 
     h1.card-title {
+      width: 408px;
+      height: 48px;
+      font-size: 40px;
       display: flex;
       align-items: center;
       justify-content: flex-start;
     }
 
     .BottomLogo {
-      margin-top: 90px;
+      margin-top: 75px;
     }
   }
 </style>

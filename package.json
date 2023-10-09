@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.4.0",
+    "@tauri-apps/cli": "^1.5.1",
     "axios": "^1.5.1",
     "bootstrap": "^5.3.1",
     "font-awesome": "^4.7.0",
@@ -25,7 +26,6 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
-    "@tauri-apps/cli": "^1.4.0",
     "@tsconfig/svelte": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
