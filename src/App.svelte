@@ -9,6 +9,9 @@
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
+  import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
+  import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
+  import ResendEmail from "./pages/Auth/resend-email/ResendEmail.svelte";
 
   export let url = "/";
 </script>
@@ -25,7 +28,11 @@
     <section slot="unauthorized">
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
-      <Route path="/reset/password" component={UpdatePassword} />
+      <Route path="/forgot/password" component={ForgotPassword} />
+      <Route path="/update/password" component={UpdatePassword} />
+      <Route path="/reset/password" component={ResetPassword} />
+      <Route path="/resend/email" component={ResendEmail} />
+
       <Route path="/*">
         <Navigate to="/login" />
       </Route>

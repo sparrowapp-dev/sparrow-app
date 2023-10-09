@@ -1,32 +1,25 @@
 <script lang="ts">
-  import { navigate } from "svelte-navigator";
-  import { authActions } from "$lib/store/auth.store";
+  //   import { navigate } from "svelte-navigator";
+  //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
-  import logo from "$lib/assets/logo.svg";
   import angleLeft from "$lib/assets/angleleft.png";
 
-  //   import {
-  //     navigateToRegister,
-  //     authNavigate,
-  //     handleLoginValidation,
-  //   } from "./login-page";
-
   //------------------------------ TOKEN -----------------------------------//
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("t");
-  if (token) {
-    authActions.setUser({ token });
-    navigate("/reset/password");
-  }
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const token = urlParams.get("t");
+  //   if (token) {
+  //     authActions.setUser({ token });
+  //     navigate("/reset/password");
+  //   }
 
   //---------------- Login Validation --------------------//
-  let validationErrors: any = {};
+  //   let validationErrors: any = {};
 
-  //------------ login Credentials ---------------//
-  let loginCredentials = {
-    email: "",
-    password: "",
-  };
+  //   //------------ login Credentials ---------------//
+  //   let loginCredentials = {
+  //     email: "",
+  //     password: "",
+  //   };
 </script>
 
 <div class="card-body">
@@ -47,6 +40,11 @@
           <span class="email-address">raman.rayaprolu@techdome.net.in</span>.
         </p>
 
+        <p class="paragraph1">
+          We sent another confirmation link to your email .
+          <span class="email-address">raman.rayaprolu@techdome.net.in</span>.
+        </p>
+
         <p class="paragraph2">
           The confirmation link will expire in <b
             style="font-weight: bold; color: #FFFFFF;"
@@ -54,10 +52,6 @@
             24 hours
           </b>
         </p>
-        <div class="paragraph3">
-          <p>No email in your inbox or spam folder?</p>
-          <a href="/reset/password">Resend Email</a>
-        </div>
       </div>
     </div>
   </div>
@@ -113,21 +107,6 @@
       height: Hug (27px);
       display: flex;
       gap: 16px;
-    }
-
-    .updatetop1 > img {
-      width: Hug (24px);
-      height: Hug (24px);
-      border-radius: 4px;
-      gap: 8px;
-    }
-
-    .updatetop1 > div > img {
-      width: 24px;
-      height: 24px;
-      top: 4px;
-      left: 7px;
-      padding: 2px, 2px, 2px, 1px;
     }
 
     .updatetop1 > h6 {
@@ -187,41 +166,6 @@
       /* Styles for the email address */
       font-weight: bold;
       color: #ffffff; /* You can change the color to your desired value */
-    }
-
-    .paragraph3 {
-      width: Fill (408px);
-      height: Hug (30px);
-      display: flex;
-      color: #cccccc;
-      gap: 16px;
-    }
-
-    .paragraph3 > p {
-      width: 205px;
-      height: 18px;
-      color: #cccccc;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 18px;
-      letter-spacing: 0em;
-      text-align: left;
-    }
-
-    .paragraph3 > a {
-      text-decoration: none;
-      width: 73px;
-      height: 18px;
-      color: #007bff;
-
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 18px;
-      letter-spacing: 0em;
-      text-align: center;
-      font-variation-settings: "slnt" 0;
     }
 
     h1.card-title {

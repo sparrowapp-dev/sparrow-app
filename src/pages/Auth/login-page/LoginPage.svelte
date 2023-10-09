@@ -12,7 +12,7 @@
     handleLoginValidation,
   } from "./login-page";
   import { error } from "$lib/api/api.common";
-
+  
   // Function to validate the email
   let isEmailTouched = false;
 
@@ -83,7 +83,7 @@
     // You can implement the authentication logic here.
     // Example: Redirect to OAuth authorization URL for the selected provider.
     console.log(`Signing in with ${provider}`);
-    maximizePage();
+    // maximizePage();
   };
 </script>
 
@@ -144,7 +144,7 @@
       </div>
 
       <a
-        href="/reset/password"
+        href="/forgot/password"
         style="color: #007BFF;"
         class=" text-decoration-none mb-3 d-flex justify-content-end"
         >Forgot Password?</a
