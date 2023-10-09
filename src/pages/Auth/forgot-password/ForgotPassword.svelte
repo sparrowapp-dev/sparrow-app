@@ -3,6 +3,7 @@
   //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
   import angleLeft from "$lib/assets/angleleft.png";
+  import { navigate } from "svelte-navigator";
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
@@ -35,6 +36,10 @@
       // Show an error only if the field has been touched and the email is not valid
       // validationErrors.email = "";
     }
+  };
+
+  const handleRequest = () => {
+    navigate("/update/password");
   };
 </script>
 
@@ -72,7 +77,9 @@
             />
           </div>
           <div class="sendButton">
-            <button class="btn btn-gradient w-100">Send Request</button>
+            <button class="btn btn-gradient w-100" on:click={handleRequest}
+              >Send Request</button
+            >
           </div>
         </form>
       </div>

@@ -146,7 +146,7 @@
       data-tauri-drag-region
     >
       <h2 class="card-subtitle">Create Account</h2>
-      <div class="form-group gap-0" data-tauri-drag-region>
+      <div class="form-group gap-0 mb-3" data-tauri-drag-region>
         <label for="email" data-tauri-drag-region>Email</label>
         <input
           class="form-control mt-1 bg-black"
@@ -174,7 +174,7 @@
           {/if}
         </div>
       </div>
-      <div class="form-group mt-1" data-tauri-drag-region>
+      <div class="form-group mt-3" data-tauri-drag-region>
         <label for="name" data-tauri-drag-region>Full Name</label>
         <input
           class="form-control mt-1 bg-black"
@@ -202,7 +202,7 @@
         </div>
       </div>
 
-      <div class="form-group mt-1" data-tauri-drag-region>
+      <div class="form-group mt-3" data-tauri-drag-region>
         <label for="password" data-tauri-drag-region>Password</label>
         <input
           class="form-control bg-black"
@@ -368,7 +368,7 @@
     font-size: 40px; /* Adjust the font size as needed */
     color: white;
     margin-left: 30px;
-    margin-top: 20px;
+    margin-top: 50px;
   }
   .form-group {
     width: Fill (360px);
@@ -460,7 +460,7 @@
     }
 
     h1.card-title {
-      margin-top: 10px;
+      margin-top: 50px;
       display: flex;
       align-items: center;
       justify-content: flex-start;
