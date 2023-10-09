@@ -8,12 +8,19 @@ import { navigate } from "svelte-navigator";
 import { invoke } from "@tauri-apps/api";
 //------------------------------Navigation-------------------------------//
 
-export const callRust = async () => { 
-  console.log('check');
-  const url = "https://httpbin.org/ip";
-  const a:string = await invoke("make_http_request_command", {url});
-  console.log("RESULT ===>",JSON.parse(a))
-}
+export const callRust = async () => {
+  console.log("check");
+  const url = "https://reqres.in/api/users";
+  const headers = new Headers(); // Add your headers if needed
+  const body =
+    "--form '=@\"/C:/Users/91877/Downloads/WhatsApp Image 2023-10-05 at 6.09.07 PM.jpeg\"'";
+  const a: string = await invoke("make_post_form_request_command", {
+    url,
+    body,
+    headers,
+  });
+  console.log("RESULT ===>", JSON.parse(a));
+};
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
