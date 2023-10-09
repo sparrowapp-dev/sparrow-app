@@ -15,6 +15,8 @@ use serde_json::json;
 use std::fs;
 use regex::Regex; 
 use std::borrow::Cow;
+
+
 // JSON Data Requests
 
 #[tauri::command]
@@ -276,18 +278,7 @@ async fn make_www_delete_form_request(
 
 
 // Multipart Form Data Requests
-
-
-fn check_Input_Type(body: String) -> bool {
-    let input = body;
-    
-    if input.contains('@') {
-        return true
-    } 
-    return false
-}
-
-
+// Handle to extract file name
 fn extract_filename(input: &str) -> Option<String> {
     let re = Regex::new(r#"\/([^/]+)"'$"#).unwrap();
     
@@ -298,16 +289,9 @@ fn extract_filename(input: &str) -> Option<String> {
     }
     
     None
-
-    // let re = Regex::new(r#"\\([^\\]+)$"#).unwrap();
-    // if let Some(captures) = re.captures(input) {
-    //     captures.get(1).map(|m| m.as_str().to_string())
-    // } else {
-    //     None
-    // }
 }
 
-
+// Handle to extract path of file
 fn extract_local_path(input: &str) -> Option<String> {
     let re = Regex::new(r#""([^"]+)""#).unwrap();
     if let Some(caps) = re.captures(input) {
@@ -317,13 +301,7 @@ fn extract_local_path(input: &str) -> Option<String> {
         }
     }
     None
-    // let start = input.find('"')? + 1;
-    // let end = input.rfind('"')?;
-    // let path = &input[start..end];
-
-    // Some(path.replace("\\\\", "\\").to_string())
 }
-
 
 
 #[tauri::command]
@@ -350,13 +328,9 @@ async fn make_post_form_request(
 ) -> Result<String, Box<dyn Error>> {
     let filename = extract_filename(body);
     let local_filepath = extract_local_path(body);
-    println!("{:#?}", filename);
-    println!("{:#?}", local_filepath);
     let local_filepath_str = local_filepath.as_ref().unwrap();
     let filename_str = filename.unwrap_or_default();
-    
     let file_fs = fs::read(local_filepath_str)?;
-    
     let part = multipart::Part::bytes(file_fs).file_name(filename_str);
     let filename1 = extract_filename(body);
     let filename_str1 = filename1.unwrap_or_default();
@@ -365,6 +339,49 @@ async fn make_post_form_request(
     .part("FileData", part);
     let client = reqwest::Client::new();
     let mut request = client.post(url);
+    for (key, value) in headers.iter() {
+        request = request.header(key, value);
+    }
+    let resp = request.multipart(form).send().await?.text().await?;
+    println!("{:#?}", resp);
+    Ok(resp)
+}
+
+
+#[tauri::command]
+fn make_put_form_request_command(
+    url: String,
+    body: &str,
+    headers: HashMap<String, String>,
+) -> String {
+    let result = make_put_form_request(url, body, headers);
+    let result_string = match result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {:?}", err),
+    };
+    println!("Result from async function: {:?}", result_string);
+    return result_string;
+}
+
+#[tokio::main]
+async fn make_put_form_request(
+    url: String,
+    body: &str,
+    headers: HashMap<String, String>,
+) -> Result<String, Box<dyn Error>> {
+    let filename = extract_filename(body);
+    let local_filepath = extract_local_path(body);
+    let local_filepath_str = local_filepath.as_ref().unwrap();
+    let filename_str = filename.unwrap_or_default();
+    let file_fs = fs::read(local_filepath_str)?;
+    let part = multipart::Part::bytes(file_fs).file_name(filename_str);
+    let filename1 = extract_filename(body);
+    let filename_str1 = filename1.unwrap_or_default();
+    let form = reqwest::multipart::Form::new()
+    .text("resourceName", filename_str1)
+    .part("FileData", part);
+    let client = reqwest::Client::new();
+    let mut request = client.put(url);
     for (key, value) in headers.iter() {
         request = request.header(key, value);
     }
@@ -386,7 +403,8 @@ fn main() {
             make_www_put_form_request_command,
             make_www_get_form_request_command,
             make_www_delete_form_request_command,
-            make_post_form_request_command
+            make_post_form_request_command,
+            make_put_form_request_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
