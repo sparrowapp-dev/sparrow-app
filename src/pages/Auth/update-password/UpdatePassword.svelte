@@ -4,7 +4,7 @@
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
   import angleLeft from "$lib/assets/angleleft.png";
-
+  export let email: string;
   //   import {
   //     navigateToRegister,
   //     authNavigate,
@@ -44,7 +44,7 @@
         <p class="paragraph1">
           To ensure that this is really you, we have sent a confirmation link to
           your email
-          <span class="email-address">raman.rayaprolu@techdome.net.in</span>.
+          <span class="email-address">{email}</span>.
         </p>
 
         <p class="paragraph2">

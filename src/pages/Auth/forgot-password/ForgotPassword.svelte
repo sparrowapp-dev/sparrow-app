@@ -3,6 +3,11 @@
   //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
   import angleLeft from "$lib/assets/angleleft.png";
+  // import { navigate } from 'svelte-routing';
+  import { useNavigate } from "svelte-navigator";
+    import { handleLoginValidation } from "../login-page/login-page";
+
+    const navigate = useNavigate();
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
@@ -20,6 +25,7 @@
   //     email: "",
   //     password: "",
   //   };
+  let forgotEmail = "";
 
   let isEmailTouched = false;
 
@@ -58,6 +64,23 @@
           class="login-form"
           on:submit|preventDefault={async () => {
             // validationErrors = await handleLoginValidation(loginCredentials);
+            let url="https://helloworld.com";
+            
+            navigate(`/update/password/${forgotEmail}`);
+
+            fetch(url, {
+              method: 'POST',
+              body: JSON.stringify({ forgotEmail }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then((res)=>{
+              navigate(`/update/password/${forgotEmail}`);
+            })
+            .catch((err)=>{
+              console.log(err);
+            });
           }}
         >
           <div class="mb-3">
@@ -68,6 +91,7 @@
               id="exampleInputEmail1"
               aria-describedby="emailHelp"
               placeholder="Please enter your registered email id"
+              bind:value={forgotEmail}
               on:input={validateEmail}
             />
           </div>
