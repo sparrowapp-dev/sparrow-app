@@ -5,6 +5,7 @@
   import angleLeft from "$lib/assets/angleleft.png";
   // import { navigate } from 'svelte-routing';
   import { useNavigate } from "svelte-navigator";
+  import authService  from "$lib/services/auth.service";
     import { handleLoginValidation } from "../login-page/login-page";
 
     const navigate = useNavigate();
@@ -64,22 +65,13 @@
           class="login-form"
           on:submit|preventDefault={async () => {
             // validationErrors = await handleLoginValidation(loginCredentials);
-            let url="https://helloworld.com";
-            
-            navigate(`/update/password/${forgotEmail}`);
-
-            fetch(url, {
-              method: 'POST',
-              body: JSON.stringify({ forgotEmail }),
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            })
+    
+            authService.forgotPassword({email : forgotEmail})
             .then((res)=>{
               navigate(`/update/password/${forgotEmail}`);
             })
             .catch((err)=>{
-              console.log(err);
+              console.error(err);
             });
           }}
         >
