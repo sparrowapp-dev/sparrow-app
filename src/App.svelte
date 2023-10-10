@@ -5,6 +5,7 @@
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import HomePage from "./pages/home-page/HomePage.svelte";
+  import TeamsPage from "./pages/teams-page/TeamsPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
 
@@ -21,6 +22,7 @@
     </section>
 
     <section slot="unauthorized">
+      <Route path="/" component={TeamsPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/*">
