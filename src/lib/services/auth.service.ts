@@ -12,6 +12,7 @@ const loginUser = async (userInfo: loginUserPostBody) => {
   const response = await authApi.loginUser(userInfo);
   if (!response.isSuccessful)
     throw "error registering user: " + response.message;
+  console.log(response.data);
   authActions.setUser(response.data);
 };
 
