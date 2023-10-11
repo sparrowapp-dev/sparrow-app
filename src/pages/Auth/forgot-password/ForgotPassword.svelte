@@ -43,6 +43,14 @@
       // validationErrors.email = "";
     }
   };
+
+  let handleForgotPassword = async (forgotEmail: string) =>{
+    let response =  await authService.forgotPassword({email : forgotEmail})
+    if(response.isSuccessful){
+      navigate(`/update/password/${forgotEmail}`);
+    }        
+  }
+  
 </script>
 
 <div class="card-body">
@@ -65,14 +73,7 @@
           class="login-form"
           on:submit|preventDefault={async () => {
             // validationErrors = await handleLoginValidation(loginCredentials);
-    
-            authService.forgotPassword({email : forgotEmail})
-            .then((res)=>{
-              navigate(`/update/password/${forgotEmail}`);
-            })
-            .catch((err)=>{
-              console.error(err);
-            });
+            handleForgotPassword(forgotEmail);     
           }}
         >
           <div class="mb-3">
