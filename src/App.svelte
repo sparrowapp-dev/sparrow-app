@@ -17,7 +17,8 @@
       <Route path="/*"> <Navigate to="/" /> </Route>
     </section>
     <section slot="unauthorized">
-      <Route path="/dashboard/*" component={Dashboard} />
+      <!-- <Route path="/dashboard/*" component={Dashboard} /> -->
+      <Route path="/*" component={Dashboard} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/*"> <Navigate to="/login"/> </Route>

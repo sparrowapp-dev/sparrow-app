@@ -7,46 +7,56 @@
     import teams from "$lib/assets/teams.svg";
     import workspaces from "$lib/assets/workspaces.svg";
     import help from "$lib/assets/circle-question.svg";
-    import { navigate } from "svelte-navigator";
+    import { Link, navigate } from "svelte-navigator";
 </script>
 
 <div class="sidebar">
     <div class="sidebar__main">
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/collections")}}>
+        <Link style="text-decoration:none;" to="collections">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={collections} alt="" /></div>
             <div class="sidebar__container--text"><p>Collections</p></div>
         </div>
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/mock")}}>
+        </Link>
+        <Link style="text-decoration:none;" to="mock">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={mock} alt="" /></div>
             <div class="sidebar__container--text"><p>Mock</p></div>
-        </div>
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/environment")}}>
+        </div></Link>
+        <Link style="text-decoration:none;" to="environment">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={environment} alt="" /></div>
             <div class="sidebar__container--text"><p>Environment</p></div>
-        </div>
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/api-builder")}}>
+        </div></Link>
+        <Link style="text-decoration:none;" to="api-builder">
+        <div class="sidebar__container" >
             <div class="sidebar__container--icon"><img src={apibuilder} alt="" /></div>
             <div class="sidebar__container--text"><p>API Builder</p></div>
-        </div>
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/wiki")}}>
+        </div></Link>
+        <Link style="text-decoration:none;" to="wiki">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={wiki} alt="" /></div>
             <div class="sidebar__container--text"><p>Wiki</p></div>
-        </div>
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/teams")}}>
+        </div></Link>
+        <Link style="text-decoration:none;" to="teams">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={teams} alt="" /></div>
             <div class="sidebar__container--text"><p>Teams</p></div>
-        </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/workspaces")}}>
+        </div></Link>
+        <Link style="text-decoration:none;" to="workspaces">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={workspaces} alt="" /></div>
             <div class="sidebar__container--text"><p>Workspaces</p></div>
         </div>
+    </Link>
     </div>
     <div class="sidebar__help">
-        <div class="sidebar__container" on:click={()=>{navigate("/dashboard/help")}}>
+        <Link style="text-decoration:none;" to="help">
+        <div class="sidebar__container">
             <div class="sidebar__container--icon"><img src={help} alt="" /></div>
             <div class="sidebar__container--text"><p>Help</p></div>
         </div>
+        </Link>
     </div>
 
 </div>
