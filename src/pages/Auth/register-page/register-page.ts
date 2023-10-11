@@ -14,7 +14,7 @@ const handleRegister = async (userData) => {
     navigate("/");
   } catch (error) {
     console.log(error);
-    notifications.error(error);
+    throw error;
   }
 };
 

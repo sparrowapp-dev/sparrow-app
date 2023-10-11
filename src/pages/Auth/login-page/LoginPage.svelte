@@ -1,18 +1,14 @@
-<!-- SignIn.svelte -->
 <script lang="ts">
   import { navigate } from "svelte-navigator";
   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
-  import googleLogo from "$lib/assets/googlelogo.png";
+  import googleLogo from "$lib/assets/googlelogo.svg";
+  import githubLogo from "$lib/assets/githublogo.svg";
+  import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
-  import {
-    navigateToRegister,
-    authNavigate,
-    handleLoginValidation,
-  } from "./login-page";
-  import { error } from "$lib/api/api.common";
-  
+  import { handleLoginValidation } from "./login-page";
+
   // Function to validate the email
   let isEmailTouched = false;
 
@@ -26,7 +22,7 @@
       validationErrors.email = "";
     } else if (isEmailTouched) {
       // Show an error only if the field has been touched and the email is not valid
-      // validationErrors.email = "";
+      validationErrors.email = "";
     }
   };
 
@@ -58,24 +54,7 @@
     password: "",
   };
 
-  let errorMessage = "";
-
-  const handleLogin = async () => {
-    // Check if the entered password matches the registered password
-
-    if (loginCredentials.password.length <= 0) {
-      errorMessage = "Please enter a password";
-    }
-
-    // isEmailValid = false;
-
-    if (validationErrors.password && loginCredentials.password.length > 0) {
-      errorMessage =
-        "The email and password combination you entered appears to be incorrect. Please try again."; // Set an error message
-    }
-    // Reset the password error message
-    validationErrors.password = "";
-  };
+  // let errorMessage = "";
 
   // Handle sign-in with external providers
   const handleSignInWithProvider = (provider: string) => {
@@ -87,49 +66,65 @@
   };
 </script>
 
-<div class="card-body">
+<!-- Below used color as color variable -->
+<div
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
+  style="height: 870px;"
+  data-tauri-drag-region
+>
   <Header />
-
-  <div class="formControl">
-    <h1 class="card-title mb-4">Welcome to Sparrow!</h1>
-
+  <div
+    class="d-flex mb-5 flex-column align-items-center justify-content-center"
+    data-tauri-drag-region
+  >
+    <h1
+      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+      style="font-size: 40px; width:408px; height:48px;"
+    >
+      Welcome to Sparrow!
+    </h1>
     <form
-      class="login-form"
-      on:submit|preventDefault={handleLogin}
+      data-tauri-drag-region
+      class="login-form text-whiteColor ps-1 pe-1 gap-16"
+      style="width:408px; height:429px"
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
+        if (isEmailValid && loginCredentials.password.length > 0) {
+          validationErrors.password =
+            "The email and password combination you entered appears to be incorrect. Please try again.";
+        }
       }}
     >
-      <h2 class="card-subtitle">Sign In</h2>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email</label>
+      <h2 class="card-subtitle  fs-4 mb-3">Sign In</h2>
+      <div class="mb-3" data-tauri-drag-region>
+        <label for="exampleInputEmail1" class="form-label text-red">Email</label
+        >
         <input
           type="email"
-          class="form-control bg-black"
+          class="form-control bg-black border:{validationErrors.email
+            ? '3px'
+            : '1px'} solid {validationErrors.email
+            ? 'border-error'
+            : 'border-default'}"
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           placeholder="Please enter your registered email id"
           bind:value={loginCredentials.email}
           on:input={validateEmail}
-          style="border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {isEmailValid
-            ? '#8DC599'
-            : validationErrors.email && validationErrors.password
-            ? '#E5ACB2'
-            : isEmailTouched
-            ? '#E5ACB2'
-            : '#45494D'}"
         />
         {#if validationErrors.email}
-          <small class="form-text" style="color: #FE8C98;">
+          <small class="form-text text-dangerColor">
             {validationErrors.email}</small
           >
         {/if}
       </div>
 
-      <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
+      <div class="mb-4">
+        <label
+          for="exampleInputPassword1"
+          class="form-label"
+          data-tauri-drag-region>Password</label
+        >
         <input
           type="password"
           class="form-control bg-black"
@@ -138,168 +133,97 @@
           bind:value={loginCredentials.password}
           style="border:{validationErrors.password
             ? '3px'
-            : '1px'} solid {validationErrors.password ? ' #FE8C98' : '#313233'}"
+            : '1px'} solid {validationErrors.password
+            ? 'border-error'
+            : 'border-default'}"
         />
-        <small class="form-text" style="color: #FE8C98;">{errorMessage}</small>
+
+        {#if validationErrors.password}<small class="form-text text-dangerColor"
+            >{validationErrors.password}</small
+          >{/if}
       </div>
 
-      <a
-        href="/forgot/password"
-        style="color: #007BFF;"
-        class=" text-decoration-none mb-3 d-flex justify-content-end"
-        >Forgot Password?</a
-      >
+      <div class="d-flex mb-4 align-items-center justify-content-end">
+        <a
+          href="/forgot/password"
+          class="text-decoration-none text-primaryColor">Forgot Password?</a
+        >
+      </div>
 
-      <div class="mb-5 mt-3">
-        <button class="btn btn-gradient w-100">Sign In</button>
+      <div class="mb-5">
+        <button class="btn btn-primary w-100 text-whiteColor border-0"
+          >Sign In</button
+        >
       </div>
 
       <div class="d-flex flex-column align-items-center justify-content-center">
         <p>or continue with</p>
-        <div class="gap-4">
-          <!-- <button
-                  class="w-8 rounded"
-                  on:click={() => handleSignInWithProvider("GitHub")}
-                >
-                  <i class="fab fa-github" />
-                </button> -->
+        <div class="d-flex gap-4">
           <button
-            class="w-2 card rounded bg-light-black d-flex align-items-center justify-content-center"
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={() => handleSignInWithProvider("Github")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
           >
-            <img src={googleLogo} alt="Google Logo" class="googleLogo" />
+            <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
           </button>
-
-          <!-- <button
-                  class="w-8 rounded"
-                  on:click={() => handleSignInWithProvider("Microsoft")}
-                >
-                  <i class="fab fa-microsoft" />
-                </button> -->
+          <button
+            on:click={() => handleSignInWithProvider("Google")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
+          >
+            <img src={googleLogo} alt="Google Logo" class="w-100 h-100" />
+          </button>
+          <button
+            on:click={() => handleSignInWithProvider("Microsoft")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
+          >
+            <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100" />
+          </button>
         </div>
-        <p class="fs-6 gap-2 mt-3">
-          New to Sparrow? <a
+        <!-- "New to the website? Create an account" link -->
+        <div class="gap-3 d-flex align-items-center">
+          <p class="fs-6 mt-3">New to sparrow?</p>
+          <a
             href="/register"
             style="color: #007BFF;"
-            class=" text-decoration-none">Create Account</a
+            class=" text-decoration-none text-primaryColor">Create Account</a
           >
-        </p>
+        </div>
       </div>
     </form>
   </div>
-
-  <!-- "New to the website? Create an account" link -->
-  <div class="BottomLogo"><img src={logo} alt="" /></div>
+  <div
+    class="BottomLogo text-white mt-5 d-flex justify-content-center align-items-center"
+  >
+    <img src={logo} alt="" class="w-50" />
+  </div>
 </div>
 
 <style>
-  /* Add your custom styles here */
-
-  h2.card-subtitle {
-    font-size: 24px; /* Adjust the font size as needed */
-    color: white;
-    margin-top: 15px;
-    margin-bottom: 15px;
+  .btn-primary {
+    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  h1.card-title {
-    font-size: 40px; /* Adjust the font size as needed */
-    color: white;
-    margin-left: 30px;
-    margin-top: 30px;
-  }
-
-  .card-body {
-    height: 749px;
-    display: flex;
-    flex-direction: column;
-    background: #000000;
-    margin: auto;
-    max-width: 500px;
-    overflow: hidden;
-    border-radius: 14px;
-  }
-
-  .login-form {
-    padding-left: 30px;
-    padding-right: 30px;
-  }
-
-  .btn-gradient {
-    background-image: linear-gradient(to right, hwb(211 0% 0%), #4930eec1);
-    color: white;
-  }
-
-  .googleLogo {
-    width: 23px;
-    height: 23px;
-  }
-
-  .bg-light-black {
-    background-color: #3333337a; /* You can adjust the color code as needed */
-  }
-
-  .BottomLogo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    width: Hug (205px);
-    height: Hug (52px);
-    padding-top: 12px;
-    gap: 2px;
-  }
-
-  .BottomLogo > img {
-    width: 40vw;
-  }
-
-  @media (min-width: 600px) {
-    .card-body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: black;
-      margin: auto;
-      padding-top: 1px;
-      padding-bottom: 10px;
-      max-width: 1500px;
-      overflow: hidden;
+  @media (min-width: 576px) {
+    .BottomLogo {
+      width: Hug (205px);
+      height: Hug (52px);
+      padding: 8px;
+      gap: 6px;
     }
-
     .BottomLogo > img {
-      width: 15vw;
-    }
-
-    .formControl {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      width: 200px;
+      height: 80px;
     }
 
     .login-form {
-      height: 429px;
-      width: 408px;
-    }
-
-    h2.card-subtitle {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    h1.card-title {
-      width: 408px;
-      height: 48px;
-      font-size: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .BottomLogo {
-      margin-top: 75px;
+      width: 488px;
+      margin: 0px auto;
+      padding: 0px;
+      border-radius: 8px;
+      gap: 16px;
+      height: auto; /* Remove fixed height for larger screens */
     }
   }
 </style>

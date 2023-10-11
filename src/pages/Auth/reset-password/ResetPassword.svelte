@@ -1,8 +1,8 @@
 <script lang="ts">
   import Header from "$lib/components/header/Header.svelte";
-  import vector1 from "$lib/assets/Vector1.png";
-  import vector2 from "$lib/assets/Vector2.png";
-  import vector3 from "$lib/assets/Vector3.png";
+  import vector1 from "$lib/assets/Vector1.svg";
+  import vector2 from "$lib/assets/Vector2.svg";
+  import vector3 from "$lib/assets/Vector3.svg";
 
   import { navigate } from "svelte-navigator";
   //   import { handleRegisterValidation } from "./register-page";
@@ -16,14 +16,11 @@
 
   let validationErrors: any = {};
 
-  //Here i am handling state variable;
-
+  // Here I am handling state variables;
   let isPasswordValid1 = false;
   let isPasswordValid2 = false;
   let isPasswordValid3 = false;
-
   let isPasswordTouched = false;
-
   let isValidPassword = false;
 
   const validatePassword = () => {
@@ -58,7 +55,6 @@
 
   const isValidPassword1 = (password) => {
     isPasswordTouched = true;
-
     if (password.length >= 8) {
       return (isPasswordValid1 = true);
     }
@@ -75,7 +71,6 @@
 
   const isValidPassword3 = (password) => {
     isPasswordTouched = true;
-
     if (/(?=.*[!@#$%^&*])/.test(password)) {
       return (isPasswordValid3 = true);
     }
@@ -87,301 +82,156 @@
   };
 </script>
 
-<div class="card-body" data-tauri-drag-region>
+<div
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
+  style="height: 800px;"
+  data-tauri-drag-region
+>
   <Header />
-  <div class="formControl">
-    <div class="formContainer">
-      <h1 class="card-title mb-4" data-tauri-drag-region>
-        Welcome to Sparrow!
-      </h1>
-      <form
-        class="login-form"
-        novalidate
-        on:submit|preventDefault={async () => {
-          // validationErrors = await handleRegisterValidation(userData);
-        }}
-        data-tauri-drag-region
-      >
-        <h2 class="card-subtitle">Reset Password & Sign In</h2>
+  <div
+    class="d-flex mb-5 flex-column align-items-center justify-content-center"
+    data-tauri-drag-region
+  >
+    <h1
+      class="text-whiteColor mt-5 ms-2 me-2 mb-5"
+      style="font-size: 40px; width:408px; height:48px;"
+    >
+      Welcome to Sparrow!
+    </h1>
 
-        <div class="userInfo">
-          <h6>Md Kashif Raza</h6>
-          <h6>kashif.raza@techdome.net.in</h6>
-        </div>
-        <div class="form-group mt-1" data-tauri-drag-region>
-          <label for="password" data-tauri-drag-region>New Password</label>
-          <input
-            class="form-control bg-black mt-1"
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Please enter your password"
-            required
-            bind:value={userData.password}
-            on:input={validatePassword}
-            style="border:{validationErrors.password
-              ? '3px'
-              : '1px'} solid {isPasswordValid1 &&
-            isPasswordValid2 &&
-            isPasswordValid3
-              ? '#8DC599'
-              : validationErrors.password
-              ? '#E5ACB2'
-              : isPasswordTouched
-              ? '#E5ACB2'
-              : '#45494D'}"
-          />
-        </div>
+    <form
+      class="register-form text-whiteColor ps-1 pe-1 gap-16"
+      style="width:408px; height:429px"
+      novalidate
+      on:submit|preventDefault={async () => {
+        // validationErrors = await handleRegisterValidation(userData);
+      }}
+      data-tauri-drag-region
+    >
+      <h2 class="card-subtitle fs-4 mb-3">Reset Password & Sign In</h2>
 
-        <div class="validation-button">
-          <div>
-            <img
-              src={isPasswordValid1
-                ? vector2
-                : isPasswordTouched
-                ? vector3
-                : vector1}
-              alt=""
-            />
+      <div class="text-lightGray gap-0 line-height-1">
+        <p>Md kashif raza</p>
+        <p>kashif.raza@techdome.net.in</p>
+      </div>
 
-            <button
-              style="color: {isPasswordValid1
-                ? '#8DC599'
-                : isPasswordTouched
-                ? '#E5ACB2'
-                : '#45494D'}"
-              disabled={!isValid}
-            >
-              Min 8 characters
-            </button>
-          </div>
-          <div>
-            <img
-              src={isPasswordValid2
-                ? vector2
-                : isPasswordTouched
-                ? vector3
-                : vector1}
-              alt=""
-            />
-            <button
-              style="color: {isPasswordValid2
-                ? '#8DC599'
-                : isPasswordTouched
-                ? '#E5ACB2'
-                : '#45494D'}"
-              disabled={!isValid}
-            >
-              Has at least one number
-            </button>
-          </div>
-          <div>
-            <img
-              src={isPasswordValid3
-                ? vector2
-                : isPasswordTouched
-                ? vector3
-                : vector1}
-              alt=""
-            />
-            <button
-              style="color: {isPasswordValid3
-                ? '#8DC599'
-                : isPasswordTouched
-                ? '#E5ACB2'
-                : '#45494D'}"
-              disabled={!isValid}
-            >
-              Has at least one special character
-            </button>
-          </div>
-        </div>
+      <div class="form-group mb-1 text-lightGray" data-tauri-drag-region>
+        <label for="password" data-tauri-drag-region>New Password</label>
+        <input
+          class="form-control mt-1 bg-black border:{validationErrors.password
+            ? '3px'
+            : '1px'} solid {isPasswordValid1 &&
+          isPasswordValid2 &&
+          isPasswordValid3
+            ? 'border-success'
+            : validationErrors.password
+            ? 'border-error'
+            : isPasswordTouched
+            ? 'border-error'
+            : 'border-default'}"
+          type="password"
+          name="password"
+          id="password"
+          placeholder="Please enter new your password"
+          required
+          bind:value={userData.password}
+          on:input={validatePassword}
+        />
+      </div>
 
-        <div class="mb-3 mt-4">
-          <button class="btn btn-gradient w-100" on:click={handleLogin}
-            >Sign In</button
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+          <div
+            class="d-flex flex-column align-items-start mt-1 text-sm"
+            style="font-size: 13px;"
           >
+            <div class="d-flex align-items-center mb-0 gap-2">
+              <img
+                src={isPasswordValid1
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid1
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Min 8 characters
+              </p>
+            </div>
+            <div class="d-flex align-items-center mb-0 gap-2">
+              <img
+                src={isPasswordValid2
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid2
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Has at least one number
+              </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <img
+                src={isPasswordValid3
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid3
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Has at least one special character
+              </p>
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div class="mb-5 mt-4">
+        <button
+          class="btn btn-primary w-100 text-whiteColor border-0"
+          on:click={handleLogin}>Sign In</button
+        >
+      </div>
+    </form>
   </div>
 </div>
 
 <style>
-  /* Add your custom styles here */
-  h2.card-subtitle {
-    font-size: 24px; /* Adjust the font size as needed */
-    color: white;
-    margin-top: 15px;
-    margin-bottom: 5px;
+  .btn-primary {
+    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  h1.card-title {
-    font-size: 40px; /* Adjust the font size as needed */
-    color: white;
-    margin-left: 30px;
-    margin-top: 20px;
-  }
-  .form-group {
-    width: Fill (360px);
-    height: Hug (61px);
-    gap: 1px;
-  }
-
-  .card-body {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: black;
-    margin: auto;
-    padding-top: 1px;
-    padding-bottom: 10px;
-    max-width: 1500px;
-    overflow: hidden;
-  }
-
-  .login-form {
-    width: Fixed (408px);
-    height: Hug (400px);
-    border-radius: 8px;
-    gap: 2px;
-    padding: 0px 40px;
-  }
-
-  .validation-button {
-    width: Fill (408px);
-    height: Hug (62px);
-    gap: 4px;
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-  }
-
-  .validation-button > div {
-    width: Fill (408px);
-    height: Hug (18px);
-    border-radius: 4px;
-    gap: 4px;
-  }
-
-  .validation-button > div > button {
-    border: none;
-    font-size: 12px;
-    background: #000000;
-    color: #45494d;
-  }
-
-  .btn-gradient {
-    background-image: linear-gradient(to right, hwb(211 0% 0%), #4930eec1);
-    color: white;
-  }
-
-  .googleLogo {
-    width: 23px;
-    height: 23px;
-  }
-
-  @media (min-width: 600px) {
-    .card-body {
-      height: 100vh;
-      background: black;
-      margin: auto;
-      padding-top: 1px;
-      padding-bottom: 10px;
-      max-width: 1500px;
-      overflow: hidden;
-    }
-
-    .formControl {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .validation-button {
-      width: Fill (408px);
-      height: Hug (62px);
-      gap: 4px;
-    }
-
-    .validation-button > div {
-      width: Fill (408px);
-      height: Hug (18px);
-      border-radius: 4px;
-      gap: 4px;
-    }
-
-    .validation-button > div > button {
-      width: 388px;
-      height: 18px;
-      color: #45494d;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 18px;
-      letter-spacing: 0em;
-      text-align: left;
-    }
-
-    .login-form {
-      width: Fixed (408px);
-      height: Hug (290px);
+  @media (min-width: 576px) {
+    .register-form {
+      width: 488px;
+      margin: 0px auto;
+      padding: 0px;
       border-radius: 8px;
       gap: 16px;
-    }
-
-    .form-group {
-      width: Fill (408px);
-      height: Hug (61px);
-      gap: 4px;
-    }
-
-    h2.card-subtitle {
-      width: 408px;
-      height: 29px;
-
-      font-family: Roboto;
-      font-size: 24px;
-      font-weight: 500;
-      line-height: 29px;
-      letter-spacing: 0em;
-      text-align: left;
-      color: #ffffff;
-
-      font-variation-settings: "slnt" 0;
-    }
-
-    h1.card-title {
-      width: 408px;
-      height: 48px;
-      margin-top: 50px;
-      font-family: Roboto;
-      font-size: 40px;
-      font-weight: 500;
-      line-height: 48px;
-      letter-spacing: 0em;
-      text-align: center;
-      font-variation-settings: "slnt" 0;
-    }
-
-    .userInfo {
-      width: Fill (408px);
-      margin-top: 20px;
-      margin-bottom: 20px;
-      height: Hug (42px);
-    }
-
-    .userInfo > h6 {
-      width: 110px;
-      height: 21px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 21px;
-      letter-spacing: 0em;
-      text-align: left;
-      color: #cccccc;
+      height: auto; /* Remove fixed height for larger screens */
     }
   }
 </style>
