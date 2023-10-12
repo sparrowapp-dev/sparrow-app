@@ -25,12 +25,11 @@
         width: 24px;
     }
     .sidebar__container--text{
-        font-family: Roboto !important;
+        font-family: Roboto;
         font-size: 10px;
         font-weight: 400;
         line-height: 10px;
         letter-spacing: 0em;
         color: white;
-        /* text-decoration:wavy; */
     }
 </style>
