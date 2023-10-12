@@ -7,7 +7,8 @@
     import hamburger from "$lib/assets/hamburger.svg";
     import people from "$lib/assets/people.svg";
     import RecentApi from "$lib/components/common/recentAPI/RecentAPI.svelte";
-
+    import {onMount} from "svelte";
+  
     let teams= [
         {name: "Techdome", icon : "https://media.licdn.com/dms/image/C4D0BAQFfIHYVwIh9Sg/company-logo_200_200/0/1673252621612/techdome_solutions_logo?e=2147483647&v=beta&t=qtBSoQK4rWfcefg6BU4d-EiHAzyR0metwD_lHh3SWnU"},
         {name: "Microsoft", icon: "https://media.licdn.com/dms/image/C4D0BAQFfIHYVwIh9Sg/company-logo_200_200/0/1673252621612/techdome_solutions_logo?e=2147483647&v=beta&t=qtBSoQK4rWfcefg6BU4d-EiHAzyR0metwD_lHh3SWnU"}
@@ -28,6 +29,7 @@
         {title : "Domigo BMS", apis : "34", collection: "32", date: "16:21 August 12"},
     ];
     let members = 12;
+
 </script>
 
 <div class="sidebar-teams">
@@ -68,9 +70,9 @@
                 <div class="team-heading d-flex justify-content-between">
                     <h2>Techdome</h2>
                     <div class="d-flex">
-                        <button><img src={people} alt=""/> {members} members</button>
+                        <button class="disable-member-btn"><img src={people} alt=""/> {members} members</button>
                         <button class="btn btn-outline-primary btn-sm px-4 mx-3">Invite</button>
-                        <button class="btn btn-primary btn-sm px-4">New Workspace</button>
+                        <button class="btn btn-primary btn-sm px-4 text-white">New Workspace</button>
                     </div>        
                 </div>
             </div>
@@ -79,9 +81,9 @@
             <div class="col-12">
                 <div class="teams-menu d-flex justify-content-between align-items-center pb-3">
                     <div class="teams-menu__left">
-                        <Link style="text-decoration:none;" to="workspaces"><span>Workspaces</span></Link>
-                        <Link style="text-decoration:none;" to="members"><span>Members</span></Link>
-                        <Link style="text-decoration:none;" to="settings"><span>Settings</span></Link>
+                        <Link style="text-decoration:none;" to="workspaces"><span class="team-menu__link">Workspaces</span></Link>
+                        <Link style="text-decoration:none;" to="members"><span class="team-menu__link mx-3">Members</span></Link>
+                        <Link style="text-decoration:none;" to="settings"><span class="team-menu__link">Settings</span></Link>
                     </div>
                     <div class="teams-menu__right">
                         <span class="mx-3"><img src={table} alt=""/></span><span><img src={hamburger} alt=""/></span>
@@ -103,6 +105,8 @@
         width: 280px;
         border-right: 1px solid #313233;
         padding: 15px;
+        height: 100vh;
+        overflow: auto;
     }
     .content-teams{
         width: calc(100% - 280px);
@@ -126,5 +130,17 @@
         width: 20px;
         height: 20px;
         margin-right: 10px;
+    }
+    .disable-member-btn{
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: text;
+    }
+    .team-menu__link{
+        color: #8A9299;
+    }
+    .team-menu__link:hover{
+        color: white;
     }
 </style>
