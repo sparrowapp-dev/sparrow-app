@@ -1,39 +1,46 @@
 <script lang="ts">
-  import Greet from './lib/Greet.svelte'
+  import { Router, Route } from "svelte-navigator";
+  import "font-awesome/css/font-awesome.css";
+
+  import Toast from "$lib/components/notifications/Toast.svelte";
+  import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
+  import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
+  import HomePage from "./pages/Home/home-page/HomePage.svelte";
+  import Authguard from "./routing/Authguard.svelte";
+  import Navigate from "./routing/Navigate.svelte";
+  import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
+  import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
+  import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
+  import ResendEmail from "./pages/Auth/resend-email/ResendEmail.svelte";
+
+  export let url = "/";
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri!</h1>
+<Router {url}>
+  <Authguard>
+    <section slot="loggedIn">
+      <Route path="/" component={HomePage} />
+      <Route path="/*">
+        <Navigate to="/" />
+      </Route>
+    </section>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
+    <section slot="unauthorized">
+      <Route path="/login" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
+      <Route path="/forgot/password" component={ForgotPassword} />
+      <Route path="/update/password" component={UpdatePassword} />
+      <Route path="/reset/password" component={ResetPassword} />
+      <Route path="/resend/email" component={ResendEmail} />
 
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
+      <Route path="/*">
+        <Navigate to="/login" />
+      </Route>
+    </section>
+  </Authguard>
+</Router>
 
-  <div class="row">
-    <Greet />
-  </div>
-
-
-</main>
+<Toast />
 
 <style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
 </style>
