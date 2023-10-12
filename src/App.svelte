@@ -29,7 +29,9 @@
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot/password" component={ForgotPassword} />
-      <Route path="/update/password" component={UpdatePassword} />
+      <Route path="/update/password/:email" let:params>
+        <UpdatePassword email = {params.email} />
+      </Route>
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/resend/email" component={ResendEmail} />
 

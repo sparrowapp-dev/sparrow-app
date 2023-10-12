@@ -2,8 +2,14 @@
   //   import { navigate } from "svelte-navigator";
   //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import { navigate } from "svelte-navigator";
+  import logo from "$lib/assets/logo.svg";
+  import angleLeft from "$lib/assets/angleleft.png";
+  export let email: string;
+  //   import {
+  //     navigateToRegister,
+  //     authNavigate,
+  //     handleLoginValidation,
+  //   } from "./login-page";
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
@@ -25,16 +31,21 @@
   data-tauri-drag-region
 >
   <Header />
-  <div
-    class="d-flex mb-5 flex-column align-items-center justify-content-center"
-    data-tauri-drag-region
-  >
-    <h1
-      class="text-whiteColor mt-5 ms-2 me-2 mb-5"
-      style="font-size: 40px; width:408px; height:48px;"
-    >
-      Welcome to Sparrow!
-    </h1>
+  <div class="formControl">
+    <h1 class="card-title mb-4">Welcome to Sparrow!</h1>
+    <div class="UpdateContainer">
+      <div class="updatetop1">
+        <div>
+          <a href="/"><img src={angleLeft} alt="" /></a>
+        </div>
+        <h6>Change Password</h6>
+      </div>
+      <div class="updatetop2">
+        <p class="paragraph1">
+          To ensure that this is really you, we have sent a confirmation link to
+          your email
+          <span class="email-address">{email}</span>.
+        </p>
 
     <div
       class="login-form text-lightGray ps-1 pe-1 gap-16"
