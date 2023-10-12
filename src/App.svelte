@@ -8,6 +8,7 @@
   import HomePage from "./pages/Home/home-page/HomePage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
+  import Dashboard from "./pages/dashboard/Dashboard.svelte";
   import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
@@ -20,12 +21,11 @@
   <Authguard>
     <section slot="loggedIn">
       <Route path="/" component={HomePage} />
-      <Route path="/*">
-        <Navigate to="/" />
-      </Route>
+      <Route path="/*"> <Navigate to="/" /> </Route>
     </section>
-
     <section slot="unauthorized">
+      <!-- <Route path="/dashboard/*" component={Dashboard} /> -->
+      <Route path="/*" component={Dashboard} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot/password" component={ForgotPassword} />
@@ -35,9 +35,7 @@
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/resend/email" component={ResendEmail} />
 
-      <Route path="/*">
-        <Navigate to="/login" />
-      </Route>
+      <Route path="/*"><Navigate to="/login" /></Route>
     </section>
   </Authguard>
 </Router>
