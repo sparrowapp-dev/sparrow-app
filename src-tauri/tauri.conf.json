@@ -42,7 +42,7 @@
     },
     "windows": [
       {
-        "decorations": true,
+        "decorations": false,
         "fullscreen": false,
         "resizable": true,
         "title": "sparrow-app",

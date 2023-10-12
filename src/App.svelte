@@ -20,12 +20,12 @@
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
-      <Route path="/" component={HomePage} />
-      <Route path="/*"> <Navigate to="/" /> </Route>
+      <!-- <Route path="/" component={HomePage} /> -->
+      <Route path="/*" component={Dashboard} />
+      <Route path="/*"><Navigate to="/" /></Route>
     </section>
     <section slot="unauthorized">
       <!-- <Route path="/dashboard/*" component={Dashboard} /> -->
-      <Route path="/*" component={Dashboard} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot/password" component={ForgotPassword} />

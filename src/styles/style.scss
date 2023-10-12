@@ -11,6 +11,8 @@ $sparrow-default: #45494d;
 $sparrow-danger: #fe8c98;
 $sparrow-white: #ffffff;
 $sparrow-light-gray: #cccccc;
+$sparrow-gradient: red;
+$sparrow-background: #1e1e1e;
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
@@ -25,8 +27,9 @@ $theme-colors: map-merge(
     "defaultColor": $sparrow-default,
     "dangerColor": $sparrow-danger,
     "whiteColor": $sparrow-white,
-    "lightGray": $sparrow-light-gray
-      // "buttonColor": $button-color,,,,,,,,,,,,,,,
+    "lightGray": $sparrow-light-gray,
+    "backgroundColor": $sparrow-background
+      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,
   )
 );
 
