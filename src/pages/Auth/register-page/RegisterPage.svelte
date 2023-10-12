@@ -1,9 +1,11 @@
 <script lang="ts">
   import Header from "$lib/components/header/Header.svelte";
-  import googleLogo from "$lib/assets/googlelogo.png";
-  import vector1 from "$lib/assets/Vector1.png";
-  import vector2 from "$lib/assets/Vector2.png";
-  import vector3 from "$lib/assets/Vector3.png";
+  import googleLogo from "$lib/assets/googlelogo.svg";
+  import githubLogo from "$lib/assets/githublogo.svg";
+  import microsoftLogo from "$lib/assets/microsoftlogo.svg";
+  import vector1 from "$lib/assets/Vector1.svg";
+  import vector2 from "$lib/assets/Vector2.svg";
+  import vector3 from "$lib/assets/Vector3.svg";
 
   import { navigate } from "svelte-navigator";
   import { handleRegisterValidation } from "./register-page";
@@ -116,12 +118,16 @@
     return (isPasswordValid3 = false);
   };
 
+  let ischeckBoxValid = false;
+
   const validateCheckbox = () => {
     isCheckboxTouched = true;
-    if (!userData.tnsCheckbox) {
-      return "Please accept the terms and conditions";
+    ischeckBoxValid = userData.tnsCheckbox;
+    if (ischeckBoxValid) {
+      validationErrors.tnsCheckbox = "";
+    } else if (isCheckboxTouched) {
+      // validationErrors.tnsCheckbox = "Please accept the terms and conditions";
     }
-    return true;
   };
 
   // Handle sign-in with external providers
@@ -133,23 +139,47 @@
   };
 </script>
 
-<div class="card-body" data-tauri-drag-region>
+<div
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
+  style="height: 900px;"
+  data-tauri-drag-region
+>
   <Header />
-  <div class="formControl">
-    <h1 class="card-title mb-4" data-tauri-drag-region>Welcome to Sparrow!</h1>
+  <div
+    class="d-flex mb-5 flex-column align-items-center justify-content-center"
+    data-tauri-drag-region
+  >
+    <h1
+      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+      style="font-size: 40px; width:408px; height:48px;"
+    >
+      Welcome to Sparrow!
+    </h1>
+
     <form
-      class="login-form"
+      class="register-form text-whiteColor ps-1 pe-1 gap-16"
+      style="width:408px; height:429px"
       novalidate
       on:submit|preventDefault={async () => {
         validationErrors = await handleRegisterValidation(userData);
       }}
       data-tauri-drag-region
     >
-      <h2 class="card-subtitle">Create Account</h2>
-      <div class="form-group gap-0" data-tauri-drag-region>
-        <label for="email" data-tauri-drag-region>Email</label>
+      <h2 class="card-subtitle  fs-4 mb-3">Create Account</h2>
+      <div class="form-group gap-0 mb-3" data-tauri-drag-region>
+        <label for="email" class="form-label" data-tauri-drag-region
+          >Email</label
+        >
         <input
-          class="form-control mt-1 bg-black"
+          class="form-control mt-1 bg-black border:{validationErrors.email
+            ? '3px'
+            : '1px'} solid {isEmailValid
+            ? 'border-success'
+            : validationErrors.email
+            ? 'border-error'
+            : isEmailTouched
+            ? 'border-error'
+            : 'border-default'}"
           type="email"
           name="email"
           id="email"
@@ -157,27 +187,26 @@
           required
           bind:value={userData.email}
           on:input={validateEmail}
-          style="border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {isEmailValid
-            ? '#8DC599'
-            : validationErrors.email
-            ? '#E5ACB2'
-            : isEmailTouched
-            ? '#E5ACB2'
-            : '#45494D'}"
         />
-        <div>
-          {#if validationErrors.email}
-            <small class="text-danger form-text">{validationErrors.email}</small
-            >
-          {/if}
-        </div>
+
+        {#if validationErrors.email}
+          <small class="text-dangerColor form-text"
+            >{validationErrors.email}</small
+          >
+        {/if}
       </div>
-      <div class="form-group mt-1" data-tauri-drag-region>
+      <div class="form-group mb-3" data-tauri-drag-region>
         <label for="name" data-tauri-drag-region>Full Name</label>
         <input
-          class="form-control mt-1 bg-black"
+          class="form-control mt-1 bg-black border:{validationErrors.email
+            ? '3px'
+            : '1px'} solid {isNameValid
+            ? 'border-success'
+            : validationErrors.name
+            ? 'border-error'
+            : isNameTouched
+            ? 'border-error'
+            : 'border-default'}"
           type="text"
           name="name"
           placeholder="Please enter your full name"
@@ -185,27 +214,29 @@
           required
           bind:value={userData.name}
           on:input={validateName}
-          style="border:{validationErrors.name
-            ? '3px'
-            : '1px'} solid {isNameValid
-            ? '#8DC599'
-            : validationErrors.name
-            ? '#E5ACB2'
-            : isNameTouched
-            ? '#E5ACB2'
-            : '#45494D'}"
         />
-        <div>
-          {#if validationErrors.name}
-            <small class="text-danger form-text">{validationErrors.name}</small>
-          {/if}
-        </div>
+
+        {#if validationErrors.name}
+          <small class="text-dangerColor form-text"
+            >{validationErrors.name}</small
+          >
+        {/if}
       </div>
 
-      <div class="form-group mt-1" data-tauri-drag-region>
+      <div class="form-group" data-tauri-drag-region>
         <label for="password" data-tauri-drag-region>Password</label>
         <input
-          class="form-control bg-black"
+          class="form-control mt-1 bg-black border:{validationErrors.password
+            ? '3px'
+            : '1px'} solid {isPasswordValid1 &&
+          isPasswordValid2 &&
+          isPasswordValid3
+            ? 'border-success'
+            : validationErrors.password
+            ? 'border-error'
+            : isPasswordTouched
+            ? 'border-error'
+            : 'border-default'}"
           type="password"
           name="password"
           id="password"
@@ -213,81 +244,76 @@
           required
           bind:value={userData.password}
           on:input={validatePassword}
-          style="border:{validationErrors.password
-            ? '3px'
-            : '1px'} solid {isPasswordValid1 &&
-          isPasswordValid2 &&
-          isPasswordValid3
-            ? '#8DC599'
-            : validationErrors.password
-            ? '#E5ACB2'
-            : isPasswordTouched
-            ? '#E5ACB2'
-            : '#45494D'}"
         />
       </div>
 
-      <div class="validation-button">
-        <div>
-          <img
-            src={isPasswordValid1
-              ? vector2
-              : isPasswordTouched
-              ? vector3
-              : vector1}
-            alt=""
-          />
-
-          <button
-            style="color: {isPasswordValid1
-              ? '#8DC599'
-              : isPasswordTouched
-              ? '#E5ACB2'
-              : '#45494D'}"
-            disabled={!isValid}
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+          <div
+            class="d-flex flex-column align-items-start mt-1 text-sm"
+            style="font-size: 13px;"
           >
-            Min 8 characters
-          </button>
-        </div>
-        <div>
-          <img
-            src={isPasswordValid2
-              ? vector2
-              : isPasswordTouched
-              ? vector3
-              : vector1}
-            alt=""
-          />
-          <button
-            style="color: {isPasswordValid2
-              ? '#8DC599'
-              : isPasswordTouched
-              ? '#E5ACB2'
-              : '#45494D'}"
-            disabled={!isValid}
-          >
-            Has at least one number
-          </button>
-        </div>
-        <div>
-          <img
-            src={isPasswordValid3
-              ? vector2
-              : isPasswordTouched
-              ? vector3
-              : vector1}
-            alt=""
-          />
-          <button
-            style="color: {isPasswordValid3
-              ? '#8DC599'
-              : isPasswordTouched
-              ? '#E5ACB2'
-              : '#45494D'}"
-            disabled={!isValid}
-          >
-            Has at least one special character
-          </button>
+            <div class="d-flex align-items-center mb-0 gap-2">
+              <img
+                src={isPasswordValid1
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid1
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Min 8 characters
+              </p>
+            </div>
+            <div class="d-flex align-items-center mb-0 gap-2">
+              <img
+                src={isPasswordValid2
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid2
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Has at least one number
+              </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <img
+                src={isPasswordValid3
+                  ? vector2
+                  : isPasswordTouched
+                  ? vector3
+                  : vector1}
+                alt=""
+                class="mr-2"
+              />
+              <p
+                class="mb-0 text : {isPasswordValid3
+                  ? 'text-successColor'
+                  : isPasswordTouched
+                  ? 'text-dangerColor'
+                  : 'text-defaultColor'}"
+              >
+                Has at least one special character
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -303,167 +329,73 @@
           class="form-check-label ms-2"
           for="tnsCheckbox"
           >I agree to the <a
-            href="#"
-            class="text-decoration-none"
-            style="color: #007BFF;">Terms of Service</a
+            href="checkbox"
+            class="text-decoration-none text-primaryColor">Terms of Service</a
           ></label
         >
       </div>
       {#if validationErrors.tnsCheckbox}
-        <small class="text-danger form-text"
+        <small class="text-dangerColor form-text"
           >{validationErrors.tnsCheckbox}</small
         >
       {/if}
 
-      <div class="mb-3 mt-4">
-        <button class="btn btn-gradient w-100">Sign Up</button>
+      <div class="mb-5 mt-4">
+        <button class="btn btn-primary w-100 text-whiteColor border-0"
+          >Sign Up</button
+        >
       </div>
 
       <div class="d-flex flex-column align-items-center justify-content-center">
         <p>or continue with</p>
-        <div class="gap-2">
-          <!-- <button
-                  class="w-8 rounded"
-                  on:click={() => handleSignInWithProvider("GitHub")}
-                >
-                  <i class="fab fa-github" />
-                </button> -->
+        <div class="d-flex gap-4">
           <button
-            class="w-2 card rounded-md bg-light-black d-flex align-items-center justify-content-center"
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={() => handleSignInWithProvider("Github")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
           >
-            <img src={googleLogo} alt="Google Logo" class="googleLogo" />
+            <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
           </button>
-
-          <!-- <button
-                  class="w-8 rounded"
-                  on:click={() => handleSignInWithProvider("Microsoft")}
-                >
-                  <i class="fab fa-microsoft" />
-                </button> -->
-        </div>
-
-        <p class="fs-6 gap-2 mt-4">
-          Already have an account? <a
-            href="/login"
-            style="color: #007BFF;"
-            class=" text-decoration-none">Sign In</a
+          <button
+            on:click={() => handleSignInWithProvider("Google")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
           >
-        </p>
+            <img src={googleLogo} alt="Google Logo" class="w-100 h-100" />
+          </button>
+          <button
+            on:click={() => handleSignInWithProvider("Microsoft")}
+            style="width: 32px; height:32px"
+            class="bg-dark border-0 rounded"
+          >
+            <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100" />
+          </button>
+        </div>
+        <!-- "New to the website? Create an account" link -->
+        <div class="gap-3 d-flex align-items-center">
+          <p class="fs-6 mt-3">Already have an account?</p>
+          <a href="/login" class=" text-decoration-none text-primaryColor"
+            >Sign In</a
+          >
+        </div>
       </div>
     </form>
   </div>
 </div>
 
 <style>
-  /* Add your custom styles here */
-  h2.card-subtitle {
-    font-size: 24px; /* Adjust the font size as needed */
-    color: white;
-    margin-top: 15px;
-    margin-bottom: 5px;
+  .btn-primary {
+    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  h1.card-title {
-    font-size: 40px; /* Adjust the font size as needed */
-    color: white;
-    margin-left: 30px;
-    margin-top: 20px;
-  }
-  .form-group {
-    width: Fill (360px);
-    height: Hug (61px);
-    gap: 1px;
-  }
-
-  .card-body {
-    height: 749px;
-    display: flex;
-    flex-direction: column;
-    background: #000000;
-    max-width: 500px;
-    overflow: hidden;
-    border-radius: 14px;
-  }
-
-  .login-form {
-    width: Fixed (408px);
-    height: Hug (400px);
-    border-radius: 8px;
-    gap: 2px;
-    padding: 0px 40px;
-  }
-
-  .validation-button {
-    width: Fill (408px);
-    height: Hug (62px);
-    gap: 4px;
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-  }
-
-  .validation-button > div {
-    width: Fill (408px);
-    height: Hug (18px);
-    border-radius: 4px;
-    gap: 4px;
-  }
-
-  .validation-button > div > button {
-    border: none;
-    font-size: 12px;
-    background: #000000;
-    color: #45494d;
-  }
-
-  .btn-gradient {
-    background-image: linear-gradient(to right, hwb(211 0% 0%), #4930eec1);
-    color: white;
-  }
-
-  .googleLogo {
-    width: 23px;
-    height: 23px;
-  }
-
-  @media (min-width: 600px) {
-    .card-body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: black;
-      margin: auto;
-      padding-top: 1px;
-      padding-bottom: 10px;
-      max-width: 1500px;
-      overflow: hidden;
-    }
-
-    .formControl {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .login-form {
-      height: 429px;
-      width: 408px;
-    }
-
-    h2.card-subtitle {
-      display: flex;
-      margin-top: 10px;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    h1.card-title {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
+  @media (min-width: 576px) {
+    .register-form {
+      width: 488px;
+      margin: 0px auto;
+      padding: 0px;
+      border-radius: 8px;
+      gap: 16px;
+      height: auto; /* Remove fixed height for larger screens */
     }
   }
 </style>

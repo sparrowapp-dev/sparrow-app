@@ -50,5 +50,5 @@ export const loginSchema = yup.object().shape({
       /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/,
       "Please enter a valid email ID.",
     ),
-  password: yup.string().required("Please enter an password"),
+  password: yup.string().required("Please enter a password"),
 });

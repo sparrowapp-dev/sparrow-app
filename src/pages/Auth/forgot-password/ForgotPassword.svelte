@@ -5,10 +5,10 @@
   import angleLeft from "$lib/assets/angleleft.png";
   // import { navigate } from 'svelte-routing';
   import { useNavigate } from "svelte-navigator";
-  import authService  from "$lib/services/auth.service";
-    import { handleLoginValidation } from "../login-page/login-page";
+  import authService from "$lib/services/auth.service";
+  import { handleLoginValidation } from "../login-page/login-page";
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
@@ -17,9 +17,6 @@
   //     authActions.setUser({ token });
   //     navigate("/reset/password");
   //   }
-
-  //---------------- Login Validation --------------------//
-  //   let validationErrors: any = {};
 
   //   //------------ login Credentials ---------------//
   //   let loginCredentials = {
@@ -44,28 +41,49 @@
     }
   };
 
-  let handleForgotPassword = async (forgotEmail: string) =>{
-    let response =  await authService.forgotPassword({email : forgotEmail})
-    if(response.isSuccessful){
+  //this is for testing
+  const handleRequest = () => {
+    navigate("/update/password");
+  };
+
+  let handleForgotPassword = async (forgotEmail: string) => {
+    let response = await authService.forgotPassword({ email: forgotEmail });
+    if (response.isSuccessful) {
       navigate(`/update/password/${forgotEmail}`);
-    }        
-  }
-  
+    }
+  };
 </script>
 
-<div class="card-body">
+<div
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
+  style="height: 727px;"
+  data-tauri-drag-region
+>
   <Header />
-  <div class="formControl">
-    <h1 class="card-title mb-4">Welcome to Sparrow!</h1>
-    <div class="UpdateContainer">
-      <div class="updatetop1">
-        <div>
+  <div
+    class="d-flex mb-5 flex-column align-items-center justify-content-center"
+    data-tauri-drag-region
+  >
+    <h1
+      class="text-whiteColor mt-5 ms-2 me-2 mb-5"
+      style="font-size: 40px; width:408px; height:48px;"
+    >
+      Welcome to Sparrow!
+    </h1>
+
+    <form
+      class="login-form text-whiteColor ps-1 pe-1 gap-16"
+      style="width:408px; height:214px"
+      on:submit|preventDefault={async () => {
+        // validationErrors = await handleLoginValidation(loginCredentials);
+      }}
+    >
+      <div class="d-flex flex-column align-items-left mb-2">
+        <div class="d-flex align-items-left mb-3 gap-3">
           <a href="/"><img src={angleLeft} alt="" /></a>
+          <h6 class="text-whiteColor fs-5">Change Password</h6>
         </div>
-        <h6>Change Password</h6>
-      </div>
-      <div class="updatetop2">
-        <p class="paragraph1">
+        <p class="text-lightGray">
           Please enter your Email ID so that we can send you a confirmation link
           to process your request.
         </p>
@@ -73,7 +91,7 @@
           class="login-form"
           on:submit|preventDefault={async () => {
             // validationErrors = await handleLoginValidation(loginCredentials);
-            handleForgotPassword(forgotEmail);     
+            handleForgotPassword(forgotEmail);
           }}
         >
           <div class="mb-3">
@@ -93,124 +111,25 @@
           </div>
         </form>
       </div>
-    </div>
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label text-lightGray"
+          >Email</label
+        >
+        <input
+          type="email"
+          class="form-control bg-black"
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+          placeholder="Please enter your registered email id"
+          on:input={validateEmail}
+        />
+      </div>
+      <div class="sendButton">
+        <button
+          class="btn btn-primaryColor text-whiteColor w-100"
+          on:click={handleRequest}>Send Request</button
+        >
+      </div>
+    </form>
   </div>
 </div>
-
-<style>
-  @media (min-width: 600px) {
-    .card-body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: black;
-      margin: auto;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      max-width: 1500px;
-      overflow: hidden;
-    }
-
-    .formControl {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-top: 50px;
-      width: Fill (408px);
-    }
-
-    .login-form {
-      width: Fill (408px);
-      height: Hug (61px);
-      gap: 4px;
-    }
-
-    .sendButton {
-      width: Fill (408px);
-      height: Hug (36px);
-      padding: 6px, 12px, 6px, 12px;
-      border-radius: 4px;
-      gap: 8px;
-      margin-bottom: 10px;
-      margin-top: 10px;
-      background: #1193f0;
-    }
-
-    .btn-gradient {
-      width: 384px;
-      color: #ffffff;
-      height: Hug (36px);
-      font-size: 16px;
-    }
-
-    .formControl > h1 {
-      width: 408px;
-      height: 48px;
-      font-family: Roboto;
-      font-size: 40px;
-      font-weight: 500;
-      line-height: 48px;
-      letter-spacing: 0em;
-      text-align: left;
-      font-variation-settings: "slnt" 0;
-    }
-
-    .UpdateContainer {
-      width: Fixed (408px);
-      height: Hug (214px);
-      border-radius: 8px;
-      gap: 16px;
-      margin-top: 30px;
-    }
-
-    .updatetop1 {
-      display: flex;
-      width: Fill (408px);
-      height: Hug (27px);
-      display: flex;
-      gap: 16px;
-    }
-
-    .updatetop1 > h6 {
-      width: 376px;
-      height: 27px;
-      font-size: 18px;
-      font-weight: 500;
-      line-height: 27px;
-      letter-spacing: 0em;
-      margin-bottom: 20px;
-      color: #ffffff;
-      text-align: left;
-      font-variation-settings: "slnt" 0;
-    }
-
-    .updatetop2 {
-      display: flex;
-      flex-direction: column;
-      width: Fill (408px);
-      height: Hug (125px);
-      gap: 8px;
-    }
-
-    .paragraph1 {
-      width: 408px;
-      height: 42px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 21px;
-      letter-spacing: 0em;
-      text-align: left;
-      color: #cccccc;
-    }
-
-    h1.card-title {
-      width: Fill (408px);
-      height: Hug (27px);
-      gap: 8px;
-      font-size: 40px;
-      color: #ffffff;
-    }
-  }
-</style>
