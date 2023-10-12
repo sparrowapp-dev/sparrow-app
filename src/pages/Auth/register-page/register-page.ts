@@ -8,14 +8,13 @@ const handleRegister = async (userData) => {
     await authService.registerUser({
       email: userData.email,
       name: userData.name,
-      username: userData.username,
       password: userData.password,
     });
     notifications.success("Registration successful!");
     navigate("/");
   } catch (error) {
     console.log(error);
-    notifications.error(error);
+    throw error;
   }
 };
 

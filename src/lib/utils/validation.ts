@@ -25,8 +25,7 @@ export const registrationSchema = yup.object().shape({
       /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/,
       "Must be a valid email address",
     ),
-  username: yup.string().required("Please enter a username"),
-  fullName: yup.string().required("Please enter your full name"),
+  name: yup.string().required("Please enter your full name"),
   password: yup
     .string()
     .required()
@@ -35,7 +34,6 @@ export const registrationSchema = yup.object().shape({
     .matches(/(?=.*[A-Z])/, "Password must contain an uppercase letter")
     .matches(/(?=.*[a-z])/, "Password must contain a lowercase letter")
     .matches(/(?=.*[!@#$%^&*])/, "Password must contain a special character"),
-  teamName: yup.string().optional(),
   tnsCheckbox: yup
     .boolean()
     .required("Please accept the terms and conditions")
@@ -48,6 +46,9 @@ export const loginSchema = yup.object().shape({
     .string()
     .email()
     .required("Please enter an email")
-    .matches(/^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/, "Must be a valid email address"),
-  password: yup.string().required("Please enter an password"),
+    .matches(
+      /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/,
+      "Please enter a valid email ID.",
+    ),
+  password: yup.string().required("Please enter a password"),
 });
