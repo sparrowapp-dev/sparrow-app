@@ -26,7 +26,7 @@ const success = (message: string, obj?: notifySetting) => {
     title: obj?.title ?? "Success",
     duration: obj?.duration ?? 3000,
     theme: obj?.theme ?? "dark",
-    placement: obj?.position ?? "top-right",
+    placement: obj?.position ?? "top-center",
     showProgress: obj?.showProgress ?? true,
   });
 };
