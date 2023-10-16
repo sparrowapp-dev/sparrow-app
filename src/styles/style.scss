@@ -2,16 +2,50 @@
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 
-$primary: #007bff;
-$secondary: #f9b001;
+$sparrow-blue: #007bff;
+$sparrow-yellow: #f9b001;
+$sparrow-black: #000000;
+$sparrow-success: #8dc599;
+$sparrow-error: #e5acb2;
+$sparrow-default: #45494d;
+$sparrow-danger: #fe8c98;
+$sparrow-white: #ffffff;
+$sparrow-light-gray: #cccccc;
 
-$theme-colors: map-merge($theme-colors, (
-  "primary": $primary,
-  "secondary": $secondary
-  ));
+// $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    "primaryColor": $sparrow-blue,
+    "secondaryColor": $sparrow-yellow,
+    "blackColor": $sparrow-black,
+    "successColor": $sparrow-success,
+    "borderColor": $sparrow-error,
+    "defaultColor": $sparrow-default,
+    "dangerColor": $sparrow-danger,
+    "whiteColor": $sparrow-white,
+    "lightGray": $sparrow-light-gray
+      // "buttonColor": $button-color,,,,,,,,,,,,,,,
+  )
+);
 
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";
 @import "bootstrap/scss/root";
 @import "bootstrap";
+
+.border-error {
+  border-color: $sparrow-error;
+  border-width: 3px;
+}
+
+.border-success {
+  border-color: $sparrow-success;
+  border-width: 1px;
+}
+
+.border-default {
+  border-color: $sparrow-default;
+  border-width: 1px;
+}

@@ -1,7 +1,6 @@
 //------- register Interface ------------//
 export interface registerUserPostBody {
   email: string;
-  username: string;
   name: string;
   password: string;
 }
@@ -11,3 +10,5 @@ export interface loginUserPostBody {
   email: string;
   password: string;
 }
+
+//i will create different interface here
