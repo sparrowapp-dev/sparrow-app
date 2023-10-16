@@ -9,12 +9,59 @@ fn greet(name: &str) -> String {
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
-use reqwest::{Client, Url, multipart};
+use std::ptr::null;
+use reqwest::{Client, Url, multipart, Response};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde_json::json;
 use std::fs;
 use regex::Regex; 
 use std::borrow::Cow;
+
+
+// Io Handle all requests 
+// use reqwest::{Client, Method, Response, Result};
+// use std::collections::HashMap;
+#[tokio::main]
+async fn make_request(
+    method: &str,
+    url: &str,
+    // headers: Option<HashMap<&str, &str>>,
+    // body: Option<&str>,
+) -> Result<String, Box<dyn Error>>
+{
+    let client = Client::new();
+
+    // Convert the method string to reqwest::Method
+    let reqwest_method = match method {
+        "GET" => reqwest::Method::GET,
+        "POST" => reqwest::Method::POST,
+        "PUT" => reqwest::Method::PUT,
+        "DELETE" => reqwest::Method::DELETE,
+        // Add other HTTP methods as needed
+        _ => reqwest::Method::GET,
+    };
+
+    let request_builder = client.request(reqwest_method, url);
+
+    // for (key, value) in headers.iter() {
+    //     request = request.header(key, value);
+    // }
+    let resp = request_builder.send().await?.text().await?;
+    println!("{:#?}", resp);
+    Ok(resp)
+}
+
+#[tauri::command]
+fn make_type_request_command(url: &str, method: &str) -> String {
+    let result = make_request(method, url);
+    let result_string = match result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {:?}", err), // Handle the error case here
+    };
+    println!("Result from async function: {:?}", result_string);
+    return result_string;
+}
+
 
 
 // JSON Data Requests
@@ -395,6 +442,7 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             greet,
+            make_type_request_command,
             make_get_http_request_command,
             make_post_http_request_command,
             make_put_http_request_command,
@@ -404,7 +452,7 @@ fn main() {
             make_www_get_form_request_command,
             make_www_delete_form_request_command,
             make_post_form_request_command,
-            make_put_form_request_command
+            make_put_form_request_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
