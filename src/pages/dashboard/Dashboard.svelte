@@ -5,12 +5,16 @@
   import Navigate from "../../routing/Navigate.svelte";
   //   import Header from "$lib/components/header/Header.svelte";
   import HeaderHome from "$lib/components/header/HeaderHome.svelte";
+  import Collections from "./collections/Collections.svelte";
+  import Parameters from "./collections/request-response-section/request-body/Parameters.svelte";
 </script>
 
 <HeaderHome />
-<div class="dashboard-teams d-flex">
+<div class="dashboard-teams d-flex flex-column ">
   <Sidebar />
-  <Route path="/collections">Collections</Route>
+  <Route path="/collections/*"><Collections /></Route>
+  <!-- <Route path="/collections/parameters"><Parameters /></Route> -->
+
   <Route path="/mock">Mock</Route>
   <Route path="/environment">Environment</Route>
   <Route path="/api-builder">API Builder</Route>

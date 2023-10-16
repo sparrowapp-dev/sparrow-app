@@ -24,30 +24,8 @@
   };
 </script>
 
-<!-- <section
-  class="d-flex w-100 justify-content-between align-items-center bg-black border-0 border-bottom border-dark p-0"
-  data-tauri-drag-region
->
-  <div class="d-flex gap-3">
-    <div class="logo">
-      <img src={logo} alt="" class="w-100" />
-    </div>
-  </div>
-  <div class="d-flex gap-0">
-    <button on:click={onMinimize} class="btn btn-black button">
-      <img src={minimizeIcon} alt="" class="w-100" />
-    </button>
-    <button on:click={toggleSize} class="btn btn-black button">
-      <img src={resizeIcon} alt="" class="w-100" />
-    </button>
-    <button on:click={onClose} class="btn btn-black">
-      <img src={closeIcon} alt="" class="w-100" />
-    </button>
-  </div>    
-</section> -->
-
 <div
-  class="d-flex p-1 align-items-center justify-content-between bg-blackColor"
+  class="d-flex w-100 p-1 align-items-center justify-content-between bg-blackColor"
   data-tauri-drag-region
 >
   <div
@@ -65,7 +43,7 @@
       class="d-flex d-flex align-items-center justify-content-center gap-2"
       style="height: 36px; width:116px"
     >
-      <p style="font-size: 12px;" class="mb-0">Workspace</p>
+      <p style="font-size: 12px;" class="mb-0 text-whiteColor">Workspace</p>
       <button class="p-1 border-0 bg-blackColor">
         <img src={dropdown} alt="" />
       </button>

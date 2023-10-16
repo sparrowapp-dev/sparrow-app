@@ -27,7 +27,7 @@
 
 <style>
   .sidebar {
-    height: 100vh;
+    height: calc(100vh - 50px);
     width: 72px;
     display: flex;
     flex-direction: column;
@@ -35,8 +35,9 @@
     border-right: 1px solid #313233;
     justify-content: space-between;
     position: fixed;
-    top: 44px;
+    top: 50px;
     left: 0;
+    background: #1e1e1e;
   }
   .sidebar__main {
     display: flex;
