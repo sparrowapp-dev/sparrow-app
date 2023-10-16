@@ -1,8 +1,11 @@
 <script lang="ts">
-    import WorkspaceCard from "$lib/components/common/workspaceCard/WorkspaceCard.svelte";
-
+    import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
+    import TeamsWorkspace from "$lib/components/table/teams-workspace/TeamsWorkspace.svelte";
     export let projects: any;
+    export let selectedView: string ;
 </script>
+
+{#if selectedView === "grid"}
 <section class="teams-workspace">
     <div class="container-fluid">
         <div class="row">
@@ -17,6 +20,18 @@
         </div>
     </div>
 </section>
+{:else}
+<section class="teams-workspace">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <TeamsWorkspace projects = {projects} />
+            </div>
+        </div>
+    </div>
+</section>
+{/if}
+
 <style>
     .teams-add-workspace{
         border: 1px dashed;

@@ -1,4 +1,5 @@
 import constants from "$lib/utils/constants";
+import { jwtDecode } from "$lib/utils/jwt";
 import { writable } from "svelte/store";
 
 export const authStore = writable({
@@ -14,6 +15,7 @@ const setUser = (user) => {
   });
   if (user?.token) {
     localStorage.setItem(constants.AUTH_TOKEN, user.token);
+    localStorage.setItem("WORKSPACE", JSON.stringify(jwtDecode(user.token)));
   }
 };
 

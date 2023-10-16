@@ -31,8 +31,10 @@
     }
     .api-type__title{
         font-size: 12px;
+        font-weight: 400;
     }
     .api-type__endpoint{
+        font-family: Roboto Mono;
         font-size: 12px;
         color: #999999;
     }
