@@ -8,7 +8,7 @@
   import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
   import { handleLoginValidation } from "./login-page";
-
+  import { checkRust } from "./login-page";
   // Function to validate the email
   let isEmailTouched = false;
 
@@ -167,7 +167,7 @@
             <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
           </button>
           <button
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={() => checkRust()}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >

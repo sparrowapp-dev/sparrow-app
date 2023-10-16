@@ -1,12 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
+// extern crate json;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 use serde_json::Value;
+use tauri::utils::config::parse::parse_json_value;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ptr::null;
@@ -16,7 +17,7 @@ use serde_json::json;
 use std::fs;
 use regex::Regex; 
 use std::borrow::Cow;
-
+use json::{JsonValue, JsonError};
 
 // Io Handle all requests 
 // use reqwest::{Client, Method, Response, Result};
@@ -100,7 +101,7 @@ async fn make_get_http_request(
 #[tauri::command]
 fn make_post_http_request_command(
     url: String,
-    body: serde_json::Value,
+    body: String,
     headers: HashMap<String, String>,
 ) -> String {
     // You can call an async function from here
@@ -116,7 +117,7 @@ fn make_post_http_request_command(
 #[tokio::main]
 async fn make_post_http_request(
     url: String,
-    body: serde_json::Value,
+    body: String,
     headers: HashMap<String, String>,
 ) -> Result<String, Box<dyn Error>> {
     let client = reqwest::Client::new();
@@ -124,7 +125,18 @@ async fn make_post_http_request(
     for (key, value) in headers.iter() {
         request = request.header(key, value);
     }
-    let resp = request.json(&body).send().await?.text().await?;
+    
+    let input = r#"{"index":0,"name":"AB/CDE/FG/402/test_int4","sts":"on","time":"2021-06-05 03:28:24.044284300 UTC","value":8}"#;
+    // let v: Result<JsonValue, JsonError> = json::parse(&input);
+    let v1: Value = serde_json::from_str(&input).unwrap();
+
+    // let updatedJson = match v {
+    //     Ok(Value) => Value,
+    //     Err(err) => format!(err),
+    // }
+    // println!("--------------->{:#?}---------------->", v);
+    // println!("--->", )
+    let resp = request.json(&v1).send().await?.text().await?;
     println!("{:#?}", resp);
     Ok(resp)
 }
