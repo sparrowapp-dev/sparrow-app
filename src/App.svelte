@@ -33,7 +33,6 @@
 
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/resend/email" component={ResendEmail} />
-
       <Route path="/*"><Navigate to="/login" /></Route>
     </section>
   </Authguard>
