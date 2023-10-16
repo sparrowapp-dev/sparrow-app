@@ -14,7 +14,7 @@
   <div class="d-flex flex-column align-items-top justify-content-center">
     <div
       style="width: 480px;"
-      class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor"
+      class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor pb-3"
     >
       <Link
         to="parameters"

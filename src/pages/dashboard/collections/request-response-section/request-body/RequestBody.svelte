@@ -1,4 +1,5 @@
 <script>
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { JSONEditor } from "svelte-jsoneditor";
 
   let content = {
@@ -6,36 +7,25 @@
       {
         "nameS": "Testing",
         "email": "testing@testing.com"
-      }`, // can be used to pass a stringified JSON document instead
+      }`, 
     json: {
-      name: "Testin",
-      email: "testing@testing.com",
+      name: "Testing",
+      email: "testing45@testing.com",
     },
   };
 
   $: console.log("contents changed:", content);
+
+  let handleDropdown = (tab)=>{
+    console.log(tab);
+  }
 </script>
 
-<div>
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown button
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </div>
-</div>
+
 <div class="editor ps-3 rounded">
+  <Dropdown data={["Pretty"]} onclick={handleDropdown} /><span class="px-2"/>
+  <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
+  <br/>
+  <br/>
   <JSONEditor bind:content />
 </div>
-
-<!-- <style>
-    .editor {
-      width: 100%;
-      max-width: 600px;
-      height: 400px;
-    }
-  </style> -->
