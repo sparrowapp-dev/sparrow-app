@@ -1,10 +1,11 @@
 <script lang="ts">
     import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
+    import TeamsWorkspace from "$lib/components/table/teams-workspace/TeamsWorkspace.svelte";
     export let projects: any;
-    export let gridView: boolean;
+    export let selectedView: string ;
 </script>
 
-{#if gridView}
+{#if selectedView === "grid"}
 <section class="teams-workspace">
     <div class="container-fluid">
         <div class="row">
@@ -24,28 +25,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <table class="table table-responsive" data-search="true" >
-                    <thead>
-                        <tr>
-                          <th data-sortable="true" class="tab-head">Workspace</th>
-                          <th data-sortable="true" class="tab-head">Team</th>
-                          <th class="tab-head">APIs</th>
-                          <th class="tab-head">Collections</th>
-                          <th class="tab-head">Last Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each projects as project}
-                        <tr>
-                            <td class="tab-data">{project.title}</td>
-                            <td class="tab-data">{project.title}</td>
-                            <td class="tab-data">{project.apis}</td>
-                            <td class="tab-data">{project.collection}</td>
-                            <td class="tab-data">{project.date}</td>
-                        </tr>
-                        {/each}
-                    </tbody>
-                </table>
+                <TeamsWorkspace projects = {projects} />
             </div>
         </div>
     </div>
@@ -68,20 +48,5 @@
         -webkit-text-fill-color: transparent; 
         -moz-background-clip: text;
         -moz-text-fill-color: transparent;
-    }
-    .tab-data{
-        padding: 8px;
-        font-family: Roboto;
-        font-size: 12px;
-        font-weight: 500;
-        line-height: 18px;
-    }
-    .tab-head{
-        padding: 8px;
-        font-family: Roboto;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 18px;
-        color: #8A9299;
     }
 </style>

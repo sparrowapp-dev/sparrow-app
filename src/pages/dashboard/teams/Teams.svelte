@@ -30,6 +30,8 @@
     ];
     let members = 12;
     let gridView : boolean = true;
+    let selectedTab = "workspaces";
+    let selectedView = "grid";
 </script>
 
 <div class="sidebar-teams">
@@ -58,16 +60,16 @@
             <div class="col-12">
                 <div class="teams-menu d-flex justify-content-between align-items-center pb-3">
                     <div class="teams-menu__left">
-                        <Link style="text-decoration:none;" to="workspaces"><span class="team-menu__link">Workspaces</span></Link>
-                        <Link style="text-decoration:none;" to="members"><span class="team-menu__link mx-3">Members</span></Link>
-                        <Link style="text-decoration:none;" to="settings"><span class="team-menu__link">Settings</span></Link>
+                        <Link style="text-decoration:none;" to="workspaces"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "workspaces"} class="team-menu__link" class:tab-active={selectedTab === "workspaces"}>Workspaces</span></Link>
+                        <Link style="text-decoration:none;" to="members"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "members"} class="team-menu__link mx-3" class:tab-active={selectedTab === "members"}>Members</span></Link>
+                        <Link style="text-decoration:none;" to="settings"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "settings"} class="team-menu__link" class:tab-active={selectedTab === "settings"}>Settings</span></Link>
                     </div>
                     <div class="teams-menu__right">
                         <span class="mx-3" style="cursor:pointer;">
-                            <img on:click={()=>{gridView = true}} src={table} alt=""/>
+                            <img on:click={()=>{selectedView = "grid"}} class:view-active={selectedView === "grid"} src={table} alt=""/>
                         </span>
                         <span style="cursor:pointer;">
-                            <img on:click={()=>{gridView = false}} src={hamburger} alt=""/>
+                            <img on:click={()=>{selectedView = "table"}} class:view-active={selectedView === "table"} src={hamburger} alt=""/>
                         </span>
                     </div>
                 </div>
@@ -75,7 +77,7 @@
         </div>
     </div>
     
-    <Route path="/workspaces"> <Workspaces projects={projects} gridView = {gridView} /> </Route>
+    <Route path="/workspaces"> <Workspaces projects={projects} selectedView = {selectedView} /> </Route>
     <Route path="/members">members</Route>
     <Route path="/settings">settings</Route>
     <Route path="/*"> <Navigate to="workspaces"/> </Route>
@@ -102,9 +104,6 @@
     .team-menu__link{
         color: #8A9299;
     }
-    .team-menu__link:hover{
-        color: white;
-    }
     .content-teams__btn-invite{
         width: 63px;
         height: 36px;
@@ -112,5 +111,12 @@
     .content-teams__btn-new-workspace{
         height: 36px;
         width: 140px;
+    }
+    .tab-active{
+        color: white;
+        border-bottom: 3px solid #85C2FF;
+    }
+    .view-active{
+        filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg) brightness(100%) contrast(100%);
     }
 </style>
