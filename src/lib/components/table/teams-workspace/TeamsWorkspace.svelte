@@ -30,6 +30,7 @@
         font-size: 12px;
         font-weight: 500;
         line-height: 18px;
+        background-color: transparent;
     }
     .tab-head{
         padding: 8px;
@@ -37,5 +38,6 @@
         font-weight: 500;
         line-height: 18px;
         color: #8A9299;
+        background-color: transparent;
     }
 </style>

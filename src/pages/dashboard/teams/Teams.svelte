@@ -29,67 +29,69 @@
         {title : "Domigo BMS", apis : "34", collection: "32", date: "16:21 August 12"},
     ];
     let members = 12;
-    let gridView : boolean = true;
     let selectedTab = "workspaces";
     let selectedView = "grid";
 </script>
 
-<div class="sidebar-teams">
-    <Teams teams = {teams} />
-    <hr/>
-    <RecentAPI recentAPI = {recentAPI} />
-    <hr/>
-    <RecentWorkspace workspace = {workspace} />
-</div>
-<div class="content-teams p-5">
-    
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 pb-3">
-                <div class="team-heading d-flex justify-content-between">
-                    <h2>Techdome</h2>
-                    <div class="d-flex">
-                        <button style="height: 36px;" class="disable-member-btn"><img src={people} alt=""/> {members} members</button>
-                        <button class="btn btn-outline-primary btn-sm content-teams__btn-invite mx-3">Invite</button>
-                        <button class="btn btn-primary btn-sm content-teams__btn-new-workspace text-white">New Workspace</button>
-                    </div>        
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="teams-menu d-flex justify-content-between align-items-center pb-3">
-                    <div class="teams-menu__left">
-                        <Link style="text-decoration:none;" to="workspaces"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "workspaces"} class="team-menu__link" class:tab-active={selectedTab === "workspaces"}>Workspaces</span></Link>
-                        <Link style="text-decoration:none;" to="members"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "members"} class="team-menu__link mx-3" class:tab-active={selectedTab === "members"}>Members</span></Link>
-                        <Link style="text-decoration:none;" to="settings"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "settings"} class="team-menu__link" class:tab-active={selectedTab === "settings"}>Settings</span></Link>
-                    </div>
-                    <div class="teams-menu__right">
-                        <span class="mx-3" style="cursor:pointer;">
-                            <img on:click={()=>{selectedView = "grid"}} class:view-active={selectedView === "grid"} src={table} alt=""/>
-                        </span>
-                        <span style="cursor:pointer;">
-                            <img on:click={()=>{selectedView = "table"}} class:view-active={selectedView === "table"} src={hamburger} alt=""/>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="d-flex bg-backgroundColor" style="height: calc(100vh - 50px);">
+    <div class="sidebar-teams">
+        <Teams teams = {teams} />
+        <hr/>
+        <RecentAPI recentAPI = {recentAPI} />
+        <hr/>
+        <RecentWorkspace workspace = {workspace} />
     </div>
-    
-    <Route path="/workspaces"> <Workspaces projects={projects} selectedView = {selectedView} /> </Route>
-    <Route path="/members">members</Route>
-    <Route path="/settings">settings</Route>
-    <Route path="/*"> <Navigate to="workspaces"/> </Route>
+    <div class="content-teams p-5">
+        
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 pb-3">
+                    <div class="team-heading d-flex justify-content-between">
+                        <h2>Techdome</h2>
+                        <div class="d-flex">
+                            <button style="height: 36px;" class="disable-member-btn"><img src={people} alt=""/> {members} members</button>
+                            <button class="btn btn-outline-primary btn-sm content-teams__btn-invite mx-3">Invite</button>
+                            <button class="btn btn-primary btn-sm content-teams__btn-new-workspace text-white">New Workspace</button>
+                        </div>        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="teams-menu d-flex justify-content-between align-items-center pb-3">
+                        <div class="teams-menu__left">
+                            <Link style="text-decoration:none;" to="workspaces"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "workspaces"} class="team-menu__link" class:tab-active={selectedTab === "workspaces"}>Workspaces</span></Link>
+                            <Link style="text-decoration:none;" to="members"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "members"} class="team-menu__link mx-3" class:tab-active={selectedTab === "members"}>Members</span></Link>
+                            <Link style="text-decoration:none;" to="settings"><span style="padding: 8px 8px;" on:click={()=>selectedTab = "settings"} class="team-menu__link" class:tab-active={selectedTab === "settings"}>Settings</span></Link>
+                        </div>
+                        <div class="teams-menu__right">
+                            <span class="mx-3" style="cursor:pointer;">
+                                <img on:click={()=>{selectedView = "grid"}} class:view-active={selectedView === "grid"} src={table} alt=""/>
+                            </span>
+                            <span style="cursor:pointer;">
+                                <img on:click={()=>{selectedView = "table"}} class:view-active={selectedView === "table"} src={hamburger} alt=""/>
+                            </span>
+                        </div>
+                    </div>
+                </div>              
+            </div>
+          
+        </div>
+        
+        <Route path="/workspaces"> <Workspaces projects={projects} selectedView = {selectedView} /> </Route>
+        <Route path="/members">members</Route>
+        <Route path="/settings">settings</Route>
+        <Route path="/*"><Navigate to="workspaces" /></Route>
+      
+    </div>
 </div>
-  
+
 
 <style>
     .sidebar-teams{
         width: 280px;
         border-right: 1px solid #313233;
         padding: 15px;
-        height: 100vh;
         overflow: auto;
     }
     .content-teams{

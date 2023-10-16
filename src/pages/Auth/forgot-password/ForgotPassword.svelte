@@ -2,13 +2,8 @@
   //   import { navigate } from "svelte-navigator";
   //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
-  import angleLeft from "$lib/assets/angleleft.png";
-  // import { navigate } from 'svelte-routing';
-  import { useNavigate } from "svelte-navigator";
-  import authService from "$lib/services/auth.service";
-  import { handleLoginValidation } from "../login-page/login-page";
-
-  const navigate = useNavigate();
+  import angleLeft from "$lib/assets/angleLeft.svg";
+  import { navigate } from "svelte-navigator";
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
@@ -17,13 +12,6 @@
   //     authActions.setUser({ token });
   //     navigate("/reset/password");
   //   }
-
-  //   //------------ login Credentials ---------------//
-  //   let loginCredentials = {
-  //     email: "",
-  //     password: "",
-  //   };
-  let forgotEmail = "";
 
   let isEmailTouched = false;
 
@@ -44,13 +32,6 @@
   //this is for testing
   const handleRequest = () => {
     navigate("/update/password");
-  };
-
-  let handleForgotPassword = async (forgotEmail: string) => {
-    let response = await authService.forgotPassword({ email: forgotEmail });
-    if (response.isSuccessful) {
-      navigate(`/update/password/${forgotEmail}`);
-    }
   };
 </script>
 
@@ -87,29 +68,6 @@
           Please enter your Email ID so that we can send you a confirmation link
           to process your request.
         </p>
-        <form
-          class="login-form"
-          on:submit|preventDefault={async () => {
-            // validationErrors = await handleLoginValidation(loginCredentials);
-            handleForgotPassword(forgotEmail);
-          }}
-        >
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Email</label>
-            <input
-              type="email"
-              class="form-control bg-black"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp"
-              placeholder="Please enter your registered email id"
-              bind:value={forgotEmail}
-              on:input={validateEmail}
-            />
-          </div>
-          <div class="sendButton">
-            <button class="btn btn-gradient w-100">Send Request</button>
-          </div>
-        </form>
       </div>
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label text-lightGray"

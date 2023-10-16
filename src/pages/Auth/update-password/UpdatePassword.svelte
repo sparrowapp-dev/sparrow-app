@@ -2,15 +2,9 @@
 
 <script lang="ts">
 
- 
-
   import Header from "$lib/components/header/Header.svelte";
-
   import angleLeft from "$lib/assets/angleLeft.svg";
 
- 
-
- 
 
   //------------------------------ TOKEN -----------------------------------//
 
@@ -26,10 +20,7 @@
 
   //   }
 
- 
-
- 
-
+  
 </script>
 
  
@@ -45,28 +36,16 @@
 >
 
   <Header />
-
   <div
-
     class="d-flex mb-5 flex-column align-items-center justify-content-center"
-
     data-tauri-drag-region
-
   >
-
     <h1
-
       class="text-whiteColor mt-5 ms-2 me-2 mb-5"
-
       style="font-size: 40px; width:408px; height:48px;"
-
     >
-
       Welcome to Sparrow!
-
     </h1>
-
- 
 
     <div
 
