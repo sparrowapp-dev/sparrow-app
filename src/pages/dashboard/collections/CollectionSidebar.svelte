@@ -19,7 +19,7 @@
     </button>
   </div>
   <div
-    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-0"
+    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
   >
     <div
       style="height:32px; width:180px "
@@ -27,6 +27,7 @@
     >
       <img src={searchIcon} alt="" />
       <input
+        style="font-size: 12px;"
         type="search"
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in Domigo"
@@ -43,7 +44,7 @@
     </div>
     <div class="d-flex align-items-center justify-content-center">
       <button
-        class="btn btn-plusButton py-0 d-flex align-items-center justify-content-center"
+        class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
         style="width: 32px; height:32px;"
       >
         <img src={plusIcon} alt="" />

@@ -27,7 +27,7 @@ $sparrow-send-hoverbutton: #4030f2e1;
   --button-color: #{$sparrow-request-body};
   --send-button: #{$sparrow-send-button};
   --send1-hoverbutton: #{$sparrow-send-hoverbutton};
-
+  --white-color: #{$sparrow-white};
   --background-color: #{$sparrow-background};
 }
 
@@ -51,7 +51,7 @@ $theme-colors: map-merge(
     "getColor": $sparrow-get,
     "requestBodyColor": $sparrow-request-body,
     "labelColor": $sparrow-send-button
-      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
   )
 );
 
