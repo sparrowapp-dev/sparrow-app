@@ -5,7 +5,7 @@
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
-  import HomePage from "./pages/Home/home-page/HomePage.svelte";
+
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/dashboard/Dashboard.svelte";

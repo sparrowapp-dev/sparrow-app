@@ -43,7 +43,9 @@
       </button>
     </div>
   </div>
-  <RequestResponse />
+  <div class="d-flex flex-column">
+    <RequestResponse />
+  </div>
 </div>
 
 <style>
