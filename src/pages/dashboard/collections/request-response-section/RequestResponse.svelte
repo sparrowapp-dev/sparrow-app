@@ -8,6 +8,8 @@
   import { Router, Route, Link } from "svelte-navigator";
   import Navigate from "../../../../routing/Navigate.svelte";
   import Collections from "../Collections.svelte";
+
+  let selectedTab = "parameters";
 </script>
 
 <div class="d-flex align-items-start justify-content-between p-4">
@@ -20,34 +22,50 @@
         to="parameters"
         style="font-size: 12px;font-weight:500"
         class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
-        >Parameters
-        <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
-          (4)
-        </p></Link
-      >
+        ><span
+          on:click={() => (selectedTab = "parameters")}
+          class="team-menu__link d-flex pb-1"
+          class:tab-active={selectedTab === "parameters"}
+          >Parameters
+          <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
+        </span>
+      </Link>
 
       <Link
-        to="requesbody"
+        to="requestbody"
         style="font-size: 12px;font-weight:500"
-        class="d-flex text-requestBodyColor text-decoration-none"
-        >Request Body
+        class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+        ><span
+          on:click={() => (selectedTab = "requestbody")}
+          class="team-menu__link d-flex pb-1"
+          class:tab-active={selectedTab === "requestbody"}
+          >Request Body
+        </span>
       </Link>
 
       <Link
         to="headers"
         style="font-size: 12px;font-weight:500"
         class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
-        >Headers
-        <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
-          (8)
-        </p></Link
-      >
+        ><span
+          on:click={() => (selectedTab = "headers")}
+          class="team-menu__link d-flex pb-1"
+          class:tab-active={selectedTab === "headers"}
+          >Headers
+          <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
+        </span>
+      </Link>
 
       <Link
         to="authorization"
         style="font-size: 12px;font-weight:500"
         class="d-flex align-items-center justify-content-center gap-1 text-requestBodyColor text-decoration-none"
-        >Authorization <img src={penIcon} alt="penIcon" class="w-100 h-100" />
+        ><span
+          on:click={() => (selectedTab = "authorization")}
+          class="team-menu__link d-flex pb-1 gap-1 align-items-center"
+          class:tab-active={selectedTab === "authorization"}
+          >Authorization <img src={penIcon} alt="penIcon" class="w-100 h-100" />
+        </span>
       </Link>
     </div>
     <div class="d-flex align-items-center justify-content-start">
@@ -63,4 +81,13 @@
 </div>
 
 <style>
+  .team-menu__link {
+    color: #8a9299;
+  }
+
+  .tab-active {
+    color: white;
+
+    border-bottom: 3px solid #85c2ff;
+  }
 </style>

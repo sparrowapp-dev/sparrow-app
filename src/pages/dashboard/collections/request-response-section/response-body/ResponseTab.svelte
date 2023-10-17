@@ -7,6 +7,7 @@
   style="width: 480px; height: 64vh;border-left:2px solid #313233;"
 >
   <div
+    data-tauri-drag-region
     class="d-flex align-items-center justify-content-between ps-3"
     style="d-flex;align-items:center; justify-content:center;width:480px;height:28px;gap: 12px;"
   >
