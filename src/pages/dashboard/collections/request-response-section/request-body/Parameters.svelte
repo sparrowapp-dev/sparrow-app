@@ -84,8 +84,6 @@
       rows = [...rows, { key: "", value: "" }];
     }
   }
-
- 
 </script>
 
 <div class="d-flex flex-column mt-4 pb-0 ps-2">

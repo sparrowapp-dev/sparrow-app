@@ -4,7 +4,7 @@
   import Parameters from "./request-body/Parameters.svelte";
   import RequestBody from "./request-body/RequestBody.svelte";
   import Headers from "./request-body/Headers.svelte";
-  import Authorization from "./request-body/Authorization.svelte";
+  import Authorization from "./request-body/authorization/Authorization.svelte";
   import { Router, Route, Link } from "svelte-navigator";
   import Navigate from "../../../../routing/Navigate.svelte";
   import Collections from "../Collections.svelte";

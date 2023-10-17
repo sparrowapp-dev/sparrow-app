@@ -23,8 +23,7 @@
 
 <style>
   .editor {
-    width: 100%;
-    max-width: 600px;
+    width: cover;
     height: 400px;
     /* background: #000000; */
   }
