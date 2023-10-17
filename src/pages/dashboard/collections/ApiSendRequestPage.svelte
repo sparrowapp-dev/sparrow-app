@@ -5,6 +5,14 @@
   import lineIcon from "$lib/assets/line.svg";
 
   import RequestResponse from "./request-response-section/RequestResponse.svelte";
+
+  let onclickState = false;
+
+  const toggleClick = () => {
+    onclickState = !onclickState;
+  };
+
+  console.log(onclickState);
 </script>
 
 <div class="d-flex flex-column">
@@ -35,17 +43,16 @@
     </div>
 
     <div class="d-flex gap-1">
-      <button class="bg-backgroundColor border-0">
+      <button class="bg-backgroundColor border-0" on:click={toggleClick}>
         <img src={tableColumnIcon} alt="" />
       </button>
-      <button class="bg-backgroundColor border-0">
+      <button class="bg-backgroundColor border-0" on:click={toggleClick}>
         <img src={barIcon} alt="" />
       </button>
     </div>
   </div>
-  <div class="d-flex flex-column">
-    <RequestResponse />
-  </div>
+
+  <RequestResponse {onclickState} />
 </div>
 
 <style>
