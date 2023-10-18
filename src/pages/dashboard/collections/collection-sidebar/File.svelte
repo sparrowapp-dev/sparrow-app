@@ -19,26 +19,15 @@
 </div>
 
 <style>
-    .red-api{
-        color: #FF7878;
-    }
-    .green-api{
-        color: #69D696;
-    }
-    .yellow-api{
-        color: #FFE47E;
-    }
-    .blue-api{
-        color: #9685FF;
-    }
-    .grey-api{
-        color: #8A9299;
-    }
+    .red-api{ color: var(--request-delete); }
+    .green-api{ color: var(--request-delete); }
+    .yellow-api{ color: var(--request-post); }
+    .blue-api{ color: var(--request-put); }
+    .grey-api{ color: var(--request-arc); }
     .api-method{
         font-size: 12px;
         font-weight: 500;
         margin-right: 8px;
-        /* width: 40px !important; */
         text-align: left;
     }
     .api-name{
