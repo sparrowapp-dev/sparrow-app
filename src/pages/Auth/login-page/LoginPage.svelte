@@ -9,7 +9,6 @@
   import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
   import { handleLoginValidation } from "./login-page";
-
   // Function to validate the email
   let isEmailTouched = false;
 

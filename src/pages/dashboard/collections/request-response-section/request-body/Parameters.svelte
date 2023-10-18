@@ -1,38 +1,214 @@
-<script>
+<script context="module">
+  import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
   import dragIcon from "$lib/assets/drag.svg";
+  import trashIcon from "$lib/assets/trash-icon.svg";
+  import penIcon from "$lib/assets/pen.svg";
 </script>
 
-<div class=" pt-3 ps-2">
+<script>
+  import { sortable } from "svelte-agnostic-draggable";
+
+  /**** Svelte Event Handling ****/
+
+  function onSortableInit() {
+    console.log("Sortable was created");
+  }
+
+  function onSortableActivate() {
+    console.log("Sortable was activated");
+    disableBodyScroll(document.body);
+  }
+
+  function onSortStart() {
+    console.log("sorting started");
+  }
+
+  function onSortMove() {
+    console.log("sorting continues");
+  }
+
+  function onSortStop() {
+    console.log("sorting stopped");
+  }
+
+  function onSortableOver() {
+    console.log("Draggable entered Sortable");
+  }
+
+  function onSortableChange() {
+    console.log("sort order was changed");
+  }
+
+  function onSortableRemove() {
+    console.log("list element was removed");
+  }
+
+  function onSortableReceive() {
+    console.log("list element was added");
+  }
+
+  function onSortableUpdate() {
+    console.log("list items were updated");
+  }
+
+  function onSortableOut() {
+    console.log("Draggable left Sortable");
+  }
+
+  function onSortableDeactivate() {
+    console.log("Sortable was deactivated");
+    enableBodyScroll(document.body);
+  }
+
+  function onSortableDestroy() {
+    console.log("Sortable was destroyed");
+  }
+
+  /**** List Data ****/
+
+  let isHovered = false;
+  let rows = [{ key: "", value: "" }];
+
+  function toggleHover() {
+    isHovered = !isHovered;
+  }
+
+  function addRow() {
+    if (rows.length === 1 && rows[0].key === "" && rows[0].value === "") {
+      rows[0].key = "New Key";
+      rows[0].value = "New Value";
+    } else if (
+      rows[rows.length - 1].key !== "" ||
+      rows[rows.length - 1].value !== ""
+    ) {
+      rows = [...rows, { key: "", value: "" }];
+    }
+  }
+</script>
+
+<div class="d-flex flex-column mt-4 pb-0 ps-2">
   <div
-    class="d-flex ps-5 align-items-center justify-content-between text-requestBodyColor"
-    style="font-size: 12px;font-weight:500"
+    class="d-flex text-requestBodyColor ps-4 py-0 align-items-center justify-content-between"
+    style="font-size: 12px; font-weight: 500;"
   >
-    <div class="d-flex align-items-center justify-content-between gap-4">
-      <p>Key</p>
-      <p>Value</p>
-    </div>
+    <p class="ps-5">Key</p>
+    <p style="margin-left: 165px;">Value</p>
   </div>
-  <div class="d-flex align-items-center gap-2">
-    <img src={dragIcon} alt="" />
-    <input type="checkbox" class="form-check-input bg-black" />
-    <input
-      class="border-0 px-2 py-1 no-outline bg-black"
-      style="outline: none;font-size:12px"
-      type="text"
-      id="password"
-      placeholder="Enter Key"
-      required
-    />
-    <input
-      class="border-0 px-2 py-1 bg-black"
-      style="outline: none;font-size:12px"
-      type="text"
-      id="password"
-      placeholder="Enter Value"
-      required
-    />
+
+  <div
+    class="sortable"
+    use:sortable={{
+      cursor: "grabbing",
+      zIndex: 10,
+    }}
+    style="
+      display: block;
+      position: relative;
+      width: 200px;
+      margin-bottom: 1px;
+    "
+    on:sortable:init={onSortableInit}
+    on:sortable:destroy={onSortableActivate}
+    on:sortable:activate={onSortableActivate}
+    on:sortable:deactivate={onSortableDeactivate}
+    on:sort:start={onSortStart}
+    on:sort:move={onSortMove}
+    on:sort:stop={onSortStop}
+    on:sortable:over={onSortableOver}
+    on:sortable:out={onSortableOut}
+    on:sortable:change={onSortableChange}
+    on:sortable:update={onSortableUpdate}
+    on:sortable:remove={onSortableRemove}
+    on:sortable:receive={onSortableReceive}
+  >
+    {#each rows as row, index}
+      <div role="button" aria-label="Toggle Hover" class="sortable > div">
+        <div
+          on:mouseenter={toggleHover}
+          on:mouseleave={toggleHover}
+          style="
+            width: 460px;
+            margin: 0px;
+            padding-top: 3px;
+            cursor: grab;
+            background-color:backgroundColor; /* Modify as needed */
+            
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <div
+            class="d-flex align-items-center justify-content-center gap-3 mb-2"
+          >
+            <button
+              class="bg-backgroundColor border-0 w-25"
+              on:mouseenter={toggleHover}
+              on:mouseleave={toggleHover}
+            >
+              <img src={dragIcon} alt="" />
+            </button>
+            <div>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                on:mouseenter={toggleHover}
+                on:mouseleave={toggleHover}
+              />
+            </div>
+            <div>
+              <input
+                on:mouseenter={toggleHover}
+                on:mouseleave={toggleHover}
+                type="text"
+                placeholder="Enter Key"
+                style="outline: none;font-size:13px;"
+                class="bg-blackColor border-0 ps-2 py-1 pe-3"
+                bind:value={row.key}
+                on:input={addRow}
+              />
+            </div>
+            <input
+              on:mouseenter={toggleHover}
+              on:mouseleave={toggleHover}
+              type="text"
+              placeholder="Enter Value"
+              style="outline: none;font-size:13px;"
+              class="bg-blackColor inputField border-0 ps-2 py-1 pe-3"
+              bind:value={row.value}
+              on:input={addRow}
+            />
+
+            <div class="w-75 h-75">
+              <button
+                style="display: {isHovered ? 'block' : 'none'}"
+                class="bg-backgroundColor border-0"
+              >
+                <img src={trashIcon} alt="" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/each}
   </div>
 </div>
 
 <style>
+  .sortable > div {
+    -webkit-touch-callout: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .inputField {
+    border: none;
+  }
+
+  .inputField:hover {
+    border-bottom: 1px solid red; /* Change border color as needed */
+  }
 </style>

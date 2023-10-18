@@ -5,6 +5,20 @@
   import lineIcon from "$lib/assets/line.svg";
 
   import RequestResponse from "./request-response-section/RequestResponse.svelte";
+
+  import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
+
+  let onclickState = false;
+
+  const toggleClick = () => {
+    onclickState = !onclickState;
+  };
+
+  let handleDropdown = (tab) => {
+    // currentTab = tab;
+    // console.log(currentTab);
+    // console.log(tab);
+  };
 </script>
 
 <div class="d-flex flex-column">
@@ -12,11 +26,22 @@
     <div class="d-flex gap-2">
       <div class="d-flex align-items-center justify-content-center">
         <button
-          style="width: 71px; height:38px border:1px solid #313233"
-          class="d-flex align-items-center bg-backgroundColor py-2 px-3 justify-content-center border-1 border-primary gap-2 rounded"
+          class="d-flex w-100 h-100 pe-3 py-1 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
         >
-          <p class="mb-0 text-getColor" style="font-size: 12px;">GET</p>
-          <img src={angleDown} alt="" />
+          <CrudDropdown
+            data={[
+              "GET",
+              "POST",
+              "PUT",
+              "DEL",
+              "TRAC",
+              "PATC",
+              "HEAD",
+              "OPT",
+              "CON",
+            ]}
+            onclick={handleDropdown}
+          />
         </button>
       </div>
       <input
@@ -35,24 +60,33 @@
     </div>
 
     <div class="d-flex gap-1">
-      <button class="bg-backgroundColor border-0">
+      <button class="bg-backgroundColor border-0" on:click={toggleClick}>
         <img src={tableColumnIcon} alt="" />
       </button>
-      <button class="bg-backgroundColor border-0">
+      <button class="bg-backgroundColor border-0" on:click={toggleClick}>
         <img src={barIcon} alt="" />
       </button>
     </div>
   </div>
-  <RequestResponse />
+
+  <RequestResponse {onclickState} />
 </div>
 
 <style>
   .btn-primary {
     background: var(--send-button);
-    border-right: 1px solid #313233;
   }
 
   .btn-primary:hover {
     background: var(--send1-hoverbutton);
+  }
+
+  .btn-primary1 {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+  }
+
+  .btn-primary1:hover {
+    background: var(--border-color);
   }
 </style>
