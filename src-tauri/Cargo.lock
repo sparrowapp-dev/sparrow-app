@@ -2690,13 +2690,10 @@ name = "sparrow-app"
 version = "0.0.0"
 dependencies = [
  "json",
- "proc-macro2",
- "quote",
  "regex",
  "reqwest",
  "serde",
  "serde_json",
- "syn 1.0.109",
  "tauri",
  "tauri-build",
  "tokio",
