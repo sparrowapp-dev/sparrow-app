@@ -2,6 +2,7 @@
 </script>
 
 <div
+  class="w-100"
   style="
             width: 460px;
             margin-right: 1px;

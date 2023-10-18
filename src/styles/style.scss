@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&family=Roboto:wght@100&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&family=Roboto:wght@100&display=swap");
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
@@ -31,6 +31,7 @@ $sparrow-send-hoverbutton: #4030f2e1;
   --send1-hoverbutton: #{$sparrow-send-hoverbutton};
   --white-color: #{$sparrow-white};
   --background-color: #{$sparrow-background};
+  --border-color: #{$sparrow-border-color};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -53,7 +54,7 @@ $theme-colors: map-merge(
     "getColor": $sparrow-get,
     "requestBodyColor": $sparrow-request-body,
     "labelColor": $sparrow-send-button
-      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
   )
 );
 

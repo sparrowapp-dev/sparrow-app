@@ -1,42 +1,57 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import checkIcon from "$lib/assets/check.svg";
+
   let visibility = false;
   export let data: any;
   export let onclick: any;
+  let selectedRequest: string | null = null;
+
   window.addEventListener("click", () => {
     visibility = false;
   });
+
   let title = data[0];
 </script>
 
-<div style="position: relative; display:inline-block; z-index:999;">
-  <button
-    class="dropdown-btn"
-    on:click={() => {
-      setTimeout(() => {
-        visibility = true;
-      }, 100);
-    }}
-    >{title}
-    <span class="px-2" class:dropdown-logo-active={visibility === true}
-      ><img style="height:10px; width:10px;" src={dropdown} alt="" /></span
-    ></button
-  >
+<div style="position: relative; display:inline-block; z-index:999;width:60px">
+  <div class="d-flex align-items-center justify-content-between gap-4">
+    <p class="mb-0" style="font-size:12px;font-weight:500">{title}</p>
+    <div>
+      <span
+        on:click={() => {
+          setTimeout(() => {
+            visibility = true;
+          }, 100);
+        }}
+        class:dropdown-logo-active={visibility === true}
+        ><img style="width:12px;cursor:pointer" src={dropdown} alt="" /></span
+      >
+    </div>
+  </div>
   <div
     style="display:none;"
-    class="dropdown-data rounded p-2"
+    class="dropdown-data rounded ps-3 pe-5 py-2 ms-4"
     class:dropdown-active={visibility === true}
   >
     {#each data as list}
       <p
-        class="m-0 py-1 px-2"
+        class="m-0 d-flex py-1 gap-4"
+        style="font-size: 12px;"
+        class:selected-request={list === selectedRequest}
         on:click={() => {
           visibility = false;
           onclick(list);
           title = list;
+          selectedRequest = list;
         }}
       >
         {list}
+        {#if list === selectedRequest}
+          <div class="w-100 ">
+            <img src={checkIcon} alt="" />
+          </div>
+        {/if}
       </p>
     {/each}
   </div>
@@ -72,5 +87,8 @@
   }
   .dropdown-logo-active {
     transform: rotateX(180deg) !important;
+  }
+  .selected-request {
+    font-weight: bold;
   }
 </style>

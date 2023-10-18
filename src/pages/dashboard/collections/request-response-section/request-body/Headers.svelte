@@ -95,13 +95,13 @@
   };
 </script>
 
-<div class="d-flex flex-column mt-4 pb-0 ps-1">
+<div class="d-flex flex-column mt-4 pb-0 ps-2">
   <div
-    class="d-flex text-requestBodyColor ps-4 py-0 align-items-center justify-content-between"
+    class="d-flex text-requestBodyColor gap-4 py-0 align-items-center justify-content-center"
     style="font-size: 12px; font-weight: 500;"
   >
-    <p class="ps-5">Key</p>
-    <p style="margin-left: 165px;">Value</p>
+    <p class="me-5 pe-5">Key</p>
+    <p class="ms-5">Value</p>
   </div>
 
   {#if isClicked}
@@ -109,7 +109,7 @@
   {/if}
 
   <div
-    class="sortable"
+    class="sortable w-100"
     use:sortable={{
       cursor: "grabbing",
       zIndex: 10,
