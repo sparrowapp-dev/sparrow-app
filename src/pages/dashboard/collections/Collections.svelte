@@ -1,6 +1,5 @@
 <script>
-  import CollectionSidebar from "./CollectionSidebar.svelte";
-
+  import CollectionSidebar from "./collection-sidebar/CollectionSidebar.svelte";
   import TabBar from "./TabBar.svelte";
 </script>
 
