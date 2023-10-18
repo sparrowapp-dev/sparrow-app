@@ -5,14 +5,14 @@
     import plusIcon from "$lib/assets/plus.svg";
     import Folder from "./Folder.svelte";
     import {fetchCollection} from "$lib/services/collection";
-    import {collectionList, currentWorkspaceId} from '$lib/store/collection';
+    import {collectionList, setCollectionList, currentWorkspaceId} from '$lib/store/collection';
 
     let collection:any;
 
     let getCollectionData = async (id: string)=>{
       const res = await fetchCollection(id);
       if(res.isSuccessful){
-        collectionList.set(res.data.data);
+        setCollectionList(res.data.data);
       }
     }
 
@@ -73,7 +73,7 @@
   <div class="d-flex flex-column pt-3">
     <div class="d-flex flex-column justify-content-center">
       {#each collection as col}
-          <Folder collectionId={col._id} title={col.name}/>
+          <Folder collection={col} title={col.name}/>
       {/each}
     </div>
   </div>

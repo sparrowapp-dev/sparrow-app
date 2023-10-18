@@ -57,7 +57,9 @@ export const put = async (url, data, headers) => {
 
 export const post = async (url, data, headers?) => {
   try {
-    const response = await axios.post(url, data, { headers });
+    const response = await axios.post(url, data, {
+      headers: { Authorization: `Bearer ${headers}` },
+    });
     if (response.status === 201 || response.status === 200) {
       return success(response.data);
     } else {

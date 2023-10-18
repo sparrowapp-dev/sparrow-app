@@ -1,11 +1,27 @@
 import constants from "$lib/utils/constants";
 import { getUserToken } from "$lib/utils/token";
-import { get } from "$lib/api/api.common";
+import { get, post } from "$lib/api/api.common";
 const apiUrl = constants.API_URL;
 
 const fetchCollection = async (workspaceId: string) => {
   const response = await get(
     `${apiUrl}/api/collection/${workspaceId}`,
+    getUserToken(),
+  );
+  return response;
+};
+
+const insertCollectionDirectory = async (
+  workspaceId,
+  collectionId,
+  directoryName,
+) => {
+  const response = await post(
+    `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
+    {
+      name: directoryName,
+      description: "",
+    },
     getUserToken(),
   );
   return response;
@@ -48,4 +64,4 @@ const fetchCollection = async (workspaceId: string) => {
 //   return response;
 // };
 
-export { fetchCollection };
+export { fetchCollection, insertCollectionDirectory };
