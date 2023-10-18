@@ -1,4 +1,6 @@
 <script>
+  let retrievedValue1 = localStorage.getItem("inputValue1");
+  let retrievedValue2 = localStorage.getItem("inputValue2");
 </script>
 
 <div
@@ -14,6 +16,28 @@
             flex-direction: column;
           "
 >
+  <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+    <div>
+      <input class="form-check-input" type="checkbox" checked disabled />
+    </div>
+    <div>
+      <input
+        type="text"
+        placeholder={retrievedValue1}
+        style="outline: none;font-size:13px;color:white;"
+        class="bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3"
+        disabled
+      />
+    </div>
+    <input
+      type="text"
+      placeholder={retrievedValue2}
+      style="outline: none;font-size:13px;color:white"
+      class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
+      disabled
+    />
+  </div>
+
   <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
     <div>
       <input class="form-check-input" type="checkbox" checked />
