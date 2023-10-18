@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { type Method } from "axios";
+import type {  RequestData } from "./requestbody.model";
 
 export const error = (error, data?) => {
   return { status: "error", isSuccessful: false, message: error, data };
@@ -74,6 +75,26 @@ export const post = async (url, data, headers?) => {
     return error(e);
   }
 };
+
+
+export const makeRequest = async(method:Method, url:string, requestData?:RequestData)=>{
+   await axios({
+    method:"POST",
+    url: '',
+    data:requestData.data,
+    headers:requestData?.headers,
+   })
+}
+
+makeRequest("GET","shjksh",{data:{
+  "asif":10,
+  "asif1":"uwyuiwyui",
+  "asif2":true,
+},headers:{
+  "Authorio":"asjkghsjikhs",
+  "Authori2o":"shjkgyjsgiyus"
+}})
+
 
 //------------- We need this function in future ------------------//
 
