@@ -2,6 +2,9 @@
   let retrievedValue1 = localStorage.getItem("inputValue1");
   let retrievedValue2 = localStorage.getItem("inputValue2");
   let BearerTokenValue = localStorage.getItem("BearerTokenValue");
+
+  let retrievedBasicAuth1 = localStorage.getItem("BasicAuth1");
+  let retrievedBasicAuth2 = localStorage.getItem("BasicAuth2");
 </script>
 
 <div
@@ -9,14 +12,37 @@
   style="
             width: 460px;
             margin-right: 1px;
-            padding-top: 3px;
-            
+            padding-top: 3px;+--------------------------------------------------------------------------------------------------
             background-color:backgroundColor; /* Modify as needed */
             
             display: flex;
             flex-direction: column;
           "
 >
+  {#if retrievedBasicAuth1.length > 0 && retrievedBasicAuth2.length > 0}
+    <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+      <div>
+        <input class="form-check-input" type="checkbox" checked disabled />
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder={retrievedBasicAuth1}
+          style="outline: none;font-size:13px;color:white;"
+          class="bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3"
+          disabled
+        />
+      </div>
+      <input
+        type="text"
+        placeholder={retrievedBasicAuth2}
+        style="outline: none;font-size:13px;color:white"
+        class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
+        disabled
+      />
+    </div>
+  {/if}
+
   {#if BearerTokenValue.length > 0}
     <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
       <div>
@@ -33,7 +59,7 @@
       </div>
       <input
         type="text"
-        placeholder={BearerTokenValue}
+        placeholder={"Bearer" + " " + BearerTokenValue}
         style="outline: none;font-size:13px;color:white"
         class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
         disabled

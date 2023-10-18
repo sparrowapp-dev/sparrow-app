@@ -1,7 +1,15 @@
 <script>
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  let handleDropdown = (tab) => {
-    // console.log(tab);
+  let BasicAuth1 = localStorage.getItem("BasicAuth1") || "";
+  let BasicAuth2 = localStorage.getItem("BasicAuth2") || "";
+
+  const handleInput1 = (event) => {
+    BasicAuth1 = event.target.value;
+    localStorage.setItem("BasicAuth1", BasicAuth1);
+  };
+
+  const handleInput2 = (event) => {
+    BasicAuth2 = event.target.value;
+    localStorage.setItem("BasicAuth2", BasicAuth2);
   };
 </script>
 
@@ -17,6 +25,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Username"
+      bind:value={BasicAuth1}
+      on:input={handleInput1}
     />
   </div>
 
@@ -31,6 +41,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Password"
+      bind:value={BasicAuth2}
+      on:input={handleInput2}
     />
   </div>
 </div>

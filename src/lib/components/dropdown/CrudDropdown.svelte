@@ -15,19 +15,21 @@
 </script>
 
 <div style="position: relative; display:inline-block; z-index:999;width:60px">
-  <div class="d-flex align-items-center justify-content-between gap-4">
-    <p class="mb-0" style="font-size:12px;font-weight:500">{title}</p>
-    <div>
+  <div class="d-flex align-items-center justify-content-between">
+    <button
+      class="dropdown-btn d-flex align-items-center justify-content-center gap-2"
+      on:click={() => {
+        setTimeout(() => {
+          visibility = true;
+        }, 100);
+      }}
+      ><p class="w-25 mb-0 d-flex align-items-center">{title}</p>
       <span
-        on:click={() => {
-          setTimeout(() => {
-            visibility = true;
-          }, 100);
-        }}
+        class="ps-4 d-flex align-items-center"
         class:dropdown-logo-active={visibility === true}
-        ><img style="width:12px;cursor:pointer" src={dropdown} alt="" /></span
-      >
-    </div>
+        ><img style="height:12px; width:12px;" src={dropdown} alt="" /></span
+      ></button
+    >
   </div>
   <div
     style="display:none;"
@@ -48,7 +50,7 @@
       >
         {list}
         {#if list === selectedRequest}
-          <div class="w-100 ">
+          <div class="w-100">
             <img src={checkIcon} alt="" />
           </div>
         {/if}
