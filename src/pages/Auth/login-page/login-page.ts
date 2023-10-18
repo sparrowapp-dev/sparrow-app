@@ -1,9 +1,11 @@
-import authService from "$lib/services/auth.service";
+import { loginUser } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import type { loginUserPostBody } from "$lib/utils/dto";
 import { notifications } from "$lib/utils/notifications";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
+import { jwtDecode, setJwt } from "$lib/utils/jwt";
+import { setUser } from "$lib/store/auth.store";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -16,12 +18,15 @@ export const authNavigate = () => {
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
-  try {
-    await authService.loginUser(loginCredentials);
+  const response = await loginUser(loginCredentials);
+  if (response.isSuccessful) {
+    setJwt(response.data.data.accessToken.token);
+    setUser(jwtDecode(response.data.data.accessToken.token));
     notifications.success("Login successful!");
     navigate("/home");
-  } catch (error) {
+  } else {
     notifications.error("Something went wrong");
+    throw "error login user: " + response.message;
   }
 };
 

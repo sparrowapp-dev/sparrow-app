@@ -11,4 +11,7 @@ export interface loginUserPostBody {
   password: string;
 }
 
+export interface EmailPostBody {
+  email: string;
+}
 //i will create different interface here

@@ -1,45 +1,53 @@
 import constants from "$lib/utils/constants";
-import { getUserToken } from "$lib/utils/token";
-import { get, post, put, del } from "$lib/api/api.common";
+import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type { WorkspacePostBody } from "$lib/utils/dto";
-const apiUrl = constants.API_URL;
+const apiUrl: string = constants.API_URL;
 
-const fetchIndividualWorkspace = async (workspaceId: string) => {
-  const response = await get(
+const fetchWorkspace = async (workspaceId: string): Promise<unknown> => {
+  const response = await makeRequest(
+    "GET",
     `${apiUrl}/api/workspace/${workspaceId}`,
-    getUserToken(),
+    {
+      headers: getAuthHeaders(),
+    },
   );
   return response;
 };
 
 const updateWorkspace = async (
   workspaceId: string,
-  data: WorkspacePostBody,
-) => {
-  const response = await put(
+  workspace: WorkspacePostBody,
+): Promise<unknown> => {
+  const response = await makeRequest(
+    "PUT",
     `${apiUrl}/api/workspace/${workspaceId}`,
-    data,
-    getUserToken,
+    {
+      body: workspace,
+      headers: getAuthHeaders(),
+    },
   );
   return response;
 };
 
-const deleteWorkspace = async (workspaceId: string) => {
-  const response = await del(
+const deleteWorkspace = async (workspaceId: string): Promise<unknown> => {
+  const response = await makeRequest(
+    "DELETE",
     `${apiUrl}/api/workspace/${workspaceId}`,
-    getUserToken,
+    {
+      headers: getAuthHeaders(),
+    },
   );
   return response;
 };
 
-const createWorkspace = async (data: WorkspacePostBody) => {
-  const response = await post(`${apiUrl}/api/workspace`, data, getUserToken);
+const createWorkspace = async (
+  workspace: WorkspacePostBody,
+): Promise<unknown> => {
+  const response = await makeRequest("POST", `${apiUrl}/api/workspace`, {
+    body: workspace,
+    headers: getAuthHeaders(),
+  });
   return response;
 };
 
-export default {
-  fetchIndividualWorkspace,
-  updateWorkspace,
-  deleteWorkspace,
-  createWorkspace,
-};
+export { fetchWorkspace, updateWorkspace, deleteWorkspace, createWorkspace };

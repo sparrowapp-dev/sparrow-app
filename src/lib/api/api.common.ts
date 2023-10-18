@@ -1,65 +1,42 @@
 import axios, { type Method } from "axios";
-import type {  RequestData } from "./requestbody.model";
+import type { RequestData } from "../utils/dto/requestdata";
+import { getUserToken } from "$lib/utils/token";
 
-export const error = (error, data?) => {
-  return { status: "error", isSuccessful: false, message: error, data };
+const error = (error, data?) => {
+  return {
+    status: "error",
+    isSuccessful: false,
+    message: error,
+    data,
+  };
 };
 
-export const success = (data) => {
+const success = (data) => {
   return {
     status: "success",
     isSuccessful: true,
     message: "",
-    data: data,
+    data,
   };
 };
 
-export const getAuthHeaders = () => {
+const getAuthHeaders = () => {
   return {
-    Authorization: "Bearer " + localStorage.getItem("AUTH_TOKEN"),
+    Authorization: `Bearer ${getUserToken()}`,
   };
 };
 
-export const get = async (url, headers?) => {
+const makeRequest = async (
+  method: Method,
+  url: string,
+  requestData?: RequestData,
+) => {
   try {
-    const response = await axios.get(url, {
-      headers: { Authorization: `Bearer ${headers}` },
-    });
-    if (response.status === 200) {
-      return success(response.data);
-    } else {
-      return error(response.data.message);
-    }
-  } catch (e) {
-    console.log(e);
-    if (e.response.data) {
-      return error(e.response.data.message);
-    }
-    return error(e);
-  }
-};
-
-export const put = async (url, data, headers) => {
-  try {
-    const response = await axios.put(url, data, { headers });
-    if (response.data.httpStatus === 200) {
-      return success(response.data.data);
-    } else {
-      return error(response.data.message);
-    }
-  } catch (e) {
-    console.log(e);
-    if (e.response.data) {
-      return error(e.response.data.message);
-    }
-    return error(e);
-  }
-};
-
-export const post = async (url, data, headers?) => {
-  try {
-    const response = await axios.post(url, data, {
-      headers: { Authorization: `Bearer ${headers}` },
+    const response = await axios({
+      method: method,
+      url: url,
+      data: requestData?.body,
+      headers: requestData?.headers,
     });
     if (response.status === 201 || response.status === 200) {
       return success(response.data);
@@ -76,28 +53,8 @@ export const post = async (url, data, headers?) => {
   }
 };
 
-
-export const makeRequest = async(method:Method, url:string, requestData?:RequestData)=>{
-   await axios({
-    method:"POST",
-    url: '',
-    data:requestData.data,
-    headers:requestData?.headers,
-   })
-}
-
-makeRequest("GET","shjksh",{data:{
-  "asif":10,
-  "asif1":"uwyuiwyui",
-  "asif2":true,
-},headers:{
-  "Authorio":"asjkghsjikhs",
-  "Authori2o":"shjkgyjsgiyus"
-}})
-
-
+export { makeRequest, getAuthHeaders };
 //------------- We need this function in future ------------------//
-
 // export const download = async (url, data, headers) => {
 //   try {
 //     let response = null;
@@ -131,37 +88,3 @@ makeRequest("GET","shjksh",{data:{
 //     return error(e);
 //   }
 // };
-
-export const update = async (url, data, headers) => {
-  try {
-    const response = await axios.put(url, data, { headers });
-    if (response.data.httpStatus === 200) {
-      return success(response.data.data);
-    } else {
-      return error(response.data.statusMessage);
-    }
-  } catch (e) {
-    console.log(e);
-    if (e.response.data) {
-      return error(e.response.data.statusMessage);
-    }
-    return error(e);
-  }
-};
-
-export const del = async (url, headers) => {
-  try {
-    const response = await axios.delete(url, { headers });
-    if (response.data.httpStatus === 200) {
-      return success(response.data.data);
-    } else {
-      return error(response.data.statusMessage, response.data.data);
-    }
-  } catch (e) {
-    console.log(e);
-    if (e.response.data) {
-      return error(e.response.data.statusMessage, e.response.data.data);
-    }
-    return error(e);
-  }
-};

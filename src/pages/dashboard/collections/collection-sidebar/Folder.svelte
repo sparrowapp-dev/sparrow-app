@@ -4,16 +4,17 @@
     import {currentWorkspaceId, setCollectionList} from '$lib/store/collection';
     import { insertCollectionDirectory, fetchCollection } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
+    import type { CreateDirectoryPostBody } from "$lib/utils/dto";
     let visibility = true;
     export let title:string;
     export let collection:any;
    
-    let workspaceId;
-    currentWorkspaceId.subscribe((value)=>{
+    let workspaceId: string = "";
+    currentWorkspaceId.subscribe((value : string)=>{
       workspaceId = value;
     });
     
-    let getCollectionData = async (id: string)=>{
+    let getCollectionData = async (id: string) =>{
       const res = await fetchCollection(id);
       if(res.isSuccessful){
         setCollectionList(res.data.data);
@@ -21,7 +22,7 @@
     }
 
     const getFolderName = ()=>{
-      let folderAvailable = true;
+      let folderAvailable : boolean = true;
       collection.items.forEach(element => {
         if(element.type === "FOLDER" && element.name === "New Folder"){
           folderAvailable = false;
@@ -41,8 +42,11 @@
     }
     
     const handleFolderClick = async ()=>{
-      let folder = getFolderName();
-      const res = await insertCollectionDirectory(workspaceId, collection._id, folder);
+      let directory : CreateDirectoryPostBody = {
+        name : getFolderName(),
+        description: ""
+      }
+      const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
             getCollectionData(workspaceId);
       }
