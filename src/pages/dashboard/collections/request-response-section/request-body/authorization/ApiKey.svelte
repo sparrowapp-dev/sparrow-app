@@ -1,20 +1,17 @@
 <script>
+  import { apiKey1, apiKey2 } from "$lib/store/requestSection";
+
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   let handleDropdown = (tab) => {
     // console.log(tab);
   };
 
-  let inputValue1 = localStorage.getItem("inputValue1") || "";
-  let inputValue2 = localStorage.getItem("inputValue2") || "";
-
-  const handleInput1 = (event) => {
-    inputValue1 = event.target.value;
-    localStorage.setItem("inputValue1", inputValue1);
+  const handleAuthKey = (event) => {
+    apiKey1.set(event.target.value);
   };
 
-  const handleInput2 = (event) => {
-    inputValue2 = event.target.value;
-    localStorage.setItem("inputValue2", inputValue2);
+  const handleAuthValue = (event) => {
+    apiKey2.set(event.target.value);
   };
 </script>
 
@@ -30,8 +27,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 p-2"
       placeholder="Enter Auth Key"
-      bind:value={inputValue1}
-      on:input={handleInput1}
+      bind:value={$apiKey1}
+      on:input={handleAuthKey}
     />
   </div>
   <div
@@ -45,8 +42,8 @@
       style="outline: none;"
       class="w-75 h-75 p-2 border-0 bg-backgroundColor"
       placeholder="Enter Auth Value"
-      bind:value={inputValue2}
-      on:input={handleInput2}
+      bind:value={$apiKey2}
+      on:input={handleAuthValue}
     />
   </div>
   <div

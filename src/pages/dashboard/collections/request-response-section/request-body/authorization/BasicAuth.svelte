@@ -1,15 +1,16 @@
-<script>
-  let BasicAuth1 = localStorage.getItem("BasicAuth1") || "";
-  let BasicAuth2 = localStorage.getItem("BasicAuth2") || "";
+<script lang="ts">
+  import {
+    basicAuth1,
+    basicAuth2,
+    createBasicAuthHeader,
+  } from "$lib/store/requestSection";
 
-  const handleInput1 = (event) => {
-    BasicAuth1 = event.target.value;
-    localStorage.setItem("BasicAuth1", BasicAuth1);
+  const handleUsername = (event) => {
+    basicAuth1.set(event.target.value);
   };
 
-  const handleInput2 = (event) => {
-    BasicAuth2 = event.target.value;
-    localStorage.setItem("BasicAuth2", BasicAuth2);
+  const handlePassword = (event) => {
+    basicAuth2.set(event.target.value);
   };
 </script>
 
@@ -25,8 +26,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Username"
-      bind:value={BasicAuth1}
-      on:input={handleInput1}
+      bind:value={$basicAuth1}
+      on:input={handleUsername}
     />
   </div>
 
@@ -41,11 +42,13 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Password"
-      bind:value={BasicAuth2}
-      on:input={handleInput2}
+      bind:value={$basicAuth2}
+      on:input={handlePassword}
     />
   </div>
 </div>
+
+<button on:click={createBasicAuthHeader}>Create Basic Auth Header</button>
 
 <style>
   input::placeholder {
