@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
     import angleRight from "$lib/assets/angleRight.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import {currentWorkspaceId, setCollectionList} from '$lib/store/collection';
@@ -79,4 +79,4 @@
     color: #fff;
     padding: 20px;
   }
-</style> -->
+</style>

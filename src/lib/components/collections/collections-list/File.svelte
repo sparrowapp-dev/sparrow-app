@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
     export let name: string;
     export let method: string;
     let apiClass = "red-api";
@@ -34,4 +34,4 @@
         font-size: 12px;
         font-weight: 400;
     }
-</style> -->
+</style>

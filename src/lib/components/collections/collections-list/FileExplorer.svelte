@@ -1,4 +1,4 @@
-<!-- <script>
+<script>
     import folder from "$lib/assets/folder.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import File from "./File.svelte";
@@ -24,4 +24,4 @@
     <div style="padding-left: 0; cursor:pointer;">
       <File name={explorer.name} method={explorer.request.method} />
     </div>
-{/if} -->
+{/if}

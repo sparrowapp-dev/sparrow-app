@@ -10,7 +10,6 @@
   } from "$lib/store/requestSection";
 
  
-
   // storing the value from store for Basic auth section
   let username;
   let password;

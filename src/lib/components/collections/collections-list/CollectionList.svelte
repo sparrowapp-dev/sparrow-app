@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
@@ -8,7 +8,7 @@
   import {
     collectionList,
     setCollectionList,
-    // currentWorkspaceId,
+    currentWorkspaceId,
   } from "$lib/store/collection";
 
   let collection: any;
@@ -29,7 +29,7 @@
 </script>
 
 <div
-  style="width: 280px; height: calc(100vh - 50px); overflow:auto; border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
+  style="width:280px;border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
   class="d-flex flex-column bg-backgroundColor"
 >
   <div
@@ -50,7 +50,7 @@
       <img src={searchIcon} alt="" />
       <input
         type="search"
-        style="font-size: 12px;font-weight:500"
+        style="  font-size: 12px;font-weight:500;"
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in Domigo"
       />
@@ -87,4 +87,4 @@
   .inputField {
     outline: none;
   }
-</style> -->
+</style>
