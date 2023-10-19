@@ -1,28 +1,31 @@
 <script lang="ts">
-    import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
-    import searchIcon from "$lib/assets/search.svg";
-    import filterIcon from "$lib/assets/filter.svg";
-    import plusIcon from "$lib/assets/plus.svg";
-    import Folder from "./Folder.svelte";
-    import {fetchCollection} from "$lib/services/collection";
-    import {collectionList, setCollectionList, currentWorkspaceId} from '$lib/store/collection';
+  import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
+  import searchIcon from "$lib/assets/search.svg";
+  import filterIcon from "$lib/assets/filter.svg";
+  import plusIcon from "$lib/assets/plus.svg";
+  import Folder from "./Folder.svelte";
+  import { fetchCollection } from "$lib/services/collection";
+  import {
+    collectionList,
+    setCollectionList,
+    currentWorkspaceId,
+  } from "$lib/store/collection";
 
-    let collection:any;
+  let collection: any;
 
-    let getCollectionData = async (id: string)=>{
-      const res = await fetchCollection(id);
-      if(res.isSuccessful){
-        setCollectionList(res.data.data);
-      }
+  let getCollectionData = async (id: string) => {
+    const res = await fetchCollection(id);
+    if (res.isSuccessful) {
+      setCollectionList(res.data.data);
     }
+  };
 
-    collectionList.subscribe((value) => {
-      collection = value;
-    });
-    currentWorkspaceId.subscribe((value) => {
-        getCollectionData(value);
-    }); 
-
+  collectionList.subscribe((value) => {
+    collection = value;
+  });
+  currentWorkspaceId.subscribe((value) => {
+    getCollectionData(value);
+  });
 </script>
 
 <div
@@ -38,7 +41,7 @@
     </button>
   </div>
   <div
-    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-0"
+    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
   >
     <div
       style="height:32px; width:180px "
@@ -47,6 +50,7 @@
       <img src={searchIcon} alt="" />
       <input
         type="search"
+        style="font-size: 12px;font-weight:500"
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in Domigo"
       />
@@ -62,7 +66,7 @@
     </div>
     <div class="d-flex align-items-center justify-content-center">
       <button
-        class="btn btn-plusButton py-0 d-flex align-items-center justify-content-center"
+        class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
         style="width: 32px; height:32px;"
       >
         <img src={plusIcon} alt="" />
@@ -73,7 +77,7 @@
   <div class="d-flex flex-column pt-3">
     <div class="d-flex flex-column justify-content-center">
       {#each collection as col}
-          <Folder collection={col} title={col.name}/>
+        <Folder collection={col} title={col.name} />
       {/each}
     </div>
   </div>

@@ -93,17 +93,15 @@
   const handleHeader = () => {
     isClicked = !isClicked;
   };
-
-  
 </script>
 
-<div class="d-flex flex-column mt-4 pb-0 ps-2">
+<div class="d-flex flex-column mt-4 pb-0 ps-2" style="height:auto;">
   <div
-    class="d-flex text-requestBodyColor gap-4 py-0 align-items-center justify-content-center"
+    class="d-flex text-requestBodyColor gap-5 align-items-center justify-content-center"
     style="font-size: 12px; font-weight: 500;"
   >
-    <p class="me-5 pe-5">Key</p>
-    <p class="ms-5">Value</p>
+    <p class="me-5">Key</p>
+    <p>Value</p>
   </div>
 
   {#if isClicked}
@@ -121,6 +119,7 @@
       position: relative;
       align-items:center;
       justify-content:center;
+    
       width: 200px;
       margin-bottom: 1px;
     "
@@ -145,6 +144,7 @@
           on:mouseleave={toggleHover}
           style="
             width: 460px;
+           
             margin: 0px;
             padding-top: 3px;
             cursor: grab;
@@ -155,7 +155,7 @@
           "
         >
           <div
-            class="d-flex align-items-center ps-1 justify-content-center gap-3 mb-2"
+            class="d-flex align-items-center justify-content-center gap-3 mb-2"
           >
             <button
               class="bg-backgroundColor border-0 w-25"
@@ -185,16 +185,18 @@
                 on:input={addRow}
               />
             </div>
-            <input
-              on:mouseenter={toggleHover}
-              on:mouseleave={toggleHover}
-              type="text"
-              placeholder="Enter Value"
-              style="outline: none;font-size:13px;"
-              class="bg-blackColor inputField border-0 ps-2 py-1 pe-3"
-              bind:value={row.value}
-              on:input={addRow}
-            />
+            <div>
+              <input
+                on:mouseenter={toggleHover}
+                on:mouseleave={toggleHover}
+                type="text"
+                placeholder="Enter Value"
+                style="outline: none;font-size:13px;"
+                class="bg-blackColor inputField border-0 ps-2 py-1 pe-3"
+                bind:value={row.value}
+                on:input={addRow}
+              />
+            </div>
 
             <div class="w-75 h-75">
               <button

@@ -30,14 +30,12 @@
 </script>
 
 <div
-  class="w-100"
+  class="pe-1"
   style="
             width: 460px;
-            margin-right: 1px;
-            padding-top: 3px;
-            
+
+            padding-top: 3px; 
             background-color:backgroundColor; /* Modify as needed */
-            
             display: flex;
             flex-direction: column;
           "
