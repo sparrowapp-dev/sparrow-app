@@ -1,5 +1,5 @@
 export interface RequestData {
-  body?: unknown;
+  body?: object;
   headers?: {
     Authorization: string;
   };

@@ -7,23 +7,21 @@ import { makeRequest } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
 const apiUrl: string = constants.API_URL;
 
-const registerUser = async (
-  userInfo: registerUserPostBody,
-): Promise<unknown> => {
+const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/user`, {
     body: userInfo,
   });
   return response;
 };
 
-const loginUser = async (userInfo: loginUserPostBody): Promise<unknown> => {
+const loginUser = async (userInfo: loginUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/auth/login`, {
     body: userInfo,
   });
   return response;
 };
 
-const forgotPassword = async (email: EmailPostBody): Promise<unknown> => {
+const forgotPassword = async (email: EmailPostBody) => {
   const response = await makeRequest(
     "POST",
     `${apiUrl}/api/auth/forgot-password`,

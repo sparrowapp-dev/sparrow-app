@@ -3,7 +3,7 @@ import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 const apiUrl: string = constants.API_URL;
 
-const fetchCollection = async (workspaceId: string): Promise<unknown> => {
+const fetchCollection = async (workspaceId: string) => {
   const response = await makeRequest(
     "GET",
     `${apiUrl}/api/collection/${workspaceId}`,
@@ -18,7 +18,7 @@ const insertCollectionDirectory = async (
   workspaceId: string,
   collectionId: string,
   directory: CreateDirectoryPostBody,
-): Promise<unknown> => {
+) => {
   const response = await makeRequest(
     "POST",
     `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
