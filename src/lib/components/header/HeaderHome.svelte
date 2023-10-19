@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import logo from "$lib/assets/logo.svg";
   import closeIcon from "$lib/assets/close.svg";
@@ -14,7 +14,7 @@
   import { clearAuthJwt } from "$lib/utils/jwt";
   import { useNavigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
-    import { setUser } from "$lib/store/auth.store";
+  import { setUser } from "$lib/store/auth.store";
   const navigate = useNavigate();
   const onMinimize = () => {
     appWindow.minimize();
@@ -39,6 +39,10 @@
       throw "error registering user: " + response.message;
     }
   }
+  let profile: boolean = false;
+  window.addEventListener("click", () => {
+    profile = false;
+  });
 </script>
 
 <div
@@ -92,8 +96,20 @@
         </button>
       </div>
       <div class="col-4">
-        <button class="btn btn-black" on:click={logout}>
-          <img src={profileIcon} alt="" />
+        <button class="btn btn-black position-relative" >
+          <img src={profileIcon} on:click={()=>{setTimeout(() => {
+            profile = true;
+          }, 100);}} alt="" />
+          <div class="position-absolute bg-white" style="display: {profile ? 'block' : 'none'}; top: 30px; right: 0; width: 219px;"  on:click={()=>{profile = false;}}>
+            <p on:click={()=>{
+              // logout();
+              profile = false;
+              }}></p>
+            <p on:click={()=>{
+              // logout();
+              profile = false;
+              }}>Sign Out</p>
+          </div>
         </button>
       </div>
     </div>
@@ -130,5 +146,8 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  .profile-tab-active{
+    display: block !important;
   }
 </style>
