@@ -15,7 +15,7 @@
   </div>
   <h1>Welcome to Sparrow App</h1>
   <a href="/dashboard" class="btn btn-link mt-4 w-100">Continue</a>
-  <a href="/" class="btn btn-link mt-4 w-100">Go Back</a>
+  <!-- <a href="/" class="btn btn-link mt-4 w-100">Go Back</a> -->
 </div>
 
 <style>

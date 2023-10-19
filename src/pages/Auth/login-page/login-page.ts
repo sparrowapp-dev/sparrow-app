@@ -19,7 +19,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
   try {
     await authService.loginUser(loginCredentials);
     notifications.success("Login successful!");
-    navigate("/");
+    navigate("/home");
   } catch (error) {
     notifications.error("Something went wrong");
   }

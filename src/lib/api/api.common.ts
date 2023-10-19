@@ -21,7 +21,9 @@ export const getAuthHeaders = () => {
 
 export const get = async (url, headers?) => {
   try {
-    const response = await axios.get(url, { headers });
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${headers}` },
+    });
     if (response.status === 200) {
       return success(response.data);
     } else {

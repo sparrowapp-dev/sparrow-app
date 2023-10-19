@@ -1,6 +1,7 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
-  import { authActions } from "$lib/store/auth.store";
+  import { setUser } from "$lib/store/auth.store";
+  import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
   import googleLogo from "$lib/assets/googlelogo.svg";
@@ -36,7 +37,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
   if (token) {
-    authActions.setUser({ token });
+    setUser(jwtDecode(token));
     navigate("/");
     maximizeWindow();
   }
