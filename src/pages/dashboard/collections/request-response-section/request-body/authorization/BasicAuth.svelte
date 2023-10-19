@@ -1,7 +1,16 @@
-<script>
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  let handleDropdown = (tab) => {
-    // console.log(tab);
+<script lang="ts">
+  import {
+    basicAuth1,
+    basicAuth2,
+    createBasicAuthHeader,
+  } from "$lib/store/requestSection";
+
+  const handleUsername = (event) => {
+    basicAuth1.set(event.target.value);
+  };
+
+  const handlePassword = (event) => {
+    basicAuth2.set(event.target.value);
   };
 </script>
 
@@ -17,6 +26,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Username"
+      bind:value={$basicAuth1}
+      on:input={handleUsername}
     />
   </div>
 
@@ -31,9 +42,13 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Password"
+      bind:value={$basicAuth2}
+      on:input={handlePassword}
     />
   </div>
 </div>
+
+<button on:click={createBasicAuthHeader}>Create Basic Auth Header</button>
 
 <style>
   input::placeholder {

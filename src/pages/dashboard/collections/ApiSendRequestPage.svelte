@@ -25,8 +25,8 @@
   <div class="d-flex align-items-center justify-content-between px-4">
     <div class="d-flex gap-2">
       <div class="d-flex align-items-center justify-content-center">
-        <button
-          class="d-flex w-100 h-100 pe-3 py-1 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
+        <p
+          class="d-flex mb-0 w-100 h-100 pe-3 py-0 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
         >
           <CrudDropdown
             data={[
@@ -42,7 +42,7 @@
             ]}
             onclick={handleDropdown}
           />
-        </button>
+            </p>
       </div>
       <input
         type="text"

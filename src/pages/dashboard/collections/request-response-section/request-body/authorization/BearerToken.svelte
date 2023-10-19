@@ -1,9 +1,17 @@
 <script>
-  let BearerTokenValue = localStorage.getItem("BearerTokenValue") || "";
+  import { BearerToken } from "$lib/store/requestSection";
+  let isOverflowing = false; // Track whether content overflows
 
   const handleInput = (event) => {
-    BearerTokenValue = event.target.value;
-    localStorage.setItem("BearerTokenValue", BearerTokenValue);
+    BearerToken.set(event.target.value);
+
+    // Check if content overflows
+    const inputElement = event.target;
+    if (inputElement.scrollWidth > inputElement.clientWidth) {
+      isOverflowing = true;
+    } else {
+      isOverflowing = false;
+    }
   };
 </script>
 
@@ -14,14 +22,23 @@
   >
     <p class="mb-0">Token</p>
 
-    <input
-      type="text"
-      style="outline: none;"
-      class="w-75 bg-backgroundColor border-0 h-75 ps-2"
-      placeholder="Enter Token"
-      bind:value={BearerTokenValue}
-      on:input={handleInput}
-    />
+    {#if isOverflowing}
+      <textarea
+        style="outline: none; height: auto;"
+        class="w-75 bg-backgroundColor border-0 h-100 ps-2"
+        bind:value={$BearerToken}
+        on:input={handleInput}
+      />
+    {:else}
+      <input
+        type="text"
+        style="outline: none;"
+        class="w-75 bg-backgroundColor border-0 h-75 ps-2"
+        placeholder="Enter Token"
+        bind:value={$BearerToken}
+        on:input={handleInput}
+      />
+    {/if}
   </div>
 </div>
 
