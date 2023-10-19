@@ -1,10 +1,13 @@
 <script>
     import folder from "$lib/assets/folder.svg";
+    import IconButton from "$lib/components/buttons/IconButton.svelte";
     import File from "./File.svelte";
     let expand = false;
     export let explorer;
+    const handleAPIClick = () =>{
+    }
 </script>
-{#if explorer.type === 0}
+{#if explorer.type === "FOLDER"}
     <div>
       <div style="height:36px;" class="d-flex align-items-center" on:click={() => {expand = !expand;}}>
         <img src={folder} alt="" style="height:16px; width:16px;">
@@ -14,6 +17,7 @@
         {#each explorer.items as exp}
           <svelte:self explorer={exp} />
         {/each}
+        <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
       </div>
     </div>
 {:else}
