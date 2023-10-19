@@ -47,7 +47,7 @@ const regenerateAuthToken = async (
   if (response.isSuccessful) {
     setAuthJwt(constants.AUTH_TOKEN, response.data.data.newAccessToken.token);
     setAuthJwt(constants.REF_TOKEN, response.data.data.newRefreshToken.token);
-    setUser(jwtDecode(response.data.data.accessToken.token));
+    setUser(jwtDecode(response.data.data.newAccessToken.token));
     makeRequest(method, url, requestData);
   } else {
     throw "error refresh token: " + response.message;
@@ -76,6 +76,7 @@ const makeRequest = async (
       regenerateAuthToken(method, url, requestData);
     } else if (e.response.data.message === ErrorMessages.Unauthorized) {
       clearAuthJwt();
+      setUser(null);
       navigate("/login");
     }
     if (e.message) {

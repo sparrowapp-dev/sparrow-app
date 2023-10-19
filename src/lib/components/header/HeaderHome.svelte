@@ -10,7 +10,12 @@
   import settingIcon from "$lib/assets/setting.svg";
   import profileIcon from "$lib/assets/profile.svg";
   import notifyIcon from "$lib/assets/notify.svg";
-
+  import {userLogout} from "$lib/services/auth.service";
+  import { clearAuthJwt } from "$lib/utils/jwt";
+  import { useNavigate } from "svelte-navigator";
+  import { notifications } from "$lib/utils/notifications";
+    import { setUser } from "$lib/store/auth.store";
+  const navigate = useNavigate();
   const onMinimize = () => {
     appWindow.minimize();
   };
@@ -22,6 +27,18 @@
   const toggleSize = () => {
     appWindow.toggleMaximize();
   };
+
+  const logout = async () => {
+    const response = await userLogout();
+    if (response.isSuccessful) {
+      clearAuthJwt();
+      setUser(null);
+      navigate("/login");
+    } else {
+      notifications.error("Something went wrong");
+      throw "error registering user: " + response.message;
+    }
+  }
 </script>
 
 <div
@@ -75,7 +92,7 @@
         </button>
       </div>
       <div class="col-4">
-        <button class="btn btn-black">
+        <button class="btn btn-black" on:click={logout}>
           <img src={profileIcon} alt="" />
         </button>
       </div>
