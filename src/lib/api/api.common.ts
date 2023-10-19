@@ -6,6 +6,7 @@ import constants from "$lib/utils/constants";
 import { clearAuthJwt, jwtDecode, setAuthJwt } from "$lib/utils/jwt";
 import { setUser } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
+import { ErrorMessages } from "$lib/utils/enums/enums";
 
 const error = (error, data?) => {
   return {
@@ -71,9 +72,9 @@ const makeRequest = async (
       return error(response.data.message);
     }
   } catch (e) {
-    if (e.response.data.statusCode === 401) {
+    if (e.response.data.message === ErrorMessages.ExpiredToken) {
       regenerateAuthToken(method, url, requestData);
-    } else if (e.response.data.statusCode === 400) {
+    } else if (e.response.data.message === ErrorMessages.Unauthorized) {
       clearAuthJwt();
       navigate("/login");
     }
