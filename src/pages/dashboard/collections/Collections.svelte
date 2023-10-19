@@ -3,10 +3,13 @@
   import TabBar from "./TabBar.svelte";
 </script>
 
-<div class="d-flex bg-backgroundColor">
+<div class="collection d-flex bg-backgroundColor">
   <CollectionSidebar />
   <TabBar />
 </div>
 
 <style>
+  .collection {
+    width: calc(100%);
+  }
 </style>

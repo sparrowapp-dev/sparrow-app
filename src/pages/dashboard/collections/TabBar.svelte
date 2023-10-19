@@ -17,11 +17,11 @@
 </script>
 
 <div class="d-flex flex-column">
-  <div style="border-top: 1px solid #313233" class="bg-backgroundColor;">
-    <div
-      class="d-flex align-items-center justify-content-start bg-blackColor ps-2 pe-5"
-      style="width:1006px;height:40px;"
-    >
+  <div
+    style="border-top: 1px solid #313233;width:calc(100%-280px);"
+    class="bg-backgroundColor;"
+  >
+    <div class="d-flex align-items-center justify-content-start bg-blackColor w-100">
       {#if tabs.length >= 5}
         <div class="d-flex gap-2 pe-1">
           <button

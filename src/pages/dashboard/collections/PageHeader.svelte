@@ -1,5 +1,4 @@
 <script>
-
   import angleDown from "$lib/assets/angle-down.svg";
 
   import floppyDisk from "$lib/assets/floppy-disk.svg";
@@ -7,7 +6,10 @@
 </script>
 
 <div class="d-flex flex-column">
-  <div class="d-flex align-items-center justify-content-between p-4">
+  <div
+    class="d-flex align-items-center justify-content-between p-4"
+    style="width:calc(100%-280px);"
+  >
     <div>
       <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
         create new booking

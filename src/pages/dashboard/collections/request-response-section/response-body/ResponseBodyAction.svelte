@@ -6,7 +6,9 @@
 </script>
 
 <div class="d-flex flex-column">
-  <div class="d-flex align-items-center justify-content-between py-3 ps-3">
+  <div
+    class="d-flex align-items-center justify-content-between py-3 ps-3"
+  >
     <div class="d-flex gap-4">
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"

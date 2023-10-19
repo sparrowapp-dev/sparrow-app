@@ -1,25 +1,26 @@
 <script>
-  import ResponseTab from "./response-body/ResponseTab.svelte";
   import penIcon from "$lib/assets/pen.svg";
   import Parameters from "./request-body/Parameters.svelte";
+
   import RequestBody from "./request-body/RequestBody.svelte";
   import Headers from "./request-body/Headers.svelte";
   import Authorization from "./request-body/authorization/Authorization.svelte";
   import { Router, Route, Link } from "svelte-navigator";
-  import Navigate from "../../../../routing/Navigate.svelte";
-  import Collections from "../Collections.svelte";
   import ResponseBodyAction from "./response-body/ResponseBodyAction.svelte";
   export let onclickState;
   let selectedTab = "parameters";
 </script>
 
-
 {#if onclickState}
-  <div class="d-flex align-items-start justify-content-between p-4">
+  <div
+    class="d-flex align-items-start justify-content-between p-4"
+    style="width:calc(100%-280px);"
+  >
     <div class="d-flex flex-column align-items-top justify-content-center">
       <div
         style="width: 480px;"
-        class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor">
+        class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor"
+      >
         <Link
           to="parameters"
           style="font-size: 12px;font-weight:500"
@@ -80,7 +81,7 @@
       </div>
       <div class="d-flex align-items-center justify-content-start">
         <Route path="/parameters"><Parameters /></Route>
-        <Route path="/requesbody"><RequestBody /></Route>
+        <Route path="/requestbody"><RequestBody /></Route>
         <Route path="/headers"><Headers /></Route>
         <Route path="/authorization"><Authorization /></Route>
       </div>
@@ -142,7 +143,10 @@
     </div>
   </div>
 {:else}
-  <div class="d-flex flex-column align-items-start justify-content-between p-4">
+  <div
+    class="d-flex flex-column align-items-start justify-content-between p-4"
+    style="width:calc(100%-280px);"
+  >
     <div class="d-flex flex-column align-items-top justify-content-center">
       <div
         style="width: 480px;"

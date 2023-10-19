@@ -22,7 +22,10 @@
 </script>
 
 <div class="d-flex flex-column">
-  <div class="d-flex align-items-center justify-content-between px-4">
+  <div
+    class="d-flex align-items-center justify-content-between px-4"
+    style="width:calc(100%-280px);"
+  >
     <div class="d-flex gap-2">
       <div class="d-flex align-items-center justify-content-center">
         <p
@@ -42,7 +45,7 @@
             ]}
             onclick={handleDropdown}
           />
-            </p>
+        </p>
       </div>
       <input
         type="text"
