@@ -1,10 +1,15 @@
 import constants from "$lib/utils/constants";
-const tokenName = constants.AUTH_TOKEN;
 
 const getUserToken = () => {
   let token = null;
-  token = localStorage.getItem(tokenName);
+  token = localStorage.getItem(constants.AUTH_TOKEN);
   return token;
 };
 
-export { getUserToken };
+const getRefToken = () => {
+  let token = null;
+  token = localStorage.getItem(constants.REF_TOKEN);
+  return token;
+};
+
+export { getUserToken, getRefToken };

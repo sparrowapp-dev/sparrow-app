@@ -1,6 +1,11 @@
 import axios, { type Method } from "axios";
 import type { RequestData } from "../utils/dto/requestdata";
-import { getUserToken } from "$lib/utils/token";
+import { getUserToken, getRefToken } from "$lib/utils/token";
+import { refreshToken } from "$lib/services/auth.service";
+import constants from "$lib/utils/constants";
+import { clearAuthJwt, jwtDecode, setAuthJwt } from "$lib/utils/jwt";
+import { setUser } from "$lib/store/auth.store";
+import { navigate } from "svelte-navigator";
 
 const error = (error, data?) => {
   return {
@@ -26,6 +31,28 @@ const getAuthHeaders = () => {
   };
 };
 
+const getRefHeaders = () => {
+  return {
+    Authorization: `Bearer ${getRefToken()}`,
+  };
+};
+
+const regenerateAuthToken = async (
+  method: Method,
+  url: string,
+  requestData?: RequestData,
+) => {
+  const response = await refreshToken();
+  if (response.isSuccessful) {
+    setAuthJwt(constants.AUTH_TOKEN, response.data.data.newAccessToken.token);
+    setAuthJwt(constants.REF_TOKEN, response.data.data.newRefreshToken.token);
+    setUser(jwtDecode(response.data.data.accessToken.token));
+    makeRequest(method, url, requestData);
+  } else {
+    throw "error refresh token: " + response.message;
+  }
+};
+
 const makeRequest = async (
   method: Method,
   url: string,
@@ -44,6 +71,12 @@ const makeRequest = async (
       return error(response.data.message);
     }
   } catch (e) {
+    if (e.response.data.statusCode === 401) {
+      regenerateAuthToken(method, url, requestData);
+    } else if (e.response.data.statusCode === 400) {
+      clearAuthJwt();
+      navigate("/login");
+    }
     if (e.message) {
       return error(e.message);
     } else if (e.response.data) {
@@ -53,7 +86,7 @@ const makeRequest = async (
   }
 };
 
-export { makeRequest, getAuthHeaders };
+export { makeRequest, getAuthHeaders, getRefHeaders };
 //------------- We need this function in future ------------------//
 // export const download = async (url, data, headers) => {
 //   try {

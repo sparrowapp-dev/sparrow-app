@@ -3,7 +3,7 @@ import type {
   registerUserPostBody,
   EmailPostBody,
 } from "$lib/utils/dto";
-import { makeRequest } from "$lib/api/api.common";
+import { makeRequest, getRefHeaders } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
 const apiUrl: string = constants.API_URL;
 
@@ -32,4 +32,15 @@ const forgotPassword = async (email: EmailPostBody) => {
   return response;
 };
 
-export { registerUser, loginUser, forgotPassword };
+const refreshToken = async () => {
+  const response = await makeRequest(
+    "POST",
+    `${apiUrl}/api/auth/refresh-token`,
+    {
+      headers: getRefHeaders(),
+    },
+  );
+  return response;
+};
+
+export { registerUser, loginUser, forgotPassword, refreshToken };
