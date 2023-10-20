@@ -24,7 +24,7 @@
 <style>
   .editor {
     width: 100%;
-  
+    height: auto;
     /* background: #000000; */
   }
 </style>
