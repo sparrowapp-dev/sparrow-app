@@ -165,7 +165,7 @@
       }}
       data-tauri-drag-region
     >
-      <h2 class="card-subtitle  fs-4 mb-3">Create Account</h2>
+      <h2 class="card-subtitle fs-4 mb-3">Create Account</h2>
       <div class="form-group gap-0 mb-3" data-tauri-drag-region>
         <label for="email" class="form-label" data-tauri-drag-region
           >Email</label
