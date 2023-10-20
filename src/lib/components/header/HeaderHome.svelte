@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import logo from "$lib/assets/logo.svg";
   import closeIcon from "$lib/assets/close.svg";
@@ -10,7 +10,18 @@
   import settingIcon from "$lib/assets/setting.svg";
   import profileIcon from "$lib/assets/profile.svg";
   import notifyIcon from "$lib/assets/notify.svg";
+  import {userLogout} from "$lib/services/auth.service";
+  import { clearAuthJwt } from "$lib/utils/jwt";
+  import { useNavigate } from "svelte-navigator";
+  import { notifications } from "$lib/utils/notifications";
+  import { setUser } from "$lib/store/auth.store";
+  import signout from "$lib/assets/signout.svg";
+  import shortcut from "$lib/assets/shortcut.svg";
+  import about from "$lib/assets/about.svg";
+  import settings from "$lib/assets/settings.svg";
+  import account from "$lib/assets/account.svg";
 
+  const navigate = useNavigate();
   const onMinimize = () => {
     appWindow.minimize();
   };
@@ -22,6 +33,22 @@
   const toggleSize = () => {
     appWindow.toggleMaximize();
   };
+
+  const logout = async () => {
+    const response = await userLogout();
+    if (response.isSuccessful) {
+      clearAuthJwt();
+      setUser(null);
+      navigate("/login");
+    } else {
+      notifications.error("Something went wrong");
+      throw "error registering user: " + response.message;
+    }
+  }
+  let profile: boolean = false;
+  window.addEventListener("click", () => {
+    profile = false;
+  });
 </script>
 
 <div
@@ -75,9 +102,36 @@
         </button>
       </div>
       <div class="col-4">
-        <button class="btn btn-black">
-          <img src={profileIcon} alt="" />
-        </button>
+        <div class="position-relative">
+          <button class="btn btn-black" style="border:none; outline:none;" >
+            <img src={profileIcon} on:click={()=>{setTimeout(() => {
+              profile = true;
+            }, 100);}} alt=""/>
+          </button>
+          <div class="rounded profile-explorer position-absolute text-color-white py-1" style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {profile ? 'block' : 'none'}; top: 40px; right: 0; width: 219px;"  on:click={()=>{profile = false;}}>
+              <div class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px" on:click={()=>{
+                profile = false;
+                }}><img src={account} alt=""><span class="m-2" style="font-size: 12px;">View Account</span>
+              </div>
+              <div class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px" on:click={()=>{
+                profile = false;
+                }}><img src={settings} alt=""><span class="m-2" style="font-size: 12px;">Notification Settings</span>
+              </div>
+              <div class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px" on:click={()=>{
+                profile = false;
+                }}><img src={shortcut} alt=""><span class="m-2" style="font-size: 12px;">App Shortcuts</span>
+              </div>
+              <div class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px" on:click={()=>{
+                profile = false;
+                }}><img src={about} alt=""><span class="m-2" style="font-size: 12px;">About Sparrow</span>
+              </div>
+              <div class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px" on:click={()=>{
+                logout();
+                }}><img src={signout} alt=""><span class="m-2" style="font-size: 12px;">Sign Out</span>
+              </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -114,4 +168,8 @@
     background-clip: text;
     color: transparent;
   }
+  .cursor-pointer{
+    cursor: pointer;
+  }
+
 </style>

@@ -32,6 +32,13 @@ const forgotPassword = async (email: EmailPostBody) => {
   return response;
 };
 
+const userLogout = async () => {
+  const response = await makeRequest("GET", `${apiUrl}/api/user/logout`, {
+    headers: getRefHeaders(),
+  });
+  return response;
+};
+
 const refreshToken = async () => {
   const response = await makeRequest(
     "POST",
@@ -43,4 +50,4 @@ const refreshToken = async () => {
   return response;
 };
 
-export { registerUser, loginUser, forgotPassword, refreshToken };
+export { registerUser, loginUser, forgotPassword, refreshToken, userLogout };
