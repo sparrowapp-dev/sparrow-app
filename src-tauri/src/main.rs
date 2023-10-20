@@ -60,11 +60,14 @@ async fn make_request(
         "FORMDATA" => make_formdata_request(request_builder, body).await,
         _ => make_json_request(request_builder, body).await,
     };
-    
+
+    // Extracting Response Value
     let response_value = match check {
         Ok(value) => value,
         Err(err) => todo!("{}", err), 
     };
+
+    // Extracting Headers, StatusCode & Response
     let headers = response_value.headers().clone();
     let status = response_value.status().clone();
     let response_text = response_value.text().await?;
@@ -72,6 +75,8 @@ async fn make_request(
         (name.to_string(), value.to_str().unwrap())
     }).collect();
     let response_json: serde_json::Value = serde_json::from_str(&response_text)?;
+
+    // Combining all parameters
     let combined_json = json!({
         "headers": headers_json,
         "status": status.to_string(),

@@ -7,7 +7,6 @@
   import googleLogo from "$lib/assets/googlelogo.svg";
   import githubLogo from "$lib/assets/githublogo.svg";
   import microsoftLogo from "$lib/assets/microsoftlogo.svg";
-  import { invoke } from "@tauri-apps/api";
 
   import { handleLoginValidation } from "./login-page";
   // Function to validate the email
@@ -58,34 +57,11 @@
   // let errorMessage = "";
 
   // Handle sign-in with external providers
-  const handleSignInWithProvider = async (provider: string) => {
+  const handleSignInWithProvider = (provider: string) => {
     // Handle sign-in with GitHub, Google, Microsoft, etc.
     // You can implement the authentication logic here.
     // Example: Redirect to OAuth authorization URL for the selected provider.
     console.log(`Signing in with ${provider}`);
-    console.log("Rust");
-  const url = "https://jsonplaceholder.typicode.com/posts";
-  // const method = "GET";
-  const headers = "Content-Type=application/json&User-Agent=MyClient/1.0"; // Add your headers if needed
-  const body =
-  "--form '=@\"/C:/Users/91877/Downloads/WhatsApp Image 2023-10-05 at 6.09.07 PM.jpeg\"'";
-  const body1 = {
-    name: "John Doe",
-    age: 50,
-    is_select: true,
-  };
-  const method = "POST";
-
-  // const body = "username=johndoe&password=secretpassword&data=example";
-  const request = "URLENCODED";
-  const a = await invoke("make_type_request_command", {
-    url,
-    method,
-    headers,
-    body,
-    request,
-  });
-  console.log("RESULT ===>", a);
     // maximizePage();
   };
 </script>
