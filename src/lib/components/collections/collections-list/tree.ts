@@ -52,7 +52,6 @@ const helper = (
 
 /**
  * Custom hook function for interacting with the tree data structure.
- * @returns {function} - Returns a function that can add files or folders to the tree.
  */
 const useTree = () => {
   return [
