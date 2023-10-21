@@ -2,9 +2,11 @@
     import folder from "$lib/assets/folder.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import File from "./File.svelte";
+    import { insertTreeNode } from "./tree";
     let expand = false;
     export let explorer;
     const handleAPIClick = () =>{
+      insertTreeNode(explorer.id, "FILE", "New Request","GET");
     }
 </script>
 {#if explorer.type === "FOLDER"}

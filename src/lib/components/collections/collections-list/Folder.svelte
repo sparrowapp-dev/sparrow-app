@@ -5,6 +5,7 @@
     import { insertCollectionDirectory, fetchCollection } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+    import { insertTreeNode } from "./tree";
     let visibility = true;
     export let title:string;
     export let collection:any;
@@ -13,13 +14,6 @@
     currentWorkspaceId.subscribe((value : string)=>{
       workspaceId = value;
     });
-    
-    let getCollectionData = async (id: string) =>{
-      const res = await fetchCollection(id);
-      if(res.isSuccessful){
-        setCollectionList(res.data.data);
-      }
-    }
 
     const getFolderName = ()=>{
       let folderAvailable : boolean = true;
@@ -48,10 +42,11 @@
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
-            getCollectionData(workspaceId);
+          insertTreeNode(collection._id, "FOLDER", directory.name);
       }
     }
     const handleAPIClick = ()=>{
+      insertTreeNode(collection._id, "FILE", "New Request", "GET");
     }
 
 </script>

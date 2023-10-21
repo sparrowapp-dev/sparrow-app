@@ -9,6 +9,8 @@
 
 <style>
   .collection {
-    width: calc(100%);
+    width: calc(100% - 280px);
+    height: calc(100vh - 50px);
+    overflow: auto;
   }
 </style>

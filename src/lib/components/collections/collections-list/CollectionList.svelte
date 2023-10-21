@@ -29,7 +29,7 @@
 </script>
 
 <div
-  style="width:280px;border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
+  style="width:280px; height: calc(100vh - 50px); overflow:auto; border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
   class="d-flex flex-column bg-backgroundColor"
 >
   <div
