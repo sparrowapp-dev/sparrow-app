@@ -7,9 +7,14 @@
   import ResponseBodyAction from "../response-body-section/ResponseBodyAction.svelte";
   import { Router, Route, Link } from "svelte-navigator";
   import Parameters from "../request-parameter-section/Parameters.svelte";
+  import Loader from "$lib/components/Transition/Loader.svelte";
+  import ResponseBody from "../response-body-section/ResponseBody.svelte";
+  import ResponseHeader from "../response-body-section/ResponseHeader.svelte";
 
   export let onclickState;
   let selectedTab = "parameters";
+
+  let visible = true;
 </script>
 
 {#if onclickState}
@@ -90,30 +95,137 @@
     <div>
       <div
         class="d-flex flex-column"
-        style="width: 480px; height: 64vh;border-left:2px solid #313233;"
+        style="width: 480px; height: 64vh;border-left:1px solid #313233;"
       >
+        <!-- this is for loading the response -->
+        <!-- <Loader {visible} /> -->
+
+        <!-- This code will be by defualt untill we don't request api -->
+        <!-- <div
+          class="d-flex text-requestBodyColor flex-column align-items-center justify-content-between py-3 ps-3"
+        >
+          <div
+            class="d-flex align-items-center justify-content-center mb-4 mt-5"
+          >
+            <h4 style="font-weight: 500;">Click send to get a Response</h4>
+          </div>
+          <div
+            style="font-family: Roboto Mono;font-size: 12px;font-weight: 400;line-height: 18px;letter-spacing: 0em;text-align: left;"
+            class="d-flex flex-column"
+          >
+            <h5 style="font-weight: 700;text-align:center">Few shortcuts</h5>
+            <div
+              class="d-flex align-items-center text-left justify-content-between gap-5 mb-2 mt-2"
+            >
+              <p class="mb-0">Send Request</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                ctrl + Enter
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">Save Request</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                ctrl + S
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">New Request</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                ctrl + N
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">Edit link</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                alt + L
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">Add Parameter</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                alt + P
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">Add Header</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                alt + H
+              </button>
+            </div>
+            <div
+              class="d-flex align-items-center justify-content-between gap-5 mb-2"
+            >
+              <p class="mb-0">Edit Body</p>
+              <button
+                disabled
+                class="bg-buttonBackColor text-buttonColor border-0 py-1 px-4"
+              >
+                alt + B
+              </button>
+            </div>
+          </div>
+        </div> -->
+        <!-- This code will be there when we do api request request api -->
         <div
           data-tauri-drag-region
           class="d-flex align-items-center justify-content-between ps-3"
           style="d-flex;align-items:center; justify-content:center;width:480px;height:28px;gap: 12px;"
         >
           <div class="d-flex gap-4 text-requestBodyColor">
-            <a
-              href="/responsebody"
+            <Link
+              to="response"
               style="font-size: 12px;font-weight:500"
-              class="d-flex text-requestBodyColor text-decoration-none"
-              >Response Body
-            </a>
+              class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+              ><span
+                on:click={() => (selectedTab = "response")}
+                class="team-menu__link d-flex pb-1"
+                class:tab-active={selectedTab === "response"}
+                >Response Body
+              </span>
+            </Link>
 
-            <a
-              href="/headers"
+            <Link
+              to="headers/response"
               style="font-size: 12px;font-weight:500"
-              class="d-flex text-requestBodyColor text-decoration-none"
-              >Headers
-              <p style="font-size: 13px;" class="mb-0 text-labelColor ps-1">
-                (8)
-              </p></a
-            >
+              class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+              ><span
+                on:click={() => (selectedTab = "headers/response")}
+                class="team-menu__link d-flex pb-1"
+                class:tab-active={selectedTab === "headers/response"}
+                >Headers
+                <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
+                  (4)
+                </p>
+              </span>
+            </Link>
           </div>
           <div class="d-flex gap-3">
             <button
@@ -223,6 +335,18 @@
         class="d-flex flex-column"
         style="width: 100%; height: 64vh;border-top:2px solid #313233;"
       >
+        <!-- this is default page for response page -->
+        <!-- <div
+          class="d-flex flex-column align-items-center justify-content-between py-3 ps-3"
+        >
+          <div>
+            <h4 style="font-weight: 500;">Click send to get a Response</h4>
+          </div>
+          <div>
+            <h5 style="font-weight: 700;">Few shortcuts</h5>
+            <div />
+          </div>
+        </div> -->
         <div
           data-tauri-drag-region
           class="d-flex align-items-center justify-content-between pt-4"
@@ -255,6 +379,10 @@
                 </p>
               </span>
             </Link>
+            <div>
+              <Route path="/response"><ResponseBody /></Route>
+              <Route path="/headers/response"><ResponseHeader /></Route>
+            </div>
           </div>
           <div class="d-flex gap-3">
             <button

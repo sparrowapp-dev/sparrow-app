@@ -20,9 +20,9 @@ export const authNavigate = () => {
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
   const response = await loginUser(loginCredentials);
   if (response.isSuccessful) {
-    setAuthJwt(constants.AUTH_TOKEN, response.data.data.accessToken.token);
-    setAuthJwt(constants.REF_TOKEN, response.data.data.refreshToken.token);
-    setUser(jwtDecode(response.data.data.accessToken.token));
+    setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
+    setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
+    setUser(jwtDecode(response.data?.data?.accessToken?.token));
     notifications.success("Login successful!");
     navigate("/home");
   } else {

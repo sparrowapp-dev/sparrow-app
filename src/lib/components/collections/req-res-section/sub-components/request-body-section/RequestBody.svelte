@@ -26,7 +26,7 @@
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
   <br />
-  <div class="my-json-editor editor jse-theme-dark my-json-editor">
+  <div class="my-json-editor me-2 editor jse-theme-dark my-json-editor">
     <JSONEditor bind:content />
   </div>
 </div>
@@ -34,15 +34,16 @@
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    width: 100%;
+    /* width: 100%; */
     height: 60vh;
     padding: 0px;
+
     /* background: #000000; */
   }
 
   .my-json-editor {
     /* define a custom theme color */
-    --jse-theme-color: var();
-    --jse-theme-color-highlight: #687177;
+    --jse-theme-color: var(--blackColor);
+    --jse-theme-color-highlight: var(--blackColor);
   }
 </style>

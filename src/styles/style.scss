@@ -20,13 +20,16 @@ $sparrow-border-color: #313233;
 $sparrow-get: #69d696;
 $sparrow-put: #9685ff;
 $sparrow-post: #ffe47e;
-$sparrow-delete: #FF7878;
-$sparrow-arc: #8A9299;
+$sparrow-delete: #ff7878;
+$sparrow-arc: #8a9299;
 $sparrow-request-body: #8a9299;
 $sparrow-send-button: #1193f0;
 $sparrow-send-hoverbutton: #4030f2e1;
+$sparrow-button-background: #2d2c2c;
+$sparrow-button-color: #e5e5e5;
 
 :root {
+  --blackColor: #{$sparrow-black};
   --success-color: #{$sparrow-success};
   --button-color: #{$sparrow-request-body};
   --send-button: #{$sparrow-send-button};
@@ -60,8 +63,9 @@ $theme-colors: map-merge(
     "lightBackground": $sparrow-border-color,
     "getColor": $sparrow-get,
     "requestBodyColor": $sparrow-request-body,
-    "labelColor": $sparrow-send-button
-      // "buttonColor": $button-color,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+    "labelColor": $sparrow-send-button,
+    "buttonBackColor": $sparrow-button-background,
+    "buttonColor": $sparrow-button-color,
   )
 );
 
