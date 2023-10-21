@@ -1,8 +1,8 @@
 <script lang="ts">
     import angleRight from "$lib/assets/angleRight.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
-    import {currentWorkspaceId, setCollectionList} from '$lib/store/collection';
-    import { insertCollectionDirectory, fetchCollection } from '$lib/services/collection';
+    import {currentWorkspaceId } from '$lib/store/collection';
+    import { insertCollectionDirectory } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
     import { useTree } from "./tree";
@@ -36,7 +36,7 @@
       return null;
     }
     
-    const handleFolderClick = async ()=>{
+    const handleFolderClick = async () : Promise<void> =>{
       let directory : CreateDirectoryPostBody = {
         name : getFolderName(),
         description: ""
