@@ -6,6 +6,10 @@ collectionList.subscribe((value: object[]) => {
   tree = JSON.parse(JSON.stringify(value));
 });
 
+/**
+ * Recursive helper function to modify the tree data structure by adding files or folders.
+ */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const helper = (
   tree: any,
@@ -37,6 +41,7 @@ const helper = (
     return 0;
   }
 
+  // Recursively search through the tree structure
   if (tree && tree.items) {
     for (let j = 0; j < tree.items.length; j++) {
       if (!helper(tree.items[j], folderId, type, name, id, method)) return 0;
@@ -45,6 +50,10 @@ const helper = (
   return 1;
 };
 
+/**
+ * Custom hook function for interacting with the tree data structure.
+ * @returns {function} - Returns a function that can add files or folders to the tree.
+ */
 const useTree = () => {
   return [
     (
@@ -54,6 +63,7 @@ const useTree = () => {
       id: string,
       method?: string,
     ): void => {
+      // Iterate through the tree to find the target folder and add the item
       for (let i = 0; i < tree.length; i++) {
         if (!helper(tree[i], folderId, type, name, id, method)) {
           setCollectionList(tree);
