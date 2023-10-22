@@ -2,6 +2,7 @@ import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type {
   CreateApiRequestPostBody,
+  CreateCollectionPostBody,
   CreateDirectoryPostBody,
 } from "$lib/utils/dto";
 const apiUrl: string = constants.API_URL;
@@ -47,6 +48,17 @@ const insertCollectionRequest = async (
   return response;
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const insertCollection: (
+  collection: CreateCollectionPostBody,
+) => Promise<any> = async (collection) => {
+  const response = await makeRequest("POST", `${apiUrl}/api/collection`, {
+    body: collection,
+    headers: getAuthHeaders(),
+  });
+  return response;
+};
+
 // collection  to create files and folder
 // const createCollectionEntry = async (collectionId :string, workspaceId: string) =>{
 //   const response = await post(
@@ -84,4 +96,9 @@ const insertCollectionRequest = async (
 //   return response;
 // };
 
-export { fetchCollection, insertCollectionDirectory, insertCollectionRequest };
+export {
+  fetchCollection,
+  insertCollectionDirectory,
+  insertCollectionRequest,
+  insertCollection,
+};

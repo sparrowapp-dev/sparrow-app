@@ -53,7 +53,7 @@ const helper: (
 /**
  * Custom hook function for interacting with the tree data structure.
  */
-const useTree = () => {
+const useTree = (): any[] => {
   const insertNode: (
     folderId: string,
     type: string,
@@ -70,7 +70,13 @@ const useTree = () => {
     }
     return;
   };
-  return [insertNode];
+  const insertHead: (name: string, _id: string) => void = (name, _id) => {
+    // Iterate through the tree to find the target folder and add the item
+    tree.push({ name, _id, items: [] });
+    setCollectionList(tree);
+    return;
+  };
+  return [insertNode, insertHead];
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

@@ -7,7 +7,7 @@
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
     import { useTree, getNextName } from "./collectionList";
     const [insertTreeNode] = useTree();
-    let visibility = true;
+    let visibility = false;
     export let title:string;
     export let collection:any;
    

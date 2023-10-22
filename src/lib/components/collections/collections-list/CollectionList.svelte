@@ -4,14 +4,17 @@
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
-  import { fetchCollection } from "$lib/services/collection";
+  import { fetchCollection, insertCollection } from "$lib/services/collection";
   import {
     collectionList,
     setCollectionList,
     currentWorkspaceId,
   } from "$lib/store/collection";
-
+  import {useTree} from './collectionList';
+  import type { CreateCollectionPostBody } from "$lib/utils/dto";
+  const [,insertHead] = useTree();
   let collection: any;
+  let workspaceId : string ="";
 
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -23,9 +26,48 @@
   collectionList.subscribe((value) => {
     collection = value;
   });
+
   currentWorkspaceId.subscribe((value) => {
+    workspaceId = value;
     getCollectionData(value);
   });
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+const getNextCollection: (list: any[], name: string) => any = (
+  list,
+  name,
+) => {
+  const isNameAvailable: (proposedName: string) => boolean = (proposedName) => {
+    return list.some((element) => {
+      return element.name === proposedName;
+    });
+  };
+
+  if (!isNameAvailable(name)) {
+    return name;
+  }
+
+  for (let i = 2; i < list.length + 10; i++) {
+    const proposedName: string = `${name}${i}`;
+    if (!isNameAvailable(proposedName)) {
+      return proposedName;
+    }
+  }
+
+  return null;
+};
+
+  const handleCreateCollection = async ()=> {
+    const newCollection : CreateCollectionPostBody = {
+      name: getNextCollection(collection, "New collection"),
+      workspaceId
+    }
+    const res = await insertCollection(newCollection);
+    if(res.isSuccessful){
+        insertHead(newCollection.name, JSON.stringify(new Date()));
+    }
+  }
+
 </script>
 
 <div
@@ -67,7 +109,7 @@
     <div class="d-flex align-items-center justify-content-center">
       <button
         class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px;"
+        style="width: 32px; height:32px;" on:click={handleCreateCollection}
       >
         <img src={plusIcon} alt="" />
       </button>
