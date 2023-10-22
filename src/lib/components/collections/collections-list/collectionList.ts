@@ -11,14 +11,14 @@ collectionList.subscribe((value: object[]) => {
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const helper = (
+const helper: (
   tree: any,
   folderId: string,
   type: string,
   name: string,
   id: string,
   method?: string,
-): number => {
+) => number = (tree, folderId, type, name, id, method?) => {
   if (tree._id === folderId || tree.id === folderId) {
     if (type === "FILE") {
       tree.items.push({
@@ -54,24 +54,49 @@ const helper = (
  * Custom hook function for interacting with the tree data structure.
  */
 const useTree = () => {
-  return [
-    (
-      folderId: string,
-      type: string,
-      name: string,
-      id: string,
-      method?: string,
-    ): void => {
-      // Iterate through the tree to find the target folder and add the item
-      for (let i = 0; i < tree.length; i++) {
-        if (!helper(tree[i], folderId, type, name, id, method)) {
-          setCollectionList(tree);
-          return;
-        }
+  const insertNode: (
+    folderId: string,
+    type: string,
+    name: string,
+    id: string,
+    method?: string,
+  ) => void = (folderId, type, name, id, method?) => {
+    // Iterate through the tree to find the target folder and add the item
+    for (let i = 0; i < tree.length; i++) {
+      if (!helper(tree[i], folderId, type, name, id, method)) {
+        setCollectionList(tree);
+        return;
       }
-      return;
-    },
-  ];
+    }
+    return;
+  };
+  return [insertNode];
 };
 
-export { useTree };
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const getNextName: (list: any[], type: string, name: string) => any = (
+  list,
+  type,
+  name,
+) => {
+  const isNameAvailable: (proposedName: string) => boolean = (proposedName) => {
+    return list.some((element) => {
+      return element.type === type && element.name === proposedName;
+    });
+  };
+
+  if (!isNameAvailable(name)) {
+    return name;
+  }
+
+  for (let i = 2; i < list.length + 10; i++) {
+    const proposedName: string = `${name}${i}`;
+    if (!isNameAvailable(proposedName)) {
+      return proposedName;
+    }
+  }
+
+  return null;
+};
+
+export { useTree, getNextName };

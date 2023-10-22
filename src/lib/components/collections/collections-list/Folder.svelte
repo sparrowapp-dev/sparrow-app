@@ -5,7 +5,7 @@
     import { insertCollectionDirectory } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
-    import { useTree } from "./tree";
+    import { useTree, getNextName } from "./collectionList";
     const [insertTreeNode] = useTree();
     let visibility = true;
     export let title:string;
@@ -15,30 +15,10 @@
     currentWorkspaceId.subscribe((value : string)=>{
       workspaceId = value;
     });
-
-    const getFolderName = ()=>{
-      let folderAvailable : boolean = true;
-      collection.items.forEach(element => {
-        if(element.type === "FOLDER" && element.name === "New Folder"){
-          folderAvailable = false;
-        }
-      });
-      if(folderAvailable) return `New Folder`;
-      for(let i = 2; i < collection.items.length + 10; i++){
-        folderAvailable = true;
-        collection.items.forEach(element => {
-          if(element.type === "FOLDER" && element.name === `New Folder${i}`){
-            folderAvailable = false;
-          }
-        });
-        if(folderAvailable) return `New Folder${i}`;
-      }
-      return null;
-    }
     
     const handleFolderClick = async () : Promise<void> =>{
       let directory : CreateDirectoryPostBody = {
-        name : getFolderName(),
+        name : getNextName(collection.items, "FOLDER", "New Folder"),
         description: ""
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
@@ -47,7 +27,8 @@
       }
     }
     const handleAPIClick = ()=>{
-      insertTreeNode(collection._id, "FILE", "New Request",JSON.stringify(new Date()), "GET");
+      const file : string = getNextName(collection.items, "FILE", "New Request"); 
+      insertTreeNode(collection._id, "FILE", file ,JSON.stringify(new Date()), "GET");
     }
 
 </script>
