@@ -85,7 +85,10 @@
   let selectedView = "grid";
 </script>
 
-<div class="d-flex bg-backgroundColor" style="height: calc(100vh);">
+<div
+  class="d-flex bg-backgroundColor"
+  style="height:100vh; margin-top:50px"
+>
   <div class="sidebar-teams">
     <Teams {teams} />
     <hr />
@@ -183,6 +186,7 @@
 
 <style>
   .sidebar-teams {
+    margin-top: 50px;
     width: 280px;
     border-right: 1px solid #313233;
     padding: 15px;
