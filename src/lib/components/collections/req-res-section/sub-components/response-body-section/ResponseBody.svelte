@@ -1,12 +1,11 @@
 <script lang="ts">
+  import { JSONEditor } from "svelte-jsoneditor";
   import angleDown from "$lib/assets/angle-down.svg";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
-  import { JSONEditor } from "svelte-jsoneditor";
-
   // let content = {
   //   text: undefined,
-  //   json:
+  //   json: {
   //     array: [1, 2, 3],
   //     boolean: true,
   //     color: "#82b92c",
@@ -26,53 +25,55 @@
   }
 </script>
 
-<div class="my-json-editor editor jse-theme-dark my-json-editor mt-2 ms-2">
-  <div class="d-flex flex-column">
-    <div class="d-flex align-items-center justify-content-between py-3 ps-3">
-      <div class="d-flex gap-4">
-        <button
-          class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
+<div
+  class="d-flex flex-column w-100 align-items-start justify-content-between mt-3"
+>
+  <div class="d-flex align-items-center justify-content-between mb-1 w-100">
+    <div class="d-flex gap-4 align-items-center justify-content-center">
+      <button
+        class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
+      >
+        <p
+          style="font-size: 12px;font-weight:400;Line-height:18px"
+          class="mb-0 text-whiteColor"
         >
-          <p
-            style="font-size: 12px;font-weight:400;Line-height:18px"
-            class="mb-0 text-whiteColor"
-          >
-            Pretty
-          </p>
-          <img src={angleDown} alt="" class="w-100 h-100" />
-        </button>
+          Pretty
+        </p>
+        <img src={angleDown} alt="" class="w-100 h-100" />
+      </button>
 
-        <button
-          class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
+      <button
+        class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
+      >
+        <p
+          style="font-size: 12px;font-weight:400;"
+          class="mb-0 text-whiteColor"
         >
-          <p
-            style="font-size: 12px;font-weight:400;"
-            class="mb-0 text-whiteColor"
-          >
-            JSON
-          </p>
-          <img src={angleDown} alt="" class="w-100 h-100" />
-        </button>
-      </div>
-      <div class="d-flex gap-4">
-        <button class=" bg-backgroundColor border-0">
-          <img src={downloadIcon} alt="" />
-        </button>
+          JSON
+        </p>
+        <img src={angleDown} alt="" class="w-100 h-100" />
+      </button>
+    </div>
+    <div class="d-flex align-items-center gap-4">
+      <button class=" bg-backgroundColor border-0">
+        <img src={downloadIcon} alt="" />
+      </button>
 
-        <button class=" bg-backgroundColor border-0">
-          <img src={copyIcon} alt="" />
-        </button>
-      </div>
+      <button class=" bg-backgroundColor border-0">
+        <img src={copyIcon} alt="" />
+      </button>
     </div>
   </div>
-  <JSONEditor bind:this={editorRef} readOnly />
+  <div class="my-json-editor editor jse-theme-dark my-json-editor">
+    <JSONEditor bind:this={editorRef} readOnly />
+  </div>
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
     width: 100%;
-    height: 60vh;
+    height: 70vh;
     background: #000000;
   }
 
