@@ -1,6 +1,9 @@
 import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
-import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+import type {
+  CreateApiRequestPostBody,
+  CreateDirectoryPostBody,
+} from "$lib/utils/dto";
 const apiUrl: string = constants.API_URL;
 
 const fetchCollection = async (workspaceId: string) => {
@@ -24,6 +27,20 @@ const insertCollectionDirectory = async (
     `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
     {
       body: directory,
+      headers: getAuthHeaders(),
+    },
+  );
+  return response;
+};
+
+const insertCollectionRequest = async (
+  apiRequest: CreateApiRequestPostBody,
+) => {
+  const response = await makeRequest(
+    "POST",
+    `${apiUrl}/api/collection/request`,
+    {
+      body: apiRequest,
       headers: getAuthHeaders(),
     },
   );
@@ -67,4 +84,4 @@ const insertCollectionDirectory = async (
 //   return response;
 // };
 
-export { fetchCollection, insertCollectionDirectory };
+export { fetchCollection, insertCollectionDirectory, insertCollectionRequest };
