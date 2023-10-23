@@ -132,7 +132,7 @@
     position: fixed;
     top: 50px;
     left: 72px;
-    height: 93vh;
+    height: calc(100vh - 50px);
   }
   .inputField {
     outline: none;

@@ -1,10 +1,12 @@
 <script lang="ts">
     import angleRight from "$lib/assets/angleRight.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
-    import {currentWorkspaceId, setCollectionList} from '$lib/store/collection';
-    import { insertCollectionDirectory, fetchCollection } from '$lib/services/collection';
+    import {currentWorkspaceId } from '$lib/store/collection';
+    import { insertCollectionDirectory } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
+    import { useTree, getNextName } from "./collectionList";
+    const [insertTreeNode] = useTree();
     let visibility = true;
     export let title:string;
     export let collection:any;
@@ -14,44 +16,19 @@
       workspaceId = value;
     });
     
-    let getCollectionData = async (id: string) =>{
-      const res = await fetchCollection(id);
-      if(res.isSuccessful){
-        setCollectionList(res.data.data);
-      }
-    }
-
-    const getFolderName = ()=>{
-      let folderAvailable : boolean = true;
-      collection.items.forEach(element => {
-        if(element.type === "FOLDER" && element.name === "New Folder"){
-          folderAvailable = false;
-        }
-      });
-      if(folderAvailable) return `New Folder`;
-      for(let i = 2; i < collection.items.length + 10; i++){
-        folderAvailable = true;
-        collection.items.forEach(element => {
-          if(element.type === "FOLDER" && element.name === `New Folder${i}`){
-            folderAvailable = false;
-          }
-        });
-        if(folderAvailable) return `New Folder${i}`;
-      }
-      return null;
-    }
-    
-    const handleFolderClick = async ()=>{
+    const handleFolderClick = async () : Promise<void> =>{
       let directory : CreateDirectoryPostBody = {
-        name : getFolderName(),
+        name : getNextName(collection.items, "FOLDER", "New Folder"),
         description: ""
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
-            getCollectionData(workspaceId);
+          insertTreeNode(collection._id, "FOLDER", directory.name, JSON.stringify(new Date()));
       }
     }
     const handleAPIClick = ()=>{
+      const file : string = getNextName(collection.items, "FILE", "New Request"); 
+      insertTreeNode(collection._id, "FILE", file ,JSON.stringify(new Date()), "GET");
     }
 
 </script>

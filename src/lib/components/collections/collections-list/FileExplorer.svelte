@@ -1,10 +1,14 @@
-<script>
+<script lang="ts">
     import folder from "$lib/assets/folder.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import File from "./File.svelte";
+    import { useTree, getNextName } from "./collectionList";
+    const [insertTreeNode] = useTree();
     let expand = false;
     export let explorer;
     const handleAPIClick = () =>{
+      const name: string = getNextName(explorer.items, "FILE", "New Request");
+      insertTreeNode(explorer.id, "FILE", name, JSON.stringify(new Date()) ,"GET");
     }
 </script>
 {#if explorer.type === "FOLDER"}
