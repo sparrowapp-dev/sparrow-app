@@ -5,6 +5,7 @@
   import angleRight from "$lib/assets/angle-right.svg";
   import linesmallIcon from "$lib/assets/linesmall.svg";
   import PageHeader from "./PageHeader.svelte";
+  import { collapsibleState } from "$lib/store/requestSection";
 
   let tabs = [
     { name: "GET", content: " Untitled Request" },
@@ -13,12 +14,16 @@
     { name: "GET", content: " Untitled Request" },
     { name: "GET", content: " Untitled Request" },
   ];
+
+  let isCollaps;
+  collapsibleState.subscribe((value) => (isCollaps = value));
+  console.log(isCollaps);
 </script>
 
 <div class="d-flex flex-column">
   <div
-    style="border-top: 1px solid #313233;width:calc(100%-280px);"
-    class="bg-backgroundColor;"
+    style="border-top: 1px solid #313233;width:{isCollaps ? '100%' : '100%'}"
+    class="tabbar bg-backgroundColor;"
   >
     <div
       class="d-flex align-items-center justify-content-start bg-blackColor w-100"
@@ -80,6 +85,13 @@
 </div>
 
 <style>
+  .tabbar {
+    /* top: 50px; */
+    position: fixed;
+    width: calc(100%-72px);
+    height: 36px;
+  }
+
   .btn-primary {
     background-color: #000000;
     color: #8a9299;
