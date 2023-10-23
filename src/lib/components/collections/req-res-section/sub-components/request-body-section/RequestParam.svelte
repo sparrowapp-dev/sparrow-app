@@ -1,31 +1,47 @@
 <script>
   import penIcon from "$lib/assets/pen.svg";
-
   import Headers from "../request-header-section/Headers.svelte";
   import RequestBody from "../request-body-section/RequestBody.svelte";
   import Authorization from "../request-authorization-section/Authorization.svelte";
-  import ResponseBodyAction from "../response-body-section/ResponseBodyAction.svelte";
-  import { Router, Route, Link } from "svelte-navigator";
+  import { Route, Link } from "svelte-navigator";
   import Parameters from "../request-parameter-section/Parameters.svelte";
-  import Loader from "$lib/components/Transition/Loader.svelte";
+  // import Loader from "$lib/components/Transition/Loader.svelte";
   import ResponseBody from "../response-body-section/ResponseBody.svelte";
   import ResponseHeader from "../response-body-section/ResponseHeader.svelte";
+  import {
+    collapsibleState,
+    isHorizontalVertical,
+  } from "$lib/store/requestSection";
 
-  export let onclickState;
-  let selectedTab = "parameters";
+  //this is for horizaontal and
+  let isHorizontalVerticalMode;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
-  let visible = true;
+  //this for active link tab
+  let selectedTab = "requestbody";
+  let selectedTab1 = "response";
+
+  //this is for expand collaps condition
+  let isCollaps;
+  collapsibleState.subscribe((value) => {
+    isCollaps = value;
+  });
+
+  // let visible = true;
 </script>
 
-{#if onclickState}
-  <div
-    class="d-flex align-items-start justify-content-between p-4"
-    style="width:calc(100%-280px);"
-  >
-    <div class="d-flex flex-column align-items-top justify-content-center">
+{#if isHorizontalVerticalMode}
+  <div class="d-flex align-items-start justify-content-between w-100">
+    <div
+      class="d-flex flex-column align-items-top justify-content-center {isCollaps
+        ? 'ps-5 pt-3 pe-1'
+        : 'pt-3 ps-4 pe-2'}"
+      style="width:{isCollaps ? '50%' : '50%'};"
+    >
       <div
-        style="width: 480px;"
-        class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor"
+        class="{isCollaps
+          ? 'ps-2 pt-2 pe-5'
+          : 'pt-1 ps-1 pe-5'} d-flex align-items-start justify-content-between text-requestBodyColor"
       >
         <Link
           to="parameters"
@@ -92,11 +108,14 @@
         <Route path="/authorization"><Authorization /></Route>
       </div>
     </div>
-    <div>
-      <div
-        class="d-flex flex-column"
-        style="width: 480px; height: 64vh;border-left:1px solid #313233;"
-      >
+
+    <div
+      style="width:{isCollaps
+        ? '50%'
+        : '50%'};border-left:1px solid #313233;height:50vh"
+      class={isCollaps ? "ps-3 pt-3 pe-3" : "pt-3 ps-2 pe-3"}
+    >
+      <div class="d-flex flex-column">
         <!-- this is for loading the response -->
         <!-- <Loader {visible} /> -->
 
@@ -194,76 +213,85 @@
           </div>
         </div> -->
         <!-- This code will be there when we do api request request api -->
-        <div
-          data-tauri-drag-region
-          class="d-flex align-items-center justify-content-between ps-3"
-          style="d-flex;align-items:center; justify-content:center;width:480px;height:28px;gap: 12px;"
-        >
-          <div class="d-flex gap-4 text-requestBodyColor">
-            <Link
-              to="response"
-              style="font-size: 12px;font-weight:500"
-              class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
-              ><span
-                on:click={() => (selectedTab = "response")}
-                class="team-menu__link d-flex pb-1"
-                class:tab-active={selectedTab === "response"}
-                >Response Body
-              </span>
-            </Link>
+        <div class="d-flex flex-column justify-content-between w-100">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex gap-4 text-requestBodyColor">
+              <Link
+                to="response"
+                style="font-size: 12px;font-weight:500"
+                class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+                ><span
+                  on:click={() => (selectedTab1 = "response")}
+                  class="team-menu__link d-flex pb-1"
+                  class:tab-active={selectedTab1 === "response"}
+                  >Response Body
+                </span>
+              </Link>
 
-            <Link
-              to="headers/response"
-              style="font-size: 12px;font-weight:500"
-              class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
-              ><span
-                on:click={() => (selectedTab = "headers/response")}
-                class="team-menu__link d-flex pb-1"
-                class:tab-active={selectedTab === "headers/response"}
-                >Headers
-                <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
-                  (4)
-                </p>
-              </span>
-            </Link>
-          </div>
-          <div class="d-flex gap-3">
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
-              style="font-size: 12px; font-weight:600"
-            >
-              <span>200</span>
-              <p class="mb-0">OK</p>
-            </button>
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary2"
-              style="font-size: 12px;font-weight:600"
-            >
-              <span>300</span>
-              <p class="mb-0">ms</p>
-            </button>
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary3"
-              style="font-size: 12px;font-weight:600"
-            >
-              <span>6.8</span>
-              <p class="mb-0">KB</p>
-            </button>
+              <Link
+                to="resheader"
+                style="font-size: 12px;font-weight:500"
+                class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+                ><span
+                  on:click={() => (selectedTab1 = "resheader")}
+                  class="team-menu__link d-flex pb-1"
+                  class:tab-active={selectedTab1 === "resheader"}
+                  >Headers
+                  <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
+                    (4)
+                  </p>
+                </span>
+              </Link>
+            </div>
+
+            <div class="d-flex gap-3">
+              <button
+                class=" d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
+                style="font-size: 12px; font-weight:600"
+              >
+                <span>200</span>
+                <p class="mb-0">OK</p>
+              </button>
+              <button
+                class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary2"
+                style="font-size: 12px;font-weight:600"
+              >
+                <span>300</span>
+                <p class="mb-0">ms</p>
+              </button>
+              <button
+                class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary3"
+                style="font-size: 12px;font-weight:600"
+              >
+                <span>6.8</span>
+                <p class="mb-0">KB</p>
+              </button>
+            </div>
           </div>
         </div>
-        <ResponseBodyAction />
+      </div>
+      <div class="d-flex align-items-center justify-content-center">
+        <Route path="/response"><ResponseBody /></Route>
+        <Route path="/resheader"><ResponseHeader /></Route>
       </div>
     </div>
   </div>
 {:else}
   <div
-    class="d-flex flex-column align-items-start justify-content-between p-4"
-    style="width:calc(100%-280px);"
+    class="d-flex flex-column align-items-start justify-content-between {isCollaps
+      ? 'pt-3 ps-5'
+      : 'pt-3 ps-3'}"
+    style="width:{isCollaps ? '100%' : '100%'};"
   >
-    <div class="d-flex flex-column align-items-top justify-content-center">
+    <div
+      class="d-flex flex-column align-items-top justify-content-center"
+      style="width:{isCollaps ? '100%' : '100%'};"
+    >
       <div
-        style="width: 480px;"
-        class=" d-flex pt-1 pe-5 ps-2 align-items-start justify-content-between text-requestBodyColor"
+        style="width:{isCollaps ? '50%' : '50%'};"
+        class="{isCollaps
+          ? ' ps-2 pe-5'
+          : 'ps-1'} d-flex align-items-start justify-content-between text-requestBodyColor"
       >
         <Link
           to="parameters"
@@ -325,7 +353,7 @@
       </div>
       <div class="d-flex align-items-center justify-content-start">
         <Route path="/parameters"><Parameters /></Route>
-        <Route path="/response"><RequestBody /></Route>
+        <Route path="/requestbody"><RequestBody /></Route>
         <Route path="/headers"><Headers /></Route>
         <Route path="/authorization"><Authorization /></Route>
       </div>
@@ -333,7 +361,9 @@
     <div>
       <div
         class="d-flex flex-column"
-        style="width: 100%; height: 64vh;border-top:2px solid #313233;"
+        style="width:{isCollaps
+          ? '100%'
+          : '100%'};border-top:2px solid #313233;"
       >
         <!-- this is default page for response page -->
         <!-- <div
@@ -348,41 +378,39 @@
           </div>
         </div> -->
         <div
-          data-tauri-drag-region
-          class="d-flex align-items-center justify-content-between pt-4"
-          style="d-flex;align-items:center; justify-content:center;width:970px;height:28px;gap: 12px;"
+          style="width:{isCollaps ? '100%' : '100%'};"
+          class="d-flex align-items-center justify-content-between pt-2"
         >
-          <div class="d-flex gap-4 text-requestBodyColor">
+          <div
+            style="width:{isCollaps ? '50%' : '50%'};"
+            class="d-flex align-items-center gap-4 text-requestBodyColor"
+          >
             <Link
               to="response"
               style="font-size: 12px;font-weight:500"
               class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
               ><span
-                on:click={() => (selectedTab = "response")}
+                on:click={() => (selectedTab1 = "response")}
                 class="team-menu__link d-flex pb-1"
-                class:tab-active={selectedTab === "response"}
+                class:tab-active={selectedTab1 === "response"}
                 >Response Body
               </span>
             </Link>
 
             <Link
-              to="headers"
+              to="resheader"
               style="font-size: 12px;font-weight:500"
               class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
               ><span
-                on:click={() => (selectedTab = "headers")}
+                on:click={() => (selectedTab1 = "resheader")}
                 class="team-menu__link d-flex pb-1"
-                class:tab-active={selectedTab === "headers"}
+                class:tab-active={selectedTab1 === "resheader"}
                 >Headers
                 <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
                   (4)
                 </p>
               </span>
             </Link>
-            <div>
-              <Route path="/response"><ResponseBody /></Route>
-              <Route path="/headers/response"><ResponseHeader /></Route>
-            </div>
           </div>
           <div class="d-flex gap-3">
             <button
@@ -408,7 +436,10 @@
             </button>
           </div>
         </div>
-        <ResponseBodyAction />
+        <div class="d-flex align-items-center justify-content-center">
+          <Route path="/response"><ResponseBody /></Route>
+          <Route path="/resheader"><ResponseHeader /></Route>
+        </div>
       </div>
     </div>
   </div>
@@ -427,6 +458,9 @@
 
   .btn-primary1 {
     background: var(--success-color);
+
+    padding-top: 1px;
+    padding-bottom: 1px;
   }
 
   .btn-primary2 {

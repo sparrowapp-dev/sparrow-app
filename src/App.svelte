@@ -13,19 +13,17 @@
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import ResendEmail from "./pages/Auth/resend-email/ResendEmail.svelte";
-    import HomePage from "./pages/Home/home-page/HomePage.svelte";
+  import HomePage from "./pages/Home/home-page/HomePage.svelte";
 
   export let url = "/";
 </script>
 
 <Router {url}>
   <Authguard>
-    <section slot="loggedIn">
-      <Route path="/home" component={HomePage} />
-      <Route path="/dashboard/*" component={Dashboard} />
-      <Route path="/*"><Navigate to="/dashboard" /></Route>
-    </section>
+    <section slot="loggedIn" />
     <section slot="unauthorized">
+      <Route path="/*"><Navigate to="/dashboard" /></Route>
+      <Route path="/dashboard/*" component={Dashboard} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot/password" component={ForgotPassword} />

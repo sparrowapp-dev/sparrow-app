@@ -21,12 +21,11 @@
   };
 </script>
 
-<div class=" ps-2 pt-3 pe-0 rounded w-100">
+<div class="ps-0 pt-3 pe-0 rounded w-100">
   <Dropdown data={["Pretty"]} onclick={handleDropdown} /><span class="px-2" />
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
-  <br />
-  <div class="my-json-editor me-2 editor jse-theme-dark my-json-editor">
+  <div class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1">
     <JSONEditor bind:content />
   </div>
 </div>
@@ -34,11 +33,7 @@
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    /* width: 100%; */
     height: 60vh;
-    padding: 0px;
-
-    /* background: #000000; */
   }
 
   .my-json-editor {

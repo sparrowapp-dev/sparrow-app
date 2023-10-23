@@ -1,5 +1,7 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
+  import doubleangleRight from "$lib/assets/doubleangleRight.svg";
+
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
@@ -10,6 +12,8 @@
     setCollectionList,
     currentWorkspaceId,
   } from "$lib/store/collection";
+
+  import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
 
   let collection: any;
 
@@ -26,17 +30,57 @@
   currentWorkspaceId.subscribe((value) => {
     getCollectionData(value);
   });
+
+  //this is for expand and collaps
+  let collapsExpandToggle = false;
+
+  collapsibleState.subscribe((value) => {
+    collapsExpandToggle = value;
+  });
+
+  const setcollapsExpandToggle = () => {
+    collapsExpandToggle = !collapsExpandToggle;
+    collapsibleState.set(collapsExpandToggle);
+  };
+  console.log(collapsibleState);
 </script>
 
+<!-- //this will show only when button will be collaps -->
+{#if collapsExpandToggle}
+  <div>
+    <button
+      class="bg-blackColor border-0 rounded pb-3 pe-1"
+      style="display: {collapsExpandToggle
+        ? 'block'
+        : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
+        ? '2'
+        : '0'}"
+      on:click={setcollapsExpandToggle}
+    >
+      <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
+      <div style="transform: rotate(270deg);font-size:10px;" class="mt-3 mb-2">
+        Collections
+      </div>
+    </button>
+  </div>
+{/if}
+
 <div
-  style="width:280px;border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
-  class="d-flex flex-column bg-backgroundColor"
+  style="width:{collapsExpandToggle
+    ? '0px'
+    : '280px'};border-right: {collapsExpandToggle
+    ? '0px'
+    : '1px solid #313233'};"
+  class="sidebar d-flex flex-column bg-backgroundColor"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
     <p class="mb-0 text-whiteColor" style="font-size: 18px;">Domigo</p>
-    <button class="bg-backgroundColor border-0">
+    <button
+      class="bg-backgroundColor border-0"
+      on:click={setcollapsExpandToggle}
+    >
       <img src={doubleangleLeft} alt="" />
     </button>
   </div>
@@ -84,6 +128,12 @@
 </div>
 
 <style>
+  .sidebar {
+    position: fixed;
+    top: 50px;
+    left: 72px;
+    height: 93vh;
+  }
   .inputField {
     outline: none;
   }

@@ -3,9 +3,12 @@
   import tableColumnIcon from "$lib/assets/table-column.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
+  import {
+    collapsibleState,
+    isHorizontalVertical,
+  } from "$lib/store/requestSection";
 
   // import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
-
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
 
@@ -13,6 +16,7 @@
 
   const toggleClick = () => {
     onclickState = !onclickState;
+    isHorizontalVertical.set(onclickState);
   };
 
   let handleDropdown = (tab) => {
@@ -20,12 +24,18 @@
     // console.log(currentTab);
     // console.log(tab);
   };
+
+  //this for expand and collaps condition
+  let isCollaps;
+  collapsibleState.subscribe((value) => (isCollaps = value));
 </script>
 
-<div class="d-flex flex-column">
+<div class="d-flex flex-column w-100">
   <div
-    class="d-flex align-items-center justify-content-between px-4"
-    style="width:calc(100%-280px);"
+    class="d-flex align-items-center justify-content-between {isCollaps
+      ? 'ps-5 pt-3 pe-3'
+      : 'pt-3 px-3'}"
+    style="width:calc(100%-312px);"
   >
     <div class="d-flex gap-2">
       <div class="d-flex align-items-center justify-content-center">
@@ -48,18 +58,22 @@
           />
         </p>
       </div>
+
       <input
         type="text"
         placeholder="Enter URL or paste text"
-        class="bg-blackColor border-0 p-3"
-        style="width:695px; height:38px; outline:none;font-size:14px; border-radius: 8px; gap: 8px;"
+        class="bg-blackColor border-0 p-3 rounded"
+        style=" width:{isCollaps
+          ? '918px'
+          : '670px'}; height:38px; outline:none;font-size:14px;"
       />
+
       <button
         class="btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:38px; font-weight:400">Send</button
       >
     </div>
-    <div>
+    <div class="ps-1">
       <img src={lineIcon} alt="" />
     </div>
 
@@ -73,7 +87,7 @@
     </div>
   </div>
 
-  <RequestParam {onclickState} />
+  <RequestParam />
 </div>
 
 <style>
