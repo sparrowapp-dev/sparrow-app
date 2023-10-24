@@ -3,10 +3,10 @@ import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type { WorkspacePostBody } from "$lib/utils/dto";
 const apiUrl: string = constants.API_URL;
 
-const fetchWorkspace = async (workspaceId: string) => {
+const fetchWorkspaces = async (userId: string) => {
   const response = await makeRequest(
     "GET",
-    `${apiUrl}/api/workspace/${workspaceId}`,
+    `${apiUrl}/api/workspace/user/${userId}`,
     {
       headers: getAuthHeaders(),
     },
@@ -48,4 +48,4 @@ const createWorkspace = async (workspace: WorkspacePostBody) => {
   return response;
 };
 
-export { fetchWorkspace, updateWorkspace, deleteWorkspace, createWorkspace };
+export { fetchWorkspaces, updateWorkspace, deleteWorkspace, createWorkspace };

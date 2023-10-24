@@ -14,12 +14,15 @@
   import { clearAuthJwt } from "$lib/utils/jwt";
   import { useNavigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
-  import { setUser } from "$lib/store/auth.store";
+  import { setUser, user } from "$lib/store/auth.store";
   import signout from "$lib/assets/signout.svg";
   import shortcut from "$lib/assets/shortcut.svg";
   import about from "$lib/assets/about.svg";
   import settings from "$lib/assets/settings.svg";
   import account from "$lib/assets/account.svg";
+    import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
+    import { fetchWorkspaces } from "$lib/services/workspace.service";
+    import { setCurrentWorkspace } from "$lib/store/workspace.store";
 
   const navigate = useNavigate();
   const onMinimize = () => {
@@ -49,10 +52,30 @@
   window.addEventListener("click", () => {
     profile = false;
   });
+
+  let workspacedropDown : any[] = [];
+
+  const handleWorkspace = async(userId: string) => {
+    let response =  await fetchWorkspaces(userId);
+    if (response.isSuccessful) {
+      workspacedropDown = response.data.data;
+      setCurrentWorkspace(response.data.data[0]._id, response.data.data[0].name);
+    }
+  }
+
+  user.subscribe((value)=>{
+    if(value){
+      handleWorkspace(value._id);
+    }
+  })
+  
+  const handleDropdown = (id, tab)=>{
+    setCurrentWorkspace(id, tab);
+  }
 </script>
 
 <div
-  class="header d-flex w-100 p-1 align-items-center justify-content-between bg-blackColor"
+  class="header d-flex w-100 p-1 align-items-center justify-content-between bg-blackColor" style="z-index:9999999999999999;"
   data-tauri-drag-region
 >
   <div
@@ -69,10 +92,7 @@
       class="d-flex d-flex align-items-center justify-content-center gap-2"
       style="height: 36px; width:116px"
     >
-      <p style="font-size: 12px;" class="mb-0 text-whiteColor">Workspace</p>
-      <button class="p-1 border-0 bg-blackColor">
-        <img src={dropdown} alt="" />
-      </button>
+      <HeaderDropdown data={workspacedropDown} onclick={handleDropdown}  />
     </div>
   </div>
 
