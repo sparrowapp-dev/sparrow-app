@@ -23,7 +23,6 @@
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
-        console.log(res);
           insertTreeNode(collection._id, res.data.data.type, res.data.data.name, res.data.data.id);
       }
     }
