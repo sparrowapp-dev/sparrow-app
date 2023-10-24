@@ -1,5 +1,7 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
+  import doubleangleRight from "$lib/assets/doubleangleRight.svg";
+
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
@@ -7,14 +9,18 @@
   import { fetchCollection, insertCollection } from "$lib/services/collection";
   import {
     collectionList,
-    setCollectionList,
-    currentWorkspaceId,
+    setCollectionList
   } from "$lib/store/collection";
   import {useTree} from './collectionList';
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
   const [,insertHead] = useTree();
-  let collection: any;
-  let workspaceId : string ="";
+  
+
+  import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
+    import { currentWorkspace } from "$lib/store/workspace.store";
+
+let collection: any;
+  let currentWorkspaceId : string ="";
 
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -25,11 +31,6 @@
 
   collectionList.subscribe((value) => {
     collection = value;
-  });
-
-  currentWorkspaceId.subscribe((value) => {
-    workspaceId = value;
-    getCollectionData(value);
   });
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -60,7 +61,7 @@ const getNextCollection: (list: any[], name: string) => any = (
   const handleCreateCollection = async ()=> {
     const newCollection : CreateCollectionPostBody = {
       name: getNextCollection(collection, "New collection"),
-      workspaceId
+      workspaceId: currentWorkspaceId
     }
     const res = await insertCollection(newCollection);
     if(res.isSuccessful){
@@ -68,17 +69,65 @@ const getNextCollection: (list: any[], name: string) => any = (
     }
   }
 
+  let currentWorkspaceName="";
+  currentWorkspace.subscribe((value) => {
+    if(value.id !== ""){
+      getCollectionData(value.id);
+      currentWorkspaceName = value.name;
+      currentWorkspaceId = value.id;
+    }
+  });
+
+  //this is for expand and collaps
+  let collapsExpandToggle = false;
+
+  collapsibleState.subscribe((value) => {
+    collapsExpandToggle = value;
+  });
+
+  const setcollapsExpandToggle = () => {
+    collapsExpandToggle = !collapsExpandToggle;
+    collapsibleState.set(collapsExpandToggle);
+  };
+  console.log(collapsibleState);
 </script>
 
+<!-- //this will show only when button will be collaps -->
+{#if collapsExpandToggle}
+  <div>
+    <button
+      class="bg-blackColor border-0 rounded pb-3 pe-1"
+      style="display: {collapsExpandToggle
+        ? 'block'
+        : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
+        ? '2'
+        : '0'}"
+      on:click={setcollapsExpandToggle}
+    >
+      <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
+      <div style="transform: rotate(270deg);font-size:10px;" class="mt-3 mb-2">
+        Collections
+      </div>
+    </button>
+  </div>
+{/if}
+
 <div
-  style="width:280px; height: calc(100vh - 50px); overflow:auto; border-right: 1px solid #313233;padding:0px, 24px, 8px, 8px "
-  class="d-flex flex-column bg-backgroundColor"
+  style="width:{collapsExpandToggle
+    ? '0px'
+    : '280px'};border-right: {collapsExpandToggle
+    ? '0px'
+    : '1px solid #313233'};"
+  class="sidebar d-flex flex-column bg-backgroundColor"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
-    <p class="mb-0 text-whiteColor" style="font-size: 18px;">Domigo</p>
-    <button class="bg-backgroundColor border-0">
+    <p class="mb-0 text-whiteColor" style="font-size: 18px;">{currentWorkspaceName}</p>
+    <button
+      class="bg-backgroundColor border-0"
+      on:click={setcollapsExpandToggle}
+    >
       <img src={doubleangleLeft} alt="" />
     </button>
   </div>
@@ -126,6 +175,12 @@ const getNextCollection: (list: any[], name: string) => any = (
 </div>
 
 <style>
+  .sidebar {
+    position: fixed;
+    top: 50px;
+    left: 72px;
+    height: calc(100vh - 50px);
+  }
   .inputField {
     outline: none;
   }

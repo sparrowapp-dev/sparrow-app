@@ -8,12 +8,12 @@
 
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
-  import Dashboard from "./pages/dashboard/Dashboard.svelte";
+  import Dashboard from "./pages/Dashboard/Dashboard.svelte";
   import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import ResendEmail from "./pages/Auth/resend-email/ResendEmail.svelte";
-    import HomePage from "./pages/Home/home-page/HomePage.svelte";
+  import HomePage from "./pages/Home/home-page/HomePage.svelte";
 
   export let url = "/";
 </script>

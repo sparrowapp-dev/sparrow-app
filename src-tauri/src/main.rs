@@ -8,25 +8,26 @@ fn greet(name: &str) -> String {
 mod json_handler;
 mod urlencoded_handler;
 mod formdata_handler;
-use serde_json::{Value, Map};
+use serde_json::Value;
 use std::collections::HashMap;
-use reqwest::{Client};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::Client;
 use json::{JsonValue, JsonError};
 use json_handler::make_json_request;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use formdata_handler::make_formdata_request;
+use serde_json::json;
 
 #[tokio::main]
 async fn make_request(
-    method: &str,
     url: &str,
+    method: &str,
     headers: &str,
     body: &str, 
-    request_type: &str,
-) -> String
+    request: &str,
+) -> Result<Value, Box<dyn std::error::Error>>
 {
     // Make a client
+    println!("justocheck");
     let client = Client::new();
     // Convert the method string to reqwest::Method
     let reqwest_method = match method {
@@ -53,25 +54,45 @@ async fn make_request(
         request_builder = request_builder.header(key, value);
     }
 
-    let check = match request_type {
+    let check = match request {
         "JSON" => make_json_request(request_builder, body).await,
         "URLENCODED" => make_www_form_urlencoded_request(request_builder, body).await,
         "FORMDATA" => make_formdata_request(request_builder, body).await,
         _ => make_json_request(request_builder, body).await,
     };
-    
-    let result_string = match check {
+
+    // Extracting Response Value
+    let response_value = match check {
         Ok(value) => value,
-        Err(err) => format!("Error: {:?}", err), 
+        Err(err) => todo!("{}", err), 
     };
-    println!("Result from async function: {:?}", result_string);
-    return result_string;
+
+    // Extracting Headers, StatusCode & Response
+    let headers = response_value.headers().clone();
+    let status = response_value.status().clone();
+    let response_text = response_value.text().await?;
+    let headers_json: serde_json::Value = headers.iter().map(|(name, value)| {
+        (name.to_string(), value.to_str().unwrap())
+    }).collect();
+    let response_json: serde_json::Value = serde_json::from_str(&response_text)?;
+
+    // Combining all parameters
+    let combined_json = json!({
+        "headers": headers_json,
+        "status": status.to_string(),
+        "response": response_json
+    });
+    return Ok(combined_json);
 }
 
 #[tauri::command]
-fn make_type_request_command(url: &str, method: &str, headers: &str, body: &str, request_type: &str) -> String {
-    let result = make_request(method, url, headers, body, request_type);
-    return result;
+fn make_type_request_command(url: &str, method: &str, headers: &str, body: &str, request: &str) -> Value {
+    let result = make_request( url, method, headers, body, request);
+    let result_value = match result {
+        Ok(value) => value,
+        Err(err) => todo!("{}", err), 
+    };
+    return result_value;
 }
 
 

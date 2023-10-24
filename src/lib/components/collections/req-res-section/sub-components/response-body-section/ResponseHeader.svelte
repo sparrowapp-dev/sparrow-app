@@ -1,5 +1,8 @@
 <!-- btoa stands for "binary to ASCII," and it's a JavaScript function for converting binary data into a base64-encoded ASCII string. The btoa function is commonly used to encode binary data, such as images or other file formats, into a format that can be safely included in text-based data formats like JSON or HTML. -->
 <script>
+  import dragIcon from "$lib/assets/drag.svg";
+  import trashIcon from "$lib/assets/trash-icon.svg";
+
   import {
     basicAuthHeader,
     basicAuth1,
@@ -8,8 +11,6 @@
     apiKey1,
     apiKey2,
   } from "$lib/store/requestSection";
-
- 
 
   // storing the value from store for Basic auth section
   let username;
@@ -29,15 +30,8 @@
 </script>
 
 <div
-  class="pe-1"
-  style="
-            width: 460px;
-
-            padding-top: 3px; 
-            background-color:backgroundColor; /* Modify as needed */
-            display: flex;
-            flex-direction: column;
-          "
+  class="d-flex flex-column mt-5 ps-0 align-items-center bg-backgroundColor"
+  style="width:460px;"
 >
   {#if username.length > 0 && password.length > 0}
     <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
@@ -88,7 +82,10 @@
   {/if}
 
   {#if apiKey.length > 0 && apiValue.length > 0}
-    <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+    <div
+      class="d-flex align-items-center justify-content-center ps-1 gap-3 mb-2"
+    >
+      <img src={dragIcon} alt="" style="cursor:grabbing;" />
       <div>
         <input class="form-check-input" type="checkbox" checked disabled />
       </div>
@@ -108,10 +105,12 @@
         class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
         readonly
       />
+      <img src={trashIcon} alt="" />
     </div>
   {/if}
 
-  <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+  <div class="d-flex align-items-center justify-content-center gap-3 mb-2 ps-1">
+    <img src={dragIcon} alt="" style="cursor:grabbing;" />
     <div>
       <input class="form-check-input" type="checkbox" checked />
     </div>
@@ -131,8 +130,10 @@
       class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
       readonly
     />
+    <img src={trashIcon} alt="" />
   </div>
-  <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+  <div class="d-flex align-items-center justify-content-center ps-1 gap-3 mb-2">
+    <img src={dragIcon} alt="" style="cursor:grabbing;" />
     <div>
       <input class="form-check-input" type="checkbox" checked />
     </div>
@@ -152,8 +153,10 @@
       class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
       readonly
     />
+    <img src={trashIcon} alt="" />
   </div>
-  <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+  <div class="d-flex align-items-center justify-content-center ps-1 gap-3 mb-2">
+    <img src={dragIcon} alt="" style="cursor:grabbing;" />
     <div>
       <input class="form-check-input" type="checkbox" checked />
     </div>
@@ -173,8 +176,10 @@
       class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
       readonly
     />
+    <img src={trashIcon} alt="" />
   </div>
-  <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+  <div class="d-flex align-items-center justify-content-center gap-3 ps-1 mb-2">
+    <img src={dragIcon} alt="" style="cursor:grabbing;" />
     <div>
       <input class="form-check-input" type="checkbox" checked />
     </div>
@@ -194,6 +199,7 @@
       class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
       readonly
     />
+    <img src={trashIcon} alt="" />
   </div>
 </div>
 

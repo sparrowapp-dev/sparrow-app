@@ -12,6 +12,14 @@ export const basicAuth1 = writable("");
 export const basicAuth2 = writable("");
 export const basicAuthHeader = writable("");
 
+//this store is for collaps and expand section
+export const collapsibleState = writable(false);
+
+//this is for horizaontal and vertical mode
+export const isHorizontalVertical = writable(false);
+
+//for color on crud operation
+
 export const createBasicAuthHeader = () => {
   // Retrieve values from the stores
   let username;

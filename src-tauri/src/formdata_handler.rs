@@ -1,4 +1,4 @@
-use reqwest::RequestBuilder;
+use reqwest::{RequestBuilder, Response};
 use std::error::Error;
 use regex::Regex; 
 use reqwest::multipart;
@@ -30,7 +30,7 @@ fn extract_local_path(input: &str) -> Option<String> {
 pub async fn make_formdata_request(
     request_builder: RequestBuilder,
     body: &str,
-) -> Result<String, Box<dyn Error>> {
+) -> Result<Response, Box<dyn Error>> {
     let filename = extract_filename(body);
     let local_filepath = extract_local_path(body);
     let local_filepath_str = local_filepath.as_ref().unwrap();
@@ -42,7 +42,7 @@ pub async fn make_formdata_request(
     let form = reqwest::multipart::Form::new()
     .text("resourceName", filename_str1)
     .part("FileData", part);
-    let resp = request_builder.multipart(form).send().await?.text().await?;
+    let resp = request_builder.multipart(form).send().await?;
     println!("{:#?}", resp);
     Ok(resp)
 }

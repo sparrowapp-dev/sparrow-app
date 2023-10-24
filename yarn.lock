@@ -3423,6 +3423,11 @@ svelte-jsoneditor@^0.18.9:
     svelte-simple-modal "^1.6.1"
     vanilla-picker "^2.12.2"
 
+svelte-loading-spinners@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/svelte-loading-spinners/-/svelte-loading-spinners-0.3.4.tgz#af11d0f9ef0943026415c931900c10fea02a88a5"
+  integrity sha512-vKaW71QMCBcTNijAGc0mUl8k3DQ66iYmp6MB8BMGCXyWk82bTrcLy8FOnSm9fE+8q6TwzD6PLUoYFHt0II93Xw==
+
 svelte-navigator@^3.2.2:
   version "3.2.2"
   resolved "https://registry.npmjs.org/svelte-navigator/-/svelte-navigator-3.2.2.tgz"
