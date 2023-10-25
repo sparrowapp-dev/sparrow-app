@@ -1,15 +1,13 @@
 <script lang="ts">
     export let name: string;
     export let method: string;
-    export let path;
+
     let apiClass = "red-api";
     if(method === "DELETE") apiClass = "red-api";
     else if(method === "GET") apiClass = "green-api"; 
     else if(method === "POST") apiClass = "yellow-api";
     else if(method === "PUT") apiClass = "blue-api";
     else if(method === "ARC") apiClass = "grey-api";
-    path.pop();
-    let actualPath = path.join('/');
     // console.log(actualPath);
 </script>
 
@@ -19,8 +17,6 @@
     </div>
     <div class="api-name">
         {name} 
-        <br/>
-        {actualPath} 
     </div>
 </div>
 

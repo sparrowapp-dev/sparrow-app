@@ -7,18 +7,17 @@
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
   import { fetchCollection, insertCollection } from "$lib/services/collection";
-  import SearchTree  from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
+  import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import {
     collectionList,
     setCollectionList
   } from "$lib/store/collection";
   import {useTree} from './collectionList';
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const [,insertHead] = useTree();
+  const [,insertHead, searchNode] = useTree();
   
   import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
   import { currentWorkspace } from "$lib/store/workspace.store";
-    import { loginSchema } from "$lib/utils/validation";
 
   let collection: any;
   let currentWorkspaceId : string ="";
@@ -93,6 +92,15 @@
   console.log(collapsibleState);
 
   let searchData : string = "";
+  let filteredCollection= [];
+  let filteredFolder = [];
+  let filteredFile = [];
+  const handleSearch = () =>{
+    filteredCollection.length = 0;
+    filteredFolder.length = 0;
+    filteredFile.length = 0;
+    searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
+  }
 </script>
 
 <!-- //this will show only when button will be collaps -->
@@ -148,6 +156,7 @@
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in {currentWorkspaceName}"
         bind:value={searchData}
+        on:input={handleSearch}
       />
     </div>
 
@@ -173,18 +182,25 @@
     <div class="d-flex flex-column justify-content-center">
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
-          <p>Files</p>
-          {#each collection as col}
-            <SearchTree path={[]} type="FILE" searchData={searchData} explorer = {col}/>
-          {/each}
-          <p>Folder</p>
-          {#each collection as col}
-            <SearchTree path={[]} type="FOLDER" searchData={searchData} explorer = {col}/>
-          {/each}
-          <p>Collection</p>
-          {#each collection as col}
-            <SearchTree path={[]} type="COLLECTION" searchData={searchData} explorer = {col}/>
-          {/each}
+          {#if filteredCollection.length >0}
+            <p class="my-2">Collections</p>
+            {#each filteredCollection as col}
+              <SearchTree explorer = {col} />
+            {/each}
+          {/if}
+          {#if filteredFolder.length > 0}
+            <p class="my-2">Folders</p>
+            {#each filteredFolder as col}
+              <SearchTree explorer = {col} />
+           {/each}
+
+          {/if}
+          {#if filteredFile.length > 0}
+            <p class="my-2">API Requests</p>
+            {#each filteredFile as col}
+              <SearchTree explorer = {col} />
+            {/each}
+          {/if}
         </div>
       {:else}
         {#each collection as col}
