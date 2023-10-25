@@ -76,7 +76,23 @@ const useTree = (): any[] => {
     setCollectionList(tree);
     return;
   };
-  return [insertNode, insertHead];
+  const searchNode: (
+    folderId: string,
+    type: string,
+    name: string,
+    id: string,
+    method?: string,
+  ) => void = (folderId, type, name, id, method?) => {
+    // Iterate through the tree to find the target folder and add the item
+    for (let i = 0; i < tree.length; i++) {
+      if (!helper(tree[i], folderId, type, name, id, method)) {
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+  return [insertNode, insertHead, searchNode];
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

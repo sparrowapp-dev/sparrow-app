@@ -7,6 +7,7 @@
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
   import { fetchCollection, insertCollection } from "$lib/services/collection";
+  import SearchTree  from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import {
     collectionList,
     setCollectionList
@@ -17,6 +18,7 @@
   
   import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
   import { currentWorkspace } from "$lib/store/workspace.store";
+    import { loginSchema } from "$lib/utils/validation";
 
   let collection: any;
   let currentWorkspaceId : string ="";
@@ -89,6 +91,8 @@
     collapsibleState.set(collapsExpandToggle);
   };
   console.log(collapsibleState);
+
+  let searchData : string = "";
 </script>
 
 <!-- //this will show only when button will be collaps -->
@@ -142,7 +146,8 @@
         type="search"
         style="  font-size: 12px;font-weight:500;"
         class="inputField border-0 w-100 h-100 bg-blackColor"
-        placeholder="Search APIs in Domigo"
+        placeholder="Search APIs in {currentWorkspaceName}"
+        bind:value={searchData}
       />
     </div>
 
@@ -166,9 +171,26 @@
 
   <div class="d-flex flex-column pt-3">
     <div class="d-flex flex-column justify-content-center">
-      {#each collection as col}
-        <Folder collection={col} title={col.name} />
-      {/each}
+      {#if searchData.length > 0}
+        <div class="p-4 pt-0">
+          <p>Files</p>
+          {#each collection as col}
+            <SearchTree path={[]} type="FILE" searchData={searchData} explorer = {col}/>
+          {/each}
+          <p>Folder</p>
+          {#each collection as col}
+            <SearchTree path={[]} type="FOLDER" searchData={searchData} explorer = {col}/>
+          {/each}
+          <p>Collection</p>
+          {#each collection as col}
+            <SearchTree path={[]} type="COLLECTION" searchData={searchData} explorer = {col}/>
+          {/each}
+        </div>
+      {:else}
+        {#each collection as col}
+          <Folder collection={col} title={col.name} />
+        {/each}
+      {/if}
     </div>
   </div>
 </div>
@@ -179,6 +201,7 @@
     top: 50px;
     left: 72px;
     height: calc(100vh - 50px);
+    overflow-y: auto;
   }
   .inputField {
     outline: none;
