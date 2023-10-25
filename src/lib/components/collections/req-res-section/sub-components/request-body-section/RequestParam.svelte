@@ -11,14 +11,14 @@
   import {
     collapsibleState,
     isHorizontalVertical,
-  } from "$lib/store/requestSection";
+  } from "$lib/store/request-response-section";
 
   //this is for horizaontal and
   let isHorizontalVerticalMode;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   //this for active link tab
-  let selectedTab = "requestbody";
+  let selectedTab = "";
   let selectedTab1 = "response";
 
   //this is for expand collaps condition
@@ -59,13 +59,13 @@
         </Link>
 
         <Link
-          to="requestbody"
+          to=""
           style="font-size: 12px;font-weight:500"
           class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
           ><span
-            on:click={() => (selectedTab = "requestbody")}
+            on:click={() => (selectedTab = "")}
             class="team-menu__link d-flex pb-1"
-            class:tab-active={selectedTab === "requestbody"}
+            class:tab-active={selectedTab === ""}
             >Request Body
           </span>
         </Link>
@@ -103,7 +103,7 @@
       </div>
       <div class="d-flex align-items-center justify-content-start">
         <Route path="/parameters"><Parameters /></Route>
-        <Route path="/requestbody"><RequestBody /></Route>
+        <Route path="/"><RequestBody /></Route>
         <Route path="/headers"><Headers /></Route>
         <Route path="/authorization"><Authorization /></Route>
       </div>
@@ -112,7 +112,7 @@
     <div
       style="width:{isCollaps
         ? '50%'
-        : '50%'};border-left:1px solid #313233;height:50vh"
+        : '50%'};border-left:1px solid #313233;height:100vh"
       class={isCollaps ? "ps-3 pt-3 pe-3" : "pt-3 ps-2 pe-3"}
     >
       <div class="d-flex flex-column">
@@ -288,10 +288,10 @@
       style="width:{isCollaps ? '100%' : '100%'};"
     >
       <div
-        style="width:{isCollaps ? '50%' : '50%'};"
+        style="width:{isCollaps ? '50%' : '50%'}; height:1vh;"
         class="{isCollaps
           ? ' ps-2 pe-5'
-          : 'ps-1'} d-flex align-items-start justify-content-between text-requestBodyColor"
+          : 'ps-1'} d-flex mb-3 align-items-start justify-content-between text-requestBodyColor"
       >
         <Link
           to="parameters"
@@ -309,13 +309,13 @@
         </Link>
 
         <Link
-          to="requestbody"
+          to=""
           style="font-size: 12px;font-weight:500"
           class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
           ><span
-            on:click={() => (selectedTab = "requestbody")}
+            on:click={() => (selectedTab = "")}
             class="team-menu__link d-flex pb-1"
-            class:tab-active={selectedTab === "requestbody"}
+            class:tab-active={selectedTab === ""}
             >Request Body
           </span>
         </Link>
@@ -353,7 +353,7 @@
       </div>
       <div class="d-flex align-items-center justify-content-start">
         <Route path="/parameters"><Parameters /></Route>
-        <Route path="/requestbody"><RequestBody /></Route>
+        <Route path="/"><RequestBody /></Route>
         <Route path="/headers"><Headers /></Route>
         <Route path="/authorization"><Authorization /></Route>
       </div>
@@ -382,8 +382,8 @@
           class="d-flex align-items-center justify-content-between pt-2"
         >
           <div
-            style="width:{isCollaps ? '50%' : '50%'};"
-            class="d-flex align-items-center gap-4 text-requestBodyColor"
+            style="width:{isCollaps ? '100%' : '100%'};"
+            class="d-flex align-items-center justify-content-between gap-4 text-requestBodyColor"
           >
             <Link
               to="response"
@@ -411,32 +411,37 @@
                 </p>
               </span>
             </Link>
-          </div>
-          <div class="d-flex gap-3">
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
-              style="font-size: 12px; font-weight:600"
+            <div
+              class="d-flex gap-3"
+              style="width:{isCollaps ? '100%' : '100%'};"
             >
-              <span>200</span>
-              <p class="mb-0">OK</p>
-            </button>
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary2"
-              style="font-size: 12px;font-weight:600"
-            >
-              <span>300</span>
-              <p class="mb-0">ms</p>
-            </button>
-            <button
-              class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary3"
-              style="font-size: 12px;font-weight:600"
-            >
-              <span>6.8</span>
-              <p class="mb-0">KB</p>
-            </button>
+              <button
+                class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
+                style="font-size: 12px; font-weight:600"
+              >
+                <span>200</span>
+                <p class="mb-0">OK</p>
+              </button>
+              <button
+                class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary2"
+                style="font-size: 12px;font-weight:600"
+              >
+                <span>300</span>
+                <p class="mb-0">ms</p>
+              </button>
+              <button
+                class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary3"
+                style="font-size: 12px;font-weight:600"
+              >
+                <span>6.8</span>
+                <p class="mb-0">KB</p>
+              </button>
+            </div>
           </div>
         </div>
-        <div class="d-flex align-items-center justify-content-center">
+        <div
+          class="d-flex align-items-center justify-content-center"
+        >
           <Route path="/response"><ResponseBody /></Route>
           <Route path="/resheader"><ResponseHeader /></Route>
         </div>

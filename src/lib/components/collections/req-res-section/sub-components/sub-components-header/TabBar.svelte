@@ -5,7 +5,7 @@
   import angleRight from "$lib/assets/angle-right.svg";
   import linesmallIcon from "$lib/assets/linesmall.svg";
   import PageHeader from "./PageHeader.svelte";
-  import { collapsibleState } from "$lib/store/requestSection";
+  import { collapsibleState } from "$lib/store/request-response-section";
 
   let tabs = [
     { name: "GET", content: " Untitled Request" },

@@ -1,6 +1,6 @@
 <script>
   import angleDown from "$lib/assets/angle-down.svg";
-  import { collapsibleState } from "$lib/store/requestSection";
+  import { collapsibleState } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
 

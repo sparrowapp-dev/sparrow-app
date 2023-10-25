@@ -13,7 +13,7 @@
     currentWorkspaceId,
   } from "$lib/store/collection";
 
-  import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
+  import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
 
   let collection: any;
 

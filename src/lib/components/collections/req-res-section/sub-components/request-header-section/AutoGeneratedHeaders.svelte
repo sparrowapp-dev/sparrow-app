@@ -10,7 +10,7 @@
     BearerToken,
     apiKey1,
     apiKey2,
-  } from "$lib/store/requestSection";
+  } from "$lib/store/request-response-section";
 
   // storing the value from store for Basic auth section
   let username;

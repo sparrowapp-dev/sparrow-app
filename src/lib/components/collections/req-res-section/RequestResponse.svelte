@@ -1,6 +1,6 @@
 <script>
   import TabBar from "./sub-components/sub-components-header/TabBar.svelte";
-  import { collapsibleState } from "$lib/store/requestSection";
+  import { collapsibleState } from "$lib/store/request-response-section";
   let isCollaps;
   collapsibleState.subscribe((value) => {
     isCollaps = value;

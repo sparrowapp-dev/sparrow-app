@@ -1,5 +1,5 @@
 <script>
-  import { BearerToken } from "$lib/store/requestSection";
+  import { BearerToken } from "$lib/store/request-response-section";
   let isOverflowing = false; // Track whether content overflows
 
   const handleInput = (event) => {

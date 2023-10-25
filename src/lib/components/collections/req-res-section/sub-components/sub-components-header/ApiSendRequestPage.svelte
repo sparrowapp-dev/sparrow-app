@@ -1,16 +1,19 @@
 <script>
-  import angleDown from "$lib/assets/angle-down.svg";
+  // import angleDown from "$lib/assets/angle-down.svg";
   import tableColumnIcon from "$lib/assets/table-column.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
   import {
     collapsibleState,
     isHorizontalVertical,
-  } from "$lib/store/requestSection";
+  } from "$lib/store/request-response-section";
 
   // import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
+  import { postMethod } from "$lib/services/collection";
+  import { apiEndPoint } from "$lib/store/api-request";
+  import { methodText } from "$lib/store/api-request";
 
   let onclickState = false;
 
@@ -19,15 +22,24 @@
     isHorizontalVertical.set(onclickState);
   };
 
-  let handleDropdown = (tab) => {
-    // currentTab = tab;
-    // console.log(currentTab);
-    // console.log(tab);
-  };
-
   //this for expand and collaps condition
   let isCollaps;
   collapsibleState.subscribe((value) => (isCollaps = value));
+
+  const handleSendRequest = () => {
+    postMethod();
+  };
+
+  //store for storing api endpoint url
+  let urlText = "";
+  const handleInputValue = () => {
+    apiEndPoint.set(urlText);
+  };
+
+  //store for storing method
+  let handleDropdown = (tab) => {
+    methodText.set(tab);
+  };
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -66,11 +78,14 @@
         style=" width:{isCollaps
           ? '918px'
           : '670px'}; height:38px; outline:none;font-size:14px;"
+        bind:value={urlText}
+        on:input={handleInputValue}
       />
 
       <button
         class="btn btn-primary text-whiteColor px-4 py-2"
-        style="font-size: 16px;height:38px; font-weight:400">Send</button
+        style="font-size: 16px;height:38px; font-weight:400"
+        on:click={handleSendRequest}>Send</button
       >
     </div>
     <div class="ps-1">

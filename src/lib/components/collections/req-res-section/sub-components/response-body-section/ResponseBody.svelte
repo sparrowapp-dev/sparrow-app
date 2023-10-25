@@ -26,10 +26,10 @@
 </script>
 
 <div
-  class="d-flex flex-column w-100 align-items-start justify-content-between mt-3"
+  class="d-flex flex-column w-100 align-items-start justify-content-between mt-3 w-100"
 >
   <div class="d-flex align-items-center justify-content-between mb-1 w-100">
-    <div class="d-flex gap-4 align-items-center justify-content-center">
+    <div class="d-flex gap-4 align-items-center justify-content-center ">
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
       >
@@ -64,7 +64,7 @@
       </button>
     </div>
   </div>
-  <div class="my-json-editor editor jse-theme-dark my-json-editor">
+  <div class="my-json-editor editor jse-theme-dark my-json-editor w-100">
     <JSONEditor bind:this={editorRef} readOnly />
   </div>
 </div>
@@ -72,8 +72,7 @@
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    width: 100%;
-    height: 70vh;
+    height: 55vh;
     background: #000000;
   }
 

@@ -1,24 +1,29 @@
 <script>
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { bodyText, requestType } from "$lib/store/api-request";
   import { JSONEditor } from "svelte-jsoneditor";
 
-  let content = {
-    text: `
-      {
-        "nameS": "Testing",
-        "email": "testing@testing.com"
-      }`,
+  //this store for updating dropdown value for JSON , XML
+  let handleDropdown = (tab) => {
+    requestType.set(tab);
+  };
+
+  // let handleContentChange = () => {
+  //   bodyText.set(content);
+  // };
+  // console.log(bodyText);
+  let jsonContent = {
     json: {
       name: "Testing",
-      email: "testing45@testing.com",
+      email: "testing@testing.com",
     },
+    text: "",
   };
 
-  $: console.log("contents changed:", content);
-
-  let handleDropdown = (tab) => {
-    console.log(tab);
-  };
+  function updateJSONContent(newContent) {
+    jsonContent = newContent;
+  }
+  console.log(jsonContent.json.email);
 </script>
 
 <div class="ps-0 pt-3 pe-0 rounded w-100">
@@ -26,14 +31,14 @@
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
   <div class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1">
-    <JSONEditor bind:content />
+    <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
   </div>
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: 60vh;
+    height: 55vh;
   }
 
   .my-json-editor {
