@@ -7,13 +7,10 @@
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
   import { fetchCollection } from "$lib/services/collection";
-  import {
-    collectionList,
-    setCollectionList,
-    currentWorkspaceId,
-  } from "$lib/store/collection";
+  import { collectionList, setCollectionList } from "$lib/store/collection";
 
   import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
+  import { currentWorkspace } from "$lib/store/workspace.store";
 
   let collection: any;
 
@@ -27,8 +24,12 @@
   collectionList.subscribe((value) => {
     collection = value;
   });
-  currentWorkspaceId.subscribe((value) => {
-    getCollectionData(value);
+  let currentWorkspaceName = "";
+  currentWorkspace.subscribe((value) => {
+    if (value.id !== "") {
+      getCollectionData(value.id);
+      currentWorkspaceName = value.name;
+    }
   });
 
   //this is for expand and collaps
@@ -76,7 +77,9 @@
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
-    <p class="mb-0 text-whiteColor" style="font-size: 18px;">Domigo</p>
+    <p class="mb-0 text-whiteColor" style="font-size: 18px;">
+      {currentWorkspaceName}
+    </p>
     <button
       class="bg-backgroundColor border-0"
       on:click={setcollapsExpandToggle}

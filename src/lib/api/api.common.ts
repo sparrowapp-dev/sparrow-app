@@ -3,7 +3,7 @@ import type { RequestData } from "../utils/dto/requestdata";
 import { getUserToken, getRefToken } from "$lib/utils/token";
 import { refreshToken } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
-import { clearAuthJwt, jwtDecode, setAuthJwt } from "$lib/utils/jwt";
+import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
 import { setUser } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
@@ -48,8 +48,10 @@ const regenerateAuthToken = async (
   if (response.isSuccessful) {
     setAuthJwt(constants.AUTH_TOKEN, response.data.data.newAccessToken.token);
     setAuthJwt(constants.REF_TOKEN, response.data.data.newRefreshToken.token);
-    setUser(jwtDecode(response.data.data.newAccessToken.token));
-    makeRequest(method, url, requestData);
+    if (requestData && requestData.headers) {
+      requestData.headers = getAuthHeaders();
+    }
+    return await makeRequest(method, url, requestData);
   } else {
     throw "error refresh token: " + response.message;
   }
@@ -74,11 +76,12 @@ const makeRequest = async (
     }
   } catch (e) {
     if (e.response.data.message === ErrorMessages.ExpiredToken) {
-      regenerateAuthToken(method, url, requestData);
+      return await regenerateAuthToken(method, url, requestData);
     } else if (e.response.data.message === ErrorMessages.Unauthorized) {
       clearAuthJwt();
       setUser(null);
       navigate("/login");
+      return error("unauthorized");
     }
     if (e.message) {
       return error(e.message);

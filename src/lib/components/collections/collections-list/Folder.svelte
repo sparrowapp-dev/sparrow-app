@@ -1,7 +1,7 @@
 <script lang="ts">
     import angleRight from "$lib/assets/angleRight.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
-    import {currentWorkspaceId } from '$lib/store/collection';
+    import {currentWorkspace } from '$lib/store/workspace.store';
     import { insertCollectionDirectory } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
@@ -12,8 +12,8 @@
     export let collection:any;
    
     let workspaceId: string = "";
-    currentWorkspaceId.subscribe((value : string)=>{
-      workspaceId = value;
+    currentWorkspace.subscribe((value : any)=>{
+      workspaceId = value.id;
     });
     
     const handleFolderClick = async () : Promise<void> =>{
@@ -23,7 +23,8 @@
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
-          insertTreeNode(collection._id, "FOLDER", directory.name, JSON.stringify(new Date()));
+        console.log(res);
+          insertTreeNode(collection._id, res.data.data.type, res.data.data.name, res.data.data.id);
       }
     }
     const handleAPIClick = ()=>{
