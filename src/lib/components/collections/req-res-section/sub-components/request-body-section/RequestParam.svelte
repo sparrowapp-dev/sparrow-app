@@ -12,6 +12,7 @@
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
+  import { responseText } from "$lib/store/api-request";
 
   //this is for horizaontal and
   let isHorizontalVerticalMode;
@@ -28,6 +29,11 @@
   });
 
   // let visible = true;
+
+  let jsonText;
+  responseText.subscribe((value) => {
+    jsonText = value;
+  });
 </script>
 
 {#if isHorizontalVerticalMode}
@@ -120,7 +126,7 @@
         <!-- <Loader {visible} /> -->
 
         <!-- This code will be by defualt untill we don't request api -->
-        <!-- <div
+        <div
           class="d-flex text-requestBodyColor flex-column align-items-center justify-content-between py-3 ps-3"
         >
           <div
@@ -211,8 +217,9 @@
               </button>
             </div>
           </div>
-        </div> -->
+        </div>
         <!-- This code will be there when we do api request request api -->
+
         <div class="d-flex flex-column justify-content-between w-100">
           <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex gap-4 text-requestBodyColor">
@@ -439,9 +446,7 @@
             </div>
           </div>
         </div>
-        <div
-          class="d-flex align-items-center justify-content-center"
-        >
+        <div class="d-flex align-items-center justify-content-center">
           <Route path="/response"><ResponseBody /></Route>
           <Route path="/resheader"><ResponseHeader /></Route>
         </div>

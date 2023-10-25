@@ -12,9 +12,9 @@ import type {
 
 import {
   apiEndPoint,
-  bodyText,
   methodText,
   requestType,
+  responseText,
 } from "$lib/store/api-request";
 
 const apiUrl: string = constants.API_URL;
@@ -113,10 +113,30 @@ export const postMethod = async () => {
   //taking headers from store
 
   //taking body text from store
-  let body_text = {};
-  bodyText.subscribe((value) => {
-    body_text = value;
-  });
+
+  // let body_email = "";
+  // let body_name = "";
+  // bodyEmail.subscribe((value) => {
+  //   body_email = value;
+  // });
+
+  // bodyName.subscribe((value) => {
+  //   body_name = value;
+  //   console.log(body_name);
+  // });
+
+  // let body_text = {
+  //   name: body_name,
+  //   email: body_email,
+  // };
+
+  // console.log(body_text);
+
+  const body_text = {
+    name: "kashif",
+    email: "kashif@gmail.com",
+  };
+
   const body = JSON.stringify(body_text);
 
   console.log(body);
@@ -144,6 +164,7 @@ export const postMethod = async () => {
     request_type,
   );
   console.log(response.data);
+  responseText.set(response.data);
 };
 
 // const newRequest = {

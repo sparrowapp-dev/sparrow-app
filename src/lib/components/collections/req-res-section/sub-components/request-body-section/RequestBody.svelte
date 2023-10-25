@@ -1,6 +1,6 @@
 <script>
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { bodyText, requestType } from "$lib/store/api-request";
+  import { bodyEmail, bodyName, requestType } from "$lib/store/api-request";
   import { JSONEditor } from "svelte-jsoneditor";
 
   //this store for updating dropdown value for JSON , XML
@@ -17,13 +17,14 @@
       name: "Testing",
       email: "testing@testing.com",
     },
-    text: "",
   };
 
   function updateJSONContent(newContent) {
     jsonContent = newContent;
   }
-  console.log(jsonContent.json.email);
+  console.log(jsonContent.json);
+  bodyEmail.set(jsonContent.json.email);
+  bodyName.set(jsonContent.json.name);
 </script>
 
 <div class="ps-0 pt-3 pe-0 rounded w-100">
