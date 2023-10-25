@@ -7,7 +7,7 @@
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
     import { useTree, getNextName } from "./collectionList";
     const [insertTreeNode] = useTree();
-    let visibility = true;
+    let visibility = false;
     export let title:string;
     export let collection:any;
    
@@ -23,7 +23,6 @@
       }
       const res = await insertCollectionDirectory(workspaceId, collection._id, directory);
       if(res.isSuccessful){
-        console.log(res);
           insertTreeNode(collection._id, res.data.data.type, res.data.data.name, res.data.data.id);
       }
     }

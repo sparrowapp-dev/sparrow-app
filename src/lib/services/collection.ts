@@ -7,6 +7,7 @@ import {
 
 import type {
   CreateApiRequestPostBody,
+  CreateCollectionPostBody,
   CreateDirectoryPostBody,
 } from "$lib/utils/dto";
 
@@ -57,6 +58,17 @@ const insertCollectionRequest = async (
       headers: getAuthHeaders(),
     },
   );
+  return response;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const insertCollection: (
+  collection: CreateCollectionPostBody,
+) => Promise<any> = async (collection) => {
+  const response = await makeRequest("POST", `${apiUrl}/api/collection`, {
+    body: collection,
+    headers: getAuthHeaders(),
+  });
   return response;
 };
 
@@ -179,4 +191,9 @@ export const postMethod = async () => {
 
 // apiRequests.update((requests) => [...requests, newRequest]);
 
-export { fetchCollection, insertCollectionDirectory, insertCollectionRequest };
+export {
+  fetchCollection,
+  insertCollectionDirectory,
+  insertCollectionRequest,
+  insertCollection,
+};

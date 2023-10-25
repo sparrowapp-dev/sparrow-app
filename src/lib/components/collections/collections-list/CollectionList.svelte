@@ -6,13 +6,19 @@
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
-  import { fetchCollection } from "$lib/services/collection";
-  import { collectionList, setCollectionList } from "$lib/store/collection";
 
   import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
+
+  import { fetchCollection, insertCollection } from "$lib/services/collection";
+  import { collectionList, setCollectionList } from "$lib/store/collection";
+  import { useTree } from "./collectionList";
+  import type { CreateCollectionPostBody } from "$lib/utils/dto";
+  const [, insertHead] = useTree();
+
   import { currentWorkspace } from "$lib/store/workspace.store";
 
   let collection: any;
+  let currentWorkspaceId: string = "";
 
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -25,10 +31,50 @@
     collection = value;
   });
   let currentWorkspaceName = "";
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const getNextCollection: (list: any[], name: string) => any = (
+    list,
+    name,
+  ) => {
+    const isNameAvailable: (proposedName: string) => boolean = (
+      proposedName,
+    ) => {
+      return list.some((element) => {
+        return element.name === proposedName;
+      });
+    };
+
+    if (!isNameAvailable(name)) {
+      return name;
+    }
+
+    for (let i = 2; i < list.length + 10; i++) {
+      const proposedName: string = `${name}${i}`;
+      if (!isNameAvailable(proposedName)) {
+        return proposedName;
+      }
+    }
+
+    return null;
+  };
+
+  const handleCreateCollection = async () => {
+    const newCollection: CreateCollectionPostBody = {
+      name: getNextCollection(collection, "New collection"),
+      workspaceId: currentWorkspaceId,
+    };
+    const res = await insertCollection(newCollection);
+    if (res.isSuccessful) {
+      insertHead(newCollection.name, res.data.data.insertedId);
+    }
+  };
+
   currentWorkspace.subscribe((value) => {
     if (value.id !== "") {
       getCollectionData(value.id);
       currentWorkspaceName = value.name;
+      currentWorkspaceId = value.id;
     }
   });
 
@@ -115,6 +161,7 @@
       <button
         class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
         style="width: 32px; height:32px;"
+        on:click={handleCreateCollection}
       >
         <img src={plusIcon} alt="" />
       </button>

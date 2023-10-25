@@ -3,6 +3,11 @@ export interface CreateDirectoryPostBody {
   description: string;
 }
 
+export interface CreateCollectionPostBody {
+  name: string;
+  workspaceId: string;
+}
+
 export interface CreateApiRequestPostBody {
   collectionId: string;
   workspaceId: string;
