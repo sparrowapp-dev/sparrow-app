@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
-  import Teams from "./teams/Teams.svelte";
+  import Teams from "../Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   //   import Header from "$lib/components/header/Header.svelte";
   import HeaderHome from "$lib/components/header/HeaderHome.svelte";
