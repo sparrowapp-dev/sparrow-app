@@ -24,9 +24,8 @@
   }
 
   .loading-spinner {
-    
     position: fixed;
-    margin:10px 10px;
+    margin: 10px 10px;
     top: 230px;
     right: 0;
     width: 480px;
@@ -34,7 +33,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.946);
+    background: rgba(0, 0, 0, 0.706);
     z-index: 999;
   }
 </style>

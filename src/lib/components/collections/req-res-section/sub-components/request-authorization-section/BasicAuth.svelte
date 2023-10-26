@@ -3,7 +3,7 @@
     basicAuth1,
     basicAuth2,
     createBasicAuthHeader,
-  } from "$lib/store/requestSection";
+  } from "$lib/store/request-response-section";
 
   const handleUsername = (event) => {
     basicAuth1.set(event.target.value);

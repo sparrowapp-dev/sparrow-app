@@ -141,7 +141,7 @@
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
-  style="height: 900px;"
+  style="height: 100vh;"
   data-tauri-drag-region
 >
   <Header />
@@ -349,27 +349,27 @@
       <div class="d-flex flex-column align-items-center justify-content-center">
         <p>or continue with</p>
         <div class="d-flex gap-4">
-          <button
+          <!-- <button
             on:click={() => handleSignInWithProvider("Github")}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
-            <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
-          </button>
+            <img src={githubLogo} alt="Github Logo" class="w-100 h-100 p-1" />
+          </button> -->
           <button
             on:click={() => handleSignInWithProvider("Google")}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
-            <img src={googleLogo} alt="Google Logo" class="w-100 h-100" />
+            <img src={googleLogo} alt="Google Logo" class="w-100 h-100 p-1" />
           </button>
-          <button
+          <!-- <button
             on:click={() => handleSignInWithProvider("Microsoft")}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
-            <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100" />
-          </button>
+            <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100 p-1" />
+          </button> -->
         </div>
         <!-- "New to the website? Create an account" link -->
         <div class="gap-3 d-flex align-items-center">
