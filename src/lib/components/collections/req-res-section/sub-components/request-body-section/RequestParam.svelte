@@ -17,10 +17,11 @@
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
   import Loader from "$lib/components/Transition/Loader.svelte";
+    import { onDestroy } from "svelte";
 
   //this is for horizaontal and
   let isHorizontalVerticalMode;
-  isHorizontalVertical.subscribe(
+  const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
     (value) => {
       isHorizontalVerticalMode = value
       console.log(value);
@@ -48,6 +49,8 @@
         showResponse = true;
       }, 2000);
   });
+
+  onDestroy(isHorizontalVerticalUnsubscribe);
 </script>
 
   <div class="d-flex align-items-start {isHorizontalVerticalMode ? 'flex-column' : 'flex-row'} justify-content-between w-100">
@@ -62,7 +65,7 @@
       >
         <span
           style="font-size: 12px;font-weight:500; margin-right:15px;"
-          class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+          class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
           ><span
             on:click={() => (selectedTab = "parameters")}
             class="team-menu__link d-flex pb-1"
@@ -76,7 +79,7 @@
 
         <span
           style="font-size: 12px;font-weight:500; margin-right:15px;"
-          class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+          class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
           ><span
             on:click={() => (selectedTab = "request-body")}
             class="team-menu__link d-flex pb-1"
@@ -87,7 +90,7 @@
 
         <span
           style="font-size: 12px;font-weight:500; margin-right:15px;"
-          class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+          class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
           ><span
             on:click={() => (selectedTab = "headers")}
             class="team-menu__link d-flex pb-1"
@@ -101,7 +104,7 @@
 
         <span
           style="font-size: 12px;font-weight:500; margin-right:15px;"
-          class="d-flex align-items-center justify-content-center gap-1 text-requestBodyColor text-decoration-none"
+          class="cursor-pointer d-flex align-items-center justify-content-center gap-1 text-requestBodyColor text-decoration-none"
           ><span
             on:click={() => (selectedTab = "authorization")}
             class="team-menu__link d-flex pb-1 gap-1 align-items-center"
