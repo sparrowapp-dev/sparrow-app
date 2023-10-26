@@ -61,8 +61,11 @@
 </div>
 
 <div class="d-flex align-items-center justify-content-center w-100">
-  <Route path="/response"><ResponseBody /></Route>
-  <Route path="/resheader"><ResponseHeader /></Route>
+  {#if selectedTab1 === "response"}
+    <ResponseBody />
+  {:else if selectedTab1 === "resheader"}
+    <ResponseHeader />
+  {/if}
 </div>
 
 <style>

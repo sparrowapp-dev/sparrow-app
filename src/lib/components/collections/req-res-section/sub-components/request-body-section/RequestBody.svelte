@@ -6,6 +6,7 @@
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
   import { JSONEditor } from "svelte-jsoneditor";
+  import { EditorView } from "@codemirror/view";
 
   //this store for updating dropdown value for JSON , XML
   let handleDropdown = (tab) => {
@@ -18,17 +19,19 @@
   // console.log(bodyText);
   let jsonContent = {
     json: {
-      name: "Testing",
-      email: "testing@testing.com",
+      name: "kashif",
+      email: "kashif@gmail.com",
     },
   };
 
   function updateJSONContent(newContent) {
     jsonContent = newContent;
   }
-  console.log(jsonContent.json);
-  bodyEmail.set(jsonContent.json.email);
-  bodyName.set(jsonContent.json.name);
+
+  function getJSONValue() {
+    const jsonValue = jsonContent.json;
+    console.log("JSON Value:", jsonValue);
+  }
 
   let isCollaps;
   collapsibleState.subscribe((value) => {
@@ -39,23 +42,37 @@
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 </script>
 
-<div class="ps-0 {isHorizontalVerticalMode ? "pt-3" : "pt-1"} pe-0 rounded w-100">
+<div
+  class="ps-0 {isHorizontalVerticalMode ? 'pt-3' : 'pt-1'} pe-0 rounded w-100"
+>
   <Dropdown data={["Pretty"]} onclick={handleDropdown} /><span class="px-2" />
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
   {#if isHorizontalVerticalMode}
     <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+      class="my-json-editor --jse-contents-background-color bg-blackColor me-0 editor jse-theme-dark my-json-editor mt-1"
       style="height:{isCollaps ? '492px' : '492px'};"
     >
-      <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
+      <JSONEditor
+        bind:content={jsonContent}
+        on:change={updateJSONContent}
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+      />
     </div>
   {:else}
     <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor"
+      class="my-json-editor --jse-contents-background-color bg-blackColor me-0 editor jse-theme-dark my-json-editor mt-1"
       style="height:{isCollaps ? '200px' : '200px'};"
     >
-      <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
+      <JSONEditor
+        bind:content={jsonContent}
+        on:change={updateJSONContent}
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+      />
     </div>
   {/if}
 </div>
@@ -66,9 +83,14 @@
     height: 492px;
   }
 
+  .--jse-contents-background-color {
+    --jse-background-color: black;
+  }
+
+  /* define a custom theme color */
   .my-json-editor {
     /* define a custom theme color */
-    --jse-theme-color: var(--blackColor);
-    --jse-theme-color-highlight: var(--blackColor);
+    --jse-theme-color: #ef1717;
+    --jse-theme-color-highlight: #687177;
   }
 </style>

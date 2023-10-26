@@ -32,8 +32,6 @@
     isCollaps = value;
   });
 
-  let visible = true;
-
   let jsonText;
   let showResponse = false;
   responseText.subscribe((value) => {
@@ -132,9 +130,9 @@
       class={isCollaps ? "ps-3 pt-3 pe-3" : "pt-3 ps-2 pe-3"}
     >
       <div class="d-flex flex-column">
-        {#if jsonText.response && !showResponse}
-          <Loader {visible} />
-        {:else if showResponse}
+        <!-- {#if !jsonText.response && !showResponse}
+          <Loader /> -->
+        {#if jsonText.response}
           <ResponseParams />
         {:else}
           <DefaultPage />
@@ -232,9 +230,7 @@
           : '100%'};border-top:2px solid #313233;"
       >
         <div class="d-flex flex-column mt-2 pe-2 ps-0">
-          {#if jsonText.response && !showResponse}
-            <Loader {visible} />
-          {:else if showResponse}
+          {#if jsonText.response}
             <ResponseParams />
           {:else}
             <DefaultPage />

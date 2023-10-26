@@ -109,7 +109,7 @@ const insertCollection: (
 //   return response;
 // };
 
-export const postMethod = async () => {
+export const crudMethod = async () => {
   //taking link from store
   let url = "";
   apiEndPoint.subscribe((value: string) => {

@@ -168,7 +168,7 @@
     </div>
   </div>
 
-  <div class="d-flex flex-column pt-3">
+  <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
     <div class="d-flex flex-column justify-content-center">
       {#each collection as col}
         <Folder collection={col} title={col.name} />

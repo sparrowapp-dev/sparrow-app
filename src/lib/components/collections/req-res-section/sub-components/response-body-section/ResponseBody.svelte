@@ -77,17 +77,31 @@
   </div>
   {#if isHorizontalVerticalMode}
     <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
       style="height:{isCollaps ? '492px' : '492px'};"
     >
-      <JSONEditor bind:content readOnly />
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
     </div>
   {:else}
     <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '295px' : '292px'};width:100%;"
+      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '295px' : '295px'};"
     >
-      <JSONEditor bind:content readOnly />
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
     </div>
   {/if}
 </div>
@@ -97,6 +111,10 @@
   .editor {
     height: 492px;
     background: #000000;
+  }
+
+  .--jse-contents-background-color {
+    --jse-background-color: black;
   }
 
   .my-json-editor {
