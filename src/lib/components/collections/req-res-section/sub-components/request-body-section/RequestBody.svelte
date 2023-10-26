@@ -46,14 +46,14 @@
   {#if isHorizontalVerticalMode}
     <div
       class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '492px' : '492px'};"
+      
     >
       <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
     </div>
   {:else}
     <div
       class="my-json-editor me-0 editor jse-theme-dark my-json-editor"
-      style="height:{isCollaps ? '200px' : '200px'};"
+      style=""
     >
       <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
     </div>
@@ -63,7 +63,7 @@
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: 492px;
+    height: auto;
   }
 
   .my-json-editor {

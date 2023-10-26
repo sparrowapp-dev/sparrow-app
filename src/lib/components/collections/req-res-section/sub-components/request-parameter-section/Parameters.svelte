@@ -100,7 +100,7 @@
 {#if isHorizontalVerticalMode}
   <div
     class="d-flex flex-column mt-4"
-    style="overflow:auto;overflow-x:hidden;height:492px;"
+    style="overflow:auto;overflow-x:hidden;"
   >
     <div
       class="d-flex text-requestBodyColor py-0 align-items-center justify-content-between"
@@ -202,7 +202,7 @@
 {:else}
   <div
     class="d-flex flex-column mt-2 w-100"
-    style="overflow:auto;overflow-x:hidden;height:200px;"
+    style="overflow:auto;overflow-x:hidden;"
   >
     <div
       class="d-flex text-requestBodyColor ps-4 py-0 align-items-center justify-content-between"
