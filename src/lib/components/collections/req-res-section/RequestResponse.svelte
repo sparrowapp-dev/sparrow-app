@@ -16,10 +16,10 @@
 
 <style>
   .collection {
-    top: 50px;
+    top: 44px;
     position: fixed;
     right: 32px;
     width: calc(100%-352px);
-    height: 93vh;
+    height: calc(100vh - 44px);
   }
 </style>

@@ -109,25 +109,27 @@
     </div>
   {/if}
 
-  <div class="d-flex align-items-center justify-content-center gap-2 mb-2 ps-1">
+  <div
+    class="d-flex align-items-center justify-content-center gap-2 mb-2 ps-1 w-100"
+  >
     <img src={dragIcon} alt="" style="cursor:grabbing;" />
     <div>
       <input class="form-check-input" type="checkbox" checked />
     </div>
-    <div>
-      <input
-        type="text"
-        placeholder="Content-Type"
-        style="outline: none;font-size:13px;color:white;"
-        class="bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3"
-        readonly
-      />
-    </div>
+
+    <input
+      type="text"
+      placeholder="Content-Type"
+      style="outline: none;font-size:13px;color:white;"
+      class="form-control bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3 w-100"
+      readonly
+    />
+
     <input
       type="text"
       placeholder="application/json"
       style="outline: none;font-size:13px;color:white"
-      class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
+      class="form-control bg-blackColor text-red border-0 ps-2 py-1 pe-3"
       readonly
     />
     <img src={trashIcon} alt="" />

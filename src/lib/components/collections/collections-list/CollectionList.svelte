@@ -180,9 +180,9 @@
 <style>
   .sidebar {
     position: fixed;
-    top: 50px;
+    top: 44px;
     left: 72px;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 44px);
   }
   .inputField {
     outline: none;

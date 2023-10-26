@@ -49,7 +49,7 @@
       : 'pt-3 px-3'}"
     style="width:calc(100%-312px);"
   >
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 w-100">
       <div class="d-flex align-items-center justify-content-center">
         <p
           class="d-flex mb-0 w-100 h-100 pe-3 py-0 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
@@ -74,25 +74,25 @@
       <input
         type="text"
         placeholder="Enter URL or paste text"
-        class="bg-blackColor border-0 p-3 rounded"
+        class="form-control bg-blackColor border-0 p-3 rounded"
         style=" width:{isCollaps
-          ? '918px'
-          : '670px'}; height:38px; outline:none;font-size:14px;"
+          ? '100%'
+          : '670px'}; height:34px; outline:none;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
       />
 
       <button
-        class="btn btn-primary text-whiteColor px-4 py-2"
-        style="font-size: 16px;height:38px; font-weight:400"
+        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
+        style="font-size: 16px;height:34px; font-weight:400"
         on:click={handleSendRequest}>Send</button
       >
     </div>
-    <div class="ps-1">
+    <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
       <img src={lineIcon} alt="" />
     </div>
 
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 ps-3">
       <button class="bg-backgroundColor border-0" on:click={toggleClick}>
         <img src={tableColumnIcon} alt="" />
       </button>

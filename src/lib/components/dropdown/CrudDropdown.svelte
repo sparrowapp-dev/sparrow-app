@@ -14,7 +14,9 @@
   let title = data[0];
 </script>
 
-<div style="position: relative; display:inline-block; z-index:999;width:60px">
+<div
+  style="position: relative; display:inline-block; z-index:9999999999999999;width:60px"
+>
   <div class="d-flex align-items-center justify-content-between">
     <button
       class="dropdown-btn d-flex align-items-center justify-content-center gap-2"
