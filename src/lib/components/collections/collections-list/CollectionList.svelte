@@ -6,6 +6,9 @@
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
+
+  import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
+
   import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import {
@@ -16,12 +19,11 @@
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
   const [,insertHead, searchNode] = useTree();
   
-  import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
   import { currentWorkspace } from "$lib/store/workspace.store";
     import { onDestroy } from "svelte";
 
   let collection: any;
-  let currentWorkspaceId : string ="";
+  let currentWorkspaceId: string = "";
 
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -33,13 +35,16 @@
   const collectionListUnsubscribe =  collectionList.subscribe((value) => {
     collection = value;
   });
+  let currentWorkspaceName = "";
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const getNextCollection: (list: any[], name: string) => any = (
     list,
     name,
   ) => {
-    const isNameAvailable: (proposedName: string) => boolean = (proposedName) => {
+    const isNameAvailable: (proposedName: string) => boolean = (
+      proposedName,
+    ) => {
       return list.some((element) => {
         return element.name === proposedName;
       });
@@ -59,18 +64,17 @@
     return null;
   };
 
-  const handleCreateCollection = async ()=> {
-    const newCollection : CreateCollectionPostBody = {
+  const handleCreateCollection = async () => {
+    const newCollection: CreateCollectionPostBody = {
       name: getNextCollection(collection, "New collection"),
-      workspaceId: currentWorkspaceId
-    }
+      workspaceId: currentWorkspaceId,
+    };
     const res = await insertCollection(newCollection);
-    if(res.isSuccessful){
-        insertHead(newCollection.name, res.data.data.insertedId);
+    if (res.isSuccessful) {
+      insertHead(newCollection.name, res.data.data.insertedId);
     }
-  }
+  };
 
-  let currentWorkspaceName="";
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if(value.id !== ""){
       getCollectionData(value.id);
@@ -138,7 +142,9 @@
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
-    <p class="mb-0 text-whiteColor" style="font-size: 18px;">{currentWorkspaceName}</p>
+    <p class="mb-0 text-whiteColor" style="font-size: 18px;">
+      {currentWorkspaceName}
+    </p>
     <button
       class="bg-backgroundColor border-0"
       on:click={setcollapsExpandToggle}
@@ -175,7 +181,8 @@
     <div class="d-flex align-items-center justify-content-center">
       <button
         class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px;" on:click={handleCreateCollection}
+        style="width: 32px; height:32px;"
+        on:click={handleCreateCollection}
       >
         <img src={plusIcon} alt="" />
       </button>
@@ -218,9 +225,9 @@
 <style>
   .sidebar {
     position: fixed;
-    top: 50px;
+    top: 44px;
     left: 72px;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 44px);
     overflow-y: auto;
   }
   .inputField {

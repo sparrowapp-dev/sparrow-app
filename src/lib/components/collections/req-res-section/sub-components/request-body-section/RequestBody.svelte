@@ -1,39 +1,69 @@
 <script>
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { bodyEmail, bodyName, requestType } from "$lib/store/api-request";
+  import {
+    collapsibleState,
+    isHorizontalVertical,
+  } from "$lib/store/request-response-section";
   import { JSONEditor } from "svelte-jsoneditor";
 
-  let content = {
-    text: `
-      {
-        "nameS": "Testing",
-        "email": "testing@testing.com"
-      }`,
+  //this store for updating dropdown value for JSON , XML
+  let handleDropdown = (tab) => {
+    requestType.set(tab);
+  };
+
+  // let handleContentChange = () => {
+  //   bodyText.set(content);
+  // };
+  // console.log(bodyText);
+  let jsonContent = {
     json: {
       name: "Testing",
-      email: "testing45@testing.com",
+      email: "testing@testing.com",
     },
   };
 
-  $: console.log("contents changed:", content);
+  function updateJSONContent(newContent) {
+    jsonContent = newContent;
+  }
+  console.log(jsonContent.json);
+  bodyEmail.set(jsonContent.json.email);
+  bodyName.set(jsonContent.json.name);
 
-  let handleDropdown = (tab) => {
-    console.log(tab);
-  };
+  let isCollaps;
+  collapsibleState.subscribe((value) => {
+    isCollaps = value;
+  });
+
+  let isHorizontalVerticalMode;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 </script>
 
-<div class="ps-0 pt-3 pe-0 rounded w-100">
+<div class="ps-0 {isHorizontalVerticalMode ? "pt-3" : "pt-1"} pe-0 rounded w-100">
   <Dropdown data={["Pretty"]} onclick={handleDropdown} /><span class="px-2" />
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
-  <div class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1">
-    <JSONEditor bind:content />
-  </div>
+  {#if isHorizontalVerticalMode}
+    <div
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '492px' : '492px'};"
+    >
+      <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
+    </div>
+  {:else}
+    <div
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor"
+      style="height:{isCollaps ? '200px' : '200px'};"
+    >
+      <JSONEditor bind:content={jsonContent} on:change={updateJSONContent} />
+    </div>
+  {/if}
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: 60vh;
+    height: 492px;
   }
 
   .my-json-editor {

@@ -1,5 +1,5 @@
 <script>
-  import { apiKey1, apiKey2 } from "$lib/store/requestSection";
+  import { apiKey1, apiKey2 } from "$lib/store/request-response-section";
 
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   let handleDropdown = (tab) => {

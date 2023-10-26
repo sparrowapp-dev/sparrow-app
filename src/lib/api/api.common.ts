@@ -7,6 +7,7 @@ import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
 import { setUser } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
+import { invoke } from "@tauri-apps/api";
 
 const error = (error, data?) => {
   return {
@@ -91,7 +92,42 @@ const makeRequest = async (
   }
 };
 
-export { makeRequest, getAuthHeaders, getRefHeaders };
+//making common file for every request
+const makeRequestforCrud = async (
+  url: string,
+  method: string,
+  headers: string,
+  body: string,
+  request: string,
+) => {
+  try {
+    const response = await invoke("make_type_request_command", {
+      url,
+      method,
+      headers,
+      body,
+      request,
+    });
+    console.log(response);
+    return success(response);
+  } catch (e) {
+    //   if (e.response.data.message === ErrorMessages.ExpiredToken) {
+    //     regenerateAuthToken(method, url, requestData);
+    //   } else if (e.response.data.message === ErrorMessages.Unauthorized) {
+    //     clearAuthJwt();
+    //     setUser(null);
+    //     navigate("/login");
+    //   }
+    //   if (e.message) {
+    //     return error(e.message);
+    //   } else if (e.response.data) {
+    //     return error(e.response.data.message);
+    //   }
+    //   return error(e);
+  }
+};
+
+export { makeRequest, getAuthHeaders, getRefHeaders, makeRequestforCrud };
 //------------- We need this function in future ------------------//
 // export const download = async (url, data, headers) => {
 //   try {

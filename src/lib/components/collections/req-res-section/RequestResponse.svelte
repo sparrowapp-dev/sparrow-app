@@ -1,6 +1,6 @@
 <script>
   import TabBar from "./sub-components/sub-components-header/TabBar.svelte";
-  import { collapsibleState } from "$lib/store/requestSection";
+  import { collapsibleState } from "$lib/store/request-response-section";
   let isCollaps;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
@@ -16,10 +16,10 @@
 
 <style>
   .collection {
-    top: 50px;
+    top: 44px;
     position: fixed;
     right: 32px;
     width: calc(100%-352px);
-    height: 93vh;
+    height: calc(100vh - 44px);
   }
 </style>

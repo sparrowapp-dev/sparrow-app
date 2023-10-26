@@ -3,18 +3,21 @@
   import angleDown from "$lib/assets/angle-down.svg";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
-  // let content = {
-  //   text: undefined,
-  //   json: {
-  //     array: [1, 2, 3],
-  //     boolean: true,
-  //     color: "#82b92c",
-  //     null: null,
-  //     number: 123,
-  //     object: { a: "b", c: "d" },
-  //     string: "Hello World",
-  //   },
-  // };
+  import { responseText } from "$lib/store/api-request";
+  import {
+    collapsibleState,
+    isHorizontalVertical,
+  } from "$lib/store/request-response-section";
+
+  let jsonText;
+  responseText.subscribe((value) => {
+    jsonText = value;
+  });
+
+  let content = {
+    text: undefined,
+    json: jsonText.response,
+  };
 
   // $: console.log("contents changed:", content);
 
@@ -23,10 +26,18 @@
   function refresh() {
     editorRef?.refresh();
   }
+
+  let isCollaps;
+  collapsibleState.subscribe((value) => {
+    isCollaps = value;
+  });
+
+  let isHorizontalVerticalMode;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 </script>
 
 <div
-  class="d-flex flex-column w-100 align-items-start justify-content-between mt-3"
+  class="d-flex flex-column align-items-start justify-content-between mt-2 w-100"
 >
   <div class="d-flex align-items-center justify-content-between mb-1 w-100">
     <div class="d-flex gap-4 align-items-center justify-content-center">
@@ -64,16 +75,27 @@
       </button>
     </div>
   </div>
-  <div class="my-json-editor editor jse-theme-dark my-json-editor">
-    <JSONEditor bind:this={editorRef} readOnly />
-  </div>
+  {#if isHorizontalVerticalMode}
+    <div
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '492px' : '492px'};"
+    >
+      <JSONEditor bind:content readOnly />
+    </div>
+  {:else}
+    <div
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '295px' : '292px'};width:100%;"
+    >
+      <JSONEditor bind:content readOnly />
+    </div>
+  {/if}
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    width: 100%;
-    height: 70vh;
+    height: 492px;
     background: #000000;
   }
 
