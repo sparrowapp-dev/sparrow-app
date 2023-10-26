@@ -11,7 +11,7 @@
     else if(method === "ARC") apiClass = "grey-api";
 </script>
 
-<div class="d-flex align-items-center" style="height:{path !== "" ? '40px' : '32px;'}">
+<div class="d-flex align-items-center" style="height: {path !== '' ? '40px' : '32px'};">
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
     </div>

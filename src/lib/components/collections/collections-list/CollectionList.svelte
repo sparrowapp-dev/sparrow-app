@@ -195,18 +195,21 @@
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
             <p class="my-2">API Requests</p>
+            <hr class="mt-0 mb-1" />
             {#each filteredFile as exp}
               <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} path={exp.path} explorer = {exp.tree} />
             {/each}
           {/if}
           {#if filteredFolder.length > 0}
             <p class="my-2">Folders</p>
+            <hr class="mt-0 mb-1"/>
             {#each filteredFolder as exp}
               <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
            {/each}
           {/if}
           {#if filteredCollection.length >0}
             <p class="my-2">Collections</p>
+            <hr class="mt-0 mb-1"/>
             {#each filteredCollection as exp}
               <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
             {/each}
