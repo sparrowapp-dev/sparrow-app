@@ -1,6 +1,7 @@
 <script lang="ts">
     export let name: string;
     export let method: string;
+    export let path : string = "";
 
     let apiClass = "red-api";
     if(method === "DELETE") apiClass = "red-api";
@@ -8,15 +9,21 @@
     else if(method === "POST") apiClass = "yellow-api";
     else if(method === "PUT") apiClass = "blue-api";
     else if(method === "ARC") apiClass = "grey-api";
-    // console.log(actualPath);
 </script>
 
-<div class="d-flex align-items-center" style="height:32px;">
+<div class="d-flex align-items-center" style="height:{path !== "" ? '40px' : '32px;'}">
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
     </div>
     <div class="api-name">
-        {name} 
+        <div>
+            <p class="mb-0">{name}</p> 
+        </div>
+        {#if path !== ""}
+            <div>
+                <p class="mb-0" style="font-size:10px;">{path}</p>
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -32,7 +39,7 @@
         margin-right: 8px;
         text-align: left;
     }
-    .api-name{
+    .api-name p{
         font-size: 12px;
         font-weight: 400;
     }

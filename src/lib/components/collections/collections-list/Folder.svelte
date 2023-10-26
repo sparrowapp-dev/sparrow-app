@@ -2,17 +2,19 @@
     import angleRight from "$lib/assets/angleRight.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import {currentWorkspace } from '$lib/store/workspace.store';
-    import { insertCollectionDirectory } from '$lib/services/collection';
+    import { insertCollectionDirectory, insertCollectionRequest } from '$lib/services/collection';
     import FileExplorer from "./FileExplorer.svelte";
     import type { CreateDirectoryPostBody } from "$lib/utils/dto";
     import { useTree, getNextName } from "./collectionList";
+    import { onDestroy } from "svelte";
     const [insertTreeNode] = useTree();
     let visibility = false;
     export let title:string;
     export let collection:any;
-   
+    export let collectionId: string;
+    export let currentWorkspaceId: string;
     let workspaceId: string = "";
-    currentWorkspace.subscribe((value : any)=>{
+    const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value : any)=>{
       workspaceId = value.id;
     });
     
@@ -26,11 +28,24 @@
           insertTreeNode(collection._id, res.data.data.type, res.data.data.name, res.data.data.id);
       }
     }
-    const handleAPIClick = ()=>{
-      const file : string = getNextName(collection.items, "FILE", "New Request"); 
-      insertTreeNode(collection._id, "FILE", file ,JSON.stringify(new Date()), "GET");
+    const handleAPIClick = async ()=> {
+      const file : string = getNextName(collection.items, "REQUEST", "New Request");
+      const res = await insertCollectionRequest({
+        collectionId: collection._id,
+        workspaceId: workspaceId,
+        items: {
+          name: file,
+          type: "REQUEST",
+          request: {
+            method: "GET"
+          }
+        }
+      });
+      if(res.isSuccessful){
+        insertTreeNode(collection._id, "REQUEST", file ,JSON.stringify(new Date()), "GET");
+      } 
     }
-
+    onDestroy(currentWorkspaceUnsubscribe);
 </script>
 
 <button on:click={()=>{visibility = !visibility}} style="height:36px;" class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1 ps-4">
@@ -39,7 +54,7 @@
 </button>
 <div style="padding-left: 40px; cursor:pointer; display: {visibility ? 'block' : 'none'};">
   {#each collection.items as exp}
-  <FileExplorer explorer={exp} />
+  <FileExplorer collectionId={collectionId} currentWorkspaceId = {currentWorkspaceId} explorer={exp} />
   {/each}
   <IconButton text = {"+ Folder"} onClick= {handleFolderClick} />
   <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />

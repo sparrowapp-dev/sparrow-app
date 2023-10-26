@@ -18,6 +18,7 @@
   
   import { collapsibleState } from "$lib/store/requestSection"; // Adjust the import path as needed
   import { currentWorkspace } from "$lib/store/workspace.store";
+    import { onDestroy } from "svelte";
 
   let collection: any;
   let currentWorkspaceId : string ="";
@@ -29,7 +30,7 @@
     }
   };
 
-  collectionList.subscribe((value) => {
+  const collectionListUnsubscribe =  collectionList.subscribe((value) => {
     collection = value;
   });
 
@@ -70,7 +71,7 @@
   }
 
   let currentWorkspaceName="";
-  currentWorkspace.subscribe((value) => {
+  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if(value.id !== ""){
       getCollectionData(value.id);
       currentWorkspaceName = value.name;
@@ -81,7 +82,7 @@
   //this is for expand and collaps
   let collapsExpandToggle = false;
 
-  collapsibleState.subscribe((value) => {
+  const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
 
@@ -89,7 +90,6 @@
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
   };
-  console.log(collapsibleState);
 
   let searchData : string = "";
   let filteredCollection= [];
@@ -101,6 +101,10 @@
     filteredFile.length = 0;
     searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
   }
+
+  onDestroy(collectionListUnsubscribe);
+  onDestroy(currentWorkspaceUnsubscribe);
+  onDestroy(collapsibleStateUnsubscribe);
 </script>
 
 <!-- //this will show only when button will be collaps -->
@@ -182,29 +186,29 @@
     <div class="d-flex flex-column justify-content-center">
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
-          {#if filteredCollection.length >0}
-            <p class="my-2">Collections</p>
-            {#each filteredCollection as col}
-              <SearchTree explorer = {col} />
+          {#if filteredFile.length > 0}
+            <p class="my-2">API Requests</p>
+            {#each filteredFile as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} path={exp.path} explorer = {exp.tree} />
             {/each}
           {/if}
           {#if filteredFolder.length > 0}
             <p class="my-2">Folders</p>
-            {#each filteredFolder as col}
-              <SearchTree explorer = {col} />
+            {#each filteredFolder as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
            {/each}
-
           {/if}
-          {#if filteredFile.length > 0}
-            <p class="my-2">API Requests</p>
-            {#each filteredFile as col}
-              <SearchTree explorer = {col} />
+          {#if filteredCollection.length >0}
+            <p class="my-2">Collections</p>
+            {#each filteredCollection as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
             {/each}
           {/if}
+          
         </div>
       {:else}
         {#each collection as col}
-          <Folder collection={col} title={col.name} />
+          <Folder collectionId={col._id} currentWorkspaceId={currentWorkspaceId} collection={col} title={col.name} />
         {/each}
       {/if}
     </div>

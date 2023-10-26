@@ -1,11 +1,9 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import logo from "$lib/assets/logo.svg";
   import closeIcon from "$lib/assets/close.svg";
   import resizeIcon from "$lib/assets/resize.svg";
   import minimizeIcon from "$lib/assets/minimize.svg";
   import circleIcon from "$lib/assets/Ellipse.svg";
-  import dropdown from "$lib/assets/dropdown.svg";
   import searchIcon from "$lib/assets/search.svg";
   import settingIcon from "$lib/assets/setting.svg";
   import profileIcon from "$lib/assets/profile.svg";
@@ -23,6 +21,7 @@
     import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
     import { fetchWorkspaces } from "$lib/services/workspace.service";
     import { setCurrentWorkspace } from "$lib/store/workspace.store";
+    import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
   const onMinimize = () => {
@@ -63,7 +62,7 @@
     }
   }
 
-  user.subscribe((value)=>{
+  const userUnsubscribe = user.subscribe((value)=>{
     if(value){
       handleWorkspace(value._id);
     }
@@ -72,6 +71,7 @@
   const handleDropdown = (id, tab)=>{
     setCurrentWorkspace(id, tab);
   }
+  onDestroy(userUnsubscribe);
 </script>
 
 <div

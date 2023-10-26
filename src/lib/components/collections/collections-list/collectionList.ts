@@ -1,6 +1,6 @@
 import { collectionList, setCollectionList } from "$lib/store/collection";
-
-let tree: object[];
+/* eslint-disable @typescript-eslint/no-explicit-any */
+let tree: any[];
 
 collectionList.subscribe((value: object[]) => {
   tree = JSON.parse(JSON.stringify(value));
@@ -20,7 +20,7 @@ const helper: (
   method?: string,
 ) => number = (tree, folderId, type, name, id, method?) => {
   if (tree._id === folderId || tree.id === folderId) {
-    if (type === "FILE") {
+    if (type === "REQUEST") {
       tree.items.push({
         id,
         name,
@@ -50,6 +50,11 @@ const helper: (
   return 1;
 };
 
+const createPath: (path: string[]) => string = (path) => {
+  const res = "/" + path.join("/");
+  return res;
+};
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const searchHelper: (
   tree: any,
@@ -57,21 +62,45 @@ const searchHelper: (
   collection: any[],
   folder: any[],
   file: any[],
-) => void = (tree, searchText, collection, folder, file) => {
+  collectionId: string,
+  path: string[],
+) => void = (
+  tree,
+  searchText,
+  collection,
+  folder,
+  file,
+  collectionId,
+  path,
+) => {
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
-    if (tree.type === "FILE") {
-      file.push(JSON.parse(JSON.stringify(tree)));
+    if (tree.type === "REQUEST") {
+      file.push({
+        tree: JSON.parse(JSON.stringify(tree)),
+        collectionId,
+        path: createPath(path),
+      });
     } else if (tree.type === "FOLDER") {
-      folder.push(JSON.parse(JSON.stringify(tree)));
+      folder.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
     } else {
-      collection.push(JSON.parse(JSON.stringify(tree)));
+      collection.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
     }
   }
 
   // Recursively search through the tree structure
   if (tree && tree.items) {
     for (let j = 0; j < tree.items.length; j++) {
-      searchHelper(tree.items[j], searchText, collection, folder, file);
+      path.push(tree.name); // Recursive backtracking
+      searchHelper(
+        tree.items[j],
+        searchText,
+        collection,
+        folder,
+        file,
+        collectionId,
+        path,
+      );
+      path.pop();
     }
   }
   return;
@@ -111,7 +140,16 @@ const useTree = (): any[] => {
   ) => void = (searchText, collection, folder, file) => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
-      searchHelper(tree[i], searchText, collection, folder, file);
+      const path = [];
+      searchHelper(
+        tree[i],
+        searchText,
+        collection,
+        folder,
+        file,
+        tree[i]._id,
+        path,
+      );
     }
     return;
   };
