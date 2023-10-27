@@ -1,6 +1,6 @@
 import { collectionList, setCollectionList } from "$lib/store/collection";
-
-let tree: object[];
+/* eslint-disable @typescript-eslint/no-explicit-any */
+let tree: any[];
 
 collectionList.subscribe((value: object[]) => {
   tree = JSON.parse(JSON.stringify(value));
@@ -20,7 +20,7 @@ const helper: (
   method?: string,
 ) => number = (tree, folderId, type, name, id, method?) => {
   if (tree._id === folderId || tree.id === folderId) {
-    if (type === "FILE") {
+    if (type === "REQUEST") {
       tree.items.push({
         id,
         name,
@@ -50,6 +50,62 @@ const helper: (
   return 1;
 };
 
+const createPath: (path: string[]) => string = (path) => {
+  const res = "/" + path.join("/");
+  return res;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const searchHelper: (
+  tree: any,
+  searchText: string,
+  collection: any[],
+  folder: any[],
+  file: any[],
+  collectionId: string,
+  path: string[],
+) => void = (
+  tree,
+  searchText,
+  collection,
+  folder,
+  file,
+  collectionId,
+  path,
+) => {
+  if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
+    if (tree.type === "REQUEST") {
+      file.push({
+        tree: JSON.parse(JSON.stringify(tree)),
+        collectionId,
+        path: createPath(path),
+      });
+    } else if (tree.type === "FOLDER") {
+      folder.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
+    } else {
+      collection.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
+    }
+  }
+
+  // Recursively search through the tree structure
+  if (tree && tree.items) {
+    for (let j = 0; j < tree.items.length; j++) {
+      path.push(tree.name); // Recursive backtracking
+      searchHelper(
+        tree.items[j],
+        searchText,
+        collection,
+        folder,
+        file,
+        collectionId,
+        path,
+      );
+      path.pop();
+    }
+  }
+  return;
+};
+
 /**
  * Custom hook function for interacting with the tree data structure.
  */
@@ -76,7 +132,28 @@ const useTree = (): any[] => {
     setCollectionList(tree);
     return;
   };
-  return [insertNode, insertHead];
+  const searchNode: (
+    searchText: string,
+    collection: any[],
+    folder: any[],
+    file: any[],
+  ) => void = (searchText, collection, folder, file) => {
+    // Iterate through the tree to find the target folder and add the item
+    for (let i = 0; i < tree.length; i++) {
+      const path = [];
+      searchHelper(
+        tree[i],
+        searchText,
+        collection,
+        folder,
+        file,
+        tree[i]._id,
+        path,
+      );
+    }
+    return;
+  };
+  return [insertNode, insertHead, searchNode];
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
