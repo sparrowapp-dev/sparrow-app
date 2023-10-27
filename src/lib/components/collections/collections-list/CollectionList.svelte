@@ -189,7 +189,7 @@
     </div>
   </div>
 
-  <div class="d-flex flex-column pt-3">
+  <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
     <div class="d-flex flex-column justify-content-center">
       {#if searchData.length > 0}
         <div class="p-4 pt-0">

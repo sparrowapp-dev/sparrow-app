@@ -37,8 +37,6 @@
     isCollaps = value;
   });
 
-  let visible = true;
-
   let jsonText;
   let showResponse = false;
   responseText.subscribe((value) => {
@@ -137,9 +135,9 @@
       class='left-panel pt-3 px-4'
     >
       <div class="d-flex flex-column">
-        {#if jsonText.response && !showResponse}
-          <Loader {visible} />
-        {:else if showResponse}
+        <!-- {#if !jsonText.response && !showResponse}
+          <Loader /> -->
+        {#if jsonText.response}
           <ResponseParams />
         {:else}
           <DefaultPage />

@@ -10,22 +10,15 @@
   } from "$lib/store/request-response-section";
 
   let jsonText;
+  let content;
   responseText.subscribe((value) => {
     jsonText = value;
+    content = {
+      text: undefined,
+      json: jsonText.response,
+    };
   });
-
-  let content = {
-    text: undefined,
-    json: jsonText.response,
-  };
-
   // $: console.log("contents changed:", content);
-
-  let editorRef;
-
-  function refresh() {
-    editorRef?.refresh();
-  }
 
   let isCollaps;
   collapsibleState.subscribe((value) => {
@@ -79,14 +72,28 @@
     <div
       class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
     >
-      <JSONEditor bind:content readOnly />
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
     </div>
   {:else}
     <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '295px' : '292px'};width:100%;"
+      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '295px' : '295px'};"
     >
-      <JSONEditor bind:content readOnly />
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
     </div>
   {/if}
 </div>
@@ -97,6 +104,10 @@
     height: auto;
     width: 100%;
     background: #000000;
+  }
+
+  .--jse-contents-background-color {
+    --jse-background-color: black;
   }
 
   .my-json-editor {

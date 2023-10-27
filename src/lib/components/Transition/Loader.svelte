@@ -1,17 +1,18 @@
 <script>
   import { Circle } from "svelte-loading-spinners";
-  export let visible;
-  let color = " #1c35f3b9";
+  // export let visible;
+  let color = "#1c35f3b9";
   let size = "70";
   //   let unit = "1px";
 </script>
 
-{#if visible}
-  <div class="loading-spinner spinner-item">
-    <Circle {size} {color} />
-    <!-- Place your loading spinner component here -->
-  </div>
-{/if}
+<!-- {#if visible} -->
+<div class="loading-spinner spinner-item">
+  <Circle {size} {color} />
+  <!-- Place your loading spinner component here -->
+</div>
+
+<!-- {/if} -->
 
 <style>
   .spinner-item {

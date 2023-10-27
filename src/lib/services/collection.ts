@@ -13,6 +13,7 @@ import type {
 
 import {
   apiEndPoint,
+  bodyText,
   methodText,
   requestType,
   responseText,
@@ -109,7 +110,7 @@ const insertCollection: (
 //   return response;
 // };
 
-export const postMethod = async () => {
+export const crudMethod = async () => {
   //taking link from store
   let url = "";
   apiEndPoint.subscribe((value: string) => {
@@ -123,31 +124,11 @@ export const postMethod = async () => {
   });
 
   //taking headers from store
+  let body_text;
 
-  //taking body text from store
-
-  // let body_email = "";
-  // let body_name = "";
-  // bodyEmail.subscribe((value) => {
-  //   body_email = value;
-  // });
-
-  // bodyName.subscribe((value) => {
-  //   body_name = value;
-  //   console.log(body_name);
-  // });
-
-  // let body_text = {
-  //   name: body_name,
-  //   email: body_email,
-  // };
-
-  // console.log(body_text);
-
-  const body_text = {
-    name: "kashif",
-    email: "kashif@gmail.com",
-  };
+  bodyText.subscribe((value: any) => {
+    body_text = value;
+  });
 
   const body = JSON.stringify(body_text);
 

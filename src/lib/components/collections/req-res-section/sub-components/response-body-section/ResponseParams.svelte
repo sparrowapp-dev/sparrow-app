@@ -60,9 +60,9 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if selectedTab1 === "response"}
-  <ResponseBody />
+    <ResponseBody />
   {:else if selectedTab1 === "resheader"}
-  <ResponseHeader />
+    <ResponseHeader />
   {/if}
 </div>
 
@@ -90,7 +90,7 @@
   .btn-primary3 {
     background: var(--button-color);
   }
-  .cursor-pointer{
-    cursor:pointer;
+  .cursor-pointer {
+    cursor: pointer;
   }
 </style>

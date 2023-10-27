@@ -15,9 +15,7 @@ export const requestType = writable("");
 export const headerText = writable("");
 
 //this store for storing body text {"name" : "kashif" , "email":"kashif@gmail.com" , "password":"kashif"}
-// export const bodyText = writable({});
-export const bodyEmail = writable("");
-export const bodyName = writable("");
+export const bodyText = writable({});
 
 //store for storing response
 export const responseText = writable({});
