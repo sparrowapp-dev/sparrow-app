@@ -2,28 +2,26 @@
   import { Route, Link } from "svelte-navigator";
   import ResponseBody from "./ResponseBody.svelte";
   import ResponseHeader from "./ResponseHeader.svelte";
-  let selectedTab1 = "";
+  let selectedTab1 = "response";
 </script>
 
 <div class="d-flex flex-column justify-content-between w-100">
   <div class="d-flex align-items-center justify-content-between">
     <div class="d-flex gap-4 text-requestBodyColor">
-      <Link
-        to="response"
+      <span
         style="font-size: 12px;font-weight:500"
-        class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+        class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => (selectedTab1 = "response")}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab1 === "response"}
           >Response Body
         </span>
-      </Link>
+      </span>
 
-      <Link
-        to="resheader"
+      <span
         style="font-size: 12px;font-weight:500"
-        class="d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
+        class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => (selectedTab1 = "resheader")}
           class="team-menu__link d-flex pb-1"
@@ -31,12 +29,12 @@
           >Headers
           <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
         </span>
-      </Link>
+      </span>
     </div>
 
     <div class="d-flex gap-3">
       <button
-        class=" d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
+        class="cursor-pointer d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
         style="font-size: 12px; font-weight:600"
       >
         <span>200</span>
@@ -61,8 +59,11 @@
 </div>
 
 <div class="d-flex align-items-center justify-content-center w-100">
-  <Route path="/response"><ResponseBody /></Route>
-  <Route path="/resheader"><ResponseHeader /></Route>
+  {#if selectedTab1 === "response"}
+  <ResponseBody />
+  {:else if selectedTab1 === "resheader"}
+  <ResponseHeader />
+  {/if}
 </div>
 
 <style>
@@ -88,5 +89,8 @@
   }
   .btn-primary3 {
     background: var(--button-color);
+  }
+  .cursor-pointer{
+    cursor:pointer;
   }
 </style>
