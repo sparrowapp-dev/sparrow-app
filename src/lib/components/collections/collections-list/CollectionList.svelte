@@ -10,12 +10,17 @@
   import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
 
   import { fetchCollection, insertCollection } from "$lib/services/collection";
-  import { collectionList, setCollectionList } from "$lib/store/collection";
-  import { useTree } from "./collectionList";
+  import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
+  import {
+    collectionList,
+    setCollectionList
+  } from "$lib/store/collection";
+  import {useTree} from './collectionList';
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const [, insertHead] = useTree();
-
+  const [,insertHead, searchNode] = useTree();
+  
   import { currentWorkspace } from "$lib/store/workspace.store";
+    import { onDestroy } from "svelte";
 
   let collection: any;
   let currentWorkspaceId: string = "";
@@ -27,7 +32,7 @@
     }
   };
 
-  collectionList.subscribe((value) => {
+  const collectionListUnsubscribe =  collectionList.subscribe((value) => {
     collection = value;
   });
   let currentWorkspaceName = "";
@@ -70,8 +75,8 @@
     }
   };
 
-  currentWorkspace.subscribe((value) => {
-    if (value.id !== "") {
+  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
+    if(value.id !== ""){
       getCollectionData(value.id);
       currentWorkspaceName = value.name;
       currentWorkspaceId = value.id;
@@ -81,7 +86,7 @@
   //this is for expand and collaps
   let collapsExpandToggle = false;
 
-  collapsibleState.subscribe((value) => {
+  const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
 
@@ -89,7 +94,21 @@
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
   };
-  console.log(collapsibleState);
+
+  let searchData : string = "";
+  let filteredCollection= [];
+  let filteredFolder = [];
+  let filteredFile = [];
+  const handleSearch = () =>{
+    filteredCollection.length = 0;
+    filteredFolder.length = 0;
+    filteredFile.length = 0;
+    searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
+  }
+
+  onDestroy(collectionListUnsubscribe);
+  onDestroy(currentWorkspaceUnsubscribe);
+  onDestroy(collapsibleStateUnsubscribe);
 </script>
 
 <!-- //this will show only when button will be collaps -->
@@ -145,7 +164,9 @@
         type="search"
         style="  font-size: 12px;font-weight:500;"
         class="inputField border-0 w-100 h-100 bg-blackColor"
-        placeholder="Search APIs in Domigo"
+        placeholder="Search APIs in {currentWorkspaceName}"
+        bind:value={searchData}
+        on:input={handleSearch}
       />
     </div>
 
@@ -170,9 +191,36 @@
 
   <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
     <div class="d-flex flex-column justify-content-center">
-      {#each collection as col}
-        <Folder collection={col} title={col.name} />
-      {/each}
+      {#if searchData.length > 0}
+        <div class="p-4 pt-0">
+          {#if filteredFile.length > 0}
+            <p class="my-2">API Requests</p>
+            <hr class="mt-0 mb-1" />
+            {#each filteredFile as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} path={exp.path} explorer = {exp.tree} />
+            {/each}
+          {/if}
+          {#if filteredFolder.length > 0}
+            <p class="my-2">Folders</p>
+            <hr class="mt-0 mb-1"/>
+            {#each filteredFolder as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
+           {/each}
+          {/if}
+          {#if filteredCollection.length >0}
+            <p class="my-2">Collections</p>
+            <hr class="mt-0 mb-1"/>
+            {#each filteredCollection as exp}
+              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
+            {/each}
+          {/if}
+          
+        </div>
+      {:else}
+        {#each collection as col}
+          <Folder collectionId={col._id} currentWorkspaceId={currentWorkspaceId} collection={col} title={col.name} />
+        {/each}
+      {/if}
     </div>
   </div>
 </div>
@@ -183,6 +231,7 @@
     top: 44px;
     left: 72px;
     height: calc(100vh - 44px);
+    overflow-y: auto;
   }
   .inputField {
     outline: none;

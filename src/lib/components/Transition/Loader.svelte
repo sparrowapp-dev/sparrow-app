@@ -1,7 +1,7 @@
 <script>
   import { Circle } from "svelte-loading-spinners";
   // export let visible;
-  let color = " #1c35f3b9";
+  let color = "#1c35f3b9";
   let size = "70";
   //   let unit = "1px";
 </script>

@@ -13,33 +13,17 @@ export interface CreateApiRequestPostBody {
   workspaceId: string;
   folderId?: string;
   items: {
-    id: string;
     name: string;
-    description: string;
     type: string;
-    items?: object[];
-    request: {
-      id: string;
-      name: string;
+    request?: {
       method: string;
-      operationId: string;
-      url: string;
-      body: [
-        {
-          type: string;
-          schema: object;
-        },
-      ];
-      queryParams: [];
-      pathParams: [
-        {
-          name: string;
-          description: string;
-          required: true;
-          schema: object;
-        },
-      ];
-      headers: [];
+    };
+    items?: {
+      name: string;
+      type: string;
+      request: {
+        method: string;
+      };
     };
   };
 }

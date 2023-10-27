@@ -44,10 +44,7 @@
   <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
   <br />
   {#if isHorizontalVerticalMode}
-    <div
-      class="my-json-editor --jse-contents-background-color bg-blackColor me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '492px' : '492px'};"
-    >
+    <div class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1">
       <JSONEditor
         bind:content={jsonContent.json}
         mainMenuBar={false}
@@ -57,8 +54,8 @@
     </div>
   {:else}
     <div
-      class="my-json-editor --jse-contents-background-color bg-blackColor me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '200px' : '200px'};"
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor"
+      style=""
     >
       <JSONEditor
         bind:content={jsonContent.json}
@@ -73,7 +70,7 @@
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: 492px;
+    height: auto;
   }
 
   .--jse-contents-background-color {

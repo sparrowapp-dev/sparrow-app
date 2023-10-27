@@ -6,8 +6,6 @@
   window.addEventListener("click", () => {
     visibility = false;
   });
-  let title;
-  $: title = data[0] ? data[0].name : "";
 </script>
 
 <div style="position: relative; display:inline-block; z-index:999;">
@@ -18,7 +16,7 @@
         visibility = true;
       }, 100);
     }}
-    >{title}
+    >Workspace
     <span class="px-2" class:dropdown-logo-active={visibility === true}
       ><img style="height:10px; width:10px;" src={dropdown} alt="" /></span
     ></button
@@ -44,7 +42,6 @@
         on:click={() => {
           visibility = false;
           onclick(list._id, list.name);
-          title = list.name;
         }}
       >
         {list.name}
