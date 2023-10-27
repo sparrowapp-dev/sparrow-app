@@ -1,37 +1,32 @@
 <script>
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { bodyEmail, bodyName, requestType } from "$lib/store/api-request";
+  import { bodyText, requestType } from "$lib/store/api-request";
   import {
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
   import { JSONEditor } from "svelte-jsoneditor";
-  import { EditorView } from "@codemirror/view";
 
   //this store for updating dropdown value for JSON , XML
   let handleDropdown = (tab) => {
     requestType.set(tab);
   };
 
-  // let handleContentChange = () => {
-  //   bodyText.set(content);
-  // };
   // console.log(bodyText);
+  // let jsonContent = {
+  //   json: {
+  //     name: "kashif",
+  //     email: "kashif@gmail.com",
+  //   },
+  // };
+
   let jsonContent = {
-    json: {
-      name: "kashif",
-      email: "kashif@gmail.com",
-    },
+    json: {},
   };
 
-  function updateJSONContent(newContent) {
-    jsonContent = newContent;
-  }
+  bodyText.set(jsonContent.json);
 
-  function getJSONValue() {
-    const jsonValue = jsonContent.json;
-    console.log("JSON Value:", jsonValue);
-  }
+  console.log(jsonContent.json);
 
   let isCollaps;
   collapsibleState.subscribe((value) => {
@@ -54,8 +49,7 @@
       style="height:{isCollaps ? '492px' : '492px'};"
     >
       <JSONEditor
-        bind:content={jsonContent}
-        on:change={updateJSONContent}
+        bind:content={jsonContent.json}
         mainMenuBar={false}
         navigationBar={false}
         mode="text"
@@ -67,8 +61,7 @@
       style="height:{isCollaps ? '200px' : '200px'};"
     >
       <JSONEditor
-        bind:content={jsonContent}
-        on:change={updateJSONContent}
+        bind:content={jsonContent.json}
         mainMenuBar={false}
         navigationBar={false}
         mode="text"

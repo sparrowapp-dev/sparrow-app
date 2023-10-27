@@ -1,6 +1,6 @@
 <script>
   // import angleDown from "$lib/assets/angle-down.svg";
-  import tableColumnIcon from "$lib/assets/table-column.svg";
+  import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
   import {
@@ -54,7 +54,7 @@
     methodText.set(tab);
   };
 
-  let selectedView = "red";
+  let selectedView = "grid";
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -107,8 +107,8 @@
       <img src={lineIcon} alt="" />
     </div>
 
-    <div class="d-flex gap-1 ps-3">
-      <span class="mx-3" style="cursor:pointer;">
+    <div class="d-flex gap-1 ps-2">
+      <span style="cursor:pointer;">
         <img
           on:click={() => isHorizontalVertical.set(true)}
           on:click={() => {
@@ -119,13 +119,13 @@
           alt=""
         />
       </span>
-      <span class="mx-3" style="cursor:pointer;">
+      <span style="cursor:pointer;">
         <img
           on:click={() => isHorizontalVertical.set(false)}
           on:click={() => {
-            selectedView = "grid";
+            selectedView = "grid1";
           }}
-          class:view-active={selectedView === "grid"}
+          class:view-active={selectedView === "grid1"}
           src={barIcon}
           alt=""
         />

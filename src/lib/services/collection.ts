@@ -13,6 +13,7 @@ import type {
 
 import {
   apiEndPoint,
+  bodyText,
   methodText,
   requestType,
   responseText,
@@ -123,31 +124,11 @@ export const crudMethod = async () => {
   });
 
   //taking headers from store
+  let body_text;
 
-  //taking body text from store
-
-  // let body_email = "";
-  // let body_name = "";
-  // bodyEmail.subscribe((value) => {
-  //   body_email = value;
-  // });
-
-  // bodyName.subscribe((value) => {
-  //   body_name = value;
-  //   console.log(body_name);
-  // });
-
-  // let body_text = {
-  //   name: body_name,
-  //   email: body_email,
-  // };
-
-  // console.log(body_text);
-
-  const body_text = {
-    name: "kashif",
-    email: "kashif@gmail.com",
-  };
+  bodyText.subscribe((value: any) => {
+    body_text = value;
+  });
 
   const body = JSON.stringify(body_text);
 

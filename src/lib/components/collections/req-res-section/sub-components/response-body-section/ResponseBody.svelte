@@ -10,22 +10,15 @@
   } from "$lib/store/request-response-section";
 
   let jsonText;
+  let content;
   responseText.subscribe((value) => {
     jsonText = value;
+    content = {
+      text: undefined,
+      json: jsonText.response,
+    };
   });
-
-  let content = {
-    text: undefined,
-    json: jsonText.response,
-  };
-
   // $: console.log("contents changed:", content);
-
-  let editorRef;
-
-  function refresh() {
-    editorRef?.refresh();
-  }
 
   let isCollaps;
   collapsibleState.subscribe((value) => {
