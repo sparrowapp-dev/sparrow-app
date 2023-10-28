@@ -15,6 +15,7 @@
   import { apiEndPoint } from "$lib/store/api-request";
   import { methodText } from "$lib/store/api-request";
 
+  import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   //this for expand and collaps condition
   let isCollaps;
   collapsibleState.subscribe((value) => (isCollaps = value));
@@ -102,6 +103,7 @@
         style="font-size: 16px;height:34px; font-weight:400"
         on:click={handleSendRequest}>{sendText}</button
       >
+      <SaveRequest visibility = {true} />
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
       <img src={lineIcon} alt="" />
