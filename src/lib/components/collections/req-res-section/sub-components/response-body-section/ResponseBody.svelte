@@ -9,8 +9,8 @@
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
 
-  let jsonText;
-  let content;
+  let jsonText: any;
+  let content: any;
   responseText.subscribe((value) => {
     jsonText = value;
     content = {
@@ -20,12 +20,12 @@
   });
   // $: console.log("contents changed:", content);
 
-  let isCollaps;
+  let isCollaps: any;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
-  let isHorizontalVerticalMode;
+  let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 </script>
 
@@ -68,42 +68,24 @@
       </button>
     </div>
   </div>
-  {#if isHorizontalVerticalMode}
-    <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
-    >
-      <JSONEditor
-        bind:content
-        readOnly
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-        askToFormat={true}
-      />
-    </div>
-  {:else}
-    <div
-      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '295px' : '295px'};"
-    >
-      <JSONEditor
-        bind:content
-        readOnly
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-        askToFormat={true}
-      />
-    </div>
-  {/if}
+  <div
+    class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1 w-100"
+  >
+    <JSONEditor
+      bind:content
+      readOnly
+      mainMenuBar={false}
+      navigationBar={false}
+      mode="text"
+      askToFormat={true}
+    />
+  </div>
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: auto;
-    width: 100%;
-    background: #000000;
+    height: 400px;
   }
 
   .--jse-contents-background-color {
@@ -112,7 +94,6 @@
 
   .my-json-editor {
     background: var(--blackColor);
-    background: #000000;
     /* define a custom theme color */
     --jse-theme-color: var(--blackColor);
     --jse-theme-color-highlight: var(--blackColor);

@@ -93,6 +93,7 @@ const makeRequest = async (
 };
 
 //making common file for every request
+
 const makeRequestforCrud = async (
   url: string,
   method: string,
@@ -108,22 +109,16 @@ const makeRequestforCrud = async (
       body,
       request,
     });
-    console.log(response);
-    return success(response);
+    console.log("Response from backend:", response);
+    // Handle response errors here
+    if (!response) {
+      throw new Error("Invalid response from the backend");
+    }
+    return await success(response);
   } catch (e) {
-    //   if (e.response.data.message === ErrorMessages.ExpiredToken) {
-    //     regenerateAuthToken(method, url, requestData);
-    //   } else if (e.response.data.message === ErrorMessages.Unauthorized) {
-    //     clearAuthJwt();
-    //     setUser(null);
-    //     navigate("/login");
-    //   }
-    //   if (e.message) {
-    //     return error(e.message);
-    //   } else if (e.response.data) {
-    //     return error(e.response.data.message);
-    //   }
-    //   return error(e);
+    console.error("Error in makeRequestforCrud:", e.message); // Log errors
+    // Handle errors appropriately
+    // return error(e.message || "An error occurred");
   }
 };
 

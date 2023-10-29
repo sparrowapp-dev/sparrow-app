@@ -43,7 +43,7 @@
         class="m-0 d-flex py-1 gap-4"
         style="font-size: 12px;"
         class:selected-request={list === selectedRequest}
-        on:click={() => {
+        on:click|preventDefault={() => {
           visibility = false;
           onclick(list);
           title = list;

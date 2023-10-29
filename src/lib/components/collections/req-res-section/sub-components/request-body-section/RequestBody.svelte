@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
   import {
@@ -12,66 +12,49 @@
     requestType.set(tab);
   };
 
-  // console.log(bodyText);
-  // let jsonContent = {
-  //   json: {
-  //     name: "kashif",
-  //     email: "kashif@gmail.com",
-  //   },
-  // };
-
-  let jsonContent = {
-    json: {},
+  let content = {
+    text: "", // can be used to pass a stringified JSON document instead
+    json: undefined,
   };
 
-  bodyText.set(jsonContent.json);
-
-  console.log(jsonContent.json);
-
-  let isCollaps;
+  let isCollaps: any;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
-  let isHorizontalVerticalMode;
+  let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+
+  const handleChange = (updatedContent: any) => {
+    bodyText.set(updatedContent.text);
+    content = updatedContent;
+  };
 </script>
 
 <div
-  class="ps-0 {isHorizontalVerticalMode ? 'pt-3' : 'pt-1'} pe-0 rounded w-100"
+  class="ps-0 {isHorizontalVerticalMode ? 'pt-3' : 'pt-2'} pe-0 rounded w-100"
 >
-  <Dropdown data={["Pretty"]} onclick={handleDropdown} /><span class="px-2" />
-  <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
-  <br />
-  {#if isHorizontalVerticalMode}
-    <div class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1">
-      <JSONEditor
-        bind:content={jsonContent.json}
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-      />
-    </div>
-  {:else}
-    <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor"
-      style=""
-    >
-      <JSONEditor
-        bind:content={jsonContent.json}
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-      />
-    </div>
-  {/if}
+  <div class="mb-2">
+    <Dropdown data={["Pretty"]} onclick={handleDropdown} />
+    <span class="pe-3" />
+    <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleDropdown} />
+  </div>
+  <div
+    style="height:{isHorizontalVerticalMode ? '200px' : '400px'}"
+    class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-0"
+  >
+    <JSONEditor
+      {content}
+      onChange={handleChange}
+      mainMenuBar={false}
+      navigationBar={false}
+      mode="text"
+    />
+  </div>
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
-  .editor {
-    height: auto;
-  }
 
   .--jse-contents-background-color {
     --jse-background-color: black;
