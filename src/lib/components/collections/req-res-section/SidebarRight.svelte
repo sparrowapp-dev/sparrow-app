@@ -4,7 +4,7 @@
   import bookIcon from "$lib/assets/book.svg";
 </script>
 
-<div class="sidebar-right bg-backgroundColor ">
+<div class="sidebar-right bg-backgroundColor">
   <div class="d-flex flex-column">
     <button class="bg-backgroundColor border-0 mb-4 mt-3">
       <img src={commetIcon} alt="" />
@@ -23,9 +23,8 @@
     width: 32px;
     position: fixed;
     right: 0;
-    top:88px;
-    height: auto;
+    top: 80px;
     border-left: 1px solid var(--border-color);
-    height: 93vh;
+    height: calc(100vh - 80px);
   }
 </style>

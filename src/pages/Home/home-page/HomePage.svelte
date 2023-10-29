@@ -1,6 +1,6 @@
 <script>
   import Header from "$lib/components/header/Header.svelte";
-  import { navigate } from "svelte-navigator";
+  import { Link, navigate } from "svelte-navigator";
 
   // Function to maximize the page
   // const maximizePage = () => {
@@ -14,7 +14,7 @@
     <Header />
   </div>
   <h1>Welcome to Sparrow App</h1>
-  <a href="/dashboard/collections" class="btn btn-link mt-4 w-100">Continue</a>
+  <Link to="/dashboard/collections" class="btn btn-link mt-4 w-100">Continue</Link>
   <!-- <a href="/" class="btn btn-link mt-4 w-100">Go Back</a> -->
 </div>
 

@@ -18,8 +18,6 @@ export const collapsibleState = writable(false);
 //this is for horizaontal and vertical mode
 export const isHorizontalVertical = writable(false);
 
-//for color on crud operation
-
 export const createBasicAuthHeader = () => {
   // Retrieve values from the stores
   let username;
@@ -36,3 +34,7 @@ export const createBasicAuthHeader = () => {
     basicAuthHeader.set(header);
   }
 };
+
+//store for Api Request ------>here i will store all new request
+const initialRequest = [];
+export const apiRequest = writable(initialRequest);

@@ -37,7 +37,7 @@
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
-  style="height: 727px;"
+  style="height: 100vh;"
   data-tauri-drag-region
 >
   <Header />

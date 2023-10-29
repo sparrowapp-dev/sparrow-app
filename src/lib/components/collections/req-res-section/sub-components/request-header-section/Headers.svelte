@@ -97,7 +97,7 @@
 
 <div
   class="d-flex flex-column mt-4"
-  style="overflow-y:auto;overflow-x:hidden;height:55vh;"
+  style="overflow-y:auto;overflow-x:hidden;"
 >
   <div
     class="d-flex ps-2 ms-5 text-requestBodyColor align-items-center justify-content-between"

@@ -22,7 +22,7 @@
   //   };
 </script>
 
-<div class="card-body">
+<div class="card-body" style="height: 100vh;">
   <Header />
   <div class="formControl">
     <h1 class="card-title mb-4">Welcome to Sparrow!</h1>

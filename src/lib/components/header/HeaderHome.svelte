@@ -1,11 +1,9 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import logo from "$lib/assets/logo.svg";
   import closeIcon from "$lib/assets/close.svg";
   import resizeIcon from "$lib/assets/resize.svg";
   import minimizeIcon from "$lib/assets/minimize.svg";
   import circleIcon from "$lib/assets/Ellipse.svg";
-  import dropdown from "$lib/assets/dropdown.svg";
   import searchIcon from "$lib/assets/search.svg";
   import settingIcon from "$lib/assets/setting.svg";
   import profileIcon from "$lib/assets/profile.svg";
@@ -23,6 +21,7 @@
     import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
     import { fetchWorkspaces } from "$lib/services/workspace.service";
     import { setCurrentWorkspace } from "$lib/store/workspace.store";
+    import { onDestroy } from "svelte";
 
   const navigate = useNavigate();
   const onMinimize = () => {
@@ -53,29 +52,34 @@
     profile = false;
   });
 
-  let workspacedropDown : any[] = [];
+  let workspacedropDown: any[] = [];
 
-  const handleWorkspace = async(userId: string) => {
-    let response =  await fetchWorkspaces(userId);
+  const handleWorkspace = async (userId: string) => {
+    let response = await fetchWorkspaces(userId);
     if (response.isSuccessful) {
       workspacedropDown = response.data.data;
-      setCurrentWorkspace(response.data.data[0]._id, response.data.data[0].name);
+      setCurrentWorkspace(
+        response.data.data[0]._id,
+        response.data.data[0].name,
+      );
     }
-  }
+  };
 
-  user.subscribe((value)=>{
+  const userUnsubscribe = user.subscribe((value)=>{
     if(value){
       handleWorkspace(value._id);
     }
-  })
-  
-  const handleDropdown = (id, tab)=>{
+  });
+
+  const handleDropdown = (id, tab) => {
     setCurrentWorkspace(id, tab);
   }
+  onDestroy(userUnsubscribe);
 </script>
 
 <div
-  class="header d-flex w-100 p-1 align-items-center justify-content-between bg-blackColor" style="z-index:9999999999999999;"
+  class="d-flex w-100 py-1 ps-1 pe-0 align-items-center justify-content-between bg-blackColor"
+  style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
   <div
@@ -92,12 +96,12 @@
       class="d-flex d-flex align-items-center justify-content-center gap-2"
       style="height: 36px; width:116px"
     >
-      <HeaderDropdown data={workspacedropDown} onclick={handleDropdown}  />
+      <HeaderDropdown data={workspacedropDown} onclick={handleDropdown} />
     </div>
   </div>
 
   <div
-    style="height:36px; width:480px "
+    style="height:32px; width:480px "
     class="inputField bg-backgroundColor ps-3 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
   >
     <img src={searchIcon} alt="" />
@@ -108,7 +112,7 @@
     />
   </div>
 
-  <div class="d-flex justify-content-between">
+  <div class="d-flex align-items-center gap-2 justify-content-between">
     <div class="row g-0">
       <div class="col-3">
         <button class="btn btn-red">
@@ -120,7 +124,7 @@
           <img src={notifyIcon} alt="" />
         </button>
       </div>
-      <div class="col-4">
+      <div class="col-3">
         <div class="position-relative">
           <button class="btn btn-black" style="border:none; outline:none;">
             <img
@@ -202,16 +206,16 @@
       </div>
     </div>
 
-    <div class="d-flex">
-      <button on:click={onMinimize} class="btn btn-black w-25">
+    <div class="d-flex gap-0">
+      <button on:click={onMinimize} class="btn btn-black">
         <img src={minimizeIcon} alt="" />
       </button>
 
-      <button on:click={toggleSize} class="btn btn-black w-25">
+      <button on:click={toggleSize} class="btn btn-black">
         <img src={resizeIcon} alt="" />
       </button>
 
-      <button on:click={onClose} class="btn btn-black w-25">
+      <button on:click={onClose} class="btn btn-black">
         <img src={closeIcon} alt="" />
       </button>
     </div>
@@ -219,14 +223,6 @@
 </div>
 
 <style>
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 7vh;
-  }
-
   .inputField > input {
     outline: none;
   }

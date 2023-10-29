@@ -3,78 +3,124 @@
   import angleDown from "$lib/assets/angle-down.svg";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
-  // let content = {
-  //   text: undefined,
-  //   json: {
-  //     array: [1, 2, 3],
-  //     boolean: true,
-  //     color: "#82b92c",
-  //     null: null,
-  //     number: 123,
-  //     object: { a: "b", c: "d" },
-  //     string: "Hello World",
-  //   },
-  // };
+  import { responseText } from "$lib/store/api-request";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import {
+    collapsibleState,
+    isHorizontalVertical,
+  } from "$lib/store/request-response-section";
 
+  let jsonText;
+  let content;
+  let downloadedData : string ="";
+  responseText.subscribe((value) => {
+    jsonText = value;
+    content = {
+      text: undefined,
+      json: jsonText.response,
+    };
+    const data : string = JSON.stringify(content.json);
+    downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
+  });
   // $: console.log("contents changed:", content);
 
-  let editorRef;
+  let isCollaps;
+  collapsibleState.subscribe((value) => {
+    isCollaps = value;
+  });
 
-  function refresh() {
-    editorRef?.refresh();
+  let isHorizontalVerticalMode;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+ 
+  let fileStyle : string = "prettier";
+  const handlePrettierDropdown : (tab: string) => void = (tab) =>{
+      if(tab === "Prettier") {
+        fileStyle = "prettier";
+      } 
   }
+  
+  let fileExtension : string = "json";
+  const handleTypeDropdown : (tab: string) => void = (tab) =>{
+    if(tab === "JSON") { 
+      fileExtension = "json" 
+    }
+    else if(tab === "XML") { 
+      fileExtension = "xml" 
+    }
+    else if(tab === "RAW") {
+      fileExtension = "text" 
+    } 
+  }
+  
 </script>
 
 <div
-  class="d-flex flex-column w-100 align-items-start justify-content-between mt-3"
+  class="d-flex flex-column align-items-start justify-content-between mt-2 w-100"
 >
   <div class="d-flex align-items-center justify-content-between mb-1 w-100">
     <div class="d-flex gap-4 align-items-center justify-content-center">
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
       >
-        <p
-          style="font-size: 12px;font-weight:400;Line-height:18px"
-          class="mb-0 text-whiteColor"
-        >
-          Pretty
-        </p>
-        <img src={angleDown} alt="" class="w-100 h-100" />
+        <Dropdown data={["Pretty"]} onclick={handlePrettierDropdown}/>
       </button>
 
       <button
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
-        <p
-          style="font-size: 12px;font-weight:400;"
-          class="mb-0 text-whiteColor"
-        >
-          JSON
-        </p>
-        <img src={angleDown} alt="" class="w-100 h-100" />
+      <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown}/>
       </button>
     </div>
     <div class="d-flex align-items-center gap-4">
-      <button class=" bg-backgroundColor border-0">
+      <a class=" bg-backgroundColor border-0" href={downloadedData} download={`response.${fileExtension}`}>
         <img src={downloadIcon} alt="" />
-      </button>
+      </a>
 
       <button class=" bg-backgroundColor border-0">
         <img src={copyIcon} alt="" />
       </button>
     </div>
   </div>
-  <div class="my-json-editor editor jse-theme-dark my-json-editor">
-    <JSONEditor bind:this={editorRef} readOnly />
-  </div>
+  {#if isHorizontalVerticalMode}
+    <div
+      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
+    >
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
+    </div>
+  {:else}
+    <div
+      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
+      style="height:{isCollaps ? '295px' : '295px'};"
+    >
+      <JSONEditor
+        bind:content
+        readOnly
+        mainMenuBar={false}
+        navigationBar={false}
+        mode="text"
+        askToFormat={true}
+      />
+    </div>
+  {/if}
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
+    height: auto;
     width: 100%;
-    height: 70vh;
     background: #000000;
+  }
+
+  .--jse-contents-background-color {
+    --jse-background-color: black;
   }
 
   .my-json-editor {
