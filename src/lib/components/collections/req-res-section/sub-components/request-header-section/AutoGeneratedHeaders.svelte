@@ -14,8 +14,12 @@
   // storing the value from store for Basic auth section
   let username;
   let password;
-  basicAuth_username.subscribe((value) => (username = value));
-  basicAuth_password.subscribe((value) => (password = value));
+  const unsubscribeBasicAuth_username = basicAuth_username.subscribe(
+    (value) => (username = value),
+  );
+  const unsubscribeBasicAuth_password = basicAuth_password.subscribe(
+    (value) => (password = value),
+  );
 
   if (username && password) {
     const credentials = `${username}:${password}`;
@@ -26,24 +30,33 @@
 
   let basicAuthHeaderValue;
 
-  basicAuthHeader.subscribe((value) => {
+  const unsubscribeBasicAuthHeader = basicAuthHeader.subscribe((value) => {
     basicAuthHeaderValue = value;
   });
 
   // storing the value from store for Bearer token section
   let BearerTokenValue;
-  BearerToken.subscribe((value) => (BearerTokenValue = value));
+  const unsubscribeBearerToken = BearerToken.subscribe(
+    (value) => (BearerTokenValue = value),
+  );
 
   // storing the value from store for apiKey section
   let apiKeyText;
   let apiValueText;
-  apiKey.subscribe((value) => (apiKeyText = value));
-  apiValue.subscribe((value) => (apiValueText = value));
+  const unsubscribeApiKey = apiKey.subscribe((value) => (apiKeyText = value));
+  const unsubscribeApiValue = apiValue.subscribe(
+    (value) => (apiValueText = value),
+  );
+
+  unsubscribeBasicAuth_password();
+  unsubscribeBasicAuth_username();
+  unsubscribeBasicAuthHeader();
+  unsubscribeBearerToken();
+  unsubscribeApiKey();
+  unsubscribeApiValue();
 </script>
 
-<div
-  class="d-flex flex-column pe-5 ps-2   bg-backgroundColor w-100"
->
+<div class="d-flex flex-column pe-5 ps-2 bg-backgroundColor w-100">
   {#if username.length > 0 && password.length > 0}
     <div
       class="d-flex align-items-center justify-content-center ps-1 gap-3 mb-2"

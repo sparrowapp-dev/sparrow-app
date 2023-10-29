@@ -11,6 +11,8 @@
   import RequestParam from "../request-body-section/RequestParam.svelte";
   import { crudMethod } from "$lib/services/collection";
   import { apiEndPoint, methodText } from "$lib/store/api-request";
+  import { keyStore, valueStore } from "$lib/store/parameter";
+  // import { keyStore, valueStore } from "$lib/store/parameter";
 
   //this for expand and collaps condition
   let isCollaps;
@@ -29,9 +31,25 @@
     }
   };
 
+  let keyText;
+  let valueText;
+
+  keyStore.subscribe((value) => {
+    keyText = value;
+  });
+
+  valueStore.subscribe((value) => {
+    valueText = value;
+  });
+
+  console.log(keyText, valueText);
+
   //store for storing api endpoint url
   let urlText = "";
   const handleInputValue = () => {
+    if ((keyText.length > 0 && valueText.length > 0) || urlText.length) {
+      urlText + "&" + keyText + "=" + valueText;
+    }
     apiEndPoint.set(urlText);
   };
 
@@ -82,7 +100,7 @@
         style=" width:{isCollaps
           ? '100%'
           : '670px'}; height:34px; outline:none;font-size:14px;"
-        bind:value={urlText}
+        bind:value={urlText } 
         on:input={handleInputValue}
         bind:this={inputElement}
       />

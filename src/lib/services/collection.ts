@@ -131,8 +131,6 @@ export const crudMethod = async () => {
       bodyTextValue = "";
     }
 
-    console.log(bodyTextValue);
-
     let request: string = "";
     const unsubscribeRequest = requestType.subscribe((value) => {
       request = value;

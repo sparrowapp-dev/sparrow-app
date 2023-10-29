@@ -17,6 +17,7 @@
 </script>
 
 <script>
+  import { keyStore, valueStore } from "$lib/store/parameter";
   import { sortable } from "svelte-agnostic-draggable";
 
   /**** Svelte Event Handling ****/
@@ -95,6 +96,14 @@
       rows = [...rows, { key: "", value: "" }];
     }
   }
+
+  function updateKey(e) {
+    keyStore.set(e.target.value);
+  }
+
+  function updateValue(e) {
+    valueStore.set(e.target.value);
+  }
 </script>
 
 <div class="d-flex flex-column mt-4 w-100">
@@ -168,6 +177,7 @@
                 style="font-size: 13px;"
                 bind:value={row.key}
                 on:input={addRow}
+                on:input={updateKey}
               />
             </div>
             <div class="flex-grow-1 w-100">
@@ -180,6 +190,7 @@
                 style="font-size: 13px;"
                 bind:value={row.value}
                 on:input={addRow}
+                on:input={updateValue}
               />
             </div>
             <div class="w-75 h-75 pe-1">
