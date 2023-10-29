@@ -5,9 +5,12 @@
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
+// mod conf
 mod json_handler;
 mod urlencoded_handler;
 mod formdata_handler;
+mod url_fetch_handler;
+mod config;
 use serde_json::Value;
 use std::collections::HashMap;
 use reqwest::Client;
@@ -15,6 +18,7 @@ use json::{JsonValue, JsonError};
 use json_handler::make_json_request;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use formdata_handler::make_formdata_request;
+use url_fetch_handler::import_swagger_url;
 use serde_json::json;
 
 #[tokio::main]
@@ -95,12 +99,23 @@ fn make_type_request_command(url: &str, method: &str, headers: &str, body: &str,
     return result_value;
 }
 
+#[tauri::command]
+fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
+   let response = import_swagger_url(url, headers, workspaceid);
+   let response_value = match response {
+    Ok(value) => value,
+    Err(err) => todo!("{}", err), 
+   };
+   return response_value;
+}
+
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             greet,
             make_type_request_command,
+            fetch_swagger_url_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
