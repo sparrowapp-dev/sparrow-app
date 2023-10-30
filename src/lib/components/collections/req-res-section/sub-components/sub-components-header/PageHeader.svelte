@@ -1,15 +1,12 @@
-<script>
+<script lang="ts">
   import angleDown from "$lib/assets/angle-down.svg";
   import { collapsibleState } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
 
-  let isCollaps;
+  let isCollaps: boolean;
   collapsibleState.subscribe((value) => (isCollaps = value));
-  // console.log(isCollaps);
 </script>
-
-<!-- {isCollaps ? "px-5 py-3" : "p-4"} -->
 
 <div class="d-flex flex-column">
   <div

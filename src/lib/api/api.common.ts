@@ -92,8 +92,6 @@ const makeRequest = async (
   }
 };
 
-//making common file for every request
-
 const makeRequestforCrud = async (
   url: string,
   method: string,
@@ -109,16 +107,13 @@ const makeRequestforCrud = async (
       body,
       request,
     });
-    console.log("Response from backend:", response);
-    // Handle response errors here
+
     if (!response) {
       throw new Error("Invalid response from the backend");
     }
     return await success(response);
   } catch (e) {
-    console.error("Error in makeRequestforCrud:", e.message); // Log errors
-    // Handle errors appropriately
-    // return error(e.message || "An error occurred");
+    return error(e.message || "An error occurred");
   }
 };
 

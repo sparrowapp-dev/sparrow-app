@@ -1,17 +1,13 @@
-<script>
-  //   import angleDown from "$lib/assets/angle-down.svg";
-
+<script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import ApiKey from "./ApiKey.svelte";
   import BasicAuth from "./BasicAuth.svelte";
   import BearerToken from "./BearerToken.svelte";
   import NoAuth from "./NoAuth.svelte";
 
-  let currentTab = "No Auth";
-  let handleDropdown = (tab) => {
+  let currentTab: string = "No Auth";
+  let handleDropdown = (tab: string) => {
     currentTab = tab;
-    console.log(currentTab);
-    // console.log(tab);
   };
 </script>
 

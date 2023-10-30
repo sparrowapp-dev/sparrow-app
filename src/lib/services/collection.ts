@@ -18,6 +18,7 @@ import {
   requestType,
   responseText,
 } from "$lib/store/api-request";
+import { keyStore, valueStore } from "$lib/store/parameter";
 
 const apiUrl: string = constants.API_URL;
 
@@ -112,10 +113,25 @@ const insertCollection: (
 
 export const crudMethod = async () => {
   try {
+    let keyText: string;
+    let valueText: string;
+
+    keyStore.subscribe((value) => {
+      keyText = value;
+    });
+
+    valueStore.subscribe((value) => {
+      valueText = value;
+    });
+
     let url: string = "";
     const unsubscribeUrl = apiEndPoint.subscribe((value) => {
       url = value;
     });
+
+    if (url.length === 0) {
+      url = keyText + valueText;
+    }
 
     let method: string = "";
     const unsubscribeMethod = methodText.subscribe((value) => {
@@ -159,7 +175,7 @@ export const crudMethod = async () => {
         responseData = response?.data;
       } catch (error) {
         console.error("Error parsing JSON:", error);
-        responseData = null; // Set to null or handle appropriately
+        responseData = null;
       }
     }
 

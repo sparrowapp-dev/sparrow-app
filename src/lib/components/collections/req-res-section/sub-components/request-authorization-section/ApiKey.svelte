@@ -1,10 +1,8 @@
-<script>
+<script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { apiKey, apiValue } from "$lib/store/authorization";
 
-  let handleDropdown = (tab) => {
-    // console.log(tab);
-  };
+  let handleDropdown = (tab: string) => {};
 
   const handleAuthKey = (event) => {
     apiKey.set(event.target.value);
