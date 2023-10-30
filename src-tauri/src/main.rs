@@ -39,6 +39,7 @@ async fn make_request(
         "POST" => reqwest::Method::POST,
         "PUT" => reqwest::Method::PUT,
         "DELETE" => reqwest::Method::DELETE,
+        "PATCH" => reqwest::Method::PATCH,
         // Add other HTTP methods as needed
         _ => reqwest::Method::GET,
     };
