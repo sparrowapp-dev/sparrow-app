@@ -128,7 +128,7 @@ export const crudMethod = async () => {
     });
 
     if (bodyTextValue === "") {
-      bodyTextValue = "";
+      bodyTextValue = "{}";
     }
 
     let request: string = "";

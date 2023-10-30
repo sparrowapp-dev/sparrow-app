@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // import angleDown from "$lib/assets/angle-down.svg";
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
@@ -14,8 +14,13 @@
   import { keyStore, valueStore } from "$lib/store/parameter";
   // import { keyStore, valueStore } from "$lib/store/parameter";
 
+  import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   //this for expand and collaps condition
   let isCollaps;
+  let visibility : boolean = true;
+  const handleBackdrop = (flag) =>{
+    visibility = flag;
+  } 
   collapsibleState.subscribe((value) => (isCollaps = value));
 
   let isInputEmpty = false;
@@ -109,6 +114,7 @@
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
       >
+      <SaveRequest visibility = {visibility} onClick={handleBackdrop} />
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
       <img src={lineIcon} alt="" />

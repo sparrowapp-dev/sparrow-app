@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { JSONEditor } from "svelte-jsoneditor";
-  import angleDown from "$lib/assets/angle-down.svg";
+  import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import { responseText } from "$lib/store/api-request";
@@ -9,6 +8,9 @@
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
+  import copyToClipBoard from "$lib/utils/copyToClipboard";
+
+  import { notifications } from "$lib/utils/notifications";
 
   let jsonText: any;
   let content: any;
@@ -32,6 +34,14 @@
 
   let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+
+  async function handleCopy() {
+    if (jsonText && jsonText.response) {
+      const jsonString = JSON.stringify(jsonText.response, null, 2); // Converts the JSON object to a formatted JSON string
+      await copyToClipBoard(jsonString);
+    }
+    notifications.success("Copy To Clipboard");
+  }
 
   let fileStyle: string = "prettier";
   const handlePrettierDropdown: (tab: string) => void = (tab) => {
@@ -78,7 +88,7 @@
         <img src={downloadIcon} alt="" />
       </a>
 
-      <button class=" bg-backgroundColor border-0">
+      <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
         <img src={copyIcon} alt="" />
       </button>
     </div>
@@ -91,7 +101,7 @@
       readOnly
       mainMenuBar={false}
       navigationBar={false}
-      mode="text"
+      mode={Mode.text}
       askToFormat={true}
     />
   </div>
