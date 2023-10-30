@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { JSONEditor } from "svelte-jsoneditor";
+  import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import { responseText } from "$lib/store/api-request";
@@ -95,7 +95,7 @@
       readOnly
       mainMenuBar={false}
       navigationBar={false}
-      mode="text"
+      mode={Mode.text}
       askToFormat={true}
     />
   </div>
