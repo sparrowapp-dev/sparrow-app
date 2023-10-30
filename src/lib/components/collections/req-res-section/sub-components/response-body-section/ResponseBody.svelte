@@ -4,6 +4,7 @@
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import { responseText } from "$lib/store/api-request";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import {
     collapsibleState,
     isHorizontalVertical,
@@ -11,12 +12,16 @@
 
   let jsonText: any;
   let content: any;
+
+  let downloadedData: string = "";
   responseText.subscribe((value) => {
     jsonText = value;
     content = {
       text: undefined,
       json: jsonText.response,
     };
+    const data: string = JSON.stringify(content.json);
+    downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
   });
   // $: console.log("contents changed:", content);
 
@@ -27,6 +32,24 @@
 
   let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+
+  let fileStyle: string = "prettier";
+  const handlePrettierDropdown: (tab: string) => void = (tab) => {
+    if (tab === "Prettier") {
+      fileStyle = "prettier";
+    }
+  };
+
+  let fileExtension: string = "json";
+  const handleTypeDropdown: (tab: string) => void = (tab) => {
+    if (tab === "JSON") {
+      fileExtension = "json";
+    } else if (tab === "XML") {
+      fileExtension = "xml";
+    } else if (tab === "RAW") {
+      fileExtension = "text";
+    }
+  };
 </script>
 
 <div
@@ -37,31 +60,23 @@
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
       >
-        <p
-          style="font-size: 12px;font-weight:400;Line-height:18px"
-          class="mb-0 text-whiteColor"
-        >
-          Pretty
-        </p>
-        <img src={angleDown} alt="" class="w-100 h-100" />
+        <Dropdown data={["Pretty"]} onclick={handlePrettierDropdown} />
       </button>
 
       <button
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
-        <p
-          style="font-size: 12px;font-weight:400;"
-          class="mb-0 text-whiteColor"
-        >
-          JSON
-        </p>
-        <img src={angleDown} alt="" class="w-100 h-100" />
+        <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown} />
       </button>
     </div>
     <div class="d-flex align-items-center gap-4">
-      <button class=" bg-backgroundColor border-0">
+      <a
+        class=" bg-backgroundColor border-0"
+        href={downloadedData}
+        download={`response.${fileExtension}`}
+      >
         <img src={downloadIcon} alt="" />
-      </button>
+      </a>
 
       <button class=" bg-backgroundColor border-0">
         <img src={copyIcon} alt="" />
