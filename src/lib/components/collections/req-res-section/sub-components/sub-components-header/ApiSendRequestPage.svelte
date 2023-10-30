@@ -7,13 +7,12 @@
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
-
-  // import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
   import { crudMethod } from "$lib/services/collection";
-  import { apiEndPoint } from "$lib/store/api-request";
-  import { methodText } from "$lib/store/api-request";
+  import { apiEndPoint, methodText } from "$lib/store/api-request";
+  import { keyStore, valueStore } from "$lib/store/parameter";
+  // import { keyStore, valueStore } from "$lib/store/parameter";
 
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   //this for expand and collaps condition
@@ -24,33 +23,38 @@
   } 
   collapsibleState.subscribe((value) => (isCollaps = value));
 
-  let sendText = "Send";
-  let isSending = false;
-  const handleSendRequest = () => {
-    if (!isSending) {
-      // If not currently sending, change to "Cancel" and start sending
-      sendText = "Cancel";
-      isSending = true;
+  let isInputEmpty = false;
+  let inputElement;
 
-      // Here you can call your send request function (e.g., handleSendRequest)
-      crudMethod();
-
-      // Automatically change back to "Send" after 2 seconds
-      setTimeout(() => {
-        sendText = "Send";
-        isSending = false;
-      }, 3000);
+  const handleSendRequest = async () => {
+    if (urlText.trim() === "") {
+      isInputEmpty = true;
+      inputElement.focus();
     } else {
-      // If currently sending, handle the cancel action (you can add your logic here)
-      // Reset the button text and state
-      sendText = "Send";
-      isSending = false;
+      isInputEmpty = false;
+      await crudMethod();
     }
   };
+
+  let keyText;
+  let valueText;
+
+  keyStore.subscribe((value) => {
+    keyText = value;
+  });
+
+  valueStore.subscribe((value) => {
+    valueText = value;
+  });
+
+  console.log(keyText, valueText);
 
   //store for storing api endpoint url
   let urlText = "";
   const handleInputValue = () => {
+    if ((keyText.length > 0 && valueText.length > 0) || urlText.length) {
+      urlText + "&" + keyText + "=" + valueText;
+    }
     apiEndPoint.set(urlText);
   };
 
@@ -92,20 +96,23 @@
       </div>
 
       <input
-        type="text"
+        required
+        type="textarea"
         placeholder="Enter URL or paste text"
-        class="form-control bg-blackColor border-0 p-3 rounded"
+        class="form-control bg-blackColor border-0 p-3 rounded {isInputEmpty
+          ? 'border-red'
+          : ''}"
         style=" width:{isCollaps
           ? '100%'
           : '670px'}; height:34px; outline:none;font-size:14px;"
-        bind:value={urlText}
+        bind:value={urlText } 
         on:input={handleInputValue}
+        bind:this={inputElement}
       />
-
       <button
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:34px; font-weight:400"
-        on:click={handleSendRequest}>{sendText}</button
+        on:click|preventDefault={handleSendRequest}>Send</button
       >
       <SaveRequest visibility = {visibility} onClick={handleBackdrop} />
     </div>
@@ -116,7 +123,7 @@
     <div class="d-flex gap-1 ps-2">
       <span style="cursor:pointer;">
         <img
-          on:click={() => isHorizontalVertical.set(true)}
+          on:click={() => isHorizontalVertical.set(false)}
           on:click={() => {
             selectedView = "grid";
           }}
@@ -127,7 +134,7 @@
       </span>
       <span style="cursor:pointer;">
         <img
-          on:click={() => isHorizontalVertical.set(false)}
+          on:click={() => isHorizontalVertical.set(true)}
           on:click={() => {
             selectedView = "grid1";
           }}
@@ -159,6 +166,10 @@
   .btn-primary1 {
     background: var(--background-color);
     border: 1px solid var(--border-color);
+  }
+
+  .border-red:focus {
+    border: 5px solid black;
   }
 
   .btn-primary1:hover {

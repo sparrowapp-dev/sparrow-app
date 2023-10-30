@@ -6,16 +6,16 @@ import { writable } from "svelte/store";
 export const apiEndPoint = writable("");
 
 //this store for method (post , get , delete , update , delete , patch )
-export const methodText = writable("");
+export const methodText = writable("GET");
 
 //this store for request type (JSON , XML , RAW)
-export const requestType = writable("");
+export const requestType = writable("JSON");
 
 //this store for storing headertext (Content-Type=application/json)
 export const headerText = writable("");
 
 //this store for storing body text {"name" : "kashif" , "email":"kashif@gmail.com" , "password":"kashif"}
-export const bodyText = writable({});
+export const bodyText = writable("");
 
 //store for storing response
-export const responseText = writable({});
+export const responseText = writable("");

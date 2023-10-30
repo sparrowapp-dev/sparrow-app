@@ -6,7 +6,7 @@
 
   let isCollaps;
   collapsibleState.subscribe((value) => (isCollaps = value));
-  console.log(isCollaps);
+  // console.log(isCollaps);
 </script>
 
 <!-- {isCollaps ? "px-5 py-3" : "p-4"} -->

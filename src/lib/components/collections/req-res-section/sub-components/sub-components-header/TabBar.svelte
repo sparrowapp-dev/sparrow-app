@@ -17,7 +17,7 @@
 
   let isCollaps;
   collapsibleState.subscribe((value) => (isCollaps = value));
-  console.log(isCollaps);
+  // console.log(isCollaps);
 </script>
 
 <div class="d-flex flex-column">

@@ -111,53 +111,64 @@ const insertCollection: (
 // };
 
 export const crudMethod = async () => {
-  //taking link from store
-  let url = "";
-  apiEndPoint.subscribe((value: string) => {
-    url = value;
-  });
+  try {
+    let url: string = "";
+    const unsubscribeUrl = apiEndPoint.subscribe((value) => {
+      url = value;
+    });
 
-  // taking GET,POST , PUT ,  DELETE...... method from store
-  let method = "";
-  methodText.subscribe((value) => {
-    method = value;
-  });
+    let method: string = "";
+    const unsubscribeMethod = methodText.subscribe((value) => {
+      method = value;
+    });
 
-  //taking headers from store
-  let body_text;
+    let bodyTextValue: string;
+    const unsubscribeBody = bodyText.subscribe((value) => {
+      bodyTextValue = value;
+    });
 
-  bodyText.subscribe((value: any) => {
-    body_text = value;
-  });
+    if (bodyTextValue === "") {
+      bodyTextValue = "{}";
+    }
 
-  const body = JSON.stringify(body_text);
+    let request: string = "";
+    const unsubscribeRequest = requestType.subscribe((value) => {
+      request = value;
+    });
 
-  console.log(body);
+    // Unsubscribe from the stores after we're done
+    unsubscribeUrl();
+    unsubscribeMethod();
+    unsubscribeBody();
+    unsubscribeRequest();
 
-  //TAKING REQUEST TYPE FROM STORE (json , xml ,)
-  let request_type = "";
-  requestType.subscribe((value) => {
-    request_type = value;
-  });
+    const headers =
+      "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
 
-  //just for now i am only giving this header for testing
-  const headers =
-    "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
-  //const body =
-  // "--form '=@\"/C:/Users/91877/Downloads/WhatsApp Image 2023-10-05 at 6.09.07 PM.jpeg\"'";
+    const response = await makeRequestforCrud(
+      url,
+      method,
+      headers,
+      bodyTextValue,
+      request,
+    );
+    let responseData: any;
 
-  // this below body type will be valid for url encoded request type
-  // const body = "username=johndoe&password=secretpassword&data=example";
+    if (response?.data) {
+      try {
+        responseData = response?.data;
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        responseData = null; // Set to null or handle appropriately
+      }
+    }
 
-  const response = await makeRequestforCrud(
-    url,
-    method,
-    headers,
-    body,
-    request_type,
-  );
-  console.log(response.data);
-  responseText.set(response.data);
+    responseText.set(responseData);
+  } catch (error) {
+    console.error("Error:", error);
+    // return error.message;
+    // Handle the error gracefully, you can show an error message to the user or take other appropriate actions.
+  }
 };
 
 // const newRequest = {

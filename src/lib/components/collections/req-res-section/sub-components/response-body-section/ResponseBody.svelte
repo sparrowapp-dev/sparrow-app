@@ -9,49 +9,58 @@
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
+  import copyToClipBoard from "$lib/utils/copyToClipboard";
 
-  let jsonText;
-  let content;
-  let downloadedData : string ="";
+  import { notifications } from "$lib/utils/notifications";
+
+  let jsonText: any;
+  let content: any;
+
+  let downloadedData: string = "";
   responseText.subscribe((value) => {
     jsonText = value;
     content = {
       text: undefined,
       json: jsonText.response,
     };
-    const data : string = JSON.stringify(content.json);
+    const data: string = JSON.stringify(content.json);
     downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
   });
   // $: console.log("contents changed:", content);
 
-  let isCollaps;
+  let isCollaps: any;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
-  let isHorizontalVerticalMode;
+  let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
- 
-  let fileStyle : string = "prettier";
-  const handlePrettierDropdown : (tab: string) => void = (tab) =>{
-      if(tab === "Prettier") {
-        fileStyle = "prettier";
-      } 
-  }
-  
-  let fileExtension : string = "json";
-  const handleTypeDropdown : (tab: string) => void = (tab) =>{
-    if(tab === "JSON") { 
-      fileExtension = "json" 
+
+  async function handleCopy() {
+    if (jsonText && jsonText.response) {
+      const jsonString = JSON.stringify(jsonText.response, null, 2); // Converts the JSON object to a formatted JSON string
+      await copyToClipBoard(jsonString);
     }
-    else if(tab === "XML") { 
-      fileExtension = "xml" 
-    }
-    else if(tab === "RAW") {
-      fileExtension = "text" 
-    } 
+    notifications.success("Copy To Clipboard");
   }
-  
+
+  let fileStyle: string = "prettier";
+  const handlePrettierDropdown: (tab: string) => void = (tab) => {
+    if (tab === "Prettier") {
+      fileStyle = "prettier";
+    }
+  };
+
+  let fileExtension: string = "json";
+  const handleTypeDropdown: (tab: string) => void = (tab) => {
+    if (tab === "JSON") {
+      fileExtension = "json";
+    } else if (tab === "XML") {
+      fileExtension = "xml";
+    } else if (tab === "RAW") {
+      fileExtension = "text";
+    }
+  };
 </script>
 
 <div
@@ -62,61 +71,47 @@
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
       >
-        <Dropdown data={["Pretty"]} onclick={handlePrettierDropdown}/>
+        <Dropdown data={["Pretty"]} onclick={handlePrettierDropdown} />
       </button>
 
       <button
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
-      <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown}/>
+        <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown} />
       </button>
     </div>
     <div class="d-flex align-items-center gap-4">
-      <a class=" bg-backgroundColor border-0" href={downloadedData} download={`response.${fileExtension}`}>
+      <a
+        class=" bg-backgroundColor border-0"
+        href={downloadedData}
+        download={`response.${fileExtension}`}
+      >
         <img src={downloadIcon} alt="" />
       </a>
 
-      <button class=" bg-backgroundColor border-0">
+      <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
         <img src={copyIcon} alt="" />
       </button>
     </div>
   </div>
-  {#if isHorizontalVerticalMode}
-    <div
-      class="my-json-editor me-0 editor jse-theme-dark my-json-editor mt-1"
-    >
-      <JSONEditor
-        bind:content
-        readOnly
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-        askToFormat={true}
-      />
-    </div>
-  {:else}
-    <div
-      class="my-json-editor w-100 --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1"
-      style="height:{isCollaps ? '295px' : '295px'};"
-    >
-      <JSONEditor
-        bind:content
-        readOnly
-        mainMenuBar={false}
-        navigationBar={false}
-        mode="text"
-        askToFormat={true}
-      />
-    </div>
-  {/if}
+  <div
+    class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1 w-100"
+  >
+    <JSONEditor
+      bind:content
+      readOnly
+      mainMenuBar={false}
+      navigationBar={false}
+      mode="text"
+      askToFormat={true}
+    />
+  </div>
 </div>
 
 <style>
   @import "svelte-jsoneditor/themes/jse-theme-dark.css";
   .editor {
-    height: auto;
-    width: 100%;
-    background: #000000;
+    height: 400px;
   }
 
   .--jse-contents-background-color {
@@ -125,7 +120,6 @@
 
   .my-json-editor {
     background: var(--blackColor);
-    background: #000000;
     /* define a custom theme color */
     --jse-theme-color: var(--blackColor);
     --jse-theme-color-highlight: var(--blackColor);
