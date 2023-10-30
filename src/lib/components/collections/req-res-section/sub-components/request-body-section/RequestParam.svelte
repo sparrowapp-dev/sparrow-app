@@ -3,11 +3,9 @@
   import Headers from "../request-header-section/Headers.svelte";
   import RequestBody from "../request-body-section/RequestBody.svelte";
   import Authorization from "../request-authorization-section/Authorization.svelte";
-  import { Route, Link } from "svelte-navigator";
+
   import Parameters from "../request-parameter-section/Parameters.svelte";
   // import Loader from "$lib/components/Transition/Loader.svelte";
-  import ResponseBody from "../response-body-section/ResponseBody.svelte";
-  import ResponseHeader from "../response-body-section/ResponseHeader.svelte";
 
   import {
     collapsibleState,
@@ -16,32 +14,26 @@
   import { responseText } from "$lib/store/api-request";
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
-  import Loader from "$lib/components/Transition/Loader.svelte";
+
   import { onDestroy } from "svelte";
 
-  //this is for horizaontal and
-  let isHorizontalVerticalMode;
+  let isHorizontalVerticalMode: boolean;
   const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
     (value) => {
       isHorizontalVerticalMode = value;
-      // console.log(value);
     },
   );
 
-  //this for active link tab
   let selectedTab: string = "parameters";
 
-  //this is for expand collaps condition
-  let isCollaps;
+  let isCollaps: boolean;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
-  let jsonText;
-
+  let jsonResponse: any;
   responseText.subscribe((value) => {
-    jsonText = value;
-    // console.log(jsonText.response);
+    jsonResponse = value;
   });
 
   onDestroy(isHorizontalVerticalUnsubscribe);
@@ -129,7 +121,7 @@
     <div class="d-flex flex-column">
       <!-- {#if !jsonText.response && !showResponse}
           <Loader /> -->
-      {#if jsonText?.response}
+      {#if jsonResponse?.response}
         <ResponseParams />
       {:else}
         <DefaultPage />

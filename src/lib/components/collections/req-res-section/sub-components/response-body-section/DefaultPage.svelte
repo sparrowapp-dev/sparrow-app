@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { isHorizontalVertical } from "$lib/store/request-response-section";
-  let isHorizontalVerticalMode;
+  let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 </script>
 
