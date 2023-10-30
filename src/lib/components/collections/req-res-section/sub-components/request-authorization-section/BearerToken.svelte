@@ -1,12 +1,11 @@
-<script>
+<script lang="ts">
   import { BearerToken } from "$lib/store/authorization";
 
-  let isOverflowing = false; // Track whether content overflows
+  let isOverflowing: boolean = false;
 
   const handleInput = (event) => {
     BearerToken.set(event.target.value);
 
-    // Check if content overflows
     const inputElement = event.target;
     if (inputElement.scrollWidth > inputElement.clientWidth) {
       isOverflowing = true;

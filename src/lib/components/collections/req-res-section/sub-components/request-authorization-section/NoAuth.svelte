@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import linkIcon from "$lib/assets/linkIcon.svg";
 </script>
 

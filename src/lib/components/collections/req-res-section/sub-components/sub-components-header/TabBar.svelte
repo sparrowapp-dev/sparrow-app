@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import crossIcon from "$lib/assets/cross.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
@@ -15,9 +15,8 @@
     { name: "GET", content: " Untitled Request" },
   ];
 
-  let isCollaps;
+  let isCollaps: boolean;
   collapsibleState.subscribe((value) => (isCollaps = value));
-  // console.log(isCollaps);
 </script>
 
 <div class="d-flex flex-column">
@@ -86,14 +85,13 @@
 
 <style>
   .tabbar {
-    /* top: 50px; */
     position: fixed;
     width: calc(100%-72px);
     height: 36px;
   }
 
   .btn-primary {
-    background-color: #000000;
+    background-color: var(--blackColor);
     color: #8a9299;
   }
 

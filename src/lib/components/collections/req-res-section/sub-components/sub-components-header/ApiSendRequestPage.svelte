@@ -1,5 +1,4 @@
-<script>
-  // import angleDown from "$lib/assets/angle-down.svg";
+<script lang="ts">
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
@@ -12,15 +11,15 @@
   import { crudMethod } from "$lib/services/collection";
   import { apiEndPoint, methodText } from "$lib/store/api-request";
   import { keyStore, valueStore } from "$lib/store/parameter";
-  // import { keyStore, valueStore } from "$lib/store/parameter";
+  import { onMount } from "svelte";
 
-  //this for expand and collaps condition
-  let isCollaps;
+  let isCollaps: boolean;
   collapsibleState.subscribe((value) => (isCollaps = value));
 
-  let isInputEmpty = false;
-  let inputElement;
+  let isInputEmpty: boolean = false;
+  let inputElement: HTMLInputElement;
 
+  let urlText: string = "";
   const handleSendRequest = async () => {
     if (urlText.trim() === "") {
       isInputEmpty = true;
@@ -31,34 +30,50 @@
     }
   };
 
-  let keyText;
-  let valueText;
+  let keyText: string;
+  let valueText: string;
 
   keyStore.subscribe((value) => {
     keyText = value;
+    updateUrlText();
   });
 
-  valueStore.subscribe((value) => {
-    valueText = value;
-  });
+  let urlInputField: string = "";
+  function handleInputValue() {
+    updateUrlText();
+  }
+  function setValueText(newValue: string) {
+    valueText = newValue;
+    handleInputValue();
+  }
 
-  console.log(keyText, valueText);
+  function updateUrlText() {
+    urlText = keyStore && valueStore ? "?" + keyText + "=" + valueText : "";
+  }
+  apiEndPoint.set(urlInputField + urlText);
 
-  //store for storing api endpoint url
-  let urlText = "";
-  const handleInputValue = () => {
-    if ((keyText.length > 0 && valueText.length > 0) || urlText.length) {
-      urlText + "&" + keyText + "=" + valueText;
-    }
-    apiEndPoint.set(urlText);
-  };
+  valueStore.subscribe(setValueText);
 
-  //store for storing method
-  let handleDropdown = (tab) => {
+  const handleDropdown = (tab: string) => {
     methodText.set(tab);
   };
 
-  let selectedView = "grid";
+  onMount(updateUrlText);
+
+  let selectedView: string = "grid";
+
+  function handleInputKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      // Enter key is pressed, set keyText and valueText
+      const inputValue = inputElement.value.trim();
+      if (inputValue.includes("=")) {
+        const [key, value] = inputValue.split("=");
+        keyStore.set(key);
+        valueStore.set(value);
+        inputElement.value = "";
+      }
+    }
+  }
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -92,7 +107,7 @@
 
       <input
         required
-        type="textarea"
+        type="text"
         placeholder="Enter URL or paste text"
         class="form-control bg-blackColor border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
@@ -100,9 +115,10 @@
         style=" width:{isCollaps
           ? '100%'
           : '670px'}; height:34px; outline:none;font-size:14px;"
-        bind:value={urlText } 
+        bind:value={urlText}
         on:input={handleInputValue}
         bind:this={inputElement}
+        on:keydown={handleInputKeyDown}
       />
       <button
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
