@@ -6,24 +6,30 @@
   import {
     apiRequest,
     collapsibleState,
+    currentTab,
     isHorizontalVertical,
+    tabs,
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
   import { crudMethod } from "$lib/services/collection";
   import { apiEndPoint, methodText } from "$lib/store/api-request";
   import { keyStore, valueStore } from "$lib/store/parameter";
-  import { onMount } from "svelte";
-
+  import { onDestroy, onMount } from "svelte";
+  
   //this for expand and collaps condition
   let isCollaps;
- 
+  
   collapsibleState.subscribe((value) => (isCollaps = value));
-
+  
   let isInputEmpty: boolean = false;
   let inputElement: HTMLInputElement;
-
+  
+  let currentTabId = null;
+  let tabList = [];
   let urlText: string = "";
+  let method="";
+  
   const handleSendRequest = async () => {
     if (urlText.trim() === "") {
       isInputEmpty = true;
@@ -35,14 +41,24 @@
   };
 
   const handleDropdown = (tab: string) => {
-    methodText.set(tab);
-    apiRequest.update(value => {
-      if(value.length === 1) {
-        let temp = value;
-        temp[0].method = tab;
+    // methodText.set(tab);
+    // apiRequest.update(value => {
+    //   if(value.length === 1) {
+    //     let temp = value;
+    //     temp[0].method = tab;
+    //     return temp;
+    //   }
+    // });
+    tabs.update(value => {
+        let temp = value.map((elem)=>{
+          if(elem.id === currentTabId){
+            elem.method = tab; 
+          } 
+          return elem;
+        });
         return temp;
-      }
     });
+
   };
   let selectedView: string = "grid";
   
@@ -59,8 +75,46 @@
     }
   }
   let handleInputValue = () =>{
-    apiEndPoint.set(urlText);
+    tabs.update(value => {
+        let temp = value.map((elem)=>{
+          if(elem.id === currentTabId){
+            elem.url = urlText; 
+          } 
+          return elem;
+        });
+        return temp;
+    });
   };
+
+  const fetchUrlData = (id, list) => {
+      list.forEach(elem => {
+        if(elem.id === id){
+          urlText = elem.url;
+          method = elem.method;
+        }
+      });
+  }
+
+  const tabsUnsubscribe = tabs.subscribe((value)=>{
+    tabList = value;
+    if(currentTabId && tabList){
+      fetchUrlData(currentTabId, tabList);
+    }
+  });
+  
+  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
+    if(value && value.id){
+      currentTabId = value.id;
+      if(currentTabId && tabList){
+        fetchUrlData(currentTabId, tabList);
+      }
+    }
+  });
+
+  onDestroy(()=>{
+    tabsUnsubscribe();
+    currentTabUnsubscribe();
+  });
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -87,6 +141,7 @@
               "OPT",
               "CON",
             ]}
+            method = {method}
             onclick={handleDropdown}
           />
         </p>

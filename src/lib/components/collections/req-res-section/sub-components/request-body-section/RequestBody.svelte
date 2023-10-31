@@ -32,11 +32,9 @@
     if(currentTabId && tabList){
       fetchBodyData(currentTabId, tabList);
     }
-    console.log(value);
   });
   
   const currentTabUnsubscribe = currentTab.subscribe((value)=>{
-    console.log(value);
     if(value && value.id){
       currentTabId = value.id;
       if(currentTabId && tabList){
@@ -65,17 +63,7 @@
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   const handleChange = (updatedContent: RequestBody) => {
-    // bodyText.set(updatedContent.text);
-    // content = updatedContent;
-    // apiRequest.update(value => {
-    //   if(value.length === 1) {
-    //     let temp = value;
-    //     temp[0].body = updatedContent.text;
-    //     return temp;
-    //   }
-    // });
     tabs.update(value => {
-        // let temp = value;
         let temp = value.map((elem)=>{
           if(elem.id === currentTabId){
             elem.body = updatedContent.text; 
