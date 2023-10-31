@@ -14,13 +14,9 @@
   import { keyStore, valueStore } from "$lib/store/parameter";
   import { onMount } from "svelte";
 
-  import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   //this for expand and collaps condition
   let isCollaps;
-  let visibility : boolean = true;
-  const handleBackdrop = (flag) =>{
-    visibility = flag;
-  } 
+ 
   collapsibleState.subscribe((value) => (isCollaps = value));
 
   let isInputEmpty: boolean = false;
@@ -132,7 +128,7 @@
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
       >
-      <SaveRequest visibility = {visibility} onClick={handleBackdrop} />
+      
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
       <img src={lineIcon} alt="" />
