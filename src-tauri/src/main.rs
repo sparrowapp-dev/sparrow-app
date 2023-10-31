@@ -9,6 +9,7 @@ fn greet(name: &str) -> String {
 mod json_handler;
 mod urlencoded_handler;
 mod formdata_handler;
+mod raw_handler;
 mod url_fetch_handler;
 mod config;
 use serde_json::Value;
@@ -19,6 +20,7 @@ use json_handler::make_json_request;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use formdata_handler::make_formdata_request;
 use url_fetch_handler::import_swagger_url;
+use raw_handler::make_text_request;
 use serde_json::json;
 
 #[tokio::main]
@@ -63,6 +65,7 @@ async fn make_request(
         "JSON" => make_json_request(request_builder, body).await,
         "URLENCODED" => make_www_form_urlencoded_request(request_builder, body).await,
         "FORMDATA" => make_formdata_request(request_builder, body).await,
+        "TEXT" => make_text_request(request_builder, body).await,
         _ => make_json_request(request_builder, body).await,
     };
 
