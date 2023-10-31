@@ -6,7 +6,7 @@
   import linesmallIcon from "$lib/assets/linesmall.svg";
   import PageHeader from "./PageHeader.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
-  import {tabs, handleTabRemove, handleTabAddons, updateInitialRequest} from "$lib/store/request-response-section";
+  import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
   
   let tabsStore = [];
   tabs.subscribe((value)=>{
@@ -45,7 +45,7 @@
       {#each tabsStore as tab}
         <div
           class="d-inline-block rounded px-2" on:click={()=>{
-            updateInitialRequest(tab);
+            updateCurrentTab(tab);
           }}
           style="width: 196px; height:35px; border-right: 1px solid grey;" 
           
@@ -85,7 +85,7 @@
     </div>
     <div class="d-inline-block" style="height:35px; width:35px;">
       <button class=" btn btn-primary border-0 ps-1 pe-1 py-0 h-100 w-100" on:click={()=>{
-        handleTabAddons("GET"," Untitled Request",JSON.stringify(new Date())+"dummy")
+        handleTabAddons("GET"," Untitled Request", new Date()+"dummy")
       } }>
         <img src={plusIcon} alt="" />
       </button>
