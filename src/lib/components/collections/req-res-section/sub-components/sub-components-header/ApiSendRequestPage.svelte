@@ -4,6 +4,7 @@
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
   import {
+    apiRequest,
     collapsibleState,
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
@@ -63,6 +64,13 @@
 
   const handleDropdown = (tab: string) => {
     methodText.set(tab);
+    apiRequest.update(value => {
+      if(value.length === 1) {
+        let temp = value;
+        temp[0].method = tab;
+        return temp;
+      }
+    });
   };
 
   onMount(updateUrlText);
