@@ -1,6 +1,8 @@
 <script lang="ts">
+     import { handleTabAddons} from "$lib/store/request-response-section";
     export let name: string;
     export let method: string;
+    export let id : string;
     let apiClass = "red-api";
     if(method === "DELETE") apiClass = "red-api";
     else if(method === "GET") apiClass = "green-api"; 
@@ -9,7 +11,9 @@
     else if(method === "ARC") apiClass = "grey-api";
 </script>
 
-<div class="d-flex align-items-center" style="height:32px;">
+<div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
+    handleTabAddons(method,name,id);
+}}>
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
     </div>

@@ -47,6 +47,6 @@
     </div>
 {:else}
     <div style="padding-left: 0; cursor:pointer;">
-      <File name={explorer.name} method={explorer.request.method} />
+      <File name={explorer.name} id={explorer.id} method={explorer.request.method} />
     </div>
 {/if}
