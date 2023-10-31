@@ -34,30 +34,6 @@
     }
   };
 
-  let keyText: string;
-  let valueText: string;
-
-  keyStore.subscribe((value) => {
-    keyText = value;
-    updateUrlText();
-  });
-
-  let urlInputField: string = "";
-  function handleInputValue() {
-    updateUrlText();
-  }
-  function setValueText(newValue: string) {
-    valueText = newValue;
-    handleInputValue();
-  }
-
-  function updateUrlText() {
-    urlText = keyStore && valueStore ? "?" + keyText + "=" + valueText : "";
-  }
-  apiEndPoint.set(urlInputField + urlText);
-
-  valueStore.subscribe(setValueText);
-
   const handleDropdown = (tab: string) => {
     methodText.set(tab);
     apiRequest.update(value => {
@@ -68,11 +44,8 @@
       }
     });
   };
-
-  onMount(updateUrlText);
-
   let selectedView: string = "grid";
-
+  
   function handleInputKeyDown(event: KeyboardEvent) {
     if (event.key === "Enter") {
       // Enter key is pressed, set keyText and valueText
@@ -85,6 +58,9 @@
       }
     }
   }
+  let handleInputValue = () =>{
+    apiEndPoint.set(urlText);
+  };
 </script>
 
 <div class="d-flex flex-column w-100">

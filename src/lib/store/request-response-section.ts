@@ -18,7 +18,7 @@ const initialRequest = [
 ];
 export const apiRequest = writable(initialRequest);
 
-export const currentTab = writable({});
+export const currentTab = writable({ id: null });
 export const tabs = writable([]);
 
 let tabStore = [];
@@ -30,8 +30,28 @@ export const updateCurrentTab = (value) => {
   currentTab.set(value);
 };
 
-export const handleTabAddons = (type, name, id) => {
-  const newTab = { type: type, name: name, id: id };
+export const handleTabAddons = (
+  id,
+  name,
+  method,
+  type = "REQUEST",
+  body = "",
+  url = "",
+  header = "",
+  requestType = "JSON",
+  response = "",
+) => {
+  const newTab = {
+    method: method,
+    name: name,
+    type,
+    id: id,
+    body,
+    url,
+    header,
+    requestType,
+    response,
+  };
   tabs.update((value) => {
     return [...value, newTab];
   });
@@ -49,6 +69,6 @@ export const handleTabRemove = (id: string) => {
   if (tabStore.length > 0) {
     updateCurrentTab(tabStore[tabStore.length - 1]);
   } else {
-    updateCurrentTab({});
+    updateCurrentTab({ id: null });
   }
 };

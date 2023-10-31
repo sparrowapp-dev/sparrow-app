@@ -12,7 +12,7 @@
 </script>
 
 <div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
-    handleTabAddons(method,name,id);
+    handleTabAddons(id, name, method);
 }}>
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 

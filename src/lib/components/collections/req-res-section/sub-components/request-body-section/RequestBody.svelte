@@ -1,12 +1,53 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import { apiRequest, isHorizontalVertical } from "$lib/store/request-response-section";
+  import { apiRequest, currentTab, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
+    import { onDestroy } from "svelte";
   import { JSONEditor } from "svelte-jsoneditor";
 
+  let bodyData = "";
+  let currentTabId = null;
+  let tabList = []
+
+  let content = {
+    text: "",
+    json: undefined,
+  };
+  
+  const fetchBodyData = (id, list) => {
+      list.forEach(elem => {
+        if(elem.id === id){
+          bodyData = elem.body;
+          content = {
+            text: bodyData,
+            json: undefined
+          };
+        }
+      });
+  }
+
+  const tabsUnsubscribe = tabs.subscribe((value)=>{
+    tabList = value;
+    if(currentTabId && tabList){
+      fetchBodyData(currentTabId, tabList);
+    }
+    console.log(value);
+  });
+  
+  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
+    console.log(value);
+    if(value && value.id){
+      currentTabId = value.id;
+      if(currentTabId && tabList){
+        fetchBodyData(currentTabId, tabList);
+      }
+    }
+  });
+
+
+
   let handleDropdown = (tab: string) => {
-    requestType.set(tab);
     apiRequest.update(value => {
       if(value.length === 1) {
         let temp = value;
@@ -15,28 +56,40 @@
       }
     });
   };
-  let bodyData = "";
-  apiRequest.subscribe(value => bodyData = value[0].body);
+  
+  // apiRequest.subscribe(value => bodyData = value[0].body);
 
-  let content = {
-    text: bodyData,
-    json: undefined,
-  };
+  
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   const handleChange = (updatedContent: RequestBody) => {
-    bodyText.set(updatedContent.text);
-    content = updatedContent;
-    apiRequest.update(value => {
-      if(value.length === 1) {
-        let temp = value;
-        temp[0].body = updatedContent.text;
+    // bodyText.set(updatedContent.text);
+    // content = updatedContent;
+    // apiRequest.update(value => {
+    //   if(value.length === 1) {
+    //     let temp = value;
+    //     temp[0].body = updatedContent.text;
+    //     return temp;
+    //   }
+    // });
+    tabs.update(value => {
+        // let temp = value;
+        let temp = value.map((elem)=>{
+          if(elem.id === currentTabId){
+            elem.body = updatedContent.text; 
+          } 
+          return elem;
+        });
         return temp;
-      }
     });
   };
+
+  onDestroy(()=>{
+    currentTabUnsubscribe();
+    tabsUnsubscribe();
+  });
 </script>
 
 <div
