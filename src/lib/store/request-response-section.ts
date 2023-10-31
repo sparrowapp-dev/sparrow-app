@@ -7,7 +7,15 @@ export const collapsibleState = writable(false);
 export const isHorizontalVertical = writable(false);
 
 //store for Api Request ------>here i will store all new request
-const initialRequest = [];
+const initialRequest = [
+  {
+    url: "",
+    method: "",
+    body: "",
+    headers: "",
+    request: "",
+  },
+];
 export const apiRequest = writable(initialRequest);
 
 export const currentTab = writable({});

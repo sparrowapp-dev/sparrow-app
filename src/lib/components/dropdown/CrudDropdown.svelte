@@ -15,7 +15,7 @@
 </script>
 
 <div
-  style="position: relative; display:inline-block; z-index:9999999999999999;width:60px"
+  style="position: relative; display:inline-block; z-index:9999;width:60px"
 >
   <div class="d-flex align-items-center justify-content-between">
     <button
