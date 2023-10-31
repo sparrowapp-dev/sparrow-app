@@ -1,83 +1,45 @@
-<script context="module">
+<script lang="ts">
   import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import {
-    collapsibleState,
-    isHorizontalVertical,
-  } from "$lib/store/request-response-section";
-
-  //this is for horizaontal and vertical mode
-  let isHorizontalVerticalMode;
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
-
-  //this is for expand and collaps
-  let isCollaps;
-  collapsibleState.subscribe((value) => (isCollaps = value));
-</script>
-
-<script>
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import { keyStore, valueStore } from "$lib/store/parameter";
   import { sortable } from "svelte-agnostic-draggable";
 
-  /**** Svelte Event Handling ****/
+  let isHorizontalVerticalMode: boolean;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
-  function onSortableInit() {
-    // console.log("Sortable was created");
-  }
+  function onSortableInit() {}
 
   function onSortableActivate() {
-    // console.log("Sortable was activated");
     disableBodyScroll(document.body);
   }
 
-  function onSortStart() {
-    // console.log("sorting started");
-  }
+  function onSortStart() {}
 
-  function onSortMove() {
-    // console.log("sorting continues");
-  }
+  function onSortMove() {}
 
-  function onSortStop() {
-    // console.log("sorting stopped");
-  }
+  function onSortStop() {}
 
-  function onSortableOver() {
-    // console.log("Draggable entered Sortable");
-  }
+  function onSortableOver() {}
 
-  function onSortableChange() {
-    // console.log("sort order was changed");
-  }
+  function onSortableChange() {}
 
-  function onSortableRemove() {
-    // console.log("list element was removed");
-  }
+  function onSortableRemove() {}
 
-  function onSortableReceive() {
-    // console.log("list element was added");
-  }
+  function onSortableReceive() {}
 
-  function onSortableUpdate() {
-    // console.log("list items were updated");
-  }
+  function onSortableUpdate() {}
 
-  function onSortableOut() {
-    // console.log("Draggable left Sortable");
-  }
+  function onSortableOut() {}
 
   function onSortableDeactivate() {
-    // console.log("Sortable was deactivated");
     enableBodyScroll(document.body);
   }
 
-  function onSortableDestroy() {
-    // console.log("Sortable was destroyed");
-  }
+  function onSortableDestroy() {}
 
-  /**** List Data ****/
-
-  let isHovered = false;
+  let isHovered: boolean = false;
   let rows = [{ key: "", value: "" }];
 
   function toggleHover() {
@@ -95,25 +57,33 @@
       rows = [...rows, { key: "", value: "" }];
     }
   }
+
+  function updateKey(e) {
+    keyStore.set(e.target.value);
+  }
+
+  function updateValue(e) {
+    valueStore.set(e.target.value);
+  }
 </script>
 
-<div class="d-flex flex-column mt-4 w-100">
+<div class="d-flex flex-column mt-3 me-0 w-100">
   <div
-    class="d-flex text-requestBodyColor py-0 align-items-center justify-content-between"
-    style="font-size: 12px; font-weight: 500;"
+    class="d-flex text-requestBodyColor align-items-center justify-content-between"
+    style="font-size: 12px; font-weight: 500; width:{isHorizontalVerticalMode
+      ? '50%'
+      : '50%'}"
   >
-    <p class="ps-5">Key</p>
-    <p style="margin-right: 190px;">Value</p>
+    <p class="ps-5 ms-4">Key</p>
+    <p style="margin-left: 130px;">Value</p>
   </div>
 
   <div
-    class="sortable"
+    class="w-100 sortable"
     use:sortable={{
       cursor: "grabbing",
     }}
-    style="
-      width:{isCollaps ? '100%' : '100%'}
-      margin-bottom: 1px;
+    style="margin-bottom: 1px;
     "
     on:sortable:init={onSortableInit}
     on:sortable:destroy={onSortableActivate}
@@ -130,21 +100,21 @@
     on:sortable:receive={onSortableReceive}
   >
     {#each rows as row, index}
-      <div role="button" aria-label="Toggle Hover" class="sortable > div">
+      <div
+        role="button"
+        aria-label="Toggle Hover"
+        class="sortable > div"
+        style="width: {isHorizontalVerticalMode ? '100%' : '100%'};"
+      >
         <div
           on:mouseenter={toggleHover}
           on:mouseleave={toggleHover}
-          style="
-            padding-top: 1px;
-            cursor: grab;
-            background-color:backgroundColor;
-            display: flex;
-            flex-direction: column;
-            width: {isCollaps ? '100%' : '100%'};
-          "
+          style="padding-top: 1px;cursor: grab;background-color:backgroundColor;display: flex;flex-direction: column;width: {isHorizontalVerticalMode
+            ? '100%'
+            : '100%'};"
         >
           <div
-            class="d-flex {isCollaps
+            class="d-flex {isHorizontalVerticalMode
               ? 'w-100'
               : 'w-100'} align-items-center justify-content-center gap-3 mb-2"
           >
@@ -168,6 +138,7 @@
                 style="font-size: 13px;"
                 bind:value={row.key}
                 on:input={addRow}
+                on:input={updateKey}
               />
             </div>
             <div class="flex-grow-1 w-100">
@@ -180,6 +151,7 @@
                 style="font-size: 13px;"
                 bind:value={row.value}
                 on:input={addRow}
+                on:input={updateValue}
               />
             </div>
             <div class="w-75 h-75 pe-1">
@@ -203,13 +175,5 @@
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-  }
-
-  .inputField {
-    border: none;
-  }
-
-  .inputField:hover {
-    border-bottom: 1px solid red; /* Change border color as needed */
   }
 </style>

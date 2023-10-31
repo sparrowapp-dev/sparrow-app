@@ -1,31 +1,23 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import {
-    collapsibleState,
-    isHorizontalVertical,
-  } from "$lib/store/request-response-section";
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import type { RequestBody } from "$lib/utils/dto/requestbody";
   import { JSONEditor } from "svelte-jsoneditor";
 
-  //this store for updating dropdown value for JSON , XML
-  let handleDropdown = (tab) => {
+  let handleDropdown = (tab: string) => {
     requestType.set(tab);
   };
 
-  let content = {
-    text: "", // can be used to pass a stringified JSON document instead
+  let content: any = {
+    text: "",
     json: undefined,
   };
 
-  let isCollaps: any;
-  collapsibleState.subscribe((value) => {
-    isCollaps = value;
-  });
-
-  let isHorizontalVerticalMode: any;
+  let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
-  const handleChange = (updatedContent: any) => {
+  const handleChange = (updatedContent: RequestBody) => {
     bodyText.set(updatedContent.text);
     content = updatedContent;
   };
@@ -60,10 +52,7 @@
     --jse-background-color: black;
   }
 
-  /* define a custom theme color */
   .my-json-editor {
-    /* define a custom theme color */
-    --jse-theme-color: #ef1717;
-    --jse-theme-color-highlight: #687177;
+    --jse-theme-color-highlight: black;
   }
 </style>

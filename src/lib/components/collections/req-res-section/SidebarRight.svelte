@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import commetIcon from "$lib/assets/comment-fill.svg";
   import codeIcon from "$lib/assets/code.svg";
   import bookIcon from "$lib/assets/book.svg";

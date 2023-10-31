@@ -11,16 +11,13 @@
 
   import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import {
-    collectionList,
-    setCollectionList
-  } from "$lib/store/collection";
-  import {useTree} from './collectionList';
+  import { collectionList, setCollectionList } from "$lib/store/collection";
+  import { useTree } from "./collectionList";
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const [,insertHead, searchNode] = useTree();
-  
+  const [, insertHead, searchNode] = useTree();
+
   import { currentWorkspace } from "$lib/store/workspace.store";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   let collection: any;
   let currentWorkspaceId: string = "";
@@ -32,12 +29,11 @@
     }
   };
 
-  const collectionListUnsubscribe =  collectionList.subscribe((value) => {
+  const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   });
   let currentWorkspaceName = "";
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   const getNextCollection: (list: any[], name: string) => any = (
     list,
     name,
@@ -76,15 +72,14 @@
   };
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if(value.id !== ""){
+    if (value.id !== "") {
       getCollectionData(value.id);
       currentWorkspaceName = value.name;
       currentWorkspaceId = value.id;
     }
   });
 
-  //this is for expand and collaps
-  let collapsExpandToggle = false;
+  let collapsExpandToggle: boolean = false;
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
@@ -95,23 +90,22 @@
     collapsibleState.set(collapsExpandToggle);
   };
 
-  let searchData : string = "";
-  let filteredCollection= [];
+  let searchData: string = "";
+  let filteredCollection = [];
   let filteredFolder = [];
   let filteredFile = [];
-  const handleSearch = () =>{
+  const handleSearch = () => {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
     searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
-  }
+  };
 
   onDestroy(collectionListUnsubscribe);
   onDestroy(currentWorkspaceUnsubscribe);
   onDestroy(collapsibleStateUnsubscribe);
 </script>
 
-<!-- //this will show only when button will be collaps -->
 {#if collapsExpandToggle}
   <div>
     <button
@@ -197,28 +191,48 @@
             <p class="my-2">API Requests</p>
             <hr class="mt-0 mb-1" />
             {#each filteredFile as exp}
-              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} path={exp.path} explorer = {exp.tree} />
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                path={exp.path}
+                explorer={exp.tree}
+              />
             {/each}
           {/if}
           {#if filteredFolder.length > 0}
             <p class="my-2">Folders</p>
-            <hr class="mt-0 mb-1"/>
+            <hr class="mt-0 mb-1" />
             {#each filteredFolder as exp}
-              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
-           {/each}
-          {/if}
-          {#if filteredCollection.length >0}
-            <p class="my-2">Collections</p>
-            <hr class="mt-0 mb-1"/>
-            {#each filteredCollection as exp}
-              <SearchTree editable={true} collectionId={exp.collectionId} workspaceId={currentWorkspaceId} explorer = {exp.tree} />
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                explorer={exp.tree}
+              />
             {/each}
           {/if}
-          
+          {#if filteredCollection.length > 0}
+            <p class="my-2">Collections</p>
+            <hr class="mt-0 mb-1" />
+            {#each filteredCollection as exp}
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                explorer={exp.tree}
+              />
+            {/each}
+          {/if}
         </div>
       {:else}
         {#each collection as col}
-          <Folder collectionId={col._id} currentWorkspaceId={currentWorkspaceId} collection={col} title={col.name} />
+          <Folder
+            collectionId={col._id}
+            {currentWorkspaceId}
+            collection={col}
+            title={col.name}
+          />
         {/each}
       {/if}
     </div>

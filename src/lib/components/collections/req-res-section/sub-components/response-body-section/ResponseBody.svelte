@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { JSONEditor } from "svelte-jsoneditor";
-  import angleDown from "$lib/assets/angle-down.svg";
+  import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import { responseText } from "$lib/store/api-request";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import {
-    collapsibleState,
-    isHorizontalVertical,
-  } from "$lib/store/request-response-section";
+
+  import copyToClipBoard from "$lib/utils/copyToClipboard";
+
+  import { notifications } from "$lib/utils/notifications";
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
 
   let jsonText: any;
   let content: any;
@@ -16,6 +16,7 @@
   let downloadedData: string = "";
   responseText.subscribe((value) => {
     jsonText = value;
+
     content = {
       text: undefined,
       json: jsonText.response,
@@ -23,12 +24,14 @@
     const data: string = JSON.stringify(content.json);
     downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
   });
-  // $: console.log("contents changed:", content);
 
-  let isCollaps: any;
-  collapsibleState.subscribe((value) => {
-    isCollaps = value;
-  });
+  async function handleCopy() {
+    if (jsonText && jsonText.response) {
+      const jsonString = JSON.stringify(jsonText.response, null, 2);
+      await copyToClipBoard(jsonString);
+    }
+    notifications.success("Copy To Clipboard");
+  }
 
   let isHorizontalVerticalMode: any;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
@@ -49,6 +52,10 @@
     } else if (tab === "RAW") {
       fileExtension = "text";
     }
+  };
+
+  const handleDownloaded = () => {
+    notifications.success("Response downloaded");
   };
 </script>
 
@@ -71,6 +78,7 @@
     </div>
     <div class="d-flex align-items-center gap-4">
       <a
+        on:click={handleDownloaded}
         class=" bg-backgroundColor border-0"
         href={downloadedData}
         download={`response.${fileExtension}`}
@@ -78,7 +86,7 @@
         <img src={downloadIcon} alt="" />
       </a>
 
-      <button class=" bg-backgroundColor border-0">
+      <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
         <img src={copyIcon} alt="" />
       </button>
     </div>
@@ -91,7 +99,7 @@
       readOnly
       mainMenuBar={false}
       navigationBar={false}
-      mode="text"
+      mode={Mode.text}
       askToFormat={true}
     />
   </div>
@@ -109,7 +117,6 @@
 
   .my-json-editor {
     background: var(--blackColor);
-    /* define a custom theme color */
     --jse-theme-color: var(--blackColor);
     --jse-theme-color-highlight: var(--blackColor);
   }
