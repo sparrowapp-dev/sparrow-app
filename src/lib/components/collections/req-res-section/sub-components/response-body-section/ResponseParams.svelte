@@ -1,5 +1,4 @@
 <script>
-  import { Route, Link } from "svelte-navigator";
   import ResponseBody from "./ResponseBody.svelte";
   import ResponseHeader from "./ResponseHeader.svelte";
   let selectedTab1 = "response";
@@ -73,7 +72,6 @@
 
   .tab-active {
     color: white;
-
     border-bottom: 3px solid #85c2ff;
   }
 

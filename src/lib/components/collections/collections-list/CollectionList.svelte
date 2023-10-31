@@ -18,7 +18,6 @@
 
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-  import { clickTypeSidebar } from "$lib/store/sidebar";
 
   let collection: any;
   let currentWorkspaceId: string = "";
@@ -35,7 +34,6 @@
   });
   let currentWorkspaceName = "";
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   const getNextCollection: (list: any[], name: string) => any = (
     list,
     name,
@@ -81,8 +79,7 @@
     }
   });
 
-  //this is for expand and collaps
-  let collapsExpandToggle = false;
+  let collapsExpandToggle: boolean = false;
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
@@ -107,11 +104,8 @@
   onDestroy(collectionListUnsubscribe);
   onDestroy(currentWorkspaceUnsubscribe);
   onDestroy(collapsibleStateUnsubscribe);
-
-
 </script>
 
-<!-- //this will show only when button will be collaps -->
 {#if collapsExpandToggle}
   <div>
     <button
@@ -147,7 +141,6 @@
     </p>
     <button
       class="bg-backgroundColor border-0"
- 
       on:click={setcollapsExpandToggle}
     >
       <img src={doubleangleLeft} alt="" />

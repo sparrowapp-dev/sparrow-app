@@ -5,7 +5,7 @@
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
  
-  let isCollaps;
+  let isCollaps : boolean;
   let display: boolean = false;
   collapsibleState.subscribe((value) => (isCollaps = value));
   
@@ -17,8 +17,6 @@
     visibility = flag;
   } 
 </script>
-
-<!-- {isCollaps ? "px-5 py-3" : "p-4"} -->
 
 <div class="d-flex flex-column">
   <div
