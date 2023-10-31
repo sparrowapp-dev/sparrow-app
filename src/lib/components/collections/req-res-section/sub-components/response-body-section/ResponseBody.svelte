@@ -8,6 +8,7 @@
   import copyToClipBoard from "$lib/utils/copyToClipboard";
 
   import { notifications } from "$lib/utils/notifications";
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
 
   let jsonText: any;
   let content: any;
@@ -31,6 +32,9 @@
     }
     notifications.success("Copy To Clipboard");
   }
+
+  let isHorizontalVerticalMode: any;
+  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   let fileStyle: string = "prettier";
   const handlePrettierDropdown: (tab: string) => void = (tab) => {
