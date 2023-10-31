@@ -1,12 +1,21 @@
-<script>
+<script lang="ts">
   import angleDown from "$lib/assets/angle-down.svg";
   import { collapsibleState } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
-
+  import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
+ 
   let isCollaps;
+  let display: boolean = false;
   collapsibleState.subscribe((value) => (isCollaps = value));
-  // console.log(isCollaps);
+  
+  window.addEventListener("click", () => {
+    display = false;
+  });
+  let visibility : boolean = false;
+  const handleBackdrop = (flag) =>{
+    visibility = flag;
+  } 
 </script>
 
 <!-- {isCollaps ? "px-5 py-3" : "p-4"} -->
@@ -36,11 +45,27 @@
             Save
           </p>
         </button>
-        <button
-          class="btn btn-primary d-flex align-items-center justify-content-center px-1 py-0 rounded border-0"
-        >
-          <img src={angleDown} alt="" class="w-100 h-100" />
-        </button>
+        <span class="position-relative">
+          <button
+          on:click={
+            ()=>{
+              setTimeout(() => {
+                display = true;
+              }, 100);
+            }
+          }
+            class="px-2 py-2  btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
+          >
+            <img src={angleDown} alt="" class="w-100 h-100" />
+          </button>
+          <div class="rounded save-options {display ? 'd-block' : 'd-none'}">
+            <p style="width:120px;" class="bg-black m-0 py-1 px-3 cursor-pointer" on:click={()=>{
+              display = false;
+              visibility = true;
+            }}>Save As</p>
+          </div>
+          <SaveRequest visibility = {visibility} onClick={handleBackdrop} />
+        </span>
       </div>
       <div>
         <button
@@ -71,5 +96,13 @@
 
   .btn-primary:hover {
     background-color: #616364;
+  }
+  .save-options{
+    position: absolute;
+    top:40px;
+    right: 0;
+  }
+  .cursor-pointer{
+    cursor: pointer;
   }
 </style>

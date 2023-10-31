@@ -386,7 +386,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999999999999999999;
+    z-index: 99999;
   }
   .save-request {
     position: fixed;
@@ -397,7 +397,7 @@
     background-color: var(--background-color);
     width: 960px;
     height: 640px;
-    z-index: 99999999999999999999;
+    z-index: 999999;
   }
   .cursor-pointer {
     cursor: pointer;
