@@ -18,16 +18,6 @@
           };
 
   let downloadedData: string = "";
-  // responseText.subscribe((value) => {
-  //   jsonText = value;
-
-  //   content = {
-  //     text: undefined,
-  //     json: jsonText.response,
-  //   };
-    // const data: string = JSON.stringify(content.json);
-    // downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
-  // });
 
 
 
@@ -88,7 +78,6 @@
 
   const tabsUnsubscribe = tabs.subscribe((value)=>{
     tabList = value;
-    console.log(value);
     if(currentTabId && tabList){
       fetchUrlData(currentTabId, tabList);
     }

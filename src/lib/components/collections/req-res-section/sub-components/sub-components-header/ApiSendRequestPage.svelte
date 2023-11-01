@@ -54,7 +54,6 @@
         requestData.requestType,
       );
 
-      console.log("response",response);
       if (response.isSuccessful) {
           let responseBody = response.data.response.data;
           let responseHeaders = response.data.headers;
@@ -124,7 +123,6 @@
 
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-    console.log("tabList", value);
     if (currentTabId && tabList) {
       fetchUrlData(currentTabId, tabList);
     }
