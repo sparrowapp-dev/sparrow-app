@@ -8,28 +8,32 @@
   import copyToClipBoard from "$lib/utils/copyToClipboard";
 
   import { notifications } from "$lib/utils/notifications";
-  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import { currentTab, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
+    import { onDestroy } from "svelte";
 
   let jsonText: any;
-  let content: any;
+  let content = {
+            text: "",
+            json: undefined
+          };
 
   let downloadedData: string = "";
-  responseText.subscribe((value) => {
-    jsonText = value;
+  // responseText.subscribe((value) => {
+  //   jsonText = value;
 
-    content = {
-      text: undefined,
-      json: jsonText.response,
-    };
-    const data: string = JSON.stringify(content.json);
-    downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
-  });
+  //   content = {
+  //     text: undefined,
+  //     json: jsonText.response,
+  //   };
+    // const data: string = JSON.stringify(content.json);
+    // downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(data);
+  // });
+
+
 
   async function handleCopy() {
-    if (jsonText && jsonText.response) {
-      const jsonString = JSON.stringify(jsonText.response, null, 2);
+      const jsonString = content.text;
       await copyToClipBoard(jsonString);
-    }
     notifications.success("Copy To Clipboard");
   }
 
@@ -57,6 +61,51 @@
   const handleDownloaded = () => {
     notifications.success("Response downloaded");
   };
+
+  let currentTabId = null;
+  let tabList = [];
+
+  const fetchUrlData = (id, list) => {
+      list.forEach(elem => {
+        if(elem.id === id){
+          if(elem.response && elem.response.body){
+            content = {
+              text: elem.response.body,
+              json: undefined
+            };
+          }
+          else{
+            content = {
+              text: "",
+              json: undefined
+            };
+          }
+          downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
+        }
+      });
+  }
+
+
+  const tabsUnsubscribe = tabs.subscribe((value)=>{
+    tabList = value;
+    console.log(value);
+    if(currentTabId && tabList){
+      fetchUrlData(currentTabId, tabList);
+    }
+  });
+  
+  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
+    if(value && value.id){
+      currentTabId = value.id;
+      if(currentTabId && tabList){
+        fetchUrlData(currentTabId, tabList);
+      }
+    }
+  });
+  onDestroy(()=>{
+    tabsUnsubscribe();
+    currentTabUnsubscribe();
+  });
 </script>
 
 <div

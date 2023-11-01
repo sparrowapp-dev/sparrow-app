@@ -118,14 +118,15 @@
       : '50%'};border-left:1px solid #313233;height:100vh"
     class="left-panel pt-3 px-4"
   >
-    <div class="d-flex flex-column">
-      <!-- {#if !jsonText.response && !showResponse}
-          <Loader /> -->
+    <!-- <div class="d-flex flex-column">
       {#if jsonResponse?.response}
         <ResponseParams />
       {:else}
         <DefaultPage />
       {/if}
+    </div> -->
+    <div class="d-flex flex-column">
+        <ResponseParams />
     </div>
   </div>
 </div>

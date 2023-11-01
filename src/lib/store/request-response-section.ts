@@ -31,15 +31,16 @@ export const updateCurrentTab = (value) => {
 };
 
 export const handleTabAddons = (
-  id,
-  name,
-  method,
-  type = "REQUEST",
-  body = "",
-  url = "",
+  id: string,
+  name: string,
+  method: string,
+  type: string = "REQUEST",
+  body: string = "",
+  url: string = "",
   header = "",
   requestType = "JSON",
-  response = "",
+  response = {},
+  path = {},
 ) => {
   const newTab = {
     method: method,
@@ -51,11 +52,21 @@ export const handleTabAddons = (
     header,
     requestType,
     response,
+    path,
   };
-  tabs.update((value) => {
-    return [...value, newTab];
+
+  const requestAlreadyExist = tabStore.filter((elem) => {
+    if (elem.id === newTab.id) return true;
+    else return false;
   });
-  updateCurrentTab(newTab);
+  if (requestAlreadyExist.length === 0) {
+    tabs.update((value) => {
+      return [...value, newTab];
+    });
+    updateCurrentTab(newTab);
+  } else {
+    updateCurrentTab(requestAlreadyExist[0]);
+  }
 };
 
 export const handleTabRemove = (id: string) => {
