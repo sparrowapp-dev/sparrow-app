@@ -4,73 +4,88 @@
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
   import {
-    apiRequest,
     collapsibleState,
+    currentTab,
     isHorizontalVertical,
+    tabs,
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
-  import { crudMethod } from "$lib/services/collection";
-  import { apiEndPoint, methodText } from "$lib/store/api-request";
   import { keyStore, valueStore } from "$lib/store/parameter";
-  import { onMount } from "svelte";
+  import { onDestroy } from "svelte";
+  import { makeRequestforCrud } from "$lib/api/api.common";
 
   //this for expand and collaps condition
   let isCollaps;
- 
+
   collapsibleState.subscribe((value) => (isCollaps = value));
 
   let isInputEmpty: boolean = false;
   let inputElement: HTMLInputElement;
 
+  let currentTabId = null;
+  let tabList = [];
   let urlText: string = "";
+  let method = "";
+  let requestData;
+
+
+  const testJSON : (text : string) => string = (text) => {
+    try {
+        JSON.parse(text);
+        return text;
+    } catch (error) {
+        return '{}';
+    }
+}
+
   const handleSendRequest = async () => {
-    if (urlText.trim() === "") {
+    const str = urlText;
+    if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
     } else {
       isInputEmpty = false;
-      await crudMethod();
+      let response = await makeRequestforCrud(
+        requestData.url,
+        requestData.method,
+        "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
+        testJSON(requestData.body),
+        requestData.requestType,
+      );
+
+      if (response.isSuccessful) {
+          let responseBody = response.data.response.data;
+          let responseHeaders = response.data.headers;
+          let responseStatus = response.data.status;
+          tabs.update((value) => {
+          let temp = value.map((elem) => {
+            if (elem.id === currentTabId) {
+              elem.response = {
+                body: JSON.stringify(responseBody),
+                headers: JSON.stringify(responseHeaders),
+                status: responseStatus
+              }
+            }
+            return elem;
+          });
+          return temp;
+        }); 
+      }
     }
   };
 
-  let keyText: string;
-  let valueText: string;
-
-  keyStore.subscribe((value) => {
-    keyText = value;
-    updateUrlText();
-  });
-
-  let urlInputField: string = "";
-  function handleInputValue() {
-    updateUrlText();
-  }
-  function setValueText(newValue: string) {
-    valueText = newValue;
-    handleInputValue();
-  }
-
-  function updateUrlText() {
-    urlText = keyStore && valueStore ? "?" + keyText + "=" + valueText : "";
-  }
-  apiEndPoint.set(urlInputField + urlText);
-
-  valueStore.subscribe(setValueText);
-
   const handleDropdown = (tab: string) => {
-    methodText.set(tab);
-    apiRequest.update(value => {
-      if(value.length === 1) {
-        let temp = value;
-        temp[0].method = tab;
-        return temp;
-      }
+    tabs.update((value) => {
+      let temp = value.map((elem) => {
+        if (elem.id === currentTabId) {
+          elem.method = tab;
+        }
+        return elem;
+      });
+      return temp;
     });
   };
-
-  onMount(updateUrlText);
-
   let selectedView: string = "grid";
 
   function handleInputKeyDown(event: KeyboardEvent) {
@@ -85,6 +100,47 @@
       }
     }
   }
+  let handleInputValue = () => {
+    tabs.update((value) => {
+      let temp = value.map((elem) => {
+        if (elem.id === currentTabId) {
+          elem.url = urlText;
+        }
+        return elem;
+      });
+      return temp;
+    });
+  };
+  const fetchUrlData = (id, list) => {
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        urlText = elem.url;
+        method = elem.method;
+        requestData = elem;
+      }
+    });
+  };
+
+  const tabsUnsubscribe = tabs.subscribe((value) => {
+    tabList = value;
+    if (currentTabId && tabList) {
+      fetchUrlData(currentTabId, tabList);
+    }
+  });
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
+      currentTabId = value.id;
+      if (currentTabId && tabList) {
+        fetchUrlData(currentTabId, tabList);
+      }
+    }
+  });
+
+  onDestroy(() => {
+    tabsUnsubscribe();
+    currentTabUnsubscribe();
+  });
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -111,6 +167,7 @@
               "OPT",
               "CON",
             ]}
+            {method}
             onclick={handleDropdown}
           />
         </p>
@@ -136,7 +193,6 @@
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
       >
-      
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
       <img src={lineIcon} alt="" />

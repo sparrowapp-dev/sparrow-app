@@ -9,7 +9,9 @@
 
   import {
     collapsibleState,
+    currentTab,
     isHorizontalVertical,
+    tabs,
   } from "$lib/store/request-response-section";
   import { responseText } from "$lib/store/api-request";
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
@@ -31,12 +33,46 @@
     isCollaps = value;
   });
 
-  let jsonResponse: any;
-  responseText.subscribe((value) => {
-    jsonResponse = value;
+  let jsonResponse: any = false;
+
+
+  let currentTabId = null;
+  let tabList = []
+
+  const fetchBodyData = (id, list) => {
+      list.forEach(elem => {
+        if(elem.id === id){
+          if(elem.response && elem.response.body){
+            jsonResponse = true;
+          }
+          else{
+            jsonResponse = false;
+          }
+        }
+      });
+  }
+
+  const tabsUnsubscribe = tabs.subscribe((value)=>{
+    tabList = value;
+    if(currentTabId && tabList){
+      fetchBodyData(currentTabId, tabList);
+    }
+  });
+  
+  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
+    if(value && value.id){
+      currentTabId = value.id;
+      if(currentTabId && tabList){
+        fetchBodyData(currentTabId, tabList);
+      }
+    }
   });
 
-  onDestroy(isHorizontalVerticalUnsubscribe);
+  onDestroy(()=>{
+    currentTabUnsubscribe();
+    tabsUnsubscribe();
+    isHorizontalVerticalUnsubscribe();
+  });
 </script>
 
 <div
@@ -119,9 +155,7 @@
     class="left-panel pt-3 px-4"
   >
     <div class="d-flex flex-column">
-      <!-- {#if !jsonText.response && !showResponse}
-          <Loader /> -->
-      {#if jsonResponse?.response}
+      {#if jsonResponse}
         <ResponseParams />
       {:else}
         <DefaultPage />

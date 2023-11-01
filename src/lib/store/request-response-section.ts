@@ -18,7 +18,7 @@ const initialRequest = [
 ];
 export const apiRequest = writable(initialRequest);
 
-export const currentTab = writable({});
+export const currentTab = writable({ id: null });
 export const tabs = writable([]);
 
 let tabStore = [];
@@ -30,12 +30,43 @@ export const updateCurrentTab = (value) => {
   currentTab.set(value);
 };
 
-export const handleTabAddons = (type, name, id) => {
-  const newTab = { type: type, name: name, id: id };
-  tabs.update((value) => {
-    return [...value, newTab];
+export const handleTabAddons = (
+  id: string,
+  name: string,
+  method: string,
+  type: string = "REQUEST",
+  body: string = "",
+  url: string = "",
+  header = "",
+  requestType = "JSON",
+  response = {},
+  path = {},
+) => {
+  const newTab = {
+    method: method,
+    name: name,
+    type,
+    id: id,
+    body,
+    url,
+    header,
+    requestType,
+    response,
+    path,
+  };
+
+  const requestAlreadyExist = tabStore.filter((elem) => {
+    if (elem.id === newTab.id) return true;
+    else return false;
   });
-  updateCurrentTab(newTab);
+  if (requestAlreadyExist.length === 0) {
+    tabs.update((value) => {
+      return [...value, newTab];
+    });
+    updateCurrentTab(newTab);
+  } else {
+    updateCurrentTab(requestAlreadyExist[0]);
+  }
 };
 
 export const handleTabRemove = (id: string) => {
@@ -49,6 +80,6 @@ export const handleTabRemove = (id: string) => {
   if (tabStore.length > 0) {
     updateCurrentTab(tabStore[tabStore.length - 1]);
   } else {
-    updateCurrentTab({});
+    updateCurrentTab({ id: null });
   }
 };

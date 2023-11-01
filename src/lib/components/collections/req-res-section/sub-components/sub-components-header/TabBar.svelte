@@ -51,7 +51,7 @@
           
         >
           <button class="bg-blackColor border-0">
-            <span style="font-size: 12px; color:#69D696; height: 35px; ">{tab.type}</span>
+            <span style="font-size: 12px; color:#69D696; height: 35px; ">{tab.method}</span>
             <span
               class="text-muted font-weight-normal"
               style="font-size: 12px; font-family: Roboto; color: #8A9299;"
@@ -85,7 +85,7 @@
     </div>
     <div class="d-inline-block" style="height:35px; width:35px;">
       <button class=" btn btn-primary border-0 ps-1 pe-1 py-0 h-100 w-100" on:click={()=>{
-        handleTabAddons("GET"," Untitled Request", new Date()+"dummy")
+        handleTabAddons(new Date()+"dummy", "Untitled Request", "GET")
       } }>
         <img src={plusIcon} alt="" />
       </button>

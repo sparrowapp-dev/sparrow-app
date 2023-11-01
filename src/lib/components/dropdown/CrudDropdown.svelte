@@ -5,13 +5,12 @@
   let visibility = false;
   export let data: any;
   export let onclick: any;
-  let selectedRequest: string | null = null;
+  export let method;
+  let selectedRequest: string | null = method;
 
   window.addEventListener("click", () => {
     visibility = false;
   });
-
-  let title = data[0];
 </script>
 
 <div
@@ -25,7 +24,7 @@
           visibility = true;
         }, 100);
       }}
-      ><p class="w-25 mb-0 d-flex align-items-center">{title}</p>
+      ><p class="w-25 mb-0 d-flex align-items-center">{method}</p>
       <span
         class="ps-4 d-flex align-items-center"
         class:dropdown-logo-active={visibility === true}
@@ -46,14 +45,13 @@
         on:click|preventDefault={() => {
           visibility = false;
           onclick(list);
-          title = list;
           selectedRequest = list;
         }}
       >
         {list}
         {#if list === selectedRequest}
           <div class="w-100">
-            <img src={checkIcon} alt="" />
+            <!-- <img src={checkIcon} alt="" /> -->
           </div>
         {/if}
       </p>
