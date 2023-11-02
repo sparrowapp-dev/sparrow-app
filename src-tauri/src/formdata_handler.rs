@@ -1,47 +1,64 @@
-use reqwest::{RequestBuilder, Response};
-use std::error::Error;
+use reqwest::{Client, Body, RequestBuilder, Response};
+use std::{error::Error, collections::HashMap, path::Path};
 use regex::Regex; 
 use reqwest::multipart;
 use std::fs;
+use tokio::fs::File;
+use tokio_util::codec::{BytesCodec, FramedRead};
 
-fn extract_filename(input: &str) -> Option<String> {
-    let re = Regex::new(r#"\/([^/]+)"'$"#).unwrap();
-    
-    if let Some(captures) = re.captures(input) {
-        if let Some(matched) = captures.get(1) {
-            return Some(matched.as_str().to_string());
-        }
-    }
-    None
+
+fn starts_with_pattern(s: &str) -> bool {
+    s.starts_with("#@#")
 }
 
-// Handle to extract path of file
-fn extract_local_path(input: &str) -> Option<String> {
-    let re = Regex::new(r#""([^"]+)""#).unwrap();
-    if let Some(caps) = re.captures(input) {
-        let path = caps.get(1).map(|m| m.as_str().to_string())?;
-        if path.starts_with("/C:") {
-            return Some(path[1..].to_string());
-        }
+fn remove_prefix(s: &str) -> &str {
+    match s.strip_prefix("#@#") {
+        Some(stripped) => stripped, // If the prefix was found, return the string without it
+        None => s, // If the prefix was not found, return the original string
     }
-    None
 }
+
+fn extract_filename(path_str: &str) -> Option<String> {
+
+    // Use the Path struct to parse the string as a path and extract the file name
+    return Path::new(path_str)
+        .file_name() // Extracts the file name component
+        .and_then(|name| name.to_str()) // Converts the OsStr to a &str
+        .map(|name| name.to_owned()) // Converts the &str to a String
+}
+
 
 pub async fn make_formdata_request(
     request_builder: RequestBuilder,
     body: &str,
 ) -> Result<Response, Box<dyn Error>> {
-    let filename = extract_filename(body);
-    let local_filepath = extract_local_path(body);
-    let local_filepath_str = local_filepath.as_ref().unwrap();
-    let filename_str = filename.unwrap_or_default();
-    let file_fs = fs::read(local_filepath_str)?;
-    let part = multipart::Part::bytes(file_fs).file_name(filename_str);
-    let filename1 = extract_filename(body);
-    let filename_str1 = filename1.unwrap_or_default();
-    let form = reqwest::multipart::Form::new()
-    .text("resourceName", filename_str1)
-    .part("FileData", part);
+    println!("inside form data");
+    let mut form = reqwest::multipart::Form::new();
+    let body_map: HashMap<_, _> = body.split('&')
+        .map(|s| {
+            let mut parts = s.split('=');
+            (parts.next().unwrap().to_owned(), parts.next().unwrap_or("").to_owned())
+        })
+        .collect();
+    for (key, value) in body_map.iter() {
+        // request_builder = request_builder.header(key, value);
+        if starts_with_pattern(value) { 
+            let updated_string = remove_prefix(value);
+            // Assuming updated_string is the path to the file
+            let file = File::open(format!(r"{}", updated_string)).await?;
+            let filename = match extract_filename(updated_string) {
+                Some(file_name) => file_name,
+                None => "file".to_string(),
+            };
+            let stream = FramedRead::new(file, BytesCodec::new());
+            let file_body = Body::wrap_stream(stream);
+            let part = multipart::Part::stream(file_body)
+            .file_name(filename);
+            form = form.part(key.clone(), part);
+        } else { 
+            form = form.text(key.clone(), value.clone());
+        }
+    }
     let resp = request_builder.multipart(form).send().await?;
     println!("{:#?}", resp);
     Ok(resp)
