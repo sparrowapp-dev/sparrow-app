@@ -41,20 +41,19 @@ pub async fn make_formdata_request(
         })
         .collect();
     for (key, value) in body_map.iter() {
-        // request_builder = request_builder.header(key, value);
         if starts_with_pattern(value) { 
-            let updated_string = remove_prefix(value);
+            let file_path = remove_prefix(value);
             // Assuming updated_string is the path to the file
-            let file = File::open(format!(r"{}", updated_string)).await?;
-            let filename = match extract_filename(updated_string) {
+            let file = File::open(format!(r"{}", file_path)).await?;
+            let filename = match extract_filename(file_path) {
                 Some(file_name) => file_name,
                 None => "file".to_string(),
             };
             let stream = FramedRead::new(file, BytesCodec::new());
             let file_body = Body::wrap_stream(stream);
-            let part = multipart::Part::stream(file_body)
+            let file_part = multipart::Part::stream(file_body)
             .file_name(filename);
-            form = form.part(key.clone(), part);
+            form = form.part(key.clone(), file_part);
         } else { 
             form = form.text(key.clone(), value.clone());
         }
