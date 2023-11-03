@@ -228,6 +228,7 @@
       {:else}
         {#each collection as col}
           <Folder
+            collectionList = {collection}
             collectionId={col._id}
             {currentWorkspaceId}
             collection={col}

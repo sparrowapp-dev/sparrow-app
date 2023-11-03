@@ -37,7 +37,12 @@
 </script>
 {#if explorer.type === "FOLDER"}
     <div>
-      <div style="height:36px;" class="d-flex align-items-center" on:click={() => {expand = !expand;}}>
+      <div style="height:36px;" class="d-flex align-items-center" on:click={() => {
+        if(!explorer.id.includes("dummy")){
+          expand = !expand;
+        }
+        
+        }}>
         <img src={folder} alt="" style="height:16px; width:16px;">
         <span style="padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;">{explorer.name}</span>
       </div>

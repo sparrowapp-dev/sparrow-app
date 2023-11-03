@@ -52,6 +52,27 @@ const insertionHelper: (
   return 1;
 };
 
+const updationIdHelper = (tree, dummyId, originalId) => {
+  if (tree._id === dummyId || tree.id === dummyId) {
+    if (tree._id) {
+      tree._id = originalId;
+    } else {
+      tree.id = originalId;
+    }
+    return 0;
+  }
+
+  // Recursively search through the tree structure
+  if (tree && tree.items) {
+    for (let j = 0; j < tree.items.length; j++) {
+      if (!updationIdHelper(tree.items[j], dummyId, originalId)) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+};
+
 const useCollectionTree = (): any => {
   const insertNode: (
     tree: any,
@@ -61,9 +82,11 @@ const useCollectionTree = (): any => {
     id: string,
     method?: string,
   ) => void = (tree, folderId, type, name, id, method?) => {
+    // debugger;
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!insertionHelper(tree[i], folderId, type, name, id, method)) {
+        console.log("new", tree);
         setCollectionList(tree);
         return;
       }
@@ -80,6 +103,20 @@ const useCollectionTree = (): any => {
     setCollectionList(tree);
     return;
   };
-  return { insertNode, insertHead };
+  const updateNodeId: (
+    tree: any,
+    dummyId: string,
+    originalId: string,
+  ) => void = (tree, dummyId, originalId) => {
+    for (let i = 0; i < tree.length; i++) {
+      if (!updationIdHelper(tree[i], dummyId, originalId)) {
+        console.log("old", tree);
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+  return { insertNode, insertHead, updateNodeId };
 };
 export { collectionList, setCollectionList, useCollectionTree };
