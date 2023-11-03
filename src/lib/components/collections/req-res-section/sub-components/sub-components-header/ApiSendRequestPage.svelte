@@ -80,6 +80,7 @@
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
           elem.method = tab;
+          elem.save = false;
         }
         return elem;
       });
@@ -105,6 +106,7 @@
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
           elem.url = urlText;
+          elem.save = false;
         }
         return elem;
       });

@@ -1,5 +1,7 @@
 import { writable } from "svelte/store";
-
+import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+import { RequestType } from "$lib/utils/enums/request.enum";
+import { ItemType } from "$lib/utils/enums/item-type.enum";
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
 
@@ -21,8 +23,9 @@ export const apiRequest = writable(initialRequest);
 export const currentTab = writable({ id: null });
 export const tabs = writable([]);
 
-let tabStore = [];
+let tabStore: NewTab[] = [];
 tabs.subscribe((value) => {
+  console.log(value);
   tabStore = value;
 });
 
@@ -34,25 +37,27 @@ export const handleTabAddons = (
   id: string,
   name: string,
   method: string,
-  type: string = "REQUEST",
+  path: Path | null = null,
+  type: string = ItemType.REQUEST,
   body: string = "",
   url: string = "",
-  header = "",
-  requestType = "JSON",
-  response = {},
-  path = {},
+  header: unknown = "",
+  requestType = RequestType.JSON,
+  response: Response | null = null,
+  save: boolean = false,
 ) => {
   const newTab = {
     method: method,
     name: name,
     type,
-    id: id,
+    id,
     body,
     url,
     header,
     requestType,
     response,
     path,
+    save,
   };
 
   const requestAlreadyExist = tabStore.filter((elem) => {

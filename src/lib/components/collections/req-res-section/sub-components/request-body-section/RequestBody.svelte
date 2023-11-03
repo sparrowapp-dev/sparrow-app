@@ -63,10 +63,14 @@
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   const handleChange = (updatedContent: RequestBody) => {
+    // debugger;
     tabs.update(value => {
         let temp = value.map((elem)=>{
           if(elem.id === currentTabId){
-            elem.body = updatedContent.text; 
+            elem.body = updatedContent.text;
+            if(updatedContent.text !== ""){
+              elem.save = false; 
+            }
           } 
           return elem;
         });
