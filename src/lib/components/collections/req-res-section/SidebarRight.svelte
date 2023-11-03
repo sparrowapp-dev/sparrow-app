@@ -26,5 +26,6 @@
     top: 80px;
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
+    z-index: 99;
   }
 </style>

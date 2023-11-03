@@ -24,7 +24,6 @@
 
 <div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
     handleTabAddons(id, name, method, path);
-    console.log("folderId", folderId, "folderName", folderName, );
 }}>
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 

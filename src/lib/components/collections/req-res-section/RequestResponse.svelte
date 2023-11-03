@@ -18,7 +18,7 @@
   .collection {
     top: 44px;
     position: fixed;
-    right: 32px;
+    right: 0;
     width: calc(100%-352px);
     height: calc(100vh - 44px);
   }

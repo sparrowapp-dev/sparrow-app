@@ -44,6 +44,7 @@ export const handleTabAddons = (
   requestType = RequestType.JSON,
   response: Response | null = null,
   save: boolean = false,
+  requestInProgress: boolean = false,
 ) => {
   const newTab = {
     method: method,
@@ -57,6 +58,7 @@ export const handleTabAddons = (
     response,
     path,
     save,
+    requestInProgress,
   };
 
   const requestAlreadyExist = tabStore.filter((elem) => {

@@ -23,4 +23,5 @@ export interface NewTab {
   requestType: string;
   response: Response;
   save: boolean;
+  requestInProgress: boolean;
 }

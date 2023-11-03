@@ -18,7 +18,7 @@
   } 
 </script>
 
-<div class="d-flex flex-column">
+<div class="d-flex flex-column" style="margin-right: 32px;">
   <div
     class="pageheader d-flex align-items-center justify-content-between {isCollaps
       ? 'ps-5 pt-4 pe-3'
