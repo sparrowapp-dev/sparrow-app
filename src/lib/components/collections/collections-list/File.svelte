@@ -3,10 +3,10 @@
     export let name: string;
     export let method: string;
     export let id : string;
-    export let collectionId; 
-    export let currentWorkspaceId;
-    export let folderId;
-    export let folderName;
+    export let collectionId : string; 
+    export let currentWorkspaceId : string;
+    export let folderId : string;
+    export let folderName : string;
 
     let apiClass = "red-api";
     if(method === "DELETE") apiClass = "red-api";

@@ -6,12 +6,12 @@
     import File from "./File.svelte";
     import { useTree, getNextName } from "./collectionList";
     const [insertTreeNode] = useTree();
-    let expand = false;
+    let expand : boolean = false;
     export let explorer;
-    export let collectionId;
-    export let currentWorkspaceId;
-    export let folderId = "";
-    export let folderName = "";
+    export let collectionId :string;
+    export let currentWorkspaceId : string;
+    export let folderId : string = "";
+    export let folderName : string = "";
     const handleAPIClick = async () =>{
       const name: string = getNextName(explorer.items, "REQUEST", "New Request");
       const res = await insertCollectionRequest({
