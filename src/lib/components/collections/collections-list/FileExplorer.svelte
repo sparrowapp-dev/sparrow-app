@@ -1,14 +1,17 @@
 <script lang="ts">
     import folder from "$lib/assets/folder.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
+    import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
     import { insertCollectionRequest } from "$lib/services/collection";
     import File from "./File.svelte";
     import { useTree, getNextName } from "./collectionList";
     const [insertTreeNode] = useTree();
-    let expand = false;
+    let expand : boolean = false;
     export let explorer;
-    export let collectionId;
-    export let currentWorkspaceId;
+    export let collectionId :string;
+    export let currentWorkspaceId : string;
+    export let folderId : string = "";
+    export let folderName : string = "";
     const handleAPIClick = async () =>{
       const name: string = getNextName(explorer.items, "REQUEST", "New Request");
       const res = await insertCollectionRequest({
@@ -40,13 +43,13 @@
       </div>
       <div style="padding-left: 15px; cursor:pointer; display: {expand ? 'block' : 'none'};">
         {#each explorer.items as exp}
-          <svelte:self explorer={exp} />
+          <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} />
         {/each}
         <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
       </div>
     </div>
 {:else}
     <div style="padding-left: 0; cursor:pointer;">
-      <File name={explorer.name} id={explorer.id} method={explorer.request.method} />
+      <File folderId = {folderId} folderName={folderName} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id} method={explorer.request.method} />
     </div>
 {/if}

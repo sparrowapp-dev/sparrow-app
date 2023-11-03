@@ -21,6 +21,11 @@ $sparrow-get: #69d696;
 $sparrow-put: #9685ff;
 $sparrow-post: #ffe47e;
 $sparrow-delete: #ff7878;
+$sparrow-trac: #FBA574;
+$sparrow-head: #69D696;
+$sparrow-con: #58C6B9;
+$sparrow-patc: #DF77F9;
+$sparrow-opt: #F15EA5;
 $sparrow-arc: #8a9299;
 $sparrow-request-body: #8a9299;
 $sparrow-send-button: #1193f0;
@@ -42,6 +47,11 @@ $sparrow-button-color: #e5e5e5;
   --request-post: #{$sparrow-post};
   --request-delete: #{$sparrow-delete};
   --request-arc: #{$sparrow-arc};
+  --request-trac: #{$sparrow-trac};
+  --request-head: #{$sparrow-head};
+  --request-con: #{$sparrow-con};
+  --request-patc: #{$sparrow-patc};
+  --request-opt: #{$sparrow-opt};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);

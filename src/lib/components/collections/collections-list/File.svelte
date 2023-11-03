@@ -3,16 +3,28 @@
     export let name: string;
     export let method: string;
     export let id : string;
+    export let collectionId : string; 
+    export let currentWorkspaceId : string;
+    export let folderId : string;
+    export let folderName : string;
+
     let apiClass = "red-api";
     if(method === "DELETE") apiClass = "red-api";
     else if(method === "GET") apiClass = "green-api"; 
     else if(method === "POST") apiClass = "yellow-api";
     else if(method === "PUT") apiClass = "blue-api";
     else if(method === "ARC") apiClass = "grey-api";
+    let path = {
+        workspaceId: currentWorkspaceId,
+        collectionId,
+        folderId,
+        folderName
+    }
 </script>
 
 <div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
-    handleTabAddons(id, name, method);
+    handleTabAddons(id, name, method, path);
+    console.log("folderId", folderId, "folderName", folderName, );
 }}>
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
