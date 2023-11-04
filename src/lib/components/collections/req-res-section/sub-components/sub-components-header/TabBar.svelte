@@ -8,16 +8,16 @@
   import { collapsibleState, currentTab } from "$lib/store/request-response-section";
   import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
     import Tab from "./Tab.svelte";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import type { Tab as tab } from "$lib/utils/interfaces/request.interface";
     import { onDestroy } from "svelte";
     import { RequestDefault } from "$lib/utils/enums/request.enum";
   
-  let tabsStore : NewTab[] = [];
+  let tabsStore : tab[] = [];
   let tabWidth : number = 196;
   let scrollerParent : number;
   let scrollerWidth : number;
 
-  const tabsUnsubscribe = tabs.subscribe((value: NewTab[])=>{
+  const tabsUnsubscribe = tabs.subscribe((value: tab[])=>{
     tabsStore = value;
     if(tabsStore.length >= 0 && tabsStore.length <= 5){
       tabWidth = 196;

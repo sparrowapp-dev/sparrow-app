@@ -1,5 +1,9 @@
 import { writable } from "svelte/store";
-import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+import type {
+  Tab,
+  Path,
+  CurrentTab,
+} from "$lib/utils/interfaces/request.interface";
 import { RequestType } from "$lib/utils/enums/request.enum";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 //this store is for collaps and expand section
@@ -20,10 +24,10 @@ const initialRequest = [
 ];
 export const apiRequest = writable(initialRequest);
 
-export const currentTab = writable({ id: null });
-export const tabs = writable([]);
+export const currentTab = writable<CurrentTab>({ id: null });
+export const tabs = writable<Tab[]>([]);
 
-let tabStore: NewTab[] = [];
+let tabStore: Tab[] = [];
 tabs.subscribe((value) => {
   tabStore = value;
 });
@@ -66,12 +70,13 @@ export const handleTabAddons = (
     else return false;
   });
   if (requestAlreadyExist.length === 0) {
-    tabs.update((value) => {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    tabs.update((value: any) => {
       return [...value, newTab];
     });
-    updateCurrentTab(newTab);
+    updateCurrentTab({ id: newTab.id });
   } else {
-    updateCurrentTab(requestAlreadyExist[0]);
+    updateCurrentTab({ id: requestAlreadyExist[0].id });
   }
 };
 
@@ -84,7 +89,7 @@ export const handleTabRemove = (id: string) => {
     return [...filteredTabs];
   });
   if (tabStore.length > 0) {
-    updateCurrentTab(tabStore[tabStore.length - 1]);
+    updateCurrentTab({ id: tabStore[tabStore.length - 1].id });
   } else {
     updateCurrentTab({ id: null });
   }
