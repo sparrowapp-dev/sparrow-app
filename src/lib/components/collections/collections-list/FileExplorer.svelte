@@ -2,19 +2,29 @@
     import folder from "$lib/assets/folder.svg";
     import IconButton from "$lib/components/buttons/IconButton.svelte";
     import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
+    import { useCollectionTree } from "$lib/store/collection";
     import { insertCollectionRequest } from "$lib/services/collection";
     import File from "./File.svelte";
-    import { useTree, getNextName } from "./collectionList";
-    const [insertTreeNode] = useTree();
+    import { getNextName } from "./collectionList";
+    const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
     export let explorer;
     export let collectionId :string;
     export let currentWorkspaceId : string;
     export let folderId : string = "";
     export let folderName : string = "";
+    export let collectionList;
     const handleAPIClick = async () =>{
       const name: string = getNextName(explorer.items, "REQUEST", "New Request");
-      const res = await insertCollectionRequest({
+      const currentDummyId = new Date + "dummy";
+      insertNode(
+        JSON.parse(JSON.stringify(collectionList)),
+        explorer.id, "REQUEST", 
+        name, 
+        currentDummyId ,
+        "GET");
+      
+        const res = await insertCollectionRequest({
         collectionId: collectionId,
         workspaceId: currentWorkspaceId,
         folderId: explorer.id,
@@ -31,7 +41,10 @@
         }
       });
       if(res.isSuccessful){
-        insertTreeNode(explorer.id, "REQUEST", name, JSON.stringify(new Date()) ,"GET");
+        updateNodeId(JSON.parse(
+          JSON.stringify(collectionList)),
+          currentDummyId,
+          new Date() + "123");
       } 
     }
 </script>

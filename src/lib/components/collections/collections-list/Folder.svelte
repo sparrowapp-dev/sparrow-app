@@ -59,6 +59,16 @@
       "REQUEST",
       "New Request",
     );
+    const currentDummyId : string = new Date() + "dummy";
+    insertNode(
+        JSON.parse(JSON.stringify(collectionList)),
+        collection._id,
+        ItemType.REQUEST,
+        file,
+        currentDummyId,
+        "GET",
+      );
+      // console.log("old", collectionList);
     const res = await insertCollectionRequest({
       collectionId: collection._id,
       workspaceId: workspaceId,
@@ -70,13 +80,12 @@
         },
       },
     });
+  
     if (res.isSuccessful) {
-      insertNode(
-        collection._id,
-        "REQUEST",
-        file,
-        JSON.stringify(new Date()),
-        "GET",
+      updateNodeId(
+        JSON.parse(JSON.stringify(collectionList)),
+        currentDummyId,
+        new Date() + "123",  // MOCKED DATA [UPDATION REQUIRED HERE]
       );
     }
   };
@@ -107,7 +116,7 @@
     : 'none'};"
 >
   {#each collection.items as exp}
-    <FileExplorer {collectionId} {currentWorkspaceId} explorer={exp} />
+    <FileExplorer collectionList={collectionList} {collectionId} {currentWorkspaceId} explorer={exp} />
   {/each}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
   <IconButton text={"+ API Request"} onClick={handleAPIClick} />

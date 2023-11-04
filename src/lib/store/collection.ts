@@ -86,7 +86,6 @@ const useCollectionTree = (): any => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!insertionHelper(tree[i], folderId, type, name, id, method)) {
-        console.log("new", tree);
         setCollectionList(tree);
         return;
       }
@@ -110,7 +109,6 @@ const useCollectionTree = (): any => {
   ) => void = (tree, dummyId, originalId) => {
     for (let i = 0; i < tree.length; i++) {
       if (!updationIdHelper(tree[i], dummyId, originalId)) {
-        console.log("old", tree);
         setCollectionList(tree);
         return;
       }
