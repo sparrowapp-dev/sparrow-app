@@ -85,7 +85,9 @@
 
 <button
   on:click={() => {
-    visibility = !visibility;
+     if(!collection._id.includes("dummy")){
+          visibility = !visibility;
+      }
   }}
   style="height:36px;"
   class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1 ps-4"

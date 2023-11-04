@@ -117,6 +117,23 @@ const useCollectionTree = (): any => {
     }
     return;
   };
-  return { insertNode, insertHead, updateNodeId };
+  const updateHeadId: (
+    tree: any,
+    dummyId: string,
+    originalId: string,
+  ) => void = (tree, dummyId, originalId) => {
+    // Iterate through the tree to find the target folder and add the item
+    // tree.push({ name, _id, items: [] });
+    for (let i = 0; i < tree.length; i++) {
+      if (tree[i]._id === dummyId) {
+        tree[i]._id = originalId;
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+
+  return { insertNode, insertHead, updateNodeId, updateHeadId };
 };
 export { collectionList, setCollectionList, useCollectionTree };
