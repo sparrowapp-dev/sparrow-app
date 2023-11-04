@@ -14,14 +14,14 @@ export interface Response {
 export interface Tab {
   id: string;
   name: string;
-  method?: string;
-  path?: Path;
-  type?: string;
-  body?: string;
-  url?: string;
-  header?: unknown;
-  requestType?: string;
-  response?: Response;
+  method: string;
+  path: Path;
+  type: string;
+  body: string;
+  url: string;
+  header: unknown;
+  requestType: string;
+  response: Response;
   save: boolean;
   requestInProgress: boolean;
 }

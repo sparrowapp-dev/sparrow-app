@@ -23,7 +23,7 @@
 </script>
 
 <div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
-     if(!id.includes("dummy")){
+     if(!id.includes("MYUID45345")){
         handleTabAddons(id, name, method, path);
         }
     }}>

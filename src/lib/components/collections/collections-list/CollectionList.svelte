@@ -7,7 +7,7 @@
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
 
-  import { collapsibleState } from "$lib/store/request-response-section"; // Adjust the import path as needed
+  import { collapsibleState } from "$lib/store/request-response-section"; 
 
   import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
@@ -16,7 +16,7 @@
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
   const {insertHead, updateHeadId} = useCollectionTree();
   const [,, searchNode] = useTree();
-
+  import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
 
@@ -66,14 +66,14 @@
       name: getNextCollection(collection, "New collection"),
       workspaceId: currentWorkspaceId,
     };
-    const currentDummyId = new Date() + "dummy";
+    const currentDummyId : string = uuidv4() + "MYUID45345";
     insertHead(JSON.parse(JSON.stringify(collection)), newCollection.name, currentDummyId);
-    // console.log(collection);
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
-      updateHeadId(JSON.parse(JSON.stringify(collection)), currentDummyId, res.data.data.insertedId);
-      // console.log(collection);
-      // insertHead(JSON.parse(JSON.stringify(collection)) ,newCollection.name, res.data.data.insertedId);
+      updateHeadId(
+        JSON.parse(JSON.stringify(collection)), 
+        currentDummyId,
+         res.data.data.insertedId);
     }
   };
 

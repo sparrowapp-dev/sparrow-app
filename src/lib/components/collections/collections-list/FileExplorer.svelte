@@ -6,6 +6,9 @@
     import { insertCollectionRequest } from "$lib/services/collection";
     import File from "./File.svelte";
     import { getNextName } from "./collectionList";
+    import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import { v4 as uuidv4 } from "uuid";
     const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
     export let explorer;
@@ -15,14 +18,14 @@
     export let folderName : string = "";
     export let collectionList;
     const handleAPIClick = async () =>{
-      const name: string = getNextName(explorer.items, "REQUEST", "New Request");
-      const currentDummyId = new Date + "dummy";
+      const name: string = getNextName(explorer.items, ItemType.REQUEST, RequestDefault.NAME);
+      const currentDummyId : string = uuidv4() + "MYUID45345";
       insertNode(
         JSON.parse(JSON.stringify(collectionList)),
-        explorer.id, "REQUEST", 
+        explorer.id, ItemType.REQUEST, 
         name, 
         currentDummyId ,
-        "GET");
+        RequestDefault.METHOD);
       
         const res = await insertCollectionRequest({
         collectionId: collectionId,
@@ -30,12 +33,12 @@
         folderId: explorer.id,
         items: {
           name: explorer.name,
-          type: "FOLDER",
+          type: ItemType.FOLDER,
           items:{
             name: name,
-            type: "REQUEST",
+            type: ItemType.REQUEST,
             request: {
-              method: "GET"
+              method: RequestDefault.METHOD
             }
           }
         }
@@ -44,14 +47,14 @@
         updateNodeId(JSON.parse(
           JSON.stringify(collectionList)),
           currentDummyId,
-          new Date() + "123");
+          new Date() + "uid"); // MOCKED DATA [UPDATION REQUIRED HERE]
       } 
     }
 </script>
 {#if explorer.type === "FOLDER"}
     <div>
       <div style="height:36px;" class="d-flex align-items-center" on:click={() => {
-        if(!explorer.id.includes("dummy")){
+        if(!explorer.id.includes("MYUID45345")){
           expand = !expand;
         }
         

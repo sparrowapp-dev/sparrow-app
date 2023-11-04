@@ -82,8 +82,7 @@ const useCollectionTree = (): any => {
     id: string,
     method?: string,
   ) => void = (tree, folderId, type, name, id, method?) => {
-    // debugger;
-    // Iterate through the tree to find the target folder and add the item
+    // Iterate through the tree to find the target folder/API Request and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!insertionHelper(tree[i], folderId, type, name, id, method)) {
         setCollectionList(tree);
@@ -97,7 +96,7 @@ const useCollectionTree = (): any => {
     name,
     _id,
   ) => {
-    // Iterate through the tree to find the target folder and add the item
+    // Push new collection to the workspace
     tree.push({ name, _id, items: [] });
     setCollectionList(tree);
     return;
@@ -120,8 +119,7 @@ const useCollectionTree = (): any => {
     dummyId: string,
     originalId: string,
   ) => void = (tree, dummyId, originalId) => {
-    // Iterate through the tree to find the target folder and add the item
-    // tree.push({ name, _id, items: [] });
+    // Iterate through the tree to find the target folder/API and update the item
     for (let i = 0; i < tree.length; i++) {
       if (tree[i]._id === dummyId) {
         tree[i]._id = originalId;

@@ -12,6 +12,8 @@
   import { onDestroy } from "svelte";
   import { useCollectionTree } from "$lib/store/collection";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import { RequestDefault } from "$lib/utils/enums/request.enum";
+    import { v4 as uuidv4 } from "uuid";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   let visibility = false;
   export let title: string;
@@ -29,10 +31,10 @@
 
   const handleFolderClick = async (): Promise<void> => {
     let directory: CreateDirectoryPostBody = {
-      name: getNextName(collection.items, "FOLDER", "New Folder"),
+      name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
       description: "",
     };
-    const currentDummyId = new Date() + "dummy";
+    const currentDummyId : string = uuidv4() + "MYUID45345";
     insertNode(
       JSON.parse(JSON.stringify(collectionList)),
       collection._id,
@@ -56,27 +58,27 @@
   const handleAPIClick = async () => {
     const file: string = getNextName(
       collection.items,
-      "REQUEST",
-      "New Request",
+      ItemType.REQUEST,
+      RequestDefault.NAME,
     );
-    const currentDummyId : string = new Date() + "dummy";
+    const currentDummyId : string = uuidv4() + "MYUID45345";
     insertNode(
         JSON.parse(JSON.stringify(collectionList)),
         collection._id,
         ItemType.REQUEST,
         file,
         currentDummyId,
-        "GET",
+        RequestDefault.METHOD,
       );
-      // console.log("old", collectionList);
+
     const res = await insertCollectionRequest({
       collectionId: collection._id,
       workspaceId: workspaceId,
       items: {
         name: file,
-        type: "REQUEST",
+        type: ItemType.REQUEST,
         request: {
-          method: "GET",
+          method: RequestDefault.METHOD,
         },
       },
     });
@@ -85,7 +87,7 @@
       updateNodeId(
         JSON.parse(JSON.stringify(collectionList)),
         currentDummyId,
-        new Date() + "123",  // MOCKED DATA [UPDATION REQUIRED HERE]
+        new Date() + "uid",  // MOCKED DATA [UPDATION REQUIRED HERE]
       );
     }
   };
@@ -94,7 +96,7 @@
 
 <button
   on:click={() => {
-     if(!collection._id.includes("dummy")){
+     if(!collection._id.includes("MYUID45345")){
           visibility = !visibility;
       }
   }}
@@ -116,7 +118,7 @@
     : 'none'};"
 >
   {#each collection.items as exp}
-    <FileExplorer collectionList={collectionList} {collectionId} {currentWorkspaceId} explorer={exp} />
+    <FileExplorer collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
   {/each}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
   <IconButton text={"+ API Request"} onClick={handleAPIClick} />
