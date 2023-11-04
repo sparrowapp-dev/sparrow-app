@@ -28,7 +28,7 @@
   let urlText: string = "";
   let method = "";
   let requestData;
-
+  let disabledSend : boolean = false;
 
   const testJSON : (text : string) => string = (text) => {
     try {
@@ -45,6 +45,15 @@
       isInputEmpty = true;
       inputElement.focus();
     } else {
+      tabs.update((value) => {
+        let temp = value.map((elem) => {
+          if (elem.id === currentTabId) {
+            elem.requestInProgress = true;
+          }
+          return elem;
+        });
+        return temp;
+      });
       isInputEmpty = false;
       let response = await makeRequestforCrud(
         requestData.url,
@@ -66,11 +75,23 @@
                 headers: JSON.stringify(responseHeaders),
                 status: responseStatus
               }
+              elem.requestInProgress = false;
             }
             return elem;
           });
           return temp;
         }); 
+      }
+      else {
+        tabs.update((value) => {
+        let temp = value.map((elem) => {
+          if (elem.id === currentTabId) {
+            elem.requestInProgress = false;
+          }
+          return elem;
+        });
+        return temp;
+      });
       }
     }
   };
@@ -118,6 +139,7 @@
       if (elem.id === id) {
         urlText = elem.url;
         method = elem.method;
+        disabledSend = elem.requestInProgress;
         requestData = elem;
       }
     });
@@ -190,7 +212,7 @@
         bind:this={inputElement}
         on:keydown={handleInputKeyDown}
       />
-      <button
+      <button disabled={disabledSend}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button

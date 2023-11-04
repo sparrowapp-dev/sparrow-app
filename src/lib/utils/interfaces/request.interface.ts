@@ -11,7 +11,7 @@ export interface Response {
   body: string;
 }
 
-export interface NewTab {
+export interface Tab {
   id: string;
   name: string;
   method: string;
@@ -23,4 +23,9 @@ export interface NewTab {
   requestType: string;
   response: Response;
   save: boolean;
+  requestInProgress: boolean;
+}
+
+export interface CurrentTab {
+  id: string | null;
 }

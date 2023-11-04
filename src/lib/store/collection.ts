@@ -52,6 +52,27 @@ const insertionHelper: (
   return 1;
 };
 
+const updationIdHelper = (tree, dummyId, originalId) => {
+  if (tree._id === dummyId || tree.id === dummyId) {
+    if (tree._id) {
+      tree._id = originalId;
+    } else {
+      tree.id = originalId;
+    }
+    return 0;
+  }
+
+  // Recursively search through the tree structure
+  if (tree && tree.items) {
+    for (let j = 0; j < tree.items.length; j++) {
+      if (!updationIdHelper(tree.items[j], dummyId, originalId)) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+};
+
 const useCollectionTree = (): any => {
   const insertNode: (
     tree: any,
@@ -61,7 +82,7 @@ const useCollectionTree = (): any => {
     id: string,
     method?: string,
   ) => void = (tree, folderId, type, name, id, method?) => {
-    // Iterate through the tree to find the target folder and add the item
+    // Iterate through the tree to find the target folder/API Request and add the item
     for (let i = 0; i < tree.length; i++) {
       if (!insertionHelper(tree[i], folderId, type, name, id, method)) {
         setCollectionList(tree);
@@ -75,11 +96,40 @@ const useCollectionTree = (): any => {
     name,
     _id,
   ) => {
-    // Iterate through the tree to find the target folder and add the item
+    // Push new collection to the workspace
     tree.push({ name, _id, items: [] });
     setCollectionList(tree);
     return;
   };
-  return { insertNode, insertHead };
+  const updateNodeId: (
+    tree: any,
+    dummyId: string,
+    originalId: string,
+  ) => void = (tree, dummyId, originalId) => {
+    for (let i = 0; i < tree.length; i++) {
+      if (!updationIdHelper(tree[i], dummyId, originalId)) {
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+  const updateHeadId: (
+    tree: any,
+    dummyId: string,
+    originalId: string,
+  ) => void = (tree, dummyId, originalId) => {
+    // Iterate through the tree to find the target folder/API and update the item
+    for (let i = 0; i < tree.length; i++) {
+      if (tree[i]._id === dummyId) {
+        tree[i]._id = originalId;
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+
+  return { insertNode, insertHead, updateNodeId, updateHeadId };
 };
 export { collectionList, setCollectionList, useCollectionTree };

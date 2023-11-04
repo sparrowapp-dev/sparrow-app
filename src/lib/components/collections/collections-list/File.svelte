@@ -23,9 +23,10 @@
 </script>
 
 <div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
-    handleTabAddons(id, name, method, path);
-    console.log("folderId", folderId, "folderName", folderName, );
-}}>
+     if(!id.includes("MYUID45345")){
+        handleTabAddons(id, name, method, path);
+        }
+    }}>
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
     </div>

@@ -12,7 +12,7 @@
 <div
   class="d-inline-block position-relative pt-1"
   on:click={() => {
-    updateCurrentTab(tab);
+    updateCurrentTab({id : tab.id});
   }}
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
