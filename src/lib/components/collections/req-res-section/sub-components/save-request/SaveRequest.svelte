@@ -3,9 +3,7 @@
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
-  import { 
-    collectionList,
-    useCollectionTree } from "$lib/store/collection";
+  import { collectionList, useCollectionTree } from "$lib/store/collection";
   import { onDestroy } from "svelte";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
@@ -21,37 +19,43 @@
     insertCollectionDirectory,
     insertCollectionRequest,
   } from "$lib/services/collection";
-  import {searchTreeDocument} from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
+  import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
   import type {
     CreateCollectionPostBody,
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
-  import { currentTab, handleTabAddons, handleTabUpdate, tabs, updateCurrentTab } from "$lib/store/request-response-section";
+  import {
+    currentTab,
+    handleTabAddons,
+    handleTabUpdate,
+    tabs,
+    updateCurrentTab,
+  } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   export let onClick;
-  
+
   interface Path {
     name: string;
-    id: string,
-    type: string,
+    id: string;
+    type: string;
   }
   interface Workspace {
     name: string;
     id: string;
   }
   const { insertNode, insertHead } = useCollectionTree();
-  
+
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
   let workspace: Workspace | null = null;
-  
+
   let currentTabId = null;
   let tabList = [];
   let tabName = "";
   let tabId: string = "";
-  let tabMethod : string = "";
-  let tabUrl : string = "";
+  let tabMethod: string = "";
+  let tabUrl: string = "";
   let componentData;
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
@@ -92,163 +96,121 @@
   };
 
   const handleSaveRequest = async () => {
-    // Handle request code goew here
     const dummyId = new Date() + "uid";
-    if(path.length > 0){
-      if(path[path.length - 1].type  === ItemType.COLLECTION){
-        
-          // create new request
-          const res = await insertCollectionRequest({
+    if (path.length > 0) {
+      const expectedRequest = {
+        method: componentData.request.method,
+        url: componentData.request.url,
+        body: componentData.request.body,
+        headers: componentData.request.headers,
+        queryParams: componentData.request.queryParams,
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        // create new request
+        const res = await insertCollectionRequest({
+          collectionId: path[path.length - 1].id,
+          workspaceId: workspace.id,
+          items: {
+            name: tabName,
+            type: ItemType.REQUEST,
+            request: expectedRequest,
+          },
+        });
+        if (res.isSuccessful) {
+          insertNode(
+            JSON.parse(JSON.stringify(collection)),
+            path[path.length - 1].id,
+            ItemType.REQUEST,
+            tabName,
+            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
+            expectedRequest,
+          );
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
             collectionId: path[path.length - 1].id,
             workspaceId: workspace.id,
+          };
+          if (!componentData.path) {
+            // update tab data
+            handleTabUpdate(
+              { name: tabName, id: dummyId, save: true, path: expectedPath },
+              currentTabId,
+            ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          } else {
+            //push new tab
+            let newTab: NewTab = {
+              id: dummyId,
+              name: tabName,
+              type: ItemType.REQUEST,
+              request: expectedRequest,
+              path: expectedPath,
+              save: true,
+              requestInProgress: false,
+            };
+            handleTabAddons(newTab);
+          }
+          onClick(false);
+          navigateToWorkspace();
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        const res = await insertCollectionRequest({
+          collectionId: path[0].id,
+          workspaceId: workspace.id,
+          folderId: path[path.length - 1].id,
+          items: {
+            name: path[path.length - 1].name,
+            type: ItemType.FOLDER,
             items: {
               name: tabName,
               type: ItemType.REQUEST,
-              request: {
-                method: componentData.request.method,
-                url: componentData.request.url,
-                body: componentData.request.body,
-                headers: componentData.request.headers,
-                queryParams: componentData.request.queryParams
-              },
+              request: expectedRequest,
             },
-          });
-          if (res.isSuccessful) {
-            insertNode(
-              JSON.parse(JSON.stringify(collection)),
-              path[path.length - 1].id,
-              ItemType.REQUEST,
-              tabName,
-              dummyId,  // MOCKED DATA [UPDATION REQUIRED HERE]
-              {
-                method: componentData.request.method,
-                url: componentData.request.url,
-                body: componentData.request.body,
-                headers: componentData.request.headers,
-                queryParams: componentData.request.queryParams
-              }
-            );
-            
-            if(!componentData.path){
-              // update tab data
-              handleTabUpdate({name : tabName, id: dummyId, save: true, path:{
-                folderId : "",
-                  folderName : "",
-                  collectionId: path[path.length - 1].id,
-                  workspaceId: workspace.id,
-              }} , currentTabId);  // MOCKED DATA [UPDATION REQUIRED HERE]
-              updateCurrentTab({id:dummyId } );  // MOCKED DATA [UPDATION REQUIRED HERE]
-            }
-            else{
-              //push new tab
-              let newTab : NewTab = {
-                id: dummyId,
-                name: tabName,
-                type: ItemType.REQUEST,
-                request : {
-                  method: componentData.request.method,
-                  url: componentData.request.url,
-                  body: componentData.request.body,
-                  headers: componentData.request.headers,
-                  queryParams: componentData.request.queryParams
-                },
-                path: {
-                  folderId : "",
-                  folderName : "",
-                  collectionId: path[path.length - 1].id,
-                  workspaceId: workspace.id,
-                },
-                save : true,
-                requestInProgress:  false,
-              }
-              handleTabAddons(newTab);
-            }
-            onClick(false);
-            navigateToWorkspace();
-          }
-        
-        
-      }
-      else if(path[path.length - 1].type  === ItemType.FOLDER){
-        // Code will be added here for FOLDER type
-        // create new request
-        const res = await insertCollectionRequest({
+          },
+        });
+        if (res.isSuccessful) {
+          insertNode(
+            JSON.parse(JSON.stringify(collection)),
+            path[path.length - 1].id,
+            ItemType.REQUEST,
+            tabName,
+            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
+            expectedRequest,
+          );
+
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
             collectionId: path[0].id,
             workspaceId: workspace.id,
-            folderId:path[path.length - 1].id,
-            items: {
-              name: path[path.length - 1].name,
-              type: ItemType.FOLDER,
-             items : {
-                name: tabName,
-                type: ItemType.REQUEST,
-              request: {
-                method: componentData.request.method,
-                url: componentData.request.url,
-                body: componentData.request.body,
-                headers: componentData.request.headers,
-                queryParams: componentData.request.queryParams
-              },
-             }
-            },
-          });
-          if (res.isSuccessful) {
-            insertNode(
-              JSON.parse(JSON.stringify(collection)),
-              path[path.length - 1].id,
-              ItemType.REQUEST,
-              tabName,
-              dummyId,  // MOCKED DATA [UPDATION REQUIRED HERE]
-              {
-                method: componentData.request.method,
-                url: componentData.request.url,
-                body: componentData.request.body,
-                headers: componentData.request.headers,
-                queryParams: componentData.request.queryParams
-              }
-            );
-            
-            if(!componentData.path){
-              // update tab data
-              handleTabUpdate({name : tabName, id: dummyId, save: true, path:{
-                  folderId : path[path.length - 1].id,
-                  folderName : path[path.length - 1].name,
-                  collectionId: path[0].id,
-                  workspaceId: workspace.id,
-              }} , currentTabId);  // MOCKED DATA [UPDATION REQUIRED HERE]
-              updateCurrentTab({id:dummyId } );  // MOCKED DATA [UPDATION REQUIRED HERE]
-            }
-            else{
-              //push new tab
-              let newTab : NewTab = {
-                id: dummyId,
-                name: tabName,
-                type: ItemType.REQUEST,
-                request : {
-                  method: componentData.request.method,
-                  url: componentData.request.url,
-                  body: componentData.request.body,
-                  headers: componentData.request.headers,
-                  queryParams: componentData.request.queryParams
-                },
-                path: {
-                  folderId : path[path.length - 1].id,
-                  folderName : path[path.length - 1].name,
-                  collectionId: path[0].id,
-                  workspaceId: workspace.id,
-                },
-                save : true,
-                requestInProgress:  false,
-              }
-              handleTabAddons(newTab);
-            }
-            onClick(false);
-            navigateToWorkspace();
+          };
+          if (!componentData.path) {
+            // update tab data
+            handleTabUpdate(
+              { name: tabName, id: dummyId, save: true, path: expectedPath },
+              currentTabId,
+            ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          } else {
+            //push new tab
+            let newTab: NewTab = {
+              id: dummyId,
+              name: tabName,
+              type: ItemType.REQUEST,
+              request: expectedRequest,
+              path: expectedPath,
+              save: true,
+              requestInProgress: false,
+            };
+            handleTabAddons(newTab);
           }
+          onClick(false);
+          navigateToWorkspace();
+        }
       }
     }
   };
-
 
   const handleFolderClick = async (): Promise<void> => {
     let directory: CreateDirectoryPostBody = {
@@ -295,7 +257,7 @@
         tabId = elem.id;
         tabMethod = elem.request.method;
         tabUrl = elem.request.url;
-        componentData = {...elem};
+        componentData = { ...elem };
       }
     });
   };
@@ -315,7 +277,6 @@
       }
     }
   });
-
 
   onDestroy(() => {
     collectionListUnsubscribe();
@@ -563,7 +524,7 @@
           />
         </span>
         <CoverButton
-          disable = {path.length === 0 ? true : false}
+          disable={path.length === 0 ? true : false}
           text={"Save"}
           size={16}
           type={"primary"}
