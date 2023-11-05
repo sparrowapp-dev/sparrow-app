@@ -171,6 +171,80 @@
       }
       else if(path[path.length - 1].type  === ItemType.FOLDER){
         // Code will be added here for FOLDER type
+        // create new request
+        const res = await insertCollectionRequest({
+            collectionId: path[0].id,
+            workspaceId: workspace.id,
+            folderId:path[path.length - 1].id,
+            items: {
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+             items : {
+                name: tabName,
+                type: ItemType.REQUEST,
+              request: {
+                method: componentData.request.method,
+                url: componentData.request.url,
+                body: componentData.request.body,
+                headers: componentData.request.headers,
+                queryParams: componentData.request.queryParams
+              },
+             }
+            },
+          });
+          if (res.isSuccessful) {
+            insertNode(
+              JSON.parse(JSON.stringify(collection)),
+              path[path.length - 1].id,
+              ItemType.REQUEST,
+              tabName,
+              dummyId,  // MOCKED DATA [UPDATION REQUIRED HERE]
+              {
+                method: componentData.request.method,
+                url: componentData.request.url,
+                body: componentData.request.body,
+                headers: componentData.request.headers,
+                queryParams: componentData.request.queryParams
+              }
+            );
+            
+            if(!componentData.path){
+              // update tab data
+              handleTabUpdate({name : tabName, id: dummyId, save: true, path:{
+                  folderId : path[path.length - 1].id,
+                  folderName : path[path.length - 1].name,
+                  collectionId: path[0].id,
+                  workspaceId: workspace.id,
+              }} , currentTabId);  // MOCKED DATA [UPDATION REQUIRED HERE]
+              updateCurrentTab({id:dummyId } );  // MOCKED DATA [UPDATION REQUIRED HERE]
+            }
+            else{
+              //push new tab
+              let newTab : NewTab = {
+                id: dummyId,
+                name: tabName,
+                type: ItemType.REQUEST,
+                request : {
+                  method: componentData.request.method,
+                  url: componentData.request.url,
+                  body: componentData.request.body,
+                  headers: componentData.request.headers,
+                  queryParams: componentData.request.queryParams
+                },
+                path: {
+                  folderId : path[path.length - 1].id,
+                  folderName : path[path.length - 1].name,
+                  collectionId: path[0].id,
+                  workspaceId: workspace.id,
+                },
+                save : true,
+                requestInProgress:  false,
+              }
+              handleTabAddons(newTab);
+            }
+            onClick(false);
+            navigateToWorkspace();
+          }
       }
     }
   };
