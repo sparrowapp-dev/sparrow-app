@@ -25,7 +25,8 @@
         explorer.id, ItemType.REQUEST, 
         name, 
         currentDummyId ,
-        RequestDefault.METHOD);
+        {method: RequestDefault.METHOD}
+        );
       
         const res = await insertCollectionRequest({
         collectionId: collectionId,
@@ -71,6 +72,6 @@
     </div>
 {:else}
     <div style="padding-left: 0; cursor:pointer;">
-      <File folderId = {folderId} folderName={folderName} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id} method={explorer.request.method} />
+      <File api = {explorer} folderId = {folderId} folderName={folderName} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id}/>
     </div>
 {/if}

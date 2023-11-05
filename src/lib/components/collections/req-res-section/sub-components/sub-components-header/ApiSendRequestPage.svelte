@@ -14,6 +14,7 @@
   import { keyStore, valueStore } from "$lib/store/parameter";
   import { onDestroy } from "svelte";
   import { makeRequestforCrud } from "$lib/api/api.common";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   //this for expand and collaps condition
   let isCollaps;
@@ -24,11 +25,12 @@
   let inputElement: HTMLInputElement;
 
   let currentTabId = null;
-  let tabList = [];
+  let tabList : NewTab[] = [];
   let urlText: string = "";
   let method = "";
   let requestData;
   let disabledSend : boolean = false;
+  let componentData: NewTab;
 
   const testJSON : (text : string) => string = (text) => {
     try {
@@ -56,11 +58,11 @@
       });
       isInputEmpty = false;
       let response = await makeRequestforCrud(
-        requestData.url,
-        requestData.method,
+        requestData.request.url,
+        requestData.request.method,
         "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
-        testJSON(requestData.body),
-        requestData.requestType,
+        testJSON(requestData.request.body),
+        "JSON",
       );
 
       if (response.isSuccessful) {
@@ -70,7 +72,7 @@
           tabs.update((value) => {
           let temp = value.map((elem) => {
             if (elem.id === currentTabId) {
-              elem.response = {
+              elem.request.response = {
                 body: JSON.stringify(responseBody),
                 headers: JSON.stringify(responseHeaders),
                 status: responseStatus
@@ -100,7 +102,7 @@
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
-          elem.method = tab;
+          elem.request.method = tab;
           elem.save = false;
         }
         return elem;
@@ -126,7 +128,7 @@
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
-          elem.url = urlText;
+          elem.request.url = urlText;
           elem.save = false;
         }
         return elem;
@@ -137,10 +139,11 @@
   const fetchUrlData = (id, list) => {
     list.forEach((elem) => {
       if (elem.id === id) {
-        urlText = elem.url;
-        method = elem.method;
+        urlText = elem.request.url;
+        method = elem.request.method;
         disabledSend = elem.requestInProgress;
         requestData = elem;
+        componentData = elem;
       }
     });
   };
@@ -191,7 +194,8 @@
               "OPT",
               "CON",
             ]}
-            {method}
+
+            method = {componentData ? componentData.request.method : ""}
             onclick={handleDropdown}
           />
         </p>

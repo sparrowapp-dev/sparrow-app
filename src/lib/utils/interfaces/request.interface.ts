@@ -1,8 +1,11 @@
+import type { Headers, QueryParams } from "../dto";
+import type { ItemType } from "../enums/item-type.enum";
+
 export interface Path {
   workspaceId: string;
   collectionId: string;
-  folderId: string;
-  folderName: string;
+  folderId?: string;
+  folderName?: string;
 }
 
 export interface Response {
@@ -11,19 +14,29 @@ export interface Response {
   body: string;
 }
 
-export interface Tab {
+export interface RequestBody {
+  method: string;
+  url?: string;
+  body?: string;
+  headers?: Headers[];
+  queryParams?: QueryParams[];
+}
+
+export interface NewTab {
   id: string;
   name: string;
-  method: string;
-  path: Path;
-  type: string;
-  body: string;
-  url: string;
-  header: unknown;
-  requestType: string;
-  response: Response;
+  type: ItemType.COLLECTION | ItemType.FOLDER | ItemType.REQUEST;
+  request?: {
+    method: string;
+    body?: string;
+    url?: string;
+    headers?: unknown;
+    queryParams?: unknown;
+    response?: Response;
+  };
   save: boolean;
   requestInProgress: boolean;
+  path?: Path;
 }
 
 export interface CurrentTab {

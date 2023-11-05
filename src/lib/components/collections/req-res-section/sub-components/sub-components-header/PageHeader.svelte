@@ -1,9 +1,10 @@
 <script lang="ts">
   import angleDown from "$lib/assets/angle-down.svg";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import { collapsibleState, currentTab, tabs } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
+    import { onDestroy } from "svelte";
  
   let isCollaps : boolean;
   let display: boolean = false;
@@ -16,6 +17,38 @@
   const handleBackdrop = (flag) =>{
     visibility = flag;
   } 
+  let currentTabId = null;
+  let tabList = [];
+  let tabName : string = ""; 
+
+  const fetchUrlData = (id, list) => {
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        tabName = elem.name;
+      }
+    });
+  };
+
+  const tabsUnsubscribe = tabs.subscribe((value) => {
+    tabList = value;
+    if (currentTabId && tabList) {
+      fetchUrlData(currentTabId, tabList);
+    }
+  });
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
+      currentTabId = value.id;
+      if (currentTabId && tabList) {
+        fetchUrlData(currentTabId, tabList);
+      }
+    }
+  });
+
+  onDestroy(() => {
+    tabsUnsubscribe();
+    currentTabUnsubscribe();
+  });
 </script>
 
 <div class="d-flex flex-column" style="margin-right: 32px;">
@@ -26,7 +59,7 @@
   >
     <div>
       <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
-        create new booking
+        {tabName}
       </p>
     </div>
 

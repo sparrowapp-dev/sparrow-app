@@ -19,15 +19,18 @@
   import {
     insertCollection,
     insertCollectionDirectory,
+    insertCollectionRequest,
   } from "$lib/services/collection";
   import {searchTreeDocument} from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
   import type {
     CreateCollectionPostBody,
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
+  import { currentTab, handleTabAddons, handleTabUpdate, tabs, updateCurrentTab } from "$lib/store/request-response-section";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
   export let onClick;
-
-   interface Path {
+  
+  interface Path {
     name: string;
     id: string,
     type: string,
@@ -36,11 +39,20 @@
     name: string;
     id: string;
   }
-
+  const { insertNode, insertHead } = useCollectionTree();
+  
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
   let workspace: Workspace | null = null;
+  
+  let currentTabId = null;
+  let tabList = [];
+  let tabName = "";
+  let tabId: string = "";
+  let tabMethod : string = "";
+  let tabUrl : string = "";
+  let componentData;
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
@@ -79,11 +91,90 @@
     }
   };
 
-  const handleSaveRequest = () => {
+  const handleSaveRequest = async () => {
     // Handle request code goew here
+    const dummyId = new Date() + "uid";
+    if(path.length > 0){
+      if(path[path.length - 1].type  === ItemType.COLLECTION){
+        
+          // create new request
+          const res = await insertCollectionRequest({
+            collectionId: path[path.length - 1].id,
+            workspaceId: workspace.id,
+            items: {
+              name: tabName,
+              type: ItemType.REQUEST,
+              request: {
+                method: componentData.request.method,
+                url: componentData.request.url,
+                body: componentData.request.body,
+                headers: componentData.request.headers,
+                queryParams: componentData.request.queryParams
+              },
+            },
+          });
+          if (res.isSuccessful) {
+            insertNode(
+              JSON.parse(JSON.stringify(collection)),
+              path[path.length - 1].id,
+              ItemType.REQUEST,
+              tabName,
+              dummyId,  // MOCKED DATA [UPDATION REQUIRED HERE]
+              {
+                method: componentData.request.method,
+                url: componentData.request.url,
+                body: componentData.request.body,
+                headers: componentData.request.headers,
+                queryParams: componentData.request.queryParams
+              }
+            );
+            
+            if(!componentData.path){
+              // update tab data
+              handleTabUpdate({name : tabName, id: dummyId, save: true, path:{
+                folderId : "",
+                  folderName : "",
+                  collectionId: path[path.length - 1].id,
+                  workspaceId: workspace.id,
+              }} , currentTabId);  // MOCKED DATA [UPDATION REQUIRED HERE]
+              updateCurrentTab({id:dummyId } );  // MOCKED DATA [UPDATION REQUIRED HERE]
+            }
+            else{
+              //push new tab
+              let newTab : NewTab = {
+                id: dummyId,
+                name: tabName,
+                type: ItemType.REQUEST,
+                request : {
+                  method: componentData.request.method,
+                  url: componentData.request.url,
+                  body: componentData.request.body,
+                  headers: componentData.request.headers,
+                  queryParams: componentData.request.queryParams
+                },
+                path: {
+                  folderId : "",
+                  folderName : "",
+                  collectionId: path[path.length - 1].id,
+                  workspaceId: workspace.id,
+                },
+                save : true,
+                requestInProgress:  false,
+              }
+              handleTabAddons(newTab);
+            }
+            onClick(false);
+            navigateToWorkspace();
+          }
+        
+        
+      }
+      else if(path[path.length - 1].type  === ItemType.FOLDER){
+        // Code will be added here for FOLDER type
+      }
+    }
   };
 
-  const { insertNode, insertHead } = useCollectionTree();
 
   const handleFolderClick = async (): Promise<void> => {
     let directory: CreateDirectoryPostBody = {
@@ -123,9 +214,40 @@
     }
   };
 
+  const fetchComponentData = (id, list) => {
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        tabName = elem.name;
+        tabId = elem.id;
+        tabMethod = elem.request.method;
+        tabUrl = elem.request.url;
+        componentData = {...elem};
+      }
+    });
+  };
+
+  const tabsUnsubscribe = tabs.subscribe((value) => {
+    tabList = value;
+    if (currentTabId && tabList) {
+      fetchComponentData(currentTabId, tabList);
+    }
+  });
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
+      currentTabId = value.id;
+      if (currentTabId && tabList) {
+        fetchComponentData(currentTabId, tabList);
+      }
+    }
+  });
+
+
   onDestroy(() => {
     collectionListUnsubscribe();
     currentWorkspaceUnsubscribe();
+    tabsUnsubscribe();
+    currentTabUnsubscribe();
   });
 </script>
 
@@ -281,6 +403,7 @@
             style="width: 100%; font-size: 12px;"
             placeholder="Request Name"
             class="p-1 bg-black outline-0 rounded border-0"
+            bind:value={tabName}
           />
         </div>
         <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
@@ -366,6 +489,7 @@
           />
         </span>
         <CoverButton
+          disable = {path.length === 0 ? true : false}
           text={"Save"}
           size={16}
           type={"primary"}

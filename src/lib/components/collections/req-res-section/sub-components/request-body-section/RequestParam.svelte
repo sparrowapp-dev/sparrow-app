@@ -42,7 +42,7 @@
   const fetchBodyData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
-          if(elem.response && elem.response.body){
+          if(elem.request?.response?.body){
             jsonResponse = true;
           }
           else{

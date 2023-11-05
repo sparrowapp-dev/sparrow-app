@@ -18,7 +18,7 @@
   const fetchBodyData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
-          bodyData = elem.body;
+          bodyData = elem.request.body;
           content = {
             text: bodyData,
             json: undefined
@@ -66,7 +66,7 @@
     tabs.update(value => {
         let temp = value.map((elem)=>{
           if(elem.id === currentTabId){
-            elem.body = updatedContent.text;
+            elem.request.body = updatedContent.text;
             if(updatedContent.text !== ""){
               elem.save = false; 
             }

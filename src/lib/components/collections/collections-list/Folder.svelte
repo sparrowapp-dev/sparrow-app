@@ -68,7 +68,7 @@
         ItemType.REQUEST,
         file,
         currentDummyId,
-        RequestDefault.METHOD,
+        {method:RequestDefault.METHOD}
       );
 
     const res = await insertCollectionRequest({
