@@ -1,5 +1,6 @@
 <script>
   import { Circle } from "svelte-loading-spinners";
+  import spin from "$lib/assets/spin.svg";
   // export let visible;
   let color = "#1c35f3b9";
   let size = "70";
@@ -8,7 +9,7 @@
 
 <!-- {#if visible} -->
 <div class="loading-spinner spinner-item">
-  <Circle {size} {color} />
+<img class="load-spin"  src={spin} style="width: 80px; height:80px;" alt="">
   <!-- Place your loading spinner component here -->
 </div>
 
@@ -16,25 +17,27 @@
 
 <style>
   .spinner-item {
-    min-width: 250px;
-    min-height: 250px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
   }
 
   .loading-spinner {
-    position: fixed;
-    margin: 10px 10px;
-    top: 230px;
-    right: 0;
-    width: 480px;
-    height: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.706);
+    backdrop-filter: blur(3px);
     z-index: 999;
   }
+  .load-spin{
+    animation: loader-animation 1s linear infinite; 
+  }  
+  @keyframes loader-animation { 
+      0% { 
+          transform: rotate(0deg); 
+      } 
+      100% { 
+          transform: rotate(360deg); 
+      } 
+  } 
 </style>

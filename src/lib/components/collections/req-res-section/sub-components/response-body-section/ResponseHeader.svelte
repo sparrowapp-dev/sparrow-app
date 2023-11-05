@@ -8,6 +8,7 @@
     basicAuth_password,
     basicAuth_username,
   } from "$lib/store/authorization";
+  export let responseHeader;
 
   let username: string;
   let password: string;
@@ -121,6 +122,27 @@
       />
     </div>
   {/if}
+
+  {#each responseHeader as [key, value]}
+  <div class="d-flex align-items-center justify-content-center ps-1 gap-2 mb-2">
+    <div>
+      <input
+        type="text"
+        placeholder={key}
+        style="outline: none;font-size:13px;color:white;"
+        class="bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3"
+        readonly
+      />
+    </div>
+    <input
+      type="text"
+      placeholder={value}
+      style="outline: none;font-size:13px;color:white"
+      class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
+      readonly
+    />
+  </div>
+{/each}
 
   <div class="d-flex align-items-center justify-content-center ps-1 gap-2 mb-2">
     <div>

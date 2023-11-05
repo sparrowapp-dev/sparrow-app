@@ -2,6 +2,8 @@
   import ResponseBody from "./ResponseBody.svelte";
   import ResponseHeader from "./ResponseHeader.svelte";
   let selectedTab1 = "response";
+  export let responseBody;
+  export let responseHeader;
 </script>
 
 <div class="d-flex flex-column justify-content-between w-100">
@@ -59,9 +61,9 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if selectedTab1 === "response"}
-    <ResponseBody />
+    <ResponseBody responseBody= {responseBody} />
   {:else if selectedTab1 === "resheader"}
-    <ResponseHeader />
+    <ResponseHeader responseHeader = {responseHeader} />
   {/if}
 </div>
 
