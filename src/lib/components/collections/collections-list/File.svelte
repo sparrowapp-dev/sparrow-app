@@ -9,13 +9,33 @@
     export let folderName : string;
     export let api;
     
-    const {url, method, body, headers, queryParams} = api.request;
+    let url, method, body, headers, queryParams
+    // let url = api.request.url;
+    // let method = api.request.method;
+    // let headers = api.request.headers;
+    // let queryParams = api.request.queryParams;
+    // let body = api.request.body;
     let apiClass = "red-api";
-    if(method === "DELETE") apiClass = "red-api";
-    else if(method === "GET") apiClass = "green-api"; 
-    else if(method === "POST") apiClass = "yellow-api";
-    else if(method === "PUT") apiClass = "blue-api";
-    else if(method === "ARC") apiClass = "grey-api";
+    
+    $: {
+    if (api) {
+        url = api.request.url;
+     method = api.request.method;
+     headers = api.request.headers;
+     queryParams = api.request.queryParams;
+     body = api.request.body;
+    }
+  }
+  $: {
+    if (method) {
+        if(method === "DELETE") apiClass = "red-api";
+        else if(method === "GET") apiClass = "green-api"; 
+        else if(method === "POST") apiClass = "yellow-api";
+        else if(method === "PUT") apiClass = "blue-api";
+        else if(method === "ARC") apiClass = "grey-api";
+    }
+  }
+    
     let path : Path = {
         workspaceId: currentWorkspaceId,
         collectionId,
