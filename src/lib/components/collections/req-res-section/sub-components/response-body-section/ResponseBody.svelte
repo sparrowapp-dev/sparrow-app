@@ -10,7 +10,7 @@
   import { notifications } from "$lib/utils/notifications";
   import { currentTab, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
     import { onDestroy } from "svelte";
-
+  export let responseBody;
   let jsonText: any;
   let content = {
             text: "",

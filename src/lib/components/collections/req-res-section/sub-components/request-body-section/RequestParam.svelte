@@ -5,7 +5,7 @@
   import Authorization from "../request-authorization-section/Authorization.svelte";
 
   import Parameters from "../request-parameter-section/Parameters.svelte";
-  // import Loader from "$lib/components/Transition/Loader.svelte";
+  import Loader from "$lib/components/Transition/Loader.svelte";
 
   import {
     collapsibleState,
@@ -37,17 +37,23 @@
 
 
   let currentTabId = null;
-  let tabList = []
+  let tabList = [];
+  let progress : boolean = false;
+  let responseBody;
+  let responseHeader;
 
   const fetchBodyData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
-          if(elem.request?.response?.body){
+          if(elem.request?.response){
             jsonResponse = true;
+            responseBody = elem.request?.response?.body;
+            responseHeader = Object.entries(JSON.parse(elem.request?.response?.headers));
           }
           else{
             jsonResponse = false;
           }
+          progress = elem.requestInProgress;
         }
       });
   }
@@ -151,14 +157,24 @@
   <div
     style="width:{isHorizontalVerticalMode
       ? '100%'
-      : '50%'};border-left:1px solid #313233;height:100vh"
-    class="left-panel pt-3 px-4"
+      : '50%'};border-left:1px solid #313233; height:calc(100vh - 200px);"
+    class="left-panel pt-3 px-4 position-relative"
   >
-    <div class="d-flex flex-column">
+    <div class=" d-flex flex-column" style="height:100%;">
       {#if jsonResponse}
-        <ResponseParams />
+        <ResponseParams responseBody = {responseBody} responseHeader={responseHeader} />
       {:else}
         <DefaultPage />
+      {/if}
+      {#if progress}
+        <div class="position-absolute" style="    
+          top: 10px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index:999;">
+          <Loader/>
+        </div>
       {/if}
     </div>
   </div>
