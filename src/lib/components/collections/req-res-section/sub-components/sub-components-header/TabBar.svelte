@@ -8,16 +8,18 @@
   import { collapsibleState, currentTab } from "$lib/store/request-response-section";
   import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
     import Tab from "./Tab.svelte";
-    import type { Tab as tab } from "$lib/utils/interfaces/request.interface";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
     import { onDestroy } from "svelte";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
-  
-  let tabsStore : tab[] = [];
+    import { RequestDefault, RequestType } from "$lib/utils/enums/request.enum";
+    import { v4 as uuidv4 } from "uuid";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
+
+  let tabsStore : NewTab[] = [];
   let tabWidth : number = 196;
   let scrollerParent : number;
   let scrollerWidth : number;
 
-  const tabsUnsubscribe = tabs.subscribe((value: tab[])=>{
+  const tabsUnsubscribe = tabs.subscribe((value: NewTab[])=>{
     tabsStore = value;
     if(tabsStore.length >= 0 && tabsStore.length <= 5){
       tabWidth = 196;
@@ -92,7 +94,7 @@
           index = {index}
           currentTabId={currentTabId} 
           tabWidth={tabWidth} 
-          method={tab.method}
+          method={tab.request.method}
           handleTabRemove={handleTabRemove} 
           updateCurrentTab={updateCurrentTab}/>
       {/each}
@@ -108,7 +110,22 @@
     {/if}
     <div class="d-inline-block" style="height:35px; width:35px;">
       <button class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100" on:click={()=>{
-        handleTabAddons(new Date()+"dummy", RequestDefault.NAME, RequestDefault.METHOD);
+        let newTab = {
+          id: uuidv4(),
+          name: RequestDefault.NAME,
+          type: ItemType.REQUEST,
+          request : {
+            method: RequestDefault.METHOD,
+            body: "",
+            url: "",
+            headers: [],
+            queryParams:[] 
+          },
+          save: false,
+          requestInProgress: false,
+          path:null
+        }
+        handleTabAddons(newTab);
         moveNavigation('right');
       } }>
         <img src={plusIcon} alt="" />

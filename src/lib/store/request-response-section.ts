@@ -1,11 +1,9 @@
 import { writable } from "svelte/store";
 import type {
-  Tab,
-  Path,
+  NewTab,
   CurrentTab,
 } from "$lib/utils/interfaces/request.interface";
-import { RequestType } from "$lib/utils/enums/request.enum";
-import { ItemType } from "$lib/utils/enums/item-type.enum";
+
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
 
@@ -25,9 +23,9 @@ const initialRequest = [
 export const apiRequest = writable(initialRequest);
 
 export const currentTab = writable<CurrentTab>({ id: null });
-export const tabs = writable<Tab[]>([]);
+export const tabs = writable<NewTab[]>([]);
 
-let tabStore: Tab[] = [];
+let tabStore: NewTab[] = [];
 tabs.subscribe((value) => {
   tabStore = value;
 });
@@ -36,35 +34,7 @@ export const updateCurrentTab = (value) => {
   currentTab.set(value);
 };
 
-export const handleTabAddons = (
-  id: string,
-  name: string,
-  method: string,
-  path: Path | null = null,
-  type: string = ItemType.REQUEST,
-  body: string = "",
-  url: string = "",
-  header: unknown = "",
-  requestType = RequestType.JSON,
-  response: Response | null = null,
-  save: boolean = false,
-  requestInProgress: boolean = false,
-) => {
-  const newTab = {
-    method: method,
-    name: name,
-    type,
-    id,
-    body,
-    url,
-    header,
-    requestType,
-    response,
-    path,
-    save,
-    requestInProgress,
-  };
-
+export const handleTabAddons = (newTab: NewTab) => {
   const requestAlreadyExist = tabStore.filter((elem) => {
     if (elem.id === newTab.id) return true;
     else return false;
@@ -93,4 +63,16 @@ export const handleTabRemove = (id: string) => {
   } else {
     updateCurrentTab({ id: null });
   }
+};
+
+export const handleTabUpdate = (obj, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem = { ...elem, ...obj };
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
 };

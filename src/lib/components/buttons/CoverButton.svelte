@@ -3,6 +3,7 @@
     export let onClick;
     export let type;
     export let size;
+    export let disable : boolean = false;
     let btnClass = "";
     if(type === 'primary'){
         btnClass = "custom-btn-primary"
@@ -11,7 +12,7 @@
         btnClass = "custom-btn-dark"
     }
 </script>
-<button style="font-size: {`${size}px`}; margin-bottom:4px; padding: 6px 12px;" class="btn {btnClass}" on:click={()=>{
+<button disabled="{disable}" style="font-size: {`${size}px`}; margin-bottom:4px; padding: 6px 12px;" class="btn {btnClass}" on:click={()=>{
     onClick();
 }}>{text}</button>
 

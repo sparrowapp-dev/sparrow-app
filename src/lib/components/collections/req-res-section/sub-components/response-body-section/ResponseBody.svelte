@@ -58,9 +58,9 @@
   const fetchUrlData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
-          if(elem.response && elem.response.body){
+          if(elem.request?.response?.body){
             content = {
-              text: elem.response.body,
+              text: elem.request?.response?.body,
               json: undefined
             };
           }

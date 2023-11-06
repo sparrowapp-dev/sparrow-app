@@ -51,7 +51,7 @@
           : method === "POST"
           ? "yellow-api"
           : ""}
-        style="font-size: 12px; height: 31px; ">{tab.method}</span
+        style="font-size: 12px; height: 31px; ">{method}</span
       >
       <span
         class="text-muted font-weight-normal"

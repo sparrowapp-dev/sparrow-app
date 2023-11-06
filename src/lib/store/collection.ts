@@ -1,4 +1,5 @@
 import { ItemType } from "$lib/utils/enums/item-type.enum";
+import type { RequestBody } from "$lib/utils/interfaces/request.interface";
 import { writable } from "svelte/store";
 
 const collectionList = writable([]);
@@ -18,8 +19,8 @@ const insertionHelper: (
   type: string,
   name: string,
   id: string,
-  method?: string,
-) => number = (tree, folderId, type, name, id, method?) => {
+  request?: RequestBody,
+) => number = (tree, folderId, type, name, id, request?) => {
   if (tree._id === folderId || tree.id === folderId) {
     if (type === ItemType.REQUEST) {
       tree.items.push({
@@ -27,7 +28,11 @@ const insertionHelper: (
         name,
         type,
         request: {
-          method: method,
+          method: request.method,
+          url: request.url,
+          body: request.body,
+          Headers: request.headers,
+          queryParams: request.queryParams,
         },
       });
     } else if (type === ItemType.FOLDER) {
@@ -45,7 +50,7 @@ const insertionHelper: (
   // Recursively search through the tree structure
   if (tree && tree.items) {
     for (let j = 0; j < tree.items.length; j++) {
-      if (!insertionHelper(tree.items[j], folderId, type, name, id, method))
+      if (!insertionHelper(tree.items[j], folderId, type, name, id, request))
         return 0;
     }
   }
@@ -80,11 +85,11 @@ const useCollectionTree = (): any => {
     type: string,
     name: string,
     id: string,
-    method?: string,
-  ) => void = (tree, folderId, type, name, id, method?) => {
+    request?: RequestBody,
+  ) => void = (tree, folderId, type, name, id, request?) => {
     // Iterate through the tree to find the target folder/API Request and add the item
     for (let i = 0; i < tree.length; i++) {
-      if (!insertionHelper(tree[i], folderId, type, name, id, method)) {
+      if (!insertionHelper(tree[i], folderId, type, name, id, request)) {
         setCollectionList(tree);
         return;
       }
