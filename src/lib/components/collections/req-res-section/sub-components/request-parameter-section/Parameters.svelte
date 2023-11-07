@@ -99,13 +99,6 @@
     return response;
   }
 
-  $: {
-    if (params) {
-      // updateQueryParams(params, currentTabId);
-      // updateURL(extractQueryParamstoURL(params), currentTabId);
-    }
-  }
-
   const updateParam = (index) => {
     
     params.forEach((elem, i)=>{

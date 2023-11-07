@@ -8,6 +8,7 @@
     currentTab,
     isHorizontalVertical,
     tabs,
+    updateQueryParams,
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
@@ -99,7 +100,6 @@
   };
  
   const extractKeyValueFromUrl = (str : string) => {
-    let param = [];
     let flag = false;
     let temp = "";
     for(let i = 0; i < str.length; i++){
@@ -110,13 +110,20 @@
         flag = true;
       }
     }
-    console.log(temp);
-  }
-
-  $: {
-    if (urlText) {
-      // extractKeyValueFromUrl(urlText);
+    if(temp === ""){
+      return [{name : "", description: " ", checked : false}]
     }
+    let paramArray = temp.split('&');
+    let param = paramArray.map((elem)=>{
+        let keyValue = elem.split("=");
+        if(keyValue.length === 1){
+          return {name : keyValue[0], description: "", checked : true}
+        }
+        else if (keyValue.length === 2){
+          return {name : keyValue[0], description: keyValue[1], checked : true}
+        }
+    });
+    return [...param, {name : "", description: " ", checked : false}]  ;
   }
 
   const handleDropdown = (tab: string) => {
@@ -146,6 +153,7 @@
     }
   }
   let handleInputValue = () => {
+
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -156,6 +164,8 @@
       });
       return temp;
     });
+    // console.log();
+    updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
   };
   const fetchUrlData = (id, list) => {
     list.forEach((elem) => {
