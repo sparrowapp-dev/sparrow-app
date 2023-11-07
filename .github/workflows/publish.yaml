@@ -23,7 +23,7 @@ jobs:
       - name: Install App Center CLI
         run: |
           npm install -g appcenter-cli
-          appcenter login -t ${{ secrets.APPCENTER_API_TOKEN }}
+          appcenter login
           
       - name: Install dependencies
         run: |
