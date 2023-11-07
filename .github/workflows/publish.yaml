@@ -32,7 +32,7 @@ jobs:
           tar -czvf app.tar.gz -C C:\sparrow-app\src-tauri\target\release\bundle\msi .
 
       - name: Upload to App Center
-        uses: wzieba/AppCenter-Upload@v2
+        uses: andymckay/action-appcenter-upload@v3
         with:
           app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
           owner_name: anjali.malviya-techdome.net.in
