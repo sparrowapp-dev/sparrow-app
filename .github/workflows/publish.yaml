@@ -20,6 +20,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install App Center CLI
+        run: |
+          npm install -g appcenter-cli
+          appcenter login -t ${{ secrets.APPCENTER_API_TOKEN }}
+          
       - name: Install dependencies
         run: |
           yarn install
@@ -31,11 +36,19 @@ jobs:
           # Archive the MSI folder (replace the path with the correct one)
           tar -czvf app.tar.gz -C C:\sparrow-app\src-tauri\target\release\bundle\msi .
 
-      - name: Upload to App Center
-        uses: andymckay/action-appcenter-upload@v3
-        with:
-          app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
-          owner_name: anjali.malviya-techdome.net.in
-          app_name: Sparrow-1
-          group: Collaborators
-          file: app.tar.gz
+      - name: Deploy to App Center
+        run: |
+          # Upload the archive to App Center (replace with your App Center app name)
+          appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow -d 1
+
+        env:
+          APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+          
+      # - name: Upload to App Center
+      #   uses: andymckay/action-appcenter-upload@v3
+      #   with:
+      #     app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
+      #     owner_name: anjali.malviya-techdome.net.in
+      #     app_name: Sparrow-1
+      #     group: Collaborators
+      #     file: app.tar.gz
