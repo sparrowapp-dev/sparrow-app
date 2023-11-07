@@ -38,7 +38,7 @@ jobs:
       - name: Deploy to App Center
         run: |
           # Upload the archive to App Center (replace with your App Center app name)
-          appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow -d 1
+          appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow --app-version v1.23.11.1-dev
 
         env:
           APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
