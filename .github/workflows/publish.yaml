@@ -33,7 +33,7 @@ jobs:
       - name: Archive the MSI Folder
         run: |
           # Archive the MSI folder (replace the path with the correct one)
-          tar -czvf app.tar.gz -C C:\sparrow-app\src-tauri\target\release\bundle\msi .
+          tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
 
       - name: Deploy to App Center
         run: |
