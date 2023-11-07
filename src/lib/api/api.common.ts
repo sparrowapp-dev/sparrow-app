@@ -100,6 +100,8 @@ const makeRequestforCrud = async (
   request: string,
 ) => {
   try {
+    console.log(url, body, method, headers, request);
+
     const response = await invoke("make_type_request_command", {
       url,
       method,
