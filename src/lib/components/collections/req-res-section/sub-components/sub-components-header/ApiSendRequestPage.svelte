@@ -14,7 +14,9 @@
   import { keyStore, valueStore } from "$lib/store/parameter";
   import { onDestroy } from "svelte";
   import { makeRequestforCrud } from "$lib/api/api.common";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { notification } from "@tauri-apps/api";
+  import { notifications } from "$lib/utils/notifications";
 
   //this for expand and collaps condition
   let isCollaps;
@@ -22,27 +24,57 @@
   collapsibleState.subscribe((value) => (isCollaps = value));
 
   let isInputEmpty: boolean = false;
+  let isInputValid: boolean = true;
   let inputElement: HTMLInputElement;
 
   let currentTabId = null;
-  let tabList : NewTab[] = [];
+  let tabList: NewTab[] = [];
   let urlText: string = "";
   let method = "";
   let requestData;
-  let disabledSend : boolean = false;
+  let disabledSend: boolean = false;
   let componentData: NewTab;
 
-  const testJSON : (text : string) => string = (text) => {
+  const testJSON: (text: string) => string = (text) => {
     try {
-        JSON.parse(text);
-        return text;
+      JSON.parse(text);
+      return text;
     } catch (error) {
-        return '{}';
+      return "{}";
     }
-}
+  };
+
+  function ensureHttpOrHttps(str) {
+    if (str.startsWith("http://") || str.startsWith("https://")) {
+      return str;
+    } else if (str.startsWith("//")) {
+      return "http:" + str;
+    } else {
+      return "http://" + str;
+    }
+  }
+
+  function isValidURL(string) {
+    var res = string.match(
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,
+    );
+    return res !== null;
+  }
 
   const handleSendRequest = async () => {
+    isInputValid = true;
+    let isValidUrlText = isValidURL(urlText);
+    let urlValue = "";
+    console.log(ensureHttpOrHttps(urlText));
+    if (isValidUrlText) {
+      urlValue = ensureHttpOrHttps(urlText);
+    } else {
+      isInputValid = false;
+      notifications.error("Invalid URL");
+      return;
+    }
     const str = urlText;
+    console.log(urlValue);
     if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
@@ -56,44 +88,46 @@
         });
         return temp;
       });
-      isInputEmpty = false;
-      let response = await makeRequestforCrud(
-        requestData.request.url,
-        requestData.request.method,
-        "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
-        testJSON(requestData.request.body),
-        "JSON",
-      );
 
-      if (response.isSuccessful) {
+      isInputEmpty = false;
+      if (isInputValid) {
+        let response = await makeRequestforCrud(
+          urlValue,
+          requestData.request.method,
+          "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
+          testJSON(requestData.request.body),
+          "JSON",
+        );
+
+        if (response.isSuccessful) {
           let responseBody = response.data.response.data;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
           tabs.update((value) => {
-          let temp = value.map((elem) => {
-            if (elem.id === currentTabId) {
-              elem.request.response = {
-                body: JSON.stringify(responseBody),
-                headers: JSON.stringify(responseHeaders),
-                status: responseStatus
+            let temp = value.map((elem) => {
+              if (elem.id === currentTabId) {
+                elem.request.response = {
+                  body: JSON.stringify(responseBody),
+                  headers: JSON.stringify(responseHeaders),
+                  status: responseStatus,
+                };
+                elem.requestInProgress = false;
               }
-              elem.requestInProgress = false;
-            }
-            return elem;
+              return elem;
+            });
+            return temp;
           });
-          return temp;
-        }); 
-      }
-      else {
-        tabs.update((value) => {
-        let temp = value.map((elem) => {
-          if (elem.id === currentTabId) {
-            elem.requestInProgress = false;
-          }
-          return elem;
-        });
-        return temp;
-      });
+        } else {
+          tabs.update((value) => {
+            let temp = value.map((elem) => {
+              if (elem.id === currentTabId) {
+                elem.requestInProgress = false;
+              }
+              return elem;
+            });
+            return temp;
+          });
+        }
       }
     }
   };
@@ -124,6 +158,7 @@
       }
     }
   }
+
   let handleInputValue = () => {
     tabs.update((value) => {
       let temp = value.map((elem) => {
@@ -136,6 +171,7 @@
       return temp;
     });
   };
+
   const fetchUrlData = (id, list) => {
     list.forEach((elem) => {
       if (elem.id === id) {
@@ -150,6 +186,7 @@
 
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
+
     if (currentTabId && tabList) {
       fetchUrlData(currentTabId, tabList);
     }
@@ -194,8 +231,7 @@
               "OPT",
               "CON",
             ]}
-
-            method = {componentData ? componentData.request.method : ""}
+            method={componentData ? componentData.request.method : ""}
             onclick={handleDropdown}
           />
         </p>
@@ -216,7 +252,8 @@
         bind:this={inputElement}
         on:keydown={handleInputKeyDown}
       />
-      <button disabled={disabledSend}
+      <button
+        disabled={disabledSend}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
