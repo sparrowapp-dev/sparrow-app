@@ -2,7 +2,7 @@
   //   import { navigate } from "svelte-navigator";
   //   import { authActions } from "$lib/store/auth.store";
   import Header from "$lib/components/header/Header.svelte";
-  import angleLeft from "$lib/assets/angleleft.png";
+  import angleLeft from "$lib/assets/angleleft.svg";
 
   //------------------------------ TOKEN -----------------------------------//
   //   const urlParams = new URLSearchParams(window.location.search);
