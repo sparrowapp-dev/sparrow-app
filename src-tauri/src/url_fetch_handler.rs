@@ -3,7 +3,6 @@ use serde_json::Value;
 use serde_json::json;
 use reqwest::Client;
 use std::collections::HashMap;
-use json::{JsonValue, JsonError};
 #[tokio::main]
 pub async fn import_swagger_url(url: &str, headers: &str, workspaceid: &str) -> Result<Value, Box<dyn std::error::Error>> { 
     let config = Config::new();
