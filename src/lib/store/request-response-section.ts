@@ -76,3 +76,27 @@ export const handleTabUpdate = (obj, id) => {
     return [...updatedTab];
   });
 };
+
+export const updateQueryParams = (params, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.queryParams = params;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const updateURL = (url, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.url = url;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};

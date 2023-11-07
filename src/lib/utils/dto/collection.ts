@@ -16,6 +16,7 @@ export interface Headers {
 export interface QueryParams {
   name: string;
   description: string;
+  checked: boolean;
 }
 
 export interface CreateApiRequestPostBody {

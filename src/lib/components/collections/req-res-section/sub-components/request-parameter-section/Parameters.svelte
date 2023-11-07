@@ -2,9 +2,10 @@
   import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import { isHorizontalVertical } from "$lib/store/request-response-section";
-  import { keyStore, valueStore } from "$lib/store/parameter";
+  import { currentTab, isHorizontalVertical, tabs, updateQueryParams, updateURL } from "$lib/store/request-response-section";
   import { sortable } from "svelte-agnostic-draggable";
+    import { onDestroy } from "svelte";
+    import type { QueryParams } from "$lib/utils/dto";
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
@@ -46,25 +47,94 @@
     isHovered = !isHovered;
   }
 
-  function addRow() {
-    if (rows.length === 1 && rows[0].key === "" && rows[0].value === "") {
-      rows[0].key = "New Key";
-      rows[0].value = "New Value";
-    } else if (
-      rows[rows.length - 1].key !== "" ||
-      rows[rows.length - 1].value !== ""
-    ) {
-      rows = [...rows, { key: "", value: "" }];
+  let currentTabId = null;
+  let tabList = [];
+  let params : QueryParams[] = []; 
+  let url : string = "";
+  const fetchComponentData = (id, list) => {
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        params = elem.request.queryParams;
+        url = elem.request.url;
+      }
+    });
+  };
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
+      currentTabId = value.id;
+      fetchComponentData(currentTabId, tabList);
+    }
+  });
+  const tabsUnsubscribe = tabs.subscribe((value) => {
+    tabList = value;
+    if (currentTabId && tabList) {
+      fetchComponentData(currentTabId, tabList);
+    }
+  });
+
+  const extractQueryParamstoURL = (params) => {
+    let response="";
+    let urlString : string = "";
+    for(let i = 0; i < url.length; i++){
+      if(url[i] === "?"){
+        break;
+      } 
+      urlString += url[i];
+    }
+    let queryString : string = "";
+    let count : number = 0;
+    for (let param of params) {
+      if (param.checked) {
+        count++;
+        queryString +=  `${param.name}=${param.description}&`;   
+      }
+    }
+    if(count !== 0){
+      queryString = queryString.slice(0, -1); 
+    }
+    response  += urlString;
+    if(queryString!== ""){
+      response += `?${queryString}`;
+    }
+    return response;
+  }
+
+  $: {
+    if (params) {
+      updateQueryParams(params, currentTabId);
+      updateURL(extractQueryParamstoURL(params), currentTabId);
     }
   }
 
-  function updateKey(e) {
-    keyStore.set(e.target.value);
+  const updateParam = (index) => {
+    params.forEach((elem, i)=>{
+      if(i == index){
+        elem.checked = true;
+      }
+    });
+    params = params;
+    if(params.length - 1 === index ){
+      params.push({name : "", description : "", checked : false});
+      params = params;
+    }  
   }
 
-  function updateValue(e) {
-    valueStore.set(e.target.value);
+  const deleteParam = (index) => {
+    if(params.length > 1){
+      let filteredParam = params.filter((elem, i)=>{
+        if(i != index){
+          return true;
+        }
+        return false;
+      });
+      params = filteredParam;
+    }
   }
+
+  onDestroy(() => {
+    currentTabUnsubscribe();
+    tabsUnsubscribe();
+  });
 </script>
 
 <div class="d-flex flex-column mt-3 me-0 w-100">
@@ -99,7 +169,7 @@
     on:sortable:remove={onSortableRemove}
     on:sortable:receive={onSortableReceive}
   >
-    {#each rows as row, index}
+    {#each params as param, index}
       <div
         role="button"
         aria-label="Toggle Hover"
@@ -125,6 +195,7 @@
                 type="checkbox"
                 on:mouseenter={toggleHover}
                 on:mouseleave={toggleHover}
+                bind:checked={param.checked}
               />
             </div>
 
@@ -136,10 +207,13 @@
                 placeholder="Enter Key"
                 class="form-control bg-blackColor py-1 border-0"
                 style="font-size: 13px;"
-                bind:value={row.key}
-                on:input={addRow}
-                on:input={updateKey}
-              />
+                bind:value={param.name}
+
+                on:input={()=>{
+                  updateParam(index)
+                }}
+              
+                />
             </div>
             <div class="flex-grow-1 w-100">
               <input
@@ -149,14 +223,19 @@
                 placeholder="Enter Value"
                 class="form-control bg-blackColor py-1 border-0"
                 style="font-size: 13px;"
-                bind:value={row.value}
-                on:input={addRow}
-                on:input={updateValue}
+                bind:value={param.description}
+                on:input={
+                ()=>{
+
+                  updateParam(index)}
+                }
               />
             </div>
             <div class="w-75 h-75 pe-1">
               <button class="bg-backgroundColor border-0">
-                <img src={trashIcon} alt="" />
+                <img src={trashIcon} on:click={()=>{
+                  deleteParam(index)
+                }} alt="" />
               </button>
             </div>
           </div>
