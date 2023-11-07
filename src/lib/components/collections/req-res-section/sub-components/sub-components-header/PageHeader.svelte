@@ -12,6 +12,7 @@
     import { currentWorkspace } from "$lib/store/workspace.store";
     import type {RequestBody} from "$lib/utils/interfaces/request.interface";
     import { collectionList, useCollectionTree } from "$lib/store/collection";
+    import  spin  from "$lib/assets/spin.svg";
  
   let isCollaps : boolean;
   let display: boolean = false;
@@ -34,6 +35,8 @@
   let componentData : NewTab; 
   let workspace : Workspace;
   let collection;
+
+  let loader= false;
 
   const { updateNodeData } = useCollectionTree();
 
@@ -171,7 +174,8 @@
               }
             }
           }>
-          <img src={floppyDisk} alt="" class="w-100 h-100" />
+          <!-- <img src={spin} class="loader-anim" alt="" style="width:14px; height:14px;"> -->
+          <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
           <p
             class="mb-0 text-whiteColor"
             style="font-size: 14px; font-weight:400;"
@@ -221,9 +225,6 @@
 </div>
 
 <style>
-  .pageheader {
-    /* margin-top: 30px; */
-  }
   .btn-primary {
     background-color: #313233;
   }
@@ -239,4 +240,15 @@
   .cursor-pointer{
     cursor: pointer;
   }
+  .loader-anim{
+    animation: loader-animation 1s linear infinite;
+  }
+  @keyframes loader-animation { 
+      0% { 
+          transform: rotate(0deg); 
+      } 
+      100% { 
+          transform: rotate(360deg); 
+      } 
+  } 
 </style>
