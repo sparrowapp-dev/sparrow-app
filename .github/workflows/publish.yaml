@@ -1,0 +1,41 @@
+name: Deploy to App Center
+
+on:
+  push:
+    branches:
+      - development
+env: 
+  VITE_API_URL: ${{secrets.VITE_API_URL}}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          yarn install
+          yarn build
+          yarn tauri build
+          
+      - name: Archive the MSI Folder
+        run: |
+          # Archive the MSI folder (replace the path with the correct one)
+          tar -czvf app.tar.gz -C C:\sparrow-app\src-tauri\target\release\bundle\msi .
+
+      - name: Upload to App Center
+        uses: wzieba/AppCenter-Upload@v2
+        with:
+          app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
+          owner_name: anjali.malviya-techdome.net.in
+          app_name: Sparrow-1
+          group: Collaborators
+          file: app.tar.gz
