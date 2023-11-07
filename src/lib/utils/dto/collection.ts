@@ -23,6 +23,7 @@ export interface CreateApiRequestPostBody {
   workspaceId: string;
   folderId?: string;
   items: {
+    id?: string;
     name: string;
     type: string;
     request?: {
@@ -33,6 +34,7 @@ export interface CreateApiRequestPostBody {
       queryParams?: QueryParams[];
     };
     items?: {
+      id?: string;
       name: string;
       type: string;
       request: {

@@ -78,6 +78,28 @@ const updationIdHelper = (tree, dummyId, originalId) => {
   return 1;
 };
 
+const updationNodeHelper = (tree, id, data) => {
+  if (tree._id === id || tree.id === id) {
+    tree.name = data.name;
+    tree.request.url = data.request.url;
+    tree.request.body = data.request.body;
+    tree.request.headers = data.request.headers;
+    tree.request.method = data.request.method;
+    tree.request.queryParams = data.request.queryParams;
+    return 0;
+  }
+
+  // Recursively search through the tree structure
+  if (tree && tree.items) {
+    for (let j = 0; j < tree.items.length; j++) {
+      if (!updationNodeHelper(tree.items[j], id, data)) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+};
+
 const useCollectionTree = (): any => {
   const insertNode: (
     tree: any,
@@ -135,6 +157,20 @@ const useCollectionTree = (): any => {
     return;
   };
 
-  return { insertNode, insertHead, updateNodeId, updateHeadId };
+  const updateNodeData: (tree: any, id: string, data: any) => void = (
+    tree,
+    id,
+    data,
+  ) => {
+    for (let i = 0; i < tree.length; i++) {
+      if (!updationNodeHelper(tree[i], id, data)) {
+        setCollectionList(tree);
+        return;
+      }
+    }
+    return;
+  };
+
+  return { insertNode, insertHead, updateNodeId, updateHeadId, updateNodeData };
 };
 export { collectionList, setCollectionList, useCollectionTree };
