@@ -101,12 +101,13 @@
 
   $: {
     if (params) {
-      updateQueryParams(params, currentTabId);
-      updateURL(extractQueryParamstoURL(params), currentTabId);
+      // updateQueryParams(params, currentTabId);
+      // updateURL(extractQueryParamstoURL(params), currentTabId);
     }
   }
 
   const updateParam = (index) => {
+    
     params.forEach((elem, i)=>{
       if(i == index){
         elem.checked = true;
@@ -116,7 +117,9 @@
     if(params.length - 1 === index ){
       params.push({name : "", description : "", checked : false});
       params = params;
-    }  
+    }
+    updateQueryParams(params, currentTabId);
+      updateURL(extractQueryParamstoURL(params), currentTabId);  
   }
 
   const deleteParam = (index) => {
@@ -129,6 +132,19 @@
       });
       params = filteredParam;
     }
+    updateQueryParams(params, currentTabId);
+      updateURL(extractQueryParamstoURL(params), currentTabId);
+  }
+  const updateCheck = (index) =>{
+    let filteredParam = params.map((elem, i)=>{
+        if(i == index){
+            elem.checked = !elem.checked;
+        }
+        return elem;
+      });
+      params = filteredParam;
+      updateQueryParams(params, currentTabId);
+      updateURL(extractQueryParamstoURL(params), currentTabId);
   }
 
   onDestroy(() => {
@@ -196,6 +212,9 @@
                 on:mouseenter={toggleHover}
                 on:mouseleave={toggleHover}
                 bind:checked={param.checked}
+                on:input={()=>{
+                  updateCheck(index)
+                }}
               />
             </div>
 

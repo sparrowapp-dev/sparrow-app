@@ -97,6 +97,27 @@
       }
     }
   };
+ 
+  const extractKeyValueFromUrl = (str : string) => {
+    let param = [];
+    let flag = false;
+    let temp = "";
+    for(let i = 0; i < str.length; i++){
+      if(flag){
+        temp += str[i];
+      }
+      if(str[i] === '?'){
+        flag = true;
+      }
+    }
+    console.log(temp);
+  }
+
+  $: {
+    if (urlText) {
+      // extractKeyValueFromUrl(urlText);
+    }
+  }
 
   const handleDropdown = (tab: string) => {
     tabs.update((value) => {
