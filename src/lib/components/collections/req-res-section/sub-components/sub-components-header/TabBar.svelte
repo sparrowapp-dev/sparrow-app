@@ -4,7 +4,6 @@
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
   import linesmallIcon from "$lib/assets/linesmall.svg";
-  import PageHeader from "./PageHeader.svelte";
   import { collapsibleState, currentTab } from "$lib/store/request-response-section";
   import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
     import Tab from "./Tab.svelte";
@@ -132,7 +131,7 @@
       </button>
     </div>
   </div>
-  <PageHeader />  
+  <!-- <PageHeader />   -->
 </div>
 
 <style>

@@ -19,8 +19,10 @@
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
+    import Collection from "$lib/components/file-types/collection/Collection.svelte";
+    import DefaultCollection from "./DefaultCollection.svelte";
 
-  let collection: any;
+  let collection: Collection[]=[];
   let currentWorkspaceId: string = "";
 
   let getCollectionData = async (id: string) => {
@@ -28,11 +30,14 @@
     if (res.isSuccessful) {
       setCollectionList(res.data.data);
     }
+    console.log(collection);
   };
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
-  });
+  }
+  );
+  console.log(collection);
   let currentWorkspaceName = "";
 
   const getNextCollection: (list: any[], name: string) => any = (
@@ -137,7 +142,7 @@
     : '280px'};border-right: {collapsExpandToggle
     ? '0px'
     : '1px solid #313233'};"
-  class="sidebar d-flex flex-column bg-backgroundColor"
+  class="sidebar d-flex flex-column bg-backgroundColor scroll"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
@@ -145,12 +150,14 @@
     <p class="mb-0 text-whiteColor" style="font-size: 18px;">
       {currentWorkspaceName}
     </p>
-    <button
-      class="bg-backgroundColor border-0"
-      on:click={setcollapsExpandToggle}
-    >
-      <img src={doubleangleLeft} alt="" />
-    </button>
+  
+        <button
+        class="bg-backgroundColor border-0"
+        on:click={setcollapsExpandToggle}
+      >
+        <img src={doubleangleLeft} alt="" />
+      </button>
+    
   </div>
   <div
     class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
@@ -232,6 +239,7 @@
           {/if}
         </div>
       {:else}
+      {#if collection.length > 2}
         {#each collection as col}
           <Folder
             collectionList = {collection}
@@ -241,6 +249,9 @@
             title={col.name}
           />
         {/each}
+        {:else}
+          <DefaultCollection></DefaultCollection>
+        {/if}
       {/if}
     </div>
   </div>
@@ -257,4 +268,7 @@
   .inputField {
     outline: none;
   }
+  .scroll::-webkit-scrollbar {
+  width: 1em;
+}
 </style>
