@@ -10,27 +10,6 @@
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
-  function onSortableInit() {}
-
-  function onSortableActivate() {
-    disableBodyScroll(document.body);
-  }
-  let count = 0;
-
-  function onSortStart() {}
-
-  function onSortMove() {}
-
-  function onSortStop() {}
-
-  function onSortableOver() {}
-
-  function onSortableChange() {}
-
-  function onSortableRemove() {}
-
-  function onSortableReceive() {}
-
   let ListView
   function onSortableUpdate() {
     let newListElements = []
@@ -45,16 +24,6 @@
     updateQueryParams(params, currentTabId);
   }
 
-  
-
-  function onSortableOut() {}
-
-  function onSortableDeactivate() {
-    enableBodyScroll(document.body);
-  }
-
-  function onSortableDestroy() {}
-
   let isHovered: boolean = false;
 
 
@@ -65,12 +34,7 @@
   let currentTabId = null;
   let tabList = [];
   let params : QueryParams[] = []; 
-
-  // $ : {
-  //   if(params.length){
-  //     count++;
-  //   }
-  // }   
+ 
   let url : string = "";
   const fetchComponentData = (id, list) => {
     list.forEach((elem) => {
@@ -88,7 +52,6 @@
   });
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-    console.log("tabList",tabList);
     if (currentTabId && tabList) {
       fetchComponentData(currentTabId, tabList);
     }
@@ -167,40 +130,26 @@
     tabsUnsubscribe();
   });
 </script>
-<!-- {#key count} -->
-<div class="d-flex flex-column mt-3 me-0 w-100">
-  <div
-    class="d-flex text-requestBodyColor align-items-center justify-content-between"
-    style="font-size: 12px; font-weight: 500; width:{isHorizontalVerticalMode
-      ? '50%'
-      : '50%'}"
-  >
-    <p class="ps-5 ms-4">Key</p>
-    <p style="margin-left: 130px;">Value</p>
+
+<div class="mt-3 me-0 w-100">
+  <div class="d-flex gap-2">
+    <div style="width:40px;"></div>
+    <div
+      class=" d-flex gap-2 text-requestBodyColor align-items-center"
+      style="font-size: 12px; font-weight: 500; width:100%;"
+    >
+      <p class="flex-grow-1 w-100">Key</p>
+      <p class="flex-grow-1 w-100">Value</p>
+    </div>
+    <div style="width:60px;"></div>
   </div>
-  {#key count}
+  
   <div
-    class="w-100 sortable > div"
-    use:sortable={{
-      cursor: "grabbing",
-    }}
+    class="w-100"
     style="display:block; position:relative;
-    width:200px; margin:20px;
+    width:200px;
     "
     bind:this={ListView}
-    on:sortable:init={onSortableInit}
-    on:sortable:destroy={onSortableActivate}
-    on:sortable:activate={onSortableActivate}
-    on:sortable:deactivate={onSortableDeactivate}
-    on:sort:start={onSortStart}
-    on:sort:move={onSortMove}
-    on:sort:stop={onSortStop}
-    on:sortable:over={onSortableOver}
-    on:sortable:out={onSortableOut}
-    on:sortable:change={onSortableChange}
-    on:sortable:update={onSortableUpdate}
-    on:sortable:remove={onSortableRemove}
-    on:sortable:receive={onSortableReceive}
   >
   {#each params as param  , index}
   <div
@@ -217,15 +166,11 @@
         : '100%'};"
     >
       <div
-        class="d-flex {isHorizontalVerticalMode
-          ? 'w-100'
-          : 'w-100'} align-items-center justify-content-center gap-3 mb-2"
+        class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
       >
-        <img src={dragIcon} alt="" on:click={()=>{
-          count++;
-        }}
+        <img src={dragIcon} alt=""  class="d-none"
         style="cursor:grabbing;" />
-        <div>
+        <div style="width:30px;">
           <input
             class="form-check-input"
             type="checkbox"
@@ -238,49 +183,51 @@
           />
         </div>
 
-        <div class="flex-grow-1 w-100">
-          <input
-            on:mouseenter={toggleHover}
-            on:mouseleave={toggleHover}
-            type="text"
-            placeholder="Enter Key"
-            class="form-control bg-blackColor py-1 border-0"
-            style="font-size: 13px;"
-            bind:value={param.name}
-
-            on:input={()=>{
-              updateParam(index)
-            }}
-          
+        <div class="w-100 d-flex gap-2">
+          <div class="flex-grow-1 w-100">
+            <input
+              on:mouseenter={toggleHover}
+              on:mouseleave={toggleHover}
+              type="text"
+              placeholder="Enter Key"
+              class="form-control bg-blackColor py-1 border-0"
+              style="font-size: 13px;"
+              bind:value={param.name}
+  
+              on:input={()=>{
+                updateParam(index)
+              }}
+            
+              />
+          </div>
+          <div class="flex-grow-1 w-100">
+            <input
+              on:mouseenter={toggleHover}
+              on:mouseleave={toggleHover}
+              type="text"
+              placeholder="Enter Value"
+              class="form-control bg-blackColor py-1 border-0"
+              style="font-size: 13px;"
+              bind:value={param.description}
+              on:input={
+              ()=>{
+  
+                updateParam(index)}
+              }
             />
-        </div>
-        <div class="flex-grow-1 w-100">
-          <input
-            on:mouseenter={toggleHover}
-            on:mouseleave={toggleHover}
-            type="text"
-            placeholder="Enter Value"
-            class="form-control bg-blackColor py-1 border-0"
-            style="font-size: 13px;"
-            bind:value={param.description}
-            on:input={
-            ()=>{
-
-              updateParam(index)}
-            }
-          />
+          </div>
         </div>
         {#if params.length - 1 != index}
-        <div class="w-75 h-75 pe-1">
-          <button class="bg-backgroundColor border-0">
+        <div class="h-75 pe-1" >
+          <button class="bg-backgroundColor border-0" style="width:40px;">
             <img src={trashIcon} on:click={()=>{
               deleteParam(index)
             }} alt="" />
           </button>
         </div>
         {:else}
-        <div class="w-75 h-75 pe-1">
-          <button class="bg-backgroundColor border-0">
+        <div class="h-75 pe-1" >
+          <button class="bg-backgroundColor border-0" style="width:40px;">
             <img src="" alt="" />
           </button>
         </div>
@@ -290,10 +237,7 @@
   </div>
     {/each}
   </div>
-  {/key}
 </div>
-
-<!-- {/key} -->
 
 <style>
   .sortable > div {

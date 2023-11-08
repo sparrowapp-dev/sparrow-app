@@ -136,10 +136,7 @@
       </button>
     </div>
   </div>
-  {#if tabsStore.length > 0}
   <PageHeader />  
-  
-  {/if}
 </div>
 
 <style>
