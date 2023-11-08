@@ -1,8 +1,6 @@
-use reqwest::{Client, Body, RequestBuilder, Response};
+use reqwest::{Body, RequestBuilder, Response};
 use std::{error::Error, collections::HashMap, path::Path};
-use regex::Regex; 
 use reqwest::multipart;
-use std::fs;
 use tokio::fs::File;
 use tokio_util::codec::{BytesCodec, FramedRead};
 

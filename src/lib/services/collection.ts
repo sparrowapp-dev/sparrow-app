@@ -63,6 +63,21 @@ const insertCollectionRequest = async (
   return response;
 };
 
+const updateCollectionRequest = async (
+  id: string,
+  apiRequest: CreateApiRequestPostBody,
+) => {
+  const response = await makeRequest(
+    "PUT",
+    `${apiUrl}/api/collection/request/${id}`,
+    {
+      body: apiRequest,
+      headers: getAuthHeaders(),
+    },
+  );
+  return response;
+};
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const insertCollection: (
   collection: CreateCollectionPostBody,
@@ -204,4 +219,5 @@ export {
   insertCollectionDirectory,
   insertCollectionRequest,
   insertCollection,
+  updateCollectionRequest,
 };

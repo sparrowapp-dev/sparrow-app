@@ -16,6 +16,7 @@ export interface Headers {
 export interface QueryParams {
   name: string;
   description: string;
+  checked: boolean;
 }
 
 export interface CreateApiRequestPostBody {
@@ -23,6 +24,7 @@ export interface CreateApiRequestPostBody {
   workspaceId: string;
   folderId?: string;
   items: {
+    id?: string;
     name: string;
     type: string;
     request?: {
@@ -33,6 +35,7 @@ export interface CreateApiRequestPostBody {
       queryParams?: QueryParams[];
     };
     items?: {
+      id?: string;
       name: string;
       type: string;
       request: {

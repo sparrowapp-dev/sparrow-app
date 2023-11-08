@@ -15,7 +15,6 @@ mod config;
 use serde_json::Value;
 use std::collections::HashMap;
 use reqwest::Client;
-use json::{JsonValue, JsonError};
 use json_handler::make_json_request;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use formdata_handler::make_formdata_request;
@@ -68,11 +67,11 @@ async fn make_request(
         "TEXT" => make_text_request(request_builder, body).await,
         _ => make_json_request(request_builder, body).await,
     };
-
-    // Extracting Response Value
     let response_value = match check {
         Ok(value) => value,
-        Err(err) => todo!("{}", err), 
+        Err(err) => {
+            return Err(err);
+        }, 
     };
 
     // Extracting Headers, StatusCode & Response
@@ -82,23 +81,22 @@ async fn make_request(
     let headers_json: serde_json::Value = headers.iter().map(|(name, value)| {
         (name.to_string(), value.to_str().unwrap())
     }).collect();
-    let response_json: serde_json::Value = serde_json::from_str(&response_text)?;
 
     // Combining all parameters
     let combined_json = json!({
         "headers": headers_json,
         "status": status.to_string(),
-        "response": response_json
+        "response": response_text
     });
     return Ok(combined_json);
 }
 
 #[tauri::command]
-fn make_type_request_command(url: &str, method: &str, headers: &str, body: &str, request: &str) -> Value {
+fn make_type_request_command(url: &str, method: &str, headers: &str, body: &str, request: &str) -> String {
     let result = make_request( url, method, headers, body, request);
     let result_value = match result {
-        Ok(value) => value,
-        Err(err) => todo!("{}", err), 
+        Ok(value) => value.to_string(),
+        Err(err) => return err.to_string(), 
     };
     return result_value;
 }
