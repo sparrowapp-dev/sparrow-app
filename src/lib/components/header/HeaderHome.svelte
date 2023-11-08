@@ -18,10 +18,14 @@
   import about from "$lib/assets/about.svg";
   import settings from "$lib/assets/settings.svg";
   import account from "$lib/assets/account.svg";
-    import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
-    import { fetchWorkspaces } from "$lib/services/workspace.service";
-    import { setCurrentWorkspace } from "$lib/store/workspace.store";
-    import { onDestroy } from "svelte";
+  import doubleResizeIcon from "$lib/assets/close-icon.svg";
+
+  import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
+  import { fetchWorkspaces } from "$lib/services/workspace.service";
+  import { setCurrentWorkspace } from "$lib/store/workspace.store";
+  import { onDestroy } from "svelte";
+
+  let minimiMaximizeWindow: boolean = false;
 
   const navigate = useNavigate();
   const onMinimize = () => {
@@ -34,6 +38,7 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
+    minimiMaximizeWindow = !minimiMaximizeWindow;
   };
 
   const logout = async () => {
@@ -65,20 +70,20 @@
     }
   };
 
-  const userUnsubscribe = user.subscribe((value)=>{
-    if(value){
+  const userUnsubscribe = user.subscribe((value) => {
+    if (value) {
       handleWorkspace(value._id);
     }
   });
 
   const handleDropdown = (id, tab) => {
     setCurrentWorkspace(id, tab);
-  }
+  };
   onDestroy(userUnsubscribe);
 </script>
 
 <div
-  class="d-flex w-100 py-1 ps-1 pe-0 align-items-center justify-content-between bg-blackColor"
+  class="d-flex w-100 ps-1 pe-2 align-items-center justify-content-between bg-blackColor pe-0"
   style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
@@ -86,8 +91,11 @@
     class="d-flex d-flex align-items-center justify-content-center"
     style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px; gap: 12px;"
   >
-    <div class="d-flex align-items-center justify-content-center gap-2">
-      <div>
+    <div
+      class="d-flex align-items-center justify-content-center gap-2"
+      data-tauri-drag-region
+    >
+      <div data-tauri-drag-region>
         <img src={circleIcon} alt="sparrowLogo" />
       </div>
       <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
@@ -101,32 +109,37 @@
   </div>
 
   <div
-    style="height:32px; width:480px "
-    class="inputField bg-backgroundColor ps-3 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+    style="height:32px; width:400px "
+    class="inputField bg-backgroundColor pe-2 d-flex align-items-center justify-content-center rounded"
   >
-    <img src={searchIcon} alt="" />
-    <input
-      type="search"
-      class="border-0 mb-0 focus-border-red w-100 h-100 fs-6 bg-backgroundColor"
-      placeholder="Search your workspaces, collections and endpoints"
-    />
+    <div class="ps-3">
+      <img src={searchIcon} alt="" />
+    </div>
+    <div class="w-100">
+      <input
+        type="search"
+        style="font-size: 12px;"
+        class="form-control border-0 bg-backgroundColor"
+        placeholder="Search your workspaces, collections and endpoints"
+      />
+    </div>
   </div>
 
-  <div class="d-flex align-items-center gap-2 justify-content-between">
-    <div class="row g-0">
+  <div class="d-flex align-items-center justify-content-center">
+    <div class="row gap-1">
       <div class="col-3">
-        <button class="btn btn-red">
+        <button class="bg-blackColor border-0">
           <img src={settingIcon} alt="" />
         </button>
       </div>
-      <div class="col-4">
-        <button class="btn btn-black">
+      <div class="col-3">
+        <button class="bg-blackColor border-0">
           <img src={notifyIcon} alt="" />
         </button>
       </div>
       <div class="col-3">
         <div class="position-relative">
-          <button class="btn btn-black" style="border:none; outline:none;">
+          <button class="bg-blackColor border-0">
             <img
               src={profileIcon}
               on:click={() => {
@@ -206,16 +219,24 @@
       </div>
     </div>
 
-    <div class="d-flex gap-0">
-      <button on:click={onMinimize} class="btn btn-black">
+    <div class="col-2">
+      <button on:click={onMinimize} class="button-minus border-0 py-1 px-2">
         <img src={minimizeIcon} alt="" />
       </button>
+    </div>
 
-      <button on:click={toggleSize} class="btn btn-black">
-        <img src={resizeIcon} alt="" />
+    <div class="col-2">
+      <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
+        {#if minimiMaximizeWindow === true}
+          <img src={resizeIcon} alt="" />
+        {:else}
+          <img src={doubleResizeIcon} alt="" />
+        {/if}
       </button>
+    </div>
 
-      <button on:click={onClose} class="btn btn-black">
+    <div class="col-2 pe-2">
+      <button on:click={onClose} class="button-close border-0 py-1 px-2">
         <img src={closeIcon} alt="" />
       </button>
     </div>
@@ -223,14 +244,20 @@
 </div>
 
 <style>
-  .inputField > input {
-    outline: none;
+  .button-minus,
+  .button-resize,
+  .button-close {
+    background-color: transparent;
+    border: none;
   }
 
-  .inputField > input:focus {
-    border-color: white;
+  .button-minus:hover,
+  .button-resize:hover {
+    background-color: rgba(66, 65, 65, 0.315);
+  }
 
-    outline: none;
+  .button-close:hover {
+    background-color: red;
   }
 
   .gradient-text {
