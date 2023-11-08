@@ -8,6 +8,7 @@
     currentTab,
     isHorizontalVertical,
     tabs,
+    updateQueryParams,
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
@@ -131,6 +132,36 @@
       }
     }
   };
+ 
+  const extractKeyValueFromUrl = (url : string) => {
+    let queryString : string = "";
+    let flag : boolean = false;
+
+    for (let i = 0; i < url.length; i++) {
+        if (flag) {
+            queryString += url[i];
+        }
+        if (url[i] === '?') {
+            flag = true;
+        }
+    }
+
+    if (queryString === "") {
+        return [{ name: "", description: "", checked: false }];
+    }
+
+    let paramsArray = queryString.split('&');
+    let params = paramsArray.map((param) => {
+        let keyValue = param.split("=");
+        if (keyValue.length === 1) {
+            return { name: keyValue[0], description: "", checked: true };
+        } else if (keyValue.length === 2) {
+            return { name: keyValue[0], description: keyValue[1], checked: true };
+        }
+    });
+
+    return [...params, { name: "", description: "", checked: false }];
+  }
 
   const handleDropdown = (tab: string) => {
     tabs.update((value) => {
@@ -160,6 +191,7 @@
   }
 
   let handleInputValue = () => {
+
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -170,6 +202,7 @@
       });
       return temp;
     });
+    updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
   };
 
   const fetchUrlData = (id, list) => {
