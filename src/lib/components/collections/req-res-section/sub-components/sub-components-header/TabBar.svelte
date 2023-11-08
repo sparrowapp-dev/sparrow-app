@@ -13,6 +13,8 @@
     import { RequestDefault, RequestType } from "$lib/utils/enums/request.enum";
     import { v4 as uuidv4 } from "uuid";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";
+    import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   let tabsStore : NewTab[] = [];
   let tabWidth : number = 196;
@@ -36,30 +38,6 @@
   let isCollaps: boolean;
   collapsibleState.subscribe((value) => (isCollaps = value));
 
-  const sideScroll = (element : any, direction : string, speed : number, distance : number, step: number) => {
-    let scrollAmount = 0;
-    var slideTimer = setInterval(function(){
-        if(direction == 'left'){
-            element.scrollLeft -= step;
-        } else {
-            element.scrollLeft += step;
-        }
-        scrollAmount += step;
-        if(scrollAmount >= distance){
-            window.clearInterval(slideTimer);
-        }
-    }, speed);
-  }
-
-  const moveNavigation = (direction : string) => {
-    const navigation = document.getElementById("tab-scroller");
-    if(direction === "left"){
-      sideScroll(navigation,'left',25,100,10);
-    }
-    else{
-      sideScroll(navigation,'right',25,100,10);
-    }
-  }
 
   let currentTabId : string = "";
   const currentTabUnsubscribe = currentTab.subscribe((value)=>{
@@ -131,8 +109,12 @@
         <img src={plusIcon} alt="" />
       </button>
     </div>
-  </div>
-  <PageHeader />  
+  </div>  
+{#if tabsStore.length>0}
+<PageHeader />  
+{:else} 
+<DefaultTabBar></DefaultTabBar>
+{/if}
 </div>
 
 <style>
