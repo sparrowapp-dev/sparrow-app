@@ -111,7 +111,7 @@
       }
     }
     if(temp === ""){
-      return [{name : "", description: " ", checked : false}]
+      return [{name : "", description: "", checked : false}]
     }
     let paramArray = temp.split('&');
     let param = paramArray.map((elem)=>{
@@ -123,7 +123,7 @@
           return {name : keyValue[0], description: keyValue[1], checked : true}
         }
     });
-    return [...param, {name : "", description: " ", checked : false}]  ;
+    return [...param, {name : "", description: "", checked : false}]  ;
   }
 
   const handleDropdown = (tab: string) => {

@@ -15,6 +15,7 @@
   function onSortableActivate() {
     disableBodyScroll(document.body);
   }
+  let count = 0;
 
   function onSortStart() {}
 
@@ -30,7 +31,21 @@
 
   function onSortableReceive() {}
 
-  function onSortableUpdate() {}
+  let ListView
+  function onSortableUpdate() {
+    let newListElements = []
+      let ItemViewList = ListView.children
+      for (let i = 0, l = ItemViewList.length; i < l; i++) {
+        let ListKey = ItemViewList[i].dataset.listKey
+        if (ListKey != null) { newListElements.push(JSON.parse(ListKey) ) }
+      }
+    
+    params=newListElements;
+    updateURL(extractQueryParamstoURL(params), currentTabId); 
+    updateQueryParams(params, currentTabId);
+  }
+
+  
 
   function onSortableOut() {}
 
@@ -41,7 +56,7 @@
   function onSortableDestroy() {}
 
   let isHovered: boolean = false;
-  let rows = [{ key: "", value: "" }];
+
 
   function toggleHover() {
     isHovered = !isHovered;
@@ -50,6 +65,12 @@
   let currentTabId = null;
   let tabList = [];
   let params : QueryParams[] = []; 
+
+  // $ : {
+  //   if(params.length){
+  //     count++;
+  //   }
+  // }   
   let url : string = "";
   const fetchComponentData = (id, list) => {
     list.forEach((elem) => {
@@ -67,6 +88,7 @@
   });
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
+    console.log("tabList",tabList);
     if (currentTabId && tabList) {
       fetchComponentData(currentTabId, tabList);
     }
@@ -145,7 +167,7 @@
     tabsUnsubscribe();
   });
 </script>
-
+<!-- {#key count} -->
 <div class="d-flex flex-column mt-3 me-0 w-100">
   <div
     class="d-flex text-requestBodyColor align-items-center justify-content-between"
@@ -156,14 +178,16 @@
     <p class="ps-5 ms-4">Key</p>
     <p style="margin-left: 130px;">Value</p>
   </div>
-
+  {#key count}
   <div
-    class="w-100 sortable"
+    class="w-100 sortable > div"
     use:sortable={{
       cursor: "grabbing",
     }}
-    style="margin-bottom: 1px;
+    style="display:block; position:relative;
+    width:200px; margin:20px;
     "
+    bind:this={ListView}
     on:sortable:init={onSortableInit}
     on:sortable:destroy={onSortableActivate}
     on:sortable:activate={onSortableActivate}
@@ -178,84 +202,98 @@
     on:sortable:remove={onSortableRemove}
     on:sortable:receive={onSortableReceive}
   >
-    {#each params as param, index}
+  {#each params as param  , index}
+  <div
+    aria-label="Toggle Hover"
+    class="sortable > div"
+    style="cursor:default; width: {isHorizontalVerticalMode ? '100%' : '100%'};"
+    data-list-key={JSON.stringify({name : param.name, description : param.description, checked : param.checked})}
+  >
+    <div
+      on:mouseenter={toggleHover}
+      on:mouseleave={toggleHover}
+      style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width: {isHorizontalVerticalMode
+        ? '100%'
+        : '100%'};"
+    >
       <div
-        role="button"
-        aria-label="Toggle Hover"
-        class="sortable > div"
-        style="width: {isHorizontalVerticalMode ? '100%' : '100%'};"
+        class="d-flex {isHorizontalVerticalMode
+          ? 'w-100'
+          : 'w-100'} align-items-center justify-content-center gap-3 mb-2"
       >
-        <div
-          on:mouseenter={toggleHover}
-          on:mouseleave={toggleHover}
-          style="padding-top: 1px;cursor: grab;background-color:backgroundColor;display: flex;flex-direction: column;width: {isHorizontalVerticalMode
-            ? '100%'
-            : '100%'};"
-        >
-          <div
-            class="d-flex {isHorizontalVerticalMode
-              ? 'w-100'
-              : 'w-100'} align-items-center justify-content-center gap-3 mb-2"
-          >
-            <img src={dragIcon} alt="" style="cursor:grabbing;" />
-            <div>
-              <input
-                class="form-check-input"
-                type="checkbox"
-                on:mouseenter={toggleHover}
-                on:mouseleave={toggleHover}
-                bind:checked={param.checked}
-                on:input={()=>{
-                  updateCheck(index)
-                }}
-              />
-            </div>
-
-            <div class="flex-grow-1 w-100">
-              <input
-                on:mouseenter={toggleHover}
-                on:mouseleave={toggleHover}
-                type="text"
-                placeholder="Enter Key"
-                class="form-control bg-blackColor py-1 border-0"
-                style="font-size: 13px;"
-                bind:value={param.name}
-
-                on:input={()=>{
-                  updateParam(index)
-                }}
-              
-                />
-            </div>
-            <div class="flex-grow-1 w-100">
-              <input
-                on:mouseenter={toggleHover}
-                on:mouseleave={toggleHover}
-                type="text"
-                placeholder="Enter Value"
-                class="form-control bg-blackColor py-1 border-0"
-                style="font-size: 13px;"
-                bind:value={param.description}
-                on:input={
-                ()=>{
-
-                  updateParam(index)}
-                }
-              />
-            </div>
-            <div class="w-75 h-75 pe-1">
-              <button class="bg-backgroundColor border-0">
-                <img src={trashIcon} on:click={()=>{
-                  deleteParam(index)
-                }} alt="" />
-              </button>
-            </div>
-          </div>
+        <img src={dragIcon} alt="" on:click={()=>{
+          count++;
+        }}
+        style="cursor:grabbing;" />
+        <div>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            on:mouseenter={toggleHover}
+            on:mouseleave={toggleHover}
+            bind:checked={param.checked}
+            on:input={()=>{
+              updateCheck(index)
+            }}
+          />
         </div>
+
+        <div class="flex-grow-1 w-100">
+          <input
+            on:mouseenter={toggleHover}
+            on:mouseleave={toggleHover}
+            type="text"
+            placeholder="Enter Key"
+            class="form-control bg-blackColor py-1 border-0"
+            style="font-size: 13px;"
+            bind:value={param.name}
+
+            on:input={()=>{
+              updateParam(index)
+            }}
+          
+            />
+        </div>
+        <div class="flex-grow-1 w-100">
+          <input
+            on:mouseenter={toggleHover}
+            on:mouseleave={toggleHover}
+            type="text"
+            placeholder="Enter Value"
+            class="form-control bg-blackColor py-1 border-0"
+            style="font-size: 13px;"
+            bind:value={param.description}
+            on:input={
+            ()=>{
+
+              updateParam(index)}
+            }
+          />
+        </div>
+        {#if params.length - 1 != index}
+        <div class="w-75 h-75 pe-1">
+          <button class="bg-backgroundColor border-0">
+            <img src={trashIcon} on:click={()=>{
+              deleteParam(index)
+            }} alt="" />
+          </button>
+        </div>
+        {:else}
+        <div class="w-75 h-75 pe-1">
+          <button class="bg-backgroundColor border-0">
+            <img src="" alt="" />
+          </button>
+        </div>
+        {/if}
       </div>
+    </div>
+  </div>
     {/each}
   </div>
+  {/key}
 </div>
+
+<!-- {/key} -->
 
 <style>
   .sortable > div {
@@ -267,4 +305,5 @@
     -ms-user-select: none;
     user-select: none;
   }
+  div:global(.ui-sortable-placeholder) { height:30px }
 </style>
