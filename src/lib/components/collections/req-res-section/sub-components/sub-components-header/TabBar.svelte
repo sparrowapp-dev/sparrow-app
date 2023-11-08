@@ -97,7 +97,11 @@
             body: "",
             url: "",
             headers: [],
-            queryParams:[] 
+            queryParams:[{
+              name: "",
+              description: "",
+              checked: false}
+            ] 
           },
           save: false,
           requestInProgress: false,
