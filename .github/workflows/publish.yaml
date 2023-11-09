@@ -38,12 +38,12 @@ jobs:
           yarn tauri build
 
       - name: Install App Center CLI
-          run:|
-            npm install -g appcenter-cli
+        run: |
+          npm install -g appcenter-cli
         
       - name: Upload to App Center
-          run:|
-            appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a <Your-App-Name>
+        run: |
+          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrowtest
         env:
           APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
 
