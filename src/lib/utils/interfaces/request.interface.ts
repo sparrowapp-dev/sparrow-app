@@ -29,6 +29,13 @@ export interface KeyValuePair {
   checked: boolean;
 }
 
+export interface KeyValuePairWithBase {
+  key: string;
+  value: string;
+  checked: boolean;
+  base: string | ArrayBuffer;
+}
+
 export interface FormData {
   key: string;
   value: string;
@@ -46,7 +53,7 @@ export interface NewTab {
       urlencoded?: KeyValuePair[];
       formdata?: {
         text: KeyValuePair[];
-        file: KeyValuePair[];
+        file: KeyValuePairWithBase[];
       };
     };
     url?: string;

@@ -34,6 +34,7 @@ const createSampleRequest = (id: string) => {
               key: "",
               value: "",
               checked: false,
+              base: "",
             },
           ],
         },

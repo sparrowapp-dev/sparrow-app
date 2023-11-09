@@ -7,7 +7,7 @@
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from 'petrel';
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
-    import type { NewTab, KeyValuePair } from "$lib/utils/interfaces/request.interface";
+    import type { NewTab, KeyValuePair, KeyValuePairWithBase } from "$lib/utils/interfaces/request.interface";
     import KeyValue from "$lib/components/key-value/KeyValue.svelte";
     import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
   let bodyData : string = "";
@@ -18,7 +18,7 @@
   let rawValue : string = "";
   let urlEncoded : KeyValuePair[] = [];
   let formDataText : KeyValuePair[] = [];
-  let formDataFile : KeyValuePair[] = [];
+  let formDataFile : KeyValuePairWithBase[] = [];
   let content = {
     text: "",
     json: undefined,
