@@ -52,7 +52,7 @@ jobs:
       #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
        
       - name: Upload to App Center
-        uses: microsoft/appcenter-action@v2
+        uses: wzieba/AppCenter-Github-Action@v1
         with:
           appName: wzieba/Sample-App
           token: ${{secrets.APPCENTER_API_TOKEN}}
