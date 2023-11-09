@@ -7,15 +7,19 @@
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
 
-  import { collapsibleState } from "$lib/store/request-response-section"; 
+  import { collapsibleState } from "$lib/store/request-response-section";
 
   import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import { collectionList, setCollectionList, useCollectionTree } from "$lib/store/collection";
+  import {
+    collectionList,
+    setCollectionList,
+    useCollectionTree,
+  } from "$lib/store/collection";
   import { useTree } from "./collectionList";
   import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const {insertHead, updateHeadId} = useCollectionTree();
-  const [,, searchNode] = useTree();
+  const { insertHead, updateHeadId } = useCollectionTree();
+  const [, , searchNode] = useTree();
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
@@ -66,14 +70,19 @@
       name: getNextCollection(collection, "New collection"),
       workspaceId: currentWorkspaceId,
     };
-    const currentDummyId : string = uuidv4() + "MYUID45345";
-    insertHead(JSON.parse(JSON.stringify(collection)), newCollection.name, currentDummyId);
+    const currentDummyId: string = uuidv4() + "MYUID45345";
+    insertHead(
+      JSON.parse(JSON.stringify(collection)),
+      newCollection.name,
+      currentDummyId,
+    );
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
       updateHeadId(
-        JSON.parse(JSON.stringify(collection)), 
+        JSON.parse(JSON.stringify(collection)),
         currentDummyId,
-         res.data.data.insertedId);
+        res.data.data.insertedId,
+      );
     }
   };
 
@@ -110,6 +119,26 @@
   onDestroy(collectionListUnsubscribe);
   onDestroy(currentWorkspaceUnsubscribe);
   onDestroy(collapsibleStateUnsubscribe);
+
+  const handleResize = () => {
+    const windowWidth = window.innerWidth;
+
+    if (windowWidth <= 800) {
+      // Programmatically trigger a click on the button
+      document.querySelector("#doubleAngleButton").click();
+      collapsibleState.set(true);
+    } else {
+      collapsibleState.set(false);
+    }
+  };
+
+  // Add a window resize event listener
+  window.addEventListener("resize", handleResize);
+
+  onDestroy(() => {
+    // Remove the window resize event listener when the component is destroyed
+    window.removeEventListener("resize", handleResize);
+  });
 </script>
 
 {#if collapsExpandToggle}
@@ -148,6 +177,7 @@
     <button
       class="bg-backgroundColor border-0"
       on:click={setcollapsExpandToggle}
+      id="doubleAngleButton"
     >
       <img src={doubleangleLeft} alt="" />
     </button>
@@ -234,7 +264,7 @@
       {:else}
         {#each collection as col}
           <Folder
-            collectionList = {collection}
+            collectionList={collection}
             collectionId={col._id}
             {currentWorkspaceId}
             collection={col}

@@ -16,16 +16,21 @@
   import HomePage from "./pages/Home/home-page/HomePage.svelte";
 
   export let url = "/";
+
+  // function handleContextMenu(event) {
+  //   event.preventDefault();
+  // on:contextmenu={handleContextMenu}
+  // }
 </script>
 
 <Router {url}>
   <Authguard>
-    <section slot="loggedIn">
+    <section slot="loggedIn" >
       <Route path="/home" component={HomePage} />
       <Route path="/dashboard/*" component={Dashboard} />
       <Route path="/*"><Navigate to="/dashboard" /></Route>
     </section>
-    <section slot="unauthorized">
+    <section slot="unauthorized" >
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot/password" component={ForgotPassword} />

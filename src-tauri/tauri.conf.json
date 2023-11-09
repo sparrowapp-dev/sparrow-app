@@ -17,6 +17,7 @@
         "all": false,
         "close": true,
         "hide": true,
+
         "show": true,
         "maximize": true,
         "minimize": true,
@@ -45,9 +46,11 @@
         "decorations": false,
         "fullscreen": false,
         "resizable": true,
-        "title": "sparrow",
-        "width": 488,
+        "title": "sparrow-app",
+        "width": 600,
         "height": 850,
+        "minWidth": 600,
+        "minHeight": 400,
         "center": true
       }
     ]
