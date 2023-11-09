@@ -3,27 +3,13 @@
      import collections from "$lib/assets/collections.svg";
      import apiRequest  from "$lib/assets/apiRequest.svg";
      import { v4 as uuidv4 } from "uuid";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { handleTabAddons } from "$lib/store/request-response-section";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import { createSampleRequest } from "$lib/utils/sample/request.sample";
   const addApiRequest=()=>{
-  let newTab = {
-          id: uuidv4(),
-          name: RequestDefault.NAME,
-          type: ItemType.REQUEST,
-          request : {
-            method: RequestDefault.METHOD,
-            body: "",
-            url: "",
-            headers: [],
-            queryParams:[] 
-          },
-          save: false,
-          requestInProgress: false,
-          path:null
-        }
-        handleTabAddons(newTab);
+        handleTabAddons(
+          createSampleRequest(
+            uuidv4()));
         moveNavigation('right');
 }
 </script>

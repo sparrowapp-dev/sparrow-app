@@ -2813,6 +2813,11 @@ periscopic@^3.1.0:
     estree-walker "^3.0.0"
     is-reference "^3.0.0"
 
+petrel@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/petrel/-/petrel-1.0.7.tgz#fa585efc2520ec7d639f0ef081d1862fa0534c0d"
+  integrity sha512-dRVgv9zuwcHa3K9db0w64ouZ3QiqPBMjxJpKHY/ohnjnzuJWLzogS7mlI6EZDuoB+hI2uBV617e2Z0brmUdYng==
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/picocolors/-/picocolors-1.0.0.tgz"

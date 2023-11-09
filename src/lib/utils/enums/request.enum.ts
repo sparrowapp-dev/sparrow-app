@@ -18,5 +18,14 @@ export enum RequestDefault {
 export enum RequestType {
   JSON = "JSON",
   XML = "XML",
-  RAW = "RAW",
+  HTML = "HTML",
+  Text = "Text",
+  JavaScript = "JavaScript",
+}
+
+export enum RequestDataset {
+  FORMDATA = "Form Data",
+  URLENCODED = "URL Encoded",
+  RAW = "Raw",
+  NONE = "None",
 }

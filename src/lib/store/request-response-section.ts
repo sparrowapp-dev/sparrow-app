@@ -100,3 +100,39 @@ export const updateURL = (url, id) => {
     return [...updatedTab];
   });
 };
+
+export const handleRequestTypeTabChange = (tab, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.additions.raw = tab;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestDatasetTabChange = (tab, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.additions.dataset = tab;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRawDataChange = (raw: string, id: string) => {
+  tabs.update((value) => {
+    const temp = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.raw = raw;
+      }
+      return elem;
+    });
+    return temp;
+  });
+};

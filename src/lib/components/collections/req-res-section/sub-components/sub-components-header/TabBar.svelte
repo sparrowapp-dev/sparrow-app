@@ -15,6 +15,7 @@
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import { createSampleRequest } from "$lib/utils/sample/request.sample";
 
   let tabsStore : NewTab[] = [];
   let tabWidth : number = 196;
@@ -88,26 +89,9 @@
     {/if}
     <div class="d-inline-block" style="height:35px; width:35px;">
       <button class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100" on:click={()=>{
-        let newTab = {
-          id: uuidv4(),
-          name: RequestDefault.NAME,
-          type: ItemType.REQUEST,
-          request : {
-            method: RequestDefault.METHOD,
-            body: "",
-            url: "",
-            headers: [],
-            queryParams:[{
-              name: "",
-              description: "",
-              checked: false}
-            ] 
-          },
-          save: false,
-          requestInProgress: false,
-          path:null
-        }
-        handleTabAddons(newTab);
+        handleTabAddons(
+          createSampleRequest(
+            uuidv4()));
         moveNavigation('right');
       } }>
         <img src={plusIcon} alt="" />
