@@ -23,12 +23,20 @@ jobs:
       - name: Install App Center CLI
         run: |
           npm install -g appcenter-cli
+
+      - name: Install Yarn
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y curl
+          curl -o- -L https://yarnpkg.com/install.sh | bash
+          export PATH=$HOME/.yarn/bin:$PATH
+
           
       - name: Install dependencies
         run: |
-          npm install --legacy-peer-deps
-          npm build
-          npm tauri build
+          yarn install
+          yarn build
+          yarn tauri build
           
       #- name: Archive the MSI Folder
         #run: |
