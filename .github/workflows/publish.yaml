@@ -35,20 +35,28 @@ jobs:
           # Archive the MSI folder (replace the path with the correct one)
           tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
 
-      - name: Deploy to App Center
-        run: |
-          # Upload the archive to App Center (replace with your App Center app name)
-          appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow 
-          appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
+      # - name: Deploy to App Center
+      #   run: |
+      #     # Upload the archive to App Center (replace with your App Center app name)
+      #     appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow 
+      #     appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
 
-        env:
-          APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
-          
-      # - name: Upload to App Center
-      #   uses: andymckay/action-appcenter-upload@v3
-      #   with:
-      #     app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
-      #     owner_name: anjali.malviya-techdome.net.in
-      #     app_name: Sparrow-1
-      #     group: Collaborators
-      #     file: app.tar.gz
+      #   env:
+      #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+       
+      - name: Upload to App Center
+        uses: wzieba/AppCenter-Github-Action@v1
+        with:
+          appName: wzieba/Sample-App
+          token: ${{secrets.APPCENTER_API_TOKEN}}
+          group: Collaborators
+          file: D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
+          notifyTesters: true
+          debug: false
+        # uses: andymckay/action-appcenter-upload@v3
+        # with:
+        #   app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
+        #   owner_name: anjali.malviya-techdome.net.in
+        #   app_name: Sparrow-1
+        #   group: Collaborators
+        #   file: app.tar.gz
