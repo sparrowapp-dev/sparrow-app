@@ -26,7 +26,7 @@ jobs:
           
       - name: Install dependencies
         run: |
-          npm install
+          npm install --force
           npm build
           npm tauri build
           
