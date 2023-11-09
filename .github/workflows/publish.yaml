@@ -6,7 +6,6 @@ on:
       - development
 env: 
   VITE_API_URL: ${{secrets.VITE_API_URL}}
-  IMPORT_PATH: './src/pages/Dashboard/Dashboard.svelte'
 
 jobs:
   deploy:
@@ -31,9 +30,6 @@ jobs:
           sudo apt-get install -y curl
           curl -o- -L https://yarnpkg.com/install.sh | bash
           export PATH=$HOME/.yarn/bin:$PATH
-          
-      - name: Replace Import Path
-        run: sed -i "s|import Dashboard from '.*'|import Dashboard from '${{ env.IMPORT_PATH }}'|g" ./src/App.svelte
           
       - name: Install dependencies
         run: |
