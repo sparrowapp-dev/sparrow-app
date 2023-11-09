@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Dashboard from './src/pages/Dashboard/Dashboard.svelte';
 
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
