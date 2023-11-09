@@ -14,7 +14,13 @@ const createSampleRequest = (id: string) => {
       method: RequestDefault.METHOD,
       body: {
         raw: "",
-        urlencoded: [],
+        urlencoded: [
+          {
+            key: "",
+            value: "",
+            checked: false,
+          },
+        ],
         formdata: [],
       },
       url: "",
