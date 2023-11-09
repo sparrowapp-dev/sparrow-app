@@ -91,11 +91,8 @@
     class="d-flex d-flex align-items-center justify-content-center"
     style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px; gap: 12px;"
   >
-    <div
-      class="d-flex align-items-center justify-content-center gap-2"
-      data-tauri-drag-region
-    >
-      <div data-tauri-drag-region>
+    <div class="d-flex align-items-center justify-content-center gap-2">
+      <div>
         <img src={circleIcon} alt="sparrowLogo" />
       </div>
       <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
@@ -229,7 +226,8 @@
       <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
         {#if minimiMaximizeWindow === true}
           <img src={resizeIcon} alt="" />
-        {:else}
+        {/if}
+        {#if minimiMaximizeWindow === false}
           <img src={doubleResizeIcon} alt="" />
         {/if}
       </button>
