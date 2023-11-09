@@ -124,3 +124,15 @@ export const handleRequestDatasetTabChange = (tab, id) => {
     return [...updatedTab];
   });
 };
+
+export const handleRawDataChange = (raw: string, id: string) => {
+  tabs.update((value) => {
+    const temp = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.raw = raw;
+      }
+      return elem;
+    });
+    return temp;
+  });
+};

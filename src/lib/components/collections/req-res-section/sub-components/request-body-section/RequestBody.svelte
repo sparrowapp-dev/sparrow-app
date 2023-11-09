@@ -1,19 +1,20 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import { apiRequest, currentTab, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
+  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
     import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from 'petrel';
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
-  let bodyData = "";
-  let currentTabId = null;
+  let bodyData : string = "";
+  let currentTabId : string | null = null;
   let mainTab : string;
   let rawTab : string;
-  let tabList = []
-  let rawValue = "";
+  let tabList : NewTab[] = []
+  let rawValue : string = "";
 
   let content = {
     text: "",
@@ -23,7 +24,8 @@
   const fetchBodyData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
-          bodyData = elem.request.body;
+          bodyData = elem.request.body.raw;
+          rawValue = elem.request.body.raw;
           content = {
             text: bodyData,
             json: undefined
@@ -33,7 +35,6 @@
           rawTab = raw;
         }
       });
-      console.log(mainTab, rawTab);
   }
 
   const tabsUnsubscribe = tabs.subscribe((value)=>{
@@ -63,7 +64,6 @@
     rawTab = tab;
     handleRequestTypeTabChange(rawTab, currentTabId)
   }
-  
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
@@ -73,9 +73,6 @@
         let temp = value.map((elem)=>{
           if(elem.id === currentTabId){
             elem.request.body.raw = updatedContent.text;
-            if(updatedContent.text !== ""){
-              elem.save = false; 
-            }
           } 
           return elem;
         });
@@ -83,27 +80,14 @@
     });
   };
 
-  const handleRawChange = (item: string) => { 
-    console.log(item);
-    tabs.update(value => { 
-      let temp = value.map((elem) => { 
-        if(elem.id === currentTabId) { 
-          elem.request.body.raw = item;
-          if(item !== "") { 
-            elem.save = false;
-          }
-        }
-        return elem;
-      })
-      return temp;
-    })
+  const handleRawChange = () => {
+    handleRawDataChange(rawValue, currentTabId); 
   }
 
-  onMount(()=>{
-    const codeEditor = new CodeEditor(document.getElementById("code-editor"))
-    codeEditor.create();
-
-  });
+  // onMount(()=>{
+  //   const codeEditor = new CodeEditor(document.getElementById("code-editor"))
+  //   codeEditor.create();
+  // });
 
   onDestroy(()=>{
     currentTabUnsubscribe();
@@ -126,21 +110,22 @@
     {/if}
     
   </div>
+  {#if mainTab === RequestDataset.RAW && rawTab === RequestType.JSON}
   <div
     style="height:{isHorizontalVerticalMode ? '200px' : '400px'}"
     class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-0"
   > 
-  {#if mainTab === RequestDataset.RAW && rawTab === RequestType.JSON}
-  <JSONEditor
+    <JSONEditor
     bind:content
     onChange={handleChange}
     mainMenuBar={false}
     navigationBar={false}
     mode={Mode.text}
-  />
-  {:else if mainTab === RequestDataset.RAW && (rawTab === RequestType.HTML || rawTab === RequestType.XML)}
-  <div id="code-editor" style="min-height: 600px; width: 100%">
-    <textarea style="color: aliceblue; min-height: 400px; width: 100%; background-color: #000000" on:input= {handleRawChange} bind:value={rawValue}></textarea>
+    />
+  </div>
+  {:else if mainTab === RequestDataset.RAW && (rawTab === RequestType.HTML || rawTab === RequestType.XML || RequestType.JavaScript || RequestType.Text)}
+  <div id="code-editor"  style="width: 100%">
+    <textarea rows="8" style="color: aliceblue; width: 100%; background-color: #000000" class="outline-0"  bind:value={rawValue} on:input={handleRawChange}></textarea>
   </div>
   {:else if mainTab === RequestDataset.NONE}
   <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
@@ -148,7 +133,6 @@
   </p>
   {/if}
     
-  </div>
 </div>
 
 <style>
