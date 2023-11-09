@@ -148,3 +148,27 @@ export const updateUrlEncode = (urlencode, id: string) => {
     return [...updatedTab];
   });
 };
+
+export const updateFormDataText = (formdatatext, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.formdata.text = formdatatext;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const updateFormDataFile = (formdatafile, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.formdata.file = formdatafile;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};

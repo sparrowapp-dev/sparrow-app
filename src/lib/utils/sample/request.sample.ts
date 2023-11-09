@@ -21,7 +21,23 @@ const createSampleRequest = (id: string) => {
             checked: false,
           },
         ],
-        formdata: [],
+        formdata: {
+          text: [
+            {
+              key: "",
+              value: "",
+              checked: false,
+            },
+          ],
+          file: [
+            {
+              key: "",
+              value: "",
+              checked: false,
+              base: "",
+            },
+          ],
+        },
       },
       url: "",
       headers: [],
