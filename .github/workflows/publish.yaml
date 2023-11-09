@@ -9,7 +9,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -24,12 +24,12 @@ jobs:
         run: |
           npm install -g appcenter-cli
 
-      - name: Install Yarn
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y curl
-          curl -o- -L https://yarnpkg.com/install.sh | bash
-          export PATH=$HOME/.yarn/bin:$PATH
+      # - name: Install Yarn
+      #   run: |
+      #     sudo apt-get update -q
+      #     sudo apt-get install -y curl
+      #     curl -o- -L https://yarnpkg.com/install.sh | bash
+      #     export PATH=$HOME/.yarn/bin:$PATH
           
       - name: Install dependencies
         run: |
@@ -52,7 +52,7 @@ jobs:
       #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
        
       - name: Upload to App Center
-        uses: wzieba/AppCenter-Github-Action@v1
+        uses: microsoft/appcenter-action@v2
         with:
           appName: wzieba/Sample-App
           token: ${{secrets.APPCENTER_API_TOKEN}}
