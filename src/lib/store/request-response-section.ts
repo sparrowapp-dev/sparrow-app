@@ -136,3 +136,15 @@ export const handleRawDataChange = (raw: string, id: string) => {
     return temp;
   });
 };
+
+export const updateUrlEncode = (urlencode, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.urlencoded = urlencode;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};

@@ -1,21 +1,21 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
+  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs, updateUrlEncode } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
     import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from 'petrel';
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-
+    import type { NewTab, KeyValuePair } from "$lib/utils/interfaces/request.interface";
+    import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   let bodyData : string = "";
   let currentTabId : string | null = null;
   let mainTab : string;
   let rawTab : string;
   let tabList : NewTab[] = []
   let rawValue : string = "";
-
+  let urlEncoded : KeyValuePair[] = [];
   let content = {
     text: "",
     json: undefined,
@@ -26,6 +26,7 @@
         if(elem.id === id){
           bodyData = elem.request.body.raw;
           rawValue = elem.request.body.raw;
+          urlEncoded = elem.request.body.urlencoded;
           content = {
             text: bodyData,
             json: undefined
@@ -39,6 +40,7 @@
 
   const tabsUnsubscribe = tabs.subscribe((value)=>{
     tabList = value;
+    console.log("tabs",tabList);
     if(currentTabId && tabList){
       fetchBodyData(currentTabId, tabList);
     }
@@ -52,8 +54,6 @@
       }
     }
   });
-
-
 
   let handleDropdown = (tab: string) => {
     mainTab = tab;
@@ -88,6 +88,9 @@
   //   const codeEditor = new CodeEditor(document.getElementById("code-editor"))
   //   codeEditor.create();
   // });
+  const handleUrlEncodeChange = (pairs) => {
+    updateUrlEncode(pairs, currentTabId);
+  }
 
   onDestroy(()=>{
     currentTabUnsubscribe();
@@ -131,6 +134,8 @@
   <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
     No Data type is selected. Check your API provider’s documentation to see if you need to send body.
   </p>
+  {:else if mainTab === RequestDataset.URLENCODED}
+    <KeyValue keyValue = {urlEncoded} callback={handleUrlEncodeChange}/>
   {/if}
     
 </div>

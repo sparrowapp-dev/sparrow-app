@@ -23,7 +23,7 @@ export interface RequestBody {
   queryParams?: QueryParams[];
 }
 
-export interface UrlEncoded {
+export interface KeyValuePair {
   key: string;
   value: string;
   checked: boolean;
@@ -43,7 +43,7 @@ export interface NewTab {
     method: string;
     body?: {
       raw?: string;
-      urlencoded?: UrlEncoded[];
+      urlencoded?: KeyValuePair[];
       formdata?: FormData[];
     };
     url?: string;
