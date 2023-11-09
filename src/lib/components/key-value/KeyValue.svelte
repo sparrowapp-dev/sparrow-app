@@ -2,11 +2,11 @@
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import { onDestroy } from "svelte";
-  import type { UrlEncoded } from "$lib/utils/interfaces/request.interface";
-  export let keyValue: UrlEncoded[];
+  import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  export let keyValue: KeyValuePair[];
   export let callback;
 
-  let pairs: UrlEncoded[] = keyValue;
+  let pairs: KeyValuePair[] = keyValue;
 
   $: {
     if (keyValue) {

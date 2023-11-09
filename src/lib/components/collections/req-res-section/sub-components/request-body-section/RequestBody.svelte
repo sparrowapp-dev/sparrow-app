@@ -7,16 +7,15 @@
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from 'petrel';
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
-    import type { NewTab, UrlEncoded } from "$lib/utils/interfaces/request.interface";
+    import type { NewTab, KeyValuePair } from "$lib/utils/interfaces/request.interface";
     import KeyValue from "$lib/components/key-value/KeyValue.svelte";
-
   let bodyData : string = "";
   let currentTabId : string | null = null;
   let mainTab : string;
   let rawTab : string;
   let tabList : NewTab[] = []
   let rawValue : string = "";
-  let urlEncoded : UrlEncoded[] = [];
+  let urlEncoded : KeyValuePair[] = [];
   let content = {
     text: "",
     json: undefined,
