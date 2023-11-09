@@ -24,8 +24,8 @@ export enum RequestType {
 }
 
 export enum RequestDataset {
-  FORMDATA = "FORMDATA",
-  URLENCODED = "URLENCODED",
-  RAW = "RAW",
-  NONE = "NONE",
+  FORMDATA = "Form Data",
+  URLENCODED = "URL Encoded",
+  RAW = "Raw",
+  NONE = "None",
 }

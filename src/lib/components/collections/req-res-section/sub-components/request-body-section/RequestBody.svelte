@@ -3,7 +3,7 @@
   import { bodyText, requestType } from "$lib/store/api-request";
   import { apiRequest, currentTab, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from 'petrel';
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
@@ -84,6 +84,7 @@
   };
 
   const handleRawChange = (item: string) => { 
+    console.log(item);
     tabs.update(value => { 
       let temp = value.map((elem) => { 
         if(elem.id === currentTabId) { 
@@ -98,8 +99,12 @@
     })
   }
 
-  const codeEditor = new CodeEditor(document.getElementById("code-editor"))
+  onMount(()=>{
+    const codeEditor = new CodeEditor(document.getElementById("code-editor"))
     codeEditor.create();
+
+  });
+
   onDestroy(()=>{
     currentTabUnsubscribe();
     tabsUnsubscribe();
