@@ -9,7 +9,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -30,10 +30,10 @@ jobs:
           yarn build
           yarn tauri build
           
-      - name: Archive the MSI Folder
-        run: |
+      #- name: Archive the MSI Folder
+        #run: |
           # Archive the MSI folder (replace the path with the correct one)
-          tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
+          #tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
 
       # - name: Deploy to App Center
       #   run: |
@@ -50,7 +50,7 @@ jobs:
           appName: wzieba/Sample-App
           token: ${{secrets.APPCENTER_API_TOKEN}}
           group: Collaborators
-          file: D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
+          file: ./sparrow-app/src-tauri/target/release/bundle/msi .
           notifyTesters: true
           debug: false
         # uses: andymckay/action-appcenter-upload@v3
