@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs, updateUrlEncode } from "$lib/store/request-response-section";
+  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs, updateFormDataFile, updateFormDataText, updateUrlEncode } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
     import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
@@ -9,6 +9,7 @@
     import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
     import type { NewTab, KeyValuePair } from "$lib/utils/interfaces/request.interface";
     import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+    import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
   let bodyData : string = "";
   let currentTabId : string | null = null;
   let mainTab : string;
@@ -16,6 +17,8 @@
   let tabList : NewTab[] = []
   let rawValue : string = "";
   let urlEncoded : KeyValuePair[] = [];
+  let formDataText : KeyValuePair[] = [];
+  let formDataFile : KeyValuePair[] = [];
   let content = {
     text: "",
     json: undefined,
@@ -27,6 +30,8 @@
           bodyData = elem.request.body.raw;
           rawValue = elem.request.body.raw;
           urlEncoded = elem.request.body.urlencoded;
+          formDataText = elem.request.body.formdata.text;
+          formDataFile = elem.request.body.formdata.file;
           content = {
             text: bodyData,
             json: undefined
@@ -91,6 +96,13 @@
   const handleUrlEncodeChange = (pairs) => {
     updateUrlEncode(pairs, currentTabId);
   }
+  const handleFormDataTextChange = (pairs) => {
+    updateFormDataText(pairs, currentTabId);
+  }
+
+  const handleFormDataFileChange = (pairs) => {
+    updateFormDataFile(pairs, currentTabId);
+  }
 
   onDestroy(()=>{
     currentTabUnsubscribe();
@@ -136,6 +148,11 @@
   </p>
   {:else if mainTab === RequestDataset.URLENCODED}
     <KeyValue keyValue = {urlEncoded} callback={handleUrlEncodeChange}/>
+  {:else if mainTab === RequestDataset.FORMDATA}
+    <p>Text</p>
+    <KeyValue keyValue = {formDataText} callback={handleFormDataTextChange}/>
+    <p>File</p>
+    <KeyValueFile keyValue = {formDataFile} callback={handleFormDataFileChange}/>
   {/if}
     
 </div>

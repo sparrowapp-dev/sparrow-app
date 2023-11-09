@@ -44,7 +44,10 @@ export interface NewTab {
     body?: {
       raw?: string;
       urlencoded?: KeyValuePair[];
-      formdata?: FormData[];
+      formdata?: {
+        text: KeyValuePair[];
+        file: KeyValuePair[];
+      };
     };
     url?: string;
     headers?: Headers[];
