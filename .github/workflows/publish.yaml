@@ -9,7 +9,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -26,9 +26,9 @@ jobs:
           
       - name: Install dependencies
         run: |
-          yarn install
-          yarn build
-          yarn tauri build
+          npm install
+          npm build
+          npm tauri build
           
       #- name: Archive the MSI Folder
         #run: |
