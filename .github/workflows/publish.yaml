@@ -36,6 +36,17 @@ jobs:
           yarn install
           yarn build
           yarn tauri build
+
+      - name: Install App Center CLI
+          run:|
+            npm install -g appcenter-cli
+        
+      - name: Upload to App Center
+          run:|
+            appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a <Your-App-Name>
+        env:
+          APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+
           
       #- name: Archive the MSI Folder
         #run: |
@@ -51,15 +62,15 @@ jobs:
       #   env:
       #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
        
-      - name: Upload to App Center
-        uses: wzieba/AppCenter-Github-Action@v1
-        with:
-          appName: wzieba/Sample-App
-          token: ${{secrets.APPCENTER_API_TOKEN}}
-          group: Collaborators
-          file: ./sparrow-app/src-tauri/target/release/bundle/msi .
-          notifyTesters: true
-          debug: false
+      # - name: Upload to App Center
+      #   uses: wzieba/AppCenter-Github-Action@v1
+      #   with:
+      #     appName: wzieba/Sample-App
+      #     token: ${{secrets.APPCENTER_API_TOKEN}}
+      #     group: Collaborators
+      #     file: ./sparrow-app/src-tauri/target/release/bundle/msi .
+      #     notifyTesters: true
+      #     debug: false
         # uses: andymckay/action-appcenter-upload@v3
         # with:
         #   app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
