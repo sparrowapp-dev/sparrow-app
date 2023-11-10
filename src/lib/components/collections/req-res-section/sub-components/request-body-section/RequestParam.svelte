@@ -10,75 +10,80 @@
   import {
     collapsibleState,
     currentTab,
+    handleRequestStateChange,
     isHorizontalVertical,
     tabs,
   } from "$lib/store/request-response-section";
-  import { responseText } from "$lib/store/api-request";
+
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
   import { onDestroy } from "svelte";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import { RequestSection } from "$lib/utils/enums/request.enum";
 
   let isHorizontalVerticalMode: boolean;
+  let selectedTab: string = "";
+  let jsonResponse: any = false;
+  let currentTabId : string = "";
+  let tabList : NewTab[] = [];
+  let progress: boolean = false;
+  let responseBody;
+  let responseHeader;
+  let requestData: NewTab;
+  let isCollaps: boolean = false;
+  
   const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
     (value) => {
       isHorizontalVerticalMode = value;
     },
   );
 
-  let selectedTab: string = "parameters";
-
-  let isCollaps: boolean;
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
-  let jsonResponse: any = false;
-
-
-  let currentTabId = null;
-  let tabList = [];
-  let progress : boolean = false;
-  let responseBody;
-  let responseHeader;
-
-  const fetchBodyData = (id, list) => {
-      list.forEach(elem => {
-        if(elem.id === id){
-          if(elem.request?.response){
-            jsonResponse = true;
-            responseBody = elem.request?.response?.body;
-            responseHeader = Object.entries(JSON.parse(elem.request?.response?.headers));
-          }
-          else{
-            jsonResponse = false;
-          }
-          progress = elem.requestInProgress;
+  const fetchComponentData = (id : string, list : NewTab[]) => {
+    list.forEach((elem : NewTab) => {
+      if (elem.id === id) {
+        requestData = elem;
+        selectedTab = elem.request.state.section;
+        if (elem.request?.response) {
+          jsonResponse = true;
+          responseBody = elem.request?.response?.body;
+          responseHeader = Object.entries(
+            JSON.parse(elem.request?.response?.headers),
+          );
+        } else {
+          jsonResponse = false;
         }
-      });
-  }
+        progress = elem.requestInProgress;
+      }
+    });
+  };
 
-  const tabsUnsubscribe = tabs.subscribe((value)=>{
+  const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-    if(currentTabId && tabList){
-      fetchBodyData(currentTabId, tabList);
+    if (currentTabId && tabList) {
+      fetchComponentData(currentTabId, tabList);
     }
   });
-  
-  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
-    if(value && value.id){
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
       currentTabId = value.id;
-      if(currentTabId && tabList){
-        fetchBodyData(currentTabId, tabList);
+      if (currentTabId && tabList) {
+        fetchComponentData(currentTabId, tabList);
       }
     }
   });
 
-  onDestroy(()=>{
+  onDestroy(() => {
     currentTabUnsubscribe();
     tabsUnsubscribe();
     isHorizontalVerticalUnsubscribe();
   });
+
 </script>
 
 <div
@@ -99,9 +104,13 @@
         style="font-size: 12px;font-weight:500; margin-right:15px;"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab = "parameters")}
+          on:click={() => {
+            handleRequestStateChange(RequestSection.PARAMETERS, "section", currentTabId);
+          }
+
+            }
           class="team-menu__link d-flex pb-1"
-          class:tab-active={selectedTab === "parameters"}
+          class:tab-active={selectedTab === RequestSection.PARAMETERS}
           >Parameters
           <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
         </span>
@@ -111,9 +120,11 @@
         style="font-size: 12px;font-weight:500; margin-right:15px;"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab = "request-body")}
+          on:click={() => {
+            handleRequestStateChange(RequestSection.REQUEST_BODY, "section", currentTabId);
+          }}
           class="team-menu__link d-flex pb-1"
-          class:tab-active={selectedTab === "request-body"}
+          class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
           >Request Body
         </span>
       </span>
@@ -122,9 +133,11 @@
         style="font-size: 12px;font-weight:500; margin-right:15px;"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab = "headers")}
+          on:click={() => {
+            handleRequestStateChange(RequestSection.HEADERS, "section", currentTabId);
+          }}
           class="team-menu__link d-flex pb-1"
-          class:tab-active={selectedTab === "headers"}
+          class:tab-active={selectedTab === RequestSection.HEADERS}
           >Headers
           <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
         </span>
@@ -134,22 +147,24 @@
         style="font-size: 12px;font-weight:500; margin-right:15px;"
         class="cursor-pointer d-flex align-items-center justify-content-center gap-1 text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab = "authorization")}
+          on:click={() => {
+            handleRequestStateChange(RequestSection.AUTHORIZATION, "section", currentTabId);
+          }}
           class="team-menu__link d-flex pb-1 gap-1 align-items-center"
-          class:tab-active={selectedTab === "authorization"}
+          class:tab-active={selectedTab === RequestSection.AUTHORIZATION}
           >Authorization <img src={penIcon} alt="penIcon" class="w-100 h-100" />
         </span>
       </span>
     </div>
     <div class="d-flex align-items-center justify-content-start">
-      {#if selectedTab === "parameters"}
+      {#if selectedTab === RequestSection.PARAMETERS}
         <Parameters />
-      {:else if selectedTab === "request-body"}
+      {:else if selectedTab === RequestSection.REQUEST_BODY}
         <RequestBody />
-      {:else if selectedTab === "headers"}
+      {:else if selectedTab === RequestSection.HEADERS}
         <Headers />
-      {:else if selectedTab === "authorization"}
-        <Authorization />
+      {:else if selectedTab === RequestSection.AUTHORIZATION}
+        <Authorization {requestData} {currentTabId} />
       {/if}
     </div>
   </div>
@@ -162,18 +177,21 @@
   >
     <div class=" d-flex flex-column" style="height:100%;">
       {#if jsonResponse}
-        <ResponseParams responseBody = {responseBody} responseHeader={responseHeader} />
+        <ResponseParams {responseBody} {responseHeader} />
       {:else}
         <DefaultPage />
       {/if}
       {#if progress}
-        <div class="position-absolute" style="    
+        <div
+          class="position-absolute"
+          style="    
           top: 10px;
           left: 0;
           right: 0;
           bottom: 0;
-          z-index:999;">
-          <Loader/>
+          z-index:999;"
+        >
+          <Loader />
         </div>
       {/if}
     </div>

@@ -29,3 +29,10 @@ export enum RequestDataset {
   RAW = "Raw",
   NONE = "None",
 }
+
+export enum RequestSection {
+  PARAMETERS = "Parameters",
+  AUTHORIZATION = "Authorization",
+  HEADERS = "Headers",
+  REQUEST_BODY = "Request Body",
+}

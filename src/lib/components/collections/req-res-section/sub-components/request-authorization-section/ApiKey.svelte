@@ -1,16 +1,22 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { apiKey, apiValue } from "$lib/store/authorization";
+  import { handleRequestAuthChange } from "$lib/store/request-response-section";
+  import { AuthSection } from "$lib/utils/enums/authorization.enum";
+  import type { ApiKey } from "$lib/utils/interfaces/request.interface";
+  export let currentTabId: string;
+  export let apiData: ApiKey;
 
-  let handleDropdown = (tab: string) => {};
-
-  const handleAuthKey = (event) => {
-    apiKey.set(event.target.value);
+  const handleAuthChange = () => {
+    handleRequestAuthChange(apiData, "apiKey", currentTabId);
   };
 
-  const handleAuthValue = (event) => {
-    apiValue.set(event.target.value);
+  const handleDropdown = (
+    tab: AuthSection.HEADER | AuthSection.QUERY_PARAMETER,
+  ) => {
+    apiData.addTo = tab;
+    handleRequestAuthChange(apiData, "apiKey", currentTabId);
   };
+  
 </script>
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
@@ -25,8 +31,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 p-2"
       placeholder="Enter Auth Key"
-      bind:value={$apiKey}
-      on:input={handleAuthKey}
+      bind:value={apiData.authKey}
+      on:input={handleAuthChange}
     />
   </div>
   <div
@@ -40,8 +46,8 @@
       style="outline: none;"
       class="w-75 h-75 p-2 border-0 bg-backgroundColor"
       placeholder="Enter Auth Value"
-      bind:value={$apiValue}
-      on:input={handleAuthValue}
+      bind:value={apiData.authValue}
+      on:input={handleAuthChange}
     />
   </div>
   <div
@@ -53,7 +59,8 @@
       <button class="d-flex bg-backgroundColor border-0">
         <p class="ps-3">
           <Dropdown
-            data={["Header", "Query Parameters", "Cookies"]}
+            title={apiData.addTo}
+            data={[AuthSection.HEADER, AuthSection.QUERY_PARAMETER]}
             onclick={handleDropdown}
           />
         </p>
