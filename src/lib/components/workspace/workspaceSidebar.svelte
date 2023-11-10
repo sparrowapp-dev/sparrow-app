@@ -1,0 +1,128 @@
+<script lang="ts">
+  import gear from "$lib/assets/gear.svg";
+  import circleinfo from "$lib/assets/circle-info.svg";
+    import { user } from "$lib/store/auth.store";
+    import { onDestroy } from "svelte";
+    import { currentTab } from "$lib/store/request-response-section";
+    import type { User } from "$lib/utils/user";
+    import { collectionList } from "$lib/store/collection";
+    import type { Collection } from "$lib/utils/interfaces/collection.interface";
+   let userInfo:Partial<User>={};
+   let workspaceId:string;
+   let userName:string;
+   let collection:Collection[]=[];
+   let apiRequests:number=0;
+   const collectionListUnsubscribe = collectionList.subscribe((value) => {
+    collection = value;
+    apiRequests=0;
+    collection.map((coll)=>{
+      apiRequests+=coll.totalRequests
+    })
+  }
+  );
+   const userUnsubscribe=user.subscribe((value)=>{
+      userInfo=value;
+   })
+   const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
+      workspaceId = value.id;
+      if (workspaceId && userInfo) {
+        userName=userInfo.personalWorkspaces.filter((workspace)=>{
+          return workspaceId= workspace.workspaceId
+        })[0].name
+      }
+    }
+  });
+    
+    onDestroy(()=>{
+      userUnsubscribe()
+      currentTabUnsubscribe()
+    })
+</script>
+<div class="main-container">
+<div class="sidebar">
+  <div class="sidebar-btn">
+     <button><img src={circleinfo} alt="circleinfo">About</button>
+     <button><img src={gear} alt="gear">Workspace Setting</button>
+  </div>
+  <div class="border"></div>
+  <div class="user-info">
+    <p class="activity">Last Activity by</p>
+    <p class="user-name">{userName}</p>
+  </div>
+</div>
+<div class="workspace-info">
+<p><span class="api-info">{apiRequests}</span>API Requests</p>
+<p><span class="api-info">{collection.length}</span>Collection</p>
+</div>
+</div>
+
+<style>
+  .main-container{
+    width: 280px;
+    position: fixed;
+    font-family: Roboto;
+    right: 0;
+    top: 80px;
+    border-left: 1px solid var(--border-color);
+    height: calc(100vh - 80px);
+    z-index: 99;
+  }
+  .sidebar{
+    width: 100%;
+    padding: 20px;
+  }
+  .sidebar-btn{
+    display: flex;
+    flex-direction: column;
+    gap:8px;
+
+  }
+  .sidebar-btn>button{
+    display: flex;
+    align-items: center;
+    background-color: #313233;
+    gap:4px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 5px;
+  }
+  .border{
+    margin-top: 18px;
+    border-bottom: 2px solid #313233;
+  }
+  .user-info{
+    font-size: 15px;
+    padding: 15px;
+  }
+  .activity{
+   color:#8A9299;
+   font-family: Roboto;
+   font-size: 14px;
+   font-weight: 700;
+
+  }
+  .user-name{
+    margin-top: -10px;
+  }
+  .workspace-info{
+    position: fixed;
+    bottom: 0;
+    padding: 15px;
+    display: flex;
+    width: 100%;
+    color:#45494D;
+    font-size: 12px;
+
+  }
+  .workspace-info>:first-child{
+    margin-right: 10px;
+  }
+  .api-info{
+    color: #85C2FF;
+    line-height: 18px;
+    font-size: 16px;
+    padding-left: 10px;
+  }
+</style>

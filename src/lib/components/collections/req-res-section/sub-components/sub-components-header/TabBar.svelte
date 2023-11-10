@@ -1,9 +1,5 @@
 <script lang="ts">
   import plusIcon from "$lib/assets/actionicon-normal.svg";
-  import crossIcon from "$lib/assets/cross.svg";
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import angleRight from "$lib/assets/angle-right.svg";
-  import linesmallIcon from "$lib/assets/linesmall.svg";
   import { collapsibleState, currentTab } from "$lib/store/request-response-section";
   import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
     import Tab from "./Tab.svelte";
@@ -15,6 +11,8 @@
     import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
     import PageHeader from "./PageHeader.svelte";
+    import angleLeft from "$lib/assets/angleLeft.svg"
+    import angleRight from "$lib/assets/angle-right.svg"
 
   let tabsStore : NewTab[] = [];
   let tabWidth : number = 196;

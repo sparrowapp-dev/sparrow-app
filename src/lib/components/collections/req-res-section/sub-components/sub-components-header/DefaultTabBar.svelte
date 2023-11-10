@@ -3,10 +3,15 @@
      import collections from "$lib/assets/collections.svg";
      import apiRequest  from "$lib/assets/apiRequest.svg";
      import { v4 as uuidv4 } from "uuid";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
+    import { RequestDefault, WorkspaceDefault } from "$lib/utils/enums/request.enum";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { handleTabAddons } from "$lib/store/request-response-section";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import { currentWorkspace } from "$lib/store/workspace.store";
+    import { onDestroy } from "svelte";
+    let currentWorkspaceName:string;
+    let currentWorkspaceId:string;
   const addApiRequest=()=>{
   let newTab = {
           id: uuidv4(),
@@ -25,14 +30,40 @@
         }
         handleTabAddons(newTab);
         moveNavigation('right');
+  }
+const addWorkspaceRequest=()=>{
+    let newTab:NewTab = {
+          id:currentWorkspaceId,
+          name: currentWorkspaceName||WorkspaceDefault.NAME,
+          type: ItemType.WORKSPACE,
+          request : {
+            method: "",
+            body: "",
+            url: "",
+            headers: [],
+            queryParams:[] 
+          },
+          save: true,
+          requestInProgress: false,
+          path:null
+        }
+        handleTabAddons(newTab);
+        moveNavigation('right');
 }
+const workspaceUnSubscribe=currentWorkspace.subscribe((value)=>{
+     currentWorkspaceName=value.name;
+     currentWorkspaceId=value.id;
+  })
+onDestroy(() => {
+  workspaceUnSubscribe();
+});
 </script>
 <div class="main-container">
    <div class="header-container">
     <h1 class="main-container-header">
       Check this Workspace's documentation
     </h1>
-      <button class="about-btn">
+      <button class="about-btn"  on:click={()=>{addWorkspaceRequest()}}>
         <img src={about} alt="" style="font-size: 12px;"/>
         About My Workspace</button>
    </div>

@@ -61,6 +61,8 @@
       setCurrentWorkspace(
         response.data.data[0]._id,
         response.data.data[0].name,
+        // response.data.data[0].owner.type,
+        
       );
     }
   };
@@ -71,8 +73,10 @@
     }
   });
 
-  const handleDropdown = (id, tab) => {
-    setCurrentWorkspace(id, tab);
+  const handleDropdown = (id:string, name:string) => {
+    // setCurrentWorkspace(id, name,type);
+    setCurrentWorkspace(id, name);
+    
   }
   onDestroy(userUnsubscribe);
 </script>

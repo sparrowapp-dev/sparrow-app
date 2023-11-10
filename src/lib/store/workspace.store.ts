@@ -3,10 +3,15 @@ import { writable } from "svelte/store";
 const currentWorkspace = writable({
   name: "",
   id: "",
+  // type:"",
 });
 
-const setCurrentWorkspace = (workspaceId, workspaceName) => {
-  currentWorkspace.set({ id: workspaceId, name: workspaceName });
+const setCurrentWorkspace = (workspaceId: string, workspaceName: string) => {
+  currentWorkspace.set({
+    id: workspaceId,
+    name: workspaceName,
+    // type:workspaceType
+  });
 };
 
 export { currentWorkspace, setCurrentWorkspace };

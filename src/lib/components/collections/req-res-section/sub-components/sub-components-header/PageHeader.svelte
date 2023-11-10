@@ -13,6 +13,7 @@
     import type {RequestBody} from "$lib/utils/interfaces/request.interface";
     import { collectionList, useCollectionTree } from "$lib/store/collection";
     import  spin  from "$lib/assets/spin.svg";
+    import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
  
   let isCollaps : boolean;
   let display: boolean = false;
@@ -35,6 +36,7 @@
   let componentData : NewTab; 
   let workspace : Workspace;
   let collection;
+  let selectedTab:Partial<NewTab> ={}
 
   let loader= false;
 
@@ -61,6 +63,9 @@
       currentTabId = value.id;
       if (currentTabId && tabList) {
         fetchComponentData(currentTabId, tabList);
+        selectedTab=tabList.filter((tab:NewTab)=>{
+          return tab.id===currentTabId
+        })[0]
       }
     }
   });
@@ -147,7 +152,9 @@
     collectionListUnsubscribe();
   });
 </script>
-
+{#if selectedTab.type===ItemType.WORKSPACE}
+<MyWorkspace></MyWorkspace>
+{:else}
 <div class="d-flex flex-column" style="margin-right: 32px;">
   <div
     class="pageheader d-flex align-items-center justify-content-between {isCollaps
@@ -174,7 +181,6 @@
               }
             }
           }>
-          <!-- <img src={spin} class="loader-anim" alt="" style="width:14px; height:14px;"> -->
           <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
           <p
             class="mb-0 text-whiteColor"
@@ -223,6 +229,7 @@
     <ApiSendRequestPage />
   </div>
 </div>
+{/if}
 
 <style>
   .btn-primary {

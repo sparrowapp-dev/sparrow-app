@@ -15,6 +15,10 @@ export enum RequestDefault {
   METHOD = "GET",
 }
 
+export enum WorkspaceDefault {
+  NAME = "MY WORKSPACE",
+}
+
 export enum RequestType {
   JSON = "JSON",
   XML = "XML",

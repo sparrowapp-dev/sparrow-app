@@ -25,7 +25,11 @@ export interface RequestBody {
 export interface NewTab {
   id: string;
   name: string;
-  type: ItemType.COLLECTION | ItemType.FOLDER | ItemType.REQUEST;
+  type:
+    | ItemType.COLLECTION
+    | ItemType.FOLDER
+    | ItemType.REQUEST
+    | ItemType.WORKSPACE;
   request?: {
     method: string;
     body?: string;

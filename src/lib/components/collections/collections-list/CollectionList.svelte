@@ -239,7 +239,7 @@
           {/if}
         </div>
       {:else}
-      {#if collection.length > 2}
+      {#if collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList = {collection}
