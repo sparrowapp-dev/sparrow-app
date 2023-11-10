@@ -22,7 +22,6 @@ jobs:
 
       - name: Install Windows SDK
         run: |
-          # Download and install Windows 10 SDK
           Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
           Start-Process -Wait -FilePath $env:TEMP\SdkSetup.exe -ArgumentList '/quiet /features /installpath:C:\Program Files (x86)\Windows Kits\10'
         shell: powershell
