@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - development
-# env: 
-#   VITE_API_URL: ${{secrets.VITE_API_URL}}
+env: 
+ VITE_API_URL: ${{secrets.VITE_API_URL}}
  
 jobs:
   deploy:
@@ -59,8 +59,8 @@ jobs:
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrow
-        env:
-          APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+        # env:
+        #   APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
 
           
       #- name: Archive the MSI Folder
