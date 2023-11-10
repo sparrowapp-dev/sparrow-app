@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - development
-env: 
-  VITE_API_URL: ${{secrets.VITE_API_URL}}
-
+# env: 
+#   VITE_API_URL: ${{secrets.VITE_API_URL}}
+ 
 jobs:
   deploy:
     runs-on: windows-latest
@@ -18,37 +18,78 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: 18.x
+
+      # - name: Install App Center CLI
+      #   run: |
+      #     npm install -g appcenter-cli
+      
+      # - name: Log in to App Center
+      #   run: |
+      #     appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
+      
+      # - name: Upload to App Center
+      #   run: |
+      #     appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi -g Collaborators -a testsp
+      #   env:
+      #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
 
       - name: Install App Center CLI
         run: |
           npm install -g appcenter-cli
+
+      # - name: Install Yarn
+      #   run: |
+      #     sudo apt-get update -q
+      #     sudo apt-get install -y curl
+      #     curl -o- -L https://yarnpkg.com/install.sh | bash
+      #     export PATH=$HOME/.yarn/bin:$PATH
           
       - name: Install dependencies
         run: |
           yarn install
           yarn build
           yarn tauri build
-          
-      - name: Archive the MSI Folder
-        run: |
-          # Archive the MSI folder (replace the path with the correct one)
-          tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
 
-      - name: Deploy to App Center
+      # - name: Install App Center CLI
+      #   run: |
+      #     npm install -g appcenter-cli
+        
+      - name: Upload to App Center
         run: |
-          # Upload the archive to App Center (replace with your App Center app name)
-          appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow 
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-
+          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrow
         env:
           APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+
           
+      #- name: Archive the MSI Folder
+        #run: |
+          # Archive the MSI folder (replace the path with the correct one)
+          #tar -czvf app.tar.gz -C D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi .
+
+      # - name: Deploy to App Center
+      #   run: |
+      #     # Upload the archive to App Center (replace with your App Center app name)
+      #     appcenter distribute release -f app.tar.gz -g Collaborators -a Sparrow 
+      #     appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
+
+      #   env:
+      #     APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
+       
       # - name: Upload to App Center
-      #   uses: andymckay/action-appcenter-upload@v3
+      #   uses: wzieba/AppCenter-Github-Action@v1
       #   with:
-      #     app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
-      #     owner_name: anjali.malviya-techdome.net.in
-      #     app_name: Sparrow-1
+      #     appName: wzieba/Sample-App
+      #     token: ${{secrets.APPCENTER_API_TOKEN}}
       #     group: Collaborators
-      #     file: app.tar.gz
+      #     file: ./sparrow-app/src-tauri/target/release/bundle/msi .
+      #     notifyTesters: true
+      #     debug: false
+        # uses: andymckay/action-appcenter-upload@v3
+        # with:
+        #   app_secret: ${{ secrets.APPCENTER_API_TOKEN }}
+        #   owner_name: anjali.malviya-techdome.net.in
+        #   app_name: Sparrow-1
+        #   group: Collaborators
+        #   file: app.tar.gz
