@@ -66,7 +66,7 @@ jobs:
            $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
            $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
            Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow_0.0.0_x64_en-US.msi"
+           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow_0.0.0_x64_en-US.msi"
            
       # - name: Install App Center CLI
       #   run: |
