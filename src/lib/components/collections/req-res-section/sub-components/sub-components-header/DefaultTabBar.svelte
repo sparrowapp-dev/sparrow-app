@@ -12,10 +12,8 @@
     import { onDestroy } from "svelte";
     let currentWorkspaceName:string;
     let currentWorkspaceId:string;
-    import { handleTabAddons } from "$lib/store/request-response-section";
-    import { moveNavigation } from "$lib/utils/helpers/navigation";
     import { createSampleRequest } from "$lib/utils/sample/request.sample";
-    
+
   const addApiRequest=()=>{
         handleTabAddons(
           createSampleRequest(
