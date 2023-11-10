@@ -6,7 +6,7 @@
   export let basicAuth: BasicAuth;
 
   const handleInput = () => {
-    handleRequestAuthChange(basicAuth, "bearerToken", currentTabId);
+    handleRequestAuthChange(basicAuth, "basicAuth", currentTabId);
   };
   
 </script>
