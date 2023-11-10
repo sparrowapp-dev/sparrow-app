@@ -45,11 +45,11 @@ jobs:
       #     curl -o- -L https://yarnpkg.com/install.sh | bash
       #     export PATH=$HOME/.yarn/bin:$PATH
           
-      - name: Install dependencies
-        run: |
-          yarn install
-          yarn build
-          yarn tauri build
+      # - name: Install dependencies
+      #   run: |
+      #     yarn install
+      #     yarn build
+      #     yarn tauri build
 
       # - name: Install App Center CLI
       #   run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrow
+          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -app Sparrow
         # env:
         #   APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
 
