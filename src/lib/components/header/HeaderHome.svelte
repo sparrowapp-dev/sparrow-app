@@ -66,7 +66,6 @@
       setCurrentWorkspace(
         response.data.data[0]._id,
         response.data.data[0].name,
-        // response.data.data[0].owner.type,
         
       );
     }

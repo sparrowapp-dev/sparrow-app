@@ -14,8 +14,8 @@
 <div class="d-flex">
   <CollectionsList />
   <SidebarRight />
-  <RequestResponse />
   <!-- we should add req-res folder -->
+  <RequestResponse />
 </div>
 
 <style>

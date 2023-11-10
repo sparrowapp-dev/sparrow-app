@@ -13,6 +13,7 @@
    let collection:Collection[]=[];
    let apiRequests:number=0;
    const collectionListUnsubscribe = collectionList.subscribe((value) => {
+    debugger;
     collection = value;
     apiRequests=0;
     collection.map((coll)=>{

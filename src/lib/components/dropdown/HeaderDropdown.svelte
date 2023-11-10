@@ -41,7 +41,7 @@
        class="d-flex align-items-center m-0 px-2"
         on:click={() => {
           visibility = false;
-          onclick(list._id, list.name,list.owner.team);
+          onclick(list._id, list.name);
         }}
       >
         {list.name}

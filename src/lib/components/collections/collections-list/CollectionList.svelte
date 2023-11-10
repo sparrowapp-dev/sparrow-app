@@ -34,14 +34,12 @@
     if (res.isSuccessful) {
       setCollectionList(res.data.data);
     }
-    console.log(collection);
   };
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   }
   );
-  console.log(collection);
   let currentWorkspaceName = "";
 
   const getNextCollection: (list: any[], name: string) => any = (
@@ -296,7 +294,4 @@
   .inputField {
     outline: none;
   }
-  .scroll::-webkit-scrollbar {
-  width: 1em;
-}
 </style>
