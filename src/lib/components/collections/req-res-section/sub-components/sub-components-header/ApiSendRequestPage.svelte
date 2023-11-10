@@ -132,36 +132,36 @@
       }
     }
   };
- 
-  const extractKeyValueFromUrl = (url : string) => {
-    let queryString : string = "";
-    let flag : boolean = false;
+
+  const extractKeyValueFromUrl = (url: string) => {
+    let queryString: string = "";
+    let flag: boolean = false;
 
     for (let i = 0; i < url.length; i++) {
-        if (flag) {
-            queryString += url[i];
-        }
-        if (url[i] === '?') {
-            flag = true;
-        }
+      if (flag) {
+        queryString += url[i];
+      }
+      if (url[i] === "?") {
+        flag = true;
+      }
     }
 
     if (queryString === "") {
-        return [{ name: "", description: "", checked: false }];
+      return [{ name: "", description: "", checked: false }];
     }
 
-    let paramsArray = queryString.split('&');
+    let paramsArray = queryString.split("&");
     let params = paramsArray.map((param) => {
-        let keyValue = param.split("=");
-        if (keyValue.length === 1) {
-            return { name: keyValue[0], description: "", checked: true };
-        } else if (keyValue.length === 2) {
-            return { name: keyValue[0], description: keyValue[1], checked: true };
-        }
+      let keyValue = param.split("=");
+      if (keyValue.length === 1) {
+        return { name: keyValue[0], description: "", checked: true };
+      } else if (keyValue.length === 2) {
+        return { name: keyValue[0], description: keyValue[1], checked: true };
+      }
     });
 
     return [...params, { name: "", description: "", checked: false }];
-  }
+  };
 
   const handleDropdown = (tab: string) => {
     tabs.update((value) => {
@@ -191,7 +191,6 @@
   }
 
   let handleInputValue = () => {
-
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -237,6 +236,26 @@
   onDestroy(() => {
     tabsUnsubscribe();
     currentTabUnsubscribe();
+  });
+
+  const handleResize = () => {
+    const windowWidth = window.innerWidth;
+
+    if (windowWidth <= 800) {
+      // Programmatically trigger a click on the button
+      document.querySelector("#barIcon").click();
+      isHorizontalVertical.set(true);
+    } else {
+      isHorizontalVertical.set(false);
+    }
+  };
+
+  // Add a window resize event listener
+  window.addEventListener("resize", handleResize);
+
+  onDestroy(() => {
+    // Remove the window resize event listener when the component is destroyed
+    window.removeEventListener("resize", handleResize);
   });
 </script>
 
@@ -317,6 +336,7 @@
           class:view-active={selectedView === "grid1"}
           src={barIcon}
           alt=""
+          id="barIcon"
         />
       </span>
     </div>

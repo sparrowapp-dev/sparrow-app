@@ -70,12 +70,10 @@
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
-  data-tauri-drag-region
 >
   <Header />
   <div
     class="d-flex mb-5 flex-column align-items-center justify-content-center"
-    data-tauri-drag-region
   >
     <h1
       class="text-whiteColor mt-5 ms-2 me-2 mb-4"
@@ -84,7 +82,6 @@
       Welcome to Sparrow!
     </h1>
     <form
-      data-tauri-drag-region
       class="login-form text-whiteColor ps-1 pe-1 gap-16"
       style="width:408px; height:429px"
       on:submit|preventDefault={async () => {
@@ -96,7 +93,7 @@
       }}
     >
       <h2 class="card-subtitle fs-4 mb-3">Sign In</h2>
-      <div class="mb-3" data-tauri-drag-region>
+      <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label text-red">Email</label
         >
         <input
