@@ -1,7 +1,9 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { apiKey, apiValue } from "$lib/store/authorization";
-
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  export let currentTabId : string;
+  export let requestData : NewTab;
   let handleDropdown = (tab: string) => {};
 
   const handleAuthKey = (event) => {
@@ -52,7 +54,7 @@
     <div class="ps-5">
       <button class="d-flex bg-backgroundColor border-0">
         <p class="ps-3">
-          <Dropdown
+          <Dropdown title={"Header"}
             data={["Header", "Query Parameters", "Cookies"]}
             onclick={handleDropdown}
           />

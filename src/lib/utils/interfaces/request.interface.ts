@@ -1,4 +1,5 @@
 import type { Headers, QueryParams } from "../dto";
+import type { AuthType } from "../enums/authorization.enum";
 import type { ItemType } from "../enums/item-type.enum";
 import type { RequestDataset, RequestType } from "../enums/request.enum";
 
@@ -60,7 +61,7 @@ export interface NewTab {
     headers?: Headers[];
     queryParams?: QueryParams[];
     response?: Response;
-    additions?: {
+    state?: {
       raw?:
         | RequestType.HTML
         | RequestType.JSON
@@ -72,6 +73,11 @@ export interface NewTab {
         | RequestDataset.NONE
         | RequestDataset.RAW
         | RequestDataset.URLENCODED;
+      auth?:
+        | AuthType.API_KEY
+        | AuthType.BASIC_AUTH
+        | AuthType.BEARER_TOKEN
+        | AuthType.NO_AUTH;
     };
   };
   save: boolean;

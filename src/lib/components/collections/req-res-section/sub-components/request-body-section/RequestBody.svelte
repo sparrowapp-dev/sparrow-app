@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { bodyText, requestType } from "$lib/store/api-request";
-  import { apiRequest, currentTab, handleRawDataChange, handleRequestDatasetTabChange, handleRequestTypeTabChange, isHorizontalVertical, tabs, updateFormDataFile, updateFormDataText, updateUrlEncode } from "$lib/store/request-response-section";
+  import { apiRequest, currentTab, handleRawDataChange, handleRequestStateChange, isHorizontalVertical, tabs, updateFormDataFile, updateFormDataText, updateUrlEncode } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
     import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
@@ -36,7 +36,7 @@
             text: bodyData,
             json: undefined
           };
-          let {raw, dataset} = elem.request.additions;
+          let {raw, dataset} = elem.request.state;
           mainTab = dataset;
           rawTab = raw;
         }
@@ -62,12 +62,12 @@
 
   let handleDropdown = (tab: string) => {
     mainTab = tab;
-    handleRequestDatasetTabChange(mainTab, currentTabId);
+    handleRequestStateChange(mainTab,"dataset", currentTabId);
   };
 
   let handleRawDropDown = (tab: string) => { 
     rawTab = tab;
-    handleRequestTypeTabChange(rawTab, currentTabId)
+    handleRequestStateChange(rawTab,"raw", currentTabId)
   }
 
   let isHorizontalVerticalMode: boolean;

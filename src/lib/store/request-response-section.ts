@@ -101,30 +101,6 @@ export const updateURL = (url, id) => {
   });
 };
 
-export const handleRequestTypeTabChange = (tab, id) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.additions.raw = tab;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const handleRequestDatasetTabChange = (tab, id) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.additions.dataset = tab;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
 export const handleRawDataChange = (raw: string, id: string) => {
   tabs.update((value) => {
     const temp = value.map((elem) => {
@@ -166,6 +142,22 @@ export const updateFormDataFile = (formdatafile, id: string) => {
     const updatedTab = value.map((elem) => {
       if (elem.id === id) {
         elem.request.body.formdata.file = formdatafile;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestStateChange = (
+  tab: string,
+  property: string,
+  id: string,
+) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.state[property] = tab;
       }
       return elem;
     });

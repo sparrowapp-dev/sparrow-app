@@ -18,6 +18,7 @@
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
   import { onDestroy } from "svelte";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   let isHorizontalVerticalMode: boolean;
   const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
@@ -41,10 +42,12 @@
   let progress : boolean = false;
   let responseBody;
   let responseHeader;
+  let requestData : NewTab;
 
   const fetchBodyData = (id, list) => {
       list.forEach(elem => {
         if(elem.id === id){
+          requestData = elem;
           if(elem.request?.response){
             jsonResponse = true;
             responseBody = elem.request?.response?.body;
@@ -60,6 +63,7 @@
 
   const tabsUnsubscribe = tabs.subscribe((value)=>{
     tabList = value;
+    console.log("tablist", tabList)
     if(currentTabId && tabList){
       fetchBodyData(currentTabId, tabList);
     }
@@ -149,7 +153,7 @@
       {:else if selectedTab === "headers"}
         <Headers />
       {:else if selectedTab === "authorization"}
-        <Authorization />
+        <Authorization requestData={requestData} currentTabId={currentTabId}/>
       {/if}
     </div>
   </div>

@@ -1,3 +1,4 @@
+import { AuthType } from "../enums/authorization.enum";
 import { ItemType } from "../enums/item-type.enum";
 import {
   RequestDataset,
@@ -48,9 +49,10 @@ const createSampleRequest = (id: string) => {
           checked: false,
         },
       ],
-      additions: {
+      state: {
         raw: RequestType.Text,
         dataset: RequestDataset.NONE,
+        auth: AuthType.NO_AUTH,
       },
     },
     save: false,
