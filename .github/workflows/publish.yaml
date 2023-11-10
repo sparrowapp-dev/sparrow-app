@@ -58,7 +58,7 @@ jobs:
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrowtest
+          appcenter distribute release -f ./sparrow-app/src-tauri/target/release/bundle/msi/Sparrow_0.0.0_x64_en-US.exe -g Collaborators -a Sparrow
         env:
           APPCENTER_TOKEN: ${{ secrets.APPCENTER_API_TOKEN }}
 
