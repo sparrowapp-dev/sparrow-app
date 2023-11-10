@@ -13,11 +13,11 @@
     isHorizontalVertical,
     tabs,
   } from "$lib/store/request-response-section";
-  import { responseText } from "$lib/store/api-request";
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
   import { onDestroy } from "svelte";
+  import ResponseError from "../response-body-section/ResponseError.svelte";
 
   let isHorizontalVerticalMode: boolean;
   const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
@@ -35,50 +35,72 @@
 
   let jsonResponse: any = false;
 
-
   let currentTabId = null;
   let tabList = [];
-  let progress : boolean = false;
+  let progress: boolean = false;
   let responseBody;
   let responseHeader;
 
-  const fetchBodyData = (id, list) => {
-      list.forEach(elem => {
-        if(elem.id === id){
-          if(elem.request?.response){
-            jsonResponse = true;
-            responseBody = elem.request?.response?.body;
-            responseHeader = Object.entries(JSON.parse(elem.request?.response?.headers));
-          }
-          else{
-            jsonResponse = false;
-          }
-          progress = elem.requestInProgress;
-        }
-      });
+  let responseError: boolean = false;
+
+  function isValidUrl(str) {
+    const pattern = new RegExp(
+      "^(https?:\\/\\/)?" + // protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR IP (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+        "(\\#[-a-z\\d_]*)?$", // fragment locator
+      "i",
+    );
+    return pattern.test(str);
   }
 
-  const tabsUnsubscribe = tabs.subscribe((value)=>{
+  let url: string = "";
+
+  const fetchBodyData = (id, list) => {
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        url = elem.request.url;
+        if (elem.request?.response) {
+          jsonResponse = true;
+          responseBody = elem.request?.response?.body;
+          responseHeader = Object.entries(
+            JSON.parse(elem.request?.response?.headers),
+          );
+        } else {
+          jsonResponse = false;
+        }
+        progress = elem.requestInProgress;
+      }
+    });
+
+    responseError = isValidUrl(url);
+  };
+
+  const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-    if(currentTabId && tabList){
+    if (currentTabId && tabList) {
       fetchBodyData(currentTabId, tabList);
     }
   });
-  
-  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
-    if(value && value.id){
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
       currentTabId = value.id;
-      if(currentTabId && tabList){
+      if (currentTabId && tabList) {
         fetchBodyData(currentTabId, tabList);
       }
     }
   });
 
-  onDestroy(()=>{
+  onDestroy(() => {
     currentTabUnsubscribe();
     tabsUnsubscribe();
     isHorizontalVerticalUnsubscribe();
   });
+
+  console.log(responseError);
 </script>
 
 <div
@@ -162,18 +184,22 @@
   >
     <div class=" d-flex flex-column" style="height:100%;">
       {#if jsonResponse}
-        <ResponseParams responseBody = {responseBody} responseHeader={responseHeader} />
+        <ResponseParams {responseBody} {responseHeader} />
       {:else}
         <DefaultPage />
       {/if}
+
       {#if progress}
-        <div class="position-absolute" style="    
+        <div
+          class="position-absolute"
+          style="    
           top: 10px;
           left: 0;
           right: 0;
           bottom: 0;
-          z-index:999;">
-          <Loader/>
+          z-index:999;"
+        >
+          <Loader />
         </div>
       {/if}
     </div>

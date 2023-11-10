@@ -100,9 +100,7 @@ const makeRequestforCrud = async (
   request: string,
 ) => {
   try {
-    console.log(url, body, method, headers, request);
-
-    const response = await invoke("make_type_request_command", {
+    const response: string = await invoke("make_type_request_command", {
       url,
       method,
       headers,
@@ -110,10 +108,11 @@ const makeRequestforCrud = async (
       request,
     });
 
+    console.log(response);
     if (!response) {
       throw new Error("Invalid response from the backend");
     }
-    return await success(response);
+    return await success(JSON.parse(response));
   } catch (e) {
     return error(e.message || "An error occurred");
   }

@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import angleDown from "$lib/assets/angle-down.svg";
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import lineIcon from "$lib/assets/line.svg";
@@ -12,15 +11,12 @@
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
-  import { keyStore, valueStore } from "$lib/store/parameter";
   import { onDestroy } from "svelte";
   import { makeRequestforCrud } from "$lib/api/api.common";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
 
-  //this for expand and collaps condition
-  let isCollaps;
+  let isCollaps: boolean;
 
   collapsibleState.subscribe((value) => (isCollaps = value));
 
@@ -66,16 +62,18 @@
     isInputValid = true;
     let isValidUrlText = isValidURL(urlText);
     let urlValue = "";
-    console.log(ensureHttpOrHttps(urlText));
     if (isValidUrlText) {
       urlValue = ensureHttpOrHttps(urlText);
     } else {
+      urlValue = urlText;
       isInputValid = false;
-      notifications.error("Invalid URL");
+      if (urlText.length > 0) {
+        notifications.error("Invalid URL");
+      }
       return;
     }
     const str = urlText;
-    console.log(urlValue);
+
     if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
@@ -101,14 +99,15 @@
         );
 
         if (response.isSuccessful) {
-          let responseBody = response.data.response.data;
+          let responseBody = response.data.response;
+          console.log(responseBody);
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
           tabs.update((value) => {
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
                 elem.request.response = {
-                  body: JSON.stringify(responseBody),
+                  body: responseBody,
                   headers: JSON.stringify(responseHeaders),
                   status: responseStatus,
                 };
@@ -177,19 +176,6 @@
   };
   let selectedView: string = "grid";
 
-  function handleInputKeyDown(event: KeyboardEvent) {
-    if (event.key === "Enter") {
-      // Enter key is pressed, set keyText and valueText
-      const inputValue = inputElement.value.trim();
-      if (inputValue.includes("=")) {
-        const [key, value] = inputValue.split("=");
-        keyStore.set(key);
-        valueStore.set(value);
-        inputElement.value = "";
-      }
-    }
-  }
-
   let handleInputValue = () => {
     tabs.update((value) => {
       let temp = value.map((elem) => {
@@ -199,6 +185,7 @@
         }
         return elem;
       });
+
       return temp;
     });
     updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
@@ -218,7 +205,6 @@
 
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-
     if (currentTabId && tabList) {
       fetchUrlData(currentTabId, tabList);
     }
@@ -242,7 +228,6 @@
     const windowWidth = window.innerWidth;
 
     if (windowWidth <= 800) {
-      // Programmatically trigger a click on the button
       document.querySelector("#barIcon").click();
       isHorizontalVertical.set(true);
     } else {
@@ -250,11 +235,9 @@
     }
   };
 
-  // Add a window resize event listener
   window.addEventListener("resize", handleResize);
 
   onDestroy(() => {
-    // Remove the window resize event listener when the component is destroyed
     window.removeEventListener("resize", handleResize);
   });
 </script>
@@ -302,7 +285,6 @@
         bind:value={urlText}
         on:input={handleInputValue}
         bind:this={inputElement}
-        on:keydown={handleInputKeyDown}
       />
       <button
         disabled={disabledSend}

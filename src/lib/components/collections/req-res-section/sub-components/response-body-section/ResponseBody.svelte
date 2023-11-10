@@ -2,28 +2,30 @@
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
-  import { responseText } from "$lib/store/api-request";
+
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   import copyToClipBoard from "$lib/utils/copyToClipboard";
 
   import { notifications } from "$lib/utils/notifications";
-  import { currentTab, isHorizontalVertical, tabs } from "$lib/store/request-response-section";
-    import { onDestroy } from "svelte";
+  import {
+    currentTab,
+    isHorizontalVertical,
+    tabs,
+  } from "$lib/store/request-response-section";
+  import { onDestroy } from "svelte";
   export let responseBody;
   let jsonText: any;
   let content = {
-            text: "",
-            json: undefined
-          };
+    text: "",
+    json: undefined,
+  };
 
   let downloadedData: string = "";
 
-
-
   async function handleCopy() {
-      const jsonString = content.text;
-      await copyToClipBoard(jsonString);
+    const jsonString = content.text;
+    await copyToClipBoard(jsonString);
     notifications.success("Copy To Clipboard");
   }
 
@@ -56,42 +58,41 @@
   let tabList = [];
 
   const fetchUrlData = (id, list) => {
-      list.forEach(elem => {
-        if(elem.id === id){
-          if(elem.request?.response?.body){
-            content = {
-              text: elem.request?.response?.body,
-              json: undefined
-            };
-          }
-          else{
-            content = {
-              text: "",
-              json: undefined
-            };
-          }
-          downloadedData = "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
+    list.forEach((elem) => {
+      if (elem.id === id) {
+        if (elem.request?.response?.body) {
+          content = {
+            text: elem.request?.response?.body,
+            json: undefined,
+          };
+        } else {
+          content = {
+            text: elem.request?.response,
+            json: undefined,
+          };
         }
-      });
-  }
+        downloadedData =
+          "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
+      }
+    });
+  };
 
-
-  const tabsUnsubscribe = tabs.subscribe((value)=>{
+  const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
-    if(currentTabId && tabList){
+    if (currentTabId && tabList) {
       fetchUrlData(currentTabId, tabList);
     }
   });
-  
-  const currentTabUnsubscribe = currentTab.subscribe((value)=>{
-    if(value && value.id){
+
+  const currentTabUnsubscribe = currentTab.subscribe((value) => {
+    if (value && value.id) {
       currentTabId = value.id;
-      if(currentTabId && tabList){
+      if (currentTabId && tabList) {
         fetchUrlData(currentTabId, tabList);
       }
     }
   });
-  onDestroy(()=>{
+  onDestroy(() => {
     tabsUnsubscribe();
     currentTabUnsubscribe();
   });
@@ -138,7 +139,6 @@
       mainMenuBar={false}
       navigationBar={false}
       mode={Mode.text}
-      askToFormat={true}
     />
   </div>
 </div>
