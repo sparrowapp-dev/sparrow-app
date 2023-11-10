@@ -57,7 +57,7 @@
   {:else if currentTab === AuthType.BEARER_TOKEN}
     <BearerToken currentTabId = {currentTabId} bearerToken = {requestData.request.auth.bearerToken} />
   {:else if currentTab === AuthType.BASIC_AUTH}
-    <BasicAuth />
+    <BasicAuth currentTabId = {currentTabId} basicAuth = {requestData.request.auth.basicAuth} />
   {/if}
 </div>
 

@@ -63,7 +63,6 @@
 
   const tabsUnsubscribe = tabs.subscribe((value)=>{
     tabList = value;
-    console.log("tablist", tabList)
     if(currentTabId && tabList){
       fetchBodyData(currentTabId, tabList);
     }
