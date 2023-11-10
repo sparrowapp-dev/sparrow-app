@@ -45,11 +45,11 @@ jobs:
       #     curl -o- -L https://yarnpkg.com/install.sh | bash
       #     export PATH=$HOME/.yarn/bin:$PATH
           
-      # - name: Install dependencies
-      #   run: |
-      #     yarn install
-      #     yarn build
-      #     yarn tauri build
+      - name: Install dependencies
+        run: |
+          yarn install
+          yarn build
+          yarn tauri build
 
       # - name: Install App Center CLI
       #   run: |
