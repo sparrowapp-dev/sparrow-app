@@ -73,7 +73,7 @@ export interface State {
     | AuthType.BASIC_AUTH
     | AuthType.BEARER_TOKEN
     | AuthType.NO_AUTH;
-  Section?:
+  section?:
     | RequestSection.PARAMETERS
     | RequestSection.REQUEST_BODY
     | RequestSection.HEADERS
