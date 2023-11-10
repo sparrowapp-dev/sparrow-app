@@ -2,6 +2,8 @@ import { writable } from "svelte/store";
 import type {
   NewTab,
   CurrentTab,
+  BasicAuth,
+  ApiKey,
 } from "$lib/utils/interfaces/request.interface";
 
 //this store is for collaps and expand section
@@ -158,6 +160,22 @@ export const handleRequestStateChange = (
     const updatedTab = value.map((elem) => {
       if (elem.id === id) {
         elem.request.state[property] = tab;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestAuthChange = (
+  data: string | BasicAuth | ApiKey,
+  property: string,
+  id: string,
+) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.auth[property] = data;
       }
       return elem;
     });

@@ -53,7 +53,7 @@
   {#if currentTab === AuthType.NO_AUTH}
     <NoAuth />
   {:else if currentTab === AuthType.API_KEY}
-    <ApiKey currentTabId={currentTabId} requestData={requestData} />
+    <ApiKey currentTabId={currentTabId} apiData={requestData.request.auth.apiKey} />
   {:else if currentTab === AuthType.BEARER_TOKEN}
     <BearerToken />
   {:else if currentTab === AuthType.BASIC_AUTH}
