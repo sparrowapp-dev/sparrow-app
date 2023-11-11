@@ -1,11 +1,12 @@
 <script lang="ts">
   import { handleRequestAuthChange } from "$lib/store/request-response-section";
+    import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
 
   export let bearerToken: string;
   export let currentTabId: string;
 
   const handleInput = () => {
-    handleRequestAuthChange(bearerToken, "bearerToken", currentTabId);
+    handleRequestAuthChange(bearerToken, RequestAuthProperty.BEARER_TOKEN, currentTabId);
   };
   
 </script>

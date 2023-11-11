@@ -1,15 +1,18 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import { onDestroy } from "svelte";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  
+  type Mode = "READ" | "WRITE";
+  
   export let keyValue: KeyValuePair[];
-  export let callback;
-  export let mode: "READ" | "WRITE" = "WRITE";
-  export let readable = {
-    key : "",
-    value : ""
+  export let callback: (pairs: KeyValuePair[]) => void;
+  export let mode: Mode = "WRITE";
+  export let readable: { key: string; value: string } = {
+    key: "",
+    value: "",
   };
+  
   let pairs: KeyValuePair[] = keyValue;
 
   $: {
@@ -18,9 +21,9 @@
     }
   }
 
-  const updateParam = (index) => {
+  const updateParam = (index : number) : void => {
     pairs.forEach((elem, i) => {
-      if (i == index) {
+      if (i === index) {
         elem.checked = true;
       }
     });
@@ -32,10 +35,10 @@
     callback(pairs);
   };
 
-  const deleteParam = (index) => {
+  const deleteParam = (index: number) : void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
-        if (i != index) {
+        if (i !== index) {
           return true;
         }
         return false;
@@ -44,9 +47,10 @@
     }
     callback(pairs);
   };
-  const updateCheck = (index) => {
+
+  const updateCheck = (index : number) : void => {
     let filteredKeyValue = pairs.map((elem, i) => {
-      if (i == index) {
+      if (i === index) {
         elem.checked = !elem.checked;
       }
       return elem;
@@ -55,7 +59,6 @@
     callback(pairs);
   };
 
-  onDestroy(() => {});
 </script>
 
 <div class="mt-3 me-0 w-100">
@@ -78,64 +81,60 @@
       "
   >
     {#if readable.key}
-    <div
-    aria-label="Toggle Hover"
-    class="sortable > div"
-    style="cursor:default; width:100%;"
-  >
-    <div
-      style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
-    >
       <div
-        class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+        aria-label="Toggle Hover"
+        class="sortable > div"
+        style="cursor:default; width:100%;"
       >
-        <img
-          src={dragIcon}
-          alt=""
-          class="d-none"
-          style="cursor:grabbing;"
-        />
-        <div style="width:30px;">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            disabled
-            checked={true}
-          />
-        </div>
+        <div
+          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+        >
+          <div
+            class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+          >
+            <img
+              src={dragIcon}
+              alt=""
+              class="d-none"
+              style="cursor:grabbing;"
+            />
+            <div style="width:30px;">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                disabled
+                checked={true}
+              />
+            </div>
 
-        <div class="w-100 d-flex gap-2">
-          <div class="flex-grow-1 w-100">
-            <input
-              type="text"
-              placeholder="Enter Key"
-              class="form-control bg-blackColor py-1 border-0"
-              style="font-size: 13px;"
-              disabled
-              bind:value={readable.key}
-            />
-          </div>
-          <div class="flex-grow-1 w-100">
-            <input
-              type="text"
-              placeholder="Enter Value"
-              class="form-control bg-blackColor py-1 border-0"
-              style="font-size: 13px;"
-              disabled
-              bind:value={readable.value}
-            />
+            <div class="w-100 d-flex gap-2">
+              <div class="flex-grow-1 w-100">
+                <input
+                  type="text"
+                  placeholder="Enter Key"
+                  class="form-control bg-blackColor py-1 border-0"
+                  style="font-size: 13px;"
+                  disabled
+                  bind:value={readable.key}
+                />
+              </div>
+              <div class="flex-grow-1 w-100">
+                <input
+                  type="text"
+                  placeholder="Enter Value"
+                  class="form-control bg-blackColor py-1 border-0"
+                  style="font-size: 13px;"
+                  disabled
+                  bind:value={readable.value}
+                />
+              </div>
+            </div>
+            <div class="h-75 pe-1">
+              <button class="bg-backgroundColor border-0" style="width:40px;" />
+            </div>
           </div>
         </div>
-          <div class="h-75 pe-1">
-            <button
-              class="bg-backgroundColor border-0"
-              style="width:40px;"
-            />
-          </div>
-      
       </div>
-    </div>
-  </div>
     {/if}
     {#each pairs as element, index}
       <div
@@ -178,9 +177,7 @@
                   placeholder="Enter Key"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
-                  disabled={ mode == "READ"
-                    ? true
-                    : false}
+                  disabled={mode == "READ" ? true : false}
                   bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
@@ -193,9 +190,7 @@
                   placeholder="Enter Value"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
-                  disabled={ mode == "READ"
-                    ? true
-                    : false}
+                  disabled={mode == "READ" ? true : false}
                   bind:value={element.value}
                   on:input={() => {
                     updateParam(index);
@@ -232,17 +227,3 @@
   </div>
 </div>
 
-<style>
-  .sortable > div {
-    -webkit-touch-callout: none;
-    -ms-touch-action: none;
-    touch-action: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  div:global(.ui-sortable-placeholder) {
-    height: 30px;
-  }
-</style>

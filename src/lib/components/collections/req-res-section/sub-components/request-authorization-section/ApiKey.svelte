@@ -2,19 +2,20 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { handleRequestAuthChange } from "$lib/store/request-response-section";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
+    import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import type { ApiKey } from "$lib/utils/interfaces/request.interface";
   export let currentTabId: string;
   export let apiData: ApiKey;
 
   const handleAuthChange = () => {
-    handleRequestAuthChange(apiData, "apiKey", currentTabId);
+    handleRequestAuthChange(apiData, RequestAuthProperty.API_KEY, currentTabId);
   };
 
   const handleDropdown = (
     tab: AuthSection.HEADER | AuthSection.QUERY_PARAMETER,
   ) => {
     apiData.addTo = tab;
-    handleRequestAuthChange(apiData, "apiKey", currentTabId);
+    handleRequestAuthChange(apiData, RequestAuthProperty.API_KEY, currentTabId);
   };
   
 </script>
