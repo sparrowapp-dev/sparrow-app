@@ -51,8 +51,8 @@ const createSampleRequest = (id: string) => {
       ],
       queryParams: [
         {
-          name: "",
-          description: "",
+          key: "",
+          value: "",
           checked: false,
         },
       ],

@@ -22,6 +22,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
     import { RequestSection } from "$lib/utils/enums/request.enum";
     import { findAuthHeader, findAuthParameter } from "$lib/utils/helpers/auth.helper";
+    import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
 
   let isHorizontalVerticalMode: boolean;
   let selectedTab: string = "";
@@ -172,13 +173,13 @@
     </div>
     <div class="d-flex align-items-center justify-content-start">
       {#if selectedTab === RequestSection.PARAMETERS}
-        <Parameters />
+        <Parameters requestData = {createDeepCopy(requestData)}  params = {createDeepCopy(requestData.request.queryParams)} url = {createDeepCopy(requestData.request.url)} {currentTabId} />
       {:else if selectedTab === RequestSection.REQUEST_BODY}
         <RequestBody />
       {:else if selectedTab === RequestSection.HEADERS}
-        <Headers {requestData} {currentTabId} />
+        <Headers requestData = {createDeepCopy(requestData)} {currentTabId} />
       {:else if selectedTab === RequestSection.AUTHORIZATION}
-        <Authorization {requestData} {currentTabId} />
+        <Authorization requestData = {createDeepCopy(requestData)} {currentTabId} />
       {/if}
     </div>
   </div>
