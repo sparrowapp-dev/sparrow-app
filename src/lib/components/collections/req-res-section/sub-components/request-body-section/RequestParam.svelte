@@ -162,7 +162,7 @@
       {:else if selectedTab === RequestSection.REQUEST_BODY}
         <RequestBody />
       {:else if selectedTab === RequestSection.HEADERS}
-        <Headers />
+        <Headers {requestData} {currentTabId} />
       {:else if selectedTab === RequestSection.AUTHORIZATION}
         <Authorization {requestData} {currentTabId} />
       {/if}

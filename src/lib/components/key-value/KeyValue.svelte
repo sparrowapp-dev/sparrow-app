@@ -5,7 +5,11 @@
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
   export let keyValue: KeyValuePair[];
   export let callback;
-
+  export let mode: "READ" | "WRITE" = "WRITE";
+  export let readable = {
+    key : "",
+    value : ""
+  };
   let pairs: KeyValuePair[] = keyValue;
 
   $: {
@@ -73,6 +77,66 @@
       width:200px;
       "
   >
+    {#if readable.key}
+    <div
+    aria-label="Toggle Hover"
+    class="sortable > div"
+    style="cursor:default; width:100%;"
+  >
+    <div
+      style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+    >
+      <div
+        class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+      >
+        <img
+          src={dragIcon}
+          alt=""
+          class="d-none"
+          style="cursor:grabbing;"
+        />
+        <div style="width:30px;">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            disabled
+            checked={true}
+          />
+        </div>
+
+        <div class="w-100 d-flex gap-2">
+          <div class="flex-grow-1 w-100">
+            <input
+              type="text"
+              placeholder="Enter Key"
+              class="form-control bg-blackColor py-1 border-0"
+              style="font-size: 13px;"
+              disabled
+              bind:value={readable.key}
+            />
+          </div>
+          <div class="flex-grow-1 w-100">
+            <input
+              type="text"
+              placeholder="Enter Value"
+              class="form-control bg-blackColor py-1 border-0"
+              style="font-size: 13px;"
+              disabled
+              bind:value={readable.value}
+            />
+          </div>
+        </div>
+          <div class="h-75 pe-1">
+            <button
+              class="bg-backgroundColor border-0"
+              style="width:40px;"
+            />
+          </div>
+      
+      </div>
+    </div>
+  </div>
+    {/if}
     {#each pairs as element, index}
       <div
         aria-label="Toggle Hover"
@@ -114,6 +178,9 @@
                   placeholder="Enter Key"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
+                  disabled={ mode == "READ"
+                    ? true
+                    : false}
                   bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
@@ -126,6 +193,9 @@
                   placeholder="Enter Value"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
+                  disabled={ mode == "READ"
+                    ? true
+                    : false}
                   bind:value={element.value}
                   on:input={() => {
                     updateParam(index);
@@ -136,20 +206,23 @@
             {#if pairs.length - 1 != index}
               <div class="h-75 pe-1">
                 <button class="bg-backgroundColor border-0" style="width:40px;">
-                  <img
-                    src={trashIcon}
-                    on:click={() => {
-                      deleteParam(index);
-                    }}
-                    alt=""
-                  />
+                  {#if mode !== "READ"}
+                    <img
+                      src={trashIcon}
+                      on:click={() => {
+                        deleteParam(index);
+                      }}
+                      alt=""
+                    />
+                  {/if}
                 </button>
               </div>
             {:else}
               <div class="h-75 pe-1">
-                <button class="bg-backgroundColor border-0" style="width:40px;">
-                  <img src="" alt="" />
-                </button>
+                <button
+                  class="bg-backgroundColor border-0"
+                  style="width:40px;"
+                />
               </div>
             {/if}
           </div>

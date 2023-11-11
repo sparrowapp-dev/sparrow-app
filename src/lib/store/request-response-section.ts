@@ -29,6 +29,7 @@ export const tabs = writable<NewTab[]>([]);
 
 let tabStore: NewTab[] = [];
 tabs.subscribe((value) => {
+  console.log(value);
   tabStore = value;
 });
 
@@ -176,6 +177,18 @@ export const handleRequestAuthChange = (
     const updatedTab = value.map((elem) => {
       if (elem.id === id) {
         elem.request.auth[property] = data;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestChange = (data, property, id) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request[property] = data;
       }
       return elem;
     });
