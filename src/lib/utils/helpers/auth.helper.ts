@@ -35,4 +35,29 @@ const findAuthHeader = (
   return authValue;
 };
 
-export { findAuthHeader };
+const findAuthParameter = (
+  requestData: NewTab,
+): {
+  key: string;
+  value: string;
+} => {
+  const authValue: { key: string; value: string } = {
+    key: "",
+    value: "",
+  };
+  if (
+    requestData.request.state.auth === AuthType.API_KEY &&
+    requestData.request.auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
+    requestData.request.auth.apiKey.authKey &&
+    requestData.request.auth.apiKey.authValue
+  ) {
+    authValue.key = requestData.request.auth.apiKey.authKey;
+    authValue.value = requestData.request.auth.apiKey.authValue;
+  } else {
+    authValue.key = "";
+    authValue.value = "";
+  }
+  return authValue;
+};
+
+export { findAuthHeader, findAuthParameter };
