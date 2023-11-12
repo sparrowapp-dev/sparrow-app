@@ -108,7 +108,7 @@
 >
   <div
     class="right-panel d-flex flex-column align-items-top justify-content-center pt-3 ps-4 pe-2"
-    style="width:{isHorizontalVerticalMode ? '100%' : '50%'};"
+    style="width:{isHorizontalVerticalMode ? '100%' : '50%'}; "
   >
     <div
       class="{isCollaps
