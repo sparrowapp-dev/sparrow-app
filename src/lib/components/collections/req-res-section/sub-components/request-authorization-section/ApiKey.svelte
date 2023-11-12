@@ -52,13 +52,13 @@
     />
   </div>
   <div
-    class="d-flex align-items-center text-requestBodyColor gap-4"
+    class="d-flex align-items-center justify-content-between text-requestBodyColor gap-4"
     style="font-size: 12px; font-weight:500"
   >
     <p>Add to</p>
-    <div class="ps-5">
-      <button class="d-flex bg-backgroundColor border-0">
-        <p class="ps-3">
+    <div class="w-75 p-2">
+      <button class="bg-backgroundColor border-0">
+        <p class="">
           <Dropdown
             title={apiData.addTo}
             data={[AuthSection.HEADER, AuthSection.QUERY_PARAMETER]}
