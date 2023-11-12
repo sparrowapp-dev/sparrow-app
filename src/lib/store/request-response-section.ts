@@ -33,7 +33,6 @@ export const tabs = writable<NewTab[]>([]);
 
 let tabStore: NewTab[] = [];
 tabs.subscribe((value) => {
-  console.log(value);
   tabStore = value;
 });
 

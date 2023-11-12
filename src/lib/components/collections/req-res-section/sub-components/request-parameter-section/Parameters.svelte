@@ -7,8 +7,11 @@
   } from "$lib/store/request-response-section";
   import type { QueryParams } from "$lib/utils/dto";
   import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
-  import type { KeyValuePair, NewTab } from "$lib/utils/interfaces/request.interface";
-    import { onMount } from "svelte";
+  import type {
+    KeyValuePair,
+    NewTab,
+  } from "$lib/utils/interfaces/request.interface";
+  import { onMount } from "svelte";
 
   export let requestData: NewTab;
   export let currentTabId: string | null = null;
@@ -19,16 +22,39 @@
     key: "",
     value: "",
   };
+  let controller: boolean = false;
 
   $: {
     if (params) {
       authValue = findAuthParameter(requestData);
+      let flag: boolean = false;
+      for (let i = 0; i < params.length - 1; i++) {
+        if (params[i].checked === false) {
+          flag = true;
+        }
+      }
+      if (flag) {
+        controller = false;
+      } else {
+        controller = true;
+      }
     }
   }
 
   $: {
     if (currentTabId) {
       authValue = findAuthParameter(requestData);
+      let flag: boolean = false;
+      for (let i = 0; i < params.length - 1; i++) {
+        if (params[i].checked === false) {
+          flag = true;
+        }
+      }
+      if (flag) {
+        controller = false;
+      } else {
+        controller = true;
+      }
     }
   }
 
@@ -52,7 +78,7 @@
     updateQueryParams(params, currentTabId);
   }
 
-  const extractQueryParamstoURL = (params : KeyValuePair[]) => {
+  const extractQueryParamstoURL = (params: KeyValuePair[]) => {
     let response = "";
     let urlString: string = "";
     for (let i = 0; i < url.length; i++) {
@@ -118,11 +144,36 @@
     updateQueryParams(params, currentTabId);
     updateURL(extractQueryParamstoURL(params), currentTabId);
   };
+
+  const handleCheckAll = (): void => {
+    let flag: boolean;
+    if (controller === true) {
+      flag = false;
+    } else {
+      flag = true;
+    }
+    let filteredKeyValue = params.map((elem, i) => {
+      if (i !== params.length - 1) {
+        elem.checked = flag;
+      }
+      return elem;
+    });
+    params = filteredKeyValue;
+    updateQueryParams(params, currentTabId);
+    updateURL(extractQueryParamstoURL(params), currentTabId);
+  };
 </script>
 
 <div class="mt-3 me-0 w-100">
   <div class="d-flex gap-2">
-    <div style="width:40px;" />
+    <div style="width:40px;">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        bind:checked={controller}
+        on:input={handleCheckAll}
+      />
+    </div>
     <div
       class=" d-flex gap-2 text-requestBodyColor align-items-center"
       style="font-size: 12px; font-weight: 500; width:100%;"
@@ -220,14 +271,16 @@
               style="cursor:grabbing;"
             />
             <div style="width:30px;">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                bind:checked={param.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
-              />
+              {#if params.length - 1 != index}
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  bind:checked={param.checked}
+                  on:input={() => {
+                    updateCheck(index);
+                  }}
+                />
+              {/if}
             </div>
 
             <div class="w-100 d-flex gap-2">
