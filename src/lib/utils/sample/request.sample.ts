@@ -69,7 +69,7 @@ const createSampleRequest = (id: string) => {
         },
       ],
       state: {
-        raw: RequestType.Text,
+        raw: RequestType.TEXT,
         dataset: RequestDataset.NONE,
         auth: AuthType.NO_AUTH,
         section: RequestSection.PARAMETERS,

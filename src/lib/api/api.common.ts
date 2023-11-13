@@ -92,7 +92,7 @@ const makeRequest = async (
   }
 };
 
-const makeRequestforCrud = async (
+const makeHttpRequest = async (
   url: string,
   method: string,
   headers: string,
@@ -100,8 +100,6 @@ const makeRequestforCrud = async (
   request: string,
 ) => {
   try {
-    console.log(url, body, method, headers, request);
-
     const response = await invoke("make_type_request_command", {
       url,
       method,
@@ -113,13 +111,13 @@ const makeRequestforCrud = async (
     if (!response) {
       throw new Error("Invalid response from the backend");
     }
-    return await success(response);
+    return await success(JSON.parse(response));
   } catch (e) {
     return error(e.message || "An error occurred");
   }
 };
 
-export { makeRequest, getAuthHeaders, getRefHeaders, makeRequestforCrud };
+export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
 //------------- We need this function in future ------------------//
 // export const download = async (url, data, headers) => {
 //   try {

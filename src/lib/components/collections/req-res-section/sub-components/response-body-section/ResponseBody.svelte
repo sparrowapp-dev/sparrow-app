@@ -60,7 +60,7 @@
         if(elem.id === id){
           if(elem.request?.response?.body){
             content = {
-              text: elem.request?.response?.body,
+              text: JSON.parse(elem.request?.response?.body),
               json: undefined
             };
           }

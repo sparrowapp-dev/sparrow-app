@@ -13,13 +13,16 @@
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
   import { keyStore, valueStore } from "$lib/store/parameter";
-  import { onDestroy } from "svelte";
-  import { makeRequestforCrud } from "$lib/api/api.common";
+  import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notification } from "@tauri-apps/api";
-  import { notifications } from "$lib/utils/notifications";
-
+  import { notifications } from "$lib/utils/notifications"; 
+  import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
+    import { createApiRequest } from "$lib/services/rest-api.service";
+ 
   //this for expand and collaps condition
+  const _apiSendRequest = new ApiSendRequestController();
+
   let isCollaps;
 
   collapsibleState.subscribe((value) => (isCollaps = value));
@@ -66,7 +69,7 @@
     isInputValid = true;
     let isValidUrlText = isValidURL(urlText);
     let urlValue = "";
-    console.log(ensureHttpOrHttps(urlText));
+    
     if (isValidUrlText) {
       urlValue = ensureHttpOrHttps(urlText);
     } else {
@@ -75,7 +78,7 @@
       return;
     }
     const str = urlText;
-    console.log(urlValue);
+    
     if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
@@ -92,18 +95,13 @@
 
       isInputEmpty = false;
       if (isInputValid) {
-        let response = await makeRequestforCrud(
-          urlValue,
-          requestData.request.method,
-          "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
-          testJSON(requestData.request.body),
-          "JSON",
+        let response = await createApiRequest(
+          _apiSendRequest.decodeRestApiData(requestData)
         );
-
         if (response.isSuccessful) {
-          let responseBody = response.data.response.data;
-          let responseHeaders = response.data.headers;
-          let responseStatus = response.data.status;
+          let responseBody = response.data?.response;
+          let responseHeaders = response.data?.headers;
+          let responseStatus = response.data?.status;
           tabs.update((value) => {
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
@@ -276,12 +274,10 @@
               "GET",
               "POST",
               "PUT",
-              "DEL",
-              "TRAC",
-              "PATC",
+              "DELETE",
+              "PATCH",
               "HEAD",
-              "OPT",
-              "CON",
+              "OPTIONS"
             ]}
             method={componentData ? componentData.request.method : ""}
             onclick={handleDropdown}

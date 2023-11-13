@@ -2,7 +2,7 @@ import constants from "$lib/utils/constants";
 import {
   makeRequest,
   getAuthHeaders,
-  makeRequestforCrud,
+  makeHttpRequest,
 } from "$lib/api/api.common";
 
 import type {
@@ -176,7 +176,7 @@ export const crudMethod = async () => {
     const headers =
       "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
 
-    const response = await makeRequestforCrud(
+    const response = await makeHttpRequest(
       url,
       method,
       headers,

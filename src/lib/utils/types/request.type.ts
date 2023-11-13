@@ -1,6 +1,11 @@
-import type {
-  RequestAuthProperty,
-  RequestProperty,
+import type { AuthType } from "../enums/authorization.enum";
+import {
+  RequestMethod,
+  type RequestAuthProperty,
+  type RequestProperty,
+  RequestDataType,
+  RequestDataset,
+  RequestSection,
 } from "../enums/request.enum";
 
 export type RequestType =
@@ -18,3 +23,37 @@ export type RequestAuthType =
   | RequestAuthProperty.API_KEY
   | RequestAuthProperty.BASIC_AUTH
   | RequestAuthProperty.BEARER_TOKEN;
+
+export type RequestMethodType =
+  | RequestMethod.DELETE
+  | RequestMethod.GET
+  | RequestMethod.HEAD
+  | RequestMethod.OPTIONS
+  | RequestMethod.PATCH
+  | RequestMethod.POST
+  | RequestMethod.PUT;
+
+export type RequestRawType =
+  | RequestDataType.HTML
+  | RequestDataType.JSON
+  | RequestDataType.JAVASCRIPT
+  | RequestDataType.TEXT
+  | RequestDataType.XML;
+
+export type RequestDatasetType =
+  | RequestDataset.FORMDATA
+  | RequestDataset.NONE
+  | RequestDataset.RAW
+  | RequestDataset.URLENCODED;
+
+export type RequestAuthTypes =
+  | AuthType.API_KEY
+  | AuthType.BASIC_AUTH
+  | AuthType.BEARER_TOKEN
+  | AuthType.NO_AUTH;
+
+export type RequestSectionType =
+  | RequestSection.PARAMETERS
+  | RequestSection.REQUEST_BODY
+  | RequestSection.HEADERS
+  | RequestSection.AUTHORIZATION;

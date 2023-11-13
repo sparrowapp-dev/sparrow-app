@@ -1,11 +1,13 @@
 import type { Headers, QueryParams } from "../dto";
-import type { AuthSection, AuthType } from "../enums/authorization.enum";
+import type { AuthSection } from "../enums/authorization.enum";
 import type { ItemType } from "../enums/item-type.enum";
 import type {
-  RequestDataset,
-  RequestSection,
-  RequestType,
-} from "../enums/request.enum";
+  RequestAuthTypes,
+  RequestDatasetType,
+  RequestMethodType,
+  RequestRawType,
+  RequestSectionType,
+} from "../types/request.type";
 
 export interface Path {
   workspaceId: string;
@@ -57,27 +59,10 @@ export interface Body {
 }
 
 export interface State {
-  raw?:
-    | RequestType.HTML
-    | RequestType.JSON
-    | RequestType.JavaScript
-    | RequestType.Text
-    | RequestType.XML;
-  dataset?:
-    | RequestDataset.FORMDATA
-    | RequestDataset.NONE
-    | RequestDataset.RAW
-    | RequestDataset.URLENCODED;
-  auth?:
-    | AuthType.API_KEY
-    | AuthType.BASIC_AUTH
-    | AuthType.BEARER_TOKEN
-    | AuthType.NO_AUTH;
-  section?:
-    | RequestSection.PARAMETERS
-    | RequestSection.REQUEST_BODY
-    | RequestSection.HEADERS
-    | RequestSection.AUTHORIZATION;
+  raw?: RequestRawType;
+  dataset?: RequestDatasetType;
+  auth?: RequestAuthTypes;
+  section?: RequestSectionType;
 }
 
 export interface BasicAuth {
@@ -98,7 +83,7 @@ export interface Auth {
 }
 
 export interface Request {
-  method: string;
+  method: RequestMethodType;
   body?: Body;
   url?: string;
   headers?: KeyValuePair[];
