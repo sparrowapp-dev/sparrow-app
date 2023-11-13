@@ -5,6 +5,10 @@ import type {
   BasicAuth,
   ApiKey,
 } from "$lib/utils/interfaces/request.interface";
+import type {
+  RequestAuthType,
+  RequestType,
+} from "$lib/utils/types/request.type";
 
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
@@ -168,14 +172,30 @@ export const handleRequestStateChange = (
 };
 
 export const handleRequestAuthChange = (
-  data: string | BasicAuth | ApiKey,
-  property: string,
+  data: any | string | BasicAuth | ApiKey,
+  property: RequestAuthType,
   id: string,
-) => {
-  tabs.update((value: any) => {
+): void => {
+  tabs.update((value: NewTab[]) => {
     const updatedTab = value.map((elem) => {
       if (elem.id === id) {
         elem.request.auth[property] = data;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestChange = (
+  data: any,
+  property: RequestType,
+  id: string,
+): void => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.id === id) {
+        elem.request[property] = data;
       }
       return elem;
     });

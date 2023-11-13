@@ -147,20 +147,20 @@
     }
 
     if (queryString === "") {
-      return [{ name: "", description: "", checked: false }];
+      return [{ key: "", value: "", checked: false }];
     }
 
     let paramsArray = queryString.split("&");
     let params = paramsArray.map((param) => {
       let keyValue = param.split("=");
       if (keyValue.length === 1) {
-        return { name: keyValue[0], description: "", checked: true };
+        return { key: keyValue[0], value: "", checked: true };
       } else if (keyValue.length === 2) {
-        return { name: keyValue[0], description: keyValue[1], checked: true };
+        return { key: keyValue[0], value: keyValue[1], checked: true };
       }
     });
 
-    return [...params, { name: "", description: "", checked: false }];
+    return [...params, { key: "", value: "", checked: false }];
   };
 
   const handleDropdown = (tab: string) => {
