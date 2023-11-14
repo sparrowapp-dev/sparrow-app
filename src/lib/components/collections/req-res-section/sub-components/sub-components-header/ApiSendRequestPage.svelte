@@ -9,7 +9,7 @@
     tabs,
     updateQueryParams,
   } from "$lib/store/request-response-section";
-  import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
+  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -262,7 +262,7 @@
   >
     <div class="d-flex gap-2 w-100">
 
-      <CrudDropdown
+      <ColorDropdown
             data={[{
               name: "GET",
               id: RequestMethod.GET,
