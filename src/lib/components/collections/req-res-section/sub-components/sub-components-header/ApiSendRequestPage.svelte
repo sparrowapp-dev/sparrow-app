@@ -18,6 +18,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
 
   //this for expand and collaps condition
   let isCollaps;
@@ -205,8 +206,8 @@
   };
 
   const fetchUrlData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
+    list.forEach((elem:NewTab) => {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         urlText = elem.request.url;
         method = elem.request.method;
         disabledSend = elem.requestInProgress;

@@ -71,7 +71,7 @@
           index = {index}
           currentTabId={currentTabId} 
           tabWidth={tabWidth} 
-          method={tab.request.method}
+          method={tab.request? tab.request.method:""}
           handleTabRemove={handleTabRemove} 
           updateCurrentTab={updateCurrentTab}/>
       {/each}

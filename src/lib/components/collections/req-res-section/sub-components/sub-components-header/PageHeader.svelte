@@ -186,7 +186,6 @@
             }
           }}
         >
-          <!-- <img src={spin} class="loader-anim" alt="" style="width:14px; height:14px;"> -->
           <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
           <p
             class="mb-0 text-whiteColor"

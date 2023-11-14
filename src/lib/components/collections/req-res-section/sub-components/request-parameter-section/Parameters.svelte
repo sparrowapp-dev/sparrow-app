@@ -6,6 +6,8 @@
   import { sortable } from "svelte-agnostic-draggable";
     import { onDestroy } from "svelte";
     import type { QueryParams } from "$lib/utils/dto";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
@@ -37,8 +39,8 @@
  
   let url : string = "";
   const fetchComponentData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
+    list.forEach((elem:NewTab) => {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         params = elem.request.queryParams;
         url = elem.request.url;
       }

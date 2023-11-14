@@ -25,13 +25,6 @@ const addWorkspaceRequest=()=>{
           id:currentWorkspaceId,
           name: currentWorkspaceName||WorkspaceDefault.NAME,
           type: ItemType.WORKSPACE,
-          request : {
-            method: "",
-            body: "",
-            url: "",
-            headers: [],
-            queryParams:[] 
-          },
           save: true,
           requestInProgress: false,
           path:null

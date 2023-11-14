@@ -1,35 +1,24 @@
-<script>
+<script lang="ts">
    import whitePlus from "$lib/assets/plus-white.svg";
     import { handleTabAddons } from "$lib/store/request-response-section";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { RequestDefault } from "$lib/utils/enums/request.enum";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
     import { v4 as uuidv4 } from "uuid";
-   const addApiRequest=()=>{
-         const newTab={
-          id: uuidv4(),
-          name: RequestDefault.NAME,
-          type: ItemType.REQUEST,
-          request : {
-            method: RequestDefault.METHOD,
-            body: "",
-            url: "",
-            headers: [],
-            queryParams:[] 
-          },
-          save: false,
-          requestInProgress: false,
-          path:null
-        }
+    import { createSampleRequest } from "$lib/utils/sample/request.sample";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+   const addApiRequest=()=>{ 
+         const newTab: NewTab=createSampleRequest(uuidv4())
         handleTabAddons(newTab);
         moveNavigation('right');
 }
    
 </script>
-<div class="main-container  ps-3 pe-3 pt-3">
-<p class="main-header">Add Collections to your Workspace to group your requests or send an API request directly</p>
-<div class="button-container">
-    <button class="buttons">
+<div class="container-fluid row  d-flex flex-column align-items-center ps-4 pe-3 pt-3">
+<p style="font-size: 14px;
+font-weight: 300;">Add Collections to your Workspace to group your requests or send an API request directly</p>
+<div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
+    <button class="buttons d-flex justify-content-center align-items-center gap-1">
       <img src={whitePlus } alt="+">Collection
     </button>
     <button  class="buttons" on:click={()=>{addApiRequest()}}>
@@ -39,29 +28,9 @@
 </div>
 
 <style>
-.main-container{
-  width: 100%;
-  margin-top: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.main-header{
-  font-size: 14px;
-}
-.button-container{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  margin-top: 10px;
-  align-items: center;
-}
+
+
 .buttons{
-display: flex;
-justify-content: center;
-align-items: center;
-gap:5px;
 width:180px;
 height: 32px;
 padding: 4px, 12px, 4px, 4px;

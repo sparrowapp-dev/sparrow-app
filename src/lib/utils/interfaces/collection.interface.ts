@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export enum ItemTypeEnum {
-  FOLDER = "FOLDER",
-  REQUEST = "REQUEST",
-}
+import type { ItemType } from "../enums/item-type.enum";
+import type { RequestMethod } from "../enums/request.enum";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export enum BodyModeEnum {
   "application/json" = "application/json",
   "application/xml" = "application/xml",
@@ -14,11 +12,6 @@ export enum BodyModeEnum {
 export enum SourceTypeEnum {
   SPEC = "SPEC",
   USER = "USER",
-}
-
-export interface QueryParams {
-  key: string;
-  value: string;
 }
 
 export interface RequestBody {
@@ -34,7 +27,7 @@ export interface Params {
 }
 
 export interface RequestMetaData {
-  method: HTTPMethods;
+  method: RequestMethod;
   operationId: string;
   url: string;
   body?: RequestBody[];
@@ -47,7 +40,7 @@ export interface CollectionItem {
   id?: string;
   name: string;
   description?: string;
-  type: ItemTypeEnum;
+  type: ItemType;
   source?: SourceTypeEnum;
   items?: CollectionItem[];
   request?: RequestMetaData;
@@ -74,21 +67,3 @@ export interface CollectionDto {
   id: string;
   name: string;
 }
-
-type HTTPMethods =
-  | "DELETE"
-  | "GET"
-  | "HEAD"
-  | "PATCH"
-  | "POST"
-  | "PUT"
-  | "OPTIONS"
-  | "PROPFIND"
-  | "PROPPATCH"
-  | "MKCOL"
-  | "COPY"
-  | "MOVE"
-  | "LOCK"
-  | "UNLOCK"
-  | "TRACE"
-  | "SEARCH";

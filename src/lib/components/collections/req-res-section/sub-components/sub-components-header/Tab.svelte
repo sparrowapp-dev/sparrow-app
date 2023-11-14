@@ -4,7 +4,7 @@
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import type { NewTab } from "$lib/utils/interfaces/request.interface";
     import book from "$lib/assets/book.svg";
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { currentWorkspace } from "$lib/store/workspace.store";
   export let tab;
   export let updateCurrentTab;
@@ -14,21 +14,16 @@
   export let index;
   export let method;
   let workspaceId:string;
-  let tabList:NewTab[]=[]
 
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;;
-    tabList.filter((tab:NewTab)=>{
-         if(tab.type===ItemType.WORKSPACE){
+  const setWorkspaceId=()=>{
+    if(tab.type===ItemType.WORKSPACE){
             workspaceId=tab.id
-         }
-    });
-  });
+      }
+  }
+  onMount(()=>{
+    setWorkspaceId();
+  })
   
-  
-  onDestroy(() => {
-    tabsUnsubscribe();
-  });
     
 </script>
 
@@ -74,7 +69,7 @@ on:click={() => {
           : method === "POST"
           ? "yellow-api"
           : ""}
-        style="font-size: 12px; height: 31px; ">{method}</span
+        style="font-size: 12px; height: 31px; ">{method||""}</span
       >
       {#if workspaceId===currentTabId && !method}
       <img src={book} alt="book">

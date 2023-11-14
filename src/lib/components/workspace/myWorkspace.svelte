@@ -29,7 +29,6 @@
 
 
   const modifyWorkspace=async()=>{
-    debugger;
     const workspace=await updateWorkspace(selectedWorkspace.id,{name:newWorkspaceName})
     const {_id:id, name}=workspace.data.data;
     setCurrentWorkspace(id,name);
@@ -41,12 +40,12 @@
 });
 </script>
 <div class="main-container">
-<div class="my-workspace">
-  <div class="my-workspace-header">
-    <input type="text" value={selectedWorkspace.name} class="workspace-input" on:input={(event)=>{handleWorkspaceInput(event)}}
+<div class="my-workspace d-flex flex-column">
+  <div class="d-flex w-100 justify-content-between">
+    <input type="text" value={selectedWorkspace.name} class="workspace-input border-0 text-center" on:input={(event)=>{handleWorkspaceInput(event)}}
       on:blur={()=>{modifyWorkspace()}} on:keydown={(event)=>{
         if(event.key=="Enter"){modifyWorkspace()}}}>
-    <button class="invite-btn">Invite</button>
+    <button class="invite-btn  border-0">Invite</button>
   </div>
   <div class="my-workspace-info">
     <p class="workspace-info">This is your personal workspace.Start Typing. Describe the Objective of your workspace and how it is meant to be used. Or create a comprehensive API documentaion by including links to your collection and requests</p>
@@ -66,25 +65,15 @@
   }
   .my-workspace{
     width: 100%;
-    display: flex;
-    flex-direction: column;
     padding: 20px;
   }
-  .my-workspace-header{
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-  }
   .workspace-input{
-    border: none;
-    text-align: center;
     background-color: linear-gradient(0deg, #313233, #313233);
     border-bottom: 1px solid  #85C2FF;
   }
   .invite-btn{
     background-color: #1193F0;
     padding: 5px 20px;
-    border: none;
     border-radius: 5px;
   }
   .workspace-info{

@@ -14,7 +14,6 @@
   });
 
   const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    debugger;
     if (value && value.id) {
       currentTabId = value.id;
       if (currentTabId && tabList) {
