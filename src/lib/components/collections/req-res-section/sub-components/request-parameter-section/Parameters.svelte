@@ -1,20 +1,66 @@
 <script lang="ts">
-  import { enableBodyScroll, disableBodyScroll } from "body-scroll-lock";
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import {
-    currentTab,
-    isHorizontalVertical,
-    tabs,
     updateQueryParams,
     updateURL,
   } from "$lib/store/request-response-section";
-  import { sortable } from "svelte-agnostic-draggable";
-  import { onDestroy } from "svelte";
   import type { QueryParams } from "$lib/utils/dto";
+  import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
+  import type {
+    KeyValuePair,
+    NewTab,
+  } from "$lib/utils/interfaces/request.interface";
+  import { onMount } from "svelte";
 
-  let isHorizontalVerticalMode: boolean;
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+  export let requestData: NewTab;
+  export let currentTabId: string | null = null;
+  export let params: KeyValuePair[] = [];
+  export let url: string = "";
+
+  let authValue: { key: string; value: string } = {
+    key: "",
+    value: "",
+  };
+  let controller: boolean = false;
+
+  $: {
+    if (params) {
+      authValue = findAuthParameter(requestData);
+      let flag: boolean = false;
+      for (let i = 0; i < params.length - 1; i++) {
+        if (params[i].checked === false) {
+          flag = true;
+        }
+      }
+      if (flag) {
+        controller = false;
+      } else {
+        controller = true;
+      }
+    }
+  }
+
+  $: {
+    if (currentTabId) {
+      authValue = findAuthParameter(requestData);
+      let flag: boolean = false;
+      for (let i = 0; i < params.length - 1; i++) {
+        if (params[i].checked === false) {
+          flag = true;
+        }
+      }
+      if (flag) {
+        controller = false;
+      } else {
+        controller = true;
+      }
+    }
+  }
+
+  onMount(() => {
+    authValue = findAuthParameter(requestData);
+  });
 
   let ListView;
   function onSortableUpdate() {
@@ -32,39 +78,7 @@
     updateQueryParams(params, currentTabId);
   }
 
-  let isHovered: boolean = false;
-
-  function toggleHover() {
-    isHovered = !isHovered;
-  }
-
-  let currentTabId = null;
-  let tabList = [];
-  let params: QueryParams[] = [];
-
-  let url: string = "";
-  const fetchComponentData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        params = elem.request.queryParams;
-        url = elem.request.url;
-      }
-    });
-  };
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      fetchComponentData(currentTabId, tabList);
-    }
-  });
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchComponentData(currentTabId, tabList);
-    }
-  });
-
-  const extractQueryParamstoURL = (params) => {
+  const extractQueryParamstoURL = (params: KeyValuePair[]) => {
     let response = "";
     let urlString: string = "";
     for (let i = 0; i < url.length; i++) {
@@ -78,7 +92,7 @@
     for (let param of params) {
       if (param.checked) {
         count++;
-        queryString += `${param.name}=${param.description}&`;
+        queryString += `${param.key}=${param.value}&`;
       }
     }
     if (count !== 0) {
@@ -99,7 +113,7 @@
     });
     params = params;
     if (params.length - 1 === index) {
-      params.push({ name: "", description: "", checked: false });
+      params.push({ key: "", value: "", checked: false });
       params = params;
     }
     updateQueryParams(params, currentTabId);
@@ -131,15 +145,35 @@
     updateURL(extractQueryParamstoURL(params), currentTabId);
   };
 
-  onDestroy(() => {
-    currentTabUnsubscribe();
-    tabsUnsubscribe();
-  });
+  const handleCheckAll = (): void => {
+    let flag: boolean;
+    if (controller === true) {
+      flag = false;
+    } else {
+      flag = true;
+    }
+    let filteredKeyValue = params.map((elem, i) => {
+      if (i !== params.length - 1) {
+        elem.checked = flag;
+      }
+      return elem;
+    });
+    params = filteredKeyValue;
+    updateQueryParams(params, currentTabId);
+    updateURL(extractQueryParamstoURL(params), currentTabId);
+  };
 </script>
 
 <div class="mt-3 me-0 w-100">
   <div class="d-flex gap-2">
-    <div style="width:40px;" />
+    <div style="width:40px;">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        bind:checked={controller}
+        on:input={handleCheckAll}
+      />
+    </div>
     <div
       class=" d-flex gap-2 text-requestBodyColor align-items-center"
       style="font-size: 12px; font-weight: 500; width:100%;"
@@ -157,25 +191,14 @@
     "
     bind:this={ListView}
   >
-    {#each params as param, index}
+    {#if authValue.key && authValue.value}
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width: {isHorizontalVerticalMode
-          ? '100%'
-          : '100%'};"
-        data-list-key={JSON.stringify({
-          name: param.name,
-          description: param.description,
-          checked: param.checked,
-        })}
+        style="cursor:default; width:100%;"
       >
         <div
-          on:mouseenter={toggleHover}
-          on:mouseleave={toggleHover}
-          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width: {isHorizontalVerticalMode
-            ? '100%'
-            : '100%'};"
+          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
         >
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
@@ -190,25 +213,84 @@
               <input
                 class="form-check-input"
                 type="checkbox"
-                on:mouseenter={toggleHover}
-                on:mouseleave={toggleHover}
-                bind:checked={param.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
+                disabled
+                checked={true}
               />
             </div>
 
             <div class="w-100 d-flex gap-2">
               <div class="flex-grow-1 w-100">
                 <input
-                  on:mouseenter={toggleHover}
-                  on:mouseleave={toggleHover}
                   type="text"
                   placeholder="Enter Key"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
-                  bind:value={param.name}
+                  disabled
+                  bind:value={authValue.key}
+                />
+              </div>
+              <div class="flex-grow-1 w-100">
+                <input
+                  type="text"
+                  placeholder="Enter Value"
+                  class="form-control bg-blackColor py-1 border-0"
+                  style="font-size: 13px;"
+                  disabled
+                  bind:value={authValue.value}
+                />
+              </div>
+            </div>
+            <div class="h-75 pe-1">
+              <button class="bg-backgroundColor border-0" style="width:40px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
+    {#each params as param, index}
+      <div
+        aria-label="Toggle Hover"
+        class="sortable > div"
+        style="cursor:default; width:100%;"
+        data-list-key={JSON.stringify({
+          name: param.key,
+          description: param.value,
+          checked: param.checked,
+        })}
+      >
+        <div
+          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+        >
+          <div
+            class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+          >
+            <img
+              src={dragIcon}
+              alt=""
+              class="d-none"
+              style="cursor:grabbing;"
+            />
+            <div style="width:30px;">
+              {#if params.length - 1 != index}
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  bind:checked={param.checked}
+                  on:input={() => {
+                    updateCheck(index);
+                  }}
+                />
+              {/if}
+            </div>
+
+            <div class="w-100 d-flex gap-2">
+              <div class="flex-grow-1 w-100">
+                <input
+                  type="text"
+                  placeholder="Enter Key"
+                  class="form-control bg-blackColor py-1 border-0"
+                  style="font-size: 13px;"
+                  bind:value={param.key}
                   on:input={() => {
                     updateParam(index);
                   }}
@@ -216,13 +298,11 @@
               </div>
               <div class="flex-grow-1 w-100">
                 <input
-                  on:mouseenter={toggleHover}
-                  on:mouseleave={toggleHover}
                   type="text"
                   placeholder="Enter Value"
                   class="form-control bg-blackColor py-1 border-0"
                   style="font-size: 13px;"
-                  bind:value={param.description}
+                  bind:value={param.value}
                   on:input={() => {
                     updateParam(index);
                   }}

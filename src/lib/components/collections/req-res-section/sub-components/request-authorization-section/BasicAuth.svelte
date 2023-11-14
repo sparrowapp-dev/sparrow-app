@@ -1,16 +1,15 @@
 <script lang="ts">
-  import {
-    basicAuth_password,
-    basicAuth_username,
-  } from "$lib/store/authorization";
+  import { handleRequestAuthChange } from "$lib/store/request-response-section";
+    import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
+  import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
 
-  const handleUsername = (event) => {
-    basicAuth_username.set(event.target.value);
-  };
+  export let currentTabId: string;
+  export let basicAuth: BasicAuth;
 
-  const handlePassword = (event) => {
-    basicAuth_password.set(event.target.value);
+  const handleInput = () => {
+    handleRequestAuthChange(basicAuth, RequestAuthProperty.BASIC_AUTH, currentTabId);
   };
+  
 </script>
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
@@ -25,8 +24,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Username"
-      bind:value={$basicAuth_username}
-      on:input={handleUsername}
+      bind:value={basicAuth.username}
+      on:input={handleInput}
     />
   </div>
 
@@ -41,8 +40,8 @@
       style="outline: none;"
       class="w-75 bg-backgroundColor border-0 h-75 ps-2"
       placeholder="Enter Password"
-      bind:value={$basicAuth_password}
-      on:input={handlePassword}
+      bind:value={basicAuth.password}
+      on:input={handleInput}
     />
   </div>
 </div>

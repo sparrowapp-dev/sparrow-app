@@ -2,7 +2,13 @@ import { writable } from "svelte/store";
 import type {
   NewTab,
   CurrentTab,
+  BasicAuth,
+  ApiKey,
 } from "$lib/utils/interfaces/request.interface";
+import type {
+  RequestAuthType,
+  RequestType,
+} from "$lib/utils/types/request.type";
 
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
@@ -94,6 +100,102 @@ export const updateURL = (url, id) => {
     const updatedTab = value.map((elem) => {
       if (elem.id === id) {
         elem.request.url = url;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRawDataChange = (raw: string, id: string) => {
+  tabs.update((value) => {
+    const temp = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.raw = raw;
+      }
+      return elem;
+    });
+    return temp;
+  });
+};
+
+export const updateUrlEncode = (urlencode, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.urlencoded = urlencode;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const updateFormDataText = (formdatatext, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.formdata.text = formdatatext;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const updateFormDataFile = (formdatafile, id: string) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.body.formdata.file = formdatafile;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestStateChange = (
+  tab: string,
+  property: string,
+  id: string,
+) => {
+  tabs.update((value: any) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.state[property] = tab;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestAuthChange = (
+  data: any | string | BasicAuth | ApiKey,
+  property: RequestAuthType,
+  id: string,
+): void => {
+  tabs.update((value: NewTab[]) => {
+    const updatedTab = value.map((elem) => {
+      if (elem.id === id) {
+        elem.request.auth[property] = data;
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+export const handleRequestChange = (
+  data: any,
+  property: RequestType,
+  id: string,
+): void => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.id === id) {
+        elem.request[property] = data;
       }
       return elem;
     });
