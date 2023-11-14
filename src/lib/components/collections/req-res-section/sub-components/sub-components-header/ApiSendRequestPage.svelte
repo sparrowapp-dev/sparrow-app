@@ -90,6 +90,7 @@
 
       isInputEmpty = false;
       if (isInputValid) {
+        let start = Date.now();
         let response = await makeRequestforCrud(
           urlValue,
           requestData.request.method,
@@ -97,10 +98,16 @@
           testJSON(requestData.request.body),
           "JSON",
         );
+        let end = Date.now();
+
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        let responseSizeKB = byteLength / 1024;
+        let duration = end - start;
 
         if (response.isSuccessful) {
           let responseBody = response.data.response;
-          console.log(responseBody);
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
           tabs.update((value) => {
@@ -110,6 +117,8 @@
                   body: responseBody,
                   headers: JSON.stringify(responseHeaders),
                   status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
                 };
                 elem.requestInProgress = false;
               }
@@ -227,7 +236,7 @@
   const handleResize = () => {
     const windowWidth = window.innerWidth;
 
-    if (windowWidth <= 800) {
+    if (windowWidth <= 1300) {
       document.querySelector("#barIcon").click();
       isHorizontalVertical.set(true);
     } else {

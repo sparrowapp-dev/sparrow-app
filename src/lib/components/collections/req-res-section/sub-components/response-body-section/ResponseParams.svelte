@@ -3,14 +3,18 @@
 
   import ResponseHeader from "./ResponseHeader.svelte";
 
-  let selectedTab1 = "response";
   export let responseBody;
   export let responseHeader;
+  export let statusCode: string;
+  export let timeTaken: number;
+  export let sizeinKb: number;
+
+  let selectedTab1: string = "response";
 </script>
 
-<div class="d-flex flex-column justify-content-between w-100">
+<div class="d-flex flex-column gap-2 justify-content-center w-100">
   <div class="d-flex align-items-center justify-content-between">
-    <div class="d-flex gap-4 text-requestBodyColor">
+    <div class="d-flex gap-3 text-requestBodyColor">
       <span
         style="font-size: 12px;font-weight:500"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
@@ -30,31 +34,32 @@
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab1 === "resheader"}
           >Headers
-          <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">(4)</p>
+          <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
+            ({responseHeader.length})
+          </p>
         </span>
       </span>
     </div>
 
-    <div class="d-flex gap-3">
+    <div class="d-flex gap-2">
       <button
-        class="cursor-pointer d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary1"
+        class="cursor-pointer ps-1 pe-1 border-0 rounded d-flex align-items-center justify-content-center text-backgroundColor gap-1 status-primary1"
         style="font-size: 12px; font-weight:600"
       >
-        <span>200</span>
-        <p class="mb-0">OK</p>
+        <span>{statusCode}</span>
       </button>
       <button
-        class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary2"
+        class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
         style="font-size: 12px;font-weight:600"
       >
-        <span>300</span>
+        <span>{timeTaken}</span>
         <p class="mb-0">ms</p>
       </button>
       <button
-        class="d-flex align-items-center justify-content-center text-backgroundColor gap-1 btn btn-primary3"
+        class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
         style="font-size: 12px;font-weight:600"
       >
-        <span>6.8</span>
+        <span>{sizeinKb?.toFixed(2)}</span>
         <p class="mb-0">KB</p>
       </button>
     </div>
@@ -79,17 +84,16 @@
     border-bottom: 3px solid #85c2ff;
   }
 
-  .btn-primary1 {
+  .status-primary1 {
     background: var(--success-color);
-
     padding-top: 1px;
     padding-bottom: 1px;
   }
 
-  .btn-primary2 {
+  .time-primary1 {
     background: var(--button-color);
   }
-  .btn-primary3 {
+  .size-primary1 {
     background: var(--button-color);
   }
   .cursor-pointer {

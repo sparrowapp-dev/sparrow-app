@@ -40,17 +40,20 @@
   let progress: boolean = false;
   let responseBody;
   let responseHeader;
+  let statusCode;
+  let timeTaken: number;
+  let sizeinKb: number;
 
   let responseError: boolean = false;
 
   function isValidUrl(str) {
     const pattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR IP (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$", // fragment locator
+      "^(https?:\\/\\/)?" +
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
+        "((\\d{1,3}\\.){3}\\d{1,3}))" +
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+        "(\\?[;&a-z\\d%_.~+=-]*)?" +
+        "(\\#[-a-z\\d_]*)?$",
       "i",
     );
     return pattern.test(str);
@@ -64,6 +67,9 @@
         url = elem.request.url;
         if (elem.request?.response) {
           jsonResponse = true;
+          statusCode = elem.request?.response?.status;
+          timeTaken = elem.request.response.time;
+          sizeinKb = elem.request.response.size;
           responseBody = elem.request?.response?.body;
           responseHeader = Object.entries(
             JSON.parse(elem.request?.response?.headers),
@@ -99,8 +105,6 @@
     tabsUnsubscribe();
     isHorizontalVerticalUnsubscribe();
   });
-
-  console.log(responseError);
 </script>
 
 <div
@@ -184,7 +188,13 @@
   >
     <div class=" d-flex flex-column" style="height:100%;">
       {#if jsonResponse}
-        <ResponseParams {responseBody} {responseHeader} />
+        <ResponseParams
+          {responseBody}
+          {responseHeader}
+          {statusCode}
+          {timeTaken}
+          {sizeinKb}
+        />
       {:else}
         <DefaultPage />
       {/if}

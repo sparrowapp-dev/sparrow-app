@@ -108,7 +108,6 @@ const makeRequestforCrud = async (
       request,
     });
 
-    console.log(response);
     if (!response) {
       throw new Error("Invalid response from the backend");
     }
