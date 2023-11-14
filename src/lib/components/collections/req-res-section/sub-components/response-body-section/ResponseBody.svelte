@@ -106,13 +106,13 @@
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
       >
-        <Dropdown data={["Pretty"]} onclick={handlePrettierDropdown} />
+        <Dropdown title="Pretty" data={["Pretty"]} onclick={handlePrettierDropdown} />
       </button>
 
       <button
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
-        <Dropdown data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown} />
+        <Dropdown title="JSON" data={["JSON", "XML", "RAW"]} onclick={handleTypeDropdown} />
       </button>
     </div>
     <div class="d-flex align-items-center gap-4">

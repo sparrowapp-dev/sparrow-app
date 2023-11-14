@@ -15,7 +15,7 @@
   import { onDestroy, onMount } from "svelte";
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import { CodeEditor } from "petrel";
-  import { RequestDataset, RequestType } from "$lib/utils/enums/request.enum";
+  import { RequestDataset, RequestDataType } from "$lib/utils/enums/request.enum";
   import type {
     NewTab,
     KeyValuePair,
@@ -146,17 +146,17 @@
       <Dropdown
         title={rawTab}
         data={[
-          RequestType.HTML,
-          RequestType.JSON,
-          RequestType.JavaScript,
-          RequestType.Text,
-          RequestType.XML,
+          RequestDataType.HTML,
+          RequestDataType.JSON,
+          RequestDataType.JAVASCRIPT,
+          RequestDataType.TEXT,
+          RequestDataType.XML,
         ]}
         onclick={handleRawDropDown}
       />
     {/if}
   </div>
-  {#if mainTab === RequestDataset.RAW && rawTab === RequestType.JSON}
+  {#if mainTab === RequestDataset.RAW && rawTab === RequestDataType.JSON}
     <div
       style="height:{isHorizontalVerticalMode ? '200px' : '400px'}"
       class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-0"
@@ -169,7 +169,7 @@
         mode={Mode.text}
       />
     </div>
-  {:else if mainTab === RequestDataset.RAW && (rawTab === RequestType.HTML || rawTab === RequestType.XML || RequestType.JavaScript || RequestType.Text)}
+  {:else if mainTab === RequestDataset.RAW && (rawTab === RequestDataType.HTML || rawTab === RequestDataType.XML || RequestDataType.JAVASCRIPT || RequestDataType.TEXT)}
     <div id="code-editor" style="width: 100%">
       <textarea
         rows="8"

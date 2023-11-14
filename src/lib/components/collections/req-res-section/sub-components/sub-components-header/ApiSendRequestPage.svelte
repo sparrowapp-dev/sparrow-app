@@ -11,11 +11,15 @@
   } from "$lib/store/request-response-section";
   import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
-  import { onDestroy } from "svelte";
-  import { makeRequestforCrud } from "$lib/api/api.common";
+  import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notification } from "@tauri-apps/api";
+  import { notifications } from "$lib/utils/notifications"; 
+  import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
+    import { createApiRequest } from "$lib/services/rest-api.service";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
+  //this for expand and collaps condition
+  const _apiSendRequest = new ApiSendRequestController();
 
   let isCollaps: boolean;
 
@@ -63,18 +67,16 @@
     isInputValid = true;
     let isValidUrlText = isValidURL(urlText);
     let urlValue = "";
-    if (isValidUrlText) {
-      urlValue = ensureHttpOrHttps(urlText);
-    } else {
-      urlValue = urlText;
-      isInputValid = false;
-      if (urlText.length > 0) {
-        notifications.error("Invalid URL");
-      }
-      return;
-    }
+    
+    // if (isValidUrlText) {
+    //   urlValue = ensureHttpOrHttps(urlText);
+    // } else {
+    //   isInputValid = false;
+    //   notifications.error("Invalid URL");
+    //   return;
+    // }
     const str = urlText;
-
+    
     if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
@@ -92,12 +94,8 @@
       isInputEmpty = false;
       if (isInputValid) {
         let start = Date.now();
-        let response = await makeRequestforCrud(
-          urlValue,
-          requestData.request.method,
-          "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
-          testJSON(requestData.request.body),
-          "JSON",
+        let response = await createApiRequest(
+          _apiSendRequest.decodeRestApiData(requestData)
         );
         let end = Date.now();
 
@@ -106,7 +104,6 @@
         ).length;
         let responseSizeKB = byteLength / 1024;
         let duration = end - start;
-
         if (response.isSuccessful) {
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
@@ -269,12 +266,10 @@
               "GET",
               "POST",
               "PUT",
-              "DEL",
-              "TRAC",
-              "PATC",
+              "DELETE",
+              "PATCH",
               "HEAD",
-              "OPT",
-              "CON",
+              "OPTIONS"
             ]}
             method={componentData ? componentData.request.method : ""}
             onclick={handleDropdown}

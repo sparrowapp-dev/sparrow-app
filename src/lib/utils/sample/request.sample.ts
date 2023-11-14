@@ -4,7 +4,7 @@ import {
   RequestDataset,
   RequestDefault,
   RequestSection,
-  RequestType,
+  RequestDataType,
 } from "../enums/request.enum";
 import type { NewTab } from "../interfaces/request.interface";
 
@@ -70,7 +70,7 @@ const createSampleRequest = (id: string): NewTab => {
         },
       ],
       state: {
-        raw: RequestType.Text,
+        raw: RequestDataType.TEXT,
         dataset: RequestDataset.NONE,
         auth: AuthType.NO_AUTH,
         section: RequestSection.PARAMETERS,

@@ -2,29 +2,27 @@ export enum RequestMethod {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
-  DEL = "DEL",
-  TRAC = "TRAC",
-  PATC = "PATC",
+  DELETE = "DELETE",
+  PATCH = "PATCH",
   HEAD = "HEAD",
-  OPT = "OPT",
-  CON = "CON",
+  OPTIONS = "OPTIONS",
 }
 
 export enum RequestDefault {
   NAME = "API Request Name",
-  METHOD = "GET",
+  METHOD = RequestMethod.GET,
 }
 
 export enum WorkspaceDefault {
   NAME = "MY WORKSPACE",
 }
 
-export enum RequestType {
+export enum RequestDataType {
   JSON = "JSON",
   XML = "XML",
   HTML = "HTML",
-  Text = "Text",
-  JavaScript = "JavaScript",
+  TEXT = "Text",
+  JAVASCRIPT = "JavaScript",
 }
 
 export enum RequestDataset {
