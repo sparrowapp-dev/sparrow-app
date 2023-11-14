@@ -1,19 +1,10 @@
 <script>
-  import { Circle } from "svelte-loading-spinners";
   import spin from "$lib/assets/spin.svg";
-  // export let visible;
-  let color = "#1c35f3b9";
-  let size = "70";
-  //   let unit = "1px";
 </script>
 
-<!-- {#if visible} -->
 <div class="loading-spinner spinner-item">
-<img class="load-spin"  src={spin} style="width: 80px; height:80px;" alt="">
-  <!-- Place your loading spinner component here -->
+  <img class="load-spin" src={spin} style="width: 80px; height:80px;" alt="" />
 </div>
-
-<!-- {/if} -->
 
 <style>
   .spinner-item {
@@ -29,15 +20,15 @@
     backdrop-filter: blur(3px);
     z-index: 999;
   }
-  .load-spin{
-    animation: loader-animation 1s linear infinite; 
-  }  
-  @keyframes loader-animation { 
-      0% { 
-          transform: rotate(0deg); 
-      } 
-      100% { 
-          transform: rotate(360deg); 
-      } 
-  } 
+  .load-spin {
+    animation: loader-animation 1s linear infinite;
+  }
+  @keyframes loader-animation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>

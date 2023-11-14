@@ -21,18 +21,17 @@ $sparrow-get: #69d696;
 $sparrow-put: #9685ff;
 $sparrow-post: #ffe47e;
 $sparrow-delete: #ff7878;
-$sparrow-trac: #FBA574;
-$sparrow-head: #69D696;
-$sparrow-con: #58C6B9;
-$sparrow-patc: #DF77F9;
-$sparrow-opt: #F15EA5;
+$sparrow-trac: #fba574;
+$sparrow-head: #69d696;
+$sparrow-con: #58c6b9;
+$sparrow-patc: #df77f9;
+$sparrow-opt: #f15ea5;
 $sparrow-arc: #8a9299;
 $sparrow-request-body: #8a9299;
 $sparrow-send-button: #1193f0;
 $sparrow-send-hoverbutton: #04416d;
 $sparrow-button-background: #2d2c2c;
 $sparrow-button-color: #e5e5e5;
-
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -77,6 +76,7 @@ $theme-colors: map-merge(
     "labelColor": $sparrow-send-button,
     "buttonBackColor": $sparrow-button-background,
     "buttonColor": $sparrow-button-color,
+    "redColor": $sparrow-gradient,
   )
 );
 
