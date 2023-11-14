@@ -8,7 +8,7 @@
   // import githubLogo from "$lib/assets/githublogo.svg";
   // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
-  import { handleLoginValidation } from "./login-page";
+  import { authNavigate, handleLoginValidation } from "./login-page";
 
   let isEmailTouched = false;
 
@@ -52,19 +52,11 @@
     password: "",
   };
 
-  // let errorMessage = "";
-
-  // Handle sign-in with external providers
-  const handleSignInWithProvider = (provider: string) => {
-    // Handle sign-in with GitHub, Google, Microsoft, etc.
-    // You can implement the authentication logic here.
-    // Example: Redirect to OAuth authorization URL for the selected provider.
-    console.log(`Signing in with ${provider}`);
-    // maximizePage();
+  const handleSignInWithProvider = () => {
+    authNavigate();
   };
 </script>
 
-<!-- Below used color as color variable -->
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
@@ -84,10 +76,6 @@
       style="width:408px; height:429px"
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
-        if (isEmailValid && loginCredentials.password.length > 0) {
-          validationErrors.password =
-            "The email and password combination you entered appears to be incorrect. Please try again.";
-        }
       }}
     >
       <h2 class="card-subtitle fs-4 mb-3">Sign In</h2>
@@ -162,7 +150,7 @@
             <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
           </button> -->
           <button
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={handleSignInWithProvider}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >

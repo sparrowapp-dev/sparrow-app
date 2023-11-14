@@ -21,6 +21,14 @@ const loginUser = async (userInfo: loginUserPostBody) => {
   return response;
 };
 
+const loginWithGoogle = async () => {
+  const response = await makeRequest("GET", `${apiUrl}/api/auth/google`, {
+    headers: getRefHeaders(),
+  });
+  console.log(response);
+  return response;
+};
+
 const forgotPassword = async (email: EmailPostBody) => {
   const response = await makeRequest(
     "POST",
@@ -50,4 +58,11 @@ const refreshToken = async () => {
   return response;
 };
 
-export { registerUser, loginUser, forgotPassword, refreshToken, userLogout };
+export {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  refreshToken,
+  userLogout,
+  loginWithGoogle,
+};

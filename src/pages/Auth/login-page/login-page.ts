@@ -1,4 +1,4 @@
-import { loginUser } from "$lib/services/auth.service";
+import { loginUser, loginWithGoogle } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import type { loginUserPostBody } from "$lib/utils/dto";
 import { notifications } from "$lib/utils/notifications";
@@ -14,6 +14,11 @@ export const navigateToRegister = () => {
 
 export const authNavigate = () => {
   navigate(`${constants.API_URL}/api/auth/google`);
+};
+
+export const handleLoginWithGoogle = async () => {
+  const response = await loginWithGoogle();
+  console.log(response);
 };
 
 //---------------- Handle Login ------------------//
