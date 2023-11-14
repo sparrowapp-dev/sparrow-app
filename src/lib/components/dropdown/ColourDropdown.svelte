@@ -2,18 +2,18 @@
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
 
-  let visibility : boolean = false;
+  let visibility: boolean = false;
   export let data: Array<{
-    name : string,
-    id : string,
-    color: string
+    name: string;
+    id: string;
+    color: string;
   }>;
   export let onclick: (tab: string) => void;
-  export let method : string;
+  export let method: string;
   let selectedRequest: {
-    name : string,
-    id : string,
-    color: string
+    name: string;
+    id: string;
+    color: string;
   };
 
   window.addEventListener("click", () => {
@@ -31,26 +31,28 @@
   }
 </script>
 
-<div class="parent-dropdown display-inline-block" style=" position: relative;  z-index:9999;"
+<div
+  class="parent-dropdown display-inline-block"
+  style=" position: relative;  z-index:9999;"
 >
-  <div on:click={() => {
-    setTimeout(() => {
-      visibility = true;
-    }, 100);
-  }}
-  >
   <div
-  class="dropdown-btn rounded px-3 d-flex align-items-center justify-content-between"
-  class:dropdown-btn-active={visibility === true}
-      ><p
-        class=" mb-0 text-{selectedRequest?.color}"
-      >
+    on:click={() => {
+      setTimeout(() => {
+        visibility = true;
+      }, 100);
+    }}
+  >
+    <div
+      class="dropdown-btn rounded px-3 d-flex align-items-center justify-content-between"
+      class:dropdown-btn-active={visibility === true}
+    >
+      <p class=" mb-0 text-{selectedRequest?.color}">
         {selectedRequest?.name}
       </p>
-      <span
-        class:dropdown-logo-active={visibility === true}
+      <span class:dropdown-logo-active={visibility === true}
         ><img style="height:12px; width:12px;" src={dropdown} alt="" /></span
-      ></div>
+      >
+    </div>
   </div>
   <div
     class="d-none dropdown-data p-1 rounded"
@@ -87,7 +89,7 @@
     height: 34px;
     width: 110px;
   }
-  .dropdown-btn:hover{
+  .dropdown-btn:hover {
     background-color: var(--border-color);
   }
   .dropdown-data {
@@ -117,11 +119,11 @@
   .highlight:hover {
     background-color: #232424;
   }
-  .dropdown-btn{
+  .dropdown-btn {
     border: 1px solid #313233;
     cursor: pointer;
   }
-  .dropdown-btn-active{
-    border: 1px solid #85C2FF;
+  .dropdown-btn-active {
+    border: 1px solid #85c2ff;
   }
 </style>
