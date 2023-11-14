@@ -104,7 +104,6 @@
         ).length;
         let responseSizeKB = byteLength / 1024;
         let duration = end - start;
-
         if (response.isSuccessful) {
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;

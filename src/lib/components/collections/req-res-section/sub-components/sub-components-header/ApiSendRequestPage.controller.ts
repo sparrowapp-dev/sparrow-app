@@ -25,6 +25,15 @@ enum fileType {
 type Type = "File" | "Text";
 
 class ApiSendRequestController {
+  private ensureHttpOrHttps = (str) => {
+    if (str.startsWith("http://") || str.startsWith("https://")) {
+      return "";
+    } else if (str.startsWith("//")) {
+      return "http:";
+    } else {
+      return "http://";
+    }
+  };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   private extractKeyValue = (pairs: any[], type: Type): string => {
     let response: string = "";
@@ -59,11 +68,25 @@ class ApiSendRequestController {
         }
       }
       if (!flag) {
-        url + "?" + authHeader.key + "=" + authHeader.value;
+        return (
+          this.ensureHttpOrHttps(url) +
+          url +
+          "?" +
+          authHeader.key +
+          "=" +
+          authHeader.value
+        );
       }
-      return url + "&" + authHeader.key + "=" + authHeader.value;
+      return (
+        this.ensureHttpOrHttps(url) +
+        url +
+        "&" +
+        authHeader.key +
+        "=" +
+        authHeader.value
+      );
     }
-    return url;
+    return this.ensureHttpOrHttps(url) + url;
   };
 
   private extractHeaders = (
