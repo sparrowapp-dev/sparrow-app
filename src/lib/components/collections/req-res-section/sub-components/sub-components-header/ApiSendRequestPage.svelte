@@ -70,13 +70,13 @@
     let isValidUrlText = isValidURL(urlText);
     let urlValue = "";
     
-    if (isValidUrlText) {
-      urlValue = ensureHttpOrHttps(urlText);
-    } else {
-      isInputValid = false;
-      notifications.error("Invalid URL");
-      return;
-    }
+    // if (isValidUrlText) {
+    //   urlValue = ensureHttpOrHttps(urlText);
+    // } else {
+    //   isInputValid = false;
+    //   notifications.error("Invalid URL");
+    //   return;
+    // }
     const str = urlText;
     
     if (str.trim() === "") {
