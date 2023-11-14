@@ -129,6 +129,8 @@
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
                 elem.requestInProgress = false;
+                let errorMessage : string = "Not Found";
+                elem.request.response.status = errorMessage;
               }
               return elem;
             });
