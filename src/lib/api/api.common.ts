@@ -100,7 +100,7 @@ const makeHttpRequest = async (
   request: string,
 ) => {
   try {
-    const response = await invoke("make_type_request_command", {
+    const response: string = await invoke("make_type_request_command", {
       url,
       method,
       headers,

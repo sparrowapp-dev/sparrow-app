@@ -20,24 +20,19 @@
 
   collapsibleStateUnsubscribe();
 
-  let isCollaps = false; // Initialize to false
+  let isCollaps = false;
 
   const handleResize = () => {
     const windowWidth = window.innerWidth;
 
-    console.log("kashif");
-    // Check if the window width is less than or equal to 600px
     isCollaps = windowWidth <= 800;
   };
 
   onMount(() => {
-    // Add the event listener when the component mounts
     window.addEventListener("resize", handleResize);
-    // Call the handler initially to set the initial state
     handleResize();
 
     return () => {
-      // Remove the event listener when the component unmounts
       window.removeEventListener("resize", handleResize);
     };
   });
