@@ -67,11 +67,11 @@
         <p
           class="m-0 p-0 text-{list.color}"
           style="font-size: 12px;"
-          class:selected-request={list.id === selectedRequest.id}
+          class:selected-request={list.id === selectedRequest?.id}
         >
           {list.name}
         </p>
-        {#if selectedRequest.id === list.id}
+        {#if selectedRequest?.id === list.id}
           <img src={checkIcon} alt="" />
         {/if}
       </div>
@@ -103,7 +103,6 @@
   .dropdown-data p {
     font-size: 12px;
     font-weight: 400;
-    cursor: pointer;
   }
   .dropdown-active {
     display: block !important;
@@ -113,6 +112,7 @@
   }
   .highlight {
     border-radius: 4px;
+    cursor: pointer;
   }
   .highlight:hover {
     background-color: #232424;

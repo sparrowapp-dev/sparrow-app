@@ -134,10 +134,22 @@
     <Dropdown
       title={mainTab}
       data={[
-        RequestDataset.NONE,
-        RequestDataset.RAW,
-        RequestDataset.FORMDATA,
-        RequestDataset.URLENCODED,
+        {
+          name: "None",
+          id: RequestDataset.NONE
+        },
+        {
+          name: "Raw",
+          id: RequestDataset.RAW
+        },
+        {
+          name: "Form Data",
+          id: RequestDataset.FORMDATA
+        },
+        {
+          name: "URL Encoded",
+          id: RequestDataset.URLENCODED
+        },
       ]}
       onclick={handleDropdown}
     />
@@ -146,11 +158,26 @@
       <Dropdown
         title={rawTab}
         data={[
-          RequestDataType.HTML,
-          RequestDataType.JSON,
-          RequestDataType.JAVASCRIPT,
-          RequestDataType.TEXT,
-          RequestDataType.XML,
+          {
+            name: "HTML",
+            id: RequestDataType.HTML 
+          },
+          {
+            name: "JSON",
+            id: RequestDataType.JSON
+          },
+          {
+            name: "JavaScript",
+            id: RequestDataType.JAVASCRIPT 
+          },
+          {
+            name: "Text",
+            id: RequestDataType.TEXT 
+          },
+          {
+            name: "XML",
+            id: RequestDataType.XML 
+          }
         ]}
         onclick={handleRawDropDown}
       />
