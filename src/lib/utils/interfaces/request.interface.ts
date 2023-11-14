@@ -18,6 +18,8 @@ export interface Response {
   headers: unknown;
   status: string;
   body: string;
+  time: number;
+  size: number;
 }
 
 export interface RequestBody {

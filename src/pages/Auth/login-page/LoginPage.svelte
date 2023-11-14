@@ -5,14 +5,13 @@
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
   import googleLogo from "$lib/assets/googlelogo.svg";
-  import githubLogo from "$lib/assets/githublogo.svg";
-  import microsoftLogo from "$lib/assets/microsoftlogo.svg";
+  // import githubLogo from "$lib/assets/githublogo.svg";
+  // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
   import { handleLoginValidation } from "./login-page";
-  // Function to validate the email
+
   let isEmailTouched = false;
 
-  // Function to validate the email
   let isEmailValid = false;
   const validateEmail = () => {
     const emailRegex = /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/;
@@ -21,7 +20,6 @@
     if (isEmailValid) {
       validationErrors.email = "";
     } else if (isEmailTouched) {
-      // Show an error only if the field has been touched and the email is not valid
       validationErrors.email = "";
     }
   };
