@@ -119,34 +119,7 @@ export interface NewTab {
     | ItemType.FOLDER
     | ItemType.REQUEST
     | ItemType.WORKSPACE;
-  request?: {
-    method: string;
-    body?: {
-      raw?: string;
-      urlencoded?: KeyValuePair[];
-      formdata?: {
-        text: KeyValuePair[];
-        file: KeyValuePairWithBase[];
-      };
-    };
-    url?: string;
-    headers?: Headers[];
-    queryParams?: QueryParams[];
-    response?: Response;
-    additions?: {
-      raw?:
-        | RequestType.HTML
-        | RequestType.JSON
-        | RequestType.JavaScript
-        | RequestType.Text
-        | RequestType.XML;
-      dataset?:
-        | RequestDataset.FORMDATA
-        | RequestDataset.NONE
-        | RequestDataset.RAW
-        | RequestDataset.URLENCODED;
-    };
-  };
+  request?: Request;
   save: boolean;
   requestInProgress: boolean;
   path?: Path;

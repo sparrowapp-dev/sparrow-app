@@ -26,6 +26,7 @@
     findAuthParameter,
   } from "$lib/utils/helpers/auth.helper";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
 
   let isHorizontalVerticalMode: boolean;
   let selectedTab: string = "";
@@ -55,7 +56,7 @@
 
   const fetchComponentData = (id: string, list: NewTab[]) => {
     list.forEach((elem: NewTab) => {
-      if (elem.id === id) {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         requestData = elem;
         selectedTab = elem.request.state.section;
         headersCount =
