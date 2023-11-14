@@ -10,7 +10,7 @@
     import Tab from "./Tab.svelte";
     import type { NewTab } from "$lib/utils/interfaces/request.interface";
     import { onDestroy } from "svelte";
-    import { RequestDefault, RequestType } from "$lib/utils/enums/request.enum";
+    import { RequestDefault, RequestDataType } from "$lib/utils/enums/request.enum";
     import { v4 as uuidv4 } from "uuid";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";

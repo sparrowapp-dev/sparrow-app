@@ -79,7 +79,7 @@
           sizeinKb = elem.request.response.size;
           responseBody = elem.request?.response?.body;
           responseHeader = Object.entries(
-            JSON.parse(elem.request?.response?.headers),
+            JSON.parse(elem.request?.response?.headers || "{}"),
           );
         } else {
           jsonResponse = false;

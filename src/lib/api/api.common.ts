@@ -92,7 +92,7 @@ const makeRequest = async (
   }
 };
 
-const makeRequestforCrud = async (
+const makeHttpRequest = async (
   url: string,
   method: string,
   headers: string,
@@ -117,7 +117,7 @@ const makeRequestforCrud = async (
   }
 };
 
-export { makeRequest, getAuthHeaders, getRefHeaders, makeRequestforCrud };
+export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
 //------------- We need this function in future ------------------//
 // export const download = async (url, data, headers) => {
 //   try {
