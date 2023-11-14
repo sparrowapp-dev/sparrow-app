@@ -1,44 +1,31 @@
 <script lang="ts">
-  import { BearerToken } from "$lib/store/authorization";
+  import { handleRequestAuthChange } from "$lib/store/request-response-section";
+    import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
 
-  let isOverflowing: boolean = false;
+  export let bearerToken: string;
+  export let currentTabId: string;
 
-  const handleInput = (event) => {
-    BearerToken.set(event.target.value);
-
-    const inputElement = event.target;
-    if (inputElement.scrollWidth > inputElement.clientWidth) {
-      isOverflowing = true;
-    } else {
-      isOverflowing = false;
-    }
+  const handleInput = () => {
+    handleRequestAuthChange(bearerToken, RequestAuthProperty.BEARER_TOKEN, currentTabId);
   };
+  
 </script>
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
+    class="d-flex justify-content-between text-requestBodyColor mb-3"
     style="font-size: 12px; font-weight:500"
   >
     <p class="mb-0">Token</p>
 
-    {#if isOverflowing}
       <textarea
-        style="outline: none; height: auto;"
-        class="w-75 bg-backgroundColor border-0 h-100 ps-2"
-        bind:value={$BearerToken}
-        on:input={handleInput}
-      />
-    {:else}
-      <input
-        type="text"
-        style="outline: none;"
-        class="w-75 bg-backgroundColor border-0 h-75 ps-2"
+        style="outline: none; "
+        class="w-75 bg-backgroundColor border-0 ps-2"
+        rows="6"
         placeholder="Enter Token"
-        bind:value={$BearerToken}
+        bind:value={bearerToken}
         on:input={handleInput}
       />
-    {/if}
   </div>
 </div>
 

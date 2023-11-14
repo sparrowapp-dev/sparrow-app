@@ -63,6 +63,7 @@
     font-size: 12px;
     font-weight: 400;
     cursor: pointer;
+    text-align: left;
   }
   .dropdown-data p:hover {
     background-color: rgba(0, 0, 0, 0.1);
