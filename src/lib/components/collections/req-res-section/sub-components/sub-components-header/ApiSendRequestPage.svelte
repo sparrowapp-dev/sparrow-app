@@ -17,6 +17,8 @@
   import { notifications } from "$lib/utils/notifications"; 
   import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
     import { createApiRequest } from "$lib/services/rest-api.service";
+    import { RequestMethod } from "$lib/utils/enums/request.enum";
+    import type { RequestMethodType } from "$lib/utils/types/request.type";
  
   //this for expand and collaps condition
   const _apiSendRequest = new ApiSendRequestController();
@@ -171,7 +173,7 @@
     return [...params, { key: "", value: "", checked: false }];
   };
 
-  const handleDropdown = (tab: string) => {
+  const handleDropdown = (tab: RequestMethodType) => {
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -259,26 +261,47 @@
     style="width:calc(100%-312px);"
   >
     <div class="d-flex gap-2 w-100">
-      <div class="d-flex align-items-center justify-content-center">
-        <p
-          class="d-flex mb-0 w-100 h-100 pe-3 py-0 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
-        >
-          <CrudDropdown
-            data={[
-              "GET",
-              "POST",
-              "PUT",
-              "DELETE",
-              "PATCH",
-              "HEAD",
-              "OPTIONS"
+
+      <CrudDropdown
+            data={[{
+              name: "GET",
+              id: RequestMethod.GET,
+              color: "getColor"
+            },
+            {
+              name: "POST",
+              id: RequestMethod.POST,
+              color: "postColor"
+            },
+            {
+              name: "PUT",
+              id: RequestMethod.PUT,
+              color: "putColor"
+            },
+            {
+              name: "DELETE",
+              id: RequestMethod.DELETE,
+              color: "deleteColor"
+            },
+            {
+              name: "PATCH",
+              id: RequestMethod.PATCH,
+              color: "patchColor"
+            },
+            {
+              name: "HEAD",
+              id: RequestMethod.HEAD,
+              color: "headColor"
+            },
+            {
+              name: "OPTIONS",
+              id: RequestMethod.OPTIONS,
+              color: "optionsColor"
+            },
             ]}
             method={componentData ? componentData.request.method : ""}
             onclick={handleDropdown}
           />
-        </p>
-      </div>
-
       <input
         required
         type="text"
