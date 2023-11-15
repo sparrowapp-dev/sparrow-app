@@ -4,8 +4,8 @@ import {
   type RxJsonSchema,
 } from "rxdb";
 
-export const productSchemaLiteral = {
-  title: "product",
+export const workspaceSchemaLiteral = {
+  title: "workspace",
   primaryKey: "_id",
   type: "object",
   version: 0,
@@ -33,6 +33,8 @@ export const productSchemaLiteral = {
     },
     permissions: {
       type: "array",
+      maxItems: 5,
+      uniqueItems: true,
       items: {
         type: "object",
         properties: {
@@ -40,21 +42,7 @@ export const productSchemaLiteral = {
             type: "string",
           },
           id: {
-            type: "string",
-          },
-        },
-      },
-    },
-    collection: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-          },
-          id: {
-            type: "string",
+            type: "number",
           },
         },
       },
@@ -66,13 +54,14 @@ export const productSchemaLiteral = {
       type: "string",
     },
   },
+  required: ["_id", "name", "owner", "permissions", "createdAt", "createdBy"],
 } as const;
 
-const schemaTyped = toTypedRxJsonSchema(productSchemaLiteral);
+const schemaTyped = toTypedRxJsonSchema(workspaceSchemaLiteral);
 
-export type ProductDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type WorkspaceDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
 
-export const workspaceSchema: RxJsonSchema<ProductDocType> =
-  productSchemaLiteral;
+export const workspaceSchema: RxJsonSchema<WorkspaceDocType> =
+  workspaceSchemaLiteral;

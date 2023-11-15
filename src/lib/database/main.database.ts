@@ -1,22 +1,16 @@
-import {
-  createRxDatabase,
-  // addRxPlugin,
-  type RxCollection,
-  type RxDatabase,
-} from "rxdb";
+import { createRxDatabase, type RxCollection, type RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
-// import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import {
   workspaceSchema,
-  type ProductDocType,
-} from "../models/workspace.model";
-// addRxPlugin(RxDBDevModePlugin);
+  type WorkspaceDocType,
+} from "$lib/models/workspace.model";
+
 // define all the Rx collections
-export type ProductCollection = RxCollection<ProductDocType>;
+export type WorkspaceCollection = RxCollection<WorkspaceDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
-  products: ProductCollection;
+  workspace: WorkspaceCollection;
 };
 
 // define the Rx database type
@@ -29,10 +23,10 @@ const db: DatabaseType = await createRxDatabase<DatabaseCollections>({
 });
 
 // add all collections
-await db.addCollections({
+const rxdb = await db.addCollections({
   workspace: {
     schema: workspaceSchema,
   },
 });
 
-export const dbCollections = db.collections;
+export { rxdb };

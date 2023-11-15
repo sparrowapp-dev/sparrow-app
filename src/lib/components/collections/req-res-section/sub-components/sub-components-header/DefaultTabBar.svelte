@@ -6,19 +6,12 @@
   import { handleTabAddons } from "$lib/store/request-response-section";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { createSampleRequest } from "$lib/utils/sample/request.sample";
-  import { dbCollections } from "$lib/database/main.database";
   import MvvmDemoViewModel from "./DefaultTabBar";
   import { onMount } from "svelte";
 
   const addApiRequest = () => {
     handleTabAddons(createSampleRequest(uuidv4()));
     moveNavigation("right");
-  };
-
-  const helloworld = () => {
-    debugger;
-    console.log("hello world");
-    // console.log("database", dbCollections.products.find().$);
   };
 
   const _viewModel = new MvvmDemoViewModel();
@@ -52,7 +45,7 @@
         <img src={apiRequest} alt="" style="width: 20px;" />
         API Request</button
       >
-      <button class="create-container-btn" on:click={helloworld}>
+      <button class="create-container-btn">
         <img src={collections} alt="" style="width: 26px;" />
         Collection</button
       >
@@ -61,7 +54,7 @@
           <button
             class="btn btn-secondary me-2 my-2"
             
-            >{product.stock}</button
+            >{product.name}</button
           >
         {/each}
       {/if}

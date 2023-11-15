@@ -1,11 +1,5 @@
-import { dbCollections } from "$lib/database/main.database";
+import { rxdb } from "$lib/database/main.database";
 // import productsService from "../../lib/services/products.service";
-
-const getProducts = async () => {
-  const response = await fetch("https://dummyjson.com/products");
-  const products = await response.json();
-  return products;
-};
 
 class MvvmDemoViewModel {
   // constant properties
@@ -20,15 +14,26 @@ class MvvmDemoViewModel {
 
   // directly attached to database
   get products() {
-    return dbCollections.products.find().$;
+    return rxdb.workspace.find().$;
   }
 
   refreshProducts = async () => {
+    const data = [
+      {
+        _id: "1",
+        name: "asif",
+      },
+      { _id: "2", name: "raza" },
+      {
+        _id: "3",
+        name: "taman",
+      },
+    ];
     // fetch latest products list from api
-    const data = await getProducts();
+    // const data = await getProducts();
 
     // update the database
-    await dbCollections.products.bulkInsert(data.products);
+    await rxdb.workspace.bulkInsert(data);
   };
 }
 
