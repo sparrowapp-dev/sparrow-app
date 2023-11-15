@@ -76,9 +76,7 @@
     const filePathResponse = await invoke("fetch_file_command");
     if(filePathResponse !== "Canceled") { 
       const filename = extractFileName(filePathResponse);
-      console.log(filename);
       const updatedFilePath = "#@#" + filePathResponse;
-      console.log(updatedFilePath);
       let filteredPair = pairs.map((elem, i) => {
         if (i == index) {
           elem.value = filename;
