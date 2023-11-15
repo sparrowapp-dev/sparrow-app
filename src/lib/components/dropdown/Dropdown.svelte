@@ -41,7 +41,7 @@
     }}
   >
     <div
-      class="dropdown-btn px-3 d-flex align-items-center justify-content-between"
+      class="dropdown-btn px-1 d-flex align-items-center justify-content-between"
       class:dropdown-btn-active={visibility === true}
     >
       <p class=" mb-0">
