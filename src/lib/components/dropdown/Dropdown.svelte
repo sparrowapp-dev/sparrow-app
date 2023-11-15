@@ -97,7 +97,7 @@
     background-color: black;
     color: white;
     position: absolute;
-    top: 40px;
+    top: 32px;
     left: 0;
     min-width: 136px;
     border: 1px solid rgb(44, 44, 44);
