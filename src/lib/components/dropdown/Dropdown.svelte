@@ -1,43 +1,84 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
-  let visibility = false;
-  export let data: any;
-  export let onclick: any;
+  import checkIcon from "$lib/assets/check.svg";
+
+  let visibility: boolean = false;
+  export let data: Array<{
+    name: string;
+    id: string;
+  }>;
+  export let onclick: (tab: string) => void;
   export let title: string;
+  let selectedTitle: {
+    name: string;
+    id: string;
+  };
+
   window.addEventListener("click", () => {
     visibility = false;
   });
+
+  $: {
+    if (title) {
+      data.forEach((element) => {
+        if (element.id === title) {
+          selectedTitle = element;
+        }
+      });
+    }
+  }
 </script>
 
-<div style="position: relative; display:inline-block; z-index:999;">
-  <button
-    class="dropdown-btn"
+<div
+  class="parent-dropdown display-inline-block"
+  style=" position: relative;  z-index:999;"
+>
+  <div
     on:click={() => {
       setTimeout(() => {
         visibility = true;
       }, 100);
     }}
-    >{title}
-    <span class="px-2" class:dropdown-logo-active={visibility === true}
-      ><img style="height:10px; width:10px;" src={dropdown} alt="" /></span
-    ></button
   >
+    <div
+      class="dropdown-btn px-3 d-flex align-items-center justify-content-between"
+      class:dropdown-btn-active={visibility === true}
+    >
+      <p class=" mb-0">
+        {selectedTitle?.name}
+      </p>
+      <span class:dropdown-logo-active={visibility === true}
+        ><img
+          style="margin-left:10px; height:12px; width:12px;"
+          src={dropdown}
+          alt=""
+        /></span
+      >
+    </div>
+  </div>
   <div
-    style="display:none;"
-    class="dropdown-data rounded p-2"
+    class="d-none dropdown-data p-1 rounded"
     class:dropdown-active={visibility === true}
   >
     {#each data as list}
-      <p
-        class="m-0 py-1 px-2"
+      <div
+        class="d-flex px-2 py-1 justify-content-between highlight"
         on:click={() => {
           visibility = false;
-          onclick(list);
-          title = list;
+          onclick(list.id);
         }}
       >
-        {list}
-      </p>
+        <p
+          class="m-0 p-0"
+          style="font-size: 12px;"
+          class:selected-request={list.id === selectedTitle?.id}
+        >
+          {list.name}
+        </p>
+        {#if selectedTitle?.id === list.id}
+          <img src={checkIcon} alt="" />
+        {/if}
+      </div>
     {/each}
   </div>
 </div>
@@ -47,31 +88,43 @@
     background: none;
     outline: none;
     border: none;
+    height: 26px;
+  }
+  .dropdown-btn:hover {
+    border-bottom: 1px solid #85c2ff;
   }
   .dropdown-data {
     background-color: black;
     color: white;
     position: absolute;
-    top: 30px;
-    left: 50%;
-    min-width: 120px;
+    top: 32px;
+    left: 0;
+    min-width: 136px;
     border: 1px solid rgb(44, 44, 44);
-    transform: translateX(-50%);
   }
-  .dropdown-btn,
+  .dropdown-btn p,
   .dropdown-data p {
     font-size: 12px;
     font-weight: 400;
-    cursor: pointer;
-    text-align: left;
-  }
-  .dropdown-data p:hover {
-    background-color: rgba(0, 0, 0, 0.1);
   }
   .dropdown-active {
     display: block !important;
   }
   .dropdown-logo-active {
     transform: rotateX(180deg) !important;
+  }
+  .highlight {
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .highlight:hover {
+    background-color: #232424;
+  }
+  .dropdown-btn {
+    cursor: pointer;
+  }
+  .dropdown-btn-active {
+    background-color: var(--border-color);
+    border-bottom: 1px solid #85c2ff;
   }
 </style>
