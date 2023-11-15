@@ -88,7 +88,7 @@
     background: none;
     outline: none;
     border: none;
-    height: 34px;
+    height: 26px;
   }
   .dropdown-btn:hover {
     border-bottom: 1px solid #85c2ff;
