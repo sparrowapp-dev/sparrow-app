@@ -21,7 +21,7 @@ use formdata_handler::make_formdata_request;
 use url_fetch_handler::import_swagger_url;
 use raw_handler::make_text_request;
 use serde_json::json;
-
+use nfd::Response;
 #[tokio::main]
 async fn make_request(
     url: &str,
@@ -112,12 +112,34 @@ fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Val
 }
 
 
+#[tauri::command]
+fn fetch_file_command() -> String { 
+   let result = nfd::open_file_dialog(None, None).expect("Error opening file dialog");
+   let mut response;
+   match result {
+    Response::Okay(file_path) => {
+        response = file_path;
+    }
+    Response::OkayMultiple(_) => {
+        let temp = "Multiple Files Selected";
+        response = temp.to_string();
+    }
+    Response::Cancel => {
+        let temp = "Canceled";
+        response = temp.to_string();
+    }
+   }
+   return response;
+}
+
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             greet,
             make_type_request_command,
             fetch_swagger_url_command,
+            fetch_file_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
