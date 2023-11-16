@@ -6,23 +6,12 @@
   import { handleTabAddons } from "$lib/store/request-response-section";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { createSampleRequest } from "$lib/utils/sample/request.sample";
-  import MvvmDemoViewModel from "./DefaultTabBar";
-  import { onMount } from "svelte";
 
   const addApiRequest = () => {
     handleTabAddons(createSampleRequest(uuidv4()));
     moveNavigation("right");
   };
 
-  const _viewModel = new MvvmDemoViewModel();
-
-  // observable properties
-  let products = _viewModel.products;
-
-  // refresh products when component is mounted
-  onMount(() => {
-    _viewModel.refreshProducts();
-  });
 </script>
 
 <div class="main-container">
@@ -49,15 +38,6 @@
         <img src={collections} alt="" style="width: 26px;" />
         Collection</button
       >
-      {#if $products}
-        {#each $products as product}
-          <button
-            class="btn btn-secondary me-2 my-2"
-            
-            >{product.name}</button
-          >
-        {/each}
-      {/if}
     </div>
   </div>
 </div>
