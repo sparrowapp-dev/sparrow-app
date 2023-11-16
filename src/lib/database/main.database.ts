@@ -4,13 +4,16 @@ import {
   workspaceSchema,
   type WorkspaceDocType,
 } from "$lib/models/workspace.model";
+import { tabSchema, type TabDocType } from "$lib/models/tab.model";
 
 // define all the Rx collections
 export type WorkspaceCollection = RxCollection<WorkspaceDocType>;
+export type TabCollection = RxCollection<TabDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
   workspace: WorkspaceCollection;
+  tab: TabCollection;
 };
 
 // define the Rx database type
@@ -26,6 +29,9 @@ const db: DatabaseType = await createRxDatabase<DatabaseCollections>({
 const rxdb = await db.addCollections({
   workspace: {
     schema: workspaceSchema,
+  },
+  tab: {
+    schema: tabSchema,
   },
 });
 
