@@ -1,4 +1,4 @@
-import { rxdb, db } from "$lib/database/app.database";
+import { rxdb } from "$lib/database/app.database";
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
 import { setUser } from "$lib/store/auth.store";
@@ -39,7 +39,7 @@ export class HeaderDashboardViewModel {
     if (response.isSuccessful) {
       clearAuthJwt();
       setUser(null);
-      await db.remove();
+      await rxdb.workspace.find().remove();
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {

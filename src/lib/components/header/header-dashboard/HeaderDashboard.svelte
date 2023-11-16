@@ -16,7 +16,7 @@
   let minimiMaximizeWindow: boolean = false;
   let profile: boolean = false;
 
-  workspaces.subscribe((value: any) => {
+  const workspaceSubscribe = workspaces.subscribe((value: any) => {
     if (value && value.length > 0) {
       updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
     }
@@ -51,6 +51,7 @@
 
   onDestroy(() => {
     userUnsubscribe();
+    workspaceSubscribe.unsubscribe();
   });
 </script>
 
