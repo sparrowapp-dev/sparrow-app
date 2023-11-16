@@ -17,13 +17,11 @@ export class HeaderDashboardViewModel {
   }
 
   public getWorkspace = async (userId: string) => {
+    const data = await rxdb.workspace.find().exec();
+    setCurrentWorkspace(data[0]?._data?._id, data[0]?._data?.name);
     const response = await this.workspaceService.fetchWorkspaces(userId);
     if (response.isSuccessful) {
       await rxdb.workspace.bulkInsert(response?.data?.data);
-      setCurrentWorkspace(
-        response?.data?.data[0]?._id,
-        response?.data?.data[0]?.name,
-      );
     }
   };
 
