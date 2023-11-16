@@ -1,4 +1,4 @@
-import { rxdb } from "$lib/database/main.database";
+import { rxdb, db } from "$lib/database/app.database";
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
 import { setUser } from "$lib/store/auth.store";
@@ -12,16 +12,25 @@ export class HeaderDashboardViewModel {
   private workspaceService = new WorkspaceService();
   constructor() {}
 
-  get fetchWorkspaces() {
+  get workspaces() {
     return rxdb.workspace.find().$;
   }
 
-  public getWorkspace = async (userId: string) => {
-    const data = await rxdb.workspace.find().exec();
-    setCurrentWorkspace(data[0]?._data?._id, data[0]?._data?.name);
+  public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
-    if (response.isSuccessful) {
-      await rxdb.workspace.bulkInsert(response?.data?.data);
+    if (response?.isSuccessful && response?.data?.data) {
+      const data = response.data.data.map((elem) => {
+        const { _id, name, owner, permissions, createdAt, createdBy } = elem;
+        return {
+          _id,
+          name,
+          owner,
+          permissions,
+          createdAt,
+          createdBy,
+        };
+      });
+      await rxdb.workspace.bulkUpsert(data);
     }
   };
 
@@ -30,6 +39,8 @@ export class HeaderDashboardViewModel {
     if (response.isSuccessful) {
       clearAuthJwt();
       setUser(null);
+      await db.remove();
+      setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {
       notifications.error("Something went wrong");

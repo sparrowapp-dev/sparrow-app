@@ -29,4 +29,4 @@ const rxdb = await db.addCollections({
   },
 });
 
-export { rxdb };
+export { rxdb, db };
