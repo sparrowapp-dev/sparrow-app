@@ -10,17 +10,31 @@
   } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
+  import { type WorkspaceDocument } from "$lib/database/app.database";
 
   const _viewModel = new HeaderDashboardViewModel();
   const workspaces: Observable<any> = _viewModel.workspaces;
+  const activeWorkspace: Observable<any> = _viewModel.activeWorkspace;
   let minimiMaximizeWindow: boolean = false;
   let profile: boolean = false;
+  let activeWorkspaceRxDoc: WorkspaceDocument;
 
-  const workspaceSubscribe = workspaces.subscribe((value: any) => {
-    if (value && value.length > 0) {
-      updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
-    }
-  });
+  const workspaceSubscribe = workspaces.subscribe(
+    (value: WorkspaceDocument[]) => {
+      if (value && value.length > 0) {
+        if (!activeWorkspaceRxDoc) {
+          _viewModel.activateWorkspace(value[0].get("_id"));
+        }
+        updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
+      }
+    },
+  );
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+    },
+  );
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -46,12 +60,17 @@
   });
 
   const handleDropdown = (id: string, tab: string) => {
+    if (activeWorkspaceRxDoc) {
+      _viewModel.deactivateWorkspace(activeWorkspaceRxDoc.get("_id"));
+    }
+    _viewModel.activateWorkspace(id);
     setCurrentWorkspace(id, tab);
   };
 
   onDestroy(() => {
     userUnsubscribe();
     workspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 

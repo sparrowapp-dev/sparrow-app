@@ -53,6 +53,10 @@ export const workspaceSchemaLiteral = {
     createdBy: {
       type: "string",
     },
+    isActiveWorkspace: {
+      type: "boolean",
+      default: false,
+    },
   },
   required: ["_id", "name", "owner", "permissions", "createdAt", "createdBy"],
 } as const;

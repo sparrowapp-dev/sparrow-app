@@ -6,6 +6,9 @@ import { setCurrentWorkspace } from "$lib/store/workspace.store";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
 import { useNavigate } from "svelte-navigator";
+import { RxDBUpdatePlugin } from "rxdb/plugins/update";
+import { addRxPlugin } from "rxdb";
+addRxPlugin(RxDBUpdatePlugin);
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
@@ -16,6 +19,24 @@ export class HeaderDashboardViewModel {
     return rxdb.workspace.find().$;
   }
 
+  get activeWorkspace() {
+    return rxdb.workspace.findOne({
+      selector: {
+        isActiveWorkspace: true,
+      },
+    }).$;
+  }
+
+  // Function to set a workspace as active
+  public activateWorkspace = (id: string): void => {
+    rxdb.workspace.setActiveWorkspace(id);
+  };
+  // Function to unset a workspace as active
+  public deactivateWorkspace = (id: string): void => {
+    rxdb.workspace.unsetActiveWorkspace(id);
+  };
+
+  // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     if (response?.isSuccessful && response?.data?.data) {
@@ -30,11 +51,12 @@ export class HeaderDashboardViewModel {
           createdBy,
         };
       });
-      await rxdb.workspace.bulkUpsert(data);
+      await rxdb.workspace.bulkInsert(data);
     }
   };
 
-  public logout = async () => {
+  // logout
+  public logout = async (): Promise<void> => {
     const response = await userLogout();
     if (response.isSuccessful) {
       clearAuthJwt();
