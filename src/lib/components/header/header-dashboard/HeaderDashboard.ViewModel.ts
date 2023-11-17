@@ -30,10 +30,7 @@ export class HeaderDashboardViewModel {
   // Function to set a workspace as active
   public activateWorkspace = (id: string): void => {
     rxdb.workspace.setActiveWorkspace(id);
-  };
-  // Function to unset a workspace as active
-  public deactivateWorkspace = (id: string): void => {
-    rxdb.workspace.unsetActiveWorkspace(id);
+    return;
   };
 
   // sync workspace data with backend server
@@ -51,7 +48,8 @@ export class HeaderDashboardViewModel {
           createdBy,
         };
       });
-      await rxdb.workspace.bulkInsert(data);
+      await rxdb.workspace.bulkInsertData(data);
+      return;
     }
   };
 
@@ -68,5 +66,6 @@ export class HeaderDashboardViewModel {
       notifications.error("Something went wrong");
       throw "error registering user: " + response.message;
     }
+    return;
   };
 }

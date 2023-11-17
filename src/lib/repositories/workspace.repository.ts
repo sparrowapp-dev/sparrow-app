@@ -12,7 +12,7 @@ export type WorkspaceDocMethods = {
 // static ORM-method for the RxCollection
 export type WorkspaceCollectionMethods = {
   setActiveWorkspace: (id: string) => Promise<void>;
-  unsetActiveWorkspace: (id: string) => Promise<void>;
+  bulkInsertData: (data: any) => Promise<void>;
 };
 
 const workspaceDocMethods: WorkspaceDocMethods = {
@@ -40,31 +40,29 @@ const workspaceCollectionMethods: WorkspaceCollectionMethods = {
     this: WorkspaceCollection,
     workspaceId: string,
   ): Promise<void> {
-    const response: WorkspaceDocument = await this.findOne({
-      selector: {
-        _id: workspaceId,
-      },
-    }).exec();
-    if (response) {
-      await response.update({ $set: { isActiveWorkspace: true } });
-    }
+    const workspaces: WorkspaceDocument[] = await this.find().exec();
+    const data = workspaces.map((elem: WorkspaceDocument) => {
+      const res = elem.getDocument();
+      if (res._id === workspaceId) {
+        res.isActiveWorkspace = true;
+      } else {
+        res.isActiveWorkspace = false;
+      }
+      return res;
+    });
+    await this.bulkUpsert(data);
+    return;
   },
 
-  /*
-   *  Sets a workspace as inactive.
+  /**
+   * Sync | refresh data
    */
-  unsetActiveWorkspace: async function (
+  bulkInsertData: async function (
     this: WorkspaceCollection,
-    workspaceId: string,
+    data: any,
   ): Promise<void> {
-    const response: WorkspaceDocument = await this.findOne({
-      selector: {
-        _id: workspaceId,
-      },
-    }).exec();
-    if (response) {
-      await response.update({ $set: { isActiveWorkspace: false } });
-    }
+    await this.bulkInsert(data);
+    return;
   },
 };
 

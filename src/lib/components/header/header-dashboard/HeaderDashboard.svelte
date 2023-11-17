@@ -24,8 +24,8 @@
       if (value && value.length > 0) {
         if (!activeWorkspaceRxDoc) {
           _viewModel.activateWorkspace(value[0].get("_id"));
+          updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
         }
-        updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
       }
     },
   );
@@ -60,9 +60,6 @@
   });
 
   const handleDropdown = (id: string, tab: string) => {
-    if (activeWorkspaceRxDoc) {
-      _viewModel.deactivateWorkspace(activeWorkspaceRxDoc.get("_id"));
-    }
     _viewModel.activateWorkspace(id);
     setCurrentWorkspace(id, tab);
   };
