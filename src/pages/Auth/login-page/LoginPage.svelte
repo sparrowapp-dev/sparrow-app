@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
-  import { isLoading, setUser } from "$lib/store/auth.store";
+  import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
@@ -10,6 +10,7 @@
 
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import { boolean } from "yup";
 
   let isEmailTouched = false;
 
@@ -61,6 +62,12 @@
   isLoading.subscribe((value) => {
     isLoadingPage = value;
   });
+
+  let isPasswordValid: boolean;
+
+  isResponseError.subscribe((value) => {
+    isPasswordValid = value;
+  });
 </script>
 
 <div
@@ -92,9 +99,10 @@
           >
           <input
             type="email"
-            class="form-control bg-black border:{validationErrors.email
+            class="form-control bg-black border:{validationErrors.email ||
+            isPasswordValid === true
               ? '3px'
-              : '1px'} solid {validationErrors.email
+              : '1px'} solid {validationErrors.email || isPasswordValid === true
               ? 'border-error'
               : 'border-default'}"
             id="exampleInputEmail1"
@@ -103,7 +111,7 @@
             bind:value={loginCredentials.email}
             on:input={validateEmail}
           />
-          {#if validationErrors.email}
+          {#if validationErrors.email && loginCredentials.email.length > 0}
             <small class="form-text text-dangerColor">
               {validationErrors.email}</small
             >
@@ -111,27 +119,23 @@
         </div>
 
         <div class="mb-4">
-          <label
-            for="exampleInputPassword1"
-            class="form-label"
-            data-tauri-drag-region>Password</label
-          >
+          <label for="exampleInputPassword1" class="form-label">Password</label>
           <input
             type="password"
-            class="form-control bg-black"
             id="exampleInputPassword1"
             placeholder="Please enter your Password"
             bind:value={loginCredentials.password}
-            style="border:{validationErrors.password
+            class="form-control bg-black border:{isPasswordValid === true
               ? '3px'
-              : '1px'} solid {validationErrors.password
+              : '1px'} solid {isPasswordValid === true
               ? 'border-error'
               : 'border-default'}"
           />
 
-          {#if validationErrors.password}<small
+          {#if isPasswordValid === true}<small
               class="form-text text-dangerColor"
-              >{validationErrors.password}</small
+              >The email and password combination you entered appears to be
+              incorrect. Please try again.</small
             >{/if}
         </div>
 

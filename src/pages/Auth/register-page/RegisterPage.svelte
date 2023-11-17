@@ -1,16 +1,12 @@
 <script lang="ts">
   import Header from "$lib/components/header/Header.svelte";
-  import googleLogo from "$lib/assets/googlelogo.svg";
-  import githubLogo from "$lib/assets/githublogo.svg";
-  import microsoftLogo from "$lib/assets/microsoftlogo.svg";
   import vector1 from "$lib/assets/Vector1.svg";
   import vector2 from "$lib/assets/Vector2.svg";
   import vector3 from "$lib/assets/Vector3.svg";
-
-  import { navigate } from "svelte-navigator";
   import { handleRegisterValidation } from "./register-page";
   import { isLoading } from "$lib/store/auth.store";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+
 
   let userData = {
     email: "",
@@ -21,7 +17,7 @@
 
   let validationErrors: any = {};
 
-  //Here i am handling state variable;
+
 
   let isPasswordValid1 = false;
   let isPasswordValid2 = false;
@@ -33,9 +29,8 @@
   let isNameTouched = false;
   let isPasswordTouched = false;
 
-  let tnsCheckboxError = "";
 
-  // Function to validate the email
+ 
   let isEmailValid = false;
   const validateEmail = () => {
     const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -44,8 +39,7 @@
     if (isEmailValid) {
       validationErrors.email = "";
     } else if (isEmailTouched) {
-      // Show an error only if the field has been touched and the email is not valid
-      // validationErrors.email = "";
+      validationErrors.email = "";
     }
   };
 
@@ -55,10 +49,11 @@
     let isNameTouched = true;
     isNameValid = nameRegex.test(userData.name);
 
-    if (isNameValid) {
+    if (isNameValid && isNameTouched) {
       validationErrors.name = "";
-    } else if (isNameTouched) {
-      // validationErrors.name = "";
+    } else {
+      validationErrors.name =
+        "Your first name cannot have numbers or special characters.";
     }
   };
 
@@ -67,7 +62,6 @@
   const validatePassword = () => {
     const password = userData.password;
 
-    // Check if the password is valid using the isValidPassword function
     isPasswordValid1 = isValidPassword1(password);
     isPasswordValid2 = isValidPassword2(password);
     isPasswordValid3 = isValidPassword3(password);
@@ -196,8 +190,8 @@
             >
           {/if}
         </div>
-        <div class="form-group mb-3" data-tauri-drag-region>
-          <label for="name" data-tauri-drag-region>Full Name</label>
+        <div class="form-group mb-3">
+          <label for="name">Full Name</label>
           <input
             class="form-control mt-1 bg-black border:{validationErrors.email
               ? '3px'
@@ -224,8 +218,8 @@
           {/if}
         </div>
 
-        <div class="form-group" data-tauri-drag-region>
-          <label for="password" data-tauri-drag-region>Password</label>
+        <div class="form-group">
+          <label for="password">Password</label>
           <input
             class="form-control mt-1 bg-black border:{validationErrors.password
               ? '3px'

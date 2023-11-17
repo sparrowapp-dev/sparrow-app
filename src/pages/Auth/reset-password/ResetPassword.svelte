@@ -2,16 +2,12 @@
   import Header from "$lib/components/header/Header.svelte";
   import vector1 from "$lib/assets/Vector1.svg";
   import vector2 from "$lib/assets/Vector2.svg";
-  import sparrowicon from "$lib/assets/sparrowIcon.svg";
+  // import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import vector3 from "$lib/assets/Vector3.svg";
 
-  import {
-    handleResetPassword,
-    handleResetPasswordValidation,
-  } from "./reset-password";
+  import { handleResetPasswordValidation } from "./reset-password";
   import { username } from "$lib/store/auth.store";
   import Welcome from "../../Home/Welcome.svelte";
-
 
   let passwordText: string = "";
 
@@ -236,7 +232,7 @@
         </div>
       </form>
     {/if}
-    {#if showModal}
+    <!-- {#if showModal}
       <div
         class="modal fade show d-flex align-items-center"
         tabindex="-1"
@@ -279,7 +275,7 @@
         </div>
       </div>
       <div class="modal-backdrop fade show" />
-    {/if}
+    {/if} -->
   </div>
 </div>
 

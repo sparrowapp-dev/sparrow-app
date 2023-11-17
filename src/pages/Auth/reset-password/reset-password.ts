@@ -10,7 +10,7 @@ export const handleResetPassword = async (
   const response = await resetPassword(resetPasswordCredential);
   if (response.isSuccessful) {
     notifications.success("Password Changed Successfully");
-    navigate("/reset/password");
+    navigate("/login");
   } else {
     notifications.error("Something went wrong");
     throw "error login user: " + response.message;
