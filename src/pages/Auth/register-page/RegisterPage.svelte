@@ -131,9 +131,9 @@
     }
   };
 
-  let isLoadingTrueFalse: boolean;
+  let isLoadingPage: boolean;
   isLoading.subscribe((value) => {
-    isLoadingTrueFalse = value;
+    isLoadingPage = value;
   });
 </script>
 
@@ -143,7 +143,7 @@
   data-tauri-drag-region
 >
   <Header />
-  {#if isLoadingTrueFalse}
+  {#if isLoadingPage}
     <PageLoader />
   {:else}
     <div

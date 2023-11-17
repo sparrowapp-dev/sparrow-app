@@ -71,12 +71,18 @@ $theme-colors: map-merge(
     "backgroundColor": $sparrow-background,
     "plusButton": $sparrow-plusbutton,
     "lightBackground": $sparrow-border-color,
-    "getColor": $sparrow-get,
     "requestBodyColor": $sparrow-request-body,
     "labelColor": $sparrow-send-button,
     "buttonBackColor": $sparrow-button-background,
     "buttonColor": $sparrow-button-color,
     "redColor": $sparrow-gradient,
+    "getColor": $sparrow-get,
+    "putColor": $sparrow-put,
+    "postColor": $sparrow-post,
+    "deleteColor": $sparrow-delete,
+    "headColor": $sparrow-head,
+    "patchColor":$sparrow-patc,
+    "optionsColor":$sparrow-opt,
   )
 );
 

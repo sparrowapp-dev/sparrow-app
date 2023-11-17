@@ -181,7 +181,6 @@
             class="btn btn-primary bg-labelColor border-0 mb-2"
             on:click|preventDefault={async () => {
               validationErrors = await handleVerifyEmail(verifyCodeCredential);
-              console.log(validationErrors);
             }}>Verify</button
           >
         {:else}

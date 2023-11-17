@@ -57,9 +57,9 @@
     authNavigate();
   };
 
-  let isLoadingTrueFalse: boolean;
+  let isLoadingPage: boolean;
   isLoading.subscribe((value) => {
-    isLoadingTrueFalse = value;
+    isLoadingPage = value;
   });
 </script>
 
@@ -68,7 +68,7 @@
   style="height: 100vh;"
 >
   <Header />
-  {#if isLoadingTrueFalse}
+  {#if isLoadingPage}
     <PageLoader />
   {:else}
     <div class="d-flex flex-column align-items-center justify-content-center">

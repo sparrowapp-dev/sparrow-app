@@ -2,18 +2,14 @@
   import spin from "$lib/assets/spin.svg";
 </script>
 
-<div class="d-flex flex-column loading-spinner spinner-item">
+<div
+  class="d-flex flex-column align-items-center justify-content-center loading-spinner spinner-item"
+>
   <img class="load-spin" src={spin} style="width: 80px; height:80px;" alt="" />
   <p class="mt-2">Please wait while we sign you in....</p>
 </div>
 
 <style>
-  .spinner-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
   .loading-spinner {
     width: 100%;
     height: 100%;

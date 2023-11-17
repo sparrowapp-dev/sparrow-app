@@ -61,7 +61,16 @@
         <p class="">
           <Dropdown
             title={apiData.addTo}
-            data={[AuthSection.HEADER, AuthSection.QUERY_PARAMETER]}
+            data={[
+              {
+                name: "Header",
+                id: AuthSection.HEADER 
+              },
+              {
+                name: "Query Parameter",
+                id: AuthSection.QUERY_PARAMETER 
+              }
+            ]}
             onclick={handleDropdown}
           />
         </p>
