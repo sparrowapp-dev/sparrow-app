@@ -1,9 +1,9 @@
 <script>
   import { appWindow } from "@tauri-apps/api/window";
-  import logo from "$lib/assets/logo.svg";
   import closeIcon from "$lib/assets/close.svg";
   import resizeIcon from "$lib/assets/resize.svg";
   import minimizeIcon from "$lib/assets/minimize.svg";
+  import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -24,7 +24,7 @@
 >
   <div class="d-flex gap-3">
     <div class="logo">
-      <img src={logo} alt="" class="w-100" />
+      <img src={sparrowicon} alt="" class="w-100" />
     </div>
   </div>
   <div class="d-flex gap-0">

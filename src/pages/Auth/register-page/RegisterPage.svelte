@@ -9,6 +9,8 @@
 
   import { navigate } from "svelte-navigator";
   import { handleRegisterValidation } from "./register-page";
+  import { isLoading } from "$lib/store/auth.store";
+  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
 
   let userData = {
     email: "",
@@ -123,20 +125,16 @@
   const validateCheckbox = () => {
     isCheckboxTouched = true;
     ischeckBoxValid = userData.tnsCheckbox;
-    if (ischeckBoxValid) {
+    if (!ischeckBoxValid) {
       validationErrors.tnsCheckbox = "";
     } else if (isCheckboxTouched) {
-      // validationErrors.tnsCheckbox = "Please accept the terms and conditions";
     }
   };
 
-  // Handle sign-in with external providers
-  const handleSignInWithProvider = (provider: string) => {
-    // Handle sign-in with GitHub, Google, Microsoft, etc.
-    // You can implement the authentication logic here.
-    // Example: Redirect to OAuth authorization URL for the selected provider.
-    console.log(`Signing in with ${provider}`);
-  };
+  let isLoadingTrueFalse: boolean;
+  isLoading.subscribe((value) => {
+    isLoadingTrueFalse = value;
+  });
 </script>
 
 <div
@@ -145,242 +143,224 @@
   data-tauri-drag-region
 >
   <Header />
-  <div
-    class="d-flex mb-5 flex-column align-items-center justify-content-center"
-    data-tauri-drag-region
-  >
-    <h1
-      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-      style="font-size: 40px; width:408px; height:48px;"
-    >
-      Welcome to Sparrow!
-    </h1>
-
-    <form
-      class="register-form text-whiteColor ps-1 pe-1 gap-16"
-      style="width:408px; height:429px"
-      novalidate
-      on:submit|preventDefault={async () => {
-        validationErrors = await handleRegisterValidation(userData);
-      }}
+  {#if isLoadingTrueFalse}
+    <PageLoader />
+  {:else}
+    <div
+      class="d-flex mb-5 flex-column align-items-center justify-content-center"
       data-tauri-drag-region
     >
-      <h2 class="card-subtitle fs-4 mb-3">Create Account</h2>
-      <div class="form-group gap-0 mb-3" data-tauri-drag-region>
-        <label for="email" class="form-label" data-tauri-drag-region
-          >Email</label
-        >
-        <input
-          class="form-control mt-1 bg-black border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {isEmailValid
-            ? 'border-success'
-            : validationErrors.email
-            ? 'border-error'
-            : isEmailTouched
-            ? 'border-error'
-            : 'border-default'}"
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Please enter your email id"
-          required
-          bind:value={userData.email}
-          on:input={validateEmail}
-        />
+      <h1
+        class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+        style="font-size: 40px; width:408px; height:48px;"
+      >
+        Welcome to Sparrow!
+      </h1>
 
-        {#if validationErrors.email}
-          <small class="text-dangerColor form-text"
-            >{validationErrors.email}</small
+      <form
+        class="register-form text-whiteColor ps-1 pe-1 gap-16"
+        style="width:408px; height:429px"
+        novalidate
+        on:submit|preventDefault={async () => {
+          validationErrors = await handleRegisterValidation(userData);
+        }}
+        data-tauri-drag-region
+      >
+        <h2 class="card-subtitle fs-4 mb-3">Create Account</h2>
+        <div class="form-group gap-0 mb-3" data-tauri-drag-region>
+          <label for="email" class="form-label" data-tauri-drag-region
+            >Email</label
           >
-        {/if}
-      </div>
-      <div class="form-group mb-3" data-tauri-drag-region>
-        <label for="name" data-tauri-drag-region>Full Name</label>
-        <input
-          class="form-control mt-1 bg-black border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {isNameValid
-            ? 'border-success'
-            : validationErrors.name
-            ? 'border-error'
-            : isNameTouched
-            ? 'border-error'
-            : 'border-default'}"
-          type="text"
-          name="name"
-          placeholder="Please enter your full name"
-          id="name"
-          required
-          bind:value={userData.name}
-          on:input={validateName}
-        />
+          <input
+            class="form-control mt-1 bg-black border:{validationErrors.email
+              ? '3px'
+              : '1px'} solid {isEmailValid
+              ? 'border-success'
+              : validationErrors.email
+              ? 'border-error'
+              : isEmailTouched
+              ? 'border-error'
+              : 'border-default'}"
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Please enter your email id"
+            required
+            bind:value={userData.email}
+            on:input={validateEmail}
+          />
 
-        {#if validationErrors.name}
-          <small class="text-dangerColor form-text"
-            >{validationErrors.name}</small
-          >
-        {/if}
-      </div>
+          {#if validationErrors.email}
+            <small class="text-dangerColor form-text"
+              >{validationErrors.email}</small
+            >
+          {/if}
+        </div>
+        <div class="form-group mb-3" data-tauri-drag-region>
+          <label for="name" data-tauri-drag-region>Full Name</label>
+          <input
+            class="form-control mt-1 bg-black border:{validationErrors.email
+              ? '3px'
+              : '1px'} solid {isNameValid
+              ? 'border-success'
+              : validationErrors.name
+              ? 'border-error'
+              : isNameTouched
+              ? 'border-error'
+              : 'border-default'}"
+            type="text"
+            name="name"
+            placeholder="Please enter your full name"
+            id="name"
+            required
+            bind:value={userData.name}
+            on:input={validateName}
+          />
 
-      <div class="form-group" data-tauri-drag-region>
-        <label for="password" data-tauri-drag-region>Password</label>
-        <input
-          class="form-control mt-1 bg-black border:{validationErrors.password
-            ? '3px'
-            : '1px'} solid {isPasswordValid1 &&
-          isPasswordValid2 &&
-          isPasswordValid3
-            ? 'border-success'
-            : validationErrors.password
-            ? 'border-error'
-            : isPasswordTouched
-            ? 'border-error'
-            : 'border-default'}"
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Please enter your password"
-          required
-          bind:value={userData.password}
-          on:input={validatePassword}
-        />
-      </div>
+          {#if validationErrors.name}
+            <small class="text-dangerColor form-text"
+              >{validationErrors.name}</small
+            >
+          {/if}
+        </div>
 
-      <div class="row">
-        <div class="col-12 col-md-12 col-lg-12">
-          <div
-            class="d-flex flex-column align-items-start mt-1 text-sm"
-            style="font-size: 13px;"
-          >
-            <div class="d-flex align-items-center mb-0 gap-2">
-              <img
-                src={isPasswordValid1
-                  ? vector2
-                  : isPasswordTouched
-                  ? vector3
-                  : vector1}
-                alt=""
-                class="mr-2"
-              />
-              <p
-                class="mb-0 text : {isPasswordValid1
-                  ? 'text-successColor'
-                  : isPasswordTouched
-                  ? 'text-dangerColor'
-                  : 'text-defaultColor'}"
-              >
-                Min 8 characters
-              </p>
-            </div>
-            <div class="d-flex align-items-center mb-0 gap-2">
-              <img
-                src={isPasswordValid2
-                  ? vector2
-                  : isPasswordTouched
-                  ? vector3
-                  : vector1}
-                alt=""
-                class="mr-2"
-              />
-              <p
-                class="mb-0 text : {isPasswordValid2
-                  ? 'text-successColor'
-                  : isPasswordTouched
-                  ? 'text-dangerColor'
-                  : 'text-defaultColor'}"
-              >
-                Has at least one number
-              </p>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <img
-                src={isPasswordValid3
-                  ? vector2
-                  : isPasswordTouched
-                  ? vector3
-                  : vector1}
-                alt=""
-                class="mr-2"
-              />
-              <p
-                class="mb-0 text : {isPasswordValid3
-                  ? 'text-successColor'
-                  : isPasswordTouched
-                  ? 'text-dangerColor'
-                  : 'text-defaultColor'}"
-              >
-                Has at least one special character
-              </p>
+        <div class="form-group" data-tauri-drag-region>
+          <label for="password" data-tauri-drag-region>Password</label>
+          <input
+            class="form-control mt-1 bg-black border:{validationErrors.password
+              ? '3px'
+              : '1px'} solid {isPasswordValid1 &&
+            isPasswordValid2 &&
+            isPasswordValid3
+              ? 'border-success'
+              : validationErrors.password
+              ? 'border-error'
+              : isPasswordTouched
+              ? 'border-error'
+              : 'border-default'}"
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Please enter your password"
+            required
+            bind:value={userData.password}
+            on:input={validatePassword}
+          />
+        </div>
+
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-12">
+            <div
+              class="d-flex flex-column align-items-start mt-1 text-sm"
+              style="font-size: 13px;"
+            >
+              <div class="d-flex align-items-center mb-0 gap-2">
+                <img
+                  src={isPasswordValid1
+                    ? vector2
+                    : isPasswordTouched
+                    ? vector3
+                    : vector1}
+                  alt=""
+                  class="mr-2"
+                />
+                <p
+                  class="mb-0 text : {isPasswordValid1
+                    ? 'text-successColor'
+                    : isPasswordTouched
+                    ? 'text-dangerColor'
+                    : 'text-defaultColor'}"
+                >
+                  Min 8 characters
+                </p>
+              </div>
+              <div class="d-flex align-items-center mb-0 gap-2">
+                <img
+                  src={isPasswordValid2
+                    ? vector2
+                    : isPasswordTouched
+                    ? vector3
+                    : vector1}
+                  alt=""
+                  class="mr-2"
+                />
+                <p
+                  class="mb-0 text : {isPasswordValid2
+                    ? 'text-successColor'
+                    : isPasswordTouched
+                    ? 'text-dangerColor'
+                    : 'text-defaultColor'}"
+                >
+                  Has at least one number
+                </p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <img
+                  src={isPasswordValid3
+                    ? vector2
+                    : isPasswordTouched
+                    ? vector3
+                    : vector1}
+                  alt=""
+                  class="mr-2"
+                />
+                <p
+                  class="mb-0 text : {isPasswordValid3
+                    ? 'text-successColor'
+                    : isPasswordTouched
+                    ? 'text-dangerColor'
+                    : 'text-defaultColor'}"
+                >
+                  Has at least one special character
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-group mt-2" data-tauri-drag-region>
-        <input
-          type="checkbox"
-          class="form-check-input bg-black"
-          id="tnsCheckbox"
-          bind:checked={userData.tnsCheckbox}
-        />
-        <label
-          data-tauri-drag-region
-          class="form-check-label ms-2"
-          for="tnsCheckbox"
-          >I agree to the <a
-            href="checkbox"
-            class="text-decoration-none text-primaryColor">Terms of Service</a
-          ></label
-        >
-      </div>
-      {#if validationErrors.tnsCheckbox}
-        <small class="text-dangerColor form-text"
-          >{validationErrors.tnsCheckbox}</small
-        >
-      {/if}
-
-      <div class="mb-5 mt-4">
-        <button class="btn btn-primary w-100 text-whiteColor border-0"
-          >Sign Up</button
-        >
-      </div>
-
-      <div class="d-flex flex-column align-items-center justify-content-center">
-        <p>or continue with</p>
-        <div class="d-flex gap-4">
-          <!-- <button
-            on:click={() => handleSignInWithProvider("Github")}
-            style="width: 32px; height:32px"
-            class="bg-dark border-0 rounded"
-          >
-            <img src={githubLogo} alt="Github Logo" class="w-100 h-100 p-1" />
-          </button> -->
-          <button
-            on:click={() => handleSignInWithProvider("Google")}
-            style="width: 32px; height:32px"
-            class="bg-dark border-0 rounded"
-          >
-            <img src={googleLogo} alt="Google Logo" class="w-100 h-100 p-1" />
-          </button>
-          <!-- <button
-            on:click={() => handleSignInWithProvider("Microsoft")}
-            style="width: 32px; height:32px"
-            class="bg-dark border-0 rounded"
-          >
-            <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100 p-1" />
-          </button> -->
-        </div>
-        <!-- "New to the website? Create an account" link -->
-        <div class="gap-3 d-flex align-items-center">
-          <p class="fs-6 mt-3">Already have an account?</p>
-          <a href="/login" class=" text-decoration-none text-primaryColor"
-            >Sign In</a
+        <div class="form-group mt-2" data-tauri-drag-region>
+          <input
+            type="checkbox"
+            class="form-check-input bg-black"
+            id="tnsCheckbox"
+            bind:checked={userData.tnsCheckbox}
+            on:input={validateCheckbox}
+          />
+          <label
+            data-tauri-drag-region
+            class="form-check-label ms-2"
+            for="tnsCheckbox"
+            >I agree to the <a
+              href="checkbox"
+              class="text-decoration-none text-primaryColor">Terms of Service</a
+            ></label
           >
         </div>
-      </div>
-    </form>
-  </div>
+        {#if validationErrors.tnsCheckbox}
+          <small class="text-dangerColor form-text"
+            >{validationErrors.tnsCheckbox}</small
+          >
+        {/if}
+
+        <div class="mb-5 mt-4">
+          <button class="btn btn-primary w-100 text-whiteColor border-0"
+            >Sign Up</button
+          >
+        </div>
+
+        <div
+          class="d-flex flex-column align-items-center justify-content-center"
+        >
+          <div class="gap-3 d-flex align-items-center">
+            <p class="fs-6 mt-3">Already have an account?</p>
+            <a href="/login" class=" text-decoration-none text-primaryColor"
+              >Sign In</a
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  {/if}
 </div>
 
 <style>
