@@ -24,6 +24,7 @@
   import { fetchWorkspaces } from "$lib/services/workspace.service";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
+  import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
   let minimiMaximizeWindow: boolean = false;
 
@@ -93,9 +94,8 @@
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={circleIcon} alt="sparrowLogo" />
+        <img src={sparrowicon} alt="sparrowLogo" />
       </div>
-      <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
     </div>
     <div
       class="d-flex d-flex align-items-center justify-content-center gap-2"

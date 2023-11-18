@@ -5,7 +5,7 @@ import { notifications } from "$lib/utils/notifications";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-import { setUser } from "$lib/store/auth.store";
+import { isResponseError, setUser } from "$lib/store/auth.store";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -26,7 +26,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     notifications.success("Login successful!");
     navigate("/home");
   } else {
-    notifications.error("Something went wrong");
+    isResponseError.set(true);
+
     throw "error login user: " + response.message;
   }
 };
