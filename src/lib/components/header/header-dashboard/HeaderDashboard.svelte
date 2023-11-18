@@ -1,29 +1,40 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import closeIcon from "$lib/assets/close.svg";
-  import resizeIcon from "$lib/assets/resize.svg";
-  import minimizeIcon from "$lib/assets/minimize.svg";
-  import circleIcon from "$lib/assets/Ellipse.svg";
-  import searchIcon from "$lib/assets/search.svg";
-  import settingIcon from "$lib/assets/setting.svg";
-  import profileIcon from "$lib/assets/profile.svg";
-  import notifyIcon from "$lib/assets/notify.svg";
   import { user } from "$lib/store/auth.store";
-  import signout from "$lib/assets/signout.svg";
-  import shortcut from "$lib/assets/shortcut.svg";
-  import about from "$lib/assets/about.svg";
-  import settings from "$lib/assets/settings.svg";
-  import account from "$lib/assets/account.svg";
-  import doubleResizeIcon from "$lib/assets/close-icon.svg";
-
+  import { Observable } from "rxjs";
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import { setCurrentWorkspace } from "$lib/store/workspace.store";
+  import icons from "$lib/assets/app.asset";
+  import {
+    setCurrentWorkspace,
+    updateCurrentWorkspace,
+  } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
+  import { type WorkspaceDocument } from "$lib/database/app.database";
 
   const _viewModel = new HeaderDashboardViewModel();
-  let workspaces = _viewModel.fetchWorkspaces;
+  const workspaces: Observable<any> = _viewModel.workspaces;
+  const activeWorkspace: Observable<any> = _viewModel.activeWorkspace;
   let minimiMaximizeWindow: boolean = false;
+  let profile: boolean = false;
+  let activeWorkspaceRxDoc: WorkspaceDocument;
+
+  const workspaceSubscribe = workspaces.subscribe(
+    (value: WorkspaceDocument[]) => {
+      if (value && value.length > 0) {
+        if (!activeWorkspaceRxDoc) {
+          _viewModel.activateWorkspace(value[0].get("_id"));
+          updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
+        }
+      }
+    },
+  );
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+    },
+  );
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -38,23 +49,25 @@
     minimiMaximizeWindow = !minimiMaximizeWindow;
   };
 
-  let profile: boolean = false;
   window.addEventListener("click", () => {
     profile = false;
   });
 
   const userUnsubscribe = user.subscribe((value) => {
     if (value) {
-      _viewModel.getWorkspace(value._id);
+      _viewModel.refreshWorkspaces(value._id);
     }
   });
 
   const handleDropdown = (id: string, tab: string) => {
+    _viewModel.activateWorkspace(id);
     setCurrentWorkspace(id, tab);
   };
 
   onDestroy(() => {
     userUnsubscribe();
+    workspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
@@ -69,7 +82,7 @@
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={circleIcon} alt="sparrowLogo" />
+        <img src={icons.circleIcon} alt="sparrowLogo" />
       </div>
       <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
     </div>
@@ -86,7 +99,7 @@
     class="inputField bg-backgroundColor pe-2 d-flex align-items-center justify-content-center rounded"
   >
     <div class="ps-3">
-      <img src={searchIcon} alt="" />
+      <img src={icons.searchIcon} alt="" />
     </div>
     <div class="w-100">
       <input
@@ -102,19 +115,19 @@
     <div class="row gap-1">
       <div class="col-3">
         <button class="bg-blackColor border-0">
-          <img src={settingIcon} alt="" />
+          <img src={icons.settingIcon} alt="" />
         </button>
       </div>
       <div class="col-3">
         <button class="bg-blackColor border-0">
-          <img src={notifyIcon} alt="" />
+          <img src={icons.notifyIcon} alt="" />
         </button>
       </div>
       <div class="col-3">
         <div class="position-relative">
           <button class="bg-blackColor border-0">
             <img
-              src={profileIcon}
+              src={icons.profileIcon}
               on:click={() => {
                 setTimeout(() => {
                   profile = true;
@@ -138,7 +151,7 @@
                 profile = false;
               }}
             >
-              <img src={account} alt="" /><span
+              <img src={icons.account} alt="" /><span
                 class="m-2"
                 style="font-size: 12px;">View Account</span
               >
@@ -149,7 +162,7 @@
                 profile = false;
               }}
             >
-              <img src={settings} alt="" /><span
+              <img src={icons.settings} alt="" /><span
                 class="m-2"
                 style="font-size: 12px;">Notification Settings</span
               >
@@ -160,7 +173,7 @@
                 profile = false;
               }}
             >
-              <img src={shortcut} alt="" /><span
+              <img src={icons.shortcut} alt="" /><span
                 class="m-2"
                 style="font-size: 12px;">App Shortcuts</span
               >
@@ -171,7 +184,7 @@
                 profile = false;
               }}
             >
-              <img src={about} alt="" /><span
+              <img src={icons.about} alt="" /><span
                 class="m-2"
                 style="font-size: 12px;">About Sparrow</span
               >
@@ -182,7 +195,7 @@
                 _viewModel.logout();
               }}
             >
-              <img src={signout} alt="" /><span
+              <img src={icons.signout} alt="" /><span
                 class="m-2"
                 style="font-size: 12px;">Sign Out</span
               >
@@ -194,24 +207,24 @@
 
     <div class="col-2">
       <button on:click={onMinimize} class="button-minus border-0 py-1 px-2">
-        <img src={minimizeIcon} alt="" />
+        <img src={icons.minimizeIcon} alt="" />
       </button>
     </div>
 
     <div class="col-2">
       <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
         {#if minimiMaximizeWindow === true}
-          <img src={resizeIcon} alt="" />
+          <img src={icons.resizeIcon} alt="" />
         {/if}
         {#if minimiMaximizeWindow === false}
-          <img src={doubleResizeIcon} alt="" />
+          <img src={icons.doubleResizeIcon} alt="" />
         {/if}
       </button>
     </div>
 
     <div class="col-2 pe-2">
       <button on:click={onClose} class="button-close border-0 py-1 px-2">
-        <img src={closeIcon} alt="" />
+        <img src={icons.closeIcon} alt="" />
       </button>
     </div>
   </div>
