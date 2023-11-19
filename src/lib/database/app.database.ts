@@ -15,7 +15,13 @@ import {
   type WorkspaceDocMethods,
   workspaceCollectionMethods,
 } from "$lib/repositories/workspace.repository";
-
+import { tabSchema, type TabDocType } from "$lib/models/tab.model";
+import {
+  tabDocMethods,
+  type TabCollectionMethods,
+  type TabDocMethods,
+  tabCollectionMethods,
+} from "$lib/repositories/tab.repository";
 // define all the Rx collections
 export type WorkspaceDocument = RxDocument<
   WorkspaceDocType,
@@ -26,10 +32,17 @@ export type WorkspaceCollection = RxCollection<
   WorkspaceDocMethods,
   WorkspaceCollectionMethods
 >;
+export type TabDocument = RxDocument<TabDocType, TabDocMethods>;
+export type TabCollection = RxCollection<
+  TabDocType,
+  TabDocMethods,
+  TabCollectionMethods
+>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
   workspace: WorkspaceCollection;
+  tab: TabCollection;
 };
 
 // define the Rx database type
@@ -47,6 +60,11 @@ const db = await rxdb.addCollections({
     schema: workspaceSchema,
     methods: workspaceDocMethods,
     statics: workspaceCollectionMethods,
+  },
+  tab: {
+    schema: tabSchema,
+    methods: tabDocMethods,
+    statics: tabCollectionMethods,
   },
 });
 

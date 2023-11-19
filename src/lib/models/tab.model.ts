@@ -155,6 +155,10 @@ const requestLiteral = {
     response: responseLiteral,
     state: stateLiteral,
     auth: authLiteral,
+    requestInProgress: {
+      type: "boolean",
+      default: false,
+    },
   },
 };
 
@@ -215,9 +219,13 @@ export const tabSchemaLiteral = {
     save: {
       type: "boolean",
     },
+    isActive: {
+      type: "boolean",
+      default: true,
+    },
     path: pathLiteral,
   },
-  required: ["id", "name", "description", "type", "property", "save"],
+  required: ["id", "name"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(tabSchemaLiteral);

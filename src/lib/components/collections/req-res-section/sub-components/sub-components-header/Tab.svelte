@@ -11,9 +11,7 @@
 
 <div
   class="d-inline-block position-relative pt-1"
-  on:click={() => {
-    updateCurrentTab({id : tab.id});
-  }}
+ 
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
@@ -25,6 +23,9 @@
       : 'transparent'}"
   >
     <button
+    on:click={() => {
+      updateCurrentTab(tab.id);
+    }}
       class="position-relative border-0"
       style="    width: 80%;
           text-overflow: ellipsis;

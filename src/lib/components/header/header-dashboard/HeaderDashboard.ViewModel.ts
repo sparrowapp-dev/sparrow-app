@@ -60,6 +60,7 @@ export class HeaderDashboardViewModel {
       clearAuthJwt();
       setUser(null);
       await rxdb.workspace.find().remove();
+      await rxdb.tab.find().remove();
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {
