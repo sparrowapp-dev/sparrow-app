@@ -15,90 +15,57 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
-  import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
+  import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
   import { RequestMethod } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
+    import type { TabDocument } from "$lib/database/app.database";
+    import type { Observable } from "rxjs";
 
   //this for expand and collaps condition
-  const _apiSendRequest = new ApiSendRequestController();
+  const _apiSendRequest = new ApiSendRequestViewModel();
+  const tab : Observable<TabDocument> = _apiSendRequest.tab;
+    let isCollaps: boolean;
+    
+    collapsibleState.subscribe((value) => (isCollaps = value));
+    
+    let isInputEmpty: boolean = false;
+    let isInputValid: boolean = true;
+    let inputElement: HTMLInputElement;
+    
+    let currentTabId = null;
+    let urlText: string = "";
+    let method = "";
+    let request;
+    let disabledSend: boolean = false;
 
-  let isCollaps: boolean;
-
-  collapsibleState.subscribe((value) => (isCollaps = value));
-
-  let isInputEmpty: boolean = false;
-  let isInputValid: boolean = true;
-  let inputElement: HTMLInputElement;
-
-  let currentTabId = null;
-  let tabList: NewTab[] = [];
-  let urlText: string = "";
-  let method = "";
-  let requestData;
-  let disabledSend: boolean = false;
-  let componentData: NewTab;
-
-  const testJSON: (text: string) => string = (text) => {
-    try {
-      JSON.parse(text);
-      return text;
-    } catch (error) {
-      return "{}";
-    }
-  };
-
-  function ensureHttpOrHttps(str) {
-    if (str.startsWith("http://") || str.startsWith("https://")) {
-      return str;
-    } else if (str.startsWith("//")) {
-      return "http:" + str;
-    } else {
-      return "http://" + str;
-    }
-  }
-
-  function isValidURL(string) {
-    var res = string.match(
-      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g,
-    );
-    return res !== null;
-  }
+    
+    const tabSubscribe = tab.subscribe((event: TabDocument)=>{
+      urlText = event?.get("property").request.url;
+      method = event?.get("property").request.method;
+      disabledSend = event?.get("property").request.requestInProgress;
+      request = event?.get("property").request;
+    });
+  
 
   const handleSendRequest = async () => {
     isInputValid = true;
-    let isValidUrlText = isValidURL(urlText);
-    let urlValue = "";
-
-    // if (isValidUrlText) {
-    //   urlValue = ensureHttpOrHttps(urlText);
-    // } else {
-    //   isInputValid = false;
-    //   notifications.error("Invalid URL");
-    //   return;
-    // }
     const str = urlText;
 
     if (str.trim() === "") {
       isInputEmpty = true;
       inputElement.focus();
     } else {
-      tabs.update((value) => {
-        let temp = value.map((elem) => {
-          if (elem.id === currentTabId) {
-            elem.requestInProgress = true;
-          }
-          return elem;
-        });
-        return temp;
-      });
+   
+      _apiSendRequest.updateRequestProperty(true, "requestInProgress");
 
       isInputEmpty = false;
       if (isInputValid) {
         let start = Date.now();
         let response = await createApiRequest(
-          _apiSendRequest.decodeRestApiData(requestData),
+          _apiSendRequest.decodeRestApiData(request),
         );
+        console.log(response);
         let end = Date.now();
 
         const byteLength = new TextEncoder().encode(
@@ -110,6 +77,7 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
+          _apiSendRequest.updateRequestProperty(false, "requestInProgress");
           tabs.update((value) => {
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
@@ -120,17 +88,18 @@
                   time: duration,
                   size: responseSizeKB,
                 };
-                elem.requestInProgress = false;
+                // elem.requestInProgress = false;
               }
               return elem;
             });
             return temp;
           });
         } else {
+          _apiSendRequest.updateRequestProperty(false, "requestInProgress");
           tabs.update((value) => {
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
-                elem.requestInProgress = false;
+                // elem.requestInProgress = false;
                 let errorMessage: string = "Not Found";
                 elem.request.response.status = errorMessage;
               }
@@ -174,20 +143,12 @@
   };
 
   const handleDropdown = (tab: RequestMethodType) => {
-    tabs.update((value) => {
-      let temp = value.map((elem) => {
-        if (elem.id === currentTabId) {
-          elem.request.method = tab;
-          elem.save = false;
-        }
-        return elem;
-      });
-      return temp;
-    });
+    _apiSendRequest.updateRequestProperty(tab, "method");
   };
   let selectedView: string = "grid";
 
   let handleInputValue = () => {
+    _apiSendRequest.updateRequestProperty(urlText, "url");
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -202,37 +163,8 @@
     updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
   };
 
-  const fetchUrlData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        urlText = elem.request.url;
-        method = elem.request.method;
-        disabledSend = elem.requestInProgress;
-        requestData = elem;
-        componentData = elem;
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchUrlData(currentTabId, tabList);
-    }
-  });
-
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchUrlData(currentTabId, tabList);
-      }
-    }
-  });
-
   onDestroy(() => {
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
+    tabSubscribe.unsubscribe();
   });
 
   const handleResize = () => {
@@ -299,7 +231,7 @@
             color: "optionsColor",
           },
         ]}
-        method={componentData ? componentData.request.method : ""}
+        method={method ? method : ""}
         onclick={handleDropdown}
       />
       <input

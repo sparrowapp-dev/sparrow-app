@@ -2,6 +2,7 @@ import {
   type TabCollection,
   type TabDocument,
 } from "$lib/database/app.database";
+import type { Observable } from "rxjs";
 
 // static ORM-method for the RxDocument
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -15,6 +16,9 @@ export type TabCollectionMethods = {
   removeTab: (id: string) => Promise<void>;
   activeTab: (id: string) => Promise<void>;
   getDocuments: () => Promise<TabDocument[]>;
+  getTab: () => Observable<TabDocument>;
+  setRequestProperty: (data: any, route: string) => Promise<void>;
+  setRequestState: (data: any, route: string) => Promise<void>;
 };
 
 const tabDocMethods: TabDocMethods = {
@@ -98,6 +102,47 @@ const tabCollectionMethods: TabCollectionMethods = {
     if (selectedTab) {
       await selectedTab.incrementalUpdate({ $set: { isActive: true } });
     }
+    return;
+  },
+  getTab: function (this: TabCollection): Observable<TabDocument> {
+    return this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).$;
+  },
+
+  setRequestProperty: async function (
+    this: TabCollection,
+    data: any,
+    route: string,
+  ): Promise<void> {
+    const query = this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).exec();
+    (await query).modify((value) => {
+      value.property.request[route] = data;
+      return value;
+    });
+    return;
+  },
+
+  setRequestState: async function (
+    this: TabCollection,
+    data: any,
+    route: string,
+  ): Promise<void> {
+    const query = this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).exec();
+    (await query).modify((value) => {
+      value.property.request.state[route] = data;
+      return value;
+    });
     return;
   },
 };
