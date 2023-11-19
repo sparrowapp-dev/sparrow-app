@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   type TabCollection,
   type TabDocument,
@@ -5,7 +6,6 @@ import {
 import type { Observable } from "rxjs";
 
 // static ORM-method for the RxDocument
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type TabDocMethods = {
   getDocument: () => any;
 };
@@ -19,7 +19,7 @@ export type TabCollectionMethods = {
   getTab: () => Observable<TabDocument>;
   setRequestProperty: (data: any, route: string) => Promise<void>;
   setRequestState: (data: any, route: string) => Promise<void>;
-  setRequestResponse: (data: any) => Promise<void>;
+  setRequestAuth: (data: any, route: string) => Promise<void>;
 };
 
 const tabDocMethods: TabDocMethods = {
@@ -146,9 +146,10 @@ const tabCollectionMethods: TabCollectionMethods = {
     });
     return;
   },
-  setRequestResponse: async function (
+  setRequestAuth: async function (
     this: TabCollection,
     data: any,
+    route: string,
   ): Promise<void> {
     const query = this.findOne({
       selector: {
@@ -156,7 +157,7 @@ const tabCollectionMethods: TabCollectionMethods = {
       },
     }).exec();
     (await query).modify((value) => {
-      value.property.request.response = data;
+      value.property.request.auth[route] = data;
       return value;
     });
     return;

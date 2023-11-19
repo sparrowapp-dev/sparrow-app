@@ -4,29 +4,20 @@
     import { AuthType } from "$lib/utils/enums/authorization.enum";
     import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import ApiKey from "./ApiKey.svelte";
+    import { AuthorizationViewModel } from "./Authorization.ViewModel";
   import BasicAuth from "./BasicAuth.svelte";
   import BearerToken from "./BearerToken.svelte";
   import NoAuth from "./NoAuth.svelte";
-  export let currentTabId : string;
-  export let requestData : NewTab;
+  export let request;
   let currentTab: string;
-  let tabId: string;
+  const _viewModel = new AuthorizationViewModel(); 
   let handleDropdown = (tab: string) => {
-    currentTab = tab;
-    handleRequestStateChange(currentTab,"auth", tabId);
+    _viewModel.updateRequestState(tab, "auth");
   };
 
   $ : {
-    if(requestData){
-      tabId = currentTabId;
-      currentTab = requestData.request.state.auth;
-    }
-  }
-
-  $ : {
-    if(currentTabId){
-      tabId = currentTabId;
-      currentTab = requestData.request.state.auth;
+    if(request){
+      currentTab = request.state.auth;
     }
   }
 </script>
@@ -70,11 +61,11 @@
   {#if currentTab === AuthType.NO_AUTH}
     <NoAuth />
   {:else if currentTab === AuthType.API_KEY}
-    <ApiKey currentTabId = {currentTabId} apiData = {requestData.request.auth.apiKey} />
+    <ApiKey  apiData = {request.auth.apiKey} callback={_viewModel.updateRequestAuth} />
   {:else if currentTab === AuthType.BEARER_TOKEN}
-    <BearerToken currentTabId = {currentTabId} bearerToken = {requestData.request.auth.bearerToken} />
+    <BearerToken  bearerToken = {request.auth.bearerToken} callback={_viewModel.updateRequestAuth}/>
   {:else if currentTab === AuthType.BASIC_AUTH}
-    <BasicAuth currentTabId = {currentTabId} basicAuth = {requestData.request.auth.basicAuth} />
+    <BasicAuth  basicAuth = {request.auth.basicAuth} callback={_viewModel.updateRequestAuth}/>
   {/if}
 </div>
 
