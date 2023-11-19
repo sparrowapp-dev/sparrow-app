@@ -52,6 +52,14 @@
     selectedTab = event?.get("property").request.state.section;
     progress = event?.get("property").request.requestInProgress;
     request = event?.get("property").request;
+    //////////////////////////// response
+    statusCode = event?.get("property").request?.response?.status;
+          timeTaken = event?.get("property").request.response.time;
+          sizeinKb = event?.get("property").request.response.size;
+          responseBody = event?.get("property").request?.response?.body;
+          responseHeader = Object.entries(
+            JSON.parse(event?.get("property").request?.response?.headers || "{}"),
+          );
   });
 
   const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
@@ -84,13 +92,13 @@
         }
 
         if (elem.request?.response) {
-          statusCode = elem.request?.response?.status;
-          timeTaken = elem.request.response.time;
-          sizeinKb = elem.request.response.size;
-          responseBody = elem.request?.response?.body;
-          responseHeader = Object.entries(
-            JSON.parse(elem.request?.response?.headers || "{}"),
-          );
+          // statusCode = elem.request?.response?.status;
+          // timeTaken = elem.request.response.time;
+          // sizeinKb = elem.request.response.size;
+          // responseBody = elem.request?.response?.body;
+          // responseHeader = Object.entries(
+          //   JSON.parse(elem.request?.response?.headers || "{}"),
+          // );
         } 
       }
     });
@@ -221,17 +229,17 @@
   >
     <div class=" d-flex flex-column" style="height:100%;">
       {#if !statusCode}
-        <!-- <DefaultPage /> -->
+        <DefaultPage />
       {:else if statusCode === "Not Found"}
-        <!-- <ResponseError/> -->
+        <ResponseError/>
       {:else if statusCode}
-        <!-- <ResponseParams
+        <ResponseParams
           {responseBody}
           {responseHeader}
           {statusCode}
           {timeTaken}
           {sizeinKb}
-        /> -->
+        />
       {/if}
 
       {#if progress}

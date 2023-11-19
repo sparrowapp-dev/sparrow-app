@@ -19,6 +19,7 @@ export type TabCollectionMethods = {
   getTab: () => Observable<TabDocument>;
   setRequestProperty: (data: any, route: string) => Promise<void>;
   setRequestState: (data: any, route: string) => Promise<void>;
+  setRequestResponse: (data: any) => Promise<void>;
 };
 
 const tabDocMethods: TabDocMethods = {
@@ -122,7 +123,7 @@ const tabCollectionMethods: TabCollectionMethods = {
         isActive: true,
       },
     }).exec();
-    (await query).modify((value) => {
+    (await query).incrementalModify((value) => {
       value.property.request[route] = data;
       return value;
     });
@@ -139,8 +140,23 @@ const tabCollectionMethods: TabCollectionMethods = {
         isActive: true,
       },
     }).exec();
-    (await query).modify((value) => {
+    (await query).incrementalModify((value) => {
       value.property.request.state[route] = data;
+      return value;
+    });
+    return;
+  },
+  setRequestResponse: async function (
+    this: TabCollection,
+    data: any,
+  ): Promise<void> {
+    const query = this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).exec();
+    (await query).modify((value) => {
+      value.property.request.response = data;
       return value;
     });
     return;

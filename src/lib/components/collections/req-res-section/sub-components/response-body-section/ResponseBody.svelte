@@ -15,14 +15,24 @@
   } from "$lib/store/request-response-section";
   import { onDestroy } from "svelte";
   export let responseBody;
-  let jsonText: any;
+
   let content = {
     text: "",
     json: undefined,
   };
-
   let downloadedData: string = "";
 
+  $:{
+    if(responseBody){
+      downloadedData =
+          "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
+      content = {
+    text: responseBody,
+    json: undefined,
+  }
+    }
+  }
+  
   async function handleCopy() {
     const jsonString = content.text;
     await copyToClipBoard(jsonString);
@@ -54,48 +64,6 @@
     notifications.success("Response downloaded");
   };
 
-  let currentTabId = null;
-  let tabList = [];
-
-  const fetchUrlData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        if (elem.request?.response?.body) {
-          content = {
-            text: elem.request?.response?.body,
-            json: undefined,
-          };
-        } else {
-          content = {
-            text: elem.request?.response,
-            json: undefined,
-          };
-        }
-        downloadedData =
-          "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchUrlData(currentTabId, tabList);
-    }
-  });
-
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchUrlData(currentTabId, tabList);
-      }
-    }
-  });
-  onDestroy(() => {
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
-  });
 </script>
 
 <div

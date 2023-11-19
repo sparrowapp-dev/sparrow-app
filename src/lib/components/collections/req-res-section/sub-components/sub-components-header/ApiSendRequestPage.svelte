@@ -57,7 +57,7 @@
       inputElement.focus();
     } else {
    
-      _apiSendRequest.updateRequestProperty(true, "requestInProgress");
+      await _apiSendRequest.updateRequestProperty(true, "requestInProgress");
 
       isInputEmpty = false;
       if (isInputValid) {
@@ -77,36 +77,27 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
-          _apiSendRequest.updateRequestProperty(false, "requestInProgress");
-          tabs.update((value) => {
-            let temp = value.map((elem) => {
-              if (elem.id === currentTabId) {
-                elem.request.response = {
+          await _apiSendRequest.updateRequestProperty(false, "requestInProgress");
+          await _apiSendRequest.updateRequestProperty(
+            {
                   body: responseBody,
                   headers: JSON.stringify(responseHeaders),
                   status: responseStatus,
                   time: duration,
                   size: responseSizeKB,
-                };
-                // elem.requestInProgress = false;
-              }
-              return elem;
-            });
-            return temp;
-          });
+                },"response"
+          );
         } else {
-          _apiSendRequest.updateRequestProperty(false, "requestInProgress");
-          tabs.update((value) => {
-            let temp = value.map((elem) => {
-              if (elem.id === currentTabId) {
-                // elem.requestInProgress = false;
-                let errorMessage: string = "Not Found";
-                elem.request.response.status = errorMessage;
-              }
-              return elem;
-            });
-            return temp;
-          });
+          await _apiSendRequest.updateRequestProperty(false, "requestInProgress");
+          await _apiSendRequest.updateRequestProperty(
+            {
+                  body: "",
+                  headers: "",
+                  status: "Not Found",
+                  time: 0,
+                  size: 0,
+                },"response"
+          );
         }
       }
     }
