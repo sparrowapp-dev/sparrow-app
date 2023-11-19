@@ -211,7 +211,7 @@
       {:else if selectedTab === RequestSection.REQUEST_BODY}
         <!-- <RequestBody /> -->
       {:else if selectedTab === RequestSection.HEADERS}
-        <!-- <Headers requestData={createDeepCopy(requestData)} {currentTabId} /> -->
+        <Headers request={createDeepCopy(request)}/>
       {:else if selectedTab === RequestSection.AUTHORIZATION}
         <Authorization
           request={createDeepCopy(request)}
