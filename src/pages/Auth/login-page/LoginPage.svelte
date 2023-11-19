@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
-  import { setUser } from "$lib/store/auth.store";
+  import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
   import logo from "$lib/assets/logo.svg";
@@ -8,7 +8,9 @@
   // import githubLogo from "$lib/assets/githublogo.svg";
   // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
-  import { handleLoginValidation } from "./login-page";
+  import { authNavigate, handleLoginValidation } from "./login-page";
+  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import { boolean } from "yup";
 
   let isEmailTouched = false;
 
@@ -52,105 +54,104 @@
     password: "",
   };
 
-  // let errorMessage = "";
-
-  // Handle sign-in with external providers
-  const handleSignInWithProvider = (provider: string) => {
-    // Handle sign-in with GitHub, Google, Microsoft, etc.
-    // You can implement the authentication logic here.
-    // Example: Redirect to OAuth authorization URL for the selected provider.
-    console.log(`Signing in with ${provider}`);
-    // maximizePage();
+  const handleSignInWithGoogle = () => {
+    authNavigate();
   };
+
+  let isLoadingPage: boolean;
+  isLoading.subscribe((value) => {
+    isLoadingPage = value;
+  });
+
+  let isPasswordValid: boolean;
+
+  isResponseError.subscribe((value) => {
+    isPasswordValid = value;
+  });
 </script>
 
-<!-- Below used color as color variable -->
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
 >
   <Header />
-  <div
-    class="d-flex mb-5 flex-column align-items-center justify-content-center"
-  >
-    <h1
-      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-      style="font-size: 40px; width:408px; height:48px;"
-    >
-      Welcome to Sparrow!
-    </h1>
-    <form
-      class="login-form text-whiteColor ps-1 pe-1 gap-16"
-      style="width:408px; height:429px"
-      on:submit|preventDefault={async () => {
-        validationErrors = await handleLoginValidation(loginCredentials);
-        if (isEmailValid && loginCredentials.password.length > 0) {
-          validationErrors.password =
-            "The email and password combination you entered appears to be incorrect. Please try again.";
-        }
-      }}
-    >
-      <h2 class="card-subtitle fs-4 mb-3">Sign In</h2>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label text-red">Email</label
-        >
-        <input
-          type="email"
-          class="form-control bg-black border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {validationErrors.email
-            ? 'border-error'
-            : 'border-default'}"
-          id="exampleInputEmail1"
-          aria-describedby="emailHelp"
-          placeholder="Please enter your registered email id"
-          bind:value={loginCredentials.email}
-          on:input={validateEmail}
-        />
-        {#if validationErrors.email}
-          <small class="form-text text-dangerColor">
-            {validationErrors.email}</small
+  {#if isLoadingPage}
+    <PageLoader />
+  {:else}
+    <div class="d-flex flex-column align-items-center justify-content-center">
+      <h1
+        class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+        style="font-size: 40px; width:408px; height:48px;"
+      >
+        Welcome to Sparrow!
+      </h1>
+      <form
+        class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-4"
+        style="width:408px;"
+        on:submit|preventDefault={async () => {
+          validationErrors = await handleLoginValidation(loginCredentials);
+        }}
+      >
+        <h2 class="card-subtitle fs-4 mb-3">Sign In</h2>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label text-red"
+            >Email</label
           >
-        {/if}
-      </div>
+          <input
+            type="email"
+            class="form-control bg-black border:{validationErrors.email ||
+            isPasswordValid === true
+              ? '3px'
+              : '1px'} solid {validationErrors.email || isPasswordValid === true
+              ? 'border-error'
+              : 'border-default'}"
+            id="exampleInputEmail1"
+            aria-describedby="emailHelp"
+            placeholder="Please enter your registered email id"
+            bind:value={loginCredentials.email}
+            on:input={validateEmail}
+          />
+          {#if validationErrors.email && loginCredentials.email.length > 0}
+            <small class="form-text text-dangerColor">
+              {validationErrors.email}</small
+            >
+          {/if}
+        </div>
 
-      <div class="mb-4">
-        <label
-          for="exampleInputPassword1"
-          class="form-label"
-          data-tauri-drag-region>Password</label
-        >
-        <input
-          type="password"
-          class="form-control bg-black"
-          id="exampleInputPassword1"
-          placeholder="Please enter your Password"
-          bind:value={loginCredentials.password}
-          style="border:{validationErrors.password
-            ? '3px'
-            : '1px'} solid {validationErrors.password
-            ? 'border-error'
-            : 'border-default'}"
-        />
+        <div class="mb-4">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input
+            type="password"
+            id="exampleInputPassword1"
+            placeholder="Please enter your Password"
+            bind:value={loginCredentials.password}
+            class="form-control bg-black border:{isPasswordValid === true
+              ? '3px'
+              : '1px'} solid {isPasswordValid === true
+              ? 'border-error'
+              : 'border-default'}"
+          />
 
-        {#if validationErrors.password}<small class="form-text text-dangerColor"
-            >{validationErrors.password}</small
-          >{/if}
-      </div>
+          {#if isPasswordValid === true}<small
+              class="form-text text-dangerColor"
+              >The email and password combination you entered appears to be
+              incorrect. Please try again.</small
+            >{/if}
+        </div>
 
-      <div class="d-flex mb-4 align-items-center justify-content-end">
-        <a
-          href="/forgot/password"
-          class="text-decoration-none text-primaryColor">Forgot Password?</a
-        >
-      </div>
+        <div class="d-flex mb-4 align-items-center justify-content-end">
+          <a
+            href="/forgot/password"
+            class="text-decoration-none text-primaryColor">Forgot Password?</a
+          >
+        </div>
 
-      <div class="mb-5">
-        <button class="btn btn-primary w-100 text-whiteColor border-0"
-          >Sign In</button
-        >
-      </div>
-
+        <div class="mb-1">
+          <button class="btn btn-primary w-100 text-whiteColor border-0"
+            >Sign In</button
+          >
+        </div>
+      </form>
       <div class="d-flex flex-column align-items-center justify-content-center">
         <p>or continue with</p>
         <div class="d-flex gap-4">
@@ -162,7 +163,7 @@
             <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
           </button> -->
           <button
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={handleSignInWithGoogle}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
@@ -186,13 +187,13 @@
           >
         </div>
       </div>
-    </form>
-  </div>
-  <div
-    class="BottomLogo text-white mt-5 d-flex justify-content-center align-items-center"
-  >
-    <img src={logo} alt="" class="w-50" />
-  </div>
+    </div>
+    <div
+      class="BottomLogo text-white mt-3 d-flex justify-content-center align-items-center"
+    >
+      <img src={logo} alt="" class="w-50" />
+    </div>
+  {/if}
 </div>
 
 <style>

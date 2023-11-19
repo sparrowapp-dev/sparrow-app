@@ -4,6 +4,7 @@
   import { onDestroy } from "svelte";
   import type { KeyValuePairWithBase } from "$lib/utils/interfaces/request.interface";
   import close from "$lib/assets/close.svg";
+  import { invoke } from "@tauri-apps/api";
   export let keyValue: KeyValuePairWithBase[];
   export let callback;
 
@@ -65,21 +66,28 @@
   };
   let files;
 
-  const uploadFormFile = (index) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(files[0]);
-    reader.onload = function () {
+  const extractFileName = (url) => {
+  const parts = url.split('\\');
+  const fileName = parts[parts.length - 1];
+  return fileName;
+  }
+
+  const uploadFormFile = async (index) => {
+    const filePathResponse = await invoke("fetch_file_command");
+    if(filePathResponse !== "Canceled") { 
+      const filename = extractFileName(filePathResponse);
+      const updatedFilePath = "#@#" + filePathResponse;
       let filteredPair = pairs.map((elem, i) => {
         if (i == index) {
-          elem.value = files[0].name;
-          elem.base = reader.result;
+          elem.value = filename;
+          elem.base = updatedFilePath;
         }
         return elem;
       });
       pairs = filteredPair;
       callback(pairs);
       updateParam(index);
-    };
+    }
   };
 
   const removeFormFile = (index) => {
@@ -209,10 +217,9 @@
                     />
                     <input
                       class="form-input"
-                      type="file"
-                      bind:files
+                      type="text"
                       id="formdata-file"
-                      on:change={() => {
+                      on:click={() => {
                         uploadFormFile(index);
                       }}
                       style="opacity: 0;

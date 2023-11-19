@@ -64,7 +64,7 @@ class ApiSendRequestViewModel {
         if (type === fileType.TEXT) {
           storage += `${pair.key}=${pair.value}&`;
         } else if (type === fileType.FILE) {
-          storage += `file::${pair.key}=${pair.base}&`;
+          storage += `${pair.key}=${pair.base}&`;
         }
       }
     }

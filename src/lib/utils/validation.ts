@@ -31,7 +31,6 @@ export const registrationSchema = yup.object().shape({
     .required()
     .min(8, "Password must be at least 8 characters")
     .matches(/(?=.*[0-9])/, "Password must contain a number")
-    .matches(/(?=.*[a-z])/, "Password must contain a lowercase letter")
     .matches(/(?=.*[!@#$%^&*])/, "Password must contain a special character"),
   tnsCheckbox: yup
     .boolean()
@@ -51,3 +50,25 @@ export const loginSchema = yup.object().shape({
     ),
   password: yup.string().required("Please enter a password"),
 });
+
+export const forgotPasswordSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required("Please enter an email")
+    .matches(
+      /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/,
+      "Please enter a valid email ID.",
+    ),
+});
+
+export const resetPasswordSchema = yup.object().shape({
+  newPassword: yup
+    .string()
+    .required()
+    .min(8, "Password must be at least 8 characters")
+    .matches(/(?=.*[0-9])/, "Password must contain a number")
+    .matches(/(?=.*[!@#$%^&*])/, "Password must contain a special character"),
+});
+
+export const updatePasswordSchema = yup.object().shape({});
