@@ -1,10 +1,6 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import {
-    updateQueryParams,
-    updateURL,
-  } from "$lib/store/request-response-section";
   import type { QueryParams } from "$lib/utils/dto";
   import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
   import type {
@@ -12,8 +8,9 @@
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import { onMount } from "svelte";
+    import { ParametersViewModel } from "./Parameters.ViewModel";
 
-  export let requestData: NewTab;
+  export let request: NewTab;
   export let currentTabId: string | null = null;
   export let params: KeyValuePair[] = [];
   export let url: string = "";
@@ -24,9 +21,11 @@
   };
   let controller: boolean = false;
 
+  const _viewModel = new ParametersViewModel();
+
   $: {
     if (params) {
-      authValue = findAuthParameter(requestData);
+      authValue = findAuthParameter(request);
       let flag: boolean = false;
       for (let i = 0; i < params.length - 1; i++) {
         if (params[i].checked === false) {
@@ -43,7 +42,7 @@
 
   $: {
     if (currentTabId) {
-      authValue = findAuthParameter(requestData);
+      authValue = findAuthParameter(request);
       let flag: boolean = false;
       for (let i = 0; i < params.length - 1; i++) {
         if (params[i].checked === false) {
@@ -59,7 +58,7 @@
   }
 
   onMount(() => {
-    authValue = findAuthParameter(requestData);
+    authValue = findAuthParameter(request);
   });
 
   let ListView;
@@ -74,8 +73,8 @@
     }
 
     params = newListElements;
-    updateURL(extractQueryParamstoURL(params), currentTabId);
-    updateQueryParams(params, currentTabId);
+    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
+    _viewModel.updateQueryParams(params, "queryParams");
   }
 
   const extractQueryParamstoURL = (params: KeyValuePair[]) => {
@@ -116,8 +115,8 @@
       params.push({ key: "", value: "", checked: false });
       params = params;
     }
-    updateQueryParams(params, currentTabId);
-    updateURL(extractQueryParamstoURL(params), currentTabId);
+    _viewModel.updateQueryParams(params, "queryParams");
+    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
   };
 
   const deleteParam = (index) => {
@@ -130,8 +129,8 @@
       });
       params = filteredParam;
     }
-    updateQueryParams(params, currentTabId);
-    updateURL(extractQueryParamstoURL(params), currentTabId);
+    _viewModel.updateQueryParams(params, "queryParams");
+    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
   };
   const updateCheck = (index) => {
     let filteredParam = params.map((elem, i) => {
@@ -141,8 +140,8 @@
       return elem;
     });
     params = filteredParam;
-    updateQueryParams(params, currentTabId);
-    updateURL(extractQueryParamstoURL(params), currentTabId);
+    _viewModel.updateQueryParams(params, "queryParams");
+    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
   };
 
   const handleCheckAll = (): void => {
@@ -159,8 +158,8 @@
       return elem;
     });
     params = filteredKeyValue;
-    updateQueryParams(params, currentTabId);
-    updateURL(extractQueryParamstoURL(params), currentTabId);
+    _viewModel.updateQueryParams(params, "queryParams");
+    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
   };
 </script>
 

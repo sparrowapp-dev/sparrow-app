@@ -202,12 +202,12 @@
     </div>
     <div class="d-flex align-items-center justify-content-start">
       {#if selectedTab === RequestSection.PARAMETERS}
-        <!-- <Parameters
-          requestData={createDeepCopy(requestData)}
-          params={createDeepCopy(requestData.request.queryParams)}
-          url={createDeepCopy(requestData.request.url)}
+        <Parameters
+          request={createDeepCopy(request)}
+          params={createDeepCopy(request.queryParams)}
+          url={createDeepCopy(request.url)}
           {currentTabId}
-        /> -->
+        />
       {:else if selectedTab === RequestSection.REQUEST_BODY}
         <!-- <RequestBody /> -->
       {:else if selectedTab === RequestSection.HEADERS}

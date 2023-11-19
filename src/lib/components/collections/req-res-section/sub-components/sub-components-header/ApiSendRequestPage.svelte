@@ -65,7 +65,6 @@
         let response = await createApiRequest(
           _apiSendRequest.decodeRestApiData(request),
         );
-        console.log(response);
         let end = Date.now();
 
         const byteLength = new TextEncoder().encode(
@@ -140,17 +139,7 @@
 
   let handleInputValue = () => {
     _apiSendRequest.updateRequestProperty(urlText, "url");
-    tabs.update((value) => {
-      let temp = value.map((elem) => {
-        if (elem.id === currentTabId) {
-          elem.request.url = urlText;
-          elem.save = false;
-        }
-        return elem;
-      });
-
-      return temp;
-    });
+    
     updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
   };
 
