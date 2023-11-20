@@ -13,8 +13,8 @@
   import { type WorkspaceDocument } from "$lib/database/app.database";
 
   const _viewModel = new HeaderDashboardViewModel();
-  const workspaces: Observable<any> = _viewModel.workspaces;
-  const activeWorkspace: Observable<any> = _viewModel.activeWorkspace;
+  const workspaces : Observable<WorkspaceDocument[]> = _viewModel.workspaces;
+  const activeWorkspace : Observable<WorkspaceDocument> = _viewModel.activeWorkspace;
   let minimiMaximizeWindow: boolean = false;
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;

@@ -1,48 +1,54 @@
-import type {
-  WorkspaceCollection,
-  WorkspaceDocument,
-} from "$lib/database/app.database";
-
-// static ORM-method for the RxDocument
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type WorkspaceDocMethods = {
-  getDocument: () => any;
-};
+import { rxdb, type WorkspaceDocument } from "$lib/database/app.database";
+import { RxDBUpdatePlugin } from "rxdb/plugins/update";
+import { addRxPlugin } from "rxdb";
+import type { Observable } from "rxjs";
+addRxPlugin(RxDBUpdatePlugin);
 
-// static ORM-method for the RxCollection
-export type WorkspaceCollectionMethods = {
-  setActiveWorkspace: (id: string) => Promise<void>;
-  bulkInsertData: (data: any) => Promise<void>;
-};
-
-const workspaceDocMethods: WorkspaceDocMethods = {
+export class WorkspaceRepository {
+  constructor() {}
   /**
-   * Prints this RxDocument.
+   * extracts RxDocument of workspace.
    */
-  getDocument: function (this: WorkspaceDocument) {
+  public getDocument = (elem: WorkspaceDocument) => {
     return {
-      _id: this._id,
-      name: this.name,
-      owner: this.owner,
-      permissions: this.permissions,
-      isActiveWorkspace: this.isActiveWorkspace,
-      createdBy: this.createdBy,
-      createdAt: this.createdAt,
+      _id: elem.get("_id"),
+      name: elem.get("name"),
+      owner: elem.get("owner"),
+      permissions: elem.get("permissions"),
+      isActiveWorkspace: elem.get("isActiveWorkspace"),
+      createdBy: elem.get("createdBy"),
+      createdAt: elem.get("createdAt"),
     };
-  },
-};
+  };
 
-const workspaceCollectionMethods: WorkspaceCollectionMethods = {
+  /**
+   * get all workspaces observable of user.
+   */
+  public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
+    return rxdb.workspace.find().$;
+  };
+  /**
+   * get active workspace of the user.
+   */
+  public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
+    return rxdb.workspace.findOne({
+      selector: {
+        isActiveWorkspace: true,
+      },
+    }).$;
+  };
+
+  public clearWorkspaces = async (): Promise<any> => {
+    return rxdb.workspace.find().remove();
+  };
   /**
    * Sets a workspace as active.
    */
-  setActiveWorkspace: async function (
-    this: WorkspaceCollection,
-    workspaceId: string,
-  ): Promise<void> {
-    const workspaces: WorkspaceDocument[] = await this.find().exec();
+  public setActiveWorkspace = async (workspaceId: string): Promise<void> => {
+    const workspaces: WorkspaceDocument[] = await rxdb.workspace.find().exec();
     const data = workspaces.map((elem: WorkspaceDocument) => {
-      const res = elem.getDocument();
+      const res = this.getDocument(elem);
       if (res._id === workspaceId) {
         res.isActiveWorkspace = true;
       } else {
@@ -50,20 +56,15 @@ const workspaceCollectionMethods: WorkspaceCollectionMethods = {
       }
       return res;
     });
-    await this.bulkUpsert(data);
+    await rxdb.workspace.bulkUpsert(data);
     return;
-  },
+  };
 
   /**
    * Sync | refresh data
    */
-  bulkInsertData: async function (
-    this: WorkspaceCollection,
-    data: any,
-  ): Promise<void> {
-    await this.bulkInsert(data);
+  public bulkInsertData = async (data: any): Promise<void> => {
+    await rxdb.workspace.bulkInsert(data);
     return;
-  },
-};
-
-export { workspaceCollectionMethods, workspaceDocMethods };
+  };
+}
