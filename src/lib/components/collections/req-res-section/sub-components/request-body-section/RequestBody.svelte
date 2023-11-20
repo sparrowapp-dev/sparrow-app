@@ -2,14 +2,7 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   
   import {
-    currentTab,
-    handleRawDataChange,
-    handleRequestStateChange,
     isHorizontalVertical,
-    tabs,
-    updateFormDataFile,
-    updateFormDataText,
-    updateUrlEncode,
   } from "$lib/store/request-response-section";
   import type { RequestBody } from "$lib/utils/dto/requestbody";
   import { onDestroy, onMount } from "svelte";
@@ -17,109 +10,79 @@
   import { CodeEditor } from "petrel";
   import { RequestDataset, RequestDataType } from "$lib/utils/enums/request.enum";
   import type {
-    NewTab,
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
+    import { RequestBodyViewModel } from "./RequestBody.ViewModel";
+    import type { TabDocument } from "$lib/database/app.database";
   
-  let bodyData: string = "";
-  let currentTabId: string | null = null;
-  let mainTab: string;
-  let rawTab: string;
-  let tabList: NewTab[] = [];
+  const _viewModel = new RequestBodyViewModel();
+  const tab = _viewModel.tab;
+
+  let mainTab: string= "";
+  let rawTab: string = "";
   let rawValue: string = "";
   let urlEncoded: KeyValuePair[] = [];
   let formDataText: KeyValuePair[] = [];
   let formDataFile: KeyValuePairWithBase[] = [];
+
   let content = {
     text: "",
     json: undefined,
   };
 
-  const fetchBodyData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        bodyData = elem.request.body.raw;
-        rawValue = elem.request.body.raw;
-        urlEncoded = elem.request.body.urlencoded;
-        formDataText = elem.request.body.formdata.text;
-        formDataFile = elem.request.body.formdata.file;
-        content = {
-          text: bodyData,
+  const tabSubscribe = tab.subscribe((event: TabDocument)=>{
+      rawValue = event?.get("property").request.body.raw;
+      urlEncoded = event?.get("property").request.body.urlencoded;
+      formDataText = event?.get("property").request.body.formdata.text;
+      formDataFile = event?.get("property").request.body.formdata.file;
+      // formDataText = text;
+      // formDataFile = file;
+      content = {
+          text: rawValue,
           json: undefined,
         };
-        let { raw, dataset } = elem.request.state;
-        mainTab = dataset;
-        rawTab = raw;
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchBodyData(currentTabId, tabList);
-    }
+        mainTab = event?.get("property").request.state.dataset;
+        
+        rawTab = event?.get("property").request.state.raw;
+        
   });
 
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchBodyData(currentTabId, tabList);
-      }
-    }
-  });
 
   let handleDropdown = (tab: string) => {
-    mainTab = tab;
-    handleRequestStateChange(mainTab, "dataset", currentTabId);
+    _viewModel.updateRequestState(tab, "dataset");
   };
 
   let handleRawDropDown = (tab: string) => {
-    rawTab = tab;
-    handleRequestStateChange(rawTab, "raw", currentTabId);
+    _viewModel.updateRequestState(tab, "raw");
   };
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   const handleChange = (updatedContent: RequestBody) => {
-    tabs.update((value) => {
-      let temp = value.map((elem) => {
-        if (elem.id === currentTabId) {
-          elem.request.body.raw = updatedContent.text;
-        }
-        return elem;
-      });
-      return temp;
-    });
+    _viewModel.updateRequestBody(updatedContent,"raw");
   };
 
   const handleRawChange = () => {
-    handleRawDataChange(rawValue, currentTabId);
+    _viewModel.updateRequestBody(rawValue,"raw");
   };
 
-  // onMount(()=>{
-  //   const codeEditor = new CodeEditor(document.getElementById("code-editor"))
-  //   codeEditor.create();
-  // });
   const handleUrlEncodeChange = (pairs) => {
-    updateUrlEncode(pairs, currentTabId);
+    _viewModel.updateRequestBody(pairs, "urlencoded");
   };
   const handleFormDataTextChange = (pairs) => {
-    updateFormDataText(pairs, currentTabId);
+    _viewModel.updateRequestBodyFormData(pairs, "text");
   };
 
   const handleFormDataFileChange = (pairs) => {
-    updateFormDataFile(pairs, currentTabId);
+    _viewModel.updateRequestBodyFormData(pairs, "file");
   };
 
   onDestroy(() => {
-    currentTabUnsubscribe();
-    tabsUnsubscribe();
+    tabSubscribe.unsubscribe();
   });
 </script>
 

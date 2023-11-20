@@ -20,6 +20,8 @@ export type TabCollectionMethods = {
   setRequestProperty: (data: any, route: string) => Promise<void>;
   setRequestState: (data: any, route: string) => Promise<void>;
   setRequestAuth: (data: any, route: string) => Promise<void>;
+  setRequestBody: (data: any, route: string) => Promise<void>;
+  setRequestBodyFormData: (data: any, route: string) => Promise<void>;
 };
 
 const tabDocMethods: TabDocMethods = {
@@ -156,8 +158,42 @@ const tabCollectionMethods: TabCollectionMethods = {
         isActive: true,
       },
     }).exec();
-    (await query).modify((value) => {
+    (await query).incrementalModify((value) => {
       value.property.request.auth[route] = data;
+      return value;
+    });
+    return;
+  },
+
+  setRequestBody: async function (
+    this: TabCollection,
+    data: any,
+    route: string,
+  ): Promise<void> {
+    const query = this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.body[route] = data;
+      return value;
+    });
+    return;
+  },
+
+  setRequestBodyFormData: async function (
+    this: TabCollection,
+    data: any,
+    route: string,
+  ): Promise<void> {
+    const query = this.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.body.formdata[route] = data;
       return value;
     });
     return;
