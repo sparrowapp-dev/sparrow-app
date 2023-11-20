@@ -18,11 +18,17 @@
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import { collectionList, useCollectionTree } from "$lib/store/collection";
   import spin from "$lib/assets/spin.svg";
+  import { PageHeaderViewModel } from "./PageHeader.ViewModel";
+    import type { TabDocument } from "$lib/database/app.database";
 
+  const _viewModel = new PageHeaderViewModel();
+  const tab = _viewModel.tab;
+
+  
   let isCollaps: boolean;
   let display: boolean = false;
   collapsibleState.subscribe((value) => (isCollaps = value));
-
+  
   window.addEventListener("click", () => {
     display = false;
   });
@@ -42,38 +48,42 @@
   let collection;
 
   let loader = false;
-
+  
   const { updateNodeData } = useCollectionTree();
 
-  const fetchComponentData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        tabName = elem.name;
-        componentData = elem;
-      }
-    });
-  };
+  const tabSubscribe = tab.subscribe((event: TabDocument) => {
+    tabName = event?.get("name");
+  });
+  
+  // const fetchComponentData = (id, list) => {
+  //   list.forEach((elem) => {
+  //     if (elem.id === id) {
+  //       tabName = elem.name;
+  //       componentData = elem;
+  //     }
+  //   });
+  // };
 
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchComponentData(currentTabId, tabList);
-    }
-  });
+  // const tabsUnsubscribe = tabs.subscribe((value) => {
+  //   tabList = value;
+  //   if (currentTabId && tabList) {
+  //     fetchComponentData(currentTabId, tabList);
+  //   }
+  // });
 
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchComponentData(currentTabId, tabList);
-      }
-    }
-  });
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id !== "") {
-      workspace = value;
-    }
-  });
+  // const currentTabUnsubscribe = currentTab.subscribe((value) => {
+  //   if (value && value.id) {
+  //     currentTabId = value.id;
+  //     if (currentTabId && tabList) {
+  //       fetchComponentData(currentTabId, tabList);
+  //     }
+  //   }
+  // });
+  // const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
+  //   if (value.id !== "") {
+  //     workspace = value;
+  //   }
+  // });
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   });
@@ -146,10 +156,11 @@
   };
 
   onDestroy(() => {
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
-    currentWorkspaceUnsubscribe();
+    // tabsUnsubscribe();
+    // currentTabUnsubscribe();
+    // currentWorkspaceUnsubscribe();
     collectionListUnsubscribe();
+    tabSubscribe.unsubscribe()
   });
 </script>
 

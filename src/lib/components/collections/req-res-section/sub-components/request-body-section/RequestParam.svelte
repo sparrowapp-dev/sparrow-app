@@ -46,7 +46,7 @@
     selectedTab = event?.get("property").request.state.section;
     progress = event?.get("property").request.requestInProgress;
     request = event?.get("property").request;
-    //////////////////////////// response
+    
     statusCode = event?.get("property").request?.response?.status;
     timeTaken = event?.get("property").request.response.time;
     sizeinKb = event?.get("property").request.response.size;
