@@ -53,4 +53,4 @@ jobs:
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version $BUILD_VERSION
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v1.0.3
