@@ -8,6 +8,7 @@ import { navigate } from "svelte-navigator";
 
 const handleRegister = async (userData) => {
   const response = await registerUser(userData);
+
   if (response.isSuccessful) {
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
@@ -15,7 +16,7 @@ const handleRegister = async (userData) => {
     notifications.success("Registration successful!");
     navigate("/login");
   } else {
-    notifications.error("Something went wrong");
+    notifications.error(response.message);
     throw "error registering user: " + response.message;
   }
 };
