@@ -224,8 +224,12 @@ export const tabSchemaLiteral = {
       default: true,
     },
     path: pathLiteral,
+    createdAt: {
+      type: "string",
+    },
   },
   required: ["id", "name"],
+  indexes: ["createdAt"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(tabSchemaLiteral);

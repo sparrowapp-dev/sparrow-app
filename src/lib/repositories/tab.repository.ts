@@ -41,7 +41,7 @@ const tabCollectionMethods: TabCollectionMethods = {
    * Return all the RxDocument refers to this collection.
    */
   getDocuments: async function (): Promise<TabDocument[]> {
-    return await this.find().exec();
+    return await this.find().sort({ createdAt: "asc" }).exec();
   },
 
   /**

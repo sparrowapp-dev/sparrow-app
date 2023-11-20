@@ -29,7 +29,6 @@
   import type { Observable } from "rxjs";
   import type { TabDocument } from "$lib/database/app.database";
 
-  let tabsStore: NewTab[] = [];
   let tabWidth: number = 196;
   let scrollerParent: number;
   let scrollerWidth: number;
@@ -38,7 +37,7 @@
   const activeTab = _viewModel.activeTab;
   const openTab: Observable<any> = _viewModel.tabs;
 
-  openTab.subscribe((tabs: TabDocument[]) => {
+  const openTabSubscribe = openTab.subscribe((tabs: TabDocument[]) => {
     if (tabs.length >= 0 && tabs.length <= 5) {
       tabWidth = 196;
     } else if (tabs.length >= 6 && tabs.length <= 10) {
@@ -47,22 +46,12 @@
       tabWidth = 100;
     }
   });
-  const tabsUnsubscribe = tabs.subscribe((value: NewTab[]) => {
-    tabsStore = value;
-  });
-
+  
   let isCollaps: boolean;
   collapsibleState.subscribe((value) => (isCollaps = value));
 
-  let currentTabId: string = "";
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-    }
-  });
   onDestroy(() => {
-    currentTabUnsubscribe();
-    tabsUnsubscribe();
+    openTabSubscribe.unsubscribe();
   });
 </script>
 
@@ -120,8 +109,7 @@
       <button
         class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
         on:click={() => {
-          handleTabAddons(createSampleRequest(uuidv4()));
-          _viewModel.handleCreateTab(generateSampleRequest(uuidv4()));
+          _viewModel.handleCreateTab(generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()));
           moveNavigation("right");
         }}
       >

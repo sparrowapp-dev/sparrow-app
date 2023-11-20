@@ -100,10 +100,9 @@ const createSampleRequest = (id: string) => {
   };
 };
 
-const generateSampleRequest = (id: string) => {
+const generateSampleRequest = (id: string, date: string) => {
   return {
-    temp: id,
-    id: "0" + new Date(),
+    id,
     name: RequestDefault.NAME,
     type: ItemType.REQUEST,
     description: "",
@@ -194,6 +193,7 @@ const generateSampleRequest = (id: string) => {
     },
     save: false,
     path: {},
+    createdAt: date,
   };
 };
 export { createSampleRequest, generateSampleRequest };

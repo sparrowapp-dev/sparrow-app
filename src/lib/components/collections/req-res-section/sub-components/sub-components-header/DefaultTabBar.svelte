@@ -3,12 +3,14 @@
   import collections from "$lib/assets/collections.svg";
   import apiRequest from "$lib/assets/apiRequest.svg";
   import { v4 as uuidv4 } from "uuid";
-  import { handleTabAddons } from "$lib/store/request-response-section";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { createSampleRequest } from "$lib/utils/sample/request.sample";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+    import { DefaultTabBarViewModel } from "./DefaultTabBar.ViewModel";
+
+  const _viewModel = new DefaultTabBarViewModel();
 
   const addApiRequest = () => {
-    handleTabAddons(createSampleRequest(uuidv4()));
+    _viewModel.handleCreateTab(generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()));
     moveNavigation("right");
   };
 
