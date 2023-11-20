@@ -3,7 +3,7 @@
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
   import Teams from "../Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
-  import HeaderHome from "$lib/components/header/HeaderHome.svelte";
+  import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
   import CollectionsHome from "../Collections/collections-home/CollectionsHome.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
@@ -38,7 +38,7 @@
   });
 </script>
 
-<HeaderHome />
+<HeaderDashboard />
 <div class="dashboard-teams d-flex flex-column">
   <Sidebar />
   <Route path="/collections/*"><CollectionsHome /></Route>
