@@ -139,8 +139,7 @@
 
   let handleInputValue = () => {
     _apiSendRequest.updateRequestProperty(urlText, "url");
-    
-    updateQueryParams(extractKeyValueFromUrl(urlText), currentTabId);
+    _apiSendRequest.updateRequestProperty(extractKeyValueFromUrl(urlText), "queryParams");
   };
 
   onDestroy(() => {
