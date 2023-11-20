@@ -9,12 +9,19 @@
     tabs,
     updateQueryParams,
   } from "$lib/store/request-response-section";
-  import CrudDropdown from "$lib/components/dropdown/CrudDropdown.svelte";
+  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
-  import { onDestroy } from "svelte";
-  import { makeRequestforCrud } from "$lib/api/api.common";
+  import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
+  import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
+  import { createApiRequest } from "$lib/services/rest-api.service";
+  import { RequestMethod } from "$lib/utils/enums/request.enum";
+  import type { RequestMethodType } from "$lib/utils/types/request.type";
+
+  //this for expand and collaps condition
+  const _apiSendRequest = new ApiSendRequestController();
 
   let isCollaps: boolean;
 
@@ -62,16 +69,14 @@
     isInputValid = true;
     let isValidUrlText = isValidURL(urlText);
     let urlValue = "";
-    if (isValidUrlText) {
-      urlValue = ensureHttpOrHttps(urlText);
-    } else {
-      urlValue = urlText;
-      isInputValid = false;
-      if (urlText.length > 0) {
-        notifications.error("Invalid URL");
-      }
-      return;
-    }
+
+    // if (isValidUrlText) {
+    //   urlValue = ensureHttpOrHttps(urlText);
+    // } else {
+    //   isInputValid = false;
+    //   notifications.error("Invalid URL");
+    //   return;
+    // }
     const str = urlText;
 
     if (str.trim() === "") {
@@ -90,17 +95,19 @@
 
       isInputEmpty = false;
       if (isInputValid) {
-        let response = await makeRequestforCrud(
-          urlValue,
-          requestData.request.method,
-          "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive",
-          testJSON(requestData.request.body),
-          "JSON",
+        let start = Date.now();
+        let response = await createApiRequest(
+          _apiSendRequest.decodeRestApiData(requestData),
         );
+        let end = Date.now();
 
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        let responseSizeKB = byteLength / 1024;
+        let duration = end - start;
         if (response.isSuccessful) {
           let responseBody = response.data.response;
-          console.log(responseBody);
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
           tabs.update((value) => {
@@ -110,6 +117,8 @@
                   body: responseBody,
                   headers: JSON.stringify(responseHeaders),
                   status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
                 };
                 elem.requestInProgress = false;
               }
@@ -122,6 +131,8 @@
             let temp = value.map((elem) => {
               if (elem.id === currentTabId) {
                 elem.requestInProgress = false;
+                let errorMessage: string = "Not Found";
+                elem.request.response.status = errorMessage;
               }
               return elem;
             });
@@ -162,7 +173,7 @@
     return [...params, { key: "", value: "", checked: false }];
   };
 
-  const handleDropdown = (tab: string) => {
+  const handleDropdown = (tab: RequestMethodType) => {
     tabs.update((value) => {
       let temp = value.map((elem) => {
         if (elem.id === currentTabId) {
@@ -227,7 +238,7 @@
   const handleResize = () => {
     const windowWidth = window.innerWidth;
 
-    if (windowWidth <= 800) {
+    if (windowWidth <= 1300) {
       document.querySelector("#barIcon").click();
       isHorizontalVertical.set(true);
     } else {
@@ -250,28 +261,47 @@
     style="width:calc(100%-312px);"
   >
     <div class="d-flex gap-2 w-100">
-      <div class="d-flex align-items-center justify-content-center">
-        <p
-          class="d-flex mb-0 w-100 h-100 pe-3 py-0 align-items-center btn btn-primary1 justify-content-center justify-content-center rounded"
-        >
-          <CrudDropdown
-            data={[
-              "GET",
-              "POST",
-              "PUT",
-              "DEL",
-              "TRAC",
-              "PATC",
-              "HEAD",
-              "OPT",
-              "CON",
-            ]}
-            method={componentData ? componentData.request.method : ""}
-            onclick={handleDropdown}
-          />
-        </p>
-      </div>
-
+      <ColorDropdown
+        data={[
+          {
+            name: "GET",
+            id: RequestMethod.GET,
+            color: "getColor",
+          },
+          {
+            name: "POST",
+            id: RequestMethod.POST,
+            color: "postColor",
+          },
+          {
+            name: "PUT",
+            id: RequestMethod.PUT,
+            color: "putColor",
+          },
+          {
+            name: "DELETE",
+            id: RequestMethod.DELETE,
+            color: "deleteColor",
+          },
+          {
+            name: "PATCH",
+            id: RequestMethod.PATCH,
+            color: "patchColor",
+          },
+          {
+            name: "HEAD",
+            id: RequestMethod.HEAD,
+            color: "headColor",
+          },
+          {
+            name: "OPTIONS",
+            id: RequestMethod.OPTIONS,
+            color: "optionsColor",
+          },
+        ]}
+        method={componentData ? componentData.request.method : ""}
+        onclick={handleDropdown}
+      />
       <input
         required
         type="text"

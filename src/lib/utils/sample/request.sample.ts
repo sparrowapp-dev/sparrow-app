@@ -4,7 +4,7 @@ import {
   RequestDataset,
   RequestDefault,
   RequestSection,
-  RequestType,
+  RequestDataType,
 } from "../enums/request.enum";
 
 const createSampleRequest = (id: string) => {
@@ -69,7 +69,7 @@ const createSampleRequest = (id: string) => {
         },
       ],
       state: {
-        raw: RequestType.Text,
+        raw: RequestDataType.TEXT,
         dataset: RequestDataset.NONE,
         auth: AuthType.NO_AUTH,
         section: RequestSection.PARAMETERS,
@@ -85,6 +85,13 @@ const createSampleRequest = (id: string) => {
           authValue: "",
           addTo: AuthSection.HEADER,
         },
+      },
+      response: {
+        headers: "",
+        status: "",
+        body: "",
+        time: 0,
+        size: 0,
       },
     },
     save: false,

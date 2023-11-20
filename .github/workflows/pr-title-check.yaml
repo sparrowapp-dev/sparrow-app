@@ -1,0 +1,27 @@
+name: PR Title Check
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  Development:
+    name: Validate PR Title 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Validate PR Title 
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          if [[ ! $PR_TITLE =~ ^(feat: |chore: |fix: |test: |build: |docs: |refactor: |bug: ) ]]; then
+            echo "Error: PR title  doesn't start with a valid prefix"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}

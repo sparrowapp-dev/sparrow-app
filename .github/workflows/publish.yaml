@@ -45,9 +45,15 @@ jobs:
            
       - name: Install App Center CLI
         run: |
-          npm install -g appcenter-cli
+          npm install -g appcenter-cli@latest
+
+      # - name: Set Build Version
+      #   run: echo "BUILD_VERSION = $(date +'%Y%m%d')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+
+      #- name: Debug Build Version
+        #run: echo "Build Version: $BUILD_VERSION"
         
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v1.0.2
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v11.23.${{ github.run_number }}

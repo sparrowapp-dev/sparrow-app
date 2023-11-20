@@ -19,7 +19,11 @@ const findAuthHeader = (
     authValue.value = "Bearer " + requestData.request.auth.bearerToken;
   } else if (requestData.request.state.auth === AuthType.BASIC_AUTH) {
     authValue.key = "Authorization";
-    authValue.value = `Basic Og== ${requestData.request.auth.basicAuth.username} ${requestData.request.auth.basicAuth.password}`;
+    authValue.value = `Basic ${btoa(
+      requestData.request.auth.basicAuth.username +
+        ":" +
+        requestData.request.auth.basicAuth.password,
+    )}`;
   } else if (
     requestData.request.state.auth === AuthType.API_KEY &&
     requestData.request.auth.apiKey.addTo === AuthSection.HEADER &&
