@@ -1,5 +1,7 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import constants from "$lib/utils/constants";
+  let workspaceLimit = constants.WORKSPACE_LIMIT;
   let visibility = false;
   export let data: any;
   export let onclick: any;
@@ -38,7 +40,7 @@
     <hr class="m-0 p-0" />
     {#if $data}
       {#each $data as list, index}
-        {#if index < 5}
+        {#if index < workspaceLimit}
           <p
             class="d-flex align-items-center m-0 px-2"
             on:click={() => {
