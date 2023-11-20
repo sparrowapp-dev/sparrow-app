@@ -12,7 +12,7 @@
   import { clearAuthJwt } from "$lib/utils/jwt";
   import { useNavigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
-  import { loginStatus, setUser, user } from "$lib/store/auth.store";
+  import { setUser, user } from "$lib/store/auth.store";
   import signout from "$lib/assets/signout.svg";
   import shortcut from "$lib/assets/shortcut.svg";
   import about from "$lib/assets/about.svg";
@@ -82,15 +82,15 @@
   };
   onDestroy(userUnsubscribe);
 
-  let isloggedIn: boolean;
-  loginStatus.subscribe((value) => {
+  let isloggedIn;
+
+  user.subscribe((value) => {
     isloggedIn = value;
   });
 
   onMount(() => {
-    $: if (isloggedIn === true) {
+    $: if (isloggedIn) {
       const resizeButton = document.getElementById("resize-button");
-      console.log(resizeButton);
       if (resizeButton) {
         resizeButton.click();
       }
@@ -99,19 +99,14 @@
 
   let isSearchVisible = true;
 
-  // Check window width on mount
   onMount(() => {
     handleWindowSize();
   });
 
-  // Check window width on resize
   window.addEventListener("resize", handleWindowSize);
 
   function handleWindowSize() {
-    // Set a minimum width threshold
-    const minWidthThreshold = 800; // Adjust as needed
-
-    // Update isSearchVisible based on window width
+    const minWidthThreshold = 800;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
   }
 </script>
@@ -157,7 +152,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-center"
+    class="d-flex align-items-center justify-content-center gap-1"
     style="margin-left: 45px;"
   >
     <div class="gap-{!isSearchVisible ? '4' : '4'} d-flex">
@@ -268,8 +263,7 @@
         >
           {#if isMaximizeWindow === true}
             <img src={resizeIcon} alt="" />
-          {/if}
-          {#if isMaximizeWindow === false}
+          {:else}
             <img src={doubleResizeIcon} alt="" />
           {/if}
         </button>
