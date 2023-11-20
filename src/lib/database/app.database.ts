@@ -22,7 +22,10 @@ import {
   type TabDocMethods,
   tabCollectionMethods,
 } from "$lib/repositories/tab.repository";
-// define all the Rx collections
+import { addRxPlugin } from "rxdb";
+import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
+addRxPlugin(RxDBMigrationPlugin);
+
 export type WorkspaceDocument = RxDocument<
   WorkspaceDocType,
   WorkspaceDocMethods
@@ -32,6 +35,7 @@ export type WorkspaceCollection = RxCollection<
   WorkspaceDocMethods,
   WorkspaceCollectionMethods
 >;
+
 export type TabDocument = RxDocument<TabDocType, TabDocMethods>;
 export type TabCollection = RxCollection<
   TabDocType,
@@ -65,6 +69,12 @@ const db = await rxdb.addCollections({
     schema: tabSchema,
     methods: tabDocMethods,
     statics: tabCollectionMethods,
+    migrationStrategies: {
+      // data migration from version 0 to version 1
+      1: function (oldDoc) {
+        return oldDoc;
+      },
+    },
   },
 });
 

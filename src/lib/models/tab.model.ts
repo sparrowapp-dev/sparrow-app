@@ -200,7 +200,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "id",
   type: "object",
-  version: 0,
+  version: 1,
   properties: {
     id: {
       type: "string",
