@@ -7,7 +7,6 @@
   import { isLoading } from "$lib/store/auth.store";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
 
-
   let userData = {
     email: "",
     name: "",
@@ -16,8 +15,6 @@
   };
 
   let validationErrors: any = {};
-
-
 
   let isPasswordValid1 = false;
   let isPasswordValid2 = false;
@@ -29,8 +26,6 @@
   let isNameTouched = false;
   let isPasswordTouched = false;
 
-
- 
   let isEmailValid = false;
   const validateEmail = () => {
     const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -134,7 +129,6 @@
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
-  data-tauri-drag-region
 >
   <Header />
   {#if isLoadingPage}
@@ -142,14 +136,13 @@
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"
-      data-tauri-drag-region
     >
-      <h1
+      <p
         class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-        style="font-size: 40px; width:408px; height:48px;"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500;"
       >
         Welcome to Sparrow!
-      </h1>
+      </p>
 
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"
@@ -158,13 +151,10 @@
         on:submit|preventDefault={async () => {
           validationErrors = await handleRegisterValidation(userData);
         }}
-        data-tauri-drag-region
       >
-        <h2 class="card-subtitle fs-4 mb-3">Create Account</h2>
-        <div class="form-group gap-0 mb-3" data-tauri-drag-region>
-          <label for="email" class="form-label" data-tauri-drag-region
-            >Email</label
-          >
+        <p class="card-subtitle fs-4 mb-3">Create Account</p>
+        <div class="form-group gap-0 mb-3">
+          <label for="email" class="form-label">Email</label>
           <input
             class="form-control mt-1 bg-black border:{validationErrors.email
               ? '3px'
