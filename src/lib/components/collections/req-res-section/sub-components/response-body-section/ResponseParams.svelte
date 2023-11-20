@@ -22,7 +22,7 @@
           on:click={() => (selectedTab1 = "response")}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab1 === "response"}
-          >Response Body
+          >Response
         </span>
       </span>
 

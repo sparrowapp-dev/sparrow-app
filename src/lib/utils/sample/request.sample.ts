@@ -86,6 +86,13 @@ const createSampleRequest = (id: string) => {
           addTo: AuthSection.HEADER,
         },
       },
+      response: {
+        headers: "",
+        status: "",
+        body: "",
+        time: 0,
+        size: 0,
+      },
     },
     save: false,
     requestInProgress: false,
