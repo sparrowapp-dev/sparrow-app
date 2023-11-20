@@ -12,7 +12,7 @@
   import { clearAuthJwt } from "$lib/utils/jwt";
   import { useNavigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
-  import { setUser, user } from "$lib/store/auth.store";
+  import { loginStatus, setUser, user } from "$lib/store/auth.store";
   import signout from "$lib/assets/signout.svg";
   import shortcut from "$lib/assets/shortcut.svg";
   import about from "$lib/assets/about.svg";
@@ -23,10 +23,10 @@
   import HeaderDropdown from "../dropdown/HeaderDropdown.svelte";
   import { fetchWorkspaces } from "$lib/services/workspace.service";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
-  let minimiMaximizeWindow: boolean = false;
+  let isMaximizeWindow: boolean = true;
 
   const navigate = useNavigate();
   const onMinimize = () => {
@@ -39,7 +39,7 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
-    minimiMaximizeWindow = !minimiMaximizeWindow;
+    isMaximizeWindow = !isMaximizeWindow;
   };
 
   const logout = async () => {
@@ -81,16 +81,50 @@
     setCurrentWorkspace(id, tab);
   };
   onDestroy(userUnsubscribe);
+
+  let isloggedIn: boolean;
+  loginStatus.subscribe((value) => {
+    isloggedIn = value;
+  });
+
+  onMount(() => {
+    $: if (isloggedIn === true) {
+      const resizeButton = document.getElementById("resize-button");
+      console.log(resizeButton);
+      if (resizeButton) {
+        resizeButton.click();
+      }
+    }
+  });
+
+  let isSearchVisible = true;
+
+  // Check window width on mount
+  onMount(() => {
+    handleWindowSize();
+  });
+
+  // Check window width on resize
+  window.addEventListener("resize", handleWindowSize);
+
+  function handleWindowSize() {
+    // Set a minimum width threshold
+    const minWidthThreshold = 800; // Adjust as needed
+
+    // Update isSearchVisible based on window width
+    isSearchVisible = window.innerWidth >= minWidthThreshold;
+  }
 </script>
 
 <div
-  class="d-flex w-100 ps-1 pe-2 align-items-center justify-content-between bg-blackColor pe-0"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor"
   style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px; gap: 12px;"
+    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px;"
+    data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
@@ -106,10 +140,10 @@
   </div>
 
   <div
-    style="height:32px; width:400px "
-    class="inputField bg-backgroundColor pe-2 d-flex align-items-center justify-content-center rounded"
+    style="height:32px; width:{isSearchVisible ? '400px' : '300px'} "
+    class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
   >
-    <div class="ps-3">
+    <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={searchIcon} alt="" />
     </div>
     <div class="w-100">
@@ -122,19 +156,22 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center justify-content-center">
-    <div class="row gap-1">
-      <div class="col-3">
+  <div
+    class="d-flex align-items-center justify-content-center"
+    style="margin-left: 45px;"
+  >
+    <div class="gap-{!isSearchVisible ? '4' : '4'} d-flex">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <button class="bg-blackColor border-0">
           <img src={settingIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <button class="bg-blackColor border-0">
           <img src={notifyIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
           <button class="bg-blackColor border-0">
             <img
@@ -216,27 +253,33 @@
       </div>
     </div>
 
-    <div class="col-2">
-      <button on:click={onMinimize} class="button-minus border-0 py-1 px-2">
-        <img src={minimizeIcon} alt="" />
-      </button>
-    </div>
+    <div class=" d-flex gap-3 {!isSearchVisible ? '' : 'gap-4'}">
+      <div class="col-2">
+        <button on:click={onMinimize} class="button-minus border-0 py-1">
+          <img src={minimizeIcon} alt="" />
+        </button>
+      </div>
 
-    <div class="col-2">
-      <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
-        {#if minimiMaximizeWindow === true}
-          <img src={resizeIcon} alt="" />
-        {/if}
-        {#if minimiMaximizeWindow === false}
-          <img src={doubleResizeIcon} alt="" />
-        {/if}
-      </button>
-    </div>
+      <div class="col-2">
+        <button
+          on:click={toggleSize}
+          class="button-resize border-0 py-1"
+          id="resize-button"
+        >
+          {#if isMaximizeWindow === true}
+            <img src={resizeIcon} alt="" />
+          {/if}
+          {#if isMaximizeWindow === false}
+            <img src={doubleResizeIcon} alt="" />
+          {/if}
+        </button>
+      </div>
 
-    <div class="col-2 pe-2">
-      <button on:click={onClose} class="button-close border-0 py-1 px-2">
-        <img src={closeIcon} alt="" />
-      </button>
+      <div class="col-2">
+        <button on:click={onClose} class="button-close border-0 py-1">
+          <img src={closeIcon} alt="" />
+        </button>
+      </div>
     </div>
   </div>
 </div>

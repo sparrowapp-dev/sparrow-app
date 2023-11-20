@@ -1,9 +1,12 @@
-<script>
+<script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import closeIcon from "$lib/assets/close.svg";
   import resizeIcon from "$lib/assets/resize.svg";
   import minimizeIcon from "$lib/assets/minimize.svg";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
+  import doubleResizeIcon from "$lib/assets/close-icon.svg";
+
+  let isMaximizeWindow: boolean = true;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -15,6 +18,7 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
+    isMaximizeWindow = !isMaximizeWindow;
   };
 </script>
 
@@ -32,7 +36,12 @@
       <img src={minimizeIcon} alt="" class="w-100" />
     </button>
     <button on:click={toggleSize} class="btn btn-black button">
-      <img src={resizeIcon} alt="" class="w-100" />
+      {#if isMaximizeWindow === true}
+        <img src={resizeIcon} alt="" />
+      {/if}
+      {#if isMaximizeWindow === false}
+        <img src={doubleResizeIcon} alt="" />
+      {/if}
     </button>
     <button on:click={onClose} class="btn btn-black">
       <img src={closeIcon} alt="" class="w-100" />

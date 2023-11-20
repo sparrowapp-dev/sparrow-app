@@ -159,7 +159,7 @@
           }}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Request Body
+          >Request
         </span>
       </span>
 
@@ -231,7 +231,7 @@
       {#if !statusCode}
         <DefaultPage />
       {:else if statusCode === "Not Found"}
-        <ResponseError/>
+        <ResponseError />
       {:else if statusCode}
         <ResponseParams
           {responseBody}

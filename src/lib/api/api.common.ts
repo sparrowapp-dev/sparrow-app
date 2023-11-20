@@ -4,7 +4,7 @@ import { getUserToken, getRefToken } from "$lib/utils/token";
 import { refreshToken } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
-import { isLoading, setUser } from "$lib/store/auth.store";
+import { isLoading, loginStatus, setUser } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
@@ -72,6 +72,7 @@ const makeRequest = async (
     });
 
     if (response.status === 201 || response.status === 200) {
+      loginStatus.set(true);
       return success(response.data);
     } else {
       return error(response.data.message);
