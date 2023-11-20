@@ -10,7 +10,6 @@
 
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
-  import { boolean } from "yup";
 
   let isEmailTouched = false;
 
@@ -36,6 +35,7 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
+
   if (token) {
     setUser(jwtDecode(token));
     navigate("/");
@@ -79,12 +79,12 @@
     <PageLoader />
   {:else}
     <div class="d-flex flex-column align-items-center justify-content-center">
-      <h1
+      <p
         class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-        style="font-size: 40px; width:408px; height:48px;"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500"
       >
         Welcome to Sparrow!
-      </h1>
+      </p>
       <form
         class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-4"
         style="width:408px;"
@@ -92,7 +92,7 @@
           validationErrors = await handleLoginValidation(loginCredentials);
         }}
       >
-        <h2 class="card-subtitle fs-4 mb-3">Sign In</h2>
+        <p class="card-subtitle fs-4 mb-3">Sign In</p>
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label text-red"
             >Email</label

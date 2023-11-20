@@ -19,6 +19,7 @@ export const authNavigate = () => {
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
   const response = await loginUser(loginCredentials);
+
   if (response.isSuccessful) {
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
@@ -27,7 +28,6 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     navigate("/home");
   } else {
     isResponseError.set(true);
-
     throw "error login user: " + response.message;
   }
 };
