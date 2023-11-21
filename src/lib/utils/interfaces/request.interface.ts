@@ -94,15 +94,20 @@ export interface Request {
   response?: Response;
   state?: State;
   auth?: Auth;
+  requestInProgress: boolean;
 }
 
 export interface NewTab {
   id: string;
   name: string;
   type: ItemType.COLLECTION | ItemType.FOLDER | ItemType.REQUEST;
-  request?: Request;
+  description: string;
+  property: {
+    request: Request;
+  };
+  isActive: boolean;
   save: boolean;
-  requestInProgress: boolean;
+  createdAt: string;
   path?: Path;
 }
 
