@@ -12,7 +12,11 @@ import {
 import { tabSchema, type TabDocType } from "$lib/models/tab.model";
 import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
+import { RxDBUpdatePlugin } from "rxdb/plugins/update";
+import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
+addRxPlugin(RxDBUpdatePlugin);
 
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceCollection = RxCollection<WorkspaceDocType>;

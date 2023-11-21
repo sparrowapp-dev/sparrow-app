@@ -16,10 +16,7 @@ import type {
   RequestDatasetType,
   RequestRawType,
 } from "$lib/utils/types/request.type";
-import { RxDBUpdatePlugin } from "rxdb/plugins/update";
-import { addRxPlugin } from "rxdb";
 import { TabRepository } from "$lib/repositories/tab.repository";
-addRxPlugin(RxDBUpdatePlugin);
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 enum fileType {

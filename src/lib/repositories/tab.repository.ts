@@ -93,6 +93,12 @@ export class TabRepository {
   };
 
   /**
+   * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
+   */
+  public getTabList = (): Observable<TabDocument[]> => {
+    return rxdb.tab.find().sort({ createdAt: "asc" }).$;
+  };
+  /**
    * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
    */
   public setRequestProperty = async (
