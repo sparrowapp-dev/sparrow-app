@@ -125,7 +125,7 @@
           }}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Request Body
+          >Body
         </span>
       </span>
 
