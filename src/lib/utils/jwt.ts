@@ -8,9 +8,6 @@ const setAuthJwt = (key: string, token: string) => {
   localStorage.setItem(key, token);
 };
 
-// const accessToken = localStorage.getItem("AUTH_TOKEN");
-// const refreshTokenToken = localStorage.getItem("REF_TOKEN");
-
 const clearAuthJwt = (): void => {
   localStorage.removeItem(constants.AUTH_TOKEN);
   localStorage.removeItem(constants.REF_TOKEN);

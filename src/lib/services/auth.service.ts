@@ -13,6 +13,7 @@ const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/user`, {
     body: userInfo,
   });
+
   return response;
 };
 
