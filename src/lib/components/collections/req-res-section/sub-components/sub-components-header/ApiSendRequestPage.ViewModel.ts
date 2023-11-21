@@ -41,11 +41,6 @@ class ApiSendRequestViewModel {
     await this.tabRepository.setRequestProperty(data, route);
   };
 
-  // public updateRequestResponse = async (data: any) => {
-  //   await rxdb.tab.setRequestResponse(data);
-  //   return
-  // }
-
   private ensureHttpOrHttps = (str) => {
     if (str.startsWith("http://") || str.startsWith("https://")) {
       return "";

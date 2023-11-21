@@ -16,6 +16,12 @@ export interface Path {
   folderName?: string;
 }
 
+/**
+ * Change of any key will affect their corresponding enum.
+ * reference: request.enum.ts
+ * @interface
+ */
+
 export interface Response {
   headers: string;
   status: string;

@@ -177,7 +177,9 @@
   >
     <div>
       <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
-        {tabName}
+        {#if tabName}
+          {tabName}
+        {/if}
       </p>
     </div>
 

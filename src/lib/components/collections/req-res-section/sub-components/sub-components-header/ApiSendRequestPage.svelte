@@ -4,20 +4,14 @@
   import lineIcon from "$lib/assets/line.svg";
   import {
     collapsibleState,
-    currentTab,
     isHorizontalVertical,
-    tabs,
-    updateQueryParams,
   } from "$lib/store/request-response-section";
   import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import RequestParam from "../request-body-section/RequestParam.svelte";
-  import { onDestroy, onMount } from "svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notification } from "@tauri-apps/api";
-  import { notifications } from "$lib/utils/notifications";
+  import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
-  import { RequestMethod } from "$lib/utils/enums/request.enum";
+  import { RequestMethod, RequestProperty } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
     import type { TabDocument } from "$lib/database/app.database";
     import type { Observable } from "rxjs";
@@ -33,7 +27,6 @@
     let isInputValid: boolean = true;
     let inputElement: HTMLInputElement;
     
-    let currentTabId = null;
     let urlText: string = "";
     let method = "";
     let request;
@@ -57,7 +50,7 @@
       inputElement.focus();
     } else {
    
-      await _apiSendRequest.updateRequestProperty(true, "requestInProgress");
+      await _apiSendRequest.updateRequestProperty(true, RequestProperty.REQUEST_IN_PROGRESS);
 
       isInputEmpty = false;
       if (isInputValid) {
@@ -76,7 +69,7 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
-          await _apiSendRequest.updateRequestProperty(false, "requestInProgress");
+          await _apiSendRequest.updateRequestProperty(false, RequestProperty.REQUEST_IN_PROGRESS);
           await _apiSendRequest.updateRequestProperty(
             {
                   body: responseBody,
@@ -84,10 +77,10 @@
                   status: responseStatus,
                   time: duration,
                   size: responseSizeKB,
-                },"response"
+                }, RequestProperty.RESPONSE
           );
         } else {
-          await _apiSendRequest.updateRequestProperty(false, "requestInProgress");
+          await _apiSendRequest.updateRequestProperty(false, RequestProperty.REQUEST_IN_PROGRESS);
           await _apiSendRequest.updateRequestProperty(
             {
                   body: "",
@@ -95,7 +88,7 @@
                   status: "Not Found",
                   time: 0,
                   size: 0,
-                },"response"
+                },RequestProperty.RESPONSE
           );
         }
       }
@@ -133,13 +126,13 @@
   };
 
   const handleDropdown = (tab: RequestMethodType) => {
-    _apiSendRequest.updateRequestProperty(tab, "method");
+    _apiSendRequest.updateRequestProperty(tab, RequestProperty.METHOD);
   };
   let selectedView: string = "grid";
 
   let handleInputValue = () => {
-    _apiSendRequest.updateRequestProperty(urlText, "url");
-    _apiSendRequest.updateRequestProperty(extractKeyValueFromUrl(urlText), "queryParams");
+    _apiSendRequest.updateRequestProperty(urlText, RequestProperty.URL);
+    _apiSendRequest.updateRequestProperty(extractKeyValueFromUrl(urlText), RequestProperty.QUERY_PARAMS);
   };
 
   onDestroy(() => {
