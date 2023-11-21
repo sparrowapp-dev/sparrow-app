@@ -155,10 +155,11 @@
     }
   };
 
+  let handleInputValue = () => {
+    _viewModel.updateTab(tabName, "name");
+  };
+
   onDestroy(() => {
-    // tabsUnsubscribe();
-    // currentTabUnsubscribe();
-    // currentWorkspaceUnsubscribe();
     collectionListUnsubscribe();
     tabSubscribe.unsubscribe()
   });
@@ -176,11 +177,12 @@
     data-tauri-drag-region
   >
     <div>
-      <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
-        {#if tabName}
-          {tabName}
-        {/if}
-      </p>
+      <input
+      placeholder="Enter API Request Name"
+      bind:value={tabName}
+      on:input={handleInputValue}
+      class="tabbar-tabName"
+    />
     </div>
 
     <div class="d-flex gap-3">
@@ -275,5 +277,12 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+  .tabbar-tabName{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    font-weight: 400;
   }
 </style>

@@ -9,6 +9,5 @@ export class PageHeaderViewModel {
   }
   public updateTab = async (data: any, route: string) => {
     await this.tabRepository.setTabProperty(data, route);
-    return;
   };
 }
