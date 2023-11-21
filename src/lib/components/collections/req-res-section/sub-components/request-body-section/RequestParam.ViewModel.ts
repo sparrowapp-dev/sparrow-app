@@ -1,14 +1,16 @@
-import { rxdb } from "$lib/database/app.database";
+import { TabRepository } from "$lib/repositories/tab.repository";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 export class RequestParamViewModel {
+  private tabRepository = new TabRepository();
   constructor() {}
 
   get tab() {
-    return rxdb.tab.getTab();
+    return this.tabRepository.getTab();
   }
 
   public updateRequestState = async (data: any, route: string) => {
-    await rxdb.tab.setRequestState(data, route);
+    await this.tabRepository.setRequestState(data, route);
     return;
   };
 }

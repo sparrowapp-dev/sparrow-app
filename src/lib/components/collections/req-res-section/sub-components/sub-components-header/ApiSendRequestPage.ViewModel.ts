@@ -1,4 +1,3 @@
-import { rxdb } from "$lib/database/app.database";
 import {
   RequestDataset,
   RequestMethod,
@@ -19,6 +18,7 @@ import type {
 } from "$lib/utils/types/request.type";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { addRxPlugin } from "rxdb";
+import { TabRepository } from "$lib/repositories/tab.repository";
 addRxPlugin(RxDBUpdatePlugin);
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -30,13 +30,15 @@ enum fileType {
 type Type = "File" | "Text";
 
 class ApiSendRequestViewModel {
+  private tabRepository = new TabRepository();
+  constructor() {}
+
   get tab() {
-    return rxdb.tab.getTab();
+    return this.tabRepository.getTab();
   }
 
   public updateRequestProperty = async (data: any, route: string) => {
-    await rxdb.tab.setRequestProperty(data, route);
-    return;
+    await this.tabRepository.setRequestProperty(data, route);
   };
 
   // public updateRequestResponse = async (data: any) => {

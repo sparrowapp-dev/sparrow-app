@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb } from "$lib/database/app.database";
+import { TabRepository } from "$lib/repositories/tab.repository";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class DefaultTabBarViewModel {
+  private tabRepository = new TabRepository();
   constructor() {}
 
   public handleCreateTab = (data: any) => {
-    rxdb.tab.createTab(data);
+    this.tabRepository.createTab(data);
   };
 }

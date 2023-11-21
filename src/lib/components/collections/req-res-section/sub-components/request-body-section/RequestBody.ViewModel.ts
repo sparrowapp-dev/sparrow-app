@@ -1,20 +1,22 @@
+import { TabRepository } from "$lib/repositories/tab.repository";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb } from "$lib/database/app.database";
+
 export class RequestBodyViewModel {
+  private tabRepository = new TabRepository();
   constructor() {}
   get tab() {
-    return rxdb.tab.getTab();
+    return this.tabRepository.getTab();
   }
   public updateRequestState = async (data: any, route: string) => {
-    await rxdb.tab.setRequestState(data, route);
+    await this.tabRepository.setRequestState(data, route);
     return;
   };
   public updateRequestBody = async (data: any, route: string) => {
-    await rxdb.tab.setRequestBody(data, route);
+    await this.tabRepository.setRequestBody(data, route);
     return;
   };
   public updateRequestBodyFormData = async (data: any, route: string) => {
-    await rxdb.tab.setRequestBodyFormData(data, route);
+    await this.tabRepository.setRequestBodyFormData(data, route);
     return;
   };
 }

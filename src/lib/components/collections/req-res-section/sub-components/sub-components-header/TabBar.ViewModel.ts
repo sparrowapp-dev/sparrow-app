@@ -4,8 +4,10 @@ import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { addRxPlugin } from "rxdb";
 addRxPlugin(RxDBUpdatePlugin);
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+import { TabRepository } from "$lib/repositories/tab.repository";
 addRxPlugin(RxDBQueryBuilderPlugin);
 export class TabBarViewModel {
+  private tabRepository = new TabRepository();
   constructor() {}
 
   get tabs() {
@@ -13,20 +15,16 @@ export class TabBarViewModel {
   }
 
   get activeTab() {
-    return rxdb.tab.findOne({
-      selector: {
-        isActive: true,
-      },
-    }).$;
+    return this.tabRepository.getTab();
   }
 
   public handleCreateTab = (data: any) => {
-    rxdb.tab.createTab(data);
+    this.tabRepository.createTab(data);
   };
   public handleRemoveTab = async (id: string) => {
-    await rxdb.tab.removeTab(id);
+    await this.tabRepository.removeTab(id);
   };
   public handleActiveTab = (id: string) => {
-    rxdb.tab.activeTab(id);
+    this.tabRepository.activeTab(id);
   };
 }

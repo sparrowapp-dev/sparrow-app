@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb } from "$lib/database/app.database";
+import { TabRepository } from "$lib/repositories/tab.repository";
 
 export class PageHeaderViewModel {
+  private tabRepository = new TabRepository();
   constructor() {}
   get tab() {
-    return rxdb.tab.getTab();
+    return this.tabRepository.getTab();
   }
   public updateTab = async (data: any, route: string) => {
-    await rxdb.tab.setTabProperty(data, route);
+    await this.tabRepository.setTabProperty(data, route);
     return;
   };
 }
