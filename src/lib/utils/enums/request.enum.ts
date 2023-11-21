@@ -1,3 +1,7 @@
+/**
+ * Enum representing the value to be stored in request interface.
+ * @enum
+ */
 export enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -35,6 +39,10 @@ export enum RequestSection {
   REQUEST_BODY = "Request Body",
 }
 
+/**
+ * Enum representing the properties of a request interface.
+ * @enum
+ */
 export enum RequestProperty {
   METHOD = "method",
   BODY = "body",
@@ -45,6 +53,7 @@ export enum RequestProperty {
   RESPONSE = "response",
   STATE = "state",
   AUTH = "auth",
+  REQUEST_IN_PROGRESS = "requestInProgress",
 }
 
 export enum RequestAuthProperty {
