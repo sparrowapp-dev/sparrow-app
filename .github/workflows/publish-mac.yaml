@@ -2,7 +2,7 @@ name: 'developmet-publish'
 on:
   push:
     branches:
-      - development
+      - development 
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
 
