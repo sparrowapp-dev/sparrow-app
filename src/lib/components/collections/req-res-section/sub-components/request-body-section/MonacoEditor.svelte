@@ -7,22 +7,28 @@
 	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
   import { RequestDataType } from '$lib/utils/enums/request.enum';
   import {handleRawDataChange } from '$lib/store/request-response-section';
+  import type { NewTab } from '$lib/utils/interfaces/request.interface';
   
 	let editorElement: HTMLDivElement;
 	let editor: monaco.editor.IStandaloneCodeEditor;
 	let model: monaco.editor.ITextModel;
-	export let value="";
   export let currentTabId:string|null;
 	export let rawTab:RequestDataType;
   let selectedRawTab:RequestDataType;
+  let selectedTabId=currentTabId;
+	export let value="";
+  export let tabList:NewTab[] = [];
+  let rawData={
+    raw:"",
+    type:RequestDataType.TEXT
+  }
 
 	function loadCode(code: string, language: string) {
 		model = monaco.editor.createModel(code, language);
 		editor.setModel(model);
 	}
 
-  const handleRawTypes=(rawTab:RequestDataType)=>{
-  const code=editor.getValue();
+  const handleRawTypes=(code:string,rawTab:RequestDataType)=>{;
 	switch (rawTab) {
   case RequestDataType.HTML:
 	 loadCode(code, 'html');
@@ -45,6 +51,20 @@
   }
   selectedRawTab=rawTab;
   }
+  export const getRawData = (id: string) => {
+  const data=tabList.filter((elem:NewTab) => {
+      if (elem.id === id) {
+        return elem;
+      }
+    });
+    rawData={
+      type:data[0].request.state.raw,
+      raw:data[0].request.body.raw
+    }
+    return rawData;
+  };
+
+  const currentRawData=getRawData(currentTabId);
  
 	onMount(async () => {
        // @ts-ignore
@@ -194,7 +214,10 @@
      
    });
    
-		loadCode(value, 'plaintext');
+ 
+  handleRawTypes(currentRawData.raw,currentRawData.type);
+
+
 	});
 
 	onDestroy(() => {
@@ -202,10 +225,17 @@
 		editor?.dispose();
 	});
 
+  
 	afterUpdate(()=>{
     if(rawTab!==selectedRawTab){
-      handleRawTypes(rawTab)
+    const rawData=editor.getValue()
+      handleRawTypes(rawData,rawTab)
     }
+    if(selectedTabId!==currentTabId){
+    const rawData=getRawData(currentTabId)
+    handleRawTypes(rawData.raw,rawData.type);
+    selectedTabId=currentTabId;
+    }  
 	})
 </script>
    

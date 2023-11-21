@@ -177,7 +177,7 @@ import MonacoEditor from "./MonacoEditor.svelte";
     {/if}
   </div>
   {#if mainTab === RequestDataset.RAW}
-      <MonacoEditor bind:value={inputValue}  rawTab={rawTab} currentTabId={currentTabId}></MonacoEditor>
+      <MonacoEditor bind:value={inputValue}  rawTab={rawTab} currentTabId={currentTabId} tabList={tabList} ></MonacoEditor>
   {:else if mainTab === RequestDataset.NONE}
     <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
       No Data type is selected. Check your API provider’s documentation to see
