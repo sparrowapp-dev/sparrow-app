@@ -38,8 +38,6 @@
       urlEncoded = event?.get("property").request.body.urlencoded;
       formDataText = event?.get("property").request.body.formdata.text;
       formDataFile = event?.get("property").request.body.formdata.file;
-      // formDataText = text;
-      // formDataFile = file;
       content = {
           text: rawValue,
           json: undefined,

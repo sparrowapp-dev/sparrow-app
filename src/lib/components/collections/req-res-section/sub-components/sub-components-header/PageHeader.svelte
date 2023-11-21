@@ -40,8 +40,6 @@
     name: string;
     id: string;
   }
-  let currentTabId = null;
-  let tabList = [];
   let tabName: string = "";
   let componentData: NewTab;
   let workspace: Workspace;
@@ -55,35 +53,6 @@
     tabName = event?.get("name");
   });
   
-  // const fetchComponentData = (id, list) => {
-  //   list.forEach((elem) => {
-  //     if (elem.id === id) {
-  //       tabName = elem.name;
-  //       componentData = elem;
-  //     }
-  //   });
-  // };
-
-  // const tabsUnsubscribe = tabs.subscribe((value) => {
-  //   tabList = value;
-  //   if (currentTabId && tabList) {
-  //     fetchComponentData(currentTabId, tabList);
-  //   }
-  // });
-
-  // const currentTabUnsubscribe = currentTab.subscribe((value) => {
-  //   if (value && value.id) {
-  //     currentTabId = value.id;
-  //     if (currentTabId && tabList) {
-  //       fetchComponentData(currentTabId, tabList);
-  //     }
-  //   }
-  // });
-  // const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-  //   if (value.id !== "") {
-  //     workspace = value;
-  //   }
-  // });
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   });

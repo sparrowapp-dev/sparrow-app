@@ -39,6 +39,12 @@ const rxdb: DatabaseType = await createRxDatabase<DatabaseCollections>({
 const db = await rxdb.addCollections({
   workspace: {
     schema: workspaceSchema,
+    migrationStrategies: {
+      // data migration from version 0 to version 1
+      1: function (oldDoc) {
+        return oldDoc;
+      },
+    },
   },
   tab: {
     schema: tabSchema,
