@@ -94,7 +94,7 @@ export interface Request {
   response?: Response;
   state?: State;
   auth?: Auth;
-  requestInProgress: boolean;
+  requestInProgress?: boolean;
 }
 
 export interface NewTab {

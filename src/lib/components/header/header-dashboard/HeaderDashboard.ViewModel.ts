@@ -6,10 +6,12 @@ import { clearAuthJwt } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
 import { useNavigate } from "svelte-navigator";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { TabRepository } from "$lib/repositories/tab.repository";
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
   private workspaceRepository = new WorkspaceRepository();
+  private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
   constructor() {}
 
@@ -54,6 +56,7 @@ export class HeaderDashboardViewModel {
       clearAuthJwt();
       setUser(null);
       await this.workspaceRepository.clearWorkspaces();
+      await this.tabRepository.clearTabs();
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {

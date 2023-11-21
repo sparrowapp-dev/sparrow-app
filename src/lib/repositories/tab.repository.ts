@@ -5,14 +5,14 @@ import type { Observable } from "rxjs";
 export class TabRepository {
   constructor() {}
   /**
-   * Return all the RxDocument refers to this collection.
+   * Return all the RxDocument refers to this collection in ascending order with respect to createdAt.
    */
   public getDocuments = async (): Promise<TabDocument[]> => {
     return await rxdb.tab.find().sort({ createdAt: "asc" }).exec();
   };
 
   /**
-   * Creates new tab to the tab bar.
+   * Creates a new tab and adds it to the tab bar.
    */
   public createTab = async (tab: any): Promise<void> => {
     const activeTab = await rxdb.tab
@@ -26,11 +26,10 @@ export class TabRepository {
       activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     await rxdb.tab.insert(tab);
-    return;
   };
 
   /**
-   * Removes existing tab from the tab bar.
+   * Removes an existing tab from the tab bar.
    */
   public removeTab = async (id: string): Promise<void> => {
     const doc = await this.getDocuments();
@@ -53,11 +52,10 @@ export class TabRepository {
     if (selectedTab) {
       await selectedTab.incrementalRemove();
     }
-    return;
   };
 
   /**
-   * Actives existing tab to the tab bar.
+   * Activates an existing tab in the tab bar.
    */
   public activeTab = async (id: string): Promise<void> => {
     const deselectedTab = await rxdb.tab
@@ -83,6 +81,9 @@ export class TabRepository {
     }
   };
 
+  /**
+   * Extracts all data of the active tab.
+   */
   public getTab = (): Observable<TabDocument> => {
     return rxdb.tab.findOne({
       selector: {
@@ -91,6 +92,9 @@ export class TabRepository {
     }).$;
   };
 
+  /**
+   * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
+   */
   public setRequestProperty = async (
     data: any,
     route: string,
@@ -108,6 +112,9 @@ export class TabRepository {
     });
   };
 
+  /**
+   * Configures the request with state such as raw, dataset, auth, section.
+   */
   public setRequestState = async (data: any, route: string): Promise<void> => {
     const query = rxdb.tab
       .findOne({
@@ -121,7 +128,9 @@ export class TabRepository {
       return value;
     });
   };
-
+  /**
+   * Configures the request with Auth such as API key, bearer token, basic auth.
+   */
   public setRequestAuth = async (data: any, route: string): Promise<void> => {
     const query = rxdb.tab
       .findOne({
@@ -135,7 +144,9 @@ export class TabRepository {
       return value;
     });
   };
-
+  /**
+   * Configures the request body such as form data, url encoded, raw.
+   */
   public setRequestBody = async (data: any, route: string): Promise<void> => {
     const query = rxdb.tab
       .findOne({
@@ -149,7 +160,9 @@ export class TabRepository {
       return value;
     });
   };
-
+  /**
+   * Configures the request body form data such as text and file.
+   */
   public setRequestBodyFormData = async (
     data: any,
     route: string,
@@ -183,5 +196,12 @@ export class TabRepository {
       value[route] = data;
       return value;
     });
+  };
+
+  /**
+   * Clear tabs
+   */
+  public clearTabs = async (): Promise<any> => {
+    return rxdb.tab.find().remove();
   };
 }
