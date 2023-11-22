@@ -20,7 +20,9 @@
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
-    updateRequestAuth: _viewModel.updateRequestAuth
+    updateRequestAuth: _viewModel.updateRequestAuth,
+    updateRequestBody: _viewModel.updateRequestBody,
+    updateRequestBodyFormData: _viewModel.updateRequestBodyFormData
   };
 
   const activeTab : Observable<TabDocument> = _viewModel.activeTab;

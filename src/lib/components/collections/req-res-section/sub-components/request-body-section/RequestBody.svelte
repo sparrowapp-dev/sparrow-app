@@ -15,11 +15,15 @@
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
-    import { RequestBodyViewModel } from "./RequestBody.ViewModel";
     import type { TabDocument } from "$lib/database/app.database";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import type { Observable } from "rxjs";
   
-  const _viewModel = new RequestBodyViewModel();
-  const tab = _viewModel.tab;
+  export let collectionsMethods: CollectionsMethods;
+  export let activeTab: Observable<TabDocument>;
+
+  // const _viewModel = new RequestBodyViewModel();
+  // const tab = _viewModel.tab;
 
   let mainTab: string= "";
   let rawTab: string = "";
@@ -33,7 +37,7 @@
     json: undefined,
   };
 
-  const tabSubscribe = tab.subscribe((event: TabDocument)=>{
+  const tabSubscribe = activeTab.subscribe((event: TabDocument)=>{
       rawValue = event?.get("property").request.body.raw;
       urlEncoded = event?.get("property").request.body.urlencoded;
       formDataText = event?.get("property").request.body.formdata.text;
@@ -45,38 +49,36 @@
         mainTab = event?.get("property").request.state.dataset;
         
         rawTab = event?.get("property").request.state.raw;
-        
   });
 
-
   let handleDropdown = (tab: string) => {
-    _viewModel.updateRequestState(tab, "dataset");
+    collectionsMethods.updateRequestState(tab, "dataset");
   };
 
   let handleRawDropDown = (tab: string) => {
-    _viewModel.updateRequestState(tab, "raw");
+    collectionsMethods.updateRequestState(tab, "raw");
   };
 
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
   const handleChange = (updatedContent: RequestBody) => {
-    _viewModel.updateRequestBody(updatedContent,"raw");
+    collectionsMethods.updateRequestBody(updatedContent,"raw");
   };
 
   const handleRawChange = () => {
-    _viewModel.updateRequestBody(rawValue,"raw");
+    collectionsMethods.updateRequestBody(rawValue,"raw");
   };
 
   const handleUrlEncodeChange = (pairs) => {
-    _viewModel.updateRequestBody(pairs, "urlencoded");
+    collectionsMethods.updateRequestBody(pairs, "urlencoded");
   };
   const handleFormDataTextChange = (pairs) => {
-    _viewModel.updateRequestBodyFormData(pairs, "text");
+    collectionsMethods.updateRequestBodyFormData(pairs, "text");
   };
 
   const handleFormDataFileChange = (pairs) => {
-    _viewModel.updateRequestBodyFormData(pairs, "file");
+    collectionsMethods.updateRequestBodyFormData(pairs, "file");
   };
 
   onDestroy(() => {

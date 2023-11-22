@@ -42,4 +42,12 @@ export class CollectionsViewModel {
   public updateRequestAuth = async (data: any, route: string) => {
     await this.tabRepository.setRequestAuth(data, route);
   };
+
+  public updateRequestBody = async (data: any, route: string) => {
+    await this.tabRepository.setRequestBody(data, route);
+  };
+
+  public updateRequestBodyFormData = async (data: any, route: string) => {
+    await this.tabRepository.setRequestBodyFormData(data, route);
+  };
 }

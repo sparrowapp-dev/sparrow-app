@@ -10,4 +10,6 @@ export interface CollectionsMethods {
   updateRequestProperty: (data, route: string) => void;
   updateRequestState: (data, route: string) => void;
   updateRequestAuth: (data, route: string) => void;
+  updateRequestBody: (data, route: string) => void;
+  updateRequestBodyFormData: (data, route: string) => void;
 }
