@@ -38,4 +38,8 @@ export class CollectionsViewModel {
   public updateRequestState = async (data: any, route: string) => {
     await this.tabRepository.setRequestState(data, route);
   };
+
+  public updateRequestAuth = async (data: any, route: string) => {
+    await this.tabRepository.setRequestAuth(data, route);
+  };
 }

@@ -9,4 +9,5 @@ export interface CollectionsMethods {
   updateTab: (data, route: string) => void;
   updateRequestProperty: (data, route: string) => void;
   updateRequestState: (data, route: string) => void;
+  updateRequestAuth: (data, route: string) => void;
 }

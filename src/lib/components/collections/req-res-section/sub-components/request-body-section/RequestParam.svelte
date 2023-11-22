@@ -44,9 +44,6 @@
   let sizeinKb: number;
   let request;
 
-  const _viewModel = new RequestParamViewModel();
-  // const tab: Observable<TabDocument> = _viewModel.tab;
-
   const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
     selectedTab = event?.get("property").request.state.section;
     progress = event?.get("property").request.requestInProgress;
@@ -177,9 +174,9 @@
       <!-- {:else if selectedTab === RequestSection.REQUEST_BODY}
         <RequestBody />
       {:else if selectedTab === RequestSection.HEADERS}
-        <Headers request={createDeepCopy(request)} />
+        <Headers request={createDeepCopy(request)} /> -->
       {:else if selectedTab === RequestSection.AUTHORIZATION}
-        <Authorization request={createDeepCopy(request)} /> -->
+        <Authorization request={createDeepCopy(request)} {collectionsMethods} />
       {/if}
     </div>
   </div>

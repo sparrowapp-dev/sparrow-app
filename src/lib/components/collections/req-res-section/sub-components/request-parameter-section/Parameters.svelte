@@ -4,13 +4,12 @@
   import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
   import type {
     KeyValuePair,
-    NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import { onMount } from "svelte";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     import { RequestProperty } from "$lib/utils/enums/request.enum";
 
-  export let request: NewTab;
+  export let request;
   export let params: KeyValuePair[] = [];
   export let url: string = "";
   export let collectionsMethods: CollectionsMethods;
