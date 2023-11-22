@@ -1,6 +1,8 @@
 <script lang="ts">
   import Header from "$lib/components/header/Header.svelte";
   import angleLeft from "$lib/assets/angleLeft.svg";
+  import starIcon from "$lib/assets/starIcon.svg";
+
   import { handleForgotPasswordValidation } from "./forgot-password";
   import { isLoading, username } from "$lib/store/auth.store";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
@@ -9,7 +11,6 @@
 
   let forgotPasswordCredential = {
     email: "",
-    name: "Kashif",
   };
 
   let isEmailTouched = false;
@@ -49,12 +50,12 @@
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"
     >
-      <h1
+      <p
         class="text-whiteColor mt-5 ms-2 me-2 mb-5"
-        style="font-size: 40px; width:408px; height:48px;"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500;"
       >
         Welcome to Sparrow!
-      </h1>
+      </p>
 
       <form
         class="login-form text-whiteColor ps-1 pe-1 gap-16"
@@ -65,20 +66,25 @@
           );
         }}
       >
-        <div class="d-flex flex-column align-items-left mb-2">
-          <div class="d-flex align-items-left mb-3 gap-3">
-            <a href="/"><img src={angleLeft} alt="" /></a>
-            <h6 class="text-whiteColor fs-5">Change Password</h6>
+        <div
+          class="d-flex flex-column align-items-left justify-content-center mb-2"
+        >
+          <div
+            class="d-flex align-items-center justify-content-start mb-3 gap-3"
+          >
+            <a href="/"><img src={angleLeft} alt="" class="mb-0" /></a>
+            <p class="text-whiteColor fs-5 mb-0">Change Password</p>
           </div>
           <p class="text-lightGray">
-            Please enter your Email ID so that we can send you a confirmation
-            link to process your request.
+            Please enter your Email ID so that we can send you a verification
+            code to process your request.
           </p>
         </div>
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label text-red"
             >Email</label
           >
+          <img src={starIcon} alt="" class="mb-3" />
           <input
             type="email"
             class="form-control bg-black border:{validationErrors.email

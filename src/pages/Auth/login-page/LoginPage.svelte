@@ -3,25 +3,33 @@
   import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
-  import logo from "$lib/assets/logo.svg";
+
   import googleLogo from "$lib/assets/googlelogo.svg";
+  import eyeHide from "$lib/assets/eye-hide.svg";
+  import eyeShow from "$lib/assets/eye-show.svg";
+
   // import githubLogo from "$lib/assets/githublogo.svg";
   // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
   let isEmailTouched = false;
 
   let isEmailValid = false;
   const validateEmail = () => {
-    const emailRegex = /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/;
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     isEmailTouched = true;
     isEmailValid = emailRegex.test(loginCredentials.email);
     if (isEmailValid) {
       validationErrors.email = "";
     } else if (isEmailTouched) {
       validationErrors.email = "";
+    }
+    if (loginCredentials.email === "") {
+      validationErrors.email = "Please enter an email id";
     }
   };
 
@@ -58,16 +66,37 @@
     authNavigate();
   };
 
+  let isPasswordtouched: boolean = false;
+
   let isLoadingPage: boolean;
   isLoading.subscribe((value) => {
     isLoadingPage = value;
   });
 
-  let isPasswordValid: boolean;
+  let isPasswordError: boolean;
 
   isResponseError.subscribe((value) => {
-    isPasswordValid = value;
+    isPasswordError = value;
   });
+
+  let errorMessage: string = "";
+
+  let isPasswordVisible = false;
+
+  const togglePasswordVisibility = () => {
+    isPasswordVisible = !isPasswordVisible;
+    const passwordInput = document.getElementById("exampleInputPassword1");
+    if (passwordInput) {
+      passwordInput.type = isPasswordVisible ? "text" : "password";
+    }
+  };
+
+  const handlePasswordChange = () => {
+    isPasswordtouched = true;
+    if (isPasswordtouched === true) {
+      validationErrors.password = "";
+    }
+  };
 </script>
 
 <div
@@ -90,6 +119,9 @@
         style="width:408px;"
         on:submit|preventDefault={async () => {
           validationErrors = await handleLoginValidation(loginCredentials);
+          if (validationErrors) {
+            errorMessage = "Please enter an email id";
+          }
         }}
       >
         <p class="card-subtitle fs-4 mb-3">Sign In</p>
@@ -100,9 +132,9 @@
           <input
             type="email"
             class="form-control bg-black border:{validationErrors.email ||
-            isPasswordValid === true
+            isPasswordError === true
               ? '3px'
-              : '1px'} solid {validationErrors.email || isPasswordValid === true
+              : '1px'} solid {validationErrors.email || isPasswordError === true
               ? 'border-error'
               : 'border-default'}"
             id="exampleInputEmail1"
@@ -111,33 +143,60 @@
             bind:value={loginCredentials.email}
             on:input={validateEmail}
           />
+
           {#if validationErrors.email && loginCredentials.email.length > 0}
             <small class="form-text text-dangerColor">
               {validationErrors.email}</small
             >
+          {:else if loginCredentials.email.length === 0}
+            <small class="form-text text-dangerColor"> {errorMessage}</small>
           {/if}
         </div>
 
         <div class="mb-4">
           <label for="exampleInputPassword1" class="form-label">Password</label>
-          <input
-            type="password"
-            id="exampleInputPassword1"
-            placeholder="Please enter your Password"
-            bind:value={loginCredentials.password}
-            class="form-control bg-black border:{isPasswordValid === true
-              ? '3px'
-              : '1px'} solid {isPasswordValid === true
-              ? 'border-error'
-              : 'border-default'}"
-          />
+          <div class="d-flex">
+            <input
+              type="password"
+              autocomplete="off"
+              on:click={handlePasswordChange}
+              id="exampleInputPassword1"
+              placeholder="Please enter your Password"
+              bind:value={loginCredentials.password}
+              class="form-control bg-black border:{isPasswordError === true
+                ? '3px'
+                : '1px'} solid {isPasswordError === true ||
+              validationErrors.password
+                ? 'border-error'
+                : 'border-default'}"
+            />
+            <button
+              type="button"
+              on:click={togglePasswordVisibility}
+              class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+            >
+              {#if isPasswordVisible}
+                <img src={eyeShow} alt="eye-show" />
+              {:else}
+                <img src={eyeHide} alt="eye-hie" />
+              {/if}
+            </button>
+          </div>
 
-          {#if isPasswordValid === true}<small
-              class="form-text text-dangerColor"
+          {#if validationErrors.password || validationErrors.password?.length === 0}
+            <small class="form-text text-dangerColor"
+              >{validationErrors.password}</small
+            >
+          {:else if isPasswordError === true || validationErrors.password?.length > 0}
+            <small class="form-text text-dangerColor"
               >The email and password combination you entered appears to be
               incorrect. Please try again.</small
-            >{/if}
+            >
+          {/if}
         </div>
+        <!-- <span on:click={togglePasswordVisibility}>
+          <img src={sparrowicon} alt="" />
+        </span> -->
 
         <div class="d-flex mb-4 align-items-center justify-content-end">
           <a
@@ -191,17 +250,30 @@
     <div
       class="BottomLogo text-white mt-3 d-flex justify-content-center align-items-center"
     >
-      <img src={logo} alt="" class="w-50" />
+      <img src={sparrowicon} alt="" class="w-50" />
     </div>
   {/if}
 </div>
 
 <style>
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+  .eye-icon > img {
+    position: absolute;
+    transform: translateX(-4vmax);
+  }
+
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  @media (min-width: 576px) {
+  @media (min-width: 1000px) {
+    .eye-icon > img {
+      position: absolute;
+      transform: translateX(-2vmax);
+    }
     .BottomLogo {
       width: Hug (205px);
       height: Hug (52px);
@@ -219,7 +291,7 @@
       padding: 0px;
       border-radius: 8px;
       gap: 16px;
-      height: auto; /* Remove fixed height for larger screens */
+      height: auto;
     }
   }
 </style>

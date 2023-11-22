@@ -6,6 +6,9 @@
   import { handleRegisterValidation } from "./register-page";
   import { isLoading } from "$lib/store/auth.store";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import starIcon from "$lib/assets/starIcon.svg";
+  import eyeHide from "$lib/assets/eye-hide.svg";
+  import eyeShow from "$lib/assets/eye-show.svg";
 
   let userData = {
     email: "",
@@ -124,6 +127,16 @@
   isLoading.subscribe((value) => {
     isLoadingPage = value;
   });
+
+  let isPasswordVisible = false;
+
+  const togglePasswordVisibility = () => {
+    isPasswordVisible = !isPasswordVisible;
+    const passwordInput = document.getElementById("expamplePassword");
+    if (passwordInput) {
+      passwordInput.type = isPasswordVisible ? "text" : "password";
+    }
+  };
 </script>
 
 <div
@@ -154,7 +167,10 @@
       >
         <p class="card-subtitle fs-4 mb-3">Create Account</p>
         <div class="form-group gap-0 mb-3">
-          <label for="email" class="form-label">Email</label>
+          <div>
+            <label for="email" class="form-label">Email</label>
+            <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
+          </div>
           <input
             class="form-control mt-1 bg-black border:{validationErrors.email
               ? '3px'
@@ -181,7 +197,11 @@
           {/if}
         </div>
         <div class="form-group mb-3">
-          <label for="name">Full Name</label>
+          <div>
+            <label for="name">Full Name</label>
+            <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
+          </div>
+
           <input
             class="form-control mt-1 bg-black border:{validationErrors.email
               ? '3px'
@@ -209,27 +229,43 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            class="form-control mt-1 bg-black border:{validationErrors.password
-              ? '3px'
-              : '1px'} solid {isPasswordValid1 &&
-            isPasswordValid2 &&
-            isPasswordValid3
-              ? 'border-success'
-              : validationErrors.password
-              ? 'border-error'
-              : isPasswordTouched
-              ? 'border-error'
-              : 'border-default'}"
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Please enter your password"
-            required
-            bind:value={userData.password}
-            on:input={validatePassword}
-          />
+          <div>
+            <label for="password" id="password">Password</label>
+            <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
+          </div>
+          <div class="d-flex">
+            <input
+              class="form-control mt-1 bg-black border:{validationErrors.password
+                ? '3px'
+                : '1px'} solid {isPasswordValid1 &&
+              isPasswordValid2 &&
+              isPasswordValid3
+                ? 'border-success'
+                : validationErrors.password
+                ? 'border-error'
+                : isPasswordTouched
+                ? 'border-error'
+                : 'border-default'}"
+              type="password"
+              name="password"
+              id="expamplePassword"
+              placeholder="Please enter your password"
+              required
+              bind:value={userData.password}
+              on:input={validatePassword}
+            />
+            <button
+              type="button"
+              on:click={togglePasswordVisibility}
+              class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+            >
+              {#if isPasswordVisible}
+                <img src={eyeShow} alt="eye-show" />
+              {:else}
+                <img src={eyeHide} alt="eye-hie" />
+              {/if}
+            </button>
+          </div>
         </div>
 
         <div class="row">
@@ -315,7 +351,7 @@
             class="form-check-label ms-2"
             for="tnsCheckbox"
             >I agree to the <a
-              href="checkbox"
+              href="/register"
               class="text-decoration-none text-primaryColor">Terms of Service</a
             ></label
           >
@@ -326,7 +362,7 @@
           >
         {/if}
 
-        <div class="mb-5 mt-4">
+        <div class="mb-3 mt-4">
           <button class="btn btn-primary w-100 text-whiteColor border-0"
             >Sign Up</button
           >
@@ -335,8 +371,8 @@
         <div
           class="d-flex flex-column align-items-center justify-content-center"
         >
-          <div class="gap-3 d-flex align-items-center">
-            <p class="fs-6 mt-3">Already have an account?</p>
+          <div class="gap-3 d-flex align-items-center justify-content-center">
+            <p class="fs-6 mb-0">Already have an account?</p>
             <a href="/login" class=" text-decoration-none text-primaryColor"
               >Sign In</a
             >
@@ -348,11 +384,25 @@
 </div>
 
 <style>
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  @media (min-width: 576px) {
+  .eye-icon > img {
+    position: absolute;
+    transform: translateX(-4vmax);
+  }
+
+  @media (min-width: 1000px) {
+    .eye-icon > img {
+      position: absolute;
+      transform: translateX(-2vmax);
+    }
     .register-form {
       width: 488px;
       margin: 0px auto;

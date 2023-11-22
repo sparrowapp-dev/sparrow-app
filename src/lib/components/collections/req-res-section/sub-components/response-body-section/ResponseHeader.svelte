@@ -5,28 +5,30 @@
 
 <div
   style="height: 400px;overflow:auto;"
-  class="d-flex flex-column align-items-center bg-backgroundColor mt-4 w-100"
+  class="d-flex flex-column align-items-center bg-backgroundColor mt-4 w-100 pe-2"
 >
   {#each responseHeader as [key, value]}
     <div
-      class="d-flex align-items-center justify-content-center ps-1 gap-2 mb-2"
+      class="d-flex align-items-center justify-content-center ps-1 gap-2 mb-2 w-100"
     >
-      <div>
+      <div class="flex-grow-1 w-100">
         <input
           type="text"
           placeholder={key}
-          style="outline: none;font-size:13px;color:white;"
-          class="bg-blackColor text-whiteColor border-0 ps-2 py-1 pe-3"
+          class="form-control bg-blackColor py-1 border-0"
+          style="font-size: 13px;"
           readonly
         />
       </div>
-      <input
-        type="text"
-        placeholder={value}
-        style="outline: none;font-size:13px;color:white"
-        class="bg-blackColor text-red border-0 ps-2 py-1 pe-3"
-        readonly
-      />
+      <div class="flex-grow-1 w-100">
+        <input
+          type="text"
+          placeholder={value}
+          class="form-control bg-blackColor py-1 border-0"
+          style="font-size: 13px;"
+          readonly
+        />
+      </div>
     </div>
   {/each}
 </div>

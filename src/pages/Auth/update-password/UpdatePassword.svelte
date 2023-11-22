@@ -2,8 +2,8 @@
   import Header from "$lib/components/header/Header.svelte";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import lineIcon from "$lib/assets/line.svg";
-
-  import { isLoading, username } from "$lib/store/auth.store";
+  import starIcon from "$lib/assets/starIcon.svg";
+  import { errorMessageText, isLoading, username } from "$lib/store/auth.store";
   import { handleVerifyEmail, isSuccessfulResponse } from "./update-password";
 
   import { writable } from "svelte/store";
@@ -70,6 +70,11 @@
   isSuccessfulResponse.subscribe((value) => {
     verificationCodeError = value;
   });
+
+  let errorMessage: string = "";
+  errorMessageText.subscribe((value) => {
+    errorMessage = value;
+  });
 </script>
 
 <div
@@ -83,22 +88,21 @@
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"
     >
-      <h1
+      <p
         class="text-whiteColor mt-5 ms-2 me-2 mb-5"
-        style="font-size: 40px; width:408px; height:48px;"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500"
       >
         Welcome to Sparrow!
-      </h1>
+      </p>
 
       <div
         class="login-form text-lightGray ps-1 pe-1 gap-16"
         style="width:408px; height:183px"
       >
         <div class="d-flex flex-column align-items-left mb-2">
-          <div class="d-flex align-items-left mb-3 gap-3">
+          <div class="d-flex align-items-center mb-3 gap-3">
             <a href="/forgot/password"><img src={angleLeft} alt="" /></a>
-
-            <h6 class="text-whiteColor fs-5">Change Password</h6>
+            <p class="text-whiteColor fs-5 mb-0">Change Password</p>
           </div>
 
           <div style="font-size: 15px;">
@@ -112,7 +116,15 @@
             </p>
             {#if $seconds > 0}
               <div class="d-flex flex-column bg-blackColor">
-                <p class="mb-1">Verification Code</p>
+                <div class="d-flex align-items-center">
+                  <p class="mb-1">Verification Code</p>
+                  <img
+                    src={starIcon}
+                    alt=""
+                    class="mb-2 ms-1"
+                    style="width: 7px;"
+                  />
+                </div>
                 <div
                   class="d-flex mb-2 align-items-center justify-content-start"
                   style="padding: 6px, 12px, 6px, 12px;border-radius: 4px;border: 1px;gap:8px"
@@ -127,11 +139,18 @@
                       : 'border-default'}"
                     style="width:48px;height:36px;border-none"
                     bind:value={verificationCode1}
-                    on:input={handleVerificationCode}
+                    on:input={() => {
+                      if (verificationCode1.length === 1) {
+                        document.getElementById("verificationCode2").focus();
+                      } else if (verificationCode1.length > 1) {
+                        verificationCode1 = verificationCode1.charAt(0);
+                      }
+                    }}
                   />
                   <img src={lineIcon} alt="" />
                   <input
                     type="text"
+                    id="verificationCode2"
                     style="width:48px;height:36px;"
                     class="form-control bg-blackColor text-center rounded fs-5 border:{verificationCodeError ===
                     true
@@ -140,11 +159,18 @@
                       ? 'border-error'
                       : 'border-default'}"
                     bind:value={verificationCode2}
-                    on:input={handleVerificationCode}
+                    on:input={() => {
+                      if (verificationCode2.length === 1) {
+                        document.getElementById("verificationCode3").focus();
+                      } else if (verificationCode2.length > 1) {
+                        verificationCode2 = verificationCode2.charAt(0);
+                      }
+                    }}
                   />
                   <img src={lineIcon} alt="" />
                   <input
                     type="text"
+                    id="verificationCode3"
                     style="width:48px;height:36px;"
                     class="form-control bg-blackColor text-center rounded fs-5 border:{verificationCodeError ===
                     true
@@ -153,11 +179,18 @@
                       ? 'border-error'
                       : 'border-default'}"
                     bind:value={verificationCode3}
-                    on:input={handleVerificationCode}
+                    on:input={() => {
+                      if (verificationCode3.length === 1) {
+                        document.getElementById("verificationCode4").focus();
+                      } else if (verificationCode3.length > 1) {
+                        verificationCode3 = verificationCode3.charAt(0);
+                      }
+                    }}
                   />
                   <img src={lineIcon} alt="" />
                   <input
                     type="text"
+                    id="verificationCode4"
                     style="width:48px;height:36px;"
                     class="form-control bg-blackColor text-center rounded fs-5 border:{verificationCodeError ===
                     true
@@ -166,11 +199,18 @@
                       ? 'border-error'
                       : 'border-default'}"
                     bind:value={verificationCode4}
-                    on:input={handleVerificationCode}
+                    on:input={() => {
+                      if (verificationCode4.length === 1) {
+                        document.getElementById("verificationCode5").focus();
+                      } else if (verificationCode4.length > 1) {
+                        verificationCode4 = verificationCode4.charAt(0);
+                      }
+                    }}
                   />
                   <img src={lineIcon} alt="" />
                   <input
                     type="text"
+                    id="verificationCode5"
                     style="width:48px;height:36px; "
                     class="form-control bg-blackColor text-center rounded fs-5 border:{verificationCodeError ===
                     true
@@ -179,11 +219,18 @@
                       ? 'border-error'
                       : 'border-default'}"
                     bind:value={verificationCode5}
-                    on:input={handleVerificationCode}
+                    on:input={() => {
+                      if (verificationCode5.length === 1) {
+                        document.getElementById("verificationCode6").focus();
+                      } else if (verificationCode5.length > 1) {
+                        verificationCode5 = verificationCode5.charAt(0);
+                      }
+                    }}
                   />
                   <img src={lineIcon} alt="" />
                   <input
                     type="text"
+                    id="verificationCode6"
                     style="width:48px;height:36px;"
                     class="form-control bg-blackColor text-center rounded fs-5 border:{verificationCodeError ===
                     true
@@ -192,12 +239,21 @@
                       ? 'border-error'
                       : 'border-default'}"
                     bind:value={verificationCode6}
+                    on:input={() => {
+                      if (verificationCode6.length === 1) {
+                        document.getElementById("verificationCode7").focus();
+                      } else if (verificationCode6.length > 1) {
+                        verificationCode6 = verificationCode6.charAt(0);
+                      }
+                    }}
                     on:input={handleVerificationCode}
                   />
                 </div>
-                {#if verificationCodeError === true && verificationCode1.length > 0 && verificationCode2.length > 0 && verificationCode3.length > 0 && verificationCode4.length > 0 && verificationCode5.length > 0 && verificationCode6.length > 0}<small
+                {#if verificationCodeError === true}<small
                     class="form-text text-dangerColor"
-                    >You have entered wrong code, please check your email.</small
+                    >{errorMessage === "Unauthorized Access"
+                      ? "You have entered wrong code, please check your email."
+                      : errorMessage}</small
                   >
                 {/if}
               </div>

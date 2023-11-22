@@ -36,7 +36,7 @@
       <img src={minimizeIcon} alt="" class="w-100" />
     </button>
     <button on:click={toggleSize} class="btn btn-black button">
-      {#if isMaximizeWindow === true}
+      {#if isMaximizeWindow}
         <img src={resizeIcon} alt="" />
       {:else}
         <img src={doubleResizeIcon} alt="" />
