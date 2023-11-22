@@ -1,54 +1,47 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import { onDestroy } from "svelte";
   import {
-    isHorizontalVertical,
-  } from "$lib/store/request-response-section";
-  import type { RequestBody } from "$lib/utils/dto/requestbody";
-  import { onDestroy, onMount } from "svelte";
-  import { JSONEditor, Mode } from "svelte-jsoneditor";
-  import { CodeEditor } from "petrel";
-  import { RequestDataset, RequestDataType } from "$lib/utils/enums/request.enum";
+    RequestDataset,
+    RequestDataType,
+  } from "$lib/utils/enums/request.enum";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
-    import type { TabDocument } from "$lib/database/app.database";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { Observable } from "rxjs";
-  
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
+
   export let collectionsMethods: CollectionsMethods;
   export let activeTab: Observable<TabDocument>;
 
-  // const _viewModel = new RequestBodyViewModel();
-  // const tab = _viewModel.tab;
+  import MonacoEditor from "./MonacoEditor.svelte";
 
-  let mainTab: string= "";
-  let rawTab: string = "";
+  let currentTabId: string = "";
+  let mainTab: string;
+  let rawTab: RequestDataType;
   let rawValue: string = "";
   let urlEncoded: KeyValuePair[] = [];
   let formDataText: KeyValuePair[] = [];
   let formDataFile: KeyValuePairWithBase[] = [];
 
-  let content = {
-    text: "",
-    json: undefined,
-  };
+  
+  let inputValue: string = "";
 
-  const tabSubscribe = activeTab.subscribe((event: TabDocument)=>{
-      rawValue = event?.get("property").request.body.raw;
-      urlEncoded = event?.get("property").request.body.urlencoded;
-      formDataText = event?.get("property").request.body.formdata.text;
-      formDataFile = event?.get("property").request.body.formdata.file;
-      content = {
-          text: rawValue,
-          json: undefined,
-        };
-        mainTab = event?.get("property").request.state.dataset;
-        
-        rawTab = event?.get("property").request.state.raw;
+  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
+    currentTabId = event?.get("id");
+    rawValue = event?.get("property").request.body.raw;
+    urlEncoded = event?.get("property").request.body.urlencoded;
+    formDataText = event?.get("property").request.body.formdata.text;
+    formDataFile = event?.get("property").request.body.formdata.file;
+   
+    mainTab = event?.get("property").request.state.dataset;
+
+    rawTab = event?.get("property").request.state.raw;
   });
 
   let handleDropdown = (tab: string) => {
@@ -62,14 +55,9 @@
   let isHorizontalVerticalMode: boolean;
   isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
 
-  const handleChange = (updatedContent: RequestBody) => {
-    collectionsMethods.updateRequestBody(updatedContent,"raw");
+  const handleRawChange = (rawValue) => {
+    collectionsMethods.updateRequestBody(rawValue, "raw");
   };
-
-  const handleRawChange = () => {
-    collectionsMethods.updateRequestBody(rawValue,"raw");
-  };
-
   const handleUrlEncodeChange = (pairs) => {
     collectionsMethods.updateRequestBody(pairs, "urlencoded");
   };
@@ -99,19 +87,19 @@
       data={[
         {
           name: "None",
-          id: RequestDataset.NONE
+          id: RequestDataset.NONE,
         },
         {
           name: "Raw",
-          id: RequestDataset.RAW
+          id: RequestDataset.RAW,
         },
         {
           name: "Form Data",
-          id: RequestDataset.FORMDATA
+          id: RequestDataset.FORMDATA,
         },
         {
           name: "URL Encoded",
-          id: RequestDataset.URLENCODED
+          id: RequestDataset.URLENCODED,
         },
       ]}
       onclick={handleDropdown}
@@ -123,52 +111,37 @@
         data={[
           {
             name: "HTML",
-            id: RequestDataType.HTML 
+            id: RequestDataType.HTML,
           },
           {
             name: "JSON",
-            id: RequestDataType.JSON
+            id: RequestDataType.JSON,
           },
           {
             name: "JavaScript",
-            id: RequestDataType.JAVASCRIPT 
+            id: RequestDataType.JAVASCRIPT,
           },
           {
             name: "Text",
-            id: RequestDataType.TEXT 
+            id: RequestDataType.TEXT,
           },
           {
             name: "XML",
-            id: RequestDataType.XML 
-          }
+            id: RequestDataType.XML,
+          },
         ]}
         onclick={handleRawDropDown}
       />
     {/if}
   </div>
-  {#if mainTab === RequestDataset.RAW && rawTab === RequestDataType.JSON}
-    <div
-      style="height:{isHorizontalVerticalMode ? '200px' : '400px'}"
-      class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-0"
-    >
-      <JSONEditor
-        bind:content
-        onChange={handleChange}
-        mainMenuBar={false}
-        navigationBar={false}
-        mode={Mode.text}
-      />
-    </div>
-  {:else if mainTab === RequestDataset.RAW && (rawTab === RequestDataType.HTML || rawTab === RequestDataType.XML || RequestDataType.JAVASCRIPT || RequestDataType.TEXT)}
-    <div id="code-editor" style="width: 100%">
-      <textarea
-        rows="8"
-        style="color: aliceblue; width: 100%; background-color: #000000"
-        class="outline-0"
-        bind:value={rawValue}
-        on:input={handleRawChange}
-      />
-    </div>
+  {#if mainTab === RequestDataset.RAW}
+    <MonacoEditor
+      bind:value={inputValue}
+      callback={handleRawChange}
+      {rawTab}
+      {rawValue}
+      {currentTabId}
+    />
   {:else if mainTab === RequestDataset.NONE}
     <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
       No Data type is selected. Check your API provider’s documentation to see
@@ -183,15 +156,3 @@
     <KeyValueFile keyValue={formDataFile} callback={handleFormDataFileChange} />
   {/if}
 </div>
-
-<style>
-  @import "svelte-jsoneditor/themes/jse-theme-dark.css";
-
-  .--jse-contents-background-color {
-    --jse-background-color: black;
-  }
-
-  .my-json-editor {
-    --jse-theme-color-highlight: black;
-  }
-</style>

@@ -118,6 +118,17 @@ export const handleRawDataChange = (raw: string, id: string) => {
     return temp;
   });
 };
+export const handleisRawBodyValid = (id: string, isError: boolean) => {
+  tabs.update((value) => {
+    const temp = value.map((elem: NewTab) => {
+      if (elem.id === id) {
+        elem.isRawBodyValid = isError;
+      }
+      return elem;
+    });
+    return temp;
+  });
+};
 
 export const updateUrlEncode = (urlencode, id: string) => {
   tabs.update((value: any) => {

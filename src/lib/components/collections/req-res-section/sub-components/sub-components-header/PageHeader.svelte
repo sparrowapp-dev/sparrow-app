@@ -31,6 +31,7 @@
   let tabName: string = "";
   let componentData: NewTab;
   let collection;
+  let selectedTab: Partial<NewTab> = {};
 
   const { updateNodeData } = useCollectionTree();
 
@@ -147,7 +148,6 @@
             }
           }}
         >
-          <!-- <img src={spin} class="loader-anim" alt="" style="width:14px; height:14px;"> -->
           <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
           <p
             class="mb-0 text-whiteColor"
@@ -196,7 +196,6 @@
       </div>
     </div>
   </div>
-  <div />
 </div>
 
 <style>

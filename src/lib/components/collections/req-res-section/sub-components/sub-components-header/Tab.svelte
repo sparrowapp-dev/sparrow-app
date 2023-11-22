@@ -34,8 +34,11 @@
       <span
         class="text-{getMethodStyle(tab.property.request.method)}"
         style="font-size: 12px; height: 31px; "
-        >{tab.property.request.method}</span
+        >{tab.property.request.method || ""}</span
       >
+      <!-- {#if workspaceId===currentTabId && !method}
+      <img src={book} alt="book">
+      {/if} -->
       <span
         class="text-muted font-weight-normal"
         style="font-size: 12px; font-family: Roboto; color: #8A9299;"

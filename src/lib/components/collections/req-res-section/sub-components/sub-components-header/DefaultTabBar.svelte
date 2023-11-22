@@ -9,23 +9,51 @@
 
   const _viewModel = new DefaultTabBarViewModel();
 
-  const addApiRequest = () => {
-    _viewModel.handleCreateTab(generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()));
-    moveNavigation("right");
-  };
+//   const addApiRequest = () => {
+//     _viewModel.handleCreateTab(generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()));
+//     moveNavigation("right");
+//   };
 
+//   const addApiRequest=()=>{
+//         handleTabAddons(
+//           createSampleRequest(
+//             uuidv4()));
+//         moveNavigation('right');
+//   }
+// const addWorkspaceRequest=()=>{
+//     let newTab:NewTab = {
+//           id:currentWorkspaceId,
+//           name: currentWorkspaceName||WorkspaceDefault.NAME,
+//           type: ItemType.WORKSPACE,
+//           save: true,
+//           requestInProgress: false,
+//           path:null
+//         }
+//         handleTabAddons(newTab);
+//         moveNavigation('right');
+// }
+// const workspaceUnSubscribe=currentWorkspace.subscribe((value)=>{
+//      currentWorkspaceName=value.name;
+//      currentWorkspaceId=value.id;
+//   })
+// onDestroy(() => {
+//   workspaceUnSubscribe();
+// });
 </script>
 
 <div class="main-container">
-  <div class="header-container">
-    <h1 class="main-container-header">Check this Workspace's documentation</h1>
-    <button class="about-btn">
-      <img src={about} alt="" style="font-size: 12px;" />
-      About My Workspace</button
-    >
-  </div>
-  <div class="create-container">
-    <h1 class="create-container-header">Create New</h1>
+   <div class="header-container">
+    <h1 class="main-container-header">
+      Check this Workspace's documentation
+    </h1>
+      <button class="about-btn"  on:click={()=>{addWorkspaceRequest()}}>
+        <img src={about} alt="" style="font-size: 12px;"/>
+        About My Workspace</button>
+   </div>
+   <div class="create-container">
+    <h1 class="create-container-header">
+      Create New
+    </h1>
     <div class="create-container-button">
       <button
         class="create-container-btn"

@@ -106,7 +106,11 @@ export interface Request {
 export interface NewTab {
   id: string;
   name: string;
-  type: ItemType.COLLECTION | ItemType.FOLDER | ItemType.REQUEST;
+  type:
+    | ItemType.COLLECTION
+    | ItemType.FOLDER
+    | ItemType.REQUEST
+    | ItemType.WORKSPACE;
   description: string;
   property: {
     request: Request;
@@ -115,6 +119,7 @@ export interface NewTab {
   save: boolean;
   createdAt: string;
   path?: Path;
+  isRawBodyValid?: boolean;
 }
 
 export interface CurrentTab {
