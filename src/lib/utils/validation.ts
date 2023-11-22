@@ -45,7 +45,7 @@ export const loginSchema = yup.object().shape({
     .email()
     .required("Please enter an email")
     .matches(
-      /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/,
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       "Please enter a valid email ID.",
     ),
   password: yup.string().required("Please enter a password"),

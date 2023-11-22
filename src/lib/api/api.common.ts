@@ -148,7 +148,7 @@ export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
 //         .replace('"', ""),
 //     });
 //   } catch (e) {
-//     console.log(e);
+//
 //     if (e.response.data) {
 //       let errorString = JSON.parse(await e.response.data.text());
 //       return errorString;

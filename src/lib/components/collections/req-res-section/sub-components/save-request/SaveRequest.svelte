@@ -32,6 +32,7 @@
     updateCurrentTab,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { notifications } from "$lib/utils/notifications";
   export let onClick;
 
   interface Path {
@@ -116,7 +117,9 @@
             request: expectedRequest,
           },
         });
+
         if (res.isSuccessful) {
+          notifications.success("API request saved");
           insertNode(
             JSON.parse(JSON.stringify(collection)),
             path[path.length - 1].id,
@@ -169,6 +172,7 @@
             },
           },
         });
+     
         if (res.isSuccessful) {
           insertNode(
             JSON.parse(JSON.stringify(collection)),
