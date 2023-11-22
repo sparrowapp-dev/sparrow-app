@@ -25,6 +25,10 @@
   import type { Observable } from "rxjs";
   import type { TabDocument } from "$lib/database/app.database";
   import { RequestParamViewModel } from "./RequestParam.ViewModel";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
+  export let activeTab: Observable<TabDocument>;
+  export let collectionsMethods: CollectionsMethods;
 
   let isHorizontalVerticalMode: boolean;
   let selectedTab: string = "";
@@ -39,10 +43,11 @@
   let timeTaken: number;
   let sizeinKb: number;
   let request;
-  const _viewModel = new RequestParamViewModel();
-  const tab: Observable<TabDocument> = _viewModel.tab;
 
-  const tabSubscribe = tab.subscribe((event: TabDocument) => {
+  const _viewModel = new RequestParamViewModel();
+  // const tab: Observable<TabDocument> = _viewModel.tab;
+
+  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
     selectedTab = event?.get("property").request.state.section;
     progress = event?.get("property").request.requestInProgress;
     request = event?.get("property").request;
@@ -102,7 +107,7 @@
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => {
-            _viewModel.updateRequestState(RequestSection.PARAMETERS, "section");
+            collectionsMethods.updateRequestState(RequestSection.PARAMETERS, "section");
           }}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.PARAMETERS}
@@ -118,7 +123,7 @@
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => {
-            _viewModel.updateRequestState(
+            collectionsMethods.updateRequestState(
               RequestSection.REQUEST_BODY,
               "section",
             );
@@ -134,7 +139,7 @@
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => {
-            _viewModel.updateRequestState(RequestSection.HEADERS, "section");
+            collectionsMethods.updateRequestState(RequestSection.HEADERS, "section");
           }}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.HEADERS}
@@ -150,7 +155,7 @@
         class="cursor-pointer d-flex align-items-center justify-content-center gap-1 text-requestBodyColor text-decoration-none"
         ><span
           on:click={() => {
-            _viewModel.updateRequestState(
+            collectionsMethods.updateRequestState(
               RequestSection.AUTHORIZATION,
               "section",
             );
@@ -167,14 +172,14 @@
           request={createDeepCopy(request)}
           params={createDeepCopy(request.queryParams)}
           url={createDeepCopy(request.url)}
-          {currentTabId}
+          {collectionsMethods}
         />
-      {:else if selectedTab === RequestSection.REQUEST_BODY}
+      <!-- {:else if selectedTab === RequestSection.REQUEST_BODY}
         <RequestBody />
       {:else if selectedTab === RequestSection.HEADERS}
         <Headers request={createDeepCopy(request)} />
       {:else if selectedTab === RequestSection.AUTHORIZATION}
-        <Authorization request={createDeepCopy(request)} />
+        <Authorization request={createDeepCopy(request)} /> -->
       {/if}
     </div>
   </div>

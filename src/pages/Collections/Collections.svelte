@@ -18,7 +18,8 @@
     handleRemoveTab: _viewModel.handleRemoveTab,
     extractTabDocument: _viewModel.extractTabDocument ,
     updateTab: _viewModel.updateTab,
-    updateRequestProperty: _viewModel.updateRequestProperty
+    updateRequestProperty: _viewModel.updateRequestProperty,
+    updateRequestState: _viewModel.updateRequestState
   };
 
   const activeTab : Observable<TabDocument> = _viewModel.activeTab;

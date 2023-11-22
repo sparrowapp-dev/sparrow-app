@@ -1,27 +1,25 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import type { QueryParams } from "$lib/utils/dto";
   import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
   import type {
     KeyValuePair,
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import { onMount } from "svelte";
-    import { ParametersViewModel } from "./Parameters.ViewModel";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import { RequestProperty } from "$lib/utils/enums/request.enum";
 
   export let request: NewTab;
-  export let currentTabId: string | null = null;
   export let params: KeyValuePair[] = [];
   export let url: string = "";
+  export let collectionsMethods: CollectionsMethods;
 
   let authValue: { key: string; value: string } = {
     key: "",
     value: "",
   };
   let controller: boolean = false;
-
-  const _viewModel = new ParametersViewModel();
 
   $: {
     if (params) {
@@ -40,42 +38,9 @@
     }
   }
 
-  $: {
-    if (currentTabId) {
-      authValue = findAuthParameter(request);
-      let flag: boolean = false;
-      for (let i = 0; i < params.length - 1; i++) {
-        if (params[i].checked === false) {
-          flag = true;
-        }
-      }
-      if (flag) {
-        controller = false;
-      } else {
-        controller = true;
-      }
-    }
-  }
-
   onMount(() => {
     authValue = findAuthParameter(request);
   });
-
-  let ListView;
-  function onSortableUpdate() {
-    let newListElements = [];
-    let ItemViewList = ListView.children;
-    for (let i = 0, l = ItemViewList.length; i < l; i++) {
-      let ListKey = ItemViewList[i].dataset.listKey;
-      if (ListKey != null) {
-        newListElements.push(JSON.parse(ListKey));
-      }
-    }
-
-    params = newListElements;
-    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
-    _viewModel.updateQueryParams(params, "queryParams");
-  }
 
   const extractQueryParamstoURL = (params: KeyValuePair[]) => {
     let response = "";
@@ -115,8 +80,8 @@
       params.push({ key: "", value: "", checked: false });
       params = params;
     }
-    _viewModel.updateQueryParams(params, "queryParams");
-    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
   };
 
   const deleteParam = (index) => {
@@ -129,8 +94,8 @@
       });
       params = filteredParam;
     }
-    _viewModel.updateQueryParams(params, "queryParams");
-    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
   };
   const updateCheck = (index) => {
     let filteredParam = params.map((elem, i) => {
@@ -140,8 +105,8 @@
       return elem;
     });
     params = filteredParam;
-    _viewModel.updateQueryParams(params, "queryParams");
-    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
   };
 
   const handleCheckAll = (): void => {
@@ -158,8 +123,8 @@
       return elem;
     });
     params = filteredKeyValue;
-    _viewModel.updateQueryParams(params, "queryParams");
-    _viewModel.updateURL(extractQueryParamstoURL(params), "url");
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
   };
 </script>
 
@@ -188,7 +153,6 @@
     style="display:block; position:relative;
     width:200px;
     "
-    bind:this={ListView}
   >
     {#if authValue.key && authValue.value}
       <div
@@ -334,17 +298,3 @@
   </div>
 </div>
 
-<style>
-  .sortable > div {
-    -webkit-touch-callout: none;
-    -ms-touch-action: none;
-    touch-action: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  div:global(.ui-sortable-placeholder) {
-    height: 30px;
-  }
-</style>

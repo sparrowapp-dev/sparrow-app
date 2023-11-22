@@ -34,4 +34,8 @@ export class CollectionsViewModel {
   public updateRequestProperty = async (data: any, route: string) => {
     await this.tabRepository.setRequestProperty(data, route);
   };
+
+  public updateRequestState = async (data: any, route: string) => {
+    await this.tabRepository.setRequestState(data, route);
+  };
 }
