@@ -1,7 +1,9 @@
 <script lang="ts">
   import crossIcon from "$lib/assets/cross.svg";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import book from "$lib/assets/book.svg";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
   export let handleTabRemove: (id: string) => void;
@@ -31,14 +33,21 @@
           white-space: nowrap;
           overflow: hidden; text-align: left; background-color:transparent;"
     >
-      <span
-        class="text-{getMethodStyle(tab.property.request.method)}"
-        style="font-size: 12px; height: 31px; "
-        >{tab.property.request.method || ""}</span
-      >
-      <!-- {#if workspaceId===currentTabId && !method}
-      <img src={book} alt="book">
-      {/if} -->
+      {#if tab.type === ItemType.REQUEST}
+        <span
+          class="text-{getMethodStyle(tab.property.request.method)}"
+          style="font-size: 12px; height: 31px; "
+          >{tab.property.request.method || ""}</span
+        >
+      {:else if tab.type === ItemType.FOLDER}
+        <span>F</span>
+      {:else if tab.type === ItemType.COLLECTION}
+        <span>C</span>
+      {:else if tab.type === ItemType.WORKSPACE}
+        <span>
+          <img src={book} alt="book" />
+        </span>
+      {/if}
       <span
         class="text-muted font-weight-normal"
         style="font-size: 12px; font-family: Roboto; color: #8A9299;"

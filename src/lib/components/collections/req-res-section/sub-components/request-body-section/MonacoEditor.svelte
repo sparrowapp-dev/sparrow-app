@@ -9,18 +9,18 @@
   import {
     handleisRawBodyValid,
   } from "$lib/store/request-response-section";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
-  let editorElement: HTMLDivElement;
-  let editor: monaco.editor.IStandaloneCodeEditor;
-  let model: monaco.editor.ITextModel;
   export let currentTabId: string;
   export let rawTab: RequestDataType;
   export let rawValue;
   export let callback;
+  export let value = "";
+  
+  let editorElement: HTMLDivElement;
+  let editor: monaco.editor.IStandaloneCodeEditor;
+  let model: monaco.editor.ITextModel;
   let selectedRawTab: RequestDataType;
   let selectedTabId = currentTabId;
-  export let value = "";
 
   let rawData = {
     raw: "",

@@ -31,7 +31,7 @@
 
   const modifyWorkspace=async()=>{
     const workspace=await workspaceService.updateWorkspace(selectedWorkspace.id,{name:newWorkspaceName})
-    const {_id:id, name}=workspace.data.data;
+    const {_id:id, name}=workspace?.data?.data;
     setCurrentWorkspace(id,name);
     handleTabUpdate({save:true,name},id)
 }

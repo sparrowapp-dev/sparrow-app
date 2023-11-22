@@ -17,12 +17,15 @@ export class CollectionsViewModel {
   public extractTabDocument = (doc: TabDocument) => {
     return this.tabRepository.extractTabDocument(doc);
   };
+
   public handleCreateTab = (data: any) => {
     this.tabRepository.createTab(data);
   };
+
   public handleRemoveTab = (id: string) => {
     this.tabRepository.removeTab(id);
   };
+
   public handleActiveTab = (id: string) => {
     this.tabRepository.activeTab(id);
   };
