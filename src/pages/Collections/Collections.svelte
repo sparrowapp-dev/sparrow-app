@@ -9,6 +9,8 @@
     import type { Observable } from "rxjs";
   import { CollectionsViewModel } from "./Collections.ViewModel";
     import type { TabDocument } from "$lib/database/app.database";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import Collection from "$lib/components/file-types/collection/Collection.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -27,7 +29,6 @@
 
   const activeTab : Observable<TabDocument> = _viewModel.activeTab;
   const tabList : Observable<TabDocument[]> = _viewModel.tabs;
-
 </script>
 
 <div class="d-flex">
@@ -42,8 +43,14 @@
       <TabBar tabList={$tabList} {collectionsMethods} />
     </div>
     <div class="tab__content">
-      <RequestResponse {activeTab} {collectionsMethods}/>
-      <!-- <DefaultTabBar {collectionsMethods} /> -->
+      {#if $tabList && $tabList.length == 0}
+        <DefaultTabBar />
+      {:else}
+        {#if $activeTab && $activeTab.type === ItemType.REQUEST}
+          <RequestResponse {activeTab} {collectionsMethods}/>
+        {/if}
+      {/if}
+
     </div>
   </div>
   <SidebarRight />
