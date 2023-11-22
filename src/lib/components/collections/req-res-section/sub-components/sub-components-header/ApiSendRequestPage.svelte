@@ -192,16 +192,6 @@
             id: RequestMethod.PATCH,
             color: "patchColor",
           },
-          {
-            name: "HEAD",
-            id: RequestMethod.HEAD,
-            color: "headColor",
-          },
-          {
-            name: "OPTIONS",
-            id: RequestMethod.OPTIONS,
-            color: "optionsColor",
-          },
         ]}
         method={method ? method : ""}
         onclick={handleDropdown}
@@ -257,8 +247,6 @@
       </span>
     </div>
   </div>
-
-  <RequestParam />
 </div>
 
 <style>

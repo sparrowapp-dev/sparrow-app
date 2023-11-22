@@ -1,25 +1,11 @@
 <script lang="ts">
-  import TabBar from "./sub-components/sub-components-header/TabBar.svelte";
-  import { collapsibleState } from "$lib/store/request-response-section";
-  let isCollaps: boolean;
-  collapsibleState.subscribe((value) => {
-    isCollaps = value;
-  });
+  import RequestParam from "./sub-components/request-body-section/RequestParam.svelte";
+  import ApiSendRequestPage from "./sub-components/sub-components-header/ApiSendRequestPage.svelte";
+  import PageHeader from "./sub-components/sub-components-header/PageHeader.svelte";
 </script>
 
-<div
-  class="collection bg-backgroundColor"
-  style="left:{isCollaps ? '72px' : '352px'}"
->
-  <TabBar />
+<div class="request-response">
+  <PageHeader />
+  <ApiSendRequestPage />
+  <RequestParam />
 </div>
-
-<style>
-  .collection {
-    top: 44px;
-    position: fixed;
-    right: 0;
-    width: calc(100%-352px);
-    height: calc(100vh - 44px);
-  }
-</style>

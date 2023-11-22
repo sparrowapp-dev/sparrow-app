@@ -7,7 +7,6 @@
     tabs,
   } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
-  import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -42,7 +41,6 @@
   }
   let tabName: string = "";
   let componentData: NewTab;
-  let workspace: Workspace;
   let collection;
 
   let loader = false;
@@ -136,7 +134,6 @@
 
 <div
   class="d-flex flex-column"
-  style="margin-right: 32px;"
   data-tauri-drag-region
 >
   <div
@@ -216,7 +213,6 @@
     </div>
   </div>
   <div>
-    <ApiSendRequestPage />
   </div>
 </div>
 

@@ -1,9 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rxdb, type TabDocument } from "$lib/database/app.database";
+import type { NewTab } from "$lib/utils/interfaces/request.interface";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
   constructor() {}
+
+  public extractTabDocument = (doc: TabDocument): NewTab => {
+    return {
+      id: doc.get("id"),
+      name: doc.get("name"),
+      createdAt: doc.get("createdAt"),
+      description: doc.get("description"),
+      type: doc.get("type"),
+      property: doc.get("property"),
+      save: doc.get("save"),
+      isActive: doc.get("isActive"),
+      path: doc.get("path"),
+    };
+  };
   /**
    * Return all the RxDocument refers to this collection in ascending order with respect to createdAt.
    */

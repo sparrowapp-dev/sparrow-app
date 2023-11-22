@@ -1,27 +1,32 @@
 <script lang="ts">
   import plusIcon from "$lib/assets/actionicon-normal.svg";
-  import crossIcon from "$lib/assets/cross.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
-  import linesmallIcon from "$lib/assets/linesmall.svg";
-  import PageHeader from "./PageHeader.svelte";
   import {
     collapsibleState,
-    currentTab,
   } from "$lib/store/request-response-section";
-  import { tabs, handleTabAddons } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { onDestroy } from "svelte";
   import { v4 as uuidv4 } from "uuid";
-  import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import {
-    generateSampleRequest,
-  } from "$lib/utils/sample/request.sample";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { TabBarViewModel } from "./TabBar.ViewModel";
-  import type { Observable } from "rxjs";
   import type { TabDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
+  export let collectionsMethods: CollectionsMethods;
+  export let tabList: TabDocument[];
+  
+  $: {
+    if (tabList) {
+      if (tabList.length >= 0 && tabList.length <= 5) {
+        tabWidth = 196;
+      } else if (tabList.length >= 6 && tabList.length <= 10) {
+        tabWidth = 140;
+      } else {
+        tabWidth = 100;
+      }
+    }
+  }
 
   let tabWidth: number = 196;
   let scrollerParent: number;
@@ -29,29 +34,12 @@
 
   const _viewModel = new TabBarViewModel();
   const activeTab = _viewModel.activeTab;
-  const openTab: Observable<any> = _viewModel.tabs;
 
-  const openTabSubscribe = openTab.subscribe((tabs: TabDocument[]) => {
-    if (tabs.length >= 0 && tabs.length <= 5) {
-      tabWidth = 196;
-    } else if (tabs.length >= 6 && tabs.length <= 10) {
-      tabWidth = 140;
-    } else {
-      tabWidth = 100;
-    }
-  });
-  
-  let isCollaps: boolean;
-  collapsibleState.subscribe((value) => (isCollaps = value));
-
-  onDestroy(() => {
-    openTabSubscribe.unsubscribe();
-  });
 </script>
 
 <div class="">
   <div
-    style="border-top: 1px solid #313233;width:{isCollaps ? '100%' : '100%'}"
+    style="border-top: 1px solid #313233;width:{$collapsibleState ? '100%' : '100%'}"
     class="tabbar bg-blackColor d-flex bg-backgroundColor;"
     bind:offsetWidth={scrollerParent}
   >
@@ -73,16 +61,14 @@
       id="tab-scroller"
       style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
     >
-      {#if $openTab}
-        {#each $openTab as tab, index}
+      {#if tabList}
+        {#each tabList as tab, index}
           <Tab
-            {tab}
+            tab = {collectionsMethods.extractTabDocument(tab)}
+            handleTabRemove={collectionsMethods.handleRemoveTab}
+            updateCurrentTab={collectionsMethods.handleActiveTab}
             {index}
-            currentTabId={$activeTab?.id}
             {tabWidth}
-            method={tab.property.request.method}
-            handleTabRemove={_viewModel.handleRemoveTab}
-            updateCurrentTab={_viewModel.handleActiveTab}
           />
         {/each}
       {/if}
@@ -103,7 +89,12 @@
       <button
         class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
         on:click={() => {
-          _viewModel.handleCreateTab(generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()));
+          _viewModel.handleCreateTab(
+            generateSampleRequest(
+              "UNTRACKED-" + uuidv4(),
+              new Date().toString(),
+            ),
+          );
           moveNavigation("right");
         }}
       >
@@ -111,11 +102,6 @@
       </button>
     </div>
   </div>
-  {#if $openTab?.length > 0}
-    <PageHeader />
-  {:else}
-    <DefaultTabBar />
-  {/if}
 </div>
 
 <style>
