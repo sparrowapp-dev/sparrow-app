@@ -1,4 +1,4 @@
-name: 'developmet-publish'
+name: 'developmet-mac-publish'
 on:
   push:
     branches:
@@ -47,6 +47,9 @@ jobs:
           #APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           #APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
           #APPLE_ID: ${{ secrets.APPLE_ID }}
           #APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
         with:
