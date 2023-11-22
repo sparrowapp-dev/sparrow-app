@@ -1,10 +1,5 @@
 <script lang="ts">
   import plusIcon from "$lib/assets/actionicon-normal.svg";
-  import crossIcon from "$lib/assets/cross.svg";
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import angleRight from "$lib/assets/angle-right.svg";
-  import linesmallIcon from "$lib/assets/linesmall.svg";
-  import PageHeader from "./PageHeader.svelte";
   import { collapsibleState, currentTab } from "$lib/store/request-response-section";
   import {tabs, handleTabRemove, handleTabAddons, updateCurrentTab} from "$lib/store/request-response-section";
     import Tab from "./Tab.svelte";
@@ -15,6 +10,9 @@
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import DefaultTabBar from "../sub-components-header/DefaultTabBar.svelte";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import PageHeader from "./PageHeader.svelte";
+    import angleLeft from "$lib/assets/angleLeft.svg"
+    import angleRight from "$lib/assets/angle-right.svg"
     import { createSampleRequest } from "$lib/utils/sample/request.sample";
 
   let tabsStore : NewTab[] = [];
@@ -73,7 +71,7 @@
           index = {index}
           currentTabId={currentTabId} 
           tabWidth={tabWidth} 
-          method={tab.request.method}
+          method={tab.request? tab.request.method:""}
           handleTabRemove={handleTabRemove} 
           updateCurrentTab={updateCurrentTab}/>
       {/each}

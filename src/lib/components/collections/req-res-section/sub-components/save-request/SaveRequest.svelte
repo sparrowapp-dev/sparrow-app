@@ -255,8 +255,8 @@
   };
 
   const fetchComponentData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
+    list.forEach((elem:NewTab) => {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         tabName = elem.name;
         tabId = elem.id;
         tabMethod = elem.request.method;

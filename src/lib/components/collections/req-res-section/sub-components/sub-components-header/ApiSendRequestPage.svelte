@@ -16,7 +16,8 @@
   import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
   import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
-  import { createApiRequest } from "$lib/services/rest-api.service";
+    import { createApiRequest } from "$lib/services/rest-api.service";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { RequestMethod } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
 
@@ -37,6 +38,7 @@
   let method = "";
   let requestData;
   let disabledSend: boolean = false;
+  let disableOnError: boolean = false;
   let componentData: NewTab;
 
   const testJSON: (text: string) => string = (text) => {
@@ -203,11 +205,12 @@
   };
 
   const fetchUrlData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
+    list.forEach((elem:NewTab) => {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         urlText = elem.request.url;
         method = elem.request.method;
         disabledSend = elem.requestInProgress;
+        disableOnError = elem?.isRawBodyValid || false;
         requestData = elem;
         componentData = elem;
       }
@@ -317,7 +320,7 @@
         bind:this={inputElement}
       />
       <button
-        disabled={disabledSend}
+        disabled={disabledSend || disableOnError}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button

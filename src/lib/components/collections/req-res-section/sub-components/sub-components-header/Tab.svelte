@@ -1,5 +1,11 @@
-<script>
+<script lang="ts">
   import crossIcon from "$lib/assets/cross.svg";
+    import { currentTab, tabs } from "$lib/store/request-response-section";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import book from "$lib/assets/book.svg";
+    import { onDestroy, onMount } from "svelte";
+    import { currentWorkspace } from "$lib/store/workspace.store";
   export let tab;
   export let updateCurrentTab;
   export let handleTabRemove;
@@ -7,13 +13,25 @@
   export let currentTabId;
   export let index;
   export let method;
+  let workspaceId:string;
+
+  const setWorkspaceId=()=>{
+    if(tab.type===ItemType.WORKSPACE){
+            workspaceId=tab.id
+      }
+  }
+  onMount(()=>{
+    setWorkspaceId();
+  })
+  
+    
 </script>
 
-<div
-  class="d-inline-block position-relative pt-1"
-  on:click={() => {
-    updateCurrentTab({id : tab.id});
-  }}
+<div 
+class="d-inline-block position-relative pt-1"
+on:click={() => {
+  updateCurrentTab({id : tab.id});
+}}
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
@@ -51,8 +69,11 @@
           : method === "POST"
           ? "yellow-api"
           : ""}
-        style="font-size: 12px; height: 31px; ">{method}</span
+        style="font-size: 12px; height: 31px; ">{method||""}</span
       >
+      {#if workspaceId===currentTabId && !method}
+      <img src={book} alt="book">
+      {/if}
       <span
         class="text-muted font-weight-normal"
         style="font-size: 12px; font-family: Roboto; color: #8A9299;"
