@@ -6,8 +6,9 @@ import {
   RequestSection,
   RequestDataType,
 } from "../enums/request.enum";
+import type { NewTab } from "../interfaces/request.interface";
 
-const createSampleRequest = (id: string) => {
+const createSampleRequest = (id: string): NewTab => {
   return {
     id,
     name: RequestDefault.NAME,

@@ -12,7 +12,6 @@
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import { onMount } from "svelte";
-
   export let requestData: NewTab;
   export let currentTabId: string | null = null;
   export let params: KeyValuePair[] = [];

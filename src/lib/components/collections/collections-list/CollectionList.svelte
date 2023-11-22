@@ -23,7 +23,10 @@
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-  let collection: any;
+    import Collection from "$lib/components/file-types/collection/Collection.svelte";
+    import DefaultCollection from "./DefaultCollection.svelte";
+
+  let collection: Collection[]=[];
   let currentWorkspaceId: string = "";
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -34,7 +37,8 @@
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
-  });
+  }
+  );
   let currentWorkspaceName = "";
 
   const getNextCollection: (list: any[], name: string) => any = (
@@ -164,7 +168,7 @@
     : '280px'};border-right: {collapsExpandToggle
     ? '0px'
     : '1px solid #313233'};"
-  class="sidebar d-flex flex-column bg-backgroundColor"
+  class="sidebar d-flex flex-column bg-backgroundColor scroll"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
@@ -257,6 +261,7 @@
           {/if}
         </div>
       {:else}
+      {#if collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList={collection}
@@ -266,6 +271,9 @@
             title={col.name}
           />
         {/each}
+        {:else}
+          <DefaultCollection></DefaultCollection>
+        {/if}
       {/if}
     </div>
   </div>

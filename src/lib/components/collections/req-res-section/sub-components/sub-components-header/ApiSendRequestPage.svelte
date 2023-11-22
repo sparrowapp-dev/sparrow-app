@@ -16,7 +16,8 @@
   import { notification } from "@tauri-apps/api";
   import { notifications } from "$lib/utils/notifications";
   import { ApiSendRequestController } from "./ApiSendRequestPage.controller";
-  import { createApiRequest } from "$lib/services/rest-api.service";
+    import { createApiRequest } from "$lib/services/rest-api.service";
+    import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { RequestMethod } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
 
@@ -204,8 +205,8 @@
   };
 
   const fetchUrlData = (id, list) => {
-    list.forEach((elem: NewTab) => {
-      if (elem.id === id) {
+    list.forEach((elem:NewTab) => {
+      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
         urlText = elem.request.url;
         method = elem.request.method;
         disabledSend = elem.requestInProgress;
