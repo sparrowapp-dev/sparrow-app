@@ -73,10 +73,10 @@
     isLoadingPage = value;
   });
 
-  let isPasswordValidError: boolean;
+  let isPasswordError: boolean;
 
   isResponseError.subscribe((value) => {
-    isPasswordValidError = value;
+    isPasswordError = value;
   });
 
   let errorMessage: string = "";
@@ -132,10 +132,9 @@
           <input
             type="email"
             class="form-control bg-black border:{validationErrors.email ||
-            isPasswordValidError === true
+            isPasswordError === true
               ? '3px'
-              : '1px'} solid {validationErrors.email ||
-            isPasswordValidError === true
+              : '1px'} solid {validationErrors.email || isPasswordError === true
               ? 'border-error'
               : 'border-default'}"
             id="exampleInputEmail1"
@@ -164,9 +163,9 @@
               id="exampleInputPassword1"
               placeholder="Please enter your Password"
               bind:value={loginCredentials.password}
-              class="form-control bg-black border:{isPasswordValidError === true
+              class="form-control bg-black border:{isPasswordError === true
                 ? '3px'
-                : '1px'} solid {isPasswordValidError === true ||
+                : '1px'} solid {isPasswordError === true ||
               validationErrors.password
                 ? 'border-error'
                 : 'border-default'}"
@@ -188,7 +187,7 @@
             <small class="form-text text-dangerColor"
               >{validationErrors.password}</small
             >
-          {:else if isPasswordValidError === true || validationErrors.password?.length > 0}
+          {:else if isPasswordError === true || validationErrors.password?.length > 0}
             <small class="form-text text-dangerColor"
               >The email and password combination you entered appears to be
               incorrect. Please try again.</small
