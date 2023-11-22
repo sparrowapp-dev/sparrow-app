@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { updateWorkspace } from "$lib/services/workspace.service";
+    import { WorkspaceService} from "$lib/services/workspace.service";
     import { currentTab, handleTabUpdate } from "$lib/store/request-response-section";
     import { currentWorkspace } from "$lib/store/workspace.store";
     import { onDestroy } from "svelte";
@@ -13,6 +13,7 @@
   let selectedWorkspace:Partial<workspace>={}
   let currentWorkSpaceTabId:string;
   let newWorkspaceName:string;
+  const workspaceService=new WorkspaceService();
   const workspaceUnSubscribe=currentWorkspace.subscribe((value)=>{
      selectedWorkspace=value;
   })
@@ -29,7 +30,7 @@
 
 
   const modifyWorkspace=async()=>{
-    const workspace=await updateWorkspace(selectedWorkspace.id,{name:newWorkspaceName})
+    const workspace=await workspaceService.updateWorkspace(selectedWorkspace.id,{name:newWorkspaceName})
     const {_id:id, name}=workspace.data.data;
     setCurrentWorkspace(id,name);
     handleTabUpdate({save:true,name},id)

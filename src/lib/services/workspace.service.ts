@@ -1,6 +1,6 @@
 import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
-import type { WorkspacePostBody } from "$lib/utils/dto";
+import type { WorkspacePostBody, WorkspacePutBody } from "$lib/utils/dto";
 const apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
@@ -18,7 +18,7 @@ export class WorkspaceService {
 
   public updateWorkspace = async (
     workspaceId: string,
-    workspace: WorkspacePostBody,
+    workspace: WorkspacePutBody,
   ) => {
     const response = await makeRequest(
       "PUT",
