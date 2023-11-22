@@ -104,6 +104,7 @@ export interface NewTab {
   save: boolean;
   requestInProgress: boolean;
   path?: Path;
+  isRawBodyValid?: boolean;
 }
 
 export interface CurrentTab {

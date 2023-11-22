@@ -37,6 +37,7 @@
   let method = "";
   let requestData;
   let disabledSend: boolean = false;
+  let disableOnError: boolean = false;
   let componentData: NewTab;
 
   const testJSON: (text: string) => string = (text) => {
@@ -203,11 +204,12 @@
   };
 
   const fetchUrlData = (id, list) => {
-    list.forEach((elem) => {
+    list.forEach((elem: NewTab) => {
       if (elem.id === id) {
         urlText = elem.request.url;
         method = elem.request.method;
         disabledSend = elem.requestInProgress;
+        disableOnError = elem?.isRawBodyValid || false;
         requestData = elem;
         componentData = elem;
       }
@@ -317,7 +319,7 @@
         bind:this={inputElement}
       />
       <button
-        disabled={disabledSend}
+        disabled={disabledSend || disableOnError}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
         style="font-size: 16px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
