@@ -4,8 +4,8 @@
 
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
-  import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
+  import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
 
   import { collapsibleState } from "$lib/store/request-response-section";
 
@@ -23,10 +23,8 @@
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-
   let collection: any;
   let currentWorkspaceId: string = "";
-
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
     if (res.isSuccessful) {
@@ -208,15 +206,12 @@
         <img src={filterIcon} alt="" />
       </button>
     </div>
-    <div class="d-flex align-items-center justify-content-center">
-      <button
-        class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px;"
-        on:click={handleCreateCollection}
-      >
-        <img src={plusIcon} alt="" />
-      </button>
+    <div>
+      <RequestDropdown></RequestDropdown>
+      
     </div>
+    
+
   </div>
 
   <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
@@ -277,14 +272,14 @@
 </div>
 
 <style>
-  .sidebar {
-    position: fixed;
-    top: 44px;
-    left: 72px;
-    height: calc(100vh - 44px);
-    overflow-y: auto;
-  }
-  .inputField {
-    outline: none;
-  }
+.sidebar {
+ position: fixed;
+ top: 44px;
+ left: 72px;
+ height: calc(100vh - 44px);
+ overflow-y:auto;
+}
+.inputField{
+  outline:none
+}
 </style>
