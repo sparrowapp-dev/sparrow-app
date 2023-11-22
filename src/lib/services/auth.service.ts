@@ -2,6 +2,8 @@ import type {
   loginUserPostBody,
   registerUserPostBody,
   EmailPostBody,
+  verifyPostbody,
+  resetPasswordPostBody,
 } from "$lib/utils/dto";
 import { makeRequest, getRefHeaders } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
@@ -11,6 +13,7 @@ const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/user`, {
     body: userInfo,
   });
+
   return response;
 };
 
@@ -21,12 +24,43 @@ const loginUser = async (userInfo: loginUserPostBody) => {
   return response;
 };
 
-const forgotPassword = async (email: EmailPostBody) => {
+const loginWithGoogle = async () => {
+  const response = await makeRequest("GET", `${apiUrl}/api/auth/google`, {
+    headers: getRefHeaders(),
+  });
+
+  return response;
+};
+
+const forgotPassword = async (emailInfo: EmailPostBody) => {
   const response = await makeRequest(
     "POST",
-    `${apiUrl}/api/auth/forgot-password`,
+    `${apiUrl}/api/user/send-verification-email`,
     {
-      body: email,
+      body: emailInfo,
+    },
+  );
+
+  return response;
+};
+
+const verifyEmail = async (verifyInfo: verifyPostbody) => {
+  const response = await makeRequest(
+    "POST",
+    `${apiUrl}/api/user/verify-email`,
+    {
+      body: verifyInfo,
+    },
+  );
+  return response;
+};
+
+const resetPassword = async (changePasswordBody: resetPasswordPostBody) => {
+  const response = await makeRequest(
+    "POST",
+    `${apiUrl}/api/user/change-password`,
+    {
+      body: changePasswordBody,
     },
   );
   return response;
@@ -50,4 +84,13 @@ const refreshToken = async () => {
   return response;
 };
 
-export { registerUser, loginUser, forgotPassword, refreshToken, userLogout };
+export {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  refreshToken,
+  userLogout,
+  loginWithGoogle,
+  verifyEmail,
+  resetPassword,
+};

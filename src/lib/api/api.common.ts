@@ -4,7 +4,7 @@ import { getUserToken, getRefToken } from "$lib/utils/token";
 import { refreshToken } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
-import { setUser } from "$lib/store/auth.store";
+import { isLoading, setUser } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
@@ -62,6 +62,7 @@ const makeRequest = async (
   url: string,
   requestData?: RequestData,
 ) => {
+  isLoading.set(true);
   try {
     const response = await axios({
       method: method,
@@ -69,13 +70,14 @@ const makeRequest = async (
       data: requestData?.body,
       headers: requestData?.headers,
     });
+
     if (response.status === 201 || response.status === 200) {
       return success(response.data);
     } else {
       return error(response.data.message);
     }
   } catch (e) {
-    if (e.response.data.message === ErrorMessages.ExpiredToken) {
+    if (e.response?.data?.message === ErrorMessages.ExpiredToken) {
       return await regenerateAuthToken(method, url, requestData);
     } else if (e.response.data.message === ErrorMessages.Unauthorized) {
       clearAuthJwt();
@@ -84,11 +86,13 @@ const makeRequest = async (
       return error("unauthorized");
     }
     if (e.message) {
-      return error(e.message);
+      return error(e.response.data.message);
     } else if (e.response.data) {
       return error(e.response.data.message);
     }
     return error(e);
+  } finally {
+    isLoading.set(false);
   }
 };
 

@@ -87,6 +87,13 @@ const createSampleRequest = (id: string): NewTab => {
           addTo: AuthSection.HEADER,
         },
       },
+      response: {
+        headers: "",
+        status: "",
+        body: "",
+        time: 0,
+        size: 0,
+      },
     },
     save: false,
     requestInProgress: false,

@@ -1,5 +1,7 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import constants from "$lib/utils/constants";
+  let workspaceLimit = constants.WORKSPACE_LIMIT;
   let visibility = false;
   export let data: any;
   export let onclick: any;
@@ -26,35 +28,41 @@
     class="dropdown-data rounded px-2"
     class:dropdown-active={visibility === true}
   >
-  <p
-  style="color: var(--send-button);" 
-  class="d-flex align-items-center justify-content-between m-0 px-2"
-  on:click={() => {
-    visibility = false;
-  }}
->
-  <span>Create New Workspace</span><span>+</span>
-</p>
-<hr class="m-0 p-0"/>
-    {#each data as list}
-      <p
-       class="d-flex align-items-center m-0 px-2"
-        on:click={() => {
-          visibility = false;
-          onclick(list._id, list.name);
-        }}
-      >
-        {list.name}
-      </p>
-    {/each}
-    <hr class="m-0 p-0"/>
-    <p 
-    style="color: var(--request-arc)"
-  class="d-flex align-items-center m-0 px-2"
-  on:click={() => {
-    visibility = false;
-  }}
->View All Workspaces</p>
+    <p
+      style="color: var(--send-button);"
+      class="d-flex align-items-center justify-content-between m-0 px-2"
+      on:click={() => {
+        visibility = false;
+      }}
+    >
+      <span>Create New Workspace</span><span>+</span>
+    </p>
+    <hr class="m-0 p-0" />
+    {#if $data}
+      {#each $data as list, index}
+        {#if index < workspaceLimit}
+          <p
+            class="d-flex align-items-center m-0 px-2"
+            on:click={() => {
+              visibility = false;
+              onclick(list._id, list.name);
+            }}
+          >
+            {list.name}
+          </p>
+        {/if}
+      {/each}
+    {/if}
+    <hr class="m-0 p-0" />
+    <p
+      style="color: var(--request-arc)"
+      class="d-flex align-items-center m-0 px-2"
+      on:click={() => {
+        visibility = false;
+      }}
+    >
+      View All Workspaces
+    </p>
   </div>
 </div>
 

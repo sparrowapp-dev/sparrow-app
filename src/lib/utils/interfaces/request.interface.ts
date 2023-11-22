@@ -17,7 +17,7 @@ export interface Path {
 }
 
 export interface Response {
-  headers: unknown;
+  headers: string;
   status: string;
   body: string;
   time: number;
@@ -108,6 +108,7 @@ export interface NewTab {
   save: boolean;
   requestInProgress: boolean;
   path?: Path;
+  isRawBodyValid?: boolean;
 }
 
 export interface CurrentTab {

@@ -43,7 +43,24 @@
       <button class="d-flex bg-backgroundColor border-0">
         <p>
           <Dropdown title= {currentTab}
-            data={[AuthType.NO_AUTH, AuthType.API_KEY, AuthType.BEARER_TOKEN, AuthType.BASIC_AUTH]}
+            data={[
+              {
+                name: "No Auth",
+                id: AuthType.NO_AUTH
+              },
+              {
+                name: "API Key",
+                id: AuthType.API_KEY
+              },
+              {
+                name: "Bearer Token",
+                id: AuthType.BEARER_TOKEN
+              },
+              {
+                name: "Basic Auth",
+                id: AuthType.BASIC_AUTH
+              }
+              ]}
             onclick={handleDropdown}
           />
         </p>

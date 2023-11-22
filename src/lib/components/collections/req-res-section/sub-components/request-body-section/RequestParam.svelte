@@ -18,7 +18,7 @@
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
   import { onDestroy } from "svelte";
-  import ResponseError from "../response-body-section/ResponseError.svelte";
+  import ResponseError from "../response-error/ResponseError.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { RequestSection } from "$lib/utils/enums/request.enum";
   import {
@@ -160,7 +160,7 @@
           }}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Request Body
+          >Body
         </span>
       </span>
 
@@ -229,7 +229,11 @@
     class="left-panel pt-3 px-4 position-relative"
   >
     <div class=" d-flex flex-column" style="height:100%;">
-      {#if jsonResponse}
+      {#if !statusCode}
+        <DefaultPage />
+      {:else if statusCode === "Not Found"}
+        <ResponseError />
+      {:else if statusCode}
         <ResponseParams
           {responseBody}
           {responseHeader}
@@ -237,8 +241,6 @@
           {timeTaken}
           {sizeinKb}
         />
-      {:else}
-        <DefaultPage />
       {/if}
 
       {#if progress}

@@ -90,7 +90,7 @@
   };
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id !== "") {
+    if (value.id && value.name) {
       getCollectionData(value.id);
       currentWorkspaceName = value.name;
       currentWorkspaceId = value.id;
