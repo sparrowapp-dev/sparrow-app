@@ -13,6 +13,10 @@ export enum RequestDefault {
   METHOD = RequestMethod.GET,
 }
 
+export enum WorkspaceDefault {
+  NAME = "MY WORKSPACE",
+}
+
 export enum RequestDataType {
   JSON = "JSON",
   XML = "XML",
