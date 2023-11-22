@@ -2,32 +2,24 @@
   import angleDown from "$lib/assets/angle-down.svg";
   import {
     collapsibleState,
-    currentTab,
     handleTabUpdate,
-    tabs,
   } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "$lib/services/collection";
-  import { path } from "@tauri-apps/api";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import { collectionList, useCollectionTree } from "$lib/store/collection";
-  import spin from "$lib/assets/spin.svg";
-  import { PageHeaderViewModel } from "./PageHeader.ViewModel";
-    import type { TabDocument } from "$lib/database/app.database";
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
 
-  const _viewModel = new PageHeaderViewModel();
-  const tab = _viewModel.tab;
+  export let activeTab: Observable<TabDocument>;
+  export let collectionsMethods: CollectionsMethods;
 
-  
-  let isCollaps: boolean;
   let display: boolean = false;
-  collapsibleState.subscribe((value) => (isCollaps = value));
-  
   window.addEventListener("click", () => {
     display = false;
   });
@@ -35,22 +27,17 @@
   const handleBackdrop = (flag) => {
     visibility = flag;
   };
-  interface Workspace {
-    name: string;
-    id: string;
-  }
+
   let tabName: string = "";
   let componentData: NewTab;
   let collection;
 
-  let loader = false;
-  
   const { updateNodeData } = useCollectionTree();
 
-  const tabSubscribe = tab.subscribe((event: TabDocument) => {
+  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
     tabName = event?.get("name");
   });
-  
+
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   });
@@ -123,32 +110,29 @@
   };
 
   let handleInputValue = () => {
-    _viewModel.updateTab(tabName, "name");
+    collectionsMethods.updateTab(tabName, "name");
   };
 
   onDestroy(() => {
     collectionListUnsubscribe();
-    tabSubscribe.unsubscribe()
+    tabSubscribe.unsubscribe();
   });
 </script>
 
-<div
-  class="d-flex flex-column"
-  data-tauri-drag-region
->
+<div class="d-flex flex-column" data-tauri-drag-region>
   <div
-    class="pageheader d-flex align-items-center justify-content-between {isCollaps
+    class="pageheader d-flex align-items-center justify-content-between {$collapsibleState
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
     data-tauri-drag-region
   >
     <div>
       <input
-      placeholder="Enter API Request Name"
-      bind:value={tabName}
-      on:input={handleInputValue}
-      class="tabbar-tabName"
-    />
+        placeholder="Enter API Request Name"
+        bind:value={tabName}
+        on:input={handleInputValue}
+        class="tabbar-tabName"
+      />
     </div>
 
     <div class="d-flex gap-3">
@@ -212,8 +196,7 @@
       </div>
     </div>
   </div>
-  <div>
-  </div>
+  <div />
 </div>
 
 <style>
@@ -243,7 +226,7 @@
       transform: rotate(360deg);
     }
   }
-  .tabbar-tabName{
+  .tabbar-tabName {
     background-color: transparent;
     border: none;
     outline: none;

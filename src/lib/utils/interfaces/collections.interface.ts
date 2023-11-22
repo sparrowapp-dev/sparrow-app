@@ -5,5 +5,7 @@ export interface CollectionsMethods {
   extractTabDocument: (doc: TabDocument) => NewTab;
   handleActiveTab: (id: string) => void;
   handleRemoveTab: (id: string) => void;
-  handleCreateTab: (id: string) => void;
+  handleCreateTab: (data) => void;
+  updateTab: (data, route: string) => void;
+  updateRequestProperty: (data, route: string) => void;
 }

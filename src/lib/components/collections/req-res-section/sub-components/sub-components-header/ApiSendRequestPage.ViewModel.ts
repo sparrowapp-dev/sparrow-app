@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   RequestDataset,
   RequestMethod,
@@ -16,8 +17,6 @@ import type {
   RequestDatasetType,
   RequestRawType,
 } from "$lib/utils/types/request.type";
-import { TabRepository } from "$lib/repositories/tab.repository";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 enum fileType {
   FILE = "File",
@@ -27,16 +26,7 @@ enum fileType {
 type Type = "File" | "Text";
 
 class ApiSendRequestViewModel {
-  private tabRepository = new TabRepository();
   constructor() {}
-
-  get tab() {
-    return this.tabRepository.getTab();
-  }
-
-  public updateRequestProperty = async (data: any, route: string) => {
-    await this.tabRepository.setRequestProperty(data, route);
-  };
 
   private ensureHttpOrHttps = (str) => {
     if (str.startsWith("http://") || str.startsWith("https://")) {
@@ -47,7 +37,6 @@ class ApiSendRequestViewModel {
       return "http://";
     }
   };
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   private extractKeyValue = (pairs: any[], type: Type): string => {
     let response: string = "";
     let storage: string = "";

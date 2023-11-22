@@ -16,7 +16,9 @@
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-    extractTabDocument: _viewModel.extractTabDocument 
+    extractTabDocument: _viewModel.extractTabDocument ,
+    updateTab: _viewModel.updateTab,
+    updateRequestProperty: _viewModel.updateRequestProperty
   };
 
   const activeTab : Observable<TabDocument> = _viewModel.activeTab;
@@ -36,7 +38,7 @@
       <TabBar tabList={$tabList} {collectionsMethods} />
     </div>
     <div class="tab__content">
-      <!-- <RequestResponse request= {$activeTab.property.request} {collectionsMethods}/> -->
+      <RequestResponse {activeTab} {collectionsMethods}/>
       <!-- <DefaultTabBar {collectionsMethods} /> -->
     </div>
   </div>

@@ -9,7 +9,6 @@
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { TabBarViewModel } from "./TabBar.ViewModel";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
@@ -31,9 +30,6 @@
   let tabWidth: number = 196;
   let scrollerParent: number;
   let scrollerWidth: number;
-
-  const _viewModel = new TabBarViewModel();
-  const activeTab = _viewModel.activeTab;
 
 </script>
 
@@ -89,12 +85,12 @@
       <button
         class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
         on:click={() => {
-          _viewModel.handleCreateTab(
+          collectionsMethods.handleCreateTab(
             generateSampleRequest(
               "UNTRACKED-" + uuidv4(),
               new Date().toString(),
             ),
-          );
+          )
           moveNavigation("right");
         }}
       >

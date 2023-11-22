@@ -26,4 +26,12 @@ export class CollectionsViewModel {
   public handleActiveTab = (id: string) => {
     this.tabRepository.activeTab(id);
   };
+
+  public updateTab = async (data: any, route: string) => {
+    await this.tabRepository.setTabProperty(data, route);
+  };
+
+  public updateRequestProperty = async (data: any, route: string) => {
+    await this.tabRepository.setRequestProperty(data, route);
+  };
 }

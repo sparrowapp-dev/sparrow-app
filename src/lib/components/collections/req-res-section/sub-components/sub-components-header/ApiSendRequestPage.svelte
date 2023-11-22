@@ -7,39 +7,42 @@
     isHorizontalVertical,
   } from "$lib/store/request-response-section";
   import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
-  import RequestParam from "../request-body-section/RequestParam.svelte";
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
-  import { RequestMethod, RequestProperty } from "$lib/utils/enums/request.enum";
+  import {
+    RequestMethod,
+    RequestProperty,
+  } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
-    import type { TabDocument } from "$lib/database/app.database";
-    import type { Observable } from "rxjs";
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
+  export let activeTab: Observable<TabDocument>;
+  export let collectionsMethods: CollectionsMethods;
   //this for expand and collaps condition
   const _apiSendRequest = new ApiSendRequestViewModel();
-  const tab : Observable<TabDocument> = _apiSendRequest.tab;
-    let isCollaps: boolean;
-    
-    collapsibleState.subscribe((value) => (isCollaps = value));
-    
-    let isInputEmpty: boolean = false;
-    let isInputValid: boolean = true;
-    let inputElement: HTMLInputElement;
-    
-    let urlText: string = "";
-    let method = "";
-    let request;
-    let disabledSend: boolean = false;
 
-    
-    const tabSubscribe = tab.subscribe((event: TabDocument)=>{
-      urlText = event?.get("property").request.url;
-      method = event?.get("property").request.method;
-      disabledSend = event?.get("property").request.requestInProgress;
-      request = event?.get("property").request;
-    });
-  
+  let isCollaps: boolean;
+
+  collapsibleState.subscribe((value) => (isCollaps = value));
+
+  let isInputEmpty: boolean = false;
+  let isInputValid: boolean = true;
+  let inputElement: HTMLInputElement;
+
+  let urlText: string = "";
+  let method = "";
+  let request;
+  let disabledSend: boolean = false;
+
+  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
+    urlText = event?.get("property").request.url;
+    method = event?.get("property").request.method;
+    disabledSend = event?.get("property").request.requestInProgress;
+    request = event?.get("property").request;
+  });
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -49,8 +52,10 @@
       isInputEmpty = true;
       inputElement.focus();
     } else {
-   
-      await _apiSendRequest.updateRequestProperty(true, RequestProperty.REQUEST_IN_PROGRESS);
+      await collectionsMethods.updateRequestProperty(
+        true,
+        RequestProperty.REQUEST_IN_PROGRESS,
+      );
 
       isInputEmpty = false;
       if (isInputValid) {
@@ -69,26 +74,34 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
-          await _apiSendRequest.updateRequestProperty(false, RequestProperty.REQUEST_IN_PROGRESS);
-          await _apiSendRequest.updateRequestProperty(
+          await collectionsMethods.updateRequestProperty(
+            false,
+            RequestProperty.REQUEST_IN_PROGRESS,
+          );
+          await collectionsMethods.updateRequestProperty(
             {
-                  body: responseBody,
-                  headers: JSON.stringify(responseHeaders),
-                  status: responseStatus,
-                  time: duration,
-                  size: responseSizeKB,
-                }, RequestProperty.RESPONSE
+              body: responseBody,
+              headers: JSON.stringify(responseHeaders),
+              status: responseStatus,
+              time: duration,
+              size: responseSizeKB,
+            },
+            RequestProperty.RESPONSE,
           );
         } else {
-          await _apiSendRequest.updateRequestProperty(false, RequestProperty.REQUEST_IN_PROGRESS);
-          await _apiSendRequest.updateRequestProperty(
+          await collectionsMethods.updateRequestProperty(
+            false,
+            RequestProperty.REQUEST_IN_PROGRESS,
+          );
+          await collectionsMethods.updateRequestProperty(
             {
-                  body: "",
-                  headers: "",
-                  status: "Not Found",
-                  time: 0,
-                  size: 0,
-                },RequestProperty.RESPONSE
+              body: "",
+              headers: "",
+              status: "Not Found",
+              time: 0,
+              size: 0,
+            },
+            RequestProperty.RESPONSE,
           );
         }
       }
@@ -126,13 +139,16 @@
   };
 
   const handleDropdown = (tab: RequestMethodType) => {
-    _apiSendRequest.updateRequestProperty(tab, RequestProperty.METHOD);
+    collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
   };
   let selectedView: string = "grid";
 
   let handleInputValue = () => {
-    _apiSendRequest.updateRequestProperty(urlText, RequestProperty.URL);
-    _apiSendRequest.updateRequestProperty(extractKeyValueFromUrl(urlText), RequestProperty.QUERY_PARAMS);
+    collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(
+      extractKeyValueFromUrl(urlText),
+      RequestProperty.QUERY_PARAMS,
+    );
   };
 
   onDestroy(() => {
