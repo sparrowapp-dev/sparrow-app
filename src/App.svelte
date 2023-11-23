@@ -14,12 +14,8 @@
   import Waiting from "./pages/Home/Waiting.svelte";
 
   import { onMount } from "svelte";
-  import {
-    appWindow,
-    currentMonitor,
-    LogicalSize,
-  } from "@tauri-apps/api/window";
-  import { user } from "$lib/store/auth.store";
+  import { appWindow, currentMonitor } from "@tauri-apps/api/window";
+  import { isLoggout, user } from "$lib/store/auth.store";
   export let url = "/";
 
   // function handleContextMenu(event) {
@@ -32,17 +28,22 @@
     isLoggedIn = value;
   });
 
-  if (isLoggedIn !== null) {
-    onMount(async () => {
-      const monitor = await currentMonitor();
-      const monitorPhysicalSize = monitor.size;
-      let scaleFactor: 1;
+  onMount(async () => {
+    const monitor = await currentMonitor();
+    const monitorPhysicalSize = monitor.size;
 
-      const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
-      await appWindow.setSize(logicalSize);
-      await appWindow.center();
+    let scaleFactor = 1;
+
+    const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
+    let appWidth = logicalSize.width / 2.5;
+    let appHeight = logicalSize.height;
+    await appWindow.setSize({
+      type: "Logical",
+      width: appWidth,
+      height: appHeight,
     });
-  }
+    await appWindow.center();
+  });
 </script>
 
 <Router {url}>
