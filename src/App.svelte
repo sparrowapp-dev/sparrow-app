@@ -15,18 +15,13 @@
 
   import { onMount } from "svelte";
   import { appWindow, currentMonitor } from "@tauri-apps/api/window";
-  import { isLoggout, user } from "$lib/store/auth.store";
+
   export let url = "/";
 
   // function handleContextMenu(event) {
   //   event.preventDefault();
   // on:contextmenu={handleContextMenu}
   // }
-
-  let isLoggedIn;
-  user.subscribe((value) => {
-    isLoggedIn = value;
-  });
 
   onMount(async () => {
     const monitor = await currentMonitor();
