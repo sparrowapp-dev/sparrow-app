@@ -64,7 +64,14 @@ jobs:
         with:
           webhookUrl: |
            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          message: Workflow has been run
+          message: |
+            🚀 **Build Status Update** 🚀
+
+            The workflow (sparrow-app for windows) has completed with status: ${{ job.status }}.
+
+            [Details on GitHub Actions Run ${{ github.run_id }}](${{ github.run_url }})
+
+            👉 Check it out!
           titleBackgroundColor: ${{ job.status }}
         env:
           SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
