@@ -57,3 +57,21 @@ jobs:
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v11.23.${{ github.run_number }}
+
+      - name: status check and upload
+        uses: neonidian/teams-notify-build-status@v3
+        if: always()
+        with:
+          webhookUrl: |
+           ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          message: |
+            🚀 **Build Status Update** 🚀
+
+            The workflow (sparrow-app for windows) has completed with status: ${{ job.status }}.
+
+            [Details on GitHub Actions Run ${{ github.run_id }}](${{ github.run_url }})
+
+            👉 Check it out!
+          titleBackgroundColor: ${{ job.status }}
+        env:
+          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
