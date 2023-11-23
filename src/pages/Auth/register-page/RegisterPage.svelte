@@ -159,7 +159,7 @@
 
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"
-        style="width:408px; height:429px"
+        style="width:408px;"
         novalidate
         on:submit|preventDefault={async () => {
           validationErrors = await handleRegisterValidation(userData);

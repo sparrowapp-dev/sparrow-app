@@ -22,7 +22,9 @@
         "minimize": true,
         "unmaximize": true,
         "unminimize": true,
-        "startDragging": true
+        "startDragging": true,
+        "setSize": true,
+        "center": true
       }
     },
     "bundle": {
@@ -47,7 +49,7 @@
         "resizable": true,
         "title": "sparrow-app",
         "width": 600,
-        "height": 850,
+        "height": 750,
         "minWidth": 600,
         "minHeight": 400,
         "center": true
