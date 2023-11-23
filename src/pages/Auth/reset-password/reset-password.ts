@@ -1,6 +1,6 @@
 import { resetPassword } from "$lib/services/auth.service";
 import type { resetPasswordPostBody } from "$lib/utils/dto";
-import { ErrorMessages } from "$lib/utils/enums/enums";
+
 import { notifications } from "$lib/utils/notifications";
 import { checkValidation, resetPasswordSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
@@ -14,7 +14,7 @@ export const handleResetPassword = async (
     notifications.success("Password Updated");
     navigate("/login");
   } else {
-    if (response.message === ErrorMessages.Unauthorized) {
+    if (response.message === "Unauthorized Access") {
       notifications.error("Old Password and New Password cannot be same");
     }
     throw "error login user: " + response.message;

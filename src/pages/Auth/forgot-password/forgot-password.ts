@@ -13,7 +13,9 @@ export const handleForgotPassword = async (
     notifications.success("Verification code sent to registered email ID");
     navigate("/update/password");
   } else {
-    notifications.error(response.message);
+    if (response.message === "Unauthorized Access") {
+      notifications.error("Please enter registered email id");
+    }
     throw "error login user: " + response.message;
   }
 };
