@@ -67,11 +67,9 @@ jobs:
           message: |
             🚀 **Build Status Update** 🚀
 
-            The workflow (sparrow-app for windows) has completed with status: ${{ job.status }}.
+            The workflow (sparrow-app for windows) has completed with status: **${{ job.status }}**.
 
-            [Details on GitHub Actions Run ${{ github.run_id }}](${{ github.run_url }})
-
-            👉 Check it out!
+            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow)!
           titleBackgroundColor: ${{ job.status }}
         env:
           SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
