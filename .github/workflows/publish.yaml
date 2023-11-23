@@ -58,21 +58,13 @@ jobs:
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v11.23.${{ github.run_number }}
 
-      - name: Get GitHub pipeline status
-        id: get-pipeline-status
-        run: |
-          curl -sSL https://api.github.com/repos/techdome-io/sparrow-app/actions/workflows/$WORKFLOW_ID/runs/$RUN_ID | jq -r '.conclusion'
-
-      - name: Post status to Teams (Success)
-        if: steps.get-pipeline-status.outputs.conclusion == 'success'
-        uses: microsoft/teams-action@v1
+      - name: status check and upload
+        uses: neonidian/teams-notify-build-status@v3
+        if: always()
         with:
-          url: $TEAMS_CHANNEL_LINK
-          message: "GitHub pipeline succeeded for workflow: $WORKFLOW_ID, run: $RUN_ID"
-
-      - name: Post status to Teams (Failure)
-        if: steps.get-pipeline-status.outputs.conclusion == 'failure'
-        uses: microsoft/teams-action@v1
-        with:
-          url: $TEAMS_CHANNEL_LINK
-          message: "GitHub pipeline failed for workflow: $WORKFLOW_ID, run: $RUN_ID"
+          webhookUrl: |
+           ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          message: Workflow has been run
+          titleBackgroundColor: ${{ job.status }}
+        env:
+          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
