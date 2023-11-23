@@ -100,8 +100,8 @@
 </script>
 
 <div
-  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
-  style="height: 100vh;"
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
+  style="height:100vh;overflow:hidden"
 >
   <Header />
   {#if isLoadingPage}
@@ -110,7 +110,7 @@
     <div class="d-flex flex-column align-items-center justify-content-center">
       <p
         class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-        style="font-size: 40px; width:408px; height:48px;font-weight:500"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500;"
       >
         Welcome to Sparrow!
       </p>
@@ -248,7 +248,7 @@
       </div>
     </div>
     <div
-      class="BottomLogo text-white mt-3 d-flex justify-content-center align-items-center"
+      class="BottomLogo text-white mt-2 d-flex justify-content-center align-items-center"
     >
       <img src={sparrowicon} alt="" class="w-50" />
     </div>

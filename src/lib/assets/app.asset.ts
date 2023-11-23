@@ -12,6 +12,7 @@ import about from "$lib/assets/about.svg";
 import settings from "$lib/assets/settings.svg";
 import account from "$lib/assets/account.svg";
 import doubleResizeIcon from "$lib/assets/close-icon.svg";
+import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
 export default {
   closeIcon,
@@ -28,4 +29,5 @@ export default {
   settings,
   account,
   doubleResizeIcon,
+  sparrowicon,
 };

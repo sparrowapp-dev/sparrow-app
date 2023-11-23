@@ -107,8 +107,8 @@
 
           <div style="font-size: 15px;">
             <p>
-              To ensure that this is really you, we have sent a confirmation
-              link to your email
+              To ensure that this is really you, we have sent a verification
+              code to your email
 
               <span class="fw-bold text-whiteColor cursor-pointer"
                 >{emailText}</span
@@ -306,8 +306,8 @@
               href="/forgot/password"
               style="font-size: 13px;"
               class="text-decoration-none text-primaryColor fw-bold"
-              >Resend Email</a
-            >
+              >Resend
+            </a>
           </div>
         {/if}
       </div>

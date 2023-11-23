@@ -13,12 +13,32 @@
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import Waiting from "./pages/Home/Waiting.svelte";
 
+  import { onMount } from "svelte";
+  import { appWindow, currentMonitor } from "@tauri-apps/api/window";
+
   export let url = "/";
 
   // function handleContextMenu(event) {
   //   event.preventDefault();
   // on:contextmenu={handleContextMenu}
   // }
+
+  onMount(async () => {
+    const monitor = await currentMonitor();
+    const monitorPhysicalSize = monitor.size;
+
+    let scaleFactor = 1;
+
+    const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
+    let appWidth = logicalSize.width / 2.5;
+    let appHeight = logicalSize.height;
+    await appWindow.setSize({
+      type: "Logical",
+      width: appWidth,
+      height: appHeight,
+    });
+    await appWindow.center();
+  });
 </script>
 
 <Router {url}>

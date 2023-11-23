@@ -17,7 +17,7 @@
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
-  let minimiMaximizeWindow: boolean = false;
+
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
@@ -82,7 +82,9 @@
     $: if (isloggedIn) {
       const resizeButton = document.getElementById("resize-button");
       if (resizeButton) {
-        resizeButton.click();
+        if (window.innerWidth < 800) {
+          resizeButton.click();
+        }
       }
     }
   });
@@ -109,9 +111,8 @@
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={icons.circleIcon} alt="sparrowLogo" />
+        <img src={icons.sparrowicon} alt="sparrowLogo" />
       </div>
-      <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
     </div>
     <div
       class="d-flex d-flex align-items-center justify-content-center gap-2"
