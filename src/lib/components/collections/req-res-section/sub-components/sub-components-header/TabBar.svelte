@@ -35,7 +35,7 @@
 onDestroy(()=>{
   collectionsMethods.handleCreateTab(
             generateSampleRequest(
-              "Raza-" + uuidv4(),
+              "UNTRACKED-" + uuidv4(),
               new Date().toString(),
             ),
           )
