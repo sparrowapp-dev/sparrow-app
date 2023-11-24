@@ -2,20 +2,22 @@
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
   import { Observable } from "rxjs";
+  import minimizeIcon from "$lib/assets/minimize.svg";
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
 
   const _viewModel = new HeaderDashboardViewModel();
-  const workspaces : Observable<WorkspaceDocument[]> = _viewModel.workspaces;
-  const activeWorkspace : Observable<WorkspaceDocument> = _viewModel.activeWorkspace;
-  let minimiMaximizeWindow: boolean = false;
+  const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
+
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
@@ -36,6 +38,8 @@
     },
   );
 
+  let isMaximizeWindow: boolean = true;
+
   const onMinimize = () => {
     appWindow.minimize();
   };
@@ -46,7 +50,7 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
-    minimiMaximizeWindow = !minimiMaximizeWindow;
+    isMaximizeWindow = !isMaximizeWindow;
   };
 
   window.addEventListener("click", () => {
@@ -69,22 +73,46 @@
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
+
+  let isloggedIn;
+  user.subscribe((value) => {
+    isloggedIn = value;
+  });
+  onMount(() => {
+    $: if (isloggedIn) {
+      const resizeButton = document.getElementById("resize-button");
+      if (resizeButton) {
+        if (window.innerWidth < 800) {
+          resizeButton.click();
+        }
+      }
+    }
+  });
+  let isSearchVisible = true;
+  onMount(() => {
+    handleWindowSize();
+  });
+  window.addEventListener("resize", handleWindowSize);
+  function handleWindowSize() {
+    const minWidthThreshold = 800;
+    isSearchVisible = window.innerWidth >= minWidthThreshold;
+  }
 </script>
 
 <div
-  class="d-flex w-100 ps-1 pe-2 align-items-center justify-content-between bg-blackColor pe-0"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor"
   style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px; gap: 12px;"
+    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px;"
+    data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={icons.circleIcon} alt="sparrowLogo" />
+        <img src={icons.sparrowicon} alt="sparrowLogo" />
       </div>
-      <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
     </div>
     <div
       class="d-flex d-flex align-items-center justify-content-center gap-2"
@@ -95,10 +123,10 @@
   </div>
 
   <div
-    style="height:32px; width:400px "
-    class="inputField bg-backgroundColor pe-2 d-flex align-items-center justify-content-center rounded"
+    style="height:32px; width:{isSearchVisible ? '400px' : '300px'} "
+    class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
   >
-    <div class="ps-3">
+    <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
     </div>
     <div class="w-100">
@@ -111,19 +139,22 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center justify-content-center">
-    <div class="row gap-1">
-      <div class="col-3">
+  <div
+    class="d-flex align-items-center justify-content-center gap-1"
+    style="margin-left: 45px;"
+  >
+    <div class="gap-{!isSearchVisible ? '4' : '4'} d-flex">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <button class="bg-blackColor border-0">
           <img src={icons.settingIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <button class="bg-blackColor border-0">
           <img src={icons.notifyIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
           <button class="bg-blackColor border-0">
             <img
@@ -205,25 +236,30 @@
       </div>
     </div>
 
-    <div class="col-2">
-      <button on:click={onMinimize} class="button-minus border-0 py-1 px-2">
-        <img src={icons.minimizeIcon} alt="" />
-      </button>
+    <div class=" d-flex gap-3 {!isSearchVisible ? '' : 'gap-4'}">
+      <div class="col-2">
+        <button on:click={onMinimize} class="button-minus border-0 py-1">
+          <img src={minimizeIcon} alt="" />
+        </button>
+      </div>
+
+      <div class="col-2">
+        <button
+          on:click={toggleSize}
+          class="button-resize border-0 py-1 px-2"
+          id="resize-button"
+        >
+          {#if isMaximizeWindow}
+            <img src={icons.resizeIcon} alt="" />
+          {:else}
+            <img src={icons.doubleResizeIcon} alt="" />
+          {/if}
+        </button>
+      </div>
     </div>
 
     <div class="col-2">
-      <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
-        {#if minimiMaximizeWindow === true}
-          <img src={icons.resizeIcon} alt="" />
-        {/if}
-        {#if minimiMaximizeWindow === false}
-          <img src={icons.doubleResizeIcon} alt="" />
-        {/if}
-      </button>
-    </div>
-
-    <div class="col-2 pe-2">
-      <button on:click={onClose} class="button-close border-0 py-1 px-2">
+      <button on:click={onClose} class="button-close border-0 py-1">
         <img src={icons.closeIcon} alt="" />
       </button>
     </div>

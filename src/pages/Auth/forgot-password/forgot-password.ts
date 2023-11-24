@@ -8,11 +8,14 @@ export const handleForgotPassword = async (
   forgotPasswordCredential: EmailPostBody,
 ) => {
   const response = await forgotPassword(forgotPasswordCredential);
+
   if (response.isSuccessful) {
     notifications.success("Verification code sent to registered email ID");
     navigate("/update/password");
   } else {
-    notifications.error("Something went wrong");
+    if (response.message === "Unauthorized Access") {
+      notifications.error("Please enter registered email id");
+    }
     throw "error login user: " + response.message;
   }
 };

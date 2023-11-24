@@ -1,4 +1,5 @@
 import { verifyEmail } from "$lib/services/auth.service";
+import { errorMessageText } from "$lib/store/auth.store";
 import type { verifyPostbody } from "$lib/utils/dto";
 import { notifications } from "$lib/utils/notifications";
 export const isSuccessfulResponse = writable(false);
@@ -16,7 +17,15 @@ export const handleVerifyEmail = async (
     navigate("/reset/password");
   } else {
     isSuccessfulResponse.set(true);
-    notifications.error("Something went wrong");
+    if (response.message === "verificationCode should not be empty") {
+      errorMessageText.set("Please enter the 6-digit verification code.");
+    }
+
+    if (response.message === "Unauthorized Access") {
+      errorMessageText.set(
+        "You have entered wrong code, please check your email.",
+      );
+    }
     throw "error login user: " + response.message;
   }
 };

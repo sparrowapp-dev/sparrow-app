@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
@@ -17,6 +16,9 @@
   import {
     syncTabs,
   } from "$lib/store/request-response-section";
+
+  import { onMount } from "svelte";
+  import { appWindow, currentMonitor } from "@tauri-apps/api/window";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -40,6 +42,22 @@
     }
   });
 
+  onMount(async () => {
+    const monitor = await currentMonitor();
+    const monitorPhysicalSize = monitor.size;
+
+    let scaleFactor = 1;
+
+    const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
+    let appWidth = logicalSize.width / 2.5;
+    let appHeight = logicalSize.height;
+    await appWindow.setSize({
+      type: "Logical",
+      width: appWidth,
+      height: appHeight,
+    });
+    await appWindow.center();
+  });
 </script>
 
 <Router {url}>

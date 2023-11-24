@@ -1,6 +1,6 @@
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
-import { setUser } from "$lib/store/auth.store";
+import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
 import { setCurrentWorkspace } from "$lib/store/workspace.store";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
@@ -52,7 +52,10 @@ export class HeaderDashboardViewModel {
   // logout
   public logout = async (): Promise<void> => {
     const response = await userLogout();
+
     if (response.isSuccessful) {
+      isLoggout.set(true);
+      isResponseError.set(false);
       clearAuthJwt();
       setUser(null);
       await this.workspaceRepository.clearWorkspaces();

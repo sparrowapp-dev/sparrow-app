@@ -12,8 +12,6 @@ export function measure<T>(
   const end = Date.now();
 
   onDuration(end - start);
-  console.log(result);
-  console.log(onDuration(end - start));
 
   return result;
 }
