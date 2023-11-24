@@ -6,9 +6,9 @@
   import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
-  import {
-    handleisRawBodyValid,
-  } from "$lib/store/request-response-section";
+  // import {
+  //   handleisRawBodyValid,
+  // } from "$lib/store/request-response-section";
 
   export let currentTabId: string;
   export let rawTab: RequestDataType;
@@ -54,7 +54,7 @@
         break;
     }
     selectedRawTab = rawTab;
-    handleisRawBodyValid(currentTabId, false);
+    // handleisRawBodyValid(currentTabId, false);
   };
   export const getRawData = () => {
     rawData = {
@@ -210,7 +210,7 @@
     });
 
     editor.onDidChangeModelContent((e) => {
-      const input = editor.getValue();
+    const input = editor.getValue();
       callback(input);
     });
 
@@ -219,9 +219,9 @@
       const model = editor.getModel();
       const markers = monaco.editor.getModelMarkers({ resource: Uri[0] });
       if (markers && markers.length > 0 && model?.id === `$model${uriId}`) {
-        handleisRawBodyValid(currentTabId, true);
+        // handleisRawBodyValid(currentTabId, true);
       } else {
-        handleisRawBodyValid(currentTabId, false);
+        // handleisRawBodyValid(currentTabId, false);
       }
     });
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { WorkspaceService} from "$lib/services/workspace.service";
-    import { currentTab, handleTabUpdate } from "$lib/store/request-response-section";
+    import { currentTab } from "$lib/store/request-response-section";
     import { currentWorkspace } from "$lib/store/workspace.store";
     import { onDestroy } from "svelte";
     import { setCurrentWorkspace } from "$lib/store/workspace.store";
@@ -24,7 +24,7 @@
   });
 
   const handleWorkspaceInput=(event)=>{
-    handleTabUpdate({save:false},currentWorkSpaceTabId)
+    // handleTabUpdate({save:false},currentWorkSpaceTabId)
     newWorkspaceName=event.target.value;
   }
 
@@ -33,7 +33,7 @@
     const workspace=await workspaceService.updateWorkspace(selectedWorkspace.id,{name:newWorkspaceName})
     const {_id:id, name}=workspace?.data?.data;
     setCurrentWorkspace(id,name);
-    handleTabUpdate({save:true,name},id)
+    // handleTabUpdate({save:true,name},id)
 }
   onDestroy(() => {
   workspaceUnSubscribe();

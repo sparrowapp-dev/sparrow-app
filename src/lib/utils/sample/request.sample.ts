@@ -100,6 +100,7 @@ const generateSampleRequest = (id: string, date: string) => {
     },
     save: false,
     path: {},
+    isActive: true,
     createdAt: date,
   };
 };

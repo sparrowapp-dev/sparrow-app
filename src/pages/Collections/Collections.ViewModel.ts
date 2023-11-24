@@ -1,56 +1,84 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { TabDocument } from "$lib/database/app.database";
 import { TabRepository } from "$lib/repositories/tab.repository";
+import {
+  requestResponseStore,
+  tabs,
+} from "$lib/store/request-response-section";
 
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   constructor() {}
 
+  public debounce = (func, delay) => {
+    let timerId;
+
+    return function (...args) {
+      /* eslint-disable @typescript-eslint/no-this-alias */
+      const context = this;
+
+      clearTimeout(timerId);
+      timerId = setTimeout(() => {
+        func.apply(context, args);
+      }, delay);
+    };
+  };
+
+  public syncTabWithStore = () => {
+    this.tabRepository.syncTabsWithStore(tabs);
+  };
+
+  debouncedTab = this.debounce(this.syncTabWithStore, 2000);
+
   get tabs() {
-    return this.tabRepository.getTabList();
+    return requestResponseStore.getTabList();
   }
 
   get activeTab() {
-    return this.tabRepository.getTab();
+    return requestResponseStore.getTab();
   }
 
-  public extractTabDocument = (doc: TabDocument) => {
-    return this.tabRepository.extractTabDocument(doc);
-  };
-
   public handleCreateTab = (data: any) => {
-    this.tabRepository.createTab(data);
+    requestResponseStore.createTab(data);
+    this.debouncedTab();
   };
 
   public handleRemoveTab = (id: string) => {
-    this.tabRepository.removeTab(id);
+    requestResponseStore.removeTab(id);
+    this.debouncedTab();
   };
 
   public handleActiveTab = (id: string) => {
-    this.tabRepository.activeTab(id);
+    requestResponseStore.activeTab(id);
+    this.debouncedTab();
   };
 
   public updateTab = async (data: any, route: string) => {
-    await this.tabRepository.setTabProperty(data, route);
+    requestResponseStore.setTabProperty(data, route);
+    this.debouncedTab();
   };
 
   public updateRequestProperty = async (data: any, route: string) => {
-    await this.tabRepository.setRequestProperty(data, route);
+    requestResponseStore.setRequestProperty(data, route);
+    this.debouncedTab();
   };
 
   public updateRequestState = async (data: any, route: string) => {
-    await this.tabRepository.setRequestState(data, route);
+    requestResponseStore.setRequestState(data, route);
+    this.debouncedTab();
   };
 
   public updateRequestAuth = async (data: any, route: string) => {
-    await this.tabRepository.setRequestAuth(data, route);
+    requestResponseStore.setRequestAuth(data, route);
+    this.debouncedTab();
   };
 
   public updateRequestBody = async (data: any, route: string) => {
-    await this.tabRepository.setRequestBody(data, route);
+    requestResponseStore.setRequestBody(data, route);
+    this.debouncedTab();
   };
 
   public updateRequestBodyFormData = async (data: any, route: string) => {
-    await this.tabRepository.setRequestBodyFormData(data, route);
+    requestResponseStore.setRequestBodyFormData(data, route);
+    this.debouncedTab();
   };
 }

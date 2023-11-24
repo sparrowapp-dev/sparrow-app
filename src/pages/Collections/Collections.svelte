@@ -6,9 +6,7 @@
   import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { Observable } from "rxjs";
   import { CollectionsViewModel } from "./Collections.ViewModel";
-  import type { TabDocument } from "$lib/database/app.database";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
 
@@ -18,7 +16,6 @@
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-    extractTabDocument: _viewModel.extractTabDocument,
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
@@ -27,8 +24,8 @@
     updateRequestBodyFormData: _viewModel.updateRequestBodyFormData,
   };
 
-  const activeTab: Observable<TabDocument> = _viewModel.activeTab;
-  const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const activeTab = _viewModel.activeTab;
+  const tabList = _viewModel.tabs;
 </script>
 
 <div class="d-flex">

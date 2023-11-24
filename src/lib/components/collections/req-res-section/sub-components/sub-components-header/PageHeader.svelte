@@ -2,7 +2,6 @@
   import angleDown from "$lib/assets/angle-down.svg";
   import {
     collapsibleState,
-    handleTabUpdate,
   } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
@@ -16,7 +15,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
 
-  export let activeTab: Observable<TabDocument>;
+  export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
   let display: boolean = false;
@@ -31,12 +30,11 @@
   let tabName: string = "";
   let componentData: NewTab;
   let collection;
-  let selectedTab: Partial<NewTab> = {};
 
   const { updateNodeData } = useCollectionTree();
 
-  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
-    tabName = event?.get("name");
+  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    tabName = event?.name;
   });
 
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
@@ -76,7 +74,7 @@
                 request: expectedRequest,
               },
             );
-            handleTabUpdate({ save: true }, componentData.id);
+            // handleTabUpdate({ save: true }, componentData.id);
           }
         } else {
           let res = await updateCollectionRequest(componentData.id, {
@@ -103,7 +101,7 @@
                 request: expectedRequest,
               },
             );
-            handleTabUpdate({ save: true }, componentData.id);
+            // handleTabUpdate({ save: true }, componentData.id);
           }
         }
       }
@@ -116,7 +114,7 @@
 
   onDestroy(() => {
     collectionListUnsubscribe();
-    tabSubscribe.unsubscribe();
+    tabSubscribe();
   });
 </script>
 

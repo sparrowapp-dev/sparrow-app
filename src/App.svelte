@@ -13,13 +13,33 @@
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import Waiting from "./pages/Home/Waiting.svelte";
+  import { TabRepository } from "$lib/repositories/tab.repository";
+  import {
+    syncTabs,
+  } from "$lib/store/request-response-section";
 
   export let url = "/";
+  const tabRepository = new TabRepository();
+  let flag: boolean = true;
 
-  // function handleContextMenu(event) {
-  //   event.preventDefault();
-  // on:contextmenu={handleContextMenu}
-  // }
+  let tabList = tabRepository.getTabList();
+  tabList.subscribe((val) => {
+    if (val.length > 0) {
+      if(flag){
+        let dm;
+        const data = val.map((elem) => {
+          let temp = elem.toJSON(); 
+          if(elem.isActive){
+            dm = temp;
+          }
+          return temp;
+        });
+        syncTabs(data, dm);
+        flag = false;
+      }
+    }
+  });
+
 </script>
 
 <Router {url}>

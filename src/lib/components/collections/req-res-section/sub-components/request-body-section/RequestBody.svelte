@@ -9,6 +9,7 @@
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
+    NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
@@ -17,7 +18,7 @@
   import type { Observable } from "rxjs";
 
   export let collectionsMethods: CollectionsMethods;
-  export let activeTab: Observable<TabDocument>;
+  export let activeTab;
 
   import MonacoEditor from "./MonacoEditor.svelte";
 
@@ -32,16 +33,16 @@
   
   let inputValue: string = "";
 
-  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
-    currentTabId = event?.get("id");
-    rawValue = event?.get("property").request.body.raw;
-    urlEncoded = event?.get("property").request.body.urlencoded;
-    formDataText = event?.get("property").request.body.formdata.text;
-    formDataFile = event?.get("property").request.body.formdata.file;
+  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    currentTabId = event?.id;
+    rawValue = event?.property.request.body.raw;
+    urlEncoded = event?.property.request.body.urlencoded;
+    formDataText = event?.property .request.body.formdata.text;
+    formDataFile = event?.property.request.body.formdata.file;
    
-    mainTab = event?.get("property").request.state.dataset;
+    mainTab = event?.property.request.state.dataset;
 
-    rawTab = event?.get("property").request.state.raw;
+    rawTab = event?.property.request.state.raw;
   });
 
   let handleDropdown = (tab: string) => {
@@ -70,7 +71,7 @@
   };
 
   onDestroy(() => {
-    tabSubscribe.unsubscribe();
+    tabSubscribe();
   });
 </script>
 

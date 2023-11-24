@@ -18,8 +18,9 @@
   import type { TabDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
-  export let activeTab: Observable<TabDocument>;
+  export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   //this for expand and collaps condition
   const _apiSendRequest = new ApiSendRequestViewModel();
@@ -37,11 +38,11 @@
   let request;
   let disabledSend: boolean = false;
 
-  const tabSubscribe = activeTab.subscribe((event: TabDocument) => {
-    urlText = event?.get("property").request.url;
-    method = event?.get("property").request.method;
-    disabledSend = event?.get("property").request.requestInProgress;
-    request = event?.get("property").request;
+  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    urlText = event?.property.request.url;
+    method = event?.property.request.method;
+    disabledSend = event?.property.request.requestInProgress;
+    request = event?.property.request;
   });
 
   const handleSendRequest = async () => {
@@ -148,11 +149,11 @@
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
-    );
+      );
   };
 
   onDestroy(() => {
-    tabSubscribe.unsubscribe();
+    tabSubscribe();
   });
 
   const handleResize = () => {

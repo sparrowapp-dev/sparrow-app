@@ -11,6 +11,7 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import { onDestroy } from "svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
@@ -31,6 +32,15 @@
   let scrollerParent: number;
   let scrollerWidth: number;
 
+onDestroy(()=>{
+  collectionsMethods.handleCreateTab(
+            generateSampleRequest(
+              "Raza-" + uuidv4(),
+              new Date().toString(),
+            ),
+          )
+          moveNavigation("right");
+});
 </script>
 
 <div class="">
@@ -60,7 +70,7 @@
       {#if tabList}
         {#each tabList as tab, index}
           <Tab
-            tab = {collectionsMethods.extractTabDocument(tab)}
+            tab = {tab}
             handleTabRemove={collectionsMethods.handleRemoveTab}
             updateCurrentTab={collectionsMethods.handleActiveTab}
             {index}
