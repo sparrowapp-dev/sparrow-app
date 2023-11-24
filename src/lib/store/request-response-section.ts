@@ -206,9 +206,9 @@ const clearTabs = async () => {
   progressiveTab.set({});
 };
 
-export const syncTabs = (t, t2) => {
-  tabs.set(t);
-  progressiveTab.set(t2);
+export const syncTabs = (data, tab) => {
+  tabs.set(data);
+  progressiveTab.set(tab);
 };
 
 const requestResponseStore = {

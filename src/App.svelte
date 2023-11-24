@@ -26,15 +26,15 @@
   tabList.subscribe((val) => {
     if (val.length > 0) {
       if(flag){
-        let dm;
-        const data = val.map((elem) => {
+        let progressiveTab;
+        const tabList = val.map((elem) => {
           let temp = elem.toJSON(); 
           if(elem.isActive){
-            dm = temp;
+            progressiveTab = temp;
           }
           return temp;
         });
-        syncTabs(data, dm);
+        syncTabs(tabList, progressiveTab);
         flag = false;
       }
     }
