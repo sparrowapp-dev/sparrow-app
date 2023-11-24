@@ -9,18 +9,18 @@
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
-    import { onDestroy } from "svelte";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import { updateCollectionRequest } from "$lib/services/collection";
-    import { path } from "@tauri-apps/api";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { currentWorkspace } from "$lib/store/workspace.store";
-    import type {RequestBody} from "$lib/utils/interfaces/request.interface";
-    import { collectionList, useCollectionTree } from "$lib/store/collection";
-    import  spin  from "$lib/assets/spin.svg";
-    import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
- 
-  let isCollaps : boolean;
+  import { onDestroy, onMount } from "svelte";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { updateCollectionRequest } from "$lib/services/collection";
+  import { path } from "@tauri-apps/api";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { currentWorkspace } from "$lib/store/workspace.store";
+  import type { RequestBody } from "$lib/utils/interfaces/request.interface";
+  import { collectionList, useCollectionTree } from "$lib/store/collection";
+  import spin from "$lib/assets/spin.svg";
+  import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+
+  let isCollaps: boolean;
   let display: boolean = false;
   collapsibleState.subscribe((value) => (isCollaps = value));
 
@@ -41,7 +41,7 @@
   let componentData: NewTab;
   let workspace: Workspace;
   let collection;
-  let selectedTab:Partial<NewTab> ={}
+  let selectedTab: Partial<NewTab> = {};
 
   let loader = false;
 
@@ -68,9 +68,9 @@
       currentTabId = value.id;
       if (currentTabId && tabList) {
         fetchComponentData(currentTabId, tabList);
-        selectedTab=tabList.filter((tab:NewTab)=>{
-          return tab.id===currentTabId
-        })[0]
+        selectedTab = tabList.filter((tab: NewTab) => {
+          return tab.id === currentTabId;
+        })[0];
       }
     }
   });
@@ -156,88 +156,113 @@
     currentWorkspaceUnsubscribe();
     collectionListUnsubscribe();
   });
+
+  let isOpen: boolean = false;
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById("save-dropdown");
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
 </script>
 
-{#if selectedTab.type===ItemType.WORKSPACE}
-<MyWorkspace></MyWorkspace>
+{#if selectedTab.type === ItemType.WORKSPACE}
+  <MyWorkspace />
 {:else}
-<div class="d-flex flex-column" style="margin-right: 32px;" data-tauri-drag-region>
   <div
-    class="pageheader d-flex align-items-center justify-content-between {isCollaps
-      ? 'ps-5 pt-4 pe-3'
-      : 'pt-4 px-3'}"
+    class="d-flex flex-column"
+    style="margin-right: 32px;"
     data-tauri-drag-region
   >
-    <div>
-      <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
-        {tabName}
-      </p>
-    </div>
-
-    <div class="d-flex gap-3">
-      <div class="d-flex gap-1">
-        <button
-          class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
-          on:click={() => {
-            if (!componentData?.path) {
-              visibility = true;
-            } else {
-              handleSaveRequest();
-            }
-          }}
-        >
-          <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
-          <p
-            class="mb-0 text-whiteColor"
-            style="font-size: 14px; font-weight:400;"
-          >
-            Save
-          </p>
-        </button>
-        <span class="position-relative">
-          <button
-            on:click={() => {
-              setTimeout(() => {
-                display = true;
-              }, 100);
-            }}
-            class="px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
-          >
-            <img src={angleDown} alt="" class="w-100 h-100" />
-          </button>
-          <div class="rounded save-options {display ? 'd-block' : 'd-none'}">
-            <p
-              style="width:120px;"
-              class="bg-black m-0 py-1 px-3 cursor-pointer"
-              on:click={() => {
-                display = false;
-                visibility = true;
-              }}
-            >
-              Save As
-            </p>
-          </div>
-          <SaveRequest {visibility} onClick={handleBackdrop} />
-        </span>
-      </div>
+    <div
+      class="pageheader d-flex align-items-center justify-content-between {isCollaps
+        ? 'ps-5 pt-4 pe-3'
+        : 'pt-4 px-3'}"
+      data-tauri-drag-region
+    >
       <div>
-        <button
-          class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
+        <p
+          class="mb-0 text-whiteColor"
+          style="font-size: 18px; font-weight:400"
         >
-          <p
-            class="mb-0 text-whiteColor"
-            style="font-size: 14px; font-weight:400"
+          {tabName}
+        </p>
+      </div>
+
+      <div class="d-flex gap-3">
+        <div class="d-flex gap-1">
+          <button
+            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
+            on:click={() => {
+              if (!componentData?.path) {
+                visibility = true;
+              } else {
+                handleSaveRequest();
+              }
+            }}
           >
-            Share
-          </p>
-        </button>
+            <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
+            <p
+              class="mb-0 text-whiteColor"
+              style="font-size: 14px; font-weight:400;"
+            >
+              Save
+            </p>
+          </button>
+          <span class="position-relative">
+            <button
+              id="save-dropdown"
+              on:click={toggleDropdown}
+              class="px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
+            >
+              <img src={angleDown} alt="" class="w-100 h-100" />
+            </button>
+            <div class="rounded save-options {isOpen ? 'd-block' : 'd-none'}">
+              <p
+                style="width:120px;"
+                class="bg-black m-0 py-1 px-3 cursor-pointer rounded fs-6"
+                on:click={() => {
+                  isOpen = false;
+                  visibility = true;
+                }}
+              >
+                Save As
+              </p>
+            </div>
+            <SaveRequest {visibility} onClick={handleBackdrop} />
+          </span>
+        </div>
+        <div>
+          <button
+            class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
+          >
+            <p
+              class="mb-0 text-whiteColor"
+              style="font-size: 14px; font-weight:400"
+            >
+              Share
+            </p>
+          </button>
+        </div>
       </div>
     </div>
+    <div>
+      <ApiSendRequestPage />
+    </div>
   </div>
-  <div>
-    <ApiSendRequestPage />
-  </div>
-</div>
 {/if}
 
 <style>

@@ -60,7 +60,7 @@ export class HeaderDashboardViewModel {
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {
-      notifications.error("Something went wrong");
+      notifications.error(response.message);
       throw "error registering user: " + response.message;
     }
     return;

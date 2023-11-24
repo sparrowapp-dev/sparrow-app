@@ -28,6 +28,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     navigate("/home");
   } else {
     isResponseError.set(true);
+    notifications.error(response.message);
     throw "error login user: " + response.message;
   }
 };

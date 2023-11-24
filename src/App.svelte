@@ -14,7 +14,11 @@
   import Waiting from "./pages/Home/Waiting.svelte";
 
   import { onMount } from "svelte";
-  import { appWindow, currentMonitor } from "@tauri-apps/api/window";
+  import {
+    appWindow,
+    currentMonitor,
+    getCurrent,
+  } from "@tauri-apps/api/window";
 
   export let url = "/";
 
@@ -25,19 +29,29 @@
 
   onMount(async () => {
     const monitor = await currentMonitor();
-    const monitorPhysicalSize = monitor.size;
-
-    let scaleFactor = 1;
-
+    const monitorPhysicalSize = await getCurrent().innerSize();
+    let scaleFactor = monitor.scaleFactor;
     const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
-    let appWidth = logicalSize.width / 2.5;
-    let appHeight = logicalSize.height;
-    await appWindow.setSize({
-      type: "Logical",
-      width: appWidth,
-      height: appHeight,
-    });
-    await appWindow.center();
+
+    const minWidth = 500;
+    const maxWidth = 500;
+    const minHeight = 700;
+    const maxHeight = 700;
+
+    if (logicalSize.width < minWidth) {
+      logicalSize.width = minWidth;
+    }
+    if (logicalSize.width > maxWidth) {
+      logicalSize.width = maxWidth;
+    }
+    if (logicalSize.height < minHeight) {
+      logicalSize.height = minHeight;
+    }
+    if (logicalSize.height > maxHeight) {
+      logicalSize.height = maxHeight;
+    }
+    await getCurrent().setSize(logicalSize);
+    await getCurrent().center();
   });
 </script>
 

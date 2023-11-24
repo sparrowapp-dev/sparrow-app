@@ -8,7 +8,7 @@
   import { user } from "$lib/store/auth.store";
   import { onMount } from "svelte";
 
-  let isMaximizeWindow: boolean = true;
+  let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -29,11 +29,12 @@
   });
 
   onMount(() => {
-    $: if (isloggedIn === null) {
+    if (isloggedIn === null) {
       const resizeButton = document.getElementById("resize-button");
       if (resizeButton) {
         if (window.innerWidth > 800) {
           resizeButton.click();
+          isMaximizeWindow = false;
         }
       }
     }
@@ -58,10 +59,10 @@
       class="btn btn-black button"
       id="resize-button"
     >
-      {#if isMaximizeWindow}
-        <img src={resizeIcon} alt="" />
-      {:else}
+      {#if isMaximizeWindow === true}
         <img src={doubleResizeIcon} alt="" />
+      {:else}
+        <img src={resizeIcon} alt="" />
       {/if}
     </button>
     <button on:click={onClose} class="btn btn-black">

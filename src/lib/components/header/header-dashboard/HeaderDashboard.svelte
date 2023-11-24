@@ -38,7 +38,7 @@
     },
   );
 
-  let isMaximizeWindow: boolean = true;
+  let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -79,15 +79,18 @@
     isloggedIn = value;
   });
   onMount(() => {
-    $: if (isloggedIn) {
+    if (isloggedIn) {
       const resizeButton = document.getElementById("resize-button");
       if (resizeButton) {
         if (window.innerWidth < 800) {
           resizeButton.click();
+          isMaximizeWindow = true;
         }
       }
     }
   });
+
+  
   let isSearchVisible = true;
   onMount(() => {
     handleWindowSize();
@@ -97,6 +100,27 @@
     const minWidthThreshold = 800;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
   }
+
+  let isOpen: boolean = false;
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById("profile-dropdown");
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
 </script>
 
 <div
@@ -156,30 +180,26 @@
       </div>
       <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
-          <button class="bg-blackColor border-0">
-            <img
-              src={icons.profileIcon}
-              on:click={() => {
-                setTimeout(() => {
-                  profile = true;
-                }, 100);
-              }}
-              alt=""
-            />
+          <button
+            class="bg-blackColor border-0"
+            id="profile-dropdown"
+            on:click={toggleDropdown}
+          >
+            <img src={icons.profileIcon} alt="" />
           </button>
           <div
             class="rounded profile-explorer position-absolute text-color-white py-1"
-            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {profile
+            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {isOpen
               ? 'block'
               : 'none'}; top: 40px; right: 0; width: 219px;"
             on:click={() => {
-              profile = false;
+              isOpen = false;
             }}
           >
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
               on:click={() => {
-                profile = false;
+                isOpen = false;
               }}
             >
               <img src={icons.account} alt="" /><span
@@ -249,10 +269,10 @@
           class="button-resize border-0 py-1 px-2"
           id="resize-button"
         >
-          {#if isMaximizeWindow}
-            <img src={icons.resizeIcon} alt="" />
-          {:else}
+          {#if isMaximizeWindow === true}
             <img src={icons.doubleResizeIcon} alt="" />
+          {:else}
+            <img src={icons.resizeIcon} alt="" />
           {/if}
         </button>
       </div>
