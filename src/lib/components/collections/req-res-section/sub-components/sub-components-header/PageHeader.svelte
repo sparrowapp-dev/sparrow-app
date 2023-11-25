@@ -2,28 +2,23 @@
   import angleDown from "$lib/assets/angle-down.svg";
   import {
     collapsibleState,
-    currentTab,
-    handleTabUpdate,
-    tabs,
   } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
-  import ApiSendRequestPage from "./ApiSendRequestPage.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
-    import { onDestroy } from "svelte";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import { updateCollectionRequest } from "$lib/services/collection";
-    import { path } from "@tauri-apps/api";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { currentWorkspace } from "$lib/store/workspace.store";
-    import type {RequestBody} from "$lib/utils/interfaces/request.interface";
-    import { collectionList, useCollectionTree } from "$lib/store/collection";
-    import  spin  from "$lib/assets/spin.svg";
-    import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
- 
-  let isCollaps : boolean;
-  let display: boolean = false;
-  collapsibleState.subscribe((value) => (isCollaps = value));
+  import { onDestroy } from "svelte";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { updateCollectionRequest } from "$lib/services/collection";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import type { RequestBody } from "$lib/utils/interfaces/request.interface";
+  import { collectionList, useCollectionTree } from "$lib/store/collection";
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
 
+  export let activeTab;
+  export let collectionsMethods: CollectionsMethods;
+
+  let display: boolean = false;
   window.addEventListener("click", () => {
     display = false;
   });
@@ -31,54 +26,17 @@
   const handleBackdrop = (flag) => {
     visibility = flag;
   };
-  interface Workspace {
-    name: string;
-    id: string;
-  }
-  let currentTabId = null;
-  let tabList = [];
+
   let tabName: string = "";
   let componentData: NewTab;
-  let workspace: Workspace;
   let collection;
-  let selectedTab:Partial<NewTab> ={}
-
-  let loader = false;
 
   const { updateNodeData } = useCollectionTree();
 
-  const fetchComponentData = (id, list) => {
-    list.forEach((elem) => {
-      if (elem.id === id) {
-        tabName = elem.name;
-        componentData = elem;
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchComponentData(currentTabId, tabList);
-    }
+  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    tabName = event?.name;
   });
 
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchComponentData(currentTabId, tabList);
-        selectedTab=tabList.filter((tab:NewTab)=>{
-          return tab.id===currentTabId
-        })[0]
-      }
-    }
-  });
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id !== "") {
-      workspace = value;
-    }
-  });
   const collectionListUnsubscribe = collectionList.subscribe((value) => {
     collection = value;
   });
@@ -116,7 +74,7 @@
                 request: expectedRequest,
               },
             );
-            handleTabUpdate({ save: true }, componentData.id);
+            // handleTabUpdate({ save: true }, componentData.id);
           }
         } else {
           let res = await updateCollectionRequest(componentData.id, {
@@ -143,35 +101,37 @@
                 request: expectedRequest,
               },
             );
-            handleTabUpdate({ save: true }, componentData.id);
+            // handleTabUpdate({ save: true }, componentData.id);
           }
         }
       }
     }
   };
 
+  let handleInputValue = () => {
+    collectionsMethods.updateTab(tabName, "name");
+  };
+
   onDestroy(() => {
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
-    currentWorkspaceUnsubscribe();
     collectionListUnsubscribe();
+    tabSubscribe();
   });
 </script>
 
-{#if selectedTab.type===ItemType.WORKSPACE}
-<MyWorkspace></MyWorkspace>
-{:else}
-<div class="d-flex flex-column" style="margin-right: 32px;" data-tauri-drag-region>
+<div class="d-flex flex-column" data-tauri-drag-region>
   <div
-    class="pageheader d-flex align-items-center justify-content-between {isCollaps
+    class="pageheader d-flex align-items-center justify-content-between {$collapsibleState
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
     data-tauri-drag-region
   >
     <div>
-      <p class="mb-0 text-whiteColor" style="font-size: 18px; font-weight:400">
-        {tabName}
-      </p>
+      <input
+        placeholder="Enter API Request Name"
+        bind:value={tabName}
+        on:input={handleInputValue}
+        class="tabbar-tabName"
+      />
     </div>
 
     <div class="d-flex gap-3">
@@ -234,11 +194,7 @@
       </div>
     </div>
   </div>
-  <div>
-    <ApiSendRequestPage />
-  </div>
 </div>
-{/if}
 
 <style>
   .btn-primary {
@@ -266,5 +222,12 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+  .tabbar-tabName {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    font-weight: 400;
   }
 </style>

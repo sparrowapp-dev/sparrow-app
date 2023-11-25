@@ -1,25 +1,17 @@
 <script lang="ts">
-  import TabBar from "./sub-components/sub-components-header/TabBar.svelte";
-  import { collapsibleState } from "$lib/store/request-response-section";
-  let isCollaps: boolean;
-  collapsibleState.subscribe((value) => {
-    isCollaps = value;
-  });
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
+  import RequestParam from "./sub-components/request-body-section/RequestParam.svelte";
+  import ApiSendRequestPage from "./sub-components/sub-components-header/ApiSendRequestPage.svelte";
+  import PageHeader from "./sub-components/sub-components-header/PageHeader.svelte";
+
+  export let activeTab: Observable<TabDocument>;
+  export let collectionsMethods: CollectionsMethods;
 </script>
 
-<div
-  class="collection bg-backgroundColor"
-  style="left:{isCollaps ? '72px' : '352px'}"
->
-  <TabBar />
+<div class="request-response">
+  <PageHeader {activeTab} {collectionsMethods} />
+  <ApiSendRequestPage {activeTab} {collectionsMethods} />
+  <RequestParam {activeTab} {collectionsMethods} />
 </div>
-
-<style>
-  .collection {
-    top: 44px;
-    position: fixed;
-    right: 0;
-    width: calc(100%-352px);
-    height: calc(100vh - 44px);
-  }
-</style>

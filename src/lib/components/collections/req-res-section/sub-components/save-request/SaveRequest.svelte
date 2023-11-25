@@ -26,10 +26,10 @@
   } from "$lib/utils/dto";
   import {
     currentTab,
-    handleTabAddons,
-    handleTabUpdate,
+    // handleTabAddons,
+    // handleTabUpdate,
     tabs,
-    updateCurrentTab,
+    // updateCurrentTab,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
@@ -136,11 +136,11 @@
           };
           if (!componentData.path) {
             // update tab data
-            handleTabUpdate(
-              { name: tabName, id: dummyId, save: true, path: expectedPath },
-              currentTabId,
-            ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // handleTabUpdate(
+            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
+            //   currentTabId,
+            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
           } else {
             //push new tab
             let newTab: NewTab = {
@@ -152,7 +152,7 @@
               save: true,
               requestInProgress: false,
             };
-            handleTabAddons(newTab);
+            // handleTabAddons(newTab);
           }
           onClick(false);
           navigateToWorkspace();
@@ -191,23 +191,23 @@
           };
           if (!componentData.path) {
             // update tab data
-            handleTabUpdate(
-              { name: tabName, id: dummyId, save: true, path: expectedPath },
-              currentTabId,
-            ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // handleTabUpdate(
+            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
+            //   currentTabId,
+            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
           } else {
             //push new tab
-            let newTab: NewTab = {
-              id: dummyId,
-              name: tabName,
-              type: ItemType.REQUEST,
-              request: expectedRequest,
-              path: expectedPath,
-              save: true,
-              requestInProgress: false,
-            };
-            handleTabAddons(newTab);
+            // let newTab: NewTab = {
+            //   id: dummyId,
+            //   name: tabName,
+            //   type: ItemType.REQUEST,
+            //   request: expectedRequest,
+            //   path: expectedPath,
+            //   save: true,
+            //   requestInProgress: false,
+            // };
+            // handleTabAddons(newTab);
           }
           onClick(false);
           navigateToWorkspace();
