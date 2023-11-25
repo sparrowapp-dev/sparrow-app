@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rxdb, type WorkspaceDocument } from "$lib/database/app.database";
-import { RxDBUpdatePlugin } from "rxdb/plugins/update";
-import { addRxPlugin } from "rxdb";
 import type { Observable } from "rxjs";
-addRxPlugin(RxDBUpdatePlugin);
 
 export class WorkspaceRepository {
   constructor() {}

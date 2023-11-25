@@ -1,5 +1,4 @@
 <script lang="ts">
-     import { handleTabAddons} from "$lib/store/request-response-section";
     import type { Path } from "$lib/utils/interfaces/request.interface";
     export let name: string;
     export let id : string;
@@ -44,25 +43,7 @@
     }
 </script>
 
-<div class="d-flex align-items-center" style="height:32px;" on:click={()=>{
-     if(!id.includes("MYUID45345")){
-        handleTabAddons( {
-            id, 
-            name, 
-            type : api.type,
-            request : {
-                method,
-                url : url ? url : '',
-                body: body ? body : "",
-                headers : headers ? headers : [],
-                queryParams : queryParams ? queryParams : []
-            }, 
-            save : true,
-            requestInProgress : false,
-            path,
-        } );
-        }
-    }}>
+<div class="d-flex align-items-center" style="height:32px;">
     <div class="api-method {apiClass}">
         {method.toUpperCase()} 
     </div>

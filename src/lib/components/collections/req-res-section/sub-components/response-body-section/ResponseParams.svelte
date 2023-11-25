@@ -3,11 +3,25 @@
 
   import ResponseHeader from "./ResponseHeader.svelte";
 
-  export let responseBody;
-  export let responseHeader;
-  export let statusCode: string;
-  export let timeTaken: number;
-  export let sizeinKb: number;
+  export let response;
+
+  let responseBody;
+  let responseHeader;
+  let statusCode: string;
+  let timeTaken: number;
+  let sizeinKb: number;
+
+  $: {
+    if (response) {
+      statusCode = response?.status;
+      timeTaken = response?.time;
+      sizeinKb = response?.size;
+      responseBody = response?.body;
+      responseHeader = Object.entries(
+        JSON.parse(response?.headers || "{}"),
+      );
+    }
+  }
 
   let selectedTab1: string = "response";
 </script>

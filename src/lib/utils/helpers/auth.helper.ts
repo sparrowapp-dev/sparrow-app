@@ -1,8 +1,7 @@
 import { AuthSection, AuthType } from "../enums/authorization.enum";
-import type { NewTab } from "../interfaces/request.interface";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const findAuthHeader = (
-  requestData: NewTab,
+  request: any,
 ): {
   key: string;
   value: string;
@@ -12,26 +11,24 @@ const findAuthHeader = (
     value: "",
   };
   if (
-    requestData.request.state.auth === AuthType.BEARER_TOKEN &&
-    requestData.request.auth.bearerToken
+    request.state.auth === AuthType.BEARER_TOKEN &&
+    request.auth.bearerToken
   ) {
     authValue.key = "Authorization";
-    authValue.value = "Bearer " + requestData.request.auth.bearerToken;
-  } else if (requestData.request.state.auth === AuthType.BASIC_AUTH) {
+    authValue.value = "Bearer " + request.auth.bearerToken;
+  } else if (request.state.auth === AuthType.BASIC_AUTH) {
     authValue.key = "Authorization";
     authValue.value = `Basic ${btoa(
-      requestData.request.auth.basicAuth.username +
-        ":" +
-        requestData.request.auth.basicAuth.password,
+      request.auth.basicAuth.username + ":" + request.auth.basicAuth.password,
     )}`;
   } else if (
-    requestData.request.state.auth === AuthType.API_KEY &&
-    requestData.request.auth.apiKey.addTo === AuthSection.HEADER &&
-    requestData.request.auth.apiKey.authKey &&
-    requestData.request.auth.apiKey.authValue
+    request.state.auth === AuthType.API_KEY &&
+    request.auth.apiKey.addTo === AuthSection.HEADER &&
+    request.auth.apiKey.authKey &&
+    request.auth.apiKey.authValue
   ) {
-    authValue.key = requestData.request.auth.apiKey.authKey;
-    authValue.value = requestData.request.auth.apiKey.authValue;
+    authValue.key = request.auth.apiKey.authKey;
+    authValue.value = request.auth.apiKey.authValue;
   } else {
     authValue.key = "";
     authValue.value = "";
@@ -40,7 +37,7 @@ const findAuthHeader = (
 };
 
 const findAuthParameter = (
-  requestData: NewTab,
+  request: any,
 ): {
   key: string;
   value: string;
@@ -50,13 +47,13 @@ const findAuthParameter = (
     value: "",
   };
   if (
-    requestData.request.state.auth === AuthType.API_KEY &&
-    requestData.request.auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
-    requestData.request.auth.apiKey.authKey &&
-    requestData.request.auth.apiKey.authValue
+    request.state.auth === AuthType.API_KEY &&
+    request.auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
+    request.auth.apiKey.authKey &&
+    request.auth.apiKey.authValue
   ) {
-    authValue.key = requestData.request.auth.apiKey.authKey;
-    authValue.value = requestData.request.auth.apiKey.authValue;
+    authValue.key = request.auth.apiKey.authKey;
+    authValue.value = request.auth.apiKey.authValue;
   } else {
     authValue.key = "";
     authValue.value = "";

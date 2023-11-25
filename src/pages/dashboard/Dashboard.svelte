@@ -4,7 +4,7 @@
   import Teams from "../Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
-  import CollectionsHome from "../Collections/collections-home/CollectionsHome.svelte";
+  import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
 
