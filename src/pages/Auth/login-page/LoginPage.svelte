@@ -3,7 +3,6 @@
   import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
-
   import googleLogo from "$lib/assets/googlelogo.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
@@ -36,10 +35,6 @@
   //------------------------------ TOKEN -----------------------------------//
 
   // Use the window object to maximize the page
-  function maximizeWindow() {
-    window.innerWidth = screen.width;
-    window.innerHeight = screen.height;
-  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
@@ -47,7 +42,6 @@
   if (token) {
     setUser(jwtDecode(token));
     navigate("/");
-    maximizeWindow();
   }
 
   //------------------------------ Login State --------------------------//
@@ -115,7 +109,7 @@
         Welcome to Sparrow!
       </p>
       <form
-        class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-4"
+        class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
         style="width:408px;"
         on:submit|preventDefault={async () => {
           validationErrors = await handleLoginValidation(loginCredentials);
@@ -248,7 +242,7 @@
       </div>
     </div>
     <div
-      class="BottomLogo text-white mt-2 d-flex justify-content-center align-items-center"
+      class="BottomLogo text-white d-flex justify-content-center align-items-center"
     >
       <img src={sparrowicon} alt="" class="w-50" />
     </div>

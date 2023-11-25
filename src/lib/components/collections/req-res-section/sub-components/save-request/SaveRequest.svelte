@@ -172,7 +172,7 @@
             },
           },
         });
-     
+
         if (res.isSuccessful) {
           insertNode(
             JSON.parse(JSON.stringify(collection)),
@@ -255,8 +255,8 @@
   };
 
   const fetchComponentData = (id, list) => {
-    list.forEach((elem:NewTab) => {
-      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
+    list.forEach((elem: NewTab) => {
+      if (elem.id === id && elem.type !== ItemType.WORKSPACE) {
         tabName = elem.name;
         tabId = elem.id;
         tabMethod = elem.request.method;

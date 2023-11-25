@@ -4,7 +4,6 @@
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
-
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/Dashboard/Dashboard.svelte";
@@ -13,12 +12,16 @@
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
+  import { syncTabs } from "$lib/store/request-response-section";
+
   import {
-    syncTabs,
-  } from "$lib/store/request-response-section";
+    resizeWindowOnLogOut,
+    resizeWindowOnLogin,
+  } from "$lib/components/header/window-resize";
 
   import { onMount } from "svelte";
-  import { appWindow, currentMonitor } from "@tauri-apps/api/window";
+
+  import { user } from "$lib/store/auth.store";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -27,11 +30,11 @@
   let tabList = tabRepository.getTabList();
   tabList.subscribe((val) => {
     if (val.length > 0) {
-      if(flag){
+      if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
-          let temp = elem.toJSON(); 
-          if(elem.isActive){
+          let temp = elem.toJSON();
+          if (elem.isActive) {
             progressiveTab = temp;
           }
           return temp;
@@ -43,20 +46,16 @@
   });
 
   onMount(async () => {
-    const monitor = await currentMonitor();
-    const monitorPhysicalSize = monitor.size;
-
-    let scaleFactor = 1;
-
-    const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
-    let appWidth = logicalSize.width / 2.5;
-    let appHeight = logicalSize.height;
-    await appWindow.setSize({
-      type: "Logical",
-      width: appWidth,
-      height: appHeight,
+    let isloggedIn;
+    user.subscribe((value) => {
+      isloggedIn = value;
     });
-    await appWindow.center();
+
+    if (!isloggedIn) {
+      resizeWindowOnLogOut();
+    } else {
+      resizeWindowOnLogin();
+    }
   });
 </script>
 

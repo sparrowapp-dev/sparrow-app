@@ -1,8 +1,8 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
+  import { onDestroy, onMount } from "svelte";
 
-  let visibility: boolean = false;
   export let data: Array<{
     name: string;
     id: string;
@@ -14,9 +14,11 @@
     id: string;
   };
 
-  window.addEventListener("click", () => {
-    visibility = false;
-  });
+  let isOpen: boolean = false;
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
 
   $: {
     if (title) {
@@ -27,27 +29,37 @@
       });
     }
   }
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(`dropdown-${title}`);
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
 </script>
 
 <div
   class="parent-dropdown display-inline-block"
   style=" position: relative;  z-index:999;"
+  on:click={handleDropdownClick}
 >
-  <div
-    on:click={() => {
-      setTimeout(() => {
-        visibility = true;
-      }, 100);
-    }}
-  >
+  <div on:click={toggleDropdown} id={`dropdown-${title}`}>
     <div
       class="dropdown-btn px-1 d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={visibility === true}
+      class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0">
         {selectedTitle?.name}
       </p>
-      <span class:dropdown-logo-active={visibility === true}
+      <span class:dropdown-logo-active={isOpen}
         ><img
           style="margin-left:10px; height:12px; width:12px;"
           src={dropdown}
@@ -56,15 +68,12 @@
       >
     </div>
   </div>
-  <div
-    class="d-none dropdown-data p-1 rounded"
-    class:dropdown-active={visibility === true}
-  >
+  <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
     {#each data as list}
       <div
         class="d-flex px-2 py-1 justify-content-between highlight"
         on:click={() => {
-          visibility = false;
+          isOpen = false;
           onclick(list.id);
         }}
       >

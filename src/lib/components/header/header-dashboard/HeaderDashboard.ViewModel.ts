@@ -7,6 +7,7 @@ import { notifications } from "$lib/utils/notifications";
 import { useNavigate } from "svelte-navigator";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
+import { resizeWindowOnLogOut } from "../window-resize";
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
@@ -54,6 +55,7 @@ export class HeaderDashboardViewModel {
     const response = await userLogout();
 
     if (response.isSuccessful) {
+      resizeWindowOnLogOut();
       isLoggout.set(true);
       isResponseError.set(false);
       clearAuthJwt();
@@ -63,7 +65,7 @@ export class HeaderDashboardViewModel {
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {
-      notifications.error("Something went wrong");
+      notifications.error(response.message);
       throw "error registering user: " + response.message;
     }
     return;

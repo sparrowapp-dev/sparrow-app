@@ -52,6 +52,7 @@ $sparrow-button-color: #e5e5e5;
   --request-con: #{$sparrow-con};
   --request-patc: #{$sparrow-patc};
   --request-opt: #{$sparrow-opt};
+  --workspace-hover-color: #{$sparrow-plusbutton};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -81,8 +82,8 @@ $theme-colors: map-merge(
     "postColor": $sparrow-post,
     "deleteColor": $sparrow-delete,
     "headColor": $sparrow-head,
-    "patchColor":$sparrow-patc,
-    "optionsColor":$sparrow-opt,
+    "patchColor": $sparrow-patc,
+    "optionsColor": $sparrow-opt,
   )
 );
 
