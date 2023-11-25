@@ -4,7 +4,6 @@
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
-
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/Dashboard/Dashboard.svelte";
@@ -13,16 +12,16 @@
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
+  import { syncTabs } from "$lib/store/request-response-section";
+
   import {
-    syncTabs,
-  } from "$lib/store/request-response-section";
+    uponLogOut,
+    uponLoggedin,
+  } from "$lib/components/header/window-resize";
 
   import { onMount } from "svelte";
-  import {
-    appWindow,
-    currentMonitor,
-    getCurrent,
-  } from "@tauri-apps/api/window";
+
+  import { user } from "$lib/store/auth.store";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -31,11 +30,11 @@
   let tabList = tabRepository.getTabList();
   tabList.subscribe((val) => {
     if (val.length > 0) {
-      if(flag){
+      if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
-          let temp = elem.toJSON(); 
-          if(elem.isActive){
+          let temp = elem.toJSON();
+          if (elem.isActive) {
             progressiveTab = temp;
           }
           return temp;
@@ -47,30 +46,16 @@
   });
 
   onMount(async () => {
-    const monitor = await currentMonitor();
-    const monitorPhysicalSize = await getCurrent().innerSize();
-    let scaleFactor = monitor.scaleFactor;
-    const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
+    let isloggedIn;
+    user.subscribe((value) => {
+      isloggedIn = value;
+    });
 
-    const minWidth = 500;
-    const maxWidth = 500;
-    const minHeight = 700;
-    const maxHeight = 700;
-
-    if (logicalSize.width < minWidth) {
-      logicalSize.width = minWidth;
+    if (!isloggedIn) {
+      uponLogOut();
+    } else {
+      uponLoggedin();
     }
-    if (logicalSize.width > maxWidth) {
-      logicalSize.width = maxWidth;
-    }
-    if (logicalSize.height < minHeight) {
-      logicalSize.height = minHeight;
-    }
-    if (logicalSize.height > maxHeight) {
-      logicalSize.height = maxHeight;
-    }
-    await getCurrent().setSize(logicalSize);
-    await getCurrent().center();
   });
 </script>
 

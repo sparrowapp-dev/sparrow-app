@@ -1,7 +1,7 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
-  import { Observable } from "rxjs";
+  import { Observable, async } from "rxjs";
   import minimizeIcon from "$lib/assets/minimize.svg";
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
@@ -74,30 +74,13 @@
     activeWorkspaceSubscribe.unsubscribe();
   });
 
-  let isloggedIn;
-  user.subscribe((value) => {
-    isloggedIn = value;
-  });
-  onMount(() => {
-    if (isloggedIn) {
-      const resizeButton = document.getElementById("resize-button");
-      if (resizeButton) {
-        if (window.innerWidth < 800) {
-          resizeButton.click();
-          isMaximizeWindow = true;
-        }
-      }
-    }
-  });
-
-  
   let isSearchVisible = true;
   onMount(() => {
     handleWindowSize();
   });
   window.addEventListener("resize", handleWindowSize);
   function handleWindowSize() {
-    const minWidthThreshold = 800;
+    const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
   }
 
@@ -147,12 +130,13 @@
   </div>
 
   <div
-    style="height:32px; width:{isSearchVisible ? '400px' : '300px'} "
+    style="height:32px; width:400px;"
     class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
     </div>
+
     <div class="w-100">
       <input
         type="search"
@@ -164,11 +148,11 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-center gap-1"
+    class="d-flex align-items-center justify-content-center"
     style="margin-left: 45px;"
   >
-    <div class="gap-{!isSearchVisible ? '4' : '4'} d-flex">
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
+      <div class="col-{!isSearchVisible ? '1' : '1'}">
         <button class="bg-blackColor border-0">
           <img src={icons.settingIcon} alt="" />
         </button>
@@ -256,7 +240,7 @@
       </div>
     </div>
 
-    <div class=" d-flex gap-3 {!isSearchVisible ? '' : 'gap-4'}">
+    <div class=" d-flex {isSearchVisible ? 'gap-4' : ' gap-3'} ">
       <div class="col-2">
         <button on:click={onMinimize} class="button-minus border-0 py-1">
           <img src={minimizeIcon} alt="" />
@@ -266,7 +250,7 @@
       <div class="col-2">
         <button
           on:click={toggleSize}
-          class="button-resize border-0 py-1 px-2"
+          class="button-resize border-0 py-1"
           id="resize-button"
         >
           {#if isMaximizeWindow === true}
@@ -276,12 +260,11 @@
           {/if}
         </button>
       </div>
-    </div>
-
-    <div class="col-2">
-      <button on:click={onClose} class="button-close border-0 py-1">
-        <img src={icons.closeIcon} alt="" />
-      </button>
+      <div class="col-2">
+        <button on:click={onClose} class="button-close border-0 py-1">
+          <img src={icons.closeIcon} alt="" />
+        </button>
+      </div>
     </div>
   </div>
 </div>

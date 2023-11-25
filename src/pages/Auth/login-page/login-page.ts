@@ -6,6 +6,7 @@ import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
 import { isResponseError, setUser } from "$lib/store/auth.store";
+import { uponLogOut, uponLoggedin } from "$lib/components/header/window-resize";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -21,12 +22,14 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
   const response = await loginUser(loginCredentials);
 
   if (response.isSuccessful) {
+    uponLoggedin();
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
     notifications.success("Login successful!");
     navigate("/home");
   } else {
+    uponLogOut();
     isResponseError.set(true);
     notifications.error(response.message);
     throw "error login user: " + response.message;

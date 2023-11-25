@@ -5,8 +5,6 @@
   import minimizeIcon from "$lib/assets/minimize.svg";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import doubleResizeIcon from "$lib/assets/close-icon.svg";
-  import { user } from "$lib/store/auth.store";
-  import { onMount } from "svelte";
 
   let isMaximizeWindow: boolean = false;
 
@@ -22,23 +20,6 @@
     appWindow.toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
-
-  let isloggedIn;
-  user.subscribe((value) => {
-    isloggedIn = value;
-  });
-
-  onMount(() => {
-    if (isloggedIn === null) {
-      const resizeButton = document.getElementById("resize-button");
-      if (resizeButton) {
-        if (window.innerWidth > 800) {
-          resizeButton.click();
-          isMaximizeWindow = false;
-        }
-      }
-    }
-  });
 </script>
 
 <section
