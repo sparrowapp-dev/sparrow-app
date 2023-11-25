@@ -21,7 +21,13 @@
 
   import { onMount } from "svelte";
 
-  import { user } from "$lib/store/auth.store";
+  import { isResponseError, setUser, user } from "$lib/store/auth.store";
+  import { invoke } from "@tauri-apps/api";
+  import { listen, once } from "@tauri-apps/api/event";
+  import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
+  import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
+  import constants from "$lib/utils/constants";
+  import { notifications } from "$lib/utils/notifications";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -46,6 +52,34 @@
   });
 
   onMount(async () => {
+    let count = 0;
+    once("receive-login", async (event) => {
+      if (!count) {
+        count++;
+        const params = new URLSearchParams(event.payload.url.split("?")[1]);
+        const accessToken = params.get("accessToken");
+        const refreshToken = params.get("refreshToken");
+        if (accessToken && refreshToken) {
+          const webView = WebviewWindow.getByLabel("oauth");
+          webView.hide();
+          appWindow.setFocus();
+          console.log("LOCAL  1 ==? ", localStorage);
+          setAuthJwt(constants.AUTH_TOKEN, accessToken);
+          setAuthJwt(constants.REF_TOKEN, refreshToken);
+          setUser(jwtDecode(accessToken));
+          console.log("After LOCAL 1 ==? ", localStorage);
+          // notifications.success("Login successful!");
+          // navigate("/home");
+        } else {
+          count = 0;
+          resizeWindowOnLogOut();
+          isResponseError.set(true);
+          notifications.error("Cant Login");
+          throw "error login user: Cant Login";
+        }
+      }
+    });
+
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

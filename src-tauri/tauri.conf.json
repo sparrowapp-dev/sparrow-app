@@ -28,7 +28,8 @@
         "startDragging": true,
         "setSize": true,
         "setFullscreen": true,
-        "center": true
+        "center": true,
+        "setFocus": true
       }
     },
     "bundle": {
@@ -48,6 +49,7 @@
     },
     "windows": [
       {
+        "label": "main",
         "decorations": false,
         "fullscreen": false,
         "resizable": true,
@@ -55,6 +57,11 @@
         "minWidth": 570,
         "minHeight": 700,
         "center": true
+      },
+      {
+        "label": "oauth",
+        "title": "Tauri App",
+        "visible": true
       }
     ]
   }
