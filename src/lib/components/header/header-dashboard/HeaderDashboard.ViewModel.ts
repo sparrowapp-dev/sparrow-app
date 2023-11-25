@@ -7,7 +7,7 @@ import { notifications } from "$lib/utils/notifications";
 import { useNavigate } from "svelte-navigator";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
-import { uponLogOut } from "../window-resize";
+import { resizeWindowOnLogOut } from "../window-resize";
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
@@ -55,7 +55,7 @@ export class HeaderDashboardViewModel {
     const response = await userLogout();
 
     if (response.isSuccessful) {
-      uponLogOut();
+      resizeWindowOnLogOut();
       isLoggout.set(true);
       isResponseError.set(false);
       clearAuthJwt();

@@ -15,8 +15,8 @@
   import { syncTabs } from "$lib/store/request-response-section";
 
   import {
-    uponLogOut,
-    uponLoggedin,
+    resizeWindowOnLogOut,
+    resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
   import { onMount } from "svelte";
@@ -52,9 +52,9 @@
     });
 
     if (!isloggedIn) {
-      uponLogOut();
+      resizeWindowOnLogOut();
     } else {
-      uponLoggedin();
+      resizeWindowOnLogin();
     }
   });
 </script>

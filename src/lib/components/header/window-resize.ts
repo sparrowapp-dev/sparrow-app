@@ -1,11 +1,11 @@
 import { platform } from "@tauri-apps/api/os";
 import { appWindow, currentMonitor, getCurrent } from "@tauri-apps/api/window";
 
-export const uponLoggedin = async () => {
+export const resizeWindowOnLogin = async () => {
   const platformName = await platform();
   if (platformName == "darwin") {
     const resizeButton = document.getElementById("resize-button");
-    console.log(resizeButton);
+
     if (resizeButton) {
       resizeButton.click();
     }
@@ -14,7 +14,7 @@ export const uponLoggedin = async () => {
   }
 };
 
-export const uponLogOut = async () => {
+export const resizeWindowOnLogOut = async () => {
   const monitor = await currentMonitor();
   const monitorPhysicalSize = await getCurrent().innerSize();
   const scaleFactor = monitor.scaleFactor;
@@ -36,8 +36,7 @@ export const uponLogOut = async () => {
   }
   if (logicalSize.height > maxHeight) {
     logicalSize.height = maxHeight;
-
-    await getCurrent().setSize(logicalSize);
-    await getCurrent().center();
   }
+  await getCurrent().setSize(logicalSize);
+  await getCurrent().center();
 };
