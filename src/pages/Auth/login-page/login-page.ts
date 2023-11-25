@@ -21,6 +21,7 @@ export const navigateToRegister = () => {
 export const authNavigate = async () => {
   emit("oauthevent", { message: "initiate oauth" });
   const webView = WebviewWindow.getByLabel("oauth");
+  await webView.show();
   await webView.setFocus();
 };
 

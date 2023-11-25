@@ -61,7 +61,7 @@
       {
         "label": "oauth",
         "title": "Tauri App",
-        "visible": true
+        "visible": false
       }
     ]
   }

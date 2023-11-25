@@ -6,6 +6,7 @@ const jwtDecode = (jwt: string) => {
 
 const setAuthJwt = (key: string, token: string) => {
   localStorage.setItem(key, token);
+  document.cookie = `${key}=${token}`;
 };
 
 const clearAuthJwt = (): void => {
