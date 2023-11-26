@@ -19,6 +19,7 @@ export class WorkspaceRepository {
       isActiveWorkspace: elem.get("isActiveWorkspace"),
       createdBy: elem.get("createdBy"),
       createdAt: elem.get("createdAt"),
+      collections: elem.get("collections"),
     };
   };
 

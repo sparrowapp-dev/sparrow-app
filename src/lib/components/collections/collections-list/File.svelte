@@ -10,11 +10,7 @@
     export let api;
     
     let url, method, body, headers, queryParams
-    // let url = api.request.url;
-    // let method = api.request.method;
-    // let headers = api.request.headers;
-    // let queryParams = api.request.queryParams;
-    // let body = api.request.body;
+
     let apiClass = "red-api";
     
     $: {

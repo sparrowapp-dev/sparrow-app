@@ -32,12 +32,21 @@ export class HeaderDashboardViewModel {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
-        const { _id, name, owner, permissions, createdAt, createdBy } = elem;
+        const {
+          _id,
+          name,
+          owner,
+          permissions,
+          createdAt,
+          createdBy,
+          collection,
+        } = elem;
         return {
           _id,
           name,
           owner,
           permissions,
+          collections: collection,
           createdAt,
           createdBy,
         };

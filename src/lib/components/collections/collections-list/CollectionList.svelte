@@ -23,11 +23,21 @@
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-    import Collection from "$lib/components/file-types/collection/Collection.svelte";
-    import DefaultCollection from "./DefaultCollection.svelte";
+  import Collection from "$lib/components/file-types/collection/Collection.svelte";
+  import DefaultCollection from "./DefaultCollection.svelte";
+  import { rxdb, type CollectionDocument, type WorkspaceDocument } from "$lib/database/app.database";
+    import { CollectionViewModel } from "./Collection.ViewModel";
+    import { user } from "$lib/store/auth.store";
+    import type { Observable } from "rxjs";
+    import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
-  let collection: Collection[]=[];
+  let collection: any[]=[];
   let currentWorkspaceId: string = "";
+  const _colllectionViewModel = new CollectionViewModel();
+  const _workspaceViewModel= new HeaderDashboardViewModel(); 
+  const collections : Observable<CollectionDocument[]> = _colllectionViewModel.collection;
+  const activeWorkspace : Observable<WorkspaceDocument> = _workspaceViewModel.activeWorkspace;
+  let activeWorkspaceRxDoc: WorkspaceDocument;
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
     if (res.isSuccessful) {
@@ -35,9 +45,17 @@
     }
   };
 
-  const collectionListUnsubscribe = collectionList.subscribe((value) => {
-    collection = value;
-  }
+  
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value && value.length > 0) {
+         const collectionArr=value.map((collectionDocument:CollectionDocument)=>{
+           const collectionObj=_colllectionViewModel.getDocument(collectionDocument);
+           return collectionObj; 
+         })
+         collection=collectionArr;
+        }
+      }
   );
   let currentWorkspaceName = "";
 
@@ -67,26 +85,34 @@
     return null;
   };
 
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+      if(activeWorkspaceRxDoc){
+        const workspaceId=activeWorkspaceRxDoc.get("_id");
+        const response=await _colllectionViewModel.getAllCollections(workspaceId);
+        if(response.isSuccessful && response.data.data.length>0){
+          const collections=response.data.data;
+          _colllectionViewModel.bulkInsert(collections);
+            return
+        }
+        
+      }
+    
+    },
+  );
   const handleCreateCollection = async () => {
-    const newCollection: CreateCollectionPostBody = {
-      name: getNextCollection(collection, "New collection"),
-      workspaceId: currentWorkspaceId,
-    };
-    const currentDummyId: string = uuidv4() + "MYUID45345";
-    insertHead(
-      JSON.parse(JSON.stringify(collection)),
-      newCollection.name,
-      currentDummyId,
-    );
-    const res = await insertCollection(newCollection);
-    if (res.isSuccessful) {
-      updateHeadId(
-        JSON.parse(JSON.stringify(collection)),
-        currentDummyId,
-        res.data.data.insertedId,
-      );
+    const newCollection={
+      _id:uuidv4(),
+      name:getNextCollection(collection,"New collection"),
+      workspaceId:currentWorkspaceId,
+      items:[],
     }
+    collection=[...collection,newCollection];
+    _colllectionViewModel.addCollection(newCollection)
+    return;
   };
+
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if (value.id && value.name) {
@@ -118,7 +144,6 @@
     searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
   };
 
-  onDestroy(collectionListUnsubscribe);
   onDestroy(currentWorkspaceUnsubscribe);
   onDestroy(collapsibleStateUnsubscribe);
 
@@ -211,7 +236,7 @@
       </button>
     </div>
     <div>
-      <RequestDropdown></RequestDropdown>
+      <RequestDropdown handleCreateCollection={handleCreateCollection}></RequestDropdown>
       
     </div>
     

@@ -9,6 +9,11 @@
     import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { v4 as uuidv4 } from "uuid";
+    import { createSampleRequest } from "$lib/utils/sample/request.sample";
+    import { handleTabAddons } from "$lib/store/request-response-section";
+    import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import { CollectionViewModel } from "./Collection.ViewModel";
+    import type { CreateApiRequestPostBody } from "$lib/utils/dto";
     const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
     export let explorer;
@@ -17,39 +22,33 @@
     export let folderId : string = "";
     export let folderName : string = "";
     export let collectionList;
+    const _colllectionViewModel = new CollectionViewModel();
     const handleAPIClick = async () =>{
-      const name: string = getNextName(explorer.items, ItemType.REQUEST, RequestDefault.NAME);
-      const currentDummyId : string = uuidv4() + "MYUID45345";
-      insertNode(
-        JSON.parse(JSON.stringify(collectionList)),
-        explorer.id, ItemType.REQUEST, 
-        name, 
-        currentDummyId ,
-        {method: RequestDefault.METHOD}
-        );
-      
-        const res = await insertCollectionRequest({
-        collectionId: collectionId,
-        workspaceId: currentWorkspaceId,
+    const request=createSampleRequest(uuidv4());
+    handleTabAddons(request);
+    moveNavigation('right');
+    explorer={...explorer,"items":[...explorer.items,request]}
+
+
+    const requestObj:CreateApiRequestPostBody={
+      collectionId: collectionId,
+      workspaceId: currentWorkspaceId,
         folderId: explorer.id,
         items: {
           name: explorer.name,
           type: ItemType.FOLDER,
           items:{
-            name: name,
+            name: request.name,
             type: ItemType.REQUEST,
             request: {
               method: RequestDefault.METHOD
             }
           }
         }
-      });
-      if(res.isSuccessful){
-        updateNodeId(JSON.parse(
-          JSON.stringify(collectionList)),
-          currentDummyId,
-          new Date() + "uid"); // MOCKED DATA [UPDATION REQUIRED HERE]
-      } 
+    
+    
+  };
+  _colllectionViewModel.addRequestInFolderInCollection(requestObj);
     }
 </script>
 {#if explorer.type === "FOLDER"}

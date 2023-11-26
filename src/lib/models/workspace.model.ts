@@ -57,6 +57,20 @@ export const workspaceSchemaLiteral = {
       type: "boolean",
       default: false,
     },
+    collections: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "number",
+          },
+          name: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
   required: ["_id", "name", "owner", "permissions", "createdAt", "createdBy"],
 } as const;

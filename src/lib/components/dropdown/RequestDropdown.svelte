@@ -1,13 +1,30 @@
 <script>
-  export let visibilty = false;
+  let visibilty = false;
   import plusIcon from "$lib/assets/plus.svg";
-  let container;
+    import { handleTabAddons } from "$lib/store/request-response-section";
+    import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import { createSampleRequest } from "$lib/utils/sample/request.sample";
+    import { v4 as uuidv4 } from "uuid";
+   let container;
+  export let handleCreateCollection
 
   function onWindowClick(e) {
     if (container.contains(e.target) == false) {
       visibilty = false;
+      changeBtnBackground();
     }
   }
+
+  function changeBtnBackground(){
+    document.getElementById("dropdown-btn-color").style.backgroundColor= visibilty?"#85C2FF":"#000000"
+  }
+  const addApiRequest=()=>{
+        handleTabAddons(
+          createSampleRequest(
+            uuidv4()));
+        moveNavigation('right');
+  }
+  
 </script>
 
 <svelte:window on:click={onWindowClick} />
@@ -15,19 +32,19 @@
   class="d-flex align-items-center justify-content-center"
   bind:this={container}
 >
-  <button
-    class="dropdown btn p-0 d-flex align-items-center justify-content-center"
-    style="width: 32px; height:32px; background-color:#85C2FF;"
+  <button id="dropdown-btn-color"
+    class="dropdown dropdown-btn btn p-0 d-flex align-items-center justify-content-center"
+    style="width: 32px; height:32px;"
     on:click={() => {
       visibilty = !visibilty;
+      changeBtnBackground()
     }}
   >
-    <!-- on:click={handleCreateCollection} -->
     <img src={plusIcon} alt="" />
     {#if visibilty}
       <div class="dropdown-content">
-        <button>Collection</button>
-        <button>API Requests</button>
+        <button on:click={handleCreateCollection}>Collection</button>
+        <button on:click={addApiRequest}>API Request</button>
       </div>
     {/if}
   </button>
@@ -62,5 +79,8 @@
   }
   .dropdown-content > button:hover {
     background-color: #232424;
+  }
+  #dropdown-btn-color{
+    background-color: #000000;
   }
 </style>
