@@ -10,8 +10,8 @@ import {
   resizeWindowOnLogOut,
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
-import { emit } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/window";
+import { invoke } from "@tauri-apps/api";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -19,10 +19,12 @@ export const navigateToRegister = () => {
 };
 
 export const authNavigate = async () => {
-  emit("oauthevent", { message: "initiate oauth" });
   const webView = WebviewWindow.getByLabel("oauth");
-  await webView.show();
-  await webView.setFocus();
+  if (webView) {
+    await invoke("open_oauth_window");
+  } else {
+    await invoke("create_oauth_window");
+  }
 };
 
 //---------------- Handle Login ------------------//

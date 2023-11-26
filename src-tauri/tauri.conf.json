@@ -57,11 +57,6 @@
         "minWidth": 570,
         "minHeight": 700,
         "center": true
-      },
-      {
-        "label": "oauth",
-        "title": "Tauri App",
-        "visible": false
       }
     ]
   }

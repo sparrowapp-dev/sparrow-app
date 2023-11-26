@@ -18,6 +18,8 @@ use std::collections::HashMap;
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
+use std::{thread, time};
+
 #[tokio::main]
 async fn make_request(
     url: &str,
@@ -27,7 +29,6 @@ async fn make_request(
     request: &str,
 ) -> Result<Value, Box<dyn std::error::Error>> {
     // Make a client
-    println!("justocheck");
     let client = Client::new();
     // Convert the method string to reqwest::Method
     let reqwest_method = match method {
@@ -137,6 +138,31 @@ fn fetch_file_command() -> String {
     return response;
 }
 
+#[tauri::command]
+async fn create_oauth_window(handle: tauri::AppHandle) {
+    tauri::WindowBuilder::new(
+        &handle,
+        "oauth", /* the unique window label */
+        tauri::WindowUrl::External("http://localhost:9000/api/auth/google".parse().unwrap()),
+    )
+    .build()
+    .unwrap();
+}
+
+#[tauri::command]
+async fn open_oauth_window(handle: tauri::AppHandle) {
+    let oauth_window = handle.get_window("oauth").unwrap();
+    let _ = oauth_window.eval(&format!(
+        "window.location.replace('http://localhost:{}/api/auth/google')",
+        "9000"
+    ));
+    let one_sec = time::Duration::from_secs(1);
+    thread::sleep(one_sec);
+
+    let _ = oauth_window.center();
+    let _ = oauth_window.show();
+}
+
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     url: String,
@@ -153,6 +179,8 @@ fn main() {
             make_type_request_command,
             fetch_swagger_url_command,
             fetch_file_command,
+            create_oauth_window,
+            open_oauth_window
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
@@ -165,27 +193,6 @@ fn main() {
                     )
                     .unwrap();
             }
-        })
-        .setup(|app| {
-            // listen to the `event-name` (emitted on the `main` window)
-            let oauth_window = app.get_window("oauth").unwrap();
-
-            app.listen_global("oauthevent", move |event| {
-                let _ = oauth_window.eval(&format!(
-                    "window.location.replace('http://localhost:{}/api/auth/google')",
-                    "9000"
-                ));
-            });
-
-            // let main_window = app.get_window("main").unwrap();
-
-            // app.listen_global("oauthevent1", move |event| {
-            //     let _ = main_window.eval(&format!(
-            //         "window.location.replace('http://localhost:{}/waiting')",
-            //         "1420"
-            //     ));
-            // });
-            Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

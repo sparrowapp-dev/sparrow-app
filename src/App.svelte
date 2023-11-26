@@ -21,8 +21,8 @@
 
   import { onMount } from "svelte";
 
-  import { isResponseError, setUser, user } from "$lib/store/auth.store";
-  import { once } from "@tauri-apps/api/event";
+  import { setUser, user } from "$lib/store/auth.store";
+  import { listen, once } from "@tauri-apps/api/event";
   import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import constants from "$lib/utils/constants";
@@ -51,30 +51,20 @@
   });
 
   onMount(async () => {
-    let count = 0;
-    once("receive-login", async (event: any) => {
-      if (!count) {
-        count++;
-        const params = new URLSearchParams(event.payload.url.split("?")[1]);
-        const accessToken = params.get("accessToken");
-        const refreshToken = params.get("refreshToken");
-        if (accessToken && refreshToken) {
-          const webView = WebviewWindow.getByLabel("oauth");
-          await webView.hide();
-          await appWindow.setFocus();
-          setAuthJwt(constants.AUTH_TOKEN, accessToken);
-          setAuthJwt(constants.REF_TOKEN, refreshToken);
-          setUser(jwtDecode(accessToken));
-          notifications.success("Login successful!");
-          navigate("/home");
-          await resizeWindowOnLogin();
-        } else {
-          count = 0;
-          resizeWindowOnLogOut();
-          isResponseError.set(true);
-          notifications.error("Cant Login");
-          throw "error login user: Cant Login";
-        }
+    listen("receive-login", async (event: any) => {
+      const params = new URLSearchParams(event.payload.url.split("?")[1]);
+      const accessToken = params.get("accessToken");
+      const refreshToken = params.get("refreshToken");
+      if (accessToken && refreshToken) {
+        const webView = WebviewWindow.getByLabel("oauth");
+        await webView.hide();
+        await appWindow.setFocus();
+        setAuthJwt(constants.AUTH_TOKEN, accessToken);
+        setAuthJwt(constants.REF_TOKEN, refreshToken);
+        setUser(jwtDecode(accessToken));
+        notifications.success("Login successful!");
+        navigate("/home");
+        await resizeWindowOnLogin();
       }
     });
 

@@ -5,13 +5,26 @@ const jwtDecode = (jwt: string) => {
 };
 
 const setAuthJwt = (key: string, token: string) => {
-  localStorage.setItem(key, token);
-  document.cookie = `${key}=${token}`;
+  setCookie(key, token, 30);
 };
 
 const clearAuthJwt = (): void => {
-  localStorage.removeItem(constants.AUTH_TOKEN);
-  localStorage.removeItem(constants.REF_TOKEN);
+  eraseCookie(constants.AUTH_TOKEN);
+  eraseCookie(constants.REF_TOKEN);
 };
+
+function setCookie(name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+function eraseCookie(name) {
+  document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+}
 
 export { jwtDecode, setAuthJwt, clearAuthJwt };
