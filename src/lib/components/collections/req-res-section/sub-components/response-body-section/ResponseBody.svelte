@@ -2,68 +2,80 @@
   import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
-
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-
   import { notifications } from "$lib/utils/notifications";
   import {
-    currentTab,
     isHorizontalVertical,
-    tabs,
   } from "$lib/store/request-response-section";
-  import { onDestroy } from "svelte";
+  import { RequestDataType } from "$lib/utils/enums/request.enum";
+  
   export let responseBody;
-
+  export let response;
+  
   let content = {
     text: "",
     json: undefined,
   };
-  let downloadedData: string = "";
-
-  $:{
-    if(responseBody){
-      downloadedData =
-          "data:text/json;charset=utf-8," + encodeURIComponent(content.text);
+  let CodeFormatter: string = "prettier";
+  let fileExtension: string = "json";
+  let selectedTab: string = RequestDataType.JSON;
+  
+  $: {
+    if (responseBody) {
       content = {
-    text: responseBody,
-    json: undefined,
-  }
+        text: responseBody,
+        json: undefined,
+      };
     }
   }
-  
-  async function handleCopy() {
+
+  /**
+   * @description Copy API response to users clipboard.
+   */
+  const handleCopy = async () => {
     const jsonString = content.text;
     await copyToClipBoard(jsonString);
-    notifications.success("Copy To Clipboard");
+    notifications.success("Copied to Clipboard");
   }
-
-  let isHorizontalVerticalMode: any;
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
-
-  let fileStyle: string = "prettier";
+  
   const handlePrettierDropdown: (tab: string) => void = (tab) => {
     if (tab === "Prettier") {
-      fileStyle = "prettier";
+      CodeFormatter = "prettier";
     }
   };
 
-  let fileExtension: string = "json";
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    if (tab === "JSON") {
+    selectedTab = tab;
+    if (selectedTab === RequestDataType.JSON) {
       fileExtension = "json";
-    } else if (tab === "XML") {
+    } else if (selectedTab === RequestDataType.XML) {
       fileExtension = "xml";
-    } else if (tab === "RAW") {
-      fileExtension = "text";
+    } else if (selectedTab === RequestDataType.HTML) {
+      fileExtension = "html";
     }
   };
 
-  const handleDownloaded = () => {
+  /**
+   * @description Configures and populates the save-as popup on the user's screen.
+   */
+  const handleDownloaded = async () => {
+    const newHandle = await window.showSaveFilePicker({
+      suggestedName: `api_response_${
+        response?.status ? response?.status : ""
+      }_${response?.time ? response?.time : "0"}ms_${
+        response?.size ? response?.size : "0"
+      }kb.${fileExtension}`,
+      accept: {
+        extensions: ["txt", "json", "xml", "js", "html"],
+      },
+    });
+    const writableStream = await newHandle.createWritable();
+    // write our file
+    await writableStream.write(content.text);
+    await writableStream.close();
     notifications.success("Response downloaded");
   };
-
 </script>
 
 <div
@@ -90,19 +102,19 @@
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
         <Dropdown
-          title="json"
+          title={selectedTab}
           data={[
             {
               name: "JSON",
-              id: "json",
+              id: RequestDataType.JSON,
             },
             {
               name: "XML",
-              id: "xml",
+              id: RequestDataType.XML,
             },
             {
-              name: "RAW",
-              id: "raw",
+              name: "HTML",
+              id: RequestDataType.HTML,
             },
           ]}
           onclick={handleTypeDropdown}
@@ -110,14 +122,9 @@
       </button>
     </div>
     <div class="d-flex align-items-center gap-4">
-      <a
-        on:click={handleDownloaded}
-        class=" bg-backgroundColor border-0"
-        href={downloadedData}
-        download={`response.${fileExtension}`}
-      >
+      <button on:click={handleDownloaded} class=" bg-backgroundColor border-0">
         <img src={downloadIcon} alt="" />
-      </a>
+      </button>
 
       <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
         <img src={copyIcon} alt="" />
