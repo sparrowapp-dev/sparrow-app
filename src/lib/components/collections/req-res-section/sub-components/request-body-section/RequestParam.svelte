@@ -129,7 +129,7 @@
           on:keydown={() => {}}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Body
+          >Request Body
         </span>
       </span>
 
