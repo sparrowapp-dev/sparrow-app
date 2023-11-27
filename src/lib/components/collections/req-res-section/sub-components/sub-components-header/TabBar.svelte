@@ -32,15 +32,7 @@
   let scrollerParent: number;
   let scrollerWidth: number;
 
-onDestroy(()=>{
-  collectionsMethods.handleCreateTab(
-            generateSampleRequest(
-              "UNTRACKED-" + uuidv4(),
-              new Date().toString(),
-            ),
-          )
-          moveNavigation("right");
-});
+  onDestroy(()=>{});
 </script>
 
 <div class="">
