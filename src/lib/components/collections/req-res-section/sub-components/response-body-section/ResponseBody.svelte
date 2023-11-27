@@ -17,8 +17,7 @@
     text: "",
     json: undefined,
   };
-  let fileStyle: string = "prettier";
-  let isHorizontalVerticalMode: any;
+  let CodeFormatter: string = "prettier";
   let fileExtension: string = "json";
   let selectedTab: string = RequestDataType.JSON;
   
@@ -40,14 +39,11 @@
     notifications.success("Copied to Clipboard");
   }
   
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
-  
   const handlePrettierDropdown: (tab: string) => void = (tab) => {
     if (tab === "Prettier") {
-      fileStyle = "prettier";
+      CodeFormatter = "prettier";
     }
   };
-
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
     selectedTab = tab;
