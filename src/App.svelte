@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Router, Route } from "svelte-navigator";
+  import { Router, Route, navigate } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
@@ -21,7 +21,12 @@
 
   import { onMount } from "svelte";
 
-  import { user } from "$lib/store/auth.store";
+  import { setUser, user } from "$lib/store/auth.store";
+  import { listen, once } from "@tauri-apps/api/event";
+  import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
+  import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
+  import constants from "$lib/utils/constants";
+  import { notifications } from "$lib/utils/notifications";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -46,6 +51,23 @@
   });
 
   onMount(async () => {
+    listen("receive-login", async (event: any) => {
+      const params = new URLSearchParams(event.payload.url.split("?")[1]);
+      const accessToken = params.get("accessToken");
+      const refreshToken = params.get("refreshToken");
+      if (accessToken && refreshToken) {
+        const webView = WebviewWindow.getByLabel("oauth");
+        await webView.hide();
+        await appWindow.setFocus();
+        setAuthJwt(constants.AUTH_TOKEN, accessToken);
+        setAuthJwt(constants.REF_TOKEN, refreshToken);
+        setUser(jwtDecode(accessToken));
+        notifications.success("Login successful!");
+        navigate("/home");
+        await resizeWindowOnLogin();
+      }
+    });
+
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

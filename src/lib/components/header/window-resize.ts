@@ -1,5 +1,10 @@
 import { platform } from "@tauri-apps/api/os";
-import { appWindow, currentMonitor, getCurrent } from "@tauri-apps/api/window";
+import {
+  WebviewWindow,
+  appWindow,
+  currentMonitor,
+  getCurrent,
+} from "@tauri-apps/api/window";
 
 export const resizeWindowOnLogin = async () => {
   const platformName = await platform();
@@ -20,6 +25,8 @@ export const resizeWindowOnLogOut = async () => {
   const scaleFactor = monitor.scaleFactor;
   const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
 
+  const oauthWindow = WebviewWindow.getByLabel("oauth");
+
   const minWidth = 570;
   const maxWidth = 570;
   const minHeight = 700;
@@ -39,4 +46,6 @@ export const resizeWindowOnLogOut = async () => {
   }
   await getCurrent().setSize(logicalSize);
   await getCurrent().center();
+  await oauthWindow.setSize(logicalSize);
+  await oauthWindow.center();
 };
