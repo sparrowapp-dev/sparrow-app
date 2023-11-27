@@ -232,7 +232,7 @@
       </button>
     </div>
     <div>
-      <RequestDropdown handleCreateCollection={handleCreateCollection}></RequestDropdown>
+      <RequestDropdown  collectionsMethods={collectionsMethods} handleCreateCollection={handleCreateCollection}></RequestDropdown>
       
     </div>
     

@@ -23,19 +23,19 @@ addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
 
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
-export type WorkspaceCollection = RxCollection<WorkspaceDocType>;
-export type CollectionCollection = RxCollection<CollectionDocType>;
+export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
+export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
-export type TabCollection = RxCollection<TabDocType>;
+export type TabContainer = RxCollection<TabDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
-  workspace: WorkspaceCollection;
-  tab: TabCollection;
-  collection: CollectionCollection;
+  workspace: WorkspaceContainer;
+  tab: TabContainer;
+  collection: CollectionContainer;
 };
 
 // define the Rx database type
