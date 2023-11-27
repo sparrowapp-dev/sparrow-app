@@ -17,20 +17,18 @@
     useCollectionTree,
   } from "$lib/store/collection";
   import { useTree } from "./collectionList";
-  import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const { insertHead, updateHeadId } = useCollectionTree();
   const [, , searchNode] = useTree();
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-  import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import DefaultCollection from "./DefaultCollection.svelte";
-  import { rxdb, type CollectionDocument, type WorkspaceDocument } from "$lib/database/app.database";
-    import { CollectionViewModel } from "./Collection.ViewModel";
-    import { user } from "$lib/store/auth.store";
+  import { type CollectionDocument, type WorkspaceDocument } from "$lib/database/app.database";
+    import { CollectionViewModel } from "./CollectionList.ViewModel";
     import type { Observable } from "rxjs";
     import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
+  export let  collectionsMethods:CollectionsMethods;
   let collection: any[]=[];
   let currentWorkspaceId: string = "";
   const _colllectionViewModel = new CollectionViewModel();
@@ -44,8 +42,6 @@
       setCollectionList(res.data.data);
     }
   };
-
-  
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
@@ -294,6 +290,7 @@
             {currentWorkspaceId}
             collection={col}
             title={col.name}
+            collectionsMethods={collectionsMethods}
           />
         {/each}
         {:else}

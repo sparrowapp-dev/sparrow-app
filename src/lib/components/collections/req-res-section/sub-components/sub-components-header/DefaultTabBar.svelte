@@ -1,64 +1,48 @@
 <script lang="ts">
-     import about from "$lib/assets/about.svg";
-     import collections from "$lib/assets/collections.svg";
-     import apiRequest  from "$lib/assets/apiRequest.svg";
-     import { v4 as uuidv4 } from "uuid"
-    import { RequestDefault, WorkspaceDefault } from "$lib/utils/enums/request.enum";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { handleTabAddons } from "$lib/store/request-response-section";
-    import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import { currentWorkspace } from "$lib/store/workspace.store";
-    import { onDestroy } from "svelte";
-    let currentWorkspaceName:string;
-    let currentWorkspaceId:string;
-    import { createSampleRequest } from "$lib/utils/sample/request.sample";
+  import about from "$lib/assets/about.svg";
+  import collections from "$lib/assets/collections.svg";
+  import apiRequest from "$lib/assets/apiRequest.svg";
+  import { v4 as uuidv4 } from "uuid";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
 
-  const addApiRequest=()=>{
-        handleTabAddons(
-          createSampleRequest(
-            uuidv4()));
-        moveNavigation('right');
-  }
-const addWorkspaceRequest=()=>{
-    let newTab:NewTab = {
-          id:currentWorkspaceId,
-          name: currentWorkspaceName||WorkspaceDefault.NAME,
-          type: ItemType.WORKSPACE,
-          save: true,
-          requestInProgress: false,
-          path:null
-        }
-        handleTabAddons(newTab);
-        moveNavigation('right');
-}
-const workspaceUnSubscribe=currentWorkspace.subscribe((value)=>{
-     currentWorkspaceName=value.name;
-     currentWorkspaceId=value.id;
-  })
-onDestroy(() => {
-  workspaceUnSubscribe();
-});
+  export let collectionsMethods: CollectionsMethods;
 </script>
 
 <div class="main-container">
-   <div class="header-container">
-    <h1 class="main-container-header">
-      Check this Workspace's documentation
-    </h1>
-      <button class="about-btn"  on:click={()=>{addWorkspaceRequest()}}>
-        <img src={about} alt="" style="font-size: 12px;"/>
-        About My Workspace</button>
-   </div>
-   <div class="create-container">
-    <h1 class="create-container-header">
-      Create New
-    </h1>
+  <div class="header-container">
+    <h1 class="main-container-header">Check this Workspace's documentation</h1>
+    <button
+      class="about-btn"
+      on:click={() => {
+        collectionsMethods.handleCreateTab(
+          generateSampleWorkspace(
+            "UNTRACKED-" + uuidv4(),
+            new Date().toString(),
+          ),
+        );
+        moveNavigation("right");
+      }}
+    >
+      <img src={about} alt="" style="font-size: 12px;" />
+      About My Workspace</button
+    >
+  </div>
+  <div class="create-container">
+    <h1 class="create-container-header">Create New</h1>
     <div class="create-container-button">
       <button
         class="create-container-btn"
         on:click={() => {
-          addApiRequest();
+          collectionsMethods.handleCreateTab(
+            generateSampleRequest(
+              "UNTRACKED-" + uuidv4(),
+              new Date().toString(),
+            ),
+          );
+          moveNavigation("right");
         }}
       >
         <img src={apiRequest} alt="" style="width: 20px;" />

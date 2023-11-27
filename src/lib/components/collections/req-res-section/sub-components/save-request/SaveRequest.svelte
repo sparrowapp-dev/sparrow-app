@@ -26,12 +26,13 @@
   } from "$lib/utils/dto";
   import {
     currentTab,
-    handleTabAddons,
-    handleTabUpdate,
+    // handleTabAddons,
+    // handleTabUpdate,
     tabs,
-    updateCurrentTab,
+    // updateCurrentTab,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { notifications } from "$lib/utils/notifications";
   export let onClick;
 
   interface Path {
@@ -116,7 +117,9 @@
             request: expectedRequest,
           },
         });
+
         if (res.isSuccessful) {
+          notifications.success("API request saved");
           insertNode(
             JSON.parse(JSON.stringify(collection)),
             path[path.length - 1].id,
@@ -133,11 +136,11 @@
           };
           if (!componentData.path) {
             // update tab data
-            handleTabUpdate(
-              { name: tabName, id: dummyId, save: true, path: expectedPath },
-              currentTabId,
-            ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // handleTabUpdate(
+            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
+            //   currentTabId,
+            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
           } else {
             //push new tab
             let newTab: NewTab = {
@@ -149,7 +152,6 @@
               save: true,
               requestInProgress: false,
             };
-            handleTabAddons(newTab);
           }
           onClick(false);
           navigateToWorkspace();
@@ -169,6 +171,7 @@
             },
           },
         });
+
         if (res.isSuccessful) {
           insertNode(
             JSON.parse(JSON.stringify(collection)),
@@ -187,23 +190,23 @@
           };
           if (!componentData.path) {
             // update tab data
-            handleTabUpdate(
-              { name: tabName, id: dummyId, save: true, path: expectedPath },
-              currentTabId,
-            ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // handleTabUpdate(
+            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
+            //   currentTabId,
+            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
+            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
           } else {
             //push new tab
-            let newTab: NewTab = {
-              id: dummyId,
-              name: tabName,
-              type: ItemType.REQUEST,
-              request: expectedRequest,
-              path: expectedPath,
-              save: true,
-              requestInProgress: false,
-            };
-            handleTabAddons(newTab);
+            // let newTab: NewTab = {
+            //   id: dummyId,
+            //   name: tabName,
+            //   type: ItemType.REQUEST,
+            //   request: expectedRequest,
+            //   path: expectedPath,
+            //   save: true,
+            //   requestInProgress: false,
+            // };
+            // handleTabAddons(newTab);
           }
           onClick(false);
           navigateToWorkspace();
@@ -251,8 +254,8 @@
   };
 
   const fetchComponentData = (id, list) => {
-    list.forEach((elem:NewTab) => {
-      if (elem.id === id && elem.type!==ItemType.WORKSPACE) {
+    list.forEach((elem: NewTab) => {
+      if (elem.id === id && elem.type !== ItemType.WORKSPACE) {
         tabName = elem.name;
         tabId = elem.id;
         tabMethod = elem.request.method;

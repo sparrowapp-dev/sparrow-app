@@ -1,11 +1,9 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-
   import Toast from "$lib/components/notifications/Toast.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
-
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/Dashboard/Dashboard.svelte";
@@ -13,13 +11,52 @@
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
   import Waiting from "./pages/Home/Waiting.svelte";
+  import { TabRepository } from "$lib/repositories/tab.repository";
+  import { syncTabs } from "$lib/store/request-response-section";
+
+  import {
+    resizeWindowOnLogOut,
+    resizeWindowOnLogin,
+  } from "$lib/components/header/window-resize";
+
+  import { onMount } from "svelte";
+
+  import { user } from "$lib/store/auth.store";
 
   export let url = "/";
+  const tabRepository = new TabRepository();
+  let flag: boolean = true;
 
-  // function handleContextMenu(event) {
-  //   event.preventDefault();
-  // on:contextmenu={handleContextMenu}
-  // }
+  let tabList = tabRepository.getTabList();
+  tabList.subscribe((val) => {
+    if (val.length > 0) {
+      if (flag) {
+        let progressiveTab;
+        const tabList = val.map((elem) => {
+          let temp = elem.toJSON();
+          if (elem.isActive) {
+            progressiveTab = temp;
+          }
+          return temp;
+        });
+        syncTabs(tabList, progressiveTab);
+        flag = false;
+      }
+    }
+  });
+
+  onMount(async () => {
+    let isloggedIn;
+    user.subscribe((value) => {
+      isloggedIn = value;
+    });
+
+    if (!isloggedIn) {
+      resizeWindowOnLogOut();
+    } else {
+      resizeWindowOnLogin();
+    }
+  });
 </script>
 
 <Router {url}>

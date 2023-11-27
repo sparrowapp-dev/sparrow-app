@@ -1,5 +1,6 @@
 import { resetPassword } from "$lib/services/auth.service";
 import type { resetPasswordPostBody } from "$lib/utils/dto";
+
 import { notifications } from "$lib/utils/notifications";
 import { checkValidation, resetPasswordSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
@@ -8,11 +9,14 @@ export const handleResetPassword = async (
   resetPasswordCredential: resetPasswordPostBody,
 ) => {
   const response = await resetPassword(resetPasswordCredential);
+
   if (response.isSuccessful) {
-    notifications.success("Password Changed Successfully");
+    notifications.success("Password Updated");
     navigate("/login");
   } else {
-    notifications.error("Something went wrong");
+    if (response.message === "Unauthorized Access") {
+      notifications.error("Old Password and New Password cannot be same");
+    }
     throw "error login user: " + response.message;
   }
 };

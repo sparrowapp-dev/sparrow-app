@@ -1,21 +1,20 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { handleRequestAuthChange } from "$lib/store/request-response-section";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
     import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import type { ApiKey } from "$lib/utils/interfaces/request.interface";
-  export let currentTabId: string;
   export let apiData: ApiKey;
+  export let callback;
 
   const handleAuthChange = () => {
-    handleRequestAuthChange(apiData, RequestAuthProperty.API_KEY, currentTabId);
+    callback(apiData, RequestAuthProperty.API_KEY)
   };
 
   const handleDropdown = (
     tab: AuthSection.HEADER | AuthSection.QUERY_PARAMETER,
   ) => {
     apiData.addTo = tab;
-    handleRequestAuthChange(apiData, RequestAuthProperty.API_KEY, currentTabId);
+    callback(apiData, RequestAuthProperty.API_KEY);
   };
   
 </script>

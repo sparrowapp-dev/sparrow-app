@@ -10,10 +10,10 @@
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { RequestDefault } from "$lib/utils/enums/request.enum";
     import { v4 as uuidv4 } from "uuid";
-    import { CollectionViewModel } from "./Collection.ViewModel";
-    import { createSampleRequest } from "$lib/utils/sample/request.sample";
-    import { handleTabAddons } from "$lib/store/request-response-section";
+    import { CollectionViewModel } from "./CollectionList.ViewModel";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   const _colllectionViewModel = new CollectionViewModel();
   let visibility = false;
@@ -23,6 +23,7 @@
   export let currentWorkspaceId: string;
   let workspaceId: string = "";
   export let collectionList;
+  export let collectionsMethods: CollectionsMethods;
   
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
     (value: any) => {
@@ -43,8 +44,8 @@
   };
   
   const handleAPIClick = async () => {     
-    const request=createSampleRequest(uuidv4());
-    handleTabAddons(request);
+    const request=generateSampleRequest("UNTRACKED-"+uuidv4(), new Date().toString());
+    collectionsMethods.handleCreateTab(request);
     moveNavigation('right');
     collection={...collection,"items":[...collection.items,request]}
 
@@ -90,7 +91,7 @@
     : 'none'};"
 >
   {#each collection.items as exp}
-    <FileExplorer collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
+    <FileExplorer collectionsMethods={collectionsMethods} collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
   {/each}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
   <IconButton text={"+ API Request"} onClick={handleAPIClick} />

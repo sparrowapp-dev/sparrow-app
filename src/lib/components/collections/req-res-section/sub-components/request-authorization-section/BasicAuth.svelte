@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { handleRequestAuthChange } from "$lib/store/request-response-section";
     import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
 
-  export let currentTabId: string;
+  export let callback;
   export let basicAuth: BasicAuth;
 
   const handleInput = () => {
-    handleRequestAuthChange(basicAuth, RequestAuthProperty.BASIC_AUTH, currentTabId);
+    callback(basicAuth, RequestAuthProperty.BASIC_AUTH);
   };
   
 </script>

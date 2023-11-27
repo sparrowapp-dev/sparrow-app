@@ -1,15 +1,18 @@
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
-import { setUser } from "$lib/store/auth.store";
+import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
 import { setCurrentWorkspace } from "$lib/store/workspace.store";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
 import { useNavigate } from "svelte-navigator";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { TabRepository } from "$lib/repositories/tab.repository";
+import { resizeWindowOnLogOut } from "../window-resize";
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
   private workspaceRepository = new WorkspaceRepository();
+  private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
   constructor() {}
 
@@ -59,14 +62,19 @@ export class HeaderDashboardViewModel {
   // logout
   public logout = async (): Promise<void> => {
     const response = await userLogout();
+
     if (response.isSuccessful) {
+      resizeWindowOnLogOut();
+      isLoggout.set(true);
+      isResponseError.set(false);
       clearAuthJwt();
       setUser(null);
       await this.workspaceRepository.clearWorkspaces();
+      await this.tabRepository.clearTabs();
       setCurrentWorkspace("", "");
       this.navigate("/login");
     } else {
-      notifications.error("Something went wrong");
+      notifications.error(response.message);
       throw "error registering user: " + response.message;
     }
     return;

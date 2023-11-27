@@ -6,21 +6,22 @@
   import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
-  import {
-    handleRawDataChange,
-    handleisRawBodyValid,
-  } from "$lib/store/request-response-section";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  // import {
+  //   handleisRawBodyValid,
+  // } from "$lib/store/request-response-section";
 
+  export let currentTabId: string;
+  export let rawTab: RequestDataType;
+  export let rawValue;
+  export let callback;
+  export let value = "";
+  
   let editorElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
   let model: monaco.editor.ITextModel;
-  export let currentTabId: string | null;
-  export let rawTab: RequestDataType;
   let selectedRawTab: RequestDataType;
   let selectedTabId = currentTabId;
-  export let value = "";
-  export let tabList: NewTab[] = [];
+
   let rawData = {
     raw: "",
     type: RequestDataType.TEXT,
@@ -53,22 +54,17 @@
         break;
     }
     selectedRawTab = rawTab;
-    handleisRawBodyValid(currentTabId, false);
+    // handleisRawBodyValid(currentTabId, false);
   };
-  export const getRawData = (id: string) => {
-    const data = tabList.filter((elem: NewTab) => {
-      if (elem.id === id) {
-        return elem;
-      }
-    });
+  export const getRawData = () => {
     rawData = {
-      type: data[0].request.state.raw,
-      raw: data[0].request.body.raw,
+      type: rawTab,
+      raw: rawValue,
     };
     return rawData;
   };
 
-  const currentRawData = getRawData(currentTabId);
+  const currentRawData = getRawData();
 
   onMount(async () => {
     // @ts-ignore
@@ -214,18 +210,18 @@
     });
 
     editor.onDidChangeModelContent((e) => {
-      const input = editor.getValue();
-      handleRawDataChange(input, currentTabId);
+    const input = editor.getValue();
+      callback(input);
     });
 
     monaco.editor.onDidChangeMarkers((Uri: monaco.Uri[]) => {
       const uriId = Number(Uri[0].path.slice(1));
       const model = editor.getModel();
       const markers = monaco.editor.getModelMarkers({ resource: Uri[0] });
-      if (markers && markers.length > 0 && model.id === `$model${uriId}`) {
-        handleisRawBodyValid(currentTabId, true);
+      if (markers && markers.length > 0 && model?.id === `$model${uriId}`) {
+        // handleisRawBodyValid(currentTabId, true);
       } else {
-        handleisRawBodyValid(currentTabId, false);
+        // handleisRawBodyValid(currentTabId, false);
       }
     });
 
@@ -243,7 +239,7 @@
       handleRawTypes(rawData, rawTab);
     }
     if (selectedTabId !== currentTabId) {
-      const rawData = getRawData(currentTabId);
+      const rawData = getRawData();
       handleRawTypes(rawData.raw, rawData.type);
       selectedTabId = currentTabId;
     }

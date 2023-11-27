@@ -16,6 +16,12 @@ export interface Path {
   folderName?: string;
 }
 
+/**
+ * Change of any key will affect their corresponding enum.
+ * reference: request.enum.ts
+ * @interface
+ */
+
 export interface Response {
   headers: string;
   status: string;
@@ -94,6 +100,7 @@ export interface Request {
   response?: Response;
   state?: State;
   auth?: Auth;
+  requestInProgress?: boolean;
 }
 
 export interface NewTab {
@@ -104,9 +111,13 @@ export interface NewTab {
     | ItemType.FOLDER
     | ItemType.REQUEST
     | ItemType.WORKSPACE;
-  request?: Request;
+  description: string;
+  property: {
+    request: Request;
+  };
+  isActive: boolean;
   save: boolean;
-  requestInProgress: boolean;
+  createdAt: string;
   path?: Path;
   isRawBodyValid?: boolean;
 }

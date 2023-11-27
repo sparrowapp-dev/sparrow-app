@@ -12,18 +12,23 @@
   },
   "tauri": {
     "allowlist": {
+      "os": {
+        "all": true
+      },
       "all": false,
       "window": {
         "all": false,
         "close": true,
         "hide": true,
-
         "show": true,
         "maximize": true,
         "minimize": true,
         "unmaximize": true,
         "unminimize": true,
-        "startDragging": true
+        "startDragging": true,
+        "setSize": true,
+        "setFullscreen": true,
+        "center": true
       }
     },
     "bundle": {
@@ -47,10 +52,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "sparrow-app",
-        "width": 600,
-        "height": 850,
-        "minWidth": 600,
-        "minHeight": 400,
+        "minWidth": 570,
+        "minHeight": 700,
         "center": true
       }
     ]

@@ -4,10 +4,14 @@
   import vector2 from "$lib/assets/Vector2.svg";
   // import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import vector3 from "$lib/assets/Vector3.svg";
-
+  import starIcon from "$lib/assets/starIcon.svg";
   import { handleResetPasswordValidation } from "./reset-password";
   import { username } from "$lib/store/auth.store";
-  import Welcome from "../../Home/Welcome.svelte";
+
+  import angleLeft from "$lib/assets/angleLeft.svg";
+  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import eyeHide from "$lib/assets/eye-hide.svg";
+  import eyeShow from "$lib/assets/eye-show.svg";
 
   let passwordText: string = "";
 
@@ -85,17 +89,30 @@
   let showModal = false;
   let isLoading = false;
 
+  let errorMessage: string = "";
   const handleSubmit = async () => {
     isLoading = true;
     try {
       validationErrors = await handleResetPasswordValidation(
         resetPasswordCredential,
       );
+      errorMessage = "Please enter new password";
+
       if (Object.keys(validationErrors).length === 0) {
         showModal = true;
       }
     } finally {
       isLoading = false;
+    }
+  };
+
+  let isPasswordVisible = false;
+
+  const togglePasswordVisibility = () => {
+    isPasswordVisible = !isPasswordVisible;
+    const passwordInput = document.getElementById("newpassword");
+    if (passwordInput) {
+      passwordInput.type = isPasswordVisible ? "text" : "password";
     }
   };
 </script>
@@ -108,15 +125,15 @@
   <div
     class="d-flex mb-5 flex-column align-items-center justify-content-center"
   >
-    <h1
-      class="text-whiteColor mt-5 ms-2 me-2 mb-5"
-      style="font-size: 40px; width:408px; height:48px;"
+    <p
+      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+      style="font-size: 40px; width:408px; height:48px;font-weight:500"
     >
       Welcome to Sparrow!
-    </h1>
+    </p>
 
     {#if isLoading}
-      <Welcome />
+      <PageLoader />
     {:else}
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"
@@ -124,35 +141,60 @@
         novalidate
         on:submit|preventDefault={handleSubmit}
       >
-        <h2 class="card-subtitle fs-4 mb-3">Reset Password & Sign In</h2>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <a href="/update/password"><img src={angleLeft} alt="" /></a>
+          <p class="card-subtitle fs-5">Reset Password & Sign In</p>
+        </div>
 
         <div class="text-lightGray gap-0 line-height-1">
-          <p>Md kashif raza</p>
           <p>{resetPasswordCredential.email}</p>
         </div>
 
         <div class="form-group mb-1 text-lightGray">
-          <label for="password">New Password</label>
-          <input
-            class="form-control mt-1 bg-black border:{validationErrors.password
-              ? '3px'
-              : '1px'} solid {isPasswordValid1 &&
-            isPasswordValid2 &&
-            isPasswordValid3
-              ? 'border-success'
-              : validationErrors.password
-              ? 'border-error'
-              : isPasswordTouched
-              ? 'border-error'
-              : 'border-default'}"
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Please enter new your password"
-            required
-            bind:value={passwordText}
-            on:input={validatePassword}
-          />
+          <div>
+            <label for="password">New Password</label>
+            <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
+          </div>
+          <div class="d-flex">
+            <input
+              class="form-control mt-1 bg-black border:{validationErrors.newPassword
+                ? '3px'
+                : '1px'} solid {isPasswordValid1 &&
+              isPasswordValid2 &&
+              isPasswordValid3
+                ? 'border-success'
+                : validationErrors.newPassword
+                ? 'border-error'
+                : isPasswordTouched
+                ? 'border-error'
+                : 'border-default'} eye-icon"
+              type="password"
+              name="password"
+              id="newpassword"
+              placeholder="Please enter your new password"
+              required
+              bind:value={passwordText}
+              on:input={validatePassword}
+            />
+            <button
+              type="button"
+              on:click={togglePasswordVisibility}
+              class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+            >
+              {#if isPasswordVisible}
+                <img src={eyeShow} alt="eye-show" />
+              {:else}
+                <img src={eyeHide} alt="eye-hie" />
+              {/if}
+            </button>
+          </div>
+          {#if validationErrors.newpassword && passwordText.length === 0}
+            <small class="text-dangerColor form-text"
+              >{validationErrors.newPassword}</small
+            >
+          {:else if passwordText.length === 0}
+            <small class="form-text text-dangerColor"> {errorMessage}</small>
+          {/if}
         </div>
 
         <div class="row">
@@ -280,11 +322,26 @@
 </div>
 
 <style>
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
+  .eye-icon > img {
+    position: absolute;
+    transform: translateX(-4vmax);
+  }
+
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  @media (min-width: 576px) {
+  @media (min-width: 1000px) {
+    .eye-icon > img {
+      position: absolute;
+      transform: translateX(-2vmax);
+    }
+
     .register-form {
       width: 488px;
       margin: 0px auto;

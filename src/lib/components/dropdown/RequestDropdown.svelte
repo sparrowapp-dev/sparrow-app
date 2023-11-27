@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   let visibilty = false;
   import plusIcon from "$lib/assets/plus.svg";
-    import { handleTabAddons } from "$lib/store/request-response-section";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import { createSampleRequest } from "$lib/utils/sample/request.sample";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
     import { v4 as uuidv4 } from "uuid";
    let container;
+   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+   
   export let handleCreateCollection
-
+  export let collectionsMethods: CollectionsMethods;
   function onWindowClick(e) {
     if (container.contains(e.target) == false) {
       visibilty = false;
@@ -19,9 +20,9 @@
     document.getElementById("dropdown-btn-color").style.backgroundColor= visibilty?"#85C2FF":"#000000"
   }
   const addApiRequest=()=>{
-        handleTabAddons(
-          createSampleRequest(
-            uuidv4()));
+        collectionsMethods.handleCreateTab(
+          generateSampleRequest(
+            "UNTRACKED-"+uuidv4(), new Date().toString(),));
         moveNavigation('right');
   }
   

@@ -1,21 +1,23 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
-  import { Observable } from "rxjs";
+  import { Observable, async } from "rxjs";
+  import minimizeIcon from "$lib/assets/minimize.svg";
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
 
   const _viewModel = new HeaderDashboardViewModel();
-  const workspaces : Observable<WorkspaceDocument[]> = _viewModel.workspaces;
-  const activeWorkspace : Observable<WorkspaceDocument> = _viewModel.activeWorkspace;
-  let minimiMaximizeWindow: boolean = false;
+  const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
+
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
@@ -36,6 +38,8 @@
     },
   );
 
+  let isMaximizeWindow: boolean = false;
+
   const onMinimize = () => {
     appWindow.minimize();
   };
@@ -46,7 +50,7 @@
 
   const toggleSize = () => {
     appWindow.toggleMaximize();
-    minimiMaximizeWindow = !minimiMaximizeWindow;
+    isMaximizeWindow = !isMaximizeWindow;
   };
 
   window.addEventListener("click", () => {
@@ -69,22 +73,53 @@
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
+
+  let isSearchVisible = true;
+  onMount(() => {
+    handleWindowSize();
+  });
+  window.addEventListener("resize", handleWindowSize);
+  function handleWindowSize() {
+    const minWidthThreshold = 500;
+    isSearchVisible = window.innerWidth >= minWidthThreshold;
+  }
+
+  let isOpen: boolean = false;
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById("profile-dropdown");
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
 </script>
 
 <div
-  class="d-flex w-100 ps-1 pe-2 align-items-center justify-content-between bg-blackColor pe-0"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor"
   style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px; gap: 12px;"
+    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px;"
+    data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={icons.circleIcon} alt="sparrowLogo" />
+        <img src={icons.sparrowicon} alt="sparrowLogo" />
       </div>
-      <p style="font-size: 18px;" class="mb-0 gradient-text">sparrow</p>
     </div>
     <div
       class="d-flex d-flex align-items-center justify-content-center gap-2"
@@ -95,12 +130,13 @@
   </div>
 
   <div
-    style="height:32px; width:400px "
-    class="inputField bg-backgroundColor pe-2 d-flex align-items-center justify-content-center rounded"
+    style="height:32px; width:400px;"
+    class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
   >
-    <div class="ps-3">
+    <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
     </div>
+
     <div class="w-100">
       <input
         type="search"
@@ -111,44 +147,43 @@
     </div>
   </div>
 
-  <div class="d-flex align-items-center justify-content-center">
-    <div class="row gap-1">
-      <div class="col-3">
+  <div
+    class="d-flex align-items-center justify-content-center"
+    style="margin-left: 45px;"
+  >
+    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
+      <div class="col-{!isSearchVisible ? '1' : '1'}">
         <button class="bg-blackColor border-0">
           <img src={icons.settingIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <button class="bg-blackColor border-0">
           <img src={icons.notifyIcon} alt="" />
         </button>
       </div>
-      <div class="col-3">
+      <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
-          <button class="bg-blackColor border-0">
-            <img
-              src={icons.profileIcon}
-              on:click={() => {
-                setTimeout(() => {
-                  profile = true;
-                }, 100);
-              }}
-              alt=""
-            />
+          <button
+            class="bg-blackColor border-0"
+            id="profile-dropdown"
+            on:click={toggleDropdown}
+          >
+            <img src={icons.profileIcon} alt="" />
           </button>
           <div
             class="rounded profile-explorer position-absolute text-color-white py-1"
-            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {profile
+            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {isOpen
               ? 'block'
               : 'none'}; top: 40px; right: 0; width: 219px;"
             on:click={() => {
-              profile = false;
+              isOpen = false;
             }}
           >
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
               on:click={() => {
-                profile = false;
+                isOpen = false;
               }}
             >
               <img src={icons.account} alt="" /><span
@@ -205,27 +240,31 @@
       </div>
     </div>
 
-    <div class="col-2">
-      <button on:click={onMinimize} class="button-minus border-0 py-1 px-2">
-        <img src={icons.minimizeIcon} alt="" />
-      </button>
-    </div>
+    <div class=" d-flex {isSearchVisible ? 'gap-4' : ' gap-3'} ">
+      <div class="col-2">
+        <button on:click={onMinimize} class="button-minus border-0 py-1">
+          <img src={minimizeIcon} alt="" />
+        </button>
+      </div>
 
-    <div class="col-2">
-      <button on:click={toggleSize} class="button-resize border-0 py-1 px-2">
-        {#if minimiMaximizeWindow === true}
-          <img src={icons.resizeIcon} alt="" />
-        {/if}
-        {#if minimiMaximizeWindow === false}
-          <img src={icons.doubleResizeIcon} alt="" />
-        {/if}
-      </button>
-    </div>
-
-    <div class="col-2 pe-2">
-      <button on:click={onClose} class="button-close border-0 py-1 px-2">
-        <img src={icons.closeIcon} alt="" />
-      </button>
+      <div class="col-2">
+        <button
+          on:click={toggleSize}
+          class="button-resize border-0 py-1"
+          id="resize-button"
+        >
+          {#if isMaximizeWindow === true}
+            <img src={icons.doubleResizeIcon} alt="" />
+          {:else}
+            <img src={icons.resizeIcon} alt="" />
+          {/if}
+        </button>
+      </div>
+      <div class="col-2">
+        <button on:click={onClose} class="button-close border-0 py-1">
+          <img src={icons.closeIcon} alt="" />
+        </button>
+      </div>
     </div>
   </div>
 </div>

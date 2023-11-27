@@ -1,32 +1,24 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-    import { handleRequestStateChange } from "$lib/store/request-response-section";
-    import { AuthType } from "$lib/utils/enums/authorization.enum";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { AuthType } from "$lib/utils/enums/authorization.enum";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import ApiKey from "./ApiKey.svelte";
   import BasicAuth from "./BasicAuth.svelte";
   import BearerToken from "./BearerToken.svelte";
   import NoAuth from "./NoAuth.svelte";
-  export let currentTabId : string;
-  export let requestData : NewTab;
+
+  export let request;
+  export let collectionsMethods: CollectionsMethods;
+
   let currentTab: string;
-  let tabId: string;
+
   let handleDropdown = (tab: string) => {
-    currentTab = tab;
-    handleRequestStateChange(currentTab,"auth", tabId);
+    collectionsMethods.updateRequestState(tab, "auth");
   };
 
-  $ : {
-    if(requestData){
-      tabId = currentTabId;
-      currentTab = requestData.request.state.auth;
-    }
-  }
-
-  $ : {
-    if(currentTabId){
-      tabId = currentTabId;
-      currentTab = requestData.request.state.auth;
+  $: {
+    if (request) {
+      currentTab = request.state.auth;
     }
   }
 </script>
@@ -42,25 +34,26 @@
     <div class="ps-5">
       <button class="d-flex bg-backgroundColor border-0">
         <p>
-          <Dropdown title= {currentTab}
+          <Dropdown
+            title={currentTab}
             data={[
               {
                 name: "No Auth",
-                id: AuthType.NO_AUTH
+                id: AuthType.NO_AUTH,
               },
               {
                 name: "API Key",
-                id: AuthType.API_KEY
+                id: AuthType.API_KEY,
               },
               {
                 name: "Bearer Token",
-                id: AuthType.BEARER_TOKEN
+                id: AuthType.BEARER_TOKEN,
               },
               {
                 name: "Basic Auth",
-                id: AuthType.BASIC_AUTH
-              }
-              ]}
+                id: AuthType.BASIC_AUTH,
+              },
+            ]}
             onclick={handleDropdown}
           />
         </p>
@@ -70,11 +63,20 @@
   {#if currentTab === AuthType.NO_AUTH}
     <NoAuth />
   {:else if currentTab === AuthType.API_KEY}
-    <ApiKey currentTabId = {currentTabId} apiData = {requestData.request.auth.apiKey} />
+    <ApiKey
+      apiData={request.auth.apiKey}
+      callback={collectionsMethods.updateRequestAuth}
+    />
   {:else if currentTab === AuthType.BEARER_TOKEN}
-    <BearerToken currentTabId = {currentTabId} bearerToken = {requestData.request.auth.bearerToken} />
+    <BearerToken
+      bearerToken={request.auth.bearerToken}
+      callback={collectionsMethods.updateRequestAuth}
+    />
   {:else if currentTab === AuthType.BASIC_AUTH}
-    <BasicAuth currentTabId = {currentTabId} basicAuth = {requestData.request.auth.basicAuth} />
+    <BasicAuth
+      basicAuth={request.auth.basicAuth}
+      callback={collectionsMethods.updateRequestAuth}
+    />
   {/if}
 </div>
 

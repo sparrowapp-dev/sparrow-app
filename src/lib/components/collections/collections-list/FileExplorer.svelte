@@ -9,11 +9,11 @@
     import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { v4 as uuidv4 } from "uuid";
-    import { createSampleRequest } from "$lib/utils/sample/request.sample";
-    import { handleTabAddons } from "$lib/store/request-response-section";
+    import { generateSampleRequest} from "$lib/utils/sample/request.sample";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import { CollectionViewModel } from "./Collection.ViewModel";
+    import { CollectionViewModel } from "./CollectionList.ViewModel";
     import type { CreateApiRequestPostBody } from "$lib/utils/dto";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
     export let explorer;
@@ -23,9 +23,10 @@
     export let folderName : string = "";
     export let collectionList;
     const _colllectionViewModel = new CollectionViewModel();
+    export let collectionsMethods: CollectionsMethods;
     const handleAPIClick = async () =>{
-    const request=createSampleRequest(uuidv4());
-    handleTabAddons(request);
+    const request=generateSampleRequest("UNTRACKED-"+ uuidv4(), new Date().toString());
+    collectionsMethods.handleCreateTab(request);
     moveNavigation('right');
     explorer={...explorer,"items":[...explorer.items,request]}
 
@@ -64,13 +65,14 @@
       </div>
       <div style="padding-left: 15px; cursor:pointer; display: {expand ? 'block' : 'none'};">
         {#each explorer.items as exp}
-          <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} />
+          <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId}
+          collectionsMethods={collectionsMethods}  />
         {/each}
         <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
       </div>
     </div>
 {:else}
     <div style="padding-left: 0; cursor:pointer;">
-      <File api = {explorer} folderId = {folderId} folderName={folderName} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id}/>
+      <File api = {explorer} folderId = {folderId} folderName={folderName} collectionsMethods={collectionsMethods}  collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id}/>
     </div>
 {/if}

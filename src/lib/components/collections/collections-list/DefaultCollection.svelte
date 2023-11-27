@@ -1,18 +1,5 @@
 <script lang="ts">
-   import whitePlus from "$lib/assets/plus-white.svg";
-    import { handleTabAddons } from "$lib/store/request-response-section";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
-    import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import { v4 as uuidv4 } from "uuid";
-    import { createSampleRequest } from "$lib/utils/sample/request.sample";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-   const addApiRequest=()=>{ 
-         const newTab: NewTab=createSampleRequest(uuidv4())
-        handleTabAddons(newTab);
-        moveNavigation('right');
-}
-   
+   import whitePlus from "$lib/assets/plus-white.svg";   
 </script>
 <div class="container-fluid row  d-flex flex-column align-items-center ps-4 pe-3 pt-3">
 <p style="font-size: 14px;
@@ -21,7 +8,7 @@ font-weight: 300;">Add Collections to your Workspace to group your requests or s
     <button class="buttons d-flex justify-content-center align-items-center gap-1">
       <img src={whitePlus } alt="+">Collection
     </button>
-    <button  class="buttons" on:click={()=>{addApiRequest()}}>
+    <button  class="buttons">
       <img src={whitePlus} alt="+">
       API Request</button>
 </div>

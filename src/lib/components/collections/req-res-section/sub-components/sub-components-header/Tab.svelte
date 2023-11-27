@@ -1,78 +1,52 @@
 <script lang="ts">
   import crossIcon from "$lib/assets/cross.svg";
-    import { currentTab, tabs } from "$lib/store/request-response-section";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import book from "$lib/assets/book.svg";
-    import { onDestroy, onMount } from "svelte";
-    import { currentWorkspace } from "$lib/store/workspace.store";
-  export let tab;
-  export let updateCurrentTab;
-  export let handleTabRemove;
-  export let tabWidth;
-  export let currentTabId;
-  export let index;
-  export let method;
-  let workspaceId:string;
-
-  const setWorkspaceId=()=>{
-    if(tab.type===ItemType.WORKSPACE){
-            workspaceId=tab.id
-      }
-  }
-  onMount(()=>{
-    setWorkspaceId();
-  })
-  
-    
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import book from "$lib/assets/book.svg";
+  export let tab: NewTab;
+  export let updateCurrentTab: (id: string) => void;
+  export let handleTabRemove: (id: string) => void;
+  export let tabWidth: number;
+  export let index: number;
 </script>
 
-<div 
-class="d-inline-block position-relative pt-1"
-on:click={() => {
-  updateCurrentTab({id : tab.id});
-}}
+<div
+  class="d-inline-block position-relative pt-1"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
 >
   <div
     class="w-100 d-flex justify-content-between ps-2 border-upper-radius"
-    style="margin-left: -3px; background-color: {currentTabId === tab.id
+    style="margin-left: -3px; background-color: {tab.isActive
       ? 'var(--background-color)'
       : 'transparent'}"
   >
     <button
+      on:click={() => {
+        updateCurrentTab(tab.id);
+      }}
       class="position-relative border-0"
       style="    width: 80%;
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden; text-align: left; background-color:transparent;"
     >
-      <span
-        class={method === "GET"
-          ? "green-api"
-          : method === "DEL"
-          ? "red-api"
-          : method === "PUT"
-          ? "blue-api"
-          : method === "TRAC"
-          ? "orange-api"
-          : method === "HEAD"
-          ? "light-green-api"
-          : method === "CON"
-          ? "navy-green-api"
-          : method === "PATC"
-          ? "purple-api"
-          : method === "OPT"
-          ? "pink-api"
-          : method === "POST"
-          ? "yellow-api"
-          : ""}
-        style="font-size: 12px; height: 31px; ">{method||""}</span
-      >
-      {#if workspaceId===currentTabId && !method}
-      <img src={book} alt="book">
+      {#if tab.type === ItemType.REQUEST}
+        <span
+          class="text-{getMethodStyle(tab.property.request.method)}"
+          style="font-size: 12px; height: 31px; "
+          >{tab.property.request.method || ""}</span
+        >
+      {:else if tab.type === ItemType.FOLDER}
+        <span>F</span>
+      {:else if tab.type === ItemType.COLLECTION}
+        <span>C</span>
+      {:else if tab.type === ItemType.WORKSPACE}
+        <span>
+          <img src={book} alt="book" />
+        </span>
       {/if}
       <span
         class="text-muted font-weight-normal"
@@ -98,7 +72,7 @@ on:click={() => {
       <img src={crossIcon} alt="cross" />
     </button>
   </div>
-  {#if currentTabId !== tab.id}
+  {#if !tab.isActive}
     <div
       class="position-absolute"
       style="height:23px; width: 0.5px; background-color: grey; top:7px; right: 0;"
@@ -111,35 +85,5 @@ on:click={() => {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     overflow: hidden;
-  }
-  .red-api {
-    color: var(--request-delete);
-  }
-  .green-api {
-    color: var(--request-get);
-  }
-  .yellow-api {
-    color: var(--request-post);
-  }
-  .blue-api {
-    color: var(--request-put);
-  }
-  .grey-api {
-    color: var(--request-arc);
-  }
-  .orange-api {
-    color: var(--request-trac);
-  }
-  .light-green-api {
-    color: var(--request-head);
-  }
-  .navy-green-api {
-    color: var(--request-con);
-  }
-  .purple-api {
-    color: var(--request-patc);
-  }
-  .pink-api {
-    color: var(--request-opt);
   }
 </style>

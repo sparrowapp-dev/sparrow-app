@@ -2,13 +2,7 @@ import { writable } from "svelte/store";
 import type {
   NewTab,
   CurrentTab,
-  BasicAuth,
-  ApiKey,
 } from "$lib/utils/interfaces/request.interface";
-import type {
-  RequestAuthType,
-  RequestType,
-} from "$lib/utils/types/request.type";
 
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
@@ -30,186 +24,205 @@ export const apiRequest = writable(initialRequest);
 
 export const currentTab = writable<CurrentTab>({ id: null });
 export const tabs = writable<NewTab[]>([]);
+export const progressiveTab = writable({});
 
-let tabStore: NewTab[] = [];
-tabs.subscribe((value) => {
-  tabStore = value;
-});
-
-export const updateCurrentTab = (value) => {
-  currentTab.set(value);
-};
-
-export const handleTabAddons = (newTab: NewTab) => {
-  const requestAlreadyExist = tabStore.filter((elem) => {
-    if (elem.id === newTab.id) return true;
-    else return false;
-  });
-  if (requestAlreadyExist.length === 0) {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    tabs.update((value: any) => {
-      return [...value, newTab];
+/**
+ * Creates a new tab and adds it to the tab bar.
+ */
+const createTab = async (tab: NewTab): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.isActive = false;
+      }
+      return elem;
     });
-    updateCurrentTab({ id: newTab.id });
-  } else {
-    updateCurrentTab({ id: requestAlreadyExist[0].id });
-  }
+    return [...updatedTab, tab];
+  });
+  progressiveTab.set(tab);
 };
 
-export const handleTabRemove = (id: string) => {
-  tabs.update((value) => {
-    const filteredTabs = value.filter((elem) => {
+/**
+ * Removes an existing tab from the tab bar.
+ */
+
+const removeTab = async (id: string): Promise<void> => {
+  tabs.update((doc: NewTab[]): NewTab[] => {
+    for (let i = 0; i < doc.length; i++) {
+      if (doc[i].id === id) {
+        if (doc[i + 1]) {
+          activeTab(doc[i + 1].id);
+        } else if (doc[i - 1]) {
+          activeTab(doc[i - 1].id);
+        }
+      }
+    }
+    const filteredTabs = doc.filter((elem) => {
       if (elem.id === id) return false;
       else return true;
     });
     return [...filteredTabs];
   });
-  if (tabStore.length > 0) {
-    updateCurrentTab({ id: tabStore[tabStore.length - 1].id });
-  } else {
-    updateCurrentTab({ id: null });
-  }
 };
 
-export const handleTabUpdate = (obj, id) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem = { ...elem, ...obj };
+/**
+ * Activates an existing tab in the tab bar.
+ */
+
+const activeTab = async (id: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.isActive = false;
       }
       return elem;
     });
     return [...updatedTab];
   });
-};
-
-export const updateQueryParams = (params, id) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.queryParams = params;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const updateURL = (url, id) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.url = url;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const handleRawDataChange = (raw: string, id: string) => {
-  tabs.update((value) => {
-    const temp = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.body.raw = raw;
-      }
-      return elem;
-    });
-    return temp;
-  });
-};
-export const handleisRawBodyValid = (id: string, isError: boolean) => {
-  tabs.update((value) => {
-    const temp = value.map((elem: NewTab) => {
-      if (elem.id === id) {
-        elem.isRawBodyValid = isError;
-      }
-      return elem;
-    });
-    return temp;
-  });
-};
-
-export const updateUrlEncode = (urlencode, id: string) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.body.urlencoded = urlencode;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const updateFormDataText = (formdatatext, id: string) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.body.formdata.text = formdatatext;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const updateFormDataFile = (formdatafile, id: string) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.body.formdata.file = formdatafile;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const handleRequestStateChange = (
-  tab: string,
-  property: string,
-  id: string,
-) => {
-  tabs.update((value: any) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.state[property] = tab;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const handleRequestAuthChange = (
-  data: any | string | BasicAuth | ApiKey,
-  property: RequestAuthType,
-  id: string,
-): void => {
-  tabs.update((value: NewTab[]) => {
-    const updatedTab = value.map((elem) => {
-      if (elem.id === id) {
-        elem.request.auth[property] = data;
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-
-export const handleRequestChange = (
-  data: any,
-  property: RequestType,
-  id: string,
-): void => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.id === id) {
-        elem.request[property] = data;
+        elem.isActive = true;
+        progressiveTab.set(elem);
       }
       return elem;
     });
     return [...updatedTab];
   });
 };
+
+/**
+ * Extracts all data of the active tab.
+ */
+const getTab = () => {
+  return progressiveTab;
+};
+
+/**
+ * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
+ */
+const getTabList = () => {
+  return tabs;
+};
+/**
+ * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
+ */
+const setRequestProperty = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+/**
+ * Configures the request with state such as raw, dataset, auth, section.
+ */
+const setRequestState = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request.state[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+/**
+ * Configures the request with Auth such as API key, bearer token, basic auth.
+ */
+const setRequestAuth = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request.auth[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+/**
+ * Configures the request body such as form data, url encoded, raw.
+ */
+const setRequestBody = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request.body[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+/**
+ * Configures the request body form data such as text and file.
+ */
+const setRequestBodyFormData = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request.body.formdata[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+/**
+ * Responsible to change tab property like :
+ * id, name, description, save.
+ */
+const setTabProperty = async (data, route: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem[route] = data;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+/**
+ * Clear tabs
+ */
+const clearTabs = async () => {
+  tabs.set([]);
+  progressiveTab.set({});
+};
+
+export const syncTabs = (data, tab) => {
+  tabs.set(data);
+  progressiveTab.set(tab);
+};
+
+const requestResponseStore = {
+  clearTabs,
+  setTabProperty,
+  setRequestBodyFormData,
+  setRequestBody,
+  setRequestAuth,
+  setRequestState,
+  setRequestProperty,
+  getTabList,
+  getTab,
+  activeTab,
+  removeTab,
+  createTab,
+};
+export { requestResponseStore };

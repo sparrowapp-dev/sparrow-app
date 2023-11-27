@@ -6,7 +6,7 @@
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import doubleResizeIcon from "$lib/assets/close-icon.svg";
 
-  let isMaximizeWindow: boolean = true;
+  let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -35,11 +35,15 @@
     <button on:click={onMinimize} class="btn btn-black button">
       <img src={minimizeIcon} alt="" class="w-100" />
     </button>
-    <button on:click={toggleSize} class="btn btn-black button">
+    <button
+      on:click={toggleSize}
+      class="btn btn-black button"
+      id="resize-button"
+    >
       {#if isMaximizeWindow === true}
-        <img src={resizeIcon} alt="" />
-      {:else}
         <img src={doubleResizeIcon} alt="" />
+      {:else}
+        <img src={resizeIcon} alt="" />
       {/if}
     </button>
     <button on:click={onClose} class="btn btn-black">
