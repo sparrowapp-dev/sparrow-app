@@ -17,16 +17,16 @@
   let editorResponseElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
   let model: monaco.editor.ITextModel;
-  // let selectedRawTab: RequestDataType;
-  // let selectedTabId = currentTabId;
 
-  function loadCode(code: string, language: string) {
+  const loadCode = async (code: string, language: string) => {
     if (editor) {
-      model = monaco.editor.createModel(code, language);
-      editor.setModel(model);
-      editor.getAction("editor.action.formatDocument").run();
+      await editor.updateOptions({ readOnly: false });
+      model = await monaco.editor.createModel(code, language);
+      await editor.setModel(model);
+      await editor.getAction("editor.action.formatDocument").run();
+      await editor.updateOptions({ readOnly: true });
     }
-  }
+  };
 
   const handleRawTypes = (code: string, rawTab: RequestDataType) => {
     if (formatter === ResponseFormatter.PRETTY) {
@@ -53,8 +53,6 @@
     } else if (formatter === ResponseFormatter.RAW) {
       loadCode(code, "plaintext");
     }
-    // selectedRawTab = rawTab;
-    // editor.getAction('editor.action.formatDocument').run();
   };
 
   onMount(async () => {
@@ -99,9 +97,7 @@
       formatOnType: true,
       fixedOverflowWidgets: true,
       autoDetectHighContrast: false,
-      readOnly: false,
       scrollbar: {
-        // Use customScrollbar to prevent overflow on the scrollbar
         useShadows: false,
         verticalHasArrows: false,
         horizontalHasArrows: false,
@@ -110,7 +106,6 @@
       },
     });
 
-    // selectedRawTab = rawTab;
     //for closing tag
     editor.onKeyDown((event) => {
       // select enabled languages
@@ -216,7 +211,6 @@
     });
 
     handleRawTypes(rawValue, rawTab);
-    // handleRawTypes(rawValue, rawTab);
   });
 
   onDestroy(() => {

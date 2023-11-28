@@ -108,6 +108,14 @@
       formatOnType: true,
       fixedOverflowWidgets: true,
       autoDetectHighContrast: false,
+      scrollbar: {
+        // Use customScrollbar to prevent overflow on the scrollbar
+        useShadows: false,
+        verticalHasArrows: false,
+        horizontalHasArrows: false,
+        horizontalScrollbarSize: 8,
+        verticalScrollbarSize: 0,
+      },
     });
 
     selectedRawTab = rawTab;
