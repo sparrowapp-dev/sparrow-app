@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { ResponseSection } from "$lib/utils/enums/request.enum";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import ResponseBody from "./ResponseBody.svelte";
 
   import ResponseHeader from "./ResponseHeader.svelte";
 
   export let response;
+  export let apiState;
+  export let collectionsMethods: CollectionsMethods;
 
   let responseBody;
   let responseHeader;
@@ -17,13 +21,9 @@
       timeTaken = response?.time;
       sizeinKb = response?.size;
       responseBody = response?.body;
-      responseHeader = Object.entries(
-        JSON.parse(response?.headers || "{}"),
-      );
+      responseHeader = Object.entries(JSON.parse(response?.headers || "{}"));
     }
   }
-
-  let selectedTab1: string = "response";
 </script>
 
 <div class="d-flex flex-column gap-2 justify-content-center w-100">
@@ -33,9 +33,15 @@
         style="font-size: 12px;font-weight:500"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab1 = "response")}
+          on:click={() => {
+            collectionsMethods.updateRequestState(
+              ResponseSection.RESPONSE,
+              "responseSection",
+            );
+          }}
           class="team-menu__link d-flex pb-1"
-          class:tab-active={selectedTab1 === "response"}
+          class:tab-active={apiState.responseSection ===
+            ResponseSection.RESPONSE}
           >Response
         </span>
       </span>
@@ -44,9 +50,15 @@
         style="font-size: 12px;font-weight:500"
         class="cursor-pointer d-flex align-items-center justify-content-center text-requestBodyColor text-decoration-none"
         ><span
-          on:click={() => (selectedTab1 = "resheader")}
+          on:click={() => {
+            collectionsMethods.updateRequestState(
+              ResponseSection.HEADERS,
+              "responseSection",
+            );
+          }}
           class="team-menu__link d-flex pb-1"
-          class:tab-active={selectedTab1 === "resheader"}
+          class:tab-active={apiState.responseSection ===
+            ResponseSection.HEADERS}
           >Headers
           <p style="font-size: 12px;" class="mb-0 text-labelColor ps-1">
             ({responseHeader.length})
@@ -81,9 +93,9 @@
 </div>
 
 <div class="d-flex align-items-center justify-content-center w-100">
-  {#if selectedTab1 === "response"}
-    <ResponseBody {responseBody} {response} />
-  {:else if selectedTab1 === "resheader"}
+  {#if apiState.responseSection === ResponseSection.RESPONSE}
+    <ResponseBody {apiState} {collectionsMethods} {response} />
+  {:else if apiState.responseSection === ResponseSection.HEADERS}
     <ResponseHeader {responseHeader} />
   {/if}
 </div>

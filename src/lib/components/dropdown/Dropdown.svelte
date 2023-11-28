@@ -9,6 +9,8 @@
   }>;
   export let onclick: (tab: string) => void;
   export let title: string;
+  export let dropdownId: string = "";
+
   let selectedTitle: {
     name: string;
     id: string;
@@ -31,7 +33,7 @@
   }
 
   function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(`dropdown-${title}`);
+    const dropdownElement = document.getElementById(`${dropdownId}-dropdown-${title}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
     }
@@ -51,7 +53,7 @@
   style=" position: relative;  z-index:999;"
   on:click={handleDropdownClick}
 >
-  <div on:click={toggleDropdown} id={`dropdown-${title}`}>
+  <div on:click={toggleDropdown} id={`${dropdownId}-dropdown-${title}`}>
     <div
       class="dropdown-btn px-1 d-flex align-items-center justify-content-between"
       class:dropdown-btn-active={isOpen}

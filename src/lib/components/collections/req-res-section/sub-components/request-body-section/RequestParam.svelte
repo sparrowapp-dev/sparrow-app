@@ -37,8 +37,9 @@
   let response;
   let request;
   let pencilIconState: boolean = false;
-
+  let apiState;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    apiState = event?.property.request.state;
     selectedTab = event?.property.request.state.section;
     progress = event?.property.request.requestInProgress;
     request = event?.property.request;
@@ -216,7 +217,7 @@
       {:else if response?.status === "Not Found"}
         <ResponseError />
       {:else if response?.status}
-        <ResponseParams {response} />
+        <ResponseParams {apiState} {collectionsMethods} {response} />
       {/if}
 
       {#if progress}

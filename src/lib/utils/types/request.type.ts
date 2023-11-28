@@ -6,6 +6,8 @@ import {
   RequestDataType,
   RequestDataset,
   RequestSection,
+  ResponseSection,
+  ResponseFormatter,
 } from "../enums/request.enum";
 
 export type RequestType =
@@ -57,3 +59,11 @@ export type RequestSectionType =
   | RequestSection.REQUEST_BODY
   | RequestSection.HEADERS
   | RequestSection.AUTHORIZATION;
+
+export type ResponseSectionType =
+  | ResponseSection.RESPONSE
+  | ResponseSection.HEADERS;
+
+export type ResponseFormatterType =
+  | ResponseFormatter.PRETTY
+  | ResponseFormatter.RAW;

@@ -27,18 +27,27 @@
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
 
   let tabList = tabRepository.getTabList();
+  let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
     if (val.length > 0) {
       if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
           let temp = elem.toJSON();
+          temp.property.request.state.responseSection =
+            sample.property.request.state.responseSection;
+          temp.property.request.state.responseRaw =
+            sample.property.request.state.responseRaw;
+          temp.property.request.state.responseFormatter =
+            sample.property.request.state.responseFormatter;
+          temp.property.request.response = sample.property.request.response;
           if (elem.isActive) {
             progressiveTab = temp;
           }
