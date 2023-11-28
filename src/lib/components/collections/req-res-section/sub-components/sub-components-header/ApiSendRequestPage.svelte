@@ -11,14 +11,13 @@
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
   import {
+    RequestDataType,
     RequestMethod,
     RequestProperty,
   } from "$lib/utils/enums/request.enum";
   import type { RequestMethodType } from "$lib/utils/types/request.type";
-  import type { TabDocument } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -44,6 +43,8 @@
     disabledSend = event?.property.request.requestInProgress;
     request = event?.property.request;
   });
+
+ 
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -75,6 +76,7 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
+          _apiSendRequest.setResponseContentType(responseHeaders, collectionsMethods);
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
@@ -149,7 +151,7 @@
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
-      );
+    );
   };
 
   onDestroy(() => {

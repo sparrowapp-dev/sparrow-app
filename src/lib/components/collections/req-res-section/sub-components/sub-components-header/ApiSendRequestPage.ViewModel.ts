@@ -8,6 +8,7 @@ import {
   findAuthHeader,
   findAuthParameter,
 } from "$lib/utils/helpers/auth.helper";
+import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import type {
   Body,
   KeyValuePair,
@@ -27,6 +28,60 @@ type Type = "File" | "Text";
 
 class ApiSendRequestViewModel {
   constructor() {}
+
+  /**
+   * @description
+   * Extracts the content type from the API response and sets it in the user's state.
+   * @param responseHeaders - Response header object
+   * @param collectionsMethods - Methods object coming from Collection View Model
+   */
+  public setResponseContentType = (
+    responseHeaders,
+    collectionsMethods: CollectionsMethods,
+  ): void => {
+    if (responseHeaders) {
+      for (const key in responseHeaders) {
+        if (
+          key === "content-type" &&
+          responseHeaders[key].includes("text/html")
+        ) {
+          collectionsMethods.updateRequestState(
+            RequestDataType.HTML,
+            "responseRaw",
+          );
+        } else if (
+          key === "content-type" &&
+          responseHeaders[key].includes("application/json")
+        ) {
+          collectionsMethods.updateRequestState(
+            RequestDataType.JSON,
+            "responseRaw",
+          );
+        } else if (
+          key === "content-type" &&
+          responseHeaders[key].includes("application/xml")
+        ) {
+          collectionsMethods.updateRequestState(
+            RequestDataType.XML,
+            "responseRaw",
+          );
+        } else if (
+          key === "content-type" &&
+          responseHeaders[key].includes("application/javascript")
+        ) {
+          collectionsMethods.updateRequestState(
+            RequestDataType.JAVASCRIPT,
+            "responseRaw",
+          );
+        } else if (key === "content-type") {
+          collectionsMethods.updateRequestState(
+            RequestDataType.TEXT,
+            "responseRaw",
+          );
+        }
+      }
+    }
+  };
 
   private ensureHttpOrHttps = (str) => {
     if (str.startsWith("http://") || str.startsWith("https://")) {
