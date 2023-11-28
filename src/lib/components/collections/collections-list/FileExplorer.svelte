@@ -9,6 +9,11 @@
     import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { v4 as uuidv4 } from "uuid";
+    import { generateSampleRequest} from "$lib/utils/sample/request.sample";
+    import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import { CollectionListViewModel } from "./CollectionList.ViewModel";
+    import type { CreateApiRequestPostBody } from "$lib/utils/dto";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
     export let explorer;
@@ -17,39 +22,34 @@
     export let folderId : string = "";
     export let folderName : string = "";
     export let collectionList;
+    const _colllectionListViewModel  = new CollectionListViewModel();
+    export let collectionsMethods: CollectionsMethods;
     const handleAPIClick = async () =>{
-      const name: string = getNextName(explorer.items, ItemType.REQUEST, RequestDefault.NAME);
-      const currentDummyId : string = uuidv4() + "MYUID45345";
-      insertNode(
-        JSON.parse(JSON.stringify(collectionList)),
-        explorer.id, ItemType.REQUEST, 
-        name, 
-        currentDummyId ,
-        {method: RequestDefault.METHOD}
-        );
-      
-        const res = await insertCollectionRequest({
-        collectionId: collectionId,
-        workspaceId: currentWorkspaceId,
+    const request=generateSampleRequest("UNTRACKED-"+ uuidv4(), new Date().toString());
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation('right');
+    explorer={...explorer,"items":[...explorer.items,request]}
+
+
+    const requestObj:CreateApiRequestPostBody={
+      collectionId: collectionId,
+      workspaceId: currentWorkspaceId,
         folderId: explorer.id,
         items: {
           name: explorer.name,
           type: ItemType.FOLDER,
           items:{
-            name: name,
+            name: request.name,
             type: ItemType.REQUEST,
             request: {
               method: RequestDefault.METHOD
             }
           }
         }
-      });
-      if(res.isSuccessful){
-        updateNodeId(JSON.parse(
-          JSON.stringify(collectionList)),
-          currentDummyId,
-          new Date() + "uid"); // MOCKED DATA [UPDATION REQUIRED HERE]
-      } 
+    
+    
+  };
+  _colllectionListViewModel .addRequestInFolderInCollection(requestObj);
     }
 </script>
 {#if explorer.type === "FOLDER"}
@@ -65,13 +65,14 @@
       </div>
       <div style="padding-left: 15px; cursor:pointer; display: {expand ? 'block' : 'none'};">
         {#each explorer.items as exp}
-          <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} />
+          <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId}
+          collectionsMethods={collectionsMethods}  />
         {/each}
         <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
       </div>
     </div>
 {:else}
     <div style="padding-left: 0; cursor:pointer;">
-      <File api = {explorer} folderId = {folderId} folderName={folderName} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id}/>
+      <File api = {explorer} folderId = {folderId} folderName={folderName} collectionsMethods={collectionsMethods}  collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} name={explorer.name} id={explorer.id}/>
     </div>
 {/if}

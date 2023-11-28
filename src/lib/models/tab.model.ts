@@ -99,6 +99,15 @@ const stateLiteral = {
     section: {
       type: "string",
     },
+    responseSection: {
+      type: "string",
+    },
+    responseRaw: {
+      type: "string",
+    },
+    responseFormatter: {
+      type: "string",
+    },
   },
 };
 const basicAuthLiteral = {
@@ -200,7 +209,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "id",
   type: "object",
-  version: 1,
+  version: 2,
   properties: {
     id: {
       type: "string",

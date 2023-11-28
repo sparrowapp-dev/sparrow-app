@@ -4,10 +4,6 @@
 
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import { currentWorkspace } from "$lib/store/workspace.store";
-  import {
-    insertCollectionDirectory,
-    insertCollectionRequest,
-  } from "$lib/services/collection";
   import FileExplorer from "./FileExplorer.svelte";
   import type { CreateDirectoryPostBody } from "$lib/utils/dto";
   import { getNextName } from "./collectionList";
@@ -15,9 +11,14 @@
   import { useCollectionTree } from "$lib/store/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { RequestDefault } from "$lib/utils/enums/request.enum";
-  import ContextMenu from "./ContextMenu.svelte";
   import { v4 as uuidv4 } from "uuid";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import ContextMenu from "./ContextMenu.svelte";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
+  const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
   export let title: string;
   export let collection: any;
@@ -25,6 +26,7 @@
   export let currentWorkspaceId: string;
   let workspaceId: string = "";
   export let collectionList;
+  export let collectionsMethods: CollectionsMethods;
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
     (value: any) => {
@@ -33,66 +35,41 @@
   );
 
   const handleFolderClick = async (): Promise<void> => {
-    let directory: CreateDirectoryPostBody = {
+    const folder = {
+      id: uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
       description: "",
+      type: ItemType.FOLDER,
+      items: [],
     };
-    const currentDummyId: string = uuidv4() + "MYUID45345";
-    insertNode(
-      JSON.parse(JSON.stringify(collectionList)),
-      collection._id,
-      ItemType.FOLDER,
-      directory.name,
-      currentDummyId,
-    );
-    const res = await insertCollectionDirectory(
-      workspaceId,
-      collection._id,
-      directory,
-    );
-    if (res.isSuccessful) {
-      updateNodeId(
-        JSON.parse(JSON.stringify(collectionList)),
-        currentDummyId,
-        res.data.data.id,
-      );
-    }
+    collection = { ...collection, items: [...collection.items, folder] };
+    _colllectionListViewModel.addFolder(workspaceId, collection._id, {
+      name: folder.name,
+      description: folder.description,
+    });
   };
-  const handleAPIClick = async () => {
-    const file: string = getNextName(
-      collection.items,
-      ItemType.REQUEST,
-      RequestDefault.NAME,
-    );
-    const currentDummyId: string = uuidv4() + "MYUID45345";
-    insertNode(
-      JSON.parse(JSON.stringify(collectionList)),
-      collection._id,
-      ItemType.REQUEST,
-      file,
-      currentDummyId,
-      { method: RequestDefault.METHOD },
-    );
 
-    const res = await insertCollectionRequest({
+  const handleAPIClick = async () => {
+    const request = generateSampleRequest(
+      "UNTRACKED-" + uuidv4(),
+      new Date().toString(),
+    );
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+    collection = { ...collection, items: [...collection.items, request] };
+
+    const requestObj = {
       collectionId: collection._id,
-      workspaceId: workspaceId,
+      workspaceId,
       items: {
-        name: file,
+        name: request.name,
         type: ItemType.REQUEST,
         request: {
           method: RequestDefault.METHOD,
         },
       },
-    });
-
-    if (res.isSuccessful) {
-      updateNodeId(
-        JSON.parse(JSON.stringify(collectionList)),
-        currentDummyId,
-        new Date() + "uid", // MOCKED DATA [UPDATION REQUIRED HERE]
-      );
-    }
+    };
+    _colllectionListViewModel.addRequest(requestObj);
   };
   onDestroy(currentWorkspaceUnsubscribe);
 
@@ -237,6 +214,7 @@
 >
   {#each collection.items as exp}
     <FileExplorer
+      {collectionsMethods}
       {collectionList}
       {collectionId}
       {currentWorkspaceId}

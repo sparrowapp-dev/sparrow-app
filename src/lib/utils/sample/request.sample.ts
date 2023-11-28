@@ -5,6 +5,8 @@ import {
   RequestDefault,
   RequestSection,
   RequestDataType,
+  ResponseSection,
+  ResponseFormatter,
 } from "../enums/request.enum";
 
 const generateSampleRequest = (id: string, date: string) => {
@@ -75,6 +77,9 @@ const generateSampleRequest = (id: string, date: string) => {
           dataset: RequestDataset.NONE,
           auth: AuthType.NO_AUTH,
           section: RequestSection.PARAMETERS,
+          responseSection: ResponseSection.RESPONSE,
+          responseRaw: RequestDataType.TEXT,
+          responseFormatter: ResponseFormatter.PRETTY,
         },
         auth: {
           bearerToken: "",

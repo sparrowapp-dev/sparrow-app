@@ -7,6 +7,8 @@ import type {
   RequestMethodType,
   RequestRawType,
   RequestSectionType,
+  ResponseFormatterType,
+  ResponseSectionType,
 } from "../types/request.type";
 
 export interface Path {
@@ -71,6 +73,9 @@ export interface State {
   dataset?: RequestDatasetType;
   auth?: RequestAuthTypes;
   section?: RequestSectionType;
+  responseSection?: ResponseSectionType;
+  responseRaw?: RequestRawType;
+  responseFormatter?: ResponseFormatterType;
 }
 
 export interface BasicAuth {

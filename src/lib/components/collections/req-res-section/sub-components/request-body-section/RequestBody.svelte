@@ -130,11 +130,12 @@
     {/if}
   </div>
   <div class="mb-2 d-flex">
-    <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
+    <p class="team-menu__link pb-1 mb-0" style="font-size: 12px; margin-top:4px;">
       Data Types:
     </p>
     <span class="pe-3" />
     <Dropdown
+      dropdownId={"hash124"}
       title={mainTab}
       data={[
         {
@@ -159,6 +160,7 @@
     <span class="pe-3" />
     {#if mainTab === RequestDataset.RAW}
       <Dropdown
+        dropdownId = {"hash987"}
         title={rawTab}
         data={[
           {
