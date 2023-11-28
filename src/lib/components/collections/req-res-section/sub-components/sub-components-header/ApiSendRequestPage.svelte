@@ -172,6 +172,12 @@
   onDestroy(() => {
     window.removeEventListener("resize", handleResize);
   });
+
+  const handleKeyPress = (event) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      handleSendRequest();
+    }
+  }
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -265,7 +271,7 @@
     </div>
   </div>
 </div>
-
+<svelte:window on:keydown={handleKeyPress} />
 <style>
   .btn-primary {
     background: var(--send-button);
