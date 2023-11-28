@@ -10,12 +10,12 @@
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { RequestDefault } from "$lib/utils/enums/request.enum";
     import { v4 as uuidv4 } from "uuid";
-    import { CollectionViewModel } from "./CollectionList.ViewModel";
+    import { CollectionListViewModel } from "./CollectionList.ViewModel";
     import { generateSampleRequest } from "$lib/utils/sample/request.sample";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
-  const _colllectionViewModel = new CollectionViewModel();
+  const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
   export let title: string;
   export let collection: any;
@@ -40,7 +40,7 @@
       items:[],
     };
     collection={...collection,"items":[...collection.items,folder]}
-    _colllectionViewModel.addFolder(workspaceId,collection._id,{name:folder.name,description:folder.description});
+    _colllectionListViewModel.addFolder(workspaceId,collection._id,{name:folder.name,description:folder.description});
   };
   
   const handleAPIClick = async () => {     
@@ -62,7 +62,7 @@
     
     
   };
-  _colllectionViewModel.addRequest(requestObj);
+  _colllectionListViewModel .addRequest(requestObj);
 }
   onDestroy(currentWorkspaceUnsubscribe);
 </script>

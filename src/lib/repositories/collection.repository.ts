@@ -27,11 +27,14 @@ export class CollectionRepository {
         },
       })
       .exec();
-    collection.patch({
+    collection.incrementalPatch({
       items: [...collection.items, items],
     });
   };
 
+  public clearCollections = async (): Promise<any> => {
+    return rxdb.collection.find().remove();
+  };
   public addRequestInFolder = async (
     collectionId: string,
     folderId: string,
@@ -51,7 +54,7 @@ export class CollectionRepository {
         return;
       }
     });
-    collection.patch({
+    collection.incrementalPatch({
       items: [...collection.items],
     });
   };

@@ -41,7 +41,7 @@
       changeBtnBackground()
     }}
   >
-    <img src={plusIcon} alt="" />
+    <img src={plusIcon} alt="plus" />
     {#if visibilty}
       <div class="dropdown-content">
         <button on:click={handleCreateCollection}>Collection</button>
@@ -70,8 +70,8 @@
     display: block;
     font-size: 12px;
     font-weight: 400;
-    background-color: black;
-    color: white;
+    background-color: var(--blackColor);
+    color:var(--white-color);
     border: 1px solid rgb(44, 44, 44);
     padding: 8px;
     padding-left: 8px;
@@ -82,6 +82,6 @@
     background-color: #232424;
   }
   #dropdown-btn-color{
-    background-color: #000000;
+    background-color: var(--blackColor);
   }
 </style>

@@ -23,7 +23,7 @@
   import { onDestroy } from "svelte";
   import DefaultCollection from "./DefaultCollection.svelte";
   import { type CollectionDocument, type WorkspaceDocument } from "$lib/database/app.database";
-    import { CollectionViewModel } from "./CollectionList.ViewModel";
+    import { CollectionListViewModel } from "./CollectionList.ViewModel";
     import type { Observable } from "rxjs";
     import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -31,9 +31,9 @@
   export let  collectionsMethods:CollectionsMethods;
   let collection: any[]=[];
   let currentWorkspaceId: string = "";
-  const _colllectionViewModel = new CollectionViewModel();
+  const _colllectionListViewModel  = new CollectionListViewModel();
   const _workspaceViewModel= new HeaderDashboardViewModel(); 
-  const collections : Observable<CollectionDocument[]> = _colllectionViewModel.collection;
+  const collections : Observable<CollectionDocument[]> = _colllectionListViewModel .collection;
   const activeWorkspace : Observable<WorkspaceDocument> = _workspaceViewModel.activeWorkspace;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let getCollectionData = async (id: string) => {
@@ -46,7 +46,7 @@
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
          const collectionArr=value.map((collectionDocument:CollectionDocument)=>{
-           const collectionObj=_colllectionViewModel.getDocument(collectionDocument);
+           const collectionObj=collectionsMethods.getCollectionDocument(collectionDocument);
            return collectionObj; 
          })
          collection=collectionArr;
@@ -86,10 +86,10 @@
       activeWorkspaceRxDoc = value;
       if(activeWorkspaceRxDoc){
         const workspaceId=activeWorkspaceRxDoc.get("_id");
-        const response=await _colllectionViewModel.getAllCollections(workspaceId);
+        const response=await collectionsMethods.getAllCollections(workspaceId);
         if(response.isSuccessful && response.data.data.length>0){
           const collections=response.data.data;
-          _colllectionViewModel.bulkInsert(collections);
+          collectionsMethods.bulkInsert(collections);
             return
         }
         
@@ -105,7 +105,7 @@
       items:[],
     }
     collection=[...collection,newCollection];
-    _colllectionViewModel.addCollection(newCollection)
+    collectionsMethods.addCollection(newCollection)
     return;
   };
 

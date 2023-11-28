@@ -11,7 +11,7 @@
     import { v4 as uuidv4 } from "uuid";
     import { generateSampleRequest} from "$lib/utils/sample/request.sample";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import { CollectionViewModel } from "./CollectionList.ViewModel";
+    import { CollectionListViewModel } from "./CollectionList.ViewModel";
     import type { CreateApiRequestPostBody } from "$lib/utils/dto";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     const { insertNode, updateNodeId } = useCollectionTree();
@@ -22,7 +22,7 @@
     export let folderId : string = "";
     export let folderName : string = "";
     export let collectionList;
-    const _colllectionViewModel = new CollectionViewModel();
+    const _colllectionListViewModel  = new CollectionListViewModel();
     export let collectionsMethods: CollectionsMethods;
     const handleAPIClick = async () =>{
     const request=generateSampleRequest("UNTRACKED-"+ uuidv4(), new Date().toString());
@@ -49,7 +49,7 @@
     
     
   };
-  _colllectionViewModel.addRequestInFolderInCollection(requestObj);
+  _colllectionListViewModel .addRequestInFolderInCollection(requestObj);
     }
 </script>
 {#if explorer.type === "FOLDER"}

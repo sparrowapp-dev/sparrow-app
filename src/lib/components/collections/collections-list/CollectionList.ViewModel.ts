@@ -8,12 +8,12 @@ import type {
   CreateDirectoryPostBody,
 } from "$lib/utils/dto";
 
-export class CollectionViewModel {
+export class CollectionListViewModel {
   private collectionRepository = new CollectionRepository();
   private collectionService = new CollectionService();
   constructor() {}
 
-  public getDocument = (elem: CollectionDocument) => {
+  public getCollectionDocument = (elem: CollectionDocument) => {
     return {
       _id: elem.get("_id"),
       name: elem.get("name"),

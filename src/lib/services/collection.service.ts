@@ -9,7 +9,7 @@ import type {
 export class CollectionService {
   constructor() {}
 
-  public apiUrl: string = constants.API_URL;
+  private apiUrl: string = constants.API_URL;
 
   public fetchCollection = async (workspaceId: string) => {
     const response = await makeRequest(

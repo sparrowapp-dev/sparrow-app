@@ -9,8 +9,10 @@
   import { CollectionsViewModel } from "./Collections.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+    import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
+  const _collectionListViewModel=new CollectionListViewModel()
 
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
@@ -22,6 +24,13 @@
     updateRequestAuth: _viewModel.updateRequestAuth,
     updateRequestBody: _viewModel.updateRequestBody,
     updateRequestBodyFormData: _viewModel.updateRequestBodyFormData,
+    getCollectionDocument:_collectionListViewModel.getCollectionDocument,
+    createCollection:_collectionListViewModel.createCollection,
+    bulkInsert:_collectionListViewModel.bulkInsert,
+    getAllCollections:_collectionListViewModel.getAllCollections,
+    addRequestaddFolder:_collectionListViewModel.addRequest,
+    addFolder:_collectionListViewModel.addFolder,
+    addCollection:_collectionListViewModel.addCollection,
   };
 
   const activeTab = _viewModel.activeTab;
