@@ -136,14 +136,14 @@
     window.addEventListener("click", handleDropdownClick);
   });
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.key === 's') {
+    if (event.ctrlKey && event.code === "KeyS") {
       if (!componentData?.path) {
-                visibility = true;
-              } else {
-                handleSaveRequest();
-              }
+        visibility = true;
+      } else {
+        handleSaveRequest();
+      }
     }
-  }
+  };
 </script>
 
 <div class="d-flex flex-column" data-tauri-drag-region>
@@ -207,7 +207,7 @@
           <SaveRequest {visibility} onClick={handleBackdrop} />
         </span>
       </div> -->
-      
+
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
@@ -268,6 +268,7 @@
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
+
 <style>
   .btn-primary {
     background-color: #313233;

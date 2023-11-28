@@ -77,14 +77,14 @@
     tabSubscribe();
   });
   const handleKeyPress = (event) => {
-    if (event.altKey && event.key === 'p') {
+    if (event.altKey && event.code === "KeyP") {
       selectedTab = RequestSection.PARAMETERS;
-    } else if (event.altKey && event.key === 'h') {
+    } else if (event.altKey && event.code === "KeyH") {
       selectedTab = RequestSection.HEADERS;
-    } else if (event.altKey && event.key === 'b') {
+    } else if (event.altKey && event.code === "KeyB") {
       selectedTab = RequestSection.REQUEST_BODY;
     }
-  }
+  };
 </script>
 
 <div
@@ -236,6 +236,7 @@
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
+
 <style>
   .team-menu__link {
     color: #8a9299;

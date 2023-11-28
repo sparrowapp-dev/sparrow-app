@@ -31,16 +31,13 @@
   const tabList = _viewModel.tabs;
 
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.key === 'n') {
+    if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
-            generateSampleRequest(
-              "UNTRACKED-" + uuidv4(),
-              new Date().toString(),
-            ),
-          )
-          moveNavigation("right");
+        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      );
+      moveNavigation("right");
     }
-  }
+  };
 </script>
 
 <div class="d-flex">
@@ -71,6 +68,7 @@
   <SidebarRight />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
+
 <style>
   .collections__tools {
     top: 44px;
