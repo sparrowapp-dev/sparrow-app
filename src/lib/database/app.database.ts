@@ -56,6 +56,9 @@ const db = await rxdb.addCollections({
       1: function (oldDoc) {
         return oldDoc;
       },
+      2: function (oldDoc) {
+        return oldDoc;
+      },
     },
   },
   tab: {
@@ -72,6 +75,12 @@ const db = await rxdb.addCollections({
   },
   collection: {
     schema: collectionSchema,
+    migrationStrategies: {
+      // data migration from version 0 to version 1
+      1: function (oldDoc) {
+        return oldDoc;
+      },
+    },
   },
 });
 
