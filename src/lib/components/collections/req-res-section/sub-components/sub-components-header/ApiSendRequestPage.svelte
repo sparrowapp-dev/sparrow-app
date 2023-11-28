@@ -18,7 +18,7 @@
   import type { TabDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -149,7 +149,7 @@
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
-      );
+    );
   };
 
   onDestroy(() => {
