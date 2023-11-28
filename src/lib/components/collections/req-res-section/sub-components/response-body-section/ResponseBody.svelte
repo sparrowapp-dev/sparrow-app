@@ -100,37 +100,39 @@
             : ''}">Raw</button
         >
       </div>
-      <button
-        class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
-      >
-        <Dropdown
-          dropdownId={"hash565"}
-          title={apiState.responseRaw}
-          data={[
-            {
-              name: "JSON",
-              id: RequestDataType.JSON,
-            },
-            {
-              name: "XML",
-              id: RequestDataType.XML,
-            },
-            {
-              name: "HTML",
-              id: RequestDataType.HTML,
-            },
-            {
-              name: "Javascript",
-              id: RequestDataType.JAVASCRIPT,
-            },
-            {
-              name: "Text",
-              id: RequestDataType.TEXT,
-            },
-          ]}
-          onclick={handleTypeDropdown}
-        />
-      </button>
+      {#if apiState.responseFormatter === ResponseFormatter.PRETTY}
+        <button
+          class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
+        >
+          <Dropdown
+            dropdownId={"hash565"}
+            title={apiState.responseRaw}
+            data={[
+              {
+                name: "JSON",
+                id: RequestDataType.JSON,
+              },
+              {
+                name: "XML",
+                id: RequestDataType.XML,
+              },
+              {
+                name: "HTML",
+                id: RequestDataType.HTML,
+              },
+              {
+                name: "Javascript",
+                id: RequestDataType.JAVASCRIPT,
+              },
+              {
+                name: "Text",
+                id: RequestDataType.TEXT,
+              },
+            ]}
+            onclick={handleTypeDropdown}
+          />
+        </button>
+      {/if}
     </div>
     <div class="d-flex align-items-center gap-4">
       <button on:click={handleDownloaded} class=" bg-backgroundColor border-0">
@@ -146,6 +148,7 @@
     <MonacoEditorResponse
       rawTab={apiState.responseRaw}
       rawValue={response.body}
+      formatter={apiState.responseFormatter}
     />
   </div>
 </div>

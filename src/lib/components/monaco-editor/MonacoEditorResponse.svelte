@@ -5,16 +5,19 @@
   import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
   import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
-  import { RequestDataType } from "$lib/utils/enums/request.enum";
+  import {
+    RequestDataType,
+    ResponseFormatter,
+  } from "$lib/utils/enums/request.enum";
 
   export let rawTab: RequestDataType;
   export let rawValue;
-  // export let value = "";
+  export let formatter;
 
   let editorResponseElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
   let model: monaco.editor.ITextModel;
-  let selectedRawTab: RequestDataType;
+  // let selectedRawTab: RequestDataType;
   // let selectedTabId = currentTabId;
 
   function loadCode(code: string, language: string) {
@@ -26,27 +29,31 @@
   }
 
   const handleRawTypes = (code: string, rawTab: RequestDataType) => {
-    switch (rawTab) {
-      case RequestDataType.HTML:
-        loadCode(code, "html");
-        break;
-      case RequestDataType.JAVASCRIPT:
-        loadCode(code, "javascript");
-        break;
-      case RequestDataType.JSON:
-        loadCode(code, "json");
-        break;
-      case RequestDataType.XML:
-        loadCode(code, "xml");
-        break;
-      case RequestDataType.TEXT:
-        loadCode(code, "plaintext");
-        break;
-      default:
-        loadCode(code, "plaintext");
-        break;
+    if (formatter === ResponseFormatter.PRETTY) {
+      switch (rawTab) {
+        case RequestDataType.HTML:
+          loadCode(code, "html");
+          break;
+        case RequestDataType.JAVASCRIPT:
+          loadCode(code, "javascript");
+          break;
+        case RequestDataType.JSON:
+          loadCode(code, "json");
+          break;
+        case RequestDataType.XML:
+          loadCode(code, "xml");
+          break;
+        case RequestDataType.TEXT:
+          loadCode(code, "plaintext");
+          break;
+        default:
+          loadCode(code, "plaintext");
+          break;
+      }
+    } else if (formatter === ResponseFormatter.RAW) {
+      loadCode(code, "plaintext");
     }
-    selectedRawTab = rawTab;
+    // selectedRawTab = rawTab;
     // editor.getAction('editor.action.formatDocument').run();
   };
 
@@ -100,10 +107,10 @@
         horizontalHasArrows: false,
         horizontalScrollbarSize: 8,
         verticalScrollbarSize: 0,
-      }
+      },
     });
 
-    selectedRawTab = rawTab;
+    // selectedRawTab = rawTab;
     //for closing tag
     editor.onKeyDown((event) => {
       // select enabled languages
@@ -223,6 +230,11 @@
   }
   $: {
     if (rawTab) {
+      handleRawTypes(rawValue, rawTab);
+    }
+  }
+  $: {
+    if (formatter) {
       handleRawTypes(rawValue, rawTab);
     }
   }
