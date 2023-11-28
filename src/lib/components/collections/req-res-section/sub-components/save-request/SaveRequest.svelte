@@ -152,7 +152,6 @@
               save: true,
               requestInProgress: false,
             };
-            // handleTabAddons(newTab);
           }
           onClick(false);
           navigateToWorkspace();

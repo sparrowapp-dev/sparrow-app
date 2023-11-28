@@ -9,11 +9,13 @@
   import { CollectionsViewModel } from "./Collections.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+    import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   const _viewModel = new CollectionsViewModel();
+  const _collectionListViewModel=new CollectionListViewModel()
 
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
@@ -25,6 +27,13 @@
     updateRequestAuth: _viewModel.updateRequestAuth,
     updateRequestBody: _viewModel.updateRequestBody,
     updateRequestBodyFormData: _viewModel.updateRequestBodyFormData,
+    getCollectionDocument:_collectionListViewModel.getCollectionDocument,
+    createCollection:_collectionListViewModel.createCollection,
+    bulkInsert:_collectionListViewModel.bulkInsert,
+    getAllCollections:_collectionListViewModel.getAllCollections,
+    addRequestaddFolder:_collectionListViewModel.addRequest,
+    addFolder:_collectionListViewModel.addFolder,
+    addCollection:_collectionListViewModel.addCollection,
   };
 
   const activeTab = _viewModel.activeTab;
@@ -42,7 +51,7 @@
 
 <div class="d-flex">
   <div class="collections__list">
-    <CollectionsList />
+    <CollectionsList collectionsMethods={collectionsMethods} />
   </div>
   <div
     class="collections__tools bg-backgroundColor"

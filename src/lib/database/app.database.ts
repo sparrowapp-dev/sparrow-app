@@ -9,6 +9,10 @@ import {
   workspaceSchema,
   type WorkspaceDocType,
 } from "$lib/models/workspace.model";
+import {
+  collectionSchema,
+  type CollectionDocType,
+} from "$lib/models/collection.model";
 import { tabSchema, type TabDocType } from "$lib/models/tab.model";
 import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
@@ -19,15 +23,19 @@ addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
 
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
-export type WorkspaceCollection = RxCollection<WorkspaceDocType>;
+export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
+export type CollectionContainer = RxCollection<CollectionDocType>;
+export type CollectionDocument = RxDocument<CollectionDocType>;
+// collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
-export type TabCollection = RxCollection<TabDocType>;
+export type TabContainer = RxCollection<TabDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
-  workspace: WorkspaceCollection;
-  tab: TabCollection;
+  workspace: WorkspaceContainer;
+  tab: TabContainer;
+  collection: CollectionContainer;
 };
 
 // define the Rx database type
@@ -58,6 +66,9 @@ const db = await rxdb.addCollections({
         return oldDoc;
       },
     },
+  },
+  collection: {
+    schema: collectionSchema,
   },
 });
 
