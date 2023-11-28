@@ -143,7 +143,7 @@ async fn create_oauth_window(handle: tauri::AppHandle) {
     tauri::WindowBuilder::new(
         &handle,
         "oauth", /* the unique window label */
-        tauri::WindowUrl::External("http://localhost:9000/api/auth/google".parse().unwrap()),
+        tauri::WindowUrl::External("https://dev-api.sparrow.techdomeaks.com/api/auth/google".parse().unwrap()),
     )
     .build()
     .unwrap();
@@ -153,8 +153,7 @@ async fn create_oauth_window(handle: tauri::AppHandle) {
 async fn open_oauth_window(handle: tauri::AppHandle) {
     let oauth_window = handle.get_window("oauth").unwrap();
     let _ = oauth_window.eval(&format!(
-        "window.location.replace('http://localhost:{}/api/auth/google')",
-        "9000"
+        "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
     ));
     let one_sec = time::Duration::from_secs(1);
     thread::sleep(one_sec);
