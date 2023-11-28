@@ -1,40 +1,23 @@
 <script lang="ts">
-  import { JSONEditor, Mode } from "svelte-jsoneditor";
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "$lib/utils/notifications";
-  import {
-    isHorizontalVertical,
-  } from "$lib/store/request-response-section";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
-  
-  export let responseBody;
+  import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
+
   export let response;
-  
-  let content = {
-    text: "",
-    json: undefined,
-  };
+
   let CodeFormatter: string = "prettier";
   let fileExtension: string = "json";
   let selectedTab: string = RequestDataType.JSON;
-  
-  $: {
-    if (responseBody) {
-      content = {
-        text: responseBody,
-        json: undefined,
-      };
-    }
-  }
 
   /**
    * @description Copy API response to users clipboard.
    */
   const handleCopy = async () => {
-    const jsonString = content.text;
+    const jsonString = response?.body;
     await copyToClipBoard(jsonString);
     notifications.success("Copied to Clipboard");
   }
@@ -72,7 +55,7 @@
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(content.text);
+    await writableStream.write(response?.body);
     await writableStream.close();
     notifications.success("Response downloaded");
   };
@@ -81,7 +64,7 @@
 <div
   class="d-flex flex-column align-items-start justify-content-between mt-2 w-100"
 >
-  <div class="d-flex align-items-center justify-content-between mb-1 w-100">
+  <div class="d-flex align-items-center justify-content-between mb-2 w-100">
     <div class="d-flex gap-4 align-items-center justify-content-center">
       <button
         class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
@@ -102,6 +85,7 @@
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
         <Dropdown
+          dropdownId={"hash565"}
           title={selectedTab}
           data={[
             {
@@ -115,6 +99,14 @@
             {
               name: "HTML",
               id: RequestDataType.HTML,
+            },
+            {
+              name: "Javascript",
+              id: RequestDataType.JAVASCRIPT,
+            },
+            {
+              name: "Text",
+              id: RequestDataType.TEXT,
             },
           ]}
           onclick={handleTypeDropdown}
@@ -132,31 +124,13 @@
     </div>
   </div>
   <div
-    class="my-json-editor --jse-contents-background-color me-0 editor jse-theme-dark my-json-editor mt-1 w-100"
+    class="w-100"
+    style="background-color:black;"
   >
-    <JSONEditor
-      bind:content
-      readOnly
-      mainMenuBar={false}
-      navigationBar={false}
-      mode={Mode.text}
+    <MonacoEditorResponse
+      bind:value={response.body}
+      rawTab = {selectedTab}
+      rawValue = {response.body}
     />
   </div>
 </div>
-
-<style>
-  @import "svelte-jsoneditor/themes/jse-theme-dark.css";
-  .editor {
-    height: 400px;
-  }
-
-  .--jse-contents-background-color {
-    --jse-background-color: black;
-  }
-
-  .my-json-editor {
-    background: var(--blackColor);
-    --jse-theme-color: var(--blackColor);
-    --jse-theme-color-highlight: var(--blackColor);
-  }
-</style>

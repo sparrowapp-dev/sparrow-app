@@ -37,7 +37,6 @@
   let response;
   let request;
   let pencilIconState: boolean = false;
-
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     selectedTab = event?.property.request.state.section;
     progress = event?.property.request.requestInProgress;

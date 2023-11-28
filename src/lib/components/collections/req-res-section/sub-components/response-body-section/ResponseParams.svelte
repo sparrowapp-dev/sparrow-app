@@ -82,7 +82,7 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if selectedTab1 === "response"}
-    <ResponseBody {responseBody} {response} />
+    <ResponseBody {response} />
   {:else if selectedTab1 === "resheader"}
     <ResponseHeader {responseHeader} />
   {/if}
