@@ -9,6 +9,9 @@
   import { CollectionsViewModel } from "./Collections.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { v4 as uuidv4 } from "uuid";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -26,6 +29,18 @@
 
   const activeTab = _viewModel.activeTab;
   const tabList = _viewModel.tabs;
+
+  const handleKeyPress = (event) => {
+    if (event.ctrlKey && event.key === 'n') {
+      collectionsMethods.handleCreateTab(
+            generateSampleRequest(
+              "UNTRACKED-" + uuidv4(),
+              new Date().toString(),
+            ),
+          )
+          moveNavigation("right");
+    }
+  }
 </script>
 
 <div class="d-flex">
@@ -55,7 +70,7 @@
   </div>
   <SidebarRight />
 </div>
-
+<svelte:window on:keydown={handleKeyPress} />
 <style>
   .collections__tools {
     top: 44px;

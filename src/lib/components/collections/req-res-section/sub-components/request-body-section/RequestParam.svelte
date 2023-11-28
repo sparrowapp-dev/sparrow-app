@@ -76,6 +76,15 @@
     isHorizontalVerticalUnsubscribe();
     tabSubscribe();
   });
+  const handleKeyPress = (event) => {
+    if (event.altKey && event.key === 'p') {
+      selectedTab = RequestSection.PARAMETERS;
+    } else if (event.altKey && event.key === 'h') {
+      selectedTab = RequestSection.HEADERS;
+    } else if (event.altKey && event.key === 'b') {
+      selectedTab = RequestSection.REQUEST_BODY;
+    }
+  }
 </script>
 
 <div
@@ -226,7 +235,7 @@
     </div>
   </div>
 </div>
-
+<svelte:window on:keydown={handleKeyPress} />
 <style>
   .team-menu__link {
     color: #8a9299;

@@ -135,6 +135,15 @@
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
   });
+  const handleKeyPress = (event) => {
+    if (event.ctrlKey && event.key === 's') {
+      if (!componentData?.path) {
+                visibility = true;
+              } else {
+                handleSaveRequest();
+              }
+    }
+  }
 </script>
 
 <div class="d-flex flex-column" data-tauri-drag-region>
@@ -258,7 +267,7 @@
     </div>
   </div>
 </div>
-
+<svelte:window on:keydown={handleKeyPress} />
 <style>
   .btn-primary {
     background-color: #313233;
