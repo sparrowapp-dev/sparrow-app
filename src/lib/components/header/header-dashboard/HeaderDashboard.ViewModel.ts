@@ -8,6 +8,7 @@ import { useNavigate } from "svelte-navigator";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
+import { requestResponseStore } from "$lib/store/request-response-section";
 
 export class HeaderDashboardViewModel {
   private navigate = useNavigate();
@@ -60,9 +61,10 @@ export class HeaderDashboardViewModel {
       isResponseError.set(false);
       clearAuthJwt();
       setUser(null);
-      await this.workspaceRepository.clearWorkspaces();
-      await this.tabRepository.clearTabs();
       setCurrentWorkspace("", "");
+      await this.workspaceRepository.clearWorkspaces();
+      await requestResponseStore.clearTabs();
+      await this.tabRepository.clearTabs();
       this.navigate("/login");
     } else {
       notifications.error(response.message);
