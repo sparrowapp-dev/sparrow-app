@@ -42,6 +42,15 @@ export enum RequestSection {
   HEADERS = "Headers",
   REQUEST_BODY = "Request Body",
 }
+export enum ResponseSection {
+  RESPONSE = "Response",
+  HEADERS = "Headers",
+}
+
+export enum ResponseFormatter {
+  PRETTY = "Pretty",
+  RAW = "Raw",
+}
 
 /**
  * Enum representing the properties of a request interface.

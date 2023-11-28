@@ -7,10 +7,9 @@
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
 
-  export let currentTabId: string;
   export let rawTab: RequestDataType;
   export let rawValue;
-  export let value = "";
+  // export let value = "";
 
   let editorResponseElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;

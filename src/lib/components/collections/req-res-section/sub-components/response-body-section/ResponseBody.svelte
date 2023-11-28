@@ -4,15 +4,18 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { notifications } from "$lib/utils/notifications";
-  import { RequestDataType } from "$lib/utils/enums/request.enum";
+  import {
+    RequestDataType,
+    ResponseFormatter,
+  } from "$lib/utils/enums/request.enum";
   import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
   export let response;
+  export let apiState;
+  export let collectionsMethods: CollectionsMethods;
 
-  let CodeFormatter: string = "prettier";
-  let fileExtension: string = "json";
-  let selectedTab: string = RequestDataType.JSON;
-
+  let fileExtension: string;
   /**
    * @description Copy API response to users clipboard.
    */
@@ -20,24 +23,27 @@
     const jsonString = response?.body;
     await copyToClipBoard(jsonString);
     notifications.success("Copied to Clipboard");
-  }
-  
-  const handlePrettierDropdown: (tab: string) => void = (tab) => {
-    if (tab === "Prettier") {
-      CodeFormatter = "prettier";
-    }
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    selectedTab = tab;
-    if (selectedTab === RequestDataType.JSON) {
-      fileExtension = "json";
-    } else if (selectedTab === RequestDataType.XML) {
-      fileExtension = "xml";
-    } else if (selectedTab === RequestDataType.HTML) {
-      fileExtension = "html";
-    }
+    collectionsMethods.updateRequestState(tab, "responseRaw");
   };
+
+  $: {
+    if (apiState) {
+      if (apiState.responseRaw === RequestDataType.JSON) {
+        fileExtension = "json";
+      } else if (apiState.responseRaw === RequestDataType.XML) {
+        fileExtension = "xml";
+      } else if (apiState.responseRaw === RequestDataType.HTML) {
+        fileExtension = "html";
+      } else if (apiState.responseRaw === RequestDataType.TEXT) {
+        fileExtension = "txt";
+      } else if (apiState.responseRaw === RequestDataType.JAVASCRIPT) {
+        fileExtension = "js";
+      }
+    }
+  }
 
   /**
    * @description Configures and populates the save-as popup on the user's screen.
@@ -66,27 +72,40 @@
 >
   <div class="d-flex align-items-center justify-content-between mb-2 w-100">
     <div class="d-flex gap-4 align-items-center justify-content-center">
-      <button
-        class="d-flex align-items-center justify-content-center bg-backgroundColor border-0 gap-2"
-      >
-        <Dropdown
-          title="pretty"
-          data={[
-            {
-              name: "Pretty",
-              id: "pretty",
-            },
-          ]}
-          onclick={handlePrettierDropdown}
-        />
-      </button>
-
+      <div class="bg-dullBackground rounded" style="height: 22px;">
+        <button
+          on:click={() => {
+            collectionsMethods.updateRequestState(
+              ResponseFormatter.PRETTY,
+              "responseFormatter",
+            );
+          }}
+          class="rounded btn-formatter {apiState.responseFormatter ===
+          ResponseFormatter.PRETTY
+            ? 'bg-lightBackground'
+            : ''}"
+        >
+          Pretty
+        </button>
+        <button
+          on:click={() => {
+            collectionsMethods.updateRequestState(
+              ResponseFormatter.RAW,
+              "responseFormatter",
+            );
+          }}
+          class="rounded btn-formatter {apiState.responseFormatter ===
+          ResponseFormatter.RAW
+            ? 'bg-lightBackground'
+            : ''}">Raw</button
+        >
+      </div>
       <button
         class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
       >
         <Dropdown
           dropdownId={"hash565"}
-          title={selectedTab}
+          title={apiState.responseRaw}
           data={[
             {
               name: "JSON",
@@ -123,14 +142,23 @@
       </button>
     </div>
   </div>
-  <div
-    class="w-100"
-    style="background-color:black;"
-  >
+  <div class="w-100" style="background-color:black;">
     <MonacoEditorResponse
-      bind:value={response.body}
-      rawTab = {selectedTab}
-      rawValue = {response.body}
+      rawTab={apiState.responseRaw}
+      rawValue={response.body}
     />
   </div>
 </div>
+
+<style>
+  .btn-formatter {
+    outline: none;
+    background-color: transparent;
+    border: none;
+    font-size: 12px;
+    padding: 2px 4px;
+    width: 46px;
+    height: 22px;
+    transform: translateY(-3px);
+  }
+</style>
