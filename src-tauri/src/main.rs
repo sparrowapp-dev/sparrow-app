@@ -138,6 +138,11 @@ fn fetch_file_command() -> String {
     return response;
 }
 
+#[derive(Clone, serde::Serialize)]
+struct OnClosePayload {
+  message: String,
+}
+
 #[tauri::command]
 async fn create_oauth_window(handle: tauri::AppHandle) {
     tauri::WindowBuilder::new(
@@ -145,8 +150,11 @@ async fn create_oauth_window(handle: tauri::AppHandle) {
         "oauth", /* the unique window label */
         tauri::WindowUrl::External("https://dev-api.sparrow.techdomeaks.com/api/auth/google".parse().unwrap()),
     )
+    .title("")
     .build()
     .unwrap();
+    let oauth_window = handle.get_window("oauth").unwrap();
+    oauth_window.emit("onclose", OnClosePayload { message: "Window Close Event".into() }).unwrap();
 }
 
 #[tauri::command]
@@ -160,6 +168,7 @@ async fn open_oauth_window(handle: tauri::AppHandle) {
 
     let _ = oauth_window.center();
     let _ = oauth_window.show();
+    oauth_window.emit("onclose", OnClosePayload { message: "Window Close Event".into() }).unwrap();
 }
 
 #[derive(Clone, serde::Serialize)]
