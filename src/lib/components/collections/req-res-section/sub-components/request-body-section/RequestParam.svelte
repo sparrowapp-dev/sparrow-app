@@ -79,16 +79,13 @@
   });
   const handleKeyPress = (event) => {
     if (event.altKey && event.code === "KeyP") {
-      selectedTab = RequestSection.PARAMETERS;
       collectionsMethods.updateRequestState(
         RequestSection.PARAMETERS,
         "section",
       );
     } else if (event.altKey && event.code === "KeyH") {
-      selectedTab = RequestSection.HEADERS;
       collectionsMethods.updateRequestState(RequestSection.HEADERS, "section");
     } else if (event.altKey && event.code === "KeyB") {
-      selectedTab = RequestSection.REQUEST_BODY;
       collectionsMethods.updateRequestState(
         RequestSection.REQUEST_BODY,
         "section",
