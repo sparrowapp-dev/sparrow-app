@@ -12,7 +12,9 @@
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
+  import { useNavigate } from "svelte-navigator";
 
+  const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
@@ -227,7 +229,9 @@
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
               on:click={() => {
-                _viewModel.logout();
+                if(_viewModel.logout()){
+                   navigate("/login");        
+                }
               }}
             >
               <img src={icons.signout} alt="" /><span
