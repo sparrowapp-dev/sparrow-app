@@ -64,7 +64,7 @@
   };
 
   once('onclose', async (event) => {
-    WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
+    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
       isLoadingPage = false;
     });
   })
