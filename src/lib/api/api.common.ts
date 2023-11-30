@@ -80,9 +80,15 @@ const makeRequest = async (
       return error(response.data.message);
     }
   } catch (e) {
-    if (e.response?.data?.message === ErrorMessages.ExpiredToken) {
+    if (
+      e.response?.data?.statusCode === 401 &&
+      e.response?.data?.message === ErrorMessages.ExpiredToken
+    ) {
       return await regenerateAuthToken(method, url, requestData);
-    } else if (e.response.data.message === ErrorMessages.Unauthorized) {
+    } else if (
+      e.response?.data?.statusCode === 401 &&
+      e.response.data.message === ErrorMessages.Unauthorized
+    ) {
       await _viewModel.clientLogout();
       navigate("/login");
       return error("unauthorized");
