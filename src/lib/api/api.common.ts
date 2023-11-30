@@ -3,11 +3,14 @@ import type { RequestData } from "../utils/dto/requestdata";
 import { getUserToken, getRefToken } from "$lib/utils/token";
 import { refreshToken } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
-import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
-import { isLoading, setUser } from "$lib/store/auth.store";
+import { setAuthJwt } from "$lib/utils/jwt";
+import { isLoading } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
+import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
+const _viewModel = new HeaderDashboardViewModel();
 
 const error = (error, data?) => {
   return {
@@ -80,8 +83,7 @@ const makeRequest = async (
     if (e.response?.data?.message === ErrorMessages.ExpiredToken) {
       return await regenerateAuthToken(method, url, requestData);
     } else if (e.response.data.message === ErrorMessages.Unauthorized) {
-      clearAuthJwt();
-      setUser(null);
+      await _viewModel.clientLogout();
       navigate("/login");
       return error("unauthorized");
     }
