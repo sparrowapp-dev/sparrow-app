@@ -67,11 +67,6 @@
     directory = JSON.parse(JSON.stringify(collection)); 
   });
 
-  // const collectionListUnsubscribe = collectionList.subscribe((value) => {
-  //   collection = value;
-  //   directory = JSON.parse(JSON.stringify(collection));
-  // });
-
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if (value.id !== "") {
       workspace = value;
