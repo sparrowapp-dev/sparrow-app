@@ -117,4 +117,25 @@ export class CollectionsViewModel {
       request,
     );
   };
+
+  public addRequestOrFolderInCollection = (
+    collectionId: string,
+    items: any,
+  ) => {
+    this.collectionRepository.addRequestOrFolderInCollection(
+      collectionId,
+      items,
+    );
+  };
+  public updateRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+    items: any,
+  ) => {
+    this.collectionRepository.updateRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+      items,
+    );
+  };
 }

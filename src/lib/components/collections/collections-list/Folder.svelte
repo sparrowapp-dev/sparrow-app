@@ -1,77 +1,79 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import FileExplorer from "./FileExplorer.svelte";
-  import type { CreateDirectoryPostBody } from "$lib/utils/dto";
   import { getNextName } from "./collectionList";
-  import { onDestroy } from "svelte";
-  import { useCollectionTree } from "$lib/store/collection";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
-    import { v4 as uuidv4 } from "uuid";
-    import { CollectionListViewModel } from "./CollectionList.ViewModel";
-    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-    import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  const { insertNode, updateNodeId, insertHead } = useCollectionTree();
-  const _colllectionListViewModel = new CollectionListViewModel();
-  let visibility = false;
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { RequestDefault } from "$lib/utils/enums/request.enum";
+  import { v4 as uuidv4 } from "uuid";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
-  let workspaceId: string = "";
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
-  
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
-    (value: any) => {
-      workspaceId = value.id;
-    },
-  );
+
+  const _colllectionListViewModel = new CollectionListViewModel();
+  let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
+
     const folder = {
-      id:uuidv4(),
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
       description: "",
-      type:ItemType.FOLDER,
-      items:[],
+      type: ItemType.FOLDER,
+      items: [],
     };
-    collection={...collection,"items":[...collection.items,folder]}
-    _colllectionListViewModel.addFolder(workspaceId,collection._id,{name:folder.name,description:folder.description});
-  };
-  
-  const handleAPIClick = async () => {     
-    const request=generateSampleRequest("UNTRACKED-"+uuidv4(), new Date().toString());
-    collectionsMethods.handleCreateTab(request);
-    moveNavigation('right');
-    collection={...collection,"items":[...collection.items,request]}
+    
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
 
-    const requestObj={
-    collectionId:collection._id,
-    workspaceId,
-    items:{
-      name:request.name,
-      type:ItemType.REQUEST,
-      request:{
-        method:RequestDefault.METHOD
-      }
+    const response = await _colllectionListViewModel.addFolder(currentWorkspaceId, collectionId, {
+      name: folder.name,
+      description: folder.description,
+    });
+
+    if (response.isSuccessful && response.data.data) {
+      const folderObj = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(collectionId, folder.id, folderObj );
+      return;
     }
-    
-    
   };
-  _colllectionListViewModel .addRequest(requestObj);
-}
-  onDestroy(currentWorkspaceUnsubscribe);
+
+  const handleAPIClick = async () => {
+    const request = generateSampleRequest(
+      "UNTRACKED-" + uuidv4(),
+      new Date().toString(),
+    );
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+    collection = { ...collection, items: [...collection.items, request] };
+
+    const requestObj = {
+      collectionId: collection._id,
+      currentWorkspaceId,
+      items: {
+        name: request.name,
+        type: ItemType.REQUEST,
+        request: {
+          method: RequestDefault.METHOD,
+        },
+      },
+    };
+    _colllectionListViewModel.addRequest(requestObj);
+  };
 </script>
 
 <button
   on:click={() => {
-     if(!collection._id.includes("MYUID45345")){
-          visibility = !visibility;
-      }
+    if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
+      visibility = !visibility;
+    }
   }}
   style="height:36px;"
   class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1 ps-4"
@@ -91,7 +93,13 @@
     : 'none'};"
 >
   {#each collection.items as exp}
-    <FileExplorer collectionsMethods={collectionsMethods} collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
+    <FileExplorer
+      {collectionsMethods}
+      {collectionList}
+      {collectionId}
+      {currentWorkspaceId}
+      explorer={exp}
+    />
   {/each}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
   <IconButton text={"+ API Request"} onClick={handleAPIClick} />

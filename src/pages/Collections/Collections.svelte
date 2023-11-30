@@ -40,7 +40,9 @@
     getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
-    updateRequestInFolder: _viewModel.updateRequestInFolder
+    updateRequestInFolder: _viewModel.updateRequestInFolder,
+    addRequestOrFolderInCollection: _viewModel.addRequestOrFolderInCollection,
+    updateRequestOrFolderInCollection: _viewModel.updateRequestOrFolderInCollection
   };
 
   const activeTab = _viewModel.activeTab;

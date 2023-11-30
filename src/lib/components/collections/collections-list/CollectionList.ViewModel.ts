@@ -49,19 +49,11 @@ export class CollectionListViewModel {
     collectionId: string,
     folder: CreateDirectoryPostBody,
   ) => {
-    const response = await this.collectionService.addFolderInCollection(
+    return await this.collectionService.addFolderInCollection(
       workspaceId,
       collectionId,
       folder,
     );
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.collectionRepository.addRequestOrFolderInCollection(
-        collectionId,
-        collections,
-      );
-      return;
-    }
   };
 
   public addRequest = async (requestData: CreateApiRequestPostBody) => {
