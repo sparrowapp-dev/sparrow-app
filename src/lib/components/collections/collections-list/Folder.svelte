@@ -4,7 +4,6 @@
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { RequestDefault } from "$lib/utils/enums/request.enum";
   import { v4 as uuidv4 } from "uuid";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -22,7 +21,6 @@
   let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
-
     const folder = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
@@ -30,42 +28,64 @@
       type: ItemType.FOLDER,
       items: [],
     };
-    
+
     collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
 
-    const response = await _colllectionListViewModel.addFolder(currentWorkspaceId, collectionId, {
-      name: folder.name,
-      description: folder.description,
-    });
+    const response = await _colllectionListViewModel.addFolder(
+      currentWorkspaceId,
+      collectionId,
+      {
+        name: folder.name,
+        description: folder.description,
+      },
+    );
 
     if (response.isSuccessful && response.data.data) {
       const folderObj = response.data.data;
-      collectionsMethods.updateRequestOrFolderInCollection(collectionId, folder.id, folderObj );
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        folder.id,
+        folderObj,
+      );
       return;
     }
   };
 
   const handleAPIClick = async () => {
     const request = generateSampleRequest(
-      "UNTRACKED-" + uuidv4(),
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
-    collectionsMethods.handleCreateTab(request);
-    moveNavigation("right");
-    collection = { ...collection, items: [...collection.items, request] };
 
     const requestObj = {
-      collectionId: collection._id,
-      currentWorkspaceId,
+      collectionId: collectionId,
+      workspaceId: currentWorkspaceId,
       items: {
         name: request.name,
-        type: ItemType.REQUEST,
+        type: request.type,
         request: {
-          method: RequestDefault.METHOD,
+          method: request.property.request.method,
         },
       },
     };
-    _colllectionListViewModel.addRequest(requestObj);
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, {
+      ...requestObj.items,
+      id: request.id,
+    });
+    const response = await _colllectionListViewModel.addRequest(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        request.id,
+        res,
+      );
+
+      request.id = res.id;
+      collectionsMethods.handleCreateTab(request);
+      moveNavigation("right");
+      return;
+    }
   };
 </script>
 

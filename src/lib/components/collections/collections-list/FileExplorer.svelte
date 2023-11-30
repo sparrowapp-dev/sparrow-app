@@ -30,7 +30,6 @@
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
-    
 
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collectionId,
@@ -50,12 +49,14 @@
     };
 
     collectionsMethods.addRequestInFolder(
-        requestObj.collectionId,
-        requestObj.folderId,
-        
-        {...requestObj.items.items, id: sampleRequest.id},
-      );
-    // handle api request
+      requestObj.collectionId,
+      requestObj.folderId,
+
+      {
+        ...requestObj.items.items,
+        id: sampleRequest.id,
+      },
+    );
     const response =
       await _colllectionListViewModel.addRequestInFolderInCollection(
         requestObj,
@@ -64,13 +65,13 @@
       const request = response.data.data;
       collectionsMethods.updateRequestInFolder(
         requestObj.collectionId,
-        requestObj.folderId,     
+        requestObj.folderId,
         sampleRequest.id,
-        request
+        request,
       );
-
+      sampleRequest.id = request.id;
       collectionsMethods.handleCreateTab(sampleRequest);
-    moveNavigation("right");
+      moveNavigation("right");
       return;
     }
   };

@@ -57,16 +57,7 @@ export class CollectionListViewModel {
   };
 
   public addRequest = async (requestData: CreateApiRequestPostBody) => {
-    const response =
-      await this.collectionService.addRequestInCollection(requestData);
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.collectionRepository.addRequestOrFolderInCollection(
-        requestData.collectionId,
-        collections,
-      );
-      return;
-    }
+    return await this.collectionService.addRequestInCollection(requestData);
   };
   public addRequestInFolderInCollection = async (
     requestData: CreateApiRequestPostBody,
