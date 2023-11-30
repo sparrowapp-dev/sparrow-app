@@ -92,4 +92,29 @@ export class CollectionsViewModel {
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
   };
+
+  public addRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    request,
+  ): void => {
+    this.collectionRepository.addRequestInFolder(
+      collectionId,
+      folderId,
+      request,
+    );
+  };
+  public updateRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+    request,
+  ): void => {
+    this.collectionRepository.updateRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+      request,
+    );
+  };
 }

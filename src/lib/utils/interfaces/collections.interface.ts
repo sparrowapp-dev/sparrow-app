@@ -29,4 +29,11 @@ export interface CollectionsMethods {
   addCollection: (collection: CreateCollectionPostBody) => any;
   getCollectionList: () => any;
   getActiveWorkspace: () => Observable<any>;
+  addRequestInFolder: (collectionId: string, folderId: string, request) => void;
+  updateRequestInFolder: (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+    request,
+  ) => void;
 }

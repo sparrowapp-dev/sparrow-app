@@ -79,17 +79,7 @@ export class CollectionListViewModel {
   public addRequestInFolderInCollection = async (
     requestData: CreateApiRequestPostBody,
   ) => {
-    const response =
-      await this.collectionService.addRequestInCollection(requestData);
-    if (response.isSuccessful && response.data.data) {
-      const request = response.data.data;
-      this.collectionRepository.addRequestInFolder(
-        requestData.collectionId,
-        requestData.folderId,
-        request,
-      );
-      return;
-    }
+    return await this.collectionService.addRequestInCollection(requestData);
   };
 
   //** Fetch All Collections From Backend */

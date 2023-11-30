@@ -38,7 +38,9 @@
     addFolder:_collectionListViewModel.addFolder,
     addCollection:_collectionListViewModel.addCollection,
     getCollectionList: _viewModel.getCollectionList,
-    getActiveWorkspace: _viewModel.getActiveWorkspace
+    getActiveWorkspace: _viewModel.getActiveWorkspace,
+    addRequestInFolder: _viewModel.addRequestInFolder,
+    updateRequestInFolder: _viewModel.updateRequestInFolder
   };
 
   const activeTab = _viewModel.activeTab;

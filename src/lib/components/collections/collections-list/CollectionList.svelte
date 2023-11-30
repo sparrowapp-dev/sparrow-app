@@ -88,6 +88,7 @@
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id"); 
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response = await collectionsMethods.getAllCollections(
           workspaceId,

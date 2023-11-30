@@ -1,6 +1,6 @@
 <script lang="ts">
     import { AuthSection, AuthType } from "$lib/utils/enums/authorization.enum";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
     import { RequestDataType, RequestDataset, RequestDefault, RequestSection } from "$lib/utils/enums/request.enum";
     import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -20,7 +20,7 @@
   let apiClass = "red-api";
 
   const handleClick = () => {
-    const request=generateSampleRequest("UNTRACKED-"+id, new Date().toString())
+    const request=generateSampleRequest(id, new Date().toString())
     collectionsMethods.handleCreateTab(request);
     }
   $: {
@@ -55,7 +55,7 @@
 </script>
 
 <div
-  class="d-flex align-items-center"
+  class="d-flex align-items-center {id.includes(UntrackedItems.UNTRACKED) ? 'unclickable' : '' }"
   style="height:32px;"
   on:click={()=>{handleClick()}}
 >
@@ -93,4 +93,7 @@
     font-size: 12px;
     font-weight: 400;
   }
+  .unclickable {
+            pointer-events: none;
+        }
 </style>

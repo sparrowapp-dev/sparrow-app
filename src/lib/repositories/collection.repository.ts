@@ -35,6 +35,7 @@ export class CollectionRepository {
   public clearCollections = async (): Promise<any> => {
     return rxdb.collection.find().remove();
   };
+
   public addRequestInFolder = async (
     collectionId: string,
     folderId: string,
@@ -47,15 +48,44 @@ export class CollectionRepository {
         },
       })
       .exec();
-
-    collection._data.items.map((item) => {
-      if (item.id === folderId) {
-        item.items.push(request);
-        return;
+    const updatedItems = collection.toJSON().items.map((element) => {
+      if (element.id === folderId) {
+        element.items.push(request);
       }
+      return element;
     });
-    collection.incrementalPatch({
-      items: [...collection.items],
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public updateRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+    request,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    const updatedItems = collection.toJSON().items.map((element) => {
+      if (element.id === folderId) {
+        for (let i = 0; i < element.items.length; i++) {
+          if (element.items[i].id === uuid) {
+            element.items[i] = request;
+          }
+        }
+      }
+      return element;
+    });
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
     });
   };
 }
