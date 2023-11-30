@@ -110,7 +110,7 @@
 
 <div
   class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor"
-  style="z-index:9999999999999999;position:fixed;left:0px;height:44px;"
+  style="z-index:999; position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
   <div

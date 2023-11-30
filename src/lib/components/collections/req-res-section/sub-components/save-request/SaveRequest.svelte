@@ -33,6 +33,9 @@
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
+  export let collectionsMethods : CollectionsMethods;
   export let onClick;
 
   interface Path {
@@ -59,10 +62,15 @@
   let tabUrl: string = "";
   let componentData;
 
-  const collectionListUnsubscribe = collectionList.subscribe((value) => {
+  const collectionListUnsubscribe = collectionsMethods.getCollectionList().subscribe((value)=>{
     collection = value;
-    directory = JSON.parse(JSON.stringify(collection));
+    directory = JSON.parse(JSON.stringify(collection)); 
   });
+
+  // const collectionListUnsubscribe = collectionList.subscribe((value) => {
+  //   collection = value;
+  //   directory = JSON.parse(JSON.stringify(collection));
+  // });
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if (value.id !== "") {
@@ -282,7 +290,7 @@
   });
 
   onDestroy(() => {
-    collectionListUnsubscribe();
+    collectionListUnsubscribe.unsubscribe();
     currentWorkspaceUnsubscribe();
     tabsUnsubscribe();
     currentTabUnsubscribe();
@@ -543,7 +551,7 @@
 <style>
   .save-request-backdrop {
     position: fixed;
-    top: 44px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;

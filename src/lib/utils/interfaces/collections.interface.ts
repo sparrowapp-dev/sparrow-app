@@ -1,4 +1,5 @@
 import type { CollectionDocument } from "$lib/database/app.database";
+import type { Observable } from "rxjs";
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
@@ -26,4 +27,6 @@ export interface CollectionsMethods {
     folder: CreateDirectoryPostBody,
   ) => any;
   addCollection: (collection: CreateCollectionPostBody) => any;
+  getCollectionList: () => any;
+  getActiveWorkspace: () => Observable<any>;
 }

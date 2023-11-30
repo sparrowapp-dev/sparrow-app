@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
   requestResponseStore,
   tabs,
@@ -7,6 +9,8 @@ import {
 
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
+  private collectionRepository = new CollectionRepository();
+  private workspaceRepository = new WorkspaceRepository();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -80,5 +84,12 @@ export class CollectionsViewModel {
   public updateRequestBodyFormData = async (data: any, route: string) => {
     requestResponseStore.setRequestBodyFormData(data, route);
     this.debouncedTab();
+  };
+
+  public getCollectionList = () => {
+    return this.collectionRepository.getCollection();
+  };
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
   };
 }

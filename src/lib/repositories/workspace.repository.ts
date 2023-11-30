@@ -62,6 +62,7 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
+    await this.clearWorkspaces();
     await rxdb.workspace.bulkInsert(data);
     return;
   };
