@@ -8,6 +8,10 @@ export interface CreateCollectionPostBody {
   workspaceId: string;
 }
 
+export interface UpdateCollectionName {
+  name: string;
+}
+
 export interface Headers {
   name: string;
   description: string;

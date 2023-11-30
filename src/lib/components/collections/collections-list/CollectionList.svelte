@@ -22,19 +22,24 @@
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import DefaultCollection from "./DefaultCollection.svelte";
-  import { type CollectionDocument, type WorkspaceDocument } from "$lib/database/app.database";
-    import { CollectionListViewModel } from "./CollectionList.ViewModel";
-    import type { Observable } from "rxjs";
-    import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-
-  export let  collectionsMethods:CollectionsMethods;
-  let collection: any[]=[];
+  import {
+    type CollectionDocument,
+    type WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import type { Observable } from "rxjs";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  export let deleteCollectionData;
+  export let collectionsMethods: CollectionsMethods;
+  let collection: any[] = [];
   let currentWorkspaceId: string = "";
-  const _colllectionListViewModel  = new CollectionListViewModel();
-  const _workspaceViewModel= new HeaderDashboardViewModel(); 
-  const collections : Observable<CollectionDocument[]> = _colllectionListViewModel .collection;
-  const activeWorkspace : Observable<WorkspaceDocument> = _workspaceViewModel.activeWorkspace;
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const _workspaceViewModel = new HeaderDashboardViewModel();
+  const collections: Observable<CollectionDocument[]> =
+    _colllectionListViewModel.collection;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _workspaceViewModel.activeWorkspace;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
@@ -45,13 +50,16 @@
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
-         const collectionArr=value.map((collectionDocument:CollectionDocument)=>{
-           const collectionObj=collectionsMethods.getCollectionDocument(collectionDocument);
-           return collectionObj; 
-         })
-         collection=collectionArr;
-        }
+        const collectionArr = value.map(
+          (collectionDocument: CollectionDocument) => {
+            const collectionObj =
+              collectionsMethods.getCollectionDocument(collectionDocument);
+            return collectionObj;
+          },
+        );
+        collection = collectionArr;
       }
+    },
   );
   let currentWorkspaceName = "";
 
@@ -84,31 +92,31 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
-      if(activeWorkspaceRxDoc){
-        const workspaceId=activeWorkspaceRxDoc.get("_id");
-        const response=await collectionsMethods.getAllCollections(workspaceId);
-        if(response.isSuccessful && response.data.data.length>0){
-          const collections=response.data.data;
+      if (activeWorkspaceRxDoc) {
+        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        const response = await collectionsMethods.getAllCollections(
+          workspaceId,
+        );
+        if (response.isSuccessful && response.data.data.length > 0) {
+          const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
-            return
+          return;
         }
-        
       }
-    
     },
   );
   const handleCreateCollection = async () => {
-    const newCollection={
-      _id:uuidv4(),
-      name:getNextCollection(collection,"New collection"),
-      workspaceId:currentWorkspaceId,
-      items:[],
-    }
-    collection=[...collection,newCollection];
-    collectionsMethods.addCollection(newCollection)
+    const newCollection = {
+      _id: uuidv4(),
+      name: getNextCollection(collection, "New collection"),
+      workspaceId: currentWorkspaceId,
+      items: [],
+    };
+    collection = [...collection, newCollection];
+
+    collectionsMethods.addCollection(newCollection);
     return;
   };
-
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if (value.id && value.name) {
@@ -232,11 +240,8 @@
       </button>
     </div>
     <div>
-      <RequestDropdown  collectionsMethods={collectionsMethods} handleCreateCollection={handleCreateCollection}></RequestDropdown>
-      
+      <RequestDropdown {collectionsMethods} {handleCreateCollection} />
     </div>
-    
-
   </div>
 
   <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
@@ -281,8 +286,7 @@
             {/each}
           {/if}
         </div>
-      {:else}
-      {#if collection.length > 0}
+      {:else if collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList={collection}
@@ -290,26 +294,25 @@
             {currentWorkspaceId}
             collection={col}
             title={col.name}
-            collectionsMethods={collectionsMethods}
+            {collectionsMethods}
           />
         {/each}
-        {:else}
-          <DefaultCollection></DefaultCollection>
-        {/if}
+      {:else}
+        <DefaultCollection />
       {/if}
     </div>
   </div>
 </div>
 
 <style>
-.sidebar {
- position: fixed;
- top: 44px;
- left: 72px;
- height: calc(100vh - 44px);
- overflow-y:auto;
-}
-.inputField{
-  outline:none
-}
+  .sidebar {
+    position: fixed;
+    top: 44px;
+    left: 72px;
+    height: calc(100vh - 44px);
+    overflow-y: auto;
+  }
+  .inputField {
+    outline: none;
+  }
 </style>

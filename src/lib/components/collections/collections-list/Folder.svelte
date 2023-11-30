@@ -1,11 +1,9 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import FileExplorer from "./FileExplorer.svelte";
-  import type { CreateDirectoryPostBody } from "$lib/utils/dto";
   import { getNextName } from "./collectionList";
   import { onDestroy } from "svelte";
   import { useCollectionTree } from "$lib/store/collection";
@@ -17,6 +15,9 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { WorkspaceService } from "$lib/services/workspace.service";
+  import { CollectionService } from "$lib/services/collection.service";
+  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
@@ -27,6 +28,8 @@
   let workspaceId: string = "";
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
+
+  const collectionService = new CollectionService();
 
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
     (value: any) => {
@@ -73,45 +76,53 @@
   };
   onDestroy(currentWorkspaceUnsubscribe);
 
-  //this is for right click on collections
-  // pos is cursor position when right click occur
-  let pos = { x: 0, y: 0 };
-  // menu is dimension (height and width) of context menu
-  let menu = { h: 0, y: 0 };
-  // browser/window dimension (height and width)
-  let browser = { h: 0, y: 0 };
-  // showMenu is state of context-menu visibility
-  let showMenu = false;
-  // to display some text
-  let content;
+  let openCollectionId = null;
+  let isMenuOpen = false;
 
-  function rightClickContextMenu(e) {
-    showMenu = true;
-    browser = {
-      y: window.innerWidth,
-      h: window.innerHeight,
-    };
-    pos = {
-      x: e.clientX,
-      y: e.clientY,
-    };
-    // If bottom part of context menu will be displayed
-    // after right-click, then change the position of the
-    // context menu. This position is controlled by `top` and `left`
-    // at inline style.
-    // Instead of context menu is displayed from top left of cursor position
-    // when right-click occur, it will be displayed from bottom left.
-    if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
-    if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
+  let pos = { x: 0, y: 0 };
+
+  let menu = { h: 0, y: 0 };
+
+  let browser = { h: 0, y: 0 };
+
+  let showMenu = false;
+  let button;
+  let openMenuButton: HTMLElement = null;
+
+  function rightClickContextMenu(e, collectionId, button) {
+    if (openCollectionId === collectionId) {
+      showMenu = !showMenu;
+    } else {
+      openCollectionId = collectionId;
+      showMenu = true;
+    }
+
+    if (button) {
+      openMenuButton = button;
+      const rect = button.getBoundingClientRect();
+      pos = { x: rect.right - 260, y: rect.top - 5 };
+    } else {
+      browser = {
+        y: window.innerWidth,
+        h: window.innerHeight,
+      };
+      pos = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+
+      if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
+      if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
+    }
+    isMenuOpen = true;
   }
+
   function onPageClick(e) {
-    // To make context menu disappear when
-    // mouse is clicked outside context menu
+    isMenuOpen = false;
     showMenu = false;
   }
+
   function getContextMenuDimension(node) {
-    // This function will get context menu dimension
-    // when navigation is shown => showMenu = true
     let height = node.offsetHeight;
     let width = node.offsetWidth;
     menu = {
@@ -119,27 +130,85 @@
       y: width,
     };
   }
-  function addCollections() {
-    // content.textContent = "created...";
-  }
-  function renameCollection() {
-    // content.textContent = "created...";
-  }
-  function addRequest() {
-    // content.textContent = "created...";
+
+  //open collection
+  function openCollections() {
+    visibility = !visibility;
   }
 
-  function addFolder() {
-    // content.textContent = "created...";
+  let newCollectionName: string = "";
+  let isRenaming = false;
+
+  const handleRenameInput = (event) => {
+    newCollectionName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newCollectionName) {
+      const updateCollectionName = await collectionService.updateCollection(
+        workspaceId,
+        openCollectionId,
+        { name: newCollectionName },
+      );
+      title = updateCollectionName?.data?.data?.name;
+      collectionsMethods.updateCollectionName(openCollectionId, title);
+    }
+    isRenaming = false;
+  };
+
+  //rename collection name
+  const renameCollection = () => {
+    isRenaming = true;
+    const inputField = document.getElementById(
+      "renameInputField",
+    ) as HTMLInputElement;
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      onRenameBlur();
+    }
+  };
+
+  //add request in collection
+  const addRequest = async () => {
+    handleAPIClick();
+    if (collectionId === openCollectionId) {
+      visibility = true;
+    }
+  };
+
+  //add folder in collection
+  const addFolder = () => {
+    handleFolderClick();
+    if (collectionId === openCollectionId) {
+      visibility = true;
+    }
+  };
+
+  let showDeleteConfirmation = false;
+
+  function openDeleteConfirmation() {
+    showDeleteConfirmation = true;
   }
 
-  function deleteCollection() {
-    // content.textContent = "created...";
+  function closeDeleteConfirmation() {
+    showDeleteConfirmation = false;
   }
+
+  //delete collection
+  const deleteCollection = async () => {
+    const deleteCollectionName = await collectionService.deleteCollection(
+      workspaceId,
+      openCollectionId,
+    );
+    collectionsMethods.deleteCollectionData(openCollectionId);
+    closeDeleteConfirmation();
+  };
 
   let menuItems = [
     {
-      onClick: addCollections,
+      onClick: openCollections,
       displayText: "Open collection",
     },
     {
@@ -164,16 +233,24 @@
 
 <div class="content" bind:this={content} />
 
-{#if showMenu && collectionId}
+{#if showMenu && collectionId === openCollectionId}
   <nav
     use:getContextMenuDimension
     style="position: absolute; top:{pos.y}px; left:{pos.x}px"
   >
-    <div class="navbar" id="navbar">
-      <ul>
+    <div
+      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+      id="navbar"
+    >
+      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
         {#each menuItems as item}
-          <li>
-            <button on:click={item.onClick}>{item.displayText}</button>
+          <li class="align-items-center">
+            <button
+              class="align-items-center mb-1 px-3 py-2"
+              on:click={item.onClick}
+              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
+              >{item.displayText}</button
+            >
           </li>
         {/each}
       </ul>
@@ -184,14 +261,16 @@
 <svelte:window on:click={onPageClick} />
 
 <button
-  on:contextmenu|preventDefault={rightClickContextMenu}
+  bind:this={button}
+  on:contextmenu|preventDefault={(e) =>
+    rightClickContextMenu(e, collectionId, button)}
   on:click={() => {
     if (!collection._id.includes("MYUID45345")) {
       visibility = !visibility;
     }
   }}
-  style="height:36px;"
-  class=" btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 my-button"
+  style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 my-button"
 >
   <div class="d-flex align-items-center">
     <img
@@ -201,12 +280,33 @@
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
     />
-    <p class="mb-0" style="font-size: 14px;">{title}</p>
+    {#if isRenaming}
+      <input
+        class="form-control py-0"
+        id="renameInputField"
+        type="text"
+        value={title}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
+      />
+    {:else}
+      <p class="mb-0" style="font-size: 14px;">
+        {title}
+      </p>
+    {/if}
   </div>
-  <div class="threedot-icon-container">
+  <button
+    class="threedot-icon-container border-0 rounded"
+    on:click={(e) => {
+      e.stopPropagation();
+      rightClickContextMenu(e, collectionId, button);
+    }}
+  >
     <img src={threedotIcon} alt="threedotIcon" />
-  </div>
+  </button>
 </button>
+
 <div
   style="padding-left: 40px; cursor:pointer; display: {visibility
     ? 'block'
@@ -232,29 +332,33 @@
 
   .threedot-icon-container {
     visibility: hidden;
+    background-color: var(--border-color);
+  }
+
+  .threedot-icon-container:hover {
+    background-color: var(--border-color);
+  }
+
+  .threedot-icon-container:active {
+    background-color: var(--workspace-hover-color);
   }
 
   .btn-primary {
-    background-color: #1e1e1e;
-    color: #fff;
+    background-color: var(--background-color);
+    color: var(--white-color);
   }
 
   .btn-primary:hover {
-    background-color: #232527;
-    color: #fff;
-    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--border-color);
+    color: var(--white-color);
+    padding: 5px;
   }
 
   .navbar {
-    display: flex;
-    align-items: start;
-    justify-content: start;
-    width: 170px;
-    background-color: #000;
-    border-radius: 6px;
+    width: 180px;
+    height: auto;
     overflow: hidden;
-    flex-direction: column;
-    color: white;
   }
 
   ul li {
@@ -263,19 +367,16 @@
 
   ul li button {
     font-size: 12px;
+    display: flex;
     width: 100%;
-    height: 30px;
-    text-align: left;
     border: 0px;
-    background-color: #000;
+    background-color: var(--blackColor);
   }
 
   ul li button:hover {
-    padding-left: 4px;
     width: 100%;
-    color: #ffffff;
-    text-align: left;
-    border-radius: 4px;
-    background-color: rgba(107, 105, 105, 0.192);
+    color: var(--white-color);
+    border-radius: 8px;
+    background-color: var(--background-color);
   }
 </style>

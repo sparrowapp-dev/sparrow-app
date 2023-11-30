@@ -4,9 +4,11 @@ import {
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
+  private collectionRepository = new CollectionRepository();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -79,6 +81,16 @@ export class CollectionsViewModel {
 
   public updateRequestBodyFormData = async (data: any, route: string) => {
     requestResponseStore.setRequestBodyFormData(data, route);
+    this.debouncedTab();
+  };
+
+  public deleteCollectionData = async (id: string) => {
+    this.collectionRepository.deleteCollection(id);
+    this.debouncedTab();
+  };
+
+  public updateCollectionName = async (id: string, name: string) => {
+    this.collectionRepository.updateCollection(id, name);
     this.debouncedTab();
   };
 }

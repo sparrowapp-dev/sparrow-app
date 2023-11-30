@@ -12,6 +12,34 @@ export class CollectionRepository {
     return rxdb.collection.find().$;
   };
 
+  // public updateCollection = async (
+  //   collectionId,
+  // ): Observable<CollectionDocument[]> => {};
+
+  public deleteCollection = async (collectionId: string) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    collection.remove();
+  };
+
+  public updateCollection = async (collectionId: string, name: string) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    collection.incrementalPatch({
+      name,
+    });
+  };
+
   public bulkInsertData = async (data: any): Promise<void> => {
     await rxdb.collection.bulkInsert(data);
   };

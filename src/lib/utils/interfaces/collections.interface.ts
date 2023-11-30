@@ -26,4 +26,6 @@ export interface CollectionsMethods {
     folder: CreateDirectoryPostBody,
   ) => any;
   addCollection: (collection: CreateCollectionPostBody) => any;
+  deleteCollectionData: (collectionId: string) => void;
+  updateCollectionName: (collectionId: string, name: string) => void;
 }

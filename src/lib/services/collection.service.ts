@@ -4,6 +4,7 @@ import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
+  UpdateCollectionName,
 } from "$lib/utils/dto";
 
 export class CollectionService {
@@ -32,6 +33,37 @@ export class CollectionService {
     );
     return response;
   };
+
+  public updateCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    name: UpdateCollectionName,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        body: name,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteCollection = async (
+    workspaceId: string,
+    collectionId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      { headers: getAuthHeaders() },
+    );
+
+    return response;
+  };
+
   public addFolderInCollection = async (
     workspaceId: string,
     collectionId: string,

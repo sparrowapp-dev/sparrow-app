@@ -2,20 +2,18 @@
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
-  import {
-    collapsibleState,
-  } from "$lib/store/request-response-section";
+  import { collapsibleState } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import { onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
-  
+
   $: {
     if (tabList) {
       if (tabList.length >= 0 && tabList.length <= 5) {
@@ -32,12 +30,14 @@
   let scrollerParent: number;
   let scrollerWidth: number;
 
-  onDestroy(()=>{});
+  onDestroy(() => {});
 </script>
 
 <div class="">
   <div
-    style="border-top: 1px solid #313233;width:{$collapsibleState ? '100%' : '100%'}"
+    style="border-top: 1px solid #313233;width:{$collapsibleState
+      ? '100%'
+      : '100%'}"
     class="tabbar bg-blackColor d-flex bg-backgroundColor;"
     bind:offsetWidth={scrollerParent}
   >
@@ -62,7 +62,7 @@
       {#if tabList}
         {#each tabList as tab, index}
           <Tab
-            tab = {tab}
+            {tab}
             handleTabRemove={collectionsMethods.handleRemoveTab}
             updateCurrentTab={collectionsMethods.handleActiveTab}
             {index}
@@ -92,7 +92,7 @@
               "UNTRACKED-" + uuidv4(),
               new Date().toString(),
             ),
-          )
+          );
           moveNavigation("right");
         }}
       >
