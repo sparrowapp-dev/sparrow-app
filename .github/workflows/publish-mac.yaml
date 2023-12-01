@@ -46,6 +46,12 @@ jobs:
     #     zip -r sparrow-app.app.zip target/release/sparrow-app.app
     #     codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/release/YourAppName.app
 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: sparrow-macos  # Update the artifact name to 'sparrow-macos'
+        path: target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg
+        
   download:
     needs: build_and_sign
     runs-on: ubuntu-latest
