@@ -81,7 +81,6 @@ const db = await rxdb.addCollections({
         return oldDoc;
       },
       2: function (oldDoc) {
-        // oldDoc.collectionId = oldDoc._id;
         return oldDoc;
       },
       3: function (oldDoc) {

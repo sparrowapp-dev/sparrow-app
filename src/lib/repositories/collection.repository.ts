@@ -142,6 +142,7 @@ export class CollectionRepository {
         for (let i = 0; i < element.items.length; i++) {
           if (element.items[i].id === uuid) {
             element.items[i] = request;
+            break;
           }
         }
       }
