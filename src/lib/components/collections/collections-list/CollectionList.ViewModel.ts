@@ -36,12 +36,7 @@ export class CollectionListViewModel {
 
   //** Add collection in Backend */
   public addCollection = async (collection: CreateCollectionPostBody) => {
-    const response = await this.collectionService.addCollection(collection);
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.createCollection(collections);
-      return;
-    }
+    return await this.collectionService.addCollection(collection);
   };
 
   public addFolder = async (
@@ -49,47 +44,20 @@ export class CollectionListViewModel {
     collectionId: string,
     folder: CreateDirectoryPostBody,
   ) => {
-    const response = await this.collectionService.addFolderInCollection(
+    return await this.collectionService.addFolderInCollection(
       workspaceId,
       collectionId,
       folder,
     );
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.collectionRepository.addRequestOrFolderInCollection(
-        collectionId,
-        collections,
-      );
-      return;
-    }
   };
 
   public addRequest = async (requestData: CreateApiRequestPostBody) => {
-    const response =
-      await this.collectionService.addRequestInCollection(requestData);
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.collectionRepository.addRequestOrFolderInCollection(
-        requestData.collectionId,
-        collections,
-      );
-      return;
-    }
+    return await this.collectionService.addRequestInCollection(requestData);
   };
   public addRequestInFolderInCollection = async (
     requestData: CreateApiRequestPostBody,
   ) => {
-    const response =
-      await this.collectionService.addRequestInCollection(requestData);
-    if (response.isSuccessful && response.data.data) {
-      const request = response.data.data;
-      this.collectionRepository.addRequestInFolder(
-        requestData.collectionId,
-        requestData.folderId,
-        request,
-      );
-      return;
-    }
+    return await this.collectionService.addRequestInCollection(requestData);
   };
 
   //** Fetch All Collections From Backend */

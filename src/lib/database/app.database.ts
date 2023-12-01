@@ -80,6 +80,13 @@ const db = await rxdb.addCollections({
       1: function (oldDoc) {
         return oldDoc;
       },
+      2: function (oldDoc) {
+        return oldDoc;
+      },
+      3: function (oldDoc) {
+        oldDoc.collectionId = oldDoc._id;
+        return oldDoc;
+      },
     },
   },
 });

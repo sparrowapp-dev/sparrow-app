@@ -92,4 +92,56 @@ export class CollectionsViewModel {
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
   };
+
+  public addRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    request,
+  ): void => {
+    this.collectionRepository.addRequestInFolder(
+      collectionId,
+      folderId,
+      request,
+    );
+  };
+  public updateRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+    request,
+  ): void => {
+    this.collectionRepository.updateRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+      request,
+    );
+  };
+
+  public addRequestOrFolderInCollection = (
+    collectionId: string,
+    items: any,
+  ) => {
+    this.collectionRepository.addRequestOrFolderInCollection(
+      collectionId,
+      items,
+    );
+  };
+  public updateRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+    items: any,
+  ) => {
+    this.collectionRepository.updateRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+      items,
+    );
+  };
+  public addCollection = (collection) => {
+    this.collectionRepository.addCollection(collection);
+  };
+  public updateCollection = (uuid, data) => {
+    this.collectionRepository.updateCollection(uuid, data);
+  };
 }
