@@ -13,6 +13,9 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import type { Observable } from "rxjs";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import type { Writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel=new CollectionListViewModel()
@@ -34,10 +37,12 @@
     addRequestaddFolder:_collectionListViewModel.addRequest,
     addFolder:_collectionListViewModel.addFolder,
     addCollection:_collectionListViewModel.addCollection,
+    getCollectionList: _viewModel.getCollectionList,
+    getActiveWorkspace: _viewModel.getActiveWorkspace
   };
 
   const activeTab = _viewModel.activeTab;
-  const tabList = _viewModel.tabs;
+  const tabList : Writable<NewTab[]> = _viewModel.tabs;
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
@@ -73,8 +78,8 @@
         <p>COLLECTION</p>
       {/if}
     </div>
+    <SidebarRight />
   </div>
-  <SidebarRight />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

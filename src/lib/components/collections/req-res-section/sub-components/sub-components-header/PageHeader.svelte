@@ -248,7 +248,7 @@
                 Save As
               </p>
             </div>
-            <SaveRequest {visibility} onClick={handleBackdrop} />
+            <SaveRequest {visibility} {collectionsMethods} onClick={handleBackdrop} />
           </span>
         </div>
         <div>
