@@ -138,4 +138,10 @@ export class CollectionsViewModel {
       items,
     );
   };
+  public addCollection = (collection) => {
+    this.collectionRepository.addCollection(collection);
+  };
+  public updateCollection = (uuid, data) => {
+    this.collectionRepository.updateCollection(uuid, data);
+  };
 }

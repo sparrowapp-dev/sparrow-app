@@ -36,12 +36,7 @@ export class CollectionListViewModel {
 
   //** Add collection in Backend */
   public addCollection = async (collection: CreateCollectionPostBody) => {
-    const response = await this.collectionService.addCollection(collection);
-    if (response.isSuccessful && response.data.data) {
-      const collections = response.data.data;
-      this.createCollection(collections);
-      return;
-    }
+    return await this.collectionService.addCollection(collection);
   };
 
   public addFolder = async (

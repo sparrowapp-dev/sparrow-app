@@ -6,20 +6,10 @@
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-
   import { collapsibleState } from "$lib/store/request-response-section";
-
-  import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import {
-    collectionList,
-    setCollectionList,
-    useCollectionTree,
-  } from "$lib/store/collection";
   import { useTree } from "./collectionList";
-  const [, , searchNode] = useTree();
   import { v4 as uuidv4 } from "uuid";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import DefaultCollection from "./DefaultCollection.svelte";
   import {
@@ -28,13 +18,15 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-
+    import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  
   export let collectionsMethods: CollectionsMethods;
+  
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
-  const _colllectionListViewModel = new CollectionListViewModel();
 
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
@@ -103,13 +95,21 @@
   );
   const handleCreateCollection = async () => {
     const newCollection = {
-      _id: uuidv4(),
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
-      workspaceId: currentWorkspaceId,
       items: [],
+      createdAt : new Date().toISOString()
     };
-    collection = [...collection, newCollection];
     collectionsMethods.addCollection(newCollection);
+    const response = await _colllectionListViewModel.addCollection({
+      name: newCollection.name,
+      workspaceId : currentWorkspaceId
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      collectionsMethods.updateCollection(newCollection._id ,res);
+      return;
+    }
     return;
   };
 

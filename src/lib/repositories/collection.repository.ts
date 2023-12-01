@@ -4,15 +4,44 @@ import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
 
+  /**
+   * @description
+   * Adds a new collection to workspace.
+   */
   public addCollection = async (collection: any) => {
     await rxdb.collection.insert(collection);
     return;
   };
+  /**
+   * @description
+   * updates existing collection to workspace.
+   */
+  public updateCollection = async (uuid: string, data) => {
+    console.log(uuid, data);
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: uuid,
+        },
+      })
+      .exec();
+    collection.incrementalModify((value) => {
+      value._id = data._id;
+      value.updatedAt = data.updatedAt;
+      value.updatedBy = data.updatedBy;
+      value.totalRequests = data.totalRequests;
+      value.createdAt = data.createdAt;
+      value.createdBy = data.createdBy;
+      return value;
+    });
+    return;
+  };
   public getCollection = (): Observable<CollectionDocument[]> => {
-    return rxdb.collection.find().$;
+    return rxdb.collection.find().sort({ createdAt: "asc" }).$;
   };
 
   public bulkInsertData = async (data: any): Promise<void> => {
+    await rxdb.collection.find().remove();
     await rxdb.collection.bulkInsert(data);
   };
 
