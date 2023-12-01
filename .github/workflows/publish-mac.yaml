@@ -71,11 +71,10 @@ jobs:
         name: sparrow-macos
         path: artifacts
 
-    # - name: List Files
-    #   run: ls -R artifacts
-
-    # - name: Log artifact URL
-    #   run: |
-    #     echo "Artifact URL: ${{ steps.upload_artifact.outputs.artifact_url }}"
     - name: Print Artifact URL
       run: echo "Artifact URL:${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+
+    - name: Upload to App Center
+      run: |
+        appcenter login --token ${{ secrets.APPCENTER_API_TOKEN_MAC }}
+        appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg -g Collaborators --app Techdome/Sparrow --build-version v12.23.${{ github.run_number }}
