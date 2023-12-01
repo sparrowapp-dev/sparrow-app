@@ -17,7 +17,6 @@ export class CollectionRepository {
    * updates existing collection to workspace.
    */
   public updateCollection = async (uuid: string, data) => {
-    console.log(uuid, data);
     const collection = await rxdb.collection
       .findOne({
         selector: {
