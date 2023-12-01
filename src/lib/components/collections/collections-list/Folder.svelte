@@ -9,6 +9,7 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
 
   export let title: string;
   export let collection: any;
@@ -96,19 +97,25 @@
     }
   }}
   style="height:36px;"
-  class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1 ps-4"
+  class="btn btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4"
 >
+<div class="d-flex align-items-center">
   <img
     src={angleRight}
+    class=""
     style="height:14px; width:14px; margin-right:8px; {visibility
       ? 'transform:rotate(90deg);'
       : 'transform:rotate(0deg);'}"
     alt="angleRight"
   />
   <p class="mb-0" style="font-size: 14px;">{title}</p>
+</div>
+{#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  <Spinner size={"15px"}/>
+{/if}
 </button>
 <div
-  style="padding-left: 40px; cursor:pointer; display: {visibility
+  style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
     ? 'block'
     : 'none'};"
 >
@@ -134,6 +141,5 @@
   .btn-primary:hover {
     background-color: #232527;
     color: #fff;
-    padding: 20px;
   }
 </style>

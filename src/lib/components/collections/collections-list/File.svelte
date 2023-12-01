@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Spinner from "$lib/components/Transition/Spinner.svelte";
     import { AuthSection, AuthType } from "$lib/utils/enums/authorization.enum";
     import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
     import { RequestDataType, RequestDataset, RequestDefault, RequestSection } from "$lib/utils/enums/request.enum";
@@ -55,16 +56,22 @@
 </script>
 
 <div
-  class="d-flex align-items-center {id.includes(UntrackedItems.UNTRACKED) ? 'unclickable' : '' }"
+  class="d-flex align-items-center justify-content-between {id.includes(UntrackedItems.UNTRACKED) ? 'unclickable' : '' }"
   style="height:32px;"
   on:click={()=>{handleClick()}}
 >
+<div class="d-flex align-items-center">
   <div class="api-method {apiClass}">
     {method.toUpperCase()}
   </div>
   <div class="api-name">
     {name}
   </div>
+
+</div>
+{#if id.includes(UntrackedItems.UNTRACKED)}
+  <Spinner size={"15px"}/>
+{/if}
 </div>
 
 <style>
