@@ -6,7 +6,11 @@
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
   import { onDestroy } from "svelte";
-  import { useCollectionTree } from "$lib/store/collection";
+  import {
+    deletedCollectionWorkspaceId,
+    isShowCollectionPopup,
+    useCollectionTree,
+  } from "$lib/store/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { RequestDefault } from "$lib/utils/enums/request.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -17,7 +21,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { WorkspaceService } from "$lib/services/workspace.service";
   import { CollectionService } from "$lib/services/collection.service";
-  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
+
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
@@ -84,6 +88,7 @@
   let menu = { h: 0, y: 0 };
 
   let browser = { h: 0, y: 0 };
+  let content;
 
   let showMenu = false;
   let button;
@@ -186,24 +191,13 @@
     }
   };
 
-  let showDeleteConfirmation = false;
-
-  function openDeleteConfirmation() {
-    showDeleteConfirmation = true;
-  }
-
-  function closeDeleteConfirmation() {
-    showDeleteConfirmation = false;
-  }
-
   //delete collection
   const deleteCollection = async () => {
-    const deleteCollectionName = await collectionService.deleteCollection(
-      workspaceId,
-      openCollectionId,
-    );
-    collectionsMethods.deleteCollectionData(openCollectionId);
-    closeDeleteConfirmation();
+    isShowCollectionPopup.set(true);
+    deletedCollectionWorkspaceId.set({
+      collectionId: openCollectionId,
+      workspaceId: workspaceId,
+    });
   };
 
   let menuItems = [
@@ -229,6 +223,10 @@
       displayText: "Delete",
     },
   ];
+
+  if (collectionId !== openCollectionId) {
+    showMenu = false;
+  }
 </script>
 
 <div class="content" bind:this={content} />
@@ -270,7 +268,7 @@
     }
   }}
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 my-button"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
 >
   <div class="d-flex align-items-center">
     <img
@@ -285,6 +283,7 @@
         class="form-control py-0"
         id="renameInputField"
         type="text"
+        style="font-size: 14px;"
         value={title}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
@@ -297,7 +296,7 @@
     {/if}
   </div>
   <button
-    class="threedot-icon-container border-0 rounded"
+    class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
     on:click={(e) => {
       e.stopPropagation();
       rightClickContextMenu(e, collectionId, button);
@@ -319,10 +318,13 @@
       {collectionId}
       {currentWorkspaceId}
       explorer={exp}
+      {visibility}
     />
   {/each}
-  <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-  <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+  <div class="mt-2 mb-2">
+    <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+    <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+  </div>
 </div>
 
 <style>

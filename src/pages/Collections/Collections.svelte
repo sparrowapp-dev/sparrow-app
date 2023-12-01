@@ -13,6 +13,12 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import {
+    isShowCollectionPopup,
+    isShowFolderPopup,
+  } from "$lib/store/collection";
+  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
+  import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -36,6 +42,8 @@
     addCollection: _collectionListViewModel.addCollection,
     deleteCollectionData: _viewModel.deleteCollectionData,
     updateCollectionName: _viewModel.updateCollectionName,
+    updateFolderName: _viewModel.updateFolderName,
+    deleteFolder: _viewModel.deleteFolder,
   };
 
   const activeTab = _viewModel.activeTab;
@@ -49,7 +57,27 @@
       moveNavigation("right");
     }
   };
+
+  let isShowPopup: boolean;
+
+  isShowCollectionPopup.subscribe((value) => {
+    isShowPopup = value;
+  });
+
+  let isShowFolder: boolean;
+
+  isShowFolderPopup.subscribe((value) => {
+    isShowFolder = value;
+  });
 </script>
+
+{#if isShowPopup}
+  <CollectionPopup {collectionsMethods} />
+{/if}
+
+{#if isShowFolder}
+  <FolderPopup {collectionsMethods} />
+{/if}
 
 <div class="d-flex">
   <div class="collections__list">

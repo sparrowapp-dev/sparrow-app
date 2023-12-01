@@ -1,4 +1,5 @@
 import type { CollectionDocument } from "$lib/database/app.database";
+
 import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
@@ -28,4 +29,16 @@ export interface CollectionsMethods {
   addCollection: (collection: CreateCollectionPostBody) => any;
   deleteCollectionData: (collectionId: string) => void;
   updateCollectionName: (collectionId: string, name: string) => void;
+  updateFolderName: (
+    collectionId: string,
+    folderId: string,
+    name: string,
+  ) => void;
+  deleteFolder: (collectionId: string, folderId: string) => void;
+  updateRequestName: (
+    requestId: string,
+    collectionId: string,
+    folderId: string,
+    name: string,
+  ) => void;
 }

@@ -4,7 +4,9 @@ import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
+  DeleteRequestName,
   UpdateCollectionName,
+  UpdateRequestName,
 } from "$lib/utils/dto";
 
 export class CollectionService {
@@ -80,6 +82,38 @@ export class CollectionService {
     return response;
   };
 
+  public updateFolderInCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    folder: CreateDirectoryPostBody,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      {
+        body: folder,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteFolderInCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public addRequestInCollection = async (
     apiRequest: CreateApiRequestPostBody,
   ) => {
@@ -91,6 +125,39 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
+    return response;
+  };
+
+  public updateRequestInCollection = async (
+    requestId: string,
+    requestBody: UpdateRequestName,
+  ) => {
+    console.log(requestBody);
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/request/${requestId}`,
+      {
+        body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    console.log(response);
+    return response;
+  };
+
+  public deleteRequestInCollection = async (
+    requestId: string,
+    deleteRequestBody: DeleteRequestName,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/request/${requestId}`,
+      {
+        body: deleteRequestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    console.log(response);
     return response;
   };
 }

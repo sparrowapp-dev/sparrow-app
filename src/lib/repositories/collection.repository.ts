@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rxdb, type CollectionDocument } from "$lib/database/app.database";
+import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
@@ -37,6 +38,50 @@ export class CollectionRepository {
       .exec();
     collection.incrementalPatch({
       name,
+    });
+  };
+
+  public updateFolderName = async (
+    collectionId: string,
+    folderId: string,
+    name: string,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    collection._data.items.map((item) => {
+      if (item.id === folderId && item.type === ItemType.FOLDER) {
+        item.name = name;
+      }
+    });
+
+    collection.incrementalPatch({
+      items: [...collection.items],
+    });
+  };
+
+  public deleteFolder = async (collectionId: string, folderId: string) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    const updatedItems = collection._data.items.filter((item) => {
+      if (item.type === ItemType.REQUEST) {
+        return item;
+      } else {
+        return item.id !== folderId;
+      }
+    });
+
+    collection.incrementalPatch({
+      items: [...updatedItems],
     });
   };
 

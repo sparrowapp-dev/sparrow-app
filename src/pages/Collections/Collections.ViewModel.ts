@@ -93,4 +93,18 @@ export class CollectionsViewModel {
     this.collectionRepository.updateCollection(id, name);
     this.debouncedTab();
   };
+
+  public updateFolderName = async (
+    id: string,
+    folderId: string,
+    name: string,
+  ) => {
+    this.collectionRepository.updateFolderName(id, folderId, name);
+    this.debouncedTab();
+  };
+
+  public deleteFolder = async (id: string, folderId: string) => {
+    this.collectionRepository.deleteFolder(id, folderId);
+    this.debouncedTab();
+  };
 }

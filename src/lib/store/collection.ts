@@ -3,6 +3,17 @@ import type { RequestBody } from "$lib/utils/interfaces/request.interface";
 import { writable } from "svelte/store";
 
 const collectionList = writable([]);
+export const isShowCollectionPopup = writable(false);
+export const isShowFolderPopup = writable(false);
+export const deletedCollectionWorkspaceId = writable({
+  collectionId: null,
+  workspaceId: null,
+});
+export const currentCollectionWorkspaceFolderId = writable({
+  collectionId: null,
+  workspaceId: null,
+  folderId: null,
+});
 
 const setCollectionList = (collection) => {
   collectionList.set(collection);

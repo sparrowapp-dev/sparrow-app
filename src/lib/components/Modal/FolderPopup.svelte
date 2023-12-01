@@ -3,83 +3,91 @@
   import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
   import {
-    deletedCollectionWorkspaceId,
-    isShowCollectionPopup,
+    currentCollectionWorkspaceFolderId,
+    isShowFolderPopup,
   } from "$lib/store/collection";
   import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
 
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
 
   let totalRequest: number = 0;
-  let totalFolder: number = 0;
-  let workspaceCollection;
+  let totalFolder: number = 1;
+  let currentWorkspaceCollectionFolder;
   let collectionTobeDeleted = [];
-  let collectionName: string = "";
+  let folderName: string = "";
 
-  deletedCollectionWorkspaceId.subscribe((value) => {
+  currentCollectionWorkspaceFolderId.subscribe((value) => {
     if (value) {
-      workspaceCollection = value;
+      currentWorkspaceCollectionFolder = value;
     }
+    console.log(currentWorkspaceCollectionFolder);
   });
 
   const _colllectionListViewModel = new CollectionListViewModel();
 
-  let collection: any[] = [];
+  let folder: any[] = [];
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
+        console.log(value);
         collectionTobeDeleted = value.filter((collection) => {
-          if (collection._data._id === workspaceCollection.collectionId) {
+          if (
+            collection._data._id ===
+            currentWorkspaceCollectionFolder.collectionId
+          ) {
             return collection._data;
           }
         });
+        console.log(collectionTobeDeleted);
       }
     },
   );
 
-  collectionName = collectionTobeDeleted[0]._data.name;
   collectionTobeDeleted[0]?._data.items.forEach((item) => {
-    if (item.type === "FOLDER") {
-      totalFolder++;
+    if (
+      item.id === currentWorkspaceCollectionFolder.folderId &&
+      item.type === ItemType.FOLDER
+    ) {
+      folderName = item.name;
       totalRequest += item.items.length;
-    }
-    if (item.type === "REQUEST") {
-      totalRequest++;
     }
   });
 
   const handleDelete = async () => {
-    const deleteCollectionName = await collectionService.deleteCollection(
-      workspaceCollection.workspaceId,
-      workspaceCollection.collectionId,
+    const deleteFolder = await collectionService.deleteFolderInCollection(
+      currentWorkspaceCollectionFolder.workspaceId,
+      currentWorkspaceCollectionFolder.collectionId,
+      currentWorkspaceCollectionFolder.folderId,
     );
-    if (deleteCollectionName.isSuccessful) {
-      collectionsMethods?.deleteCollectionData(
-        workspaceCollection.collectionId,
+    if (deleteFolder.isSuccessful) {
+      collectionsMethods?.deleteFolder(
+        currentWorkspaceCollectionFolder.collectionId,
+        currentWorkspaceCollectionFolder.folderId,
       );
-      isShowCollectionPopup.set(false);
-      notifications.success(`"${collectionName}" Collection deleted.`);
+      isShowFolderPopup.set(false);
+      notifications.success(`"${folderName}" Folder deleted.`);
     } else {
-      isShowCollectionPopup.set(false);
-      notifications.error("Failed to delete the Collection.");
+      isShowFolderPopup.set(false);
+      notifications.error("Failed to delete the Folder.");
     }
   };
 
   let isPopupShow: boolean;
 
-  isShowCollectionPopup.subscribe((value) => {
+  isShowFolderPopup.subscribe((value) => {
     isPopupShow = value;
   });
 
   const handleCancel = async () => {
-    isShowCollectionPopup.set(false);
+    isShowFolderPopup.set(false);
   };
 </script>
 
@@ -90,7 +98,7 @@
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-      Delete Collection?
+      Delete Folder?
     </h5>
     <button class="btn-close1 border-0 rounded" on:click={handleCancel}>
       <img src={closeIcon} alt="" />
@@ -98,9 +106,9 @@
   </div>
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <p>
-      Are you sure you want to delete this Collection? Everything in <span
+      Are you sure you want to delete this Folder? Everything in <span
         style="font-weight:700;"
-        class="text-whiteColor">"{collectionName}"</span
+        class="text-whiteColor">"{folderName}"</span
       >
       will be removed.
     </p>

@@ -11,6 +11,9 @@ export interface CreateCollectionPostBody {
 export interface UpdateCollectionName {
   name: string;
 }
+export interface UpdateFolderName {
+  name: string;
+}
 
 export interface Headers {
   name: string;
@@ -21,6 +24,26 @@ export interface QueryParams {
   name: string;
   description: string;
   checked: boolean;
+}
+
+export interface UpdateRequestName {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  items: {
+    name: string;
+    type: string;
+  };
+}
+
+export interface DeleteRequestName {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  items: {
+    name: string;
+    type: string;
+  };
 }
 
 export interface CreateApiRequestPostBody {
