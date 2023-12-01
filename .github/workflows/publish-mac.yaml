@@ -74,6 +74,10 @@ jobs:
     - name: Print Artifact URL
       run: echo "Artifact URL:${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
 
+    - name: Install App Center CLI
+      run: |
+        npm install -g appcenter-cli@latest
+
     - name: Upload to App Center
       run: |
         appcenter login --token ${{ secrets.APPCENTER_API_TOKEN_MAC }}
