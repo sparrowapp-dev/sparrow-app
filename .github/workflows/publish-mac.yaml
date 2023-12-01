@@ -71,9 +71,11 @@ jobs:
         name: sparrow-macos
         path: artifacts
 
-    - name: List Files
-      run: ls -R artifacts
+    # - name: List Files
+    #   run: ls -R artifacts
 
-    - name: Log artifact URL
-      run: |
-        echo "Artifact URL: ${{ steps.upload_artifact.outputs.artifact_url }}"
+    # - name: Log artifact URL
+    #   run: |
+    #     echo "Artifact URL: ${{ steps.upload_artifact.outputs.artifact_url }}"
+    - name: Print Artifact URL
+      run: echo "Artifact URL:${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
