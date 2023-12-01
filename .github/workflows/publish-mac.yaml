@@ -3,7 +3,7 @@ name: Mac Build, Sign, and Download Tauri App
 on:
   push:
     branches:
-      - development
+      - none
 
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
