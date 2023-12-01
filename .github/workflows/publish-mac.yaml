@@ -37,9 +37,9 @@ jobs:
 
     - name: Build Tauri App
       run: |
-        APPLE_SIGNING_IDENTITY=${{ secrets.APPLE_SIGNING_IDENTITY }}
-        APPLE_CERTIFICATE=${{ secrets.APPLE_CERTIFICATE }}
-        APPLE_CERTIFICATE_PASSWORD=${{ secrets.APPLE_CERTIFICATE_PASSWORD }} yarn tauri build
+        APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
+        APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
+        APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" yarn tauri build
 
     # - name: Archive and Sign App
     #   run: |
