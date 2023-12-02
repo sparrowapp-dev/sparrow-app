@@ -11,7 +11,7 @@ env:
 jobs:
   build_and_sign:
     runs-on: macos-latest
-
+ 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
