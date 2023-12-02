@@ -112,6 +112,7 @@ const setRequestProperty = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request[route] = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -128,6 +129,7 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.state[route] = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -143,6 +145,7 @@ const setRequestAuth = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.auth[route] = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -158,6 +161,7 @@ const setRequestBody = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.body[route] = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -173,6 +177,7 @@ const setRequestBodyFormData = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.body.formdata[route] = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -190,6 +195,9 @@ const setTabProperty = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem[route] = data;
+        if (route !== "save") {
+          elem.save = false;
+        }
         progressiveTab.set(elem);
       }
       return elem;

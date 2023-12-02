@@ -8,10 +8,7 @@
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
-  import { collectionList, useCollectionTree } from "$lib/store/collection";
-  import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { Observable } from "rxjs";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -27,29 +24,23 @@
 
   let tabName: string = "";
   let componentData: NewTab;
-  let collection;
-
-  const { updateNodeData } = useCollectionTree();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     tabName = event?.name;
-  });
-
-  const collectionListUnsubscribe = collectionList.subscribe((value) => {
-    collection = value;
+    componentData = event;
   });
 
   const handleSaveRequest = async () => {
     if (componentData?.id && componentData?.path) {
       const { folderId, folderName, collectionId, workspaceId } =
         componentData.path;
-      if (componentData.path) {
+      // if (componentData.path) {
         const expectedRequest: RequestBody = {
-          method: componentData.request.method,
-          url: componentData.request.url,
-          body: componentData.request.body,
-          headers: componentData.request.headers,
-          queryParams: componentData.request.queryParams,
+          method: componentData.property.request.method,
+          url: componentData.property.request.url,
+          body: componentData.property.request.body,
+          headers: componentData.property.request.headers,
+          queryParams: componentData.property.request.queryParams,
         };
 
         if (!folderId && !folderName) {
@@ -64,15 +55,12 @@
             },
           });
           if (res.isSuccessful) {
-            updateNodeData(
-              JSON.parse(JSON.stringify(collection)),
+            collectionsMethods.updateRequestOrFolderInCollection(
+              collectionId,
               componentData.id,
-              {
-                name: tabName,
-                request: expectedRequest,
-              },
+              res.data.data,
             );
-            // handleTabUpdate({ save: true }, componentData.id);
+            collectionsMethods.updateTab(true, "save");
           }
         } else {
           let res = await updateCollectionRequest(componentData.id, {
@@ -91,18 +79,16 @@
             },
           });
           if (res.isSuccessful) {
-            updateNodeData(
-              JSON.parse(JSON.stringify(collection)),
+            collectionsMethods.updateRequestInFolder(
+              collectionId,
+              folderId,
               componentData.id,
-              {
-                name: tabName,
-                request: expectedRequest,
-              },
+              res.data.data,
             );
-            // handleTabUpdate({ save: true }, componentData.id);
+            collectionsMethods.updateTab(true, "save");
           }
         }
-      }
+      // }
     }
   };
 
@@ -111,7 +97,6 @@
   };
 
   onDestroy(() => {
-    collectionListUnsubscribe();
     tabSubscribe();
   });
 
@@ -152,62 +137,16 @@
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
   >
-    <div>
+    <div class="w-100 me-3">
       <input
         placeholder="Enter API Request Name"
         bind:value={tabName}
         on:input={handleInputValue}
-        class="tabbar-tabName"
+        class="tabbar-tabName w-100"
       />
     </div>
 
     <div class="d-flex gap-3">
-      <!-- <div class="d-flex gap-1">
-        <button
-          class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
-          on:click={() => {
-            if (!componentData?.path) {
-              visibility = true;
-            } else {
-              handleSaveRequest();
-            }
-          }}
-        >
-          <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
-          <p
-            class="mb-0 text-whiteColor"
-            style="font-size: 14px; font-weight:400;"
-          >
-            Save
-          </p>
-        </button>
-        <span class="position-relative">
-          <button
-            on:click={() => {
-              setTimeout(() => {
-                display = true;
-              }, 100);
-            }}
-            class="px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
-          >
-            <img src={angleDown} alt="" class="w-100 h-100" />
-          </button>
-          <div class="rounded save-options {display ? 'd-block' : 'd-none'}">
-            <p
-              style="width:120px;"
-              class="bg-black m-0 py-1 px-3 cursor-pointer"
-              on:click={() => {
-                display = false;
-                visibility = true;
-              }}
-            >
-              Save As
-            </p>
-          </div>
-          <SaveRequest {visibility} onClick={handleBackdrop} />
-        </span>
-      </div> -->
-
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
@@ -228,7 +167,7 @@
               Save
             </p>
           </button>
-          <span class="position-relative">
+          <span class="position-relative" style="width:35px;">
             <button
               id="save-dropdown"
               on:click={toggleDropdown}
@@ -248,7 +187,11 @@
                 Save As
               </p>
             </div>
-            <SaveRequest {visibility} {collectionsMethods} onClick={handleBackdrop} />
+            <SaveRequest
+              {visibility}
+              {collectionsMethods}
+              onClick={handleBackdrop}
+            />
           </span>
         </div>
         <div>

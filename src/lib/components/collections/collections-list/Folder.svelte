@@ -83,6 +83,10 @@
       );
 
       request.id = res.id;
+      request.path = {
+        workspaceId: currentWorkspaceId,
+        collectionId,
+      }
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
       return;
