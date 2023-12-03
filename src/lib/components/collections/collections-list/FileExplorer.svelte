@@ -70,14 +70,13 @@
         sampleRequest.id,
         request,
       );
-      debugger;
+      
       sampleRequest.id = request.id;
-      sampleRequest.path = {
-        workspaceId: currentWorkspaceId,
-        collectionId,
-        folderId : explorer.id,
-        folderName : explorer.name,
-      }
+      sampleRequest.path.workspaceId = currentWorkspaceId;
+      sampleRequest.path.collectionId = collectionId;
+      sampleRequest.path.folderId = explorer.id;
+      sampleRequest.path.folderName = explorer.name;
+      
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
       return;

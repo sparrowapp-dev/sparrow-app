@@ -123,7 +123,7 @@ export interface NewTab {
   save: boolean;
   createdAt: string;
   path?: Path;
-  isRawBodyValid?: boolean;
+  saveInProgress?: boolean;
 }
 
 export interface CurrentTab {

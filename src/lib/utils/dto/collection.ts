@@ -32,7 +32,7 @@ export interface CreateApiRequestPostBody {
     request?: {
       method: string;
       url?: string;
-      body?: string;
+      body?: unknown;
       headers?: KeyValuePair[];
       queryParams?: KeyValuePair[];
     };
@@ -43,7 +43,7 @@ export interface CreateApiRequestPostBody {
       request: {
         method: string;
         url?: string;
-        body?: string;
+        body?: unknown;
         headers?: KeyValuePair[];
         queryParams?: KeyValuePair[];
       };
