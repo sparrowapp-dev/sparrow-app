@@ -301,7 +301,6 @@
 
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
-    // currentWorkspaceUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     tabsUnsubscribe();
     currentTabUnsubscribe();
