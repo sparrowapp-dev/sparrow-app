@@ -155,6 +155,7 @@
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
+            style="width:160px;"
             class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
             on:click={() => {
               if (
@@ -176,7 +177,7 @@
               class="mb-0 text-whiteColor"
               style="font-size: 14px; font-weight:400;"
             >
-              Save
+              Save Request
             </p>
           </button>
           <span class="position-relative" style="width:35px;">
@@ -199,11 +200,13 @@
                 Save As
               </p>
             </div>
-            <SaveRequest
-              {visibility}
-              {collectionsMethods}
-              onClick={handleBackdrop}
-            />
+            {#if visibility}
+              <SaveRequest
+                {collectionsMethods}
+                {componentData}
+                onClick={handleBackdrop}
+              />
+            {/if}
           </span>
         </div>
         <div>

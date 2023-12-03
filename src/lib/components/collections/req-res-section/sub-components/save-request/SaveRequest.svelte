@@ -36,9 +36,11 @@
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     import type { Observable } from "rxjs";
     import type { WorkspaceDocument } from "$lib/database/app.database";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
   export let collectionsMethods : CollectionsMethods;
   export let onClick;
+  export let componentData : NewTab;
 
   interface Path {
     name: string;
@@ -61,14 +63,13 @@
     id: "",
     name:""
   };
-
-  let currentTabId = null;
-  let tabList = [];
-  let tabName = "";
-  let tabId: string = "";
-  let tabMethod: string = "";
-  let tabUrl: string = "";
-  let componentData;
+  let tabName;
+  if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+    tabName = componentData.name;
+  }
+  else{
+    tabName = componentData.name + " Copy";
+  }
   let latestRoute : {
     id: string
   } = {
@@ -120,15 +121,15 @@
     }
   };
 
-  const handleSaveRequest = async () => {
-    const dummyId = new Date() + "uid";
+  const handleSaveAsRequest = async () => {
+    // const dummyId = new Date() + "uid";
     if (path.length > 0) {
       const expectedRequest = {
-        method: componentData.request.method,
-        url: componentData.request.url,
-        body: componentData.request.body,
-        headers: componentData.request.headers,
-        queryParams: componentData.request.queryParams,
+        method: componentData.property.request.method,
+        url: componentData.property.request.url,
+        body: componentData.property.request.body,
+        headers: componentData.property.request.headers,
+        queryParams: componentData.property.request.queryParams,
       };
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
@@ -144,38 +145,30 @@
 
         if (res.isSuccessful) {
           notifications.success("API request saved");
-          insertNode(
-            JSON.parse(JSON.stringify(collection)),
-            path[path.length - 1].id,
-            ItemType.REQUEST,
-            tabName,
-            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
-            expectedRequest,
-          );
+          // console.log(res.data.data);
+          collectionsMethods.addRequestOrFolderInCollection(path[path.length - 1].id, res.data.data);
           const expectedPath = {
             folderId: "",
             folderName: "",
             collectionId: path[path.length - 1].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path) {
-            // update tab data
-            // handleTabUpdate(
-            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
-            //   currentTabId,
-            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+            collectionsMethods.updateTab(expectedPath, "path");
+            collectionsMethods.updateTab(res.data.data.name, "name");
+            collectionsMethods.updateTab(res.data.data.id, "id");
+            collectionsMethods.updateTab(true, "save");
           } else {
-            //push new tab
-            let newTab: NewTab = {
-              id: dummyId,
-              name: tabName,
-              type: ItemType.REQUEST,
-              request: expectedRequest,
-              path: expectedPath,
-              save: true,
-              requestInProgress: false,
-            };
+            let sampleRequest = generateSampleRequest(res.data.data.id, new Date().toString());
+            sampleRequest.name = res.data.data.name;
+            sampleRequest.path = expectedPath;
+            sampleRequest.save = true;
+            sampleRequest.property.request.url = res.data.data.request.url;
+            sampleRequest.property.request.method = res.data.data.request.method;
+            sampleRequest.property.request.body = res.data.data.request.body;
+            sampleRequest.property.request.queryParams = res.data.data.request.queryParams;
+            sampleRequest.property.request.headers = res.data.data.request.headers;
+            collectionsMethods.handleCreateTab(sampleRequest);
           }
           onClick(false);
           navigateToWorkspace();
@@ -197,40 +190,29 @@
         });
 
         if (res.isSuccessful) {
-          insertNode(
-            JSON.parse(JSON.stringify(collection)),
-            path[path.length - 1].id,
-            ItemType.REQUEST,
-            tabName,
-            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
-            expectedRequest,
-          );
-
+          collectionsMethods.addRequestInFolder(path[0].id, path[path.length - 1].id, res.data.data);
           const expectedPath = {
             folderId: path[path.length - 1].id,
             folderName: path[path.length - 1].name,
             collectionId: path[0].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path) {
-            // update tab data
-            // handleTabUpdate(
-            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
-            //   currentTabId,
-            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+            collectionsMethods.updateTab(expectedPath, "path");
+            collectionsMethods.updateTab(res.data.data.name, "name");
+            collectionsMethods.updateTab(res.data.data.id, "id");
+            collectionsMethods.updateTab(true, "save");
           } else {
-            //push new tab
-            // let newTab: NewTab = {
-            //   id: dummyId,
-            //   name: tabName,
-            //   type: ItemType.REQUEST,
-            //   request: expectedRequest,
-            //   path: expectedPath,
-            //   save: true,
-            //   requestInProgress: false,
-            // };
-            // handleTabAddons(newTab);
+            let sampleRequest = generateSampleRequest(res.data.data.id, new Date().toString());
+            sampleRequest.name = res.data.data.name;
+            sampleRequest.path = expectedPath;
+            sampleRequest.save = true;
+            sampleRequest.property.request.url = res.data.data.request.url;
+            sampleRequest.property.request.method = res.data.data.request.method;
+            sampleRequest.property.request.body = res.data.data.request.body;
+            sampleRequest.property.request.queryParams = res.data.data.request.queryParams;
+            sampleRequest.property.request.headers = res.data.data.request.headers;
+            collectionsMethods.handleCreateTab(sampleRequest);
           }
           onClick(false);
           navigateToWorkspace();
@@ -271,49 +253,19 @@
     }
   };
 
-  const fetchComponentData = (id, list) => {
-    list.forEach((elem: NewTab) => {
-      if (elem.id === id && elem.type !== ItemType.WORKSPACE) {
-        tabName = elem.name;
-        tabId = elem.id;
-        tabMethod = elem.request.method;
-        tabUrl = elem.request.url;
-        componentData = { ...elem };
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchComponentData(currentTabId, tabList);
-    }
-  });
-
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchComponentData(currentTabId, tabList);
-      }
-    }
-  });
-
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
   });
 </script>
 
 <div
-  class="save-request-backdrop {visibility ? 'd-block' : 'd-none'}"
+  class="save-request-backdrop d-block"
   on:click={() => {
     onClick(false);
   }}
 />
-<div class="save-request {visibility ? 'd-block' : 'd-none'}">
+<div class="save-request d-block">
   <div class="contain">
     <div class="d-flex justify-content-between">
       <div class="pb-2">
@@ -550,7 +502,7 @@
           size={16}
           type={"primary"}
           onClick={() => {
-            handleSaveRequest();
+            handleSaveAsRequest();
           }}
         />
       </div>
