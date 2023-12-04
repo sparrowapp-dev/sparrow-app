@@ -6,6 +6,7 @@
   import filterIcon from "$lib/assets/filter.svg";
   import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
+  import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
 
   import { collapsibleState } from "$lib/store/request-response-section";
 
@@ -23,12 +24,17 @@
   import { v4 as uuidv4 } from "uuid";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-    import Collection from "$lib/components/file-types/collection/Collection.svelte";
-    import DefaultCollection from "./DefaultCollection.svelte";
+  import Collection from "$lib/components/file-types/collection/Collection.svelte";
+  import DefaultCollection from "./DefaultCollection.svelte";
+  import { selectMethodsStore, selectedMethodsCollectionStore} from "$lib/store/methods";
 
   let collection: Collection[]=[];
   let currentWorkspaceId: string = "";
+  let showfilterDropdown=false;
 
+  let selectedApiMethods:string[]=[];
+  let filteredSelectedMethodsCollection=[];
+  let collapsExpandToggle: boolean = false;
   let getCollectionData = async (id: string) => {
     const res = await fetchCollection(id);
     if (res.isSuccessful) {
@@ -40,6 +46,17 @@
     collection = value;
   }
   );
+  const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      selectedApiMethods=value; 
+    }
+  })
+
+  const selectedMethodsCollectionUnsubscribe=selectedMethodsCollectionStore.subscribe((value)=>{
+    if(value){
+      filteredSelectedMethodsCollection=value;
+    }
+  })
   let currentWorkspaceName = "";
 
   const getNextCollection: (list: any[], name: string) => any = (
@@ -89,6 +106,12 @@
     }
   };
 
+  const handleFilterDropdown=()=>{
+    const filterBtn=document.getElementById("filter-btn");
+    showfilterDropdown=!showfilterDropdown
+    filterBtn.style.backgroundColor=showfilterDropdown?"#85C2FF":"#000000";
+  }
+
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
     if (value.id && value.name) {
       getCollectionData(value.id);
@@ -97,7 +120,7 @@
     }
   });
 
-  let collapsExpandToggle: boolean = false;
+ 
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
@@ -116,12 +139,19 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
-    searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
+    searchNode(searchData, filteredCollection, filteredFolder, filteredFile,filteredSelectedMethodsCollection);
   };
 
   onDestroy(collectionListUnsubscribe);
   onDestroy(currentWorkspaceUnsubscribe);
   onDestroy(collapsibleStateUnsubscribe);
+  onDestroy(()=>{
+   collectionListUnsubscribe();
+   currentWorkspaceUnsubscribe();
+   collapsibleStateUnsubscribe();
+   selectedMethodsCollectionUnsubscribe();
+   selectedMethodUnsubscibe();
+  })
 
   const handleResize = () => {
     const windowWidth = window.innerWidth;
@@ -199,17 +229,24 @@
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in {currentWorkspaceName}"
         bind:value={searchData}
-        on:input={handleSearch}
+        on:input={()=>{handleSearch()}}
       />
     </div>
 
     <div class="d-flex align-items-center justify-content-center">
-      <button
-        class="btn btn-blackColor d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px;"
-      >
-        <img src={filterIcon} alt="" />
-      </button>
+      <button id="filter-btn"
+  class="btn btn-blackColor  d-flex align-items-center justify-content-center"
+  style="width: 32px; height:32px; position:relative" on:click={handleFilterDropdown}
+>
+
+  <img src={filterIcon}  alt=""/>
+  {#if showfilterDropdown}
+  <span
+  class="position-absolute"
+  style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+/>
+{/if}
+</button>
     </div>
     <div class="d-flex align-items-center justify-content-center">
       <button
@@ -224,11 +261,12 @@
 
   <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
     <div class="d-flex flex-column justify-content-center">
+      {#if showfilterDropdown}
+      <FilterDropDown handleSearch={handleSearch}></FilterDropDown>
+      {/if}
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
-            <p class="my-2">API Requests</p>
-            <hr class="mt-0 mb-1" />
             {#each filteredFile as exp}
               <SearchTree
                 editable={true}
@@ -236,34 +274,44 @@
                 workspaceId={currentWorkspaceId}
                 path={exp.path}
                 explorer={exp.tree}
+                searchData={searchData}
               />
             {/each}
           {/if}
           {#if filteredFolder.length > 0}
-            <p class="my-2">Folders</p>
-            <hr class="mt-0 mb-1" />
+
             {#each filteredFolder as exp}
               <SearchTree
                 editable={true}
                 collectionId={exp.collectionId}
                 workspaceId={currentWorkspaceId}
                 explorer={exp.tree}
+                searchData={searchData}
               />
             {/each}
           {/if}
           {#if filteredCollection.length > 0}
-            <p class="my-2">Collections</p>
-            <hr class="mt-0 mb-1" />
             {#each filteredCollection as exp}
               <SearchTree
                 editable={true}
                 collectionId={exp.collectionId}
                 workspaceId={currentWorkspaceId}
                 explorer={exp.tree}
+                searchData={searchData}
               />
             {/each}
           {/if}
         </div>
+        {:else if selectedApiMethods.length>0 }
+        {#each filteredSelectedMethodsCollection as col}
+        <Folder
+          collectionList={collection}
+          collectionId={col._id}
+          {currentWorkspaceId}
+          collection={col}
+          title={col.name}
+        />
+      {/each}
       {:else}
       {#if collection.length > 0}
         {#each collection as col}
@@ -293,5 +341,8 @@
   }
   .inputField {
     outline: none;
+  }
+  .inputField:hover{
+    border:1px solid var(--workspace-hover-color);
   }
 </style>

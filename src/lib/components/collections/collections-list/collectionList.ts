@@ -1,9 +1,22 @@
 import { collectionList, setCollectionList } from "$lib/store/collection";
+import { ItemType } from "$lib/utils/enums/item-type.enum";
+import type { Collection } from "$lib/utils/interfaces/collection.interface";
+import {
+  selectMethodsStore,
+  selectedMethodsCollectionStore,
+} from "$lib/store/methods";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
-
+const filterTree: Collection[] = [];
+let selectedAPIMethods: string[] = [];
 collectionList.subscribe((value: object[]) => {
   tree = JSON.parse(JSON.stringify(value));
+});
+
+selectMethodsStore.subscribe((value) => {
+  if (value) {
+    selectedAPIMethods = value;
+  }
 });
 
 /**
@@ -106,6 +119,40 @@ const searchHelper: (
   return;
 };
 
+const sortHelperMethod: (
+  tree: any,
+  path: string[],
+  selectedMethods: string[],
+  filterTree: any[],
+) => any[] = (tree, path, selectedMethods, filterTree) => {
+  if (
+    tree.type === ItemType.REQUEST &&
+    selectedMethods.includes(tree.request.method)
+  ) {
+    if (path.length === 2) {
+      filterTree[0].items[filterTree[0].items.length - 1].items.push(tree);
+    } else {
+      filterTree[0].items.push(tree);
+    }
+  } else if (tree.type == ItemType.FOLDER) {
+    filterTree[0].items.push({ ...tree, items: [] });
+  } else if (
+    !(tree.type === ItemType.REQUEST) &&
+    !(tree.type === ItemType.FOLDER)
+  ) {
+    filterTree = [{ ...tree, items: [] }];
+  }
+  // Recursively search through the tree structure
+  if (tree && tree.items) {
+    for (let j = 0; j < tree.items.length; j++) {
+      path.push(tree.name); // Recursive backtracking
+      sortHelperMethod(tree.items[j], path, selectedMethods, filterTree);
+      path.pop();
+    }
+  }
+  return filterTree;
+};
+
 /**
  * Custom hook function for interacting with the tree data structure.
  */
@@ -138,16 +185,51 @@ const useTree = (): any[] => {
     folder: any[],
     file: any[],
   ) => void = (searchText, collection, folder, file) => {
+    const filteredByMethodTrees = [];
+    // iterate through the tree and filter according to api methods selected
+    if (selectedAPIMethods.length > 0) {
+      for (let i = 0; i < tree.length; i++) {
+        const path = [];
+        const treeCol = sortHelperMethod(
+          tree[i],
+          path,
+          selectedAPIMethods,
+          filterTree,
+        );
+        filteredByMethodTrees.push(...treeCol);
+      }
+    }
+    let filteredTrees = [];
+    // iterate through the tree and remove empty collection and folder on filter
+    if (filteredByMethodTrees.length > 0) {
+      filteredTrees = filteredByMethodTrees.filter((collectionObj) => {
+        if (collectionObj.items.length > 0) {
+          const items = collectionObj.items.filter(
+            (item) =>
+              !(item.type === ItemType.FOLDER && item.items.length === 0),
+          );
+          collectionObj.items = items;
+          if (collectionObj.items.length > 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      });
+    } else {
+      filteredTrees = tree;
+    }
+    selectedMethodsCollectionStore.update(() => filteredTrees);
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < tree.length; i++) {
       const path = [];
       searchHelper(
-        tree[i],
+        filteredTrees[i],
         searchText,
         collection,
         folder,
         file,
-        tree[i]._id,
+        filteredTrees[i]._id,
         path,
       );
     }

@@ -9,8 +9,11 @@
     import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
     import { ItemType } from "$lib/utils/enums/item-type.enum";
     import { v4 as uuidv4 } from "uuid";
+    import { selectMethodsStore } from "$lib/store/methods";
+    import { onDestroy } from "svelte";
     const { insertNode, updateNodeId } = useCollectionTree();
     let expand : boolean = false;
+    let showFolderAPIButtons:boolean=true;
     export let explorer;
     export let collectionId :string;
     export let currentWorkspaceId : string;
@@ -51,6 +54,19 @@
           new Date() + "uid"); // MOCKED DATA [UPDATION REQUIRED HERE]
       } 
     }
+    const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      expand=true;
+      showFolderAPIButtons=false;
+    }else{
+      showFolderAPIButtons=true;
+      expand=false;
+    }
+  })
+
+  onDestroy(()=>{
+    selectedMethodUnsubscibe();
+  })
 </script>
 {#if explorer.type === "FOLDER"}
     <div>
@@ -67,7 +83,9 @@
         {#each explorer.items as exp}
           <svelte:self folderId = {explorer.id} folderName={explorer.name} explorer={exp} collectionId={collectionId} currentWorkspaceId={currentWorkspaceId} />
         {/each}
-        <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
+        {#if showFolderAPIButtons}
+         <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
+         {/if}
       </div>
     </div>
 {:else}

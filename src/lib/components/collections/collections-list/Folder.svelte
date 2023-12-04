@@ -11,9 +11,10 @@
   import { getNextName } from "./collectionList";
   import { onDestroy } from "svelte";
   import { useCollectionTree } from "$lib/store/collection";
-    import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import { RequestDefault } from "$lib/utils/enums/request.enum";
-    import { v4 as uuidv4 } from "uuid";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { RequestDefault } from "$lib/utils/enums/request.enum";
+  import { v4 as uuidv4 } from "uuid";
+  import { selectMethodsStore } from "$lib/store/methods";
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   let visibility = false;
   export let title: string;
@@ -21,6 +22,7 @@
   export let collectionId: string;
   export let currentWorkspaceId: string;
   let workspaceId: string = "";
+  let showFolderAPIButtons:boolean=true;
   export let collectionList;
   
   const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
@@ -91,7 +93,20 @@
       );
     }
   };
-  onDestroy(currentWorkspaceUnsubscribe);
+   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      showFolderAPIButtons=false;
+      visibility=true;
+    }else if(value && value.length===0){
+       visibility=false;
+    }else{
+      showFolderAPIButtons=true;
+    }
+  })
+  onDestroy(()=>{
+    currentWorkspaceUnsubscribe();
+    selectedMethodUnsubscibe();
+    });
 </script>
 
 <button
@@ -120,8 +135,10 @@
   {#each collection.items as exp}
     <FileExplorer collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
   {/each}
+  {#if showFolderAPIButtons}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
   <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+  {/if}
 </div>
 
 <style>
