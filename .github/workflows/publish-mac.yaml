@@ -19,16 +19,16 @@ jobs:
     - name: Rust setup
       uses: dtolnay/rust-toolchain@stable
 
-    - name: Rust cache
-      uses: swatinem/rust-cache@v2
-      with:
-        workspaces: './src-tauri -> target'
+    # - name: Rust cache
+    #   uses: swatinem/rust-cache@v2
+    #   with:
+    #     workspaces: './src-tauri -> target'
 
     - name: Sync node version and setup cache
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
-        cache: 'yarn' # Set this to npm, yarn or pnpm.
+        node-version: '18.x'
+        #cache: 'yarn' # Set this to npm, yarn or pnpm.
 
     - name: Install Dependencies
       run: |
