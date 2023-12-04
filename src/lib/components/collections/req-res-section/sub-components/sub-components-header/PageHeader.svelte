@@ -155,8 +155,9 @@
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
-            style="width:160px;"
-            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
+            disabled={componentData?.save}
+            style="width:140px;"
+            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
               if (
                 componentData?.path.collectionId &&

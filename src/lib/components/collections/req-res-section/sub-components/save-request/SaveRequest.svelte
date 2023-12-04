@@ -1,11 +1,8 @@
 <script lang="ts">
-  export let visibility: boolean = true;
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
-  import { collectionList, useCollectionTree } from "$lib/store/collection";
   import { onDestroy } from "svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
   import workspaceAsset from "$lib/assets/workspace.svg";
@@ -24,23 +21,16 @@
     CreateCollectionPostBody,
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
-  import {
-    currentTab,
-    // handleTabAddons,
-    // handleTabUpdate,
-    tabs,
-    // updateCurrentTab,
-  } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { Observable } from "rxjs";
-    import type { WorkspaceDocument } from "$lib/database/app.database";
-    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
-  export let collectionsMethods : CollectionsMethods;
+  export let collectionsMethods: CollectionsMethods;
   export let onClick;
-  export let componentData : NewTab;
+  export let componentData: NewTab;
 
   interface Path {
     name: string;
@@ -51,40 +41,41 @@
     name: string;
     id: string;
   }
-  const { insertNode, insertHead } = useCollectionTree();
 
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
   let workspace: {
-    id: string,
-    name: string
+    id: string;
+    name: string;
   } = {
     id: "",
-    name:""
+    name: "",
   };
   let tabName;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
     tabName = componentData.name;
-  }
-  else{
+  } else {
     tabName = componentData.name + " Copy";
   }
-  let latestRoute : {
-    id: string
+  let latestRoute: {
+    id: string;
   } = {
-    id: ""
-  }
+    id: "",
+  };
+
+  let isLoading : boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
- 
-  const collectionListUnsubscribe = collectionsMethods.getCollectionList().subscribe((value)=>{
-    collection = value;
-    directory = JSON.parse(JSON.stringify(collection));
-    if(latestRoute.id) 
-      navigateToDirectory(latestRoute);
-  });
+
+  const collectionListUnsubscribe = collectionsMethods
+    .getCollectionList()
+    .subscribe((value) => {
+      collection = value;
+      directory = JSON.parse(JSON.stringify(collection));
+      if (latestRoute.id) navigateToDirectory(latestRoute);
+    });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -92,7 +83,7 @@
         workspace.id = value.get("_id");
         workspace.name = value.get("name");
       }
-    }
+    },
   );
 
   const navigateToWorkspace = () => {
@@ -123,6 +114,7 @@
 
   const handleSaveAsRequest = async () => {
     // const dummyId = new Date() + "uid";
+    isLoading = true;
     if (path.length > 0) {
       const expectedRequest = {
         method: componentData.property.request.method,
@@ -146,32 +138,45 @@
         if (res.isSuccessful) {
           notifications.success("API request saved");
           // console.log(res.data.data);
-          collectionsMethods.addRequestOrFolderInCollection(path[path.length - 1].id, res.data.data);
+          collectionsMethods.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
           const expectedPath = {
             folderId: "",
             folderName: "",
             collectionId: path[path.length - 1].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+          if (
+            !componentData.path.workspaceId &&
+            !componentData.path.collectionId
+          ) {
             collectionsMethods.updateTab(expectedPath, "path");
             collectionsMethods.updateTab(res.data.data.name, "name");
             collectionsMethods.updateTab(res.data.data.id, "id");
             collectionsMethods.updateTab(true, "save");
           } else {
-            let sampleRequest = generateSampleRequest(res.data.data.id, new Date().toString());
+            let sampleRequest = generateSampleRequest(
+              res.data.data.id,
+              new Date().toString(),
+            );
             sampleRequest.name = res.data.data.name;
             sampleRequest.path = expectedPath;
             sampleRequest.save = true;
             sampleRequest.property.request.url = res.data.data.request.url;
-            sampleRequest.property.request.method = res.data.data.request.method;
+            sampleRequest.property.request.method =
+              res.data.data.request.method;
             sampleRequest.property.request.body = res.data.data.request.body;
-            sampleRequest.property.request.queryParams = res.data.data.request.queryParams;
-            sampleRequest.property.request.headers = res.data.data.request.headers;
+            sampleRequest.property.request.queryParams =
+              res.data.data.request.queryParams;
+            sampleRequest.property.request.headers =
+              res.data.data.request.headers;
             collectionsMethods.handleCreateTab(sampleRequest);
           }
           onClick(false);
           navigateToWorkspace();
+          isLoading = false
         }
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
         const res = await insertCollectionRequest({
@@ -190,28 +195,41 @@
         });
 
         if (res.isSuccessful) {
-          collectionsMethods.addRequestInFolder(path[0].id, path[path.length - 1].id, res.data.data);
+          collectionsMethods.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
           const expectedPath = {
             folderId: path[path.length - 1].id,
             folderName: path[path.length - 1].name,
             collectionId: path[0].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+          if (
+            !componentData.path.workspaceId &&
+            !componentData.path.collectionId
+          ) {
             collectionsMethods.updateTab(expectedPath, "path");
             collectionsMethods.updateTab(res.data.data.name, "name");
             collectionsMethods.updateTab(res.data.data.id, "id");
             collectionsMethods.updateTab(true, "save");
           } else {
-            let sampleRequest = generateSampleRequest(res.data.data.id, new Date().toString());
+            let sampleRequest = generateSampleRequest(
+              res.data.data.id,
+              new Date().toString(),
+            );
             sampleRequest.name = res.data.data.name;
             sampleRequest.path = expectedPath;
             sampleRequest.save = true;
             sampleRequest.property.request.url = res.data.data.request.url;
-            sampleRequest.property.request.method = res.data.data.request.method;
+            sampleRequest.property.request.method =
+              res.data.data.request.method;
             sampleRequest.property.request.body = res.data.data.request.body;
-            sampleRequest.property.request.queryParams = res.data.data.request.queryParams;
-            sampleRequest.property.request.headers = res.data.data.request.headers;
+            sampleRequest.property.request.queryParams =
+              res.data.data.request.queryParams;
+            sampleRequest.property.request.headers =
+              res.data.data.request.headers;
             collectionsMethods.handleCreateTab(sampleRequest);
           }
           onClick(false);
@@ -233,9 +251,12 @@
     );
     if (res.isSuccessful) {
       latestRoute = {
-        id: res.data.data.id
-      }
-      collectionsMethods.addRequestOrFolderInCollection(path[0].id, res.data.data);
+        id: res.data.data.id,
+      };
+      collectionsMethods.addRequestOrFolderInCollection(
+        path[0].id,
+        res.data.data,
+      );
     }
   };
 
@@ -247,8 +268,8 @@
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
       latestRoute = {
-        id: res.data.data._id
-      }
+        id: res.data.data._id,
+      };
       collectionsMethods.addCollection(res.data.data);
     }
   };
@@ -485,7 +506,7 @@
           />
         {/if}
       </div>
-      <div>
+      <div class="d-flex">
         <span class="mx-2">
           <CoverButton
             text={"Cancel"}
@@ -501,6 +522,7 @@
           text={"Save"}
           size={16}
           type={"primary"}
+          loader= {isLoading}
           onClick={() => {
             handleSaveAsRequest();
           }}
