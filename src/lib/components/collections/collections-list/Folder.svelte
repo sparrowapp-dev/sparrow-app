@@ -2,86 +2,110 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
-  import { onDestroy } from "svelte";
+
   import {
-    deletedCollectionWorkspaceId,
     isShowCollectionPopup,
     useCollectionTree,
   } from "$lib/store/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { RequestDefault } from "$lib/utils/enums/request.enum";
-  import { v4 as uuidv4 } from "uuid";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import ContextMenu from "./ContextMenu.svelte";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { WorkspaceService } from "$lib/services/workspace.service";
   import { CollectionService } from "$lib/services/collection.service";
 
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
-  const _colllectionListViewModel = new CollectionListViewModel();
-  let visibility = false;
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { v4 as uuidv4 } from "uuid";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
+
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
-  let workspaceId: string = "";
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
 
   const collectionService = new CollectionService();
-
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
-    (value: any) => {
-      workspaceId = value.id;
-    },
-  );
+  const _colllectionListViewModel = new CollectionListViewModel();
+  let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
     const folder = {
-      id: uuidv4(),
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
       description: "",
       type: ItemType.FOLDER,
       items: [],
     };
-    collection = { ...collection, items: [...collection.items, folder] };
-    _colllectionListViewModel.addFolder(workspaceId, collection._id, {
-      name: folder.name,
-      description: folder.description,
-    });
+
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
+
+    const response = await _colllectionListViewModel.addFolder(
+      currentWorkspaceId,
+      collectionId,
+      {
+        name: folder.name,
+        description: folder.description,
+      },
+    );
+
+    if (response.isSuccessful && response.data.data) {
+      const folderObj = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        folder.id,
+        folderObj,
+      );
+      return;
+    }
   };
 
   const handleAPIClick = async () => {
     const request = generateSampleRequest(
-      "UNTRACKED-" + uuidv4(),
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
-    collectionsMethods.handleCreateTab(request);
-    moveNavigation("right");
-    collection = { ...collection, items: [...collection.items, request] };
 
     const requestObj = {
-      collectionId: collection._id,
-      workspaceId,
+      collectionId: collectionId,
+      workspaceId: currentWorkspaceId,
       items: {
         name: request.name,
-        type: ItemType.REQUEST,
+        type: request.type,
         request: {
-          method: RequestDefault.METHOD,
+          method: request.property.request.method,
         },
       },
     };
-    _colllectionListViewModel.addRequest(requestObj);
-  };
-  onDestroy(currentWorkspaceUnsubscribe);
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, {
+      ...requestObj.items,
+      id: request.id,
+    });
+    const response = await _colllectionListViewModel.addRequest(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
 
-  let openCollectionId = null;
-  let isMenuOpen = false;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        request.id,
+        res,
+      );
+
+      request.id = res.id;
+      collectionsMethods.handleCreateTab(request);
+      moveNavigation("right");
+      return;
+    }
+  };
+
+  let openCollectionId: string;
+  let isMenuOpen: boolean = false;
 
   let pos = { x: 0, y: 0 };
 
@@ -90,11 +114,11 @@
   let browser = { h: 0, y: 0 };
   let content;
 
-  let showMenu = false;
+  let showMenu: boolean = false;
   let button;
   let openMenuButton: HTMLElement = null;
 
-  function rightClickContextMenu(e, collectionId, button) {
+  function rightClickContextMenu(e, button) {
     if (openCollectionId === collectionId) {
       showMenu = !showMenu;
     } else {
@@ -122,9 +146,13 @@
     isMenuOpen = true;
   }
 
+  let menuContainer;
+
   function onPageClick(e) {
-    isMenuOpen = false;
-    showMenu = false;
+    if (menuContainer && !menuContainer.contains(e.target)) {
+      isMenuOpen = false;
+      showMenu = false;
+    }
   }
 
   function getContextMenuDimension(node) {
@@ -139,6 +167,7 @@
   //open collection
   function openCollections() {
     visibility = !visibility;
+    showMenu = false;
   }
 
   let newCollectionName: string = "";
@@ -150,13 +179,24 @@
 
   const onRenameBlur = async () => {
     if (newCollectionName) {
-      const updateCollectionName = await collectionService.updateCollection(
-        workspaceId,
-        openCollectionId,
+      const updateCollectionName = await collectionService.updateCollectionData(
+        collectionId,
+        currentWorkspaceId,
         { name: newCollectionName },
       );
+
       title = updateCollectionName?.data?.data?.name;
-      collectionsMethods.updateCollectionName(openCollectionId, title);
+
+      const updatedCollection = {
+        name: title,
+        _id: collection._id,
+        updatedAt: collection.updatedAt,
+        updatedBy: collection.updatedBy,
+        totalRequests: collection.totalRequests,
+        createdAt: collection.createdAt,
+        createdBy: collection.createdBy,
+      };
+      collectionsMethods.updateCollection(openCollectionId, updatedCollection);
     }
     isRenaming = false;
   };
@@ -167,6 +207,7 @@
     const inputField = document.getElementById(
       "renameInputField",
     ) as HTMLInputElement;
+    showMenu = false;
   };
 
   const onRenameInputKeyPress = (event) => {
@@ -181,6 +222,7 @@
     if (collectionId === openCollectionId) {
       visibility = true;
     }
+    showMenu = false;
   };
 
   //add folder in collection
@@ -189,15 +231,13 @@
     if (collectionId === openCollectionId) {
       visibility = true;
     }
+    showMenu = false;
   };
 
   //delete collection
   const deleteCollection = async () => {
     isShowCollectionPopup.set(true);
-    deletedCollectionWorkspaceId.set({
-      collectionId: openCollectionId,
-      workspaceId: workspaceId,
-    });
+    showMenu = false;
   };
 
   let menuItems = [
@@ -227,15 +267,37 @@
   if (collectionId !== openCollectionId) {
     showMenu = false;
   }
+
+  let isShowCollection: boolean;
+  isShowCollectionPopup.subscribe((value) => {
+    isShowCollection = value;
+  });
+
+  function toggleMenuVisibility() {
+    showMenu = !showMenu;
+  }
 </script>
+
+{#if isShowCollection}
+  <CollectionPopup
+    {collectionsMethods}
+    {openCollectionId}
+    {currentWorkspaceId}
+  />
+{/if}
 
 <div class="content" bind:this={content} />
 
 {#if showMenu && collectionId === openCollectionId}
   <nav
+    bind:this={menuContainer}
     use:getContextMenuDimension
     style="position: absolute; top:{pos.y}px; left:{pos.x}px"
   >
+    <div
+      on:click={toggleMenuVisibility}
+      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
+    />
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -260,10 +322,9 @@
 
 <button
   bind:this={button}
-  on:contextmenu|preventDefault={(e) =>
-    rightClickContextMenu(e, collectionId, button)}
+  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, button)}
   on:click={() => {
-    if (!collection._id.includes("MYUID45345")) {
+    if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
       visibility = !visibility;
     }
   }}
@@ -296,18 +357,21 @@
     {/if}
   </div>
   <button
-    class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+    class="threedot-icon-container pe-1 border-0 rounded d-flex justify-content-center align-items-center"
     on:click={(e) => {
       e.stopPropagation();
-      rightClickContextMenu(e, collectionId, button);
+      rightClickContextMenu(e, button);
     }}
   >
     <img src={threedotIcon} alt="threedotIcon" />
   </button>
+  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+    <Spinner size={"15px"} />
+  {/if}
 </button>
 
 <div
-  style="padding-left: 40px; cursor:pointer; display: {visibility
+  style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
     ? 'block'
     : 'none'};"
 >
@@ -379,6 +443,6 @@
     width: 100%;
     color: var(--white-color);
     border-radius: 8px;
-    background-color: var(--background-color);
+    background-color: #232527;
   }
 </style>

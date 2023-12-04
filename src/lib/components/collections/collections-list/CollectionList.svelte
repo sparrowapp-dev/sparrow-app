@@ -6,20 +6,10 @@
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-
   import { collapsibleState } from "$lib/store/request-response-section";
-
-  import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import {
-    collectionList,
-    setCollectionList,
-    useCollectionTree,
-  } from "$lib/store/collection";
   import { useTree } from "./collectionList";
-  const [, , searchNode] = useTree();
   import { v4 as uuidv4 } from "uuid";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import DefaultCollection from "./DefaultCollection.svelte";
   import {
@@ -29,24 +19,26 @@
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
   export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
-  let collection: any[] = [];
-  let currentWorkspaceId: string = "";
+
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
+
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+
+  const [, , searchNode] = useTree();
+  let collection: any[] = [];
+  let currentWorkspaceId: string = "";
+
   const activeWorkspace: Observable<WorkspaceDocument> =
-    _workspaceViewModel.activeWorkspace;
+    collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
-  let getCollectionData = async (id: string) => {
-    const res = await fetchCollection(id);
-    if (res.isSuccessful) {
-      setCollectionList(res.data.data);
-    }
-  };
+
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
@@ -61,7 +53,6 @@
       }
     },
   );
-  let currentWorkspaceName = "";
 
   const getNextCollection: (list: any[], name: string) => any = (
     list,
@@ -88,11 +79,13 @@
 
     return null;
   };
-
+  let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response = await collectionsMethods.getAllCollections(
           workspaceId,
@@ -107,24 +100,26 @@
   );
   const handleCreateCollection = async () => {
     const newCollection = {
-      _id: uuidv4(),
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
-      workspaceId: currentWorkspaceId,
       items: [],
+      createdAt: new Date().toISOString(),
     };
     collection = [...collection, newCollection];
 
     collectionsMethods.addCollection(newCollection);
+    const response = await _colllectionListViewModel.addCollection({
+      name: newCollection.name,
+      workspaceId: currentWorkspaceId,
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+    
+      collectionsMethods.updateCollection(newCollection._id, res);
+      return;
+    }
     return;
   };
-
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id && value.name) {
-      getCollectionData(value.id);
-      currentWorkspaceName = value.name;
-      currentWorkspaceId = value.id;
-    }
-  });
 
   let collapsExpandToggle: boolean = false;
 
@@ -148,9 +143,6 @@
     searchNode(searchData, filteredCollection, filteredFolder, filteredFile);
   };
 
-  onDestroy(currentWorkspaceUnsubscribe);
-  onDestroy(collapsibleStateUnsubscribe);
-
   const handleResize = () => {
     const windowWidth = window.innerWidth;
 
@@ -169,6 +161,9 @@
   onDestroy(() => {
     // Remove the window resize event listener when the component is destroyed
     window.removeEventListener("resize", handleResize);
+    collectionSubscribe.unsubscribe();
+    collapsibleStateUnsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
@@ -203,7 +198,7 @@
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
     <p class="mb-0 text-whiteColor" style="font-size: 18px;">
-      {currentWorkspaceName}
+      {currentWorkspaceName || ""}
     </p>
     <button
       class="bg-backgroundColor border-0"
@@ -225,7 +220,7 @@
         type="search"
         style="  font-size: 12px;font-weight:500;"
         class="inputField border-0 w-100 h-100 bg-blackColor"
-        placeholder="Search APIs in {currentWorkspaceName}"
+        placeholder="Search APIs in {currentWorkspaceName || ''}"
         bind:value={searchData}
         on:input={handleSearch}
       />

@@ -1,60 +1,81 @@
-name: 'developmet-mac-publish'
+name: Mac Build, Sign, and Download Tauri App 
+
 on:
   push:
     branches:
-      - none 
+      - development
+
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest]
-    runs-on: ${{ matrix.platform }}
+  build_and_sign:
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
+    - name: Rust setup
+      uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
 
-      - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
-        with:
-          node-version: 'lts/*'
-          cache: 'yarn' # Set this to npm, yarn or pnpm.
+    - name: Sync node version and setup cache
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'yarn' # Set this to npm, yarn or pnpm.
 
-      - name: Install frontend dependencies
-        run: |
-          yarn install
-          yarn build
-          yarn tauri build
+    - name: Install Dependencies
+      run: |
+        yarn install
+        yarn build
 
-      - name: Build the app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          #APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
-          #APPLE_ID: ${{ secrets.APPLE_ID }}
-          #APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-        with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+    - name: Build Tauri App
+      run: |
+        APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
+        APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
+        APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" yarn tauri build
+
+    # - name: Archive and Sign App
+    #   run: |
+    #     zip -r sparrow-app.app.zip target/release/sparrow-app.app
+    #     codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/release/YourAppName.app
+
+    - name: Archive
+      run: |
+        #zip -r sparrow.app.zip /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/macos/sparrow-app.app
+        #codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/release/bundle/macos/sparrow-app.app
+        zip -r sparrow-app_0.0.0_x64.dmg /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: sparrow-macos
+        path: |
+          sparrow.app.zip
+          sparrow-app_0.0.0_x64.dmg
+        
+  download:
+    needs: build_and_sign
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: sparrow-macos
+        path: artifacts
+
+    # - name: List Files
+    #   run: ls -R artifacts
+
+    # - name: Log artifact URL
+    #   run: |
+    #     echo "Artifact URL: ${{ steps.upload_artifact.outputs.artifact_url }}"
+    - name: Print Artifact URL
+      run: echo "Artifact URL:${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"

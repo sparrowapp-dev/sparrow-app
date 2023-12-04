@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
-import { CollectionRepository } from "$lib/repositories/collection.repository";
 
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
+  private workspaceRepository = new WorkspaceRepository();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -106,5 +108,99 @@ export class CollectionsViewModel {
   public deleteFolder = async (id: string, folderId: string) => {
     this.collectionRepository.deleteFolder(id, folderId);
     this.debouncedTab();
+  };
+  public getCollectionList = () => {
+    return this.collectionRepository.getCollection();
+  };
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
+  };
+
+  public addRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    request,
+  ): void => {
+    this.collectionRepository.addRequestInFolder(
+      collectionId,
+      folderId,
+      request,
+    );
+  };
+  public updateRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+    request,
+  ): void => {
+    this.collectionRepository.updateRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+      request,
+    );
+  };
+
+  public updateRequestInFolderCollection = (
+    collectionId: string,
+    uuid: string,
+    item: any,
+    folderId?: string,
+  ): void => {
+    this.collectionRepository.updateRequestInFolderCollection(
+      collectionId,
+      uuid,
+      item,
+      folderId,
+    );
+  };
+
+  public deleteRequestInFolderCollection = (
+    collectionId: string,
+    uuid: string,
+    folderId: string,
+  ): void => {
+    this.collectionRepository.deleteRequestInFolderCollection(
+      collectionId,
+      uuid,
+      folderId,
+    );
+  };
+
+  public addRequestOrFolderInCollection = (
+    collectionId: string,
+    items: any,
+  ) => {
+    this.collectionRepository.addRequestOrFolderInCollection(
+      collectionId,
+      items,
+    );
+  };
+  public updateRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+    items: any,
+  ) => {
+    this.collectionRepository.updateRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+      items,
+    );
+  };
+
+  public deleteRequestInCollection = (
+    collectionId: string,
+    requestId: string,
+  ) => {
+    this.collectionRepository.deleteRequestInCollection(
+      collectionId,
+      requestId,
+    );
+  };
+  public addCollection = (collection) => {
+    this.collectionRepository.addCollection(collection);
+  };
+  public updateCollection = (uuid, data) => {
+    this.collectionRepository.updateCollection(uuid, data);
   };
 }

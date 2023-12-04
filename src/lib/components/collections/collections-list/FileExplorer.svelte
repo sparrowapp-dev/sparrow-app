@@ -1,6 +1,6 @@
 <script lang="ts">
   import folder from "$lib/assets/folder.svg";
-  import folderOpenIcon from "$lib/assets/folder-open.svg";
+  import folderOpenIcon from "$lib/assets/open-folder.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
   import {
@@ -12,7 +12,7 @@
   import File from "./File.svelte";
   import { getNextName } from "./collectionList";
   import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -21,6 +21,8 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
   const { insertNode, updateNodeId } = useCollectionTree();
   let expand: boolean = false;
   export let explorer;
@@ -36,13 +38,10 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
   const handleAPIClick = async () => {
-    const request = generateSampleRequest(
-      "UNTRACKED-" + uuidv4(),
+    const sampleRequest = generateSampleRequest(
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
-    collectionsMethods.handleCreateTab(request);
-    moveNavigation("right");
-    explorer = { ...explorer, items: [...explorer.items, request] };
 
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collectionId,
@@ -52,63 +51,81 @@
         name: explorer.name,
         type: ItemType.FOLDER,
         items: {
-          name: request.name,
-          type: ItemType.REQUEST,
+          name: sampleRequest.name,
+          type: sampleRequest.type,
           request: {
-            method: RequestDefault.METHOD,
+            method: sampleRequest.property.request.method,
           },
         },
       },
     };
-    _colllectionListViewModel.addRequestInFolderInCollection(requestObj);
+
+    collectionsMethods.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+
+      {
+        ...requestObj.items.items,
+        id: sampleRequest.id,
+      },
+    );
+    const response =
+      await _colllectionListViewModel.addRequestInFolderInCollection(
+        requestObj,
+      );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      collectionsMethods.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.id,
+        request,
+      );
+      sampleRequest.id = request.id;
+      collectionsMethods.handleCreateTab(sampleRequest);
+      moveNavigation("right");
+      return;
+    }
   };
 
   let pos = { x: 0, y: 0 };
-  let menu = { h: 0, y: 0 };
+
+  let menu = { h: -25, y: -25 };
+
   let browser = { h: 0, y: 0 };
   let content;
-  let showMenu = false;
+  let showMenu: boolean = false;
   let button;
 
   let openMenuButton: HTMLElement = null;
 
-  let openFolderId: string;
+  let openFolderId: string = "";
 
-  function rightClickContextMenu(e, seletedFolderId, button) {
-  
-    if (openFolderId === seletedFolderId) {
-      showMenu = !showMenu;
-    } else {
-      openFolderId = seletedFolderId;
+  // Assuming you have a container reference (e.g., containerRef) in your component
+  let containerRef;
+
+  function rightClickContextMenu(e, selectedFolderId, button) {
+    if (!showMenu) {
+      openFolderId = selectedFolderId;
       showMenu = true;
+
+      // Dynamically calculate the position based on the click event
+      pos = { x: e.clientX, y: e.clientY };
+
+      const containerRect = containerRef?.getBoundingClientRect();
+      if (containerRect) {
+        // Adjust position if necessary to keep the menu within the container
+        pos.x = Math.min(pos.x, containerRect.right - menu.y);
+        pos.y = Math.min(pos.y, containerRect.bottom - menu.h);
+      }
     }
-    if (button) {
-      openMenuButton = button;
-      const rect = button.getBoundingClientRect();
-      pos = { x: rect.right, y: rect.top };
-    } else {
-      browser = {
-        y: window.innerWidth,
-        h: window.innerHeight,
-      };
-
-      pos = {
-        x: e.clientX,
-        y: e.clientY,
-      };
-
-      if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
-      if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
-    }
-
-    // Ensure the menu stays within the viewport
-    pos.x = Math.min(pos.x, window.innerWidth - menu.y);
-    pos.y = Math.min(pos.y, window.innerHeight - menu.h);
   }
 
   function onPageClick(e) {
     showMenu = false;
   }
+
   function getContextMenuDimension(node) {
     let height = node.offsetHeight;
     let width = node.offsetWidth;
@@ -143,7 +160,6 @@
         },
       );
 
-    
       explorer.name = updateFolderName?.data?.data?.name;
       collectionsMethods.updateFolderName(
         collectionId,
@@ -152,8 +168,6 @@
       );
     }
 
-    // title = updateCollectionName?.data?.data?.name;
-    // collectionsMethods.updateCollectionName(openCollectionId, title);
     expand = false;
     isRenaming = false;
   };
@@ -182,13 +196,7 @@
   }
 
   async function deleteFolder() {
-   
     isShowFolderPopup.set(true);
-    currentCollectionWorkspaceFolderId.set({
-      collectionId: collectionId,
-      workspaceId: currentWorkspaceId,
-      folderId: openFolderId,
-    });
   }
 
   let menuItems = [
@@ -210,15 +218,40 @@
       displayText: "Delete",
     },
   ];
+
+  function toggleMenuVisibility() {
+    showMenu = !showMenu;
+  }
+
+  let isShowFolder: boolean;
+  isShowFolderPopup.subscribe((value) => {
+    isShowFolder = value;
+  });
+
+  let workspaceId = currentWorkspaceId;
+  console.log(openFolderId);
 </script>
+
+{#if isShowFolder}
+  <FolderPopup
+    {collectionsMethods}
+    {collectionId}
+    {openFolderId}
+    {workspaceId}
+  />
+{/if}
 
 <svelte:window on:click={onPageClick} />
 
 {#if showMenu}
   <nav
     use:getContextMenuDimension
-    style="position: absolute; top:{pos.y}px; left:{pos.x}px"
+    style="position: fixed; top:{pos.y}px; left:{pos.x}px"
   >
+    <div
+      on:click={toggleMenuVisibility}
+      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
+    />
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -240,78 +273,82 @@
 {/if}
 
 {#if explorer.type === "FOLDER"}
-  <div>
-    <div
-      on:contextmenu|preventDefault={(e) =>
-        rightClickContextMenu(e, explorer.id, button)}
-      style="height:36px;width:280px;"
-      class="d-flex align-items-center justify-content-between my-button btn-primary w-100 pe-3 ps-2"
-      on:click={() => {
-        if (!explorer.id.includes("MYUID45345")) {
-          expand = !expand;
-        }
+  <div
+    on:contextmenu|preventDefault={(e) =>
+      rightClickContextMenu(e, explorer.id, button)}
+    style="height:36px;"
+    class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
+    on:click={() => {
+      if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+        expand = !expand;
+      }
+    }}
+  >
+    <div class="d-flex align-items-center justify-content-center gap-2 pe-0">
+      {#if expand}
+        <div
+          style="height:16px; width:16px;"
+          class="d-flex align-items-center justify-content-center gap-0"
+        >
+          <img src={folderOpenIcon} alt="" class="pe-0" />
+        </div>
+      {:else}
+        <img src={folder} alt="" style="height:16px; width:16px;" />
+      {/if}
+
+      {#if isRenaming}
+        <input
+          class="form-control py-0"
+          id="renameInputField"
+          type="text"
+          style="font-size: 14px;"
+          value={explorer.name}
+          on:input={handleRenameInput}
+          on:blur={onRenameBlur}
+          on:keydown={onRenameInputKeyPress}
+        />
+      {:else}
+        <span
+          style="padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;"
+          >{explorer.name}</span
+        >
+      {/if}
+    </div>
+
+    <button
+      class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
+      on:click={(e) => {
+        e.stopPropagation();
+        rightClickContextMenu(e, explorer.id, button);
       }}
     >
-      <div class="d-flex align-items-center justify-content-center gap-2 pe-0">
-        {#if expand}
-          <div class="pe-0">
-            <img src={folderOpenIcon} alt="" style="height:24px; width:24px;" />
-          </div>
-        {:else}
-          <img src={folder} alt="" style="height:16px; width:16px;" />
-        {/if}
-
-        {#if isRenaming}
-          <input
-            class="form-control py-0"
-            id="renameInputField"
-            type="text"
-            style="font-size: 14px;"
-            value={explorer.name}
-            on:input={handleRenameInput}
-            on:blur={onRenameBlur}
-            on:keydown={onRenameInputKeyPress}
-          />
-        {:else}
-          <span
-            style="padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;"
-            >{explorer.name}</span
-          >
-        {/if}
-      </div>
-
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-        on:click={(e) => {
-          e.stopPropagation();
-          rightClickContextMenu(e, explorer.id, button);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </div>
-    <div
-      style="padding-left: 15px; cursor:pointer; display: {expand
-        ? 'block'
-        : 'none'};"
-    >
-      {#each explorer.items as exp}
-        <svelte:self
-          folderId={explorer.id}
-          folderName={explorer.name}
-          explorer={exp}
-          {collectionId}
-          {currentWorkspaceId}
-          {collectionsMethods}
-        />
-      {/each}
-      <div class="mt-2 mb-2">
-        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-      </div>
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
+    {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
+      <Spinner size={"15px"} />
+    {/if}
+  </div>
+  <div
+    style="padding-left: 15px; cursor:pointer; display: {expand
+      ? 'block'
+      : 'none'};"
+  >
+    {#each explorer.items as exp}
+      <svelte:self
+        folderId={explorer.id}
+        folderName={explorer.name}
+        explorer={exp}
+        {collectionId}
+        {currentWorkspaceId}
+        {collectionsMethods}
+      />
+    {/each}
+    <div class="mt-2 mb-2 ms-2">
+      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
     </div>
   </div>
 {:else}
-  <div style="padding-left: 0; cursor:pointer;">
+  <div style="padding-left: 6px; cursor:pointer;">
     <File
       api={explorer}
       {folderId}

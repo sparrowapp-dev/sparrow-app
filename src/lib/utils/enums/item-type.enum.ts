@@ -4,3 +4,7 @@ export enum ItemType {
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
 }
+
+export enum UntrackedItems {
+  UNTRACKED = "UNTRACKED-",
+}

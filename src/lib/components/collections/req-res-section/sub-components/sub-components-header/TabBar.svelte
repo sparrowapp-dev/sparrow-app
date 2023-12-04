@@ -33,7 +33,7 @@
   onDestroy(() => {});
 </script>
 
-<div class="">
+<div class="tab">
   <div
     style="border-top: 1px solid #313233;width:{$collapsibleState
       ? '100%'
@@ -103,8 +103,10 @@
 </div>
 
 <style>
+
   .tabbar {
     height: 36px;
+    z-index: 999999;
   }
 
   .tab-scroller::-webkit-scrollbar {

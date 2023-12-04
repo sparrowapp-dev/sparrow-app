@@ -36,9 +36,9 @@ export class CollectionService {
     return response;
   };
 
-  public updateCollection = async (
-    workspaceId: string,
+  public updateCollectionData = async (
     collectionId: string,
+    workspaceId: string,
     name: UpdateCollectionName,
   ) => {
     const response = await makeRequest(
@@ -96,6 +96,7 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
+
     return response;
   };
 
@@ -132,7 +133,6 @@ export class CollectionService {
     requestId: string,
     requestBody: UpdateRequestName,
   ) => {
-    console.log(requestBody);
     const response = await makeRequest(
       "PUT",
       `${this.apiUrl}/api/collection/request/${requestId}`,
@@ -141,7 +141,7 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-    console.log(response);
+
     return response;
   };
 
@@ -157,7 +157,7 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-    console.log(response);
+
     return response;
   };
 }

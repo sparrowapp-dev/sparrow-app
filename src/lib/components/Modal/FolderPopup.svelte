@@ -2,31 +2,24 @@
   import closeIcon from "$lib/assets/close.svg";
   import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
-  import {
-    currentCollectionWorkspaceFolderId,
-    isShowFolderPopup,
-  } from "$lib/store/collection";
+  import { isShowFolderPopup } from "$lib/store/collection";
   import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-
+  export let collectionId: string;
+  export let openFolderId: string;
+  export let workspaceId: string;
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
 
+  let nameFolder: string = "";
   let totalRequest: number = 0;
   let totalFolder: number = 1;
-  let currentWorkspaceCollectionFolder;
+
   let collectionTobeDeleted = [];
   let folderName: string = "";
-
-  currentCollectionWorkspaceFolderId.subscribe((value) => {
-    if (value) {
-      currentWorkspaceCollectionFolder = value;
-    }
-    console.log(currentWorkspaceCollectionFolder);
-  });
 
   const _colllectionListViewModel = new CollectionListViewModel();
 
@@ -37,41 +30,31 @@
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
-        console.log(value);
         collectionTobeDeleted = value.filter((collection) => {
-          if (
-            collection._data._id ===
-            currentWorkspaceCollectionFolder.collectionId
-          ) {
+          if (collection._data._id === collectionId) {
             return collection._data;
           }
         });
-        console.log(collectionTobeDeleted);
       }
     },
   );
 
   collectionTobeDeleted[0]?._data.items.forEach((item) => {
-    if (
-      item.id === currentWorkspaceCollectionFolder.folderId &&
-      item.type === ItemType.FOLDER
-    ) {
-      folderName = item.name;
+    if (item.id === openFolderId && item.type === ItemType.FOLDER) {
+      nameFolder = item.name;
       totalRequest += item.items.length;
     }
   });
 
   const handleDelete = async () => {
     const deleteFolder = await collectionService.deleteFolderInCollection(
-      currentWorkspaceCollectionFolder.workspaceId,
-      currentWorkspaceCollectionFolder.collectionId,
-      currentWorkspaceCollectionFolder.folderId,
+      workspaceId,
+      collectionId,
+      openFolderId,
     );
+
     if (deleteFolder.isSuccessful) {
-      collectionsMethods?.deleteFolder(
-        currentWorkspaceCollectionFolder.collectionId,
-        currentWorkspaceCollectionFolder.folderId,
-      );
+      collectionsMethods?.deleteFolder(collectionId, openFolderId);
       isShowFolderPopup.set(false);
       notifications.success(`"${folderName}" Folder deleted.`);
     } else {
@@ -108,7 +91,7 @@
     <p>
       Are you sure you want to delete this Folder? Everything in <span
         style="font-weight:700;"
-        class="text-whiteColor">"{folderName}"</span
+        class="text-whiteColor">"{nameFolder}"</span
       >
       will be removed.
     </p>
@@ -147,7 +130,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 9999999999;
+    z-index: 9999;
     border: 2px solid red;
   }
 
@@ -159,7 +142,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 99999999999999;
+    z-index: 9999;
     border-radius: 10px;
   }
 

@@ -2,34 +2,40 @@
   import closeIcon from "$lib/assets/close.svg";
   import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
-  import { isShowCollectionPopup } from "$lib/store/collection";
+  import {
+    currentFolderIdName,
+    isShowFilePopup,
+    isShowFolderPopup,
+  } from "$lib/store/collection";
   import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
-  export let openCollectionId: string;
-  export let currentWorkspaceId: string;
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  export let folderId: string;
+  export let folderName: string;
+  export let collectionId: string;
+  export let openRequestId: string;
+  export let name: string;
+  export let workspaceId: string;
 
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
 
-  let totalRequest: number = 0;
-  let totalFolder: number = 0;
-
-  let collectionTobeDeleted = [];
-  let collectionName: string = "";
+  let fileTobeDeleted = [];
+  let requestName: string = "";
 
   const _colllectionListViewModel = new CollectionListViewModel();
 
-  let collection: any[] = [];
+  let folder: any[] = [];
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       if (value && value.length > 0) {
-        collectionTobeDeleted = value.filter((collection) => {
-          if (collection._data._id === openCollectionId) {
+        fileTobeDeleted = value.filter((collection) => {
+          if (collection._data._id === collectionId) {
             return collection._data;
           }
         });
@@ -37,52 +43,75 @@
     },
   );
 
-  collectionName = collectionTobeDeleted[0]?._data.name;
-  collectionTobeDeleted[0]?._data.items.forEach((item) => {
-    if (item.type === "FOLDER") {
-      totalFolder++;
-      totalRequest += item.items.length;
+  fileTobeDeleted[0]?._data.items.forEach((item) => {
+    if (item.id === openRequestId && item.type === ItemType.REQUEST) {
+      requestName = item.name;
     }
-    if (item.type === "REQUEST") {
-      totalRequest++;
+
+    if (item.id === folderId && item.type === ItemType.FOLDER) {
+      for (let i = 0; i < item.items.length; i++) {
+        if (item.items[i].id === openRequestId) {
+          requestName = item.items[i].name;
+        }
+      }
     }
   });
 
   const handleDelete = async () => {
-    const deleteCollectionName = await collectionService.deleteCollection(
-      currentWorkspaceId,
-      openCollectionId,
+    const deleteFolder = await collectionService.deleteRequestInCollection(
+      openRequestId,
+      {
+        collectionId,
+        workspaceId,
+        folderId,
+        items: {
+          name: name,
+          type: "REQUEST",
+        },
+      },
     );
- 
-    if (deleteCollectionName.isSuccessful) {
-      collectionsMethods?.deleteCollectionData(openCollectionId);
-      isShowCollectionPopup.set(false);
-      notifications.success(`"${collectionName}" Collection deleted.`);
+
+    if (deleteFolder.isSuccessful) {
+      if (folderId !== "" && folderName !== "") {
+        collectionsMethods?.deleteRequestInFolderCollection(
+          collectionId,
+          openRequestId,
+          folderId,
+        );
+      } else {
+        collectionsMethods.deleteRequestInCollection(
+          collectionId,
+          openRequestId,
+        );
+      }
+
+      isShowFilePopup.set(false);
+      notifications.success(`"${requestName}" Request deleted.`);
     } else {
-      isShowCollectionPopup.set(false);
-      notifications.error("Failed to delete the Collection.");
+      isShowFilePopup.set(false);
+      notifications.error("Failed to delete the Request.");
     }
   };
 
-  let isPopupShow: boolean;
+  let isFilePopup: boolean;
 
-  isShowCollectionPopup.subscribe((value) => {
-    isPopupShow = value;
+  isShowFilePopup.subscribe((value) => {
+    isFilePopup = value;
   });
 
   const handleCancel = async () => {
-    isShowCollectionPopup.set(false);
+    isShowFilePopup.set(false);
   };
 </script>
 
-{#if isPopupShow}
+{#if isFilePopup}
   <div class="background-overlay" />
 {/if}
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-      Delete Collection?
+      Delete Request?
     </h5>
     <button class="btn-close1 border-0 rounded" on:click={handleCancel}>
       <img src={closeIcon} alt="" />
@@ -90,23 +119,14 @@
   </div>
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <p>
-      Are you sure you want to delete this Collection? Everything in <span
+      Are you sure you want to delete this Request? <span
         style="font-weight:700;"
-        class="text-whiteColor">"{collectionName}"</span
+        class="text-whiteColor">"{requestName} "</span
       >
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3" style="font-size:12px">
-    <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalRequest}</span>
-      <p>API Requests</p>
-    </div>
-    <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalFolder}</span>
-      <p>Folder</p>
-    </div>
-  </div>
+
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
@@ -131,19 +151,19 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 99;
+    z-index: 9999;
     border: 2px solid red;
   }
 
   .container {
     position: fixed;
-    height: 244px;
+    height: 204px;
     width: 540px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 99;
+    z-index: 9999;
     border-radius: 10px;
   }
 

@@ -13,12 +13,10 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import {
-    isShowCollectionPopup,
-    isShowFolderPopup,
-  } from "$lib/store/collection";
-  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
-  import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
+
+  import type { Observable } from "rxjs";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { Writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -39,15 +37,27 @@
     getAllCollections: _collectionListViewModel.getAllCollections,
     addRequestaddFolder: _collectionListViewModel.addRequest,
     addFolder: _collectionListViewModel.addFolder,
-    addCollection: _collectionListViewModel.addCollection,
     deleteCollectionData: _viewModel.deleteCollectionData,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
     deleteFolder: _viewModel.deleteFolder,
+    getCollectionList: _viewModel.getCollectionList,
+    getActiveWorkspace: _viewModel.getActiveWorkspace,
+    addRequestInFolder: _viewModel.addRequestInFolder,
+    updateRequestInFolder: _viewModel.updateRequestInFolder,
+    updateRequestInFolderCollection: _viewModel.updateRequestInFolderCollection,
+
+    addRequestOrFolderInCollection: _viewModel.addRequestOrFolderInCollection,
+    updateRequestOrFolderInCollection:
+      _viewModel.updateRequestOrFolderInCollection,
+    addCollection: _viewModel.addCollection,
+    updateCollection: _viewModel.updateCollection,
+    deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
+    deleteRequestInCollection: _viewModel.deleteRequestInCollection,
   };
 
   const activeTab = _viewModel.activeTab;
-  const tabList = _viewModel.tabs;
+  const tabList: Writable<NewTab[]> = _viewModel.tabs;
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
@@ -57,29 +67,9 @@
       moveNavigation("right");
     }
   };
-
-  let isShowPopup: boolean;
-
-  isShowCollectionPopup.subscribe((value) => {
-    isShowPopup = value;
-  });
-
-  let isShowFolder: boolean;
-
-  isShowFolderPopup.subscribe((value) => {
-    isShowFolder = value;
-  });
 </script>
 
-{#if isShowPopup}
-  <CollectionPopup {collectionsMethods} />
-{/if}
-
-{#if isShowFolder}
-  <FolderPopup {collectionsMethods} />
-{/if}
-
-<div class="d-flex">
+<div class="d-flex collection">
   <div class="collections__list">
     <CollectionsList {collectionsMethods} />
   </div>
@@ -103,8 +93,8 @@
         <p>COLLECTION</p>
       {/if}
     </div>
+    <SidebarRight />
   </div>
-  <SidebarRight />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
@@ -113,8 +103,10 @@
     top: 44px;
     position: fixed;
     right: 0;
+    left: 0;
     width: calc(100%-352px);
     height: calc(100vh - 44px);
+    z-index: -1;
   }
   .tab__content {
     margin-right: 32px;

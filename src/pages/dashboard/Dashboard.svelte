@@ -39,7 +39,7 @@
   });
 </script>
 
-<div>
+<div class="dashboard">
   <HeaderDashboard />
   <div class="dashboard-teams d-flex flex-column">
     <Sidebar />
@@ -61,5 +61,10 @@
 <style>
   .dashboard-teams {
     margin-left: 72px;
+    z-index: -1;
+  }
+
+  .dashboard {
+    z-index: 0;
   }
 </style>

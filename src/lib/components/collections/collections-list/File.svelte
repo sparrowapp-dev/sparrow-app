@@ -1,6 +1,5 @@
 <script lang="ts">
   import { AuthSection, AuthType } from "$lib/utils/enums/authorization.enum";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
   import {
     RequestDataType,
     RequestDataset,
@@ -8,6 +7,8 @@
     RequestSection,
   } from "$lib/utils/enums/request.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -22,18 +23,22 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
+  import FilePopup from "$lib/components/Modal/FilePopup.svelte";
   const _colllectionListViewModel = new CollectionListViewModel();
   const collectionService = new CollectionService();
+
+  currentFolderIdName.set({
+    folderId: folderId,
+    folderName: folderName,
+  });
 
   let url, method, body, headers, queryParams, type;
 
   let apiClass = "red-api";
 
   const handleClick = () => {
-    const request = generateSampleRequest(
-      "UNTRACKED-" + id,
-      new Date().toString(),
-    );
+    const request = generateSampleRequest(id, new Date().toString());
     collectionsMethods.handleCreateTab(request);
   };
   $: {
@@ -79,33 +84,18 @@
   let showMenu = false;
   let button;
   let openMenuButton: HTMLElement = null;
-
+  let containerRef;
   function rightClickContextMenu(e, button) {
-    if (openRequestId === id) {
-      showMenu = !showMenu;
-    } else {
-      openRequestId = id;
-      showMenu = true;
-    }
+    e.preventDefault();
 
-    if (button) {
-      openMenuButton = button;
-      const rect = button.getBoundingClientRect();
-      pos = { x: rect.right - 260, y: rect.top - 5 };
-    } else {
-      browser = {
-        y: window.innerWidth,
-        h: window.innerHeight,
-      };
-      pos = {
-        x: e.clientX,
-        y: e.clientY,
-      };
+    const containerRect = containerRef?.getBoundingClientRect();
+    const mouseX = e.clientX - (containerRect?.left || 0);
+    const mouseY = e.clientY - (containerRect?.top || 0);
 
-      if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
-      if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
-    }
-    isMenuOpen = true;
+    pos = { x: mouseX, y: mouseY };
+
+    openRequestId = id;
+    showMenu = true;
   }
 
   function onPageClick(e) {
@@ -152,12 +142,12 @@
           },
         });
 
-      name = updateRequestName?.data?.data?.name;
-      collectionsMethods.updateRequestName(
-        openRequestId,
+      name = updateRequestName?.data?.data.name;
+      collectionsMethods.updateRequestInFolderCollection(
         collectionId,
+        openRequestId,
+        updateRequestName.data.data,
         folderID,
-        name,
       );
     }
     isRenaming = false;
@@ -179,24 +169,7 @@
 
   //delete collection
   const deleteRequest = async () => {
-    // isShowCollectionPopup.set(true);
-    // deletedCollectionWorkspaceId.set({
-    //   collectionId: openCollectionId,
-    //   workspaceId: workspaceId,
-    // });
-
-    const deleteRequestName = await collectionService.deleteRequestInCollection(
-      openRequestId,
-      {
-        collectionId: collectionId,
-        workspaceId: currentWorkspaceId,
-        folderId: folderID,
-        items: {
-          name: newRequestName,
-          type: "REQUEST",
-        },
-      },
-    );
+    isShowFilePopup.set(true);
   };
 
   let menuItems = [
@@ -213,14 +186,41 @@
       displayText: "Delete",
     },
   ];
+
+  let isFilePopup: boolean;
+  isShowFilePopup.subscribe((value) => {
+    isFilePopup = value;
+  });
+
+  let workspaceId = currentWorkspaceId;
+
+  function toggleMenuVisibility() {
+    showMenu = !showMenu;
+  }
 </script>
+
+{#if isFilePopup}
+  <FilePopup
+    {collectionsMethods}
+    {folderId}
+    {folderName}
+    {collectionId}
+    {openRequestId}
+    {name}
+    {workspaceId}
+  />
+{/if}
 
 <div class="content" bind:this={content} />
 
 {#if showMenu && id === openRequestId}
+  <div
+    on:click={toggleMenuVisibility}
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
+  />
   <nav
     use:getContextMenuDimension
-    style="position: absolute; top:{pos.y}px; left:{pos.x}px"
+    style="position: fixed; top:{pos.y}px; left:{pos.x}px"
   >
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
@@ -245,7 +245,11 @@
 <svelte:window on:click={onPageClick} />
 
 <div
-  class="btn-primary d-flex align-items-center justify-content-between ps-2 my-button pe-3"
+  class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary {id?.includes(
+    UntrackedItems.UNTRACKED,
+  )
+    ? 'unclickable'
+    : ''}"
   style="height:32px;"
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, button)}
   on:click={() => {
@@ -284,6 +288,10 @@
   >
     <img src={threedotIcon} alt="threedotIcon" />
   </button>
+
+  {#if id?.includes(UntrackedItems.UNTRACKED)}
+    <Spinner size={"15px"} />
+  {/if}
 </div>
 
 <style>
@@ -365,5 +373,8 @@
     color: var(--white-color);
     border-radius: 8px;
     background-color: var(--background-color);
+  }
+  .unclickable {
+    pointer-events: none;
   }
 </style>

@@ -5,6 +5,8 @@ import { writable } from "svelte/store";
 const collectionList = writable([]);
 export const isShowCollectionPopup = writable(false);
 export const isShowFolderPopup = writable(false);
+export const isShowFilePopup = writable(false);
+
 export const deletedCollectionWorkspaceId = writable({
   collectionId: null,
   workspaceId: null,
@@ -14,6 +16,19 @@ export const currentCollectionWorkspaceFolderId = writable({
   workspaceId: null,
   folderId: null,
 });
+
+export const currentCollectionWorkspaceFolderRequestId = writable({
+  collectionId: null,
+  workspaceId: null,
+  folderId: null,
+  requestId: null,
+  items: {
+    name: "",
+    type: "REQUEST",
+  },
+});
+
+export const currentFolderIdName = writable({ folderId: "", folderName: "" });
 
 const setCollectionList = (collection) => {
   collectionList.set(collection);
