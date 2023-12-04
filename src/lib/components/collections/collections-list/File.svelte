@@ -17,7 +17,7 @@
     export let api;
     export let collectionsMethods: CollectionsMethods;
   
-    let url, method, body, headers, queryParams, type;
+    let url, method, body, headers, queryParams, type, description;
     let apiClass = "red-api";
     const path: Path = {
       workspaceId: currentWorkspaceId,
@@ -34,6 +34,7 @@
         queryParams = api.request.queryParams;
         body = api.request.body;
         type = api.request.type;
+        description = api.description;
       }
     }
     
@@ -41,6 +42,8 @@
       const request : NewTab =generateSampleRequest(id, new Date().toString());
       request.path = path;
       request.name = name;
+      if(description)
+      request.description = description;
       if(url)
       request.property.request.url = url;
       if(body)

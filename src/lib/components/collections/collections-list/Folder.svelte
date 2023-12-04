@@ -64,6 +64,7 @@
       items: {
         name: request.name,
         type: request.type,
+        description:"",
         request: {
           method: request.property.request.method,
         },

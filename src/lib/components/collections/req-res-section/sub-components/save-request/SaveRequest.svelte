@@ -27,6 +27,7 @@
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+    import MethodButton from "$lib/components/buttons/MethodButton.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -52,7 +53,8 @@
     id: "",
     name: "",
   };
-  let tabName;
+  let tabName: string;
+  let description: string;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
     tabName = componentData.name;
   } else {
@@ -130,6 +132,7 @@
           workspaceId: workspace.id,
           items: {
             name: tabName,
+            description,
             type: ItemType.REQUEST,
             request: expectedRequest,
           },
@@ -188,6 +191,7 @@
             type: ItemType.FOLDER,
             items: {
               name: tabName,
+              description,
               type: ItemType.REQUEST,
               request: expectedRequest,
             },
@@ -425,15 +429,22 @@
       </div>
       <div class="col-6">
         <!-- <div>Right panel</div> -->
-        <p class="save-text-clr mb-1" style="font-size:12px">Request Name</p>
-        <div class="pb-1">
+        <p class="save-text-clr mb-1" style="font-size:12px">Request Name <span class="text-dangerColor">*</span></p>
+        <div class="pb-2">
           <input
             type="text"
-            style="width: 100%; font-size: 12px;"
-            placeholder="Request Name"
+            style="width: 100%; font-size: 12px; {tabName?.length === 0 ? `outline: 1px solid #FE8C98`: ``}"
+            placeholder="Enter request name."
             class="p-1 bg-black outline-0 rounded border-0"
             bind:value={tabName}
           />
+        </div>
+        {#if tabName?.length === 0}
+          <p class="tabname-error-text text-dangerColor">Please add the Request Name to save the request.</p>
+        {/if}
+        <div class="d-flex">
+          <MethodButton method={componentData?.property.request.method}/>
+          <p class="api-url">{componentData?.property.request.url}</p>
         </div>
         <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
         <div class="pb-1">
@@ -442,11 +453,12 @@
             class="p-1 bg-black rounded border-0"
             rows="3"
             placeholder="Give a description to help people know about this request."
+            bind:value={description}
           />
         </div>
         <p class="save-text-clr mb-1" style="font-size:12px">Saving to</p>
         {#if path.length === 0}
-          <p style="font-size: 12px;" class="save-text-clr">
+          <p style="font-size: 12px;" class="save-text-clr text-dangerColor">
             Select a Collection or Folder.
           </p>
         {:else}
@@ -518,7 +530,7 @@
           />
         </span>
         <CoverButton
-          disable={path.length === 0 ? true : false}
+          disable={path.length > 0 ? tabName.length > 0 ? false : true : true}
           text={"Save"}
           size={16}
           type={"primary"}
@@ -556,7 +568,17 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .save-text-clr {
-    color: var(--request-arc);
+  .api-url {
+    word-break: break-all;
+    font-size: 12px;
+    color: #999999;
+    font-family: monospace;
+  }
+  .save-request input:focus, .save-request textarea:focus{
+    outline: none;
+    padding: 6px 12px;
+  }
+  .tabname-error-text{
+    font-size: 12px;
   }
 </style>
