@@ -104,7 +104,13 @@ const generateSampleRequest = (id: string, date: string) => {
       },
     },
     save: false,
-    path: {},
+    path: {
+      workspaceId: "",
+      collectionId: "",
+      folderId: "",
+      folderName: "",
+    },
+    saveInProgress: false,
     isActive: true,
     createdAt: date,
   };

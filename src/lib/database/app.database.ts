@@ -64,11 +64,21 @@ const db = await rxdb.addCollections({
   tab: {
     schema: tabSchema,
     migrationStrategies: {
-      // data migration from version 0 to version 1
+      // database  migration functions
       1: function (oldDoc) {
         return oldDoc;
       },
       2: function (oldDoc) {
+        return oldDoc;
+      },
+      3: function (oldDoc) {
+        oldDoc.tabId = oldDoc.id;
+        oldDoc.saveInProgress = false;
+        return oldDoc;
+      },
+      4: function (oldDoc) {
+        oldDoc.tabId = oldDoc.id;
+        oldDoc.saveInProgress = false;
         return oldDoc;
       },
     },

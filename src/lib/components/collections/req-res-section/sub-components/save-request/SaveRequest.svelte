@@ -34,6 +34,8 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import type { Observable } from "rxjs";
+    import type { WorkspaceDocument } from "$lib/database/app.database";
 
   export let collectionsMethods : CollectionsMethods;
   export let onClick;
@@ -52,7 +54,13 @@
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
-  let workspace: Workspace | null = null;
+  let workspace: {
+    id: string,
+    name: string
+  } = {
+    id: "",
+    name:""
+  };
 
   let currentTabId = null;
   let tabList = [];
@@ -61,17 +69,30 @@
   let tabMethod: string = "";
   let tabUrl: string = "";
   let componentData;
+  let latestRoute : {
+    id: string
+  } = {
+    id: ""
+  }
 
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+ 
   const collectionListUnsubscribe = collectionsMethods.getCollectionList().subscribe((value)=>{
     collection = value;
-    directory = JSON.parse(JSON.stringify(collection)); 
+    directory = JSON.parse(JSON.stringify(collection));
+    if(latestRoute.id) 
+      navigateToDirectory(latestRoute);
   });
 
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id !== "") {
-      workspace = value;
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      if (value) {
+        workspace.id = value.get("_id");
+        workspace.name = value.get("name");
+      }
     }
-  });
+  );
 
   const navigateToWorkspace = () => {
     directory = JSON.parse(JSON.stringify(collection));
@@ -229,14 +250,10 @@
       directory,
     );
     if (res.isSuccessful) {
-      insertNode(
-        JSON.parse(JSON.stringify(collection)),
-        path[0].id,
-        res.data.data.type,
-        res.data.data.name,
-        res.data.data.id,
-      );
-      navigateToDirectory({ id: res.data.data.id });
+      latestRoute = {
+        id: res.data.data.id
+      }
+      collectionsMethods.addRequestOrFolderInCollection(path[0].id, res.data.data);
     }
   };
 
@@ -247,12 +264,10 @@
     };
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
-      insertHead(
-        JSON.parse(JSON.stringify(collection)),
-        newCollection.name,
-        res.data.data.insertedId,
-      );
-      navigateToDirectory({ id: res.data.data.insertedId });
+      latestRoute = {
+        id: res.data.data._id
+      }
+      collectionsMethods.addCollection(res.data.data);
     }
   };
 
@@ -286,7 +301,7 @@
 
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
-    currentWorkspaceUnsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
     tabsUnsubscribe();
     currentTabUnsubscribe();
   });
