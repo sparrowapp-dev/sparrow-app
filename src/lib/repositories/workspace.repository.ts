@@ -16,6 +16,7 @@ export class WorkspaceRepository {
       isActiveWorkspace: elem.get("isActiveWorkspace"),
       createdBy: elem.get("createdBy"),
       createdAt: elem.get("createdAt"),
+      collections: elem.get("collections"),
     };
   };
 
@@ -61,6 +62,7 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
+    await this.clearWorkspaces();
     await rxdb.workspace.bulkInsert(data);
     return;
   };

@@ -99,6 +99,15 @@ const stateLiteral = {
     section: {
       type: "string",
     },
+    responseSection: {
+      type: "string",
+    },
+    responseRaw: {
+      type: "string",
+    },
+    responseFormatter: {
+      type: "string",
+    },
   },
 };
 const basicAuthLiteral = {
@@ -198,10 +207,18 @@ const pathLiteral = {
 
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
-  primaryKey: "id",
+  primaryKey: {
+    key: "tabId",
+    fields: ["id"],
+    separator: "|",
+  },
   type: "object",
-  version: 1,
+  version: 4,
   properties: {
+    tabId: {
+      type: "string",
+      maxLength: 100,
+    },
     id: {
       type: "string",
       maxLength: 100,
@@ -224,6 +241,9 @@ export const tabSchemaLiteral = {
       default: true,
     },
     path: pathLiteral,
+    saveInProgress: {
+      type: "boolean",
+    },
     createdAt: {
       type: "string",
     },

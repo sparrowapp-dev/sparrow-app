@@ -1,8 +1,17 @@
 <script lang="ts">
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { getPathFromUrl,truncatePath } from "$lib/utils/helpers/common.helper";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import {
+    getPathFromUrl,
+    truncatePath,
+  } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
+    import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -11,36 +20,40 @@
   export let folderName: string;
   export let api;
   let showPath = false;
+  export let collectionsMethods: CollectionsMethods;
 
-  let url, method, body, headers, queryParams;
-  // let url = api.request.url;
-  // let method = api.request.method;
-  // let headers = api.request.headers;
-  // let queryParams = api.request.queryParams;
-  // let body = api.request.body;
+  let url, method, body, headers, queryParams, type;
+
   let apiClass = "red-api";
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
   });
-
   $: {
     if (api) {
+      if (api.property) {
+        api = api.property;
+      }
       url = api.request.url;
       method = api.request.method;
       headers = api.request.headers;
       queryParams = api.request.queryParams;
       body = api.request.body;
+      type = api.request.type;
     }
   }
-  $: {
-    if (method) {
-      if (method === "DELETE") apiClass = "red-api";
-      else if (method === "GET") apiClass = "green-api";
-      else if (method === "POST") apiClass = "yellow-api";
-      else if (method === "PUT") apiClass = "blue-api";
-      else if (method === "ARC") apiClass = "grey-api";
-    }
-  }
+  const handleClick = () => {
+    const request: NewTab = generateSampleRequest(id, new Date().toString());
+    request.path = path;
+    request.name = name;
+    if (url) request.property.request.url = url;
+    if (body) request.property.request.body = body;
+    if (method) request.property.request.method = method;
+    if (queryParams) request.property.request.queryParams = queryParams;
+    if (headers) request.property.request.headers = headers;
+    request.save = true;
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+  };
 
   let path: Path = {
     workspaceId: currentWorkspaceId,
@@ -48,45 +61,42 @@
     folderId,
     folderName,
   };
+
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
-
-
-    function TruncatePath(arg0: string) {
-        throw new Error("Function not implemented.");
-    }
 </script>
 
-<div></div>
-<div class="d-flex align-items-center api-request">
-  <div class="api-method {apiClass}">
-    {method.toUpperCase()}
+<div
+  class="d-flex align-items-center justify-content-between {id.includes(
+    UntrackedItems.UNTRACKED,
+  )
+    ? 'unclickable'
+    : ''}"
+  style="height:32px;"
+  on:click={() => {
+    handleClick();
+  }}
+>
+  <div class="d-flex align-items-center">
+    <div class="api-method text-{getMethodStyle(method)}">
+      {method.toUpperCase()}
+    </div>
+    <div class="api-name">
+      {name}
+      {#if showPath}
+        <span class="path-name"
+          >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+        >
+      {/if}
+    </div>
   </div>
-  <div class="api-info">
-    <div class="api-name">{name}</div>
-    {#if showPath}
-      <span class="path-name">{`${url ? (truncatePath(getPathFromUrl(url),14)) : ""}`}</span>
-    {/if}
-  </div>
+  {#if id.includes(UntrackedItems.UNTRACKED)}
+    <Spinner size={"15px"} />
+  {/if}
 </div>
 
 <style>
-  .red-api {
-    color: var(--request-delete);
-  }
-  .green-api {
-    color: var(--request-get);
-  }
-  .yellow-api {
-    color: var(--request-post);
-  }
-  .blue-api {
-    color: var(--request-put);
-  }
-  .grey-api {
-    color: var(--request-arc);
-  }
   .api-method {
     font-size: 12px;
     font-weight: 500;
@@ -98,6 +108,7 @@
     padding: 8px 12px 8px 8px;
     display: flex;
     justify-content: center;
+    text-align: left;
   }
   .api-name {
     font-size: 12px;
@@ -120,8 +131,7 @@
   .highlight {
     color: var(--white-color);
   }
-  .api-request {
-    display: flex;
-    margin-top: 5px;
+  .unclickable {
+    pointer-events: none;
   }
 </style>

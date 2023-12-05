@@ -1,4 +1,3 @@
-import type { Headers, QueryParams } from "../dto";
 import type { AuthSection } from "../enums/authorization.enum";
 import type { ItemType } from "../enums/item-type.enum";
 import type {
@@ -7,6 +6,8 @@ import type {
   RequestMethodType,
   RequestRawType,
   RequestSectionType,
+  ResponseFormatterType,
+  ResponseSectionType,
 } from "../types/request.type";
 
 export interface Path {
@@ -33,9 +34,9 @@ export interface Response {
 export interface RequestBody {
   method: string;
   url?: string;
-  body?: string;
-  headers?: Headers[];
-  queryParams?: QueryParams[];
+  body?: unknown;
+  headers?: KeyValuePair[];
+  queryParams?: KeyValuePair[];
 }
 
 export interface KeyValuePair {
@@ -71,6 +72,9 @@ export interface State {
   dataset?: RequestDatasetType;
   auth?: RequestAuthTypes;
   section?: RequestSectionType;
+  responseSection?: ResponseSectionType;
+  responseRaw?: RequestRawType;
+  responseFormatter?: ResponseFormatterType;
 }
 
 export interface BasicAuth {
@@ -119,7 +123,7 @@ export interface NewTab {
   save: boolean;
   createdAt: string;
   path?: Path;
-  isRawBodyValid?: boolean;
+  saveInProgress?: boolean;
 }
 
 export interface CurrentTab {

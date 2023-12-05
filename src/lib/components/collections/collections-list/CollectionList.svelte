@@ -4,47 +4,58 @@
 
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
-  import plusIcon from "$lib/assets/plus.svg";
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
 
+  import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
-
-  import { fetchCollection, insertCollection } from "$lib/services/collection";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import {
-    collectionList,
-    setCollectionList,
-    useCollectionTree,
-  } from "$lib/store/collection";
   import { useTree } from "./collectionList";
-  import type { CreateCollectionPostBody } from "$lib/utils/dto";
-  const { insertHead, updateHeadId } = useCollectionTree();
-  const [, , searchNode] = useTree();
   import { v4 as uuidv4 } from "uuid";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
-  import Collection from "$lib/components/file-types/collection/Collection.svelte";
-  import DefaultCollection from "./DefaultCollection.svelte";
   import { selectMethodsStore, selectedMethodsCollectionStore} from "$lib/store/methods";
 
-  let collection: Collection[]=[];
+
+  import DefaultCollection from "./DefaultCollection.svelte";
+  import {
+    type CollectionDocument,
+    type WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import type { Observable } from "rxjs";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  
+  export let collectionsMethods: CollectionsMethods;
+  
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const [, , searchNode] = useTree();
+  let collection: any[] = [];
   let currentWorkspaceId: string = "";
   let showfilterDropdown=false;
 
   let selectedApiMethods:string[]=[];
   let filteredSelectedMethodsCollection=[];
   let collapsExpandToggle: boolean = false;
-  let getCollectionData = async (id: string) => {
-    const res = await fetchCollection(id);
-    if (res.isSuccessful) {
-      setCollectionList(res.data.data);
-    }
-  };
+  const collections: Observable<CollectionDocument[]> =
+    _colllectionListViewModel.collection;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
 
-  const collectionListUnsubscribe = collectionList.subscribe((value) => {
-    collection = value;
-  }
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value && value.length > 0) {
+        const collectionArr = value.map(
+          (collectionDocument: CollectionDocument) => {
+            const collectionObj =
+              collectionsMethods.getCollectionDocument(collectionDocument);
+            return collectionObj;
+          },
+        );
+        collection = collectionArr;
+      }
+    },
   );
   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
     if(value && value.length>0){
@@ -57,7 +68,7 @@
       filteredSelectedMethodsCollection=value;
     }
   })
-  let currentWorkspaceName = "";
+  
 
   const getNextCollection: (list: any[], name: string) => any = (
     list,
@@ -84,26 +95,43 @@
 
     return null;
   };
-
+  let currentWorkspaceName : string;
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id"); 
+        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        const response = await collectionsMethods.getAllCollections(
+          workspaceId,
+        );
+        if (response.isSuccessful && response.data.data.length > 0) {
+          const collections = response.data.data;
+          collectionsMethods.bulkInsert(collections);
+          return;
+        }
+      }
+    },
+  );
   const handleCreateCollection = async () => {
-    const newCollection: CreateCollectionPostBody = {
+    const newCollection = {
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
-      workspaceId: currentWorkspaceId,
+      items: [],
+      createdAt : new Date().toISOString()
     };
-    const currentDummyId: string = uuidv4() + "MYUID45345";
-    insertHead(
-      JSON.parse(JSON.stringify(collection)),
-      newCollection.name,
-      currentDummyId,
-    );
-    const res = await insertCollection(newCollection);
-    if (res.isSuccessful) {
-      updateHeadId(
-        JSON.parse(JSON.stringify(collection)),
-        currentDummyId,
-        res.data.data.insertedId,
-      );
+    collectionsMethods.addCollection(newCollection);
+    const response = await _colllectionListViewModel.addCollection({
+      name: newCollection.name,
+      workspaceId : currentWorkspaceId
+    });
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      collectionsMethods.updateCollection(newCollection._id ,res);
+      return;
     }
+    return;
   };
 
   const handleFilterDropdown=()=>{
@@ -112,13 +140,7 @@
     filterBtn.style.backgroundColor=showfilterDropdown?"#85C2FF":"#000000";
   }
 
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe((value) => {
-    if (value.id && value.name) {
-      getCollectionData(value.id);
-      currentWorkspaceName = value.name;
-      currentWorkspaceId = value.id;
-    }
-  });
+ 
 
  
 
@@ -139,15 +161,12 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
-    searchNode(searchData, filteredCollection, filteredFolder, filteredFile,filteredSelectedMethodsCollection);
+    searchNode(searchData, filteredCollection, filteredFolder, filteredFile,collection);
+
   };
 
-  onDestroy(collectionListUnsubscribe);
-  onDestroy(currentWorkspaceUnsubscribe);
-  onDestroy(collapsibleStateUnsubscribe);
+  
   onDestroy(()=>{
-   collectionListUnsubscribe();
-   currentWorkspaceUnsubscribe();
    collapsibleStateUnsubscribe();
    selectedMethodsCollectionUnsubscribe();
    selectedMethodUnsubscibe();
@@ -171,6 +190,9 @@
   onDestroy(() => {
     // Remove the window resize event listener when the component is destroyed
     window.removeEventListener("resize", handleResize);
+    collectionSubscribe.unsubscribe();
+    collapsibleStateUnsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
@@ -205,7 +227,7 @@
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
     <p class="mb-0 text-whiteColor" style="font-size: 18px;">
-      {currentWorkspaceName}
+      {currentWorkspaceName || ""}
     </p>
     <button
       class="bg-backgroundColor border-0"
@@ -227,7 +249,7 @@
         type="search"
         style="  font-size: 12px;font-weight:500;"
         class="inputField border-0 w-100 h-100 bg-blackColor"
-        placeholder="Search APIs in {currentWorkspaceName}"
+        placeholder="Search APIs in {currentWorkspaceName || ''}"
         bind:value={searchData}
         on:input={()=>{handleSearch()}}
       />
@@ -248,14 +270,8 @@
 {/if}
 </button>
     </div>
-    <div class="d-flex align-items-center justify-content-center">
-      <button
-        class="btn btn-blackColor p-0 d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px;"
-        on:click={handleCreateCollection}
-      >
-        <img src={plusIcon} alt="" />
-      </button>
+    <div>
+      <RequestDropdown {collectionsMethods} {handleCreateCollection} />
     </div>
   </div>
 
@@ -310,6 +326,7 @@
           {currentWorkspaceId}
           collection={col}
           title={col.name}
+          collectionsMethods={collectionsMethods}
         />
       {/each}
       {:else}
@@ -321,11 +338,12 @@
             {currentWorkspaceId}
             collection={col}
             title={col.name}
+            {collectionsMethods}
           />
         {/each}
-        {:else}
-          <DefaultCollection></DefaultCollection>
-        {/if}
+      {:else}
+        <DefaultCollection />
+      {/if}
       {/if}
     </div>
   </div>

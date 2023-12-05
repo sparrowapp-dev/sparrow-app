@@ -1,3 +1,5 @@
+import type { KeyValuePair } from "../interfaces/request.interface";
+
 export interface CreateDirectoryPostBody {
   name: string;
   description: string;
@@ -30,9 +32,9 @@ export interface CreateApiRequestPostBody {
     request?: {
       method: string;
       url?: string;
-      body?: string;
-      headers?: Headers[];
-      queryParams?: QueryParams[];
+      body?: unknown;
+      headers?: KeyValuePair[];
+      queryParams?: KeyValuePair[];
     };
     items?: {
       id?: string;
@@ -41,9 +43,9 @@ export interface CreateApiRequestPostBody {
       request: {
         method: string;
         url?: string;
-        body?: string;
-        headers?: Headers[];
-        queryParams?: QueryParams[];
+        body?: unknown;
+        headers?: KeyValuePair[];
+        queryParams?: KeyValuePair[];
       };
     };
   };

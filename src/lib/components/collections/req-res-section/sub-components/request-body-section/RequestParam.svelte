@@ -37,8 +37,9 @@
   let response;
   let request;
   let pencilIconState: boolean = false;
-
+  let apiState;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    apiState = event?.property.request.state;
     selectedTab = event?.property.request.state.section;
     progress = event?.property.request.requestInProgress;
     request = event?.property.request;
@@ -76,6 +77,21 @@
     isHorizontalVerticalUnsubscribe();
     tabSubscribe();
   });
+  const handleKeyPress = (event) => {
+    if (event.altKey && event.code === "KeyP") {
+      collectionsMethods.updateRequestState(
+        RequestSection.PARAMETERS,
+        "section",
+      );
+    } else if (event.altKey && event.code === "KeyH") {
+      collectionsMethods.updateRequestState(RequestSection.HEADERS, "section");
+    } else if (event.altKey && event.code === "KeyB") {
+      collectionsMethods.updateRequestState(
+        RequestSection.REQUEST_BODY,
+        "section",
+      );
+    }
+  };
 </script>
 
 <div
@@ -207,7 +223,7 @@
       {:else if response?.status === "Not Found"}
         <ResponseError />
       {:else if response?.status}
-        <ResponseParams {response} />
+        <ResponseParams {apiState} {collectionsMethods} {response} />
       {/if}
 
       {#if progress}
@@ -226,6 +242,7 @@
     </div>
   </div>
 </div>
+<svelte:window on:keydown={handleKeyPress} />
 
 <style>
   .team-menu__link {

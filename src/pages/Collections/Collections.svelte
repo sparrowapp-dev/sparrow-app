@@ -9,8 +9,16 @@
   import { CollectionsViewModel } from "./Collections.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+    import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { v4 as uuidv4 } from "uuid";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+    import type { Observable } from "rxjs";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import type { Writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
+  const _collectionListViewModel=new CollectionListViewModel()
 
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
@@ -22,15 +30,38 @@
     updateRequestAuth: _viewModel.updateRequestAuth,
     updateRequestBody: _viewModel.updateRequestBody,
     updateRequestBodyFormData: _viewModel.updateRequestBodyFormData,
+    getCollectionDocument:_collectionListViewModel.getCollectionDocument,
+    createCollection:_collectionListViewModel.createCollection,
+    bulkInsert:_collectionListViewModel.bulkInsert,
+    getAllCollections:_collectionListViewModel.getAllCollections,
+    addRequestaddFolder:_collectionListViewModel.addRequest,
+    addFolder:_collectionListViewModel.addFolder,
+    getCollectionList: _viewModel.getCollectionList,
+    getActiveWorkspace: _viewModel.getActiveWorkspace,
+    addRequestInFolder: _viewModel.addRequestInFolder,
+    updateRequestInFolder: _viewModel.updateRequestInFolder,
+    addRequestOrFolderInCollection: _viewModel.addRequestOrFolderInCollection,
+    updateRequestOrFolderInCollection: _viewModel.updateRequestOrFolderInCollection,
+    addCollection: _viewModel.addCollection,
+    updateCollection : _viewModel.updateCollection
   };
 
   const activeTab = _viewModel.activeTab;
-  const tabList = _viewModel.tabs;
+  const tabList : Writable<NewTab[]> = _viewModel.tabs;
+
+  const handleKeyPress = (event) => {
+    if (event.ctrlKey && event.code === "KeyN") {
+      collectionsMethods.handleCreateTab(
+        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      );
+      moveNavigation("right");
+    }
+  };
 </script>
 
 <div class="d-flex">
   <div class="collections__list">
-    <CollectionsList />
+    <CollectionsList collectionsMethods={collectionsMethods} />
   </div>
   <div
     class="collections__tools bg-backgroundColor"
@@ -52,9 +83,10 @@
         <p>COLLECTION</p>
       {/if}
     </div>
+    <SidebarRight />
   </div>
-  <SidebarRight />
 </div>
+<svelte:window on:keydown={handleKeyPress} />
 
 <style>
   .collections__tools {

@@ -1,96 +1,97 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
-  import {
-    insertCollectionDirectory,
-    insertCollectionRequest,
-  } from "$lib/services/collection";
   import FileExplorer from "./FileExplorer.svelte";
-  import type { CreateDirectoryPostBody } from "$lib/utils/dto";
   import { getNextName } from "./collectionList";
-  import { onDestroy } from "svelte";
-  import { useCollectionTree } from "$lib/store/collection";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import { RequestDefault } from "$lib/utils/enums/request.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
-  const { insertNode, updateNodeId, insertHead } = useCollectionTree();
-  let visibility = false;
+  import { onDestroy } from "svelte";
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
-  let workspaceId: string = "";
+
   let showFolderAPIButtons:boolean=true;
   export let collectionList;
-  
-  const currentWorkspaceUnsubscribe = currentWorkspace.subscribe(
-    (value: any) => {
-      workspaceId = value.id;
-    },
-  );
+  export let collectionsMethods: CollectionsMethods;
+
+  const _colllectionListViewModel = new CollectionListViewModel();
+  let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
-    let directory: CreateDirectoryPostBody = {
+    const folder = {
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
       description: "",
+      type: ItemType.FOLDER,
+      items: [],
     };
-    const currentDummyId : string = uuidv4() + "MYUID45345";
-    insertNode(
-      JSON.parse(JSON.stringify(collectionList)),
-      collection._id,
-      ItemType.FOLDER,
-      directory.name,
-      currentDummyId,
+
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
+
+    const response = await _colllectionListViewModel.addFolder(
+      currentWorkspaceId,
+      collectionId,
+      {
+        name: folder.name,
+        description: folder.description,
+      },
     );
-    const res = await insertCollectionDirectory(
-      workspaceId,
-      collection._id,
-      directory,
-    );
-    if (res.isSuccessful) {
-      updateNodeId(
-        JSON.parse(JSON.stringify(collectionList)),
-        currentDummyId,
-        res.data.data.id
+
+    if (response.isSuccessful && response.data.data) {
+      const folderObj = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        folder.id,
+        folderObj,
       );
+      return;
     }
   };
-  const handleAPIClick = async () => {
-    const file: string = getNextName(
-      collection.items,
-      ItemType.REQUEST,
-      RequestDefault.NAME,
-    );
-    const currentDummyId : string = uuidv4() + "MYUID45345";
-    insertNode(
-        JSON.parse(JSON.stringify(collectionList)),
-        collection._id,
-        ItemType.REQUEST,
-        file,
-        currentDummyId,
-        {method:RequestDefault.METHOD}
-      );
 
-    const res = await insertCollectionRequest({
-      collectionId: collection._id,
-      workspaceId: workspaceId,
+  const handleAPIClick = async () => {
+    const request = generateSampleRequest(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      new Date().toString(),
+    );
+
+    const requestObj = {
+      collectionId: collectionId,
+      workspaceId: currentWorkspaceId,
       items: {
-        name: file,
-        type: ItemType.REQUEST,
+        name: request.name,
+        type: request.type,
         request: {
-          method: RequestDefault.METHOD,
+          method: request.property.request.method,
         },
       },
+    };
+    collectionsMethods.addRequestOrFolderInCollection(collectionId, {
+      ...requestObj.items,
+      id: request.id,
     });
-  
-    if (res.isSuccessful) {
-      updateNodeId(
-        JSON.parse(JSON.stringify(collectionList)),
-        currentDummyId,
-        new Date() + "uid",  // MOCKED DATA [UPDATION REQUIRED HERE]
+    const response = await _colllectionListViewModel.addRequest(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        collectionId,
+        request.id,
+        res,
       );
+
+      request.id = res.id;
+      request.path.workspaceId = currentWorkspaceId;
+      request.path.collectionId = collectionId;
+      
+      collectionsMethods.handleCreateTab(request);
+      moveNavigation("right");
+      return;
     }
   };
    const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
@@ -104,36 +105,47 @@
     }
   })
   onDestroy(()=>{
-    currentWorkspaceUnsubscribe();
     selectedMethodUnsubscibe();
     });
 </script>
 
 <button
   on:click={() => {
-     if(!collection._id.includes("MYUID45345")){
-          visibility = !visibility;
-      }
+    if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
+      visibility = !visibility;
+    }
   }}
   style="height:36px;"
-  class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1 ps-4"
+  class="btn btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4"
 >
+<div class="d-flex align-items-center">
   <img
     src={angleRight}
+    class=""
     style="height:14px; width:14px; margin-right:8px; {visibility
       ? 'transform:rotate(90deg);'
       : 'transform:rotate(0deg);'}"
     alt="angleRight"
   />
   <p class="mb-0" style="font-size: 14px;">{title}</p>
+</div>
+{#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  <Spinner size={"15px"}/>
+{/if}
 </button>
 <div
-  style="padding-left: 40px; cursor:pointer; display: {visibility
+  style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
     ? 'block'
     : 'none'};"
 >
   {#each collection.items as exp}
-    <FileExplorer collectionList={collectionList} collectionId = {collectionId} currentWorkspaceId =  {currentWorkspaceId} explorer={exp} />
+    <FileExplorer
+      {collectionsMethods}
+      {collectionList}
+      {collectionId}
+      {currentWorkspaceId}
+      explorer={exp}
+    />
   {/each}
   {#if showFolderAPIButtons}
   <IconButton text={"+ Folder"} onClick={handleFolderClick} />
@@ -150,6 +162,5 @@
   .btn-primary:hover {
     background-color: #232527;
     color: #fff;
-    padding: 20px;
   }
 </style>

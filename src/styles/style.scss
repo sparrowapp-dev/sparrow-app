@@ -33,6 +33,7 @@ $sparrow-send-hoverbutton: #04416d;
 $sparrow-button-background: #2d2c2c;
 $sparrow-button-color: #e5e5e5;
 $sparrow-input-slider-button:#1d3650;
+$sparrow-dull-background: #232424;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -86,6 +87,7 @@ $theme-colors: map-merge(
     "headColor": $sparrow-head,
     "patchColor": $sparrow-patc,
     "optionsColor": $sparrow-opt,
+    "dullBackground" : $sparrow-dull-background
   )
 );
 
