@@ -91,28 +91,30 @@
 </script>
 
 <div
-  class="save-request-backdrop d-block"
+  class="close-request-backdrop d-block"
   on:click={() => {
     closeCallback(false);
   }}
 />
-<div class="save-request d-block">
+<div class="close-request d-block">
   <div class="contain">
     <div class="d-flex justify-content-between">
       <div class="pb-2">
-        <h4>Save Changes?</h4>
+        <h4 class="close-request__title">Save Changes?</h4>
       </div>
       <button
-        class="btn"
+        class="btn pt-0 p-0 pe-0"
         on:click={() => {
           closeCallback(false);
         }}><img src={crossAsset} alt="" /></button
       >
     </div>
-    <p>
-      You have unsaved changes. Do you want to save them before closing the
-      file?
-    </p>
+    <div class="pb-3">
+        <small class="">
+          You have unsaved changes. Do you want to save them before closing the
+          file?
+        </small>
+    </div>
     <div class="d-flex justify-content-between">
       <div>
         <CoverButton
@@ -125,15 +127,17 @@
         />
       </div>
       <div class="d-flex">
-        <CoverButton
-          text={"Discard Changes"}
-          size={16}
-          type={"dark"}
-          onClick={() => {
-            collectionsMethods.handleRemoveTab(componentData.id);
-            closeCallback(false);
-          }}
-        />
+        <span style="margin-right: 15px;" > 
+            <CoverButton
+              text={"Discard Changes"}
+              size={16}
+              type={"dark"}
+              onClick={() => {
+                collectionsMethods.handleRemoveTab(componentData.id);
+                closeCallback(false);
+              }}
+            />
+        </span>
         <CoverButton
           text={"Save Changes"}
           size={16}
@@ -157,7 +161,7 @@
 </div>
 
 <style>
-  .save-request-backdrop {
+  .close-request-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -166,7 +170,7 @@
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 99999;
   }
-  .save-request {
+  .close-request {
     position: fixed;
     left: 50%;
     top: 50%;
@@ -180,18 +184,7 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .api-url {
-    word-break: break-all;
-    font-size: 12px;
-    color: #999999;
-    font-family: monospace;
-  }
-  .save-request input:focus,
-  .save-request textarea:focus {
-    outline: none;
-    padding: 6px 12px;
-  }
-  .tabname-error-text {
-    font-size: 12px;
+  .close-request__title{
+    font-size: 20px;
   }
 </style>
