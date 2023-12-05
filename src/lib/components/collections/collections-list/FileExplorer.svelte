@@ -10,8 +10,6 @@
   } from "$lib/store/collection";
   import { insertCollectionRequest } from "$lib/services/collection";
   import File from "./File.svelte";
-  import { getNextName } from "./collectionList";
-  import { RequestDefault, RequestMethod } from "$lib/utils/enums/request.enum";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -19,10 +17,13 @@
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { CreateApiRequestPostBody } from "$lib/utils/dto";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
+  import { selectMethodsStore } from "$lib/store/methods";
+  import { onDestroy } from "svelte";
+
   const { insertNode, updateNodeId } = useCollectionTree();
   let expand: boolean = false;
   export let explorer;
@@ -37,6 +38,9 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
+
+  let showFolderAPIButtons:boolean=true;
+
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -94,6 +98,19 @@
       return;
     }
   };
+   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      expand=true;
+      showFolderAPIButtons=false;
+    }else{
+      showFolderAPIButtons=true;
+      expand=false;
+    }
+  })
+
+  onDestroy(()=>{
+    selectedMethodUnsubscibe();
+  })
 
   let pos = { x: 0, y: 0 };
 
@@ -349,10 +366,14 @@
         {collectionsMethods}
       />
     {/each}
+    {#if showFolderAPIButtons}
     <div class="mt-2 mb-2 ms-2">
-      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-    </div>
+    <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
   </div>
+
+    {/if}
+  </div>
+   
 {:else}
   <div style="padding-left: 6px; cursor:pointer;">
     <File

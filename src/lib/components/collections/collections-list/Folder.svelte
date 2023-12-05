@@ -22,12 +22,16 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { selectMethodsStore } from "$lib/store/methods";
+  import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+
+  let showFolderAPIButtons:boolean=true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
 
@@ -106,6 +110,19 @@
       return;
     }
   };
+   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      showFolderAPIButtons=false;
+      visibility=true;
+    }else if(value && value.length===0){
+       visibility=false;
+    }else{
+      showFolderAPIButtons=true;
+    }
+  })
+  onDestroy(()=>{
+    selectedMethodUnsubscibe();
+    });
 
   let openCollectionId: string;
   let isMenuOpen: boolean = false;
@@ -388,10 +405,12 @@
       {visibility}
     />
   {/each}
+  {#if showFolderAPIButtons}
   <div class="mt-2 mb-2">
     <IconButton text={"+ Folder"} onClick={handleFolderClick} />
     <IconButton text={"+ API Request"} onClick={handleAPIClick} />
   </div>
+  {/if}
 </div>
 
 <style>
