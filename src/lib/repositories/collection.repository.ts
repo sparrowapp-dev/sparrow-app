@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rxdb, type CollectionDocument } from "$lib/database/app.database";
+import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
@@ -24,7 +25,9 @@ export class CollectionRepository {
         },
       })
       .exec();
+
     collection.incrementalModify((value) => {
+      value.name = data.name;
       value._id = data._id;
       value.updatedAt = data.updatedAt;
       value.updatedBy = data.updatedBy;
@@ -33,10 +36,71 @@ export class CollectionRepository {
       value.createdBy = data.createdBy;
       return value;
     });
+
     return;
   };
+
   public getCollection = (): Observable<CollectionDocument[]> => {
     return rxdb.collection.find().sort({ createdAt: "asc" }).$;
+  };
+
+  // public updateCollection = async (
+  //   collectionId,
+  // ): Observable<CollectionDocument[]> => {};
+
+  public deleteCollection = async (collectionId: string) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    collection.remove();
+  };
+
+  public updateFolderName = async (
+    collectionId: string,
+    folderId: string,
+    name: string,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    collection._data.items.map((item) => {
+      if (item.id === folderId && item.type === ItemType.FOLDER) {
+        item.name = name;
+      }
+    });
+
+    collection.incrementalPatch({
+      items: [...collection.items],
+    });
+  };
+
+  public deleteFolder = async (collectionId: string, folderId: string) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    const updatedItems = collection._data.items.filter((item) => {
+      if (item.type === ItemType.REQUEST) {
+        return item;
+      } else {
+        return item.id !== folderId;
+      }
+    });
+
+    collection.incrementalPatch({
+      items: [...updatedItems],
+    });
   };
 
   public bulkInsertData = async (data: any): Promise<void> => {
@@ -148,6 +212,94 @@ export class CollectionRepository {
       }
       return element;
     });
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public updateRequestInFolderCollection = async (
+    collectionId: string,
+    uuid: string,
+    item: any,
+    folderId?: string,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    const updatedItems = collection.toJSON().items.map((element) => {
+      if (element.id === folderId) {
+        for (let i = 0; i < element.items.length; i++) {
+          if (
+            element.items[i].id === uuid &&
+            element.items[i].type === ItemType.REQUEST
+          ) {
+            element.items[i] = item;
+            break;
+          }
+        }
+      }
+      return element;
+    });
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public deleteRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+
+    const updatedItems = collection.toJSON().items.filter((element) => {
+      if (element.id !== requestId) {
+        return element;
+      }
+    });
+
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public deleteRequestInFolderCollection = async (
+    collectionId: string,
+    uuid: string,
+    folderId: string,
+  ) => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+
+    const updatedItems = collection._data.items.map((element) => {
+      if (element.id === folderId) {
+        const filteredItems = element.items.filter((item) => item.id !== uuid);
+
+        return {
+          ...element,
+          items: filteredItems,
+        };
+      }
+      return element;
+    });
+
     collection.incrementalModify((value) => {
       value.items = [...updatedItems];
       return value;

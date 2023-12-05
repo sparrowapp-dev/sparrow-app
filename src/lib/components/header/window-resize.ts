@@ -46,6 +46,6 @@ export const resizeWindowOnLogOut = async () => {
   }
   await getCurrent().setSize(logicalSize);
   await getCurrent().center();
-  await oauthWindow.setSize(logicalSize);
+  await oauthWindow?.setSize(logicalSize);
   await oauthWindow.center();
 };
