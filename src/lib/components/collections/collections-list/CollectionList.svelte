@@ -18,18 +18,24 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
 
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
+  export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
 
   const _colllectionListViewModel = new CollectionListViewModel();
+  const _workspaceViewModel = new HeaderDashboardViewModel();
+  const collections: Observable<CollectionDocument[]> =
+    _colllectionListViewModel.collection;
+
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
 
-  const collections: Observable<CollectionDocument[]> =
-    _colllectionListViewModel.collection;
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
@@ -100,6 +106,8 @@
       items: [],
       createdAt: new Date().toISOString(),
     };
+    collection = [...collection, newCollection];
+
     collectionsMethods.addCollection(newCollection);
     const response = await _colllectionListViewModel.addCollection({
       name: newCollection.name,
@@ -107,6 +115,7 @@
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+
       collectionsMethods.updateCollection(newCollection._id, res);
       return;
     }

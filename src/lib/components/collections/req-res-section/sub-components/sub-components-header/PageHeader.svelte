@@ -136,7 +136,7 @@
   };
 </script>
 
-<div class="d-flex flex-column" data-tauri-drag-region>
+<div class="d-flex flex-column pageheader" data-tauri-drag-region>
   <div
     class="pageheader d-flex align-items-center justify-content-between {$collapsibleState
       ? 'ps-5 pt-4 pe-3'
@@ -225,6 +225,9 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
+  .pageheader {
+    z-index: 999;
+  }
   .btn-primary {
     background-color: #313233;
   }
