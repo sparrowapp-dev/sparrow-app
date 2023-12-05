@@ -153,7 +153,7 @@
     width:200px;
     "
   >
-    {#if authValue.key && authValue.value}
+    {#if authValue.key || authValue.value}
       <div
         aria-label="Toggle Hover"
         class="sortable > div"

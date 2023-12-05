@@ -51,13 +51,13 @@
     pencilIconState = false;
 
     // Triggers active auth header
-    if (request && findAuthHeader(request).key) {
+    if (request && (findAuthHeader(request).key || findAuthHeader(request).value)) {
       headersCount += 1;
       pencilIconState = true;
     }
 
     // Triggers active auth query parameters
-    if (request && findAuthParameter(request).key) {
+    if (request && (findAuthParameter(request).key || findAuthParameter(request).value) ) {
       parametersCount += 1;
       pencilIconState = true;
     }
