@@ -12,9 +12,14 @@
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
     import { onDestroy } from "svelte";
+    import SaveRequest from "../save-request/SaveRequest.svelte";
+    import ClosePopup from "../close-popup/ClosePopup.svelte";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
+  let removeTab;
+  let closePopup : boolean = false;
   
   $: {
     if (tabList) {
@@ -28,9 +33,29 @@
     }
   }
 
+  let saveAsVisibility: boolean = false;
+  const handleSaveAsBackdrop = (flag) => {
+    saveAsVisibility = flag;
+  }; 
+
   let tabWidth: number = 196;
   let scrollerParent: number;
   let scrollerWidth: number;
+  let tabId: string;
+
+  const handleClosePopupBackdrop = (flag) => {
+    closePopup = flag;
+  }; 
+  const closeTab = (id, tab : NewTab) => {
+    if(tab.save){
+      collectionsMethods.handleRemoveTab(id);
+    }
+    else{
+      tabId = id;
+      removeTab = tab;
+      closePopup = true;
+    }
+  }
 
   onDestroy(()=>{});
 </script>
@@ -63,8 +88,8 @@
         {#each tabList as tab, index}
           <Tab
             tab = {tab}
-            handleTabRemove={collectionsMethods.handleRemoveTab}
             updateCurrentTab={collectionsMethods.handleActiveTab}
+            {closeTab}
             {index}
             {tabWidth}
           />
@@ -101,6 +126,29 @@
     </div>
   </div>
 </div>
+
+{#if saveAsVisibility}
+  <SaveRequest
+    {collectionsMethods}
+    componentData={removeTab}
+    onFinish = {(_id)=>{
+      collectionsMethods.handleRemoveTab(_id);
+    }}
+    onClick={handleSaveAsBackdrop}
+  />
+{/if}
+{#if closePopup}
+  <ClosePopup
+    {collectionsMethods}
+    {tabId}
+    onFinish = {(_id)=>{
+      collectionsMethods.handleRemoveTab(_id);
+    }}
+    componentData = {removeTab}
+    {handleSaveAsBackdrop}
+    closeCallback ={handleClosePopupBackdrop}
+  />
+{/if}
 
 <style>
   .tabbar {
