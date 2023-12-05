@@ -1,4 +1,4 @@
-import { collectionList, setCollectionList } from "$lib/store/collection";
+import { setCollectionList } from "$lib/store/collection";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { Collection } from "$lib/utils/interfaces/collection.interface";
 import {
@@ -9,10 +9,6 @@ import {
 let tree: any[];
 const filterTree: Collection[] = [];
 let selectedAPIMethods: string[] = [];
-collectionList.subscribe((value: object[]) => {
-  tree = JSON.parse(JSON.stringify(value));
-});
-
 selectMethodsStore.subscribe((value) => {
   if (value) {
     selectedAPIMethods = value;
@@ -184,8 +180,10 @@ const useTree = (): any[] => {
     collection: any[],
     folder: any[],
     file: any[],
-  ) => void = (searchText, collection, folder, file) => {
+    collectionData: any[],
+  ) => void = (searchText, collection, folder, file, collectionData) => {
     const filteredByMethodTrees = [];
+    tree = collectionData;
     // iterate through the tree and filter according to api methods selected
     if (selectedAPIMethods.length > 0) {
       for (let i = 0; i < tree.length; i++) {
@@ -221,7 +219,7 @@ const useTree = (): any[] => {
     }
     selectedMethodsCollectionStore.update(() => filteredTrees);
     // Iterate through the tree to find the target folder and add the item
-    for (let i = 0; i < tree.length; i++) {
+    for (let i = 0; i < filteredTrees.length; i++) {
       const path = [];
       searchHelper(
         filteredTrees[i],

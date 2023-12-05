@@ -1,6 +1,7 @@
 import type { CollectionDocument } from "$lib/database/app.database";
-import type { Observable } from "rxjs";
+
 import type { CreateApiRequestPostBody, CreateDirectoryPostBody } from "../dto";
+import type { Observable } from "rxjs";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CollectionsMethods {
   handleActiveTab: (id: string) => void;
@@ -22,6 +23,14 @@ export interface CollectionsMethods {
     collectionId: string,
     folder: CreateDirectoryPostBody,
   ) => any;
+  deleteCollectionData: (collectionId: string) => void;
+  updateCollectionName: (collectionId: string, name: string) => void;
+  updateFolderName: (
+    collectionId: string,
+    folderId: string,
+    name: string,
+  ) => void;
+  deleteFolder: (collectionId: string, folderId: string) => void;
   getCollectionList: () => any;
   getActiveWorkspace: () => Observable<any>;
   addRequestInFolder: (collectionId: string, folderId: string, request) => void;
@@ -37,6 +46,21 @@ export interface CollectionsMethods {
     uuid: string,
     items: any,
   ) => void;
+
+  deleteRequestInCollection: (collectionId: string, requestId: string) => void;
   addCollection: (collection) => void;
   updateCollection: (uuid: string, data) => void;
+
+  updateRequestInFolderCollection: (
+    collectionId: string,
+    uuid: string,
+    item: any,
+    folderId?: string,
+  ) => void;
+
+  deleteRequestInFolderCollection: (
+    collectionId: string,
+    uuid: string,
+    folderId: string,
+  ) => void;
 }

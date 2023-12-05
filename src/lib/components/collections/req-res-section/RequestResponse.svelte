@@ -15,3 +15,9 @@
   <ApiSendRequestPage {activeTab} {collectionsMethods} />
   <RequestParam {activeTab} {collectionsMethods} />
 </div>
+
+<style>
+  .request-response {
+    z-index: 9999999;
+  }
+</style>

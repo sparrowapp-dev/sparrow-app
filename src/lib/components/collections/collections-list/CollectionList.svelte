@@ -23,12 +23,19 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
+  
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
+  export let deleteCollectionData;
+  export let collectionsMethods: CollectionsMethods;
+
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const _workspaceViewModel = new HeaderDashboardViewModel();
+  
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  
-  export let collectionsMethods: CollectionsMethods;
-  
-  const _colllectionListViewModel = new CollectionListViewModel();
+
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
@@ -95,13 +102,13 @@
 
     return null;
   };
-  let currentWorkspaceName : string;
+  let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id"); 
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response = await collectionsMethods.getAllCollections(
           workspaceId,
@@ -119,16 +126,19 @@
       _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
-      createdAt : new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
+    collection = [...collection, newCollection];
+
     collectionsMethods.addCollection(newCollection);
     const response = await _colllectionListViewModel.addCollection({
       name: newCollection.name,
-      workspaceId : currentWorkspaceId
+      workspaceId: currentWorkspaceId,
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      collectionsMethods.updateCollection(newCollection._id ,res);
+    
+      collectionsMethods.updateCollection(newCollection._id, res);
       return;
     }
     return;
@@ -142,6 +152,7 @@
 
  
 
+ 
  
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
