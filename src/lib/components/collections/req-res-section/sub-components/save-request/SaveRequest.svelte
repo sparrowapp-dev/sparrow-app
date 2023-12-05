@@ -33,7 +33,6 @@
   export let onClick;
   export let componentData: NewTab;
   export let onFinish = (_id)=>{};
-  export let _tabId : string;
 
   interface Path {
     name: string;
@@ -117,7 +116,7 @@
   };
 
   const handleSaveAsRequest = async () => {
-    // const dummyId = new Date() + "uid";
+    const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
       const expectedRequest = {
@@ -156,10 +155,10 @@
             !componentData.path.workspaceId &&
             !componentData.path.collectionId
           ) {
-            collectionsMethods.updateTab(expectedPath, "path",componentData.id);
-            collectionsMethods.updateTab(res.data.data.name, "name", componentData.id);
-            collectionsMethods.updateTab(true, "save", componentData.id);
-            collectionsMethods.updateTab(res.data.data.id, "id", componentData.id);
+            collectionsMethods.updateTab(expectedPath, "path", _id);
+            collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.id, "id", _id);
+            collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
@@ -216,10 +215,10 @@
             !componentData.path.workspaceId &&
             !componentData.path.collectionId
           ) {
-            collectionsMethods.updateTab(expectedPath, "path", componentData.id);
-            collectionsMethods.updateTab(res.data.data.name, "name", componentData.id);
-            collectionsMethods.updateTab(res.data.data.id, "id", componentData.id);
-            collectionsMethods.updateTab(true, "save", componentData.id);
+            collectionsMethods.updateTab(expectedPath, "path", _id);
+            collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.id, "id", _id);
+            collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,

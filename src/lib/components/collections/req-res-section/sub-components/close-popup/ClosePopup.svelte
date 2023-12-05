@@ -14,8 +14,9 @@
   let loader : boolean = false;
 
   const handleSaveRequest = async () => {
+    const _id = componentData.id;
     loader = true;
-    collectionsMethods.updateTab(true, "saveInProgress");
+    collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
 
@@ -45,13 +46,13 @@
           res.data.data,
         );
         loader = false;
-        collectionsMethods.updateTab(false, "saveInProgress");
-        collectionsMethods.updateTab(true, "save");
-        onFinish(componentData.id);
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
+        onFinish(_id);
         closeCallback(false);
       } else {
         loader = false;
-        collectionsMethods.updateTab(false, "saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     } else {
       let res = await updateCollectionRequest(componentData.id, {
@@ -77,13 +78,13 @@
           res.data.data,
         );
         loader = false;
-        collectionsMethods.updateTab(false, "saveInProgress");
-        collectionsMethods.updateTab(true, "save");
-        onFinish(componentData.id); 
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
+        onFinish(_id); 
         closeCallback(false);
       } else {
         loader = false;
-        collectionsMethods.updateTab(false, "saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     }
   };

@@ -32,7 +32,8 @@
   });
 
   const handleSaveRequest = async () => {
-    collectionsMethods.updateTab(true, "saveInProgress");
+    const _id = componentData.id;
+    collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
 
@@ -61,10 +62,10 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false, "saveInProgress");
-        collectionsMethods.updateTab(true, "save");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
       } else {
-        collectionsMethods.updateTab(false, "saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     } else {
       let res = await updateCollectionRequest(componentData.id, {
@@ -89,16 +90,16 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false, "saveInProgress");
-        collectionsMethods.updateTab(true, "save");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
       } else {
-        collectionsMethods.updateTab(false, "saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     }
   };
 
   let handleInputValue = () => {
-    collectionsMethods.updateTab(tabName, "name");
+    collectionsMethods.updateTab(tabName, "name", componentData.id);
   };
 
   onDestroy(() => {
