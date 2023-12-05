@@ -13,7 +13,6 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import type { Observable } from "rxjs";
     import type { NewTab } from "$lib/utils/interfaces/request.interface";
     import type { Writable } from "svelte/store";
 
@@ -68,7 +67,7 @@
     style="left:{$collapsibleState ? '72px' : '352px'}"
   >
     <div class="tab__bar">
-      <TabBar tabList={$tabList} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId = {$activeTab.id} {collectionsMethods} />
     </div>
     <div class="tab__content">
       {#if $tabList && $tabList.length == 0}

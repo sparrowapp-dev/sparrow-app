@@ -56,8 +56,8 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
-  public updateTab = async (data: any, route: string) => {
-    requestResponseStore.setTabProperty(data, route);
+  public updateTab = async (data: any, route: string, _id: string) => {
+    requestResponseStore.setTabProperty(data, route, _id);
     this.debouncedTab();
   };
 

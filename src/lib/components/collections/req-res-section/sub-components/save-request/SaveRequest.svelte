@@ -33,6 +33,7 @@
   export let onClick;
   export let componentData: NewTab;
   export let onFinish = (_id)=>{};
+  export let _tabId : string;
 
   interface Path {
     name: string;
@@ -155,10 +156,10 @@
             !componentData.path.workspaceId &&
             !componentData.path.collectionId
           ) {
-            collectionsMethods.updateTab(expectedPath, "path");
-            collectionsMethods.updateTab(res.data.data.name, "name");
-            collectionsMethods.updateTab(res.data.data.id, "id");
-            collectionsMethods.updateTab(true, "save");
+            collectionsMethods.updateTab(expectedPath, "path",componentData.id);
+            collectionsMethods.updateTab(res.data.data.name, "name", componentData.id);
+            collectionsMethods.updateTab(true, "save", componentData.id);
+            collectionsMethods.updateTab(res.data.data.id, "id", componentData.id);
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
@@ -215,10 +216,10 @@
             !componentData.path.workspaceId &&
             !componentData.path.collectionId
           ) {
-            collectionsMethods.updateTab(expectedPath, "path");
-            collectionsMethods.updateTab(res.data.data.name, "name");
-            collectionsMethods.updateTab(res.data.data.id, "id");
-            collectionsMethods.updateTab(true, "save");
+            collectionsMethods.updateTab(expectedPath, "path", componentData.id);
+            collectionsMethods.updateTab(res.data.data.name, "name", componentData.id);
+            collectionsMethods.updateTab(res.data.data.id, "id", componentData.id);
+            collectionsMethods.updateTab(true, "save", componentData.id);
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,

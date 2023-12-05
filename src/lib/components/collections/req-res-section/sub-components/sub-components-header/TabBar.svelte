@@ -15,9 +15,11 @@
     import SaveRequest from "../save-request/SaveRequest.svelte";
     import ClosePopup from "../close-popup/ClosePopup.svelte";
     import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import { string } from "yup";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
+  export let  _tabId : string;
   let removeTab;
   let closePopup : boolean = false;
   
@@ -130,6 +132,7 @@
 {#if saveAsVisibility}
   <SaveRequest
     {collectionsMethods}
+    {_tabId}
     componentData={removeTab}
     onFinish = {(_id)=>{
       collectionsMethods.handleRemoveTab(_id);
@@ -140,7 +143,6 @@
 {#if closePopup}
   <ClosePopup
     {collectionsMethods}
-    {tabId}
     onFinish = {(_id)=>{
       collectionsMethods.handleRemoveTab(_id);
     }}

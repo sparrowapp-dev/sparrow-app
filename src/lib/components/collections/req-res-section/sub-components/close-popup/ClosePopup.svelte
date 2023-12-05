@@ -7,7 +7,6 @@
   import type { NewTab, RequestBody } from "$lib/utils/interfaces/request.interface";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
-  export let tabId;
   export let componentData : NewTab;
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
@@ -80,7 +79,7 @@
         loader = false;
         collectionsMethods.updateTab(false, "saveInProgress");
         collectionsMethods.updateTab(true, "save");
-        onFinish(componentData.id);
+        onFinish(componentData.id); 
         closeCallback(false);
       } else {
         loader = false;
