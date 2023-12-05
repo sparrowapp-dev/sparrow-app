@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { AuthSection, AuthType } from "$lib/utils/enums/authorization.enum";
-  import {
-    RequestDataType,
-    RequestDataset,
-    RequestDefault,
-    RequestSection,
-  } from "$lib/utils/enums/request.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import threedotIcon from "$lib/assets/3dot.svg";
+  import { CollectionService } from "$lib/services/collection.service";
+  import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
+  import FilePopup from "$lib/components/Modal/FilePopup.svelte";
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -20,12 +18,6 @@
   export let folderName: string;
   export let api;
   export let collectionsMethods: CollectionsMethods;
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { CollectionService } from "$lib/services/collection.service";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
-  import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
-  import FilePopup from "$lib/components/Modal/FilePopup.svelte";
-  const _colllectionListViewModel = new CollectionListViewModel();
   const collectionService = new CollectionService();
 
   currentFolderIdName.set({
@@ -38,9 +30,24 @@
   let apiClass = "red-api";
 
   const handleClick = () => {
-    const request = generateSampleRequest(id, new Date().toString());
-    collectionsMethods.handleCreateTab(request);
-  };
+      const request = generateSampleRequest(id, new Date().toString());
+      request.path = path;
+      request.name = name;
+      if(url)
+      request.property.request.url = url;
+      if(body)
+      request.property.request.body = body; 
+      if(method)
+      request.property.request.method = method;
+      if(queryParams)
+      request.property.request.queryParams = queryParams;
+      if(headers)
+      request.property.request.headers = headers;
+      request.save = true;
+      collectionsMethods.handleCreateTab(request);
+      moveNavigation("right");
+      }
+
   $: {
     if (api) {
       if (api.property) {
@@ -211,6 +218,7 @@
   />
 {/if}
 
+
 <div class="content" bind:this={content} />
 
 {#if showMenu && id === openRequestId}
@@ -256,8 +264,8 @@
     handleClick();
   }}
 >
-  <div class="d-flex">
-    <div class="api-method {apiClass}">
+<div class="d-flex align-items-center">
+  <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 
@@ -295,21 +303,6 @@
 </div>
 
 <style>
-  .red-api {
-    color: var(--request-delete);
-  }
-  .green-api {
-    color: var(--request-get);
-  }
-  .yellow-api {
-    color: var(--request-post);
-  }
-  .blue-api {
-    color: var(--request-put);
-  }
-  .grey-api {
-    color: var(--request-arc);
-  }
   .api-method {
     font-size: 12px;
     font-weight: 500;

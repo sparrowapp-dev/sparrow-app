@@ -207,10 +207,18 @@ const pathLiteral = {
 
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
-  primaryKey: "id",
+  primaryKey: {
+    key: "tabId",
+    fields: ["id"],
+    separator: "|",
+  },
   type: "object",
-  version: 2,
+  version: 4,
   properties: {
+    tabId: {
+      type: "string",
+      maxLength: 100,
+    },
     id: {
       type: "string",
       maxLength: 100,
@@ -233,6 +241,9 @@ export const tabSchemaLiteral = {
       default: true,
     },
     path: pathLiteral,
+    saveInProgress: {
+      type: "boolean",
+    },
     createdAt: {
       type: "string",
     },

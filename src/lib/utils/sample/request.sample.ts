@@ -7,9 +7,11 @@ import {
   RequestDataType,
   ResponseSection,
   ResponseFormatter,
+  RequestMethod,
 } from "../enums/request.enum";
+import type { NewTab } from "../interfaces/request.interface";
 
-const generateSampleRequest = (id: string, date: string) => {
+const generateSampleRequest = (id: string, date: string): NewTab => {
   return {
     id,
     name: RequestDefault.NAME,
@@ -17,7 +19,7 @@ const generateSampleRequest = (id: string, date: string) => {
     description: "",
     property: {
       request: {
-        method: RequestDefault.METHOD,
+        method: RequestMethod.GET,
         body: {
           raw: "",
           urlencoded: [
@@ -104,7 +106,13 @@ const generateSampleRequest = (id: string, date: string) => {
       },
     },
     save: false,
-    path: {},
+    path: {
+      workspaceId: "",
+      collectionId: "",
+      folderId: "",
+      folderName: "",
+    },
+    saveInProgress: false,
     isActive: true,
     createdAt: date,
   };
