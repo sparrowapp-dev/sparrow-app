@@ -22,12 +22,13 @@
   import { onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
-  import { listen, once } from "@tauri-apps/api/event";
-  import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
+  import { listen } from "@tauri-apps/api/event";
+  import { appWindow } from "@tauri-apps/api/window";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+    import { invoke } from "@tauri-apps/api";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -65,8 +66,7 @@
       const accessToken = params.get("accessToken");
       const refreshToken = params.get("refreshToken");
       if (accessToken && refreshToken) {
-        const webView = WebviewWindow.getByLabel("oauth");
-        await webView.hide();
+        await invoke("close_oauth_window");
         await appWindow.setFocus();
         setAuthJwt(constants.AUTH_TOKEN, accessToken);
         setAuthJwt(constants.REF_TOKEN, refreshToken);
@@ -112,4 +112,5 @@
 <Toast />
 
 <style>
+  
 </style>

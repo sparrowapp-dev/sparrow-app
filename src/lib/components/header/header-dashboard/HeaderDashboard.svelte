@@ -109,7 +109,7 @@
 </script>
 
 <div
-  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
   style="z-index:999; position:fixed;left:0px;height:44px;"
   data-tauri-drag-region
 >
@@ -229,8 +229,8 @@
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
               on:click={() => {
-                if(_viewModel.logout()){
-                   navigate("/login");        
+                if (_viewModel.logout()) {
+                  navigate("/login");
                 }
               }}
             >
@@ -274,6 +274,10 @@
 </div>
 
 <style>
+  .header {
+    z-index: 0;
+  }
+
   .button-minus,
   .button-resize,
   .button-close {

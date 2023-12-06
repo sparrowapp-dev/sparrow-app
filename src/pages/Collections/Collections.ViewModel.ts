@@ -86,6 +86,29 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public deleteCollectionData = async (id: string) => {
+    this.collectionRepository.deleteCollection(id);
+    this.debouncedTab();
+  };
+
+  public updateCollectionName = async (id: string, name: string) => {
+    this.collectionRepository.updateCollection(id, name);
+    this.debouncedTab();
+  };
+
+  public updateFolderName = async (
+    id: string,
+    folderId: string,
+    name: string,
+  ) => {
+    this.collectionRepository.updateFolderName(id, folderId, name);
+    this.debouncedTab();
+  };
+
+  public deleteFolder = async (id: string, folderId: string) => {
+    this.collectionRepository.deleteFolder(id, folderId);
+    this.debouncedTab();
+  };
   public getCollectionList = () => {
     return this.collectionRepository.getCollection();
   };
@@ -118,6 +141,32 @@ export class CollectionsViewModel {
     );
   };
 
+  public updateRequestInFolderCollection = (
+    collectionId: string,
+    uuid: string,
+    item: any,
+    folderId?: string,
+  ): void => {
+    this.collectionRepository.updateRequestInFolderCollection(
+      collectionId,
+      uuid,
+      item,
+      folderId,
+    );
+  };
+
+  public deleteRequestInFolderCollection = (
+    collectionId: string,
+    uuid: string,
+    folderId: string,
+  ): void => {
+    this.collectionRepository.deleteRequestInFolderCollection(
+      collectionId,
+      uuid,
+      folderId,
+    );
+  };
+
   public addRequestOrFolderInCollection = (
     collectionId: string,
     items: any,
@@ -136,6 +185,16 @@ export class CollectionsViewModel {
       collectionId,
       uuid,
       items,
+    );
+  };
+
+  public deleteRequestInCollection = (
+    collectionId: string,
+    requestId: string,
+  ) => {
+    this.collectionRepository.deleteRequestInCollection(
+      collectionId,
+      requestId,
     );
   };
   public addCollection = (collection) => {

@@ -1,3 +1,4 @@
+import { resizeWindowOnLogin } from "$lib/components/header/window-resize";
 import { registerUser } from "$lib/services/auth.service";
 import { setUser } from "$lib/store/auth.store";
 import constants from "$lib/utils/constants";
@@ -15,6 +16,7 @@ const handleRegister = async (userData) => {
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
     notifications.success("Registration successful!");
     navigate("/login");
+    await resizeWindowOnLogin();
   } else {
     notifications.error(response.message);
     throw "error registering user: " + response.message;

@@ -4,6 +4,9 @@ import type {
   CreateApiRequestPostBody,
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
+  DeleteRequestName,
+  UpdateCollectionName,
+  UpdateRequestName,
 } from "$lib/utils/dto";
 
 export class CollectionService {
@@ -32,6 +35,37 @@ export class CollectionService {
     );
     return response;
   };
+
+  public updateCollectionData = async (
+    collectionId: string,
+    workspaceId: string,
+    name: UpdateCollectionName,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        body: name,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteCollection = async (
+    workspaceId: string,
+    collectionId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      { headers: getAuthHeaders() },
+    );
+
+    return response;
+  };
+
   public addFolderInCollection = async (
     workspaceId: string,
     collectionId: string,
@@ -42,6 +76,39 @@ export class CollectionService {
       `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
       {
         body: folder,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateFolderInCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    folder: CreateDirectoryPostBody,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      {
+        body: folder,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteFolderInCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      {
         headers: getAuthHeaders(),
       },
     );
@@ -59,6 +126,38 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
+    return response;
+  };
+
+  public updateRequestInCollection = async (
+    requestId: string,
+    requestBody: UpdateRequestName,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/collection/request/${requestId}`,
+      {
+        body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteRequestInCollection = async (
+    requestId: string,
+    deleteRequestBody: DeleteRequestName,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/request/${requestId}`,
+      {
+        body: deleteRequestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+
     return response;
   };
 }

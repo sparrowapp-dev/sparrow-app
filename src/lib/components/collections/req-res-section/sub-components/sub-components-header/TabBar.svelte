@@ -2,9 +2,7 @@
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
-  import {
-    collapsibleState,
-  } from "$lib/store/request-response-section";
+  import { collapsibleState } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -59,12 +57,14 @@
     }
   }
 
-  onDestroy(()=>{});
+  onDestroy(() => {});
 </script>
 
-<div class="">
+<div class="tab">
   <div
-    style="border-top: 1px solid #313233;width:{$collapsibleState ? '100%' : '100%'}"
+    style="border-top: 1px solid #313233;width:{$collapsibleState
+      ? '100%'
+      : '100%'}"
     class="tabbar bg-blackColor d-flex bg-backgroundColor;"
     bind:offsetWidth={scrollerParent}
   >
@@ -89,7 +89,8 @@
       {#if tabList}
         {#each tabList as tab, index}
           <Tab
-            tab = {tab}
+            {tab}
+            handleTabRemove={collectionsMethods.handleRemoveTab}
             updateCurrentTab={collectionsMethods.handleActiveTab}
             {closeTab}
             {index}
@@ -119,7 +120,7 @@
               "UNTRACKED-" + uuidv4(),
               new Date().toString(),
             ),
-          )
+          );
           moveNavigation("right");
         }}
       >
@@ -153,8 +154,10 @@
 {/if}
 
 <style>
+
   .tabbar {
     height: 36px;
+    z-index: 999999;
   }
 
   .tab-scroller::-webkit-scrollbar {
