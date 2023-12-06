@@ -4,18 +4,20 @@
   export let route: string;
   export let heading: string;
   export let logo: any;
-
+  export let activeSideBarTabMethods;
+  export let isSelected:boolean;
   let collapsExpandToggle = false;
-
+  export let changeSelectedActiveSideBarTab;
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
-
   const setcollapsExpandToggle = () => {
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
-  };
+    activeSideBarTabMethods.updateActiveTab(route);
+    changeSelectedActiveSideBarTab(route);
 
+  }; 
   collapsibleStateUnsubscribe();
 </script>
 
@@ -24,7 +26,7 @@
   to={route}
   on:click={setcollapsExpandToggle}
 >
-  <div class="sidebar__container">
+  <div class="sidebar__container {isSelected?'sidebar__container_background':'sidebar__container_background2'}" >
     <div class="sidebar__container--icon"><img src={logo} alt="" /></div>
     <div class="sidebar__container--text"><p>{heading}</p></div>
   </div>
@@ -48,5 +50,11 @@
     line-height: 10px;
     letter-spacing: 0em;
     color: white;
+  }
+  .sidebar__container_background{
+    background-color: var(--selected-active-sidebar);
+  }
+  .sidebar__container_background2{
+    background-color: transparent;
   }
 </style>

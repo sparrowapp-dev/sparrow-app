@@ -13,6 +13,11 @@ import {
   collectionSchema,
   type CollectionDocType,
 } from "$lib/models/collection.model";
+
+import {
+  type ActiveSideBarTabDocType,
+  activeSideBarTabSchema,
+} from "$lib/models/active-sidebar-tab.model";
 import { tabSchema, type TabDocType } from "$lib/models/tab.model";
 import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
@@ -30,12 +35,15 @@ export type CollectionDocument = RxDocument<CollectionDocType>;
 
 export type TabDocument = RxDocument<TabDocType>;
 export type TabContainer = RxCollection<TabDocType>;
+export type ActiveSideBarTabDocument = RxDocument<ActiveSideBarTabDocType>;
+export type ActiveSideBarTabContainer = RxCollection<ActiveSideBarTabDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
   workspace: WorkspaceContainer;
   tab: TabContainer;
   collection: CollectionContainer;
+  activeSideBarTab: ActiveSideBarTabContainer;
 };
 
 // define the Rx database type
@@ -95,6 +103,24 @@ const db = await rxdb.addCollections({
       },
       3: function (oldDoc) {
         oldDoc.collectionId = oldDoc._id;
+        return oldDoc;
+      },
+    },
+  },
+  activeSideBarTab: {
+    schema: activeSideBarTabSchema,
+    migrationStrategies: {
+      // data migration from version 0 to version 1
+      1: function (oldDoc) {
+        return oldDoc;
+      },
+      2: function (oldDoc) {
+        return oldDoc;
+      },
+      3: function (oldDoc) {
+        return oldDoc;
+      },
+      4: function (oldDoc) {
         return oldDoc;
       },
     },
