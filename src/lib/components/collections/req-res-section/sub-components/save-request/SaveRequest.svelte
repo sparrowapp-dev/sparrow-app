@@ -2,7 +2,7 @@
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
   import workspaceAsset from "$lib/assets/workspace.svg";
@@ -31,6 +31,7 @@
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import questionIcon from "$lib/assets/question.svg";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -81,6 +82,8 @@
   let createFolderName: string = constant.newFolder;
   let createFolderNameVisibility: boolean = false;
   let createDirectoryLoader: boolean = false;
+
+  let instructionEnabled : boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
@@ -306,9 +309,20 @@
     }
   };
 
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(`3456-dropdown900`);
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      instructionEnabled = false;
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    window.removeEventListener("click", handleDropdownClick);
   });
 </script>
 
@@ -345,7 +359,9 @@
       {#if workspace}
         <span
           on:click={navigateToWorkspace}
-          class="{path.length === 0 ? 'text-whiteColor':''} cursor-pointer px-1"
+          class="{path.length === 0
+            ? 'text-whiteColor'
+            : ''} cursor-pointer px-1"
           style="font-size: 12px;"
         >
           <img
@@ -363,7 +379,9 @@
             on:click={() => {
               navigateToDirectory(elem);
             }}
-            class="{path.length - 1 === index ? 'text-whiteColor':''} cursor-pointer px-1"
+            class="{path.length - 1 === index
+              ? 'text-whiteColor'
+              : ''} cursor-pointer px-1"
             style="font-size: 12px;"
           >
             {#if elem.type === ItemType.COLLECTION}
@@ -654,9 +672,52 @@
       </div>
       <div class="col-6">
         <!-- Right panel  -->
-        <p class="save-text-clr mb-1" style="font-size:12px">
-          Request Name <span class="text-dangerColor">*</span>
-        </p>
+        <div class="d-flex justify-content-between" on:click={
+          handleDropdownClick
+        } >
+          <p class="save-text-clr mb-1" style="font-size:12px">
+            Request Name <span class="text-dangerColor">*</span>
+          </p>
+          <span id="3456-dropdown900"  class="instruction-btn  {instructionEnabled ? 'bg-sparrowBottomBorder' : ''} rounded d-flex align-items-center justify-content-center position-relative">
+            <img on:click={()=>{
+              instructionEnabled = true;
+            }} src={questionIcon} alt="question" />
+            {#if instructionEnabled}
+            <div class="bg-blackColor api-name-usage p-2">
+              <p class="text-whiteColor">Best Practices</p>
+              <p class="save-as-instructions">
+                When naming your requests, remember that resources are at the
+                core of REST. Use nouns to represent your resources, such as
+                'user accounts' or 'managed devices.' Keep your URIs clear and
+                consistent by using forward slashes to indicate hierarchy, avoid
+                file extensions.
+              </p>
+              <div class="d-flex">
+                <div class="w-50">
+                  <p class="save-as-instructions">Do's:</p>
+                  <ul class="save-as-instructions">
+                    <li>Use nouns to represent resources </li>
+                    <li>Use forward slashes for hierarchy </li>
+                    <li>Use hyphens for readability </li>
+                    <li>Use lowercase letters in URIs </li>
+                    <li>Use HTTP methods for CRUD actions </li>
+                    </ul>
+                </div>
+                <div class="w-50">
+                  <p class="save-as-instructions">Don'ts:</p>
+                  <ul class="save-as-instructions">
+                    <li>Don't use file extensions.</li>
+                    <li>Don't use underscores in URIs.</li>
+                    <li>Don't use verbs in the URIs. </li>
+                    <li>Don't put CRUD function names in URIs. </li>
+                    <li>Don't use capital letters in URIs.</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+            {/if}
+          </span>
+        </div>
         <div class="pb-2">
           <input
             type="text"
@@ -838,5 +899,23 @@
   }
   .save-text-clr {
     color: #8a9299;
+  }
+  .api-name-usage {
+    position: absolute;
+    top: 25px;
+    right: 0;
+    width: 521px;
+    border-radius: 8px;
+  }
+  .save-as-instructions{
+    font-size: 12px;
+    color: #CCCCCC;
+  }
+  ul.save-as-instructions{
+    padding-left: 15px;
+  }
+  .instruction-btn {
+    width: 24px;
+    height: 24px;
   }
 </style>
