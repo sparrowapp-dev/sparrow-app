@@ -1,23 +1,41 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
+  import threedotIcon from "$lib/assets/3dot.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
+
+  import {
+    isShowCollectionPopup,
+    useCollectionTree,
+  } from "$lib/store/collection";
+  import { RequestDefault } from "$lib/utils/enums/request.enum";
+  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import ContextMenu from "./ContextMenu.svelte";
+  import { WorkspaceService } from "$lib/services/workspace.service";
+  import { CollectionService } from "$lib/services/collection.service";
+
+  const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { selectMethodsStore } from "$lib/store/methods";
+  import { onDestroy } from "svelte";
+  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+
+  let showFolderAPIButtons:boolean=true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
 
+  const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
 
@@ -76,6 +94,7 @@
     const response = await _colllectionListViewModel.addRequest(requestObj);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+
       collectionsMethods.updateRequestOrFolderInCollection(
         collectionId,
         request.id,
@@ -91,32 +110,286 @@
       return;
     }
   };
+   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
+    if(value && value.length>0){
+      showFolderAPIButtons=false;
+      visibility=true;
+    }else if(value && value.length===0){
+       visibility=false;
+    }else{
+      showFolderAPIButtons=true;
+    }
+  })
+  onDestroy(()=>{
+    selectedMethodUnsubscibe();
+    });
+
+  let openCollectionId: string;
+  let isMenuOpen: boolean = false;
+
+  let pos = { x: 0, y: 0 };
+
+  let menu = { h: 0, y: 0 };
+
+  let browser = { h: 0, y: 0 };
+  let content;
+
+  let showMenu: boolean = false;
+  let button;
+  let openMenuButton: HTMLElement = null;
+
+  function rightClickContextMenu(e, button) {
+    if (openCollectionId === collectionId) {
+      showMenu = !showMenu;
+    } else {
+      openCollectionId = collectionId;
+      showMenu = true;
+    }
+
+    if (button) {
+      openMenuButton = button;
+      const rect = button.getBoundingClientRect();
+      pos = { x: rect.right - 260, y: rect.top - 5 };
+    } else {
+      browser = {
+        y: window.innerWidth,
+        h: window.innerHeight,
+      };
+      pos = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+
+      if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
+      if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
+    }
+    isMenuOpen = true;
+  }
+
+  let menuContainer;
+
+  function onPageClick(e) {
+    if (menuContainer && !menuContainer.contains(e.target)) {
+      isMenuOpen = false;
+      showMenu = false;
+    }
+  }
+
+  function getContextMenuDimension(node) {
+    let height = node.offsetHeight;
+    let width = node.offsetWidth;
+    menu = {
+      h: height,
+      y: width,
+    };
+  }
+
+  //open collection
+  function openCollections() {
+    visibility = !visibility;
+    showMenu = false;
+  }
+
+  let newCollectionName: string = "";
+  let isRenaming = false;
+
+  const handleRenameInput = (event) => {
+    newCollectionName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newCollectionName) {
+      const updateCollectionName = await collectionService.updateCollectionData(
+        collectionId,
+        currentWorkspaceId,
+        { name: newCollectionName },
+      );
+
+      title = updateCollectionName?.data?.data?.name;
+
+      const updatedCollection = {
+        name: title,
+        _id: collection._id,
+        updatedAt: collection.updatedAt,
+        updatedBy: collection.updatedBy,
+        totalRequests: collection.totalRequests,
+        createdAt: collection.createdAt,
+        createdBy: collection.createdBy,
+      };
+      collectionsMethods.updateCollection(openCollectionId, updatedCollection);
+    }
+    isRenaming = false;
+  };
+
+  //rename collection name
+  const renameCollection = () => {
+    isRenaming = true;
+    const inputField = document.getElementById(
+      "renameInputField",
+    ) as HTMLInputElement;
+    showMenu = false;
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      onRenameBlur();
+    }
+  };
+
+  //add request in collection
+  const addRequest = async () => {
+    handleAPIClick();
+    if (collectionId === openCollectionId) {
+      visibility = true;
+    }
+    showMenu = false;
+  };
+
+  //add folder in collection
+  const addFolder = () => {
+    handleFolderClick();
+    if (collectionId === openCollectionId) {
+      visibility = true;
+    }
+    showMenu = false;
+  };
+
+  //delete collection
+  const deleteCollection = async () => {
+    isShowCollectionPopup.set(true);
+    showMenu = false;
+  };
+
+  let menuItems = [
+    {
+      onClick: openCollections,
+      displayText: "Open collection",
+    },
+    {
+      onClick: renameCollection,
+      displayText: "Rename collection",
+    },
+    {
+      onClick: addRequest,
+      displayText: "Add Request",
+    },
+    {
+      onClick: addFolder,
+      displayText: "Add Folder",
+    },
+
+    {
+      onClick: deleteCollection,
+      displayText: "Delete",
+    },
+  ];
+
+  if (collectionId !== openCollectionId) {
+    showMenu = false;
+  }
+
+  let isShowCollection: boolean;
+  isShowCollectionPopup.subscribe((value) => {
+    isShowCollection = value;
+  });
+
+  function toggleMenuVisibility() {
+    showMenu = !showMenu;
+  }
 </script>
 
+{#if isShowCollection}
+  <CollectionPopup
+    {collectionsMethods}
+    {openCollectionId}
+    {currentWorkspaceId}
+  />
+{/if}
+
+<div class="content" bind:this={content} />
+
+{#if showMenu && collectionId === openCollectionId}
+  <nav
+    bind:this={menuContainer}
+    use:getContextMenuDimension
+    style="position: absolute; top:{pos.y}px; left:{pos.x}px"
+  >
+    <div
+      on:click={toggleMenuVisibility}
+      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
+    />
+    <div
+      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+      id="navbar"
+    >
+      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
+        {#each menuItems as item}
+          <li class="align-items-center">
+            <button
+              class="align-items-center mb-1 px-3 py-2"
+              on:click={item.onClick}
+              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
+              >{item.displayText}</button
+            >
+          </li>
+        {/each}
+      </ul>
+    </div>
+  </nav>
+{/if}
+
+<svelte:window on:click={onPageClick} />
+
 <button
+  bind:this={button}
+  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, button)}
   on:click={() => {
     if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
       visibility = !visibility;
     }
   }}
-  style="height:36px;"
-  class="btn btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4"
+  style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
 >
-<div class="d-flex align-items-center">
-  <img
-    src={angleRight}
-    class=""
-    style="height:14px; width:14px; margin-right:8px; {visibility
-      ? 'transform:rotate(90deg);'
-      : 'transform:rotate(0deg);'}"
-    alt="angleRight"
-  />
-  <p class="mb-0" style="font-size: 14px;">{title}</p>
-</div>
-{#if collection._id.includes(UntrackedItems.UNTRACKED)}
-  <Spinner size={"15px"}/>
-{/if}
+  <div class="d-flex align-items-center">
+    <img
+      src={angleRight}
+      style="height:14px; width:14px; margin-right:8px; {visibility
+        ? 'transform:rotate(90deg);'
+        : 'transform:rotate(0deg);'}"
+      alt="angleRight"
+    />
+    {#if isRenaming}
+      <input
+        class="form-control py-0"
+        id="renameInputField"
+        type="text"
+        style="font-size: 14px;"
+        value={title}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
+      />
+    {:else}
+      <p class="mb-0" style="font-size: 14px;">
+        {title}
+      </p>
+    {/if}
+  </div>
+  <button
+    class="threedot-icon-container pe-1 border-0 rounded d-flex justify-content-center align-items-center"
+    on:click={(e) => {
+      e.stopPropagation();
+      rightClickContextMenu(e, button);
+    }}
+  >
+    <img src={threedotIcon} alt="threedotIcon" />
+  </button>
+  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+    <Spinner size={"15px"} />
+  {/if}
 </button>
+
 <div
   style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
     ? 'block'
@@ -129,20 +402,69 @@
       {collectionId}
       {currentWorkspaceId}
       explorer={exp}
+      {visibility}
     />
   {/each}
-  <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-  <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+  {#if showFolderAPIButtons}
+  <div class="mt-2 mb-2">
+    <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+    <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+  </div>
+  {/if}
 </div>
 
 <style>
+  .my-button:hover .threedot-icon-container {
+    visibility: visible;
+  }
+
+  .threedot-icon-container {
+    visibility: hidden;
+    background-color: var(--border-color);
+  }
+
+  .threedot-icon-container:hover {
+    background-color: var(--border-color);
+  }
+
+  .threedot-icon-container:active {
+    background-color: var(--workspace-hover-color);
+  }
+
   .btn-primary {
-    background-color: #1e1e1e;
-    color: #fff;
+    background-color: var(--background-color);
+    color: var(--white-color);
   }
 
   .btn-primary:hover {
+    border-radius: 8px;
+    background-color: var(--border-color);
+    color: var(--white-color);
+    padding: 5px;
+  }
+
+  .navbar {
+    width: 180px;
+    height: auto;
+    overflow: hidden;
+  }
+
+  ul li {
+    display: block;
+  }
+
+  ul li button {
+    font-size: 12px;
+    display: flex;
+    width: 100%;
+    border: 0px;
+    background-color: var(--blackColor);
+  }
+
+  ul li button:hover {
+    width: 100%;
+    color: var(--white-color);
+    border-radius: 8px;
     background-color: #232527;
-    color: #fff;
   }
 </style>
