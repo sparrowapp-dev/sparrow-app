@@ -33,6 +33,7 @@ $sparrow-send-hoverbutton: #04416d;
 $sparrow-button-background: #2d2c2c;
 $sparrow-button-color: #e5e5e5;
 $sparrow-dull-background: #232424;
+$sparrow-bottom-border :#85C2FF;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -54,6 +55,7 @@ $sparrow-dull-background: #232424;
   --request-patc: #{$sparrow-patc};
   --request-opt: #{$sparrow-opt};
   --workspace-hover-color: #{$sparrow-plusbutton};
+  --sparrow-bottom-border : #{$sparrow-bottom-border};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -85,7 +87,8 @@ $theme-colors: map-merge(
     "headColor": $sparrow-head,
     "patchColor": $sparrow-patc,
     "optionsColor": $sparrow-opt,
-    "dullBackground" : $sparrow-dull-background
+    "dullBackground" : $sparrow-dull-background,
+    "sparrowBottomBorder": $sparrow-bottom-border
   )
 );
 

@@ -28,6 +28,9 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import MethodButton from "$lib/components/buttons/MethodButton.svelte";
+  import tickIcon from "$lib/assets/tick-grey.svg";
+  import crossIcon from "$lib/assets/cross-grey.svg";
+    import Spinner from "$lib/components/Transition/Spinner.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -43,6 +46,11 @@
     name: string;
     id: string;
   }
+
+  const constant = {
+    newFolder :  "New Folder",
+    newCollection : "New Collection"
+  } 
 
   let collection: any[] = [];
   let directory: any[] = [];
@@ -68,10 +76,11 @@
   };
 
   let isLoading: boolean = false;
-  let createCollectionName: string = "";
+  let createCollectionName: string = constant.newCollection;
   let createCollectionNameVisibility: boolean = false;
-  let createFolderName: string = "";
+  let createFolderName: string = constant.newFolder;
   let createFolderNameVisibility: boolean = false;
+  let createDirectoryLoader : boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
@@ -253,6 +262,7 @@
   };
 
   const handleFolderClick = async (folderName): Promise<void> => {
+    createDirectoryLoader = true;
     let directory: CreateDirectoryPostBody = {
       name: folderName,
       description: "",
@@ -263,7 +273,8 @@
       directory,
     );
     if (res.isSuccessful) {
-      createFolderName = "";
+      createDirectoryLoader = false;
+      createFolderName = constant.newFolder;
       latestRoute = {
         id: res.data.data.id,
       };
@@ -272,20 +283,28 @@
         res.data.data,
       );
     }
+    else{
+      createDirectoryLoader = false;
+    }
   };
 
   const handleCreateCollection = async (collectionName) => {
+    createDirectoryLoader = true;
     const newCollection: CreateCollectionPostBody = {
       name: collectionName,
       workspaceId: workspace.id,
     };
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
-      createCollectionName = "";
+      createDirectoryLoader = false;
+      createCollectionName = constant.newCollection;
       latestRoute = {
         id: res.data.data._id,
       };
       collectionsMethods.addCollection(res.data.data);
+    }
+    else{
+      createDirectoryLoader = false;
     }
   };
 
@@ -401,62 +420,84 @@
           {#if directory.length > 0}
             {#if path.length === 0 && createCollectionNameVisibility}
               <div class="d-flex justify-content-between">
-                <div>
-                  <input
+                <div class="w-100 pe-3">
+                  <input class="form-input save-input"
                     type="text"
-                    placeholder="Type collection name"
+                    placeholder="Name your collection"
                     bind:value={createCollectionName}
+                    autofocus
                   />
                 </div>
                 <div class="d-flex">
-                  <CoverButton
-                    disable={createCollectionName.length > 0 ? false : true}
-                    text={"Create"}
-                    size={12}
-                    type="dark"
-                    onClick={() => {
+                  {#if !createDirectoryLoader}
+                  <button
+                    class="icon-btn {createCollectionName.length > 0
+                      ? ''
+                      : 'unclickable'}"
+                    on:click={() => {
                       handleCreateCollection(createCollectionName);
                     }}
-                  />
-                  <CoverButton
-                    text={"Cancel"}
-                    size={12}
-                    type={"dark"}
-                    onClick={() => {
-                      createCollectionNameVisibility = false;
-                      createCollectionName ="";
-                    }}
-                  />
+                  >
+                    <img src={tickIcon} alt="" />
+                  </button>
+
+                  <button
+                  class="icon-btn"
+                  on:click={() => {
+                    createCollectionNameVisibility = false;
+                    createCollectionName = constant.newCollection;
+                  }}
+                >
+                  <img src={crossIcon} alt="" />
+                </button>
+                  {:else}
+                  <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
+                    <Spinner size={"16px"} />
+                  </button>
+                  {/if}
+                  
                 </div>
               </div>
             {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
               <div class="d-flex justify-content-between">
-                <div>
+                <div class="w-100 pe-3">
                   <input
+                  class="form-input save-input"
                     type="text"
-                    placeholder="Type folder name"
+                    placeholder="Name your folder"
                     bind:value={createFolderName}
+                    autofocus
                   />
                 </div>
                 <div class="d-flex">
-                  <CoverButton
-                    disable={createFolderName.length > 0 ? false : true}
-                    text={"Create"}
-                    size={12}
-                    type="dark"
-                    onClick={() => {
+                  {#if !createDirectoryLoader}
+                  <button
+                    class="icon-btn {createFolderName.length > 0
+                      ? ''
+                      : 'unclickable'}"
+                    on:click={() => {
                       handleFolderClick(createFolderName);
                     }}
-                  />
-                  <CoverButton
-                    text={"Cancel"}
-                    size={12}
-                    type={"dark"}
-                    onClick={() => {
-                      createFolderNameVisibility = false;
-                      createFolderName = "";
-                    }}
-                  />
+                  >
+                    <img src={tickIcon} alt="" />
+                  </button>
+
+                  <button
+                  class="icon-btn"
+                  on:click={() => {
+                     createFolderNameVisibility = false;
+                      createFolderName = constant.newFolder;
+                  }}
+                >
+                  <img src={crossIcon} alt="" />
+                </button>
+                  
+                  {:else}
+                  <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
+                    <Spinner size={"16px"} />
+                  </button>
+                  {/if}
+                  
                 </div>
               </div>
             {/if}
@@ -482,67 +523,89 @@
               {/if}
             {/each}
           {:else}
-            <div >
+            <div>
               {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
-              <div class="d-flex justify-content-between">
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Type folder name"
-                    bind:value={createFolderName}
-                  />
-                </div>
-                <div class="d-flex">
-                  <CoverButton
-                    disable={createFolderName.length > 0 ? false : true}
-                    text={"Create"}
-                    size={12}
-                    type="dark"
-                    onClick={() => {
+                <div class="d-flex justify-content-between">
+                  <div class="w-100 pe-3">
+                    <input
+                    class="form-input save-input"
+                      type="text"
+                      placeholder="Name your folder"
+                      bind:value={createFolderName}
+                      autofocus
+                    />
+                  </div>
+                  <div class="d-flex">
+                    {#if !createDirectoryLoader}
+                    <button
+                    class="icon-btn {createFolderName.length > 0
+                      ? ''
+                      : 'unclickable'}"
+                    on:click={() => {
                       handleFolderClick(createFolderName);
                     }}
-                  />
-                  <CoverButton
-                    text={"Cancel"}
-                    size={12}
-                    type={"dark"}
-                    onClick={() => {
-                      createFolderNameVisibility = false;
-                      createFolderName = "";
-                    }}
-                  />
+                  >
+                    <img src={tickIcon} alt="" />
+                  </button>
+
+                  <button
+                  class="icon-btn"
+                  on:click={() => {
+                     createFolderNameVisibility = false;
+                      createFolderName = constant.newFolder;
+                  }}
+                >
+                  <img src={crossIcon} alt="" />
+                </button>
+                  
+                    {:else}
+                    <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
+                      <Spinner size={"16px"} />
+                    </button>
+                  {/if}
+                  </div>
                 </div>
-              </div>
               {:else if path.length === 0 && createCollectionNameVisibility}
-              <div class="d-flex justify-content-between">
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Type collection name"
-                    bind:value={createCollectionName}
-                  />
+                <div class="d-flex justify-content-between">
+                  <div class="w-100 pe-3">
+                    <input
+                    class="form-input save-input"
+                      type="text"
+                      placeholder="Name your collection"
+                      bind:value={createCollectionName}
+                      autofocus
+                    />
+                  </div>
+                  <div class="d-flex">
+                    {#if !createDirectoryLoader}
+
+                    <button
+                      class="icon-btn {createCollectionName.length > 0
+                        ? ''
+                        : 'unclickable'}"
+                      on:click={() => {
+                        handleCreateCollection(createCollectionName);
+                      }}
+                    >
+                      <img src={tickIcon} alt="" />
+                    </button>
+                    <button
+                      class="icon-btn"
+                      on:click={() => {
+                        createCollectionNameVisibility = false;
+                        createCollectionName = constant.newCollection;
+                      }}
+                    >
+                      <img src={crossIcon} alt="" />
+                    </button>
+                  
+                    {:else}
+                    <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
+                      <Spinner size={"16px"} />
+                    </button>
+                  {/if}
+                  </div>
                 </div>
-                <div class="d-flex">
-                  <CoverButton
-                    disable={createCollectionName.length > 0 ? false : true}
-                    text={"Create"}
-                    size={12}
-                    type="dark"
-                    onClick={() => {
-                      handleCreateCollection(createCollectionName);
-                    }}
-                  />
-                  <CoverButton
-                    text={"Cancel"}
-                    size={12}
-                    type={"dark"}
-                    onClick={() => {
-                      createCollectionNameVisibility = false;
-                      createCollectionName = "";
-                    }}
-                  />
-                </div>
-              </div>
               {/if}
             </div>
             <div
@@ -590,6 +653,7 @@
             placeholder="Enter request name."
             class="p-1 bg-black outline-0 rounded border-0"
             bind:value={tabName}
+            autofocus
           />
         </div>
         {#if tabName?.length === 0}
@@ -736,5 +800,27 @@
   }
   .tabname-error-text {
     font-size: 12px;
+  }
+
+  .unclickable {
+    pointer-events: none;
+  }
+  .save-request .icon-btn{
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+  }
+  .save-input{
+    width: 100%;
+    padding: 0 8px !important;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--sparrow-bottom-border);
+  }
+  .save-input:focus{
+    background-color: var(--border-color);
   }
 </style>
