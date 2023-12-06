@@ -30,7 +30,7 @@
   import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
-    import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -48,9 +48,9 @@
   }
 
   const constant = {
-    newFolder :  "New Folder",
-    newCollection : "New Collection"
-  } 
+    newFolder: "New Folder",
+    newCollection: "New Collection",
+  };
 
   let collection: any[] = [];
   let directory: any[] = [];
@@ -80,7 +80,7 @@
   let createCollectionNameVisibility: boolean = false;
   let createFolderName: string = constant.newFolder;
   let createFolderNameVisibility: boolean = false;
-  let createDirectoryLoader : boolean = false;
+  let createDirectoryLoader: boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
@@ -282,8 +282,7 @@
         path[0].id,
         res.data.data,
       );
-    }
-    else{
+    } else {
       createDirectoryLoader = false;
     }
   };
@@ -302,8 +301,7 @@
         id: res.data.data._id,
       };
       collectionsMethods.addCollection(res.data.data);
-    }
-    else{
+    } else {
       createDirectoryLoader = false;
     }
   };
@@ -347,7 +345,7 @@
       {#if workspace}
         <span
           on:click={navigateToWorkspace}
-          class="cursor-pointer px-1"
+          class="{path.length === 0 ? 'text-whiteColor':''} cursor-pointer px-1"
           style="font-size: 12px;"
         >
           <img
@@ -359,13 +357,13 @@
         >
       {/if}
       {#if path.length > 0}
-        {#each path as elem}
+        {#each path as elem, index}
           <span>/</span>
           <span
             on:click={() => {
               navigateToDirectory(elem);
             }}
-            class="cursor-pointer px-1"
+            class="{path.length - 1 === index ? 'text-whiteColor':''} cursor-pointer px-1"
             style="font-size: 12px;"
           >
             {#if elem.type === ItemType.COLLECTION}
@@ -392,7 +390,9 @@
           {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
             <p class="mb-0">
               <small class="save-text-clr">Collection: </small>
-              <small> {path[path.length - 1].name}</small>
+              <small class="text-whiteColor">
+                {path[path.length - 1].name}</small
+              >
             </p>
             <small class="save-text-clr" style="font-size: 12px;"
               >Save your request in this collection or any of its folders.</small
@@ -400,13 +400,15 @@
           {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
             <p class="mb-0">
               <small class="save-text-clr">Folder: </small>
-              <small> {path[path.length - 1].name}</small>
+              <small class="text-whiteColor">
+                {path[path.length - 1].name}</small
+              >
             </p>
           {:else}
             <p class="mb-0">
               <small class="save-text-clr">Workspace: </small>
               {#if workspace}
-                <small>
+                <small class="text-whiteColor">
                   {workspace.name}
                 </small>
               {/if}
@@ -421,7 +423,8 @@
             {#if path.length === 0 && createCollectionNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
-                  <input class="form-input save-input"
+                  <input
+                    class="form-input save-input"
                     type="text"
                     placeholder="Name your collection"
                     bind:value={createCollectionName}
@@ -430,39 +433,41 @@
                 </div>
                 <div class="d-flex">
                   {#if !createDirectoryLoader}
-                  <button
-                    class="icon-btn {createCollectionName.length > 0
-                      ? ''
-                      : 'unclickable'}"
-                    on:click={() => {
-                      handleCreateCollection(createCollectionName);
-                    }}
-                  >
-                    <img src={tickIcon} alt="" />
-                  </button>
+                    <button
+                      class="icon-btn {createCollectionName.length > 0
+                        ? ''
+                        : 'unclickable'}"
+                      on:click={() => {
+                        handleCreateCollection(createCollectionName);
+                      }}
+                    >
+                      <img src={tickIcon} alt="" />
+                    </button>
 
-                  <button
-                  class="icon-btn"
-                  on:click={() => {
-                    createCollectionNameVisibility = false;
-                    createCollectionName = constant.newCollection;
-                  }}
-                >
-                  <img src={crossIcon} alt="" />
-                </button>
+                    <button
+                      class="icon-btn"
+                      on:click={() => {
+                        createCollectionNameVisibility = false;
+                        createCollectionName = constant.newCollection;
+                      }}
+                    >
+                      <img src={crossIcon} alt="" />
+                    </button>
                   {:else}
-                  <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
-                    <Spinner size={"16px"} />
-                  </button>
+                    <button
+                      class="d-flex justify-content-center border-0"
+                      style="width:50px; background-color: transparent;"
+                    >
+                      <Spinner size={"16px"} />
+                    </button>
                   {/if}
-                  
                 </div>
               </div>
             {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
                   <input
-                  class="form-input save-input"
+                    class="form-input save-input"
                     type="text"
                     placeholder="Name your folder"
                     bind:value={createFolderName}
@@ -471,33 +476,34 @@
                 </div>
                 <div class="d-flex">
                   {#if !createDirectoryLoader}
-                  <button
-                    class="icon-btn {createFolderName.length > 0
-                      ? ''
-                      : 'unclickable'}"
-                    on:click={() => {
-                      handleFolderClick(createFolderName);
-                    }}
-                  >
-                    <img src={tickIcon} alt="" />
-                  </button>
+                    <button
+                      class="icon-btn {createFolderName.length > 0
+                        ? ''
+                        : 'unclickable'}"
+                      on:click={() => {
+                        handleFolderClick(createFolderName);
+                      }}
+                    >
+                      <img src={tickIcon} alt="" />
+                    </button>
 
-                  <button
-                  class="icon-btn"
-                  on:click={() => {
-                     createFolderNameVisibility = false;
-                      createFolderName = constant.newFolder;
-                  }}
-                >
-                  <img src={crossIcon} alt="" />
-                </button>
-                  
+                    <button
+                      class="icon-btn"
+                      on:click={() => {
+                        createFolderNameVisibility = false;
+                        createFolderName = constant.newFolder;
+                      }}
+                    >
+                      <img src={crossIcon} alt="" />
+                    </button>
                   {:else}
-                  <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
-                    <Spinner size={"16px"} />
-                  </button>
+                    <button
+                      class="d-flex justify-content-center border-0"
+                      style="width:50px; background-color: transparent;"
+                    >
+                      <Spinner size={"16px"} />
+                    </button>
                   {/if}
-                  
                 </div>
               </div>
             {/if}
@@ -528,7 +534,7 @@
                 <div class="d-flex justify-content-between">
                   <div class="w-100 pe-3">
                     <input
-                    class="form-input save-input"
+                      class="form-input save-input"
                       type="text"
                       placeholder="Name your folder"
                       bind:value={createFolderName}
@@ -537,39 +543,41 @@
                   </div>
                   <div class="d-flex">
                     {#if !createDirectoryLoader}
-                    <button
-                    class="icon-btn {createFolderName.length > 0
-                      ? ''
-                      : 'unclickable'}"
-                    on:click={() => {
-                      handleFolderClick(createFolderName);
-                    }}
-                  >
-                    <img src={tickIcon} alt="" />
-                  </button>
+                      <button
+                        class="icon-btn {createFolderName.length > 0
+                          ? ''
+                          : 'unclickable'}"
+                        on:click={() => {
+                          handleFolderClick(createFolderName);
+                        }}
+                      >
+                        <img src={tickIcon} alt="" />
+                      </button>
 
-                  <button
-                  class="icon-btn"
-                  on:click={() => {
-                     createFolderNameVisibility = false;
-                      createFolderName = constant.newFolder;
-                  }}
-                >
-                  <img src={crossIcon} alt="" />
-                </button>
-                  
+                      <button
+                        class="icon-btn"
+                        on:click={() => {
+                          createFolderNameVisibility = false;
+                          createFolderName = constant.newFolder;
+                        }}
+                      >
+                        <img src={crossIcon} alt="" />
+                      </button>
                     {:else}
-                    <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
-                      <Spinner size={"16px"} />
-                    </button>
-                  {/if}
+                      <button
+                        class="d-flex justify-content-center border-0"
+                        style="width:50px; background-color: transparent;"
+                      >
+                        <Spinner size={"16px"} />
+                      </button>
+                    {/if}
                   </div>
                 </div>
               {:else if path.length === 0 && createCollectionNameVisibility}
                 <div class="d-flex justify-content-between">
                   <div class="w-100 pe-3">
                     <input
-                    class="form-input save-input"
+                      class="form-input save-input"
                       type="text"
                       placeholder="Name your collection"
                       bind:value={createCollectionName}
@@ -578,32 +586,33 @@
                   </div>
                   <div class="d-flex">
                     {#if !createDirectoryLoader}
-
-                    <button
-                      class="icon-btn {createCollectionName.length > 0
-                        ? ''
-                        : 'unclickable'}"
-                      on:click={() => {
-                        handleCreateCollection(createCollectionName);
-                      }}
-                    >
-                      <img src={tickIcon} alt="" />
-                    </button>
-                    <button
-                      class="icon-btn"
-                      on:click={() => {
-                        createCollectionNameVisibility = false;
-                        createCollectionName = constant.newCollection;
-                      }}
-                    >
-                      <img src={crossIcon} alt="" />
-                    </button>
-                  
+                      <button
+                        class="icon-btn {createCollectionName.length > 0
+                          ? ''
+                          : 'unclickable'}"
+                        on:click={() => {
+                          handleCreateCollection(createCollectionName);
+                        }}
+                      >
+                        <img src={tickIcon} alt="" />
+                      </button>
+                      <button
+                        class="icon-btn"
+                        on:click={() => {
+                          createCollectionNameVisibility = false;
+                          createCollectionName = constant.newCollection;
+                        }}
+                      >
+                        <img src={crossIcon} alt="" />
+                      </button>
                     {:else}
-                    <button class="d-flex justify-content-center border-0" style="width:50px; background-color: transparent;">
-                      <Spinner size={"16px"} />
-                    </button>
-                  {/if}
+                      <button
+                        class="d-flex justify-content-center border-0"
+                        style="width:50px; background-color: transparent;"
+                      >
+                        <Spinner size={"16px"} />
+                      </button>
+                    {/if}
                   </div>
                 </div>
               {/if}
@@ -619,21 +628,25 @@
                   This Collection is empty
                 </p>
               {:else if path.length === 0}
-                <p class="save-text-clr text-center">
-                  This Workspace is empty
-
-                  <!-- 
-
-
-
-
-                      collection nesds ro be revised
-
-
-
-
-                   -->
-                </p>
+                <div>
+                  <p
+                    style="font-size: 12px;"
+                    class="w-100 save-text-clr text-center"
+                  >
+                    You have no collections in this workspace. Create a
+                    Collection to easily organize and use your API requests.
+                  </p>
+                  <div class="w-100 d-flex justify-content-center">
+                    <CoverButton
+                      text={"+ Collection"}
+                      size={14}
+                      type={"primary"}
+                      onClick={() => {
+                        createCollectionNameVisibility = true;
+                      }}
+                    />
+                  </div>
+                </div>
               {/if}
             </div>
           {/if}
@@ -805,14 +818,14 @@
   .unclickable {
     pointer-events: none;
   }
-  .save-request .icon-btn{
+  .save-request .icon-btn {
     width: 25px;
     height: 25px;
     background-color: transparent;
     outline: none;
     border: none;
   }
-  .save-input{
+  .save-input {
     width: 100%;
     padding: 0 8px !important;
     font-size: 14px;
@@ -820,7 +833,10 @@
     border: none;
     border-bottom: 1px solid var(--sparrow-bottom-border);
   }
-  .save-input:focus{
+  .save-input:focus {
     background-color: var(--border-color);
+  }
+  .save-text-clr {
+    color: #8a9299;
   }
 </style>
