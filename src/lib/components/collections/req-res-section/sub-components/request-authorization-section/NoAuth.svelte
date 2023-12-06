@@ -35,14 +35,4 @@
       headers of the request. Remember to keep your tokens secure.
     </p>
   </div>
-
-  <div style="font-size: 12px;">
-    <a href="#" class="text-labelColor"
-      >Learn more about Authorization <img
-        src={linkIcon}
-        alt="link icon"
-        class=" ps-1"
-      /></a
-    >
-  </div>
 </div>

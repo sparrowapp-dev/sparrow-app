@@ -339,7 +339,7 @@
         <h4>Save Request</h4>
       </div>
       <button
-        class="btn"
+        class="btn pe-0 pt-0 border-0"
         on:click={() => {
           onClick(false);
         }}><img src={crossAsset} alt="" /></button
@@ -680,7 +680,7 @@
           </p>
           <span id="3456-dropdown900"  class="instruction-btn  {instructionEnabled ? 'bg-sparrowBottomBorder' : ''} rounded d-flex align-items-center justify-content-center position-relative">
             <img on:click={()=>{
-              instructionEnabled = true;
+              instructionEnabled = !instructionEnabled;
             }} src={questionIcon} alt="question" />
             {#if instructionEnabled}
             <div class="bg-blackColor api-name-usage p-2">
