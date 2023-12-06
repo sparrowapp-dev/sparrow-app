@@ -32,7 +32,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
   export let componentData: NewTab;
-  export let onFinish = (_id)=>{};
+  export let onFinish = (_id) => {};
 
   interface Path {
     name: string;
@@ -68,6 +68,10 @@
   };
 
   let isLoading: boolean = false;
+  let createCollectionName: string = "";
+  let createCollectionNameVisibility: boolean = false;
+  let createFolderName: string = "";
+  let createFolderNameVisibility: boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
@@ -101,6 +105,8 @@
     );
     directory = response.items;
     path = response.path;
+    createFolderNameVisibility = false;
+    createCollectionNameVisibility = false;
   };
 
   const navigateToLastRoute = () => {
@@ -246,9 +252,9 @@
     }
   };
 
-  const handleFolderClick = async (): Promise<void> => {
+  const handleFolderClick = async (folderName): Promise<void> => {
     let directory: CreateDirectoryPostBody = {
-      name: "New folder",
+      name: folderName,
       description: "",
     };
     const res = await insertCollectionDirectory(
@@ -257,6 +263,7 @@
       directory,
     );
     if (res.isSuccessful) {
+      createFolderName = "";
       latestRoute = {
         id: res.data.data.id,
       };
@@ -267,13 +274,14 @@
     }
   };
 
-  const handleCreateCollection = async () => {
+  const handleCreateCollection = async (collectionName) => {
     const newCollection: CreateCollectionPostBody = {
-      name: "New collection",
+      name: collectionName,
       workspaceId: workspace.id,
     };
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
+      createCollectionName = "";
       latestRoute = {
         id: res.data.data._id,
       };
@@ -391,6 +399,67 @@
           {/if}
           <p />
           {#if directory.length > 0}
+            {#if path.length === 0 && createCollectionNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Type collection name"
+                    bind:value={createCollectionName}
+                  />
+                </div>
+                <div class="d-flex">
+                  <CoverButton
+                    disable={createCollectionName.length > 0 ? false : true}
+                    text={"Create"}
+                    size={12}
+                    type="dark"
+                    onClick={() => {
+                      handleCreateCollection(createCollectionName);
+                    }}
+                  />
+                  <CoverButton
+                    text={"Cancel"}
+                    size={12}
+                    type={"dark"}
+                    onClick={() => {
+                      createCollectionNameVisibility = false;
+                      createCollectionName ="";
+                    }}
+                  />
+                </div>
+              </div>
+            {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Type folder name"
+                    bind:value={createFolderName}
+                  />
+                </div>
+                <div class="d-flex">
+                  <CoverButton
+                    disable={createFolderName.length > 0 ? false : true}
+                    text={"Create"}
+                    size={12}
+                    type="dark"
+                    onClick={() => {
+                      handleFolderClick(createFolderName);
+                    }}
+                  />
+                  <CoverButton
+                    text={"Cancel"}
+                    size={12}
+                    type={"dark"}
+                    onClick={() => {
+                      createFolderNameVisibility = false;
+                      createFolderName = "";
+                    }}
+                  />
+                </div>
+              </div>
+            {/if}
             {#each directory as col}
               {#if col.type === ItemType.FOLDER}
                 <div
@@ -413,6 +482,69 @@
               {/if}
             {/each}
           {:else}
+            <div >
+              {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Type folder name"
+                    bind:value={createFolderName}
+                  />
+                </div>
+                <div class="d-flex">
+                  <CoverButton
+                    disable={createFolderName.length > 0 ? false : true}
+                    text={"Create"}
+                    size={12}
+                    type="dark"
+                    onClick={() => {
+                      handleFolderClick(createFolderName);
+                    }}
+                  />
+                  <CoverButton
+                    text={"Cancel"}
+                    size={12}
+                    type={"dark"}
+                    onClick={() => {
+                      createFolderNameVisibility = false;
+                      createFolderName = "";
+                    }}
+                  />
+                </div>
+              </div>
+              {:else if path.length === 0 && createCollectionNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Type collection name"
+                    bind:value={createCollectionName}
+                  />
+                </div>
+                <div class="d-flex">
+                  <CoverButton
+                    disable={createCollectionName.length > 0 ? false : true}
+                    text={"Create"}
+                    size={12}
+                    type="dark"
+                    onClick={() => {
+                      handleCreateCollection(createCollectionName);
+                    }}
+                  />
+                  <CoverButton
+                    text={"Cancel"}
+                    size={12}
+                    type={"dark"}
+                    onClick={() => {
+                      createCollectionNameVisibility = false;
+                      createCollectionName = "";
+                    }}
+                  />
+                </div>
+              </div>
+              {/if}
+            </div>
             <div
               class="d-flex align-items-center justify-content-center"
               style="height: 300px;"
@@ -424,14 +556,28 @@
                   This Collection is empty
                 </p>
               {:else if path.length === 0}
-                <p class="save-text-clr text-center">This Workspace is empty</p>
+                <p class="save-text-clr text-center">
+                  This Workspace is empty
+
+                  <!-- 
+
+
+
+
+                      collection nesds ro be revised
+
+
+
+
+                   -->
+                </p>
               {/if}
             </div>
           {/if}
         </div>
       </div>
       <div class="col-6">
-        <!-- <div>Right panel</div> -->
+        <!-- Right panel  -->
         <p class="save-text-clr mb-1" style="font-size:12px">
           Request Name <span class="text-dangerColor">*</span>
         </p>
@@ -515,14 +661,14 @@
           <IconButton
             text={"+ Collection"}
             onClick={() => {
-              handleCreateCollection();
+              createCollectionNameVisibility = true;
             }}
           />
         {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
           <IconButton
             text={"+ Folder"}
             onClick={() => {
-              handleFolderClick();
+              createFolderNameVisibility = true;
             }}
           />
         {/if}
