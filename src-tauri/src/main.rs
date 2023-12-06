@@ -144,31 +144,40 @@ struct OnClosePayload {
 }
 
 #[tauri::command]
-async fn create_oauth_window(handle: tauri::AppHandle) {
-    tauri::WindowBuilder::new(
-        &handle,
-        "oauth", /* the unique window label */
-        tauri::WindowUrl::External("https://dev-api.sparrow.techdomeaks.com/api/auth/google".parse().unwrap()),
-    )
-    .title("")
-    .build()
-    .unwrap();
+async fn open_oauth_window(handle: tauri::AppHandle) {
+    let oauth_window = handle.get_window("oauth");
+    if oauth_window == None {
+        tauri::WindowBuilder::new(
+            &handle,
+            "oauth", /* the unique window label */
+            tauri::WindowUrl::External("https://dev-api.sparrow.techdomeaks.com/api/auth/google".parse().unwrap()),
+        )
+        .title("")
+        .build()
+        .unwrap();
+    }
+    else {
+        let oauth_window = handle.get_window("oauth").unwrap();
+        let _ = oauth_window.eval(&format!(
+            "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
+        ));
+        let one_sec = time::Duration::from_secs(1);
+        thread::sleep(one_sec);
+    
+        let _ = oauth_window.center();
+        let _ = oauth_window.show();
+    }
     let oauth_window = handle.get_window("oauth").unwrap();
     oauth_window.emit("onclose", OnClosePayload { message: "Window Close Event".into() }).unwrap();
 }
 
 #[tauri::command]
-async fn open_oauth_window(handle: tauri::AppHandle) {
+async fn close_oauth_window(handle: tauri::AppHandle) {
     let oauth_window = handle.get_window("oauth").unwrap();
     let _ = oauth_window.eval(&format!(
-        "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
+        "window.location.replace('https://accounts.google.com/logout')"
     ));
-    let one_sec = time::Duration::from_secs(1);
-    thread::sleep(one_sec);
-
-    let _ = oauth_window.center();
-    let _ = oauth_window.show();
-    oauth_window.emit("onclose", OnClosePayload { message: "Window Close Event".into() }).unwrap();
+    let _ = oauth_window.hide();
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -187,8 +196,8 @@ fn main() {
             make_type_request_command,
             fetch_swagger_url_command,
             fetch_file_command,
-            create_oauth_window,
-            open_oauth_window
+            open_oauth_window,
+            close_oauth_window
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
