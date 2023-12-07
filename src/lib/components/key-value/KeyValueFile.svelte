@@ -189,7 +189,7 @@
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   bind:value={element.key}
                   on:input={() => {
@@ -205,7 +205,7 @@
                   {#if element.value === ""}
                     <input
                       type="text"
-                      class="bg-blackColor form-control border-0 py-1"
+                      class="bg-keyValuePairColor form-control border-0 py-1"
                       readonly
                       style="z-index:4; font-size:13px;
                     position: absolute;

@@ -66,6 +66,14 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public deleteResponseFromRequestProperty = async (
+    data: any,
+    route: string,
+  ) => {
+    requestResponseStore.deleteResponseFromRequestProperty(data, route);
+    this.debouncedTab();
+  };
+
   public updateRequestState = async (data: any, route: string) => {
     requestResponseStore.setRequestState(data, route);
     this.debouncedTab();

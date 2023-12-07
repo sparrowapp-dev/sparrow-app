@@ -156,7 +156,7 @@
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled
                   bind:value={readable.key}
@@ -166,7 +166,7 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled
                   bind:value={readable.value}
@@ -221,7 +221,7 @@
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.key}
@@ -234,7 +234,7 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.value}

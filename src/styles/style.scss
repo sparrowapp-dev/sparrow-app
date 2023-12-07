@@ -38,6 +38,7 @@ $sparrow-cancel-hover: #31323360;
 $sparrow-delete-hover: #f16674;
 $sparrow-background-hover: rgba(0, 0, 0, 0.706);
 $sparrow-button-pressed: #1d3650;
+$sparrow-key-value-pair:#262626;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -65,6 +66,7 @@ $sparrow-button-pressed: #1d3650;
   --delete-hover: #{$sparrow-delete-hover};
   --background-hover: #{$sparrow-background-hover};
   --button-pressed: #{$sparrow-button-pressed};
+  --keyvalue-pair:#{$sparrow-key-value-pair};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -97,6 +99,7 @@ $theme-colors: map-merge(
     "patchColor": $sparrow-patc,
     "optionsColor": $sparrow-opt,
     "dullBackground": $sparrow-dull-background,
+    "keyValuePairColor":$sparrow-key-value-pair
   )
 );
 

@@ -63,4 +63,5 @@ export interface CollectionsMethods {
     uuid: string,
     folderId: string,
   ) => void;
+  deleteResponseFromRequestProperty: (data: any, route: string) => void;
 }
