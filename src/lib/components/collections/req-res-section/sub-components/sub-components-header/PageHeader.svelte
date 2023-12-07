@@ -230,9 +230,6 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  .pageheader {
-    z-index: 999;
-  }
   .btn-primary {
     background-color: #313233;
   }

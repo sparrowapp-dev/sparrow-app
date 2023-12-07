@@ -61,10 +61,5 @@
 <style>
   .dashboard-teams {
     margin-left: 72px;
-    z-index: -1;
-  }
-
-  .dashboard {
-    z-index: 0;
   }
 </style>

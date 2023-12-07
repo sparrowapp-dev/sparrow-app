@@ -157,7 +157,6 @@
 
   .tabbar {
     height: 36px;
-    z-index: 999999;
   }
 
   .tab-scroller::-webkit-scrollbar {

@@ -104,7 +104,6 @@
     left: 0;
     width: calc(100%-352px);
     height: calc(100vh - 44px);
-    z-index: -1;
   }
   .tab__content {
     margin-right: 32px;
