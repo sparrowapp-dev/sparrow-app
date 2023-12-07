@@ -9,6 +9,7 @@ import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
+import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -16,6 +17,7 @@ export class HeaderDashboardViewModel {
   private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
   private collectionRepository = new CollectionRepository();
+  private activeSideBarTabRepository = new ActiveSideBarTabReposistory();
 
   get workspaces() {
     return this.workspaceRepository.getWorkspaces();
@@ -72,6 +74,7 @@ export class HeaderDashboardViewModel {
     await this.collectionRepository.clearCollections();
     await requestResponseStore.clearTabs();
     await this.tabRepository.clearTabs();
+    await this.activeSideBarTabRepository.clearActiveTabs();
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
