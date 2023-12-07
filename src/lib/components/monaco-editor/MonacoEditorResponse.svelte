@@ -10,6 +10,7 @@
     ResponseFormatter,
   } from "$lib/utils/enums/request.enum";
 
+
   export let rawTab: RequestDataType;
   export let rawValue;
   export let formatter;
@@ -232,13 +233,15 @@
       handleRawTypes(rawValue, rawTab);
     }
   }
+
+
 </script>
 
 <div class="code-editor" bind:this={editorResponseElement} />
 
 <style>
   .code-editor {
-    width: 100%;
+    width: 99%;
     height: 250px;
   }
 </style>

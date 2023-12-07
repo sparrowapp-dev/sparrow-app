@@ -253,7 +253,7 @@
       {currentWorkspaceName || ""}
     </p>
     <button
-      class="bg-plusButton border-0 rounded px-2 angleButton"
+      class=" border-0 rounded px-2 angleButton"
       on:click={setcollapsExpandToggle}
       id="doubleAngleButton"
     >
@@ -405,7 +405,12 @@
     background-color: var(--button-pressed);
   }
   .angleButton {
+    background-color: var(--background-color);
     cursor: pointer;
+  }
+
+  .angleButton:hover {
+    background-color: var(--workspace-hover-color);
   }
 
   .angleButton:active {

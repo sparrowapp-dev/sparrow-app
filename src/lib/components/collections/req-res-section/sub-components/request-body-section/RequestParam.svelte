@@ -51,13 +51,19 @@
     pencilIconState = false;
 
     // Triggers active auth header
-    if (request && (findAuthHeader(request).key || findAuthHeader(request).value)) {
+    if (
+      request &&
+      (findAuthHeader(request).key || findAuthHeader(request).value)
+    ) {
       headersCount += 1;
       pencilIconState = true;
     }
 
     // Triggers active auth query parameters
-    if (request && (findAuthParameter(request).key || findAuthParameter(request).value) ) {
+    if (
+      request &&
+      (findAuthParameter(request).key || findAuthParameter(request).value)
+    ) {
       parametersCount += 1;
       pencilIconState = true;
     }
@@ -92,6 +98,7 @@
       );
     }
   };
+
 </script>
 
 <div
@@ -145,7 +152,8 @@
           on:keydown={() => {}}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Request Body
+        >
+          Body
         </span>
       </span>
 
