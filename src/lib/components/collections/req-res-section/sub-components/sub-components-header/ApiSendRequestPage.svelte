@@ -44,8 +44,6 @@
     request = event?.property.request;
   });
 
- 
-
   const handleSendRequest = async () => {
     isInputValid = true;
     const str = urlText;
@@ -76,7 +74,10 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
-          _apiSendRequest.setResponseContentType(responseHeaders, collectionsMethods);
+          _apiSendRequest.setResponseContentType(
+            responseHeaders,
+            collectionsMethods,
+          );
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
@@ -176,12 +177,12 @@
   });
 
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.key === 'Enter') {
+    if (event.ctrlKey && event.key === "Enter") {
       handleSendRequest();
-    } else if (event.altKey && event.code === "KeyL") { 
+    } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
     }
-  }
+  };
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -254,6 +255,13 @@
           on:click={() => isHorizontalVertical.set(false)}
           on:click={() => {
             selectedView = "grid";
+            const splitter = document.querySelector(".splitpanes__splitter");
+            const leftPanel = document.querySelector(".left-panel");
+            const rightPanel = document.querySelector(".right-panel");
+            rightPanel.style.width = "50%";
+            leftPanel.style.width = "50%";
+            splitter.style.height = "calc(100vh - 200px)";
+            splitter.style.width = "0%";
           }}
           class:view-active={selectedView === "grid"}
           src={tableColumnIcon}
@@ -265,6 +273,13 @@
           on:click={() => isHorizontalVertical.set(true)}
           on:click={() => {
             selectedView = "grid1";
+            const splitter = document.querySelector(".splitpanes__splitter");
+            const leftPanel = document.querySelector(".left-panel");
+            const rightPanel = document.querySelector(".right-panel");
+            splitter.style.height = "0%";
+            splitter.style.width = "100%";
+            rightPanel.style.width = "100%";
+            leftPanel.style.width = "100%";
           }}
           class:view-active={selectedView === "grid1"}
           src={barIcon}
@@ -276,6 +291,7 @@
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
+
 <style>
   .btn-primary {
     background: var(--send-button);

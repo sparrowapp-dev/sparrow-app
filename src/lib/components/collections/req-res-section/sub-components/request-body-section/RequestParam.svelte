@@ -24,6 +24,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -51,13 +52,19 @@
     pencilIconState = false;
 
     // Triggers active auth header
-    if (request && (findAuthHeader(request).key || findAuthHeader(request).value)) {
+    if (
+      request &&
+      (findAuthHeader(request).key || findAuthHeader(request).value)
+    ) {
       headersCount += 1;
       pencilIconState = true;
     }
 
     // Triggers active auth query parameters
-    if (request && (findAuthParameter(request).key || findAuthParameter(request).value) ) {
+    if (
+      request &&
+      (findAuthParameter(request).key || findAuthParameter(request).value)
+    ) {
       parametersCount += 1;
       pencilIconState = true;
     }
@@ -92,16 +99,32 @@
       );
     }
   };
+
+  function stylePanes() {
+    const splitter = document.querySelector(".splitpanes__splitter");
+    if (splitter) {
+      // Common styles
+      splitter.style.height = isHorizontalVerticalMode
+        ? "calc(100vh - 200px)"
+        : "0%";
+      splitter.style.width = "2px";
+      splitter.style.cursor = "row-resize";
+      splitter.style.border = "solid #313233";
+    }
+  }
 </script>
 
-<div
+<Splitpanes
+  on:ready={stylePanes}
+  theme=""
   class="d-flex align-items-start {isHorizontalVerticalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
+  horizontal={isHorizontalVerticalMode ? true : false}
 >
-  <div
+  <Pane
     class="right-panel d-flex flex-column align-items-top justify-content-center pt-3 ps-4 pe-2"
-    style="width:{isHorizontalVerticalMode ? '100%' : '50%'}; "
+    minSize={25}
   >
     <div
       class="{isCollaps
@@ -209,15 +232,10 @@
         <Authorization request={createDeepCopy(request)} {collectionsMethods} />
       {/if}
     </div>
-  </div>
+  </Pane>
 
-  <div
-    style="width:{isHorizontalVerticalMode
-      ? '100%'
-      : '50%'};border-left:1px solid #313233; height:calc(100vh - 200px);"
-    class="left-panel pt-3 px-4 position-relative"
-  >
-    <div class=" d-flex flex-column" style="height:100%;">
+  <Pane class="left-panel pt-3 px-4 position-relative " minSize={25}>
+    <div class=" d-flex flex-column">
       {#if !response?.status}
         <DefaultPage />
       {:else if response?.status === "Not Found"}
@@ -240,8 +258,8 @@
         </div>
       {/if}
     </div>
-  </div>
-</div>
+  </Pane>
+</Splitpanes>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>

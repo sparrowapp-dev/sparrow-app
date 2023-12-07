@@ -26,10 +26,13 @@
     "path": "^0.12.7",
     "rxdb": "^14.17.1",
     "rxjs": "^7.8.1",
+    "split.js": "^1.6.5",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-jsoneditor": "^0.18.9",
     "svelte-navigator": "^3.2.2",
     "svelte-sortablejs": "^0.2.0",
+    "svelte-split-pane": "^0.1.2",
+    "svelte-splitpanes": "^0.8.0",
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
     "yup": "^1.2.0"
