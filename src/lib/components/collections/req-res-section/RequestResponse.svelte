@@ -15,3 +15,6 @@
   <ApiSendRequestPage {activeTab} {collectionsMethods} />
   <RequestParam {activeTab} {collectionsMethods} />
 </div>
+
+<style>
+</style>

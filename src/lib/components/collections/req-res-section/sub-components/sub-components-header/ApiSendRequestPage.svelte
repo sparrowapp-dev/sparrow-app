@@ -19,6 +19,8 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   //this for expand and collaps condition
@@ -36,7 +38,7 @@
   let method = "";
   let request;
   let disabledSend: boolean = false;
-
+  let isLoading: boolean = false;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     urlText = event?.property.request?.url;
     method = event?.property.request?.method;
@@ -60,9 +62,12 @@
       isInputEmpty = false;
       if (isInputValid) {
         let start = Date.now();
+        isLoading = true;
         let response = await createApiRequest(
           _apiSendRequest.decodeRestApiData(request),
         );
+
+      
         let end = Date.now();
 
         const byteLength = new TextEncoder().encode(
@@ -92,6 +97,7 @@
             },
             RequestProperty.RESPONSE,
           );
+          isLoading = false;
         } else {
           await collectionsMethods.updateRequestProperty(
             false,
@@ -107,6 +113,7 @@
             },
             RequestProperty.RESPONSE,
           );
+          isLoading = false;
         }
       }
     }
@@ -233,16 +240,26 @@
           : ''}"
         style=" width:{isCollaps
           ? '100%'
-          : '670px'}; height:34px; outline:none;font-size:14px;"
+          : ''}; height:34px; outline:none;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
         bind:this={inputElement}
       />
+
       <button
         disabled={disabledSend}
-        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor px-4 py-2"
-        style="font-size: 16px;height:34px; font-weight:400"
-        on:click|preventDefault={handleSendRequest}>Send</button
+        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-3 pe-3 py-2"
+        style="font-size: 15px;height:34px; font-weight:400"
+        on:click|preventDefault={handleSendRequest}
+        >{#if isLoading}
+          <span
+            class="me-1 ms-0 d-flex align-item-center justify-content-start"
+          >
+            {#if loaderColor === "default"}
+              <Spinner size={"15px"} />
+            {/if}
+          </span>
+        {/if}Send</button
       >
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
