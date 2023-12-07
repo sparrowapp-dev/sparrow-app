@@ -86,9 +86,8 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
-  public deleteCollectionData = async (id: string) => {
+  public deleteCollection = async (id: string) => {
     this.collectionRepository.deleteCollection(id);
-    this.debouncedTab();
   };
 
   public updateCollectionName = async (id: string, name: string) => {

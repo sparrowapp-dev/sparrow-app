@@ -1,104 +1,84 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
-  import { isShowCollectionPopup } from "$lib/store/collection";
-  import type { Observable } from "rxjs";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-  import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
-  export let openCollectionId: string;
-  export let currentWorkspaceId: string;
-  export let closePopup : (flag: boolean) => void;
 
+  export let collectionId: string;
+  export let workspaceId: string;
+  export let collection;
+  export let closePopup: (flag: boolean) => void;
   export let collectionsMethods: CollectionsMethods;
+
   const collectionService = new CollectionService();
 
-  let totalRequest: number = 0;
-  let totalFolder: number = 0;
+  let requestCount: number = 0;
+  let folderCount: number = 0;
 
-  let collectionTobeDeleted = [];
-  let collectionName: string = "";
-
-  const _colllectionListViewModel = new CollectionListViewModel();
-
-  let collection: any[] = [];
-  const collections: Observable<CollectionDocument[]> =
-    _colllectionListViewModel.collection;
-
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value && value.length > 0) {
-        collectionTobeDeleted = value.filter((collection) => {
-          if (collection._data._id === openCollectionId) {
-            return collection._data;
-          }
-        });
-      }
-    },
-  );
-
-  collectionName = collectionTobeDeleted[0]?._data.name;
-  collectionTobeDeleted[0]?._data.items.forEach((item) => {
-    if (item.type === "FOLDER") {
-      totalFolder++;
-      totalRequest += item.items.length;
+  collection.items.forEach((item) => {
+    if (item.type === ItemType.FOLDER) {
+      folderCount++;
+      requestCount += item.items.length;
     }
-    if (item.type === "REQUEST") {
-      totalRequest++;
+    if (item.type === ItemType.REQUEST) {
+      requestCount++;
     }
   });
 
   const handleDelete = async () => {
-    const deleteCollectionName = await collectionService.deleteCollection(
-      currentWorkspaceId,
-      openCollectionId,
+    const response = await collectionService.deleteCollection(
+      workspaceId,
+      collectionId,
     );
- 
-    if (deleteCollectionName.isSuccessful) {
-      collectionsMethods?.deleteCollectionData(openCollectionId);
-      isShowCollectionPopup.set(false);
-      notifications.success(`"${collectionName}" Collection deleted.`);
+
+    if (response.isSuccessful) {
+      collectionsMethods.deleteCollection(collectionId);
+      closePopup(false);
+      notifications.success(`"${collection.name}" Collection deleted.`);
     } else {
-      isShowCollectionPopup.set(false);
       notifications.error("Failed to delete the Collection.");
     }
   };
 </script>
 
-  <div class="background-overlay" 
-  on:click={()=>{
+<div
+  class="background-overlay"
+  on:click={() => {
     closePopup(false);
-  }}/>
-
+  }}
+/>
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Collection?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={()=>{
-      closePopup(false);
-    }}>
-      <img src={closeIcon} alt=""  />
+    <button
+      class="btn-close1 border-0 rounded"
+      on:click={() => {
+        closePopup(false);
+      }}
+    >
+      <img src={closeIcon} alt="" />
     </button>
   </div>
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <p>
       Are you sure you want to delete this Collection? Everything in <span
         style="font-weight:700;"
-        class="text-whiteColor">"{collectionName}"</span
+        class="text-whiteColor">"{collection.name}"</span
       >
       will be removed.
     </p>
   </div>
   <div class="d-flex gap-3" style="font-size:12px">
     <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalRequest}</span>
+      <span class="text-plusButton">{requestCount}</span>
       <p>API Requests</p>
     </div>
     <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalFolder}</span>
+      <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
     </div>
   </div>
@@ -108,7 +88,7 @@
   >
     <button
       class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={()=>{
+      on:click={() => {
         closePopup(false);
       }}>Cancel</button
     >
@@ -128,8 +108,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 99;
-    border: 2px solid red;
+    z-index: 9;
   }
 
   .container {
@@ -140,7 +119,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 99;
+    z-index: 10;
     border-radius: 10px;
   }
 

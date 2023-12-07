@@ -4,18 +4,8 @@
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
-
-  import {
-    isShowCollectionPopup,
-    useCollectionTree,
-  } from "$lib/store/collection";
-  import { RequestDefault } from "$lib/utils/enums/request.enum";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
-  import ContextMenu from "./ContextMenu.svelte";
-  import { WorkspaceService } from "$lib/services/workspace.service";
   import { CollectionService } from "$lib/services/collection.service";
-
-  const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -30,11 +20,10 @@
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
-
-  let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
-
+  
+  let showFolderAPIButtons: boolean = true;
   const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
@@ -254,8 +243,9 @@
 {#if isCollectionPopup}
   <CollectionPopup
     {collectionsMethods}
-    {openCollectionId}
-    {currentWorkspaceId}
+    {collection}
+    collectionId = {collectionId}
+    workspaceId = {currentWorkspaceId}
     closePopup={handleCollectionPopUp}
   />
 {/if}

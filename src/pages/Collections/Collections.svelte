@@ -35,7 +35,7 @@
     getAllCollections: _collectionListViewModel.getAllCollections,
     addRequestaddFolder: _collectionListViewModel.addRequest,
     addFolder: _collectionListViewModel.addFolder,
-    deleteCollectionData: _viewModel.deleteCollectionData,
+    deleteCollection: _viewModel.deleteCollection,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
     deleteFolder: _viewModel.deleteFolder,

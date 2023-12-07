@@ -103,7 +103,6 @@
     background: var(--background-hover);
     backdrop-filter: blur(3px);
     z-index: 9;
-    border: 2px solid red;
   }
 
   .container {

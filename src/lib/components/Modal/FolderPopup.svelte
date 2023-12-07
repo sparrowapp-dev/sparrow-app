@@ -137,8 +137,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 9999;
-    border: 2px solid red;
+    z-index: 9;
   }
 
   .container {
@@ -149,7 +148,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 9999;
+    z-index: 10;
     border-radius: 10px;
   }
 
