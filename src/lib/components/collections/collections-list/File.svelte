@@ -25,7 +25,8 @@
   export let api;
   export let collectionsMethods: CollectionsMethods;
   let showPath = false;
-
+  let isFilePopup: boolean = false ;
+  
   const collectionService = new CollectionService();
 
   currentFolderIdName.set({
@@ -39,6 +40,9 @@
     showPath = value;
   });
 
+  const handleFilePopUp = (flag) => {
+    isFilePopup = flag
+  }
 
   const handleClick = () => {
       const request = generateSampleRequest(id, new Date().toString());
@@ -87,51 +91,29 @@
   });
 
   let openRequestId = null;
-  let isMenuOpen = false;
 
   let pos = { x: 0, y: 0 };
 
-  let menu = { h: 0, y: 0 };
-
-  let browser = { h: 0, y: 0 };
-  let content;
-
-  let showMenu = false;
+  let showMenu : boolean = false;
   let button;
-  let openMenuButton: HTMLElement = null;
   let containerRef;
-  function rightClickContextMenu(e, button) {
+
+  function rightClickContextMenu(e) {
     e.preventDefault();
-
-    const containerRect = containerRef?.getBoundingClientRect();
-    const mouseX = e.clientX - (containerRect?.left || 0);
-    const mouseY = e.clientY - (containerRect?.top || 0);
-
-    pos = { x: mouseX, y: mouseY };
-
-    openRequestId = id;
-    showMenu = true;
+    setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY };
+      showMenu = true;    
+    }, 100);
   }
 
-  function onPageClick(e) {
-    isMenuOpen = false;
+  function closeRrightClickContextMenu(){
     showMenu = false;
   }
 
-  function getContextMenuDimension(node) {
-    let height = node.offsetHeight;
-    let width = node.offsetWidth;
-    menu = {
-      h: height,
-      y: width,
-    };
-  }
-
   let folderID;
-  //open collection
-  function openRequest() {
-    // visibility = !visibility;
-  }
 
   let newRequestName: string = "";
   let isRenaming = false;
@@ -182,14 +164,9 @@
     }
   };
 
-  //delete collection
-  const deleteRequest = async () => {
-    isShowFilePopup.set(true);
-  };
-
   let menuItems = [
     {
-      onClick: openRequest,
+      onClick: ()=>{},
       displayText: "Open Request",
     },
     {
@@ -197,21 +174,18 @@
       displayText: "Rename Request",
     },
     {
-      onClick: deleteRequest,
+      onClick: ()=>{
+        handleFilePopUp(true);
+      },
       displayText: "Delete",
     },
   ];
 
-  let isFilePopup: boolean;
-  isShowFilePopup.subscribe((value) => {
-    isFilePopup = value;
-  });
+
+ 
 
   let workspaceId = currentWorkspaceId;
 
-  function toggleMenuVisibility() {
-    showMenu = !showMenu;
-  }
 </script>
 
 {#if isFilePopup}
@@ -223,19 +197,12 @@
     {openRequestId}
     {name}
     {workspaceId}
+    closePopup = {handleFilePopUp}
   />
 {/if}
 
-
-<div class="content" bind:this={content} />
-
-{#if showMenu && id === openRequestId}
-  <div
-    on:click={toggleMenuVisibility}
-    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
-  />
+{#if showMenu}
   <nav
-    use:getContextMenuDimension
     style="position: fixed; top:{pos.y}px; left:{pos.x}px"
   >
     <div
@@ -258,7 +225,7 @@
   </nav>
 {/if}
 
-<svelte:window on:click={onPageClick} />
+<svelte:window on:click={closeRrightClickContextMenu}   on:contextmenu|preventDefault={(e) => closeRrightClickContextMenu(e)}/>
 
 <div
   class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary {id?.includes(

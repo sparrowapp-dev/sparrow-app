@@ -1,61 +1,20 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
-  import {
-    currentFolderIdName,
-    isShowFilePopup,
-    isShowFolderPopup,
-  } from "$lib/store/collection";
-  import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-  import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
   export let folderId: string;
   export let folderName: string;
   export let collectionId: string;
   export let openRequestId: string;
   export let name: string;
   export let workspaceId: string;
+  export let closePopup : (flag: boolean) => void;
 
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
 
-  let fileTobeDeleted = [];
   let requestName: string = "";
-
-  const _colllectionListViewModel = new CollectionListViewModel();
-
-  let folder: any[] = [];
-  const collections: Observable<CollectionDocument[]> =
-    _colllectionListViewModel.collection;
-
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value && value.length > 0) {
-        fileTobeDeleted = value.filter((collection) => {
-          if (collection._data._id === collectionId) {
-            return collection._data;
-          }
-        });
-      }
-    },
-  );
-
-  fileTobeDeleted[0]?._data.items.forEach((item) => {
-    if (item.id === openRequestId && item.type === ItemType.REQUEST) {
-      requestName = item.name;
-    }
-
-    if (item.id === folderId && item.type === ItemType.FOLDER) {
-      for (let i = 0; i < item.items.length; i++) {
-        if (item.items[i].id === openRequestId) {
-          requestName = item.items[i].name;
-        }
-      }
-    }
-  });
 
   const handleDelete = async () => {
     const deleteFolder = await collectionService.deleteRequestInCollection(
@@ -84,36 +43,26 @@
           openRequestId,
         );
       }
-
-      isShowFilePopup.set(false);
       notifications.success(`"${requestName}" Request deleted.`);
     } else {
-      isShowFilePopup.set(false);
       notifications.error("Failed to delete the Request.");
     }
   };
 
-  let isFilePopup: boolean;
-
-  isShowFilePopup.subscribe((value) => {
-    isFilePopup = value;
-  });
-
-  const handleCancel = async () => {
-    isShowFilePopup.set(false);
-  };
 </script>
 
-{#if isFilePopup}
-  <div class="background-overlay" />
-{/if}
+  <div class="background-overlay" on:click={()=>{
+    closePopup(false);
+  }}/>
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Request?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={handleCancel}>
+    <button class="btn-close1 border-0 rounded" on:click={()=>{
+      closePopup(false);
+    }}>
       <img src={closeIcon} alt="" />
     </button>
   </div>
@@ -133,7 +82,9 @@
   >
     <button
       class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={handleCancel}>Cancel</button
+      on:click={()=>{
+        closePopup(false);
+      }}>Cancel</button
     >
     <button
       class="btn-secondary border-0 text-blackColor px-3 py-1 rounded"
@@ -151,7 +102,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 9999;
+    z-index: 9;
     border: 2px solid red;
   }
 
@@ -163,7 +114,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 9999;
+    z-index: 10;
     border-radius: 10px;
   }
 
