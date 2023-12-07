@@ -25,8 +25,8 @@
   export let api;
   export let collectionsMethods: CollectionsMethods;
   let showPath = false;
-  let isFilePopup: boolean = false ;
-  
+  let isFilePopup: boolean = false;
+
   const collectionService = new CollectionService();
 
   currentFolderIdName.set({
@@ -41,29 +41,23 @@
   });
 
   const handleFilePopUp = (flag) => {
-    isFilePopup = flag
-  }
+    isFilePopup = flag;
+  };
 
   const handleClick = () => {
-      const request = generateSampleRequest(id, new Date().toString());
-      request.path = path;
-      request.name = name;
-      if(description)
-      request.description = description;
-      if(url)
-      request.property.request.url = url;
-      if(body)
-      request.property.request.body = body; 
-      if(method)
-      request.property.request.method = method;
-      if(queryParams)
-      request.property.request.queryParams = queryParams;
-      if(headers)
-      request.property.request.headers = headers;
-      request.save = true;
-      collectionsMethods.handleCreateTab(request);
-      moveNavigation("right");
-      }
+    const request = generateSampleRequest(id, new Date().toString());
+    request.path = path;
+    request.name = name;
+    if (description) request.description = description;
+    if (url) request.property.request.url = url;
+    if (body) request.property.request.body = body;
+    if (method) request.property.request.method = method;
+    if (queryParams) request.property.request.queryParams = queryParams;
+    if (headers) request.property.request.headers = headers;
+    request.save = true;
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+  };
 
   $: {
     if (api) {
@@ -94,7 +88,7 @@
 
   let pos = { x: 0, y: 0 };
 
-  let showMenu : boolean = false;
+  let showMenu: boolean = false;
   let button;
   let containerRef;
 
@@ -105,11 +99,11 @@
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
       pos = { x: mouseX, y: mouseY };
-      showMenu = true;    
+      showMenu = true;
     }, 100);
   }
 
-  function closeRrightClickContextMenu(){
+  function closeRrightClickContextMenu() {
     showMenu = false;
   }
 
@@ -166,7 +160,7 @@
 
   let menuItems = [
     {
-      onClick: ()=>{},
+      onClick: () => {},
       displayText: "Open Request",
     },
     {
@@ -174,18 +168,14 @@
       displayText: "Rename Request",
     },
     {
-      onClick: ()=>{
+      onClick: () => {
         handleFilePopUp(true);
       },
       displayText: "Delete",
     },
   ];
 
-
- 
-
   let workspaceId = currentWorkspaceId;
-
 </script>
 
 {#if isFilePopup}
@@ -197,14 +187,12 @@
     {openRequestId}
     {name}
     {workspaceId}
-    closePopup = {handleFilePopUp}
+    closePopup={handleFilePopUp}
   />
 {/if}
 
 {#if showMenu}
-  <nav
-    style="position: fixed; top:{pos.y}px; left:{pos.x}px"
-  >
+  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -225,22 +213,27 @@
   </nav>
 {/if}
 
-<svelte:window on:click={closeRrightClickContextMenu}   on:contextmenu|preventDefault={(e) => closeRrightClickContextMenu(e)}/>
+<svelte:window
+  on:click={closeRrightClickContextMenu}
+  on:contextmenu|preventDefault={closeRrightClickContextMenu}
+/>
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary {id?.includes(
-    UntrackedItems.UNTRACKED,
-  )
-    ? 'unclickable'
-    : ''}"
+  class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary"
   style="height:32px;"
-  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, button)}
-  on:click={() => {
-    handleClick();
-  }}
 >
-<div class="d-flex align-items-center">
-  <div class="api-method text-{getMethodStyle(method)}">
+  <div
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click={() => {
+      handleClick();
+    }}
+    class="d-flex w-100 align-items-center {id?.includes(
+      UntrackedItems.UNTRACKED,
+    )
+      ? 'unclickable'
+      : ''}"
+  >
+    <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 
@@ -259,26 +252,25 @@
       <div class="api-name">
         {name}
         {#if showPath}
-        <span class="path-name"
-          >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
-        >
-      {/if}
+          <span class="path-name"
+            >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+          >
+        {/if}
       </div>
     {/if}
   </div>
 
-  <button
-    class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-    on:click={(e) => {
-      e.stopPropagation();
-      rightClickContextMenu(e, button);
-    }}
-  >
-    <img src={threedotIcon} alt="threedotIcon" />
-  </button>
-
   {#if id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
+  {:else}
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+      on:click={(e) => {
+        rightClickContextMenu(e);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
   {/if}
 </div>
 

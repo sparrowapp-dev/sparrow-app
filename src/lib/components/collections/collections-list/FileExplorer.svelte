@@ -39,7 +39,7 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
 
-  let showFolderAPIButtons:boolean=true;
+  let showFolderAPIButtons: boolean = true;
 
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
@@ -87,40 +87,37 @@
         sampleRequest.id,
         request,
       );
-      
+
       sampleRequest.id = request.id;
       sampleRequest.path.workspaceId = currentWorkspaceId;
       sampleRequest.path.collectionId = collectionId;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
-      
+
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
       return;
     }
   };
-   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
-    if(value && value.length>0){
-      expand=true;
-      showFolderAPIButtons=false;
-    }else{
-      showFolderAPIButtons=true;
-      expand=false;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      expand = true;
+      showFolderAPIButtons = false;
+    } else {
+      showFolderAPIButtons = true;
+      expand = false;
     }
-  })
+  });
 
-  onDestroy(()=>{
+  onDestroy(() => {
     selectedMethodUnsubscibe();
-  })
+  });
 
   let pos = { x: 0, y: 0 };
 
-
-
   let showMenu: boolean = false;
-  let button;
-  let isFolderPopup: boolean = false ;
- 
+  let isFolderPopup: boolean = false;
+
   let openFolderId: string = "";
 
   // Assuming you have a container reference (e.g., containerRef) in your component
@@ -133,17 +130,17 @@
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
       pos = { x: mouseX, y: mouseY };
-      showMenu = true;    
+      showMenu = true;
     }, 100);
   }
 
-  function closeRightClickContextMenu(){
+  function closeRightClickContextMenu() {
     showMenu = false;
   }
 
   const handleFolderPopUp = (flag) => {
     isFolderPopup = flag;
-  }
+  };
 
   let newFolderName: string = "";
   let isRenaming = false;
@@ -220,7 +217,7 @@
     },
 
     {
-      onClick: ()=>{
+      onClick: () => {
         handleFolderPopUp(true);
       },
       displayText: "Delete",
@@ -236,16 +233,17 @@
     {collectionId}
     {openFolderId}
     {workspaceId}
-    closePopup = {handleFolderPopUp}
+    closePopup={handleFolderPopUp}
   />
 {/if}
 
-<svelte:window on:click={closeRightClickContextMenu}   on:contextmenu|preventDefault={(e) => closeRightClickContextMenu()} />
+<svelte:window
+  on:click={closeRightClickContextMenu}
+  on:contextmenu|preventDefault={closeRightClickContextMenu}
+/>
 
 {#if showMenu}
-  <nav
-    style="position: fixed; top:{pos.y}px; left:{pos.x}px"
-  >
+  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -268,17 +266,18 @@
 
 {#if explorer.type === "FOLDER"}
   <div
-    on:contextmenu|preventDefault={(e) =>
-      rightClickContextMenu(e, explorer.id, button)}
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
-    on:click={() => {
-      if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-        expand = !expand;
-      }
-    }}
   >
-    <div class="d-flex align-items-center justify-content-center gap-2 pe-0">
+    <div
+      on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+      on:click={() => {
+        if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+          expand = !expand;
+        }
+      }}
+      class="w-100 d-flex align-items-center gap-2 pe-0"
+    >
       {#if expand}
         <div
           style="height:16px; width:16px;"
@@ -309,17 +308,17 @@
       {/if}
     </div>
 
-    <button
-      class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
-      on:click={(e) => {
-        e.stopPropagation();
-        rightClickContextMenu(e, explorer.id, button);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
     {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
+    {:else}
+      <button
+        class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
+        on:click={(e) => {
+          rightClickContextMenu(e);
+        }}
+      >
+        <img src={threedotIcon} alt="threedotIcon" />
+      </button>
     {/if}
   </div>
   <div
@@ -338,13 +337,11 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-    <div class="mt-2 mb-2 ms-2">
-    <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
-  </div>
-
+      <div class="mt-2 mb-2 ms-2">
+        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+      </div>
     {/if}
   </div>
-   
 {:else}
   <div style="padding-left: 6px; cursor:pointer;">
     <File

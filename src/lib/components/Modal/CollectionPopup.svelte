@@ -9,6 +9,7 @@
   import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
   export let openCollectionId: string;
   export let currentWorkspaceId: string;
+  export let closePopup : (flag: boolean) => void;
 
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
@@ -63,29 +64,23 @@
       notifications.error("Failed to delete the Collection.");
     }
   };
-
-  let isPopupShow: boolean;
-
-  isShowCollectionPopup.subscribe((value) => {
-    isPopupShow = value;
-  });
-
-  const handleCancel = async () => {
-    isShowCollectionPopup.set(false);
-  };
 </script>
 
-{#if isPopupShow}
-  <div class="background-overlay" />
-{/if}
+  <div class="background-overlay" 
+  on:click={()=>{
+    closePopup(false);
+  }}/>
+
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Collection?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={handleCancel}>
-      <img src={closeIcon} alt="" />
+    <button class="btn-close1 border-0 rounded" on:click={()=>{
+      closePopup(false);
+    }}>
+      <img src={closeIcon} alt=""  />
     </button>
   </div>
   <div style="font-size: 14px;" class="text-lightGray mb-1">
@@ -113,7 +108,9 @@
   >
     <button
       class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={handleCancel}>Cancel</button
+      on:click={()=>{
+        closePopup(false);
+      }}>Cancel</button
     >
     <button
       class="btn-secondary border-0 text-blackColor px-3 py-1 rounded"
