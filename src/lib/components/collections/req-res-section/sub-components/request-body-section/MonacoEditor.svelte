@@ -96,7 +96,7 @@
         { token: "delimiter", foreground: "#FFFFFF" },
       ],
       colors: {
-        "editor.background": "#000000",
+        "editor.background": '#1E1E1E',
       },
     });
     monaco.editor.setTheme("myTheme");
