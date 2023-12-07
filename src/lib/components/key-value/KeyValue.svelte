@@ -124,7 +124,7 @@
       width:200px;
       "
   >
-    {#if readable.key && readable.value}
+    {#if readable.key || readable.value}
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
