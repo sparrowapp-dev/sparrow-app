@@ -37,6 +37,7 @@ $sparrow-cancel-hover: #31323360;
 $sparrow-delete-hover: #f16674;
 $sparrow-background-hover: rgba(0, 0, 0, 0.706);
 $sparrow-button-pressed: #1d3650;
+$sparrow-text-color: #8a9299;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -95,6 +96,7 @@ $theme-colors: map-merge(
     "patchColor": $sparrow-patc,
     "optionsColor": $sparrow-opt,
     "dullBackground": $sparrow-dull-background,
+    "textColor": $sparrow-text-color,
   )
 );
 

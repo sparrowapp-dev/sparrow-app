@@ -33,12 +33,14 @@
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { Observable } from "rxjs";
-    import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
 
-  export let collectionsMethods : CollectionsMethods;
+  export let collectionsMethods: CollectionsMethods;
   export let onClick;
+
+
 
   interface Path {
     name: string;
@@ -55,11 +57,11 @@
   let directory: any[] = [];
   let path: Path[] = [];
   let workspace: {
-    id: string,
-    name: string
+    id: string;
+    name: string;
   } = {
     id: "",
-    name:""
+    name: "",
   };
 
   let currentTabId = null;
@@ -69,21 +71,22 @@
   let tabMethod: string = "";
   let tabUrl: string = "";
   let componentData;
-  let latestRoute : {
-    id: string
+  let latestRoute: {
+    id: string;
   } = {
-    id: ""
-  }
+    id: "",
+  };
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
- 
-  const collectionListUnsubscribe = collectionsMethods.getCollectionList().subscribe((value)=>{
-    collection = value;
-    directory = JSON.parse(JSON.stringify(collection));
-    if(latestRoute.id) 
-      navigateToDirectory(latestRoute);
-  });
+
+  const collectionListUnsubscribe = collectionsMethods
+    .getCollectionList()
+    .subscribe((value) => {
+      collection = value;
+      directory = JSON.parse(JSON.stringify(collection));
+      if (latestRoute.id) navigateToDirectory(latestRoute);
+    });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -91,7 +94,7 @@
         workspace.id = value.get("_id");
         workspace.name = value.get("name");
       }
-    }
+    },
   );
 
   const navigateToWorkspace = () => {
@@ -251,9 +254,12 @@
     );
     if (res.isSuccessful) {
       latestRoute = {
-        id: res.data.data.id
-      }
-      collectionsMethods.addRequestOrFolderInCollection(path[0].id, res.data.data);
+        id: res.data.data.id,
+      };
+      collectionsMethods.addRequestOrFolderInCollection(
+        path[0].id,
+        res.data.data,
+      );
     }
   };
 
@@ -265,8 +271,8 @@
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
       latestRoute = {
-        id: res.data.data._id
-      }
+        id: res.data.data._id,
+      };
       collectionsMethods.addCollection(res.data.data);
     }
   };
@@ -418,7 +424,7 @@
                     navigateToDirectory(col);
                   }}
                 >
-                  <Folder name={col.name} />
+                  <Folder name={col.name}  />
                 </div>
               {:else if col.type === ItemType.REQUEST}
                 <Request name={col.name} method={col.request.method} />

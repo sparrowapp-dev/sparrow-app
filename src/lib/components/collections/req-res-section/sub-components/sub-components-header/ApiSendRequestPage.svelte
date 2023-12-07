@@ -38,13 +38,11 @@
   let disabledSend: boolean = false;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    urlText = event?.property.request.url;
-    method = event?.property.request.method;
-    disabledSend = event?.property.request.requestInProgress;
+    urlText = event?.property.request?.url;
+    method = event?.property.request?.method;
+    disabledSend = event?.property.request?.requestInProgress;
     request = event?.property.request;
   });
-
- 
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -76,7 +74,10 @@
           let responseBody = response.data.response;
           let responseHeaders = response.data.headers;
           let responseStatus = response.data.status;
-          _apiSendRequest.setResponseContentType(responseHeaders, collectionsMethods);
+          _apiSendRequest.setResponseContentType(
+            responseHeaders,
+            collectionsMethods,
+          );
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
@@ -176,12 +177,12 @@
   });
 
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.key === 'Enter') {
+    if (event.ctrlKey && event.key === "Enter") {
       handleSendRequest();
-    } else if (event.altKey && event.code === "KeyL") { 
+    } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
     }
-  }
+  };
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -276,6 +277,7 @@
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
+
 <style>
   .btn-primary {
     background: var(--send-button);

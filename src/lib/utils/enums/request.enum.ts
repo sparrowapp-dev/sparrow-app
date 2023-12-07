@@ -21,6 +21,10 @@ export enum WorkspaceDefault {
   NAME = "MY WORKSPACE",
 }
 
+export enum CollectionDefault {
+  NAME = "New Collection",
+}
+
 export enum RequestDataType {
   JSON = "JSON",
   XML = "XML",

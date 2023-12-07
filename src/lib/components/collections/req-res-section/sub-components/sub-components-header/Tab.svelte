@@ -3,7 +3,7 @@
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import collectionAsset from "$lib/assets/collection.svg";
+  import collectionAsset from "$lib/assets/collection-nodes.svg";
   import book from "$lib/assets/book.svg";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
@@ -44,7 +44,11 @@
         <span>F</span>
       {:else if tab.type === ItemType.COLLECTION}
         <span>
-          <img src={collectionAsset} alt="book" />
+          <img
+            src={collectionAsset}
+            alt="book"
+            style="width: 19px;heigh:19px;margin-right:5px;"
+          />
         </span>
       {:else if tab.type === ItemType.WORKSPACE}
         <span>

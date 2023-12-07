@@ -32,7 +32,7 @@
   });
 
   const handleSaveRequest = async () => {
-    collectionsMethods.updateTab(true,"saveInProgress");
+    collectionsMethods.updateTab(true, "saveInProgress");
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
 
@@ -61,10 +61,10 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false,"saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress");
         collectionsMethods.updateTab(true, "save");
-      }else{
-        collectionsMethods.updateTab(false,"saveInProgress");        
+      } else {
+        collectionsMethods.updateTab(false, "saveInProgress");
       }
     } else {
       let res = await updateCollectionRequest(componentData.id, {
@@ -89,10 +89,10 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false,"saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress");
         collectionsMethods.updateTab(true, "save");
-      }else{
-        collectionsMethods.updateTab(false,"saveInProgress");
+      } else {
+        collectionsMethods.updateTab(false, "saveInProgress");
       }
     }
   };

@@ -31,6 +31,9 @@
 
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -99,6 +102,7 @@
       }
     },
   );
+
   const handleCreateCollection = async () => {
     const newCollection = {
       _id: UntrackedItems.UNTRACKED + uuidv4(),
@@ -113,8 +117,27 @@
       name: newCollection.name,
       workspaceId: currentWorkspaceId,
     });
+
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data._id,
+      };
+      const Samplecollection = generateSampleCollection(
+        response.data.data._id,
+        new Date().toString(),
+      );
+
+      Samplecollection.id = response.data.data._id;
+      Samplecollection.path = path;
+      Samplecollection.name = response.data.data.name;
+      Samplecollection.property.collection.requestCount = 0;
+      Samplecollection.property.collection.folderCount = 0;
+      Samplecollection.save = true;
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
 
       collectionsMethods.updateCollection(newCollection._id, res);
       return;
@@ -166,7 +189,7 @@
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
-</script>
+</script>vscode-file://vscode-app/c:/Users/Md%20Kashif%20Raza/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html
 
 {#if collapsExpandToggle}
   <div>

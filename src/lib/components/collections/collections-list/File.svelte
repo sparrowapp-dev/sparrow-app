@@ -30,23 +30,18 @@
   let apiClass = "red-api";
 
   const handleClick = () => {
-      const request = generateSampleRequest(id, new Date().toString());
-      request.path = path;
-      request.name = name;
-      if(url)
-      request.property.request.url = url;
-      if(body)
-      request.property.request.body = body; 
-      if(method)
-      request.property.request.method = method;
-      if(queryParams)
-      request.property.request.queryParams = queryParams;
-      if(headers)
-      request.property.request.headers = headers;
-      request.save = true;
-      collectionsMethods.handleCreateTab(request);
-      moveNavigation("right");
-      }
+    const request = generateSampleRequest(id, new Date().toString());
+    request.path = path;
+    request.name = name;
+    if (url) request.property.request.url = url;
+    if (body) request.property.request.body = body;
+    if (method) request.property.request.method = method;
+    if (queryParams) request.property.request.queryParams = queryParams;
+    if (headers) request.property.request.headers = headers;
+    request.save = true;
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+  };
 
   $: {
     if (api) {
@@ -218,7 +213,6 @@
   />
 {/if}
 
-
 <div class="content" bind:this={content} />
 
 {#if showMenu && id === openRequestId}
@@ -264,8 +258,8 @@
     handleClick();
   }}
 >
-<div class="d-flex align-items-center">
-  <div class="api-method text-{getMethodStyle(method)}">
+  <div class="d-flex align-items-center">
+    <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 

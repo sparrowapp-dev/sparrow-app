@@ -17,6 +17,7 @@
   import type { Observable } from "rxjs";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
+  import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -90,7 +91,7 @@
       {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
         <p>FOLDER</p>
       {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-        <p>COLLECTION</p>
+        <MyCollection {collectionsMethods} {activeTab} />
       {/if}
     </div>
     <SidebarRight />

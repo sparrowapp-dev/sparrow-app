@@ -82,13 +82,13 @@
         sampleRequest.id,
         request,
       );
-      
+
       sampleRequest.id = request.id;
       sampleRequest.path.workspaceId = currentWorkspaceId;
       sampleRequest.path.collectionId = collectionId;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
-      
+
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
       return;
@@ -235,7 +235,6 @@
   });
 
   let workspaceId = currentWorkspaceId;
-  console.log(openFolderId);
 </script>
 
 {#if isShowFolder}
