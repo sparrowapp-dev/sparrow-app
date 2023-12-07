@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import {
+    getPathFromUrl,
+    truncatePath,
+  } from "$lib/utils/helpers/common.helper";
+  import { showPathStore } from "$lib/store/methods";
+  import { onDestroy } from "svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
@@ -18,6 +24,8 @@
   export let folderName: string;
   export let api;
   export let collectionsMethods: CollectionsMethods;
+  let showPath = false;
+
   const collectionService = new CollectionService();
 
   currentFolderIdName.set({
@@ -28,6 +36,11 @@
   let url, method, body, headers, queryParams, type;
 
   let apiClass = "red-api";
+
+  const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
+    showPath = value;
+  });
+
 
   const handleClick = () => {
     const request = generateSampleRequest(id, new Date().toString());
@@ -56,15 +69,6 @@
       type = api.request?.type;
     }
   }
-  $: {
-    if (method) {
-      if (method === "DELETE") apiClass = "red-api";
-      else if (method === "GET") apiClass = "green-api";
-      else if (method === "POST") apiClass = "yellow-api";
-      else if (method === "PUT") apiClass = "blue-api";
-      else if (method === "ARC") apiClass = "grey-api";
-    }
-  }
 
   let path: Path = {
     workspaceId: currentWorkspaceId,
@@ -72,6 +76,9 @@
     folderId,
     folderName,
   };
+  onDestroy(() => {
+    selectedMethodUnsubscibe();
+  });
 
   let openRequestId = null;
   let isMenuOpen = false;
@@ -277,6 +284,11 @@
     {:else}
       <div class="api-name">
         {name}
+        {#if showPath}
+        <span class="path-name"
+          >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+        >
+      {/if}
       </div>
     {/if}
   </div>
@@ -301,11 +313,35 @@
     font-size: 12px;
     font-weight: 500;
     margin-right: 8px;
+    border: 1px solid var(--border-color);
+    width: 56px;
+    height: 34px;
+    border-radius: 8px;
+    padding: 8px 12px 8px 8px;
+    display: flex;
+    justify-content: center;
     text-align: left;
   }
   .api-name {
     font-size: 12px;
     font-weight: 400;
+  }
+  .api-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .path-name {
+    margin-top: -4px;
+    font-family: Roboto Mono;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #999999;
+  }
+  .highlight {
+    color: var(--white-color);
   }
 
   .my-button:hover .threedot-icon-container {

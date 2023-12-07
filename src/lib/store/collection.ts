@@ -8,12 +8,6 @@ export const isShowFolderPopup = writable(false);
 export const isShowFilePopup = writable(false);
 export const isSelectedCollection = writable(false);
 
-export const currentCollectionWorkspaceId = writable({
-  collectionId: "",
-  workspaceId: "",
-  name: "",
-});
-
 export const deletedCollectionWorkspaceId = writable({
   collectionId: null,
   workspaceId: null,

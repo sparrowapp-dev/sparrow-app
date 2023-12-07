@@ -3,7 +3,7 @@
 
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { currentCollectionWorkspaceId } from "$lib/store/collection";
+
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { v4 as uuidv4 } from "uuid";
@@ -31,11 +31,7 @@
     totalFolder = event?.property?.collection?.folderCount;
   });
 
-  let currentWorkspaceCollectionName;
-  const unsubscribecurrentCollectionWorkspaceId =
-    currentCollectionWorkspaceId.subscribe((value) => {
-      currentWorkspaceCollectionName = value;
-    });
+
 
   const handleCollectionInput = (event) => {
     newCollectionName = event.target.value;
@@ -122,7 +118,7 @@
   onDestroy(() => {
     tabSubscribe();
     collapsibleStateUnsubscribe();
-    unsubscribecurrentCollectionWorkspaceId();
+  
   });
   onDestroy(() => {});
 
