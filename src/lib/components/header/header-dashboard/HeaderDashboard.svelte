@@ -274,9 +274,6 @@
 </div>
 
 <style>
-  .header {
-    z-index: 0;
-  }
 
   .button-minus,
   .button-resize,

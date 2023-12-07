@@ -89,6 +89,9 @@ const db = await rxdb.addCollections({
         oldDoc.saveInProgress = false;
         return oldDoc;
       },
+      5: function (oldDoc) {
+        return oldDoc;
+      },
     },
   },
   collection: {

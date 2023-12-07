@@ -1,11 +1,8 @@
 <script lang="ts">
-  export let visibility: boolean = true;
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
-  import { collectionList, useCollectionTree } from "$lib/store/collection";
-  import { onDestroy } from "svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
+  import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
   import workspaceAsset from "$lib/assets/workspace.svg";
@@ -24,21 +21,22 @@
     CreateCollectionPostBody,
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
-  import {
-    currentTab,
-    // handleTabAddons,
-    // handleTabUpdate,
-    tabs,
-    // updateCurrentTab,
-  } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import type { Observable } from "rxjs";
-    import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import MethodButton from "$lib/components/buttons/MethodButton.svelte";
+  import tickIcon from "$lib/assets/tick-grey.svg";
+  import crossIcon from "$lib/assets/cross-grey.svg";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import questionIcon from "$lib/assets/question.svg";
 
-  export let collectionsMethods : CollectionsMethods;
+  export let collectionsMethods: CollectionsMethods;
   export let onClick;
+  export let componentData: NewTab;
+  export let onFinish = (_id) => {};
 
   interface Path {
     name: string;
@@ -49,41 +47,54 @@
     name: string;
     id: string;
   }
-  const { insertNode, insertHead } = useCollectionTree();
+
+  const constant = {
+    newFolder: "New Folder",
+    newCollection: "New Collection",
+  };
 
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
   let workspace: {
-    id: string,
-    name: string
+    id: string;
+    name: string;
   } = {
     id: "",
-    name:""
+    name: "",
+  };
+  let tabName: string;
+  let description: string;
+  if (!componentData.path.workspaceId && !componentData.path.collectionId) {
+    tabName = componentData.name;
+  } else {
+    tabName = componentData.name + " Copy";
+  }
+  let latestRoute: {
+    id: string;
+  } = {
+    id: "",
   };
 
-  let currentTabId = null;
-  let tabList = [];
-  let tabName = "";
-  let tabId: string = "";
-  let tabMethod: string = "";
-  let tabUrl: string = "";
-  let componentData;
-  let latestRoute : {
-    id: string
-  } = {
-    id: ""
-  }
+  let isLoading: boolean = false;
+  let createCollectionName: string = constant.newCollection;
+  let createCollectionNameVisibility: boolean = false;
+  let createFolderName: string = constant.newFolder;
+  let createFolderNameVisibility: boolean = false;
+  let createDirectoryLoader: boolean = false;
+
+  let instructionEnabled : boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
- 
-  const collectionListUnsubscribe = collectionsMethods.getCollectionList().subscribe((value)=>{
-    collection = value;
-    directory = JSON.parse(JSON.stringify(collection));
-    if(latestRoute.id) 
-      navigateToDirectory(latestRoute);
-  });
+
+  const collectionListUnsubscribe = collectionsMethods
+    .getCollectionList()
+    .subscribe((value) => {
+      collection = value;
+      directory = JSON.parse(JSON.stringify(collection));
+      if (latestRoute.id) navigateToDirectory(latestRoute);
+    });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -91,7 +102,7 @@
         workspace.id = value.get("_id");
         workspace.name = value.get("name");
       }
-    }
+    },
   );
 
   const navigateToWorkspace = () => {
@@ -106,6 +117,8 @@
     );
     directory = response.items;
     path = response.path;
+    createFolderNameVisibility = false;
+    createCollectionNameVisibility = false;
   };
 
   const navigateToLastRoute = () => {
@@ -120,15 +133,16 @@
     }
   };
 
-  const handleSaveRequest = async () => {
-    const dummyId = new Date() + "uid";
+  const handleSaveAsRequest = async () => {
+    const _id = componentData.id;
+    isLoading = true;
     if (path.length > 0) {
       const expectedRequest = {
-        method: componentData.request.method,
-        url: componentData.request.url,
-        body: componentData.request.body,
-        headers: componentData.request.headers,
-        queryParams: componentData.request.queryParams,
+        method: componentData.property.request.method,
+        url: componentData.property.request.url,
+        body: componentData.property.request.body,
+        headers: componentData.property.request.headers,
+        queryParams: componentData.property.request.queryParams,
       };
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
@@ -137,6 +151,7 @@
           workspaceId: workspace.id,
           items: {
             name: tabName,
+            description,
             type: ItemType.REQUEST,
             request: expectedRequest,
           },
@@ -144,13 +159,9 @@
 
         if (res.isSuccessful) {
           notifications.success("API request saved");
-          insertNode(
-            JSON.parse(JSON.stringify(collection)),
+          collectionsMethods.addRequestOrFolderInCollection(
             path[path.length - 1].id,
-            ItemType.REQUEST,
-            tabName,
-            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
-            expectedRequest,
+            res.data.data,
           );
           const expectedPath = {
             folderId: "",
@@ -158,27 +169,36 @@
             collectionId: path[path.length - 1].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path) {
-            // update tab data
-            // handleTabUpdate(
-            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
-            //   currentTabId,
-            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          if (
+            !componentData.path.workspaceId &&
+            !componentData.path.collectionId
+          ) {
+            collectionsMethods.updateTab(expectedPath, "path", _id);
+            collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.id, "id", _id);
+            collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
-            //push new tab
-            let newTab: NewTab = {
-              id: dummyId,
-              name: tabName,
-              type: ItemType.REQUEST,
-              request: expectedRequest,
-              path: expectedPath,
-              save: true,
-              requestInProgress: false,
-            };
+            let sampleRequest = generateSampleRequest(
+              res.data.data.id,
+              new Date().toString(),
+            );
+            sampleRequest.name = res.data.data.name;
+            sampleRequest.path = expectedPath;
+            sampleRequest.save = true;
+            sampleRequest.property.request.url = res.data.data.request.url;
+            sampleRequest.property.request.method =
+              res.data.data.request.method;
+            sampleRequest.property.request.body = res.data.data.request.body;
+            sampleRequest.property.request.queryParams =
+              res.data.data.request.queryParams;
+            sampleRequest.property.request.headers =
+              res.data.data.request.headers;
+            collectionsMethods.handleCreateTab(sampleRequest);
           }
+          onFinish(res.data.data.id);
           onClick(false);
           navigateToWorkspace();
+          isLoading = false;
         }
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
         const res = await insertCollectionRequest({
@@ -190,6 +210,7 @@
             type: ItemType.FOLDER,
             items: {
               name: tabName,
+              description,
               type: ItemType.REQUEST,
               request: expectedRequest,
             },
@@ -197,51 +218,56 @@
         });
 
         if (res.isSuccessful) {
-          insertNode(
-            JSON.parse(JSON.stringify(collection)),
+          collectionsMethods.addRequestInFolder(
+            path[0].id,
             path[path.length - 1].id,
-            ItemType.REQUEST,
-            tabName,
-            dummyId, // MOCKED DATA [UPDATION REQUIRED HERE]
-            expectedRequest,
+            res.data.data,
           );
-
           const expectedPath = {
             folderId: path[path.length - 1].id,
             folderName: path[path.length - 1].name,
             collectionId: path[0].id,
             workspaceId: workspace.id,
           };
-          if (!componentData.path) {
-            // update tab data
-            // handleTabUpdate(
-            //   { name: tabName, id: dummyId, save: true, path: expectedPath },
-            //   currentTabId,
-            // ); // MOCKED DATA [UPDATION REQUIRED HERE]
-            // updateCurrentTab({ id: dummyId }); // MOCKED DATA [UPDATION REQUIRED HERE]
+          if (
+            !componentData.path.workspaceId &&
+            !componentData.path.collectionId
+          ) {
+            collectionsMethods.updateTab(expectedPath, "path", _id);
+            collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.id, "id", _id);
+            collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
-            //push new tab
-            // let newTab: NewTab = {
-            //   id: dummyId,
-            //   name: tabName,
-            //   type: ItemType.REQUEST,
-            //   request: expectedRequest,
-            //   path: expectedPath,
-            //   save: true,
-            //   requestInProgress: false,
-            // };
-            // handleTabAddons(newTab);
+            let sampleRequest = generateSampleRequest(
+              res.data.data.id,
+              new Date().toString(),
+            );
+            sampleRequest.name = res.data.data.name;
+            sampleRequest.path = expectedPath;
+            sampleRequest.save = true;
+            sampleRequest.property.request.url = res.data.data.request.url;
+            sampleRequest.property.request.method =
+              res.data.data.request.method;
+            sampleRequest.property.request.body = res.data.data.request.body;
+            sampleRequest.property.request.queryParams =
+              res.data.data.request.queryParams;
+            sampleRequest.property.request.headers =
+              res.data.data.request.headers;
+            collectionsMethods.handleCreateTab(sampleRequest);
           }
+          onFinish(res.data.data.id);
           onClick(false);
           navigateToWorkspace();
+          isLoading = false;
         }
       }
     }
   };
 
-  const handleFolderClick = async (): Promise<void> => {
+  const handleFolderClick = async (folderName): Promise<void> => {
+    createDirectoryLoader = true;
     let directory: CreateDirectoryPostBody = {
-      name: "New folder",
+      name: folderName,
       description: "",
     };
     const res = await insertCollectionDirectory(
@@ -250,77 +276,70 @@
       directory,
     );
     if (res.isSuccessful) {
+      createDirectoryLoader = false;
+      createFolderName = constant.newFolder;
       latestRoute = {
-        id: res.data.data.id
-      }
-      collectionsMethods.addRequestOrFolderInCollection(path[0].id, res.data.data);
+        id: res.data.data.id,
+      };
+      collectionsMethods.addRequestOrFolderInCollection(
+        path[0].id,
+        res.data.data,
+      );
+    } else {
+      createDirectoryLoader = false;
     }
   };
 
-  const handleCreateCollection = async () => {
+  const handleCreateCollection = async (collectionName) => {
+    createDirectoryLoader = true;
     const newCollection: CreateCollectionPostBody = {
-      name: "New collection",
+      name: collectionName,
       workspaceId: workspace.id,
     };
     const res = await insertCollection(newCollection);
     if (res.isSuccessful) {
+      createDirectoryLoader = false;
+      createCollectionName = constant.newCollection;
       latestRoute = {
-        id: res.data.data._id
-      }
+        id: res.data.data._id,
+      };
       collectionsMethods.addCollection(res.data.data);
+    } else {
+      createDirectoryLoader = false;
     }
   };
 
-  const fetchComponentData = (id, list) => {
-    list.forEach((elem: NewTab) => {
-      if (elem.id === id && elem.type !== ItemType.WORKSPACE) {
-        tabName = elem.name;
-        tabId = elem.id;
-        tabMethod = elem.request.method;
-        tabUrl = elem.request.url;
-        componentData = { ...elem };
-      }
-    });
-  };
-
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-    if (currentTabId && tabList) {
-      fetchComponentData(currentTabId, tabList);
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(`3456-dropdown900`);
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      instructionEnabled = false;
     }
-  });
+  }
 
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentTabId = value.id;
-      if (currentTabId && tabList) {
-        fetchComponentData(currentTabId, tabList);
-      }
-    }
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
   });
-
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
-    tabsUnsubscribe();
-    currentTabUnsubscribe();
+    window.removeEventListener("click", handleDropdownClick);
   });
 </script>
 
 <div
-  class="save-request-backdrop {visibility ? 'd-block' : 'd-none'}"
+  class="save-request-backdrop d-block"
   on:click={() => {
     onClick(false);
   }}
 />
-<div class="save-request {visibility ? 'd-block' : 'd-none'}">
+<div class="save-request d-block">
   <div class="contain">
     <div class="d-flex justify-content-between">
       <div class="pb-2">
         <h4>Save Request</h4>
       </div>
       <button
-        class="btn"
+        class="btn pe-0 pt-0 border-0"
         on:click={() => {
           onClick(false);
         }}><img src={crossAsset} alt="" /></button
@@ -340,7 +359,9 @@
       {#if workspace}
         <span
           on:click={navigateToWorkspace}
-          class="cursor-pointer px-1"
+          class="{path.length === 0
+            ? 'text-whiteColor'
+            : ''} cursor-pointer px-1"
           style="font-size: 12px;"
         >
           <img
@@ -352,13 +373,15 @@
         >
       {/if}
       {#if path.length > 0}
-        {#each path as elem}
+        {#each path as elem, index}
           <span>/</span>
           <span
             on:click={() => {
               navigateToDirectory(elem);
             }}
-            class="cursor-pointer px-1"
+            class="{path.length - 1 === index
+              ? 'text-whiteColor'
+              : ''} cursor-pointer px-1"
             style="font-size: 12px;"
           >
             {#if elem.type === ItemType.COLLECTION}
@@ -385,7 +408,9 @@
           {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
             <p class="mb-0">
               <small class="save-text-clr">Collection: </small>
-              <small> {path[path.length - 1].name}</small>
+              <small class="text-whiteColor">
+                {path[path.length - 1].name}</small
+              >
             </p>
             <small class="save-text-clr" style="font-size: 12px;"
               >Save your request in this collection or any of its folders.</small
@@ -393,13 +418,15 @@
           {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
             <p class="mb-0">
               <small class="save-text-clr">Folder: </small>
-              <small> {path[path.length - 1].name}</small>
+              <small class="text-whiteColor">
+                {path[path.length - 1].name}</small
+              >
             </p>
           {:else}
             <p class="mb-0">
               <small class="save-text-clr">Workspace: </small>
               {#if workspace}
-                <small>
+                <small class="text-whiteColor">
                   {workspace.name}
                 </small>
               {/if}
@@ -411,6 +438,93 @@
           {/if}
           <p />
           {#if directory.length > 0}
+            {#if path.length === 0 && createCollectionNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div class="w-100 pe-3">
+                  <input
+                    class="form-input save-input"
+                    type="text"
+                    placeholder="Name your collection"
+                    bind:value={createCollectionName}
+                    autofocus
+                  />
+                </div>
+                <div class="d-flex">
+                  {#if !createDirectoryLoader}
+                    <button
+                      class="icon-btn {createCollectionName.length > 0
+                        ? ''
+                        : 'unclickable'}"
+                      on:click={() => {
+                        handleCreateCollection(createCollectionName);
+                      }}
+                    >
+                      <img src={tickIcon} alt="" />
+                    </button>
+
+                    <button
+                      class="icon-btn"
+                      on:click={() => {
+                        createCollectionNameVisibility = false;
+                        createCollectionName = constant.newCollection;
+                      }}
+                    >
+                      <img src={crossIcon} alt="" />
+                    </button>
+                  {:else}
+                    <button
+                      class="d-flex justify-content-center border-0"
+                      style="width:50px; background-color: transparent;"
+                    >
+                      <Spinner size={"16px"} />
+                    </button>
+                  {/if}
+                </div>
+              </div>
+            {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+              <div class="d-flex justify-content-between">
+                <div class="w-100 pe-3">
+                  <input
+                    class="form-input save-input"
+                    type="text"
+                    placeholder="Name your folder"
+                    bind:value={createFolderName}
+                    autofocus
+                  />
+                </div>
+                <div class="d-flex">
+                  {#if !createDirectoryLoader}
+                    <button
+                      class="icon-btn {createFolderName.length > 0
+                        ? ''
+                        : 'unclickable'}"
+                      on:click={() => {
+                        handleFolderClick(createFolderName);
+                      }}
+                    >
+                      <img src={tickIcon} alt="" />
+                    </button>
+
+                    <button
+                      class="icon-btn"
+                      on:click={() => {
+                        createFolderNameVisibility = false;
+                        createFolderName = constant.newFolder;
+                      }}
+                    >
+                      <img src={crossIcon} alt="" />
+                    </button>
+                  {:else}
+                    <button
+                      class="d-flex justify-content-center border-0"
+                      style="width:50px; background-color: transparent;"
+                    >
+                      <Spinner size={"16px"} />
+                    </button>
+                  {/if}
+                </div>
+              </div>
+            {/if}
             {#each directory as col}
               {#if col.type === ItemType.FOLDER}
                 <div
@@ -433,6 +547,94 @@
               {/if}
             {/each}
           {:else}
+            <div>
+              {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+                <div class="d-flex justify-content-between">
+                  <div class="w-100 pe-3">
+                    <input
+                      class="form-input save-input"
+                      type="text"
+                      placeholder="Name your folder"
+                      bind:value={createFolderName}
+                      autofocus
+                    />
+                  </div>
+                  <div class="d-flex">
+                    {#if !createDirectoryLoader}
+                      <button
+                        class="icon-btn {createFolderName.length > 0
+                          ? ''
+                          : 'unclickable'}"
+                        on:click={() => {
+                          handleFolderClick(createFolderName);
+                        }}
+                      >
+                        <img src={tickIcon} alt="" />
+                      </button>
+
+                      <button
+                        class="icon-btn"
+                        on:click={() => {
+                          createFolderNameVisibility = false;
+                          createFolderName = constant.newFolder;
+                        }}
+                      >
+                        <img src={crossIcon} alt="" />
+                      </button>
+                    {:else}
+                      <button
+                        class="d-flex justify-content-center border-0"
+                        style="width:50px; background-color: transparent;"
+                      >
+                        <Spinner size={"16px"} />
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+              {:else if path.length === 0 && createCollectionNameVisibility}
+                <div class="d-flex justify-content-between">
+                  <div class="w-100 pe-3">
+                    <input
+                      class="form-input save-input"
+                      type="text"
+                      placeholder="Name your collection"
+                      bind:value={createCollectionName}
+                      autofocus
+                    />
+                  </div>
+                  <div class="d-flex">
+                    {#if !createDirectoryLoader}
+                      <button
+                        class="icon-btn {createCollectionName.length > 0
+                          ? ''
+                          : 'unclickable'}"
+                        on:click={() => {
+                          handleCreateCollection(createCollectionName);
+                        }}
+                      >
+                        <img src={tickIcon} alt="" />
+                      </button>
+                      <button
+                        class="icon-btn"
+                        on:click={() => {
+                          createCollectionNameVisibility = false;
+                          createCollectionName = constant.newCollection;
+                        }}
+                      >
+                        <img src={crossIcon} alt="" />
+                      </button>
+                    {:else}
+                      <button
+                        class="d-flex justify-content-center border-0"
+                        style="width:50px; background-color: transparent;"
+                      >
+                        <Spinner size={"16px"} />
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+            </div>
             <div
               class="d-flex align-items-center justify-content-center"
               style="height: 300px;"
@@ -444,23 +646,98 @@
                   This Collection is empty
                 </p>
               {:else if path.length === 0}
-                <p class="save-text-clr text-center">This Workspace is empty</p>
+                <div>
+                  <p
+                    style="font-size: 12px;"
+                    class="w-100 save-text-clr text-center"
+                  >
+                    You have no collections in this workspace. Create a
+                    Collection to easily organize and use your API requests.
+                  </p>
+                  <div class="w-100 d-flex justify-content-center">
+                    <CoverButton
+                      text={"+ Collection"}
+                      size={14}
+                      type={"primary"}
+                      onClick={() => {
+                        createCollectionNameVisibility = true;
+                      }}
+                    />
+                  </div>
+                </div>
               {/if}
             </div>
           {/if}
         </div>
       </div>
       <div class="col-6">
-        <!-- <div>Right panel</div> -->
-        <p class="save-text-clr mb-1" style="font-size:12px">Request Name</p>
-        <div class="pb-1">
+        <!-- Right panel  -->
+        <div class="d-flex justify-content-between" on:click={
+          handleDropdownClick
+        } >
+          <p class="save-text-clr mb-1" style="font-size:12px">
+            Request Name <span class="text-dangerColor">*</span>
+          </p>
+          <span id="3456-dropdown900"  class="instruction-btn  {instructionEnabled ? 'bg-sparrowBottomBorder' : ''} rounded d-flex align-items-center justify-content-center position-relative">
+            <img on:click={()=>{
+              instructionEnabled = !instructionEnabled;
+            }} src={questionIcon} alt="question" />
+            {#if instructionEnabled}
+            <div class="bg-blackColor api-name-usage p-2">
+              <p class="text-whiteColor">Best Practices</p>
+              <p class="save-as-instructions">
+                When naming your requests, remember that resources are at the
+                core of REST. Use nouns to represent your resources, such as
+                'user accounts' or 'managed devices.' Keep your URIs clear and
+                consistent by using forward slashes to indicate hierarchy, avoid
+                file extensions.
+              </p>
+              <div class="d-flex">
+                <div class="w-50">
+                  <p class="save-as-instructions">Do's:</p>
+                  <ul class="save-as-instructions">
+                    <li>Use nouns to represent resources </li>
+                    <li>Use forward slashes for hierarchy </li>
+                    <li>Use hyphens for readability </li>
+                    <li>Use lowercase letters in URIs </li>
+                    <li>Use HTTP methods for CRUD actions </li>
+                    </ul>
+                </div>
+                <div class="w-50">
+                  <p class="save-as-instructions">Don'ts:</p>
+                  <ul class="save-as-instructions">
+                    <li>Don't use file extensions.</li>
+                    <li>Don't use underscores in URIs.</li>
+                    <li>Don't use verbs in the URIs. </li>
+                    <li>Don't put CRUD function names in URIs. </li>
+                    <li>Don't use capital letters in URIs.</li>
+                    </ul>
+                </div>
+              </div>
+            </div>
+            {/if}
+          </span>
+        </div>
+        <div class="pb-2">
           <input
             type="text"
-            style="width: 100%; font-size: 12px;"
-            placeholder="Request Name"
+            style="width: 100%; font-size: 12px; {tabName?.length === 0
+              ? `outline: 1px solid #FE8C98`
+              : ``}"
+            placeholder="Enter request name."
             class="p-1 bg-black outline-0 rounded border-0"
             bind:value={tabName}
+            autofocus
           />
+        </div>
+        {#if tabName?.length === 0}
+          <p class="tabname-error-text text-dangerColor">
+            Please add the Request Name to save the request.
+          </p>
+        {/if}
+        <div class="d-flex">
+          <MethodButton method={componentData?.property.request.method} />
+          <p class="api-url">{componentData?.property.request.url}</p>
         </div>
         <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
         <div class="pb-1">
@@ -469,11 +746,12 @@
             class="p-1 bg-black rounded border-0"
             rows="3"
             placeholder="Give a description to help people know about this request."
+            bind:value={description}
           />
         </div>
         <p class="save-text-clr mb-1" style="font-size:12px">Saving to</p>
         {#if path.length === 0}
-          <p style="font-size: 12px;" class="save-text-clr">
+          <p style="font-size: 12px;" class="save-text-clr text-dangerColor">
             Select a Collection or Folder.
           </p>
         {:else}
@@ -521,19 +799,19 @@
           <IconButton
             text={"+ Collection"}
             onClick={() => {
-              handleCreateCollection();
+              createCollectionNameVisibility = true;
             }}
           />
         {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
           <IconButton
             text={"+ Folder"}
             onClick={() => {
-              handleFolderClick();
+              createFolderNameVisibility = true;
             }}
           />
         {/if}
       </div>
-      <div>
+      <div class="d-flex">
         <span class="mx-2">
           <CoverButton
             text={"Cancel"}
@@ -545,12 +823,13 @@
           />
         </span>
         <CoverButton
-          disable={path.length === 0 ? true : false}
+          disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
           text={"Save"}
           size={16}
           type={"primary"}
+          loader={isLoading}
           onClick={() => {
-            handleSaveRequest();
+            handleSaveAsRequest();
           }}
         />
       </div>
@@ -582,7 +861,61 @@
   .cursor-pointer {
     cursor: pointer;
   }
+  .api-url {
+    word-break: break-all;
+    font-size: 12px;
+    color: #999999;
+    font-family: monospace;
+  }
+  .save-request input:focus,
+  .save-request textarea:focus {
+    outline: none;
+    padding: 6px 12px;
+  }
+  .tabname-error-text {
+    font-size: 12px;
+  }
+
+  .unclickable {
+    pointer-events: none;
+  }
+  .save-request .icon-btn {
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+  }
+  .save-input {
+    width: 100%;
+    padding: 0 8px !important;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--sparrow-bottom-border);
+  }
+  .save-input:focus {
+    background-color: var(--border-color);
+  }
   .save-text-clr {
-    color: var(--request-arc);
+    color: #8a9299;
+  }
+  .api-name-usage {
+    position: absolute;
+    top: 25px;
+    right: 0;
+    width: 521px;
+    border-radius: 8px;
+  }
+  .save-as-instructions{
+    font-size: 12px;
+    color: #CCCCCC;
+  }
+  ul.save-as-instructions{
+    padding-left: 15px;
+  }
+  .instruction-btn {
+    width: 24px;
+    height: 24px;
   }
 </style>

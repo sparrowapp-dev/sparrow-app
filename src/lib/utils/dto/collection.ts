@@ -57,6 +57,7 @@ export interface CreateApiRequestPostBody {
     id?: string;
     name: string;
     type: string;
+    description?: string;
     request?: {
       method: string;
       url?: string;
@@ -68,6 +69,7 @@ export interface CreateApiRequestPostBody {
       id?: string;
       name: string;
       type: string;
+      description?: string;
       request: {
         method: string;
         url?: string;
