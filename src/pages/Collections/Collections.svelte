@@ -13,10 +13,8 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-
-  import type { Observable } from "rxjs";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { Writable } from "svelte/store";
+    import type { NewTab } from "$lib/utils/interfaces/request.interface";
+    import type { Writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -74,41 +72,34 @@
     <CollectionsList {collectionsMethods} />
   </div>
   <div
-    class="collections__tools bg-backgroundColor"
-    style="left:{$collapsibleState ? '72px' : '352px'}"
+    class="collections__tools w-100 bg-backgroundColor"
   >
     <div class="tab__bar">
-      <TabBar tabList={$tabList} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId = {$activeTab.id} {collectionsMethods} />
     </div>
-    <div class="tab__content">
-      {#if $tabList && $tabList.length == 0}
-        <DefaultTabBar {collectionsMethods} />
-      {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-        <RequestResponse {activeTab} {collectionsMethods} />
-      {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-        <MyWorkspace />
-      {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-        <p>FOLDER</p>
-      {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-        <p>COLLECTION</p>
-      {/if}
+    <div class="tab__content d-flex">
+      <div class="w-100">
+        {#if $tabList && $tabList.length == 0}
+          <DefaultTabBar {collectionsMethods} />
+        {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
+          <RequestResponse {activeTab} {collectionsMethods} />
+        {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+          <MyWorkspace />
+        {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+          <p>FOLDER</p>
+        {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+          <p>COLLECTION</p>
+        {/if}
+
+      </div>
+        <SidebarRight />
     </div>
-    <SidebarRight />
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
   .collections__tools {
-    top: 44px;
-    position: fixed;
-    right: 0;
-    left: 0;
-    width: calc(100%-352px);
     height: calc(100vh - 44px);
-    z-index: -1;
-  }
-  .tab__content {
-    margin-right: 32px;
   }
 </style>

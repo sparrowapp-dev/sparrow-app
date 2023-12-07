@@ -1,16 +1,12 @@
 <script lang="ts">
+    import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+
     export let name: string;
     export let method: string;
-    let apiClass = "red-api";
-    if(method === "DELETE") apiClass = "red-api";
-    else if(method === "GET") apiClass = "green-api"; 
-    else if(method === "POST") apiClass = "yellow-api";
-    else if(method === "PUT") apiClass = "blue-api";
-    else if(method === "ARC") apiClass = "grey-api";
 </script>
 
 <div class="d-flex align-items-center" style="height:32px;">
-    <div class="api-method {apiClass}">
+    <div class="api-method text-{getMethodStyle(method)}">
         {method.toUpperCase()} 
     </div>
     <div class="api-name">
@@ -19,11 +15,6 @@
 </div>
 
 <style>
-    .red-api{ color: var(--request-delete); }
-    .green-api{ color: var(--request-get); }
-    .yellow-api{ color: var(--request-post); }
-    .blue-api{ color: var(--request-put); }
-    .grey-api{ color: var(--request-arc); }
     .api-method{
         font-size: 12px;
         font-weight: 500;

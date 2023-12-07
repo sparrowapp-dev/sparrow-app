@@ -412,9 +412,6 @@
     background-color: var(--button-pressed);
   }
   .sidebar {
-    position: fixed;
-    top: 44px;
-    left: 72px;
     height: calc(100vh - 44px);
     overflow-y: auto;
   }

@@ -32,7 +32,8 @@
   });
 
   const handleSaveRequest = async () => {
-    collectionsMethods.updateTab(true,"saveInProgress");
+    const _id = componentData.id;
+    collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
 
@@ -61,10 +62,10 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false,"saveInProgress");
-        collectionsMethods.updateTab(true, "save");
-      }else{
-        collectionsMethods.updateTab(false,"saveInProgress");        
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
+      } else {
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     } else {
       let res = await updateCollectionRequest(componentData.id, {
@@ -89,16 +90,16 @@
           componentData.id,
           res.data.data,
         );
-        collectionsMethods.updateTab(false,"saveInProgress");
-        collectionsMethods.updateTab(true, "save");
-      }else{
-        collectionsMethods.updateTab(false,"saveInProgress");
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
+        collectionsMethods.updateTab(true, "save", _id);
+      } else {
+        collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     }
   };
 
   let handleInputValue = () => {
-    collectionsMethods.updateTab(tabName, "name");
+    collectionsMethods.updateTab(tabName, "name", componentData.id);
   };
 
   onDestroy(() => {
@@ -127,10 +128,10 @@
   });
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyS") {
-      if (!componentData?.path) {
-        visibility = true;
-      } else {
+      if (componentData?.path.collectionId && componentData?.path.workspaceId) {
         handleSaveRequest();
+      } else {
+        visibility = true;
       }
     }
   };
@@ -155,7 +156,9 @@
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
-            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center gap-2 ps-3 pe-4 rounded border-0"
+            disabled={componentData?.save}
+            style="width:140px;"
+            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
               if (
                 componentData?.path.collectionId &&
@@ -176,7 +179,7 @@
               class="mb-0 text-whiteColor"
               style="font-size: 14px; font-weight:400;"
             >
-              Save
+              Save Request
             </p>
           </button>
           <span class="position-relative" style="width:35px;">
@@ -199,11 +202,13 @@
                 Save As
               </p>
             </div>
-            <SaveRequest
-              {visibility}
-              {collectionsMethods}
-              onClick={handleBackdrop}
-            />
+            {#if visibility}
+              <SaveRequest
+                {collectionsMethods}
+                {componentData}
+                onClick={handleBackdrop}
+              />
+            {/if}
           </span>
         </div>
         <div>
@@ -225,9 +230,6 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  .pageheader {
-    z-index: 999;
-  }
   .btn-primary {
     background-color: #313233;
   }

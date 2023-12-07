@@ -209,11 +209,11 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: {
     key: "tabId",
-    fields: ["id"],
+    fields: ["createdAt"],
     separator: "|",
   },
   type: "object",
-  version: 4,
+  version: 5,
   properties: {
     tabId: {
       type: "string",

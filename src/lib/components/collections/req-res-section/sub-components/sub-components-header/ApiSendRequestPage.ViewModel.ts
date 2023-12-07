@@ -117,7 +117,7 @@ class ApiSendRequestViewModel {
       key: string;
       value: string;
     } = findAuthParameter(request);
-    if (authHeader.key && authHeader.value) {
+    if (authHeader.key || authHeader.value) {
       let flag: boolean = false;
       for (let i = 0; i < url.length; i++) {
         if (url[i] === "?") {
@@ -155,7 +155,7 @@ class ApiSendRequestViewModel {
       key: string;
       value: string;
     } = findAuthHeader(request);
-    if (authHeader.key && authHeader.value) {
+    if (authHeader.key || authHeader.value) {
       return (
         authHeader.key +
         "=" +
