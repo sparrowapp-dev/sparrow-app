@@ -115,48 +115,34 @@
 
   let pos = { x: 0, y: 0 };
 
-  let menu = { h: -25, y: -25 };
 
-  let browser = { h: 0, y: 0 };
-  let content;
+
   let showMenu: boolean = false;
   let button;
-
-  let openMenuButton: HTMLElement = null;
-
+  let isFolderPopup: boolean = false ;
+ 
   let openFolderId: string = "";
 
   // Assuming you have a container reference (e.g., containerRef) in your component
   let containerRef;
 
-  function rightClickContextMenu(e, selectedFolderId, button) {
-    if (!showMenu) {
-      openFolderId = selectedFolderId;
-      showMenu = true;
-
-      // Dynamically calculate the position based on the click event
-      pos = { x: e.clientX, y: e.clientY };
-
+  function rightClickContextMenu(e) {
+    e.preventDefault();
+    setTimeout(() => {
       const containerRect = containerRef?.getBoundingClientRect();
-      if (containerRect) {
-        // Adjust position if necessary to keep the menu within the container
-        pos.x = Math.min(pos.x, containerRect.right - menu.y);
-        pos.y = Math.min(pos.y, containerRect.bottom - menu.h);
-      }
-    }
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY };
+      showMenu = true;    
+    }, 100);
   }
 
-  function onPageClick(e) {
+  function closeRightClickContextMenu(){
     showMenu = false;
   }
 
-  function getContextMenuDimension(node) {
-    let height = node.offsetHeight;
-    let width = node.offsetWidth;
-    menu = {
-      h: height,
-      y: width,
-    };
+  const handleFolderPopUp = (flag) => {
+    isFolderPopup = flag;
   }
 
   let newFolderName: string = "";
@@ -219,10 +205,6 @@
     expand = true;
   }
 
-  async function deleteFolder() {
-    isShowFolderPopup.set(true);
-  }
-
   let menuItems = [
     {
       onClick: openFolder,
@@ -238,44 +220,32 @@
     },
 
     {
-      onClick: deleteFolder,
+      onClick: ()=>{
+        handleFolderPopUp(true);
+      },
       displayText: "Delete",
     },
   ];
 
-  function toggleMenuVisibility() {
-    showMenu = !showMenu;
-  }
-
-  let isShowFolder: boolean;
-  isShowFolderPopup.subscribe((value) => {
-    isShowFolder = value;
-  });
-
   let workspaceId = currentWorkspaceId;
-  console.log(openFolderId);
 </script>
 
-{#if isShowFolder}
+{#if isFolderPopup}
   <FolderPopup
     {collectionsMethods}
     {collectionId}
     {openFolderId}
     {workspaceId}
+    closePopup = {handleFolderPopUp}
   />
 {/if}
 
-<svelte:window on:click={onPageClick} />
+<svelte:window on:click={closeRightClickContextMenu}   on:contextmenu|preventDefault={(e) => closeRightClickContextMenu()} />
 
 {#if showMenu}
   <nav
-    use:getContextMenuDimension
     style="position: fixed; top:{pos.y}px; left:{pos.x}px"
   >
-    <div
-      on:click={toggleMenuVisibility}
-      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
-    />
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"

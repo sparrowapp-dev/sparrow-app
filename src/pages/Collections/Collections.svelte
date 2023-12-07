@@ -75,7 +75,7 @@
     class="collections__tools w-100 bg-backgroundColor"
   >
     <div class="tab__bar">
-      <TabBar tabList={$tabList} _tabId = {$activeTab.id} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId = {$activeTab?.id} {collectionsMethods} />
     </div>
     <div class="tab__content d-flex">
       <div class="w-100">

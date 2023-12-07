@@ -12,6 +12,7 @@
   export let openFolderId: string;
   export let workspaceId: string;
   export let collectionsMethods: CollectionsMethods;
+  export let closePopup : (flag: boolean) => void;
   const collectionService = new CollectionService();
 
   let nameFolder: string = "";
@@ -74,16 +75,20 @@
   };
 </script>
 
-{#if isPopupShow}
-  <div class="background-overlay" />
-{/if}
+  <div class="background-overlay" 
+  on:click={()=>{
+    closePopup(false);
+  }}/>
+
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Folder?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={handleCancel}>
+    <button class="btn-close1 border-0 rounded" on:click={()=>{
+      closePopup(false);
+    }}>
       <img src={closeIcon} alt="" />
     </button>
   </div>
@@ -112,7 +117,9 @@
   >
     <button
       class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={handleCancel}>Cancel</button
+      on:click={()=>{
+        closePopup(false);
+      }}>Cancel</button
     >
     <button
       class="btn-secondary border-0 text-blackColor px-3 py-1 rounded"
