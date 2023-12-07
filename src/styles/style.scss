@@ -32,16 +32,17 @@ $sparrow-send-button: #1193f0;
 $sparrow-send-hoverbutton: #04416d;
 $sparrow-button-background: #2d2c2c;
 $sparrow-button-color: #e5e5e5;
-$sparrow-input-slider-button:#1d3650;
+$sparrow-input-slider-button: #1d3650;
 $sparrow-dull-background: #232424;
-$sparrow-bottom-border :#85C2FF;
+$sparrow-bottom-border: #85c2ff;
 $sparrow-cancel-hover: #31323360;
 $sparrow-delete-hover: #f16674;
 $sparrow-background-hover: rgba(0, 0, 0, 0.706);
 $sparrow-button-pressed: #1d3650;
-$sparrow-key-value-pair:#262626;
+$sparrow-text-color: #8a9299;
+$sparrow-key-value-pair: #262626;
+$sparrow-selectedSideBarTab: #11253a;
 
-$sparrow-selectedSideBarTab:#11253A;
 :root {
   --blackColor: #{$sparrow-black};
   --success-color: #{$sparrow-success};
@@ -62,15 +63,15 @@ $sparrow-selectedSideBarTab:#11253A;
   --request-patc: #{$sparrow-patc};
   --request-opt: #{$sparrow-opt};
   --workspace-hover-color: #{$sparrow-plusbutton};
-  --sparrow-bottom-border : #{$sparrow-bottom-border};
-  --sparrow-input-slider-button:#{$sparrow-input-slider-button};
+  --sparrow-bottom-border: #{$sparrow-bottom-border};
+  --sparrow-input-slider-button: #{$sparrow-input-slider-button};
   --dangerColor: #{$sparrow-danger};
   --cancel-hover: #{$sparrow-cancel-hover};
   --delete-hover: #{$sparrow-delete-hover};
   --background-hover: #{$sparrow-background-hover};
   --button-pressed: #{$sparrow-button-pressed};
-  --keyvalue-pair:#{$sparrow-key-value-pair};
-  --selected-active-sidebar:#{$sparrow-selectedSideBarTab};
+  --keyvalue-pair: #{$sparrow-key-value-pair};
+  --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -102,9 +103,10 @@ $theme-colors: map-merge(
     "headColor": $sparrow-head,
     "patchColor": $sparrow-patc,
     "optionsColor": $sparrow-opt,
-    "keyValuePairColor":$sparrow-key-value-pair
-    "dullBackground" : $sparrow-dull-background,
-    "sparrowBottomBorder": $sparrow-bottom-border
+    "textColor": $sparrow-text-color,
+    "keyValuePairColor": $sparrow-key-value-pair,
+    "dullBackground": $sparrow-dull-background,
+    "sparrowBottomBorder": $sparrow-bottom-border,
   )
 );
 
