@@ -7,14 +7,23 @@
   import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
-  import { isShowCollectionPopup } from "$lib/store/collection";
+  import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
+
+
 
   let collapsExpandToggle = false;
+  let selectedActiveSideBar:string="collections";
+
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
-
+  const _viewModel = new ActiveSideBarTabViewModel();
+  const activeSideBarTabMethods={
+    addActiveTab:_viewModel.addActiveTab,
+    getActiveTab:_viewModel.getActiveTab,
+    updateActiveTab:_viewModel.updateActiveTab,
+  }
   const setcollapsExpandToggle = () => {
     collapsibleState.set(false);
   };
@@ -25,14 +34,28 @@
 
   const handleResize = () => {
     const windowWidth = window.innerWidth;
-
     isCollaps = windowWidth <= 800;
   };
+
+
+  async function handleActiveTab(){
+    const activeTab=await activeSideBarTabMethods.getActiveTab();
+    if(activeTab){
+      selectedActiveSideBar=activeTab;
+    }else{
+      await activeSideBarTabMethods.addActiveTab("collections");
+      selectedActiveSideBar="collections";
+    }
+    return selectedActiveSideBar;
+  }
+
+  const getActiveTab=handleActiveTab();
+
+  
 
   onMount(() => {
     window.addEventListener("resize", handleResize);
     handleResize();
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -42,18 +65,25 @@
 <div class="dashboard">
   <HeaderDashboard />
   <div class="dashboard-teams d-flex flex-column">
-    <Sidebar />
-
+    {#await getActiveTab}
+    {:then selectedActiveSideBar}
+    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={selectedActiveSideBar} />
+    {:catch}
+    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={"collections"} />
+    {/await}
     <Route path="/collections/*"><CollectionsHome /></Route>
     <Route path="/mock">Mock</Route>
     <Route path="/environment">Environment</Route>
-    <Route path="/api-builder">API Builder</Route>
-    <Route path="/wiki">Wiki</Route>
     <Route path="/teams/*"><Teams /></Route>
     <Route path="/workspaces">Workspaces</Route>
     <Route path="/help">Help</Route>
     <Route path="/*">
-      <Navigate to="collections" />
+     {#await getActiveTab}
+     {:then activeTab}
+     <Navigate to={activeTab}></Navigate>
+     {:catch}
+     <Navigate to={"collections"}></Navigate>
+     {/await}
     </Route>
   </div>
 </div>
