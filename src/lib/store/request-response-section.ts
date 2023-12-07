@@ -189,10 +189,14 @@ const setRequestBodyFormData = async (data, route: string): Promise<void> => {
  * Responsible to change tab property like :
  * id, name, description, save.
  */
-const setTabProperty = async (data, route: string): Promise<void> => {
+const setTabProperty = async (
+  data,
+  route: string,
+  _id: string,
+): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
+      if (elem.id === _id) {
         elem[route] = data;
         if (route !== "save") {
           elem.save = false;

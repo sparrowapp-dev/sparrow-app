@@ -7,9 +7,9 @@
   import book from "$lib/assets/book.svg";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
-  export let handleTabRemove: (id: string) => void;
   export let tabWidth: number;
   export let index: number;
+  export let closeTab;
 </script>
 
 <div
@@ -72,7 +72,7 @@
     <button
       class="btn border-0 d-flex align-items-center"
       on:click={() => {
-        handleTabRemove(tab.id);
+        closeTab(tab.id, tab);
       }}
       style="overflow:hidden; height:31px;"
     >

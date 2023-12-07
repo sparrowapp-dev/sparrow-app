@@ -47,9 +47,6 @@
 <style>
   .sidebar-right {
     width: 32px;
-    position: fixed;
-    right: 0;
-    top: 80px;
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
   }

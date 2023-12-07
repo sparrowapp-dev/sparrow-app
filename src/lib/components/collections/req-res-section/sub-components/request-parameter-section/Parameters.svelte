@@ -153,7 +153,7 @@
     width:200px;
     "
   >
-    {#if authValue.key && authValue.value}
+    {#if authValue.key || authValue.value}
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
@@ -250,7 +250,7 @@
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor  py-1 border-0"
                   style="font-size: 13px;"
                   bind:value={param.key}
                   on:input={() => {
@@ -262,7 +262,7 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control bg-blackColor py-1 border-0"
+                  class="form-control  bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   bind:value={param.value}
                   on:input={() => {

@@ -49,8 +49,8 @@
 </script>
 
 <div
-  class="parent-dropdown display-inline-block"
-  style=" position: relative;  z-index:9999;"
+  class="parent-dropdown display-inline-block z-3"
+  style=" position: relative;"
   on:click={handleDropdownClick}
 >
   <div on:click={toggleDropdown}>

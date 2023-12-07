@@ -35,9 +35,6 @@
     padding: 12px 4px 12px 4px;
     border-right: 1px solid #313233;
     justify-content: space-between;
-    position: fixed;
-    top: 44px;
-    left: 0;
     background: #1e1e1e;
   }
   .sidebar__main {

@@ -51,13 +51,13 @@
     pencilIconState = false;
 
     // Triggers active auth header
-    if (request && findAuthHeader(request).key) {
+    if (request && (findAuthHeader(request).key || findAuthHeader(request).value)) {
       headersCount += 1;
       pencilIconState = true;
     }
 
     // Triggers active auth query parameters
-    if (request && findAuthParameter(request).key) {
+    if (request && (findAuthParameter(request).key || findAuthParameter(request).value) ) {
       parametersCount += 1;
       pencilIconState = true;
     }
@@ -214,8 +214,9 @@
   <div
     style="width:{isHorizontalVerticalMode
       ? '100%'
-      : '50%'};border-left:1px solid #313233; height:calc(100vh - 200px);"
-    class="left-panel pt-3 px-4 position-relative"
+      : '50%'};
+      height:calc(100vh - 200px);"
+    class="left-panel pt-3 px-4 position-relative {isHorizontalVerticalMode?'border-top':'border-left'}"
   >
     <div class=" d-flex flex-column" style="height:100%;">
       {#if !response?.status}
@@ -225,7 +226,6 @@
       {:else if response?.status}
         <ResponseParams {apiState} {collectionsMethods} {response} />
       {/if}
-
       {#if progress}
         <div
           class="position-absolute"
@@ -256,5 +256,11 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .border-left{
+    border-left: 1px solid var( --border-color) ;
+  }
+  .border-top{
+    border-top: 1px solid var( --border-color) ;
   }
 </style>

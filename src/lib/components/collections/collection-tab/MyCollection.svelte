@@ -31,13 +31,13 @@
     totalFolder = event?.property?.collection?.folderCount;
   });
 
-
-
   const handleCollectionInput = (event) => {
     newCollectionName = event.target.value;
-
-
-    collectionsMethods.updateTab(false, "save");
+    collectionsMethods.updateTab(
+      false,
+      "save",
+      componentData.path.collectionId,
+    );
   };
 
   const modifyCollection = async () => {
@@ -55,8 +55,16 @@
         updateCollectionName.data.data,
       );
 
-      collectionsMethods.updateTab(tabName, "name");
-      collectionsMethods.updateTab(true, "save");
+      collectionsMethods.updateTab(
+        tabName,
+        "name",
+        componentData.path.collectionId,
+      );
+      collectionsMethods.updateTab(
+        true,
+        "save",
+        componentData.path.collectionId,
+      );
 
       Promise.resolve().then(() => {
         moveNavigation("right");
@@ -118,7 +126,6 @@
   onDestroy(() => {
     tabSubscribe();
     collapsibleStateUnsubscribe();
-  
   });
   onDestroy(() => {});
 
