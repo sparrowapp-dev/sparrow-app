@@ -100,7 +100,7 @@
             UntrackedItems.UNTRACKED + uuidv4(),
             new Date().toString(),
           ).property.request.response;
-          collectionsMethods.deleteResponseFromRequestProperty(response,RequestProperty.RESPONSE,)
+          collectionsMethods.updateRequestProperty(response,RequestProperty.RESPONSE)
           notifications.success("Response Cleared");
         }}
       >
