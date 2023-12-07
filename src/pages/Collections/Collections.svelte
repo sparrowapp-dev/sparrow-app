@@ -52,6 +52,7 @@
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInCollection: _viewModel.deleteRequestInCollection,
+    deleteResponseFromRequestProperty:_viewModel.deleteResponseFromRequestProperty
   };
 
   const activeTab = _viewModel.activeTab;
