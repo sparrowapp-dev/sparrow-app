@@ -110,7 +110,7 @@
 
 <div
   class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
-  style="z-index:999; position:fixed;left:0px;height:44px;"
+  style="height:44px;"
   data-tauri-drag-region
 >
   <div
@@ -174,7 +174,7 @@
             <img src={icons.profileIcon} alt="" />
           </button>
           <div
-            class="rounded profile-explorer position-absolute text-color-white py-1"
+            class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
             style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {isOpen
               ? 'block'
               : 'none'}; top: 40px; right: 0; width: 219px;"

@@ -64,13 +64,14 @@
 
 <div class="dashboard">
   <HeaderDashboard />
-  <div class="dashboard-teams d-flex flex-column">
+  <div class="dashboard-teams d-flex">
     {#await getActiveTab}
     {:then selectedActiveSideBar}
     <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={selectedActiveSideBar} />
     {:catch}
     <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={"collections"} />
     {/await}
+    <section class="w-100">
     <Route path="/collections/*"><CollectionsHome /></Route>
     <Route path="/mock">Mock</Route>
     <Route path="/environment">Environment</Route>
@@ -85,11 +86,6 @@
      <Navigate to={"collections"}></Navigate>
      {/await}
     </Route>
+  </section>
   </div>
 </div>
-
-<style>
-  .dashboard-teams {
-    margin-left: 72px;
-  }
-</style>
