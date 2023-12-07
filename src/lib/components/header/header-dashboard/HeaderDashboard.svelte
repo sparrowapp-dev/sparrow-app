@@ -13,6 +13,7 @@
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
@@ -155,14 +156,18 @@
   >
     <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
       <div class="col-{!isSearchVisible ? '1' : '1'}">
-        <button class="bg-blackColor border-0">
-          <img src={icons.settingIcon} alt="" />
-        </button>
+        <Tooltip>
+          <button class="bg-blackColor border-0">
+            <img src={icons.settingIcon} alt="" />
+          </button>
+        </Tooltip>
       </div>
       <div class="col-{!isSearchVisible ? '1' : '2'}">
-        <button class="bg-blackColor border-0">
-          <img src={icons.notifyIcon} alt="" />
-        </button>
+        <Tooltip>
+          <button class="bg-blackColor border-0">
+            <img src={icons.notifyIcon} alt="" />
+          </button>
+        </Tooltip>
       </div>
       <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
@@ -274,7 +279,6 @@
 </div>
 
 <style>
-
   .button-minus,
   .button-resize,
   .button-close {
