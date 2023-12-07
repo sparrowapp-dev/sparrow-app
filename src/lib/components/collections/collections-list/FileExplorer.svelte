@@ -57,6 +57,7 @@
         items: {
           name: sampleRequest.name,
           type: sampleRequest.type,
+          description: "",
           request: {
             method: sampleRequest.property.request.method,
           },

@@ -24,8 +24,7 @@ const findAuthHeader = (
   } else if (
     request.state.auth === AuthType.API_KEY &&
     request.auth.apiKey.addTo === AuthSection.HEADER &&
-    request.auth.apiKey.authKey &&
-    request.auth.apiKey.authValue
+    (request.auth.apiKey.authKey || request.auth.apiKey.authValue)
   ) {
     authValue.key = request.auth.apiKey.authKey;
     authValue.value = request.auth.apiKey.authValue;
@@ -49,8 +48,7 @@ const findAuthParameter = (
   if (
     request.state.auth === AuthType.API_KEY &&
     request.auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
-    request.auth.apiKey.authKey &&
-    request.auth.apiKey.authValue
+    (request.auth.apiKey.authKey || request.auth.apiKey.authValue)
   ) {
     authValue.key = request.auth.apiKey.authKey;
     authValue.value = request.auth.apiKey.authValue;

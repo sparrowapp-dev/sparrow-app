@@ -30,8 +30,8 @@
 </script>
 
 <div
-  class="rounded"
-  style="position: relative; display:inline-block; z-index:999;"
+  class="rounded z-3"
+  style="position: relative; display:inline-block;"
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}
 >

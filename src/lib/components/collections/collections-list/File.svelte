@@ -5,7 +5,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
   import {
     getPathFromUrl,
     truncatePath,
@@ -33,9 +33,7 @@
     folderName: folderName,
   });
 
-  let url, method, body, headers, queryParams, type;
-
-  let apiClass = "red-api";
+  let url, method, body, headers, queryParams, type, description;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -46,6 +44,8 @@
       const request = generateSampleRequest(id, new Date().toString());
       request.path = path;
       request.name = name;
+      if(description)
+      request.description = description;
       if(url)
       request.property.request.url = url;
       if(body)
@@ -72,6 +72,7 @@
       queryParams = api.request?.queryParams;
       body = api.request?.body;
       type = api.request?.type;
+      description = api.description;
     }
   }
 
