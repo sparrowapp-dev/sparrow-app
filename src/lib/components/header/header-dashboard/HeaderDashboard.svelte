@@ -13,6 +13,7 @@
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
+    import GlobalSearchBarPopup from "$lib/components/Modal/GlobalSearchBarPopup.svelte";
 
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
@@ -22,6 +23,7 @@
 
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
+  let showGlobalSearchPopup:boolean=false;
 
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
@@ -132,10 +134,10 @@
   </div>
 
   <div
-    style="height:32px; width:400px;"
+    style="height:32px; width:400px;position: relative;"
     class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
   >
-    <div class="ps-3 d-flex align-items-center justify-content-center">
+    <div class="ps-3 d-flex align-items-center justify-content-center border">
       <img src={icons.searchIcon} alt="" />
     </div>
 
@@ -145,8 +147,12 @@
         style="font-size: 12px;"
         class="form-control border-0 bg-backgroundColor"
         placeholder="Search your workspaces, collections and endpoints"
+        on:input={()=>{showGlobalSearchPopup=true}}
       />
     </div>
+    {#if showGlobalSearchPopup}
+      <GlobalSearchBarPopup></GlobalSearchBarPopup>
+    {/if}
   </div>
 
   <div
