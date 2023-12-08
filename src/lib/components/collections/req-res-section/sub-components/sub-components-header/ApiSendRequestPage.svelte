@@ -260,7 +260,7 @@
             const rightPanel = document.querySelector(".right-panel");
             rightPanel.style.width = "50%";
             leftPanel.style.width = "50%";
-            splitter.style.height = "calc(100vh - 200px)";
+            splitter.style.height = "85vh";
             splitter.style.width = "0%";
           }}
           class:view-active={selectedView === "grid"}

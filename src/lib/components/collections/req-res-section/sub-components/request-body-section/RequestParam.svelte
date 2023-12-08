@@ -14,7 +14,7 @@
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import ResponseError from "../response-error/ResponseError.svelte";
   import { RequestSection } from "$lib/utils/enums/request.enum";
   import {
@@ -99,32 +99,46 @@
       );
     }
   };
-
+  onMount(() => {
+    const splitter = document.querySelector(".splitpanes__splitter");
+    if (splitter) {
+      splitter.addEventListener("mouseover", () => {
+        splitter.style.border = "solid #1193f0";
+        splitter.style.cursor = isHorizontalVerticalMode
+          ? "row-resize"
+          : "col-resize";
+      });
+      splitter.addEventListener("mouseout", () => {
+        splitter.style.border = "solid #313233";
+      });
+    }
+  });
   function stylePanes() {
     const splitter = document.querySelector(".splitpanes__splitter");
     if (splitter) {
       // Common styles
-      splitter.style.height = isHorizontalVerticalMode
-        ? "calc(100vh - 200px)"
-        : "0%";
+      splitter.style.height = "85vh";
       splitter.style.width = "2px";
-      splitter.style.cursor = "row-resize";
+
       splitter.style.border = "solid #313233";
     }
   }
 </script>
 
 <Splitpanes
+  style={isHorizontalVertical && "height: 85vh; "}
   on:ready={stylePanes}
   theme=""
   class="d-flex align-items-start {isHorizontalVerticalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
   horizontal={isHorizontalVerticalMode ? true : false}
+  dblClickSplitter={false}
 >
   <Pane
-    class="right-panel d-flex flex-column align-items-top justify-content-center pt-3 ps-4 pe-2"
+    class="right-panel d-flex flex-column align-items-top overflow-y-auto pt-3 ps-4 pe-2"
     minSize={25}
+    size={50}
   >
     <div
       class="{isCollaps
@@ -234,7 +248,7 @@
     </div>
   </Pane>
 
-  <Pane class="left-panel pt-3 px-4 position-relative " minSize={25}>
+  <Pane class="left-panel pt-3 px-4 position-relative " minSize={25} size={50}>
     <div class=" d-flex flex-column">
       {#if !response?.status}
         <DefaultPage />

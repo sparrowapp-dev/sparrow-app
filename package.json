@@ -26,7 +26,6 @@
     "path": "^0.12.7",
     "rxdb": "^14.17.1",
     "rxjs": "^7.8.1",
-    "split.js": "^1.6.5",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-jsoneditor": "^0.18.9",
     "svelte-navigator": "^3.2.2",
