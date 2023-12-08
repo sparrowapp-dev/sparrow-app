@@ -6,7 +6,6 @@
   import { getNextName } from "./collectionList";
 
   import {
- 
     isShowCollectionPopup,
     useCollectionTree,
   } from "$lib/store/collection";
@@ -33,10 +32,9 @@
   export let collectionId: string;
   export let currentWorkspaceId: string;
 
-  let showFolderAPIButtons:boolean=true;
+  let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
-
 
   const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -85,7 +83,7 @@
       items: {
         name: request.name,
         type: request.type,
-        description:"",
+        description: "",
         request: {
           method: request.property.request.method,
         },
@@ -114,19 +112,19 @@
       return;
     }
   };
-   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
-    if(value && value.length>0){
-      showFolderAPIButtons=false;
-      visibility=true;
-    }else if(value && value.length===0){
-       visibility=false;
-    }else{
-      showFolderAPIButtons=true;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      showFolderAPIButtons = false;
+      visibility = true;
+    } else if (value && value.length === 0) {
+      visibility = false;
+    } else {
+      showFolderAPIButtons = true;
     }
-  })
-  onDestroy(()=>{
+  });
+  onDestroy(() => {
     selectedMethodUnsubscibe();
-    });
+  });
 
   let openCollectionId: string;
   let isMenuOpen: boolean = false;
@@ -285,17 +283,15 @@
   const handleClick = () => {
     let totalFolder: number = 0;
     let totalRequest: number = 0;
-
-    if (collection._id === collectionId) {
-      collection.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item.items.length;
-        }
-      });
-    }
+    console.log(collection);
+    collection.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+        totalRequest += item.items.length;
+      }
+    });
 
     let path: Path = {
       workspaceId: currentWorkspaceId,
@@ -443,10 +439,10 @@
     />
   {/each}
   {#if showFolderAPIButtons}
-  <div class="mt-2 mb-2">
-    <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-    <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-  </div>
+    <div class="mt-2 mb-2">
+      <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+    </div>
   {/if}
 </div>
 

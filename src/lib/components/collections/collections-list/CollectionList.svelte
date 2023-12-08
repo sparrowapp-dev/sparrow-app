@@ -26,7 +26,6 @@
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
 
-  
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
   export let deleteCollectionData;
@@ -36,7 +35,7 @@
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -128,13 +127,14 @@
   );
 
   const handleCreateCollection = async () => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
     const newCollection = {
       _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
       createdAt: new Date().toISOString(),
     };
-    collection = [...collection, newCollection];
 
     collectionsMethods.addCollection(newCollection);
     const response = await _colllectionListViewModel.addCollection({
@@ -144,7 +144,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-
+      console.log(response.data.data);
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -154,11 +154,20 @@
         new Date().toString(),
       );
 
+      // response.data.data.items.map((item) => {
+      //   if (item.type === ItemType.REQUEST) {
+      //     totalRequest++;
+      //   } else {
+      //     totalFolder++;
+      //     totalRequest += item.items.length;
+      //   }
+      // });
+
       Samplecollection.id = response.data.data._id;
       Samplecollection.path = path;
       Samplecollection.name = response.data.data.name;
-      Samplecollection.property.collection.requestCount = 0;
-      Samplecollection.property.collection.folderCount = 0;
+      Samplecollection.property.collection.requestCount = totalRequest;
+      Samplecollection.property.collection.folderCount = totalFolder;
       Samplecollection.save = true;
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
@@ -267,7 +276,7 @@
     ? '0px'
     : '280px'};border-right: {collapsExpandToggle
     ? '0px'
-    : '1px solid #313233'};"
+    : '1px solid #313233'};overflow:auto"
   class="sidebar d-flex flex-column bg-backgroundColor scroll"
 >
   <div

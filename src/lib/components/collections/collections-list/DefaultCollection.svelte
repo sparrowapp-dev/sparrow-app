@@ -1,5 +1,6 @@
 <script lang="ts">
   import whitePlus from "$lib/assets/plus-white.svg";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -9,7 +10,10 @@
 
   const addApiRequest = () => {
     collectionsMethods.handleCreateTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      generateSampleRequest(
+        UntrackedItems.UNTRACKED + uuidv4(),
+        new Date().toString(),
+      ),
     );
     moveNavigation("right");
   };

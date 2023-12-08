@@ -40,41 +40,13 @@
     );
   };
 
-  const modifyCollection = async () => {
-    if (newCollectionName) {
-      const updateCollectionName = await collectionService.updateCollectionData(
-        componentData.path.collectionId,
-        componentData.path.workspaceId,
-        { name: newCollectionName },
-      );
-
-      tabName = updateCollectionName.data.data.name;
-
-      collectionsMethods.updateCollection(
-        componentData.path.collectionId,
-        updateCollectionName.data.data,
-      );
-
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.collectionId,
-      );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.collectionId,
-      );
-
-      Promise.resolve().then(() => {
-        moveNavigation("right");
-      });
-    }
-
-    if (newCollectionName === "") {
-      notifications.error("Please enter text before save");
-    }
-    // handleTabUpdate({save:true,name},id)
+  const modifyCollectionData = async () => {
+    await _myColllectionViewModel.modifyCollection(
+      componentData,
+      newCollectionName,
+      collectionsMethods,
+      tabName,
+    );
   };
 
   const handleApiRequest = async () => {
@@ -132,17 +104,10 @@
   let isClickOnEnter: boolean = false;
 </script>
 
-<div
-  class="main-container d-flex"
-  style="width:{collapsExpandToggle
-    ? 'calc(100% - 104px)'
-    : 'calc(100% - 384px)'};"
->
+<div class="main-container d-flex">
   <div
     class="my-workspace d-flex flex-column"
-    style="width:{collapsExpandToggle
-      ? 'calc(100% - 384px)'
-      : 'calc(100% - 280px)'}; margin-top: 15px;"
+    style="width:calc(100% - 280px); margin-top: 15px;"
   >
     <div class="d-flex align-items-center w-100 justify-content-between mb-4">
       <div class="d-flex align-items-center justify-content-start w-50">
@@ -157,13 +122,15 @@
           on:keydown={(event) => {
             if (event.key === "Enter") {
               isClickOnEnter = true;
-              modifyCollection();
+              modifyCollectionData();
             }
           }}
         />
       </div>
-      <button class="btn btn-primary border-0" on:click={handleApiRequest}
-        >New Request</button
+      <button
+        style="font-size: 12px;"
+        class="btn btn-primary border-0 py-2"
+        on:click={handleApiRequest}>New Request</button
       >
     </div>
     <div class="d-flex gap-4 mb-4 ps-2">
@@ -191,11 +158,11 @@
   >
     <div
       style="text-align:left;font-size:16px; font-weigh:400;"
-      class="mt-5 ps-2 text-whiteColor"
+      class="mt-5 ps-3 text-whiteColor"
     >
       <p>Index</p>
     </div>
-    <div class="mt-2 ps-2" style="font-size:12px; font-weight:400">
+    <div class="mt-2 ps-3" style="font-size:12px; font-weight:400">
       <p class="text-textColor">
         Begin adding content, and the Index will automatically populate here.
         This will help you easily navigate and organize your documentation as it
@@ -207,18 +174,15 @@
 
 <style>
   .main-container {
-    position: fixed;
-
-    height: 100vh;
+    height: calc(100vh - 80px);
     background-color: var(--background-color);
   }
+
   .my-workspace {
     padding: 20px;
   }
 
-  .invite-btn {
-    background-color: #1193f0;
-    padding: 5px 20px;
-    border-radius: 5px;
+  .btn-primary {
+    background-color: var(--send-button);
   }
 </style>

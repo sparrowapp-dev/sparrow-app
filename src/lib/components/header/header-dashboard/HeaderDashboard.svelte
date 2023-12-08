@@ -246,15 +246,15 @@
 
     <div class=" d-flex {isSearchVisible ? 'gap-4' : ' gap-3'} ">
       <div class="col-2">
-        <button on:click={onMinimize} class="button-minus border-0 py-1">
-          <img src={minimizeIcon} alt="" />
+        <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
+          <img src={icons.minimizeIcon} alt="" />
         </button>
       </div>
 
       <div class="col-2">
         <button
           on:click={toggleSize}
-          class="button-resize border-0 py-1"
+          class="button-resize border-0 py-1 px-1"
           id="resize-button"
         >
           {#if isMaximizeWindow === true}
@@ -265,7 +265,7 @@
         </button>
       </div>
       <div class="col-2">
-        <button on:click={onClose} class="button-close border-0 py-1">
+        <button on:click={onClose} class="button-close border-0 py-1 px-1">
           <img src={icons.closeIcon} alt="" />
         </button>
       </div>
@@ -274,7 +274,6 @@
 </div>
 
 <style>
-
   .button-minus,
   .button-resize,
   .button-close {
@@ -284,7 +283,7 @@
 
   .button-minus:hover,
   .button-resize:hover {
-    background-color: rgba(66, 65, 65, 0.315);
+    background-color: rgba(128, 128, 128, 0.288);
   }
 
   .button-close:hover {

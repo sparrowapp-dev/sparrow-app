@@ -14,7 +14,7 @@ const generateSampleCollection = (id: string, date: string): NewTab => {
         folderCount: 0,
       },
     },
-    save: false,
+    save: true,
     path: { workspaceId: "", collectionId: "" },
     isActive: true,
     createdAt: date,
