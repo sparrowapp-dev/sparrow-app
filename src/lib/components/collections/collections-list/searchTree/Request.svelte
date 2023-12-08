@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getPathFromUrl, replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
   export let name: string;
   export let method: string;
@@ -17,6 +18,7 @@
 <div
   class="d-flex align-items-center api-request"
   style="height: {path !== '' ? '40px' : '32px'};"
+  on:click={()=>{}}
 >
   <div class="api-method {apiClass}">
     {method.toUpperCase()}

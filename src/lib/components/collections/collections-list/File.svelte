@@ -41,6 +41,7 @@
 
 
   const handleClick = () => {
+    console.log("path",path);
       const request = generateSampleRequest(id, new Date().toString());
       request.path = path;
       request.name = name;
@@ -57,6 +58,7 @@
       if(headers)
       request.property.request.headers = headers;
       request.save = true;
+      console.log(request);
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
       }

@@ -32,7 +32,6 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
   
-
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
 
@@ -106,6 +105,8 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
+      debugger;
+      console.log("in current",activeWorkspace);
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");

@@ -10,6 +10,7 @@ import { resizeWindowOnLogOut } from "../window-resize";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+import type { WorkspaceDocument } from "$lib/database/app.database";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -19,6 +20,13 @@ export class HeaderDashboardViewModel {
   private collectionRepository = new CollectionRepository();
   private activeSideBarTabRepository = new ActiveSideBarTabReposistory();
 
+  public getWorkspaceDocument = (elem: WorkspaceDocument) => {
+    return {
+      _id: elem.get("_id"),
+      name: elem.get("name"),
+      collections: elem.get("collections"),
+    };
+  };
   get workspaces() {
     return this.workspaceRepository.getWorkspaces();
   }

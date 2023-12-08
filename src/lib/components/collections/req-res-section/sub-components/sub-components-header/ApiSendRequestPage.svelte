@@ -38,6 +38,8 @@
   let disabledSend: boolean = false;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    debugger;
+    console.log("API",event);
     urlText = event?.property.request.url;
     method = event?.property.request.method;
     disabledSend = event?.property.request.requestInProgress;
