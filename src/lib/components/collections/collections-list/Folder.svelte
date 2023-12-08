@@ -5,6 +5,7 @@
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
+
   import { CollectionService } from "$lib/services/collection.service";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -12,18 +13,21 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
+  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+
+  let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
   
-  let showFolderAPIButtons: boolean = true;
   const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
@@ -166,16 +170,10 @@
 
       title = updateCollectionName?.data?.data?.name;
 
-      const updatedCollection = {
-        name: title,
-        _id: collection._id,
-        updatedAt: collection.updatedAt,
-        updatedBy: collection.updatedBy,
-        totalRequests: collection.totalRequests,
-        createdAt: collection.createdAt,
-        createdBy: collection.createdBy,
-      };
-      collectionsMethods.updateCollection(openCollectionId, updatedCollection);
+      collectionsMethods.updateCollection(
+        openCollectionId,
+        updateCollectionName.data.data,
+      );
     }
     isRenaming = false;
   };
@@ -238,6 +236,38 @@
       displayText: "Delete",
     },
   ];
+
+  const handleClick = () => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    collection.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+        totalRequest += item.items.length;
+      }
+    });
+
+    let path: Path = {
+      workspaceId: currentWorkspaceId,
+      collectionId,
+    };
+
+    const Samplecollection = generateSampleCollection(
+      collectionId,
+      new Date().toString(),
+    );
+
+    Samplecollection.id = collectionId;
+    Samplecollection.path = path;
+    Samplecollection.name = title;
+    Samplecollection.property.collection.requestCount = totalRequest;
+    Samplecollection.property.collection.folderCount = totalFolder;
+    Samplecollection.save = true;
+    collectionsMethods.handleCreateTab(Samplecollection);
+    moveNavigation("right");
+  };
 </script>
 
 {#if isCollectionPopup}
@@ -286,12 +316,14 @@
     on:click={() => {
       if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
+        handleClick();
       }
     }}
     class="d-flex w-100 align-items-center"
   >
     <img
       src={angleRight}
+      class=""
       style="height:14px; width:14px; margin-right:8px; {visibility
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"

@@ -8,7 +8,9 @@ import { isLoading } from "$lib/store/auth.store";
 import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
+
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
 
@@ -104,6 +106,14 @@ const makeRequest = async (
   }
 };
 
+function timeout(timeout: number) {
+  return new Promise((res, rej) => {
+    setTimeout(() => {
+      rej("Timeout");
+    }, timeout);
+  });
+}
+
 const makeHttpRequest = async (
   url: string,
   method: string,
@@ -111,22 +121,25 @@ const makeHttpRequest = async (
   body: string,
   request: string,
 ) => {
-  try {
-    const response: string = await invoke("make_type_request_command", {
+  let response;
+
+  return await Promise.race([
+    timeout(apiTimeOut),
+    invoke("make_type_request_command", {
       url,
       method,
       headers,
       body,
       request,
-    });
-
-    if (!response) {
+    }),
+  ])
+    .then(async (data) => {
+      response = data;
+      return success(JSON.parse(response));
+    })
+    .catch(() => {
       throw new Error("Invalid response from the backend");
-    }
-    return await success(JSON.parse(response));
-  } catch (e) {
-    return error(e.message || "An error occurred");
-  }
+    });
 };
 
 export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };

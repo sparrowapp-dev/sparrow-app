@@ -1,14 +1,142 @@
 <script lang="ts">
   import about from "$lib/assets/about.svg";
-  import collections from "$lib/assets/collections.svg";
+  import collectionss from "$lib/assets/collections.svg";
   import apiRequest from "$lib/assets/apiRequest.svg";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-
+  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  const _colllectionListViewModel = new CollectionListViewModel();
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import { onDestroy } from "svelte";
   export let collectionsMethods: CollectionsMethods;
+
+  const collections: Observable<CollectionDocument[]> =
+    _colllectionListViewModel.collection;
+
+  let collection: any[] = [];
+  let currentWorkspaceId: string = "";
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
+
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value && value.length > 0) {
+        const collectionArr = value.map(
+          (collectionDocument: CollectionDocument) => {
+            const collectionObj =
+              collectionsMethods.getCollectionDocument(collectionDocument);
+            return collectionObj;
+          },
+        );
+        collection = collectionArr;
+      }
+    },
+  );
+
+  const getNextCollection: (list: any[], name: string) => any = (
+    list,
+    name,
+  ) => {
+    const isNameAvailable: (proposedName: string) => boolean = (
+      proposedName,
+    ) => {
+      return list.some((element) => {
+        return element.name === proposedName;
+      });
+    };
+
+    if (!isNameAvailable(name)) {
+      return name;
+    }
+
+    for (let i = 2; i < list.length + 10; i++) {
+      const proposedName: string = `${name}${i}`;
+      if (!isNameAvailable(proposedName)) {
+        return proposedName;
+      }
+    }
+
+    return null;
+  };
+
+  let currentWorkspaceName: string;
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");    
+      }
+    },
+  );
+
+  const handleCreateCollection = async () => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    const newCollection = {
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
+      name: getNextCollection(collection, "New collection"),
+      items: [],
+      createdAt: new Date().toISOString(),
+    };
+
+    collectionsMethods.addCollection(newCollection);
+    const response = await _colllectionListViewModel.addCollection({
+      name: newCollection.name,
+      workspaceId: currentWorkspaceId,
+    });
+
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data._id,
+      };
+      const Samplecollection = generateSampleCollection(
+        response.data.data._id,
+        new Date().toString(),
+      );
+
+      response.data.data.items.map((item) => {
+        if (item.type === ItemType.REQUEST) {
+          totalRequest++;
+        } else {
+          totalFolder++;
+          totalRequest += item.items.length;
+        }
+      });
+
+      Samplecollection.id = response.data.data._id;
+      Samplecollection.path = path;
+      Samplecollection.name = response.data.data.name;
+      Samplecollection.property.collection.requestCount = totalRequest;
+      Samplecollection.property.collection.folderCount = totalFolder;
+      Samplecollection.save = true;
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
+
+      collectionsMethods.updateCollection(newCollection._id, res);
+      return;
+    }
+    return;
+  };
+
+  onDestroy(() => {
+    collectionSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <div class="main-container">
@@ -48,8 +176,8 @@
         <img src={apiRequest} alt="" style="width: 20px;" />
         API Request</button
       >
-      <button class="create-container-btn">
-        <img src={collections} alt="" style="width: 26px;" />
+      <button class="create-container-btn" on:click={handleCreateCollection}>
+        <img src={collectionss} alt="" style="width: 26px;" />
         Collection</button
       >
     </div>

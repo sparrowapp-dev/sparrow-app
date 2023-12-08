@@ -38,6 +38,8 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
 
+
+
   interface Path {
     name: string;
     id: string;
@@ -532,7 +534,7 @@
                     navigateToDirectory(col);
                   }}
                 >
-                  <Folder name={col.name} />
+                  <Folder name={col.name}  />
                 </div>
               {:else if col.type === ItemType.REQUEST}
                 <Request name={col.name} method={col.request.method} />

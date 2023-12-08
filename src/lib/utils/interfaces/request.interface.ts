@@ -107,6 +107,11 @@ export interface Request {
   requestInProgress?: boolean;
 }
 
+export interface Collection {
+  requestCount?: number;
+  folderCount?: number;
+}
+
 export interface NewTab {
   id: string;
   name: string;
@@ -118,6 +123,7 @@ export interface NewTab {
   description: string;
   property: {
     request: Request;
+    collection: Collection;
   };
   isActive: boolean;
   save: boolean;

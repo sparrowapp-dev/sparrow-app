@@ -32,11 +32,11 @@
   let formDataFile: KeyValuePairWithBase[] = [];
   let method: string;
   let inputValue: string = "";
-  let getMessage : boolean = true;
-  let deleteMessage : boolean = true;
+  let getMessage: boolean = true;
+  let deleteMessage: boolean = true;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event?.id && currentTabId != event?.id){
+    if (event?.id && currentTabId != event?.id) {
       getMessage = true;
       deleteMessage = true;
     }
@@ -99,10 +99,14 @@
         <div
           class="cross-button d-flex align-items-center justify-content-center"
         >
-          <img src={crossIcon} alt="info"
-          class="cursor-pointer" on:click={()=>{
-            getMessage = false;
-          }} />
+          <img
+            src={crossIcon}
+            alt="info"
+            class="cursor-pointer"
+            on:click={() => {
+              getMessage = false;
+            }}
+          />
         </div>
       </div>
     {:else if method === "DELETE" && deleteMessage}
@@ -120,17 +124,23 @@
         <div
           class="cross-button d-flex align-items-center justify-content-center"
         >
-          <img src={crossIcon} alt="info"
-          class="cursor-pointer"
-          on:click={()=>{
-            deleteMessage = false;
-          }} />
+          <img
+            src={crossIcon}
+            alt="info"
+            class="cursor-pointer"
+            on:click={() => {
+              deleteMessage = false;
+            }}
+          />
         </div>
       </div>
     {/if}
   </div>
   <div class="mb-2 d-flex">
-    <p class="team-menu__link pb-1 mb-0" style="font-size: 12px; margin-top:4px;">
+    <p
+      class="team-menu__link pb-1 mb-0"
+      style="font-size: 12px; margin-top:4px;"
+    >
       Data Types:
     </p>
     <span class="pe-3" />
@@ -160,7 +170,7 @@
     <span class="pe-3" />
     {#if mainTab === RequestDataset.RAW}
       <Dropdown
-        dropdownId = {"hash987"}
+        dropdownId={"hash987"}
         title={rawTab}
         data={[
           {
@@ -222,7 +232,7 @@
   .cross-button {
     width: 36px;
   }
-  .cursor-pointer{
+  .cursor-pointer {
     cursor: pointer;
   }
 </style>
