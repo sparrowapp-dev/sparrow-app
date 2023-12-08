@@ -59,7 +59,7 @@
     <a
       target="_blank"
       href="http://sparrowapp.dev/"
-      class="view-roadmap-btn rounded d-flex p-2 justify-content-center align-items-center text-white text-decoration-none m-auto gap-2"
+      class="view-roadmap-btn rounded d-flex py-2 px-3 justify-content-center align-items-center text-white text-decoration-none m-auto gap-2"
     >
       View Roadmap
     </a>

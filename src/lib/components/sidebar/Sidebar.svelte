@@ -6,7 +6,7 @@
   import workspaces from "$lib/assets/workspaces.svg";
   import help from "$lib/assets/circle-question.svg";
   import Helper from "./Helper.svelte";
-  import Tooltip from "../tooltip/Tooltip.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let activeSideBarTabMethods;
   export let selectedActiveSideBarTab;
   function changeSelectedActiveSideBarTab(tab: string) {
