@@ -13,8 +13,10 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
-  import { selectMethodsStore, selectedMethodsCollectionStore} from "$lib/store/methods";
-
+  import {
+    selectMethodsStore,
+    selectedMethodsCollectionStore,
+  } from "$lib/store/methods";
 
   import DefaultCollection from "./DefaultCollection.svelte";
   import {
@@ -23,7 +25,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
+
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
   export let deleteCollectionData;
@@ -31,7 +33,6 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
-  
 
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -39,10 +40,10 @@
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
-  let showfilterDropdown=false;
+  let showfilterDropdown = false;
 
-  let selectedApiMethods:string[]=[];
-  let filteredSelectedMethodsCollection=[];
+  let selectedApiMethods: string[] = [];
+  let filteredSelectedMethodsCollection = [];
   let collapsExpandToggle: boolean = false;
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
@@ -64,18 +65,18 @@
       }
     },
   );
-  const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
-    if(value && value.length>0){
-      selectedApiMethods=value; 
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      selectedApiMethods = value;
     }
-  })
+  });
 
-  const selectedMethodsCollectionUnsubscribe=selectedMethodsCollectionStore.subscribe((value)=>{
-    if(value){
-      filteredSelectedMethodsCollection=value;
-    }
-  })
-  
+  const selectedMethodsCollectionUnsubscribe =
+    selectedMethodsCollectionStore.subscribe((value) => {
+      if (value) {
+        filteredSelectedMethodsCollection = value;
+      }
+    });
 
   const getNextCollection: (list: any[], name: string) => any = (
     list,
@@ -137,23 +138,20 @@
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-    
+
       collectionsMethods.updateCollection(newCollection._id, res);
       return;
     }
     return;
   };
 
-  const handleFilterDropdown=()=>{
-    const filterBtn=document.getElementById("filter-btn");
-    showfilterDropdown=!showfilterDropdown
-    filterBtn.style.backgroundColor=showfilterDropdown?"#85C2FF":"#000000";
-  }
-
- 
-
- 
- 
+  const handleFilterDropdown = () => {
+    const filterBtn = document.getElementById("filter-btn");
+    showfilterDropdown = !showfilterDropdown;
+    filterBtn.style.backgroundColor = showfilterDropdown
+      ? "#85C2FF"
+      : "#000000";
+  };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
@@ -172,16 +170,20 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
-    searchNode(searchData, filteredCollection, filteredFolder, filteredFile,collection);
-
+    searchNode(
+      searchData,
+      filteredCollection,
+      filteredFolder,
+      filteredFile,
+      collection,
+    );
   };
 
-  
-  onDestroy(()=>{
-   collapsibleStateUnsubscribe();
-   selectedMethodsCollectionUnsubscribe();
-   selectedMethodUnsubscibe();
-  })
+  onDestroy(() => {
+    collapsibleStateUnsubscribe();
+    selectedMethodsCollectionUnsubscribe();
+    selectedMethodUnsubscibe();
+  });
 
   const handleResize = () => {
     const windowWidth = window.innerWidth;
@@ -205,12 +207,14 @@
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
+
+  let selectedView: string = "grid";
 </script>
 
 {#if collapsExpandToggle}
   <div>
     <button
-      class="bg-blackColor border-0 rounded pb-3 pe-1"
+      class="border-0 rounded pb-3 pe-1 angleRight"
       style="display: {collapsExpandToggle
         ? 'block'
         : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
@@ -218,7 +222,15 @@
         : '0'}"
       on:click={setcollapsExpandToggle}
     >
-      <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
+      <img
+        src={doubleangleRight}
+        alt="Expand"
+        class="mb-4 mt-2"
+        on:click={() => {
+          selectedView = "grid";
+        }}
+        class:view-active={selectedView === "grid"}
+      />
       <div style="transform: rotate(270deg);font-size:10px;" class="mt-3 mb-2">
         Collections
       </div>
@@ -241,11 +253,19 @@
       {currentWorkspaceName || ""}
     </p>
     <button
-      class="bg-backgroundColor border-0"
+      class=" border-0 rounded px-2 angleButton"
       on:click={setcollapsExpandToggle}
       id="doubleAngleButton"
     >
-      <img src={doubleangleLeft} alt="" />
+      <img
+        src={doubleangleLeft}
+        alt=""
+        class="filter-green"
+        on:click={() => {
+          selectedView = "grid";
+        }}
+        class:view-active={selectedView === "grid"}
+      />
     </button>
   </div>
   <div
@@ -262,24 +282,27 @@
         class="inputField border-0 w-100 h-100 bg-blackColor"
         placeholder="Search APIs in {currentWorkspaceName || ''}"
         bind:value={searchData}
-        on:input={()=>{handleSearch()}}
+        on:input={() => {
+          handleSearch();
+        }}
       />
     </div>
 
     <div class="d-flex align-items-center justify-content-center">
-      <button id="filter-btn"
-  class="btn btn-blackColor  d-flex align-items-center justify-content-center"
-  style="width: 32px; height:32px; position:relative" on:click={handleFilterDropdown}
->
-
-  <img src={filterIcon}  alt=""/>
-  {#if showfilterDropdown}
-  <span
-  class="position-absolute"
-  style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
-/>
-{/if}
-</button>
+      <button
+        id="filter-btn"
+        class="btn btn-blackColor d-flex align-items-center justify-content-center"
+        style="width: 32px; height:32px; position:relative"
+        on:click={handleFilterDropdown}
+      >
+        <img src={filterIcon} alt="" />
+        {#if showfilterDropdown}
+          <span
+            class="position-absolute"
+            style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+          />
+        {/if}
+      </button>
     </div>
     <div>
       <RequestDropdown {collectionsMethods} {handleCreateCollection} />
@@ -289,7 +312,7 @@
   <div class="d-flex flex-column pt-3" style="overflow:auto;margin-top:5px;">
     <div class="d-flex flex-column justify-content-center">
       {#if showfilterDropdown}
-      <FilterDropDown handleSearch={handleSearch}></FilterDropDown>
+        <FilterDropDown {handleSearch} />
       {/if}
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
@@ -301,19 +324,18 @@
                 workspaceId={currentWorkspaceId}
                 path={exp.path}
                 explorer={exp.tree}
-                searchData={searchData}
+                {searchData}
               />
             {/each}
           {/if}
           {#if filteredFolder.length > 0}
-
             {#each filteredFolder as exp}
               <SearchTree
                 editable={true}
                 collectionId={exp.collectionId}
                 workspaceId={currentWorkspaceId}
                 explorer={exp.tree}
-                searchData={searchData}
+                {searchData}
               />
             {/each}
           {/if}
@@ -324,24 +346,23 @@
                 collectionId={exp.collectionId}
                 workspaceId={currentWorkspaceId}
                 explorer={exp.tree}
-                searchData={searchData}
+                {searchData}
               />
             {/each}
           {/if}
         </div>
-        {:else if selectedApiMethods.length>0 }
+      {:else if selectedApiMethods.length > 0}
         {#each filteredSelectedMethodsCollection as col}
-        <Folder
-          collectionList={collection}
-          collectionId={col._id}
-          {currentWorkspaceId}
-          collection={col}
-          title={col.name}
-          collectionsMethods={collectionsMethods}
-        />
-      {/each}
-      {:else}
-      {#if collection.length > 0}
+          <Folder
+            collectionList={collection}
+            collectionId={col._id}
+            {currentWorkspaceId}
+            collection={col}
+            title={col.name}
+            {collectionsMethods}
+          />
+        {/each}
+      {:else if collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList={collection}
@@ -355,12 +376,46 @@
       {:else}
         <DefaultCollection />
       {/if}
-      {/if}
     </div>
   </div>
 </div>
 
 <style>
+  .view-active {
+    filter: invert(98%) sepia(99%) saturate(24%) hue-rotate(160deg)
+      brightness(107%) contrast(100%);
+  }
+
+  .view-active:hover {
+    filter: invert(100%) sepia(100%) saturate(14%) hue-rotate(212deg)
+      brightness(104%) contrast(104%);
+  }
+
+  .angleRight {
+    background-color: var(--blackColor);
+  }
+  .angleRight:hover {
+    color: var(--blackColor);
+    font-weight: 600;
+    background-color: var(--workspace-hover-color);
+  }
+
+  .angleRight:active {
+    color: var(--white-color);
+    background-color: var(--button-pressed);
+  }
+  .angleButton {
+    background-color: var(--background-color);
+    cursor: pointer;
+  }
+
+  .angleButton:hover {
+    background-color: var(--workspace-hover-color);
+  }
+
+  .angleButton:active {
+    background-color: var(--button-pressed);
+  }
   .sidebar {
     height: calc(100vh - 44px);
     overflow-y: auto;
@@ -368,7 +423,7 @@
   .inputField {
     outline: none;
   }
-  .inputField:hover{
-    border:1px solid var(--workspace-hover-color);
+  .inputField:hover {
+    border: 1px solid var(--workspace-hover-color);
   }
 </style>
