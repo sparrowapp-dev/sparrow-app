@@ -42,13 +42,15 @@
         let progressiveTab;
         const tabList = val.map((elem) => {
           let temp = elem.toJSON();
-          temp.property.request.state.responseSection =
-            sample.property.request.state.responseSection;
-          temp.property.request.state.responseRaw =
-            sample.property.request.state.responseRaw;
-          temp.property.request.state.responseFormatter =
-            sample.property.request.state.responseFormatter;
-          temp.property.request.response = sample.property.request.response;
+          if(temp?.property?.request){
+            temp.property.request.state.responseSection =
+              sample.property.request.state.responseSection;
+            temp.property.request.state.responseRaw =
+              sample.property.request.state.responseRaw;
+            temp.property.request.state.responseFormatter =
+              sample.property.request.state.responseFormatter;
+            temp.property.request.response = sample.property.request.response;
+          }
           if (elem.isActive) {
             progressiveTab = temp;
           }
@@ -112,5 +114,4 @@
 <Toast />
 
 <style>
-  
 </style>

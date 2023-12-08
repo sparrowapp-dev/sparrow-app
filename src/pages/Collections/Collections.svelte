@@ -13,8 +13,11 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import type { Writable } from "svelte/store";
+
+  import type { Observable } from "rxjs";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { Writable } from "svelte/store";
+  import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -35,10 +38,10 @@
     getAllCollections: _collectionListViewModel.getAllCollections,
     addRequestaddFolder: _collectionListViewModel.addRequest,
     addFolder: _collectionListViewModel.addFolder,
-    deleteCollectionData: _viewModel.deleteCollectionData,
+    deleteCollection: _viewModel.deleteCollection,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
-    deleteFolder: _viewModel.deleteFolder,
+    deleteRequestOrFolderInCollection: _viewModel.deleteRequestOrFolderInCollection,
     getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
@@ -51,7 +54,7 @@
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
-    deleteRequestInCollection: _viewModel.deleteRequestInCollection,
+    deleteRequestInFolder: _viewModel.deleteRequestInFolder
   };
 
   const activeTab = _viewModel.activeTab;
@@ -71,11 +74,9 @@
   <div class="collections__list">
     <CollectionsList {collectionsMethods} />
   </div>
-  <div
-    class="collections__tools w-100 bg-backgroundColor"
-  >
+  <div class="collections__tools w-100 bg-backgroundColor">
     <div class="tab__bar">
-      <TabBar tabList={$tabList} _tabId = {$activeTab.id} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId = {$activeTab?.id} {collectionsMethods} />
     </div>
     <div class="tab__content d-flex">
       <div class="w-100">
@@ -88,11 +89,10 @@
         {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
           <p>FOLDER</p>
         {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-          <p>COLLECTION</p>
+          <MyCollection {collectionsMethods} {activeTab} />
         {/if}
-
       </div>
-        <SidebarRight />
+      <SidebarRight />
     </div>
   </div>
 </div>
