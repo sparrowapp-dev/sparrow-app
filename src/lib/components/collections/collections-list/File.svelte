@@ -226,7 +226,6 @@
   />
 {/if}
 
-
 <div class="content" bind:this={content} />
 
 {#if showMenu && id === openRequestId}
@@ -272,8 +271,8 @@
     handleClick();
   }}
 >
-<div class="d-flex align-items-center">
-  <div class="api-method text-{getMethodStyle(method)}">
+  <div class="d-flex align-items-center">
+    <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 

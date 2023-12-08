@@ -1,6 +1,6 @@
-import closeIcon from "$lib/assets/close.svg";
-import resizeIcon from "$lib/assets/resize.svg";
-import minimizeIcon from "$lib/assets/minimize.svg";
+import closeIcon from "$lib/assets/xmark.svg";
+import resizeIcon from "$lib/assets/window-resize-close.svg";
+import minimizeIcon from "$lib/assets/minus.svg";
 import circleIcon from "$lib/assets/Ellipse.svg";
 import searchIcon from "$lib/assets/search.svg";
 import settingIcon from "$lib/assets/setting.svg";
@@ -11,7 +11,7 @@ import shortcut from "$lib/assets/shortcut.svg";
 import about from "$lib/assets/about.svg";
 import settings from "$lib/assets/settings.svg";
 import account from "$lib/assets/account.svg";
-import doubleResizeIcon from "$lib/assets/close-icon.svg";
+import doubleResizeIcon from "$lib/assets/window-resize-open.svg";
 import sparrowicon from "$lib/assets/sparrowIcon.svg";
 
 export default {

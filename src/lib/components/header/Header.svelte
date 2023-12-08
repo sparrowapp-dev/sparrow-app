@@ -1,10 +1,7 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import closeIcon from "$lib/assets/close.svg";
-  import resizeIcon from "$lib/assets/resize.svg";
-  import minimizeIcon from "$lib/assets/minimize.svg";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import doubleResizeIcon from "$lib/assets/close-icon.svg";
+  import icons from "$lib/assets/app.asset";
 
   let isMaximizeWindow: boolean = false;
 
@@ -32,22 +29,40 @@
     </div>
   </div>
   <div class="d-flex gap-0">
-    <button on:click={onMinimize} class="btn btn-black button">
-      <img src={minimizeIcon} alt="" class="w-100" />
+    <button on:click={onMinimize} class="button-minus py-1 px-2">
+      <img src={icons.minimizeIcon} alt="" class="w-100" />
     </button>
     <button
       on:click={toggleSize}
-      class="btn btn-black button"
+      class="button-resize py-1 px-2"
       id="resize-button"
     >
       {#if isMaximizeWindow === true}
-        <img src={doubleResizeIcon} alt="" />
+        <img src={icons.doubleResizeIcon} alt="" />
       {:else}
-        <img src={resizeIcon} alt="" />
+        <img src={icons.resizeIcon} alt="" />
       {/if}
     </button>
-    <button on:click={onClose} class="btn btn-black">
-      <img src={closeIcon} alt="" class="w-100" />
+    <button on:click={onClose} class="button-close py-1 px-2">
+      <img src={icons.closeIcon} alt="" class="w-100" />
     </button>
   </div>
 </section>
+
+<style>
+  .button-minus,
+  .button-resize,
+  .button-close {
+    background-color: transparent;
+    border: none;
+  }
+
+  .button-minus:hover,
+  .button-resize:hover {
+    background-color: rgba(128, 128, 128, 0.288);
+  }
+
+  .button-close:hover {
+    background-color: red;
+  }
+</style>
