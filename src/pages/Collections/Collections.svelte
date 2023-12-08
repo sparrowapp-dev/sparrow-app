@@ -38,7 +38,7 @@
     deleteCollection: _viewModel.deleteCollection,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
-    deleteFolder: _viewModel.deleteFolder,
+    deleteRequestOrFolderInCollection: _viewModel.deleteRequestOrFolderInCollection,
     getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
@@ -51,7 +51,7 @@
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
-    deleteRequestInCollection: _viewModel.deleteRequestInCollection,
+    deleteRequestInFolder: _viewModel.deleteRequestInFolder,
   };
 
   const activeTab = _viewModel.activeTab;

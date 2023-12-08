@@ -1,77 +1,33 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import type { CollectionDocument } from "$lib/database/app.database";
   import { CollectionService } from "$lib/services/collection.service";
-  import { isShowFolderPopup } from "$lib/store/collection";
-  import type { Observable } from "rxjs";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-  import { CollectionListViewModel } from "../collections/collections-list/CollectionList.ViewModel";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
   export let collectionId: string;
-  export let openFolderId: string;
+  export let folderId: string;
   export let workspaceId: string;
+  export let folder;
   export let collectionsMethods: CollectionsMethods;
   export let closePopup : (flag: boolean) => void;
   const collectionService = new CollectionService();
 
-  let nameFolder: string = "";
-  let totalRequest: number = 0;
-  let totalFolder: number = 1;
-
-  let collectionTobeDeleted = [];
-  let folderName: string = "";
-
-  const _colllectionListViewModel = new CollectionListViewModel();
-
-  let folder: any[] = [];
-  const collections: Observable<CollectionDocument[]> =
-    _colllectionListViewModel.collection;
-
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value && value.length > 0) {
-        collectionTobeDeleted = value.filter((collection) => {
-          if (collection._data._id === collectionId) {
-            return collection._data;
-          }
-        });
-      }
-    },
-  );
-
-  collectionTobeDeleted[0]?._data.items.forEach((item) => {
-    if (item.id === openFolderId && item.type === ItemType.FOLDER) {
-      nameFolder = item.name;
-      totalRequest += item.items.length;
-    }
-  });
+  console.log(collectionId, workspaceId, folderId, folder);
+  let requestCount: number = folder.items.length;
 
   const handleDelete = async () => {
-    const deleteFolder = await collectionService.deleteFolderInCollection(
+    const response = await collectionService.deleteFolderInCollection(
       workspaceId,
       collectionId,
-      openFolderId,
+      folderId,
     );
 
-    if (deleteFolder.isSuccessful) {
-      collectionsMethods?.deleteFolder(collectionId, openFolderId);
-      isShowFolderPopup.set(false);
-      notifications.success(`"${folderName}" Folder deleted.`);
+    if (response.isSuccessful) {
+      collectionsMethods.deleteRequestOrFolderInCollection(collectionId, folderId);
+    
+      notifications.success(`"${folder.name}" Folder deleted.`);
     } else {
-      isShowFolderPopup.set(false);
       notifications.error("Failed to delete the Folder.");
     }
-  };
-
-  let isPopupShow: boolean;
-
-  isShowFolderPopup.subscribe((value) => {
-    isPopupShow = value;
-  });
-
-  const handleCancel = async () => {
-    isShowFolderPopup.set(false);
   };
 </script>
 
@@ -96,19 +52,15 @@
     <p>
       Are you sure you want to delete this Folder? Everything in <span
         style="font-weight:700;"
-        class="text-whiteColor">"{nameFolder}"</span
+        class="text-whiteColor">"{folder.name}"</span
       >
       will be removed.
     </p>
   </div>
   <div class="d-flex gap-3" style="font-size:12px">
     <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalRequest}</span>
+      <span class="text-plusButton">{requestCount}</span>
       <p>API Requests</p>
-    </div>
-    <div class="d-flex gap-1">
-      <span class="text-plusButton">{totalFolder}</span>
-      <p>Folder</p>
     </div>
   </div>
   <div

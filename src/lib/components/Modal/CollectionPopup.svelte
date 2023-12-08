@@ -4,6 +4,7 @@
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
+  import CoverButton from "../buttons/CoverButton.svelte";
 
   export let collectionId: string;
   export let workspaceId: string;
@@ -25,8 +26,9 @@
       requestCount++;
     }
   });
-
+  let deleteLoader: boolean = false;
   const handleDelete = async () => {
+    deleteLoader = true;
     const response = await collectionService.deleteCollection(
       workspaceId,
       collectionId,
@@ -36,8 +38,10 @@
       collectionsMethods.deleteCollection(collectionId);
       closePopup(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
+      deleteLoader = false;
     } else {
       notifications.error("Failed to delete the Collection.");
+      deleteLoader = false;
     }
   };
 </script>
@@ -86,16 +90,27 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <button
-      class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={() => {
+    <CoverButton
+      disable={deleteLoader}
+      text={"Cancel"}
+      size={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
         closePopup(false);
-      }}>Cancel</button
-    >
-    <button
-      class="btn-secondary border-0 text-blackColor px-3 py-1 rounded"
-      on:click={handleDelete}>Delete</button
-    >
+      }}
+    />
+
+    <CoverButton
+      disable={deleteLoader}
+      text={"Delete"}
+      size={14}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        handleDelete();
+      }}
+    />
   </div>
 </div>
 

@@ -82,7 +82,10 @@ export class CollectionRepository {
     });
   };
 
-  public deleteFolder = async (collectionId: string, folderId: string) => {
+  public deleteRequestOrFolderInCollection = async (
+    collectionId: string,
+    deleteId: string,
+  ) => {
     const collection = await rxdb.collection
       .findOne({
         selector: {
@@ -90,16 +93,15 @@ export class CollectionRepository {
         },
       })
       .exec();
-    const updatedItems = collection._data.items.filter((item) => {
-      if (item.type === ItemType.REQUEST) {
-        return item;
-      } else {
-        return item.id !== folderId;
+    const updatedItems = collection.toJSON().items.filter((element) => {
+      if (element.id !== deleteId) {
+        return true;
       }
+      return false;
     });
-
-    collection.incrementalPatch({
-      items: [...updatedItems],
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
     });
   };
 
@@ -251,8 +253,9 @@ export class CollectionRepository {
     });
   };
 
-  public deleteRequestInCollection = async (
+  public deleteRequestInFolder = async (
     collectionId: string,
+    folderId: string,
     requestId: string,
   ) => {
     const collection = await rxdb.collection
@@ -263,10 +266,24 @@ export class CollectionRepository {
       })
       .exec();
 
-    const updatedItems = collection.toJSON().items.filter((element) => {
-      if (element.id !== requestId) {
-        return element;
+    // const updatedItems = collection.toJSON().items.filter((element) => {
+    //   if (element.id !== requestId) {
+    //     return element;
+    //   }
+    // });
+
+    const updatedItems = collection.toJSON().items.map((element) => {
+      if (element.id === folderId) {
+        const deletedElement = element.items.filter((e) => {
+          if (e.id !== requestId) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        element.items = deletedElement;
       }
+      return element;
     });
 
     collection.incrementalModify((value) => {

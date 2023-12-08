@@ -231,8 +231,9 @@
   <FolderPopup
     {collectionsMethods}
     {collectionId}
-    {openFolderId}
+    folderId = {explorer.id}
     {workspaceId}
+    folder = {explorer}
     closePopup={handleFolderPopUp}
   />
 {/if}

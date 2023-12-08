@@ -182,11 +182,9 @@
   <FilePopup
     {collectionsMethods}
     {folderId}
-    {folderName}
     {collectionId}
-    {openRequestId}
-    {name}
-    {workspaceId}
+    workspaceId = {currentWorkspaceId}
+    request = {api}
     closePopup={handleFilePopUp}
   />
 {/if}

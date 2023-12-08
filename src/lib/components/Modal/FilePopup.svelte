@@ -4,12 +4,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   export let folderId: string;
-  export let folderName: string;
   export let collectionId: string;
-  export let openRequestId: string;
-  export let name: string;
   export let workspaceId: string;
-  export let closePopup : (flag: boolean) => void;
+  export let request;
+  export let closePopup: (flag: boolean) => void;
 
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
@@ -17,52 +15,67 @@
   let requestName: string = "";
 
   const handleDelete = async () => {
-    const deleteFolder = await collectionService.deleteRequestInCollection(
-      openRequestId,
-      {
-        collectionId,
-        workspaceId,
-        folderId,
-        items: {
-          name: name,
-          type: "REQUEST",
-        },
-      },
-    );
-
-    if (deleteFolder.isSuccessful) {
-      if (folderId !== "" && folderName !== "") {
-        collectionsMethods?.deleteRequestInFolderCollection(
+    if (folderId) {
+      const response = await collectionService.deleteRequestInCollection(
+        request.id,
+        {
           collectionId,
-          openRequestId,
+          workspaceId,
           folderId,
-        );
-      } else {
-        collectionsMethods.deleteRequestInCollection(
+        },
+      );
+      if (response.isSuccessful) {
+        collectionsMethods.deleteRequestInFolder(
           collectionId,
-          openRequestId,
+          folderId,
+          request.id
         );
+        notifications.success(`"${request.name}" Request deleted.`);
+
+      } else {
+        notifications.error("Failed to delete the Request.");
       }
-      notifications.success(`"${requestName}" Request deleted.`);
-    } else {
-      notifications.error("Failed to delete the Request.");
+    } 
+    else if (workspaceId && collectionId){
+      const response = await collectionService.deleteRequestInCollection(
+        request.id,
+        {
+          collectionId,
+          workspaceId,
+        },
+      );
+      if (response.isSuccessful) {
+        collectionsMethods.deleteRequestOrFolderInCollection(
+          collectionId,
+          request.id
+        );
+        notifications.success(`"${request.name}" Request deleted.`);
+
+      } else {
+        notifications.error("Failed to delete the Request.");
+      }
     }
   };
-
 </script>
 
-  <div class="background-overlay" on:click={()=>{
+<div
+  class="background-overlay"
+  on:click={() => {
     closePopup(false);
-  }}/>
+  }}
+/>
 
 <div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Request?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={()=>{
-      closePopup(false);
-    }}>
+    <button
+      class="btn-close1 border-0 rounded"
+      on:click={() => {
+        closePopup(false);
+      }}
+    >
       <img src={closeIcon} alt="" />
     </button>
   </div>
@@ -70,7 +83,7 @@
     <p>
       Are you sure you want to delete this Request? <span
         style="font-weight:700;"
-        class="text-whiteColor">"{requestName} "</span
+        class="text-whiteColor">"{request.name} "</span
       >
       will be removed.
     </p>
@@ -82,7 +95,7 @@
   >
     <button
       class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={()=>{
+      on:click={() => {
         closePopup(false);
       }}>Cancel</button
     >

@@ -30,7 +30,10 @@ export interface CollectionsMethods {
     folderId: string,
     name: string,
   ) => void;
-  deleteFolder: (collectionId: string, folderId: string) => void;
+  deleteRequestOrFolderInCollection: (
+    collectionId: string,
+    deleteId: string,
+  ) => void;
   getCollectionList: () => any;
   getActiveWorkspace: () => Observable<any>;
   addRequestInFolder: (collectionId: string, folderId: string, request) => void;
@@ -47,7 +50,11 @@ export interface CollectionsMethods {
     items: any,
   ) => void;
 
-  deleteRequestInCollection: (collectionId: string, requestId: string) => void;
+  deleteRequestInFolder: (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+  ) => void;
   addCollection: (collection) => void;
   updateCollection: (uuid: string, data) => void;
 
