@@ -15,6 +15,8 @@
   import { useNavigate } from "svelte-navigator";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let collectionsMethods: CollectionsMethods;
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -116,7 +118,7 @@
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px;height:20px ;padding: 0px, 6px, 0px, 6px;"
+    style="width: 238px; height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
@@ -160,77 +162,76 @@
   >
     <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
       <div class="col-{!isSearchVisible ? '1' : '1'}">
-        <button class="bg-blackColor border-0">
-          <img src={icons.settingIcon} alt="" />
-        </button>
+        <Tooltip>
+          <button class="bg-blackColor border-0">
+            <img src={icons.settingIcon} alt="" />
+          </button>
+        </Tooltip>
       </div>
       <div class="col-{!isSearchVisible ? '1' : '2'}">
-        <button class="bg-blackColor border-0">
-          <img src={icons.notifyIcon} alt="" />
-        </button>
+        <Tooltip>
+          <button class="bg-blackColor border-0">
+            <img src={icons.notifyIcon} alt="" />
+          </button>
+        </Tooltip>
       </div>
       <div class="col-{!isSearchVisible ? '1' : '2'}">
         <div class="position-relative">
           <button
-            class="bg-blackColor border-0"
+            class={`bg-blackColor border-0`}
             id="profile-dropdown"
+            style="width: 24px; height: 24px;"
             on:click={toggleDropdown}
           >
-            <img src={icons.profileIcon} alt="" />
+            <p
+              class={`profile-circle ${
+                isOpen
+                  ? "bg-plusButton text-black"
+                  : "profile-btn text-defaultColor"
+              } m-auto text-center align-items-center justify-content-center `}
+              style={`font-size: 12px; ${
+                isOpen
+                  ? "border: 2.2px solid #1193F0;"
+                  : "border: 2.2px solid #45494D;"
+              } `}
+            >
+              R
+            </p>
           </button>
+
           <div
             class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
-            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: {isOpen
+            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
               ? 'block'
-              : 'none'}; top: 40px; right: 0; width: 219px;"
+              : 'none'}; top: 40px; right: -10px; width: 219px;"
             on:click={() => {
               isOpen = false;
             }}
           >
             <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
-              on:click={() => {
-                isOpen = false;
-              }}
+              class="text-center align-items-center justify-content-center pt-3"
             >
-              <img src={icons.account} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">View Account</span
+              <p
+                class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-            </div>
-            <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
-              on:click={() => {
-                profile = false;
-              }}
-            >
-              <img src={icons.settings} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">Notification Settings</span
+                R
+              </p>
+              <h1
+                class="text-white fw-normal mt-3"
+                style="color: #999; font-family: Roboto; font-size: 12px;"
               >
-            </div>
-            <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
-              on:click={() => {
-                profile = false;
-              }}
-            >
-              <img src={icons.shortcut} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">App Shortcuts</span
+                John Doe
+              </h1>
+              <p
+                class="text-requestBodyColor fw-medium mb-0"
+                style="font-size: 12px;"
               >
+                john.doe@gmail.com
+              </p>
             </div>
-            <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
-              on:click={() => {
-                profile = false;
-              }}
-            >
-              <img src={icons.about} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">About Sparrow</span
-              >
-            </div>
+            <hr class="" />
+
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
               on:click={() => {
@@ -293,6 +294,13 @@
 
   .button-close:hover {
     background-color: red;
+  }
+  .profile-circle {
+    border-radius: 50%;
+  }
+  .profile-btn:hover {
+    border: 2.2px solid #8a9299 !important;
+    color: #8a9299 !important;
   }
 
   .gradient-text {

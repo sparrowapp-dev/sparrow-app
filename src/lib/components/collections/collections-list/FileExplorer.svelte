@@ -39,7 +39,7 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
 
-  let showFolderAPIButtons:boolean=true;
+  let showFolderAPIButtons: boolean = true;
 
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
@@ -99,65 +99,48 @@
       return;
     }
   };
-   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
-    if(value && value.length>0){
-      expand=true;
-      showFolderAPIButtons=false;
-    }else{
-      showFolderAPIButtons=true;
-      expand=false;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      expand = true;
+      showFolderAPIButtons = false;
+    } else {
+      showFolderAPIButtons = true;
+      expand = false;
     }
-  })
+  });
 
-  onDestroy(()=>{
+  onDestroy(() => {
     selectedMethodUnsubscibe();
-  })
+  });
 
   let pos = { x: 0, y: 0 };
 
-  let menu = { h: -25, y: -25 };
-
-  let browser = { h: 0, y: 0 };
-  let content;
   let showMenu: boolean = false;
-  let button;
-
-  let openMenuButton: HTMLElement = null;
+  let isFolderPopup: boolean = false;
 
   let openFolderId: string = "";
 
   // Assuming you have a container reference (e.g., containerRef) in your component
   let containerRef;
 
-  function rightClickContextMenu(e, selectedFolderId, button) {
-    if (!showMenu) {
-      openFolderId = selectedFolderId;
-      showMenu = true;
-
-      // Dynamically calculate the position based on the click event
-      pos = { x: e.clientX, y: e.clientY };
-
+  function rightClickContextMenu(e) {
+    e.preventDefault();
+    setTimeout(() => {
       const containerRect = containerRef?.getBoundingClientRect();
-      if (containerRect) {
-        // Adjust position if necessary to keep the menu within the container
-        pos.x = Math.min(pos.x, containerRect.right - menu.y);
-        pos.y = Math.min(pos.y, containerRect.bottom - menu.h);
-      }
-    }
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY };
+      showMenu = true;
+    }, 100);
   }
 
-  function onPageClick(e) {
+  function closeRightClickContextMenu() {
     showMenu = false;
   }
 
-  function getContextMenuDimension(node) {
-    let height = node.offsetHeight;
-    let width = node.offsetWidth;
-    menu = {
-      h: height,
-      y: width,
-    };
-  }
+  const handleFolderPopUp = (flag) => {
+    isFolderPopup = flag;
+  };
 
   let newFolderName: string = "";
   let isRenaming = false;
@@ -219,62 +202,53 @@
     expand = true;
   }
 
-  async function deleteFolder() {
-    isShowFolderPopup.set(true);
-  }
-
   let menuItems = [
     {
       onClick: openFolder,
       displayText: "Open Folder",
+      disabled: false,
     },
     {
       onClick: renameFolder,
       displayText: "Rename Folder",
+      disabled: true,
     },
     {
       onClick: addRequest,
       displayText: "Add Request",
+      disabled: false,
     },
 
     {
-      onClick: deleteFolder,
+      onClick: () => {
+        handleFolderPopUp(true);
+      },
       displayText: "Delete",
+      disabled: false,
     },
   ];
-
-  function toggleMenuVisibility() {
-    showMenu = !showMenu;
-  }
-
-  let isShowFolder: boolean;
-  isShowFolderPopup.subscribe((value) => {
-    isShowFolder = value;
-  });
 
   let workspaceId = currentWorkspaceId;
 </script>
 
-{#if isShowFolder}
+{#if isFolderPopup}
   <FolderPopup
     {collectionsMethods}
     {collectionId}
-    {openFolderId}
+    folderId={explorer.id}
     {workspaceId}
+    folder={explorer}
+    closePopup={handleFolderPopUp}
   />
 {/if}
 
-<svelte:window on:click={onPageClick} />
+<svelte:window
+  on:click={closeRightClickContextMenu}
+  on:contextmenu|preventDefault={closeRightClickContextMenu}
+/>
 
 {#if showMenu}
-  <nav
-    use:getContextMenuDimension
-    style="position: fixed; top:{pos.y}px; left:{pos.x}px"
-  >
-    <div
-      on:click={toggleMenuVisibility}
-      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
-    />
+  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -283,7 +257,10 @@
         {#each menuItems as item}
           <li class="align-items-center">
             <button
-              class="align-items-center mb-1 px-3 py-2"
+              disabled={item.disabled}
+              class={`align-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
               on:click={item.onClick}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
@@ -297,17 +274,18 @@
 
 {#if explorer.type === "FOLDER"}
   <div
-    on:contextmenu|preventDefault={(e) =>
-      rightClickContextMenu(e, explorer.id, button)}
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
-    on:click={() => {
-      if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-        expand = !expand;
-      }
-    }}
   >
-    <div class="d-flex align-items-center justify-content-center gap-2 pe-0">
+    <div
+      on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+      on:click={() => {
+        if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+          expand = !expand;
+        }
+      }}
+      class="w-100 d-flex align-items-center gap-2 pe-0"
+    >
       {#if expand}
         <div
           style="height:16px; width:16px;"
@@ -338,17 +316,17 @@
       {/if}
     </div>
 
-    <button
-      class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
-      on:click={(e) => {
-        e.stopPropagation();
-        rightClickContextMenu(e, explorer.id, button);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
     {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
+    {:else}
+      <button
+        class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
+        on:click={(e) => {
+          rightClickContextMenu(e);
+        }}
+      >
+        <img src={threedotIcon} alt="threedotIcon" />
+      </button>
     {/if}
   </div>
   <div
@@ -367,13 +345,11 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-    <div class="mt-2 mb-2 ms-2">
-    <IconButton text = {"+ API Request"} onClick= {handleAPIClick} />
-  </div>
-
+      <div class="mt-2 mb-2 ms-2">
+        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+      </div>
     {/if}
   </div>
-   
 {:else}
   <div style="padding-left: 6px; cursor:pointer;">
     <File

@@ -43,10 +43,6 @@ export interface DeleteRequestName {
   collectionId: string;
   workspaceId: string;
   folderId?: string;
-  items: {
-    name: string;
-    type: string;
-  };
 }
 
 export interface CreateApiRequestPostBody {

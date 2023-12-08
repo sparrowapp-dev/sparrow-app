@@ -2307,6 +2307,18 @@ eslint@^8.54.0:
     strip-ansi "^6.0.1"
     text-table "^0.2.0"
 
+esm-env-robust@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/esm-env-robust/-/esm-env-robust-0.0.3.tgz#ef95644dde2f2bd750dec4366a43950b3dc3ed50"
+  integrity sha512-90Gnuw2DALOqlL1581VxP3GHPUNHX9U+fQ+8FNcTTFClhY5gEggAAnJ3q1b2Oq23knRsjv8YpNeMRPaMLUymOA==
+  dependencies:
+    esm-env "^1.0.0"
+
+esm-env@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/esm-env/-/esm-env-1.0.0.tgz#b124b40b180711690a4cb9b00d16573391950413"
+  integrity sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==
+
 espree@^9.6.0, espree@^9.6.1:
   version "9.6.1"
   resolved "https://registry.yarnpkg.com/espree/-/espree-9.6.1.tgz#a2a17b8e434690a5432f2f8018ce71d331a48c6f"
@@ -4883,6 +4895,18 @@ svelte-sortablejs@^0.2.0:
   dependencies:
     sirv-cli "^0.4.4"
     sortablejs "^1.10.2"
+
+svelte-split-pane@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/svelte-split-pane/-/svelte-split-pane-0.1.2.tgz#aae94c583fdcf80e3ceaefc31755f3c49886e6a8"
+  integrity sha512-JluEydC9v2DetyhlwCF3CdqAkET8XPHP7WeWbl4lVLOg55avDOhoS5U6BRhvWd104HOqhUcCSz+7Nveyjmzjeg==
+
+svelte-splitpanes@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/svelte-splitpanes/-/svelte-splitpanes-0.8.0.tgz#8135f21c8f5c6529ec6fa59b120a32785bcbef2c"
+  integrity sha512-cdtSUG8GE8eCAY+TiIGJmnEqV0GC1k/7lwWqovN0qTbw7OIAKEA2BWvqnZ/jk7UzSLlzdI2Uxxm4shXgCdN1kQ==
+  dependencies:
+    esm-env-robust "0.0.3"
 
 svelte-toasts@^1.1.2:
   version "1.1.2"

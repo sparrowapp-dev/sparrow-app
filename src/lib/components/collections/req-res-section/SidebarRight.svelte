@@ -6,9 +6,10 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import WorkspaceSidebar from "$lib/components/workspace/workspaceSidebar.svelte";
-    let tabList = [];
-    let currentTabId:string;
-    let selectedTab:Partial<NewTab>={}
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  let tabList = [];
+  let currentTabId: string;
+  let selectedTab: Partial<NewTab> = {};
   const tabsUnsubscribe = tabs.subscribe((value) => {
     tabList = value;
   });
@@ -17,33 +18,40 @@
     if (value && value.id) {
       currentTabId = value.id;
       if (currentTabId && tabList) {
-        selectedTab=tabList.filter((tab:NewTab)=>{
-          return tab.id===currentTabId
-        })[0]
+        selectedTab = tabList.filter((tab: NewTab) => {
+          return tab.id === currentTabId;
+        })[0];
       }
-    }else{
-      selectedTab={};
+    } else {
+      selectedTab = {};
     }
   });
 </script>
 
 {#if selectedTab.type === ItemType.WORKSPACE}
-<WorkspaceSidebar></WorkspaceSidebar>
+  <WorkspaceSidebar></WorkspaceSidebar>
 {:else}
-<div class="sidebar-right bg-backgroundColor">
-  <div class="d-flex flex-column">
-    <button class="bg-backgroundColor border-0 mb-4 mt-3">
-      <img src={commetIcon} alt="" />
-    </button>
-    <button class="bg-backgroundColor border-0 mb-4">
-      <img src={bookIcon} alt="" />
-    </button>
-    <button class="bg-backgroundColor border-0">
-      <img src={codeIcon} alt="" />
-    </button>
+  <div class="sidebar-right bg-backgroundColor">
+    <div class="d-flex flex-column">
+      <Tooltip>
+        <button class="bg-backgroundColor border-0 mb-4 mt-3">
+          <img src={commetIcon} alt="" />
+        </button>
+      </Tooltip>
+      <Tooltip>
+        <button class="bg-backgroundColor border-0 mb-4">
+          <img src={bookIcon} alt="" />
+        </button>
+      </Tooltip>
+      <Tooltip>
+        <button class="bg-backgroundColor border-0">
+          <img src={codeIcon} alt="" />
+        </button>
+      </Tooltip>
+    </div>
   </div>
-</div>
 {/if}
+
 <style>
   .sidebar-right {
     width: 32px;

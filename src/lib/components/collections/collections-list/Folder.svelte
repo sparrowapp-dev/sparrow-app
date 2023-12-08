@@ -4,17 +4,9 @@
   import IconButton from "$lib/components/buttons/IconButton.svelte";
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
-
-  import {
-    isShowCollectionPopup,
-    useCollectionTree,
-  } from "$lib/store/collection";
-
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
 
   import { CollectionService } from "$lib/services/collection.service";
-
-  const { insertNode, updateNodeId, insertHead } = useCollectionTree();
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -26,6 +18,7 @@
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
   import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let title: string;
   export let collection: any;
@@ -127,63 +120,32 @@
   });
 
   let openCollectionId: string;
-  let isMenuOpen: boolean = false;
 
   let pos = { x: 0, y: 0 };
 
-  let menu = { h: 0, y: 0 };
-
-  let browser = { h: 0, y: 0 };
-  let content;
-
   let showMenu: boolean = false;
   let button;
-  let openMenuButton: HTMLElement = null;
 
-  function rightClickContextMenu(e, button) {
-    if (openCollectionId === collectionId) {
-      showMenu = !showMenu;
-    } else {
-      openCollectionId = collectionId;
+  let containerRef;
+  function rightClickContextMenu(e) {
+    e.preventDefault();
+    setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
-    }
-
-    if (button) {
-      openMenuButton = button;
-      const rect = button.getBoundingClientRect();
-      pos = { x: rect.right - 260, y: rect.top - 5 };
-    } else {
-      browser = {
-        y: window.innerWidth,
-        h: window.innerHeight,
-      };
-      pos = {
-        x: e.clientX,
-        y: e.clientY,
-      };
-
-      if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
-      if (browser.y - pos.x < menu.y) pos.x = pos.x - menu.y;
-    }
-    isMenuOpen = true;
+    }, 100);
   }
 
-  let menuContainer;
+  let isCollectionPopup: boolean = false;
 
-  function onPageClick(e) {
-    if (menuContainer && !menuContainer.contains(e.target)) {
-      isMenuOpen = false;
-      showMenu = false;
-    }
-  }
+  const handleCollectionPopUp = (flag) => {
+    isCollectionPopup = flag;
+  };
 
-  function getContextMenuDimension(node) {
-    let height = node.offsetHeight;
-    let width = node.offsetWidth;
-    menu = {
-      h: height,
-      y: width,
-    };
+  function closeRightClickContextMenu() {
+    showMenu = false;
   }
 
   //open collection
@@ -250,40 +212,40 @@
     showMenu = false;
   };
 
-  //delete collection
-  const deleteCollection = async () => {
-    isShowCollectionPopup.set(true);
-    showMenu = false;
-  };
-
   let menuItems = [
     {
       onClick: openCollections,
       displayText: "Open collection",
+      disabled: false,
     },
     {
       onClick: renameCollection,
       displayText: "Rename collection",
+      disabled: true,
     },
     {
       onClick: addRequest,
       displayText: "Add Request",
+      disabled: false,
     },
     {
       onClick: addFolder,
       displayText: "Add Folder",
+      disabled: false,
     },
 
     {
-      onClick: deleteCollection,
+      onClick: () => {
+        handleCollectionPopUp(true);
+      },
       displayText: "Delete",
+      disabled: false,
     },
   ];
 
   const handleClick = () => {
     let totalFolder: number = 0;
     let totalRequest: number = 0;
-    console.log(collection);
     collection.items.map((item) => {
       if (item.type === ItemType.REQUEST) {
         totalRequest++;
@@ -312,41 +274,20 @@
     collectionsMethods.handleCreateTab(Samplecollection);
     moveNavigation("right");
   };
-
-  if (collectionId !== openCollectionId) {
-    showMenu = false;
-  }
-
-  let isShowCollection: boolean;
-  isShowCollectionPopup.subscribe((value) => {
-    isShowCollection = value;
-  });
-
-  function toggleMenuVisibility() {
-    showMenu = !showMenu;
-  }
 </script>
 
-{#if isShowCollection}
+{#if isCollectionPopup}
   <CollectionPopup
     {collectionsMethods}
-    {openCollectionId}
-    {currentWorkspaceId}
+    {collection}
+    {collectionId}
+    workspaceId={currentWorkspaceId}
+    closePopup={handleCollectionPopUp}
   />
 {/if}
 
-<div class="content" bind:this={content} />
-
-{#if showMenu && collectionId === openCollectionId}
-  <nav
-    bind:this={menuContainer}
-    use:getContextMenuDimension
-    style="position: absolute; top:{pos.y}px; left:{pos.x}px"
-  >
-    <div
-      on:click={toggleMenuVisibility}
-      style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;"
-    />
+{#if showMenu}
+  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
     <div
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
@@ -355,7 +296,10 @@
         {#each menuItems as item}
           <li class="align-items-center">
             <button
-              class="align-items-center mb-1 px-3 py-2"
+              disabled={item.disabled}
+              class={`align-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
               on:click={item.onClick}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
@@ -367,23 +311,25 @@
   </nav>
 {/if}
 
-<svelte:window on:click={onPageClick} />
+<svelte:window
+  on:click={closeRightClickContextMenu}
+  on:contextmenu|preventDefault={closeRightClickContextMenu}
+/>
 
 <button
-  bind:this={button}
-  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, button)}
-  on:click={() => {
-    if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
-      visibility = !visibility;
-    }
-  }}
-  on:click={() => {
-    handleClick();
-  }}
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
 >
-  <div class="d-flex align-items-center">
+  <div
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click={() => {
+      if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
+        visibility = !visibility;
+        handleClick();
+      }
+    }}
+    class="d-flex w-100 align-items-center"
+  >
     <img
       src={angleRight}
       class=""
@@ -409,17 +355,17 @@
       </p>
     {/if}
   </div>
-  <button
-    class="threedot-icon-container pe-1 border-0 rounded d-flex justify-content-center align-items-center"
-    on:click={(e) => {
-      e.stopPropagation();
-      rightClickContextMenu(e, button);
-    }}
-  >
-    <img src={threedotIcon} alt="threedotIcon" />
-  </button>
-  {#if collection?._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
+  {:else}
+    <button
+      class="threedot-icon-container pe-1 border-0 rounded d-flex justify-content-center align-items-center"
+      on:click={(e) => {
+        rightClickContextMenu(e);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
   {/if}
 </button>
 

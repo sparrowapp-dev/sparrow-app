@@ -10,7 +10,8 @@
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-
+  import lockicon from "$lib/assets/lock-icon.svg";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -212,16 +213,20 @@
           </span>
         </div>
         <div>
-          <button
-            class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
-          >
-            <p
-              class="mb-0 text-whiteColor"
-              style="font-size: 14px; font-weight:400"
+          <Tooltip>
+            <button
+              disabled
+              class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
             >
-              Share
-            </p>
-          </button>
+              <img src={lockicon} alt="lock-icon" />
+              <p
+                class="mb-0 text-whiteColor"
+                style="font-size: 14px; font-weight:400"
+              >
+                Share
+              </p>
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>

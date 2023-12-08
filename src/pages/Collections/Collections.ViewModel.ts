@@ -86,9 +86,8 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
-  public deleteCollectionData = async (id: string) => {
+  public deleteCollection = async (id: string) => {
     this.collectionRepository.deleteCollection(id);
-    this.debouncedTab();
   };
 
   public updateCollectionName = async (id: string, name: string) => {
@@ -105,9 +104,11 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
-  public deleteFolder = async (id: string, folderId: string) => {
-    this.collectionRepository.deleteFolder(id, folderId);
-    this.debouncedTab();
+  public deleteRequestOrFolderInCollection = async (
+    id: string,
+    deleteId: string,
+  ) => {
+    this.collectionRepository.deleteRequestOrFolderInCollection(id, deleteId);
   };
   public getCollectionList = () => {
     return this.collectionRepository.getCollection();
@@ -188,12 +189,14 @@ export class CollectionsViewModel {
     );
   };
 
-  public deleteRequestInCollection = (
+  public deleteRequestInFolder = (
     collectionId: string,
+    folderId: string,
     requestId: string,
   ) => {
-    this.collectionRepository.deleteRequestInCollection(
+    this.collectionRepository.deleteRequestInFolder(
       collectionId,
+      folderId,
       requestId,
     );
   };

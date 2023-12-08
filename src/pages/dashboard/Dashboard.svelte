@@ -1,14 +1,16 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
-  import Teams from "../Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
+  import Teams from "../Teams/Teams.svelte";
   import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel";
+  import Mock from "../Mock/Mock.svelte";
+  import Enviornment from "../Enviornment/Enviornment.svelte";
 
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
@@ -74,16 +76,16 @@
     {/await}
     <section class="w-100">
       <Route path="/collections/*"><CollectionsHome /></Route>
-      <Route path="/mock">Mock</Route>
-      <Route path="/environment">Environment</Route>
+      <Route path="/mock/*"><Mock /></Route>
+      <Route path="/environment/*"><Enviornment /></Route>
       <Route path="/teams/*"><Teams /></Route>
       <Route path="/workspaces">Workspaces</Route>
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#await getActiveTab then activeTab}
-          <Navigate to={activeTab} />
+          <Navigate to={activeTab}></Navigate>
         {:catch}
-          <Navigate to={"collections"} />
+          <Navigate to={"collections"}></Navigate>
         {/await}
       </Route>
     </section>
