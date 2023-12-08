@@ -31,15 +31,23 @@ export const progressiveTab = writable({});
  */
 const createTab = async (tab: NewTab): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
-    const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
-        elem.isActive = false;
+    let flag: boolean = false;
+    value.forEach((element: NewTab) => {
+      if (tab.id === element.id) {
+        flag = true;
+        element.isActive = true;
+        progressiveTab.set(element);
+      } else {
+        element.isActive = false;
       }
-      return elem;
     });
-    return [...updatedTab, tab];
+    if (flag) {
+      return value;
+    } else {
+      progressiveTab.set(tab);
+      return [...value, tab];
+    }
   });
-  progressiveTab.set(tab);
 };
 /**
  * Removes an existing tab from the tab bar.
