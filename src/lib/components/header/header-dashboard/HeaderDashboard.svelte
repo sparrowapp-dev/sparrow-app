@@ -1,8 +1,8 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
-  import { Observable, async } from "rxjs";
-  import minimizeIcon from "$lib/assets/minimize.svg";
+  import { Observable } from "rxjs";
+ 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
