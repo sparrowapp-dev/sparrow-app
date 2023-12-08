@@ -56,7 +56,7 @@
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
-      if (value && value.length > 0) {
+      if (value) {
         const collectionArr = value.map(
           (collectionDocument: CollectionDocument) => {
             const collectionObj =

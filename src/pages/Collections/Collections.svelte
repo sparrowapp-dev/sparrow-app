@@ -38,10 +38,10 @@
     getAllCollections: _collectionListViewModel.getAllCollections,
     addRequestaddFolder: _collectionListViewModel.addRequest,
     addFolder: _collectionListViewModel.addFolder,
-    deleteCollectionData: _viewModel.deleteCollectionData,
+    deleteCollection: _viewModel.deleteCollection,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
-    deleteFolder: _viewModel.deleteFolder,
+    deleteRequestOrFolderInCollection: _viewModel.deleteRequestOrFolderInCollection,
     getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
@@ -54,9 +54,7 @@
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
-    deleteRequestInCollection: _viewModel.deleteRequestInCollection,
-    deleteResponseFromRequestProperty:
-      _viewModel.deleteResponseFromRequestProperty,
+    deleteRequestInFolder: _viewModel.deleteRequestInFolder
   };
 
   const activeTab = _viewModel.activeTab;
@@ -78,7 +76,7 @@
   </div>
   <div class="collections__tools w-100 bg-backgroundColor">
     <div class="tab__bar">
-      <TabBar tabList={$tabList} _tabId={$activeTab.id} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId = {$activeTab?.id} {collectionsMethods} />
     </div>
     <div class="tab__content d-flex">
       <div class="w-100">
