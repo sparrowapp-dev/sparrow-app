@@ -4,17 +4,14 @@
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { v4 as uuidv4 } from "uuid";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
-
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  let isLoading: boolean = false;
 
   let tabName: string = "";
   let componentData: NewTab;
@@ -50,42 +47,12 @@
   };
 
   const handleApiRequest = async () => {
-    const request = generateSampleRequest(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
+    const response = await _myColllectionViewModel.createApiRequest(
+      componentData,
+      collectionsMethods,
     );
-    const requestObj = {
-      collectionId: componentData.path.collectionId,
-      workspaceId: componentData.path.workspaceId,
-      items: {
-        name: request.name,
-        type: request.type,
-        request: {
-          method: request.property.request.method,
-        },
-      },
-    };
-    collectionsMethods.addRequestOrFolderInCollection(
-      componentData.path.collectionId,
-      {
-        ...requestObj.items,
-        id: request.id,
-      },
-    );
-    const response = await _myColllectionViewModel.addRequest(requestObj);
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
-      collectionsMethods.updateRequestOrFolderInCollection(
-        componentData.path.collectionId,
-        request.id,
-        res,
-      );
-      request.id = res.id;
-      request.path.workspaceId = componentData.path.workspaceId;
-      request.path.collectionId = componentData.path.collectionId;
-      collectionsMethods.handleCreateTab(request);
-      moveNavigation("right");
-      return;
+    if (response.isSuccessful) {
+      isLoading = false;
     }
   };
 
@@ -128,9 +95,18 @@
         />
       </div>
       <button
-        style="font-size: 12px;"
-        class="btn btn-primary border-0 py-2"
-        on:click={handleApiRequest}>New Request</button
+        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor"
+        style="font-size: 15px;font-weight:400"
+        on:click={handleApiRequest}
+        >{#if isLoading}
+          <span
+            class="me-1 ms-0 d-flex align-item-center justify-content-start"
+          >
+            {#if loaderColor === "default"}
+              <Spinner size={"8px"} />
+            {/if}
+          </span>
+        {/if}New Request</button
       >
     </div>
     <div class="d-flex gap-4 mb-4 ps-2">

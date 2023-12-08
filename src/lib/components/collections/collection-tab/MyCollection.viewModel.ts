@@ -2,9 +2,12 @@
 
 import { CollectionService } from "$lib/services/collection.service";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
+import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import { notifications } from "$lib/utils/notifications";
+import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+import { v4 as uuidv4 } from "uuid";
 
 export class MyCollectionViewModel {
   private collectionService = new CollectionService();
@@ -63,6 +66,50 @@ export class MyCollectionViewModel {
 
     if (newCollectionName === "") {
       notifications.error("Please enter text before save");
+    }
+  };
+
+  public createApiRequest = async (
+    componentData,
+    collectionsMethods: CollectionsMethods,
+  ) => {
+    const request = generateSampleRequest(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      new Date().toString(),
+    );
+    const requestObj = {
+      collectionId: componentData.path.collectionId,
+      workspaceId: componentData.path.workspaceId,
+      items: {
+        name: request.name,
+        type: request.type,
+        request: {
+          method: request.property.request.method,
+        },
+      },
+    };
+    collectionsMethods.addRequestOrFolderInCollection(
+      componentData.path.collectionId,
+      {
+        ...requestObj.items,
+        id: request.id,
+      },
+    );
+    const response = await this.addRequest(requestObj);
+
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      collectionsMethods.updateRequestOrFolderInCollection(
+        componentData.path.collectionId,
+        request.id,
+        res,
+      );
+      request.id = res.id;
+      request.path.workspaceId = componentData.path.workspaceId;
+      request.path.collectionId = componentData.path.collectionId;
+      collectionsMethods.handleCreateTab(request);
+      moveNavigation("right");
+      return response;
     }
   };
 }
