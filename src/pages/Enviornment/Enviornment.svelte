@@ -1,5 +1,5 @@
 <script lang="ts">
-  import UnderDevelopment from "$pages/UnderDevelopment/UnderDevelopment.svelte";
+  import UnderDevelopment from "../UnderDevelopment/UnderDevelopment.svelte";
 </script>
 
 <div class="d-flex">
