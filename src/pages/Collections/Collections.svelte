@@ -68,13 +68,15 @@
       moveNavigation("right");
     }
   };
+
+  const collapseCollectionPanel = collapsibleState;
 </script>
 
 <div class="d-flex collection">
   <div class="collections__list">
     <CollectionsList {collectionsMethods} />
   </div>
-  <div class="collections__tools w-100 bg-backgroundColor">
+  <div class="collections__tools bg-backgroundColor {$collapseCollectionPanel ? 'sidebar-collapse' : 'sidebar-expand'}">
     <div class="tab__bar">
       <TabBar tabList={$tabList} _tabId = {$activeTab?.id} {collectionsMethods} />
     </div>
@@ -101,5 +103,11 @@
 <style>
   .collections__tools {
     height: calc(100vh - 44px);
+  }
+  .sidebar-expand{
+    width: calc(100vw - 352px);
+  }
+  .sidebar-collapse{
+    width: calc(100vw - 72px);
   }
 </style>
