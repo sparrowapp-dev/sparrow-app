@@ -16,6 +16,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -162,16 +163,19 @@
     {
       onClick: () => {},
       displayText: "Open Request",
+      disabled: false,
     },
     {
       onClick: renameRequest,
       displayText: "Rename Request",
+      disabled: true,
     },
     {
       onClick: () => {
         handleFilePopUp(true);
       },
       displayText: "Delete",
+      disabled: false,
     },
   ];
 
@@ -183,8 +187,8 @@
     {collectionsMethods}
     {folderId}
     {collectionId}
-    workspaceId = {currentWorkspaceId}
-    request = {api}
+    workspaceId={currentWorkspaceId}
+    request={api}
     closePopup={handleFilePopUp}
   />
 {/if}
@@ -199,7 +203,10 @@
         {#each menuItems as item}
           <li class="align-items-center">
             <button
-              class="align-items-center mb-1 px-3 py-2"
+              disabled={item.disabled}
+              class={`align-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
               on:click={item.onClick}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
