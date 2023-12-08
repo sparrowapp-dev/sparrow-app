@@ -1,5 +1,22 @@
 <script lang="ts">
   import whitePlus from "$lib/assets/plus-white.svg";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { v4 as uuidv4 } from "uuid";
+  export let handleCreateCollection;
+  export let collectionsMethods: CollectionsMethods;
+
+  const addApiRequest = () => {
+    collectionsMethods.handleCreateTab(
+      generateSampleRequest(
+        UntrackedItems.UNTRACKED + uuidv4(),
+        new Date().toString(),
+      ),
+    );
+    moveNavigation("right");
+  };
 </script>
 
 <div
@@ -15,10 +32,11 @@ font-weight: 300;"
   <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
     <button
       class="buttons d-flex justify-content-center align-items-center gap-1"
+      on:click={handleCreateCollection}
     >
       <img src={whitePlus} alt="+" />Collection
     </button>
-    <button class="buttons">
+    <button class="buttons" on:click={addApiRequest}>
       <img src={whitePlus} alt="+" />
       API Request</button
     >

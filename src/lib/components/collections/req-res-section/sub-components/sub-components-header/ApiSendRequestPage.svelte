@@ -40,9 +40,9 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    urlText = event?.property.request.url;
-    method = event?.property.request.method;
-    disabledSend = event?.property.request.requestInProgress;
+    urlText = event?.property.request?.url;
+    method = event?.property.request?.method;
+    disabledSend = event?.property.request?.requestInProgress;
     request = event?.property.request;
   });
 

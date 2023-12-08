@@ -9,10 +9,9 @@
     isShowCollectionPopup,
     useCollectionTree,
   } from "$lib/store/collection";
-  import { RequestDefault } from "$lib/utils/enums/request.enum";
+
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
-  import ContextMenu from "./ContextMenu.svelte";
-  import { WorkspaceService } from "$lib/services/workspace.service";
+
   import { CollectionService } from "$lib/services/collection.service";
 
   const { insertNode, updateNodeId, insertHead } = useCollectionTree();
@@ -22,16 +21,18 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
+  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
 
-  let showFolderAPIButtons:boolean=true;
+  let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
 
@@ -82,7 +83,7 @@
       items: {
         name: request.name,
         type: request.type,
-        description:"",
+        description: "",
         request: {
           method: request.property.request.method,
         },
@@ -105,25 +106,25 @@
       request.id = res.id;
       request.path.workspaceId = currentWorkspaceId;
       request.path.collectionId = collectionId;
-      
+
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
       return;
     }
   };
-   const selectedMethodUnsubscibe=selectMethodsStore.subscribe((value)=>{
-    if(value && value.length>0){
-      showFolderAPIButtons=false;
-      visibility=true;
-    }else if(value && value.length===0){
-       visibility=false;
-    }else{
-      showFolderAPIButtons=true;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      showFolderAPIButtons = false;
+      visibility = true;
+    } else if (value && value.length === 0) {
+      visibility = false;
+    } else {
+      showFolderAPIButtons = true;
     }
-  })
-  onDestroy(()=>{
+  });
+  onDestroy(() => {
     selectedMethodUnsubscibe();
-    });
+  });
 
   let openCollectionId: string;
   let isMenuOpen: boolean = false;
@@ -208,16 +209,10 @@
 
       title = updateCollectionName?.data?.data?.name;
 
-      const updatedCollection = {
-        name: title,
-        _id: collection._id,
-        updatedAt: collection.updatedAt,
-        updatedBy: collection.updatedBy,
-        totalRequests: collection.totalRequests,
-        createdAt: collection.createdAt,
-        createdBy: collection.createdBy,
-      };
-      collectionsMethods.updateCollection(openCollectionId, updatedCollection);
+      collectionsMethods.updateCollection(
+        openCollectionId,
+        updateCollectionName.data.data,
+      );
     }
     isRenaming = false;
   };
@@ -285,6 +280,39 @@
     },
   ];
 
+  const handleClick = () => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    console.log(collection);
+    collection.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+        totalRequest += item.items.length;
+      }
+    });
+
+    let path: Path = {
+      workspaceId: currentWorkspaceId,
+      collectionId,
+    };
+
+    const Samplecollection = generateSampleCollection(
+      collectionId,
+      new Date().toString(),
+    );
+
+    Samplecollection.id = collectionId;
+    Samplecollection.path = path;
+    Samplecollection.name = title;
+    Samplecollection.property.collection.requestCount = totalRequest;
+    Samplecollection.property.collection.folderCount = totalFolder;
+    Samplecollection.save = true;
+    collectionsMethods.handleCreateTab(Samplecollection);
+    moveNavigation("right");
+  };
+
   if (collectionId !== openCollectionId) {
     showMenu = false;
   }
@@ -349,12 +377,16 @@
       visibility = !visibility;
     }
   }}
+  on:click={() => {
+    handleClick();
+  }}
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
 >
   <div class="d-flex align-items-center">
     <img
       src={angleRight}
+      class=""
       style="height:14px; width:14px; margin-right:8px; {visibility
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
@@ -386,7 +418,7 @@
   >
     <img src={threedotIcon} alt="threedotIcon" />
   </button>
-  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection?._id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {/if}
 </button>
@@ -407,10 +439,10 @@
     />
   {/each}
   {#if showFolderAPIButtons}
-  <div class="mt-2 mb-2">
-    <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-    <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-  </div>
+    <div class="mt-2 mb-2">
+      <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+    </div>
   {/if}
 </div>
 

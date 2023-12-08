@@ -6,6 +6,7 @@ const collectionList = writable([]);
 export const isShowCollectionPopup = writable(false);
 export const isShowFolderPopup = writable(false);
 export const isShowFilePopup = writable(false);
+export const isSelectedCollection = writable(false);
 
 export const deletedCollectionWorkspaceId = writable({
   collectionId: null,

@@ -39,10 +39,10 @@
   let pencilIconState: boolean = false;
   let apiState;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    apiState = event?.property.request.state;
-    selectedTab = event?.property.request.state.section;
-    progress = event?.property.request.requestInProgress;
-    request = event?.property.request;
+    apiState = event?.property?.request?.state;
+    selectedTab = event?.property?.request?.state.section;
+    progress = event?.property?.request?.requestInProgress;
+    request = event?.property?.request;
 
     response = event?.property.request?.response;
     headersCount =
