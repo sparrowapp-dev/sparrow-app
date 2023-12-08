@@ -3,6 +3,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
+    import CoverButton from "../buttons/CoverButton.svelte";
   export let folderId: string;
   export let collectionId: string;
   export let workspaceId: string;
@@ -12,10 +13,11 @@
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
 
-  let requestName: string = "";
+  let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
-    if (folderId) {
+    if (folderId && collectionId && workspaceId) {
+      deleteLoader = true;
       const response = await collectionService.deleteRequestInCollection(
         request.id,
         {
@@ -29,14 +31,16 @@
           collectionId,
           folderId,
           request.id
-        );
-        notifications.success(`"${request.name}" Request deleted.`);
-
+          );
+          notifications.success(`"${request.name}" Request deleted.`);
+          deleteLoader = false;
       } else {
         notifications.error("Failed to delete the Request.");
+        deleteLoader = false;
       }
     } 
     else if (workspaceId && collectionId){
+      deleteLoader = true;
       const response = await collectionService.deleteRequestInCollection(
         request.id,
         {
@@ -50,9 +54,11 @@
           request.id
         );
         notifications.success(`"${request.name}" Request deleted.`);
+        deleteLoader = false;
 
       } else {
         notifications.error("Failed to delete the Request.");
+        deleteLoader = false;
       }
     }
   };
@@ -93,16 +99,27 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <button
-      class="btn-primary px-3 py-1 border-0 rounded"
-      on:click={() => {
-        closePopup(false);
-      }}>Cancel</button
-    >
-    <button
-      class="btn-secondary border-0 text-blackColor px-3 py-1 rounded"
-      on:click={handleDelete}>Delete</button
-    >
+  <CoverButton
+  disable={deleteLoader}
+  text={"Cancel"}
+  size={14}
+  type={"dark"}
+  loader={false}
+  onClick={() => {
+    closePopup(false);
+  }}
+/>
+
+<CoverButton
+  disable={deleteLoader}
+  text={"Delete"}
+  size={14}
+  type={"danger"}
+  loader={deleteLoader}
+  onClick={() => {
+    handleDelete();
+  }}
+/>
   </div>
 </div>
 
