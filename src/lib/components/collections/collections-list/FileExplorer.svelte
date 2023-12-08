@@ -206,14 +206,17 @@
     {
       onClick: openFolder,
       displayText: "Open Folder",
+      disabled: false,
     },
     {
       onClick: renameFolder,
       displayText: "Rename Folder",
+      disabled: true,
     },
     {
       onClick: addRequest,
       displayText: "Add Request",
+      disabled: false,
     },
 
     {
@@ -221,6 +224,7 @@
         handleFolderPopUp(true);
       },
       displayText: "Delete",
+      disabled: false,
     },
   ];
 
@@ -231,9 +235,9 @@
   <FolderPopup
     {collectionsMethods}
     {collectionId}
-    folderId = {explorer.id}
+    folderId={explorer.id}
     {workspaceId}
-    folder = {explorer}
+    folder={explorer}
     closePopup={handleFolderPopUp}
   />
 {/if}
@@ -253,7 +257,10 @@
         {#each menuItems as item}
           <li class="align-items-center">
             <button
-              class="align-items-center mb-1 px-3 py-2"
+              disabled={item.disabled}
+              class={`align-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
               on:click={item.onClick}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button

@@ -22,6 +22,7 @@
       heading="Collections"
       logo={collections}
       isSelected={"collections" === selectedActiveSideBarTab ? true : false}
+      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
@@ -30,6 +31,7 @@
       heading="Mock"
       logo={mock}
       isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      disabled={true}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
@@ -38,14 +40,17 @@
       heading="Environment"
       logo={environment}
       isSelected={"environment" === selectedActiveSideBarTab ? true : false}
+      disabled={true}
       {changeSelectedActiveSideBarTab}
     />
+    <hr class="m-1 border-2" />
     <Helper
       {activeSideBarTabMethods}
       route="teams"
       heading="Teams"
       logo={teams}
       isSelected={"teams" === selectedActiveSideBarTab ? true : false}
+      disabled={true}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
@@ -54,6 +59,7 @@
       heading="Workspaces"
       logo={workspaces}
       isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
   </div>
@@ -66,6 +72,7 @@
         logo={help}
         isSelected={"help" === selectedActiveSideBarTab ? true : false}
         {changeSelectedActiveSideBarTab}
+        disabled={true}
       />
     </Tooltip>
   </div>
