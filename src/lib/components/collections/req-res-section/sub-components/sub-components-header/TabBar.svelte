@@ -9,18 +9,18 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import { onDestroy } from "svelte";
-    import SaveRequest from "../save-request/SaveRequest.svelte";
-    import ClosePopup from "../close-popup/ClosePopup.svelte";
-    import type { NewTab } from "$lib/utils/interfaces/request.interface";
-    import { string } from "yup";
+  import { onDestroy } from "svelte";
+  import SaveRequest from "../save-request/SaveRequest.svelte";
+  import ClosePopup from "../close-popup/ClosePopup.svelte";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { string } from "yup";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
-  export let  _tabId : string;
+  export let _tabId: string;
   let removeTab;
-  let closePopup : boolean = false;
-  
+  let closePopup: boolean = false;
+
   $: {
     if (tabList) {
       if (tabList.length >= 0 && tabList.length <= 5) {
@@ -36,7 +36,7 @@
   let saveAsVisibility: boolean = false;
   const handleSaveAsBackdrop = (flag) => {
     saveAsVisibility = flag;
-  }; 
+  };
 
   let tabWidth: number = 196;
   let scrollerParent: number;
@@ -45,17 +45,16 @@
 
   const handleClosePopupBackdrop = (flag) => {
     closePopup = flag;
-  }; 
-  const closeTab = (id, tab : NewTab) => {
-    if(tab.save){
+  };
+  const closeTab = (id, tab: NewTab) => {
+    if (tab.save) {
       collectionsMethods.handleRemoveTab(id);
-    }
-    else{
+    } else {
       tabId = id;
       removeTab = tab;
       closePopup = true;
     }
-  }
+  };
 
   onDestroy(() => {});
 </script>
@@ -135,7 +134,7 @@
     {collectionsMethods}
     {_tabId}
     componentData={removeTab}
-    onFinish = {(_id)=>{
+    onFinish={(_id) => {
       collectionsMethods.handleRemoveTab(_id);
     }}
     onClick={handleSaveAsBackdrop}
@@ -144,17 +143,16 @@
 {#if closePopup}
   <ClosePopup
     {collectionsMethods}
-    onFinish = {(_id)=>{
+    onFinish={(_id) => {
       collectionsMethods.handleRemoveTab(_id);
     }}
-    componentData = {removeTab}
+    componentData={removeTab}
     {handleSaveAsBackdrop}
-    closeCallback ={handleClosePopupBackdrop}
+    closeCallback={handleClosePopupBackdrop}
   />
 {/if}
 
 <style>
-
   .tabbar {
     height: 36px;
   }

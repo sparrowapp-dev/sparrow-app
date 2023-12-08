@@ -38,6 +38,8 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
 
+
+
   interface Path {
     name: string;
     id: string;
@@ -532,7 +534,7 @@
                     navigateToDirectory(col);
                   }}
                 >
-                  <Folder name={col.name} />
+                  <Folder name={col.name}  />
                 </div>
               {:else if col.type === ItemType.REQUEST}
                 <Request name={col.name} method={col.request.method} />
@@ -845,7 +847,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
-    z-index: 99999;
+    z-index: 9;
   }
   .save-request {
     position: fixed;
@@ -856,7 +858,7 @@
     background-color: var(--background-color);
     width: 960px;
     height: 640px;
-    z-index: 999999;
+    z-index: 10;
   }
   .cursor-pointer {
     cursor: pointer;

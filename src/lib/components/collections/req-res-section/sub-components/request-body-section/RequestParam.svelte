@@ -40,10 +40,10 @@
   let pencilIconState: boolean = false;
   let apiState;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    apiState = event?.property.request.state;
-    selectedTab = event?.property.request.state.section;
-    progress = event?.property.request.requestInProgress;
-    request = event?.property.request;
+    apiState = event?.property?.request?.state;
+    selectedTab = event?.property?.request?.state.section;
+    progress = event?.property?.request?.requestInProgress;
+    request = event?.property?.request;
 
     response = event?.property.request?.response;
     headersCount =
@@ -182,7 +182,8 @@
           on:keydown={() => {}}
           class="team-menu__link d-flex pb-1"
           class:tab-active={selectedTab === RequestSection.REQUEST_BODY}
-          >Request Body
+        >
+          Body
         </span>
       </span>
 
@@ -257,7 +258,6 @@
       {:else if response?.status}
         <ResponseParams {apiState} {collectionsMethods} {response} />
       {/if}
-
       {#if progress}
         <div
           class="position-absolute"
@@ -288,5 +288,11 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .border-left {
+    border-left: 1px solid var(--border-color);
+  }
+  .border-top {
+    border-top: 1px solid var(--border-color);
   }
 </style>

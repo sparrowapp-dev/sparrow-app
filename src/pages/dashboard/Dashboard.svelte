@@ -1,29 +1,28 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
-  import Teams from "../Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
+  import Teams from "../Teams/Teams.svelte";
   import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
-
-
+  import Mock from "../Mock/Mock.svelte";
+  import Enviornment from "../Enviornment/Enviornment.svelte";
 
   let collapsExpandToggle = false;
-  let selectedActiveSideBar:string="collections";
-
+  let selectedActiveSideBar: string = "collections";
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
   const _viewModel = new ActiveSideBarTabViewModel();
-  const activeSideBarTabMethods={
-    addActiveTab:_viewModel.addActiveTab,
-    getActiveTab:_viewModel.getActiveTab,
-    updateActiveTab:_viewModel.updateActiveTab,
-  }
+  const activeSideBarTabMethods = {
+    addActiveTab: _viewModel.addActiveTab,
+    getActiveTab: _viewModel.getActiveTab,
+    updateActiveTab: _viewModel.updateActiveTab,
+  };
   const setcollapsExpandToggle = () => {
     collapsibleState.set(false);
   };
@@ -37,21 +36,18 @@
     isCollaps = windowWidth <= 800;
   };
 
-
-  async function handleActiveTab(){
-    const activeTab=await activeSideBarTabMethods.getActiveTab();
-    if(activeTab){
-      selectedActiveSideBar=activeTab;
-    }else{
+  async function handleActiveTab() {
+    const activeTab = await activeSideBarTabMethods.getActiveTab();
+    if (activeTab) {
+      selectedActiveSideBar = activeTab;
+    } else {
       await activeSideBarTabMethods.addActiveTab("collections");
-      selectedActiveSideBar="collections";
+      selectedActiveSideBar = "collections";
     }
     return selectedActiveSideBar;
   }
 
-  const getActiveTab=handleActiveTab();
-
-  
+  const getActiveTab = handleActiveTab();
 
   onMount(() => {
     window.addEventListener("resize", handleResize);
@@ -64,32 +60,32 @@
 
 <div class="dashboard">
   <HeaderDashboard />
-  <div class="dashboard-teams d-flex flex-column">
-    {#await getActiveTab}
-    {:then selectedActiveSideBar}
-    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={selectedActiveSideBar} />
+  <div class="dashboard-teams d-flex">
+    {#await getActiveTab then selectedActiveSideBar}
+      <Sidebar
+        {activeSideBarTabMethods}
+        selectedActiveSideBarTab={selectedActiveSideBar}
+      />
     {:catch}
-    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={"collections"} />
+      <Sidebar
+        {activeSideBarTabMethods}
+        selectedActiveSideBarTab={"collections"}
+      />
     {/await}
-    <Route path="/collections/*"><CollectionsHome /></Route>
-    <Route path="/mock">Mock</Route>
-    <Route path="/environment">Environment</Route>
-    <Route path="/teams/*"><Teams /></Route>
-    <Route path="/workspaces">Workspaces</Route>
-    <Route path="/help">Help</Route>
-    <Route path="/*">
-     {#await getActiveTab}
-     {:then activeTab}
-     <Navigate to={activeTab}></Navigate>
-     {:catch}
-     <Navigate to={"collections"}></Navigate>
-     {/await}
-    </Route>
+    <section class="w-100">
+      <Route path="/collections/*"><CollectionsHome /></Route>
+      <Route path="/mock/*"><Mock /></Route>
+      <Route path="/environment/*"><Enviornment /></Route>
+      <Route path="/teams/*"><Teams /></Route>
+      <Route path="/workspaces">Workspaces</Route>
+      <Route path="/help">Help</Route>
+      <Route path="/*">
+        {#await getActiveTab then activeTab}
+          <Navigate to={activeTab}></Navigate>
+        {:catch}
+          <Navigate to={"collections"}></Navigate>
+        {/await}
+      </Route>
+    </section>
   </div>
 </div>
-
-<style>
-  .dashboard-teams {
-    margin-left: 72px;
-  }
-</style>

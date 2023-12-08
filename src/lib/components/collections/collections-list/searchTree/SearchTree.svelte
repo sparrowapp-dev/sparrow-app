@@ -13,7 +13,7 @@
   function getIndex(text:string,searchData:string):number{
     return text.toLowerCase().indexOf(searchData.toLowerCase());
   }
-  debugger;
+
 </script>
 
 <div>

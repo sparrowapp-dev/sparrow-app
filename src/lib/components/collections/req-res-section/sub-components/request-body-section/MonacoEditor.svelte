@@ -6,6 +6,7 @@
   import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
+  import { isHorizontalVertical } from "$lib/store/request-response-section";
   // import {
   //   handleisRawBodyValid,
   // } from "$lib/store/request-response-section";
@@ -15,7 +16,7 @@
   export let rawValue;
   export let callback;
   export let value = "";
-  
+
   let editorElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
   let model: monaco.editor.ITextModel;
@@ -95,7 +96,7 @@
         { token: "delimiter", foreground: "#FFFFFF" },
       ],
       colors: {
-        "editor.background": "#000000",
+        "editor.background": '#1E1E1E',
       },
     });
     monaco.editor.setTheme("myTheme");
@@ -218,7 +219,7 @@
     });
 
     editor.onDidChangeModelContent((e) => {
-    const input = editor.getValue();
+      const input = editor.getValue();
       callback(input);
     });
 
@@ -252,13 +253,24 @@
       selectedTabId = currentTabId;
     }
   });
+
+  let isHorizontalVerticalMode: boolean;
+  const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
+    (value) => {
+      isHorizontalVerticalMode = value;
+    },
+  );
+
+  onDestroy(() => {
+    isHorizontalVerticalUnsubscribe();
+  });
 </script>
 
 <div class="code-editor" bind:this={editorElement} />
 
 <style>
   .code-editor {
-    width: 100%;
+    width: 99%;
     height: 250px;
   }
 </style>

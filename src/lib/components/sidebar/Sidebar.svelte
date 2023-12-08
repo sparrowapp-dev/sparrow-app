@@ -6,23 +6,68 @@
   import workspaces from "$lib/assets/workspaces.svg";
   import help from "$lib/assets/circle-question.svg";
   import Helper from "./Helper.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let activeSideBarTabMethods;
   export let selectedActiveSideBarTab;
-  function changeSelectedActiveSideBarTab(tab:string){
-    selectedActiveSideBarTab=tab
+  function changeSelectedActiveSideBarTab(tab: string) {
+    selectedActiveSideBarTab = tab;
   }
 </script>
 
 <div class="sidebar">
   <div class="sidebar__main">
-    <Helper   activeSideBarTabMethods={activeSideBarTabMethods}  route="collections" heading="Collections" logo={collections} isSelected={"collections"===selectedActiveSideBarTab?true:false} changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab} />
-    <Helper  activeSideBarTabMethods={activeSideBarTabMethods} route="mock" heading="Mock" logo={mock} isSelected={"mock"===selectedActiveSideBarTab?true:false} changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab}/>
-    <Helper  activeSideBarTabMethods={activeSideBarTabMethods} route="environment" heading="Environment" logo={environment} isSelected={"environment"===selectedActiveSideBarTab?true:false}  changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab}/>
-    <Helper  activeSideBarTabMethods={activeSideBarTabMethods} route="teams" heading="Teams" logo={teams}  isSelected={"teams"===selectedActiveSideBarTab?true:false}  changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab}  />
-    <Helper  activeSideBarTabMethods={activeSideBarTabMethods} route="workspaces" heading="Workspaces" logo={workspaces}  isSelected={"workspaces"===selectedActiveSideBarTab?true:false} changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab}/>
+    <Helper
+      {activeSideBarTabMethods}
+      route="collections"
+      heading="Collections"
+      logo={collections}
+      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <Helper
+      {activeSideBarTabMethods}
+      route="mock"
+      heading="Mock"
+      logo={mock}
+      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <Helper
+      {activeSideBarTabMethods}
+      route="environment"
+      heading="Environment"
+      logo={environment}
+      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <Helper
+      {activeSideBarTabMethods}
+      route="teams"
+      heading="Teams"
+      logo={teams}
+      isSelected={"teams" === selectedActiveSideBarTab ? true : false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <Helper
+      {activeSideBarTabMethods}
+      route="workspaces"
+      heading="Workspaces"
+      logo={workspaces}
+      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      {changeSelectedActiveSideBarTab}
+    />
   </div>
   <div class="sidebar__help">
-    <Helper  activeSideBarTabMethods={activeSideBarTabMethods} route="help" heading="Help" logo={help} isSelected={"help"===selectedActiveSideBarTab?true:false} changeSelectedActiveSideBarTab={changeSelectedActiveSideBarTab} />
+    <Tooltip>
+      <Helper
+        {activeSideBarTabMethods}
+        route="help"
+        heading="Help"
+        logo={help}
+        isSelected={"help" === selectedActiveSideBarTab ? true : false}
+        {changeSelectedActiveSideBarTab}
+      />
+    </Tooltip>
   </div>
 </div>
 
@@ -35,9 +80,6 @@
     padding: 12px 4px 12px 4px;
     border-right: 1px solid #313233;
     justify-content: space-between;
-    position: fixed;
-    top: 44px;
-    left: 0;
     background: #1e1e1e;
   }
   .sidebar__main {

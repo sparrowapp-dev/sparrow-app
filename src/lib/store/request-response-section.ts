@@ -41,7 +41,6 @@ const createTab = async (tab: NewTab): Promise<void> => {
   });
   progressiveTab.set(tab);
 };
-
 /**
  * Removes an existing tab from the tab bar.
  */
