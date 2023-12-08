@@ -27,9 +27,8 @@
         "unminimize": true,
         "startDragging": true,
         "setSize": true,
-        "setFullscreen": true,
-        "center": true,
-        "setFocus": true
+        "setFocus": true,
+        "center": true
       }
     },
     "bundle": {
