@@ -1,15 +1,15 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
-  import Teams from "$pages/Teams/Teams.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
-  import CollectionsHome from "$pages/Collections/Collections.svelte";
+  import Teams from "../Teams/Teams.svelte";
+  import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
-  import Mock from "$pages/Mock/Mock.svelte";
-  import Enviornment from "$pages/Enviornment/Enviornment.svelte";
+  import Mock from "../Mock/Mock.svelte";
+  import Enviornment from "../Enviornment/Enviornment.svelte";
 
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";

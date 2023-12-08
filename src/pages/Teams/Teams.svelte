@@ -1,7 +1,7 @@
 <script lang="ts">
   // import TeamsList from "$lib/components/teams/teams-list/TeamsList.svelte";
   // import TeamsContent from "$lib/components/teams/teams-content/TeamsContent.svelte";
-  import UnderDevelopment from "$pages/UnderDevelopment/UnderDevelopment.svelte";
+  import UnderDevelopment from "../UnderDevelopment/UnderDevelopment.svelte";
 </script>
 
 <div class="d-flex">
