@@ -272,6 +272,13 @@
           on:click={() => isHorizontalVertical.set(false)}
           on:click={() => {
             selectedView = "grid";
+            const splitter = document.querySelector(".splitpanes__splitter");
+            const leftPanel = document.querySelector(".left-panel");
+            const rightPanel = document.querySelector(".right-panel");
+            rightPanel.style.width = "50%";
+            leftPanel.style.width = "50%";
+            splitter.style.height = "85vh";
+            splitter.style.width = "0%";
           }}
           class:view-active={selectedView === "grid"}
           src={tableColumnIcon}
@@ -283,6 +290,13 @@
           on:click={() => isHorizontalVertical.set(true)}
           on:click={() => {
             selectedView = "grid1";
+            const splitter = document.querySelector(".splitpanes__splitter");
+            const leftPanel = document.querySelector(".left-panel");
+            const rightPanel = document.querySelector(".right-panel");
+            splitter.style.height = "0%";
+            splitter.style.width = "100%";
+            rightPanel.style.width = "100%";
+            leftPanel.style.width = "100%";
           }}
           class:view-active={selectedView === "grid1"}
           src={barIcon}

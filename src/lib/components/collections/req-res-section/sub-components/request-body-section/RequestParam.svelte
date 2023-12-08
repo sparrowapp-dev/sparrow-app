@@ -14,7 +14,7 @@
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import ResponseError from "../response-error/ResponseError.svelte";
   import { RequestSection } from "$lib/utils/enums/request.enum";
   import {
@@ -24,6 +24,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -98,17 +99,46 @@
       );
     }
   };
+  onMount(() => {
+    const splitter = document.querySelector(".splitpanes__splitter");
+    if (splitter) {
+      splitter.addEventListener("mouseover", () => {
+        splitter.style.border = "solid #1193f0";
+        splitter.style.cursor = isHorizontalVerticalMode
+          ? "row-resize"
+          : "col-resize";
+      });
+      splitter.addEventListener("mouseout", () => {
+        splitter.style.border = "solid #313233";
+      });
+    }
+  });
+  function stylePanes() {
+    const splitter = document.querySelector(".splitpanes__splitter");
+    if (splitter) {
+      // Common styles
+      splitter.style.height = "85vh";
+      splitter.style.width = "2px";
 
+      splitter.style.border = "solid #313233";
+    }
+  }
 </script>
 
-<div
+<Splitpanes
+  style={isHorizontalVertical && "height: 85vh; "}
+  on:ready={stylePanes}
+  theme=""
   class="d-flex align-items-start {isHorizontalVerticalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
+  horizontal={isHorizontalVerticalMode ? true : false}
+  dblClickSplitter={false}
 >
-  <div
-    class="right-panel d-flex flex-column align-items-top justify-content-center pt-3 ps-4 pe-2"
-    style="width:{isHorizontalVerticalMode ? '100%' : '50%'}; "
+  <Pane
+    class="right-panel d-flex flex-column align-items-top overflow-y-auto pt-3 ps-4 pe-2"
+    minSize={25}
+    size={50}
   >
     <div
       class="{isCollaps
@@ -217,16 +247,10 @@
         <Authorization request={createDeepCopy(request)} {collectionsMethods} />
       {/if}
     </div>
-  </div>
+  </Pane>
 
-  <div
-    style="width:{isHorizontalVerticalMode
-      ? '100%'
-      : '50%'};
-      height:calc(100vh - 200px);"
-    class="left-panel pt-3 px-4 position-relative {isHorizontalVerticalMode?'border-top':'border-left'}"
-  >
-    <div class=" d-flex flex-column" style="height:100%;">
+  <Pane class="left-panel pt-3 px-4 position-relative " minSize={25} size={50}>
+    <div class=" d-flex flex-column">
       {#if !response?.status}
         <DefaultPage />
       {:else if response?.status === "Not Found"}
@@ -248,8 +272,8 @@
         </div>
       {/if}
     </div>
-  </div>
-</div>
+  </Pane>
+</Splitpanes>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
@@ -265,10 +289,10 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .border-left{
-    border-left: 1px solid var( --border-color) ;
+  .border-left {
+    border-left: 1px solid var(--border-color);
   }
-  .border-top{
-    border-top: 1px solid var( --border-color) ;
+  .border-top {
+    border-top: 1px solid var(--border-color);
   }
 </style>
