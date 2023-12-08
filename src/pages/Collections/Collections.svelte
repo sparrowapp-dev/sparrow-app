@@ -87,14 +87,14 @@
         {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
           <RequestResponse {activeTab} {collectionsMethods} />
         {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-          <MyWorkspace />
+          <MyWorkspace {activeTab} />
         {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
           <p>FOLDER</p>
         {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
           <MyCollection {collectionsMethods} {activeTab} />
         {/if}
       </div>
-      <SidebarRight />
+      <!-- <SidebarRight /> -->
     </div>
   </div>
 </div>

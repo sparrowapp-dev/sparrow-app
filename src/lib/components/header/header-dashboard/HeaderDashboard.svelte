@@ -2,7 +2,7 @@
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
   import { Observable } from "rxjs";
- 
+
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
@@ -13,7 +13,8 @@
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
-
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  export let collectionsMethods: CollectionsMethods;
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -127,7 +128,11 @@
       class="d-flex d-flex align-items-center justify-content-center gap-2"
       style="height: 36px; width:116px"
     >
-      <HeaderDropdown data={workspaces} onclick={handleDropdown} />
+      <HeaderDropdown
+        data={workspaces}
+        onclick={handleDropdown}
+        {collectionsMethods}
+      />
     </div>
   </div>
 

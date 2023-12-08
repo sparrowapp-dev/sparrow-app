@@ -2,15 +2,67 @@
   import dropdown from "$lib/assets/dropdown.svg";
   import constants from "$lib/utils/constants";
   import { onDestroy, onMount } from "svelte";
+  import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   let workspaceLimit = constants.WORKSPACE_LIMIT;
-  let visibility = false;
+  import { v4 as uuidv4 } from "uuid";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
   export let data: any;
   export let onclick: any;
-
+  export let collectionsMethods: CollectionsMethods;
+  const _viewModel = new HeaderDashboardViewModel();
+  let visibility = false;
+  console.log(data);
   let isOpen: boolean = false;
-
+  let tabName: string = "";
+  // const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+  //   tabName = event?.name;
+  // });
   const toggleDropdown = () => {
     isOpen = !isOpen;
+  };
+
+  const handleCreateWorkSpace = async () => {
+    const workspaceData = {
+      name: "My Workspace",
+      type: "PERSONAL",
+    };
+    const response = await _viewModel.createWorkspace(workspaceData);
+    if (response.isSuccessful) {
+      _viewModel.addWorkspace(response.data.data);
+    }
+    const Samplecollection = generateSampleWorkspace(
+      UntrackedItems.UNTRACKED,
+      new Date().toString(),
+    );
+  };
+
+  const handleWorkspaceTab = (id: string, name: string) => {
+    let totalCollection: number = 0;
+    let totalRequest: number = 0;
+
+    // collection.items.map((item) => {
+    //   if (item.type === ItemType.REQUEST) {
+    //     totalRequest++;
+    //   } else {
+    //     totalFolder++;
+    //     totalRequest += item.items.length;
+    //   }
+    // });
+
+    const SampleWorkspace = generateSampleWorkspace(id, new Date().toString());
+    console.log(SampleWorkspace);
+
+    SampleWorkspace.id = id;
+    SampleWorkspace.name = name;
+    SampleWorkspace.property.workspace.requestCount = totalRequest;
+    SampleWorkspace.property.workspace.collectionCount = totalCollection;
+    SampleWorkspace.save = true;
+    collectionsMethods.handleCreateTab(SampleWorkspace);
+    moveNavigation("right");
   };
 
   function handleDropdownClick(event: MouseEvent) {
@@ -62,8 +114,8 @@
         isOpen = true;
       }}
     >
-      <span>Create New Workspace</span><span style="height:20px;width:20px"
-        >+</span
+      <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
+        style="height:20px;width:20px">+</span
       >
     </p>
     <hr class="m-0 p-0" />
@@ -76,6 +128,9 @@
             on:click={() => {
               isOpen = false;
               onclick(list._id, list.name);
+            }}
+            on:click={() => {
+              handleWorkspaceTab(list._id, list.name);
             }}
           >
             {list.name}

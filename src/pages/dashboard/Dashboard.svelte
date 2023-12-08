@@ -8,22 +8,21 @@
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
-
-
+  import { CollectionsViewModel } from "../Collections/Collections.ViewModel";
 
   let collapsExpandToggle = false;
-  let selectedActiveSideBar:string="collections";
-
+  let selectedActiveSideBar: string = "collections";
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
   const _viewModel = new ActiveSideBarTabViewModel();
-  const activeSideBarTabMethods={
-    addActiveTab:_viewModel.addActiveTab,
-    getActiveTab:_viewModel.getActiveTab,
-    updateActiveTab:_viewModel.updateActiveTab,
-  }
+  const collectionsMethods = new CollectionsViewModel();
+  const activeSideBarTabMethods = {
+    addActiveTab: _viewModel.addActiveTab,
+    getActiveTab: _viewModel.getActiveTab,
+    updateActiveTab: _viewModel.updateActiveTab,
+  };
   const setcollapsExpandToggle = () => {
     collapsibleState.set(false);
   };
@@ -37,21 +36,18 @@
     isCollaps = windowWidth <= 800;
   };
 
-
-  async function handleActiveTab(){
-    const activeTab=await activeSideBarTabMethods.getActiveTab();
-    if(activeTab){
-      selectedActiveSideBar=activeTab;
-    }else{
+  async function handleActiveTab() {
+    const activeTab = await activeSideBarTabMethods.getActiveTab();
+    if (activeTab) {
+      selectedActiveSideBar = activeTab;
+    } else {
       await activeSideBarTabMethods.addActiveTab("collections");
-      selectedActiveSideBar="collections";
+      selectedActiveSideBar = "collections";
     }
     return selectedActiveSideBar;
   }
 
-  const getActiveTab=handleActiveTab();
-
-  
+  const getActiveTab = handleActiveTab();
 
   onMount(() => {
     window.addEventListener("resize", handleResize);
@@ -63,29 +59,33 @@
 </script>
 
 <div class="dashboard">
-  <HeaderDashboard />
+  <HeaderDashboard {collectionsMethods} />
   <div class="dashboard-teams d-flex">
-    {#await getActiveTab}
-    {:then selectedActiveSideBar}
-    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={selectedActiveSideBar} />
+    {#await getActiveTab then selectedActiveSideBar}
+      <Sidebar
+        {activeSideBarTabMethods}
+        selectedActiveSideBarTab={selectedActiveSideBar}
+      />
     {:catch}
-    <Sidebar activeSideBarTabMethods={activeSideBarTabMethods} selectedActiveSideBarTab={"collections"} />
+      <Sidebar
+        {activeSideBarTabMethods}
+        selectedActiveSideBarTab={"collections"}
+      />
     {/await}
     <section class="w-100">
-    <Route path="/collections/*"><CollectionsHome /></Route>
-    <Route path="/mock">Mock</Route>
-    <Route path="/environment">Environment</Route>
-    <Route path="/teams/*"><Teams /></Route>
-    <Route path="/workspaces">Workspaces</Route>
-    <Route path="/help">Help</Route>
-    <Route path="/*">
-     {#await getActiveTab}
-     {:then activeTab}
-     <Navigate to={activeTab}></Navigate>
-     {:catch}
-     <Navigate to={"collections"}></Navigate>
-     {/await}
-    </Route>
-  </section>
+      <Route path="/collections/*"><CollectionsHome /></Route>
+      <Route path="/mock">Mock</Route>
+      <Route path="/environment">Environment</Route>
+      <Route path="/teams/*"><Teams /></Route>
+      <Route path="/workspaces">Workspaces</Route>
+      <Route path="/help">Help</Route>
+      <Route path="/*">
+        {#await getActiveTab then activeTab}
+          <Navigate to={activeTab} />
+        {:catch}
+          <Navigate to={"collections"} />
+        {/await}
+      </Route>
+    </section>
   </div>
 </div>

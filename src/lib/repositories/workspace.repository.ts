@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rxdb, type WorkspaceDocument } from "$lib/database/app.database";
+
 import type { Observable } from "rxjs";
 
 export class WorkspaceRepository {
@@ -55,6 +56,28 @@ export class WorkspaceRepository {
       return res;
     });
     await rxdb.workspace.bulkUpsert(data);
+    return;
+  };
+
+  public updateWorkspace = async (workspaceId: string, name: string) => {
+    const workspace = await rxdb.workspace
+      .findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+
+    workspace.incrementalModify((value) => {
+      value.name = name;
+      return value;
+    });
+
+    console.log(workspace);
+  };
+
+  public addWorkspace = async (workspace: any): Promise<void> => {
+    await rxdb.workspace.insert(workspace);
     return;
   };
 

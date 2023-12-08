@@ -4,42 +4,56 @@
   import { currentWorkspace } from "$lib/store/workspace.store";
   import { onDestroy } from "svelte";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
+  export let activeTab;
+  const _viewModel = new HeaderDashboardViewModel();
+  let tabName: string = "";
+  let componentData: NewTab;
+
+  let totalFolder: number = 0;
+  let totalRequest: number = 0;
+
+  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    tabName = event?.name;
+    componentData = event;
+    totalRequest = event?.property?.collection?.requestCount;
+    totalFolder = event?.property?.collection?.folderCount;
+  });
 
   interface workspace {
     id: string;
     name: string;
   }
   let selectedWorkspace: Partial<workspace> = {};
-  let currentWorkSpaceTabId: string;
+
   let newWorkspaceName: string;
   const workspaceService = new WorkspaceService();
   const workspaceUnSubscribe = currentWorkspace.subscribe((value) => {
     selectedWorkspace = value;
   });
-  const currentTabUnsubscribe = currentTab.subscribe((value) => {
-    if (value && value.id) {
-      currentWorkSpaceTabId = value.id;
-    }
-  });
 
   const handleWorkspaceInput = (event) => {
-    // handleTabUpdate({save:false},currentWorkSpaceTabId)
     newWorkspaceName = event.target.value;
   };
 
+  console.log(componentData);
   const modifyWorkspace = async () => {
-    const workspace = await workspaceService.updateWorkspace(
-      selectedWorkspace.id,
-      { name: newWorkspaceName },
-    );
+    const workspace = await workspaceService.updateWorkspace(componentData.id, {
+      name: newWorkspaceName,
+    });
 
-    const { _id: id, name } = workspace?.data?.data;
-    setCurrentWorkspace(id, name);
+    console.log(workspace);
+
+    tabName = workspace?.data?.data.name;
+    _viewModel.updateWorkspace(componentData.id, tabName);
+
+    // setCurrentWorkspace(id, name);
     // handleTabUpdate({save:true,name},id)
   };
   onDestroy(() => {
     workspaceUnSubscribe();
-    currentTabUnsubscribe();
+    tabSubscribe();
   });
 </script>
 
@@ -48,13 +62,10 @@
     <div class="d-flex w-100 justify-content-between">
       <input
         type="text"
-        value={selectedWorkspace.name}
+        value={tabName}
         class="workspace-input border-0 text-center"
         on:input={(event) => {
           handleWorkspaceInput(event);
-        }}
-        on:blur={() => {
-          modifyWorkspace();
         }}
         on:keydown={(event) => {
           if (event.key == "Enter") {

@@ -33,6 +33,14 @@ export class HeaderDashboardViewModel {
     return;
   };
 
+  public addWorkspace = (workspace) => {
+    this.workspaceRepository.addWorkspace(workspace);
+  };
+
+  public updateWorkspace = (workspaceId: string, name: string) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, name);
+  };
+
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
@@ -87,5 +95,10 @@ export class HeaderDashboardViewModel {
       notifications.error(response.message);
       return false;
     }
+  };
+
+  public createWorkspace = async (workspace) => {
+    const response = await this.workspaceService.createWorkspace(workspace);
+    return response;
   };
 }

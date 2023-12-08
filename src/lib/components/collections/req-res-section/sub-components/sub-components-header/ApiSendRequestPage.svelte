@@ -67,7 +67,6 @@
           _apiSendRequest.decodeRestApiData(request),
         );
 
-      
         let end = Date.now();
 
         const byteLength = new TextEncoder().encode(
@@ -99,6 +98,7 @@
           );
           isLoading = false;
         } else {
+          console.log("timeout");
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
