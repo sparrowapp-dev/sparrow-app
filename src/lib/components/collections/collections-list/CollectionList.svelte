@@ -144,7 +144,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      console.log(response.data.data);
+
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -154,14 +154,14 @@
         new Date().toString(),
       );
 
-      // response.data.data.items.map((item) => {
-      //   if (item.type === ItemType.REQUEST) {
-      //     totalRequest++;
-      //   } else {
-      //     totalFolder++;
-      //     totalRequest += item.items.length;
-      //   }
-      // });
+      response.data.data.items.map((item) => {
+        if (item.type === ItemType.REQUEST) {
+          totalRequest++;
+        } else {
+          totalFolder++;
+          totalRequest += item.items.length;
+        }
+      });
 
       Samplecollection.id = response.data.data._id;
       Samplecollection.path = path;
