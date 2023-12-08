@@ -76,15 +76,7 @@
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        const response = await collectionsMethods.getAllCollections(
-          currentWorkspaceId,
-        );
-        if (response.isSuccessful && response.data.data.length > 0) {
-          const collections = response.data.data;
-          collectionsMethods.bulkInsert(collections);
-          return;
-        }
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");    
       }
     },
   );
