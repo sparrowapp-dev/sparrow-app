@@ -114,9 +114,8 @@
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response = await collectionsMethods.getAllCollections(
-          workspaceId,
-        );
+        const response =
+          await collectionsMethods.getAllCollections(workspaceId);
         if (response.isSuccessful && response.data.data.length > 0) {
           const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
@@ -347,7 +346,10 @@
     </div>
   </div>
 
-  <div class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4" style="overflow:auto;margin-top:5px;">
+  <div
+    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
+    style="overflow:auto;margin-top:5px;"
+  >
     <div class="d-flex flex-column justify-content-center">
       {#if showfilterDropdown}
         <FilterDropDown {handleSearch} />
@@ -466,8 +468,8 @@
   }
   .collections-list::-webkit-scrollbar {
     width: 2px;
-  } 
+  }
   .collections-list::-webkit-scrollbar-thumb {
-  background: #888;
-}
+    background: #888;
+  }
 </style>
