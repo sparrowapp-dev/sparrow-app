@@ -5,7 +5,8 @@
   export let heading: string;
   export let logo: any;
   export let activeSideBarTabMethods;
-  export let isSelected:boolean;
+  export let isSelected: boolean;
+  export let disabled: boolean;
   let collapsExpandToggle = false;
   export let changeSelectedActiveSideBarTab;
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -16,8 +17,7 @@
     collapsibleState.set(collapsExpandToggle);
     activeSideBarTabMethods.updateActiveTab(route);
     changeSelectedActiveSideBarTab(route);
-
-  }; 
+  };
   collapsibleStateUnsubscribe();
 </script>
 
@@ -26,9 +26,17 @@
   to={route}
   on:click={setcollapsExpandToggle}
 >
-  <div class="sidebar__container {isSelected?'sidebar__container_background':'sidebar__container_background2'}" >
-    <div class="sidebar__container--icon"><img src={logo} alt="" /></div>
-    <div class="sidebar__container--text"><p>{heading}</p></div>
+  <div
+    class="sidebar__container {isSelected && !disabled
+      ? 'sidebar__container_background rounded'
+      : 'sidebar__container_background2'}"
+  >
+    <div class="sidebar__container--icon pt-2"><img src={logo} alt="" /></div>
+    <div
+      class={`sidebar__container--text mt-1 ${disabled && "text-textColor"}`}
+    >
+      <p>{heading}</p>
+    </div>
   </div>
 </Link>
 
@@ -51,10 +59,10 @@
     letter-spacing: 0em;
     color: white;
   }
-  .sidebar__container_background{
+  .sidebar__container_background {
     background-color: var(--selected-active-sidebar);
   }
-  .sidebar__container_background2{
+  .sidebar__container_background2 {
     background-color: transparent;
   }
 </style>

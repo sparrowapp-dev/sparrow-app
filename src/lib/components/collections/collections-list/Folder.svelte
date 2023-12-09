@@ -18,6 +18,7 @@
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
   import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let title: string;
   export let collection: any;
@@ -27,7 +28,7 @@
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
-  
+
   const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
@@ -215,18 +216,22 @@
     {
       onClick: openCollections,
       displayText: "Open collection",
+      disabled: false,
     },
     {
       onClick: renameCollection,
       displayText: "Rename collection",
+      disabled: true,
     },
     {
       onClick: addRequest,
       displayText: "Add Request",
+      disabled: false,
     },
     {
       onClick: addFolder,
       displayText: "Add Folder",
+      disabled: false,
     },
 
     {
@@ -234,6 +239,7 @@
         handleCollectionPopUp(true);
       },
       displayText: "Delete",
+      disabled: false,
     },
   ];
 
@@ -274,8 +280,8 @@
   <CollectionPopup
     {collectionsMethods}
     {collection}
-    collectionId = {collectionId}
-    workspaceId = {currentWorkspaceId}
+    {collectionId}
+    workspaceId={currentWorkspaceId}
     closePopup={handleCollectionPopUp}
   />
 {/if}
@@ -290,7 +296,10 @@
         {#each menuItems as item}
           <li class="align-items-center">
             <button
-              class="align-items-center mb-1 px-3 py-2"
+              disabled={item.disabled}
+              class={`align-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
               on:click={item.onClick}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
