@@ -122,10 +122,10 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
-    // const notActiveWorkspacesCollections=getNotActiveWorkspaceCollections();
-    // let allCollections=[...collections,...notActiveWorkspacesCollections];
+    const notActiveWorkspacesCollections=getNotActiveWorkspaceCollections();
+    let allCollections=[...collections,...notActiveWorkspacesCollections];
     // console.log(allCollections);
-    searchNode(searchData, filteredCollection, filteredFolder, filteredRequest,collections,activeWorkspaceName);
+    searchNode(searchData, filteredCollection, filteredFolder, filteredRequest,allCollections,activeWorkspaceName);
   };
 
   

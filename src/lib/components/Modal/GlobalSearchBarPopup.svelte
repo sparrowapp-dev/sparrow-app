@@ -9,6 +9,8 @@
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   let container;
   export let handleGlobalSearchPopup;
   export let searchData;
@@ -29,18 +31,11 @@
     // }
   }
 
-  // let path: Path = {
-  //   workspaceId: currentWorkspaceId,
-  //   collectionId,
-  //   folderId,
-  //   folderName,
-  // };
 
   function getIndex(text: string, searchData: string): number {
     return text.toLowerCase().indexOf(searchData.toLowerCase());
   }
 
-  console.log(filteredCollection);
   function handleSelection(id: string) {
     const previousSelectedButton = document.getElementById(
       currentSelectedId,
@@ -61,8 +56,6 @@
     handleDropdown(id,name)
     handleGlobalSearchPopup(false);
   }
-
-
   const handleRequestClick=(req:any,path:any)=>{
     const request = generateSampleRequest(req.id, new Date().toString());
       request.path = path;
@@ -84,7 +77,39 @@
       moveNavigation("right");
       handleGlobalSearchPopup(false);
   }
+  const handleCollectionClick = (collection:any,currentWorkspaceId:string,collectionId:string) => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    collection.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+        totalRequest += item.items.length;
+      }
+    });
 
+    let path= {
+      workspaceId: currentWorkspaceId,
+      collectionId,
+    };
+
+    const Samplecollection = generateSampleCollection(
+      collectionId,
+      new Date().toString(),
+    );
+
+    Samplecollection.id = collectionId;
+    Samplecollection.path = path;
+    Samplecollection.name = collection.name;
+    Samplecollection.property.collection.requestCount = totalRequest;
+    Samplecollection.property.collection.folderCount = totalFolder;
+    Samplecollection.save = true;
+    _collectionMethods.handleCreateTab(Samplecollection);
+    moveNavigation("right");
+    handleGlobalSearchPopup(false);
+
+  };
 
 </script>
 
@@ -217,7 +242,7 @@
       {/if}
       {#if filteredCollection.length > 0 && (currentSelectedId === "all" || currentSelectedId === "collection")}
         {#each filteredCollection as filterCollection}
-        <div class="request">
+        <div class="request" on:click={()=>{handleCollectionClick(filterCollection.tree,filterCollection.tree._id,activeWorkspaceId)}}>
           <div
             style="height:36px;"
             class="d-flex align-items-center search-option-request"
