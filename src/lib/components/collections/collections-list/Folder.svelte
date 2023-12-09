@@ -398,7 +398,9 @@
     <Spinner size={"15px"} />
   {:else}
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu ? 'threedot-active' : ''}"
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
@@ -443,7 +445,7 @@
     background-color: var(--border-color);
   }
 
-  .threedot-active{
+  .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
   }
@@ -494,15 +496,15 @@
     color: var(--white-color);
     padding-left: 0;
   }
-  .sub-folders{
+  .sub-folders {
     border-left: 1px solid var(--border-color);
   }
   .ellipsis {
-  white-space: nowrap;      /* Prevents the text from wrapping */
-  overflow: hidden;         /* Hides any content that overflows the container */
-  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
-}
-.main-collection{
-  width: calc(100% - 24px);
-}
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-collection {
+    width: calc(100% - 24px);
+  }
 </style>

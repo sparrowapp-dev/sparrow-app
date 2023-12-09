@@ -16,7 +16,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
-  
+
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -90,7 +90,7 @@
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  
+
   let containerRef;
 
   function rightClickContextMenu(e) {
@@ -123,48 +123,49 @@
     }
 
     if (newRequestName) {
-      if(!folderId){
+      if (!folderId) {
         let storage = api;
         storage.name = newRequestName;
-        const response =
-          await collectionService.updateRequestInCollection(api.id, {
+        const response = await collectionService.updateRequestInCollection(
+          api.id,
+          {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
             items: storage,
-          });
-          if (response.isSuccessful) {
-            collectionsMethods.updateRequestOrFolderInCollection(
-              collectionId,
-              api.id,
-              response.data.data,
-            );
-
-          }
-      }
-      else if(collectionId && currentWorkspaceId && folderId){
+          },
+        );
+        if (response.isSuccessful) {
+          collectionsMethods.updateRequestOrFolderInCollection(
+            collectionId,
+            api.id,
+            response.data.data,
+          );
+        }
+      } else if (collectionId && currentWorkspaceId && folderId) {
         let storage = api;
         storage.name = newRequestName;
-        const response =
-          await collectionService.updateRequestInCollection(api.id, {
+        const response = await collectionService.updateRequestInCollection(
+          api.id,
+          {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
             folderId,
             items: {
               name: folderName,
               id: folderId,
-              type:ItemType.FOLDER,
-              items: storage
+              type: ItemType.FOLDER,
+              items: storage,
             },
-          });
-          if (response.isSuccessful) {
-            collectionsMethods.updateRequestInFolder(
-              collectionId,
-              folderId,
-              api.id,
-              response.data.data,
-            );
-
-          }
+          },
+        );
+        if (response.isSuccessful) {
+          collectionsMethods.updateRequestInFolder(
+            collectionId,
+            folderId,
+            api.id,
+            response.data.data,
+          );
+        }
       }
     }
     isRenaming = false;
@@ -179,9 +180,9 @@
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-      "renameInputFieldFile",
-    ) as HTMLInputElement;
-    inputField.blur();
+        "renameInputFieldFile",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
@@ -204,7 +205,6 @@
       disabled: false,
     },
   ];
-
 </script>
 
 {#if isFilePopup}
@@ -295,7 +295,9 @@
     <Spinner size={"15px"} />
   {:else}
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu ? 'threedot-active' : ''}"
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
@@ -349,7 +351,7 @@
     background-color: var(--border-color);
   }
 
-  .threedot-active{
+  .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
   }
@@ -397,18 +399,18 @@
   .unclickable {
     pointer-events: none;
   }
-  .renameInputFieldFile{
+  .renameInputFieldFile {
     border: none;
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
   }
   .ellipsis {
-  white-space: nowrap;      /* Prevents the text from wrapping */
-  overflow: hidden;         /* Hides any content that overflows the container */
-  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
-}
-.main-file{
-  width: calc(100% - 24px);
-}
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-file {
+    width: calc(100% - 24px);
+  }
 </style>

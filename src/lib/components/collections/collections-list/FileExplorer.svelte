@@ -3,9 +3,7 @@
   import folderOpenIcon from "$lib/assets/open-folder.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
 
-  import {
-    isFolderCreatedFirstTime,
-  } from "$lib/store/collection";
+  import { isFolderCreatedFirstTime } from "$lib/store/collection";
 
   import File from "./File.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -220,8 +218,7 @@
   };
 
   function openFolder() {
-    if(!expand)
-    expand = !expand;
+    if (!expand) expand = !expand;
   }
 
   function addRequest() {
@@ -350,7 +347,9 @@
       <Spinner size={"15px"} />
     {:else}
       <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu ? 'threedot-active' : ''}"
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -364,23 +363,23 @@
       ? 'block'
       : 'none'};"
   >
-  <div class="sub-files ps-3">
-    {#each explorer.items as exp}
-      <svelte:self
-        folderId={explorer.id}
-        folderName={explorer.name}
-        explorer={exp}
-        {collectionId}
-        {currentWorkspaceId}
-        {collectionsMethods}
-      />
-    {/each}
-    {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 ms-0">
-        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-      </div>
-    {/if}
-  </div>
+    <div class="sub-files ps-3">
+      {#each explorer.items as exp}
+        <svelte:self
+          folderId={explorer.id}
+          folderName={explorer.name}
+          explorer={exp}
+          {collectionId}
+          {currentWorkspaceId}
+          {collectionsMethods}
+        />
+      {/each}
+      {#if showFolderAPIButtons}
+        <div class="mt-2 mb-2 ms-0">
+          <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+        </div>
+      {/if}
+    </div>
   </div>
 {:else}
   <div style="cursor:pointer;">
@@ -444,7 +443,7 @@
     background-color: var(--border-color);
   }
 
-  .threedot-active{
+  .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
   }
@@ -469,15 +468,15 @@
     color: var(--white-color);
     padding-left: 0;
   }
-  .sub-files{
+  .sub-files {
     border-left: 1px solid var(--border-color);
   }
   .ellipsis {
-  white-space: nowrap;      /* Prevents the text from wrapping */
-  overflow: hidden;         /* Hides any content that overflows the container */
-  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
-}
-.main-folder{
-  width: calc(100% - 24px);
-}
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-folder {
+    width: calc(100% - 24px);
+  }
 </style>
