@@ -10,6 +10,7 @@ import { resizeWindowOnLogOut } from "../window-resize";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -31,6 +32,51 @@ export class HeaderDashboardViewModel {
   public activateWorkspace = (id: string): void => {
     this.workspaceRepository.setActiveWorkspace(id);
     return;
+  };
+
+  public addWorkspace = (workspace) => {
+    this.workspaceRepository.addWorkspace(workspace);
+  };
+
+  public updateWorkspace = (workspaceId: string, name: string) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, name);
+  };
+
+  public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {
+    this.workspaceRepository.updateCollectionInWorkspace(
+      workspaceId,
+      collectionObj,
+    );
+  };
+
+  public modifyWorkspace = async (
+    componentData,
+    collectionsMethods: CollectionsMethods,
+    newWorkspaceName: string,
+    tabName: string,
+  ) => {
+    if (newWorkspaceName) {
+      const workspace = await this.workspaceService.updateWorkspace(
+        componentData.id,
+        {
+          name: newWorkspaceName,
+        },
+      );
+
+      tabName = workspace?.data?.data.name;
+      this.updateWorkspace(componentData.id, tabName);
+
+      collectionsMethods.updateTab(
+        tabName,
+        "name",
+        componentData.path.workspaceId,
+      );
+      collectionsMethods.updateTab(
+        true,
+        "save",
+        componentData.path.workspaceId,
+      );
+    }
   };
 
   // sync workspace data with backend server
@@ -87,5 +133,10 @@ export class HeaderDashboardViewModel {
       notifications.error(response.message);
       return false;
     }
+  };
+
+  public createWorkspace = async (workspace) => {
+    const response = await this.workspaceService.createWorkspace(workspace);
+    return response;
   };
 }

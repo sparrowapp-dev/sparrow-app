@@ -2,13 +2,12 @@
   import folder from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-  import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
+
   import {
-    currentCollectionWorkspaceFolderId,
-    isShowFolderPopup,
+    isFolderCreatedFirstTime,
     useCollectionTree,
   } from "$lib/store/collection";
-  import { insertCollectionRequest } from "$lib/services/collection";
+
   import File from "./File.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -23,6 +22,8 @@
   import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
+  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
 
   const { insertNode, updateNodeId } = useCollectionTree();
   let expand: boolean = false;
@@ -40,6 +41,41 @@
   export let collectionsMethods: CollectionsMethods;
 
   let showFolderAPIButtons: boolean = true;
+
+  const handleClick = () => {
+    isFolderCreatedFirstTime.set(false);
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    explorer.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+      }
+    });
+
+    let path: Path = {
+      workspaceId: currentWorkspaceId,
+      collectionId: collectionId,
+      folderId: explorer.id,
+      folderName: explorer.name,
+    };
+
+    const sampleFolder = generateSampleFolder(
+      explorer.id,
+      new Date().toString(),
+    );
+
+    sampleFolder.id = explorer.id;
+    sampleFolder.path = path;
+    sampleFolder.name = explorer.name;
+    sampleFolder.property.folder.requestCount = totalRequest;
+    sampleFolder.property.folder.folderCount = totalFolder;
+    sampleFolder.save = true;
+
+    collectionsMethods.handleCreateTab(sampleFolder);
+    moveNavigation("right");
+  };
 
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
@@ -99,6 +135,7 @@
       return;
     }
   };
+
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       expand = true;
@@ -276,6 +313,7 @@
   <div
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
+    on:click={handleClick}
   >
     <div
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}

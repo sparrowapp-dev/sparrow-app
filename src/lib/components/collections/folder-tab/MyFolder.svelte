@@ -1,54 +1,47 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-
-  import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
-  import { MyCollectionViewModel } from "./MyCollection.viewModel";
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import { MyFolderViewModel } from "./MyFolder.viewModel";
+  import { isFolderCreatedFirstTime } from "$lib/store/collection";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   let isLoading: boolean = false;
-
+  let collapsExpandToggle: boolean = false;
   let tabName: string = "";
   let componentData: NewTab;
-  const collectionService = new CollectionService();
   let totalFolder: number = 0;
   let totalRequest: number = 0;
-  let newCollectionName: string = "";
-  const _myColllectionViewModel = new MyCollectionViewModel();
+  let newFolderName: string = "";
+  const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     tabName = event?.name;
     componentData = event;
-    totalRequest = event?.property?.collection?.requestCount;
-    totalFolder = event?.property?.collection?.folderCount;
+    totalRequest = event?.property?.folder?.requestCount;
+    totalFolder = event?.property?.folder?.folderCount;
   });
 
-  const handleCollectionInput = (event) => {
-    newCollectionName = event.target.value;
-    collectionsMethods.updateTab(
-      false,
-      "save",
-      componentData.path.collectionId,
-    );
+  const handleFolderInput = (event) => {
+    newFolderName = event.target.value;
+    collectionsMethods.updateTab(false, "save", componentData.path.folderId);
   };
 
-  const modifyCollectionData = async () => {
-    await _myColllectionViewModel.modifyCollection(
+  const modifyFolderData = async () => {
+    await _myFolderViewModel.modifyFolder(
       componentData,
-      newCollectionName,
+      newFolderName,
       collectionsMethods,
       tabName,
     );
   };
 
   const handleApiRequest = async () => {
-    const response = await _myColllectionViewModel.createApiRequest(
+    const response = await _myFolderViewModel.createApiRequest(
       componentData,
       collectionsMethods,
     );
@@ -57,26 +50,23 @@
     }
   };
 
-  let collapsExpandToggle: boolean = false;
-
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
 
-  let isCollectionNameVisibility: boolean;
-
+  let isFolderNameVisibility: boolean;
   const unsubscribeisCollectionCreatedFirstTime =
-    isCollectionCreatedFirstTime.subscribe((value) => {
-      isCollectionNameVisibility = value;
+    isFolderCreatedFirstTime.subscribe((value) => {
+      isFolderNameVisibility = value;
     });
 
+  let autofocus = isFolderNameVisibility;
   onDestroy(() => {
     tabSubscribe();
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
   });
   onDestroy(() => {});
-  let autofocus = isCollectionNameVisibility;
   let isClickOnEnter: boolean = false;
 </script>
 
@@ -93,12 +83,12 @@
         value={tabName}
         class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
         on:input={(event) => {
-          handleCollectionInput(event);
+          handleFolderInput(event);
         }}
         on:keydown={(event) => {
           if (event.key === "Enter") {
             isClickOnEnter = true;
-            modifyCollectionData();
+            modifyFolderData();
           }
         }}
       />
@@ -124,7 +114,7 @@
         type="text"
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+        placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
       />
     </div>
   </div>

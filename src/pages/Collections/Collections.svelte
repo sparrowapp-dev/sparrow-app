@@ -8,7 +8,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { CollectionsViewModel } from "./Collections.ViewModel";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import MyWorkspace from "$lib/components/workspace/myWorkspace.svelte";
+  import MyWorkspace from "$lib/components/workspace/workspace-tab/myWorkspace.svelte";
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
@@ -18,6 +18,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
   import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
+  import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -41,7 +42,8 @@
     deleteCollection: _viewModel.deleteCollection,
     updateCollectionName: _viewModel.updateCollectionName,
     updateFolderName: _viewModel.updateFolderName,
-    deleteRequestOrFolderInCollection: _viewModel.deleteRequestOrFolderInCollection,
+    deleteRequestOrFolderInCollection:
+      _viewModel.deleteRequestOrFolderInCollection,
     getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
@@ -54,7 +56,7 @@
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
-    deleteRequestInFolder: _viewModel.deleteRequestInFolder
+    deleteRequestInFolder: _viewModel.deleteRequestInFolder,
   };
 
   const activeTab = _viewModel.activeTab;
@@ -76,9 +78,13 @@
   <div class="collections__list">
     <CollectionsList {collectionsMethods} />
   </div>
-  <div class="collections__tools bg-backgroundColor {$collapseCollectionPanel ? 'sidebar-collapse' : 'sidebar-expand'}">
+  <div
+    class="collections__tools bg-backgroundColor {$collapseCollectionPanel
+      ? 'sidebar-collapse'
+      : 'sidebar-expand'}"
+  >
     <div class="tab__bar">
-      <TabBar tabList={$tabList} _tabId = {$activeTab?.id} {collectionsMethods} />
+      <TabBar tabList={$tabList} _tabId={$activeTab?.id} {collectionsMethods} />
     </div>
     <div class="tab__content d-flex">
       <div class="w-100">
@@ -87,14 +93,14 @@
         {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
           <RequestResponse {activeTab} {collectionsMethods} />
         {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-          <MyWorkspace />
+          <MyWorkspace {activeTab} {collectionsMethods} />
         {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-          <p>FOLDER</p>
+          <MyFolder {collectionsMethods} {activeTab} />
         {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
           <MyCollection {collectionsMethods} {activeTab} />
         {/if}
       </div>
-      <SidebarRight />
+      <!-- <SidebarRight /> -->
     </div>
   </div>
 </div>
@@ -104,10 +110,10 @@
   .collections__tools {
     height: calc(100vh - 44px);
   }
-  .sidebar-expand{
+  .sidebar-expand {
     width: calc(100vw - 352px);
   }
-  .sidebar-collapse{
+  .sidebar-collapse {
     width: calc(100vw - 72px);
   }
 </style>
