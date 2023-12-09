@@ -6,7 +6,6 @@ import type {
   CreateDirectoryPostBody,
   DeleteRequestName,
   UpdateCollectionName,
-  UpdateRequestName,
 } from "$lib/utils/dto";
 
 export class CollectionService {
@@ -131,7 +130,7 @@ export class CollectionService {
 
   public updateRequestInCollection = async (
     requestId: string,
-    requestBody: UpdateRequestName,
+    requestBody: CreateApiRequestPostBody,
   ) => {
     const response = await makeRequest(
       "PUT",

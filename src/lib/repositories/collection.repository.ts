@@ -27,13 +27,14 @@ export class CollectionRepository {
       .exec();
 
     collection.incrementalModify((value) => {
-      value.name = data.name;
-      value._id = data._id;
-      value.updatedAt = data.updatedAt;
-      value.updatedBy = data.updatedBy;
-      value.totalRequests = data.totalRequests;
-      value.createdAt = data.createdAt;
-      value.createdBy = data.createdBy;
+      if (data.name) value.name = data.name;
+      if (data._id) value._id = data._id;
+      if (data.updatedAt) value.updatedAt = data.updatedAt;
+      if (data.updatedBy) value.updatedBy = data.updatedBy;
+      if (data.totalRequests) value.totalRequests = data.totalRequests;
+      if (data.createdAt) value.createdAt = data.createdAt;
+      if (data.createdBy) value.createdBy = data.createdBy;
+      if (data.items) value.items = data.items;
       return value;
     });
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -16,7 +16,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -90,7 +90,7 @@
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let button;
+
   let containerRef;
 
   function rightClickContextMenu(e) {
@@ -99,7 +99,7 @@
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY };
+      pos = { x: mouseX, y: mouseY + 20 };
       showMenu = true;
     }, 100);
   }
@@ -123,39 +123,66 @@
     }
 
     if (newRequestName) {
-      const updateRequestName =
-        await collectionService.updateRequestInCollection(openRequestId, {
-          collectionId: collectionId,
-          workspaceId: currentWorkspaceId,
-          folderId: folderID,
-          items: {
-            name: newRequestName,
-            type: "REQUEST",
+      if (!folderId) {
+        let storage = api;
+        storage.name = newRequestName;
+        const response = await collectionService.updateRequestInCollection(
+          api.id,
+          {
+            collectionId: collectionId,
+            workspaceId: currentWorkspaceId,
+            items: storage,
           },
-        });
-
-      name = updateRequestName?.data?.data.name;
-      collectionsMethods.updateRequestInFolderCollection(
-        collectionId,
-        openRequestId,
-        updateRequestName.data.data,
-        folderID,
-      );
+        );
+        if (response.isSuccessful) {
+          collectionsMethods.updateRequestOrFolderInCollection(
+            collectionId,
+            api.id,
+            response.data.data,
+          );
+        }
+      } else if (collectionId && currentWorkspaceId && folderId) {
+        let storage = api;
+        storage.name = newRequestName;
+        const response = await collectionService.updateRequestInCollection(
+          api.id,
+          {
+            collectionId: collectionId,
+            workspaceId: currentWorkspaceId,
+            folderId,
+            items: {
+              name: folderName,
+              id: folderId,
+              type: ItemType.FOLDER,
+              items: storage,
+            },
+          },
+        );
+        if (response.isSuccessful) {
+          collectionsMethods.updateRequestInFolder(
+            collectionId,
+            folderId,
+            api.id,
+            response.data.data,
+          );
+        }
+      }
     }
     isRenaming = false;
+    newRequestName = "";
   };
 
   //rename collection name
   const renameRequest = () => {
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+        "renameInputFieldFile",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
@@ -168,7 +195,7 @@
     {
       onClick: renameRequest,
       displayText: "Rename Request",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: () => {
@@ -178,8 +205,6 @@
       disabled: false,
     },
   ];
-
-  let workspaceId = currentWorkspaceId;
 </script>
 
 {#if isFilePopup}
@@ -224,7 +249,7 @@
 />
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary"
+  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary"
   style="height:32px;"
 >
   <div
@@ -232,7 +257,7 @@
     on:click={() => {
       handleClick();
     }}
-    class="d-flex w-100 align-items-center {id?.includes(
+    class="main-file d-flex align-items-center {id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
@@ -244,17 +269,18 @@
 
     {#if isRenaming}
       <input
-        class="form-control py-0"
-        style="font-size: 14px;"
-        id="renameInputField"
+        class="form-control py-0 renameInputFieldFile"
+        style="font-size: 12px;"
+        id="renameInputFieldFile"
         type="text"
+        autofocus
         value={name}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div class="api-name">
+      <div class="api-name ellipsis">
         {name}
         {#if showPath}
           <span class="path-name"
@@ -269,7 +295,9 @@
     <Spinner size={"15px"} />
   {:else}
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
@@ -285,13 +313,12 @@
     font-weight: 500;
     margin-right: 8px;
     border: 1px solid var(--border-color);
-    width: 56px;
-    height: 34px;
+    height: 30px;
     border-radius: 8px;
     padding: 8px 12px 8px 8px;
     display: flex;
     justify-content: center;
-    text-align: left;
+    align-items: center;
   }
   .api-name {
     font-size: 12px;
@@ -324,24 +351,25 @@
     background-color: var(--border-color);
   }
 
-  .threedot-icon-container:hover {
-    background-color: var(--border-color);
+  .threedot-active {
+    visibility: visible;
+    background-color: var(--workspace-hover-color);
   }
-
-  .threedot-icon-container:active {
+  .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
   }
 
   .btn-primary {
     background-color: var(--background-color);
     color: var(--white-color);
+    padding-left: 0 !important;
+    padding-right: 5px;
   }
 
   .btn-primary:hover {
     border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
-    padding: 5px;
   }
 
   .navbar {
@@ -370,5 +398,19 @@
   }
   .unclickable {
     pointer-events: none;
+  }
+  .renameInputFieldFile {
+    border: none;
+    background-color: transparent;
+    color: var(--white-color);
+    padding-left: 0;
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-file {
+    width: calc(100% - 24px);
   }
 </style>
