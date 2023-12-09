@@ -99,6 +99,7 @@
       request.id = res.id;
       request.path.workspaceId = currentWorkspaceId;
       request.path.collectionId = collectionId;
+      request.save = true;
 
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");

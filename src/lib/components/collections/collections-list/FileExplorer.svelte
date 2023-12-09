@@ -93,6 +93,7 @@
       sampleRequest.path.collectionId = collectionId;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
+      sampleRequest.save = true;
 
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
