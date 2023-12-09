@@ -120,7 +120,7 @@
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY };
+      pos = { x: mouseX, y: mouseY + 20 };
       showMenu = true;
     }, 100);
   }
@@ -306,7 +306,7 @@
       <Spinner size={"15px"} />
     {:else}
       <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu ? 'threedot-active' : ''}"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -357,13 +357,13 @@
   .btn-primary {
     background-color: var(--background-color);
     color: var(--white-color);
+    padding-right: 5px;
   }
 
   .btn-primary:hover {
     border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
-    padding: 5px;
   }
 
   .navbar {
@@ -400,11 +400,12 @@
     background-color: var(--border-color);
   }
 
-  .threedot-icon-container:hover {
-    background-color: var(--border-color);
+  .threedot-active{
+    visibility: visible;
+    background-color: var(--workspace-hover-color);
   }
 
-  .threedot-icon-container:active {
+  .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
   }
 
