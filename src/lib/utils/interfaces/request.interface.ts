@@ -117,6 +117,11 @@ export interface WorkSpace {
   collectionCount?: number;
 }
 
+export interface FOLDER {
+  requestCount?: number;
+  folderCount?: number;
+}
+
 export interface NewTab {
   id: string;
   name: string;
@@ -130,6 +135,7 @@ export interface NewTab {
     request: Request;
     collection: Collection;
     workspace: WorkSpace;
+    folder: FOLDER;
   };
   isActive: boolean;
   save: boolean;

@@ -28,17 +28,17 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
-  export let deleteCollectionData;
-  export let collectionsMethods: CollectionsMethods;
-
-  const _colllectionListViewModel = new CollectionListViewModel();
-  const _workspaceViewModel = new HeaderDashboardViewModel();
-
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  export let deleteCollectionData;
+  export let collectionsMethods: CollectionsMethods;
+
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const _workspaceViewModel = new HeaderDashboardViewModel();
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -127,6 +127,7 @@
   );
 
   const handleCreateCollection = async () => {
+    isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {

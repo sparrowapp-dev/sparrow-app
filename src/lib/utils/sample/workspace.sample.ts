@@ -13,7 +13,7 @@ const generateSampleWorkspace = (id: string, date: string) => {
       },
     },
     save: true,
-    path: { workspaceId: "" },
+    path: { workspaceId: "", collectionId: "" },
     isActive: true,
     createdAt: date,
   };

@@ -41,7 +41,13 @@
           >{tab.property.request.method || ""}</span
         >
       {:else if tab.type === ItemType.FOLDER}
-        <span>F</span>
+        <span>
+          <img
+            src={collectionAsset}
+            alt="book"
+            style="width: 19px;heigh:19px;margin-right:5px;"
+          /></span
+        >
       {:else if tab.type === ItemType.COLLECTION}
         <span>
           <img

@@ -5,39 +5,20 @@
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   let workspaceLimit = constants.WORKSPACE_LIMIT;
-  import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { navigate } from "svelte-navigator";
+
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
   const _viewModel = new HeaderDashboardViewModel();
-  let visibility = false;
-  console.log(data);
+
   let isOpen: boolean = false;
-  let tabName: string = "";
-  // const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-  //   tabName = event?.name;
-  // });
+
   const toggleDropdown = () => {
     isOpen = !isOpen;
-  };
-
-  const handleCreateWorkSpace = async () => {
-    const workspaceData = {
-      name: "My Workspace",
-      type: "PERSONAL",
-    };
-    const response = await _viewModel.createWorkspace(workspaceData);
-    if (response.isSuccessful) {
-      _viewModel.addWorkspace(response.data.data);
-    }
-    const Samplecollection = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED,
-      new Date().toString(),
-    );
   };
 
   const handleWorkspaceTab = (id: string, name: string) => {
@@ -53,16 +34,32 @@
     //   }
     // });
 
-    const SampleWorkspace = generateSampleWorkspace(id, new Date().toString());
-    console.log(SampleWorkspace);
+    let path: Path = {
+      workspaceId: id,
+      collectionId: "",
+    };
 
+    const SampleWorkspace = generateSampleWorkspace(id, new Date().toString());
     SampleWorkspace.id = id;
     SampleWorkspace.name = name;
+    SampleWorkspace.path = path;
     SampleWorkspace.property.workspace.requestCount = totalRequest;
     SampleWorkspace.property.workspace.collectionCount = totalCollection;
     SampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(SampleWorkspace);
     moveNavigation("right");
+  };
+
+  const handleCreateWorkSpace = async () => {
+    const workspaceData = {
+      name: "My Workspace",
+      type: "PERSONAL",
+    };
+    const response = await _viewModel.createWorkspace(workspaceData);
+    if (response.isSuccessful) {
+      _viewModel.addWorkspace(response.data.data);
+      handleWorkspaceTab(response.data.data._id, response.data.data.name);
+    }
   };
 
   function handleDropdownClick(event: MouseEvent) {
@@ -142,6 +139,10 @@
     <p
       style="cursor:pointer"
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
+      on:click={() => {
+        console.log("object");
+        navigate("/dashboard/workspaces");
+      }}
       on:click={() => {
         isOpen = true;
       }}
