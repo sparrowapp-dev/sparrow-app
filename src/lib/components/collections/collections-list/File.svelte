@@ -1,6 +1,6 @@
 <script lang="ts">
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -90,7 +90,7 @@
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let button;
+  
   let containerRef;
 
   function rightClickContextMenu(e) {
@@ -123,39 +123,65 @@
     }
 
     if (newRequestName) {
-      const updateRequestName =
-        await collectionService.updateRequestInCollection(openRequestId, {
-          collectionId: collectionId,
-          workspaceId: currentWorkspaceId,
-          folderId: folderID,
-          items: {
-            name: newRequestName,
-            type: "REQUEST",
-          },
-        });
+      if(!folderId){
+        let storage = api;
+        storage.name = newRequestName;
+        const response =
+          await collectionService.updateRequestInCollection(api.id, {
+            collectionId: collectionId,
+            workspaceId: currentWorkspaceId,
+            items: storage,
+          });
+          if (response.isSuccessful) {
+            collectionsMethods.updateRequestOrFolderInCollection(
+              collectionId,
+              api.id,
+              response.data.data,
+            );
 
-      name = updateRequestName?.data?.data.name;
-      collectionsMethods.updateRequestInFolderCollection(
-        collectionId,
-        openRequestId,
-        updateRequestName.data.data,
-        folderID,
-      );
+          }
+      }
+      else if(collectionId && currentWorkspaceId && folderId){
+        let storage = api;
+        storage.name = newRequestName;
+        const response =
+          await collectionService.updateRequestInCollection(api.id, {
+            collectionId: collectionId,
+            workspaceId: currentWorkspaceId,
+            folderId,
+            items: {
+              name: folderName,
+              id: folderId,
+              type:ItemType.FOLDER,
+              items: storage
+            },
+          });
+          if (response.isSuccessful) {
+            collectionsMethods.updateRequestInFolder(
+              collectionId,
+              folderId,
+              api.id,
+              response.data.data,
+            );
+
+          }
+      }
     }
     isRenaming = false;
+    newRequestName = "";
   };
 
   //rename collection name
   const renameRequest = () => {
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+      "renameInputFieldFile",
+    ) as HTMLInputElement;
+    inputField.blur();
     }
   };
 
@@ -168,7 +194,7 @@
     {
       onClick: renameRequest,
       displayText: "Rename Request",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: () => {
@@ -179,7 +205,6 @@
     },
   ];
 
-  let workspaceId = currentWorkspaceId;
 </script>
 
 {#if isFilePopup}
@@ -244,10 +269,11 @@
 
     {#if isRenaming}
       <input
-        class="form-control py-0"
+        class="form-control py-0 renameInputFieldFile"
         style="font-size: 14px;"
-        id="renameInputField"
+        id="renameInputFieldFile"
         type="text"
+        autofocus
         value={name}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
@@ -370,5 +396,10 @@
   }
   .unclickable {
     pointer-events: none;
+  }
+  .renameInputFieldFile{
+    border: none;
+    background-color: transparent;
+    color: var(--white-color);
   }
 </style>

@@ -119,8 +119,6 @@
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
 
-  let openFolderId: string = "";
-
   // Assuming you have a container reference (e.g., containerRef) in your component
   let containerRef;
 
@@ -147,51 +145,43 @@
   let isRenaming = false;
 
   const handleRenameInput = (event) => {
-    expand = false;
     newFolderName = event.target.value;
   };
 
   const onRenameBlur = async () => {
-    const folder = {
-      name: newFolderName,
-      description: "",
-    };
-
     if (newFolderName) {
-      const updateFolderName = await collectionService.updateFolderInCollection(
+      const response = await collectionService.updateFolderInCollection(
         currentWorkspaceId,
         collectionId,
-        openFolderId,
+        explorer.id,
         {
-          name: folder.name,
-          description: folder.description,
+          name: newFolderName,
         },
       );
-
-      explorer.name = updateFolderName?.data?.data?.name;
-      collectionsMethods.updateFolderName(
-        collectionId,
-        openFolderId,
-        explorer.name,
-      );
+      if (response.isSuccessful) {
+        collectionsMethods.updateRequestOrFolderInCollection(
+          collectionId,
+          explorer.id,
+          response.data.data,
+        );
+      }
+      isRenaming = false;
+      newFolderName = "";
     }
-
-    expand = false;
-    isRenaming = false;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+        "renameInputFieldFolder",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
   const renameFolder = () => {
     expand = false;
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
   };
 
   function openFolder() {
@@ -212,7 +202,7 @@
     {
       onClick: renameFolder,
       displayText: "Rename Folder",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: addRequest,
@@ -300,10 +290,11 @@
 
       {#if isRenaming}
         <input
-          class="form-control py-0"
-          id="renameInputField"
+          class="form-control py-0 renameInputFieldFolder"
+          id="renameInputFieldFolder"
           type="text"
           style="font-size: 14px;"
+          autofocus
           value={explorer.name}
           on:input={handleRenameInput}
           on:blur={onRenameBlur}
@@ -429,6 +420,11 @@
   .btn-primary:hover {
     border-radius: 8px;
     background-color: var(--border-color);
+    color: var(--white-color);
+  }
+  .renameInputFieldFolder {
+    border: none;
+    background-color: transparent;
     color: var(--white-color);
   }
 </style>

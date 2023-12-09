@@ -125,7 +125,6 @@
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let button;
 
   let containerRef;
   function rightClickContextMenu(e) {
@@ -151,7 +150,9 @@
 
   //open collection
   function openCollections() {
-    visibility = !visibility;
+    if (!visibility) {
+      visibility = !visibility;
+    }
     showMenu = false;
   }
 
@@ -164,34 +165,31 @@
 
   const onRenameBlur = async () => {
     if (newCollectionName) {
-      const updateCollectionName = await collectionService.updateCollectionData(
+      const response = await collectionService.updateCollectionData(
         collectionId,
         currentWorkspaceId,
         { name: newCollectionName },
       );
-
-      title = updateCollectionName?.data?.data?.name;
-
-      collectionsMethods.updateCollection(
-        openCollectionId,
-        updateCollectionName.data.data,
-      );
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(collectionId, response.data.data);
+      }
     }
     isRenaming = false;
+    newCollectionName = "";
   };
 
   //rename collection name
   const renameCollection = () => {
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
     showMenu = false;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+      "renameInputFieldCollection",
+    ) as HTMLInputElement;
+    inputField.blur();
     }
   };
 
@@ -222,7 +220,7 @@
     {
       onClick: renameCollection,
       displayText: "Rename collection",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: addRequest,
@@ -341,11 +339,12 @@
     />
     {#if isRenaming}
       <input
-        class="form-control py-0"
-        id="renameInputField"
+        class="form-control py-0 renameInputFieldCollection"
+        id="renameInputFieldCollection"
         type="text"
         style="font-size: 14px;"
         value={title}
+        autofocus
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
@@ -446,5 +445,11 @@
     color: var(--white-color);
     border-radius: 8px;
     background-color: #232527;
+  }
+
+  .renameInputFieldCollection {
+    border: none;
+    background-color: transparent;
+    color: var(--white-color);
   }
 </style>
