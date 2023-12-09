@@ -28,10 +28,12 @@
     let totalRequest: number = 0;
 
     $data.map((item) => {
-      if (item._data._id === id) {
-        totalCollection = item._data.collections.length;
-      } else {
-        totalRequest = 0;
+      if (item) {
+        if (item._data._id === id) {
+          totalCollection = item?._data?.collections?.length;
+        } else {
+          totalRequest = 0;
+        }
       }
     });
 
@@ -78,7 +80,6 @@
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
   });
-
 </script>
 
 <div
@@ -143,7 +144,6 @@
       style="cursor:pointer"
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
       on:click={() => {
-     
         navigate("/dashboard/workspaces");
       }}
       on:click={() => {
