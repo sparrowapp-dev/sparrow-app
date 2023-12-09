@@ -16,7 +16,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  
   export let name: string;
   export let id: string;
   export let collectionId: string;
@@ -249,7 +249,7 @@
 />
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-1 justify-content-between my-button btn-primary"
+  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary"
   style="height:32px;"
 >
   <div
@@ -257,7 +257,7 @@
     on:click={() => {
       handleClick();
     }}
-    class="d-flex w-100 align-items-center {id?.includes(
+    class="main-file d-flex align-items-center {id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
@@ -270,7 +270,7 @@
     {#if isRenaming}
       <input
         class="form-control py-0 renameInputFieldFile"
-        style="font-size: 14px;"
+        style="font-size: 12px;"
         id="renameInputFieldFile"
         type="text"
         autofocus
@@ -280,7 +280,7 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div class="api-name">
+      <div class="api-name ellipsis">
         {name}
         {#if showPath}
           <span class="path-name"
@@ -311,13 +311,12 @@
     font-weight: 500;
     margin-right: 8px;
     border: 1px solid var(--border-color);
-    width: 56px;
-    height: 34px;
+    height: 30px;
     border-radius: 8px;
     padding: 8px 12px 8px 8px;
     display: flex;
     justify-content: center;
-    text-align: left;
+    align-items: center;
   }
   .api-name {
     font-size: 12px;
@@ -361,6 +360,7 @@
   .btn-primary {
     background-color: var(--background-color);
     color: var(--white-color);
+    padding-left: 0 !important;
   }
 
   .btn-primary:hover {
@@ -368,6 +368,7 @@
     background-color: var(--border-color);
     color: var(--white-color);
     padding: 5px;
+    padding-left: 0;
   }
 
   .navbar {
@@ -401,5 +402,14 @@
     border: none;
     background-color: transparent;
     color: var(--white-color);
+    padding-left: 0;
   }
+  .ellipsis {
+  white-space: nowrap;      /* Prevents the text from wrapping */
+  overflow: hidden;         /* Hides any content that overflows the container */
+  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
+}
+.main-file{
+  width: calc(100% - 24px);
+}
 </style>

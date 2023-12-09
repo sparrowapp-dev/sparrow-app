@@ -2,13 +2,6 @@
   import folder from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-  import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
-  import {
-    currentCollectionWorkspaceFolderId,
-    isShowFolderPopup,
-    useCollectionTree,
-  } from "$lib/store/collection";
-  import { insertCollectionRequest } from "$lib/services/collection";
   import File from "./File.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -24,7 +17,6 @@
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
 
-  const { insertNode, updateNodeId } = useCollectionTree();
   let expand: boolean = false;
   export let explorer;
   export let collectionId: string;
@@ -185,6 +177,7 @@
   };
 
   function openFolder() {
+    if(!expand)
     expand = !expand;
   }
 
@@ -275,7 +268,7 @@
           expand = !expand;
         }
       }}
-      class="w-100 d-flex align-items-center gap-2 pe-0"
+      class="main-folder d-flex align-items-center gap-2 pe-0"
     >
       {#if expand}
         <div
@@ -293,7 +286,7 @@
           class="form-control py-0 renameInputFieldFolder"
           id="renameInputFieldFolder"
           type="text"
-          style="font-size: 14px;"
+          style="font-size: 12px;"
           autofocus
           value={explorer.name}
           on:input={handleRenameInput}
@@ -302,7 +295,8 @@
         />
       {:else}
         <span
-          style="padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;"
+          class="ellipsis"
+          style="padding-left: 8px; cursor:pointer; font-size:12px; font-weight:400;"
           >{explorer.name}</span
         >
       {/if}
@@ -312,7 +306,7 @@
       <Spinner size={"15px"} />
     {:else}
       <button
-        class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -322,10 +316,11 @@
     {/if}
   </div>
   <div
-    style="padding-left: 15px; cursor:pointer; display: {expand
+    style="padding-left: 12px; cursor:pointer; display: {expand
       ? 'block'
       : 'none'};"
   >
+  <div class="sub-files ps-3">
     {#each explorer.items as exp}
       <svelte:self
         folderId={explorer.id}
@@ -337,13 +332,14 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 ms-2">
+      <div class="mt-2 mb-2 ms-0">
         <IconButton text={"+ API Request"} onClick={handleAPIClick} />
       </div>
     {/if}
   </div>
+  </div>
 {:else}
-  <div style="padding-left: 6px; cursor:pointer;">
+  <div style="cursor:pointer;">
     <File
       api={explorer}
       {folderId}
@@ -426,5 +422,17 @@
     border: none;
     background-color: transparent;
     color: var(--white-color);
+    padding-left: 0;
   }
+  .sub-files{
+    border-left: 1px solid var(--border-color);
+  }
+  .ellipsis {
+  white-space: nowrap;      /* Prevents the text from wrapping */
+  overflow: hidden;         /* Hides any content that overflows the container */
+  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
+}
+.main-folder{
+  width: calc(100% - 24px);
+}
 </style>

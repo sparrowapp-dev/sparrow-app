@@ -187,9 +187,9 @@
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-      "renameInputFieldCollection",
-    ) as HTMLInputElement;
-    inputField.blur();
+        "renameInputFieldCollection",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
@@ -317,7 +317,7 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-2 pe-2 my-button"
 >
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
@@ -327,7 +327,7 @@
         handleClick();
       }
     }}
-    class="d-flex w-100 align-items-center"
+    class="d-flex main-collection align-items-center"
   >
     <img
       src={angleRight}
@@ -342,7 +342,7 @@
         class="form-control py-0 renameInputFieldCollection"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 14px;"
+        style="font-size: 12px;"
         value={title}
         autofocus
         on:input={handleRenameInput}
@@ -350,7 +350,7 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <p class="mb-0" style="font-size: 14px;">
+      <p class="mb-0 ellipsis" style="font-size: 12px;">
         {title}
       </p>
     {/if}
@@ -370,26 +370,28 @@
 </button>
 
 <div
-  style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
+  style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
     ? 'block'
     : 'none'};"
 >
-  {#each collection.items as exp}
-    <FileExplorer
-      {collectionsMethods}
-      {collectionList}
-      {collectionId}
-      {currentWorkspaceId}
-      explorer={exp}
-      {visibility}
-    />
-  {/each}
-  {#if showFolderAPIButtons}
-    <div class="mt-2 mb-2">
-      <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-    </div>
-  {/if}
+  <div class="sub-folders ps-3">
+    {#each collection.items as exp}
+      <FileExplorer
+        {collectionsMethods}
+        {collectionList}
+        {collectionId}
+        {currentWorkspaceId}
+        explorer={exp}
+        {visibility}
+      />
+    {/each}
+    {#if showFolderAPIButtons}
+      <div class="mt-2 mb-2">
+        <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -451,5 +453,17 @@
     border: none;
     background-color: transparent;
     color: var(--white-color);
+    padding-left: 0;
   }
+  .sub-folders{
+    border-left: 1px solid var(--border-color);
+  }
+  .ellipsis {
+  white-space: nowrap;      /* Prevents the text from wrapping */
+  overflow: hidden;         /* Hides any content that overflows the container */
+  text-overflow: ellipsis;  /* Displays an ellipsis (...) when the text overflows */
+}
+.main-collection{
+  width: calc(100% - 24px);
+}
 </style>
