@@ -9,6 +9,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
+  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
 
   export let data: any;
   export let onclick: any;
@@ -22,17 +23,17 @@
   };
 
   const handleWorkspaceTab = (id: string, name: string) => {
+    isWorkspaceCreatedFirstTime.set(false);
     let totalCollection: number = 0;
     let totalRequest: number = 0;
 
-    // collection.items.map((item) => {
-    //   if (item.type === ItemType.REQUEST) {
-    //     totalRequest++;
-    //   } else {
-    //     totalFolder++;
-    //     totalRequest += item.items.length;
-    //   }
-    // });
+    $data.map((item) => {
+      if (item._data._id === id) {
+        totalCollection = item._data.collections.length;
+      } else {
+        totalRequest = 0;
+      }
+    });
 
     let path: Path = {
       workspaceId: id,
@@ -51,6 +52,7 @@
   };
 
   const handleCreateWorkSpace = async () => {
+    isWorkspaceCreatedFirstTime.set(true);
     const workspaceData = {
       name: "My Workspace",
       type: "PERSONAL",
@@ -76,6 +78,7 @@
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
   });
+
 </script>
 
 <div
@@ -140,7 +143,7 @@
       style="cursor:pointer"
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
       on:click={() => {
-        console.log("object");
+     
         navigate("/dashboard/workspaces");
       }}
       on:click={() => {

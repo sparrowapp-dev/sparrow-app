@@ -174,6 +174,10 @@
       moveNavigation("right");
 
       collectionsMethods.updateCollection(newCollection._id, res);
+      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: Samplecollection.id,
+        name: newCollection.name,
+      });
       return;
     }
     return;
@@ -407,7 +411,7 @@
             {collectionsMethods}
           />
         {/each}
-      {:else}
+      {:else if collection && collection.length === 0}
         <DefaultCollection {handleCreateCollection} {collectionsMethods} />
       {/if}
     </div>

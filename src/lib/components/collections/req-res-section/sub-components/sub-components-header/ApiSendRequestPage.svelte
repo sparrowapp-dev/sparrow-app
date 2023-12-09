@@ -98,7 +98,7 @@
           );
           isLoading = false;
         } else {
-          console.log("timeout");
+     
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,

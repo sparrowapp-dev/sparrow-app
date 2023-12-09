@@ -4,6 +4,8 @@
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import collectionAsset from "$lib/assets/collection-nodes.svg";
+  import folderTab from "$lib/assets/folder-tab.svg";
+
   import book from "$lib/assets/book.svg";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
@@ -43,9 +45,9 @@
       {:else if tab.type === ItemType.FOLDER}
         <span>
           <img
-            src={collectionAsset}
-            alt="book"
-            style="width: 19px;heigh:19px;margin-right:5px;"
+            src={folderTab}
+            alt="folder-tab"
+            style="width: 32px;heigh:25px;margin-right:5px;"
           /></span
         >
       {:else if tab.type === ItemType.COLLECTION}

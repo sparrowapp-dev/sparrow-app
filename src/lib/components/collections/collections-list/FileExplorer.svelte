@@ -72,7 +72,7 @@
     SampleFolder.property.folder.requestCount = totalRequest;
     SampleFolder.property.folder.folderCount = totalFolder;
     SampleFolder.save = true;
-    console.log(SampleFolder);
+ 
     collectionsMethods.handleCreateTab(SampleFolder);
     moveNavigation("right");
   };

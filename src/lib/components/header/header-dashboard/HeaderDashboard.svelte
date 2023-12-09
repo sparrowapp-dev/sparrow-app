@@ -6,6 +6,7 @@
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
+    isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
@@ -85,6 +86,7 @@
 
   const handleDropdown = (id: string, tab: string) => {
     _viewModel.activateWorkspace(id);
+    isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
   };
 

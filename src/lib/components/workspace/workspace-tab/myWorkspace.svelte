@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { WorkspaceService } from "$lib/services/workspace.service";
   import { onDestroy } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "../../header/header-dashboard/HeaderDashboard.ViewModel";
@@ -7,14 +6,13 @@
   import Tooltip from "../../tooltip/Tooltip.svelte";
   import icons from "$lib/assets/app.asset";
   import { user } from "$lib/store/auth.store";
+  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
-  const workspaceService = new WorkspaceService();
   let tabName: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
-  let createWorkspaceNameVisibility: boolean = false;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     tabName = event?.name;
@@ -26,29 +24,13 @@
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
   };
 
-  const modifyWorkspace = async () => {
-    if (newWorkspaceName) {
-      const workspace = await workspaceService.updateWorkspace(
-        componentData.id,
-        {
-          name: newWorkspaceName,
-        },
-      );
-
-      tabName = workspace?.data?.data.name;
-      _viewModel.updateWorkspace(componentData.id, tabName);
-
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.workspaceId,
-      );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.workspaceId,
-      );
-    }
+  const modifyWorkspaceData = async () => {
+    await _viewModel.modifyWorkspace(
+      componentData,
+      collectionsMethods,
+      newWorkspaceName,
+      tabName,
+    );
   };
 
   let name: string = "";
@@ -64,10 +46,18 @@
     }
   });
 
+  let isWorkspaceNameVisibility: boolean;
+  const unsubscribeisWorkspaceCreatedFirstTime =
+    isWorkspaceCreatedFirstTime.subscribe((value) => {
+      isWorkspaceNameVisibility = value;
+    });
+
   onDestroy(() => {
+    unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
   });
+  let autofocus = isWorkspaceNameVisibility;
 </script>
 
 <div class="main-container d-flex">
@@ -79,13 +69,14 @@
       <input
         type="text"
         value={tabName}
+        {autofocus}
         class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
         on:input={(event) => {
           handleWorkspaceInput(event);
         }}
         on:keydown={(event) => {
           if (event.key == "Enter") {
-            modifyWorkspace();
+            modifyWorkspaceData();
           }
         }}
       />
@@ -148,7 +139,9 @@
     <div class="workspace-info gap-3 text-defaultColor">
       <p><span class="me-1 fs-6 text-plusButton">{0}</span>API REQUESTS</p>
       <p>
-        <span class="me-1 fs-6 text-plusButton">{0}</span>COLLECTION
+        <span class="me-1 fs-6 text-plusButton"
+          >{componentData.property.workspace.collectionCount}</span
+        >COLLECTION
       </p>
     </div>
   </div>

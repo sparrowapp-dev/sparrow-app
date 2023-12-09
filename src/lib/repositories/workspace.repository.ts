@@ -38,6 +38,23 @@ export class WorkspaceRepository {
     }).$;
   };
 
+  public updateCollectionInWorkspace = async (
+    workspaceId: string,
+    collectionObj,
+  ) => {
+    const workspace = await rxdb.workspace
+      .findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+
+    workspace.incrementalPatch({
+      collections: [...workspace.collections, collectionObj],
+    });
+  };
+
   public clearWorkspaces = async (): Promise<any> => {
     return rxdb.workspace.find().remove();
   };
@@ -72,8 +89,6 @@ export class WorkspaceRepository {
       value.name = name;
       return value;
     });
-
-    console.log(workspace);
   };
 
   public addWorkspace = async (workspace: any): Promise<void> => {
