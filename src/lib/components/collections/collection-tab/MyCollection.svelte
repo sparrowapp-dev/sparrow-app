@@ -68,7 +68,6 @@
   const unsubscribeisCollectionCreatedFirstTime =
     isCollectionCreatedFirstTime.subscribe((value) => {
       isCollectionNameVisibility = value;
-     
     });
 
   onDestroy(() => {

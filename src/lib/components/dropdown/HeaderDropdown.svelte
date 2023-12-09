@@ -42,14 +42,14 @@
       collectionId: "",
     };
 
-    const SampleWorkspace = generateSampleWorkspace(id, new Date().toString());
-    SampleWorkspace.id = id;
-    SampleWorkspace.name = name;
-    SampleWorkspace.path = path;
-    SampleWorkspace.property.workspace.requestCount = totalRequest;
-    SampleWorkspace.property.workspace.collectionCount = totalCollection;
-    SampleWorkspace.save = true;
-    collectionsMethods.handleCreateTab(SampleWorkspace);
+    const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
+    sampleWorkspace.id = id;
+    sampleWorkspace.name = name;
+    sampleWorkspace.path = path;
+    sampleWorkspace.property.workspace.requestCount = totalRequest;
+    sampleWorkspace.property.workspace.collectionCount = totalCollection;
+    sampleWorkspace.save = true;
+    collectionsMethods.handleCreateTab(sampleWorkspace);
     moveNavigation("right");
   };
 

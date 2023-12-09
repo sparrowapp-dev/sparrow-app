@@ -61,19 +61,19 @@
       folderName: explorer.name,
     };
 
-    const SampleFolder = generateSampleFolder(
+    const sampleFolder = generateSampleFolder(
       explorer.id,
       new Date().toString(),
     );
 
-    SampleFolder.id = explorer.id;
-    SampleFolder.path = path;
-    SampleFolder.name = explorer.name;
-    SampleFolder.property.folder.requestCount = totalRequest;
-    SampleFolder.property.folder.folderCount = totalFolder;
-    SampleFolder.save = true;
- 
-    collectionsMethods.handleCreateTab(SampleFolder);
+    sampleFolder.id = explorer.id;
+    sampleFolder.path = path;
+    sampleFolder.name = explorer.name;
+    sampleFolder.property.folder.requestCount = totalRequest;
+    sampleFolder.property.folder.folderCount = totalFolder;
+    sampleFolder.save = true;
+
+    collectionsMethods.handleCreateTab(sampleFolder);
     moveNavigation("right");
   };
 
