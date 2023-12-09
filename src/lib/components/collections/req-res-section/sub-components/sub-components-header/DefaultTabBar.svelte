@@ -18,6 +18,7 @@
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
+  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -76,12 +77,14 @@
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");    
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
       }
     },
   );
 
   const handleCreateCollection = async () => {
+    isCollectionCreatedFirstTime.set(true);
+
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {

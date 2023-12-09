@@ -20,7 +20,7 @@
 </script>
 
 <section
-  class="d-flex justify-content-between align-items-center bg-black border-0 border-bottom border-dark p-0"
+  class="d-flex justify-content-between pe-2 align-items-center bg-black border-0 border-bottom border-dark p-0"
   data-tauri-drag-region
 >
   <div class="d-flex gap-3">
@@ -28,7 +28,7 @@
       <img src={sparrowicon} alt="" class="w-100" />
     </div>
   </div>
-  <div class="d-flex gap-0">
+  <div class="d-flex gap-2">
     <button on:click={onMinimize} class="button-minus py-1 px-2">
       <img src={icons.minimizeIcon} alt="" class="w-100" />
     </button>

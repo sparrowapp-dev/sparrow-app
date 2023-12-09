@@ -2,10 +2,11 @@
   import { appWindow } from "@tauri-apps/api/window";
   import { user } from "$lib/store/auth.store";
   import { Observable } from "rxjs";
- 
+
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons from "$lib/assets/app.asset";
   import {
+    isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
@@ -13,6 +14,8 @@
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   const navigate = useNavigate();
@@ -23,6 +26,21 @@
 
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
+
+  let name: string = "";
+  let email: string = "";
+  let firstLetter;
+  const unsubscribeUser = user.subscribe((value) => {
+    if (value) {
+      if (value.personalWorkspaces) {
+        name = value?.personalWorkspaces[0]?.name;
+      }
+      email = value?.email;
+      if (name) {
+        firstLetter = name[0];
+      }
+    }
+  });
 
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
@@ -68,6 +86,7 @@
 
   const handleDropdown = (id: string, tab: string) => {
     _viewModel.activateWorkspace(id);
+    isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
   };
 
@@ -102,6 +121,7 @@
 
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
+    unsubscribeUser();
   });
 
   onMount(() => {
@@ -128,7 +148,11 @@
       class="d-flex d-flex align-items-center justify-content-center gap-2"
       style="height: 36px; width:116px"
     >
-      <HeaderDropdown data={workspaces} onclick={handleDropdown} />
+      <HeaderDropdown
+        data={workspaces}
+        onclick={handleDropdown}
+        {collectionsMethods}
+      />
     </div>
   </div>
 
@@ -189,7 +213,7 @@
                   : "border: 2.2px solid #45494D;"
               } `}
             >
-              R
+              {firstLetter.toUpperCase()}
             </p>
           </button>
 
@@ -209,25 +233,25 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-                R
+                {firstLetter.toUpperCase()}
               </p>
               <h1
                 class="text-white fw-normal mt-3"
                 style="color: #999; font-family: Roboto; font-size: 12px;"
               >
-                John Doe
+                {name}
               </h1>
               <p
                 class="text-requestBodyColor fw-medium mb-0"
                 style="font-size: 12px;"
               >
-                john.doe@gmail.com
+                {email}
               </p>
             </div>
             <hr class="" />
 
             <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px"
+              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
               on:click={() => {
                 if (_viewModel.logout()) {
                   navigate("/login");
@@ -274,6 +298,10 @@
 </div>
 
 <style>
+  .signOut:hover {
+    background-color: var(--background-color);
+  }
+
   .button-minus,
   .button-resize,
   .button-close {

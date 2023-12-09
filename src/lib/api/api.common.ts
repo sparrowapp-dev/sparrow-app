@@ -125,6 +125,7 @@ const makeHttpRequest = async (
 
   return await Promise.race([
     timeout(apiTimeOut),
+
     invoke("make_type_request_command", {
       url,
       method,
@@ -135,45 +136,15 @@ const makeHttpRequest = async (
   ])
     .then(async (data) => {
       response = data;
-      return success(JSON.parse(response));
+      try {
+        return success(JSON.parse(response));
+      } catch (e) {
+        return error("error");
+      }
     })
     .catch(() => {
-      throw new Error("Invalid response from the backend");
+      return error("error");
     });
 };
 
 export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
-//------------- We need this function in future ------------------//
-// export const download = async (url, data, headers) => {
-//   try {
-//     let response = null;
-//     if (data === null) {
-//       response = await axios.get(url, {
-//         headers,
-//         responseType: "blob",
-//       });
-//     } else {
-//       response = await axios.post(url, data, {
-//         headers,
-//         responseType: "blob",
-//       });
-//     }
-//     var contentDisposition = response.headers["content-disposition"];
-//     var filename = contentDisposition.match(/filename=(?<filename>[^,;]+);/)[0];
-//     return success({
-//       file: response.data,
-//       filename: filename
-//         .split("=")[1]
-//         .replace(";", "")
-//         .replace('"', "")
-//         .replace('"', ""),
-//     });
-//   } catch (e) {
-//
-//     if (e.response.data) {
-//       let errorString = JSON.parse(await e.response.data.text());
-//       return errorString;
-//     }
-//     return error(e);
-//   }
-// };
