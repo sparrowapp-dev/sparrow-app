@@ -14,6 +14,9 @@ import account from "$lib/assets/account.svg";
 import doubleResizeIcon from "$lib/assets/window-resize-open.svg";
 import sparrowicon from "$lib/assets/sparrowIcon.svg";
 import lockicon from "$lib/assets/lock-icon.svg";
+import info from "$lib/assets/circle-info-white.svg";
+import setting from "$lib/assets/setting-white.svg";
+import line from "$lib/assets/right-line.svg";
 
 export default {
   closeIcon,
@@ -32,4 +35,7 @@ export default {
   doubleResizeIcon,
   sparrowicon,
   lockicon,
+  info,
+  setting,
+  line,
 };

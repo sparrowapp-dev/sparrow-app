@@ -29,15 +29,16 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-
-
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-
+  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
-  
+
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
+
+
+ import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -127,6 +128,7 @@
   );
 
   const handleCreateCollection = async () => {
+    isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {
@@ -173,6 +175,10 @@
       moveNavigation("right");
 
       collectionsMethods.updateCollection(newCollection._id, res);
+      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: Samplecollection.id,
+        name: newCollection.name,
+      });
       return;
     }
     return;
@@ -412,7 +418,7 @@
             {collectionsMethods}
           />
         {/each}
-      {:else}
+      {:else if collection && collection.length === 0}
         <DefaultCollection {handleCreateCollection} {collectionsMethods} />
       {/if}
     </div>

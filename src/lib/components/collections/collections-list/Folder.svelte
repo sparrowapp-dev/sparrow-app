@@ -19,6 +19,11 @@
   import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
+  import {
+    isCollectionCreatedFirstTime,
+    isFolderCreatedFirstTime,
+  } from "$lib/store/collection";
 
   export let title: string;
   export let collection: any;
@@ -34,6 +39,9 @@
   let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
+    isFolderCreatedFirstTime.set(true);
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
     const folder = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextName(collection.items, ItemType.FOLDER, "New Folder"),
@@ -54,6 +62,35 @@
     );
 
     if (response.isSuccessful && response.data.data) {
+      response.data.data.items.map((item) => {
+        if (item.type === ItemType.REQUEST) {
+          totalRequest++;
+        } else {
+          totalFolder++;
+        }
+      });
+
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: collectionId,
+        folderId: response.data.data.id,
+        folderName: response.data.data.name,
+      };
+
+      const SampleFolder = generateSampleFolder(
+        response.data.data.id,
+        new Date().toString(),
+      );
+
+      SampleFolder.id = response.data.data.id;
+      SampleFolder.path = path;
+      SampleFolder.name = response.data.data.name;
+      SampleFolder.property.folder.requestCount = totalRequest;
+      SampleFolder.property.folder.folderCount = totalFolder;
+      SampleFolder.save = true;
+      collectionsMethods.handleCreateTab(SampleFolder);
+      moveNavigation("right");
+
       const folderObj = response.data.data;
       collectionsMethods.updateRequestOrFolderInCollection(
         collectionId,
@@ -62,6 +99,7 @@
       );
       return;
     }
+    return;
   };
 
   const handleAPIClick = async () => {

@@ -67,7 +67,6 @@
           _apiSendRequest.decodeRestApiData(request),
         );
 
-      
         let end = Date.now();
 
         const byteLength = new TextEncoder().encode(
@@ -99,6 +98,7 @@
           );
           isLoading = false;
         } else {
+     
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
@@ -235,12 +235,10 @@
         required
         type="text"
         placeholder="Enter URL or paste text"
-        class="form-control bg-blackColor border-0 p-3 rounded {isInputEmpty
+        class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
-        style=" width:{isCollaps
-          ? '100%'
-          : ''}; height:34px; outline:none;font-size:14px;"
+        style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
         bind:this={inputElement}
@@ -334,5 +332,13 @@
 
   .btn-primary1:hover {
     background: var(--border-color);
+  }
+
+  .input-outline {
+    border-radius: 0%;
+  }
+
+  .input-outline:focus {
+    outline: 2px solid var(--sparrow-blue);
   }
 </style>
