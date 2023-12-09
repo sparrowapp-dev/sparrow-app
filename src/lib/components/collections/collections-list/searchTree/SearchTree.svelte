@@ -2,12 +2,14 @@
   import folder from "$lib/assets/folder.svg";
   import Request from "$lib/components/collections/collections-list/searchTree/Request.svelte";
   import collectionIcon from "$lib/assets/collection-icon.svg"
+  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
   export let explorer: any;
   export let editable: boolean = false;
   export let workspaceId: string = "";
   export let collectionId: string = "";
+  export let folderDetails:{id:string,name:string};
   export let path: string = "";
   export let searchData: string = "";
   function getIndex(text:string,searchData:string):number{
@@ -29,10 +31,8 @@
         <img src={folder} alt="" style="height:16px; width:16px;" />
         <span
           style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
-        >{explorer.name.substring(0,getIndex(explorer.name,searchData))}
-          <span class="highlight"
-            >{explorer.name.substring(getIndex(explorer.name,searchData), (getIndex(explorer.name,searchData)+searchData.length))}</span
-          >{explorer.name.substring(getIndex(explorer.name,searchData) + searchData.length)}
+        >{explorer.name.substring(0,getIndex(explorer.name,searchData))}<span class="highlight"
+            >{explorer.name.substring(getIndex(explorer.name,searchData), (getIndex(explorer.name,searchData)+searchData.length))}</span>{explorer.name.substring(getIndex(explorer.name,searchData) + searchData.length)}
         </span>
       </div>
       <div
@@ -52,14 +52,16 @@
     <div style="padding-left: 0; cursor:pointer; ">
       <Request
         path={path}
-        name={explorer.name}
-        method={explorer.request.method}
+        request={explorer}
         searchData={searchData}
         getIndex={getIndex}
+        folderDetails={folderDetails}
+        collectionId={collectionId}
+        workspaceId={workspaceId}
       />
     </div>
   {:else}
-    <div style="cursor:pointer;">
+    <div style="cursor:pointer;" on:click={()=>{handleCollectionClick(explorer,workspaceId,collectionId)}}>
       <button
         on:click={() => {
           collectionExpand = !collectionExpand;
@@ -74,9 +76,7 @@
             : 'transform:rotate(0deg);'}"
           alt="angleRight"
         />
-        <p class="mb-0" style="font-size: 14px; color:#999999">{explorer.name.substring(0,getIndex(explorer.name,searchData))}
-          <span class="highlight">{explorer.name.substring(getIndex(explorer.name,searchData), (getIndex(explorer.name,searchData))+searchData.length)}</span>{
-            explorer.name.substring(getIndex(explorer.name,searchData) + searchData.length)}
+        <p class="mb-0" style="font-size: 14px; color:#999999">{explorer.name.substring(0,getIndex(explorer.name,searchData))}<span class="highlight">{explorer.name.substring(getIndex(explorer.name,searchData), (getIndex(explorer.name,searchData))+searchData.length)}</span>{explorer.name.substring(getIndex(explorer.name,searchData) + searchData.length)}
         </p>
       </button>
       <div

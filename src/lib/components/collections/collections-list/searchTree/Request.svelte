@@ -1,38 +1,38 @@
 <script lang="ts">
-    import { getPathFromUrl, replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-
-  export let name: string;
-  export let method: string;
-    export let path : string = "";
+    import {replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
+    import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+    import { handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
+  export let path : string = "";
   export let searchData: string = "";
   export let getIndex;
-  let apiClass = "red-api";
-  if (method === "DELETE") apiClass = "red-api";
-  else if (method === "GET") apiClass = "green-api";
-  else if (method === "POST") apiClass = "yellow-api";
-  else if (method === "PUT") apiClass = "blue-api";
-  else if (method === "ARC") apiClass = "grey-api";
+  export let folderDetails:{id:string,name:string};
+  export let request:any;
+  export let workspaceId: string = "";
+  export let collectionId: string = "";
+ 
 </script>
 
 <div
   class="d-flex align-items-center api-request"
   style="height: {path !== '' ? '40px' : '32px'};"
-  on:click={()=>{}}
+  on:click={()=>{handleRequestClick(request,{
+          collectionId,
+          workspaceId,
+          folderId:folderDetails.id?folderDetails.id:"",
+          folderName:folderDetails.name?folderDetails.name:""
+        })}}
 >
-  <div class="api-method {apiClass}">
-    {method.toUpperCase()}
+  <div class="api-method  text-{getMethodStyle(request.request.method)}">
+    {request.request.method.toUpperCase()}
   </div>
   <div class="api-name">
     <div>
       <p class="mb-0" style="color:#999999">
-        {name.substring(0, getIndex(name, searchData))}
-        <span class="highlight"
-          >{name.substring(
-            getIndex(name, searchData),
-            getIndex(name, searchData) + searchData.length,
-          )}</span
-        >{name.substring(getIndex(name, searchData) + searchData.length)}
+        {request.name.substring(0, getIndex(request.name, searchData))}<span class="highlight"
+          >{request.name.substring(
+            getIndex(request.name, searchData),
+            getIndex(request.name, searchData) + searchData.length,
+          )}</span>{request.name.substring(getIndex(request.name, searchData) + searchData.length)}
       </p>
     </div>
     {#if path !== ""}

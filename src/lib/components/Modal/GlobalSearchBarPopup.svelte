@@ -7,29 +7,16 @@
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { onMount } from "svelte";
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
-  let container;
-  export let handleGlobalSearchPopup;
-  export let searchData;
+  import { handleCollectionClick, handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
+  export let handleGlobalSearchPopup:(show:boolean)=>void;
+  export let searchData:string;
   export let filteredRequest: any[];
   export let filteredFolder: any[];
   export let filteredCollection: any[];
   export let workspaces: any[];
-  export let _collectionMethods;
-  export let activeWorkspaceId;
-  export let _viewModel;
-  export let handleDropdown;
-  console.log("fill",filteredRequest);
+  export let activeWorkspaceId:string;
+  export let handleDropdown:(id:string,name:string)=>void;
   let currentSelectedId = "all";
-  function onWindowClick(e) {
-    // !REMOVE
-    // if (container.contains(e.target) === false) {
-    //   handleGlobalSearchPopup(false);
-    // }
-  }
 
 
   function getIndex(text: string, searchData: string): number {
@@ -53,73 +40,19 @@
   });
 
   const handleWorkspaceClick=(id:string,name:string)=>{
+    if(id!==activeWorkspaceId){
     handleDropdown(id,name)
-    handleGlobalSearchPopup(false);
   }
-  const handleRequestClick=(req:any,path:any)=>{
-    const request = generateSampleRequest(req.id, new Date().toString());
-      request.path = path;
-      request.name = req.name;
-      if(req.description)
-      request.description = req.description;
-      if(req.request.url)
-      request.property.request.url = req.request.url;
-      if(req.request.body)
-      request.property.request.body = req.request.body; 
-      if(req.request.method)
-      request.property.request.method = req.request.method;
-      if(req.request.queryParams)
-      request.property.request.queryParams = req.request.queryParams;
-      if(req.request.headers)
-      request.property.request.headers = req.request.headers;
-      request.save = true;
-      _collectionMethods.handleCreateTab(request);
-      moveNavigation("right");
-      handleGlobalSearchPopup(false);
+  handleGlobalSearchPopup(false);
   }
-  const handleCollectionClick = (collection:any,currentWorkspaceId:string,collectionId:string) => {
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    collection.items.map((item) => {
-      if (item.type === ItemType.REQUEST) {
-        totalRequest++;
-      } else {
-        totalFolder++;
-        totalRequest += item.items.length;
-      }
-    });
-
-    let path= {
-      workspaceId: currentWorkspaceId,
-      collectionId,
-    };
-
-    const Samplecollection = generateSampleCollection(
-      collectionId,
-      new Date().toString(),
-    );
-
-    Samplecollection.id = collectionId;
-    Samplecollection.path = path;
-    Samplecollection.name = collection.name;
-    Samplecollection.property.collection.requestCount = totalRequest;
-    Samplecollection.property.collection.folderCount = totalFolder;
-    Samplecollection.save = true;
-    _collectionMethods.handleCreateTab(Samplecollection);
-    moveNavigation("right");
-    handleGlobalSearchPopup(false);
-
-  };
-
 </script>
 
-<!-- <svelte:window on:click={onWindowClick} /> -->
-<div class="container" bind:this={container}>
+<div class="container">
   <div class="workspace-options-container">
     <button
       id="all"
       class="workspace-options option selected"
-      on:click={(event) => {
+      on:click={() => {
         handleSelection("all");
       }}
     >
@@ -172,10 +105,12 @@
     {#if searchData.length > 0}
       {#if filteredRequest.length > 0 && (currentSelectedId === "all" || currentSelectedId === "request")}
         {#each filteredRequest as filterRequest}
-        <div class="request" on:click={()=>{handleRequestClick(filterRequest.tree,{workspaceId: activeWorkspaceId,
+        <button class="request-btn" on:click={()=>{
+          handleRequestClick(filterRequest.tree,{workspaceId: activeWorkspaceId,
            collectionId:filterRequest.collectionId,
-          folderId:filterRequest.folderDetails?filterRequest.folderDetails.id:{},
-          folderName:filterRequest.folderDetails?filterRequest.folderDetails.name:{}})}}>
+          folderId:filterRequest.folderDetails?filterRequest.folderDetails.id:"",
+          folderName:filterRequest.folderDetails?filterRequest.folderDetails.name:""})
+          handleGlobalSearchPopup(false);}}>
           <div
             class="d-flex align-items-center search-option-request"
             style="height:32px;"
@@ -206,12 +141,12 @@
           <div class="api-path">
             <span>{filterRequest.path?replaceSlashWithGreaterThanSymbol(filterRequest.path):""}</span>
           </div>
-        </div>
+        </button>
         {/each}
       {/if}
       {#if filteredFolder.length > 0 && (currentSelectedId === "all" || currentSelectedId === "folder")}
         {#each filteredFolder as filterFolder}
-        <div class="request">
+        <button class="folder-btn">
           <div
             style="height:36px;"
             class="d-flex align-items-center search-option-request"
@@ -237,12 +172,15 @@
           <div class="api-path">
             <span>{filterFolder.path?replaceSlashWithGreaterThanSymbol(filterFolder.path):""}</span>
           </div>
-        </div>
+        </button>
         {/each}
       {/if}
       {#if filteredCollection.length > 0 && (currentSelectedId === "all" || currentSelectedId === "collection")}
         {#each filteredCollection as filterCollection}
-        <div class="request" on:click={()=>{handleCollectionClick(filterCollection.tree,filterCollection.tree._id,activeWorkspaceId)}}>
+        <button class="collection-btn" on:click={()=>{
+          handleCollectionClick(filterCollection.tree,activeWorkspaceId,filterCollection.tree._id);
+          handleGlobalSearchPopup(false);
+          }}>
           <div
             style="height:36px;"
             class="d-flex align-items-center search-option-request"
@@ -272,14 +210,14 @@
           <div class="api-path">
             <span>{filterCollection.path?replaceSlashWithGreaterThanSymbol(filterCollection.path):""}</span>
           </div>
-        </div>
+        </button>
           
         {/each}
       {/if}
       {#if workspaces.length > 0 && (currentSelectedId === "all" || currentSelectedId === "workspace")}
         {#each workspaces as workspace}
           {#if workspace.name.toLowerCase().includes(searchData.toLowerCase())}
-          <div class="request"  on:click={()=>{ handleWorkspaceClick(workspace._id,workspace.name)}}>
+          <button class="workspace-btn"  on:click={()=>{ handleWorkspaceClick(workspace._id,workspace.name)}}>
             <div
             style="height:36px;"
             class="d-flex align-items-center search-option-request"
@@ -305,7 +243,7 @@
               )}
             </span>
           </div>
-          </div>
+          </button>
           {/if}
         {/each}
       {/if}
@@ -360,9 +298,6 @@
   .workspace-options:hover {
     background-color: #313233;
   }
-  /* .selected{
-    background-color: #313233;
-  } */
   .api-method {
     font-size: 12px;
     font-weight: 500;
@@ -379,7 +314,11 @@
     width: 100%;
     padding: 10px;
   }
-  .request:hover {
+  .request-btn,.folder-btn,.collection-btn,.workspace-btn{
+    background-color: transparent;
+    border: none;
+  }
+  .request-btn:hover,.folder-btn:hover,.collection-btn:hover,.workspace-btn:hover{
     background-color: #313233;
   }
   .highlight {
@@ -391,7 +330,6 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
-    /* border: 2px solid red; */
   }
 
   .api-path {

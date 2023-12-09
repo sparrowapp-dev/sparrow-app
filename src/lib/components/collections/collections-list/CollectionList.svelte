@@ -1,12 +1,10 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
@@ -37,7 +35,7 @@
 
   export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
-
+  
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
@@ -67,6 +65,7 @@
         );
         collection = collectionArr;
       }
+      handleSearch();
     },
   );
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -111,8 +110,6 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
-      debugger;
-      console.log("in current",activeWorkspace);
       if (activeWorkspaceRxDoc) {
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
@@ -187,6 +184,11 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
+    if(!showfilterDropdown){
+      selectMethodsStore.update(()=>[]);
+      handleSearch();
+    }
+      
   };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -361,6 +363,7 @@
                 path={exp.path}
                 explorer={exp.tree}
                 {searchData}
+                folderDetails={exp.folderDetails}
               />
             {/each}
           {/if}

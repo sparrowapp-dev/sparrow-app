@@ -13,12 +13,12 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
   import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
 
   export let title: string;
   export let collection: any;
@@ -243,37 +243,6 @@
     },
   ];
 
-  const handleClick = () => {
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    collection.items.map((item) => {
-      if (item.type === ItemType.REQUEST) {
-        totalRequest++;
-      } else {
-        totalFolder++;
-        totalRequest += item.items.length;
-      }
-    });
-
-    let path: Path = {
-      workspaceId: currentWorkspaceId,
-      collectionId,
-    };
-
-    const Samplecollection = generateSampleCollection(
-      collectionId,
-      new Date().toString(),
-    );
-
-    Samplecollection.id = collectionId;
-    Samplecollection.path = path;
-    Samplecollection.name = title;
-    Samplecollection.property.collection.requestCount = totalRequest;
-    Samplecollection.property.collection.folderCount = totalFolder;
-    Samplecollection.save = true;
-    collectionsMethods.handleCreateTab(Samplecollection);
-    moveNavigation("right");
-  };
 </script>
 
 {#if isCollectionPopup}
@@ -325,7 +294,7 @@
     on:click={() => {
       if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
-        handleClick();
+        handleCollectionClick(collection,currentWorkspaceId,collectionId);
       }
     }}
     class="d-flex w-100 align-items-center"

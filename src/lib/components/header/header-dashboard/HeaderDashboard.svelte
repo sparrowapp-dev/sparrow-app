@@ -99,19 +99,7 @@
     isMaximizeWindow = !isMaximizeWindow;
   };
 
-  const getNotActiveWorkspaceCollections=()=>{
-  let notActiveWorkspacesCollections:any[]=[];
-    allworkspaces.map((workspace)=>{
-      if(workspace._id!==activeWorkspaceId){
-      if(workspace.collections && workspace.collections.length>0){
-        workspace.collections.map((collection)=>{
-          notActiveWorkspacesCollections.push({...collection,items:[]})
-          return;
-         })
-      }
-    }})
-    return notActiveWorkspacesCollections;
-  }
+  
 
 
 
@@ -122,10 +110,7 @@
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredRequest.length = 0;
-    const notActiveWorkspacesCollections=getNotActiveWorkspaceCollections();
-    let allCollections=[...collections,...notActiveWorkspacesCollections];
-    // console.log(allCollections);
-    searchNode(searchData, filteredCollection, filteredFolder, filteredRequest,allCollections,activeWorkspaceName);
+    searchNode(searchData, filteredCollection, filteredFolder, filteredRequest,collections,activeWorkspaceName);
   };
 
   
@@ -222,7 +207,7 @@
       <input
         type="search"
         style="font-size: 12px;"
-        class="form-control border-0 bg-backgroundColor"
+        class="input-search-bar  bg-backgroundColor"
         placeholder="Search your workspaces, collections and endpoints"
         bind:value={searchData}
         on:input={() => {
@@ -239,8 +224,8 @@
     </div>
     {#if showGlobalSearchPopup}
       <GlobalSearchBarPopup  searchData={searchData} {handleGlobalSearchPopup} {filteredCollection}
-      {filteredFolder} {filteredRequest} workspaces={allworkspaces} _collectionMethods={_collectionMethods}
-      activeWorkspaceId={activeWorkspaceId} _viewModel={_viewModel} handleDropdown={handleDropdown}
+      {filteredFolder} {filteredRequest} workspaces={allworkspaces} 
+      activeWorkspaceId={activeWorkspaceId}  handleDropdown={handleDropdown}
        ></GlobalSearchBarPopup>
        
     {/if}
@@ -417,5 +402,17 @@
     background: var(--background-hover);
     backdrop-filter: blur(3px);
     z-index: 4;
+  }
+  .input-search-bar{
+    width:100%;
+    padding: 6px 12px;
+    font-size: 16px;
+    line-height: 1.5;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+  }
+  input[type=search]:focus{
+    border: 1px solid var(--workspace-hover-color);
   }
 </style>
