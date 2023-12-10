@@ -14,9 +14,6 @@
       align-items: center;
     }
   
-    .loading-spinner {
-      z-index: 999;
-    }
     .load-spin {
       animation: loader-animation 1s linear infinite;
     }

@@ -3,10 +3,7 @@
   import folderOpenIcon from "$lib/assets/open-folder.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
 
-  import {
-    isFolderCreatedFirstTime,
-    useCollectionTree,
-  } from "$lib/store/collection";
+  import { isFolderCreatedFirstTime } from "$lib/store/collection";
 
   import File from "./File.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -26,7 +23,6 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
     import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
 
-  const { insertNode, updateNodeId } = useCollectionTree();
   let expand: boolean = false;
   export let explorer;
   export let collectionId: string;
@@ -130,6 +126,7 @@
       sampleRequest.path.collectionId = collectionId;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
+      sampleRequest.save = true;
 
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
@@ -156,8 +153,6 @@
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
 
-  let openFolderId: string = "";
-
   // Assuming you have a container reference (e.g., containerRef) in your component
   let containerRef;
 
@@ -167,7 +162,7 @@
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY };
+      pos = { x: mouseX, y: mouseY + 20 };
       showMenu = true;
     }, 100);
   }
@@ -184,55 +179,47 @@
   let isRenaming = false;
 
   const handleRenameInput = (event) => {
-    expand = false;
     newFolderName = event.target.value;
   };
 
   const onRenameBlur = async () => {
-    const folder = {
-      name: newFolderName,
-      description: "",
-    };
-
     if (newFolderName) {
-      const updateFolderName = await collectionService.updateFolderInCollection(
+      const response = await collectionService.updateFolderInCollection(
         currentWorkspaceId,
         collectionId,
-        openFolderId,
+        explorer.id,
         {
-          name: folder.name,
-          description: folder.description,
+          name: newFolderName,
         },
       );
-
-      explorer.name = updateFolderName?.data?.data?.name;
-      collectionsMethods.updateFolderName(
-        collectionId,
-        openFolderId,
-        explorer.name,
-      );
+      if (response.isSuccessful) {
+        collectionsMethods.updateRequestOrFolderInCollection(
+          collectionId,
+          explorer.id,
+          response.data.data,
+        );
+      }
+      isRenaming = false;
+      newFolderName = "";
     }
-
-    expand = false;
-    isRenaming = false;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+        "renameInputFieldFolder",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
   const renameFolder = () => {
     expand = false;
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
   };
 
   function openFolder() {
-    expand = !expand;
+    if (!expand) expand = !expand;
   }
 
   function addRequest() {
@@ -249,7 +236,7 @@
     {
       onClick: renameFolder,
       displayText: "Rename Folder",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: addRequest,
@@ -323,7 +310,7 @@
           expand = !expand;
         }
       }}
-      class="w-100 d-flex align-items-center gap-2 pe-0"
+      class="main-folder d-flex align-items-center gap-2 pe-0"
     >
       {#if expand}
         <div
@@ -338,10 +325,11 @@
 
       {#if isRenaming}
         <input
-          class="form-control py-0"
-          id="renameInputField"
+          class="form-control py-0 renameInputFieldFolder"
+          id="renameInputFieldFolder"
           type="text"
-          style="font-size: 14px;"
+          style="font-size: 12px;"
+          autofocus
           value={explorer.name}
           on:input={handleRenameInput}
           on:blur={onRenameBlur}
@@ -349,7 +337,8 @@
         />
       {:else}
         <span
-          style="padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;"
+          class="ellipsis"
+          style="padding-left: 8px; cursor:pointer; font-size:12px; font-weight:400;"
           >{explorer.name}</span
         >
       {/if}
@@ -359,7 +348,9 @@
       <Spinner size={"15px"} />
     {:else}
       <button
-        class="threedot-icon-container border-0 rounded ps-3 d-flex justify-content-center align-items-center"
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -369,28 +360,30 @@
     {/if}
   </div>
   <div
-    style="padding-left: 15px; cursor:pointer; display: {expand
+    style="padding-left: 12px; cursor:pointer; display: {expand
       ? 'block'
       : 'none'};"
   >
-    {#each explorer.items as exp}
-      <svelte:self
-        folderId={explorer.id}
-        folderName={explorer.name}
-        explorer={exp}
-        {collectionId}
-        {currentWorkspaceId}
-        {collectionsMethods}
-      />
-    {/each}
-    {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 ms-2">
-        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-      </div>
-    {/if}
+    <div class="sub-files ps-3">
+      {#each explorer.items as exp}
+        <svelte:self
+          folderId={explorer.id}
+          folderName={explorer.name}
+          explorer={exp}
+          {collectionId}
+          {currentWorkspaceId}
+          {collectionsMethods}
+        />
+      {/each}
+      {#if showFolderAPIButtons}
+        <div class="mt-2 mb-2 ms-0">
+          <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+        </div>
+      {/if}
+    </div>
   </div>
 {:else}
-  <div style="padding-left: 6px; cursor:pointer;">
+  <div style="cursor:pointer;">
     <File
       api={explorer}
       {folderId}
@@ -408,13 +401,13 @@
   .btn-primary {
     background-color: var(--background-color);
     color: var(--white-color);
+    padding-right: 5px;
   }
 
   .btn-primary:hover {
     border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
-    padding: 5px;
   }
 
   .navbar {
@@ -451,11 +444,12 @@
     background-color: var(--border-color);
   }
 
-  .threedot-icon-container:hover {
-    background-color: var(--border-color);
+  .threedot-active {
+    visibility: visible;
+    background-color: var(--workspace-hover-color);
   }
 
-  .threedot-icon-container:active {
+  .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
   }
 
@@ -468,5 +462,22 @@
     border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
+  }
+  .renameInputFieldFolder {
+    border: none;
+    background-color: transparent;
+    color: var(--white-color);
+    padding-left: 0;
+  }
+  .sub-files {
+    border-left: 1px solid var(--border-color);
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-folder {
+    width: calc(100% - 24px);
   }
 </style>

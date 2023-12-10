@@ -137,6 +137,7 @@
       request.id = res.id;
       request.path.workspaceId = currentWorkspaceId;
       request.path.collectionId = collectionId;
+      request.save = true;
 
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
@@ -162,7 +163,6 @@
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let button;
 
   let containerRef;
   function rightClickContextMenu(e) {
@@ -171,7 +171,7 @@
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY };
+      pos = { x: mouseX, y: mouseY + 20 };
       showMenu = true;
     }, 100);
   }
@@ -188,7 +188,9 @@
 
   //open collection
   function openCollections() {
-    visibility = !visibility;
+    if (!visibility) {
+      visibility = !visibility;
+    }
     showMenu = false;
   }
 
@@ -201,34 +203,31 @@
 
   const onRenameBlur = async () => {
     if (newCollectionName) {
-      const updateCollectionName = await collectionService.updateCollectionData(
+      const response = await collectionService.updateCollectionData(
         collectionId,
         currentWorkspaceId,
         { name: newCollectionName },
       );
-
-      title = updateCollectionName?.data?.data?.name;
-
-      collectionsMethods.updateCollection(
-        openCollectionId,
-        updateCollectionName.data.data,
-      );
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(collectionId, response.data.data);
+      }
     }
     isRenaming = false;
+    newCollectionName = "";
   };
 
   //rename collection name
   const renameCollection = () => {
     isRenaming = true;
-    const inputField = document.getElementById(
-      "renameInputField",
-    ) as HTMLInputElement;
     showMenu = false;
   };
 
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
-      onRenameBlur();
+      const inputField = document.getElementById(
+        "renameInputFieldCollection",
+      ) as HTMLInputElement;
+      inputField.blur();
     }
   };
 
@@ -259,7 +258,7 @@
     {
       onClick: renameCollection,
       displayText: "Rename collection",
-      disabled: true,
+      disabled: false,
     },
     {
       onClick: addRequest,
@@ -325,7 +324,7 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-4 pe-3 my-button"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-2 my-button"
 >
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
@@ -335,7 +334,7 @@
         handleCollectionClick(collection,currentWorkspaceId,collectionId);
       }
     }}
-    class="d-flex w-100 align-items-center"
+    class="d-flex main-collection align-items-center"
   >
     <img
       src={angleRight}
@@ -347,17 +346,18 @@
     />
     {#if isRenaming}
       <input
-        class="form-control py-0"
-        id="renameInputField"
+        class="form-control py-0 renameInputFieldCollection"
+        id="renameInputFieldCollection"
         type="text"
-        style="font-size: 14px;"
+        style="font-size: 12px;"
         value={title}
+        autofocus
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <p class="mb-0" style="font-size: 14px;">
+      <p class="mb-0 ellipsis" style="font-size: 12px;">
         {title}
       </p>
     {/if}
@@ -366,7 +366,9 @@
     <Spinner size={"15px"} />
   {:else}
     <button
-      class="threedot-icon-container pe-1 border-0 rounded d-flex justify-content-center align-items-center"
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
@@ -377,26 +379,28 @@
 </button>
 
 <div
-  style="padding-left: 40px; padding-right:12px; cursor:pointer; display: {visibility
+  style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
     ? 'block'
     : 'none'};"
 >
-  {#each collection.items as exp}
-    <FileExplorer
-      {collectionsMethods}
-      {collectionList}
-      {collectionId}
-      {currentWorkspaceId}
-      explorer={exp}
-      {visibility}
-    />
-  {/each}
-  {#if showFolderAPIButtons}
-    <div class="mt-2 mb-2">
-      <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-      <IconButton text={"+ API Request"} onClick={handleAPIClick} />
-    </div>
-  {/if}
+  <div class="sub-folders ps-3">
+    {#each collection.items as exp}
+      <FileExplorer
+        {collectionsMethods}
+        {collectionList}
+        {collectionId}
+        {currentWorkspaceId}
+        explorer={exp}
+        {visibility}
+      />
+    {/each}
+    {#if showFolderAPIButtons}
+      <div class="mt-2 mb-2">
+        <IconButton text={"+ Folder"} onClick={handleFolderClick} />
+        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -409,24 +413,24 @@
     background-color: var(--border-color);
   }
 
-  .threedot-icon-container:hover {
-    background-color: var(--border-color);
+  .threedot-active {
+    visibility: visible;
+    background-color: var(--workspace-hover-color);
   }
-
-  .threedot-icon-container:active {
+  .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
   }
 
   .btn-primary {
     background-color: var(--background-color);
     color: var(--white-color);
+    padding-right: 5px;
   }
 
   .btn-primary:hover {
     border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
-    padding: 5px;
   }
 
   .navbar {
@@ -452,5 +456,23 @@
     color: var(--white-color);
     border-radius: 8px;
     background-color: #232527;
+  }
+
+  .renameInputFieldCollection {
+    border: none;
+    background-color: transparent;
+    color: var(--white-color);
+    padding-left: 0;
+  }
+  .sub-folders {
+    border-left: 1px solid var(--border-color);
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .main-collection {
+    width: calc(100% - 24px);
   }
 </style>
