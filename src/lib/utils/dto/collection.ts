@@ -2,7 +2,7 @@ import type { KeyValuePair } from "../interfaces/request.interface";
 
 export interface CreateDirectoryPostBody {
   name: string;
-  description: string;
+  description?: string;
 }
 
 export interface CreateCollectionPostBody {

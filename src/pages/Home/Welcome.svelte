@@ -14,7 +14,7 @@
     width: 100%;
     height: 100%;
     backdrop-filter: blur(3px);
-    z-index: 999;
+    z-index: 10;
   }
   .load-spin {
     animation: loader-animation 1s linear infinite;
