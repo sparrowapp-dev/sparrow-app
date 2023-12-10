@@ -221,9 +221,9 @@
 
   <div
     style="height:32px; width:400px;position: relative;"
-    class="bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+    class="search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
-    <div class="ps-3 d-flex align-items-center justify-content-center border">
+    <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
     </div>
 
@@ -440,7 +440,7 @@
     border: none;
     outline: none;
   }
-  input[type=search]:focus{
+  .search-container:hover{
     border: 1px solid var(--workspace-hover-color);
   }
 </style>
