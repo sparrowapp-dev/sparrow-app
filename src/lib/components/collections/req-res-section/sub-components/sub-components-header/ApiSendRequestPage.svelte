@@ -46,7 +46,7 @@
     urlText = event?.property.request?.url;
     method = event?.property.request?.method;
     disabledSend = event?.property.request?.requestInProgress;
-    request = event?.property.request;
+    request = event?.property?.request;
   });
 
   const handleSendRequest = async () => {

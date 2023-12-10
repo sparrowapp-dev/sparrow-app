@@ -21,6 +21,7 @@
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
   import type { Path } from "$lib/utils/interfaces/request.interface";
+    import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
 
   let expand: boolean = false;
   export let explorer;
@@ -38,41 +39,7 @@
 
   let showFolderAPIButtons: boolean = true;
 
-  const handleClick = () => {
-    isFolderCreatedFirstTime.set(false);
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    explorer.items.map((item) => {
-      if (item.type === ItemType.REQUEST) {
-        totalRequest++;
-      } else {
-        totalFolder++;
-      }
-    });
-
-    let path: Path = {
-      workspaceId: currentWorkspaceId,
-      collectionId: collectionId,
-      folderId: explorer.id,
-      folderName: explorer.name,
-    };
-
-    const sampleFolder = generateSampleFolder(
-      explorer.id,
-      new Date().toString(),
-    );
-
-    sampleFolder.id = explorer.id;
-    sampleFolder.path = path;
-    sampleFolder.name = explorer.name;
-    sampleFolder.property.folder.requestCount = totalRequest;
-    sampleFolder.property.folder.folderCount = totalFolder;
-    sampleFolder.save = true;
-
-    collectionsMethods.handleCreateTab(sampleFolder);
-    moveNavigation("right");
-  };
-
+ 
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -300,7 +267,7 @@
   <div
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
-    on:click={handleClick}
+    on:click={()=>{handleFolderClick(explorer,currentWorkspaceId,collectionId)}}
   >
     <div
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}

@@ -81,7 +81,10 @@
         style="background-color: transparent; border-style:none; margin-top:-10px dropdown-active"
         on:click={() => {
           showMethods = !showMethods;
-
+          if(!showMethods){
+            selectMethodsStore .update(()=>[]);
+            handleSearch()
+          }
         }}><span class="dropdown-active"><img src={showMethods?angleUp:angleDown} alt="angledown"/></span></button
       >
     </div>

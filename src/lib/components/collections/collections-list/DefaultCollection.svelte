@@ -5,7 +5,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  export let handleCreateCollection;
+  export let handleCreateCollection:any;
   export let collectionsMethods: CollectionsMethods;
 
   const addApiRequest = () => {

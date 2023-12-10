@@ -12,20 +12,51 @@
   } from "$lib/store/workspace.store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
-  import { type WorkspaceDocument } from "$lib/database/app.database";
+  import {
+    type CollectionDocument,
+    type WorkspaceDocument,
+  } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
+  import GlobalSearchBarPopup from "$lib/components/Modal/GlobalSearchBarPopup.svelte";
+  import { useTree } from "$lib/components/collections/collections-list/collectionList";
+  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
+  const [, , searchNode] = useTree();
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
+  const _collectionMethods=new CollectionsViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
+  let collections = [];
+  let allworkspaces=[];
+  let activeWorkspaceId:string;
+  let activeWorkspaceName:string;
+  let searchData: string = "";
+
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const collection = _colllectionListViewModel.collection;
+
+  collection.subscribe((value) => {
+    const collectionArr = value.map(
+      (collectionDocument: CollectionDocument) => {
+        const collectionObj =
+          _colllectionListViewModel.getCollectionDocument(collectionDocument);
+        return collectionObj;
+      },
+    );
+    collections = collectionArr;
+  });
+
+
 
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
+  let showGlobalSearchPopup: boolean = false;
 
   let name: string = "";
   let email: string = "";
@@ -45,6 +76,14 @@
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
       if (value && value.length > 0) {
+        const workspaceArr = value.map(
+          (workspaceDocument: WorkspaceDocument) => {
+            const workspaceObj =
+              _viewModel.getWorkspaceDocument(workspaceDocument)
+            return workspaceObj;
+          },
+        );
+        allworkspaces =  workspaceArr;
         if (!activeWorkspaceRxDoc) {
           _viewModel.activateWorkspace(value[0].get("_id"));
           updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
@@ -56,6 +95,8 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
+      activeWorkspaceId=value._data._id;
+      activeWorkspaceName=value._data.name
     },
   );
 
@@ -73,6 +114,22 @@
     appWindow.toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
+
+  
+
+
+
+  let filteredCollection = [];
+  let filteredFolder = [];
+  let filteredRequest = [];
+  const handleSearch = () => {
+    filteredCollection.length = 0;
+    filteredFolder.length = 0;
+    filteredRequest.length = 0;
+    searchNode(searchData, filteredCollection, filteredFolder, filteredRequest,collections,activeWorkspaceName);
+  };
+
+  
 
   window.addEventListener("click", () => {
     profile = false;
@@ -119,6 +176,10 @@
     }
   }
 
+  function handleGlobalSearchPopup(show: boolean) {
+    showGlobalSearchPopup = show;
+  }
+
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
     unsubscribeUser();
@@ -157,22 +218,43 @@
   </div>
 
   <div
-    style="height:32px; width:400px;"
-    class="bg-backgroundColor pe-2 d-flex align-items-center justify-content-end rounded"
+    style="height:32px; width:400px;position: relative;"
+    class="search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
     </div>
 
-    <div class="w-100">
+    <div class="w-100" >
       <input
         type="search"
         style="font-size: 12px;"
-        class="form-control border-0 bg-backgroundColor"
+        class="input-search-bar  bg-backgroundColor"
         placeholder="Search your workspaces, collections and endpoints"
+        bind:value={searchData}
+        on:input={() => {
+          handleGlobalSearchPopup(true);
+          handleSearch()
+        }}
+        on:click={()=>{
+          handleGlobalSearchPopup(true);
+        }}
+        
+     
+       
       />
     </div>
+    {#if showGlobalSearchPopup}
+      <GlobalSearchBarPopup  searchData={searchData} {handleGlobalSearchPopup} {filteredCollection}
+      {filteredFolder} {filteredRequest} workspaces={allworkspaces} 
+      activeWorkspaceId={activeWorkspaceId}  handleDropdown={handleDropdown}
+       ></GlobalSearchBarPopup>
+       
+    {/if}
   </div>
+  {#if showGlobalSearchPopup}
+  <div class="background-overlay" on:click={(()=>{handleGlobalSearchPopup(false)})}></div>
+  {/if}
 
   <div
     class="d-flex align-items-center justify-content-center"
@@ -333,5 +415,30 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .search-bar {
+    z-index: 8;
+  }
+  .background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--background-hover);
+    backdrop-filter: blur(3px);
+    z-index: 4;
+  }
+  .input-search-bar{
+    width:100%;
+    padding: 6px 12px;
+    font-size: 16px;
+    line-height: 1.5;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+  }
+  .search-container:hover{
+    border: 1px solid var(--workspace-hover-color);
   }
 </style>
