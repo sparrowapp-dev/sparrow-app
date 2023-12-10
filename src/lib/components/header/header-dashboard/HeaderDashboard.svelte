@@ -78,7 +78,6 @@
       if (value && value.length > 0) {
         const workspaceArr = value.map(
           (workspaceDocument: WorkspaceDocument) => {
-            console.log(workspaceDocument);
             const workspaceObj =
               _viewModel.getWorkspaceDocument(workspaceDocument)
             return workspaceObj;
@@ -95,7 +94,6 @@
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
-      console.log(value);
       activeWorkspaceRxDoc = value;
       activeWorkspaceId=value._data._id;
       activeWorkspaceName=value._data.name

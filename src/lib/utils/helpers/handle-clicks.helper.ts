@@ -29,18 +29,18 @@ export const handleCollectionClick = (
     collectionId,
   };
 
-  const Samplecollection = generateSampleCollection(
+  const sampleCollection = generateSampleCollection(
     collectionId,
     new Date().toString(),
   );
 
-  Samplecollection.id = collectionId;
-  Samplecollection.path = path;
-  Samplecollection.name = collection.name;
-  Samplecollection.property.collection.requestCount = totalRequest;
-  Samplecollection.property.collection.folderCount = totalFolder;
-  Samplecollection.save = true;
-  _collectionMethods.handleCreateTab(Samplecollection);
+  sampleCollection.id = collectionId;
+  sampleCollection.path = path;
+  sampleCollection.name = collection.name;
+  sampleCollection.property.collection.requestCount = totalRequest;
+  sampleCollection.property.collection.folderCount = totalFolder;
+  sampleCollection.save = true;
+  _collectionMethods.handleCreateTab(sampleCollection);
   moveNavigation("right");
 };
 
