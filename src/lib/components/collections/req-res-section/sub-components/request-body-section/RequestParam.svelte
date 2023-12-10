@@ -150,12 +150,6 @@
             rightPanelWidthSize = value;
           });
         }
-        console.log({
-          topPanelHeightSize: topPanelHeightSize,
-          bottomPanelHeightSize: bottomPanelHeightSize,
-          leftPanelWidthSize: leftPanelWidthSize,
-          rightPanelWidthSize: rightPanelWidthSize
-        });
       });
       splitter.addEventListener("mouseout", () => {
         splitter.style.border = "solid #313233";
