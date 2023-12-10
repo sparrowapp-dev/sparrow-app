@@ -213,7 +213,7 @@
                   : "border: 2.2px solid #45494D;"
               } `}
             >
-              {firstLetter.toUpperCase()}
+              {firstLetter?.toUpperCase()}
             </p>
           </button>
 
@@ -233,7 +233,7 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-                {firstLetter.toUpperCase()}
+                {firstLetter?.toUpperCase()}
               </p>
               <h1
                 class="text-white fw-normal mt-3"

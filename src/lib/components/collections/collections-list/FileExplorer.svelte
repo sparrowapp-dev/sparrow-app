@@ -21,6 +21,7 @@
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
   import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 
   let expand: boolean = false;
   export let explorer;
@@ -74,6 +75,7 @@
   };
 
   const handleAPIClick = async () => {
+    isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),

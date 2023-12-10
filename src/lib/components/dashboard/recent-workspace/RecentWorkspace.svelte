@@ -18,6 +18,7 @@
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
+    overflow: auto;
   }
   .recent-workspace {
     font-size: 12px;

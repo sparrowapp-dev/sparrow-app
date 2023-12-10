@@ -28,7 +28,7 @@
 
 <div
   style="border-right: 1px solid #313233; overflow: auto;"
-  class="sidebar d-flex flex-column bg-backgroundColor p-3"
+  class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-5"
 >
   <RecentApi {recentAPI} />
   <hr />
@@ -37,10 +37,10 @@
 
 <style>
   .sidebar {
-    width: 280px;
+    width: 282px;
     position: fixed;
     top: 44px;
-    left: 72px;
+    left: 69px;
     height: calc(100vh - 44px);
   }
 </style>

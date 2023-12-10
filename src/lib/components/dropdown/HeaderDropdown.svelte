@@ -64,6 +64,7 @@
     if (response.isSuccessful) {
       _viewModel.addWorkspace(response.data.data);
       handleWorkspaceTab(response.data.data._id, response.data.data.name);
+      isWorkspaceCreatedFirstTime.set(true);
     }
   };
 

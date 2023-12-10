@@ -31,11 +31,11 @@
     {#if $data}
       {#each $data.slice().reverse() as list, index}
         <tr>
-          <td class="tab-data">{list?.name}</td>
-          <td class="tab-data">Personal Workspace</td>
-          <td class="tab-data">12</td>
-          <td class="tab-data">{list?.collections?.length}</td>
-          <td class="tab-data"
+          <td class="tab-data py-3">{list?.name}</td>
+          <td class="tab-data py-3">Personal Workspace</td>
+          <td class="tab-data py-3">12</td>
+          <td class="tab-data py-3">{list?.collections?.length}</td>
+          <td class="tab-data py-3"
             >{calculateTimeDifferenceInDays(
               new Date(),
               new Date(list?.createdAt),
@@ -49,10 +49,10 @@
 
 <style>
   .tab-data {
-    padding: 15px;
     font-size: 12px;
     font-weight: 500;
     line-height: 18px;
+
     background-color: transparent;
   }
   .tab-head {
@@ -62,5 +62,9 @@
     line-height: 18px;
     color: #8a9299;
     background-color: transparent;
+  }
+
+  .table {
+    overflow: auto;
   }
 </style>

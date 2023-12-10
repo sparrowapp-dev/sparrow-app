@@ -6,6 +6,7 @@
   import hamburger from "$lib/assets/hamburger.svg";
   export let data: any;
   import Navigate from "../../routing/Navigate.svelte";
+  import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
 
   let selectedTab = "recent";
   let selectedView = "table";
@@ -30,9 +31,9 @@
       <div class="row">
         <div class="col-12">
           <div
-            class="teams-menu d-flex justify-content-between align-items-center pb-3"
+            class="teams-menu d-flex justify-content-between align-items-center pb-4"
           >
-            <div class="teams-menu__left">
+            <div class="teams-menu__left gap-4">
               <Link style="text-decoration:none;" to="recent"
                 ><span
                   style="padding: 8px 8px;"
@@ -41,12 +42,12 @@
                   class:tab-active={selectedTab === "recent"}>Recent</span
                 ></Link
               >
-              <Link style="text-decoration:none;" to="all"
+              <Link style="text-decoration:none;" to="all-workspace"
                 ><span
                   style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "all")}
+                  on:click={() => (selectedTab = "all-workspace")}
                   class="team-menu__link"
-                  class:tab-active={selectedTab === "all"}>All</span
+                  class:tab-active={selectedTab === "all-workspace"}>All</span
                 ></Link
               >
               <Link style="text-decoration:none;" to="personal-workspaces"
@@ -58,7 +59,7 @@
                   >Personal Workspaces</span
                 ></Link
               >
-              <Link style="text-decoration:none;" to="team-workspaces"
+              <!-- <Link style="text-decoration:none;" to="team-workspaces"
                 ><span
                   style="padding: 8px 8px;"
                   on:click={() => (selectedTab = "team-workspaces")}
@@ -66,13 +67,13 @@
                   class:tab-active={selectedTab === "team-workspaces"}
                   >Team Workspaces</span
                 ></Link
-              >
+              > -->
             </div>
             <div class="teams-menu__right">
               <span class="mx-3" style="cursor:pointer;">
                 <img
                   on:click={() => {
-                    selectedView = "grid";
+                    selectedView = "table";
                   }}
                   class:view-active={selectedView === "grid"}
                   src={table}
@@ -96,9 +97,9 @@
     </div>
 
     <Route path="/recent"><Workspaces {data} {selectedView} /></Route>
-    <Route path="/all">All</Route>
+    <Route path="/all-workspace">All</Route>
     <Route path="/personal-workspace">Personal workspace</Route>
-    <Route path="/team-workspace">Team workspace</Route>
+    <!-- <Route path="/team-workspace">Team workspace</Route> -->
     <Route path="/*"><Navigate to="recent" /></Route>
   </div>
 </div>

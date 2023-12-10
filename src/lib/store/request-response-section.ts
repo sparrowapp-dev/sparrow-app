@@ -4,6 +4,7 @@ import type {
   CurrentTab,
 } from "$lib/utils/interfaces/request.interface";
 
+export const isApiCreatedFirstTime = writable(false);
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
 
