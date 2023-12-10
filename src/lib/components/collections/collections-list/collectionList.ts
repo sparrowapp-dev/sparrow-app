@@ -100,7 +100,6 @@ const searchHelper: (
         collectionId,
         path: createPath(path),
       });
-      // path: createPath(path);
     } else {
       collection.push({
         tree: JSON.parse(JSON.stringify(tree)),

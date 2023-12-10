@@ -39,41 +39,7 @@
 
   let showFolderAPIButtons: boolean = true;
 
-  // const handleClick = () => {
-  //   isFolderCreatedFirstTime.set(false);
-  //   let totalFolder: number = 0;
-  //   let totalRequest: number = 0;
-  //   explorer.items.map((item) => {
-  //     if (item.type === ItemType.REQUEST) {
-  //       totalRequest++;
-  //     } else {
-  //       totalFolder++;
-  //     }
-  //   });
-
-  //   let path: Path = {
-  //     workspaceId: currentWorkspaceId,
-  //     collectionId: collectionId,
-  //     folderId: explorer.id,
-  //     folderName: explorer.name,
-  //   };
-
-  //   const sampleFolder = generateSampleFolder(
-  //     explorer.id,
-  //     new Date().toString(),
-  //   );
-
-  //   sampleFolder.id = explorer.id;
-  //   sampleFolder.path = path;
-  //   sampleFolder.name = explorer.name;
-  //   sampleFolder.property.folder.requestCount = totalRequest;
-  //   sampleFolder.property.folder.folderCount = totalFolder;
-  //   sampleFolder.save = true;
-
-  //   collectionsMethods.handleCreateTab(sampleFolder);
-  //   moveNavigation("right");
-  // };
-
+ 
   const handleAPIClick = async () => {
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
