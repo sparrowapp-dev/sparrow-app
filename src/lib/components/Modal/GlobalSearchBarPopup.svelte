@@ -7,7 +7,7 @@
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { onMount } from "svelte";
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-  import { handleCollectionClick, handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { handleCollectionClick, handleRequestClick ,handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   export let handleGlobalSearchPopup:(show:boolean)=>void;
   export let searchData:string;
   export let filteredRequest: any[];
@@ -146,7 +146,10 @@
       {/if}
       {#if filteredFolder.length > 0 && (currentSelectedId === "all" || currentSelectedId === "folder")}
         {#each filteredFolder as filterFolder}
-        <button class="folder-btn">
+        <button class="folder-btn" on:click={()=>{
+          handleFolderClick(filterFolder.tree,activeWorkspaceId,filterFolder.collectionId)
+          handleGlobalSearchPopup(false)
+          }}>
           <div
             style="height:36px;"
             class="d-flex align-items-center search-option-request"

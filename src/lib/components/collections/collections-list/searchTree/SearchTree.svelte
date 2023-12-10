@@ -2,7 +2,7 @@
   import folder from "$lib/assets/folder.svg";
   import Request from "$lib/components/collections/collections-list/searchTree/Request.svelte";
   import collectionIcon from "$lib/assets/collection-icon.svg"
-  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { handleCollectionClick, handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
   export let explorer: any;
@@ -26,6 +26,7 @@
         class="d-flex align-items-center"
         on:click={() => {
           folderExpand = !folderExpand;
+          handleFolderClick(explorer,workspaceId,collectionId)
         }}
       >
         <img src={folder} alt="" style="height:16px; width:16px;" />

@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isFolderCreatedFirstTime } from "$lib/store/collection";
 import { CollectionsViewModel } from "../../../pages/Collections/Collections.ViewModel";
 import { ItemType } from "../enums/item-type.enum";
+import type { Path } from "../interfaces/request.interface";
 import { generateSampleCollection } from "../sample/collection.sample";
+import { generateSampleFolder } from "../sample/folder.sample";
 import { generateSampleRequest } from "../sample/request.sample";
 import { moveNavigation } from "./navigation";
 const _collectionMethods = new CollectionsViewModel();
@@ -55,5 +58,41 @@ export const handleRequestClick = (req: any, path: any) => {
     request.property.request.headers = req.request.headers;
   request.save = true;
   _collectionMethods.handleCreateTab(request);
+  moveNavigation("right");
+};
+
+export const handleFolderClick = (
+  folder: any,
+  currentWorkspaceId: string,
+  collectionId: string,
+) => {
+  isFolderCreatedFirstTime.set(false);
+  let totalFolder: number = 0;
+  let totalRequest: number = 0;
+  folder.items.map((item) => {
+    if (item.type === ItemType.REQUEST) {
+      totalRequest++;
+    } else {
+      totalFolder++;
+    }
+  });
+
+  const path: Path = {
+    workspaceId: currentWorkspaceId,
+    collectionId: collectionId,
+    folderId: folder.id,
+    folderName: folder.name,
+  };
+
+  const sampleFolder = generateSampleFolder(folder.id, new Date().toString());
+
+  sampleFolder.id = folder.id;
+  sampleFolder.path = path;
+  sampleFolder.name = folder.name;
+  sampleFolder.property.folder.requestCount = totalRequest;
+  sampleFolder.property.folder.folderCount = totalFolder;
+  sampleFolder.save = true;
+
+  _collectionMethods.handleCreateTab(sampleFolder);
   moveNavigation("right");
 };
