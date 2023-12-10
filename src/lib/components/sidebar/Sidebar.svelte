@@ -65,15 +65,16 @@
   </div>
   <div class="sidebar__help">
     <Tooltip>
-      <Helper
-        {activeSideBarTabMethods}
-        route="help"
-        heading="Help"
-        logo={help}
-        isSelected={"help" === selectedActiveSideBarTab ? true : false}
-        {changeSelectedActiveSideBarTab}
-        disabled={true}
-      />
+      <div class="sidebar__container sidebar__container_background2">
+        <div class="sidebar__container--icon pt-2">
+          <img src={help} alt="help-icon" />
+        </div>
+        <div
+          class={`sidebar__container--text mt-1 text-textColor`}
+        >
+          <p>Help</p>
+        </div>
+      </div>
     </Tooltip>
   </div>
 </div>
@@ -97,5 +98,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .sidebar__container--text {
+    font-family: Roboto;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 10px;
+    letter-spacing: 0em;
+    color: white;
   }
 </style>

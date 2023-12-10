@@ -1,5 +1,5 @@
 <script lang="ts">
-  import crossIcon from "$lib/assets/cross.svg";
+  import Crossicon from "$lib/assets/crossicon.svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -56,8 +56,8 @@
         </span>
       {/if}
       <span
-        class="text-muted font-weight-normal"
-        style="font-size: 12px; font-family: Roboto; color: #8A9299;"
+        class="font-weight-normal"
+        style={`font-size: 12px; font-family: Roboto; color: ${tab.isActive ? '#fff;' : '#8A9299;'}`}
       >
         {tab.name}
       </span>
@@ -76,7 +76,7 @@
       }}
       style="overflow:hidden; height:31px;"
     >
-      <img src={crossIcon} alt="cross" />
+      <Crossicon color={tab.isActive ? '#fff' : '#8A9299'}/>
     </button>
   </div>
   {#if !tab.isActive}

@@ -4,6 +4,10 @@
   margin: 0px;
   padding: 0px;
   font-family: "Roboto", sans-serif;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   /* overflow: hidden; */
   /* background: #313233; */
 }

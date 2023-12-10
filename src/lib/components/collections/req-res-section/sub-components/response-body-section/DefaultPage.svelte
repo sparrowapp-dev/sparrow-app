@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { isHorizontalVertical } from "$lib/store/request-response-section";
-  let isHorizontalVerticalMode: boolean;
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+  import { isHorizontal } from "$lib/store/request-response-section";
+  let isHorizontalMode: boolean;
+  isHorizontal.subscribe((value) => (isHorizontalMode = value));
 </script>
 
 <div
-  class="d-flex text-requestBodyColor flex-column {isHorizontalVerticalMode
+  class="d-flex text-requestBodyColor flex-column {isHorizontalMode
     ? 'align-items-start'
     : 'align-items-center'} justify-content-between py-3 ps-3"
 >
   <div
-    class="d-flex flex-column align-items-start {isHorizontalVerticalMode
+    class="d-flex flex-column align-items-start {isHorizontalMode
       ? 'align-items-start '
-      : 'align-items-center'} justify-content-start {isHorizontalVerticalMode
+      : 'align-items-center'} justify-content-start {isHorizontalMode
       ? 'mb-2 mt-3'
       : 'mb-3 mt-5'} "
   >
@@ -21,12 +21,12 @@
   </div>
   <div
     style="font-family: Roboto Mono;font-size: 12px;font-weight: 400;line-height: 18px;letter-spacing: 0em;;"
-    class={isHorizontalVerticalMode
+    class={isHorizontalMode
       ? "d-flex align-items-start justify-content-between gap-4"
       : "d-flex flex-column"}
   >
     <div
-      class={isHorizontalVerticalMode
+      class={isHorizontalMode
         ? "d-flex flex-column align-items-start justify-content-between"
         : ""}
     >
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div
-      class={isHorizontalVerticalMode
+      class={isHorizontalMode
         ? "d-flex flex-column"
         : "d-flex flex-column"}
     >

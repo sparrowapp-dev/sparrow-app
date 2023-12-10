@@ -4,7 +4,9 @@
   import lineIcon from "$lib/assets/line.svg";
   import {
     collapsibleState,
-    isHorizontalVertical,
+    isHorizontal,
+    leftPanelWidth,
+    rightPanelWidth
   } from "$lib/store/request-response-section";
   import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
@@ -33,6 +35,7 @@
   let isInputEmpty: boolean = false;
   let isInputValid: boolean = true;
   let inputElement: HTMLInputElement;
+  let isHorizontalMode: boolean;
 
   let urlText: string = "";
   let method = "";
@@ -148,11 +151,16 @@
 
     return [...params, { key: "", value: "", checked: false }];
   };
+  const isHorizontalUnsubscribe = isHorizontal.subscribe(
+    (value) => {
+      isHorizontalMode = value;
+    },
+  );
 
   const handleDropdown = (tab: RequestMethodType) => {
     collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
   };
-  let selectedView: string = "grid";
+  let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
   let handleInputValue = () => {
     collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL);
@@ -161,22 +169,20 @@
       RequestProperty.QUERY_PARAMS,
     );
   };
-
   onDestroy(() => {
+    isHorizontalUnsubscribe();
     tabSubscribe();
   });
-
   const handleResize = () => {
     const windowWidth = window.innerWidth;
 
     if (windowWidth <= 1300) {
       document.querySelector("#barIcon").click();
-      isHorizontalVertical.set(true);
+      isHorizontal.set(true);
     } else {
-      isHorizontalVertical.set(false);
+      isHorizontal.set(false);
     }
   };
-
   window.addEventListener("resize", handleResize);
 
   onDestroy(() => {
@@ -184,7 +190,7 @@
   });
 
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.key === "Enter") {
+    if (event.key === "Enter") {
       handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
@@ -243,6 +249,7 @@
           : ''}; height:34px; outline:none;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
+        on:keydown={(e) => handleKeyPress(e)}
         bind:this={inputElement}
       />
 
@@ -269,36 +276,36 @@
     <div class="d-flex gap-1 ps-2">
       <span style="cursor:pointer;">
         <img
-          on:click={() => isHorizontalVertical.set(false)}
+          on:click={() => isHorizontal.set(false)}
           on:click={() => {
-            selectedView = "grid";
+            selectedView = "vertical";
             const splitter = document.querySelector(".splitpanes__splitter");
             const leftPanel = document.querySelector(".left-panel");
             const rightPanel = document.querySelector(".right-panel");
-            rightPanel.style.width = "50%";
-            leftPanel.style.width = "50%";
+            leftPanel.style.width = `${leftPanelWidth}%`;
+            rightPanel.style.width = `${rightPanelWidth}%`;
             splitter.style.height = "85vh";
             splitter.style.width = "0%";
           }}
-          class:view-active={selectedView === "grid"}
+          class:view-active={selectedView === "vertical"}
           src={tableColumnIcon}
           alt=""
         />
       </span>
       <span style="cursor:pointer;">
         <img
-          on:click={() => isHorizontalVertical.set(true)}
+          on:click={() => isHorizontal.set(true)}
           on:click={() => {
-            selectedView = "grid1";
+            selectedView = "horizontal";
             const splitter = document.querySelector(".splitpanes__splitter");
             const leftPanel = document.querySelector(".left-panel");
             const rightPanel = document.querySelector(".right-panel");
             splitter.style.height = "0%";
             splitter.style.width = "100%";
-            rightPanel.style.width = "100%";
-            leftPanel.style.width = "100%";
+            rightPanel.style.width = `${rightPanelWidth}%`;
+            leftPanel.style.width = `${leftPanelWidth}%`;
           }}
-          class:view-active={selectedView === "grid1"}
+          class:view-active={selectedView === "horizontal"}
           src={barIcon}
           alt=""
           id="barIcon"

@@ -6,7 +6,7 @@
   import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
-  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import { isHorizontal } from "$lib/store/request-response-section";
   // import {
   //   handleisRawBodyValid,
   // } from "$lib/store/request-response-section";
@@ -254,15 +254,15 @@
     }
   });
 
-  let isHorizontalVerticalMode: boolean;
-  const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
+  let isHorizontalMode: boolean;
+  const isHorizontalUnsubscribe = isHorizontal.subscribe(
     (value) => {
-      isHorizontalVerticalMode = value;
+      isHorizontalMode = value;
     },
   );
 
   onDestroy(() => {
-    isHorizontalVerticalUnsubscribe();
+    isHorizontalUnsubscribe();
   });
 </script>
 
