@@ -1,6 +1,6 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { isHorizontalVertical } from "$lib/store/request-response-section";
+  import { isHorizontal } from "$lib/store/request-response-section";
   import { onDestroy } from "svelte";
   import {
     RequestDataset,
@@ -58,8 +58,8 @@
     collectionsMethods.updateRequestState(tab, "raw");
   };
 
-  let isHorizontalVerticalMode: boolean;
-  isHorizontalVertical.subscribe((value) => (isHorizontalVerticalMode = value));
+  let isHorizontalMode: boolean;
+  isHorizontal.subscribe((value) => (isHorizontalMode = value));
 
   const handleRawChange = (rawValue) => {
     collectionsMethods.updateRequestBody(rawValue, "raw");
@@ -81,7 +81,7 @@
 </script>
 
 <div
-  class="ps-0 {isHorizontalVerticalMode ? 'pt-3' : 'pt-2'} pe-0 rounded w-100"
+  class="ps-0 {isHorizontalMode ? 'pt-3' : 'pt-2'} pe-0 rounded w-100"
 >
   <div>
     {#if method === "GET" && getMessage}

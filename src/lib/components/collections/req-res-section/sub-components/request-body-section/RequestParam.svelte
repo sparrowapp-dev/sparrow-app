@@ -8,8 +8,12 @@
   import Loader from "$lib/components/Transition/Loader.svelte";
 
   import {
+    bottomPanelHeight,
     collapsibleState,
-    isHorizontalVertical,
+    isHorizontal,
+    leftPanelWidth,
+    rightPanelWidth,
+    topPanelHeight,
   } from "$lib/store/request-response-section";
   import ResponseParams from "../response-body-section/ResponseParams.svelte";
   import DefaultPage from "../response-body-section/DefaultPage.svelte";
@@ -29,8 +33,12 @@
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
-  let isHorizontalVerticalMode: boolean;
+  let isHorizontalMode: boolean;
   let selectedTab: string = "";
+  let rightPanelWidthSize: number;
+  let leftPanelWidthSize: number;
+  let topPanelHeightSize: number;
+  let bottomPanelHeightSize: number;
   let progress: boolean = false;
   let isCollaps: boolean = false;
   let headersCount: number | string = 0;
@@ -70,18 +78,33 @@
     }
   });
 
-  const isHorizontalVerticalUnsubscribe = isHorizontalVertical.subscribe(
-    (value) => {
-      isHorizontalVerticalMode = value;
-    },
-  );
+  const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
+    isHorizontalMode = value;
+  });
+
+  const rightPanelWidthSubscribe = rightPanelWidth.subscribe((value) => {
+    rightPanelWidthSize = value;
+  });
+  const leftPanelWidthSubscribe = leftPanelWidth.subscribe((value) => {
+    leftPanelWidthSize = value;
+  });
+  const topPanelHeightSubscribe = topPanelHeight.subscribe((value) => {
+    topPanelHeightSize = value;
+  });
+  const bottomPanelHeightSubscribe = bottomPanelHeight.subscribe((value) => {
+    bottomPanelHeightSize = value;
+  });
 
   collapsibleState.subscribe((value) => {
     isCollaps = value;
   });
 
   onDestroy(() => {
-    isHorizontalVerticalUnsubscribe();
+    leftPanelWidthSubscribe();
+    rightPanelWidthSubscribe();
+    topPanelHeightSubscribe();
+    bottomPanelHeightSubscribe();
+    isHorizontalUnsubscribe();
     tabSubscribe();
   });
   const handleKeyPress = (event) => {
@@ -101,12 +124,32 @@
   };
   onMount(() => {
     const splitter = document.querySelector(".splitpanes__splitter");
+    const leftPanel = document.getElementsByClassName("left-panel");
+    const rightPanel = document.getElementsByClassName("right-panel");
     if (splitter) {
       splitter.addEventListener("mouseover", () => {
         splitter.style.border = "solid #1193f0";
-        splitter.style.cursor = isHorizontalVerticalMode
-          ? "row-resize"
-          : "col-resize";
+        splitter.style.cursor = isHorizontalMode ? "row-resize" : "col-resize";
+        if(isHorizontalMode){
+    
+          topPanelHeight.set(parseInt(leftPanel[0].style.height));
+          bottomPanelHeight.set(parseInt(rightPanel[0].style.height));
+          topPanelHeight.subscribe((value) => {
+            topPanelHeightSize = value;
+          });
+          bottomPanelHeight.subscribe((value) => {
+            bottomPanelHeightSize = value;
+          });
+        }else{
+          leftPanelWidth.set(parseInt(leftPanel[0].style.width));
+          rightPanelWidth.set(parseInt(rightPanel[0].style.width));
+          leftPanelWidth.subscribe((value) => {
+            leftPanelWidthSize = value;
+          });
+          rightPanelWidth.subscribe((value) => {
+            rightPanelWidthSize = value;
+          });
+        }
       });
       splitter.addEventListener("mouseout", () => {
         splitter.style.border = "solid #313233";
@@ -114,31 +157,45 @@
     }
   });
   function stylePanes() {
+    rightPanelWidth.subscribe((value) => {
+      rightPanelWidthSize = value;
+    });
+    leftPanelWidth.subscribe((value) => {
+      leftPanelWidthSize = value;
+    });
+    topPanelHeight.subscribe((value) => {
+      topPanelHeightSize = value;
+    });
+    bottomPanelHeight.subscribe((value) => {
+      bottomPanelHeightSize = value;
+    });
     const splitter = document.querySelector(".splitpanes__splitter");
-    if (splitter) {
-      // Common styles
+    if (splitter && isHorizontalMode) {
+      splitter.style.border = "solid #313233";
+      splitter.style.height = "0%";
+      splitter.style.width = "100%";
+    } else if (splitter && !isHorizontalMode) {
+      splitter.style.border = "solid #313233";
       splitter.style.height = "85vh";
       splitter.style.width = "2px";
-
-      splitter.style.border = "solid #313233";
     }
   }
 </script>
 
 <Splitpanes
-  style={isHorizontalVertical && "height: 85vh; "}
+  style={isHorizontal && "height: 78vh; "}
   on:ready={stylePanes}
   theme=""
-  class="d-flex align-items-start {isHorizontalVerticalMode
+  class="d-flex align-items-start {isHorizontalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
-  horizontal={isHorizontalVerticalMode ? true : false}
+  horizontal={isHorizontalMode ? true : false}
   dblClickSplitter={false}
 >
   <Pane
-    class="right-panel d-flex flex-column align-items-top overflow-y-auto pt-3 ps-4 pe-2"
+    class="left-panel d-flex flex-column align-items-top overflow-y-auto pt-3 ps-4 pe-2"
     minSize={25}
-    size={50}
+    size={isHorizontalMode ? topPanelHeightSize : leftPanelWidthSize}
   >
     <div
       class="{isCollaps
@@ -249,7 +306,11 @@
     </div>
   </Pane>
 
-  <Pane class="left-panel pt-3 px-4 position-relative " minSize={25} size={50}>
+  <Pane
+    class="right-panel pt-3 px-4 position-relative overflow-y-auto"
+    minSize={25}
+    size={isHorizontalMode ? bottomPanelHeightSize : rightPanelWidthSize}
+  >
     <div class=" d-flex flex-column">
       {#if !response?.status}
         <DefaultPage />
