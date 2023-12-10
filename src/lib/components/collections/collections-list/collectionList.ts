@@ -37,6 +37,8 @@ const helper: (
         request: {
           method: method,
         },
+        folderId,
+        folderName: name,
       });
     } else if (type === "FOLDER") {
       tree.items.push({
@@ -73,6 +75,7 @@ const searchHelper: (
   file: any[],
   collectionId: string,
   path: string[],
+  folderDetails: Record<string, string>,
 ) => void = (
   tree,
   searchText,
@@ -81,18 +84,28 @@ const searchHelper: (
   file,
   collectionId,
   path,
+  folderDetails,
 ) => {
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
     if (tree.type === "REQUEST") {
       file.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
+        folderDetails,
         path: createPath(path),
       });
     } else if (tree.type === "FOLDER") {
-      folder.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
+      folder.push({
+        tree: JSON.parse(JSON.stringify(tree)),
+        collectionId,
+        path: createPath(path),
+      });
     } else {
-      collection.push({ tree: JSON.parse(JSON.stringify(tree)), collectionId });
+      collection.push({
+        tree: JSON.parse(JSON.stringify(tree)),
+        collectionId,
+        path: createPath(path),
+      });
     }
   }
 
@@ -108,6 +121,7 @@ const searchHelper: (
         file,
         collectionId,
         path,
+        tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
       );
       path.pop();
     }
@@ -181,7 +195,15 @@ const useTree = (): any[] => {
     folder: any[],
     file: any[],
     collectionData: any[],
-  ) => void = (searchText, collection, folder, file, collectionData) => {
+    workspacePath?: string,
+  ) => void = (
+    searchText,
+    collection,
+    folder,
+    file,
+    collectionData,
+    workspacePath,
+  ) => {
     const filteredByMethodTrees = [];
     tree = collectionData;
     // iterate through the tree and filter according to api methods selected
@@ -221,6 +243,9 @@ const useTree = (): any[] => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < filteredTrees.length; i++) {
       const path = [];
+      if (workspacePath) {
+        path.push(workspacePath);
+      }
       searchHelper(
         filteredTrees[i],
         searchText,
@@ -229,6 +254,7 @@ const useTree = (): any[] => {
         file,
         filteredTrees[i]._id,
         path,
+        {},
       );
     }
     return;

@@ -9,7 +9,11 @@ export const isApiCreatedFirstTime = writable(false);
 export const collapsibleState = writable(false);
 
 //this is for horizaontal and vertical mode
-export const isHorizontalVertical = writable(false);
+export const isHorizontal = writable(false);
+export const leftPanelWidth = writable(50);
+export const rightPanelWidth = writable(50);
+export const topPanelHeight = writable(50);
+export const bottomPanelHeight = writable(50);
 
 //store for Api Request ------>here i will store all new request
 const initialRequest = [

@@ -1,12 +1,10 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-
   import searchIcon from "$lib/assets/search.svg";
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
@@ -25,9 +23,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-
+  
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -39,6 +35,10 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
+
+
+ import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -66,6 +66,7 @@
         );
         collection = collectionArr;
       }
+      handleSearch();
     },
   );
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -188,6 +189,11 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
+    if(!showfilterDropdown){
+      selectMethodsStore.update(()=>[]);
+      handleSearch();
+    }
+      
   };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -365,6 +371,7 @@
                 path={exp.path}
                 explorer={exp.tree}
                 {searchData}
+                folderDetails={exp.folderDetails}
               />
             {/each}
           {/if}
