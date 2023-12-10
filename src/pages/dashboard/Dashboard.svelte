@@ -82,10 +82,10 @@
     {/await}
     <section class="w-100">
       <Route path="/collections/*"><CollectionsHome /></Route>
+      <Route path="/workspaces/*"><Workspaces data={workspaces} /></Route>
       <Route path="/mock/*"><Mock /></Route>
       <Route path="/environment/*"><Enviornment /></Route>
       <Route path="/teams/*"><Teams /></Route>
-      <Route path="/workspaces/*"><Workspaces data={workspaces} /></Route>
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#await getActiveTab then activeTab}

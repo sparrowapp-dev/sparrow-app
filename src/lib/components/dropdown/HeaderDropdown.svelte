@@ -60,6 +60,7 @@
       type: "PERSONAL",
     };
     const response = await _viewModel.createWorkspace(workspaceData);
+    console.log(response);
     if (response.isSuccessful) {
       _viewModel.addWorkspace(response.data.data);
       handleWorkspaceTab(response.data.data._id, response.data.data.name);
@@ -122,21 +123,21 @@
     <hr class="m-0 p-0" />
     {#if $data}
       {#each $data as list, index}
-        {#if index < workspaceLimit}
-          <p
-            class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-            style="cursor: pointer;"
-            on:click={() => {
-              isOpen = false;
-              onclick(list._id, list.name);
-            }}
-            on:click={() => {
-              handleWorkspaceTab(list._id, list.name);
-            }}
-          >
-            {list.name}
-          </p>
-        {/if}
+        <!-- {#if index < workspaceLimit} -->
+        <p
+          class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
+          style="cursor: pointer;"
+          on:click={() => {
+            isOpen = false;
+            onclick(list._id, list.name);
+          }}
+          on:click={() => {
+            handleWorkspaceTab(list._id, list.name);
+          }}
+        >
+          {list.name}
+        </p>
+        <!-- {/if} -->
       {/each}
     {/if}
     <hr class="m-0 p-0 mt-1" />
