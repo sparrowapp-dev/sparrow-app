@@ -6,7 +6,7 @@
     collapsibleState,
     isHorizontal,
     leftPanelWidth,
-    rightPanelWidth
+    rightPanelWidth,
   } from "$lib/store/request-response-section";
   import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
@@ -57,7 +57,7 @@
       isInputEmpty = true;
       inputElement.focus();
     } else {
-      await collectionsMethods.updateRequestProperty(
+      collectionsMethods.updateRequestProperty(
         true,
         RequestProperty.REQUEST_IN_PROGRESS,
       );
@@ -66,58 +66,59 @@
       if (isInputValid) {
         let start = Date.now();
         isLoading = true;
-        let response = await createApiRequest(
-          _apiSendRequest.decodeRestApiData(request),
-        );
+        createApiRequest(_apiSendRequest.decodeRestApiData(request))
+          .then((response) => {
+            let end = Date.now();
 
-        let end = Date.now();
+            const byteLength = new TextEncoder().encode(
+              JSON.stringify(response),
+            ).length;
+            let responseSizeKB = byteLength / 1024;
+            let duration = end - start;
 
-        const byteLength = new TextEncoder().encode(
-          JSON.stringify(response),
-        ).length;
-        let responseSizeKB = byteLength / 1024;
-        let duration = end - start;
-        if (response.isSuccessful) {
-          let responseBody = response.data.response;
-          let responseHeaders = response.data.headers;
-          let responseStatus = response.data.status;
-          _apiSendRequest.setResponseContentType(
-            responseHeaders,
-            collectionsMethods,
-          );
-          await collectionsMethods.updateRequestProperty(
-            false,
-            RequestProperty.REQUEST_IN_PROGRESS,
-          );
-          await collectionsMethods.updateRequestProperty(
-            {
-              body: responseBody,
-              headers: JSON.stringify(responseHeaders),
-              status: responseStatus,
-              time: duration,
-              size: responseSizeKB,
-            },
-            RequestProperty.RESPONSE,
-          );
-          isLoading = false;
-        } else {
-     
-          await collectionsMethods.updateRequestProperty(
-            false,
-            RequestProperty.REQUEST_IN_PROGRESS,
-          );
-          await collectionsMethods.updateRequestProperty(
-            {
-              body: "",
-              headers: "",
-              status: "Not Found",
-              time: 0,
-              size: 0,
-            },
-            RequestProperty.RESPONSE,
-          );
-          isLoading = false;
-        }
+            let responseBody = response.data.response;
+            let responseHeaders = response.data.headers;
+            let responseStatus = response.data.status;
+            _apiSendRequest.setResponseContentType(
+              responseHeaders,
+              collectionsMethods,
+            );
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: responseBody,
+                headers: JSON.stringify(responseHeaders),
+                status: responseStatus,
+                time: duration,
+                size: responseSizeKB,
+              },
+              RequestProperty.RESPONSE,
+            );
+            isLoading = false;
+          })
+          .catch((error) => {
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: "",
+                headers: "",
+                status: "Not Found",
+                time: 0,
+                size: 0,
+              },
+              RequestProperty.RESPONSE,
+            );
+            isLoading = false;
+          });
+          // For Test purpose (BUG NOT RESOLVED YET)
+          // console.log("running", Date.now() - start )
+
       }
     }
   };
@@ -151,11 +152,9 @@
 
     return [...params, { key: "", value: "", checked: false }];
   };
-  const isHorizontalUnsubscribe = isHorizontal.subscribe(
-    (value) => {
-      isHorizontalMode = value;
-    },
-  );
+  const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
+    isHorizontalMode = value;
+  });
 
   const handleDropdown = (tab: RequestMethodType) => {
     collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
@@ -255,7 +254,7 @@
         disabled={disabledSend}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-3 pe-3 py-2"
         style="font-size: 15px;height:34px; font-weight:400"
-        on:click|preventDefault={handleSendRequest}
+        on:click={handleSendRequest}
         >{#if isLoading}
           <span
             class="me-1 ms-0 d-flex align-item-center justify-content-start"
