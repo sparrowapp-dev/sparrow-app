@@ -131,6 +131,22 @@ const setRequestProperty = async (data, route: string): Promise<void> => {
     return [...updatedTab];
   });
 };
+const updateRequestPropertyResponseBody = async (
+  data,
+  route: string,
+): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request[route].body = data;
+        elem.save = false;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
 
 /**
  * Configures the request with state such as raw, dataset, auth, section.
@@ -242,6 +258,7 @@ const requestResponseStore = {
   setRequestAuth,
   setRequestState,
   setRequestProperty,
+  updateRequestPropertyResponseBody,
   getTabList,
   getTab,
   activeTab,
