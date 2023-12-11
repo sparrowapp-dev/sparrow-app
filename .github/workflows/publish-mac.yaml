@@ -33,7 +33,7 @@ jobs:
     - name: Install Dependencies
       run: |
         yarn install
-        yarn build
+        yarn build --debug
 
     - name: Build Tauri App
       run: |
