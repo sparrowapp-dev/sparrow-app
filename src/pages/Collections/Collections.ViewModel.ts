@@ -92,7 +92,6 @@ export class CollectionsViewModel {
 
   public updateCollectionName = async (id: string, name: string) => {
     this.collectionRepository.updateCollection(id, name);
-    this.debouncedTab();
   };
 
   public updateFolderName = async (
@@ -101,7 +100,6 @@ export class CollectionsViewModel {
     name: string,
   ) => {
     this.collectionRepository.updateFolderName(id, folderId, name);
-    this.debouncedTab();
   };
 
   public deleteRequestOrFolderInCollection = async (
