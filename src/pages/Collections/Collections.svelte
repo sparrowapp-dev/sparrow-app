@@ -55,6 +55,7 @@
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
+    removeMultipleTabs: _viewModel.removeMultipleTabs
   };
 
   let stack = [];

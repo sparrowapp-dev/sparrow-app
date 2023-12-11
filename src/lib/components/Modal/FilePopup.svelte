@@ -34,6 +34,8 @@
           );
           notifications.success(`"${request.name}" Request deleted.`);
           deleteLoader = false;
+          collectionsMethods.handleRemoveTab(request.id);
+          closePopup(false);
       } else {
         notifications.error("Failed to delete the Request.");
         deleteLoader = false;
@@ -55,6 +57,8 @@
         );
         notifications.success(`"${request.name}" Request deleted.`);
         deleteLoader = false;
+        collectionsMethods.handleRemoveTab(request.id);
+        closePopup(false);
 
       } else {
         notifications.error("Failed to delete the Request.");

@@ -13,6 +13,11 @@
   const collectionService = new CollectionService();
 
   let requestCount: number = folder.items.length;
+  let requestIds = folder.items.map((element)=>{
+    return element.id;
+  });
+  requestIds.push(folderId);
+
   let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
@@ -28,6 +33,8 @@
     
       notifications.success(`"${folder.name}" Folder deleted.`);
       deleteLoader = false;
+      collectionsMethods.removeMultipleTabs(requestIds);
+      closePopup(false);
     } else {
       notifications.error("Failed to delete the Folder.");
       deleteLoader = false;

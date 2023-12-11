@@ -212,6 +212,7 @@
       );
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
+        collectionsMethods.updateTab(newCollectionName,"name",collectionId);
       }
     }
     isRenaming = false;

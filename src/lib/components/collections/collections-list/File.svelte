@@ -109,7 +109,6 @@
     showMenu = false;
   }
 
-  let folderID;
 
   let newRequestName: string = "";
   let isRenaming = false;
@@ -119,10 +118,7 @@
   };
 
   const onRenameBlur = async () => {
-    if (folderId) {
-      folderID = folderId;
-    }
-
+  
     if (newRequestName) {
       if (!folderId) {
         let storage = api;
@@ -141,6 +137,7 @@
             api.id,
             response.data.data,
           );
+          collectionsMethods.updateTab(newRequestName,"name",api.id);
         }
       } else if (collectionId && currentWorkspaceId && folderId) {
         let storage = api;
@@ -166,6 +163,7 @@
             api.id,
             response.data.data,
           );
+          collectionsMethods.updateTab(newRequestName, "name", api.id);
         }
       }
     }

@@ -57,7 +57,7 @@
       isInputEmpty = true;
       inputElement.focus();
     } else {
-      await collectionsMethods.updateRequestProperty(
+      collectionsMethods.updateRequestProperty(
         true,
         RequestProperty.REQUEST_IN_PROGRESS,
       );
@@ -66,57 +66,58 @@
       if (isInputValid) {
         let start = Date.now();
         isLoading = true;
-        let response = await createApiRequest(
-          _apiSendRequest.decodeRestApiData(request),
-        );
+        createApiRequest(_apiSendRequest.decodeRestApiData(request))
+          .then((response) => {
+            let end = Date.now();
 
-        let end = Date.now();
+            const byteLength = new TextEncoder().encode(
+              JSON.stringify(response),
+            ).length;
+            let responseSizeKB = byteLength / 1024;
+            let duration = end - start;
 
-        const byteLength = new TextEncoder().encode(
-          JSON.stringify(response),
-        ).length;
-        let responseSizeKB = byteLength / 1024;
-        let duration = end - start;
-        if (response.isSuccessful) {
-          let responseBody = response.data.response;
-          let responseHeaders = response.data.headers;
-          let responseStatus = response.data.status;
-          _apiSendRequest.setResponseContentType(
-            responseHeaders,
-            collectionsMethods,
-          );
-          await collectionsMethods.updateRequestProperty(
-            false,
-            RequestProperty.REQUEST_IN_PROGRESS,
-          );
-          await collectionsMethods.updateRequestProperty(
-            {
-              body: responseBody,
-              headers: JSON.stringify(responseHeaders),
-              status: responseStatus,
-              time: duration,
-              size: responseSizeKB,
-            },
-            RequestProperty.RESPONSE,
-          );
-          isLoading = false;
-        } else {
-          await collectionsMethods.updateRequestProperty(
-            false,
-            RequestProperty.REQUEST_IN_PROGRESS,
-          );
-          await collectionsMethods.updateRequestProperty(
-            {
-              body: "",
-              headers: "",
-              status: "Not Found",
-              time: 0,
-              size: 0,
-            },
-            RequestProperty.RESPONSE,
-          );
-          isLoading = false;
-        }
+            let responseBody = response.data.response;
+            let responseHeaders = response.data.headers;
+            let responseStatus = response.data.status;
+            _apiSendRequest.setResponseContentType(
+              responseHeaders,
+              collectionsMethods,
+            );
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: responseBody,
+                headers: JSON.stringify(responseHeaders),
+                status: responseStatus,
+                time: duration,
+                size: responseSizeKB,
+              },
+              RequestProperty.RESPONSE,
+            );
+            isLoading = false;
+          })
+          .catch((error) => {
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: "",
+                headers: "",
+                status: "Not Found",
+                time: 0,
+                size: 0,
+              },
+              RequestProperty.RESPONSE,
+            );
+            isLoading = false;
+          });
+        // For Test purpose (BUG NOT RESOLVED YET)
+        // console.log("running", Date.now() - start )
       }
     }
   };
@@ -187,7 +188,7 @@
   });
 
   const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.ctrlKey && event.key === "Enter") {
       handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
