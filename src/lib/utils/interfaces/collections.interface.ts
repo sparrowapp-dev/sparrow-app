@@ -70,4 +70,5 @@ export interface CollectionsMethods {
     uuid: string,
     folderId: string,
   ) => void;
+  removeMultipleTabs: (ids: string[]) => void;
 }

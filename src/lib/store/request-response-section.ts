@@ -77,6 +77,16 @@ const removeTab = async (id: string): Promise<void> => {
 };
 
 /**
+ * Removes an existing multiple tabs from the tab bar.
+ */
+
+const removeMultipleTabs = async (id: string[]): Promise<void> => {
+  id.forEach((element) => {
+    removeTab(element);
+  });
+};
+
+/**
  * Activates an existing tab in the tab bar.
  */
 
@@ -264,5 +274,6 @@ const requestResponseStore = {
   activeTab,
   removeTab,
   createTab,
+  removeMultipleTabs,
 };
 export { requestResponseStore };

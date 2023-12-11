@@ -17,15 +17,23 @@
   let requestCount: number = 0;
   let folderCount: number = 0;
 
+  let deleteIds : string[] = [];
   collection.items.forEach((item) => {
     if (item.type === ItemType.FOLDER) {
+      deleteIds.push(item.id);
       folderCount++;
       requestCount += item.items.length;
+      for(let i = 0; i < item.items.length; i++){
+        deleteIds.push(item.items[i].id);
+      }
     }
     if (item.type === ItemType.REQUEST) {
       requestCount++;
+      deleteIds.push(item.id);
     }
   });
+  deleteIds.push(collectionId);
+
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
     deleteLoader = true;
@@ -38,6 +46,7 @@
       collectionsMethods.deleteCollection(collectionId);
       closePopup(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
+      collectionsMethods.removeMultipleTabs(deleteIds);
       deleteLoader = false;
     } else {
       notifications.error("Failed to delete the Collection.");

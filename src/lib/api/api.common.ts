@@ -123,7 +123,7 @@ const makeHttpRequest = async (
 ) => {
   let response;
 
-  return await Promise.race([
+  return Promise.race([
     timeout(apiTimeOut),
 
     invoke("make_type_request_command", {
