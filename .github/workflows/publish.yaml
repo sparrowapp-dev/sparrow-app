@@ -33,7 +33,7 @@ jobs:
         run: |
           yarn install
           yarn build
-          yarn tauri build
+          yarn tauri build --debug
 
       - name: sign msi
         run: |
