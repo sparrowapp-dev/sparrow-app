@@ -189,7 +189,7 @@
   });
 
   const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.ctrlKey && event.key === "Enter") {
       handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
