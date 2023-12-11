@@ -86,6 +86,11 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public removeMultipleTabs = async (ids: string[]) => {
+    requestResponseStore.removeMultipleTabs(ids);
+    this.debouncedTab();
+  };
+
   public deleteCollection = async (id: string) => {
     this.collectionRepository.deleteCollection(id);
   };

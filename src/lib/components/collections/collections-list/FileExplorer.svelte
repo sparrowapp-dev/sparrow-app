@@ -164,6 +164,7 @@
           explorer.id,
           response.data.data,
         );
+        collectionsMethods.updateTab(newFolderName,"name",explorer.id);
       }
       isRenaming = false;
       newFolderName = "";
