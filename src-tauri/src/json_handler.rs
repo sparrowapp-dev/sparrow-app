@@ -12,12 +12,12 @@ pub async fn make_json_request(
     request_builder: RequestBuilder,
     body: &str,
 ) -> Result<Response, Box<dyn std::error::Error>> {
-    let resp;
+    let response;
     if is_valid_json(body) { 
         let valid_json: Value = serde_json::from_str(&body).unwrap();
-        resp = request_builder.json(&valid_json).send().await?;
+        response = request_builder.json(&valid_json).send().await?;
     } else { 
-        resp = request_builder.json(&body).send().await?;
+        response = request_builder.json(&body).send().await?;
     }
-    return Ok(resp);
+    return Ok(response);
 }
