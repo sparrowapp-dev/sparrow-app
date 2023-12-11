@@ -18,6 +18,12 @@
       title: "Cancel Booking",
       endpoint: "Domigo/bookings (book)",
     },
+
+    {
+      type: "GET",
+      title: "Cancel Booking",
+      endpoint: "Domigo/bookings (book)",
+    },
     {
       type: "PUT",
       title: "Cancel Booking",

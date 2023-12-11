@@ -7,6 +7,78 @@
   export let data: any;
   import Navigate from "../../routing/Navigate.svelte";
   import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
+  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  export let collectionsMethods: CollectionsMethods;
+  export let loaderColor = "default";
+
+  let isLoading: boolean = false;
+
+  const _viewModel = new HeaderDashboardViewModel();
+
+  const handleCreateWorkSpace = async () => {
+    isWorkspaceCreatedFirstTime.set(true);
+    const workspaceObj = generateSampleWorkspace(
+      UntrackedItems.UNTRACKED,
+      new Date().toString(),
+    );
+   
+    const workspaceData = {
+      name: workspaceObj.name,
+      type: workspaceObj.type,
+    };
+
+    _viewModel.addWorkspace(workspaceObj);
+
+    isLoading = true;
+
+    const response = await _viewModel.createWorkspace(workspaceData);
+
+    if (response.isSuccessful) {
+      isLoading = false;
+      _viewModel.addWorkspace(response.data.data);
+
+      let totalCollection: number = 0;
+      let totalRequest: number = 0;
+
+      if ($data) {
+        $data.map((item) => {
+          if (item) {
+            if (item._data._id === response.data.data_id) {
+              // totalCollection = item?._data?.collections?.length;
+              totalCollection = 0;
+            } else {
+              totalRequest = 0;
+            }
+          }
+        });
+      }
+      let path: Path = {
+        workspaceId: response.data.data_id,
+        collectionId: "",
+      };
+
+      workspaceObj.id = response.data.data_id;
+      workspaceObj.name = response.data.data.name;
+      workspaceObj.path = path;
+      workspaceObj.property.workspace.requestCount = totalRequest;
+      workspaceObj.property.workspace.collectionCount = 0;
+      workspaceObj.save = true;
+      _viewModel.addWorkspace(workspaceObj);
+
+      collectionsMethods.handleCreateTab(workspaceObj);
+      moveNavigation("right");
+      isWorkspaceCreatedFirstTime.set(true);
+    } else {
+      isLoading = false;
+    }
+  };
 
   let selectedTab = "recent";
   let selectedView = "table";
@@ -21,8 +93,16 @@
             <h2>Workspaces</h2>
             <div class="d-flex">
               <button
-                class="btn btn-primary btn-sm content-teams__btn-new-workspace text-white"
-                >New Workspace</button
+                style="font-size: 12px;"
+                on:click={handleCreateWorkSpace}
+                class=" d-flex align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
+                >{#if isLoading}
+                  <span class="ms-0 me-1">
+                    {#if loaderColor === "default"}
+                      <Spinner size={"15px"} />
+                    {/if}
+                  </span>
+                {/if}New Workspace</button
               >
             </div>
           </div>
@@ -96,11 +176,17 @@
       </div>
     </div>
 
-    <Route path="/recent"><Workspaces {data} {selectedView} /></Route>
-    <Route path="/all-workspace">All</Route>
-    <Route path="/personal-workspace">Personal workspace</Route>
+    <Route path="/recent"
+      ><Workspaces {data} {selectedView} {selectedTab} /></Route
+    >
+    <Route path="/all-workspace"
+      ><PersonalWorkspace {data} {selectedTab} /></Route
+    >
+    <Route path="/personal-workspaces"
+      ><PersonalWorkspace {data} {selectedTab} /></Route
+    >
     <!-- <Route path="/team-workspace">Team workspace</Route> -->
-    <Route path="/*"><Navigate to="recent" /></Route>
+    <Route path="/"><Navigate to="recent" /></Route>
   </div>
 </div>
 
@@ -109,8 +195,7 @@
     color: #8a9299;
   }
   .content-teams__btn-new-workspace {
-    height: 36px;
-    width: 140px;
+    height: 30px;
   }
   .tab-active {
     color: white;

@@ -6,9 +6,11 @@
   <h6 class="teams-heading">Recent Workspace</h6>
   {#if $data}
     {#each $data.slice().reverse() as list, index}
-      <div class="d-flex pb-3">
-        <p class="mb-0 recent-workspace">{list.name}</p>
-      </div>
+      {#if index < 5}
+        <div class="d-flex pb-3">
+          <p class="mb-0 recent-workspace">{list.name}</p>
+        </div>
+      {/if}
     {/each}
   {/if}
 </section>

@@ -1,13 +1,17 @@
 <script lang="ts">
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+
   import WorkspaceContent from "./WorkspaceContent.svelte";
   import WorkspaceList from "./workspace-list/WorkspaceList.svelte";
   export let data: any;
-  console.log($data);
+  export let tabList: any;
+
+  export let collectionsMethods: CollectionsMethods;
 </script>
 
 <div class="workspace bg-backgroundColor">
   <WorkspaceList {data} />
-  <WorkspaceContent {data} />
+  <WorkspaceContent {data} {collectionsMethods} />
 </div>
 
 <style>

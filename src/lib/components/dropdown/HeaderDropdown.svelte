@@ -10,6 +10,8 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  export let activeSideBarTabMethods;
 
   export let data: any;
   export let onclick: any;
@@ -22,7 +24,7 @@
     isOpen = !isOpen;
   };
 
-  const handleWorkspaceTab = (id: string, name: string) => {
+  const handleWorkspaceTab = (id: string, name) => {
     isWorkspaceCreatedFirstTime.set(false);
     let totalCollection: number = 0;
     let totalRequest: number = 0;
@@ -55,15 +57,52 @@
 
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
+    const workspaceObj = generateSampleWorkspace(
+      UntrackedItems.UNTRACKED,
+      new Date().toString(),
+    );
+
     const workspaceData = {
-      name: "My Workspace",
-      type: "PERSONAL",
+      name: workspaceObj.name,
+      type: workspaceObj.type,
     };
+
+    _viewModel.addWorkspace(workspaceObj);
+
     const response = await _viewModel.createWorkspace(workspaceData);
-    console.log(response);
+
     if (response.isSuccessful) {
       _viewModel.addWorkspace(response.data.data);
-      handleWorkspaceTab(response.data.data._id, response.data.data.name);
+
+      let totalCollection: number = 0;
+      let totalRequest: number = 0;
+
+      $data.map((item) => {
+        if (item) {
+          if (item._data._id === response.data.data_id) {
+            // totalCollection = item?._data?.collections?.length;
+            totalCollection = 0;
+          } else {
+            totalRequest = 0;
+          }
+        }
+      });
+
+      let path: Path = {
+        workspaceId: response.data.data_id,
+        collectionId: "",
+      };
+
+      workspaceObj.id = response.data.data_id;
+      workspaceObj.name = response.data.data.name;
+      workspaceObj.path = path;
+      workspaceObj.property.workspace.requestCount = totalRequest;
+      workspaceObj.property.workspace.collectionCount = 0;
+      workspaceObj.save = true;
+      _viewModel.addWorkspace(workspaceObj);
+
+      collectionsMethods.handleCreateTab(workspaceObj);
+      moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
     }
   };
@@ -106,12 +145,12 @@
     ></button
   >
   <div
-    style="display:none;"
+    style="display:none;overflow:auto;"
     class="dropdown-data rounded px-2"
     class:dropdown-active={isOpen}
   >
     <p
-      style="cursor:pointer "
+      style="cursor:pointer;overflow:auto"
       class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
       on:click={() => {
         isOpen = true;
@@ -127,7 +166,7 @@
         <!-- {#if index < workspaceLimit} -->
         <p
           class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-          style="cursor: pointer;"
+          style="cursor: pointer;overflow:auto"
           on:click={() => {
             isOpen = false;
             onclick(list._id, list.name);
@@ -147,6 +186,7 @@
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
       on:click={() => {
         navigate("/dashboard/workspaces");
+        activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
       }}
       on:click={() => {
         isOpen = true;

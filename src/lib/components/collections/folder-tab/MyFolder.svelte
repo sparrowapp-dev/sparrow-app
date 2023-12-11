@@ -68,9 +68,9 @@
   let isClickOnEnter: boolean = false;
   let inputElement;
 
-  console.log($isFolderCreatedFirstTime);
+
   $: if ($isFolderCreatedFirstTime) {
-    console.log("object");
+
     inputElement?.select();
   }
 

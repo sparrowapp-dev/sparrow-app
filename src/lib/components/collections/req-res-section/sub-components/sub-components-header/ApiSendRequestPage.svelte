@@ -6,7 +6,7 @@
     collapsibleState,
     isHorizontal,
     leftPanelWidth,
-    rightPanelWidth
+    rightPanelWidth,
   } from "$lib/store/request-response-section";
   import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
@@ -101,7 +101,6 @@
           );
           isLoading = false;
         } else {
-     
           await collectionsMethods.updateRequestProperty(
             false,
             RequestProperty.REQUEST_IN_PROGRESS,
@@ -151,11 +150,9 @@
 
     return [...params, { key: "", value: "", checked: false }];
   };
-  const isHorizontalUnsubscribe = isHorizontal.subscribe(
-    (value) => {
-      isHorizontalMode = value;
-    },
-  );
+  const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
+    isHorizontalMode = value;
+  });
 
   const handleDropdown = (tab: RequestMethodType) => {
     collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
@@ -255,16 +252,7 @@
         disabled={disabledSend}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-3 pe-3 py-2"
         style="font-size: 15px;height:34px; font-weight:400"
-        on:click|preventDefault={handleSendRequest}
-        >{#if isLoading}
-          <span
-            class="me-1 ms-0 d-flex align-item-center justify-content-start"
-          >
-            {#if loaderColor === "default"}
-              <Spinner size={"15px"} />
-            {/if}
-          </span>
-        {/if}Send</button
+        on:click|preventDefault={handleSendRequest}>Send</button
       >
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
