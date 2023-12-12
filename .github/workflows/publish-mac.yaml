@@ -48,9 +48,9 @@ jobs:
 
     - name: Archive
       run: |
-        #zip -r sparrow.app.zip /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/macos/sparrow-app.app
-        #codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/release/bundle/macos/sparrow-app.app
-        zip -r sparrow-app_0.0.0_x64.dmg /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg
+        #zip -r sparrow.app.zip /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/sparrow-app.app
+        #codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/debug/bundle/macos/sparrow-app.app
+        zip -r sparrow-app_0.0.0_x64.dmg /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_0.0.0_x64.dmg
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
