@@ -5,7 +5,7 @@ import {
 } from "rxdb";
 
 export const activeSideBarTabSchemaLiteral = {
-  title: "activeSideBarTab",
+  title: "activesidebartab",
   primaryKey: "activeTabId",
   type: "object",
   version: 4,

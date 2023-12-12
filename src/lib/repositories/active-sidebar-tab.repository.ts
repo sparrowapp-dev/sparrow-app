@@ -1,18 +1,18 @@
-import { rxdb } from "$lib/database/app.database";
+import { RxDB } from "$lib/database/app.database";
 
 export class ActiveSideBarTabReposistory {
   constructor() {}
 
   public setActiveTab = async (activeTabName: string) => {
-    const activTab = await rxdb.activeSideBarTab.insert({
+    const activTab = await RxDB.getInstance().rxdb.activesidebartab.insert({
       activeTabId: "activeTabId",
       activeTabName,
     });
     return activTab;
   };
   public getActiveTab = async () => {
-    const activeTabData = await rxdb.activeSideBarTab
-      .findOne({
+    const activeTabData = await RxDB.getInstance()
+      .rxdb.activesidebartab.findOne({
         selector: {
           activeTabId: "activeTabId",
         },
@@ -30,6 +30,6 @@ export class ActiveSideBarTabReposistory {
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   public clearActiveTabs = async (): Promise<any> => {
-    return rxdb.activeSideBarTab.find().remove();
+    return RxDB.getInstance().rxdb.activesidebartab.find().remove();
   };
 }

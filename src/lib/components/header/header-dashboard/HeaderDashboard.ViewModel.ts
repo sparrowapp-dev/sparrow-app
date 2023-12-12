@@ -10,7 +10,7 @@ import { resizeWindowOnLogOut } from "../window-resize";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
-import type { WorkspaceDocument } from "$lib/database/app.database";
+import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
 export class HeaderDashboardViewModel {
@@ -124,11 +124,12 @@ export class HeaderDashboardViewModel {
     clearAuthJwt();
     setUser(null);
     setCurrentWorkspace("", "");
-    await this.workspaceRepository.clearWorkspaces();
-    await this.collectionRepository.clearCollections();
-    await requestResponseStore.clearTabs();
-    await this.tabRepository.clearTabs();
-    await this.activeSideBarTabRepository.clearActiveTabs();
+    // await this.workspaceRepository.clearWorkspaces();
+    // await this.collectionRepository.clearCollections();
+    // await requestResponseStore.clearTabs();
+    // await this.tabRepository.clearTabs();
+    // await this.activeSideBarTabRepository.clearActiveTabs();
+    await RxDB.getInstance().destroyDb();
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
