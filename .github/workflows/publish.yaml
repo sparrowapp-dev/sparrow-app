@@ -32,7 +32,6 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-          yarn build
           yarn tauri build --debug
 
       - name: sign msi
