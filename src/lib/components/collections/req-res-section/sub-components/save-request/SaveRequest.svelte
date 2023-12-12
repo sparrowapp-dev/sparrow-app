@@ -37,6 +37,7 @@
   export let onClick;
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
+  export let type : "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
 
 
 
@@ -69,8 +70,10 @@
   let description: string;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
     tabName = componentData.name;
+    description = componentData.description;
   } else {
     tabName = componentData.name + " Copy";
+    description = componentData.description + " Copy";
   }
   let latestRoute: {
     id: string;
@@ -139,13 +142,34 @@
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
-      const expectedRequest = {
-        method: componentData.property.request.method,
-        url: componentData.property.request.url,
-        body: componentData.property.request.body,
-        headers: componentData.property.request.headers,
-        queryParams: componentData.property.request.queryParams,
-      };
+      let existingRequest;
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id,componentData.id);
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, componentData.id);
+      }
+      console.log("existing",existingRequest);
+      // console.log("ex",existingRequest);
+      const randomRequest: NewTab = generateSampleRequest("id", new Date().toString())
+      let expectedRequest;
+      if(!existingRequest){
+        expectedRequest = {
+        method: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.method : componentData.property.request.method,
+        url: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.url :  componentData.property.request.url,
+        body: type === "SAVE_DESCRIPTION" ?  randomRequest.property.request.body :  componentData.property.request.body,
+        headers: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.headers : componentData.property.request.headers,
+        queryParams: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.queryParams : componentData.property.request.queryParams,
+      };  
+      }
+      else{
+        expectedRequest = {
+          method: type === "SAVE_DESCRIPTION" ? existingRequest?.request.method : componentData.property.request.method,
+          url: type === "SAVE_DESCRIPTION" ? existingRequest?.request.url :  componentData.property.request.url,
+          body: type === "SAVE_DESCRIPTION" ? existingRequest?.request.body : componentData.property.request.body,
+          headers: type === "SAVE_DESCRIPTION" ? existingRequest?.request.headers : componentData.property.request.headers,
+          queryParams: type === "SAVE_DESCRIPTION" ? existingRequest?.request.queryParams : componentData.property.request.queryParams,
+        };
+      }
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
         const res = await insertCollectionRequest({
@@ -177,6 +201,7 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.description, "description", _id);
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
             collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
@@ -185,6 +210,7 @@
               new Date().toString(),
             );
             sampleRequest.name = res.data.data.name;
+            sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
             sampleRequest.save = true;
             sampleRequest.property.request.url = res.data.data.request.url;
@@ -237,6 +263,7 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.description, "description", _id)
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
             collectionsMethods.updateTab(true, "save", res.data.data.id);
           } else {
@@ -245,6 +272,7 @@
               new Date().toString(),
             );
             sampleRequest.name = res.data.data.name;
+            sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
             sampleRequest.save = true;
             sampleRequest.property.request.url = res.data.data.request.url;

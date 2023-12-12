@@ -43,12 +43,21 @@ export interface CollectionsMethods {
     uuid: string,
     request,
   ) => void;
+  readRequestInFolder: (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => unknown;
   addRequestOrFolderInCollection: (collectionId: string, items) => void;
   updateRequestOrFolderInCollection: (
     collectionId: string,
     uuid: string,
     items: any,
   ) => void;
+  readRequestOrFolderInCollection: (
+    collectionId: string,
+    uuid: string,
+  ) => unknown;
 
   deleteRequestInFolder: (
     collectionId: string,

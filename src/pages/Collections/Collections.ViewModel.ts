@@ -145,6 +145,18 @@ export class CollectionsViewModel {
     );
   };
 
+  public readRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+    );
+  };
+
   public updateRequestInFolderCollection = (
     collectionId: string,
     uuid: string,
@@ -189,6 +201,16 @@ export class CollectionsViewModel {
       collectionId,
       uuid,
       items,
+    );
+  };
+
+  public readRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestOrFolderInCollection(
+      collectionId,
+      uuid,
     );
   };
 

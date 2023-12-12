@@ -37,7 +37,20 @@
     collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-
+      let existingRequest;
+    if (!folderId) {
+      existingRequest =
+        await collectionsMethods.readRequestOrFolderInCollection(
+          collectionId,
+          _id,
+        );
+    } else {
+      existingRequest = await collectionsMethods.readRequestInFolder(
+        collectionId,
+        folderId,
+        _id,
+      );
+    }
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
@@ -46,13 +59,14 @@
       queryParams: componentData.property.request.queryParams,
     };
 
-    if (!folderId && !folderName) {
-      let res = await updateCollectionRequest(componentData.id, {
+    if (!folderId) {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         items: {
-          id: componentData.id,
+          id: _id,
           name: tabName,
+          description: existingRequest?.description,
           type: ItemType.REQUEST,
           request: expectedRequest,
         },
@@ -60,7 +74,7 @@
       if (res.isSuccessful) {
         collectionsMethods.updateRequestOrFolderInCollection(
           collectionId,
-          componentData.id,
+          _id,
           res.data.data,
         );
         collectionsMethods.updateTab(false, "saveInProgress", _id);
@@ -69,7 +83,7 @@
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     } else {
-      let res = await updateCollectionRequest(componentData.id, {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
@@ -77,8 +91,9 @@
           name: folderName,
           type: ItemType.FOLDER,
           items: {
-            id: componentData.id,
+            id: _id,
             name: tabName,
+            description: existingRequest.description,
             type: ItemType.REQUEST,
             request: expectedRequest,
           },
@@ -88,7 +103,7 @@
         collectionsMethods.updateRequestInFolder(
           collectionId,
           folderId,
-          componentData.id,
+          _id,
           res.data.data,
         );
         collectionsMethods.updateTab(false, "saveInProgress", _id);

@@ -48,11 +48,14 @@
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
     updateRequestInFolder: _viewModel.updateRequestInFolder,
+    readRequestInFolder: _viewModel.readRequestInFolder,
     updateRequestInFolderCollection: _viewModel.updateRequestInFolderCollection,
 
     addRequestOrFolderInCollection: _viewModel.addRequestOrFolderInCollection,
     updateRequestOrFolderInCollection:
       _viewModel.updateRequestOrFolderInCollection,
+    readRequestOrFolderInCollection:
+      _viewModel.readRequestOrFolderInCollection,
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
@@ -101,7 +104,6 @@
           <MyCollection {collectionsMethods} {activeTab} />
         {/if}
       </div>
-      <!-- <SidebarRight /> -->
     </div>
   </div>
 </div>

@@ -161,6 +161,30 @@ export class CollectionRepository {
 
   /**
    * @description
+   * Updates an API request or folder within a collection.
+   */
+  public readRequestOrFolderInCollection = async (
+    collectionId: string,
+    uuid: string,
+  ): Promise<unknown> => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    let response;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === uuid) {
+        response = element;
+      }
+    });
+    return response;
+  };
+
+  /**
+   * @description
    * Creates an API request within a folder.
    */
   public addRequestInFolder = async (
@@ -219,6 +243,35 @@ export class CollectionRepository {
       value.items = [...updatedItems];
       return value;
     });
+  };
+
+  /**
+   * @description
+   * Read an API request within a folder.
+   */
+  public readRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ): Promise<unknown> => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: collectionId,
+        },
+      })
+      .exec();
+    let response;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === folderId) {
+        for (let i = 0; i < element.items.length; i++) {
+          if (element.items[i].id === uuid) {
+            response = element.items[i];
+          }
+        }
+      }
+    });
+    return response;
   };
 
   public updateRequestInFolderCollection = async (
