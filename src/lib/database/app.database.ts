@@ -24,6 +24,7 @@ import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -67,10 +68,10 @@ export class RxDB {
   public async getDb() {
     if (this.rxdb && this.db) return { rxdb: this.rxdb, db: this.db };
     // create the Rx database
-    await removeRxDatabase("mydatabase", getRxStorageDexie());
     this.rxdb = await createRxDatabase<DatabaseCollections>({
       name: "mydatabase",
       storage: getRxStorageDexie(),
+      ignoreDuplicate: true,
     });
 
     // add all collections
@@ -162,7 +163,7 @@ export class RxDB {
   }
 
   public async destroyDb(): Promise<void> {
-    await this.rxdb.destroy();
+    await removeRxDatabase("mydatabase", getRxStorageDexie());
     this.rxdb = null;
     this.db = null;
     return;
