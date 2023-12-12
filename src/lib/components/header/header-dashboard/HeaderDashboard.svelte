@@ -93,9 +93,11 @@
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
-      activeWorkspaceRxDoc = value;
-      activeWorkspaceId = value?._data?._id;
-      activeWorkspaceName = value._data.name;
+      if (value) {
+        activeWorkspaceRxDoc = value;
+        activeWorkspaceId = value._data._id;
+        activeWorkspaceName = value._data.name;
+      }
     },
   );
 
@@ -252,7 +254,7 @@
         workspaces={allworkspaces}
         {activeWorkspaceId}
         {handleDropdown}
-      />
+      ></GlobalSearchBarPopup>
     {/if}
   </div>
   {#if showGlobalSearchPopup}
@@ -261,7 +263,7 @@
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
-    />
+    ></div>
   {/if}
 
   <div
