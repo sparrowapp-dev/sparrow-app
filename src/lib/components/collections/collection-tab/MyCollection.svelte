@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import {
+    collapsibleState,
+    isApiCreatedFirstTime,
+  } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
@@ -48,6 +51,8 @@
   };
 
   const handleApiRequest = async () => {
+    isApiCreatedFirstTime.set(true);
+
     const response = await _myColllectionViewModel.createApiRequest(
       componentData,
       collectionsMethods,
@@ -78,6 +83,14 @@
   onDestroy(() => {});
   let autofocus = isCollectionNameVisibility;
   let isClickOnEnter: boolean = false;
+  let inputElement;
+
+  onMount(() => {
+    // When autofocus is true, select the text in the input element
+    if (autofocus) {
+      inputElement.select();
+    }
+  });
 </script>
 
 <div class="main-container d-flex">
@@ -101,6 +114,7 @@
             modifyCollectionData();
           }
         }}
+        bind:this={inputElement}
       />
 
       <button

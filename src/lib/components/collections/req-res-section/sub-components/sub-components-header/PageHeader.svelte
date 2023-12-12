@@ -1,6 +1,9 @@
 <script lang="ts">
   import angleDown from "$lib/assets/angle-down.svg";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import {
+    collapsibleState,
+    isApiCreatedFirstTime,
+  } from "$lib/store/request-response-section";
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy, onMount } from "svelte";
@@ -136,6 +139,27 @@
       }
     }
   };
+
+  let isRequestNameVisibility: boolean;
+
+  const unsubscribeisApiCreatedFirstTime = isApiCreatedFirstTime.subscribe(
+    (value) => {
+      isRequestNameVisibility = value;
+    },
+  );
+
+  let autofocus = isRequestNameVisibility;
+
+  let inputElement;
+
+  onMount(() => {
+    if (autofocus) {
+      inputElement.select();
+    }
+  });
+  onDestroy(() => {
+    unsubscribeisApiCreatedFirstTime();
+  });
 </script>
 
 <div class="d-flex flex-column" data-tauri-drag-region>
@@ -146,10 +170,13 @@
   >
     <div class="w-100 me-3">
       <input
+        {autofocus}
         placeholder="Enter API Request Name"
         bind:value={tabName}
         on:input={handleInputValue}
         class="tabbar-tabName w-100"
+        bind:this={inputElement}
+        style="outline: none;"
       />
     </div>
 

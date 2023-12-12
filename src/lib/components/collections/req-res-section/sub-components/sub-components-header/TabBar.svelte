@@ -2,7 +2,10 @@
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import {
+    collapsibleState,
+    isApiCreatedFirstTime,
+  } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -114,6 +117,7 @@
       <button
         class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
         on:click={() => {
+          isApiCreatedFirstTime.set(true);
           collectionsMethods.handleCreateTab(
             generateSampleRequest(
               "UNTRACKED-" + uuidv4(),
