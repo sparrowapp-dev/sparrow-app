@@ -8,12 +8,12 @@ export const activeSideBarTabSchemaLiteral = {
   title: "activesidebartab",
   primaryKey: "activeTabId",
   type: "object",
-  version: 4,
+  version: 5,
   properties: {
     activeTabId: {
       type: "string",
       default: "activeTabId",
-      maxlength: 100,
+      maxLength: 100,
     },
     activeTabName: {
       type: "string",

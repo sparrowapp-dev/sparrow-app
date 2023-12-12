@@ -21,14 +21,14 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: uuid,
+          id: uuid,
         },
       })
       .exec();
 
     collection.incrementalModify((value) => {
       if (data.name) value.name = data.name;
-      if (data._id) value._id = data._id;
+      if (data.id) value.id = data.id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.totalRequests) value.totalRequests = data.totalRequests;
@@ -54,7 +54,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -69,7 +69,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -91,7 +91,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -107,10 +107,16 @@ export class CollectionRepository {
     });
   };
 
-  public bulkInsertData = async (data: any): Promise<void> => {
+  public bulkInsertData = async (collection: any[]): Promise<void> => {
+    const updatedCollections = collection.map((collectionObj) => {
+      collectionObj["id"] = collectionObj._id;
+      delete collectionObj._id;
+      return collectionObj;
+    });
+    console.log(updatedCollections);
     if (RxDB.getInstance().rxdb) {
       await RxDB.getInstance().rxdb.collection.find().remove();
-      await RxDB.getInstance().rxdb.collection.bulkInsert(data);
+      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
     }
   };
 
@@ -125,7 +131,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -146,7 +152,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -174,7 +180,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -203,7 +209,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -233,7 +239,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -265,7 +271,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -304,7 +310,7 @@ export class CollectionRepository {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();

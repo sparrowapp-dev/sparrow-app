@@ -24,8 +24,6 @@ import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
-// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-// addRxPlugin(RxDBDevModePlugin);
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -112,6 +110,9 @@ export class RxDB {
           5: function (oldDoc) {
             return oldDoc;
           },
+          6: function (oldDoc) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -126,6 +127,10 @@ export class RxDB {
           },
           3: function (oldDoc) {
             oldDoc.collectionId = oldDoc._id;
+            return oldDoc;
+          },
+          4: function (oldDoc) {
+            oldDoc.collectionId = oldDoc.id;
             return oldDoc;
           },
         },
@@ -144,6 +149,9 @@ export class RxDB {
             return oldDoc;
           },
           4: function (oldDoc) {
+            return oldDoc;
+          },
+          5: function (oldDoc) {
             return oldDoc;
           },
         },
