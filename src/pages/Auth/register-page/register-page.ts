@@ -1,20 +1,17 @@
-import authService from "$lib/services/auth.service";
+import { registerUser } from "$lib/services/auth.service";
 import { notifications } from "$lib/utils/notifications";
 import { checkValidation, registrationSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 
 const handleRegister = async (userData) => {
-  try {
-    await authService.registerUser({
-      email: userData.email,
-      name: userData.name,
-      password: userData.password,
-    });
+  const response = await registerUser(userData);
+
+  if (response.isSuccessful) {
     notifications.success("Registration successful!");
-    navigate("/");
-  } catch (error) {
-    console.log(error);
-    throw error;
+    navigate("/login");
+  } else {
+    notifications.error(response.message);
+    throw "error registering user: " + response.message;
   }
 };
 

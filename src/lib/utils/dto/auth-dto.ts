@@ -11,4 +11,17 @@ export interface loginUserPostBody {
   password: string;
 }
 
+export interface EmailPostBody {
+  email: string;
+}
+
+export interface verifyPostbody {
+  email: string;
+  verificationCode: string;
+}
+
+export interface resetPasswordPostBody {
+  email: string;
+  newPassword: string;
+}
 //i will create different interface here

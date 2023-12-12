@@ -1,31 +1,14 @@
-import constants from "$lib/utils/constants";
 import { writable } from "svelte/store";
 
-export const authStore = writable({
-  user: null,
-});
+const user = writable(null);
+export const username = writable("");
+export const isLoading = writable(false);
+export const isResponseError = writable(false);
+export const errorMessageText = writable("");
+export const isLoggout = writable(false);
 
-const setUser = (user) => {
-  authStore.update((currentValue) => {
-    return {
-      ...currentValue,
-      user,
-    };
-  });
-  if (user?.token) {
-    localStorage.setItem(constants.AUTH_TOKEN, user.token);
-  }
+const setUser = (data) => {
+  user.set(data);
 };
 
-const checkAuthStatus = () => {
-  const token = localStorage.getItem(constants.AUTH_TOKEN);
-  if (token) {
-    const userData = JSON.parse(atob(token.split(".")[1]));
-    setUser(userData);
-  }
-};
-
-export const authActions = {
-  setUser,
-  checkAuthStatus,
-};
+export { setUser, user };

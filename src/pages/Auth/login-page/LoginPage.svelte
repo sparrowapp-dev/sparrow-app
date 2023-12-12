@@ -1,45 +1,49 @@
 <script lang="ts">
   import { navigate } from "svelte-navigator";
-  import { authActions } from "$lib/store/auth.store";
+  import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
+  import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
-  import logo from "$lib/assets/logo.svg";
   import googleLogo from "$lib/assets/googlelogo.svg";
-  import githubLogo from "$lib/assets/githublogo.svg";
-  import microsoftLogo from "$lib/assets/microsoftlogo.svg";
+  import eyeHide from "$lib/assets/eye-hide.svg";
+  import eyeShow from "$lib/assets/eye-show.svg";
 
-  import { handleLoginValidation } from "./login-page";
+  // import githubLogo from "$lib/assets/githublogo.svg";
+  // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
 
-  // Function to validate the email
+  import { authNavigate, handleLoginValidation } from "./login-page";
+  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import sparrowicon from "$lib/assets/sparrowIcon.svg";
+  import { once } from '@tauri-apps/api/event'
+  import { WebviewWindow } from "@tauri-apps/api/window";
+
   let isEmailTouched = false;
 
-  // Function to validate the email
   let isEmailValid = false;
   const validateEmail = () => {
-    const emailRegex = /^[\w-]+@([\w-]+\.)+[\w-]{2,6}$/;
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     isEmailTouched = true;
     isEmailValid = emailRegex.test(loginCredentials.email);
     if (isEmailValid) {
       validationErrors.email = "";
     } else if (isEmailTouched) {
-      // Show an error only if the field has been touched and the email is not valid
       validationErrors.email = "";
+    }
+    if (loginCredentials.email === "") {
+      validationErrors.email = "Please enter an email id";
     }
   };
 
   //------------------------------ TOKEN -----------------------------------//
 
   // Use the window object to maximize the page
-  function maximizeWindow() {
-    window.innerWidth = screen.width;
-    window.innerHeight = screen.height;
-  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("t");
+
   if (token) {
-    authActions.setUser({ token });
+    setUser(jwtDecode(token));
     navigate("/");
-    maximizeWindow();
   }
 
   //------------------------------ Login State --------------------------//
@@ -53,133 +57,187 @@
     email: "",
     password: "",
   };
+  let isLoadingPage: boolean;
+  const handleSignInWithGoogle = async () => {
+    isLoadingPage = true;
+    await authNavigate();
+  };
 
-  // let errorMessage = "";
+  once('onclose', async (event) => {
+    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
+      isLoadingPage = false;
+    });
+  })
 
-  // Handle sign-in with external providers
-  const handleSignInWithProvider = (provider: string) => {
-    // Handle sign-in with GitHub, Google, Microsoft, etc.
-    // You can implement the authentication logic here.
-    // Example: Redirect to OAuth authorization URL for the selected provider.
-    console.log(`Signing in with ${provider}`);
-    // maximizePage();
+  let isPasswordtouched: boolean = false;
+
+
+  isLoading.subscribe((value) => {
+    isLoadingPage = value;
+  });
+
+  let isPasswordError: boolean;
+
+  isResponseError.subscribe((value) => {
+    isPasswordError = value;
+  });
+
+  let errorMessage: string = "";
+
+  let isPasswordVisible = false;
+
+  const togglePasswordVisibility = () => {
+    isPasswordVisible = !isPasswordVisible;
+    const passwordInput = document.getElementById("exampleInputPassword1");
+    if (passwordInput) {
+      passwordInput.type = isPasswordVisible ? "text" : "password";
+    }
+  };
+
+  const handlePasswordChange = () => {
+    isPasswordtouched = true;
+    if (isPasswordtouched === true) {
+      validationErrors.password = "";
+    }
   };
 </script>
 
-<!-- Below used color as color variable -->
 <div
-  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
-  style="height: 870px;"
-  data-tauri-drag-region
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
+  style="height:100vh;overflow:hidden"
 >
   <Header />
-  <div
-    class="d-flex mb-5 flex-column align-items-center justify-content-center"
-    data-tauri-drag-region
-  >
-    <h1
-      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-      style="font-size: 40px; width:408px; height:48px;"
-    >
-      Welcome to Sparrow!
-    </h1>
-    <form
-      data-tauri-drag-region
-      class="login-form text-whiteColor ps-1 pe-1 gap-16"
-      style="width:408px; height:429px"
-      on:submit|preventDefault={async () => {
-        validationErrors = await handleLoginValidation(loginCredentials);
-        if (isEmailValid && loginCredentials.password.length > 0) {
-          validationErrors.password =
-            "The email and password combination you entered appears to be incorrect. Please try again.";
-        }
-      }}
-    >
-      <h2 class="card-subtitle  fs-4 mb-3">Sign In</h2>
-      <div class="mb-3" data-tauri-drag-region>
-        <label for="exampleInputEmail1" class="form-label text-red">Email</label
-        >
-        <input
-          type="email"
-          class="form-control bg-black border:{validationErrors.email
-            ? '3px'
-            : '1px'} solid {validationErrors.email
-            ? 'border-error'
-            : 'border-default'}"
-          id="exampleInputEmail1"
-          aria-describedby="emailHelp"
-          placeholder="Please enter your registered email id"
-          bind:value={loginCredentials.email}
-          on:input={validateEmail}
-        />
-        {#if validationErrors.email}
-          <small class="form-text text-dangerColor">
-            {validationErrors.email}</small
+  {#if isLoadingPage}
+    <PageLoader />
+  {:else}
+    <div class="d-flex flex-column align-items-center justify-content-center">
+      <p
+        class="text-whiteColor mt-5 ms-2 me-2 mb-4"
+        style="font-size: 40px; width:408px; height:48px;font-weight:500;"
+      >
+        Welcome to Sparrow!
+      </p>
+      <form
+        class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
+        style="width:408px;"
+        on:submit|preventDefault={async () => {
+          validationErrors = await handleLoginValidation(loginCredentials);
+          if (validationErrors) {
+            errorMessage = "Please enter an email id";
+          }
+        }}
+      >
+        <p class="card-subtitle fs-4 mb-3">Sign In</p>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label text-red"
+            >Email</label
           >
-        {/if}
-      </div>
+          <input
+            type="email"
+            class="form-control bg-black border:{validationErrors.email ||
+            isPasswordError === true
+              ? '3px'
+              : '1px'} solid {validationErrors.email || isPasswordError === true
+              ? 'border-error'
+              : 'border-default'}"
+            id="exampleInputEmail1"
+            aria-describedby="emailHelp"
+            placeholder="Please enter your registered email id"
+            bind:value={loginCredentials.email}
+            on:input={validateEmail}
+          />
 
-      <div class="mb-4">
-        <label
-          for="exampleInputPassword1"
-          class="form-label"
-          data-tauri-drag-region>Password</label
-        >
-        <input
-          type="password"
-          class="form-control bg-black"
-          id="exampleInputPassword1"
-          placeholder="Please enter your Password"
-          bind:value={loginCredentials.password}
-          style="border:{validationErrors.password
-            ? '3px'
-            : '1px'} solid {validationErrors.password
-            ? 'border-error'
-            : 'border-default'}"
-        />
+          {#if validationErrors.email && loginCredentials.email.length > 0}
+            <small class="form-text text-dangerColor">
+              {validationErrors.email}</small
+            >
+          {:else if loginCredentials.email.length === 0}
+            <small class="form-text text-dangerColor"> {errorMessage}</small>
+          {/if}
+        </div>
 
-        {#if validationErrors.password}<small class="form-text text-dangerColor"
-            >{validationErrors.password}</small
-          >{/if}
-      </div>
+        <div class="mb-4">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <div class="d-flex">
+            <input
+              type="password"
+              autocomplete="off"
+              on:click={handlePasswordChange}
+              id="exampleInputPassword1"
+              placeholder="Please enter your Password"
+              bind:value={loginCredentials.password}
+              class="form-control bg-black border:{isPasswordError === true
+                ? '3px'
+                : '1px'} solid {isPasswordError === true ||
+              validationErrors.password
+                ? 'border-error'
+                : 'border-default'}"
+            />
+            <button
+              type="button"
+              on:click={togglePasswordVisibility}
+              class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+            >
+              {#if isPasswordVisible}
+                <img src={eyeShow} alt="eye-show" />
+              {:else}
+                <img src={eyeHide} alt="eye-hie" />
+              {/if}
+            </button>
+          </div>
 
-      <div class="d-flex mb-4 align-items-center justify-content-end">
-        <a
-          href="/forgot/password"
-          class="text-decoration-none text-primaryColor">Forgot Password?</a
-        >
-      </div>
+          {#if validationErrors.password || validationErrors.password?.length === 0}
+            <small class="form-text text-dangerColor"
+              >{validationErrors.password}</small
+            >
+          {:else if isPasswordError === true || validationErrors.password?.length > 0}
+            <small class="form-text text-dangerColor"
+              >The email and password combination you entered appears to be
+              incorrect. Please try again.</small
+            >
+          {/if}
+        </div>
+        <!-- <span on:click={togglePasswordVisibility}>
+          <img src={sparrowicon} alt="" />
+        </span> -->
 
-      <div class="mb-5">
-        <button class="btn btn-primary w-100 text-whiteColor border-0"
-          >Sign In</button
-        >
-      </div>
+        <div class="d-flex mb-4 align-items-center justify-content-end">
+          <a
+            href="/forgot/password"
+            class="text-decoration-none text-primaryColor">Forgot Password?</a
+          >
+        </div>
 
+        <div class="mb-1">
+          <button class="btn btn-primary w-100 text-whiteColor border-0"
+            >Sign In</button
+          >
+        </div>
+      </form>
       <div class="d-flex flex-column align-items-center justify-content-center">
         <p>or continue with</p>
         <div class="d-flex gap-4">
-          <button
+          <!-- <button
             on:click={() => handleSignInWithProvider("Github")}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
             <img src={githubLogo} alt="Github Logo" class="w-100 h-100" />
-          </button>
+          </button> -->
           <button
-            on:click={() => handleSignInWithProvider("Google")}
+            on:click={handleSignInWithGoogle}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
-            <img src={googleLogo} alt="Google Logo" class="w-100 h-100" />
+            <img src={googleLogo} alt="Google Logo" class="w-100 h-100 p-1" />
           </button>
-          <button
+          <!-- <button
             on:click={() => handleSignInWithProvider("Microsoft")}
             style="width: 32px; height:32px"
             class="bg-dark border-0 rounded"
           >
             <img src={microsoftLogo} alt="Microsoft Logo" class="w-100 h-100" />
-          </button>
+          </button> -->
         </div>
         <!-- "New to the website? Create an account" link -->
         <div class="gap-3 d-flex align-items-center">
@@ -191,21 +249,34 @@
           >
         </div>
       </div>
-    </form>
-  </div>
-  <div
-    class="BottomLogo text-white mt-5 d-flex justify-content-center align-items-center"
-  >
-    <img src={logo} alt="" class="w-50" />
-  </div>
+    </div>
+    <div
+      class="BottomLogo text-white d-flex justify-content-center align-items-center"
+    >
+      <img src={sparrowicon} alt="" class="w-50" />
+    </div>
+  {/if}
 </div>
 
 <style>
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+  .eye-icon > img {
+    position: absolute;
+    transform: translateX(-4vmax);
+  }
+
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-  @media (min-width: 576px) {
+  @media (min-width: 1000px) {
+    .eye-icon > img {
+      position: absolute;
+      transform: translateX(-2vmax);
+    }
     .BottomLogo {
       width: Hug (205px);
       height: Hug (52px);
@@ -223,7 +294,7 @@
       padding: 0px;
       border-radius: 8px;
       gap: 16px;
-      height: auto; /* Remove fixed height for larger screens */
+      height: auto;
     }
   }
 </style>

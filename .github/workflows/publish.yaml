@@ -1,0 +1,74 @@
+name: Development
+
+on:
+  push:
+    branches:
+      - development
+env: 
+ VITE_API_URL: ${{secrets.VITE_API_URL}}
+ 
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+
+      - name: Install Windows SDK
+        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
+        shell: powershell
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+ 
+      - name: Install dependencies
+        run: |
+          yarn install
+          yarn tauri build --debug
+
+      - name: sign msi
+        run: |
+           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\Certificate.pfx" -Password $password
+           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi"
+           
+      - name: Install App Center CLI
+        run: |
+          npm install -g appcenter-cli@latest
+
+      # - name: Set Build Version
+      #   run: echo "BUILD_VERSION = $(date +'%Y%m%d')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+
+      #- name: Debug Build Version
+        #run: echo "Build Version: $BUILD_VERSION"
+        
+      - name: Upload to App Center
+        run: |
+          appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\release\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app Techdome/Sparrow --build-version v11.23.${{ github.run_number }}
+
+      - name: status check and upload
+        uses: neonidian/teams-notify-build-status@v3
+        if: always()
+        with:
+          webhookUrl: |
+           ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          message: |
+            🚀 **Build Status Update** 🚀
+
+            The workflow (sparrow-app for windows) has completed with status: **${{ job.status }}**.
+
+            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow)!
+          titleBackgroundColor: ${{ job.status }}
+        env:
+          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
