@@ -12,6 +12,7 @@
   export let tabWidth: number;
   export let index: number;
   export let closeTab;
+
 </script>
 
 <div
@@ -65,7 +66,9 @@
       {/if}
       <span
         class="font-weight-normal"
-        style={`font-size: 12px; font-family: Roboto; color: ${tab.isActive ? '#fff;' : '#8A9299;'}`}
+        style={`font-size: 12px; font-family: Roboto; color: ${
+          tab.isActive ? "#fff;" : "#8A9299;"
+        }`}
       >
         {tab.name}
       </span>
@@ -84,7 +87,7 @@
       }}
       style="overflow:hidden; height:31px;"
     >
-      <Crossicon color={tab.isActive ? '#fff' : '#8A9299'}/>
+      <Crossicon color={tab.isActive ? "#fff" : "#8A9299"} />
     </button>
   </div>
   {#if !tab.isActive}

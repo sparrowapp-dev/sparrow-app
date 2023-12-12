@@ -19,6 +19,7 @@
   onDestroy(() => {
     unsubscribeUser();
   });
+  
 </script>
 
 <div class="main-container">
