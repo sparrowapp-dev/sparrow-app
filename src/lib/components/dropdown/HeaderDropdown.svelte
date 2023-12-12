@@ -10,7 +10,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   export let activeSideBarTabMethods;
 
   export let data: any;
@@ -64,7 +64,7 @@
 
     const workspaceData = {
       name: workspaceObj.name,
-      type: workspaceObj.type,
+      type: ItemType.PERSONAL,
     };
 
     _viewModel.addWorkspace(workspaceObj);

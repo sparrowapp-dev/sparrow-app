@@ -9,35 +9,35 @@
   import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { v4 as uuidv4 } from "uuid";
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { WorkspaceViewModel } from "./workspace.viewModel";
   export let collectionsMethods: CollectionsMethods;
   export let loaderColor = "default";
 
   let isLoading: boolean = false;
 
-  const _viewModel = new HeaderDashboardViewModel();
+  const _viewModel = new WorkspaceViewModel();
 
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
     const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED,
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
-   
+
     const workspaceData = {
       name: workspaceObj.name,
-      type: workspaceObj.type,
+      type: ItemType.PERSONAL,
     };
-
     _viewModel.addWorkspace(workspaceObj);
-
     isLoading = true;
-
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
@@ -51,8 +51,7 @@
         $data.map((item) => {
           if (item) {
             if (item._data._id === response.data.data_id) {
-              // totalCollection = item?._data?.collections?.length;
-              totalCollection = 0;
+              totalCollection = item?._data?.collections?.length;
             } else {
               totalRequest = 0;
             }
@@ -60,15 +59,15 @@
         });
       }
       let path: Path = {
-        workspaceId: response.data.data_id,
+        workspaceId: response?.data?.data?._id,
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data_id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
-      workspaceObj.property.workspace.collectionCount = 0;
+      workspaceObj.property.workspace.collectionCount = totalCollection;
       workspaceObj.save = true;
       _viewModel.addWorkspace(workspaceObj);
 
@@ -139,15 +138,6 @@
                   >Personal Workspaces</span
                 ></Link
               >
-              <!-- <Link style="text-decoration:none;" to="team-workspaces"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "team-workspaces")}
-                  class="team-menu__link mx-3"
-                  class:tab-active={selectedTab === "team-workspaces"}
-                  >Team Workspaces</span
-                ></Link
-              > -->
             </div>
             <div class="teams-menu__right">
               <span class="mx-3" style="cursor:pointer;">
@@ -192,14 +182,14 @@
 
 <style>
   .team-menu__link {
-    color: #8a9299;
+    color: var(--button-color);
   }
   .content-teams__btn-new-workspace {
     height: 30px;
   }
   .tab-active {
-    color: white;
-    border-bottom: 3px solid #85c2ff;
+    color: var(--white-color);
+    border-bottom: 3px solid var(--workspace-hover-color);
   }
   .view-active {
     filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)

@@ -1,8 +1,6 @@
 <script lang="ts">
-  //   import WorkspaceCard from "$lib/components/dashboard/workspace-card/WorkspaceCard.svelte";
-  import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
   import RecentWorkspace from "$lib/components/table/recent-workspae/RecentWorkspace.svelte";
-  //   import TeamsWorkspace from "$lib/components/table/teams-workspace/TeamsWorkspace.svelte";
+
   export let data: any;
   export let selectedView: string;
   export let selectedTab: string;

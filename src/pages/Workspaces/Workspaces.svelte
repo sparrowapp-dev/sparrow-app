@@ -2,7 +2,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
   import WorkspaceContent from "./WorkspaceContent.svelte";
-  import WorkspaceList from "./workspace-list/WorkspaceList.svelte";
+  import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
   export let data: any;
   export let tabList: any;
 
