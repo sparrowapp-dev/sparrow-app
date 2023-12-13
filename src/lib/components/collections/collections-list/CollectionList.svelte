@@ -23,7 +23,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -188,8 +188,8 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
-    if(!showfilterDropdown){
-      selectMethodsStore.update(()=>[]);
+    if (!showfilterDropdown) {
+      selectMethodsStore.update(() => []);
       handleSearch();
     }
   };
@@ -250,33 +250,51 @@
   });
 
   let selectedView: string = "grid";
+  import { slide } from "svelte/transition";
 </script>
 
 {#if collapsExpandToggle}
-  <div>
-    <button
-      class="border-0 rounded pb-3 pe-1 angleRight"
-      style="display: {collapsExpandToggle
-        ? 'block'
-        : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
-        ? '2'
-        : '0'}"
-      on:click={setcollapsExpandToggle}
-    >
-      <img
-        src={doubleangleRight}
-        alt="Expand"
-        class="mb-4 mt-2"
-        on:click={() => {
-          selectedView = "grid";
-        }}
-        class:view-active={selectedView === "grid"}
-      />
-      <div style="transform: rotate(270deg);font-size:10px;" class="mt-3 mb-2">
-        Collections
-      </div>
-    </button>
-  </div>
+  <Motion
+    initial={{ x: 0, width: "280px" }}
+    animate={{ x: "280px", width: 0 }}
+    exit={!collapsExpandToggle && { x: 0, width: "280px" }}
+    transition={{
+      type: "spring",
+      duration: 0.5,
+      stiffness: 200,
+      damping: 25,
+    }}
+    let:motion
+    layout
+  >
+    <div use:motion>
+      <button
+        class="border-0 rounded pb-3 pe-1 angleRight"
+        style="display: {collapsExpandToggle
+          ? 'block'
+          : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
+          ? '2'
+          : '0'}"
+        on:click={setcollapsExpandToggle}
+      >
+        <img
+          src={doubleangleRight}
+          alt="Expand"
+          class="mb-4 mt-2"
+          on:click={() => {
+            selectedView = "grid";
+          }}
+          class:view-active={selectedView === "grid"}
+        />
+        <div
+          style="transform: rotate(270deg);font-size:10px;"
+          class="mt-3 mb-2"
+        >
+          Collections
+        </div>
+      </button>
+    </div>
+  </Motion>
 {/if}
 
 {#if !collapsExpandToggle}
