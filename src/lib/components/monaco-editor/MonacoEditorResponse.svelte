@@ -7,8 +7,10 @@
   import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
   import {
     RequestDataType,
+    RequestProperty,
     ResponseFormatter,
   } from "$lib/utils/enums/request.enum";
+    import { requestResponseStore } from "$lib/store/request-response-section";
 
 
   export let rawTab: RequestDataType;
@@ -25,6 +27,8 @@
       model = await monaco.editor.createModel(code, language);
       await editor.setModel(model);
       await editor.getAction("editor.action.formatDocument").run();
+      const value=editor.getValue();
+      requestResponseStore.updateRequestPropertyResponseBody(value,RequestProperty.RESPONSE)
       await editor.updateOptions({ readOnly: true });
     }
   };

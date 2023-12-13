@@ -24,6 +24,7 @@
     isCollectionCreatedFirstTime,
     isFolderCreatedFirstTime,
   } from "$lib/store/collection";
+  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 
   export let title: string;
   export let collection: any;
@@ -103,6 +104,7 @@
   };
 
   const handleAPIClick = async () => {
+    isApiCreatedFirstTime.set(true);
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),

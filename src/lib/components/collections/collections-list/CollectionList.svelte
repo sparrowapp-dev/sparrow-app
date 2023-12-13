@@ -65,7 +65,10 @@
         );
         collection = collectionArr;
       }
-      handleSearch();
+      if(searchData || selectedApiMethods.length>0){
+        handleSearch();
+
+      }
     },
   );
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -207,7 +210,7 @@
   let filteredCollection = [];
   let filteredFolder = [];
   let filteredFile = [];
-  const handleSearch = () => {
+  function handleSearch() {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;

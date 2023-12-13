@@ -1,9 +1,10 @@
 import { ItemType } from "../enums/item-type.enum";
+import { WorkspaceDefault } from "../enums/request.enum";
 
 const generateSampleWorkspace = (id: string, date: string) => {
   return {
     id,
-    name: "MY WORKSPACE",
+    name: WorkspaceDefault.NAME,
     type: ItemType.WORKSPACE,
     description: "",
     property: {

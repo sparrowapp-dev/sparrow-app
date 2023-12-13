@@ -43,9 +43,9 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    urlText = event?.property.request?.url;
-    method = event?.property.request?.method;
-    disabledSend = event?.property.request?.requestInProgress;
+    urlText = event?.property?.request?.url;
+    method = event?.property?.request?.method;
+    disabledSend = event?.property?.request?.requestInProgress;
     request = event?.property?.request;
   });
 
@@ -116,9 +116,8 @@
             );
             isLoading = false;
           });
-          // For Test purpose (BUG NOT RESOLVED YET)
-          // console.log("running", Date.now() - start )
-
+        // For Test purpose (BUG NOT RESOLVED YET)
+        // console.log("running", Date.now() - start )
       }
     }
   };
@@ -254,16 +253,7 @@
         disabled={disabledSend}
         class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-3 pe-3 py-2"
         style="font-size: 15px;height:34px; font-weight:400"
-        on:click={handleSendRequest}
-        >{#if isLoading}
-          <span
-            class="me-1 ms-0 d-flex align-item-center justify-content-start"
-          >
-            {#if loaderColor === "default"}
-              <Spinner size={"15px"} />
-            {/if}
-          </span>
-        {/if}Send</button
+        on:click|preventDefault={handleSendRequest}>Send</button
       >
     </div>
     <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">

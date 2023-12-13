@@ -16,6 +16,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
+  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 
   export let name: string;
   export let id: string;
@@ -249,6 +250,9 @@
 <div
   class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary"
   style="height:32px;"
+  on:click={() => {
+    isApiCreatedFirstTime.set(false);
+  }}
 >
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}

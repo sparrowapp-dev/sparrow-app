@@ -3,6 +3,7 @@ export enum ItemType {
   REQUEST = "REQUEST",
   COLLECTION = "COLLECTION",
   WORKSPACE = "WORKSPACE",
+  PERSONAL = "PERSONAL",
 }
 
 export enum UntrackedItems {

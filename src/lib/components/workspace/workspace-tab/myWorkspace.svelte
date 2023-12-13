@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "../../header/header-dashboard/HeaderDashboard.ViewModel";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -58,6 +58,13 @@
     tabSubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
+
+  let inputElement;
+  onMount(() => {
+    if (autofocus) {
+      inputElement.select();
+    }
+  });
 </script>
 
 <div class="main-container d-flex">
@@ -79,6 +86,7 @@
             modifyWorkspaceData();
           }
         }}
+        bind:this={inputElement}
       />
 
       <Tooltip>

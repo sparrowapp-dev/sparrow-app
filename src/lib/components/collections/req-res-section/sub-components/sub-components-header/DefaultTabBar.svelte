@@ -19,6 +19,7 @@
   import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -167,6 +168,8 @@
       <button
         class="create-container-btn"
         on:click={() => {
+          isApiCreatedFirstTime.set(true);
+
           collectionsMethods.handleCreateTab(
             generateSampleRequest(
               "UNTRACKED-" + uuidv4(),
