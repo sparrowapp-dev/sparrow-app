@@ -43,11 +43,8 @@ export class CollectionRepository {
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
-    if (RxDB.getInstance().rxdb?.collection) {
-      return RxDB.getInstance()
-        .rxdb.collection.find()
-        .sort({ createdAt: "asc" }).$;
-    }
+    return RxDB.getInstance().rxdb.collection.find().sort({ createdAt: "asc" })
+      .$;
   };
 
   // public updateCollection = async (
@@ -118,14 +115,10 @@ export class CollectionRepository {
         delete collectionObj._id;
         return collectionObj;
       });
-      if (RxDB.getInstance().rxdb.collection) {
-        await RxDB.getInstance().rxdb.collection.find().remove();
-        await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
-      }
+      await RxDB.getInstance().rxdb.collection.find().remove();
+      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
     } else {
-      if (RxDB.getInstance().rxdb.collection) {
-        await RxDB.getInstance().rxdb.collection.find().remove();
-      }
+      await RxDB.getInstance().rxdb.collection.find().remove();
     }
   };
 
@@ -346,8 +339,6 @@ export class CollectionRepository {
   };
 
   public clearCollections = async (): Promise<any> => {
-    if (RxDB.getInstance().rxdb.collection) {
-      return RxDB.getInstance().rxdb.collection.find().remove();
-    }
+    return RxDB.getInstance().rxdb.collection.find().remove();
   };
 }

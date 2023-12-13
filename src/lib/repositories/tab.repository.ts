@@ -9,31 +9,27 @@ export class TabRepository {
    * Return all the RxDocument refers to this collection in ascending order with respect to createdAt.
    */
   public getDocuments = async (): Promise<TabDocument[]> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      return await RxDB.getInstance()
-        .rxdb.tab.find()
-        .sort({ createdAt: "asc" })
-        .exec();
-    }
+    return await RxDB.getInstance()
+      .rxdb.tab.find()
+      .sort({ createdAt: "asc" })
+      .exec();
   };
 
   /**
    * Creates a new tab and adds it to the tab bar.
    */
   public createTab = async (tab: any): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const activeTab = await RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      if (activeTab) {
-        activeTab.incrementalUpdate({ $set: { isActive: false } });
-      }
-      await RxDB.getInstance().rxdb.tab.insert(tab);
+    const activeTab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    if (activeTab) {
+      activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
+    await RxDB.getInstance().rxdb.tab.insert(tab);
   };
 
   /**
@@ -93,22 +89,18 @@ export class TabRepository {
    * Extracts all data of the active tab.
    */
   public getTab = (): Observable<TabDocument> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      return RxDB.getInstance().rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      }).$;
-    }
+    return RxDB.getInstance().rxdb.tab.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).$;
   };
 
   /**
    * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      return RxDB.getInstance().rxdb.tab.find().sort({ createdAt: "asc" }).$;
-    }
+    return RxDB.getInstance().rxdb.tab.find().sort({ createdAt: "asc" }).$;
   };
   /**
    * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
@@ -117,74 +109,66 @@ export class TabRepository {
     data: any,
     route: string,
   ): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value.property.request[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value.property.request[route] = data;
+      return value;
+    });
   };
 
   /**
    * Configures the request with state such as raw, dataset, auth, section.
    */
   public setRequestState = async (data: any, route: string): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value.property.request.state[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.state[route] = data;
+      return value;
+    });
   };
   /**
    * Configures the request with Auth such as API key, bearer token, basic auth.
    */
   public setRequestAuth = async (data: any, route: string): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value.property.request.auth[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.auth[route] = data;
+      return value;
+    });
   };
   /**
    * Configures the request body such as form data, url encoded, raw.
    */
   public setRequestBody = async (data: any, route: string): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value.property.request.body[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.body[route] = data;
+      return value;
+    });
   };
   /**
    * Configures the request body form data such as text and file.
@@ -193,19 +177,17 @@ export class TabRepository {
     data: any,
     route: string,
   ): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value.property.request.body.formdata[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value.property.request.body.formdata[route] = data;
+      return value;
+    });
   };
 
   /**
@@ -213,37 +195,31 @@ export class TabRepository {
    * id, name, description, save.
    */
   public setTabProperty = async (data: any, route: string): Promise<void> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      const query = RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            isActive: true,
-          },
-        })
-        .exec();
-      (await query).incrementalModify((value) => {
-        value[route] = data;
-        return value;
-      });
-    }
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          isActive: true,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      value[route] = data;
+      return value;
+    });
   };
 
   /**
    * Clear tabs
    */
   public clearTabs = async (): Promise<any> => {
-    if (RxDB.getInstance().rxdb.tab) {
-      return RxDB.getInstance().rxdb.tab.find().remove();
-    }
+    return RxDB.getInstance().rxdb.tab.find().remove();
   };
 
   public syncTabsWithStore = async (data) => {
-    if (RxDB.getInstance().rxdb.tab) {
-      await this.clearTabs();
-      const sub = data.subscribe((docs) => {
-        RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
-      });
-      sub();
-    }
+    await this.clearTabs();
+    const sub = data.subscribe((docs) => {
+      RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
+    });
+    sub();
   };
 }
