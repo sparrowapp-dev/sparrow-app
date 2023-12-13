@@ -60,7 +60,6 @@ export class RxDB {
   public static getInstance(): RxDB {
     if (!(RxDB.instance?.db && RxDB.instance?.rxdb)) {
       RxDB.instance = new RxDB();
-      RxDB.instance.getDb();
     }
     return RxDB.instance;
   }
