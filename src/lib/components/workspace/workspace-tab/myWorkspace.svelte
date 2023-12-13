@@ -15,10 +15,8 @@
   let newWorkspaceName: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-      tabName = event?.name;
-      componentData = event;
-    }
+    tabName = event?.name;
+    componentData = event;
   });
 
   const handleWorkspaceInput = (event) => {

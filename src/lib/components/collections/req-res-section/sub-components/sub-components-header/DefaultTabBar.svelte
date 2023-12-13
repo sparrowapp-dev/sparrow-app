@@ -20,7 +20,6 @@
   import { onDestroy } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-    import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -31,7 +30,6 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
-  const _workspaceViewModel = new HeaderDashboardViewModel();
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
@@ -91,7 +89,7 @@
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {
-      id: UntrackedItems.UNTRACKED + uuidv4(),
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
       createdAt: new Date().toISOString(),
@@ -133,11 +131,7 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(newCollection.id, res);
-      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: Samplecollection.id,
-        name: newCollection.name,
-      });
+      collectionsMethods.updateCollection(newCollection._id, res);
       return;
     }
     return;

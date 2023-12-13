@@ -40,10 +40,8 @@
 
   let emailText: string = "";
   username.subscribe((value) => {
-    if(value){
-      emailText = value;
-      verifyCodeCredential.email = emailText;
-    }
+    emailText = value;
+    verifyCodeCredential.email = emailText;
   });
 
   const handleVerificationCode = () => {
@@ -60,9 +58,7 @@
   };
 
   verifyString.subscribe((value) => {
-    if(value){
-      verifyLength = value;
-    }
+    verifyLength = value;
   });
 
   let isLoadingPage: boolean;
@@ -72,14 +68,12 @@
 
   let verificationCodeError: boolean;
   isSuccessfulResponse.subscribe((value) => {
-      verificationCodeError = value;
+    verificationCodeError = value;
   });
 
   let errorMessage: string = "";
   errorMessageText.subscribe((value) => {
-    if(value){
-      errorMessage = value;
-    }
+    errorMessage = value;
   });
 </script>
 

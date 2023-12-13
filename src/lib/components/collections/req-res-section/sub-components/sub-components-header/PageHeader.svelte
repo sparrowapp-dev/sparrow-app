@@ -31,10 +31,8 @@
   let componentData: NewTab;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
     tabName = event?.name;
     componentData = event;
-    }
   });
 
   const handleSaveRequest = async () => {

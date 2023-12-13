@@ -132,22 +132,16 @@ export const crudMethod = async () => {
     let valueText: string;
 
     keyStore.subscribe((value) => {
-      if (value) {
-        keyText = value;
-      }
+      keyText = value;
     });
 
     valueStore.subscribe((value) => {
-      if (value) {
-        valueText = value;
-      }
+      valueText = value;
     });
 
     let url: string = "";
     const unsubscribeUrl = apiEndPoint.subscribe((value) => {
-      if (value) {
-        url = value;
-      }
+      url = value;
     });
 
     if (url.length === 0) {
@@ -156,16 +150,12 @@ export const crudMethod = async () => {
 
     let method: string = "";
     const unsubscribeMethod = methodText.subscribe((value) => {
-      if (value) {
-        method = value;
-      }
+      method = value;
     });
 
     let bodyTextValue: string;
     const unsubscribeBody = bodyText.subscribe((value) => {
-      if (value) {
-        bodyTextValue = value;
-      }
+      bodyTextValue = value;
     });
 
     if (bodyTextValue === "") {
@@ -174,9 +164,7 @@ export const crudMethod = async () => {
 
     let request: string = "";
     const unsubscribeRequest = requestType.subscribe((value) => {
-      if (value) {
-        request = value;
-      }
+      request = value;
     });
 
     // Unsubscribe from the stores after we're done

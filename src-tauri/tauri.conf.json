@@ -28,7 +28,6 @@
         "startDragging": true,
         "setSize": true,
         "setFocus": true,
-        "setFullscreen": true,
         "center": true
       }
     },
