@@ -170,6 +170,7 @@ export class RxDB {
 
   public async destroyDb(): Promise<void> {
     await this.rxdb.destroy();
+    await this.rxdb.remove();
     this.rxdb = null;
     this.db = null;
     return;
