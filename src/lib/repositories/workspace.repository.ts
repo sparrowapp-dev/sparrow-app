@@ -9,16 +9,7 @@ export class WorkspaceRepository {
    * extracts RxDocument of workspace.
    */
   public getDocument = (elem: WorkspaceDocument) => {
-    return {
-      _id: elem.get("_id"),
-      name: elem.get("name"),
-      owner: elem.get("owner"),
-      permissions: elem.get("permissions"),
-      isActiveWorkspace: elem.get("isActiveWorkspace"),
-      createdBy: elem.get("createdBy"),
-      createdAt: elem.get("createdAt"),
-      collections: elem.get("collections"),
-    };
+    return elem.toMutableJSON();
   };
 
   /**
