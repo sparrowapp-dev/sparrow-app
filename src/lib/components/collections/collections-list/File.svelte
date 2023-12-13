@@ -187,7 +187,9 @@
 
   let menuItems = [
     {
-      onClick: () => {},
+      onClick: () => {
+        handleClick()
+      },
       displayText: "Open Request",
       disabled: false,
     },

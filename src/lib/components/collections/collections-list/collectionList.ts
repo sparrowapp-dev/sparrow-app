@@ -252,7 +252,7 @@ const useTree = (): any[] => {
         collection,
         folder,
         file,
-        filteredTrees[i]._id,
+        filteredTrees[i].id,
         path,
         {},
       );

@@ -14,10 +14,18 @@
   let username: string;
   let password: string;
   const unsubscribeBasicAuth_username = basicAuth_username.subscribe(
-    (value) => (username = value),
+    (value) => {
+      if (value) {
+        username = value;
+      }
+    },
   );
   const unsubscribeBasicAuth_password = basicAuth_password.subscribe(
-    (value) => (password = value),
+    (value) => {
+      if (value) {
+        password = value;
+      }
+    },
   );
 
   if (username && password) {
@@ -30,20 +38,30 @@
   let basicAuthHeaderValue: string;
 
   const unsubscribeBasicAuthHeader = basicAuthHeader.subscribe((value) => {
-    basicAuthHeaderValue = value;
+    if (value) {
+      basicAuthHeaderValue = value;
+    }
   });
 
   let BearerTokenValue: string;
-  const unsubscribeBearerToken = BearerToken.subscribe(
-    (value) => (BearerTokenValue = value),
-  );
+  const unsubscribeBearerToken = BearerToken.subscribe((value) => {
+    if (value) {
+      BearerTokenValue = value;
+    }
+  });
 
   let apiKeyText: string;
   let apiValueText: string;
-  const unsubscribeApiKey = apiKey.subscribe((value) => (apiKeyText = value));
-  const unsubscribeApiValue = apiValue.subscribe(
-    (value) => (apiValueText = value),
-  );
+  const unsubscribeApiKey = apiKey.subscribe((value) => {
+    if(value){
+      apiKeyText=value
+    }
+  });
+  const unsubscribeApiValue = apiValue.subscribe((value) => {
+    if (value) {
+      apiValueText = value;
+    }
+  });
 
   unsubscribeBasicAuth_password();
   unsubscribeBasicAuth_username();

@@ -119,6 +119,7 @@ export class HeaderDashboardViewModel {
   public clientLogout = async (): Promise<void> => {
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
+    await RxDB.getInstance().getDb();
     resizeWindowOnLogOut();
     isLoggout.set(true);
     isResponseError.set(false);
