@@ -165,18 +165,11 @@ export class RxDB {
         },
       },
     });
-    console.log("rxdb ====> ", this.rxdb);
-    console.log("db ====> ", this.db);
-
     return { rxdb: this.rxdb, db: this.db };
   }
 
   public async destroyDb(): Promise<void> {
-    const removedDatabses = await removeRxDatabase(
-      "mydatabase",
-      getRxStorageDexie(),
-    );
-    console.log("Removed Databases ====> ", removedDatabses);
+    await this.rxdb.destroy();
     this.rxdb = null;
     this.db = null;
     return;

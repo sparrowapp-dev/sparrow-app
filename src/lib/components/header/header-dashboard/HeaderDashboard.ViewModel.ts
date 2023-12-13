@@ -126,7 +126,6 @@ export class HeaderDashboardViewModel {
     clearAuthJwt();
     setUser(null);
     setCurrentWorkspace("", "");
-    console.log("Logout Success");
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
