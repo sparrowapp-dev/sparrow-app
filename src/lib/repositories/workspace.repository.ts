@@ -16,17 +16,21 @@ export class WorkspaceRepository {
    * get all workspaces observable of user.
    */
   public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
-    return RxDB.getInstance().rxdb.workspace.find().$;
+    if (RxDB.getInstance().rxdb.workspace) {
+      return RxDB.getInstance().rxdb.workspace.find().$;
+    }
   };
   /**
    * get active workspace of the user.
    */
   public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
-    return RxDB.getInstance().rxdb.workspace.findOne({
-      selector: {
-        isActiveWorkspace: true,
-      },
-    }).$;
+    if (RxDB.getInstance().rxdb.workspace) {
+      return RxDB.getInstance().rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      }).$;
+    }
   };
 
   public updateCollectionInWorkspace = async (
