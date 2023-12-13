@@ -7,8 +7,11 @@
   let container;
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+  import { slide } from "svelte/transition";
+  import Spinner from "../Transition/Spinner.svelte";
 
   export let handleCreateCollection;
+  export let collectionUnderCreation: boolean = false;
   export let collectionsMethods: CollectionsMethods;
   function onWindowClick(e) {
     if (container.contains(e.target) == false) {
@@ -44,9 +47,15 @@
       changeBtnBackground();
     }}
   >
-    <img src={plusIcon} alt="plus" />
+    {#if collectionUnderCreation}
+      <Spinner size={"15px"} />
+    {/if}
+    {#if !collectionUnderCreation}
+      <img src={plusIcon} alt="plus" />
+    {/if}
+
     {#if visibilty}
-      <div class="dropdown-content">
+      <div class="dropdown-content" transition:slide={{ duration: 100 }}>
         <button on:click={handleCreateCollection}>Collection</button>
         <button on:click={addApiRequest}>API Request</button>
       </div>

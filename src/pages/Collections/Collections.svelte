@@ -18,6 +18,7 @@
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
+  import { blur } from "svelte/transition";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -68,7 +69,6 @@
       stack.push(tab.name);
     });
   }
-
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {

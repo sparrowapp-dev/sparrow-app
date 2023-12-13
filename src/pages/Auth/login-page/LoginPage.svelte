@@ -13,7 +13,7 @@
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import { once } from '@tauri-apps/api/event'
+  import { once } from "@tauri-apps/api/event";
   import { WebviewWindow } from "@tauri-apps/api/window";
 
   let isEmailTouched = false;
@@ -63,14 +63,13 @@
     await authNavigate();
   };
 
-  once('onclose', async (event) => {
-    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
+  once("onclose", async (event) => {
+    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => {
       isLoadingPage = false;
     });
-  })
+  });
 
   let isPasswordtouched: boolean = false;
-
 
   isLoading.subscribe((value) => {
     isLoadingPage = value;

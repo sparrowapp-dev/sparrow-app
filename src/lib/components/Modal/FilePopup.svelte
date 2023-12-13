@@ -3,7 +3,8 @@
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-    import CoverButton from "../buttons/CoverButton.svelte";
+  import { fade, fly } from "svelte/transition";
+  import CoverButton from "../buttons/CoverButton.svelte";
   export let folderId: string;
   export let collectionId: string;
   export let workspaceId: string;
@@ -30,18 +31,17 @@
         collectionsMethods.deleteRequestInFolder(
           collectionId,
           folderId,
-          request.id
-          );
-          notifications.success(`"${request.name}" Request deleted.`);
-          deleteLoader = false;
-          collectionsMethods.handleRemoveTab(request.id);
-          closePopup(false);
+          request.id,
+        );
+        notifications.success(`"${request.name}" Request deleted.`);
+        deleteLoader = false;
+        collectionsMethods.handleRemoveTab(request.id);
+        closePopup(false);
       } else {
         notifications.error("Failed to delete the Request.");
         deleteLoader = false;
       }
-    } 
-    else if (workspaceId && collectionId){
+    } else if (workspaceId && collectionId) {
       deleteLoader = true;
       const response = await collectionService.deleteRequestInCollection(
         request.id,
@@ -53,13 +53,12 @@
       if (response.isSuccessful) {
         collectionsMethods.deleteRequestOrFolderInCollection(
           collectionId,
-          request.id
+          request.id,
         );
         notifications.success(`"${request.name}" Request deleted.`);
         deleteLoader = false;
         collectionsMethods.handleRemoveTab(request.id);
         closePopup(false);
-
       } else {
         notifications.error("Failed to delete the Request.");
         deleteLoader = false;
@@ -73,9 +72,15 @@
   on:click={() => {
     closePopup(false);
   }}
+  transition:fade={{ delay: 0, duration: 100 }}
 />
 
-<div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
+<div
+  class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Request?
@@ -103,27 +108,27 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-  <CoverButton
-  disable={deleteLoader}
-  text={"Cancel"}
-  size={14}
-  type={"dark"}
-  loader={false}
-  onClick={() => {
-    closePopup(false);
-  }}
-/>
+    <CoverButton
+      disable={deleteLoader}
+      text={"Cancel"}
+      size={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        closePopup(false);
+      }}
+    />
 
-<CoverButton
-  disable={deleteLoader}
-  text={"Delete"}
-  size={14}
-  type={"danger"}
-  loader={deleteLoader}
-  onClick={() => {
-    handleDelete();
-  }}
-/>
+    <CoverButton
+      disable={deleteLoader}
+      text={"Delete"}
+      size={14}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        handleDelete();
+      }}
+    />
   </div>
 </div>
 

@@ -1,10 +1,10 @@
 <script lang="ts">
   import UnderDevelopment from "../UnderDevelopment/UnderDevelopment.svelte";
   import { Motion } from "svelte-motion";
-  import { scaleComponent } from "$lib/utils/animations";
+  import { scaleMotionProps } from "$lib/utils/animations";
 </script>
 
-<Motion {...scaleComponent} let:motion>
+<Motion {...scaleMotionProps} let:motion>
   <div class="d-flex" use:motion>
     <UnderDevelopment
       heading="Mock Server"

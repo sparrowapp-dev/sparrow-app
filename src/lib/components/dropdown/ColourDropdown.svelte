@@ -2,6 +2,7 @@
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
+  import { fade, fly, slide } from "svelte/transition";
 
   let isOpen: boolean = false;
 
@@ -57,7 +58,7 @@
     <div
       id="request-dropdown"
       class="dropdown-btn rounded px-3 d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={isOpen}
+      class:dropdown-btn-active={true}
     >
       <p class=" mb-0 text-{selectedRequest?.color}">
         {selectedRequest?.name}
@@ -67,28 +68,35 @@
       >
     </div>
   </div>
-  <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
-    {#each data as list}
-      <div
-        class="d-flex px-2 py-1 justify-content-between highlight"
-        on:click={() => {
-          isOpen = false;
-          onclick(list.id);
-        }}
-      >
-        <p
-          class="m-0 p-0 text-{list.color}"
-          style="font-size: 12px;"
-          class:selected-request={list.id === selectedRequest?.id}
+
+  {#if isOpen}
+    <div
+      class="d-none dropdown-data p-1 rounded"
+      class:dropdown-active={isOpen}
+      transition:slide={{ duration: 100 }}
+    >
+      {#each data as list}
+        <div
+          class="d-flex px-2 py-1 justify-content-between highlight"
+          on:click={() => {
+            isOpen = false;
+            onclick(list.id);
+          }}
         >
-          {list.name}
-        </p>
-        {#if selectedRequest?.id === list.id}
-          <img src={checkIcon} alt="" />
-        {/if}
-      </div>
-    {/each}
-  </div>
+          <p
+            class="m-0 p-0 text-{list.color}"
+            style="font-size: 12px;"
+            class:selected-request={list.id === selectedRequest?.id}
+          >
+            {list.name}
+          </p>
+          {#if selectedRequest?.id === list.id}
+            <img src={checkIcon} alt="" />
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
