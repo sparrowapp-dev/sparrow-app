@@ -94,6 +94,11 @@ export interface Auth {
   apiKey?: ApiKey;
 }
 
+export interface Save {
+  api?: boolean;
+  description?: boolean;
+}
+
 export interface Request {
   method: RequestMethodType;
   body?: Body;
@@ -105,6 +110,7 @@ export interface Request {
   state?: State;
   auth?: Auth;
   requestInProgress?: boolean;
+  save?: Save;
 }
 
 export interface Collection {
@@ -132,10 +138,10 @@ export interface NewTab {
     | ItemType.WORKSPACE;
   description: string;
   property: {
-    request: Request;
-    collection: Collection;
-    workspace: WorkSpace;
-    folder: FOLDER;
+    request?: Request;
+    collection?: Collection;
+    workspace?: WorkSpace;
+    folder?: FOLDER;
   };
   isActive: boolean;
   save: boolean;

@@ -77,8 +77,9 @@
           _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "api", _id);
         collectionsMethods.updateTab(false, "saveInProgress", _id);
-        collectionsMethods.updateTab(true, "save", _id);
+        // collectionsMethods.updateTab(true, "save", _id);
       } else {
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
@@ -106,8 +107,9 @@
           _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "api", _id);
         collectionsMethods.updateTab(false, "saveInProgress", _id);
-        collectionsMethods.updateTab(true, "save", _id);
+        // collectionsMethods.updateTab(true, "save", _id);
       } else {
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }

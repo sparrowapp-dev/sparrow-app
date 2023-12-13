@@ -144,9 +144,9 @@
     if (path.length > 0) {
       let existingRequest;
       if (path[path.length - 1].type === ItemType.COLLECTION) {
-        existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id,componentData.id);
+        existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id, _id);
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, componentData.id);
+        existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, _id);
       }
       console.log("existing",existingRequest);
       // console.log("ex",existingRequest);
@@ -184,7 +184,9 @@
         });
 
         if (res.isSuccessful) {
-          notifications.success("API request saved");
+          if(type !== "SAVE_DESCRIPTION"){
+            notifications.success("API request saved");
+          }
           collectionsMethods.addRequestOrFolderInCollection(
             path[path.length - 1].id,
             res.data.data,
@@ -203,7 +205,13 @@
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
             collectionsMethods.updateTab(res.data.data.description, "description", _id);
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            collectionsMethods.updateTab(true, "save", res.data.data.id);
+            if(type === "SAVE_DESCRIPTION"){
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
+            else{
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
@@ -212,7 +220,8 @@
             sampleRequest.name = res.data.data.name;
             sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
-            sampleRequest.save = true;
+            sampleRequest.property.request.save.api = true;
+            sampleRequest.property.request.save.description = true;
             sampleRequest.property.request.url = res.data.data.request.url;
             sampleRequest.property.request.method =
               res.data.data.request.method;
@@ -246,6 +255,9 @@
         });
 
         if (res.isSuccessful) {
+          if(type !== "SAVE_DESCRIPTION"){
+            notifications.success("API request saved");
+          }
           collectionsMethods.addRequestInFolder(
             path[0].id,
             path[path.length - 1].id,
@@ -265,7 +277,13 @@
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
             collectionsMethods.updateTab(res.data.data.description, "description", _id)
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            collectionsMethods.updateTab(true, "save", res.data.data.id);
+            if(type === "SAVE_DESCRIPTION"){
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
+            else{
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
@@ -274,7 +292,8 @@
             sampleRequest.name = res.data.data.name;
             sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
-            sampleRequest.save = true;
+            sampleRequest.property.request.save.api = true;
+            sampleRequest.property.request.save.description = true;
             sampleRequest.property.request.url = res.data.data.request.url;
             sampleRequest.property.request.method =
               res.data.data.request.method;

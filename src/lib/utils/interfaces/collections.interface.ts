@@ -80,4 +80,5 @@ export interface CollectionsMethods {
     folderId: string,
   ) => void;
   removeMultipleTabs: (ids: string[]) => void;
+  setRequestSave: (data: boolean, route: string, id: string) => void;
 }

@@ -60,7 +60,8 @@
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
-    removeMultipleTabs: _viewModel.removeMultipleTabs
+    removeMultipleTabs: _viewModel.removeMultipleTabs,
+    setRequestSave: _viewModel.setRequestSave
   };
 
   const activeTab = _viewModel.activeTab;

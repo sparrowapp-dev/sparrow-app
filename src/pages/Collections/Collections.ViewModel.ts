@@ -91,6 +91,11 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public setRequestSave = async (data: boolean, route: string, id: string) => {
+    requestResponseStore.setRequestSave(data, route, id);
+    this.debouncedTab();
+  };
+
   public deleteCollection = async (id: string) => {
     this.collectionRepository.deleteCollection(id);
   };
@@ -225,9 +230,11 @@ export class CollectionsViewModel {
       requestId,
     );
   };
+
   public addCollection = (collection) => {
     this.collectionRepository.addCollection(collection);
   };
+
   public updateCollection = (uuid, data) => {
     this.collectionRepository.updateCollection(uuid, data);
   };

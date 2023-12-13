@@ -15,6 +15,7 @@
 
   let componentData: NewTab;
   let description: string;
+  let isSaveDescription: boolean = true;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     componentData = event;
@@ -32,7 +33,7 @@
 
   const handleSaveRequest = async () => {
     const _id = componentData?.id;
-    collectionsMethods.updateTab(true, "saveInProgress", _id);
+    // collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
     let existingRequest;
@@ -75,6 +76,7 @@
           _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "description", _id);
       } else {
       }
     } else {
@@ -101,6 +103,7 @@
           _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "description", _id);
       } else {
       }
     }
@@ -128,25 +131,36 @@
       </div>
     </div>
     <div>
-      <p
-        on:click={() => {
-          if (
-            componentData?.path.collectionId &&
-            componentData?.path.workspaceId
-          ) {
-            handleSaveRequest();
-          } else {
-            visibility = true;
-          }
+      {#if isSaveDescription}
+        <p class="description-field text-labelColor"
+        on:click={()=>{
+          isSaveDescription = !isSaveDescription;
         }}
-      >
-        Save Changes
-      </p>
+        >Edit</p>
+      {:else}
+        <p
+        class="description-field text-labelColor"
+          on:click={() => {
+            if (
+              componentData?.path.collectionId &&
+              componentData?.path.workspaceId
+            ) {
+              handleSaveRequest();
+              isSaveDescription = !isSaveDescription;
+            } else {
+              visibility = true;
+            }
+          }}
+        >
+          Save Changes
+        </p>
+      {/if}
       <textarea
         placeholder="Enter API Description"
         bind:value={description}
         on:input={handleInputValue}
-        class="api-description w-100"
+        disabled={isSaveDescription}
+        class="api-description w-100 {isSaveDescription ? 'block-mode' : 'edit-mode'}"
       />
     </div>
   </div>
@@ -180,6 +194,9 @@
     {collectionsMethods}
     {componentData}
     onClick={handleBackdrop}
+    onFinish={()=>{
+      isSaveDescription = !isSaveDescription;
+    }}
     type="SAVE_DESCRIPTION"
   />
 {/if}
@@ -198,4 +215,16 @@
   .api-description {
     background-color: transparent;
   }
+  .block-mode{
+    /* pointer-events: none;
+    user-select: text;  */
+    outline: none;
+  }
+  .edit-mode{
+
+  }
+  .description-field{
+    font-size: 12px;
+  }
+
 </style>

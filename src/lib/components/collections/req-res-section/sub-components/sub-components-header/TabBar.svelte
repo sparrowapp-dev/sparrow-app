@@ -47,12 +47,12 @@
     closePopup = flag;
   };
   const closeTab = (id, tab: NewTab) => {
-    if (tab.save) {
-      collectionsMethods.handleRemoveTab(id);
-    } else {
+    if ((tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description) ) {
       tabId = id;
       removeTab = tab;
       closePopup = true;
+    } else {
+      collectionsMethods.handleRemoveTab(id);
     }
   };
 
