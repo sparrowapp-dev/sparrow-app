@@ -40,16 +40,14 @@
       getMessage = true;
       deleteMessage = true;
     }
-    if (event && event.property) {
-      currentTabId = event?.id;
-      rawValue = event?.property?.request?.body.raw;
-      urlEncoded = event?.property?.request.body.urlencoded;
-      formDataText = event?.property?.request.body.formdata.text;
-      formDataFile = event?.property?.request.body.formdata.file;
-      method = event?.property?.request.method;
-      mainTab = event?.property?.request.state.dataset;
-      rawTab = event?.property?.request.state.raw;
-    }
+    currentTabId = event?.id;
+    rawValue = event?.property?.request?.body.raw;
+    urlEncoded = event?.property?.request.body.urlencoded;
+    formDataText = event?.property?.request.body.formdata.text;
+    formDataFile = event?.property?.request.body.formdata.file;
+    method = event?.property?.request.method;
+    mainTab = event?.property?.request.state.dataset;
+    rawTab = event?.property?.request.state.raw;
   });
 
   let handleDropdown = (tab: string) => {

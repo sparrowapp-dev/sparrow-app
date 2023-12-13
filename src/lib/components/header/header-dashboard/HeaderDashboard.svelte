@@ -43,7 +43,6 @@
   const collection = _colllectionListViewModel.collection;
 
   collection.subscribe((value) => {
-    if(value){
     const collectionArr = value.map(
       (collectionDocument: CollectionDocument) => {
         const collectionObj =
@@ -52,7 +51,6 @@
       },
     );
     collections = collectionArr;
-    }
   });
 
   let profile: boolean = false;

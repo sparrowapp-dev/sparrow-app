@@ -48,7 +48,6 @@
   let pencilIconState: boolean = false;
   let apiState;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
     apiState = event?.property?.request?.state;
     selectedTab = event?.property?.request?.state.section;
     progress = event?.property?.request?.requestInProgress;
@@ -77,7 +76,6 @@
       parametersCount += 1;
       pencilIconState = true;
     }
-  }
   });
 
   const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {

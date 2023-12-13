@@ -28,6 +28,7 @@
     isWorkspaceCreatedFirstTime.set(false);
     let totalCollection: number = 0;
     let totalRequest: number = 0;
+
     $data.map((item) => {
       if (item) {
         if (item._data._id === id) {
@@ -169,6 +170,8 @@
           on:click={() => {
             isOpen = false;
             onclick(list._id, list.name);
+          }}
+          on:click={() => {
             handleWorkspaceTab(list._id, list.name);
           }}
         >

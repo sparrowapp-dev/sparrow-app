@@ -21,9 +21,7 @@
   };
 
   username.subscribe((value) => {
-    if(value){
-      resetPasswordCredential.email = value;
-    }
+    resetPasswordCredential.email = value;
   });
 
   let validationErrors: any = {};

@@ -38,21 +38,12 @@
 
 
  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
- import { username } from "$lib/store/auth.store";
 
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
-  let searchData: string = "";
-  let userName:string="";
-
-  const usernameUnsubscribe=username.subscribe((value)=>{
-    if(value){
-      userName=value;
-    }
-  })
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
@@ -129,7 +120,7 @@
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response =
           await collectionsMethods.getAllCollections(workspaceId);
-        if (response.isSuccessful && response.data.data) {
+        if (response.isSuccessful && response.data.data.length > 0) {
           const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
           return;
@@ -143,7 +134,7 @@
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {
-      id: UntrackedItems.UNTRACKED + uuidv4(),
+      _id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
       createdAt: new Date().toISOString(),
@@ -185,7 +176,7 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(newCollection.id, res);
+      collectionsMethods.updateCollection(newCollection._id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
@@ -217,6 +208,7 @@
     collapsibleState.set(collapsExpandToggle);
   };
 
+  let searchData: string = "";
   let filteredCollection = [];
   let filteredFolder = [];
   let filteredFile = [];
@@ -374,7 +366,6 @@
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
-          
             {#each filteredFile as exp}
               <SearchTree
                 editable={true}
@@ -414,7 +405,7 @@
         {#each filteredSelectedMethodsCollection as col}
           <Folder
             collectionList={collection}
-            collectionId={col.id}
+            collectionId={col._id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}
@@ -425,7 +416,7 @@
         {#each collection as col}
           <Folder
             collectionList={collection}
-            collectionId={col.id}
+            collectionId={col._id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}

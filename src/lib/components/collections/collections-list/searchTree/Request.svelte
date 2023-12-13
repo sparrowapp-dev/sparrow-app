@@ -9,7 +9,7 @@
   export let request:any;
   export let workspaceId: string = "";
   export let collectionId: string = "";
-
+ 
 </script>
 
 <div
