@@ -124,17 +124,17 @@ export class HeaderDashboardViewModel {
     isLoggout.set(true);
     isResponseError.set(false);
     clearAuthJwt();
-    setUser(null);
-    setCurrentWorkspace("", "");
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
-  public logout = async (): Promise<boolean> => {
+  public logout = async (user): Promise<boolean> => {
+    setUser(null);
     const response = await userLogout();
     if (response.isSuccessful) {
       this.clientLogout();
       return true;
     } else {
+      setUser(user);
       notifications.error(response.message);
       return false;
     }
