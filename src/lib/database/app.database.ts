@@ -134,6 +134,14 @@ export class RxDB {
             oldDoc.collectionId = oldDoc.id;
             return oldDoc;
           },
+          5: function (oldDoc) {
+            oldDoc.collectionId = oldDoc.id;
+            return oldDoc;
+          },
+          6: function (oldDoc) {
+            // oldDoc.coll = oldDoc.id;
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {

@@ -38,6 +38,7 @@
 
 
  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+ import { username } from "$lib/store/auth.store";
 
 
   const [, , searchNode] = useTree();
@@ -45,6 +46,13 @@
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
+  let userName:string="";
+
+  const usernameUnsubscribe=username.subscribe((value)=>{
+    if(value){
+      userName=value;
+    }
+  })
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
@@ -121,7 +129,7 @@
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response =
           await collectionsMethods.getAllCollections(workspaceId);
-        if (response.isSuccessful && response.data.data.length > 0) {
+        if (response.isSuccessful && response.data.data) {
           const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
           return;
@@ -366,6 +374,7 @@
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
+          
             {#each filteredFile as exp}
               <SearchTree
                 editable={true}
@@ -405,7 +414,7 @@
         {#each filteredSelectedMethodsCollection as col}
           <Folder
             collectionList={collection}
-            collectionId={col._id}
+            collectionId={col.id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}
@@ -416,7 +425,7 @@
         {#each collection as col}
           <Folder
             collectionList={collection}
-            collectionId={col._id}
+            collectionId={col.id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}
