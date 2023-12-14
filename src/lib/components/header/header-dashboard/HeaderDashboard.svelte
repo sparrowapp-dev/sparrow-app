@@ -45,6 +45,7 @@
   const collection = _colllectionListViewModel.collection;
 
   collection.subscribe((value) => {
+    if(value){
     const collectionArr = value.map(
       (collectionDocument: CollectionDocument) => {
         const collectionObj =
@@ -53,6 +54,7 @@
       },
     );
     collections = collectionArr;
+    }
   });
 
   let profile: boolean = false;
@@ -61,9 +63,10 @@
 
   let name: string = "";
   let email: string = "";
-  let firstLetter;
+  let firstLetter, currentUser;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
+      currentUser = value;
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }

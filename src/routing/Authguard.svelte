@@ -15,7 +15,7 @@
   let currentUser = null;
   
   user.subscribe((value)=>{
-    currentUser = value;
+      currentUser = value;
   });
   
 </script>

@@ -331,7 +331,7 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
-      if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
+      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
         handleCollectionClick(collection, currentWorkspaceId, collectionId);
       }
@@ -364,7 +364,7 @@
       </p>
     {/if}
   </div>
-  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <button

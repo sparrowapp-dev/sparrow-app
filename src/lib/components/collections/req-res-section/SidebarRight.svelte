@@ -11,7 +11,9 @@
   let currentTabId: string;
   let selectedTab: Partial<NewTab> = {};
   const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
+    if(value){
+      tabList = value;
+    }
   });
 
   const currentTabUnsubscribe = currentTab.subscribe((value) => {
