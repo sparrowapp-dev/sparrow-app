@@ -162,6 +162,10 @@ export class CollectionsViewModel {
     );
   };
 
+  public readCollection = (uuid: string) => {
+    return this.collectionRepository.readCollection(uuid);
+  };
+
   public updateRequestInFolderCollection = (
     collectionId: string,
     uuid: string,

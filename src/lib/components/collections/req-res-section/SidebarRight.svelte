@@ -18,12 +18,23 @@
   let description: string;
   let isSaveDescription: boolean;
   let additions: string;
+  let collectionName: string;
+  let folderName;
 
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
     componentData = event;
     description = event?.description;
-    isSaveDescription = event.property.request.state.isSaveDescription;
-    additions = event.property.request.state.additions;
+    isSaveDescription = event?.property?.request?.state?.isSaveDescription;
+    additions = event?.property?.request?.state?.additions;
+    const path = event?.path;
+    if(path?.folderId){
+      const folder = await collectionsMethods.readRequestOrFolderInCollection(path.collectionId, path.folderId);
+      folderName = "/"+folder?.name;
+    }
+    if(path?.collectionId){
+      const collection = await collectionsMethods.readCollection(path.collectionId);
+      collectionName = "/"+collection?.name;
+    }
   });
 
   let handleInputValue = () => {
@@ -132,7 +143,8 @@
         <MethodButton method={componentData?.property.request.method} />
       </div>
       <div>
-        <p>{componentData?.name}</p>
+        <p class="mb-0" style="font-size:12px;">{componentData?.name}</p>
+        <span class="text-textColor" style="font-size:12px;">{collectionName || ''}</span><span class="text-textColor" style="font-size:12px;">{folderName || ''}</span>
       </div>
     </div>
     <div>

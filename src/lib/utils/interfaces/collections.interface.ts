@@ -59,6 +59,8 @@ export interface CollectionsMethods {
     uuid: string,
   ) => unknown;
 
+  readCollection: (uuid: string) => unknown;
+
   deleteRequestInFolder: (
     collectionId: string,
     folderId: string,

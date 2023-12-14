@@ -41,6 +41,19 @@ export class CollectionRepository {
     return;
   };
 
+  public readCollection = async (uuid: string): Promise<unknown> => {
+    const collection = await rxdb.collection
+      .findOne({
+        selector: {
+          _id: uuid,
+        },
+      })
+      .exec();
+
+    const response = collection;
+    return response;
+  };
+
   public getCollection = (): Observable<CollectionDocument[]> => {
     return rxdb.collection.find().sort({ createdAt: "asc" }).$;
   };

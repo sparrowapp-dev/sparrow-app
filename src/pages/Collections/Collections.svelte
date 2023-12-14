@@ -56,6 +56,8 @@
       _viewModel.updateRequestOrFolderInCollection,
     readRequestOrFolderInCollection:
       _viewModel.readRequestOrFolderInCollection,
+      readCollection:
+      _viewModel.readCollection,
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
