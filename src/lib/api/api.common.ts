@@ -5,7 +5,6 @@ import { refreshToken } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import { setAuthJwt } from "$lib/utils/jwt";
 import { isLoading } from "$lib/store/auth.store";
-import { navigate } from "svelte-navigator";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
 
@@ -92,7 +91,6 @@ const makeRequest = async (
       e.response.data.message === ErrorMessages.Unauthorized
     ) {
       await _viewModel.clientLogout();
-      navigate("/login");
       return error("unauthorized");
     }
     if (e.message) {
