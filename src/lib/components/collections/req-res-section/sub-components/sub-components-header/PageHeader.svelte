@@ -15,6 +15,7 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import lockicon from "$lib/assets/lock-icon.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -176,6 +177,38 @@
       inputElement.select();
     }
   });
+
+  const onRenameBlur = async () => {
+    if (!tabName) {
+      const {collectionId, folderId} = componentData?.path; 
+      if(collectionId && folderId){
+        const req = await collectionsMethods.readRequestInFolder(collectionId, folderId, componentData?.id);
+        if(req?.name){
+          collectionsMethods.updateTab(req.name, "name", componentData.id);
+        }
+      }
+      else if(collectionId){
+        const req = await collectionsMethods.readRequestOrFolderInCollection(collectionId, componentData.id);
+        if(req?.name){  
+          collectionsMethods.updateTab(req.name, "name", componentData.id);
+        }
+      }
+      else{
+        const req = generateSampleRequest("id", new Date().toString());
+        collectionsMethods.updateTab(req.name, "name", componentData.id);
+      }
+    }
+      
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldName#5874-ydr364-84hr",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
   onDestroy(() => {
     unsubscribeisApiCreatedFirstTime();
   });
@@ -190,12 +223,14 @@
     <div class="w-100 me-3">
       <input
         {autofocus}
-        placeholder="Enter API Request Name"
+        id="renameInputFieldName#5874-ydr364-84hr"
         bind:value={tabName}
         on:input={handleInputValue}
         class="tabbar-tabName w-100"
         bind:this={inputElement}
         style="outline: none;"
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
       />
     </div>
 
