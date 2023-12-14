@@ -71,6 +71,7 @@
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
+
     if (response.isSuccessful) {
       _viewModel.addWorkspace(response.data.data);
 
@@ -79,7 +80,7 @@
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data_id) {
+          if (item._data._id === response.data.data._id) {
             // totalCollection = item?._data?.collections?.length;
             totalCollection = 0;
           } else {
@@ -89,11 +90,11 @@
       });
 
       let path: Path = {
-        workspaceId: response.data.data_id,
+        workspaceId: response.data.data._id,
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data_id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;

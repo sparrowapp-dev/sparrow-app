@@ -16,7 +16,6 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { string } from "yup";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];

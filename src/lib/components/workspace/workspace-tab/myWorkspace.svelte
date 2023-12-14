@@ -17,6 +17,7 @@
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     tabName = event?.name;
     componentData = event;
+ 
   });
 
   const handleWorkspaceInput = (event) => {
@@ -24,7 +25,7 @@
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
   };
 
-  const modifyWorkspaceData = async () => {
+  const onRenameBlur = async () => {
     await _viewModel.modifyWorkspace(
       componentData,
       collectionsMethods,
@@ -65,6 +66,15 @@
       inputElement.select();
     }
   });
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldWorkspace",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -76,16 +86,14 @@
       <input
         type="text"
         value={tabName}
+        id="renameInputFieldWorkspace"
         {autofocus}
         class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
         on:input={(event) => {
           handleWorkspaceInput(event);
         }}
-        on:keydown={(event) => {
-          if (event.key == "Enter") {
-            modifyWorkspaceData();
-          }
-        }}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}
       />
 

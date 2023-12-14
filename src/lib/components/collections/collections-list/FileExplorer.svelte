@@ -22,7 +22,7 @@
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-    import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
 
   let expand: boolean = false;
   export let explorer;
@@ -40,7 +40,6 @@
 
   let showFolderAPIButtons: boolean = true;
 
- 
   const handleAPIClick = async () => {
     isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
@@ -166,7 +165,7 @@
           explorer.id,
           response.data.data,
         );
-        collectionsMethods.updateTab(newFolderName,"name",explorer.id);
+        collectionsMethods.updateTab(newFolderName, "name", explorer.id);
       }
       isRenaming = false;
       newFolderName = "";
@@ -192,8 +191,8 @@
   }
 
   function addRequest() {
-    handleAPIClick();
     expand = true;
+    handleAPIClick();
   }
 
   let menuItems = [
@@ -270,7 +269,9 @@
   <div
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
-    on:click={()=>{handleFolderClick(explorer,currentWorkspaceId,collectionId)}}
+    on:click={() => {
+      handleFolderClick(explorer, currentWorkspaceId, collectionId);
+    }}
   >
     <div
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}

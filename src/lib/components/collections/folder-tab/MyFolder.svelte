@@ -34,7 +34,7 @@
     collectionsMethods.updateTab(false, "save", componentData.path.folderId);
   };
 
-  const modifyFolderData = async () => {
+  const onRenameBlur = async () => {
     await _myFolderViewModel.modifyFolder(
       componentData,
       newFolderName,
@@ -65,12 +65,10 @@
     });
 
   let autofocus = isFolderNameVisibility;
-  let isClickOnEnter: boolean = false;
+
   let inputElement;
 
-
   $: if ($isFolderCreatedFirstTime) {
-
     inputElement?.select();
   }
 
@@ -80,6 +78,15 @@
     unsubscribeisCollectionCreatedFirstTime();
   });
   onDestroy(() => {});
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFolder",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -92,19 +99,15 @@
         type="text"
         required
         {autofocus}
+        id="renameInputFieldFolder"
         value={tabName}
-        class="bg-backgroundColor border-0 text-left w-100 ps-2 py-0 fs-5"
+        class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
         on:input={(event) => {
           handleFolderInput(event);
         }}
-        on:keydown={(event) => {
-          if (event.key === "Enter") {
-            isClickOnEnter = true;
-            modifyFolderData();
-          }
-        }}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}
-        style="outline: none;"
       />
 
       <button

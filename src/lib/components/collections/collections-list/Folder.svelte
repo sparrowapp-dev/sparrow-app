@@ -212,7 +212,7 @@
       );
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
-        collectionsMethods.updateTab(newCollectionName,"name",collectionId);
+        collectionsMethods.updateTab(newCollectionName, "name", collectionId);
       }
     }
     isRenaming = false;
@@ -245,6 +245,7 @@
 
   //add folder in collection
   const addFolder = () => {
+    visibility = true;
     handleFolderClick();
     if (collectionId === openCollectionId) {
       visibility = true;
@@ -282,7 +283,6 @@
       disabled: false,
     },
   ];
-
 </script>
 
 {#if isCollectionPopup}
@@ -332,9 +332,11 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
+      isCollectionCreatedFirstTime.set(false);
+
       if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
-        handleCollectionClick(collection,currentWorkspaceId,collectionId);
+        handleCollectionClick(collection, currentWorkspaceId, collectionId);
       }
     }}
     class="d-flex main-collection align-items-center"

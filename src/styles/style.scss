@@ -43,9 +43,12 @@ $sparrow-text-color: #8a9299;
 $sparrow-key-value-pair: #262626;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-selectedSideBarTab: #11253a;
+$sparrow-recentApiText: #f3e4e4d7;
 
 :root {
   --blackColor: #{$sparrow-black};
+  --recentApiText: #{$sparrow-recentApiText};
+
   --success-color: #{$sparrow-success};
   --button-color: #{$sparrow-request-body};
   --send-button: #{$sparrow-send-button};
@@ -82,6 +85,8 @@ $theme-colors: map-merge(
   $theme-colors,
   (
     "primaryColor": $sparrow-blue,
+    "recentApiText": $sparrow-recentApiText,
+
     "secondaryColor": $sparrow-yellow,
     "blackColor": $sparrow-black,
     "successColor": $sparrow-success,
