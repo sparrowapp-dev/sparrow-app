@@ -112,7 +112,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 6,
+  version: 0,
   properties: {
     collectionId: {
       type: "string",

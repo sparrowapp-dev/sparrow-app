@@ -6,6 +6,7 @@ on:
       - development
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
+
  
 jobs:
   deploy:

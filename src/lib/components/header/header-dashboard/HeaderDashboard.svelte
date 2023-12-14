@@ -61,10 +61,9 @@
 
   let name: string = "";
   let email: string = "";
-  let firstLetter, currentUser;
+  let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      currentUser = value;
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
@@ -344,14 +343,9 @@
               </p>
             </div>
             <hr class="" />
-
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
-              on:click={() => {
-                if (_viewModel.logout(currentUser)) {
-                  navigate("/login");
-                }
-              }}
+              on:click={async () => {await _viewModel.logout()}}
             >
               <img src={icons.signout} alt="" /><span
                 class="m-2"

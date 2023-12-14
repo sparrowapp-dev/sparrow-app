@@ -1,7 +1,6 @@
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
-import { setCurrentWorkspace } from "$lib/store/workspace.store";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
@@ -117,6 +116,7 @@ export class HeaderDashboardViewModel {
 
   // logout to frontend - clears local db, store, and cookies.
   public clientLogout = async (): Promise<void> => {
+    setUser(null);
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
@@ -127,14 +127,12 @@ export class HeaderDashboardViewModel {
   };
 
   // logout to backend - expires jwt - auth and refresh tokens
-  public logout = async (user): Promise<boolean> => {
-    setUser(null);
+  public logout = async (): Promise<boolean> => {
     const response = await userLogout();
     if (response.isSuccessful) {
-      this.clientLogout();
+      await this.clientLogout();
       return true;
     } else {
-      setUser(user);
       notifications.error(response.message);
       return false;
     }
