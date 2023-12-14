@@ -213,7 +213,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 6,
+  version: 0,
   properties: {
     tabId: {
       type: "string",

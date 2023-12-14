@@ -6,6 +6,8 @@ on:
       - development
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
+ VITE_RXDB_DB_NAME: ${{secrets.VITE_RXDB_DB_NAME}}
+ VITE_API_TIMEOUT: ${{secrets.VITE_API_TIMEOUT}}
  
 jobs:
   deploy:

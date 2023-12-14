@@ -130,7 +130,7 @@ export class HeaderDashboardViewModel {
   public logout = async (): Promise<boolean> => {
     const response = await userLogout();
     if (response.isSuccessful) {
-      this.clientLogout();
+      await this.clientLogout();
       return true;
     } else {
       notifications.error(response.message);

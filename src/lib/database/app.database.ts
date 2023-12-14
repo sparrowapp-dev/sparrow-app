@@ -53,19 +53,18 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 //RxDB Class
 export class RxDB {
   private static instance: RxDB | null = null;
-  public db = null;
   public rxdb = null;
   private constructor() {}
 
   public static getInstance(): RxDB {
-    if (!(RxDB.instance?.db && RxDB.instance?.rxdb)) {
+    if (!RxDB.instance?.rxdb) {
       RxDB.instance = new RxDB();
     }
     return RxDB.instance;
   }
 
   public async getDb() {
-    if (this.rxdb && this.db) return { rxdb: this.rxdb, db: this.db };
+    if (this.rxdb) return { rxdb: this.rxdb };
     // create the Rx database
     this.rxdb = await createRxDatabase<DatabaseCollections>({
       name: constants.RXDB_DB_NAME,
@@ -74,105 +73,27 @@ export class RxDB {
     });
 
     // add all collections
-    this.db = await this.rxdb.addCollections({
+    await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
-        migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-        },
       },
       tab: {
         schema: tabSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          5: function (oldDoc) {
-            return oldDoc;
-          },
-          6: function (oldDoc) {
-            return oldDoc;
-          },
-        },
       },
       collection: {
         schema: collectionSchema,
-        migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.collectionId = oldDoc._id;
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            oldDoc.collectionId = oldDoc.id;
-            return oldDoc;
-          },
-          5: function (oldDoc) {
-            oldDoc.collectionId = oldDoc.id;
-            return oldDoc;
-          },
-          6: function (oldDoc) {
-            // oldDoc.coll = oldDoc.id;
-            return oldDoc;
-          },
-        },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
-        migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            return oldDoc;
-          },
-          5: function (oldDoc) {
-            return oldDoc;
-          },
-        },
       },
     });
-    return { rxdb: this.rxdb, db: this.db };
+    return { rxdb: this.rxdb };
   }
 
   public async destroyDb(): Promise<void> {
     await this.rxdb.destroy();
     await this.rxdb.remove();
     this.rxdb = null;
-    this.db = null;
     return;
   }
 }
