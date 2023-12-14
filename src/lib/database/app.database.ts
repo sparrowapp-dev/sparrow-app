@@ -1,6 +1,5 @@
 import {
   createRxDatabase,
-  removeRxDatabase,
   type RxCollection,
   type RxDatabase,
   type RxDocument,
@@ -24,6 +23,7 @@ import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+import constants from "$lib/utils/constants";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -68,7 +68,7 @@ export class RxDB {
     if (this.rxdb && this.db) return { rxdb: this.rxdb, db: this.db };
     // create the Rx database
     this.rxdb = await createRxDatabase<DatabaseCollections>({
-      name: "mydatabase",
+      name: constants.RXDB_DB_NAME,
       storage: getRxStorageDexie(),
       ignoreDuplicate: true,
     });
