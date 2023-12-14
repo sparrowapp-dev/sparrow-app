@@ -75,6 +75,8 @@ export interface State {
   responseSection?: ResponseSectionType;
   responseRaw?: RequestRawType;
   responseFormatter?: ResponseFormatterType;
+  additions: string;
+  isSaveDescription: boolean;
 }
 
 export interface BasicAuth {

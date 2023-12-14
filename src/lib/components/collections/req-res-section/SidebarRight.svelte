@@ -1,7 +1,7 @@
 <script lang="ts">
   import commetIcon from "$lib/assets/comment-fill.svg";
   import codeIcon from "$lib/assets/code.svg";
-  import bookIcon from "$lib/assets/book.svg";
+  import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import MethodButton from "$lib/components/buttons/MethodButton.svelte";
@@ -10,16 +10,20 @@
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
+    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let activeTab;
-  export let collectionsMethods;
+  export let collectionsMethods: CollectionsMethods;
 
   let componentData: NewTab;
   let description: string;
-  let isSaveDescription: boolean = true;
+  let isSaveDescription: boolean;
+  let additions: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     componentData = event;
     description = event?.description;
+    isSaveDescription = event.property.request.state.isSaveDescription;
+    additions = event.property.request.state.additions;
   });
 
   let handleInputValue = () => {
@@ -33,7 +37,6 @@
 
   const handleSaveRequest = async () => {
     const _id = componentData?.id;
-    // collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
     let existingRequest;
@@ -120,7 +123,9 @@
   <WorkspaceSidebar></WorkspaceSidebar>
 {/if} -->
 
+
 <div class="d-flex">
+  {#if additions === "description"}
   <div class="sidebar-content p-3 bg-backgroundColor">
     <div class="d-flex">
       <div>
@@ -134,9 +139,14 @@
       {#if isSaveDescription}
         <p class="description-field text-labelColor"
         on:click={()=>{
-          isSaveDescription = !isSaveDescription;
+          collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
         }}
         >Edit</p>
+        {#if description?.length === 0}
+        <small class="description-head">Click edit button to add description.</small>
+        {:else}
+        <small class="description-head">{description}</small>
+        {/if}
       {:else}
         <p
         class="description-field text-labelColor"
@@ -146,7 +156,7 @@
               componentData?.path.workspaceId
             ) {
               handleSaveRequest();
-              isSaveDescription = !isSaveDescription;
+              collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
             } else {
               visibility = true;
             }
@@ -154,17 +164,21 @@
         >
           Save Changes
         </p>
-      {/if}
-      <textarea
-        placeholder="Enter API Description"
+        <textarea
+        autofocus
+        placeholder="Describe how to use this API request to your team. Simply start typing here."
         bind:value={description}
         on:input={handleInputValue}
         disabled={isSaveDescription}
-        class="api-description w-100 {isSaveDescription ? 'block-mode' : 'edit-mode'}"
+        maxlength="300"
+        rows="10"
+        class="p-1 api-description w-100 {isSaveDescription ? 'block-mode' : 'edit-mode'}"
       />
+      {/if}
+      
     </div>
   </div>
-
+  {/if}
   <div class="sidebar-right bg-backgroundColor">
     <div class="d-flex flex-column">
       <!-- comment for future use -->
@@ -174,11 +188,18 @@
             <img src={commetIcon} alt="" />
           </button>
         </Tooltip> -->
-      <Tooltip>
-        <button class="bg-backgroundColor border-0 mb-4">
-          <img src={bookIcon} alt="" />
+        <button class="bg-backgroundColor border-0 mb-4" 
+        on:click={()=>{
+          if(additions === "description"){
+            collectionsMethods.updateRequestState("","additions");
+          }
+          else{
+            collectionsMethods.updateRequestState("description","additions");
+          }
+        }}
+        >
+        <BookIcon color={additions === "description"? '#85C2FF' :'#8A9299'} />
         </button>
-      </Tooltip>
       <!-- comment for future use -->
 
       <!-- <Tooltip>
@@ -189,13 +210,14 @@
     </div>
   </div>
 </div>
+
 {#if visibility}
   <SaveRequest
     {collectionsMethods}
     {componentData}
     onClick={handleBackdrop}
     onFinish={()=>{
-      isSaveDescription = !isSaveDescription;
+      collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
     }}
     type="SAVE_DESCRIPTION"
   />
@@ -214,17 +236,18 @@
   }
   .api-description {
     background-color: transparent;
-  }
-  .block-mode{
-    /* pointer-events: none;
-    user-select: text;  */
+    font-size: 12px;
     outline: none;
-  }
-  .edit-mode{
-
+    border: 1px solid #85C2FF;
+    caret-color: #85C2FF;
+    
   }
   .description-field{
     font-size: 12px;
+  }
+  .description-head{
+    font-size: 12px;
+    color: #CCCCCC;
   }
 
 </style>
