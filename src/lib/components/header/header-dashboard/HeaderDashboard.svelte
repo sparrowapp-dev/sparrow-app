@@ -204,13 +204,13 @@
     style="width: 238px; height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
-    <div class="d-flex align-items-center justify-content-center gap-2">
+    <div class="d-flex align-items-center justify-content-center gap-2 ">
       <div>
         <img src={icons.sparrowicon} alt="sparrowLogo" />
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2"
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup?'d-none':''}"
       style="height: 36px; width:116px"
     >
       <HeaderDropdown
@@ -269,10 +269,10 @@
   {/if}
 
   <div
-    class="d-flex align-items-center justify-content-center"
+    class="d-flex align-items-center justify-content-center "
     style="margin-left: 45px;"
   >
-    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
+    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex {showGlobalSearchPopup?'d-none':''}">
       <div class="col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -280,14 +280,14 @@
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+      <div class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup?'d-none':''}">
         <Tooltip>
           <button class="bg-blackColor border-0">
             <img src={icons.notifyIcon} alt="" />
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+      <div class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup?'d-none':''}">
         <div class="position-relative">
           <button
             class={`bg-blackColor border-0`}
@@ -296,10 +296,11 @@
             on:click={toggleDropdown}
           >
             <p
-              class={`profile-circle ${
+              class={showGlobalSearchPopup?'d-none':''}{`profile-circle ${
                 isOpen
                   ? "bg-plusButton text-black"
                   : "profile-btn text-defaultColor"
+                  
               } m-auto text-center align-items-center justify-content-center `}
               style={`font-size: 12px; ${
                 isOpen
