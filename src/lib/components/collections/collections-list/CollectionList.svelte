@@ -38,12 +38,21 @@
 
 
  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+ import { username } from "$lib/store/auth.store";
 
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
+  let searchData: string = "";
+  let userName:string="";
+
+  const usernameUnsubscribe=username.subscribe((value)=>{
+    if(value){
+      userName=value;
+    }
+  })
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
@@ -66,7 +75,10 @@
         );
         collection = collectionArr;
       }
-      handleSearch();
+      if(searchData || selectedApiMethods.length>0){
+        handleSearch();
+
+      }
     },
   );
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -117,7 +129,7 @@
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         const response =
           await collectionsMethods.getAllCollections(workspaceId);
-        if (response.isSuccessful && response.data.data.length > 0) {
+        if (response.isSuccessful && response.data.data) {
           const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
           return;
@@ -131,7 +143,7 @@
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {
-      _id: UntrackedItems.UNTRACKED + uuidv4(),
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
       createdAt: new Date().toISOString(),
@@ -173,7 +185,7 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(newCollection._id, res);
+      collectionsMethods.updateCollection(newCollection.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
@@ -205,11 +217,10 @@
     collapsibleState.set(collapsExpandToggle);
   };
 
-  let searchData: string = "";
   let filteredCollection = [];
   let filteredFolder = [];
   let filteredFile = [];
-  const handleSearch = () => {
+  function handleSearch() {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
@@ -363,6 +374,7 @@
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
+          
             {#each filteredFile as exp}
               <SearchTree
                 editable={true}
@@ -402,7 +414,7 @@
         {#each filteredSelectedMethodsCollection as col}
           <Folder
             collectionList={collection}
-            collectionId={col._id}
+            collectionId={col.id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}
@@ -413,7 +425,7 @@
         {#each collection as col}
           <Folder
             collectionList={collection}
-            collectionId={col._id}
+            collectionId={col.id}
             {currentWorkspaceId}
             collection={col}
             title={col.name}

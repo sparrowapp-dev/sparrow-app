@@ -8,6 +8,7 @@ on:
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
 
+
 jobs:
   build_and_sign:
     runs-on: macos-latest
@@ -33,13 +34,13 @@ jobs:
     - name: Install Dependencies
       run: |
         yarn install
-        yarn build
+        yarn tauri build --debug
 
     - name: Build Tauri App
       run: |
         APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
         APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
-        APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" yarn tauri build
+        APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" yarn tauri build --debug
 
     # - name: Archive and Sign App
     #   run: |
@@ -48,9 +49,9 @@ jobs:
 
     - name: Archive
       run: |
-        #zip -r sparrow.app.zip /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/macos/sparrow-app.app
-        #codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/release/bundle/macos/sparrow-app.app
-        zip -r sparrow-app_0.0.0_x64.dmg /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg
+        #zip -r sparrow.app.zip /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/sparrow-app.app
+        #codesign --force --verify --verbose --sign "$APPLE_SIGNING_IDENTITY" target/debug/bundle/macos/sparrow-app.app
+        zip -r sparrow-app_0.0.0_x64.dmg /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_0.0.0_x64.dmg
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
@@ -67,4 +68,4 @@ jobs:
     - name: Upload to App Center
       run: |
         appcenter login --token ${{ secrets.APPCENTER_API_TOKEN_MAC }}
-        appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/release/bundle/dmg/sparrow-app_0.0.0_x64.dmg -g Collaborators --app Techdome/Sparrow-1 --build-version v12.23.${{ github.run_number }} --build-number ${{ github.run_number }}
+        appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_0.0.0_x64.dmg -g Collaborators --app Techdome/Sparrow-1 --build-version v12.23.${{ github.run_number }} --build-number ${{ github.run_number }}

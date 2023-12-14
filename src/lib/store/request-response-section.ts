@@ -4,6 +4,7 @@ import type {
   CurrentTab,
 } from "$lib/utils/interfaces/request.interface";
 
+export const isApiCreatedFirstTime = writable(false);
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
 
@@ -134,6 +135,22 @@ const setRequestProperty = async (data, route: string): Promise<void> => {
       if (elem.isActive) {
         elem.property.request[route] = data;
         elem.property.request.save.api = false;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+const updateRequestPropertyResponseBody = async (
+  data,
+  route: string,
+): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.isActive) {
+        elem.property.request[route].body = data;
+        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -273,6 +290,7 @@ const requestResponseStore = {
   setRequestAuth,
   setRequestState,
   setRequestProperty,
+  updateRequestPropertyResponseBody,
   getTabList,
   getTab,
   activeTab,

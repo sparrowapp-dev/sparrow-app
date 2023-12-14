@@ -27,6 +27,15 @@
     />
     <Helper
       {activeSideBarTabMethods}
+      route="workspaces"
+      heading="Workspaces"
+      logo={workspaces}
+      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      disabled={false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <Helper
+      {activeSideBarTabMethods}
       route="mock"
       heading="Mock"
       logo={mock}
@@ -51,15 +60,6 @@
       logo={teams}
       isSelected={"teams" === selectedActiveSideBarTab ? true : false}
       disabled={true}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
-      route="workspaces"
-      heading="Workspaces"
-      logo={workspaces}
-      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
   </div>

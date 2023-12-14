@@ -24,6 +24,7 @@
     isCollectionCreatedFirstTime,
     isFolderCreatedFirstTime,
   } from "$lib/store/collection";
+  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 
   export let title: string;
   export let collection: any;
@@ -103,6 +104,7 @@
   };
 
   const handleAPIClick = async () => {
+    isApiCreatedFirstTime.set(true);
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
@@ -137,7 +139,8 @@
       request.id = res.id;
       request.path.workspaceId = currentWorkspaceId;
       request.path.collectionId = collectionId;
-      request.save = true;
+      request.property.request.save.api = true;
+      request.property.request.save.description = true;
 
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
@@ -330,7 +333,7 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
-      if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
+      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
         handleCollectionClick(collection,currentWorkspaceId,collectionId);
       }
@@ -363,7 +366,7 @@
       </p>
     {/if}
   </div>
-  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <button

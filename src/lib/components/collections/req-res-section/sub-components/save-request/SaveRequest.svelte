@@ -96,9 +96,11 @@
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
-      collection = value;
-      directory = JSON.parse(JSON.stringify(collection));
-      if (latestRoute.id) navigateToDirectory(latestRoute);
+      if(value){
+        collection = value;
+        directory = JSON.parse(JSON.stringify(collection));
+        if (latestRoute.id) navigateToDirectory(latestRoute);
+      }
     });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
@@ -148,8 +150,7 @@
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
         existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, _id);
       }
-      console.log("existing",existingRequest);
-      // console.log("ex",existingRequest);
+
       const randomRequest: NewTab = generateSampleRequest("id", new Date().toString())
       let expectedRequest;
       if(!existingRequest){
@@ -352,7 +353,11 @@
       latestRoute = {
         id: res.data.data._id,
       };
-      collectionsMethods.addCollection(res.data.data);
+      let storage = res.data.data;
+      let _id = res.data.data._id;
+      delete storage._id;
+      storage.id = _id;
+      collectionsMethods.addCollection(storage);
     } else {
       createDirectoryLoader = false;
     }

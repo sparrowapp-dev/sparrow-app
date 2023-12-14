@@ -213,7 +213,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 5,
+  version: 0,
   properties: {
     tabId: {
       type: "string",
@@ -246,6 +246,7 @@ export const tabSchemaLiteral = {
     },
     createdAt: {
       type: "string",
+      maxLength: 100,
     },
   },
   required: ["id", "name"],

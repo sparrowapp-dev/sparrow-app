@@ -1,7 +1,6 @@
 <script lang="ts">
   import CollectionsList from "$lib/components/collections/collections-list/CollectionList.svelte";
   import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
-  import SidebarRight from "$lib/components/collections/req-res-section/SidebarRight.svelte";
   import DefaultTabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/DefaultTabBar.svelte";
   import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
@@ -13,8 +12,6 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-
-  import type { Observable } from "rxjs";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import type { Writable } from "svelte/store";
   import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
@@ -27,6 +24,7 @@
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
+
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
@@ -66,8 +64,15 @@
     setRequestSave: _viewModel.setRequestSave
   };
 
+  let stack = [];
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  if ($tabList) {
+    $tabList.map((tab) => {
+      stack.push(tab.name);
+    });
+  }
+
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {

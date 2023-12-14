@@ -6,12 +6,13 @@
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
 
-  import book from "$lib/assets/book.svg";
+  import BookIcon from "$lib/assets/book.svelte";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
   export let tabWidth: number;
   export let index: number;
   export let closeTab;
+
 </script>
 
 <div
@@ -60,12 +61,14 @@
         </span>
       {:else if tab.type === ItemType.WORKSPACE}
         <span>
-          <img src={book} alt="book" />
+          <BookIcon/>
         </span>
       {/if}
       <span
         class="font-weight-normal"
-        style={`font-size: 12px; font-family: Roboto; color: ${tab.isActive ? '#fff;' : '#8A9299;'}`}
+        style={`font-size: 12px; font-family: Roboto; color: ${
+          tab.isActive ? "#fff;" : "#8A9299;"
+        }`}
       >
         {tab.name}
       </span>
@@ -84,7 +87,7 @@
       }}
       style="overflow:hidden; height:31px;"
     >
-      <Crossicon color={tab.isActive ? '#fff' : '#8A9299'}/>
+      <Crossicon color={tab.isActive ? "#fff" : "#8A9299"} />
     </button>
   </div>
   {#if !tab.isActive}

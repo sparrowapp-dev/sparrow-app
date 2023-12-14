@@ -107,18 +107,18 @@ export const collectionSchemaLiteral = {
     // where should the composed string be stored
     key: "collectionId",
     // fields that will be used to create the composed key
-    fields: ["_id"],
+    fields: ["createdAt"],
     // separator which is used to concat the fields values.
     separator: "|",
   },
   type: "object",
-  version: 3,
+  version: 0,
   properties: {
     collectionId: {
       type: "string",
       maxLength: 100,
     },
-    _id: {
+    id: {
       type: "string",
       maxLength: 100,
     },
@@ -136,7 +136,7 @@ export const collectionSchemaLiteral = {
       type: "boolean",
     },
     createdAt: {
-      type: "date-time",
+      type: "string",
     },
     updatedAt: {
       type: "date-time",

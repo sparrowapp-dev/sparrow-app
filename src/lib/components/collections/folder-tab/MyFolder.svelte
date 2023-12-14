@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import {
+    collapsibleState,
+    isApiCreatedFirstTime,
+  } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { MyFolderViewModel } from "./MyFolder.viewModel";
@@ -20,10 +23,12 @@
   const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    if(event){
     tabName = event?.name;
     componentData = event;
     totalRequest = event?.property?.folder?.requestCount;
     totalFolder = event?.property?.folder?.folderCount;
+    }
   });
 
   const handleFolderInput = (event) => {
@@ -41,6 +46,7 @@
   };
 
   const handleApiRequest = async () => {
+    isApiCreatedFirstTime.set(true);
     const response = await _myFolderViewModel.createApiRequest(
       componentData,
       collectionsMethods,
@@ -61,13 +67,21 @@
     });
 
   let autofocus = isFolderNameVisibility;
+  let isClickOnEnter: boolean = false;
+  let inputElement;
+
+
+  $: if ($isFolderCreatedFirstTime) {
+
+    inputElement?.select();
+  }
+
   onDestroy(() => {
     tabSubscribe();
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
   });
   onDestroy(() => {});
-  let isClickOnEnter: boolean = false;
 </script>
 
 <div class="main-container d-flex">
@@ -81,7 +95,7 @@
         required
         {autofocus}
         value={tabName}
-        class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+        class="bg-backgroundColor border-0 text-left w-100 ps-2 py-0 fs-5"
         on:input={(event) => {
           handleFolderInput(event);
         }}
@@ -91,6 +105,8 @@
             modifyFolderData();
           }
         }}
+        bind:this={inputElement}
+        style="outline: none;"
       />
 
       <button
@@ -111,7 +127,7 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-        type="text"
+        type="textarea"
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
