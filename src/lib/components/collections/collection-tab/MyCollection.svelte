@@ -26,10 +26,12 @@
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+    if(event){
     tabName = event?.name;
     componentData = event;
     totalRequest = event?.property?.collection?.requestCount;
     totalFolder = event?.property?.collection?.folderCount;
+    }
   });
 
   const handleCollectionInput = (event) => {

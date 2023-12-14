@@ -40,14 +40,16 @@
       getMessage = true;
       deleteMessage = true;
     }
-    currentTabId = event?.id;
-    rawValue = event?.property?.request?.body.raw;
-    urlEncoded = event?.property.request.body.urlencoded;
-    formDataText = event?.property.request.body.formdata.text;
-    formDataFile = event?.property.request.body.formdata.file;
-    method = event?.property.request.method;
-    mainTab = event?.property.request.state.dataset;
-    rawTab = event?.property.request.state.raw;
+    if (event && event.property) {
+      currentTabId = event?.id;
+      rawValue = event?.property?.request?.body.raw;
+      urlEncoded = event?.property?.request.body.urlencoded;
+      formDataText = event?.property?.request.body.formdata.text;
+      formDataFile = event?.property?.request.body.formdata.file;
+      method = event?.property?.request.method;
+      mainTab = event?.property?.request.state.dataset;
+      rawTab = event?.property?.request.state.raw;
+    }
   });
 
   let handleDropdown = (tab: string) => {
@@ -80,9 +82,7 @@
   });
 </script>
 
-<div
-  class="ps-0 {isHorizontalMode ? 'pt-3' : 'pt-2'} pe-0 rounded w-100"
->
+<div class="ps-0 {isHorizontalMode ? 'pt-3' : 'pt-2'} pe-0 rounded w-100">
   <div>
     {#if method === "GET" && getMessage}
       <div class="d-flex error-message py-1 mb-2">

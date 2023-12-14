@@ -43,6 +43,7 @@
   const collection = _colllectionListViewModel.collection;
 
   collection.subscribe((value) => {
+    if(value){
     const collectionArr = value.map(
       (collectionDocument: CollectionDocument) => {
         const collectionObj =
@@ -51,6 +52,7 @@
       },
     );
     collections = collectionArr;
+    }
   });
 
   let profile: boolean = false;
@@ -59,9 +61,10 @@
 
   let name: string = "";
   let email: string = "";
-  let firstLetter;
+  let firstLetter, currentUser;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
+      currentUser = value;
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
@@ -93,9 +96,11 @@
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
-      activeWorkspaceRxDoc = value;
-      activeWorkspaceId = value?._data?._id;
-      activeWorkspaceName = value._data.name;
+      if (value) {
+        activeWorkspaceRxDoc = value;
+        activeWorkspaceId = value._data._id;
+        activeWorkspaceName = value._data.name;
+      }
     },
   );
 
@@ -252,7 +257,7 @@
         workspaces={allworkspaces}
         {activeWorkspaceId}
         {handleDropdown}
-      />
+      ></GlobalSearchBarPopup>
     {/if}
   </div>
   {#if showGlobalSearchPopup}
@@ -261,7 +266,7 @@
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
-    />
+    ></div>
   {/if}
 
   <div
@@ -343,7 +348,7 @@
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
               on:click={() => {
-                if (_viewModel.logout()) {
+                if (_viewModel.logout(currentUser)) {
                   navigate("/login");
                 }
               }}

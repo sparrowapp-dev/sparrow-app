@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb, type CollectionDocument } from "$lib/database/app.database";
+import { RxDB, type CollectionDocument } from "$lib/database/app.database";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
+import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
 import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
@@ -10,7 +11,7 @@ export class CollectionRepository {
    * Adds a new collection to workspace.
    */
   public addCollection = async (collection: any) => {
-    await rxdb.collection.insert(collection);
+    await RxDB.getInstance().rxdb.collection.insert(collection);
     return;
   };
   /**
@@ -18,21 +19,21 @@ export class CollectionRepository {
    * updates existing collection to workspace.
    */
   public updateCollection = async (uuid: string, data) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: uuid,
+          id: uuid,
         },
       })
       .exec();
 
     collection.incrementalModify((value) => {
       if (data.name) value.name = data.name;
-      if (data._id) value._id = data._id;
+      if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.totalRequests) value.totalRequests = data.totalRequests;
-      if (data.createdAt) value.createdAt = data.createdAt;
+
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
       return value;
@@ -42,7 +43,8 @@ export class CollectionRepository {
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
-    return rxdb.collection.find().sort({ createdAt: "asc" }).$;
+    return RxDB.getInstance().rxdb.collection.find().sort({ createdAt: "asc" })
+      .$;
   };
 
   // public updateCollection = async (
@@ -50,10 +52,10 @@ export class CollectionRepository {
   // ): Observable<CollectionDocument[]> => {};
 
   public deleteCollection = async (collectionId: string) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -65,10 +67,10 @@ export class CollectionRepository {
     folderId: string,
     name: string,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -87,10 +89,10 @@ export class CollectionRepository {
     collectionId: string,
     deleteId: string,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -106,9 +108,18 @@ export class CollectionRepository {
     });
   };
 
-  public bulkInsertData = async (data: any): Promise<void> => {
-    await rxdb.collection.find().remove();
-    await rxdb.collection.bulkInsert(data);
+  public bulkInsertData = async (collection: any[]): Promise<void> => {
+    if (collection.length > 0) {
+      const updatedCollections = collection.map((collectionObj) => {
+        collectionObj["id"] = collectionObj._id;
+        delete collectionObj._id;
+        return collectionObj;
+      });
+      await RxDB.getInstance().rxdb.collection.find().remove();
+      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
+    } else {
+      await RxDB.getInstance().rxdb.collection.find().remove();
+    }
   };
 
   /**
@@ -119,10 +130,10 @@ export class CollectionRepository {
     collectionId: string,
     items: any,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -140,10 +151,10 @@ export class CollectionRepository {
     uuid: string,
     items: any,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -168,14 +179,15 @@ export class CollectionRepository {
     folderId: string,
     request: any,
   ): Promise<void> => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
-    const updatedItems = collection.toJSON().items.map((element) => {
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
       if (element.id === folderId) {
         element.items.push(request);
       }
@@ -197,14 +209,15 @@ export class CollectionRepository {
     uuid: string,
     request,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
-    const updatedItems = collection.toJSON().items.map((element) => {
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
       if (element.id === folderId) {
         for (let i = 0; i < element.items.length; i++) {
           if (element.items[i].id === uuid) {
@@ -227,10 +240,10 @@ export class CollectionRepository {
     item: any,
     folderId?: string,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -259,10 +272,10 @@ export class CollectionRepository {
     folderId: string,
     requestId: string,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -273,7 +286,8 @@ export class CollectionRepository {
     //   }
     // });
 
-    const updatedItems = collection.toJSON().items.map((element) => {
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
       if (element.id === folderId) {
         const deletedElement = element.items.filter((e) => {
           if (e.id !== requestId) {
@@ -298,10 +312,10 @@ export class CollectionRepository {
     uuid: string,
     folderId: string,
   ) => {
-    const collection = await rxdb.collection
-      .findOne({
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
         selector: {
-          _id: collectionId,
+          id: collectionId,
         },
       })
       .exec();
@@ -325,6 +339,6 @@ export class CollectionRepository {
   };
 
   public clearCollections = async (): Promise<any> => {
-    return rxdb.collection.find().remove();
+    return RxDB.getInstance().rxdb.collection.find().remove();
   };
 }

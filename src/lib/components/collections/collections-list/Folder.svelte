@@ -367,7 +367,7 @@
       </p>
     {/if}
   </div>
-  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <button

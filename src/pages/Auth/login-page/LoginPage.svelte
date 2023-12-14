@@ -73,13 +73,13 @@
 
 
   isLoading.subscribe((value) => {
-    isLoadingPage = value;
+      isLoadingPage = value;
   });
 
   let isPasswordError: boolean;
 
   isResponseError.subscribe((value) => {
-    isPasswordError = value;
+      isPasswordError = value;
   });
 
   let errorMessage: string = "";

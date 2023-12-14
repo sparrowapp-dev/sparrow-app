@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb, type WorkspaceDocument } from "$lib/database/app.database";
+import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 
 import type { Observable } from "rxjs";
 
@@ -9,29 +9,20 @@ export class WorkspaceRepository {
    * extracts RxDocument of workspace.
    */
   public getDocument = (elem: WorkspaceDocument) => {
-    return {
-      _id: elem.get("_id"),
-      name: elem.get("name"),
-      owner: elem.get("owner"),
-      permissions: elem.get("permissions"),
-      isActiveWorkspace: elem.get("isActiveWorkspace"),
-      createdBy: elem.get("createdBy"),
-      createdAt: elem.get("createdAt"),
-      collections: elem.get("collections"),
-    };
+    return elem.toMutableJSON();
   };
 
   /**
    * get all workspaces observable of user.
    */
   public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
-    return rxdb.workspace.find().$;
+    return RxDB.getInstance().rxdb.workspace.find().$;
   };
   /**
    * get active workspace of the user.
    */
   public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
-    return rxdb.workspace.findOne({
+    return RxDB.getInstance().rxdb.workspace.findOne({
       selector: {
         isActiveWorkspace: true,
       },
@@ -42,8 +33,8 @@ export class WorkspaceRepository {
     workspaceId: string,
     collectionObj,
   ) => {
-    const workspace = await rxdb.workspace
-      .findOne({
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
         selector: {
           _id: workspaceId,
         },
@@ -56,13 +47,15 @@ export class WorkspaceRepository {
   };
 
   public clearWorkspaces = async (): Promise<any> => {
-    return rxdb.workspace.find().remove();
+    return RxDB.getInstance().rxdb.workspace.find().remove();
   };
   /**
    * Sets a workspace as active.
    */
   public setActiveWorkspace = async (workspaceId: string): Promise<void> => {
-    const workspaces: WorkspaceDocument[] = await rxdb.workspace.find().exec();
+    const workspaces: WorkspaceDocument[] = await RxDB.getInstance()
+      .rxdb.workspace.find()
+      .exec();
     const data = workspaces.map((elem: WorkspaceDocument) => {
       const res = this.getDocument(elem);
       if (res._id === workspaceId) {
@@ -72,13 +65,13 @@ export class WorkspaceRepository {
       }
       return res;
     });
-    await rxdb.workspace.bulkUpsert(data);
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 
   public updateWorkspace = async (workspaceId: string, name: string) => {
-    const workspace = await rxdb.workspace
-      .findOne({
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
         selector: {
           _id: workspaceId,
         },
@@ -92,7 +85,7 @@ export class WorkspaceRepository {
   };
 
   public addWorkspace = async (workspace: any): Promise<void> => {
-    await rxdb.workspace.insert(workspace);
+    await RxDB.getInstance().rxdb.workspace.insert(workspace);
     return;
   };
 
@@ -101,7 +94,7 @@ export class WorkspaceRepository {
    */
   public bulkInsertData = async (data: any): Promise<void> => {
     await this.clearWorkspaces();
-    await rxdb.workspace.bulkInsert(data);
+    await RxDB.getInstance().rxdb.workspace.bulkInsert(data);
     return;
   };
 }

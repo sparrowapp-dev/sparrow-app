@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rxdb, type TabDocument } from "$lib/database/app.database";
+import { RxDB, type TabDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
@@ -9,15 +9,18 @@ export class TabRepository {
    * Return all the RxDocument refers to this collection in ascending order with respect to createdAt.
    */
   public getDocuments = async (): Promise<TabDocument[]> => {
-    return await rxdb.tab.find().sort({ createdAt: "asc" }).exec();
+    return await RxDB.getInstance()
+      .rxdb.tab.find()
+      .sort({ createdAt: "asc" })
+      .exec();
   };
 
   /**
    * Creates a new tab and adds it to the tab bar.
    */
   public createTab = async (tab: any): Promise<void> => {
-    const activeTab = await rxdb.tab
-      .findOne({
+    const activeTab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -26,7 +29,7 @@ export class TabRepository {
     if (activeTab) {
       activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
-    await rxdb.tab.insert(tab);
+    await RxDB.getInstance().rxdb.tab.insert(tab);
   };
 
   /**
@@ -43,8 +46,8 @@ export class TabRepository {
         }
       }
     }
-    const selectedTab = await rxdb.tab
-      .findOne({
+    const selectedTab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           id,
         },
@@ -59,8 +62,8 @@ export class TabRepository {
    * Activates an existing tab in the tab bar.
    */
   public activeTab = async (id: string): Promise<void> => {
-    const deselectedTab = await rxdb.tab
-      .findOne({
+    const deselectedTab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -70,8 +73,8 @@ export class TabRepository {
     if (deselectedTab) {
       await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
     }
-    const selectedTab = await rxdb.tab
-      .findOne({
+    const selectedTab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           id,
         },
@@ -86,7 +89,7 @@ export class TabRepository {
    * Extracts all data of the active tab.
    */
   public getTab = (): Observable<TabDocument> => {
-    return rxdb.tab.findOne({
+    return RxDB.getInstance().rxdb.tab.findOne({
       selector: {
         isActive: true,
       },
@@ -97,7 +100,7 @@ export class TabRepository {
    * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return rxdb.tab.find().sort({ createdAt: "asc" }).$;
+    return RxDB.getInstance().rxdb.tab.find().sort({ createdAt: "asc" }).$;
   };
   /**
    * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
@@ -106,8 +109,8 @@ export class TabRepository {
     data: any,
     route: string,
   ): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -123,8 +126,8 @@ export class TabRepository {
    * Configures the request with state such as raw, dataset, auth, section.
    */
   public setRequestState = async (data: any, route: string): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -139,8 +142,8 @@ export class TabRepository {
    * Configures the request with Auth such as API key, bearer token, basic auth.
    */
   public setRequestAuth = async (data: any, route: string): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -155,8 +158,8 @@ export class TabRepository {
    * Configures the request body such as form data, url encoded, raw.
    */
   public setRequestBody = async (data: any, route: string): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -174,8 +177,8 @@ export class TabRepository {
     data: any,
     route: string,
   ): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -192,8 +195,8 @@ export class TabRepository {
    * id, name, description, save.
    */
   public setTabProperty = async (data: any, route: string): Promise<void> => {
-    const query = rxdb.tab
-      .findOne({
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
         selector: {
           isActive: true,
         },
@@ -209,13 +212,13 @@ export class TabRepository {
    * Clear tabs
    */
   public clearTabs = async (): Promise<any> => {
-    return rxdb.tab.find().remove();
+    return RxDB.getInstance().rxdb.tab.find().remove();
   };
 
   public syncTabsWithStore = async (data) => {
     await this.clearTabs();
     const sub = data.subscribe((docs) => {
-      rxdb.tab.bulkUpsert(docs);
+      RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
     });
     sub();
   };
