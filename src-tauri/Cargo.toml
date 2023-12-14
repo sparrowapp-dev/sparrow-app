@@ -1,7 +1,7 @@
 [package]
 name = "sparrow-app"
 version = "0.0.0"
-description = "A Tauri App"
+description = "Sparrow App"
 authors = ["you"]
 license = ""
 repository = ""

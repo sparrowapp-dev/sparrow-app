@@ -63,10 +63,9 @@
 
   let name: string = "";
   let email: string = "";
-  let firstLetter, currentUser;
+  let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      currentUser = value;
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
