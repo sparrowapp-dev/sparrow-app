@@ -399,68 +399,75 @@
         }}><img src={crossAsset} alt="" /></button
       >
     </div>
-    <div class="url d-flex align-items-center pb-3" style="height:20px;">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      {#if path.length > 0}
-        <span
-          class="d-flex align-items-center justify-content-center cursor-pointer"
-          style="height:24px; width:24px;"
-          on:click={navigateToLastRoute}
-          ><img src={leftArrowAsset} alt="" /></span
-        >
-      {/if}
-      {#if workspace}
-        <span
-          on:click={navigateToWorkspace}
-          class="{path.length === 0
-            ? 'text-whiteColor'
-            : ''} cursor-pointer px-1"
-          style="font-size: 12px;"
-        >
-          <img
-            style="height:10.67px; width: 10.67px;"
-            src={workspaceAsset}
-            alt=""
-          />
-          {workspace.name}</span
-        >
-      {/if}
-      {#if path.length > 0}
-        {#each path as elem, index}
-          <span>/</span>
+    <div class="url d-flex align-items-center pb-3">
+      <p class="ellipsis mb-0">
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        {#if path.length > 0}
           <span
-            on:click={() => {
-              navigateToDirectory(elem);
-            }}
-            class="{path.length - 1 === index
+            class="cursor-pointer"
+            style="height:24px; width:24px;"
+            on:click={navigateToLastRoute}
+            ><img src={leftArrowAsset} alt="" /></span
+          >
+        {/if}
+        {#if workspace}
+          <span
+            on:click={navigateToWorkspace}
+            class="{path.length === 0
               ? 'text-whiteColor'
               : ''} cursor-pointer px-1"
             style="font-size: 12px;"
           >
-            {#if elem.type === ItemType.COLLECTION}
-              <img
-                src={collectionAsset}
-                style="height:10.67px; width: 10.67px;"
-                alt=""
-              />
-            {:else if elem.type === ItemType.FOLDER}
-              <img
-                src={folderAsset}
-                style="height:10.67px; width: 10.67px;"
-                alt=""
-              />
-            {/if}
-            {elem.name}</span
+            <img
+              style="height:10.67px; width: 10.67px;"
+              src={workspaceAsset}
+              alt=""
+            />
+            {workspace.name}</span
           >
-        {/each}
-      {/if}
+        {/if}
+        {#if path.length > 0}
+          {#each path as elem, index}
+            <span>/</span>
+            <span
+              on:click={() => {
+                navigateToDirectory(elem);
+              }}
+              class="{path.length - 1 === index
+                ? 'text-whiteColor'
+                : ''} cursor-pointer px-1"
+              style="font-size: 12px;"
+            >
+              {#if elem.type === ItemType.COLLECTION}
+                <img
+                  src={collectionAsset}
+                  style="height:10.67px; width: 10.67px;"
+                  alt=""
+                />
+              {:else if elem.type === ItemType.FOLDER}
+                <img
+                  src={folderAsset}
+                  style="height:10.67px; width: 10.67px;"
+                  alt=""
+                />
+              {/if}
+              {elem.name}</span
+            >
+          {/each}
+        {/if}
+      </p>
     </div>
     <div class="row">
       <div class="col-6" style="border-right: 1px solid var(--border-color);">
         <div style="height: 460px; overflow:auto;">
+          <!-- 
+            --
+            shows current directory 
+          --
+          -->
           {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Collection: </small>
               <small class="text-whiteColor">
                 {path[path.length - 1].name}</small
@@ -470,14 +477,14 @@
               >Save your request in this collection or any of its folders.</small
             >
           {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Folder: </small>
               <small class="text-whiteColor">
                 {path[path.length - 1].name}</small
               >
             </p>
           {:else}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Workspace: </small>
               {#if workspace}
                 <small class="text-whiteColor">
@@ -492,6 +499,11 @@
           {/if}
           <p />
           {#if directory.length > 0}
+          <!-- 
+            --
+            create collection 
+          --
+          -->
             {#if path.length === 0 && createCollectionNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
@@ -535,6 +547,11 @@
                   {/if}
                 </div>
               </div>
+              <!-- 
+            --
+            create folder 
+          --
+          -->
             {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
@@ -580,6 +597,11 @@
               </div>
             {/if}
             {#each directory as col}
+            <!-- 
+            --
+            render collection, folder and requests 
+          --
+          -->
               {#if col.type === ItemType.FOLDER}
                 <div
                   on:click={() => {
@@ -810,40 +832,45 @@
             Select a Collection or Folder.
           </p>
         {:else}
+        <!-- 
+            --
+            current directory path 
+          --
+          -->
           <div class="url d-flex align-items-center pb-3">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            {#if workspace}
-              <span class="px-1" style="font-size: 12px;">
-                <img
-                  style="height:10.67px; width: 10.67px;"
-                  src={workspaceAsset}
-                  alt=""
-                />
-                {workspace.name}</span
-              >
-            {/if}
-            {#if path.length > 0}
-              {#each path as elem}
-                <span>/</span>
+            <p class="ellipsis mb-0">
+              {#if workspace}
                 <span class="px-1" style="font-size: 12px;">
-                  {#if elem.type === ItemType.COLLECTION}
-                    <img
-                      src={collectionAsset}
-                      style="height:10.67px; width: 10.67px;"
-                      alt=""
-                    />
-                  {:else if elem.type === ItemType.FOLDER}
-                    <img
-                      src={folderAsset}
-                      style="height:10.67px; width: 10.67px;"
-                      alt=""
-                    />
-                  {/if}
-                  {elem.name}</span
+                  <img
+                    style="height:10.67px; width: 10.67px;"
+                    src={workspaceAsset}
+                    alt=""
+                  />
+                  {workspace.name}</span
                 >
-              {/each}
-            {/if}
+              {/if}
+              {#if path.length > 0}
+                {#each path as elem}
+                  <span>/</span>
+                  <span class="px-1" style="font-size: 12px;">
+                    {#if elem.type === ItemType.COLLECTION}
+                      <img
+                        src={collectionAsset}
+                        style="height:10.67px; width: 10.67px;"
+                        alt=""
+                      />
+                    {:else if elem.type === ItemType.FOLDER}
+                      <img
+                        src={folderAsset}
+                        style="height:10.67px; width: 10.67px;"
+                        alt=""
+                      />
+                    {/if}
+                    {elem.name}</span
+                  >
+                {/each}
+              {/if}
+            </p>
           </div>
         {/if}
       </div>
@@ -901,6 +928,7 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 9;
+    backdrop-filter: blur(3px);
   }
   .save-request {
     position: fixed;
@@ -909,9 +937,11 @@
     transform: translateX(-50%) translateY(-50%);
     padding: 24px;
     background-color: var(--background-color);
-    width: 960px;
+    width: 100%;
+    max-width: 960px;
     height: 640px;
     z-index: 10;
+    border-radius: 8px;
   }
   .cursor-pointer {
     cursor: pointer;
@@ -972,5 +1002,10 @@
   .instruction-btn {
     width: 24px;
     height: 24px;
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
