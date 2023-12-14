@@ -405,8 +405,6 @@
     </div>
     <div class="url d-flex align-items-center pb-3">
       <p class="ellipsis mb-0">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
         {#if path.length > 0}
           <span
             class="cursor-pointer"

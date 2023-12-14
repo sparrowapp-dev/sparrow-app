@@ -235,7 +235,6 @@ const setRequestSave = async (
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.id === id) {
         elem.property.request.save[route] = data;
-        // progressiveTab.set(elem);
       }
       return elem;
     });
