@@ -66,6 +66,10 @@
     id: "",
     name: "",
   };
+
+  const saveType = {
+    SAVE_DESCRIPTION : "SAVE_DESCRIPTION"
+  }
   let tabName: string;
   let description: string;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
@@ -155,20 +159,20 @@
       let expectedRequest;
       if(!existingRequest){
         expectedRequest = {
-        method: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.method : componentData.property.request.method,
-        url: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.url :  componentData.property.request.url,
-        body: type === "SAVE_DESCRIPTION" ?  randomRequest.property.request.body :  componentData.property.request.body,
-        headers: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.headers : componentData.property.request.headers,
-        queryParams: type === "SAVE_DESCRIPTION" ? randomRequest.property.request.queryParams : componentData.property.request.queryParams,
+        method: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.method : componentData.property.request.method,
+        url: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.url :  componentData.property.request.url,
+        body: type === saveType.SAVE_DESCRIPTION ?  randomRequest.property.request.body :  componentData.property.request.body,
+        headers: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.headers : componentData.property.request.headers,
+        queryParams: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.queryParams : componentData.property.request.queryParams,
       };  
       }
       else{
         expectedRequest = {
-          method: type === "SAVE_DESCRIPTION" ? existingRequest?.request.method : componentData.property.request.method,
-          url: type === "SAVE_DESCRIPTION" ? existingRequest?.request.url :  componentData.property.request.url,
-          body: type === "SAVE_DESCRIPTION" ? existingRequest?.request.body : componentData.property.request.body,
-          headers: type === "SAVE_DESCRIPTION" ? existingRequest?.request.headers : componentData.property.request.headers,
-          queryParams: type === "SAVE_DESCRIPTION" ? existingRequest?.request.queryParams : componentData.property.request.queryParams,
+          method: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.method : componentData.property.request.method,
+          url: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.url :  componentData.property.request.url,
+          body: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.body : componentData.property.request.body,
+          headers: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.headers : componentData.property.request.headers,
+          queryParams: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.queryParams : componentData.property.request.queryParams,
         };
       }
       if (path[path.length - 1].type === ItemType.COLLECTION) {
@@ -185,7 +189,7 @@
         });
 
         if (res.isSuccessful) {
-          if(type !== "SAVE_DESCRIPTION"){
+          if(type !== saveType.SAVE_DESCRIPTION){
             notifications.success("API request saved");
           }
           collectionsMethods.addRequestOrFolderInCollection(
@@ -206,7 +210,7 @@
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
             collectionsMethods.updateTab(res.data.data.description, "description", _id);
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            if(type === "SAVE_DESCRIPTION"){
+            if(type === saveType.SAVE_DESCRIPTION){
               collectionsMethods.setRequestSave(true, "description", res.data.data.id);
             }
             else{
@@ -256,7 +260,7 @@
         });
 
         if (res.isSuccessful) {
-          if(type !== "SAVE_DESCRIPTION"){
+          if(type !== saveType.SAVE_DESCRIPTION){
             notifications.success("API request saved");
           }
           collectionsMethods.addRequestInFolder(
@@ -278,7 +282,7 @@
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
             collectionsMethods.updateTab(res.data.data.description, "description", _id)
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            if(type === "SAVE_DESCRIPTION"){
+            if(type === saveType.SAVE_DESCRIPTION){
               collectionsMethods.setRequestSave(true, "description", res.data.data.id);
             }
             else{
