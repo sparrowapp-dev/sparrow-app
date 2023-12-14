@@ -23,6 +23,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
     import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import requestIcon from "$lib/assets/create_request.svg";
 
   let expand: boolean = false;
   export let explorer;
@@ -347,7 +348,7 @@
       {/each}
       {#if showFolderAPIButtons}
         <div class="mt-2 mb-2 ms-0">
-          <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+          <img class="list-icons"  src={requestIcon} alt="+ API Request" on:click={handleAPIClick}>
         </div>
       {/if}
     </div>
@@ -379,7 +380,15 @@
     background-color: var(--border-color);
     color: var(--white-color);
   }
-
+  .list-icons{
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+  .list-icons:hover{
+    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
+      brightness(100%) contrast(100%);
+  }
   .navbar {
     width: 180px;
     height: auto;

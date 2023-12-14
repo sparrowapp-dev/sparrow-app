@@ -22,6 +22,8 @@
   let folderName;
 
   const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
+    collectionName = "";
+    folderName = "";
     componentData = event;
     description = event?.description;
     isSaveDescription = event?.property?.request?.state?.isSaveDescription;
@@ -142,9 +144,17 @@
       <div>
         <MethodButton method={componentData?.property.request.method} />
       </div>
-      <div>
-        <p class="mb-0" style="font-size:12px;">{componentData?.name}</p>
-        <span class="text-textColor" style="font-size:12px;">{collectionName || ''}</span><span class="text-textColor" style="font-size:12px;">{folderName || ''}</span>
+      <div style="width: calc(100% - 70px);">
+        <p class="ellipsis mb-0" style="font-size:12px;">{componentData?.name}</p>
+        {#if !collectionName}
+          <p class="ellipsis mb-0">
+            <span class="text-textColor" style="font-size:12px;">{'Unsaved'}</span>
+          </p>
+        {:else}
+        <p class="ellipsis mb-0">
+          <span class="text-textColor" style="font-size:12px;">{collectionName || ''}</span><span class="text-textColor" style="font-size:12px;">{folderName || ''}</span>
+        </p>
+        {/if}
       </div>
     </div>
     <div>
@@ -182,9 +192,9 @@
         bind:value={description}
         on:input={handleInputValue}
         disabled={isSaveDescription}
-        maxlength="300"
+        maxlength="200"
         rows="10"
-        class="p-1 api-description w-100 {isSaveDescription ? 'block-mode' : 'edit-mode'}"
+        class="p-1 api-description w-100"
       />
       {/if}
       
@@ -236,6 +246,11 @@
 {/if}
 
 <style>
+   .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .sidebar-right {
     width: 32px;
     border-left: 1px solid var(--border-color);
@@ -245,6 +260,7 @@
     width: 320px;
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
+    overflow: hidden;
   }
   .api-description {
     background-color: transparent;
@@ -252,6 +268,7 @@
     outline: none;
     border: 1px solid #85C2FF;
     caret-color: #85C2FF;
+    resize:none;
     
   }
   .description-field{

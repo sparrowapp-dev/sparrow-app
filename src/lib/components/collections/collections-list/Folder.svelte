@@ -25,6 +25,8 @@
     isFolderCreatedFirstTime,
   } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+  import folderIcon from "$lib/assets/create_folder.svg";
+  import requestIcon from "$lib/assets/create_request.svg";
 
   export let title: string;
   export let collection: any;
@@ -400,8 +402,8 @@
     {/each}
     {#if showFolderAPIButtons}
       <div class="mt-2 mb-2">
-        <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+        <img class="list-icons" src={folderIcon} alt="+ Folder" on:click={handleFolderClick}>
+        <img class="list-icons"  src={requestIcon} alt="+ API Request" on:click={handleAPIClick}>
       </div>
     {/if}
   </div>
@@ -411,7 +413,15 @@
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }
-
+  .list-icons{
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+  .list-icons:hover{
+    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
+      brightness(100%) contrast(100%);
+  }
   .threedot-icon-container {
     visibility: hidden;
     background-color: var(--border-color);
