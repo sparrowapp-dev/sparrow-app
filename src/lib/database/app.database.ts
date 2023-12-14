@@ -67,7 +67,7 @@ export class RxDB {
     if (this.rxdb && this.db) return { rxdb: this.rxdb, db: this.db };
     // create the Rx database
     this.rxdb = await createRxDatabase<DatabaseCollections>({
-      name: "mydatabase",
+      name: "mydatabase1",
       storage: getRxStorageDexie(),
       ignoreDuplicate: true,
     });

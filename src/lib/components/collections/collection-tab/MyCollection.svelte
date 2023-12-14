@@ -84,7 +84,7 @@
   });
   onDestroy(() => {});
   let autofocus = isCollectionNameVisibility;
-  let isClickOnEnter: boolean = false;
+
   let inputElement;
 
   onMount(() => {

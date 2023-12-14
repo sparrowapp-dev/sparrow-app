@@ -43,15 +43,15 @@
   const collection = _colllectionListViewModel.collection;
 
   collection.subscribe((value) => {
-    if(value){
-    const collectionArr = value.map(
-      (collectionDocument: CollectionDocument) => {
-        const collectionObj =
-          _colllectionListViewModel.getCollectionDocument(collectionDocument);
-        return collectionObj;
-      },
-    );
-    collections = collectionArr;
+    if (value) {
+      const collectionArr = value.map(
+        (collectionDocument: CollectionDocument) => {
+          const collectionObj =
+            _colllectionListViewModel.getCollectionDocument(collectionDocument);
+          return collectionObj;
+        },
+      );
+      collections = collectionArr;
     }
   });
 
@@ -63,6 +63,7 @@
   let email: string = "";
   let firstLetter, currentUser;
   const unsubscribeUser = user.subscribe((value) => {
+    console.log(value);
     if (value) {
       currentUser = value;
       if (value.personalWorkspaces) {
@@ -257,7 +258,7 @@
         workspaces={allworkspaces}
         {activeWorkspaceId}
         {handleDropdown}
-      ></GlobalSearchBarPopup>
+      />
     {/if}
   </div>
   {#if showGlobalSearchPopup}
@@ -266,14 +267,17 @@
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
-    ></div>
+    />
   {/if}
 
   <div
     class="d-flex align-items-center justify-content-center"
     style="margin-left: 45px;"
   >
-    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
+    <div
+      class="gap-{!isSearchVisible ? '0' : '3'} d-flex"
+      style="z-index: 99999;"
+    >
       <div class="col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -308,7 +312,9 @@
                   : "border: 2.2px solid #45494D;"
               } `}
             >
-              {firstLetter?.toUpperCase()}
+              {firstLetter?.toUpperCase() === undefined
+                ? email[0]?.toUpperCase()
+                : firstLetter?.toUpperCase()}
             </p>
           </button>
 
@@ -328,13 +334,15 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-                {firstLetter?.toUpperCase()}
+                {firstLetter?.toUpperCase() === undefined
+                  ? email[0]?.toUpperCase()
+                  : firstLetter?.toUpperCase()}
               </p>
               <h1
                 class="text-white fw-normal mt-3"
                 style="color: #999; font-family: Roboto; font-size: 12px;"
               >
-                {name}
+                {name === undefined ? email[0]?.toUpperCase() : name}
               </h1>
               <p
                 class="text-requestBodyColor fw-medium mb-0"
@@ -413,7 +421,7 @@
     background-color: red;
   }
   .profile-circle {
-    border-radius: 50%;
+    border-radius: 100%;
   }
   .profile-btn:hover {
     border: 2.2px solid #8a9299 !important;

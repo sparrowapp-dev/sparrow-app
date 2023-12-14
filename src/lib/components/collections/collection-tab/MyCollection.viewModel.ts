@@ -5,7 +5,7 @@ import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-import { notifications } from "$lib/utils/notifications";
+
 import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 import { v4 as uuidv4 } from "uuid";
 
@@ -62,10 +62,6 @@ export class MyCollectionViewModel {
       Promise.resolve().then(() => {
         moveNavigation("right");
       });
-    }
-
-    if (newCollectionName === "") {
-      notifications.error("Please enter text before save");
     }
   };
 

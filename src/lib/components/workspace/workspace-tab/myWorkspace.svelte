@@ -15,7 +15,7 @@
   let newWorkspaceName: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
+    if (event) {
       tabName = event?.name;
       componentData = event;
     }
@@ -36,6 +36,7 @@
   };
 
   let name: string = "";
+  let email: string = "";
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
@@ -45,6 +46,7 @@
       if (name) {
         firstLetter = name[0];
       }
+      email = value?.email;
     }
   });
 
@@ -146,10 +148,12 @@
             <p
               class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
             >
-              {firstLetter.toUpperCase()}
+              {firstLetter?.toUpperCase() === undefined
+                ? email[0]?.toUpperCase()
+                : firstLetter?.toUpperCase()}
             </p>
           </button>
-          <p class="mb-0">{name}</p>
+          <p class="mb-0">{name === undefined ? email : name}</p>
         </div>
       </div>
     </div>
