@@ -11,6 +11,8 @@
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
     import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+    import SaveIcon from "$lib/assets/save-desc.svg";
+    import EditIcon from "$lib/assets/edit-desc.svg";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -163,7 +165,9 @@
         on:click={()=>{
           collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
         }}
-        >Edit</p>
+        >
+        <img src={EditIcon} alt="">
+        Edit</p>
         {#if description?.length === 0}
         <small class="description-head">Click edit button to add description.</small>
         {:else}
@@ -184,6 +188,7 @@
             }
           }}
         >
+        <img src={SaveIcon} alt="save">
           Save Changes
         </p>
         <textarea
