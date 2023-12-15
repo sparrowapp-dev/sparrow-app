@@ -23,8 +23,6 @@
 
   let isOpen: boolean = false;
 
-  console.log($data);
-
   // let isActive: boolean;
 
   // $data?._data.map((item) => {
@@ -145,14 +143,6 @@
     style="font-size: 12px;"
     class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
     on:click={toggleDropdown}
-    on:click={() => {
-      console.log($data);
-      const updateData = $data.filter(
-        (item) => item._data._id !== activeWorkspaceId,
-      );
-      console.log(updateData);
-      $data.unshift(list);
-    }}
     id="workspace-dropdown"
     >Workspace
     <span class="px-2" class:dropdown-logo-active={isOpen}

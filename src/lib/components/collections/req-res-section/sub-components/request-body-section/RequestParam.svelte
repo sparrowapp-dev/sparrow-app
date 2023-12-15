@@ -83,7 +83,7 @@
   const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
     isHorizontalMode = value;
     stylePanes();
-    console.log("isHorizontalMode: ", isHorizontalMode);
+  
   });
 
   const rightPanelWidthSubscribe = rightPanelWidth.subscribe((value) => {
