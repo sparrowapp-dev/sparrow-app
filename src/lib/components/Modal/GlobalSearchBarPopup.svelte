@@ -50,7 +50,6 @@
   };
 
   function isFilteredWorkspaces(workspace: any) {
-    console.log(workspace);
     return workspace.name.toLowerCase().includes(searchData.toLowerCase());
   }
 </script>
@@ -361,7 +360,7 @@
   .api-name {
     font-size: 12px;
     font-weight: 400;
-    color: var(lightGray);
+    color: var(--lightGray);
   }
   .search-option-request {
     width: 100%;
@@ -383,11 +382,7 @@
     font-family: Roboto;
     font-size: 20px;
     font-weight: 600;
-    line-height: 30px;
-    letter-spacing: 0em;
-    text-align: center;
-
-    color: grey;
+    color:  var(--lightGray);
   }
   .request-btn:hover,
   .folder-btn:hover,
