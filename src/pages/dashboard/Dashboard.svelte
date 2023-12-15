@@ -75,12 +75,10 @@
       window.removeEventListener("resize", handleResize);
     };
   });
-
-
 </script>
 
 <div class="dashboard">
-  <HeaderDashboard {collectionsMethods}{activeSideBarTabMethods} />
+  <HeaderDashboard {collectionsMethods} {activeSideBarTabMethods} />
   <div class="dashboard-teams d-flex">
     {#await getActiveTab then selectedActiveSideBar}
       <Sidebar

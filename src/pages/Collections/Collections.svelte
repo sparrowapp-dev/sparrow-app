@@ -16,6 +16,9 @@
   import type { Writable } from "svelte/store";
   import MyCollection from "$lib/components/collections/collection-tab/MyCollection.svelte";
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
+  import { Motion } from "svelte-motion";
+  import { scaleMotionProps } from "$lib/utils/animations";
+  import { blur } from "svelte/transition";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -73,7 +76,6 @@
     });
   }
 
-
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -86,35 +88,42 @@
   const collapseCollectionPanel = collapsibleState;
 </script>
 
-<div class="d-flex collection">
-  <div class="collections__list">
-    <CollectionsList {collectionsMethods} />
-  </div>
-  <div
-    class="collections__tools bg-backgroundColor {$collapseCollectionPanel
-      ? 'sidebar-collapse'
-      : 'sidebar-expand'}"
-  >
-    <div class="tab__bar">
-      <TabBar tabList={$tabList} _tabId={$activeTab?.id} {collectionsMethods} />
+<Motion {...scaleMotionProps} let:motion>
+  <div class="d-flex collection" use:motion>
+    <div class="collections__list">
+      <CollectionsList {collectionsMethods} />
     </div>
-    <div class="tab__content d-flex">
-      <div class="w-100">
-        {#if $tabList && $tabList.length == 0}
-          <DefaultTabBar {collectionsMethods} />
-        {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-          <RequestResponse {activeTab} {collectionsMethods} />
-        {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-          <MyWorkspace {activeTab} {collectionsMethods} />
-        {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-          <MyFolder {collectionsMethods} {activeTab} />
-        {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-          <MyCollection {collectionsMethods} {activeTab} />
-        {/if}
+    <div
+      class="collections__tools bg-backgroundColor {$collapseCollectionPanel
+        ? 'sidebar-collapse'
+        : 'sidebar-expand'}"
+    >
+      <div class="tab__bar">
+        <TabBar
+          tabList={$tabList}
+          _tabId={$activeTab?.id}
+          {collectionsMethods}
+        />
+      </div>
+      <div class="tab__content d-flex">
+        <div class="w-100">
+          {#if $tabList && $tabList.length == 0}
+            <DefaultTabBar {collectionsMethods} />
+          {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
+            <RequestResponse {activeTab} {collectionsMethods} />
+          {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+            <MyWorkspace {activeTab} {collectionsMethods} />
+          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+            <MyFolder {collectionsMethods} {activeTab} />
+          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+            <MyCollection {collectionsMethods} {activeTab} />
+          {/if}
+        </div>
+        <!-- <SidebarRight /> -->
       </div>
     </div>
   </div>
-</div>
+</Motion>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>

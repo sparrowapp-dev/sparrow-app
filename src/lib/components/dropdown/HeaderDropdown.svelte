@@ -11,6 +11,7 @@
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { fade, slide } from "svelte/transition";
   export let activeSideBarTabMethods;
 
   export let data: any;
@@ -161,21 +162,27 @@
     </p>
     <hr class="m-0 p-0" />
     {#if $data}
-      {#each $data as list, index}
-        <!-- {#if index < workspaceLimit} -->
-        <p
-          class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-          style="cursor: pointer;overflow:auto"
-          on:click={() => {
-            isOpen = false;
-            onclick(list._id, list.name);
-            handleWorkspaceTab(list._id, list.name);
-          }}
-        >
-          {list.name}
-        </p>
-        <!-- {/if} -->
-      {/each}
+      {#if isOpen}
+        <div transition:slide={{ duration: 800 }}>
+          {#each $data as list, index}
+            <!-- {#if index < workspaceLimit} -->
+            <p
+              class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
+              style="cursor: pointer;overflow:auto"
+              on:click={() => {
+                isOpen = false;
+                onclick(list._id, list.name);
+              }}
+              on:click={() => {
+                handleWorkspaceTab(list._id, list.name);
+              }}
+            >
+              {list.name}
+            </p>
+            <!-- {/if} -->
+          {/each}
+        </div>
+      {/if}
     {/if}
     <hr class="m-0 p-0 mt-1" />
     <p

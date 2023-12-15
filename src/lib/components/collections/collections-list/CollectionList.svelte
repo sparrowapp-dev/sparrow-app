@@ -11,6 +11,7 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
+  import { fly, slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -23,7 +24,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -36,10 +37,8 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
-
- import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
  import { username } from "$lib/store/auth.store";
-
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -75,9 +74,8 @@
         );
         collection = collectionArr;
       }
-      if(searchData || selectedApiMethods.length>0){
+      if (searchData || selectedApiMethods.length > 0) {
         handleSearch();
-
       }
     },
   );
@@ -137,8 +135,9 @@
       }
     },
   );
-
+  let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
+    collectionUnderCreation = true;
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -157,7 +156,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-
+      collectionUnderCreation = false;
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -201,11 +200,10 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
-    if(!showfilterDropdown){
-      selectMethodsStore.update(()=>[]);
+    if (!showfilterDropdown) {
+      selectMethodsStore.update(() => []);
       handleSearch();
     }
-      
   };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -231,7 +229,7 @@
       filteredFile,
       collection,
     );
-  };
+  }
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
@@ -244,6 +242,7 @@
 
     if (windowWidth <= 800) {
       // Programmatically trigger a click on the button
+      //@ts-ignore
       document.querySelector("#doubleAngleButton").click();
       collapsibleState.set(true);
     } else {
@@ -292,152 +291,159 @@
   </div>
 {/if}
 
-<div
-  style="width:{collapsExpandToggle
-    ? '0px'
-    : '280px'};border-right: {collapsExpandToggle
-    ? '0px'
-    : '1px solid #313233'};overflow:auto"
-  class="sidebar d-flex flex-column bg-backgroundColor scroll"
->
+{#if !collapsExpandToggle}
   <div
-    class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
-  >
-    <p class="mb-0 text-whiteColor" style="font-size: 18px;">
-      {currentWorkspaceName || ""}
-    </p>
-    <button
-      class=" border-0 rounded px-2 angleButton"
-      on:click={setcollapsExpandToggle}
-      id="doubleAngleButton"
-    >
-      <img
-        src={doubleangleLeft}
-        alt=""
-        class="filter-green"
-        on:click={() => {
-          selectedView = "grid";
-        }}
-        class:view-active={selectedView === "grid"}
-      />
-    </button>
-  </div>
-  <div
-    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
+    style="width:{collapsExpandToggle
+      ? '0px'
+      : '280px'};border-right: {collapsExpandToggle
+      ? '0px'
+      : '1px solid #313233'};overflow:auto"
+    class="sidebar d-flex flex-column bg-backgroundColor scroll"
+    transition:slide={{ axis: "0 | 500" }}
   >
     <div
-      style="height:32px; width:180px "
-      class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
     >
-      <img src={searchIcon} alt="" />
-      <input
-        type="search"
-        style="  font-size: 12px;font-weight:500;"
-        class="inputField border-0 w-100 h-100 bg-blackColor"
-        placeholder="Search APIs in {currentWorkspaceName || ''}"
-        bind:value={searchData}
-        on:input={() => {
-          handleSearch();
-        }}
-      />
-    </div>
-
-    <div class="d-flex align-items-center justify-content-center">
+      <p class="mb-0 text-whiteColor" style="font-size: 18px;">
+        {currentWorkspaceName || ""}
+      </p>
       <button
-        id="filter-btn"
-        class="btn btn-blackColor d-flex align-items-center justify-content-center"
-        style="width: 32px; height:32px; position:relative"
-        on:click={handleFilterDropdown}
+        class=" border-0 rounded px-2 angleButton"
+        on:click={setcollapsExpandToggle}
+        id="doubleAngleButton"
       >
-        <img src={filterIcon} alt="" />
-        {#if showfilterDropdown}
-          <span
-            class="position-absolute"
-            style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
-          />
-        {/if}
+        <img
+          src={doubleangleLeft}
+          alt=""
+          class="filter-green"
+          on:click={() => {
+            selectedView = "grid";
+          }}
+          class:view-active={selectedView === "grid"}
+        />
       </button>
     </div>
-    <div>
-      <RequestDropdown {collectionsMethods} {handleCreateCollection} />
-    </div>
-  </div>
+    <div
+      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
+    >
+      <div
+        style="height:32px; width:180px "
+        class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+      >
+        <img src={searchIcon} alt="" />
+        <input
+          type="search"
+          style="  font-size: 12px;font-weight:500;"
+          class="inputField border-0 w-100 h-100 bg-blackColor"
+          placeholder="Search APIs in {currentWorkspaceName || ''}"
+          bind:value={searchData}
+          on:input={() => {
+            handleSearch();
+          }}
+        />
+      </div>
 
-  <div
-    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
-    style="overflow:auto;margin-top:5px;"
-  >
-    <div class="d-flex flex-column justify-content-center">
-      {#if showfilterDropdown}
-        <FilterDropDown {handleSearch} />
-      {/if}
-      {#if searchData.length > 0}
-        <div class="p-4 pt-0">
-          {#if filteredFile.length > 0}
-          
+      <div class="d-flex align-items-center justify-content-center">
+        <button
+          id="filter-btn"
+          class="btn btn-blackColor d-flex align-items-center justify-content-center"
+          style="width: 32px; height:32px; position:relative"
+          on:click={handleFilterDropdown}
+        >
+          <img src={filterIcon} alt="" />
+          {#if showfilterDropdown}
+            <span
+              class="position-absolute"
+              style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+            />
+          {/if}
+        </button>
+      </div>
+      <div>
+        <RequestDropdown
+          {collectionsMethods}
+          {handleCreateCollection}
+          {collectionUnderCreation}
+        />
+      </div>
+    </div>
+
+    <div
+      class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
+      style="overflow:auto;margin-top:5px;"
+    >
+      <div class="d-flex flex-column justify-content-center">
+        {#if showfilterDropdown}
+          <FilterDropDown {handleSearch} />
+        {/if}
+        {#if searchData.length > 0}
+          <div class="p-4 pt-0">
+            {#if filteredFile.length > 0}
+            
             {#each filteredFile as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                path={exp.path}
-                explorer={exp.tree}
-                {searchData}
-                folderDetails={exp.folderDetails}
-              />
-            {/each}
-          {/if}
-          {#if filteredFolder.length > 0}
-            {#each filteredFolder as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
-          {#if filteredCollection.length > 0}
-            {#each filteredCollection as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
-        </div>
-      {:else if selectedApiMethods.length > 0}
-        {#each filteredSelectedMethodsCollection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-          />
-        {/each}
-      {:else if collection.length > 0}
-        {#each collection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-          />
-        {/each}
-      {:else if collection && collection.length === 0}
-        <DefaultCollection {handleCreateCollection} {collectionsMethods} />
-      {/if}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  path={exp.path}
+                  explorer={exp.tree}
+                  {searchData}
+                  folderDetails={exp.folderDetails}
+                />
+              {/each}
+            {/if}
+            {#if filteredFolder.length > 0}
+              {#each filteredFolder as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+            {#if filteredCollection.length > 0}
+              {#each filteredCollection as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+          </div>
+        {:else if selectedApiMethods.length > 0}
+          {#each filteredSelectedMethodsCollection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+            />
+          {/each}
+        {:else if collection.length > 0}
+          {#each collection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+            />
+          {/each}
+        {:else if collection && collection.length === 0}
+          <DefaultCollection {handleCreateCollection} {collectionsMethods} />
+        {/if}
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style>
   .view-active {
