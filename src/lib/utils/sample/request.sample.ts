@@ -82,6 +82,8 @@ const generateSampleRequest = (id: string, date: string): NewTab => {
           responseSection: ResponseSection.RESPONSE,
           responseRaw: RequestDataType.TEXT,
           responseFormatter: ResponseFormatter.PRETTY,
+          additions: "",
+          isSaveDescription: true,
         },
         auth: {
           bearerToken: "",
@@ -103,6 +105,10 @@ const generateSampleRequest = (id: string, date: string): NewTab => {
           size: 0,
         },
         requestInProgress: false,
+        save: {
+          api: false,
+          description: false,
+        },
       },
     },
     save: false,

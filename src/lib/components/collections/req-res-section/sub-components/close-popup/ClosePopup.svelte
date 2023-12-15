@@ -31,13 +31,14 @@
       queryParams: componentData.property.request.queryParams,
     };
 
-    if (!folderId && !folderName) {
-      let res = await updateCollectionRequest(componentData.id, {
+    if (!folderId) {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         items: {
-          id: componentData.id,
+          id: _id,
           name: componentData.name,
+          description: componentData.description,
           type: ItemType.REQUEST,
           request: expectedRequest,
         },
@@ -45,7 +46,7 @@
       if (res.isSuccessful) {
         collectionsMethods.updateRequestOrFolderInCollection(
           collectionId,
-          componentData.id,
+          _id,
           res.data.data,
         );
         loader = false;
@@ -55,7 +56,7 @@
         loader = false;
       }
     } else {
-      let res = await updateCollectionRequest(componentData.id, {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
@@ -63,8 +64,9 @@
           name: folderName,
           type: ItemType.FOLDER,
           items: {
-            id: componentData.id,
+            id: _id,
             name: componentData.name,
+            description: componentData.description,
             type: ItemType.REQUEST,
             request: expectedRequest,
           },
@@ -74,7 +76,7 @@
         collectionsMethods.updateRequestInFolder(
           collectionId,
           folderId,
-          componentData.id,
+          _id,
           res.data.data,
         );
         loader = false;

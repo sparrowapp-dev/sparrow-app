@@ -10,7 +10,7 @@
         {method.toUpperCase()} 
     </div>
     <div class="api-name">
-        {name} 
+        <p class="ellipsis mb-0">{name}</p> 
     </div>
 </div>
 
@@ -19,10 +19,16 @@
         font-size: 12px;
         font-weight: 500;
         margin-right: 8px;
-        text-align: left;
+        text-align: left; 
     }
     .api-name{
         font-size: 12px;
         font-weight: 400;
+        width: calc(100% - 70px);
     }
+    .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
