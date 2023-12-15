@@ -134,7 +134,7 @@ const setRequestProperty = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request[route] = data;
-        elem.save = false;
+        elem.property.request.save.api = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -167,7 +167,6 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.state[route] = data;
-        elem.save = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -183,7 +182,7 @@ const setRequestAuth = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.auth[route] = data;
-        elem.save = false;
+        elem.property.request.save.api = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -199,7 +198,7 @@ const setRequestBody = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.body[route] = data;
-        elem.save = false;
+        elem.property.request.save.api = false;
         progressiveTab.set(elem);
       }
       return elem;
@@ -215,8 +214,27 @@ const setRequestBodyFormData = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.body.formdata[route] = data;
-        elem.save = false;
+        elem.property.request.save.api = false;
         progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
+
+/**
+ * Responsible to change tab save
+ */
+const setRequestSave = async (
+  data: boolean,
+  route: string,
+  id: string,
+): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.id === id) {
+        elem.property.request.save[route] = data;
       }
       return elem;
     });
@@ -237,8 +255,10 @@ const setTabProperty = async (
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.id === _id) {
         elem[route] = data;
-        if (route !== "save") {
-          elem.save = false;
+        if (route === "name") {
+          elem.property.request.save.api = false;
+        } else if (route === "description") {
+          elem.property.request.save.description = false;
         }
         progressiveTab.set(elem);
       }
@@ -276,5 +296,6 @@ const requestResponseStore = {
   removeTab,
   createTab,
   removeMultipleTabs,
+  setRequestSave,
 };
 export { requestResponseStore };

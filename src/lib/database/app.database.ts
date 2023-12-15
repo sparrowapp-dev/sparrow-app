@@ -79,6 +79,12 @@ export class RxDB {
       },
       tab: {
         schema: tabSchema,
+        migrationStrategies: {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
       collection: {
         schema: collectionSchema,

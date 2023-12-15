@@ -46,16 +46,22 @@
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
     updateRequestInFolder: _viewModel.updateRequestInFolder,
+    readRequestInFolder: _viewModel.readRequestInFolder,
     updateRequestInFolderCollection: _viewModel.updateRequestInFolderCollection,
 
     addRequestOrFolderInCollection: _viewModel.addRequestOrFolderInCollection,
     updateRequestOrFolderInCollection:
       _viewModel.updateRequestOrFolderInCollection,
+    readRequestOrFolderInCollection:
+      _viewModel.readRequestOrFolderInCollection,
+      readCollection:
+      _viewModel.readCollection,
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
-    removeMultipleTabs: _viewModel.removeMultipleTabs
+    removeMultipleTabs: _viewModel.removeMultipleTabs,
+    setRequestSave: _viewModel.setRequestSave
   };
 
   let stack = [];
@@ -106,7 +112,6 @@
           <MyCollection {collectionsMethods} {activeTab} />
         {/if}
       </div>
-      <!-- <SidebarRight /> -->
     </div>
   </div>
 </div>

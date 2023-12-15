@@ -108,6 +108,12 @@ const stateLiteral = {
     responseFormatter: {
       type: "string",
     },
+    additions: {
+      type: "string",
+    },
+    isSaveDescription: {
+      type: "boolean",
+    },
   },
 };
 const basicAuthLiteral = {
@@ -148,6 +154,18 @@ const authLiteral = {
   },
 };
 
+const saveLiteral = {
+  type: "object",
+  properties: {
+    api: {
+      type: "boolean",
+    },
+    description: {
+      type: "boolean",
+    },
+  },
+};
+
 const requestLiteral = {
   type: "object",
   properties: {
@@ -168,6 +186,7 @@ const requestLiteral = {
       type: "boolean",
       default: false,
     },
+    save: saveLiteral,
   },
 };
 
@@ -213,7 +232,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 0,
+  version: 1,
   properties: {
     tabId: {
       type: "string",
