@@ -146,61 +146,64 @@
       /></span
     ></button
   >
-  <div
-    style="display:none;overflow:auto;"
-    class="dropdown-data rounded px-2"
-    class:dropdown-active={isOpen}
-  >
-    <p
-      style="cursor:pointer;overflow:auto"
-      class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
-      on:click={() => {
-        isOpen = true;
-      }}
+  {#if isOpen}
+    <div
+      style="display:none;overflow:auto;"
+      class="dropdown-data rounded px-2"
+      class:dropdown-active={isOpen}
+      transition:slide={{ duration: 300 }}
     >
-      <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
-        style="height:20px;width:20px">+</span
+      <p
+        style="cursor:pointer;overflow:auto"
+        class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
+        on:click={() => {
+          isOpen = true;
+        }}
       >
-    </p>
-    <hr class="m-0 p-0" />
-    {#if $data}
-      {#if isOpen}
-        <div transition:slide={{ duration: 800 }}>
-          {#each $data as list, index}
-            <!-- {#if index < workspaceLimit} -->
-            <p
-              class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-              style="cursor: pointer;overflow:auto"
-              on:click={() => {
-                isOpen = false;
-                onclick(list._id, list.name);
-              }}
-              on:click={() => {
-                handleWorkspaceTab(list._id, list.name);
-              }}
-            >
-              {list.name}
-            </p>
-            <!-- {/if} -->
-          {/each}
-        </div>
+        <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
+          style="height:20px;width:20px">+</span
+        >
+      </p>
+      <hr class="m-0 p-0" />
+      {#if $data}
+        {#if isOpen}
+          <div>
+            {#each $data as list, index}
+              <!-- {#if index < workspaceLimit} -->
+              <p
+                class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
+                style="cursor: pointer;overflow:auto"
+                on:click={() => {
+                  isOpen = false;
+                  onclick(list._id, list.name);
+                }}
+                on:click={() => {
+                  handleWorkspaceTab(list._id, list.name);
+                }}
+              >
+                {list.name}
+              </p>
+              <!-- {/if} -->
+            {/each}
+          </div>
+        {/if}
       {/if}
-    {/if}
-    <hr class="m-0 p-0 mt-1" />
-    <p
-      style="cursor:pointer"
-      class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
-      on:click={() => {
-        navigate("/dashboard/workspaces");
-        activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
-      }}
-      on:click={() => {
-        isOpen = true;
-      }}
-    >
-      View All Workspaces
-    </p>
-  </div>
+      <hr class="m-0 p-0 mt-1" />
+      <p
+        style="cursor:pointer"
+        class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
+        on:click={() => {
+          navigate("/dashboard/workspaces");
+          activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
+        }}
+        on:click={() => {
+          isOpen = true;
+        }}
+      >
+        View All Workspaces
+      </p>
+    </div>
+  {/if}
 </div>
 
 <style>

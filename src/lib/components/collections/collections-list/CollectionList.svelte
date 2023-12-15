@@ -298,11 +298,10 @@
   <div
     style="width:{collapsExpandToggle
       ? '0px'
-      : '280px'};border-right: {collapsExpandToggle
+      : '280px'}; border-right: {collapsExpandToggle
       ? '0px'
       : '1px solid #313233'};overflow:auto"
     class="sidebar d-flex flex-column bg-backgroundColor scroll"
-    transition:slide={{ axis: "0 | 500" }}
   >
     <div
       class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
