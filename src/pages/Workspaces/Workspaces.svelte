@@ -3,16 +3,20 @@
 
   import WorkspaceContent from "./WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
+  import { scaleMotionProps } from "$lib/utils/animations";
+  import { Motion } from "svelte-motion";
   export let data: any;
   export let tabList: any;
 
   export let collectionsMethods: CollectionsMethods;
 </script>
 
-<div class="workspace bg-backgroundColor">
-  <WorkspaceList {data} />
-  <WorkspaceContent {data} {collectionsMethods} />
-</div>
+<Motion {...scaleMotionProps} let:motion>
+  <div class="workspace bg-backgroundColor" use:motion>
+    <WorkspaceList {data} />
+    <WorkspaceContent {data} {collectionsMethods} />
+  </div>
+</Motion>
 
 <style>
   .workspace {

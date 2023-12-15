@@ -28,6 +28,7 @@
     "rxjs": "^7.8.1",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-jsoneditor": "^0.18.9",
+    "svelte-motion": "^0.11.5",
     "svelte-navigator": "^3.2.2",
     "svelte-sortablejs": "^0.2.0",
     "svelte-split-pane": "^0.1.2",

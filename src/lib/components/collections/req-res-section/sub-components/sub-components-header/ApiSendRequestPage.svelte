@@ -43,11 +43,11 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-    urlText = event?.property?.request?.url;
-    method = event?.property?.request?.method;
-    disabledSend = event?.property?.request?.requestInProgress;
-    request = event?.property?.request;
+    if (event) {
+      urlText = event?.property?.request?.url;
+      method = event?.property?.request?.method;
+      disabledSend = event?.property?.request?.requestInProgress;
+      request = event?.property?.request;
     }
   });
 
@@ -180,6 +180,7 @@
       document.querySelector("#barIcon").click();
       isHorizontal.set(true);
     } else {
+      document.querySelector("#lineIcon").click();
       isHorizontal.set(false);
     }
   };
@@ -279,6 +280,7 @@
           class:view-active={selectedView === "vertical"}
           src={tableColumnIcon}
           alt=""
+          id="lineIcon"
         />
       </span>
       <span style="cursor:pointer;">

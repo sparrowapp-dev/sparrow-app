@@ -2,6 +2,7 @@
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
+  import { slide } from "svelte/transition";
 
   export let data: Array<{
     name: string;
@@ -33,7 +34,9 @@
   }
 
   function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(`${dropdownId}-dropdown-${title}`);
+    const dropdownElement = document.getElementById(
+      `${dropdownId}-dropdown-${title}`,
+    );
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
     }

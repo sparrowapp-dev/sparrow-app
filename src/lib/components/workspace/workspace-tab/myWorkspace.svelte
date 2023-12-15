@@ -139,7 +139,7 @@
             <p
               class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
             >
-              {firstLetter.toUpperCase()}
+              {firstLetter?.toUpperCase()}
             </p>
           </button>
           <p class="mb-0">{name}</p>
@@ -150,7 +150,7 @@
       <p><span class="me-1 fs-6 text-plusButton">{0}</span>API REQUESTS</p>
       <p>
         <span class="me-1 fs-6 text-plusButton"
-          >{componentData.property.workspace.collectionCount}</span
+          >{componentData?.property?.workspace?.collectionCount}</span
         >COLLECTION
       </p>
     </div>
