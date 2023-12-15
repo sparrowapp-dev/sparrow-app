@@ -197,7 +197,7 @@
         bind:value={description}
         on:input={handleInputValue}
         disabled={isSaveDescription}
-        maxlength="200"
+        maxlength="1024"
         rows="10"
         class="p-1 api-description w-100"
       />
