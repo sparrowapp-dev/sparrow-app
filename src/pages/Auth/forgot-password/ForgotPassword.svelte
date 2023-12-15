@@ -6,6 +6,7 @@
   import { handleForgotPasswordValidation } from "./forgot-password";
   import { isLoading, username } from "$lib/store/auth.store";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import { Link } from "svelte-navigator";
 
   let validationErrors: any = {};
 
@@ -73,7 +74,7 @@
           <div
             class="d-flex align-items-center justify-content-start mb-3 gap-3"
           >
-            <a href="/"><img src={angleLeft} alt="" class="mb-0" /></a>
+            <Link to="/"><img src={angleLeft} alt="" class="mb-0" /></Link>
             <p class="text-whiteColor fs-5 mb-0">Change Password</p>
           </div>
           <p class="text-lightGray">
