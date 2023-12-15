@@ -11,7 +11,7 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
-  import { fly, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -38,20 +38,21 @@
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
- import { username } from "$lib/store/auth.store";
+  import { username } from "$lib/store/auth.store";
+  import { notifications } from "$lib/utils/notifications";
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
-  let userName:string="";
+  let userName: string = "";
 
-  const usernameUnsubscribe=username.subscribe((value)=>{
-    if(value){
-      userName=value;
+  const usernameUnsubscribe = username.subscribe((value) => {
+    if (value) {
+      userName = value;
     }
-  })
+  });
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
@@ -189,6 +190,7 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
+      notifications.success("New Collection Created");
       return;
     }
     return;
@@ -259,6 +261,7 @@
     collectionSubscribe.unsubscribe();
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    usernameUnsubscribe();
   });
 
   let selectedView: string = "grid";
@@ -379,8 +382,7 @@
         {#if searchData.length > 0}
           <div class="p-4 pt-0">
             {#if filteredFile.length > 0}
-            
-            {#each filteredFile as exp}
+              {#each filteredFile as exp}
                 <SearchTree
                   editable={true}
                   collectionId={exp.collectionId}

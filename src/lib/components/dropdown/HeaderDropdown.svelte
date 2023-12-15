@@ -11,6 +11,7 @@
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { notifications } from "$lib/utils/notifications";
   import { fade, slide } from "svelte/transition";
   export let activeSideBarTabMethods;
 
@@ -79,7 +80,7 @@
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data_id) {
+          if (item._data._id === response.data.data._id) {
             // totalCollection = item?._data?.collections?.length;
             totalCollection = 0;
           } else {
@@ -89,11 +90,11 @@
       });
 
       let path: Path = {
-        workspaceId: response.data.data_id,
+        workspaceId: response.data.data._id,
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data_id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
@@ -104,6 +105,7 @@
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
+      notifications.success("New Workspace Created");
     }
   };
 

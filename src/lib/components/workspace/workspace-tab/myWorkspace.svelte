@@ -15,7 +15,7 @@
   let newWorkspaceName: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
+    if (event) {
       tabName = event?.name;
       componentData = event;
     }
@@ -26,7 +26,7 @@
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
   };
 
-  const modifyWorkspaceData = async () => {
+  const onRenameBlur = async () => {
     await _viewModel.modifyWorkspace(
       componentData,
       collectionsMethods,
@@ -36,6 +36,7 @@
   };
 
   let name: string = "";
+  let email: string = "";
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
@@ -45,6 +46,7 @@
       if (name) {
         firstLetter = name[0];
       }
+      email = value?.email;
     }
   });
 
@@ -67,6 +69,15 @@
       inputElement.select();
     }
   });
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldWorkspace",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -78,23 +89,19 @@
       <input
         type="text"
         value={tabName}
+        id="renameInputFieldWorkspace"
         {autofocus}
         class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
         on:input={(event) => {
           handleWorkspaceInput(event);
         }}
-        on:keydown={(event) => {
-          if (event.key == "Enter") {
-            modifyWorkspaceData();
-          }
-        }}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}
       />
 
       <Tooltip>
-        <button class="btn btn-primary rounded border-0 text-align-right py-1"
-          >Invite</button
-        >
+        <button class="btn btn-primary rounded border-0 py-1">Invite</button>
       </Tooltip>
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
@@ -139,10 +146,12 @@
             <p
               class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
             >
-              {firstLetter?.toUpperCase()}
+              {firstLetter?.toUpperCase() === undefined
+                ? email[0]?.toUpperCase()
+                : firstLetter?.toUpperCase()}
             </p>
           </button>
-          <p class="mb-0">{name}</p>
+          <p class="mb-0">{name === undefined ? email : name}</p>
         </div>
       </div>
     </div>
@@ -164,6 +173,10 @@
   }
   .my-workspace {
     padding: 20px;
+  }
+
+  .btn-primary {
+    z-index: 5;
   }
 
   .profile-circle {

@@ -1,22 +1,63 @@
 <script lang="ts">
   export let api: any;
+  export let data: any;
+  export let collectionList;
+
   let apiClass = "api-yellow";
-  if (api.type === "DEL") apiClass = "red-api";
-  if (api.type === "GET") apiClass = "green-api";
-  if (api.type === "POST") apiClass = "yellow-api";
-  if (api.type === "PUT") apiClass = "blue-api";
-  if (api.type === "ARC") apiClass = "grey-api";
+  if (api?.property?.request?.method === "DEL") apiClass = "red-api";
+  if (api?.property?.request?.method === "GET") apiClass = "green-api";
+  if (api?.property?.request?.method === "POST") apiClass = "yellow-api";
+  if (api?.property?.request?.method === "PUT") apiClass = "blue-api";
+  if (api?.property?.request?.method === "ARC") apiClass = "grey-api";
 </script>
 
 <div class="d-flex flex-start pb-2" style=" overflow: auto;">
   <div
     class="api-type rounded d-flex align-items-center justify-content-center"
   >
-    <span class={apiClass}>{api.type}</span>
+    <span class={apiClass}>{api?.property?.request?.method}</span>
   </div>
-  <div class="api-desc">
-    <p class="mb-0 api-type__title">{api.title}</p>
-    <p class="mb-0 api-type__endpoint">{api.endpoint}</p>
+  <div class="api-desc" style="font-size: 12px;">
+    <p class="mb-0 api-type__title text-whiteColor">{api.name}</p>
+    <div class="d-flex">
+      {#if $data}
+        {#each $data.slice().reverse() as list}
+          {#if list}
+            {#if list?._id === api?.path?.workspaceId}
+              <p class="mb-0 api-type__endpoint">
+                {list.name}
+              </p>
+            {/if}
+          {/if}
+        {/each}
+      {/if}
+      <p class="mb-0 api-type__endpoint">:</p>
+
+      {#if api?.path?.collectionId}
+        <p class="mb-0 api-type__endpoint">/</p>
+      {/if}
+
+      {#if collectionList}
+        {#each collectionList.slice().reverse() as list}
+          {#if list}
+            {#if list?.id === api?.path?.collectionId}
+              <p class="mb-0 api-type__endpoint">{list.name}</p>
+              {#if api.path.folderId}
+                <p class="mb-0 api-type__endpoint">/</p>
+              {/if}
+
+              {#each list.items as item}
+                {#if list.items && item}
+                  {#if item.id === api.path.folderId}
+                    <p class="mb-0 api-type__endpoint">{item.name}</p>
+                  {/if}
+                {/if}
+              {/each}
+            {/if}
+          {/if}
+        {/each}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -41,13 +82,14 @@
   .api-type__endpoint {
     font-family: Roboto Mono;
     font-size: 12px;
-    color: #999999;
+    font-weight: 400;
+    color: var(--recentApiText);
   }
   .api-type__title,
   .api-type__endpoint {
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    /* text-overflow: ellipsis; */
   }
   .red-api {
     color: #ff7878;

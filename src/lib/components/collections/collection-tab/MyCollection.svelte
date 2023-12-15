@@ -43,7 +43,7 @@
     );
   };
 
-  const modifyCollectionData = async () => {
+  const onRenameBlur = async () => {
     await _myColllectionViewModel.modifyCollection(
       componentData,
       newCollectionName,
@@ -84,7 +84,7 @@
   });
   onDestroy(() => {});
   let autofocus = isCollectionNameVisibility;
-  let isClickOnEnter: boolean = false;
+
   let inputElement;
 
   onMount(() => {
@@ -93,6 +93,15 @@
       inputElement.select();
     }
   });
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldCollection",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -105,17 +114,14 @@
         type="text"
         required
         {autofocus}
+        id="renameInputFieldCollection"
         value={tabName}
         class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
         on:input={(event) => {
           handleCollectionInput(event);
         }}
-        on:keydown={(event) => {
-          if (event.key === "Enter") {
-            isClickOnEnter = true;
-            modifyCollectionData();
-          }
-        }}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}
       />
 
