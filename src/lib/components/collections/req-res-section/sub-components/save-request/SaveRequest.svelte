@@ -37,6 +37,7 @@
   export let onClick;
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
+  export let type : "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
 
 
 
@@ -65,12 +66,18 @@
     id: "",
     name: "",
   };
+
+  const saveType = {
+    SAVE_DESCRIPTION : "SAVE_DESCRIPTION"
+  }
   let tabName: string;
   let description: string;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
     tabName = componentData.name;
+    description = componentData.description;
   } else {
     tabName = componentData.name + " Copy";
+    description = componentData.description + " Copy";
   }
   let latestRoute: {
     id: string;
@@ -141,13 +148,26 @@
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
+      
+      let existingRequest;
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id, _id);
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, _id);
+      }
+
+      const randomRequest: NewTab = generateSampleRequest("id", new Date().toString())
+      
+      const request = !existingRequest ? randomRequest.property.request : existingRequest.request;
       const expectedRequest = {
-        method: componentData.property.request.method,
-        url: componentData.property.request.url,
-        body: componentData.property.request.body,
-        headers: componentData.property.request.headers,
-        queryParams: componentData.property.request.queryParams,
-      };
+        method: type === saveType.SAVE_DESCRIPTION ? request.method : componentData.property.request.method,
+        url: type === saveType.SAVE_DESCRIPTION ? request.url :  componentData.property.request.url,
+        body: type === saveType.SAVE_DESCRIPTION ?  request.body :  componentData.property.request.body,
+        headers: type === saveType.SAVE_DESCRIPTION ? request.headers : componentData.property.request.headers,
+        queryParams: type === saveType.SAVE_DESCRIPTION ? request.queryParams : componentData.property.request.queryParams,
+      };  
+      
+    
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
         const res = await insertCollectionRequest({
@@ -162,7 +182,9 @@
         });
 
         if (res.isSuccessful) {
-          notifications.success("API request saved");
+          if(type !== saveType.SAVE_DESCRIPTION){
+            notifications.success("API request saved");
+          }
           collectionsMethods.addRequestOrFolderInCollection(
             path[path.length - 1].id,
             res.data.data,
@@ -179,16 +201,25 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.description, "description", _id);
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            collectionsMethods.updateTab(true, "save", res.data.data.id);
+            if(type === saveType.SAVE_DESCRIPTION){
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
+            else{
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
               new Date().toString(),
             );
             sampleRequest.name = res.data.data.name;
+            sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
-            sampleRequest.save = true;
+            sampleRequest.property.request.save.api = true;
+            sampleRequest.property.request.save.description = true;
             sampleRequest.property.request.url = res.data.data.request.url;
             sampleRequest.property.request.method =
               res.data.data.request.method;
@@ -222,6 +253,9 @@
         });
 
         if (res.isSuccessful) {
+          if(type !== saveType.SAVE_DESCRIPTION){
+            notifications.success("API request saved");
+          }
           collectionsMethods.addRequestInFolder(
             path[0].id,
             path[path.length - 1].id,
@@ -239,16 +273,25 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
+            collectionsMethods.updateTab(res.data.data.description, "description", _id)
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            collectionsMethods.updateTab(true, "save", res.data.data.id);
+            if(type === saveType.SAVE_DESCRIPTION){
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
+            else{
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
+              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            }
           } else {
             let sampleRequest = generateSampleRequest(
               res.data.data.id,
               new Date().toString(),
             );
             sampleRequest.name = res.data.data.name;
+            sampleRequest.description = res.data.data.description;
             sampleRequest.path = expectedPath;
-            sampleRequest.save = true;
+            sampleRequest.property.request.save.api = true;
+            sampleRequest.property.request.save.description = true;
             sampleRequest.property.request.url = res.data.data.request.url;
             sampleRequest.property.request.method =
               res.data.data.request.method;
@@ -307,7 +350,11 @@
       latestRoute = {
         id: res.data.data._id,
       };
-      collectionsMethods.addCollection(res.data.data);
+      let storage = res.data.data;
+      let _id = res.data.data._id;
+      delete storage._id;
+      storage.id = _id;
+      collectionsMethods.addCollection(storage);
     } else {
       createDirectoryLoader = false;
     }
@@ -349,68 +396,73 @@
         }}><img src={crossAsset} alt="" /></button
       >
     </div>
-    <div class="url d-flex align-items-center pb-3" style="height:20px;">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      {#if path.length > 0}
-        <span
-          class="d-flex align-items-center justify-content-center cursor-pointer"
-          style="height:24px; width:24px;"
-          on:click={navigateToLastRoute}
-          ><img src={leftArrowAsset} alt="" /></span
-        >
-      {/if}
-      {#if workspace}
-        <span
-          on:click={navigateToWorkspace}
-          class="{path.length === 0
-            ? 'text-whiteColor'
-            : ''} cursor-pointer px-1"
-          style="font-size: 12px;"
-        >
-          <img
-            style="height:10.67px; width: 10.67px;"
-            src={workspaceAsset}
-            alt=""
-          />
-          {workspace.name}</span
-        >
-      {/if}
-      {#if path.length > 0}
-        {#each path as elem, index}
-          <span>/</span>
+    <div class="url d-flex align-items-center pb-3">
+      <p class="ellipsis mb-0">
+        {#if path.length > 0}
           <span
-            on:click={() => {
-              navigateToDirectory(elem);
-            }}
-            class="{path.length - 1 === index
+            class="cursor-pointer"
+            style="height:24px; width:24px;"
+            on:click={navigateToLastRoute}
+            ><img src={leftArrowAsset} alt="" /></span
+          >
+        {/if}
+        {#if workspace}
+          <span
+            on:click={navigateToWorkspace}
+            class="{path.length === 0
               ? 'text-whiteColor'
               : ''} cursor-pointer px-1"
             style="font-size: 12px;"
           >
-            {#if elem.type === ItemType.COLLECTION}
-              <img
-                src={collectionAsset}
-                style="height:10.67px; width: 10.67px;"
-                alt=""
-              />
-            {:else if elem.type === ItemType.FOLDER}
-              <img
-                src={folderAsset}
-                style="height:10.67px; width: 10.67px;"
-                alt=""
-              />
-            {/if}
-            {elem.name}</span
+            <img
+              style="height:10.67px; width: 10.67px;"
+              src={workspaceAsset}
+              alt=""
+            />
+            {workspace.name}</span
           >
-        {/each}
-      {/if}
+        {/if}
+        {#if path.length > 0}
+          {#each path as elem, index}
+            <span>/</span>
+            <span
+              on:click={() => {
+                navigateToDirectory(elem);
+              }}
+              class="{path.length - 1 === index
+                ? 'text-whiteColor'
+                : ''} cursor-pointer px-1"
+              style="font-size: 12px;"
+            >
+              {#if elem.type === ItemType.COLLECTION}
+                <img
+                  src={collectionAsset}
+                  style="height:10.67px; width: 10.67px;"
+                  alt=""
+                />
+              {:else if elem.type === ItemType.FOLDER}
+                <img
+                  src={folderAsset}
+                  style="height:10.67px; width: 10.67px;"
+                  alt=""
+                />
+              {/if}
+              {elem.name}</span
+            >
+          {/each}
+        {/if}
+      </p>
     </div>
     <div class="row">
       <div class="col-6" style="border-right: 1px solid var(--border-color);">
         <div style="height: 460px; overflow:auto;">
+          <!-- 
+            --
+            shows current directory 
+          --
+          -->
           {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Collection: </small>
               <small class="text-whiteColor">
                 {path[path.length - 1].name}</small
@@ -420,14 +472,14 @@
               >Save your request in this collection or any of its folders.</small
             >
           {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Folder: </small>
               <small class="text-whiteColor">
                 {path[path.length - 1].name}</small
               >
             </p>
           {:else}
-            <p class="mb-0">
+            <p class="mb-0 ellipsis">
               <small class="save-text-clr">Workspace: </small>
               {#if workspace}
                 <small class="text-whiteColor">
@@ -442,6 +494,11 @@
           {/if}
           <p />
           {#if directory.length > 0}
+          <!-- 
+            --
+            create collection 
+          --
+          -->
             {#if path.length === 0 && createCollectionNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
@@ -485,6 +542,11 @@
                   {/if}
                 </div>
               </div>
+              <!-- 
+            --
+            create folder 
+          --
+          -->
             {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
               <div class="d-flex justify-content-between">
                 <div class="w-100 pe-3">
@@ -530,6 +592,11 @@
               </div>
             {/if}
             {#each directory as col}
+            <!-- 
+            --
+            render collection, folder and requests 
+          --
+          -->
               {#if col.type === ItemType.FOLDER}
                 <div
                   on:click={() => {
@@ -746,9 +813,10 @@
         <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
         <div class="pb-1">
           <textarea
-            style="width: 100%; font-size: 12px;"
+            style="width: 100%; font-size: 12px; resize:none;"
             class="p-1 bg-black rounded border-0"
-            rows="3"
+            rows="5"
+            maxlength="200"
             placeholder="Give a description to help people know about this request."
             bind:value={description}
           />
@@ -759,40 +827,45 @@
             Select a Collection or Folder.
           </p>
         {:else}
+        <!-- 
+            --
+            current directory path 
+          --
+          -->
           <div class="url d-flex align-items-center pb-3">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            {#if workspace}
-              <span class="px-1" style="font-size: 12px;">
-                <img
-                  style="height:10.67px; width: 10.67px;"
-                  src={workspaceAsset}
-                  alt=""
-                />
-                {workspace.name}</span
-              >
-            {/if}
-            {#if path.length > 0}
-              {#each path as elem}
-                <span>/</span>
+            <p class="ellipsis mb-0">
+              {#if workspace}
                 <span class="px-1" style="font-size: 12px;">
-                  {#if elem.type === ItemType.COLLECTION}
-                    <img
-                      src={collectionAsset}
-                      style="height:10.67px; width: 10.67px;"
-                      alt=""
-                    />
-                  {:else if elem.type === ItemType.FOLDER}
-                    <img
-                      src={folderAsset}
-                      style="height:10.67px; width: 10.67px;"
-                      alt=""
-                    />
-                  {/if}
-                  {elem.name}</span
+                  <img
+                    style="height:10.67px; width: 10.67px;"
+                    src={workspaceAsset}
+                    alt=""
+                  />
+                  {workspace.name}</span
                 >
-              {/each}
-            {/if}
+              {/if}
+              {#if path.length > 0}
+                {#each path as elem}
+                  <span>/</span>
+                  <span class="px-1" style="font-size: 12px;">
+                    {#if elem.type === ItemType.COLLECTION}
+                      <img
+                        src={collectionAsset}
+                        style="height:10.67px; width: 10.67px;"
+                        alt=""
+                      />
+                    {:else if elem.type === ItemType.FOLDER}
+                      <img
+                        src={folderAsset}
+                        style="height:10.67px; width: 10.67px;"
+                        alt=""
+                      />
+                    {/if}
+                    {elem.name}</span
+                  >
+                {/each}
+              {/if}
+            </p>
           </div>
         {/if}
       </div>
@@ -850,6 +923,7 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 9;
+    backdrop-filter: blur(3px);
   }
   .save-request {
     position: fixed;
@@ -858,9 +932,11 @@
     transform: translateX(-50%) translateY(-50%);
     padding: 24px;
     background-color: var(--background-color);
-    width: 960px;
+    width: 100%;
+    max-width: 960px;
     height: 640px;
     z-index: 10;
+    border-radius: 8px;
   }
   .cursor-pointer {
     cursor: pointer;
@@ -921,5 +997,10 @@
   .instruction-btn {
     width: 24px;
     height: 24px;
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
