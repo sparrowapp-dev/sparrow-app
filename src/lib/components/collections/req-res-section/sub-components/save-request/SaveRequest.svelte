@@ -99,7 +99,7 @@
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
-      if(value){
+      if (value) {
         collection = value;
         directory = JSON.parse(JSON.stringify(collection));
         if (latestRoute.id) navigateToDirectory(latestRoute);
@@ -354,6 +354,7 @@
       delete storage._id;
       storage.id = _id;
       collectionsMethods.addCollection(storage);
+      notifications.success("New Collection Created");
     } else {
       createDirectoryLoader = false;
     }
@@ -499,7 +500,7 @@
           {/if}
           <p />
           {#if directory.length > 0}
-          <!-- 
+            <!-- 
             --
             create collection 
           --
@@ -597,7 +598,7 @@
               </div>
             {/if}
             {#each directory as col}
-            <!-- 
+              <!-- 
             --
             render collection, folder and requests 
           --
@@ -842,7 +843,7 @@
             Select a Collection or Folder.
           </p>
         {:else}
-        <!-- 
+          <!-- 
             --
             current directory path 
           --

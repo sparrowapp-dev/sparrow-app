@@ -15,8 +15,7 @@
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { Writable } from "svelte/store";
+
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -25,14 +24,6 @@
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
   const _viewModels = new CollectionsViewModel();
-
-  const tabList: Writable<NewTab[]> = _viewModels.tabs;
-  let stack = [];
-  if ($tabList) {
-    $tabList.map((tab) => {
-      stack.push(tab.name);
-    });
-  }
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
@@ -93,13 +84,7 @@
     {/await}
     <section class="w-100">
       <Route path="/collections/*"><CollectionsHome /></Route>
-      <Route path="/workspaces/*"
-        ><Workspaces
-          data={workspaces}
-          {collectionsMethods}
-          tabList:{$tabList}
-        /></Route
-      >
+      <Route path="/workspaces/*"><Workspaces data={workspaces} /></Route>
       <Route path="/mock/*"><Mock /></Route>
       <Route path="/environment/*"><Enviornment /></Route>
       <Route path="/teams/*"><Teams /></Route>
