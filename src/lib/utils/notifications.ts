@@ -23,11 +23,9 @@ const success = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "success",
     description: message,
-    title: obj?.title ?? "Success",
-    duration: obj?.duration ?? 3000,
+    duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-right",
-    showProgress: obj?.showProgress ?? true,
   });
 };
 
@@ -35,11 +33,9 @@ const error = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "error",
     description: message,
-    title: obj?.title ?? "Error",
-    duration: obj?.duration ?? 3000,
+    duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "bottom-center",
-    showProgress: obj?.showProgress ?? true,
   });
 };
 
@@ -47,11 +43,9 @@ const info = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "info",
     description: message,
-    title: obj?.title ?? "Info",
-    duration: obj?.duration ?? 3000,
+    duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "top-right",
-    showProgress: obj?.showProgress ?? true,
   });
 };
 
@@ -59,11 +53,9 @@ const warning = (message: string, obj?: notifySetting) => {
   toasts.add({
     type: "warning",
     description: message,
-    title: obj?.title ?? "Warning",
-    duration: obj?.duration ?? 3000,
+    duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
     placement: obj?.position ?? "top-right",
-    showProgress: obj?.showProgress ?? true,
   });
 };
 

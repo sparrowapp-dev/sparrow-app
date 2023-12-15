@@ -164,6 +164,7 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 9;
+    backdrop-filter: blur(3px);
   }
   .close-request {
     position: fixed;
