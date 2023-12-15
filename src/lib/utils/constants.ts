@@ -4,7 +4,7 @@ const constants = {
   RXDB_DB_NAME: "sparrow-db",
   AUTH_TOKEN: "AUTH_TOKEN",
   REF_TOKEN: "REF_TOKEN",
-  WORKSPACE_LIMIT: 5,
+  WORKSPACE_LIMIT: 10,
 };
 
 export default constants;

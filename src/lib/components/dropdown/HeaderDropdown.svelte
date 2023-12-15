@@ -12,15 +12,25 @@
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
-  import { fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
+  import checkIcon from "$lib/assets/check.svg";
+  export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
-
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
   const _viewModel = new HeaderDashboardViewModel();
 
   let isOpen: boolean = false;
+
+  console.log($data);
+
+  // let isActive: boolean;
+
+  // $data?._data.map((item) => {
+  //   if (item.isActiveWorkspace === true) {
+  //   }
+  // });
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
@@ -135,6 +145,14 @@
     style="font-size: 12px;"
     class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
     on:click={toggleDropdown}
+    on:click={() => {
+      console.log($data);
+      const updateData = $data.filter(
+        (item) => item._data._id !== activeWorkspaceId,
+      );
+      console.log(updateData);
+      $data.unshift(list);
+    }}
     id="workspace-dropdown"
     >Workspace
     <span class="px-2" class:dropdown-logo-active={isOpen}
@@ -162,26 +180,36 @@
         style="height:20px;width:20px">+</span
       >
     </p>
-    <hr class="m-0 p-0" />
+    <hr class="m-0 p-0 mb-1" />
     {#if $data}
       {#if isOpen}
-        <div transition:slide={{ duration: 800 }}>
-          {#each $data as list, index}
-            <!-- {#if index < workspaceLimit} -->
-            <p
-              class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-              style="cursor: pointer;overflow:auto"
-              on:click={() => {
-                isOpen = false;
-                onclick(list._id, list.name);
-              }}
-              on:click={() => {
-                handleWorkspaceTab(list._id, list.name);
-              }}
-            >
-              {list.name}
-            </p>
-            <!-- {/if} -->
+        <div transition:slide={{ duration: 500 }} class="gap-2">
+          {#each $data.slice().reverse() as list, index}
+            {#if index < workspaceLimit}
+              <div
+                class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
+              >
+                <p
+                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  style="cursor: pointer;overflow:auto"
+                  on:click={() => {
+                    isOpen = false;
+
+                    onclick(list._id, list.name);
+                  }}
+                  on:click={() => {
+                    handleWorkspaceTab(list._id, list.name);
+                  }}
+                >
+                  {list.name}
+                </p>
+                <div>
+                  {#if activeWorkspaceId === list._id}
+                    <img src={checkIcon} alt="checkIcon" />
+                  {/if}
+                </div>
+              </div>
+            {/if}
           {/each}
         </div>
       {/if}
