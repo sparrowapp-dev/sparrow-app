@@ -1,5 +1,7 @@
 <p align="center">
+<a href="https://sparrows-newsletter.beehiiv.com/subscribe">
 <img src="https://sparrowassets.blob.core.windows.net/publicassest/sparrow-logo.png" width="400" alt="logo"/>
+</a>
 </p>
  
 <h1 align="center">
