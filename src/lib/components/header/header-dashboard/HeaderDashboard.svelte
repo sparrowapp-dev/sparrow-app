@@ -305,7 +305,7 @@
           ? 'd-none'
           : ''}"
       >
-        <div class="position-relative">
+        <div class="position-relative" style="z-index: 9;">
           <button
             class={`bg-blackColor border-0`}
             id="profile-dropdown"

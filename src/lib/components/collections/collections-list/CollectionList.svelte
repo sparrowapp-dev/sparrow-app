@@ -10,8 +10,8 @@
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
-  import { onDestroy, onMount } from "svelte";
-  import { fly, slide } from "svelte/transition";
+  import { onDestroy } from "svelte";
+  import { slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -40,7 +40,6 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
   import { notifications } from "$lib/utils/notifications";
-  import { writable } from "svelte/store";
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
@@ -262,29 +261,10 @@
     collectionSubscribe.unsubscribe();
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    usernameUnsubscribe();
   });
 
   let selectedView: string = "grid";
-
-  let isSidepanelVisible = writable(false);
-
-  let isSearchVisible = false;
-  onMount(() => {
-    handleWindowSize();
-  });
-  window.addEventListener("resize", handleWindowSize);
-  function handleWindowSize() {
-    const minWidthThreshold = 500;
-    console.log(window.innerWidth);
-    isSearchVisible = window.innerWidth >= minWidthThreshold;
-    isSidepanelVisible.set(isSearchVisible);
-  }
-
-  let sidepanelVisible: boolean;
-
-  isSidepanelVisible.subscribe((value) => {
-    sidepanelVisible = value;
-  });
 </script>
 
 {#if collapsExpandToggle}

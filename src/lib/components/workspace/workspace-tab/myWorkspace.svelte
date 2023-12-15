@@ -101,9 +101,7 @@
       />
 
       <Tooltip>
-        <button class="btn btn-primary rounded border-0 text-align-right py-1"
-          >Invite</button
-        >
+        <button class="btn btn-primary rounded border-0 py-1">Invite</button>
       </Tooltip>
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
@@ -175,6 +173,10 @@
   }
   .my-workspace {
     padding: 20px;
+  }
+
+  .btn-primary {
+    z-index: 5;
   }
 
   .profile-circle {

@@ -3,9 +3,6 @@
   export let data: any;
   export let collectionList;
 
-  console.log(api);
-  console.log(collectionList);
-
   let apiClass = "api-yellow";
   if (api?.property?.request?.method === "DEL") apiClass = "red-api";
   if (api?.property?.request?.method === "GET") apiClass = "green-api";
