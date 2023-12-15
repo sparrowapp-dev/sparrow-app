@@ -125,7 +125,7 @@ export interface WorkSpace {
   collectionCount?: number;
 }
 
-export interface FOLDER {
+export interface Folder {
   requestCount?: number;
   folderCount?: number;
 }
@@ -143,7 +143,7 @@ export interface NewTab {
     request?: Request;
     collection?: Collection;
     workspace?: WorkSpace;
-    folder?: FOLDER;
+    folder?: Folder;
   };
   isActive: boolean;
   save: boolean;

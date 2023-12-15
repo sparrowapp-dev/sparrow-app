@@ -43,16 +43,13 @@ export class CollectionRepository {
   };
 
   public readCollection = async (uuid: string): Promise<unknown> => {
-    const collection = await RxDB.getInstance()
+    return await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
           id: uuid,
         },
       })
       .exec();
-
-    const response = collection;
-    return response;
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
@@ -202,6 +199,7 @@ export class CollectionRepository {
     collection.toJSON().items.forEach((element) => {
       if (element.id === uuid) {
         response = element;
+        return;
       }
     });
     return response;
@@ -293,6 +291,7 @@ export class CollectionRepository {
         for (let i = 0; i < element.items.length; i++) {
           if (element.items[i].id === uuid) {
             response = element.items[i];
+            break;
           }
         }
       }

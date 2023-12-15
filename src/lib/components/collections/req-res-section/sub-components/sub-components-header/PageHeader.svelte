@@ -114,7 +114,6 @@
         );
         collectionsMethods.setRequestSave(true, "api", _id);
         collectionsMethods.updateTab(false, "saveInProgress", _id);
-        // collectionsMethods.updateTab(true, "save", _id);
       } else {
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
@@ -203,7 +202,7 @@
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-        "renameInputFieldName#5874-ydr364-84hr",
+        "renameInputFieldNamePageHeader",
       ) as HTMLInputElement;
       inputField.blur();
     }
@@ -222,7 +221,7 @@
     <div class="w-100 me-3">
       <input
         {autofocus}
-        id="renameInputFieldName#5874-ydr364-84hr"
+        id="renameInputFieldNamePageHeader"
         bind:value={tabName}
         on:input={handleInputValue}
         class="tabbar-tabName w-100"

@@ -148,6 +148,7 @@
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
+      
       let existingRequest;
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id, _id);
@@ -156,25 +157,17 @@
       }
 
       const randomRequest: NewTab = generateSampleRequest("id", new Date().toString())
-      let expectedRequest;
-      if(!existingRequest){
-        expectedRequest = {
-        method: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.method : componentData.property.request.method,
-        url: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.url :  componentData.property.request.url,
-        body: type === saveType.SAVE_DESCRIPTION ?  randomRequest.property.request.body :  componentData.property.request.body,
-        headers: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.headers : componentData.property.request.headers,
-        queryParams: type === saveType.SAVE_DESCRIPTION ? randomRequest.property.request.queryParams : componentData.property.request.queryParams,
+      
+      const request = !existingRequest ? randomRequest.property.request : existingRequest.request;
+      const expectedRequest = {
+        method: type === saveType.SAVE_DESCRIPTION ? request.method : componentData.property.request.method,
+        url: type === saveType.SAVE_DESCRIPTION ? request.url :  componentData.property.request.url,
+        body: type === saveType.SAVE_DESCRIPTION ?  request.body :  componentData.property.request.body,
+        headers: type === saveType.SAVE_DESCRIPTION ? request.headers : componentData.property.request.headers,
+        queryParams: type === saveType.SAVE_DESCRIPTION ? request.queryParams : componentData.property.request.queryParams,
       };  
-      }
-      else{
-        expectedRequest = {
-          method: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.method : componentData.property.request.method,
-          url: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.url :  componentData.property.request.url,
-          body: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.body : componentData.property.request.body,
-          headers: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.headers : componentData.property.request.headers,
-          queryParams: type === saveType.SAVE_DESCRIPTION ? existingRequest?.request.queryParams : componentData.property.request.queryParams,
-        };
-      }
+      
+    
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
         const res = await insertCollectionRequest({
