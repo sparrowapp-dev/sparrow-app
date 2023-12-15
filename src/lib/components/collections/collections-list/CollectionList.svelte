@@ -10,7 +10,7 @@
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -23,7 +23,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -36,23 +36,23 @@
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
-
- import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
- import { username } from "$lib/store/auth.store";
-
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { username } from "$lib/store/auth.store";
+  import { notifications } from "$lib/utils/notifications";
+  import { writable } from "svelte/store";
 
   const [, , searchNode] = useTree();
   let collection: any[] = [];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
-  let userName:string="";
+  let userName: string = "";
 
-  const usernameUnsubscribe=username.subscribe((value)=>{
-    if(value){
-      userName=value;
+  const usernameUnsubscribe = username.subscribe((value) => {
+    if (value) {
+      userName = value;
     }
-  })
+  });
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
@@ -75,9 +75,8 @@
         );
         collection = collectionArr;
       }
-      if(searchData || selectedApiMethods.length>0){
+      if (searchData || selectedApiMethods.length > 0) {
         handleSearch();
-
       }
     },
   );
@@ -127,8 +126,9 @@
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response =
-          await collectionsMethods.getAllCollections(workspaceId);
+        const response = await collectionsMethods.getAllCollections(
+          workspaceId,
+        );
         if (response.isSuccessful && response.data.data) {
           const collections = response.data.data;
           collectionsMethods.bulkInsert(collections);
@@ -157,7 +157,6 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -190,6 +189,7 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
+      notifications.success("New Collection Created");
       return;
     }
     return;
@@ -201,11 +201,10 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
-    if(!showfilterDropdown){
-      selectMethodsStore.update(()=>[]);
+    if (!showfilterDropdown) {
+      selectMethodsStore.update(() => []);
       handleSearch();
     }
-      
   };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -231,7 +230,7 @@
       filteredFile,
       collection,
     );
-  };
+  }
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
@@ -263,6 +262,29 @@
   });
 
   let selectedView: string = "grid";
+
+  let isSidepanelVisible = writable(false);
+
+  let isSearchVisible = false;
+  onMount(() => {
+    handleWindowSize();
+  });
+  window.addEventListener("resize", handleWindowSize);
+  function handleWindowSize() {
+    const minWidthThreshold = 500;
+    console.log(window.innerWidth);
+    isSearchVisible = window.innerWidth >= minWidthThreshold;
+    isSidepanelVisible.set(isSearchVisible);
+    console.log(isSearchVisible);
+  }
+
+  let sidepanelVisible: boolean;
+
+  isSidepanelVisible.subscribe((value) => {
+    sidepanelVisible = value;
+  });
+
+  console.log(sidepanelVisible);
 </script>
 
 {#if collapsExpandToggle}
@@ -297,7 +319,7 @@
     ? '0px'
     : '280px'};border-right: {collapsExpandToggle
     ? '0px'
-    : '1px solid #313233'};overflow:auto"
+    : '1px solid #313233'};overflow:auto;"
   class="sidebar d-flex flex-column bg-backgroundColor scroll"
 >
   <div
@@ -374,7 +396,6 @@
       {#if searchData.length > 0}
         <div class="p-4 pt-0">
           {#if filteredFile.length > 0}
-          
             {#each filteredFile as exp}
               <SearchTree
                 editable={true}

@@ -11,6 +11,7 @@
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { notifications } from "$lib/utils/notifications";
   export let activeSideBarTabMethods;
 
   export let data: any;
@@ -70,7 +71,6 @@
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
-
     if (response.isSuccessful) {
       _viewModel.addWorkspace(response.data.data);
 
@@ -104,6 +104,7 @@
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
+      notifications.success("New Workspace Created");
     }
   };
 

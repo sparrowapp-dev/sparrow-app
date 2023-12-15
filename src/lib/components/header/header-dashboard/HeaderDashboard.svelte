@@ -63,7 +63,6 @@
   let email: string = "";
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
-    console.log(value);
     if (value) {
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
@@ -273,10 +272,7 @@
     class="d-flex align-items-center justify-content-center"
     style="margin-left: 45px;"
   >
-    <div
-      class="gap-{!isSearchVisible ? '0' : '3'} d-flex"
-      style="z-index: 99999;"
-    >
+    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
       <div class="col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -311,7 +307,7 @@
                   : "border: 2.2px solid #45494D;"
               } `}
             >
-              {firstLetter?.toUpperCase() === undefined
+              {!firstLetter
                 ? email[0]?.toUpperCase()
                 : firstLetter?.toUpperCase()}
             </p>
@@ -333,7 +329,7 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-                {firstLetter?.toUpperCase() === undefined
+                {!firstLetter
                   ? email[0]?.toUpperCase()
                   : firstLetter?.toUpperCase()}
               </p>
@@ -353,7 +349,9 @@
             <hr class="" />
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
-              on:click={async () => {await _viewModel.logout()}}
+              on:click={async () => {
+                await _viewModel.logout();
+              }}
             >
               <img src={icons.signout} alt="" /><span
                 class="m-2"

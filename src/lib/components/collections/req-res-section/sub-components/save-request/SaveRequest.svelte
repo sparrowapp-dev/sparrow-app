@@ -38,8 +38,6 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
 
-
-
   interface Path {
     name: string;
     id: string;
@@ -85,7 +83,7 @@
   let createFolderNameVisibility: boolean = false;
   let createDirectoryLoader: boolean = false;
 
-  let instructionEnabled : boolean = false;
+  let instructionEnabled: boolean = false;
 
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
@@ -93,7 +91,7 @@
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
-      if(value){
+      if (value) {
         collection = value;
         directory = JSON.parse(JSON.stringify(collection));
         if (latestRoute.id) navigateToDirectory(latestRoute);
@@ -308,6 +306,7 @@
         id: res.data.data._id,
       };
       collectionsMethods.addCollection(res.data.data);
+      notifications.success("New Collection Created");
     } else {
       createDirectoryLoader = false;
     }
@@ -536,7 +535,7 @@
                     navigateToDirectory(col);
                   }}
                 >
-                  <Folder name={col.name}  />
+                  <Folder name={col.name} />
                 </div>
               {:else if col.type === ItemType.REQUEST}
                 <Request name={col.name} method={col.request.method} />
@@ -676,49 +675,59 @@
       </div>
       <div class="col-6">
         <!-- Right panel  -->
-        <div class="d-flex justify-content-between" on:click={
-          handleDropdownClick
-        } >
+        <div
+          class="d-flex justify-content-between"
+          on:click={handleDropdownClick}
+        >
           <p class="save-text-clr mb-1" style="font-size:12px">
             Request Name <span class="text-dangerColor">*</span>
           </p>
-          <span id="3456-dropdown900"  class="instruction-btn  {instructionEnabled ? 'bg-sparrowBottomBorder' : ''} rounded d-flex align-items-center justify-content-center position-relative">
-            <img on:click={()=>{
-              instructionEnabled = !instructionEnabled;
-            }} src={questionIcon} alt="question" />
+          <span
+            id="3456-dropdown900"
+            class="instruction-btn {instructionEnabled
+              ? 'bg-sparrowBottomBorder'
+              : ''} rounded d-flex align-items-center justify-content-center position-relative"
+          >
+            <img
+              on:click={() => {
+                instructionEnabled = !instructionEnabled;
+              }}
+              src={questionIcon}
+              alt="question"
+            />
             {#if instructionEnabled}
-            <div class="bg-blackColor api-name-usage p-2">
-              <p class="text-whiteColor">Best Practices</p>
-              <p class="save-as-instructions">
-                When naming your requests, remember that resources are at the
-                core of REST. Use nouns to represent your resources, such as
-                'user accounts' or 'managed devices.' Keep your URIs clear and
-                consistent by using forward slashes to indicate hierarchy, avoid
-                file extensions.
-              </p>
-              <div class="d-flex">
-                <div class="w-50">
-                  <p class="save-as-instructions">Do's:</p>
-                  <ul class="save-as-instructions">
-                    <li>Use nouns to represent resources </li>
-                    <li>Use forward slashes for hierarchy </li>
-                    <li>Use hyphens for readability </li>
-                    <li>Use lowercase letters in URIs </li>
-                    <li>Use HTTP methods for CRUD actions </li>
+              <div class="bg-blackColor api-name-usage p-2">
+                <p class="text-whiteColor">Best Practices</p>
+                <p class="save-as-instructions">
+                  When naming your requests, remember that resources are at the
+                  core of REST. Use nouns to represent your resources, such as
+                  'user accounts' or 'managed devices.' Keep your URIs clear and
+                  consistent by using forward slashes to indicate hierarchy,
+                  avoid file extensions.
+                </p>
+                <div class="d-flex">
+                  <div class="w-50">
+                    <p class="save-as-instructions">Do's:</p>
+                    <ul class="save-as-instructions">
+                      <li>Use nouns to represent resources</li>
+                      <li>Use forward slashes for hierarchy</li>
+                      <li>Use hyphens for readability</li>
+                      <li>Use lowercase letters in URIs</li>
+                      <li>Use HTTP methods for CRUD actions</li>
                     </ul>
-                </div>
-                <div class="w-50">
-                  <p class="save-as-instructions">Don'ts:</p>
-                  <ul class="save-as-instructions">
-                    <li>Don't use file extensions.</li>
-                    <li>Don't use underscores in URIs.</li>
-                    <li>Don't use verbs in the URIs. </li>
-                    <li>Don't put CRUD function names in URIs. </li>
-                    <li>Don't use capital letters in URIs.</li>
+                  </div>
+                  <div class="w-50">
+                    <p class="save-as-instructions">Don'ts:</p>
+                    <ul class="save-as-instructions">
+                      <li>Don't use file extensions.</li>
+                      <li>Don't use underscores in URIs.</li>
+                      <li>Don't use verbs in the URIs.</li>
+                      <li>Don't put CRUD function names in URIs.</li>
+                      <li>Don't use capital letters in URIs.</li>
                     </ul>
+                  </div>
                 </div>
               </div>
-            </div>
             {/if}
           </span>
         </div>
@@ -911,11 +920,11 @@
     width: 521px;
     border-radius: 8px;
   }
-  .save-as-instructions{
+  .save-as-instructions {
     font-size: 12px;
-    color: #CCCCCC;
+    color: #cccccc;
   }
-  ul.save-as-instructions{
+  ul.save-as-instructions {
     padding-left: 15px;
   }
   .instruction-btn {

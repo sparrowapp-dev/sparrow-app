@@ -55,7 +55,7 @@
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
-    removeMultipleTabs: _viewModel.removeMultipleTabs
+    removeMultipleTabs: _viewModel.removeMultipleTabs,
   };
 
   let stack = [];
@@ -66,7 +66,6 @@
       stack.push(tab.name);
     });
   }
-
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
@@ -85,6 +84,7 @@
     <CollectionsList {collectionsMethods} />
   </div>
   <div
+    style=""
     class="collections__tools bg-backgroundColor {$collapseCollectionPanel
       ? 'sidebar-collapse'
       : 'sidebar-expand'}"
