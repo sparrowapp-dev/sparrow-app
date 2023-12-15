@@ -831,7 +831,7 @@
             style="width: 100%; font-size: 12px; resize:none;"
             class="p-1 bg-black rounded border-0"
             rows="5"
-            maxlength="200"
+            maxlength="1024"
             placeholder="Give a description to help people know about this request."
             bind:value={description}
           />

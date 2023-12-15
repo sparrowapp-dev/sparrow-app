@@ -197,7 +197,7 @@
         bind:value={description}
         on:input={handleInputValue}
         disabled={isSaveDescription}
-        maxlength="200"
+        maxlength="1024"
         rows="10"
         class="p-1 api-description w-100"
       />
@@ -271,10 +271,13 @@
     background-color: transparent;
     font-size: 12px;
     outline: none;
-    border: 1px solid #85C2FF;
     caret-color: #85C2FF;
     resize:none;
-    
+    border-radius: 4px;
+  }
+  .api-description:focus{
+    border: 1px solid #85C2FF;
+
   }
   .description-field{
     font-size: 12px;
