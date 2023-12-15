@@ -23,13 +23,6 @@
 
   let isOpen: boolean = false;
 
-  // let isActive: boolean;
-
-  // $data?._data.map((item) => {
-  //   if (item.isActiveWorkspace === true) {
-  //   }
-  // });
-
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
