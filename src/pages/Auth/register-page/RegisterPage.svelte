@@ -9,6 +9,7 @@
   import starIcon from "$lib/assets/starIcon.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
+  import { Link } from "svelte-navigator";
 
   let userData = {
     email: "",
@@ -373,8 +374,8 @@
         >
           <div class="gap-3 d-flex align-items-center justify-content-center">
             <p class="fs-6 mb-0">Already have an account?</p>
-            <a href="/login" class=" text-decoration-none text-primaryColor"
-              >Sign In</a
+            <Link to="/login" class=" text-decoration-none text-primaryColor"
+              >Sign In</Link
             >
           </div>
         </div>

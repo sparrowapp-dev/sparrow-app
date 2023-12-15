@@ -8,7 +8,7 @@
 
   import { writable } from "svelte/store";
   import { onDestroy } from "svelte";
-  import { navigate } from "svelte-navigator";
+  import { Link, navigate } from "svelte-navigator";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
 
   const seconds = writable(59);
@@ -40,7 +40,7 @@
 
   let emailText: string = "";
   username.subscribe((value) => {
-    if(value){
+    if (value) {
       emailText = value;
       verifyCodeCredential.email = emailText;
     }
@@ -60,7 +60,7 @@
   };
 
   verifyString.subscribe((value) => {
-    if(value){
+    if (value) {
       verifyLength = value;
     }
   });
@@ -72,12 +72,12 @@
 
   let verificationCodeError: boolean;
   isSuccessfulResponse.subscribe((value) => {
-      verificationCodeError = value;
+    verificationCodeError = value;
   });
 
   let errorMessage: string = "";
   errorMessageText.subscribe((value) => {
-    if(value){
+    if (value) {
       errorMessage = value;
     }
   });
@@ -287,9 +287,8 @@
             <button
               class="btn btn-primary bg-labelColor border-0 mb-2"
               on:click|preventDefault={async () => {
-                validationErrors = await handleVerifyEmail(
-                  verifyCodeCredential,
-                );
+                validationErrors =
+                  await handleVerifyEmail(verifyCodeCredential);
               }}>Verify</button
             >
           {:else}
@@ -308,12 +307,12 @@
               No email in your inbox or spam folder?
             </p>
 
-            <a
-              href="/forgot/password"
+            <Link
+              to="/forgot/password"
               style="font-size: 13px;"
               class="text-decoration-none text-primaryColor fw-bold"
               >Resend
-            </a>
+            </Link>
           </div>
         {/if}
       </div>

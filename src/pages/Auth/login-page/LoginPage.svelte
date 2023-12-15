@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigate } from "svelte-navigator";
+  import { Link, navigate } from "svelte-navigator";
   import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
@@ -13,7 +13,7 @@
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import { once } from '@tauri-apps/api/event'
+  import { once } from "@tauri-apps/api/event";
   import { WebviewWindow } from "@tauri-apps/api/window";
 
   let isEmailTouched = false;
@@ -63,23 +63,22 @@
     await authNavigate();
   };
 
-  once('onclose', async (event) => {
-    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
+  once("onclose", async (event) => {
+    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => {
       isLoadingPage = false;
     });
-  })
+  });
 
   let isPasswordtouched: boolean = false;
 
-
   isLoading.subscribe((value) => {
-      isLoadingPage = value;
+    isLoadingPage = value;
   });
 
   let isPasswordError: boolean;
 
   isResponseError.subscribe((value) => {
-      isPasswordError = value;
+    isPasswordError = value;
   });
 
   let errorMessage: string = "";
@@ -202,9 +201,10 @@
         </span> -->
 
         <div class="d-flex mb-4 align-items-center justify-content-end">
-          <a
-            href="/forgot/password"
-            class="text-decoration-none text-primaryColor">Forgot Password?</a
+          <Link
+            to="/forgot/password"
+            class="text-decoration-none text-primaryColor"
+            >Forgot Password?</Link
           >
         </div>
 
@@ -242,10 +242,10 @@
         <!-- "New to the website? Create an account" link -->
         <div class="gap-3 d-flex align-items-center">
           <p class="fs-6 mt-3">New to sparrow?</p>
-          <a
-            href="/register"
+          <Link
+            to="/register"
             style="color: #007BFF;"
-            class=" text-decoration-none text-primaryColor">Create Account</a
+            class=" text-decoration-none text-primaryColor">Create Account</Link
           >
         </div>
       </div>
