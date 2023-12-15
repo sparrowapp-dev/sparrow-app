@@ -51,7 +51,7 @@
       {
         "label": "main",
         "decorations": false,
-        "fullscreen": true,
+        "fullscreen": false,
         "resizable": true,
         "title": "sparrow-app",
         "minWidth": 570,
