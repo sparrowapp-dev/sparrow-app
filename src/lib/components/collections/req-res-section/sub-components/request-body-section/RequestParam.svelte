@@ -83,7 +83,6 @@
   const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
     isHorizontalMode = value;
     stylePanes();
-    console.log("isHorizontalMode: ", isHorizontalMode);
   });
 
   const rightPanelWidthSubscribe = rightPanelWidth.subscribe((value) => {
@@ -161,12 +160,6 @@
             rightPanelWidthSize = value;
           });
         }
-        console.log({
-          leftPanelWidthSize,
-          rightPanelWidthSize,
-          topPanelHeightSize,
-          bottomPanelHeightSize,
-        });
       });
       window.addEventListener("mouseup", () => {
         splitter.style.border = "solid #313233";
