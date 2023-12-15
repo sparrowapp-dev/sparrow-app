@@ -3,6 +3,9 @@
   export let data: any;
   export let collectionList;
 
+  console.log(api);
+  console.log(collectionList);
+
   let apiClass = "api-yellow";
   if (api?.property?.request?.method === "DEL") apiClass = "red-api";
   if (api?.property?.request?.method === "GET") apiClass = "green-api";
@@ -33,14 +36,14 @@
       {/if}
       <p class="mb-0 api-type__endpoint">:</p>
 
-      {#if api.path.collectionId}
+      {#if api?.path?.collectionId}
         <p class="mb-0 api-type__endpoint">/</p>
       {/if}
 
       {#if collectionList}
         {#each collectionList.slice().reverse() as list}
           {#if list}
-            {#if list?._id === api?.path?.collectionId}
+            {#if list?.id === api?.path?.collectionId}
               <p class="mb-0 api-type__endpoint">{list.name}</p>
               {#if api.path.folderId}
                 <p class="mb-0 api-type__endpoint">/</p>

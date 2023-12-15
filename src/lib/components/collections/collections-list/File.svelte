@@ -56,7 +56,8 @@
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
     if (headers) request.property.request.headers = headers;
-    request.save = true;
+    request.property.request.save.api = true;
+    request.property.request.save.description = true;
     collectionsMethods.handleCreateTab(request);
     moveNavigation("right");
   };

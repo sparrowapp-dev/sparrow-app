@@ -90,7 +90,7 @@ export class HeaderDashboardViewModel {
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
+      const data = response.data.data.map((elem, index) => {
         const {
           _id,
           name,
@@ -106,6 +106,7 @@ export class HeaderDashboardViewModel {
           owner,
           permissions,
           collections: collection,
+          isActiveWorkspace: !index ? true : false,
           createdAt,
           createdBy,
         };

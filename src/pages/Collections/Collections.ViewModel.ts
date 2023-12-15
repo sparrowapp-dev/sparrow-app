@@ -91,6 +91,11 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public setRequestSave = async (data: boolean, route: string, id: string) => {
+    requestResponseStore.setRequestSave(data, route, id);
+    this.debouncedTab();
+  };
+
   public deleteCollection = async (id: string) => {
     this.collectionRepository.deleteCollection(id);
   };
@@ -145,6 +150,22 @@ export class CollectionsViewModel {
     );
   };
 
+  public readRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+    );
+  };
+
+  public readCollection = (uuid: string) => {
+    return this.collectionRepository.readCollection(uuid);
+  };
+
   public updateRequestInFolderCollection = (
     collectionId: string,
     uuid: string,
@@ -192,6 +213,16 @@ export class CollectionsViewModel {
     );
   };
 
+  public readRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+    );
+  };
+
   public deleteRequestInFolder = (
     collectionId: string,
     folderId: string,
@@ -203,9 +234,11 @@ export class CollectionsViewModel {
       requestId,
     );
   };
+
   public addCollection = (collection) => {
     this.collectionRepository.addCollection(collection);
   };
+
   public updateCollection = (uuid, data) => {
     this.collectionRepository.updateCollection(uuid, data);
   };

@@ -43,12 +43,23 @@ export interface CollectionsMethods {
     uuid: string,
     request,
   ) => void;
+  readRequestInFolder: (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => unknown;
   addRequestOrFolderInCollection: (collectionId: string, items) => void;
   updateRequestOrFolderInCollection: (
     collectionId: string,
     uuid: string,
     items: any,
   ) => void;
+  readRequestOrFolderInCollection: (
+    collectionId: string,
+    uuid: string,
+  ) => unknown;
+
+  readCollection: (uuid: string) => unknown;
 
   deleteRequestInFolder: (
     collectionId: string,
@@ -71,4 +82,5 @@ export interface CollectionsMethods {
     folderId: string,
   ) => void;
   removeMultipleTabs: (ids: string[]) => void;
+  setRequestSave: (data: boolean, route: string, id: string) => void;
 }
