@@ -4,7 +4,8 @@
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
   import { WorkspaceViewModel } from "./workspace.viewModel";
-
+  import { scaleMotionProps } from "$lib/utils/animations";
+  import { Motion } from "svelte-motion";
   export let data: any;
 
   const _viewModel = new WorkspaceViewModel();
@@ -17,10 +18,12 @@
   const collectionList = _viewModel.collection;
 </script>
 
-<div class="workspace bg-backgroundColor">
-  <WorkspaceList {data} tabList={$tabList} collectionList={$collectionList} />
-  <WorkspaceContent {data} {workspaceMethods} />
-</div>
+<Motion {...scaleMotionProps} let:motion>
+  <div class="workspace bg-backgroundColor" use:motion>
+    <WorkspaceList {data} tabList={$tabList} collectionList={$collectionList} />
+    <WorkspaceContent {data} {workspaceMethods} />
+  </div>
+</Motion>
 
 <style>
   .workspace {

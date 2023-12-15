@@ -2,75 +2,86 @@
   import angleDown from "$lib/assets/dropdown.svg";
   import angleUp from "$lib/assets/angle-up-2.svg";
   import plus from "$lib/assets/white-plus.svg";
-  import close from "$lib/assets/close.svg"
-  import { selectMethodsStore, showPathStore} from "$lib/store/methods";
-    import { onDestroy } from "svelte";
+  import close from "$lib/assets/close.svg";
+  import { selectMethodsStore, showPathStore } from "$lib/store/methods";
+  import { onDestroy } from "svelte";
+  import { slide } from "svelte/transition";
   export let handleSearch;
-  let newTabs=[];
+  let newTabs = [];
   let showMethods = false;
 
-  const selectedMethodUnsubscibe=selectMethodsStore .subscribe((value)=>{
-    if(value){
-      newTabs=value;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value) {
+      newTabs = value;
     }
-  })
+  });
 
-
-  function addInSelectedMethods(event:any,id:string){
-    const methodType=event.currentTarget.innerText
+  function addInSelectedMethods(event: any, id: string) {
+    const methodType = event.currentTarget.innerText;
     const methodItemButton = document.getElementById(id) as HTMLButtonElement;
-    const methodAddButton = document.getElementById(id+"ADD") as HTMLImageElement;;
+    const methodAddButton = document.getElementById(
+      id + "ADD",
+    ) as HTMLImageElement;
     if (methodItemButton.classList.contains("selected")) {
-          methodItemButton.style.backgroundColor = "transparent";
-          methodItemButton.style.color = "";
-          methodAddButton.src=plus
-          methodAddButton.style.width="16px";
-          methodItemButton.classList.remove("selected");
-          const filterTabs= newTabs.filter((item)=>{return item!==methodType})
-          selectMethodsStore .update(()=>filterTabs);
-        } else {
-          methodItemButton.style.backgroundColor = "#2196f3";
-          methodAddButton.style.color = "#000000";
-          methodItemButton.style.color = "#000000";
-          methodAddButton.src=close
-          methodAddButton.style.width="22px";
-          methodItemButton.classList.add("selected");
-          newTabs.push(methodType);
-          selectMethodsStore .update(()=>newTabs);
-        }
-    handleSearch()
-  }
-  function showPaths(id:string){
-    const isShowPathChecked = (document.getElementById(id) as HTMLInputElement).checked;
-    if(isShowPathChecked){
-      showPathStore.update(()=>true)
-    }else{
-      showPathStore.update(()=>false)
-    }
-  }
-
-  function handleHover(id:string,show:boolean){
-    const methodItemButton = document.getElementById(id) as HTMLButtonElement;
-    if(show){
-    methodItemButton.style.backgroundColor = "#2196f3";
-    methodItemButton.style.color = "#000000";
-    }else{
-      if(!methodItemButton.classList.contains("selected")){
       methodItemButton.style.backgroundColor = "transparent";
       methodItemButton.style.color = "";
+      methodAddButton.src = plus;
+      methodAddButton.style.width = "16px";
+      methodItemButton.classList.remove("selected");
+      const filterTabs = newTabs.filter((item) => {
+        return item !== methodType;
+      });
+      selectMethodsStore.update(() => filterTabs);
+    } else {
+      methodItemButton.style.backgroundColor = "#2196f3";
+      methodAddButton.style.color = "#000000";
+      methodItemButton.style.color = "#000000";
+      methodAddButton.src = close;
+      methodAddButton.style.width = "22px";
+      methodItemButton.classList.add("selected");
+      newTabs.push(methodType);
+      selectMethodsStore.update(() => newTabs);
+    }
+    handleSearch();
+  }
+  function showPaths(id: string) {
+    const isShowPathChecked = (document.getElementById(id) as HTMLInputElement)
+      .checked;
+    if (isShowPathChecked) {
+      showPathStore.update(() => true);
+    } else {
+      showPathStore.update(() => false);
+    }
+  }
+
+  function handleHover(id: string, show: boolean) {
+    const methodItemButton = document.getElementById(id) as HTMLButtonElement;
+    if (show) {
+      methodItemButton.style.backgroundColor = "#2196f3";
+      methodItemButton.style.color = "#000000";
+    } else {
+      if (!methodItemButton.classList.contains("selected")) {
+        methodItemButton.style.backgroundColor = "transparent";
+        methodItemButton.style.color = "";
       }
     }
   }
-  onDestroy(()=>{
-    selectedMethodUnsubscibe()
-  })
+  onDestroy(() => {
+    selectedMethodUnsubscibe();
+  });
 </script>
 
-<div class="px-3">
+<div class="px-3" transition:slide>
   <div class="show-url">
     <p>Show Paths</p>
     <label class="switch">
-      <input type="checkbox"  id="showPath" on:change={()=>{showPaths("showPath")}}/>
+      <input
+        type="checkbox"
+        id="showPath"
+        on:change={() => {
+          showPaths("showPath");
+        }}
+      />
       <span class="slider round"></span>
     </label>
   </div>
@@ -81,31 +92,113 @@
         style="background-color: transparent; border-style:none; margin-top:-10px dropdown-active"
         on:click={() => {
           showMethods = !showMethods;
-          if(!showMethods){
-            selectMethodsStore .update(()=>[]);
-            handleSearch()
+          if (!showMethods) {
+            selectMethodsStore.update(() => []);
+            handleSearch();
           }
-        }}><span class="dropdown-active"><img src={showMethods?angleUp:angleDown} alt="angledown"/></span></button
+        }}
+        ><span class="dropdown-active"
+          ><img src={showMethods ? angleUp : angleDown} alt="angledown" /></span
+        ></button
       >
     </div>
     {#if showMethods}
-      <div class="all-methods">
-        <button class="method-button green-api" id="GET" on:mouseenter={()=>{handleHover("GET",true)}} on:mouseleave={()=>{handleHover("GET",false)}}  on:click={(event)=>{addInSelectedMethods(event,"GET")}}
-        
-          ><span>GET</span><img class="plus" id="GETADD" src={plus} alt="+" /></button
+      <div class="all-methods" transition:slide>
+        <button
+          class="method-button green-api"
+          id="GET"
+          on:mouseenter={() => {
+            handleHover("GET", true);
+          }}
+          on:mouseleave={() => {
+            handleHover("GET", false);
+          }}
+          on:click={(event) => {
+            addInSelectedMethods(event, "GET");
+          }}
+          ><span>GET</span><img
+            class="plus"
+            id="GETADD"
+            src={plus}
+            alt="+"
+          /></button
         >
-       <button class="method-button yellow-api"  id="POST" on:mouseenter={()=>{handleHover("POST",true)}} on:mouseleave={()=>{handleHover("POST",false)}}  on:click={(event)=>{addInSelectedMethods(event,"POST")}} 
-          ><span>POST</span><img class="plus" id="POSTADD" src={plus} alt="+" /></button
+        <button
+          class="method-button yellow-api"
+          id="POST"
+          on:mouseenter={() => {
+            handleHover("POST", true);
+          }}
+          on:mouseleave={() => {
+            handleHover("POST", false);
+          }}
+          on:click={(event) => {
+            addInSelectedMethods(event, "POST");
+          }}
+          ><span>POST</span><img
+            class="plus"
+            id="POSTADD"
+            src={plus}
+            alt="+"
+          /></button
         >
-        <button class="method-button blue-api" id="PUT" on:mouseenter={()=>{handleHover("PUT",true)}} on:mouseleave={()=>{handleHover("PUT",false)}}  on:click={(event)=>{addInSelectedMethods(event,"PUT")}}
-          ><span>PUT</span><img class="plus" id="PUTADD" src={plus} alt="+" /></button
+        <button
+          class="method-button blue-api"
+          id="PUT"
+          on:mouseenter={() => {
+            handleHover("PUT", true);
+          }}
+          on:mouseleave={() => {
+            handleHover("PUT", false);
+          }}
+          on:click={(event) => {
+            addInSelectedMethods(event, "PUT");
+          }}
+          ><span>PUT</span><img
+            class="plus"
+            id="PUTADD"
+            src={plus}
+            alt="+"
+          /></button
         >
-        <button class="method-button pink-api" id="PATCH" on:mouseenter={()=>{handleHover("PATCH",true)}} on:mouseleave={()=>{handleHover("PATCH",false)}}  on:click={(event)=>{addInSelectedMethods(event,"PATCH")}}
-          ><span>PATCH</span><img class="plus" id="PATCHADD" src={plus} alt="+" /></button
+        <button
+          class="method-button pink-api"
+          id="PATCH"
+          on:mouseenter={() => {
+            handleHover("PATCH", true);
+          }}
+          on:mouseleave={() => {
+            handleHover("PATCH", false);
+          }}
+          on:click={(event) => {
+            addInSelectedMethods(event, "PATCH");
+          }}
+          ><span>PATCH</span><img
+            class="plus"
+            id="PATCHADD"
+            src={plus}
+            alt="+"
+          /></button
         >
-        <button class="method-button red-api" id="DELETE"  on:mouseenter={()=>{handleHover("DELETE",true)}} on:mouseleave={()=>{handleHover("DELETE",false)}} on:click={(event)=>{addInSelectedMethods(event,"DELETE")}}
-          ><span>DELETE</span><img class="plus" id="DELETEADD" src={plus} alt="+" /></button
-        > 
+        <button
+          class="method-button red-api"
+          id="DELETE"
+          on:mouseenter={() => {
+            handleHover("DELETE", true);
+          }}
+          on:mouseleave={() => {
+            handleHover("DELETE", false);
+          }}
+          on:click={(event) => {
+            addInSelectedMethods(event, "DELETE");
+          }}
+          ><span>DELETE</span><img
+            class="plus"
+            id="DELETEADD"
+            src={plus}
+            alt="+"
+          /></button
+        >
       </div>
     {/if}
   </div>
@@ -135,7 +228,7 @@
   .blue-api {
     color: var(--request-put);
   }
-.pink-api {
+  .pink-api {
     color: var(--request-patc);
   }
 
@@ -201,14 +294,13 @@
     top: 2px;
     bottom: 4px;
     background-color: var(--white-color);
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
   }
 
   input:checked + .slider {
-    background-color: var(--sparrow-input-slider-button);
+    background-color: #85c2ff;
   }
-
 
   input:checked + .slider:before {
     -webkit-transform: translateX(15px);

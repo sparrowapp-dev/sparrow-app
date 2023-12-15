@@ -3,15 +3,19 @@
   import CoverButton from "$lib/components/buttons/CoverButton.svelte";
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { fade, fly } from "svelte/transition";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import type { NewTab, RequestBody } from "$lib/utils/interfaces/request.interface";
+  import type {
+    NewTab,
+    RequestBody,
+  } from "$lib/utils/interfaces/request.interface";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
-  export let componentData : NewTab;
+  export let componentData: NewTab;
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
 
-  let loader : boolean = false;
+  let loader: boolean = false;
 
   const handleSaveRequest = async () => {
     const _id = componentData.id;
@@ -76,7 +80,7 @@
           res.data.data,
         );
         loader = false;
-        onFinish(_id); 
+        onFinish(_id);
         closeCallback(false);
       } else {
         loader = false;
@@ -90,8 +94,14 @@
   on:click={() => {
     closeCallback(false);
   }}
+  transition:fade={{ delay: 0, duration: 100 }}
 />
-<div class="close-request d-block">
+<div
+  class="close-request d-block"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="contain">
     <div class="d-flex justify-content-between">
       <div class="pb-2">
@@ -105,10 +115,10 @@
       >
     </div>
     <div class="pb-3">
-        <small class="">
-          You have unsaved changes. Do you want to save them before closing the
-          file?
-        </small>
+      <small class="">
+        You have unsaved changes. Do you want to save them before closing the
+        file?
+      </small>
     </div>
     <div class="d-flex justify-content-between">
       <div>
@@ -122,16 +132,16 @@
         />
       </div>
       <div class="d-flex">
-        <span style="margin-right: 15px;" > 
-            <CoverButton
-              text={"Discard Changes"}
-              size={16}
-              type={"dark"}
-              onClick={() => {
-                collectionsMethods.handleRemoveTab(componentData.id);
-                closeCallback(false);
-              }}
-            />
+        <span style="margin-right: 15px;">
+          <CoverButton
+            text={"Discard Changes"}
+            size={16}
+            type={"dark"}
+            onClick={() => {
+              collectionsMethods.handleRemoveTab(componentData.id);
+              closeCallback(false);
+            }}
+          />
         </span>
         <CoverButton
           text={"Save Changes"}
@@ -140,14 +150,14 @@
           {loader}
           onClick={() => {
             if (
-                componentData?.path.collectionId &&
-                componentData?.path.workspaceId
-              ) {
-                handleSaveRequest();
-              } else {  
-                closeCallback(false);
-                handleSaveAsBackdrop(true);
-              }
+              componentData?.path.collectionId &&
+              componentData?.path.workspaceId
+            ) {
+              handleSaveRequest();
+            } else {
+              closeCallback(false);
+              handleSaveAsBackdrop(true);
+            }
           }}
         />
       </div>
@@ -179,7 +189,7 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  .close-request__title{
+  .close-request__title {
     font-size: 20px;
   }
 </style>

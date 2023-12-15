@@ -25,6 +25,8 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { slide } from "svelte/transition";
+  // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
@@ -38,7 +40,7 @@
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
-
+  // let isLoadingPage: boolean = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -194,6 +196,7 @@
   });
 </script>
 
+<!-- {#if !isLoadingPage} -->
 <div
   class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
   style="height:44px;"
@@ -210,7 +213,9 @@
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2"
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup
+        ? 'd-none'
+        : ''}"
       style="height: 36px; width:116px"
     >
       <HeaderDropdown
@@ -272,7 +277,11 @@
     class="d-flex align-items-center justify-content-center"
     style="margin-left: 45px;"
   >
-    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
+    <div
+      class="gap-{!isSearchVisible ? '0' : '3'} d-flex {showGlobalSearchPopup
+        ? 'd-none'
+        : ''}"
+    >
       <div class="col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -280,14 +289,22 @@
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+      <div
+        class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+          ? 'd-none'
+          : ''}"
+      >
         <Tooltip>
           <button class="bg-blackColor border-0">
             <img src={icons.notifyIcon} alt="" />
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+      <div
+        class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+          ? 'd-none'
+          : ''}"
+      >
         <div class="position-relative">
           <button
             class={`bg-blackColor border-0`}
@@ -296,11 +313,11 @@
             on:click={toggleDropdown}
           >
             <p
-              class={`profile-circle ${
+              class="{showGlobalSearchPopup ? 'd-none' : ''}{`profile-circle ${
                 isOpen
-                  ? "bg-plusButton text-black"
-                  : "profile-btn text-defaultColor"
-              } m-auto text-center align-items-center justify-content-center `}
+                  ? 'bg-plusButton text-black'
+                  : 'profile-btn text-defaultColor'
+              } m-auto text-center align-items-center justify-content-center `}"
               style={`font-size: 12px; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
@@ -313,52 +330,56 @@
             </p>
           </button>
 
-          <div
-            class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
-            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
-              ? 'block'
-              : 'none'}; top: 40px; right: -10px; width: 219px;"
-            on:click={() => {
-              isOpen = false;
-            }}
-          >
+          {#if isOpen}
             <div
-              class="text-center align-items-center justify-content-center pt-3"
-            >
-              <p
-                class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
-              >
-                {!firstLetter
-                  ? email[0]?.toUpperCase()
-                  : firstLetter?.toUpperCase()}
-              </p>
-              <h1
-                class="text-white fw-normal mt-3"
-                style="color: #999; font-family: Roboto; font-size: 12px;"
-              >
-                {name === undefined ? email[0]?.toUpperCase() : name}
-              </h1>
-              <p
-                class="text-requestBodyColor fw-medium mb-0"
-                style="font-size: 12px;"
-              >
-                {email}
-              </p>
-            </div>
-            <hr class="" />
-            <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
-              on:click={async () => {
-                await _viewModel.logout();
+              class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
+              style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
+                ? 'block'
+                : 'none'}; top: 40px; right: -10px; width: 219px;"
+              on:click={() => {
+                isOpen = false;
               }}
+              transition:slide={{ duration: 300 }}
             >
-              <img src={icons.signout} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">Sign Out</span
+              <div
+                class="text-center align-items-center justify-content-center pt-3"
               >
+                <p
+                  class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                  style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
+                >
+                  {!firstLetter
+                    ? email[0]?.toUpperCase()
+                    : firstLetter?.toUpperCase()}
+                </p>
+                <h1
+                  class="text-white fw-normal mt-3"
+                  style="color: #999; font-family: Roboto; font-size: 12px;"
+                >
+                  {!name ? email[0]?.toUpperCase() : name}
+                </h1>
+                <p
+                  class="text-requestBodyColor fw-medium mb-0"
+                  style="font-size: 12px;"
+                >
+                  {email}
+                </p>
+              </div>
+              <hr class="" />
+
+              <div
+                class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
+                on:click={async () => {
+                  await _viewModel.logout();
+                }}
+              >
+                <img src={icons.signout} alt="" /><span
+                  class="m-2"
+                  style="font-size: 12px;">Sign Out</span
+                >
+              </div>
             </div>
-          </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -391,6 +412,10 @@
     </div>
   </div>
 </div>
+
+<!-- {:else}
+  <PageLoader />
+{/if} -->
 
 <style>
   .signOut:hover {

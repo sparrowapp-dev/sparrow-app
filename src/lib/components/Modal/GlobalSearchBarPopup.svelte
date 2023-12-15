@@ -7,17 +7,20 @@
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { onMount } from "svelte";
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
-  import { handleCollectionClick, handleRequestClick ,handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
-  export let handleGlobalSearchPopup:(show:boolean)=>void;
-  export let searchData:string;
+  import {
+    handleCollectionClick,
+    handleRequestClick,
+    handleFolderClick,
+  } from "$lib/utils/helpers/handle-clicks.helper";
+  export let handleGlobalSearchPopup: (show: boolean) => void;
+  export let searchData: string;
   export let filteredRequest: any[];
   export let filteredFolder: any[];
   export let filteredCollection: any[];
   export let workspaces: any[];
-  export let activeWorkspaceId:string;
-  export let handleDropdown:(id:string,name:string)=>void;
+  export let activeWorkspaceId: string;
+  export let handleDropdown: (id: string, name: string) => void;
   let currentSelectedId = "all";
-
 
   function getIndex(text: string, searchData: string): number {
     return text.toLowerCase().indexOf(searchData.toLowerCase());
@@ -39,11 +42,15 @@
     button.style.backgroundColor = "#313233";
   });
 
-  const handleWorkspaceClick=(id:string,name:string)=>{
-    if(id!==activeWorkspaceId){
-    handleDropdown(id,name)
-  }
-  handleGlobalSearchPopup(false);
+  const handleWorkspaceClick = (id: string, name: string) => {
+    if (id !== activeWorkspaceId) {
+      handleDropdown(id, name);
+    }
+    handleGlobalSearchPopup(false);
+  };
+
+  function isFilteredWorkspaces(workspace: any) {
+    return workspace.name.toLowerCase().includes(searchData.toLowerCase());
   }
 </script>
 
@@ -96,7 +103,6 @@
         handleSelection("request");
       }}
     >
-  
       <img src={RequestIcon} alt="request" />
       <span>Request</span>
     </button>
@@ -105,150 +111,193 @@
     {#if searchData.length > 0}
       {#if filteredRequest.length > 0 && (currentSelectedId === "all" || currentSelectedId === "request")}
         {#each filteredRequest as filterRequest}
-        <button class="request-btn" on:click={()=>{
-          handleRequestClick(filterRequest.tree,{workspaceId: activeWorkspaceId,
-           collectionId:filterRequest.collectionId,
-          folderId:filterRequest.folderDetails?filterRequest.folderDetails.id:"",
-          folderName:filterRequest.folderDetails?filterRequest.folderDetails.name:""})
-          handleGlobalSearchPopup(false);}}>
-          <div
-            class="d-flex align-items-center search-option-request"
-            style="height:32px;"
+          <button
+            class="request-btn"
+            on:click={() => {
+              handleRequestClick(filterRequest.tree, {
+                workspaceId: activeWorkspaceId,
+                collectionId: filterRequest.collectionId,
+                folderId: filterRequest.folderDetails
+                  ? filterRequest.folderDetails.id
+                  : "",
+                folderName: filterRequest.folderDetails
+                  ? filterRequest.folderDetails.name
+                  : "",
+              });
+              handleGlobalSearchPopup(false);
+            }}
           >
             <div
-              class="api-method text-{getMethodStyle(
-                filterRequest.tree.request.method,
-              )}"
+              class="d-flex align-items-center search-option-request"
+              style="height:32px;"
             >
-              {filterRequest.tree.request.method.toUpperCase()}
-            </div>
-            <div class="api-name">
-              {filterRequest.tree.name.substring(
-                0,
-                getIndex(filterRequest.tree.name, searchData),
-              )}<span class="highlight"
-                >{filterRequest.tree.name.substring(
+              <div
+                class="api-method text-{getMethodStyle(
+                  filterRequest.tree.request.method,
+                )}"
+              >
+                {filterRequest.tree.request.method.toUpperCase()}
+              </div>
+              <div class="api-name">
+                {filterRequest.tree.name.substring(
+                  0,
                   getIndex(filterRequest.tree.name, searchData),
+                )}<span class="highlight"
+                  >{filterRequest.tree.name.substring(
+                    getIndex(filterRequest.tree.name, searchData),
+                    getIndex(filterRequest.tree.name, searchData) +
+                      searchData.length,
+                  )}</span
+                >{filterRequest.tree.name.substring(
                   getIndex(filterRequest.tree.name, searchData) +
                     searchData.length,
-                )}</span
-              >{filterRequest.tree.name.substring(
-                getIndex(filterRequest.tree.name, searchData) +
-                  searchData.length,
-              )}
+                )}
+              </div>
             </div>
-          </div>
-          <div class="api-path">
-            <span>{filterRequest.path?replaceSlashWithGreaterThanSymbol(filterRequest.path):""}</span>
-          </div>
-        </button>
+            <div class="api-path">
+              <span
+                >{filterRequest.path
+                  ? replaceSlashWithGreaterThanSymbol(filterRequest.path)
+                  : ""}</span
+              >
+            </div>
+          </button>
         {/each}
       {/if}
       {#if filteredFolder.length > 0 && (currentSelectedId === "all" || currentSelectedId === "folder")}
         {#each filteredFolder as filterFolder}
-        <button class="folder-btn" on:click={()=>{
-          handleFolderClick(filterFolder.tree,activeWorkspaceId,filterFolder.collectionId)
-          handleGlobalSearchPopup(false)
-          }}>
-          <div
-            style="height:36px;"
-            class="d-flex align-items-center search-option-request"
+          <button
+            class="folder-btn"
+            on:click={() => {
+              handleFolderClick(
+                filterFolder.tree,
+                activeWorkspaceId,
+                filterFolder.collectionId,
+              );
+              handleGlobalSearchPopup(false);
+            }}
           >
-            <img src={FolderIcon} alt="" style="height:16px; width:16px;" />
-            <span
-              style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
-              >{filterFolder.tree.name.substring(
-                0,
-                getIndex(filterFolder.tree.name, searchData),
-              )}<span class="highlight"
+            <div
+              style="height:36px;"
+              class="d-flex align-items-center search-option-request"
+            >
+              <img src={FolderIcon} alt="" style="height:16px; width:16px;" />
+              <span
+                style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
                 >{filterFolder.tree.name.substring(
+                  0,
                   getIndex(filterFolder.tree.name, searchData),
+                )}<span class="highlight"
+                  >{filterFolder.tree.name.substring(
+                    getIndex(filterFolder.tree.name, searchData),
+                    getIndex(filterFolder.tree.name, searchData) +
+                      searchData.length,
+                  )}</span
+                >{filterFolder.tree.name.substring(
                   getIndex(filterFolder.tree.name, searchData) +
                     searchData.length,
-                )}</span
-              >{filterFolder.tree.name.substring(
-                getIndex(filterFolder.tree.name, searchData) +
-                  searchData.length,
-              )}
-            </span>
-          </div>
-          <div class="api-path">
-            <span>{filterFolder.path?replaceSlashWithGreaterThanSymbol(filterFolder.path):""}</span>
-          </div>
-        </button>
+                )}
+              </span>
+            </div>
+            <div class="api-path">
+              <span
+                >{filterFolder.path
+                  ? replaceSlashWithGreaterThanSymbol(filterFolder.path)
+                  : ""}</span
+              >
+            </div>
+          </button>
         {/each}
       {/if}
       {#if filteredCollection.length > 0 && (currentSelectedId === "all" || currentSelectedId === "collection")}
         {#each filteredCollection as filterCollection}
-        <button class="collection-btn" on:click={()=>{
-          handleCollectionClick(filterCollection.tree,activeWorkspaceId,filterCollection.tree._id);
-          handleGlobalSearchPopup(false);
-          }}>
-          <div
-            style="height:36px;"
-            class="d-flex align-items-center search-option-request"
+          <button
+            class="collection-btn"
+            on:click={() => {
+              handleCollectionClick(
+                filterCollection.tree,
+                activeWorkspaceId,
+                filterCollection.tree._id,
+              );
+              handleGlobalSearchPopup(false);
+            }}
           >
-            <img
-              src={collectionsIcon}
-              alt=""
-              style="height:20px; width:20px;"
-            />
-            <span
-              style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
-              >{filterCollection.tree.name.substring(
-                0,
-                getIndex(filterCollection.tree.name, searchData),
-              )}<span class="highlight">
-                {filterCollection.tree.name.substring(
+            <div
+              style="height:36px;"
+              class="d-flex align-items-center search-option-request"
+            >
+              <img
+                src={collectionsIcon}
+                alt=""
+                style="height:20px; width:20px;"
+              />
+              <span
+                style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
+                >{filterCollection.tree.name.substring(
+                  0,
                   getIndex(filterCollection.tree.name, searchData),
+                )}<span class="highlight">
+                  {filterCollection.tree.name.substring(
+                    getIndex(filterCollection.tree.name, searchData),
+                    getIndex(filterCollection.tree.name, searchData) +
+                      searchData.length,
+                  )}</span
+                >{filterCollection.tree.name.substring(
                   getIndex(filterCollection.tree.name, searchData) +
                     searchData.length,
-                )}</span
-              >{filterCollection.tree.name.substring(
-                getIndex(filterCollection.tree.name, searchData) +
-                  searchData.length,
-              )}
-            </span>
-          </div>
-          <div class="api-path">
-            <span>{filterCollection.path?replaceSlashWithGreaterThanSymbol(filterCollection.path):""}</span>
-          </div>
-        </button>
-          
+                )}
+              </span>
+            </div>
+            <div class="api-path">
+              <span
+                >{filterCollection.path
+                  ? replaceSlashWithGreaterThanSymbol(filterCollection.path)
+                  : ""}</span
+              >
+            </div>
+          </button>
         {/each}
       {/if}
       {#if workspaces.length > 0 && (currentSelectedId === "all" || currentSelectedId === "workspace")}
         {#each workspaces as workspace}
           {#if workspace.name.toLowerCase().includes(searchData.toLowerCase())}
-          <button class="workspace-btn"  on:click={()=>{ handleWorkspaceClick(workspace._id,workspace.name)}}>
-            <div
-            style="height:36px;"
-            class="d-flex align-items-center search-option-request"
-          >
-            <img
-              src={workspacesIcon}
-              alt=""
-              style="height:20px; width:20px;"
-            />
-            <span
-              style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
+            <button
+              class="workspace-btn"
+              on:click={() => {
+                handleWorkspaceClick(workspace._id, workspace.name);
+              }}
             >
-              {workspace.name.substring(
-                0,
-                getIndex(workspace.name, searchData),
-              )}<span class="highlight"
-                >{workspace.name.substring(
-                  getIndex(workspace.name, searchData),
-                  getIndex(workspace.name, searchData) + searchData.length,
-                )}</span
-              >{workspace.name.substring(
-                getIndex(workspace.name, searchData) + searchData.length,
-              )}
-            </span>
-          </div>
-          </button>
+              <div
+                style="height:36px;"
+                class="d-flex align-items-center search-option-request"
+              >
+                <img
+                  src={workspacesIcon}
+                  alt=""
+                  style="height:20px; width:20px;"
+                />
+                <span
+                  style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
+                >
+                  {workspace.name.substring(
+                    0,
+                    getIndex(workspace.name, searchData),
+                  )}<span class="highlight"
+                    >{workspace.name.substring(
+                      getIndex(workspace.name, searchData),
+                      getIndex(workspace.name, searchData) + searchData.length,
+                    )}</span
+                  >{workspace.name.substring(
+                    getIndex(workspace.name, searchData) + searchData.length,
+                  )}
+                </span>
+              </div>
+            </button>
           {/if}
         {/each}
+      {/if}
+      {#if filteredRequest.length === 0 && filteredCollection.length === 0 && filteredFolder.length === 0 && !workspaces.some(isFilteredWorkspaces)}
+        <p class="result-none">No Results Found</p>
       {/if}
     {/if}
   </div>
@@ -261,12 +310,13 @@
     position: absolute;
     height: 400px;
     width: 400px;
-    top: 30px;
-    left: 0;
     background-color: var(--background-color);
     z-index: 20;
     border-radius: 10px;
     margin-top: 5px;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .workspace-options-container {
@@ -310,18 +360,34 @@
   .api-name {
     font-size: 12px;
     font-weight: 400;
-    color: #8a9299;
+    color: var(--lightGray);
   }
-
   .search-option-request {
     width: 100%;
     padding: 10px;
   }
-  .request-btn,.folder-btn,.collection-btn,.workspace-btn{
+  .request-btn,
+  .folder-btn,
+  .collection-btn,
+  .workspace-btn {
     background-color: transparent;
     border: none;
   }
-  .request-btn:hover,.folder-btn:hover,.collection-btn:hover,.workspace-btn:hover{
+  .result-none {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Roboto;
+    font-size: 20px;
+    font-weight: 600;
+    color:  var(--lightGray);
+  }
+  .request-btn:hover,
+  .folder-btn:hover,
+  .collection-btn:hover,
+  .workspace-btn:hover {
     background-color: #313233;
   }
   .highlight {

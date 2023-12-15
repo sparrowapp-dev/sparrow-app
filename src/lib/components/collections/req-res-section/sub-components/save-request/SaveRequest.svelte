@@ -2,6 +2,7 @@
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
+  import { fade, fly, slide } from "svelte/transition";
   import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
@@ -381,8 +382,14 @@
   on:click={() => {
     onClick(false);
   }}
+  transition:fade={{ delay: 0, duration: 100 }}
 />
-<div class="save-request d-block">
+<div
+  class="save-request d-block"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="contain">
     <div class="d-flex justify-content-between">
       <div class="pb-2">
