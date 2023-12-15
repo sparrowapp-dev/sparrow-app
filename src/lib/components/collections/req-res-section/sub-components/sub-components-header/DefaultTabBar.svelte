@@ -20,7 +20,8 @@
   import { onDestroy } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-    import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { notifications } from "$lib/utils/notifications";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -138,6 +139,8 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
+      notifications.success("New Collection Created");
+
       return;
     }
     return;

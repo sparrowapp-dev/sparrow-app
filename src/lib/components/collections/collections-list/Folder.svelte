@@ -248,6 +248,7 @@
 
   //add folder in collection
   const addFolder = () => {
+    visibility = true;
     handleFolderClick();
     if (collectionId === openCollectionId) {
       visibility = true;
@@ -334,6 +335,8 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
+      isCollectionCreatedFirstTime.set(false);
+
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
         handleCollectionClick(collection, currentWorkspaceId, collectionId);
@@ -401,8 +404,18 @@
     {/each}
     {#if showFolderAPIButtons}
       <div class="mt-2 mb-2">
-        <img class="list-icons" src={folderIcon} alt="+ Folder" on:click={handleFolderClick}>
-        <img class="list-icons"  src={requestIcon} alt="+ API Request" on:click={handleAPIClick}>
+        <img
+          class="list-icons"
+          src={folderIcon}
+          alt="+ Folder"
+          on:click={handleFolderClick}
+        />
+        <img
+          class="list-icons"
+          src={requestIcon}
+          alt="+ API Request"
+          on:click={handleAPIClick}
+        />
       </div>
     {/if}
   </div>
@@ -412,12 +425,12 @@
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }
-  .list-icons{
+  .list-icons {
     width: 16px;
     height: 16px;
     margin-right: 10px;
   }
-  .list-icons:hover{
+  .list-icons:hover {
     filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
       brightness(100%) contrast(100%);
   }
