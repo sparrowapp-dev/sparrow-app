@@ -12,9 +12,10 @@
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
-  import { fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
+  import checkIcon from "$lib/assets/check.svg";
+  export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
-
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
@@ -162,26 +163,36 @@
         style="height:20px;width:20px">+</span
       >
     </p>
-    <hr class="m-0 p-0" />
+    <hr class="m-0 p-0 mb-1" />
     {#if $data}
       {#if isOpen}
-        <div transition:slide={{ duration: 800 }}>
-          {#each $data as list, index}
-            <!-- {#if index < workspaceLimit} -->
-            <p
-              class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-              style="cursor: pointer;overflow:auto"
-              on:click={() => {
-                isOpen = false;
-                onclick(list._id, list.name);
-              }}
-              on:click={() => {
-                handleWorkspaceTab(list._id, list.name);
-              }}
-            >
-              {list.name}
-            </p>
-            <!-- {/if} -->
+        <div transition:slide={{ duration: 500 }} class="gap-2">
+          {#each $data.slice().reverse() as list, index}
+            {#if index < workspaceLimit}
+              <div
+                class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
+              >
+                <p
+                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  style="cursor: pointer;overflow:auto"
+                  on:click={() => {
+                    isOpen = false;
+
+                    onclick(list._id, list.name);
+                  }}
+                  on:click={() => {
+                    handleWorkspaceTab(list._id, list.name);
+                  }}
+                >
+                  {list.name}
+                </p>
+                <div>
+                  {#if activeWorkspaceId === list._id}
+                    <img src={checkIcon} alt="checkIcon" />
+                  {/if}
+                </div>
+              </div>
+            {/if}
           {/each}
         </div>
       {/if}
