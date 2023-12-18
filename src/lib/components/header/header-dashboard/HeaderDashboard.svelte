@@ -223,6 +223,7 @@
         onclick={handleDropdown}
         {collectionsMethods}
         {activeSideBarTabMethods}
+        {activeWorkspaceId}
       />
     </div>
   </div>

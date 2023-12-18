@@ -12,9 +12,10 @@
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
-  import { fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
+  import checkIcon from "$lib/assets/check.svg";
+  export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
-
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
@@ -146,64 +147,71 @@
       /></span
     ></button
   >
-  {#if isOpen}
-    <div
-      style="display:none;overflow:auto;"
-      class="dropdown-data rounded px-2"
-      class:dropdown-active={isOpen}
-      transition:slide={{ duration: 300 }}
+  <div
+    style="display:none;overflow:auto;"
+    class="dropdown-data rounded px-2"
+    class:dropdown-active={isOpen}
+  >
+    <p
+      style="cursor:pointer;overflow:auto"
+      class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
+      on:click={() => {
+        isOpen = true;
+      }}
     >
-      <p
-        style="cursor:pointer;overflow:auto"
-        class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
-        on:click={() => {
-          isOpen = true;
-        }}
+      <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
+        style="height:20px;width:20px">+</span
       >
-        <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
-          style="height:20px;width:20px">+</span
-        >
-      </p>
-      <hr class="m-0 p-0" />
-      {#if $data}
-        {#if isOpen}
-          <div>
-            {#each $data as list, index}
-              <!-- {#if index < workspaceLimit} -->
-              <p
-                class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-                style="cursor: pointer;overflow:auto"
-                on:click={() => {
-                  isOpen = false;
-                  onclick(list._id, list.name);
-                }}
-                on:click={() => {
-                  handleWorkspaceTab(list._id, list.name);
-                }}
+    </p>
+    <hr class="m-0 p-0 mb-1" />
+    {#if $data}
+      {#if isOpen}
+        <div transition:slide={{ duration: 500 }} class="gap-2">
+          {#each $data.slice().reverse() as list, index}
+            {#if index < workspaceLimit}
+              <div
+                class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
               >
-                {list.name}
-              </p>
-              <!-- {/if} -->
-            {/each}
-          </div>
-        {/if}
+                <p
+                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  style="cursor: pointer;overflow:auto"
+                  on:click={() => {
+                    isOpen = false;
+
+                    onclick(list._id, list.name);
+                  }}
+                  on:click={() => {
+                    handleWorkspaceTab(list._id, list.name);
+                  }}
+                >
+                  {list.name}
+                </p>
+                <div>
+                  {#if activeWorkspaceId === list._id}
+                    <img src={checkIcon} alt="checkIcon" />
+                  {/if}
+                </div>
+              </div>
+            {/if}
+          {/each}
+        </div>
       {/if}
-      <hr class="m-0 p-0 mt-1" />
-      <p
-        style="cursor:pointer"
-        class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
-        on:click={() => {
-          navigate("/dashboard/workspaces");
-          activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
-        }}
-        on:click={() => {
-          isOpen = true;
-        }}
-      >
-        View All Workspaces
-      </p>
-    </div>
-  {/if}
+    {/if}
+    <hr class="m-0 p-0 mt-1" />
+    <p
+      style="cursor:pointer"
+      class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
+      on:click={() => {
+        navigate("/dashboard/workspaces");
+        activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
+      }}
+      on:click={() => {
+        isOpen = true;
+      }}
+    >
+      View All Workspaces
+    </p>
+  </div>
 </div>
 
 <style>
