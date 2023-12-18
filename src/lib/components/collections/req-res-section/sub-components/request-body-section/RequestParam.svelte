@@ -205,7 +205,7 @@
 >
   <Pane
     class="left-panel d-flex flex-column align-items-top overflow-y-auto pt-3 ps-4 pe-2"
-    minSize={25}
+    minSize={35}
     size={isHorizontalMode ? topPanelHeightSize : leftPanelWidthSize}
   >
     <div
@@ -319,7 +319,7 @@
 
   <Pane
     class="right-panel pt-3 px-4 position-relative overflow-y-auto"
-    minSize={25}
+    minSize={35}
     size={isHorizontalMode ? bottomPanelHeightSize : rightPanelWidthSize}
   >
     <div class=" d-flex flex-column">
