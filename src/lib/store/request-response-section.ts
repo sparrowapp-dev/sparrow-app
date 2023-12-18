@@ -142,6 +142,20 @@ const setRequestProperty = async (data, route: string): Promise<void> => {
     return [...updatedTab];
   });
 };
+
+const setResponse = async (data, route: string, id: string): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.id === id) {
+        elem.property.request[route] = data;
+        elem.property.request.save.api = false;
+        progressiveTab.set(elem);
+      }
+      return elem;
+    });
+    return [...updatedTab];
+  });
+};
 const updateRequestPropertyResponseBody = async (
   data,
   route: string,
@@ -289,6 +303,7 @@ const requestResponseStore = {
   setRequestAuth,
   setRequestState,
   setRequestProperty,
+  setResponse,
   updateRequestPropertyResponseBody,
   getTabList,
   getTab,

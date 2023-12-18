@@ -22,6 +22,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { listen } from "@tauri-apps/api/event";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -42,14 +43,25 @@
   let request;
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
+  let currentTabId:string = "";
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
+      currentTabId = event?.id;
       urlText = event?.property?.request?.url;
       method = event?.property?.request?.method;
       disabledSend = event?.property?.request?.requestInProgress;
       request = event?.property?.request;
     }
   });
+
+  const success = (data) => {
+    return {
+      status: "success",
+      isSuccessful: true,
+      message: "",
+      data,
+    };
+  };
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -68,8 +80,13 @@
       if (isInputValid) {
         let start = Date.now();
         isLoading = true;
-        createApiRequest(_apiSendRequest.decodeRestApiData(request))
-          .then((response) => {
+        createApiRequest(_apiSendRequest.decodeRestApiData(request),currentTabId);
+ 
+        await listen("rs2js", (event) => {
+          let response = event.payload[0];
+          let tabId = event.payload[1]
+          try {
+            response = success(JSON.parse(response as string));
             let end = Date.now();
 
             const byteLength = new TextEncoder().encode(
@@ -85,11 +102,12 @@
               responseHeaders,
               collectionsMethods,
             );
-            collectionsMethods.updateRequestProperty(
+            collectionsMethods.updateResponse(
               false,
               RequestProperty.REQUEST_IN_PROGRESS,
+              tabId
             );
-            collectionsMethods.updateRequestProperty(
+            collectionsMethods.updateResponse(
               {
                 body: responseBody,
                 headers: JSON.stringify(responseHeaders),
@@ -98,26 +116,14 @@
                 size: responseSizeKB,
               },
               RequestProperty.RESPONSE,
+              tabId
             );
             isLoading = false;
-          })
-          .catch((error) => {
-            collectionsMethods.updateRequestProperty(
-              false,
-              RequestProperty.REQUEST_IN_PROGRESS,
-            );
-            collectionsMethods.updateRequestProperty(
-              {
-                body: "",
-                headers: "",
-                status: "Not Found",
-                time: 0,
-                size: 0,
-              },
-              RequestProperty.RESPONSE,
-            );
-            isLoading = false;
-          });
+          } catch (e) {
+            // return error("error");
+            console.log(e)
+          }
+        });
         // For Test purpose (BUG NOT RESOLVED YET)
         // console.log("running", Date.now() - start )
       }

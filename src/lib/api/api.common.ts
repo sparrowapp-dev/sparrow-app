@@ -118,31 +118,16 @@ const makeHttpRequest = async (
   headers: string,
   body: string,
   request: string,
+  tabId: string,
 ) => {
-  let response;
-
+  const array = [url, method, headers, body, request, tabId];
   return Promise.race([
     timeout(apiTimeOut),
-
-    invoke("make_type_request_command", {
-      url,
-      method,
-      headers,
-      body,
-      request,
+    invoke("js2rs", {
+      message: array,
+      id: tabId,
     }),
-  ])
-    .then(async (data) => {
-      response = data;
-      try {
-        return success(JSON.parse(response));
-      } catch (e) {
-        return error("error");
-      }
-    })
-    .catch(() => {
-      return error("error");
-    });
+  ]);
 };
 
 export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };

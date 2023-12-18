@@ -9,6 +9,7 @@ export interface CollectionsMethods {
   handleCreateTab: (data) => void;
   updateTab: (data, route: string, _id: string) => void;
   updateRequestProperty: (data, route: string) => void;
+  updateResponse: (data, route: string, id: string) => void;
   updateRequestState: (data, route: string) => void;
   updateRequestAuth: (data, route: string) => void;
   updateRequestBody: (data, route: string) => void;
