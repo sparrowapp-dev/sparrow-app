@@ -11,7 +11,7 @@ fn is_valid_json(input: &str) -> bool {
 pub async fn make_json_request(
     request_builder: RequestBuilder,
     body: &str,
-) -> Result<Response, Box<dyn std::error::Error>> {
+) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
     let response;
     if is_valid_json(body) { 
         let valid_json: Value = serde_json::from_str(&body).unwrap();

@@ -2832,6 +2832,8 @@ dependencies = [
  "tauri-build",
  "tokio",
  "tokio-util 0.6.10",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

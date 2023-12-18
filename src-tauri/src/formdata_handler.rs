@@ -1,5 +1,5 @@
 use reqwest::{Body, RequestBuilder, Response};
-use std::{error::Error, collections::HashMap, path::Path};
+use std::{collections::HashMap, path::Path};
 use reqwest::multipart;
 use tokio::fs::File;
 use tokio_util::codec::{BytesCodec, FramedRead};
@@ -29,7 +29,7 @@ fn extract_filename(path_str: &str) -> Option<String> {
 pub async fn make_formdata_request(
     request_builder: RequestBuilder,
     body: &str,
-) -> Result<Response, Box<dyn Error>> {
+) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
     println!("inside form data");
     let mut form = reqwest::multipart::Form::new();
     let body_map: HashMap<_, _> = body.split('&')

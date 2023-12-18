@@ -5,7 +5,7 @@ use std::collections::HashMap;
 pub async fn make_www_form_urlencoded_request(
     request_builder: RequestBuilder,
     body: &str,
-) -> Result<Response, Box<dyn Error>> {
+) -> Result<Response, Box<dyn std::error::Error + Send + Sync>> {
     let body_map: HashMap<_, _> = body.split('&')
         .map(|s| {
             let mut parts = s.split('=');
