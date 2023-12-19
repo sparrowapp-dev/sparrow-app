@@ -132,32 +132,17 @@ const getTabList = () => {
 const setRequestProperty = async (
   data,
   route: string,
-  id?: string,
+  id: string,
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
-    let activeId;
-    value.forEach((elem: NewTab): void => {
-      if (elem.isActive) {
-        activeId = elem.id;
-      }
-    });
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (id) {
-        if (elem.id === id) {
-          elem.property.request[route] = data;
-          elem.property.request.save.api = false;
-          if (activeId === id) {
-            progressiveTab.set(elem);
-          }
-        }
-      } else {
+      if (elem.id === id) {
+        elem.property.request[route] = data;
+        elem.property.request.save.api = false;
         if (elem.isActive) {
-          elem.property.request[route] = data;
-          elem.property.request.save.api = false;
-          // progressiveTab.set(elem);
+          progressiveTab.set(elem);
         }
       }
-
       return elem;
     });
 
@@ -170,20 +155,12 @@ const updateRequestPropertyResponseBody = async (
   route: string,
   id: string,
 ): Promise<void> => {
-  let activeId;
   tabs.update((value: NewTab[]): NewTab[] => {
-    value.forEach((elem: NewTab): NewTab => {
-      if (elem.isActive) {
-        activeId = elem.id;
-      }
-
-      return elem;
-    });
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.id === id) {
         elem.property.request[route].body = data;
         elem.save = false;
-        if (id === activeId) {
+        if (elem.isActive) {
           progressiveTab.set(elem);
         }
       }

@@ -64,7 +64,7 @@ export class CollectionsViewModel {
   public updateRequestProperty = async (
     data: any,
     route: string,
-    id?: string,
+    id: string,
   ) => {
     requestResponseStore.setRequestProperty(data, route, id);
     this.debouncedTab();

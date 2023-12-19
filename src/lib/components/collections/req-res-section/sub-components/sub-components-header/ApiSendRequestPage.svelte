@@ -68,18 +68,18 @@
   listen("rs2js", (event) => {
     let response = event.payload[0];
     let tabId = event.payload[1];
+    let start= new Date(event.payload[2]).getTime();
     try {
       if (response.indexOf("dns error") != -1) {
         throw response;
       }
       response = success(JSON.parse(response as string));
       let end = Date.now();
-
       const byteLength = new TextEncoder().encode(
         JSON.stringify(response),
       ).length;
       let responseSizeKB = byteLength / 1024;
-      let duration = end - 0;
+      let duration = end - start;
 
       let responseBody = response.data.response;
       let responseHeaders = response.data.headers;
@@ -142,7 +142,6 @@
 
       isInputEmpty = false;
       if (isInputValid) {
-        // let start = Date.now();
         isLoading = true;
         createApiRequest(
           _apiSendRequest.decodeRestApiData(request),
@@ -191,10 +190,11 @@
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
   let handleInputValue = () => {
-    collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL,currentTabId);
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
+      currentTabId
     );
   };
   onDestroy(() => {
