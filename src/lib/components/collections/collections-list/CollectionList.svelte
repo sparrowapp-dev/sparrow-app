@@ -57,7 +57,6 @@
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
   let collapsExpandToggle: boolean = false;
-  $: sidebarWidth = collapsExpandToggle ? 0 : 280;
 
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
