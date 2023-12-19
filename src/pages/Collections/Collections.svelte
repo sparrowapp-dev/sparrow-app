@@ -120,10 +120,29 @@
   .collections__tools {
     height: calc(100vh - 44px);
   }
+  @keyframes increaseWidth {
+    0% {
+      width: calc(100vw - 352px);
+    }
+
+    100% {
+      width: calc(100vw - 72px);
+    }
+  }
+  @keyframes decreaseWidth {
+    0% {
+      width: calc(100vw - 72px);
+    }
+    100% {
+      width: calc(100vw - 352px);
+    }
+  }
   .sidebar-expand {
     width: calc(100vw - 352px);
+    animation: decreaseWidth 0.3s;
   }
   .sidebar-collapse {
     width: calc(100vw - 72px);
+    animation: increaseWidth 0.3s;
   }
 </style>
