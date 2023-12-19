@@ -24,6 +24,7 @@ use tracing_subscriber;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 
+
 async fn make_request(
     url: &str,
     method: &str,
@@ -246,24 +247,6 @@ fn rs2js<R: tauri::Runtime>(message: Vec<String>, manager: &impl Manager<R>) {
     manager.emit_all("rs2js", message).unwrap();
 }
 
-// #[tauri::command]
-// fn make_type_request_command(
-//     url: &str,
-//     method: &str,
-//     headers: &str,
-//     body: &str,
-//     request: &str,
-//     state: tauri::State<'_, AsyncProcInputTx>,
-// ) -> String {
-//     // let async_proc_input_tx = state.inner.lock().await;
-//     let result = make_request(url, method, headers, body, request);
-//     let result_value = match result {
-//         Ok(value) => value.to_string(),
-//         Err(err) => return err.to_string(),
-//     };
-//     return result_value;
-// }
-
 #[tauri::command]
 async fn js2rs(
     message: Vec<String>,
@@ -283,6 +266,7 @@ async fn async_process_model(
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     while let Some(input) = input_rx.recv().await {
         info!(?input, "async_process_model");
+        let start = chrono::offset::Local::now();
         let result = make_request(&input[0], &input[1], &input[2], &input[3], &input[4]);
         let result_value = match result.await {
             Ok(value) => value.to_string(),
@@ -293,6 +277,7 @@ async fn async_process_model(
         string_vector.push(result_value);
         let tab_id: String = input.clone().remove(5);
         string_vector.push(tab_id);
+        string_vector.push(start.to_string());
         output_tx.send(string_vector).await?;
     }
 
