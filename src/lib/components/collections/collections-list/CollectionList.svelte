@@ -234,7 +234,6 @@
         .classList.remove("decrease-width");
     }
 
-    console.log(document.getElementsByClassName("sidebar")[0].classList);
   };
 
   let filteredCollection = [];
@@ -503,7 +502,6 @@
   .sidebar {
     height: calc(100vh - 44px);
     overflow-y: auto;
-    /* width: 280px; */
   }
   .inputField {
     outline: none;
