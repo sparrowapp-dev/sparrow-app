@@ -316,12 +316,14 @@
           on:keydown={onRenameInputKeyPress}
         />
       {:else}
-        <span
+        <div
           on:click={() => {
             handleFolderClick(explorer, currentWorkspaceId, collectionId);
           }}
-          class="ellipsis d-flex"
-          style="cursor:pointer; font-size:12px; font-weight:400;"
+          class="folder-title d-flex align-items-center"
+          style="cursor:pointer; font-size:12px;
+          height: 36px;
+           font-weight:400;"
         >
           {#if expand}
             <div
@@ -335,10 +337,10 @@
               <img src={folder} alt="" style="height:16px; width:16px;" />
             </div>
           {/if}
-          <div>
+          <p class="ellipsis mb-0">
             {explorer.name}
-          </div>
-        </span>
+          </p>
+        </div>
       {/if}
     </div>
 
@@ -495,5 +497,8 @@
   }
   .active-folder-tab {
     background-color: var(--selected-active-sidebar) !important;
+  }
+  .folder-title {
+    width: calc(100% - 30px);
   }
 </style>
