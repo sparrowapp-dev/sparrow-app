@@ -83,7 +83,11 @@
 <Motion {...scaleMotionProps} let:motion>
   <div class="d-flex collection" use:motion>
     <div class="collections__list">
-      <CollectionsList {collectionsMethods} />
+      <CollectionsList
+        activeTabId={$activeTab?.id}
+        activePath={$activeTab?.path}
+        {collectionsMethods}
+      />
     </div>
     <div
       class="collections__tools bg-backgroundColor {$collapseCollectionPanel
