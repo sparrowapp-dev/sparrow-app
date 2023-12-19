@@ -23,12 +23,11 @@
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
 
-  
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-    
+
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateResponse: _viewModel.updateResponse,
@@ -47,7 +46,7 @@
     updateFolderName: _viewModel.updateFolderName,
     deleteRequestOrFolderInCollection:
       _viewModel.deleteRequestOrFolderInCollection,
-      getCollectionList: _viewModel.getCollectionList,
+    getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
     updateRequestInFolder: _viewModel.updateRequestInFolder,
@@ -69,14 +68,12 @@
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
-  let type:string=""
-  const tab=activeTab.subscribe((event:NewTab)=>{
-    if(event){
-      type=event.type;
-      console.log(type);
+  let type: string = "";
+  const tab = activeTab.subscribe((event: NewTab) => {
+    if (event) {
+      type = event.type;
     }
-  })
-
+  });
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {

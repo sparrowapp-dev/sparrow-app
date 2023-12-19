@@ -13,7 +13,7 @@ const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
 
-const error = (error, data?) => {
+export const error = (error, data?) => {
   return {
     status: "error",
     isSuccessful: false,
@@ -43,7 +43,7 @@ const getRefHeaders = () => {
   };
 };
 
-const regenerateAuthToken = async (
+export const regenerateAuthToken = async (
   method: Method,
   url: string,
   requestData?: RequestData,
@@ -121,13 +121,16 @@ const makeHttpRequest = async (
   tabId: string,
 ) => {
   const array = [url, method, headers, body, request, tabId];
-  return Promise.race([
+  Promise.race([
     timeout(apiTimeOut),
     invoke("js2rs", {
       message: array,
       id: tabId,
     }),
-  ]);
+  ]).catch((e) => {
+    console.log(e);
+  });
+  return;
 };
 
 export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };

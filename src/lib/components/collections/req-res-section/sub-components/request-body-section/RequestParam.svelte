@@ -163,12 +163,6 @@
             rightPanelWidthSize = value;
           });
         }
-        console.log({
-          leftPanelWidthSize,
-          rightPanelWidthSize,
-          topPanelHeightSize,
-          bottomPanelHeightSize,
-        });
       });
       window.addEventListener("mouseup", () => {
         splitter.style.border = "solid #313233";
@@ -337,7 +331,12 @@
       {:else if response?.status === "Not Found"}
         <ResponseError />
       {:else if response?.status}
-        <ResponseParams {apiState} {collectionsMethods} {response} {currentTabId} />
+        <ResponseParams
+          {apiState}
+          {collectionsMethods}
+          {response}
+          {currentTabId}
+        />
       {/if}
       {#if progress}
         <div

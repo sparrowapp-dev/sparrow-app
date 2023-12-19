@@ -22,18 +22,17 @@
   let model: monaco.editor.ITextModel;
 
   const loadCode = async (code: string, language: string) => {
-    const _id = currentTabId;
     if (editor) {
       await editor.updateOptions({ readOnly: false });
       model = await monaco.editor.createModel(code, language);
       await editor.setModel(model);
       await editor.getAction("editor.action.formatDocument").run();
       const value = editor.getValue();
-      // requestResponseStore.updateRequestPropertyResponseBody(
-      //   value,
-      //   RequestProperty.RESPONSE,
-      //   _id,
-      // );
+      requestResponseStore.updateRequestPropertyResponseBody(
+        value,
+        RequestProperty.RESPONSE,
+        currentTabId,
+      );
       await editor.updateOptions({ readOnly: true });
     }
   };

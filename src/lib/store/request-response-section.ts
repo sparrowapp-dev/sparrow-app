@@ -136,12 +136,11 @@ const setRequestProperty = async (
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     let activeId;
-    value.forEach((elem: NewTab): NewTab => {
+    value.forEach((elem: NewTab): void => {
       if (elem.isActive) {
         activeId = elem.id;
       }
     });
-
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (id) {
         if (elem.id === id) {
@@ -153,7 +152,6 @@ const setRequestProperty = async (
         }
       } else {
         if (elem.isActive) {
-          console.log(elem.isActive, "here");
           elem.property.request[route] = data;
           elem.property.request.save.api = false;
           // progressiveTab.set(elem);

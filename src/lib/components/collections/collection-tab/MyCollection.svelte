@@ -1,40 +1,31 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-
-  import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
   import {
     collapsibleState,
     isApiCreatedFirstTime,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   let isLoading: boolean = false;
 
-
-
   let tabName: string = "";
   let componentData: NewTab;
-  const collectionService = new CollectionService();
   let totalFolder: number = 0;
   let totalRequest: number = 0;
   let newCollectionName: string = "";
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.collection?.requestCount;
-    totalFolder = event?.property?.collection?.folderCount;
-    console.log(event);
-    console.log("IN COLLECTION");
+    if (event) {
+      tabName = event?.name;
+      componentData = event;
+      totalRequest = event?.property?.collection?.requestCount;
+      totalFolder = event?.property?.collection?.folderCount;
     }
   });
 

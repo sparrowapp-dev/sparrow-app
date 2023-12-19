@@ -23,6 +23,8 @@
 
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { listen } from "@tauri-apps/api/event";
+  import { ErrorMessages } from "$lib/utils/enums/enums";
+  import { error, regenerateAuthToken } from "$lib/api/api.common";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -63,8 +65,68 @@
     };
   };
 
+  listen("rs2js", (event) => {
+    let response = event.payload[0];
+    let tabId = event.payload[1];
+    try {
+      if (response.indexOf("dns error") != -1) {
+        throw response;
+      }
+      response = success(JSON.parse(response as string));
+      let end = Date.now();
+
+      const byteLength = new TextEncoder().encode(
+        JSON.stringify(response),
+      ).length;
+      let responseSizeKB = byteLength / 1024;
+      let duration = end - 0;
+
+      let responseBody = response.data.response;
+      let responseHeaders = response.data.headers;
+      let responseStatus = response.data.status;
+      _apiSendRequest.setResponseContentType(
+        responseHeaders,
+        collectionsMethods,
+      );
+      collectionsMethods.updateRequestProperty(
+        false,
+        RequestProperty.REQUEST_IN_PROGRESS,
+        tabId,
+      );
+      collectionsMethods.updateRequestProperty(
+        {
+          body: responseBody,
+          headers: JSON.stringify(responseHeaders),
+          status: responseStatus,
+          time: duration,
+          size: responseSizeKB,
+        },
+        RequestProperty.RESPONSE,
+        tabId,
+      );
+      isLoading = false;
+    } catch (e) {
+      collectionsMethods.updateRequestProperty(
+        false,
+        RequestProperty.REQUEST_IN_PROGRESS,
+        tabId,
+      );
+      collectionsMethods.updateRequestProperty(
+        {
+          body: "",
+          headers: "",
+          status: "Not Found",
+          time: 0,
+          size: 0,
+        },
+        RequestProperty.RESPONSE,
+        tabId,
+      );
+      isLoading = false;
+    }
+  });
+
   const handleSendRequest = async () => {
-    const _id = currentTabId;
     isInputValid = true;
     const str = urlText;
 
@@ -75,59 +137,17 @@
       collectionsMethods.updateRequestProperty(
         true,
         RequestProperty.REQUEST_IN_PROGRESS,
-        _id,
+        currentTabId,
       );
 
       isInputEmpty = false;
       if (isInputValid) {
-        let start = Date.now();
+        // let start = Date.now();
         isLoading = true;
-        createApiRequest(_apiSendRequest.decodeRestApiData(request), _id);
-
-        await listen("rs2js", (event) => {
-          let response = event.payload[0];
-          let tabId = event.payload[1];
-          try {
-            response = success(JSON.parse(response as string));
-            let end = Date.now();
-
-            const byteLength = new TextEncoder().encode(
-              JSON.stringify(response),
-            ).length;
-            let responseSizeKB = byteLength / 1024;
-            let duration = end - start;
-
-            let responseBody = response.data.response;
-            let responseHeaders = response.data.headers;
-            let responseStatus = response.data.status;
-            _apiSendRequest.setResponseContentType(
-              responseHeaders,
-              collectionsMethods,
-            );
-            collectionsMethods.updateRequestProperty(
-              false,
-              RequestProperty.REQUEST_IN_PROGRESS,
-              _id,
-            );
-            collectionsMethods.updateRequestProperty(
-              {
-                body: responseBody,
-                headers: JSON.stringify(responseHeaders),
-                status: responseStatus,
-                time: duration,
-                size: responseSizeKB,
-              },
-              RequestProperty.RESPONSE,
-              _id,
-            );
-            isLoading = false;
-          } catch (e) {
-            // return error("error");
-            console.log(e);
-          }
-        });
-        // For Test purpose (BUG NOT RESOLVED YET)
-        // console.log("running", Date.now() - start )
+        createApiRequest(
+          _apiSendRequest.decodeRestApiData(request),
+          currentTabId,
+        );
       }
     }
   };
