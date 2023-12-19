@@ -339,7 +339,7 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-2 my-button {collection.id ===
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
@@ -374,9 +374,9 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <p
-        class="mb-0 ellipsis"
-        style="font-size: 12px;"
+      <div
+        class="collection-title d-flex align-items-center py-1 mb-0"
+        style="height: 36px;"
         on:click={() => {
           isCollectionCreatedFirstTime.set(false);
 
@@ -385,8 +385,10 @@
           }
         }}
       >
-        {title}
-      </p>
+        <p class="ellipsis w-100 mb-0" style="font-size: 12px;">
+          {title}
+        </p>
+      </div>
     {/if}
   </div>
   {#if collection.id.includes(UntrackedItems.UNTRACKED)}
@@ -524,5 +526,9 @@
   }
   .active-collection-tab {
     background-color: var(--selected-active-sidebar) !important;
+  }
+  .collection-title {
+    width: calc(100% - 30px);
+    text-align: left;
   }
 </style>
