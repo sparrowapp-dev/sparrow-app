@@ -28,6 +28,7 @@
     componentData = event;
     totalRequest = event?.property?.folder?.requestCount;
     totalFolder = event?.property?.folder?.folderCount;
+    console.log("IN FOLDER");
     }
   });
 

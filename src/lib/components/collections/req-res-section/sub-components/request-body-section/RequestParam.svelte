@@ -47,8 +47,11 @@
   let request;
   let pencilIconState: boolean = false;
   let apiState;
+  let currentTabId: string = "";
+
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
+      currentTabId = event.id;
       apiState = event?.property?.request?.state;
       selectedTab = event?.property?.request?.state.section;
       progress = event?.property?.request?.requestInProgress;
@@ -83,7 +86,6 @@
   const isHorizontalUnsubscribe = isHorizontal.subscribe((value) => {
     isHorizontalMode = value;
     stylePanes();
-  
   });
 
   const rightPanelWidthSubscribe = rightPanelWidth.subscribe((value) => {
@@ -335,7 +337,7 @@
       {:else if response?.status === "Not Found"}
         <ResponseError />
       {:else if response?.status}
-        <ResponseParams {apiState} {collectionsMethods} {response} />
+        <ResponseParams {apiState} {collectionsMethods} {response} {currentTabId} />
       {/if}
       {#if progress}
         <div

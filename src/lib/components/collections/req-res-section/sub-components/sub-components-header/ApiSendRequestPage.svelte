@@ -43,7 +43,7 @@
   let request;
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
-  let currentTabId:string = "";
+  let currentTabId: string = "";
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       currentTabId = event?.id;
@@ -64,6 +64,7 @@
   };
 
   const handleSendRequest = async () => {
+    const _id = currentTabId;
     isInputValid = true;
     const str = urlText;
 
@@ -74,17 +75,18 @@
       collectionsMethods.updateRequestProperty(
         true,
         RequestProperty.REQUEST_IN_PROGRESS,
+        _id,
       );
 
       isInputEmpty = false;
       if (isInputValid) {
         let start = Date.now();
         isLoading = true;
-        createApiRequest(_apiSendRequest.decodeRestApiData(request),currentTabId);
- 
+        createApiRequest(_apiSendRequest.decodeRestApiData(request), _id);
+
         await listen("rs2js", (event) => {
           let response = event.payload[0];
-          let tabId = event.payload[1]
+          let tabId = event.payload[1];
           try {
             response = success(JSON.parse(response as string));
             let end = Date.now();
@@ -102,12 +104,12 @@
               responseHeaders,
               collectionsMethods,
             );
-            collectionsMethods.updateResponse(
+            collectionsMethods.updateRequestProperty(
               false,
               RequestProperty.REQUEST_IN_PROGRESS,
-              tabId
+              _id,
             );
-            collectionsMethods.updateResponse(
+            collectionsMethods.updateRequestProperty(
               {
                 body: responseBody,
                 headers: JSON.stringify(responseHeaders),
@@ -116,12 +118,12 @@
                 size: responseSizeKB,
               },
               RequestProperty.RESPONSE,
-              tabId
+              _id,
             );
             isLoading = false;
           } catch (e) {
             // return error("error");
-            console.log(e)
+            console.log(e);
           }
         });
         // For Test purpose (BUG NOT RESOLVED YET)

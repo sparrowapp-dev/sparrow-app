@@ -12,6 +12,7 @@
   export let response;
   export let apiState;
   export let collectionsMethods: CollectionsMethods;
+  export let currentTabId;
 
   let responseBody;
   let responseHeader;
@@ -112,7 +113,7 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if apiState.responseSection === ResponseSection.RESPONSE}
-    <ResponseBody {apiState} {collectionsMethods} {response} />
+    <ResponseBody {apiState} {collectionsMethods} {response}  currentTabId={currentTabId}}/>
   {:else if apiState.responseSection === ResponseSection.HEADERS}
     <ResponseHeader {responseHeader} />
   {/if}

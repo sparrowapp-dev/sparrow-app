@@ -61,16 +61,14 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
-  public updateRequestProperty = async (data: any, route: string) => {
-    requestResponseStore.setRequestProperty(data, route);
+  public updateRequestProperty = async (
+    data: any,
+    route: string,
+    id?: string,
+  ) => {
+    requestResponseStore.setRequestProperty(data, route, id);
     this.debouncedTab();
   };
-
-  public updateResponse = async (data: any, route: string, id: string) => {
-    requestResponseStore.setResponse(data, route, id);
-    this.debouncedTab();
-  };
-
   public updateRequestState = async (data: any, route: string) => {
     requestResponseStore.setRequestState(data, route);
     this.debouncedTab();

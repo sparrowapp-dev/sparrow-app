@@ -23,11 +23,12 @@
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
 
+  
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-
+    
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateResponse: _viewModel.updateResponse,
@@ -46,7 +47,7 @@
     updateFolderName: _viewModel.updateFolderName,
     deleteRequestOrFolderInCollection:
       _viewModel.deleteRequestOrFolderInCollection,
-    getCollectionList: _viewModel.getCollectionList,
+      getCollectionList: _viewModel.getCollectionList,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
     addRequestInFolder: _viewModel.addRequestInFolder,
     updateRequestInFolder: _viewModel.updateRequestInFolder,
@@ -68,6 +69,14 @@
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  let type:string=""
+  const tab=activeTab.subscribe((event:NewTab)=>{
+    if(event){
+      type=event.type;
+      console.log(type);
+    }
+  })
+
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
@@ -102,13 +111,13 @@
         <div class="w-100">
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
+          {:else if type === ItemType.REQUEST}
             <RequestResponse {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+          {:else if type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+          {:else if type === ItemType.FOLDER}
             <MyFolder {collectionsMethods} {activeTab} />
-          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+          {:else if type === ItemType.COLLECTION}
             <MyCollection {collectionsMethods} {activeTab} />
           {/if}
         </div>

@@ -17,6 +17,8 @@
   export let collectionsMethods: CollectionsMethods;
   let isLoading: boolean = false;
 
+
+
   let tabName: string = "";
   let componentData: NewTab;
   const collectionService = new CollectionService();
@@ -31,6 +33,8 @@
     componentData = event;
     totalRequest = event?.property?.collection?.requestCount;
     totalFolder = event?.property?.collection?.folderCount;
+    console.log(event);
+    console.log("IN COLLECTION");
     }
   });
 
