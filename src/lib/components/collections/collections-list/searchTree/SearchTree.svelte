@@ -6,7 +6,6 @@
     handleCollectionClick,
     handleFolderClick,
   } from "$lib/utils/helpers/handle-clicks.helper";
-  import { fade, slide } from "svelte/transition";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
   export let explorer: any;

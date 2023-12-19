@@ -25,7 +25,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
@@ -268,6 +268,7 @@
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
+      transition:fade={{ delay: 0, duration: 200 }}
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
@@ -279,11 +280,11 @@
     style="margin-left: 45px;"
   >
     <div
-      class="gap-{!isSearchVisible ? '0' : '3'} d-flex {showGlobalSearchPopup
-        ? 'd-none'
-        : ''}"
+      class="my-auto gap-{!isSearchVisible
+        ? '0'
+        : '4'} d-flex {showGlobalSearchPopup ? 'd-none' : ''}"
     >
-      <div class="col-{!isSearchVisible ? '1' : '1'}">
+      <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
             <img src={icons.settingIcon} alt="" />
@@ -291,7 +292,7 @@
         </Tooltip>
       </div>
       <div
-        class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
           ? 'd-none'
           : ''}"
       >
@@ -302,7 +303,7 @@
         </Tooltip>
       </div>
       <div
-        class="col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
           ? 'd-none'
           : ''}"
       >
