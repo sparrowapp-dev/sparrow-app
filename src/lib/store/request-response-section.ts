@@ -73,6 +73,9 @@ const removeTab = async (id: string): Promise<void> => {
       if (elem.id === id) return false;
       else return true;
     });
+    if (filteredTabs.length === 0) {
+      progressiveTab.set({});
+    }
     return [...filteredTabs];
   });
 };
