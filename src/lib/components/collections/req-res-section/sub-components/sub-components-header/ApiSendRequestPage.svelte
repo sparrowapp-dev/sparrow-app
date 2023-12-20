@@ -13,7 +13,6 @@
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
   import {
-    RequestDataType,
     RequestMethod,
     RequestProperty,
   } from "$lib/utils/enums/request.enum";
@@ -21,14 +20,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { listen } from "@tauri-apps/api/event";
-  import { ErrorMessages } from "$lib/utils/enums/enums";
-  import { error, regenerateAuthToken } from "$lib/api/api.common";
-  export let loaderColor = "default";
+  export const loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  //this for expand and collaps condition
+  //this for expand and collapse condition
   const _apiSendRequest = new ApiSendRequestViewModel();
 
   let isCollaps: boolean;
@@ -56,76 +51,6 @@
     }
   });
 
-  const success = (data) => {
-    return {
-      status: "success",
-      isSuccessful: true,
-      message: "",
-      data,
-    };
-  };
-
-  listen("send_http_response_to_js", (event) => {
-    let response = event.payload[0];
-    let tabId = event.payload[1];
-    let start= new Date(event.payload[2]).getTime();
-    try {
-      if (response.indexOf("dns error") != -1) {
-        throw response;
-      }
-      response = success(JSON.parse(response as string));
-      let end = Date.now();
-      const byteLength = new TextEncoder().encode(
-        JSON.stringify(response),
-      ).length;
-      let responseSizeKB = byteLength / 1024;
-      let duration = end - start;
-
-      let responseBody = response.data.response;
-      let responseHeaders = response.data.headers;
-      let responseStatus = response.data.status;
-      _apiSendRequest.setResponseContentType(
-        responseHeaders,
-        collectionsMethods,
-      );
-      collectionsMethods.updateRequestProperty(
-        false,
-        RequestProperty.REQUEST_IN_PROGRESS,
-        tabId,
-      );
-      collectionsMethods.updateRequestProperty(
-        {
-          body: responseBody,
-          headers: JSON.stringify(responseHeaders),
-          status: responseStatus,
-          time: duration,
-          size: responseSizeKB,
-        },
-        RequestProperty.RESPONSE,
-        tabId,
-      );
-      isLoading = false;
-    } catch (e) {
-      collectionsMethods.updateRequestProperty(
-        false,
-        RequestProperty.REQUEST_IN_PROGRESS,
-        tabId,
-      );
-      collectionsMethods.updateRequestProperty(
-        {
-          body: "",
-          headers: "",
-          status: "Not Found",
-          time: 0,
-          size: 0,
-        },
-        RequestProperty.RESPONSE,
-        tabId,
-      );
-      isLoading = false;
-    }
-  });
-
   const handleSendRequest = async () => {
     isInputValid = true;
     const str = urlText;
@@ -142,11 +67,63 @@
 
       isInputEmpty = false;
       if (isInputValid) {
+        let start = Date.now();
         isLoading = true;
+
         createApiRequest(
           _apiSendRequest.decodeRestApiData(request),
           currentTabId,
-        );
+        )
+          .then((response) => {
+            let end = Date.now();
+            const byteLength = new TextEncoder().encode(
+              JSON.stringify(response),
+            ).length;
+            let responseSizeKB = byteLength / 1024;
+            let duration = end - start;
+
+            let responseBody = response.data.response;
+            let responseHeaders = response.data.headers;
+            let responseStatus = response.data.status;
+            _apiSendRequest.setResponseContentType(
+              responseHeaders,
+              collectionsMethods,
+            );
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+              response.tabId,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: responseBody,
+                headers: JSON.stringify(responseHeaders),
+                status: responseStatus,
+                time: duration,
+                size: responseSizeKB,
+              },
+              RequestProperty.RESPONSE,
+              response.tabId,
+            );
+            isLoading = false;
+          })
+          .catch((error) => {
+            collectionsMethods.updateRequestProperty(
+              false,
+              RequestProperty.REQUEST_IN_PROGRESS,
+            );
+            collectionsMethods.updateRequestProperty(
+              {
+                body: "",
+                headers: "",
+                status: "Not Found",
+                time: 0,
+                size: 0,
+              },
+              RequestProperty.RESPONSE,
+            );
+            isLoading = false;
+          });
       }
     }
   };
@@ -190,11 +167,15 @@
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
   let handleInputValue = () => {
-    collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL,currentTabId);
+    collectionsMethods.updateRequestProperty(
+      urlText,
+      RequestProperty.URL,
+      currentTabId,
+    );
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
-      currentTabId
+      currentTabId,
     );
   };
   onDestroy(() => {
@@ -205,10 +186,10 @@
     const windowWidth = window.innerWidth;
 
     if (windowWidth <= 1300) {
-      document.querySelector("#barIcon").click();
+      document.querySelector<HTMLElement>("#barIcon").click();
       isHorizontal.set(true);
     } else {
-      document.querySelector("#lineIcon").click();
+      document.querySelector<HTMLElement>("#lineIcon").click();
       isHorizontal.set(false);
     }
   };
@@ -293,6 +274,7 @@
 
     <div class="d-flex gap-1 ps-2">
       <span style="cursor:pointer;">
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <img
           on:click={() => isHorizontal.set(false)}
           on:click={() => {

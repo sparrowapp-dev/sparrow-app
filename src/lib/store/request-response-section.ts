@@ -176,7 +176,7 @@ const updateRequestPropertyResponseBody = async (
 const setRequestState = async (data, route: string): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
+      if (elem.isActive && elem.property.request) {
         elem.property.request.state[route] = data;
         progressiveTab.set(elem);
       }

@@ -13,21 +13,23 @@ const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
 
-export const error = (error, data?) => {
+export const error = (error, data?, tabId?) => {
   return {
     status: "error",
     isSuccessful: false,
     message: error,
     data,
+    tabId,
   };
 };
 
-const success = (data) => {
+const success = (data, tabId) => {
   return {
     status: "success",
     isSuccessful: true,
     message: "",
     data,
+    tabId,
   };
 };
 
@@ -76,7 +78,7 @@ const makeRequest = async (
     });
 
     if (response.status === 201 || response.status === 200) {
-      return success(response.data);
+      return success(response.data, "");
     } else {
       return error(response.data.message);
     }
@@ -120,17 +122,32 @@ const makeHttpRequest = async (
   request: string,
   tabId: string,
 ) => {
-  const array = [url, method, headers, body, request, tabId];
-  Promise.race([
+  let response;
+
+  return Promise.race([
     timeout(apiTimeOut),
-    invoke("get_http_request_from_js", {
-      message: array,
-      id: tabId,
+
+    invoke("make_http_request", {
+      url,
+      method,
+      headers,
+      body,
+      request,
+      tabId,
     }),
-  ]).catch((e) => {
-    console.log(e);
-  });
-  return;
+  ])
+    .then(async (data: string) => {
+      response = data.split("---TAB---")[0];
+      const tabId = data.split("---TAB---")[1];
+      try {
+        return success(JSON.parse(response), tabId);
+      } catch (e) {
+        return error("error");
+      }
+    })
+    .catch(() => {
+      return error("error");
+    });
 };
 
 export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };

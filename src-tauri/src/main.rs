@@ -12,13 +12,12 @@ use json_handler::make_json_request;
 use nfd::Response;
 use raw_handler::make_text_request;
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::{thread, time};
 use tauri::Manager;
-use tokio::sync::mpsc;
-use tokio::sync::Mutex;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 
@@ -101,37 +100,20 @@ async fn close_oauth_window(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn get_http_request_from_js(
-    message: Vec<String>,
-    state: tauri::State<'_, InputChannelMutex>,
-) -> Result<(), String> {
-    let input_queue_sender = state.inner.lock().await;
-    input_queue_sender
-        .send(message)
-        .await
-        .map_err(|e| e.to_string())
-}
+async fn make_http_request(
+    url: &str,
+    method: &str,
+    headers: &str,
+    body: &str,
+    request: &str,
+    tab_id: &str,
+) -> Result<String, ()> {
+    let result = make_request(url, method, headers, body, request).await;
 
-// Helper Functions
-async fn process_http_request(
-    mut input_queue_receiver: mpsc::Receiver<Vec<String>>,
-    output_queue_sender: mpsc::Sender<Vec<String>>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    while let Some(input) = input_queue_receiver.recv().await {
-        let start = chrono::offset::Local::now();
-        let result = make_request(&input[0], &input[1], &input[2], &input[3], &input[4]);
-        let result_value = match result.await {
-            Ok(value) => value.to_string(),
-            Err(err) => err.to_string(),
-        };
-        let mut string_vector: Vec<String> = Vec::new();
-        let tab_id: String = input.clone().remove(5);
-        string_vector.push(result_value);
-        string_vector.push(tab_id);
-        string_vector.push(start.to_string());
-        output_queue_sender.send(string_vector).await?;
-    }
-    Ok(())
+    return match result {
+        Ok(value) => Ok(value.to_string() + "---TAB---" + tab_id),
+        Err(err) => Ok(format!("Error: {}", err)),
+    };
 }
 
 async fn make_request(
@@ -140,7 +122,7 @@ async fn make_request(
     headers: &str,
     body: &str,
     request: &str,
-) -> Result<Value, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<String, std::io::Error> {
     // Make a client
     let client = Client::new();
     // Convert the method string to reqwest::Method
@@ -183,6 +165,7 @@ async fn make_request(
     let response_value = match check {
         Ok(value) => value,
         Err(err) => {
+            // converting `reqwest::Error` to `std::io::Error
             return Err(err);
         }
     };
@@ -190,25 +173,24 @@ async fn make_request(
     // Extracting Headers, StatusCode & Response
     let headers = response_value.headers().clone();
     let status = response_value.status().clone();
-    let response_text = response_value.text().await?;
+    let response_text_result = response_value.text().await;
     let headers_json: serde_json::Value = headers
         .iter()
         .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
         .collect();
 
+    let response_text = match response_text_result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {}", err),
+    };
+
     // Combining all parameters
     let combined_json = json!({
         "headers": headers_json,
         "status": status.to_string(),
-        "response": response_text
+        "response": response_text,
     });
-    return Ok(combined_json);
-}
-
-fn send_http_response_to_js<R: tauri::Runtime>(message: Vec<String>, manager: &impl Manager<R>) {
-    manager
-        .emit_all("send_http_response_to_js", message)
-        .unwrap();
+    return Ok(combined_json.to_string());
 }
 
 // Sturct Types
@@ -222,30 +204,22 @@ struct OnClosePayload {
     message: String,
 }
 
-//It wraps a mutex on the input channel. It helps to simplify the type signature. Instead of having to write Mutex<mpsc::Sender<String>> everywhere, we only have to write InputChannelMutex.
-// Why use mutex at all? - So that it an be state managed by tauri. Hence, we can use it in tauri commands and get mutable access to send data into it.
-struct InputChannelMutex {
-    inner: Mutex<mpsc::Sender<Vec<String>>>,
+#[derive(Debug, Serialize, Deserialize)]
+struct MyResponse {
+    tab_id: String,
+    response: Result<String, String>,
 }
 
 // Driver Function
 fn main() {
-    // Initiate two mpsc channels(FIFO Queues) to facilitate async operations that can hold 100 messages each.
-    let (input_queue_sender, input_queue_receiver) = mpsc::channel::<Vec<String>>(100);
-    let (output_queue_sender, mut output_queue_receiver) = mpsc::channel::<Vec<String>>(100);
-
     // Initiate Tauri Runtime
     tauri::Builder::default()
-        .manage(InputChannelMutex {
-            inner: Mutex::new(input_queue_sender),
-        })
         .invoke_handler(tauri::generate_handler![
-            // make_type_request_command,
             fetch_swagger_url_command,
             fetch_file_command,
             open_oauth_window,
             close_oauth_window,
-            get_http_request_from_js
+            make_http_request
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
@@ -258,24 +232,6 @@ fn main() {
                     )
                     .unwrap();
             }
-        })
-        .setup(|app| {
-            // Loop Input receiver for http request, process it and send response to Output sender
-            tauri::async_runtime::spawn(async move {
-                process_http_request(input_queue_receiver, output_queue_sender).await
-            });
-
-            //Loop Output receiver for response and emit it to JS
-            let app_handle = app.handle();
-            tauri::async_runtime::spawn(async move {
-                loop {
-                    if let Some(output) = output_queue_receiver.recv().await {
-                        send_http_response_to_js(output, &app_handle);
-                    }
-                }
-            });
-
-            Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
