@@ -65,7 +65,7 @@
     };
   };
 
-  listen("rs2js", (event) => {
+  listen("send_http_response_to_js", (event) => {
     let response = event.payload[0];
     let tabId = event.payload[1];
     let start= new Date(event.payload[2]).getTime();

@@ -123,7 +123,7 @@ const makeHttpRequest = async (
   const array = [url, method, headers, body, request, tabId];
   Promise.race([
     timeout(apiTimeOut),
-    invoke("js2rs", {
+    invoke("get_http_request_from_js", {
       message: array,
       id: tabId,
     }),

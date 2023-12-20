@@ -19,11 +19,120 @@ use std::{thread, time};
 use tauri::Manager;
 use tokio::sync::mpsc;
 use tokio::sync::Mutex;
-use tracing::info;
-use tracing_subscriber;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 
+// Commands
+#[tauri::command]
+fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
+    let response = import_swagger_url(url, headers, workspaceid);
+    let response_value = match response {
+        Ok(value) => value,
+        Err(err) => todo!("{}", err),
+    };
+    return response_value;
+}
+
+#[tauri::command]
+fn fetch_file_command() -> String {
+    let result = nfd::open_file_dialog(None, None).expect("Error opening file dialog");
+    let response;
+    match result {
+        Response::Okay(file_path) => {
+            response = file_path;
+        }
+        Response::OkayMultiple(_) => {
+            let temp = "Multiple Files Selected";
+            response = temp.to_string();
+        }
+        Response::Cancel => {
+            let temp = "Canceled";
+            response = temp.to_string();
+        }
+    }
+    return response;
+}
+
+#[tauri::command]
+async fn open_oauth_window(handle: tauri::AppHandle) {
+    let oauth_window = handle.get_window("oauth");
+    if oauth_window == None {
+        tauri::WindowBuilder::new(
+            &handle,
+            "oauth", /* the unique window label */
+            tauri::WindowUrl::External(
+                "https://dev-api.sparrow.techdomeaks.com/api/auth/google"
+                    .parse()
+                    .unwrap(),
+            ),
+        )
+        .title("")
+        .build()
+        .unwrap();
+    } else {
+        let oauth_window = handle.get_window("oauth").unwrap();
+        let _ = oauth_window.eval(&format!(
+            "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
+        ));
+        let one_sec = time::Duration::from_secs(1);
+        thread::sleep(one_sec);
+
+        let _ = oauth_window.center();
+        let _ = oauth_window.show();
+    }
+    let oauth_window = handle.get_window("oauth").unwrap();
+    oauth_window
+        .emit(
+            "onclose",
+            OnClosePayload {
+                message: "Window Close Event".into(),
+            },
+        )
+        .unwrap();
+}
+
+#[tauri::command]
+async fn close_oauth_window(handle: tauri::AppHandle) {
+    let oauth_window = handle.get_window("oauth").unwrap();
+    let _ = oauth_window.eval(&format!(
+        "window.location.replace('https://accounts.google.com/logout')"
+    ));
+    let _ = oauth_window.hide();
+}
+
+#[tauri::command]
+async fn get_http_request_from_js(
+    message: Vec<String>,
+    state: tauri::State<'_, InputChannelMutex>,
+) -> Result<(), String> {
+    let input_queue_sender = state.inner.lock().await;
+    input_queue_sender
+        .send(message)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// Helper Functions
+async fn process_http_request(
+    mut input_queue_receiver: mpsc::Receiver<Vec<String>>,
+    output_queue_sender: mpsc::Sender<Vec<String>>,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    while let Some(input) = input_queue_receiver.recv().await {
+        let start = chrono::offset::Local::now();
+        let result = make_request(&input[0], &input[1], &input[2], &input[3], &input[4]);
+        let result_value = match result.await {
+            Ok(value) => value.to_string(),
+            Err(err) => err.to_string(),
+        };
+        let mut string_vector: Vec<String> = Vec::new();
+        let tab_id: String = input.clone().remove(5);
+        string_vector.push(result_value);
+        string_vector.push(tab_id);
+        string_vector.push(start.to_string());
+        output_queue_sender.send(string_vector).await?;
+    }
+    Ok(())
+}
 
 async fn make_request(
     url: &str,
@@ -96,34 +205,16 @@ async fn make_request(
     return Ok(combined_json);
 }
 
-#[tauri::command]
-fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
-    let response = import_swagger_url(url, headers, workspaceid);
-    let response_value = match response {
-        Ok(value) => value,
-        Err(err) => todo!("{}", err),
-    };
-    return response_value;
+fn send_http_response_to_js<R: tauri::Runtime>(message: Vec<String>, manager: &impl Manager<R>) {
+    manager
+        .emit_all("send_http_response_to_js", message)
+        .unwrap();
 }
 
-#[tauri::command]
-fn fetch_file_command() -> String {
-    let result = nfd::open_file_dialog(None, None).expect("Error opening file dialog");
-    let mut response;
-    match result {
-        Response::Okay(file_path) => {
-            response = file_path;
-        }
-        Response::OkayMultiple(_) => {
-            let temp = "Multiple Files Selected";
-            response = temp.to_string();
-        }
-        Response::Cancel => {
-            let temp = "Canceled";
-            response = temp.to_string();
-        }
-    }
-    return response;
+// Sturct Types
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    url: String,
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -131,76 +222,21 @@ struct OnClosePayload {
     message: String,
 }
 
-#[tauri::command]
-async fn open_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth");
-    if oauth_window == None {
-        tauri::WindowBuilder::new(
-            &handle,
-            "oauth", /* the unique window label */
-            tauri::WindowUrl::External(
-                "https://dev-api.sparrow.techdomeaks.com/api/auth/google"
-                    .parse()
-                    .unwrap(),
-            ),
-        )
-        .title("")
-        .build()
-        .unwrap();
-    } else {
-        let oauth_window = handle.get_window("oauth").unwrap();
-        let _ = oauth_window.eval(&format!(
-            "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
-        ));
-        let one_sec = time::Duration::from_secs(1);
-        thread::sleep(one_sec);
-
-        let _ = oauth_window.center();
-        let _ = oauth_window.show();
-    }
-    let oauth_window = handle.get_window("oauth").unwrap();
-    oauth_window
-        .emit(
-            "onclose",
-            OnClosePayload {
-                message: "Window Close Event".into(),
-            },
-        )
-        .unwrap();
-}
-
-#[tauri::command]
-async fn close_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth").unwrap();
-    let _ = oauth_window.eval(&format!(
-        "window.location.replace('https://accounts.google.com/logout')"
-    ));
-    let _ = oauth_window.hide();
-}
-
-#[derive(Clone, serde::Serialize)]
-struct Payload {
-    url: String,
-}
-
-#[derive(Clone, serde::Serialize)]
-struct Payload1 {
-    message: String,
-}
-
-struct AsyncProcInputTx {
+//It wraps a mutex on the input channel. It helps to simplify the type signature. Instead of having to write Mutex<mpsc::Sender<String>> everywhere, we only have to write InputChannelMutex.
+struct InputChannelMutex {
     inner: Mutex<mpsc::Sender<Vec<String>>>,
 }
 
+// Driver Function
 fn main() {
-    tracing_subscriber::fmt::init();
+    // Initiate two mpsc channels(FIFO Queues) to facilitate async operations that can hold 100 messages each.
+    let (input_queue_sender, input_queue_receiver) = mpsc::channel::<Vec<String>>(100);
+    let (output_queue_sender, mut output_queue_receiver) = mpsc::channel::<Vec<String>>(100);
 
-    let (async_proc_input_tx, async_proc_input_rx) = mpsc::channel::<Vec<String>>(100);
-    let (async_proc_output_tx, mut async_proc_output_rx) = mpsc::channel::<Vec<String>>(100);
-
+    // Initiate Tauri Runtime
     tauri::Builder::default()
-        .manage(AsyncProcInputTx {
-            inner: Mutex::new(async_proc_input_tx),
+        .manage(InputChannelMutex {
+            inner: Mutex::new(input_queue_sender),
         })
         .invoke_handler(tauri::generate_handler![
             // make_type_request_command,
@@ -208,7 +244,7 @@ fn main() {
             fetch_file_command,
             open_oauth_window,
             close_oauth_window,
-            js2rs
+            get_http_request_from_js
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
@@ -223,15 +259,17 @@ fn main() {
             }
         })
         .setup(|app| {
+            // Loop Input receiver for http request, process it and send response to Output sender
             tauri::async_runtime::spawn(async move {
-                async_process_model(async_proc_input_rx, async_proc_output_tx).await
+                process_http_request(input_queue_receiver, output_queue_sender).await
             });
 
+            //Loop Output receiver for response and emit it to JS
             let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
                 loop {
-                    if let Some(output) = async_proc_output_rx.recv().await {
-                        rs2js(output, &app_handle);
+                    if let Some(output) = output_queue_receiver.recv().await {
+                        send_http_response_to_js(output, &app_handle);
                     }
                 }
             });
@@ -240,46 +278,4 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-fn rs2js<R: tauri::Runtime>(message: Vec<String>, manager: &impl Manager<R>) {
-    // info!(?message, "rs2js");
-    manager.emit_all("rs2js", message).unwrap();
-}
-
-#[tauri::command]
-async fn js2rs(
-    message: Vec<String>,
-    state: tauri::State<'_, AsyncProcInputTx>,
-) -> Result<(), String> {
-    info!(?message, "js2rs");
-    let async_proc_input_tx = state.inner.lock().await;
-    async_proc_input_tx
-        .send(message)
-        .await
-        .map_err(|e| e.to_string())
-}
-
-async fn async_process_model(
-    mut input_rx: mpsc::Receiver<Vec<String>>,
-    output_tx: mpsc::Sender<Vec<String>>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    while let Some(input) = input_rx.recv().await {
-        info!(?input, "async_process_model");
-        let start = chrono::offset::Local::now();
-        let result = make_request(&input[0], &input[1], &input[2], &input[3], &input[4]);
-        let result_value = match result.await {
-            Ok(value) => value.to_string(),
-            Err(err) => err.to_string(),
-        };
-        // info!(?result_value, "async_process_model");
-        let mut string_vector: Vec<String> = Vec::new();
-        string_vector.push(result_value);
-        let tab_id: String = input.clone().remove(5);
-        string_vector.push(tab_id);
-        string_vector.push(start.to_string());
-        output_tx.send(string_vector).await?;
-    }
-
-    Ok(())
 }
