@@ -13,6 +13,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
+  import { notifications } from "$lib/utils/notifications";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -100,6 +101,7 @@
           res.data.data,
         );
         collectionsMethods.setRequestSave(true, "description", _id);
+        notifications.success("Documentation updated");
       } else {
       }
     } else {
@@ -127,6 +129,7 @@
           res.data.data,
         );
         collectionsMethods.setRequestSave(true, "description", _id);
+        notifications.success("Documentation updated");
       } else {
       }
     }
@@ -290,6 +293,7 @@
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
     overflow: hidden;
+    overflow-y: auto;
   }
   .api-description {
     background-color: transparent;
