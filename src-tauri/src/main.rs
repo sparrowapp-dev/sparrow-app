@@ -223,6 +223,7 @@ struct OnClosePayload {
 }
 
 //It wraps a mutex on the input channel. It helps to simplify the type signature. Instead of having to write Mutex<mpsc::Sender<String>> everywhere, we only have to write InputChannelMutex.
+// Why use mutex at all? - So that it an be state managed by tauri. Hence, we can use it in tauri commands and get mutable access to send data into it.
 struct InputChannelMutex {
     inner: Mutex<mpsc::Sender<Vec<String>>>,
 }
