@@ -541,8 +541,10 @@
   .decrease-width {
     animation: decreaseWidth 0.3s;
     width: 0;
+    max-width: 280px;
   }
   .increase-width {
     animation: increaseWidth 0.3s;
+    max-width: 280px;
   }
 </style>
