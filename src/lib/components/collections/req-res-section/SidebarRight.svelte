@@ -293,6 +293,7 @@
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
     overflow: hidden;
+    overflow-y: auto;
   }
   .api-description {
     background-color: transparent;
