@@ -142,3 +142,8 @@ $theme-colors: map-merge(
   border-color: #313233;
   width: 1px;
 }
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
