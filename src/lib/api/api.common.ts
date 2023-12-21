@@ -13,7 +13,7 @@ const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
 
-export const error = (error, data?, tabId?) => {
+const error = (error, data?, tabId?) => {
   return {
     status: "error",
     isSuccessful: false,
@@ -137,10 +137,11 @@ const makeHttpRequest = async (
     }),
   ])
     .then(async (data: string) => {
-      response = data.split("---TAB---")[0];
-      const tabId = data.split("---TAB---")[1];
       try {
-        return success(JSON.parse(response), tabId);
+        response = JSON.parse(data);
+        const tabId = response.tabId;
+        response = JSON.parse(response.body);
+        return success(response, tabId);
       } catch (e) {
         return error("error");
       }

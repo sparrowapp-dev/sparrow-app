@@ -107,12 +107,21 @@ async fn make_http_request(
     body: &str,
     request: &str,
     tab_id: &str,
-) -> Result<String, ()> {
+) -> Result<String, String> {
     let result = make_request(url, method, headers, body, request).await;
 
-    return match result {
-        Ok(value) => Ok(value.to_string() + "---TAB---" + tab_id),
-        Err(err) => Ok(format!("Error: {}", err)),
+    let result_value = match result {
+        Ok(value) => value.to_string(),
+        Err(err) => err.to_string(),
+    };
+
+    let response = json!({
+        "body": result_value,
+        "tabId": tab_id
+    });
+    return match serde_json::to_string(&response) {
+        Ok(value) => Ok(value.to_string()),
+        Err(err) => Err(err.to_string()),
     };
 }
 
