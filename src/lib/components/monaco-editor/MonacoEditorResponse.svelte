@@ -246,6 +246,6 @@
 <style>
   .code-editor {
     width: 99%;
-    height: 250px;
+    height: calc(100vh - 360px);
   }
 </style>
