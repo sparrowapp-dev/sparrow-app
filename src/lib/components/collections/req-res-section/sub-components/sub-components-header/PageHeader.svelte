@@ -227,6 +227,7 @@
         class="tabbar-tabName w-100"
         bind:this={inputElement}
         style="outline: none;"
+        maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
       />

@@ -278,11 +278,6 @@
 {/if}
 
 <style>
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .sidebar-right {
     width: 32px;
     border-left: 1px solid var(--border-color);

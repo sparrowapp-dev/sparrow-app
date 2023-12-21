@@ -277,7 +277,7 @@
 
   <div
     class="d-flex align-items-center justify-content-center"
-    style="margin-left: 45px;"
+    style="margin-left: 10px;"
   >
     <div
       class="my-auto gap-{!isSearchVisible
