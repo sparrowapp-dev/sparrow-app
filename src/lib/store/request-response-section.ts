@@ -132,29 +132,40 @@ const getTabList = () => {
 /**
  * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
  */
-const setRequestProperty = async (data, route: string): Promise<void> => {
-  tabs.update((value: NewTab[]): NewTab[] => {
-    const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
-        elem.property.request[route] = data;
-        elem.property.request.save.api = false;
-        progressiveTab.set(elem);
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-const updateRequestPropertyResponseBody = async (
+const setRequestProperty = async (
   data,
   route: string,
+  id: string,
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
+      if (elem.id === id) {
+        elem.property.request[route] = data;
+        elem.property.request.save.api = false;
+        if (elem.isActive) {
+          progressiveTab.set(elem);
+        }
+      }
+      return elem;
+    });
+
+    return [...updatedTab];
+  });
+};
+
+const updateRequestPropertyResponseBody = async (
+  data,
+  route: string,
+  id: string,
+): Promise<void> => {
+  tabs.update((value: NewTab[]): NewTab[] => {
+    const updatedTab = value.map((elem: NewTab): NewTab => {
+      if (elem.id === id) {
         elem.property.request[route].body = data;
         elem.save = false;
-        progressiveTab.set(elem);
+        if (elem.isActive) {
+          progressiveTab.set(elem);
+        }
       }
       return elem;
     });
@@ -168,7 +179,7 @@ const updateRequestPropertyResponseBody = async (
 const setRequestState = async (data, route: string): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive) {
+      if (elem.isActive && elem.property.request) {
         elem.property.request.state[route] = data;
         progressiveTab.set(elem);
       }

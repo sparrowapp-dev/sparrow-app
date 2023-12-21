@@ -1,5 +1,4 @@
 {
-  "window.zoomLevel": 0,
   "editor.minimap.enabled": false,
   "[javascript]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
