@@ -5,7 +5,7 @@ import circleIcon from "$lib/assets/Ellipse.svg";
 import searchIcon from "$lib/assets/search.svg";
 import settingIcon from "$lib/assets/setting.svg";
 import profileIcon from "$lib/assets/profile.svg";
-import notifyIcon from "$lib/assets/notify.svg";
+import NotifyIcon from "$lib/assets/notify.svelte";
 import signout from "$lib/assets/signout.svg";
 import shortcut from "$lib/assets/shortcut.svg";
 import about from "$lib/assets/about.svg";
@@ -17,6 +17,8 @@ import lockicon from "$lib/assets/lock-icon.svg";
 import info from "$lib/assets/circle-info-white.svg";
 import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
+export { default as NotifyIcon } from "$lib/assets/notify.svelte";
+export { default as SettingIcon } from "$lib/assets/setting.svelte";
 
 export default {
   closeIcon,
@@ -26,7 +28,7 @@ export default {
   searchIcon,
   settingIcon,
   profileIcon,
-  notifyIcon,
+  NotifyIcon,
   signout,
   shortcut,
   about,
