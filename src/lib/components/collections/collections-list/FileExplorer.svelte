@@ -310,6 +310,7 @@
           type="text"
           style="font-size: 12px;"
           autofocus
+          maxlength={100}
           value={explorer.name}
           on:input={handleRenameInput}
           on:blur={onRenameBlur}
@@ -487,11 +488,7 @@
   .sub-files {
     border-left: 1px solid var(--border-color);
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  
   .main-folder {
     width: calc(100% - 24px);
   }

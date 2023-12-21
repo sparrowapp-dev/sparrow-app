@@ -8,7 +8,6 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import {
     getPathFromUrl,
-    truncatePath,
   } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
@@ -287,6 +286,7 @@
         type="text"
         autofocus
         value={name}
+        maxlength={100}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
@@ -295,8 +295,8 @@
       <div class="api-name ellipsis">
         {name}
         {#if showPath}
-          <span class="path-name"
-            >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+          <span class="path-name ellipsis"
+            >{`${url ? getPathFromUrl(url) : ""}`}</span
           >
         {/if}
       </div>
@@ -416,11 +416,6 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
-  }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   .main-file {
     width: calc(100% - 24px);

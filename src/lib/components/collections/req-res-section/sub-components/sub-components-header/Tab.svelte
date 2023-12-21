@@ -31,11 +31,9 @@
       on:click={() => {
         updateCurrentTab(tab.id);
       }}
-      class="position-relative border-0"
+      class="position-relative border-0 ellipsis"
       style="    width: 80%;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden; text-align: left; background-color:transparent;"
+       text-align: left; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span

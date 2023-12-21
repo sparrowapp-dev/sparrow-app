@@ -107,6 +107,7 @@
         on:input={(event) => {
           handleFolderInput(event);
         }}
+        maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}

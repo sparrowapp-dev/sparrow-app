@@ -12,7 +12,7 @@
 </script>
 
 <div
-  class="d-flex align-items-center api-request"
+  class="d-flex align-items-center api-request p-1"
   style="height: {path !== '' ? '40px' : '32px'};"
   on:click={() => {
     handleRequestClick(request, {
@@ -26,9 +26,9 @@
   <div class="api-method text-{getMethodStyle(request.request.method)}">
     {request.request.method.toUpperCase()}
   </div>
-  <div class="api-name">
+  <div class="api-name" style="width:80%;">
     <div>
-      <p class="mb-0" style="color:#999999">
+      <p class="mb-0 ellipsis" style="color:#999999;">
         {request.name.substring(0, getIndex(request.name, searchData))}<span
           class="highlight"
           >{request.name.substring(
@@ -41,8 +41,8 @@
       </p>
     </div>
     {#if path !== ""}
-      <div>
-        <p class="mb-0" style="font-size:10px;">
+      <div style="width: 100%;">
+        <p class="mb-0 ellipsis" style="font-size:10px;width:100%">
           {replaceSlashWithGreaterThanSymbol(path)}
         </p>
       </div>
@@ -80,11 +80,7 @@
     color: var(--white-color);
   }
   .api-request {
-    width: 328px;
+    width: 100%;
     height: 60px;
-    padding: 4px 12px 4px 12px;
-  }
-  .api-request:hover {
-    background-color: var(--border-color);
   }
 </style>

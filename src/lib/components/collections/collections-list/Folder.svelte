@@ -369,6 +369,7 @@
         style="font-size: 12px;"
         value={title}
         autofocus
+        maxlength={100}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
@@ -515,11 +516,6 @@
   }
   .sub-folders {
     border-left: 1px solid var(--border-color);
-  }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   .main-collection {
     width: calc(100% - 24px);
