@@ -23,11 +23,11 @@
   const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.folder?.requestCount;
-    totalFolder = event?.property?.folder?.folderCount;
+    if (event) {
+      tabName = event?.name;
+      componentData = event;
+      totalRequest = event?.property?.folder?.requestCount;
+      totalFolder = event?.property?.folder?.folderCount;
     }
   });
 
@@ -107,6 +107,7 @@
         on:input={(event) => {
           handleFolderInput(event);
         }}
+        maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}

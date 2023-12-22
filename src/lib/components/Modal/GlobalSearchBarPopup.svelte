@@ -139,7 +139,7 @@
               >
                 {filterRequest.tree.request.method.toUpperCase()}
               </div>
-              <div class="api-name">
+              <div class="api-name ellipsis">
                 {filterRequest.tree.name.substring(
                   0,
                   getIndex(filterRequest.tree.name, searchData),
@@ -155,7 +155,7 @@
                 )}
               </div>
             </div>
-            <div class="api-path">
+            <div class="api-path ellipsis">
               <span
                 >{filterRequest.path
                   ? replaceSlashWithGreaterThanSymbol(filterRequest.path)
@@ -183,7 +183,7 @@
               class="d-flex align-items-center search-option-request"
             >
               <img src={FolderIcon} alt="" style="height:16px; width:16px;" />
-              <span
+              <span class="ellipsis"
                 style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
                 >{filterFolder.tree.name.substring(
                   0,
@@ -200,7 +200,7 @@
                 )}
               </span>
             </div>
-            <div class="api-path">
+            <div class="api-path ellipsis">
               <span
                 >{filterFolder.path
                   ? replaceSlashWithGreaterThanSymbol(filterFolder.path)
@@ -232,7 +232,7 @@
                 alt=""
                 style="height:20px; width:20px;"
               />
-              <span
+              <span class="ellipsis"
                 style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
                 >{filterCollection.tree.name.substring(
                   0,
@@ -249,7 +249,7 @@
                 )}
               </span>
             </div>
-            <div class="api-path">
+            <div class="api-path ellipsis">
               <span
                 >{filterCollection.path
                   ? replaceSlashWithGreaterThanSymbol(filterCollection.path)
@@ -278,6 +278,7 @@
                   style="height:20px; width:20px;"
                 />
                 <span
+                class="ellipsis"
                   style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
                 >
                   {workspace.name.substring(

@@ -27,7 +27,6 @@
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
@@ -67,7 +66,6 @@
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
-
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -109,9 +107,9 @@
             <RequestResponse {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+          {:else if $activeTab && $activeTab.type=== ItemType.FOLDER}
             <MyFolder {collectionsMethods} {activeTab} />
-          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+          {:else if $activeTab && $activeTab.type=== ItemType.COLLECTION}
             <MyCollection {collectionsMethods} {activeTab} />
           {/if}
         </div>

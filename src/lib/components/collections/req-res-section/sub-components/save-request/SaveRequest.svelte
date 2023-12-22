@@ -1014,9 +1014,4 @@
     width: 24px;
     height: 24px;
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 </style>

@@ -23,16 +23,16 @@
 <div>
   {#if explorer.type === "FOLDER"}
     <div>
-      <div
+      <div 
         style="height:36px;"
-        class="d-flex align-items-center"
+        class="folder rounded d-flex align-items-center p-1"
         on:click={() => {
           folderExpand = !folderExpand;
           handleFolderClick(explorer, workspaceId, collectionId);
         }}
       >
         <img src={folder} alt="" style="height:16px; width:16px;" />
-        <span
+        <span class="ellipsis"
           style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
           >{explorer.name.substring(
             0,
@@ -61,7 +61,7 @@
       </div>
     </div>
   {:else if explorer.type === "REQUEST"}
-    <div style="padding-left: 0; cursor:pointer; ">
+    <div style="padding-left: 0; cursor:pointer;width:100%" class="request rounded">
       <Request
         {path}
         request={explorer}
@@ -84,7 +84,7 @@
           collectionExpand = !collectionExpand;
         }}
         style="height:36px;"
-        class="btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1"
+        class="collection btn btn-primary d-flex w-100 align-items-center justify-content-start border-0 py-1"
       >
         <img
           src={collectionIcon}
@@ -93,7 +93,7 @@
             : 'transform:rotate(0deg);'}"
           alt="angleRight"
         />
-        <p class="mb-0" style="font-size: 14px; color:#999999">
+        <p class="mb-0 ellipsis" style="font-size: 14px; color:#999999">
           {explorer.name.substring(0, getIndex(explorer.name, searchData))}<span
             class="highlight"
             >{explorer.name.substring(
@@ -134,5 +134,11 @@
   }
   .highlight {
     color: var(--white-color);
+  }
+  .folder,.collection,.request{
+    width: 100%;
+  }
+  .folder:hover, .collection:hover,.request:hover{
+    background-color: var(--border-color);
   }
 </style>

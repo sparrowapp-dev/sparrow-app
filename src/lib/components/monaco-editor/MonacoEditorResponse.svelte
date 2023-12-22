@@ -10,12 +10,12 @@
     RequestProperty,
     ResponseFormatter,
   } from "$lib/utils/enums/request.enum";
-    import { requestResponseStore } from "$lib/store/request-response-section";
-
+  import { requestResponseStore } from "$lib/store/request-response-section";
 
   export let rawTab: RequestDataType;
   export let rawValue;
   export let formatter;
+  export let currentTabId;
 
   let editorResponseElement: HTMLDivElement;
   let editor: monaco.editor.IStandaloneCodeEditor;
@@ -27,8 +27,12 @@
       model = await monaco.editor.createModel(code, language);
       await editor.setModel(model);
       await editor.getAction("editor.action.formatDocument").run();
-      const value=editor.getValue();
-      requestResponseStore.updateRequestPropertyResponseBody(value,RequestProperty.RESPONSE)
+      const value = editor.getValue();
+      requestResponseStore.updateRequestPropertyResponseBody(
+        value,
+        RequestProperty.RESPONSE,
+        currentTabId,
+      );
       await editor.updateOptions({ readOnly: true });
     }
   };
@@ -237,8 +241,6 @@
       handleRawTypes(rawValue, rawTab);
     }
   }
-
-
 </script>
 
 <div class="code-editor" bind:this={editorResponseElement} />

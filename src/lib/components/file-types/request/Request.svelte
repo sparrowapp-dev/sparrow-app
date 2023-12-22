@@ -26,9 +26,4 @@
         font-weight: 400;
         width: calc(100% - 70px);
     }
-    .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 </style>
