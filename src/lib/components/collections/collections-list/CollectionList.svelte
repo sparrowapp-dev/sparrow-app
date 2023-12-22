@@ -367,6 +367,7 @@
           {collectionsMethods}
           {handleCreateCollection}
           {collectionUnderCreation}
+          {currentWorkspaceId}
         />
       </div>
     </div>
@@ -440,7 +441,11 @@
             />
           {/each}
         {:else if collection && collection.length === 0}
-          <DefaultCollection {handleCreateCollection} {collectionsMethods} />
+          <DefaultCollection
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+          />
         {/if}
       </div>
     </div>

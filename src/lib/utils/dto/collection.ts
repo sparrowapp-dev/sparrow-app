@@ -45,6 +45,12 @@ export interface DeleteRequestName {
   folderId?: string;
 }
 
+export interface ImportCollectionBody {}
+
+export interface ImportBodyUrl {
+  url: string;
+}
+
 export interface CreateApiRequestPostBody {
   collectionId: string;
   workspaceId: string;

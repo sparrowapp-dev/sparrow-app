@@ -9,10 +9,18 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { slide } from "svelte/transition";
   import Spinner from "../Transition/Spinner.svelte";
+  import ImportCollection from "../collections/collections-list/ImportCollection.svelte";
 
   export let handleCreateCollection;
+  export let currentWorkspaceId;
   export let collectionUnderCreation: boolean = false;
   export let collectionsMethods: CollectionsMethods;
+
+  let isImportCollectionPopup: boolean = false;
+  const handleImportCollectionPopup = (flag) => {
+    isImportCollectionPopup = flag;
+  };
+
   function onWindowClick(e) {
     if (container.contains(e.target) == false) {
       visibilty = false;
@@ -34,6 +42,16 @@
 </script>
 
 <svelte:window on:click={onWindowClick} />
+
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
+
 <div
   class="d-flex align-items-center justify-content-center"
   bind:this={container}
@@ -56,7 +74,11 @@
 
     {#if visibilty}
       <div class="dropdown-content" transition:slide={{ duration: 100 }}>
-        <button on:click={handleCreateCollection}>Collection</button>
+        <button
+          on:click={() => {
+            handleImportCollectionPopup(true);
+          }}>Collection</button
+        >
         <button on:click={addApiRequest}>API Request</button>
       </div>
     {/if}

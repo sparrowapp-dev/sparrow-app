@@ -5,8 +5,15 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  export let handleCreateCollection:any;
+  import ImportCollection from "./ImportCollection.svelte";
+  export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;
+  export let currentWorkspaceId;
+
+  let isImportCollectionPopup: boolean = false;
+  const handleImportCollectionPopup = (flag) => {
+    isImportCollectionPopup = flag;
+  };
 
   const addApiRequest = () => {
     collectionsMethods.handleCreateTab(
@@ -18,6 +25,15 @@
     moveNavigation("right");
   };
 </script>
+
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
 
 <div
   class="container-fluid row d-flex flex-column align-items-center ps-4 pe-3 pt-3"
@@ -32,7 +48,9 @@ font-weight: 300;"
   <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
     <button
       class="buttons d-flex justify-content-center align-items-center gap-1"
-      on:click={handleCreateCollection}
+      on:click={() => {
+        handleImportCollectionPopup(true);
+      }}
     >
       <img src={whitePlus} alt="+" />Collection
     </button>

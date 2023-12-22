@@ -5,6 +5,7 @@ import type {
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
   DeleteRequestName,
+  ImportBodyUrl,
   UpdateCollectionName,
 } from "$lib/utils/dto";
 
@@ -159,4 +160,34 @@ export class CollectionService {
 
     return response;
   };
+
+  public importCollection = async (workspaceId: string, url: ImportBodyUrl) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importUrl/collection`,
+      {
+        body: url,
+        headers: getAuthHeaders(),
+      },
+    );
+    console.log(url);
+    return response;
+  };
+
+  // public importCollectionFile = async (
+  //   workspaceId: string,
+  //   // url: ImportBodyFile,
+
+  // ) => {
+  //   const response = await makeRequest(
+  //     "POST",
+  //     `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+  //     {
+  //       // body: url,
+  //       headers: getAuthHeaders(),
+  //     },
+  //   );
+  //   console.log(response);
+  //   return response;
+  // };
 }
