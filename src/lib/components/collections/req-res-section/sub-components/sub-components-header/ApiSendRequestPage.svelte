@@ -162,7 +162,11 @@
   });
 
   const handleDropdown = (tab: RequestMethodType) => {
-    collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
+    collectionsMethods.updateRequestProperty(
+      tab,
+      RequestProperty.METHOD,
+      currentTabId,
+    );
   };
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
