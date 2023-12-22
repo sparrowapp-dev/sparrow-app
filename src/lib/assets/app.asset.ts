@@ -17,6 +17,9 @@ import lockicon from "$lib/assets/lock-icon.svg";
 import info from "$lib/assets/circle-info-white.svg";
 import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
+export { default as PlusIcon } from "./plus.svelte";
+export { default as HelpIcon } from "./help.svelte";
+export { default as SaveIcon } from "./save.svelte";
 
 export default {
   closeIcon,
