@@ -17,6 +17,7 @@ import lockicon from "$lib/assets/lock-icon.svg";
 import info from "$lib/assets/circle-info-white.svg";
 import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
+import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {
   closeIcon,
@@ -38,4 +39,5 @@ export default {
   info,
   setting,
   line,
+  logoSparrow,
 };
