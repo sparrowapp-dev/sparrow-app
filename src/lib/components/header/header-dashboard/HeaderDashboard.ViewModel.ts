@@ -12,6 +12,7 @@ import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-ta
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import { requestResponseStore } from "$lib/store/request-response-section";
+
 export class HeaderDashboardViewModel {
   constructor() {}
   private workspaceRepository = new WorkspaceRepository();
@@ -89,6 +90,7 @@ export class HeaderDashboardViewModel {
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
+
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem, index) => {
         const {
@@ -111,6 +113,7 @@ export class HeaderDashboardViewModel {
           createdBy,
         };
       });
+
       await this.workspaceRepository.bulkInsertData(data);
       return;
     }

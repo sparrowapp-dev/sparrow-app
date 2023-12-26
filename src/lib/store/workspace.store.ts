@@ -1,6 +1,7 @@
 import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
 import { writable } from "svelte/store";
 export const isWorkspaceCreatedFirstTime = writable(false);
+export const isWorkspaceLoaded = writable(true);
 
 /**
  * The writable store containing the current workspace information.
