@@ -18,6 +18,7 @@ import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
 export { default as NotifyIcon } from "$lib/assets/notify.svelte";
 export { default as SettingIcon } from "$lib/assets/setting.svelte";
+import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {
   closeIcon,
@@ -38,4 +39,5 @@ export default {
   info,
   setting,
   line,
+  logoSparrow,
 };
