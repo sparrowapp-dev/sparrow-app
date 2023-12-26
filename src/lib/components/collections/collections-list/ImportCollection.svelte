@@ -26,70 +26,113 @@
     text = e.target.value;
   };
 
-  const handleImportUrl = async () => {
+  // const handleImportUrl = async () => {
+  //   isLoading = true;
+  //   const response = await _viewImportCollection.importCollectionData(
+  //     currentWorkspaceId,
+  //     { url: text },
+  //   );
+
+  //   console.log(response);
+
+  //   onClick(false);
+  //   if (response.isSuccessful) {
+  //     const res = response.data.data;
+  //     isLoading = false;
+  //     // collectionUnderCreation = true;
+  //     isCollectionCreatedFirstTime.set(true);
+
+  //     const newCollection = {
+  //       id: res.id,
+  //       name: res.name,
+  //       items: [],
+  //       createdAt: new Date().toISOString(),
+  //     };
+
+  //     collectionsMethods.addCollection(newCollection);
+
+  //     let path: Path = {
+  //       workspaceId: currentWorkspaceId,
+  //       collectionId: res.id,
+  //     };
+
+  //     const Samplecollection = generateSampleCollection(
+  //       res.id,
+  //       new Date().toString(),
+  //     );
+
+  //     Samplecollection.id = res.id;
+  //     Samplecollection.path = path;
+  //     Samplecollection.name = res.name;
+  //     Samplecollection.save = true;
+  //     collectionsMethods.handleCreateTab(Samplecollection);
+  //     moveNavigation("right");
+
+  //     collectionsMethods.updateCollection(res.id, res);
+  //     _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+  //       id: res.id,
+  //       name: newCollection.name,
+  //     });
+  //     notifications.success(response.data.message);
+  //   } else {
+  //     isLoading = false;
+  //   }
+  // };
+
+  const handleImportFile = async (fileContent) => {
     isLoading = true;
-
-    const response = await _viewImportCollection.importCollectionData(
+    const response = await _viewImportCollection.importCollectionFile(
       currentWorkspaceId,
-      { url: text },
+      fileContent,
     );
-
-    onClick(false);
+    console.log(response);
     if (response.isSuccessful) {
-      const res = response.data.data;
+      onClick(false);
       isLoading = false;
-      // collectionUnderCreation = true;
-      isCollectionCreatedFirstTime.set(true);
-
-      const newCollection = {
-        id: res.id,
-        name: res.name,
-        items: [],
-        createdAt: new Date().toISOString(),
-      };
-
-      collectionsMethods.addCollection(newCollection);
-
-      let path: Path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: res.id,
-      };
-
-      const Samplecollection = generateSampleCollection(
-        res.id,
-        new Date().toString(),
-      );
-
-      Samplecollection.id = res.id;
-      Samplecollection.path = path;
-      Samplecollection.name = res.name;
-      Samplecollection.save = true;
-      collectionsMethods.handleCreateTab(Samplecollection);
-      moveNavigation("right");
-
-      collectionsMethods.updateCollection(res.id, res);
-      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: res.id,
-        name: newCollection.name,
-      });
       notifications.success(response.data.message);
     } else {
       isLoading = false;
+      notifications.error(response.message);
     }
   };
 
-  //   const handleImportFile = async () => {
-  //     isLoading = true;
-  //     const response =
-  //       await _viewImportCollection.importCollectionFile(currentWorkspaceId);
-  //     if (response.isSuccessful) {
-  //       onClick(false);
-  //       isLoading = false;
-  //       notifications.success(response.data.message);
-  //     } else {
-  //       isLoading = false;
-  //     }
-  //   };
+  function handleFileUpload() {
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    console.log(fileInput);
+    const file = fileInput.files[0];
+    console.log(file);
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const fileContent = e.target.result;
+        console.log(fileContent);
+        handleImportFile(fileContent);
+      };
+      reader.readAsText(file);
+    }
+  }
+
+  // const handleImportJsonObject = async () => {
+  //   isLoading = true;
+  //   console.log(text);
+
+  //   const response = await _viewImportCollection.importCollectionFromJsonObject(
+  //     currentWorkspaceId,
+  //     { jsonObj: text },
+  //   );
+
+  //   console.log(response);
+  //   if (response.isSuccessful) {
+  //     onClick(false);
+  //     isLoading = false;
+  //     notifications.success(response.data.message);
+  //   } else {
+  //     isLoading = false;
+  //     notifications.error(response.message);
+  //   }
+  // };
 </script>
 
 {#if isLoading}
@@ -151,7 +194,8 @@
       id="file-input"
       name="file-input"
       required
-      accept="image/jpeg"
+      accept=".json"
+      on:input={handleFileUpload}
     />
     <label
       id="file-input-label"
@@ -168,7 +212,7 @@
   >
     <button
       class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
-      on:click|preventDefault={handleImportUrl}
+      on:click|preventDefault={handleImportJsonObject}
     >
       <span class="me-3">
         {#if isLoading}

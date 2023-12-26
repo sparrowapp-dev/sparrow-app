@@ -170,24 +170,37 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-    console.log(url);
+
     return response;
   };
 
-  // public importCollectionFile = async (
-  //   workspaceId: string,
-  //   // url: ImportBodyFile,
+  public importCollectionFile = async (workspaceId: string, file) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+      {
+        body: file,
+        headers: getAuthHeaders(),
+      },
+    );
 
-  // ) => {
-  //   const response = await makeRequest(
-  //     "POST",
-  //     `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
-  //     {
-  //       // body: url,
-  //       headers: getAuthHeaders(),
-  //     },
-  //   );
-  //   console.log(response);
-  //   return response;
-  // };
+    return response;
+  };
+
+  public importCollectionFromJsonObject = async (
+    workspaceId: string,
+    jsonObject,
+  ) => {
+    console.log(workspaceId, jsonObject);
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importJson/collection`,
+      {
+        body: jsonObject,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
 }

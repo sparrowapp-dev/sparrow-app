@@ -12,7 +12,17 @@ export class ImportCollectionViewModel {
     return await this.collectionService.importCollection(workspaceId, url);
   };
 
-  //   public importCollectionFile = async (workspaceId: string) => {
-  //     return await this.collectionService.importCollectionFile(workspaceId);
-  //   };
+  public importCollectionFile = async (workspaceId: string, file) => {
+    return await this.collectionService.importCollectionFile(workspaceId, file);
+  };
+
+  public importCollectionFromJsonObject = async (
+    workspaceId: string,
+    jsonObject,
+  ) => {
+    return await this.collectionService.importCollectionFromJsonObject(
+      workspaceId,
+      jsonObject,
+    );
+  };
 }

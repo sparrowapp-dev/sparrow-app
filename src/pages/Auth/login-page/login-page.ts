@@ -32,6 +32,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
     notifications.success("Login successful!");
     navigate("/home");
+    return response;
   } else {
     resizeWindowOnLogOut();
     isResponseError.set(true);
@@ -51,6 +52,5 @@ export const handleLoginValidation = async (
   if (isError) {
     return errorObject;
   }
-  handleLogin(loginCredentials);
-  return {};
+  return handleLogin(loginCredentials);
 };

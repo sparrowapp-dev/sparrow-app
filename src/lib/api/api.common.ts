@@ -39,6 +39,13 @@ const getAuthHeaders = () => {
   };
 };
 
+const getHeaders = () => {
+  return {
+    "Content-type": "application/json",
+    Authorization: `Bearer ${getUserToken()}`,
+  };
+};
+
 const getRefHeaders = () => {
   return {
     Authorization: `Bearer ${getRefToken()}`,
@@ -151,4 +158,10 @@ const makeHttpRequest = async (
     });
 };
 
-export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
+export {
+  makeRequest,
+  getAuthHeaders,
+  getRefHeaders,
+  makeHttpRequest,
+  getHeaders,
+};
