@@ -4,7 +4,7 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons from "$lib/assets/app.asset";
+  import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
@@ -284,7 +284,7 @@
       <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
-            <img src={icons.settingIcon} alt="" />
+            <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
       </div>
@@ -295,7 +295,7 @@
       >
         <Tooltip>
           <button class="bg-blackColor border-0">
-            <img src={icons.notifyIcon} alt="" />
+            <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>
       </div>
@@ -317,7 +317,7 @@
                   ? "bg-plusButton text-black"
                   : "profile-btn text-defaultColor"
               } m-auto text-center align-items-center justify-content-center `}
-              style={`font-size: 12px; ${
+              style={`font-size: 12px; width: 24px; height: 24px; display:flex; padding-right: 0.5px; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
                   : "border: 2.2px solid #45494D;"
@@ -343,13 +343,15 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
               >
-                {firstLetter?.toUpperCase()}
+                {!firstLetter
+                  ? email[0]?.toUpperCase()
+                  : firstLetter?.toUpperCase()}
               </p>
               <h1
                 class="text-white fw-normal mt-3"
                 style="color: #999; font-family: Roboto; font-size: 12px;"
               >
-                {name}
+                {!name ? email[0]?.toUpperCase() : name}
               </h1>
               <p
                 class="text-requestBodyColor fw-medium mb-0"
@@ -358,7 +360,6 @@
                 {email}
               </p>
             </div>
-            <hr class="" />
 
             <div
               class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
