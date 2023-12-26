@@ -43,6 +43,9 @@
 </div>
 
 <style>
+  .tooltip {
+    z-index: 2 !important;
+  }
   .tooltip-text {
     /* width: 120px; */
     font-family: Roboto;
