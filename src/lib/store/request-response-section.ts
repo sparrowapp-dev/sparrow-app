@@ -170,6 +170,9 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         elem.property.request.state[route] = data;
+        if (route === "dataset" || route === "raw") {
+          elem.property.request.save.api = false;
+        }
         progressiveTab.set(elem);
       }
       return elem;

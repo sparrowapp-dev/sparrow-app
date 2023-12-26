@@ -16,6 +16,8 @@
   import lockicon from "$lib/assets/lock-icon.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
     import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+    import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+    import { RequestDataset } from "$lib/utils/enums/request.enum";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -57,14 +59,18 @@
         _id,
       );
     }
+    const bodyType =
+    componentData.property.request.state.dataset === RequestDataset.RAW
+          ? componentData.property.request.state.raw
+          : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
+      selectedRequestBodyType:setContentTypeHeader(bodyType),
     };
-
     if (!folderId) {
       let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
@@ -184,19 +190,19 @@
         if(req?.name){
           collectionsMethods.updateTab(req.name, "name", componentData.id);
         }
-      }
-      else if(collectionId){
-        const req = await collectionsMethods.readRequestOrFolderInCollection(collectionId, componentData.id);
-        if(req?.name){  
+      } else if (collectionId) {
+        const req = await collectionsMethods.readRequestOrFolderInCollection(
+          collectionId,
+          componentData.id,
+        );
+        if (req?.name) {
           collectionsMethods.updateTab(req.name, "name", componentData.id);
         }
-      }
-      else{
+      } else {
         const req = generateSampleRequest("id", new Date().toString());
         collectionsMethods.updateTab(req.name, "name", componentData.id);
       }
     }
-      
   };
 
   const onRenameInputKeyPress = (event) => {

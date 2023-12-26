@@ -1,3 +1,4 @@
+import type { ContentTypeEnum } from "../enums/request.enum";
 import type { KeyValuePair } from "../interfaces/request.interface";
 
 export interface CreateDirectoryPostBody {
@@ -57,7 +58,9 @@ export interface CreateApiRequestPostBody {
     request?: {
       method: string;
       url?: string;
-      body?: unknown;
+      body?: {
+        type: ContentTypeEnum;
+      };
       headers?: KeyValuePair[];
       queryParams?: KeyValuePair[];
     };
