@@ -1,50 +1,50 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
-
+  import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
+  import { LockIcon } from "$lib/assets/app.asset";
   type Mode = "READ" | "WRITE";
 
-  export let keyValue: KeyValuePair[];
-  export let callback: (pairs: KeyValuePair[]) => void;
+  export let keyValue: EnvValuePair[];
+  export let callback: (pairs: EnvValuePair[]) => void;
   export let mode: Mode = "WRITE";
   export let readable: { key: string; value: string } = {
     key: "",
     value: "",
   };
 
-  let pairs: KeyValuePair[] = keyValue;
+  let pairs: EnvValuePair[] = keyValue;
   let controller: boolean = false;
 
-  $: {
-    if (keyValue) {
-      pairs = keyValue;
-      let flag: boolean = false;
-      for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === false) {
-          flag = true;
-        }
-      }
-      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = true;
-      }
-      if (flag) {
-        controller = false;
-      } else {
-        controller = true;
-      }
-    }
-  }
+  //   $: {
+  //     if (keyValue) {
+  //       pairs = keyValue;
+  //       let flag: boolean = false;
+  //       for (let i = 0; i < pairs.length - 1; i++) {
+  //         if (pairs[i].checked === false) {
+  //           flag = true;
+  //         }
+  //       }
+  //       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
+  //         flag = true;
+  //       }
+  //       if (flag) {
+  //         controller = false;
+  //       } else {
+  //         controller = true;
+  //       }
+  //     }
+  //   }
 
   const updateParam = (index: number): void => {
     pairs.forEach((elem, i) => {
       if (i === index) {
-        elem.checked = true;
+        // elem.checked = true;
       }
     });
     pairs = pairs;
     if (pairs.length - 1 === index) {
-      pairs.push({ key: "", value: "", checked: false });
+      pairs.push({ variable: "", value: "", checked: false });
       pairs = pairs;
     }
     callback(pairs);
@@ -62,7 +62,6 @@
     }
     callback(pairs);
   };
-
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i === index) {
@@ -73,7 +72,6 @@
     pairs = filteredKeyValue;
     callback(pairs);
   };
-
   const handleCheckAll = (): void => {
     let flag: boolean;
     if (controller === true) {
@@ -94,7 +92,7 @@
   };
 </script>
 
-<div class="mt-3 me-0 w-100">
+<div class="mt-3 me-0 w-100" style="width: 60vw;">
   <div class="d-flex gap-2">
     <div style="width:40px;">
       <input
@@ -106,25 +104,25 @@
     </div>
     <div
       class=" d-flex gap-2 text-requestBodyColor align-items-center"
-      style="font-size: 12px; font-weight: 500; width:100%;"
+      style="font-size: 12px; font-weight: 500; width: 100%;"
     >
-      <p class="flex-grow-1 w-100">Key</p>
+      <p class="flex-grow-1 w-100">Variable</p>
       <p class="flex-grow-1 w-100">Value</p>
     </div>
-    <div style="width:60px;" />
+    <!-- <div style="width:60px;" /> -->
   </div>
 
   <div
     class="w-100"
     style="display:block; position:relative;
-      width:200px;
-      "
+        width:200px;
+        "
   >
     {#if readable.key || readable.value}
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width:100%;"
+        style="cursor:default; width:60vw;"
       >
         <div
           style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
@@ -151,7 +149,7 @@
               <div class="flex-grow-1 w-100">
                 <input
                   type="text"
-                  placeholder="Enter Key"
+                  placeholder="Enter Variable"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled
@@ -180,9 +178,9 @@
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width:100%;"
+        style="cursor:default; width:55vw; overflow-y: scroll;"
         data-list-key={JSON.stringify({
-          name: element.key,
+          name: element.variable,
           description: element.value,
           checked: element.checked,
         })}
@@ -193,12 +191,6 @@
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
           >
-            <img
-              src={dragIcon}
-              alt=""
-              class="d-none"
-              style="cursor:grabbing;"
-            />
             <div style="width:30px;">
               {#if pairs.length - 1 != index || mode === "READ"}
                 <input
@@ -211,16 +203,15 @@
                 />
               {/if}
             </div>
-
             <div class="w-100 d-flex gap-2">
               <div class="flex-grow-1 w-100">
                 <input
                   type="text"
-                  placeholder="Enter Key"
+                  placeholder="Enter Variable"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled={mode == "READ" ? true : false}
-                  bind:value={element.key}
+                  bind:value={element.variable}
                   on:input={() => {
                     updateParam(index);
                   }}
@@ -241,7 +232,16 @@
               </div>
             </div>
             {#if pairs.length - 1 != index}
-              <div class="h-75 pe-1">
+              <div class="h-75 pe-1 d-flex">
+                <!-- <button
+                  class="bg-backgroundColor border-0"
+                  style="width: 40px;"
+                  on:click={() => {
+                    lockParam(index);
+                  }}
+                >
+                  <LockIcon locked={element.locked} />
+                </button> -->
                 <button class="bg-backgroundColor border-0" style="width:40px;">
                   {#if mode !== "READ"}
                     <img
@@ -255,7 +255,11 @@
                 </button>
               </div>
             {:else}
-              <div class="h-75 pe-1">
+              <div class="h-75 pe-1 d-flex">
+                <!-- <button
+                  class="bg-backgroundColor border-0"
+                  style="width:40px;"
+                /> -->
                 <button
                   class="bg-backgroundColor border-0"
                   style="width:40px;"

@@ -1,5 +1,5 @@
 <script>
-  import { PlusIcon } from "$lib/assets/app.asset";
+  import { PlusIcon, SelectIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
 </script>
 
@@ -31,11 +31,12 @@
       <span class={`my-auto`}>Environment</span>
     </button>
   </div>
-  <!-- <ul class={`env-side-tab-list `}>
-    <input class={`radio-tick-box`} type="radio" value="Dev" id="Dev" />
-    <label for="Dev">Dev</label>
-    <li class={`env-item rounded fw-normal text-decoration-none `}>Dev</li>
-  </ul> -->
+  <ul class={`env-side-tab-list `}>
+    <div class={`d-flex rounded`}>
+      <SelectIcon classProp={`my-auto`} width={14} height={14} />
+      <p class={`env-item my-auto fw-normal`}>Dev</p>
+    </div>
+  </ul>
 </div>
 
 <style lang="scss">

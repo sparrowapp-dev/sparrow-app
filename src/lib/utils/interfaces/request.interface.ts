@@ -45,6 +45,12 @@ export interface KeyValuePair {
   checked: boolean;
 }
 
+export interface EnvValuePair {
+  variable: string;
+  value: string;
+  checked: boolean;
+}
+
 export interface KeyValuePairWithBase {
   key: string;
   value: string;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import EnvValue from "$lib/components/env-value/EnvValue.svelte";
 </script>
 
 <div class={`env-panel`}>
@@ -21,8 +21,8 @@
     </div>
   </header>
   <section class={`var-value-container`}>
-    <KeyValue
-      keyValue={[{ key: "a", value: "ss", checked: true }]}
+    <EnvValue
+      keyValue={[{ variable: "a", value: "ss", locked: true }]}
       callback={() => {}}
     />
   </section>
@@ -32,7 +32,8 @@
   .env-panel {
     background-color: var(--background-color);
     width: 75vw;
-    padding: 24px;
+    height: 94vh;
+    padding: 3vw;
   }
   .env-header {
     margin-bottom: 24px;
