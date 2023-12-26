@@ -5,12 +5,11 @@ export const resizeWindowOnLogin = async () => {
   const platformName = await platform();
   if (platformName == "darwin") {
     const resizeButton = document.getElementById("resize-button");
-
     if (resizeButton) {
       resizeButton.click();
     }
   } else {
-    await appWindow.setFullscreen(true);
+    await appWindow.maximize();
   }
 };
 

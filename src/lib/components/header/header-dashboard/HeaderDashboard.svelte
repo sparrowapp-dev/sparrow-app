@@ -25,6 +25,8 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { fade, slide } from "svelte/transition";
+  // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
@@ -263,6 +265,7 @@
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
+      transition:fade={{ delay: 0, duration: 200 }}
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
@@ -271,25 +274,37 @@
 
   <div
     class="d-flex align-items-center justify-content-center"
-    style="margin-left: 45px;"
+    style="margin-left: 10px;"
   >
-    <div class="gap-{!isSearchVisible ? '0' : '3'} d-flex">
-      <div class="col-{!isSearchVisible ? '1' : '1'}">
+    <div
+      class="my-auto gap-{!isSearchVisible
+        ? '0'
+        : '4'} d-flex {showGlobalSearchPopup ? 'd-none' : ''}"
+    >
+      <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
             <img src={icons.settingIcon} alt="" />
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
+      <div
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+          ? 'd-none'
+          : ''}"
+      >
         <Tooltip>
           <button class="bg-blackColor border-0">
             <img src={icons.notifyIcon} alt="" />
           </button>
         </Tooltip>
       </div>
-      <div class="col-{!isSearchVisible ? '1' : '2'}">
-        <div class="position-relative">
+      <div
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+          ? 'd-none'
+          : ''}"
+      >
+        <div class="position-relative" style="z-index: 9;">
           <button
             class={`bg-blackColor border-0`}
             id="profile-dropdown"

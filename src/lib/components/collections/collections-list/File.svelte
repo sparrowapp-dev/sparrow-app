@@ -8,7 +8,6 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import {
     getPathFromUrl,
-    truncatePath,
   } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
@@ -26,6 +25,8 @@
   export let folderName: string;
   export let api;
   export let collectionsMethods: CollectionsMethods;
+  export let activeTabId: string;
+
   let showPath = false;
   let isFilePopup: boolean = false;
 
@@ -110,7 +111,6 @@
     showMenu = false;
   }
 
-
   let newRequestName: string = "";
   let isRenaming = false;
 
@@ -119,7 +119,6 @@
   };
 
   const onRenameBlur = async () => {
-  
     if (newRequestName) {
       if (!folderId) {
         let storage = api;
@@ -138,7 +137,7 @@
             api.id,
             response.data.data,
           );
-          collectionsMethods.updateTab(newRequestName,"name",api.id);
+          collectionsMethods.updateTab(newRequestName, "name", api.id);
         }
       } else if (collectionId && currentWorkspaceId && folderId) {
         let storage = api;
@@ -189,7 +188,7 @@
   let menuItems = [
     {
       onClick: () => {
-        handleClick()
+        handleClick();
       },
       displayText: "Open Request",
       disabled: false,
@@ -251,7 +250,10 @@
 />
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary"
+  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {id ===
+  activeTabId
+    ? 'active-request-tab'
+    : ''}"
   style="height:32px;"
   on:click={() => {
     isApiCreatedFirstTime.set(false);
@@ -268,7 +270,11 @@
       ? 'unclickable'
       : ''}"
   >
-    <div class="api-method text-{getMethodStyle(method)}">
+    <div
+      class="api-method text-{getMethodStyle(method)}  {id === activeTabId
+        ? ' active-request-method'
+        : ''}"
+    >
       {method?.toUpperCase()}
     </div>
 
@@ -280,6 +286,7 @@
         type="text"
         autofocus
         value={name}
+        maxlength={100}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
@@ -288,8 +295,8 @@
       <div class="api-name ellipsis">
         {name}
         {#if showPath}
-          <span class="path-name"
-            >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+          <span class="path-name ellipsis"
+            >{`${url ? getPathFromUrl(url) : ""}`}</span
           >
         {/if}
       </div>
@@ -353,7 +360,7 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: var(--border-color);
+    background-color: transparent;
   }
 
   .threedot-active {
@@ -369,10 +376,10 @@
     color: var(--white-color);
     padding-left: 0 !important;
     padding-right: 5px;
+    border-radius: 8px;
   }
 
   .btn-primary:hover {
-    border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
   }
@@ -410,12 +417,13 @@
     color: var(--white-color);
     padding-left: 0;
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .main-file {
     width: calc(100% - 24px);
+  }
+  .active-request-tab {
+    background-color: var(--selected-active-sidebar) !important;
+  }
+  .active-request-method {
+    background-color: var(--selected-active-sidebar) !important;
   }
 </style>

@@ -16,7 +16,9 @@
       ? 'mb-2 mt-3'
       : 'mb-3 mt-5'} "
   >
-    <h4 style="font-weight: 500;">Click send to get a Response</h4>
+    <h4 style="font-weight: 500; text-align: center;">
+      Click send to get a Response
+    </h4>
     <h5 style="font-weight: 700;">Few shortcuts</h5>
   </div>
   <div
@@ -60,11 +62,7 @@
         </button>
       </div>
     </div>
-    <div
-      class={isHorizontalMode
-        ? "d-flex flex-column"
-        : "d-flex flex-column"}
-    >
+    <div class={isHorizontalMode ? "d-flex flex-column" : "d-flex flex-column"}>
       <div class="d-flex align-items-center justify-content-between gap-5 mb-2">
         <p class="mb-0 shortcut-text">Edit link</p>
         <button
@@ -106,10 +104,11 @@
 </div>
 
 <style>
-.shortcut-btn-api{
-  width: 150px;
-}
-.shortcut-text{
-  width: 150px;
-}
+  .shortcut-btn-api {
+    width: 120px;
+  }
+  .shortcut-text {
+    min-width: 80px;
+    width: auto;
+  }
 </style>

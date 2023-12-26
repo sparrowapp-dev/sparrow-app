@@ -31,11 +31,17 @@
       ? 'sidebar__container_background rounded'
       : 'sidebar__container_background2'}"
   >
-    <div class="sidebar__container--icon pt-2"><img src={logo} alt="" /></div>
+    <div class="sidebar__container--icon pt-2">
+      <img
+        src={logo}
+        class={isSelected && !disabled ? "active-icon" : ""}
+        alt=""
+      />
+    </div>
     <div
       class={`sidebar__container--text mt-1 ${disabled && "text-textColor"}`}
     >
-      <p>{heading}</p>
+      <p class={isSelected && !disabled ? "text-plusButton" : ""}>{heading}</p>
     </div>
   </div>
 </Link>
@@ -64,5 +70,9 @@
   }
   .sidebar__container_background2 {
     background-color: transparent;
+  }
+  .active-icon {
+    filter: brightness(0) saturate(100%) invert(68%) sepia(50%) saturate(1710%)
+      hue-rotate(186deg) brightness(108%) contrast(101%);
   }
 </style>
