@@ -13,21 +13,23 @@ const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
 
-const error = (error, data?) => {
+const error = (error, data?, tabId?) => {
   return {
     status: "error",
     isSuccessful: false,
     message: error,
     data,
+    tabId,
   };
 };
 
-const success = (data) => {
+const success = (data, tabId) => {
   return {
     status: "success",
     isSuccessful: true,
     message: "",
     data,
+    tabId,
   };
 };
 
@@ -43,7 +45,7 @@ const getRefHeaders = () => {
   };
 };
 
-const regenerateAuthToken = async (
+export const regenerateAuthToken = async (
   method: Method,
   url: string,
   requestData?: RequestData,
@@ -76,7 +78,7 @@ const makeRequest = async (
     });
 
     if (response.status === 201 || response.status === 200) {
-      return success(response.data);
+      return success(response.data, "");
     } else {
       return error(response.data.message);
     }
@@ -118,24 +120,28 @@ const makeHttpRequest = async (
   headers: string,
   body: string,
   request: string,
+  tabId: string,
 ) => {
   let response;
 
   return Promise.race([
     timeout(apiTimeOut),
 
-    invoke("make_type_request_command", {
+    invoke("make_http_request", {
       url,
       method,
       headers,
       body,
       request,
+      tabId,
     }),
   ])
-    .then(async (data) => {
-      response = data;
+    .then(async (data: string) => {
       try {
-        return success(JSON.parse(response));
+        response = JSON.parse(data);
+        const tabId = response.tabId;
+        response = JSON.parse(response.body);
+        return success(response, tabId);
       } catch (e) {
         return error("error");
       }

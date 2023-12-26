@@ -28,8 +28,8 @@
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-    import { invoke } from "@tauri-apps/api";
-    import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+  import { invoke } from "@tauri-apps/api";
+  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -43,7 +43,7 @@
         let progressiveTab;
         const tabList = val.map((elem) => {
           let temp = createDeepCopy(elem.toJSON());
-          if(temp?.property?.request){
+          if (temp?.property?.request) {
             temp.property.request.state.responseSection =
               sample.property.request.state.responseSection;
             temp.property.request.state.responseRaw =
@@ -82,7 +82,7 @@
 
     let isloggedIn;
     user.subscribe((value) => {
-        isloggedIn = value;
+      isloggedIn = value;
     });
 
     if (!isloggedIn) {

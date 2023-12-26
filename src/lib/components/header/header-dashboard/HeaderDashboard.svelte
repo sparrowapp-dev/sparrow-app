@@ -4,7 +4,7 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons from "$lib/assets/app.asset";
+  import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
@@ -287,7 +287,7 @@
       <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
           <button class="bg-blackColor border-0">
-            <img src={icons.settingIcon} alt="" />
+            <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
       </div>
@@ -298,7 +298,7 @@
       >
         <Tooltip>
           <button class="bg-blackColor border-0">
-            <img src={icons.notifyIcon} alt="" />
+            <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>
       </div>
@@ -320,7 +320,7 @@
                   ? 'bg-plusButton text-black'
                   : 'profile-btn text-defaultColor'
               } m-auto text-center align-items-center justify-content-center `}"
-              style={`font-size: 12px; ${
+              style={`font-size: 12px; width: 24px; height: 24px; display:flex; padding-right: 0.5px; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
                   : "border: 2.2px solid #45494D;"
@@ -348,7 +348,7 @@
               >
                 <p
                   class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                  style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;`}
                 >
                   {!firstLetter
                     ? email[0]?.toUpperCase()
@@ -440,7 +440,7 @@
     background-color: red;
   }
   .profile-circle {
-    border-radius: 100%;
+    border-radius: 50%;
   }
   .profile-btn:hover {
     border: 2.2px solid #8a9299 !important;
