@@ -16,6 +16,13 @@
     registerUser = value;
   });
 
+  if (registerUser) {
+    const resizeButton = document.getElementById("resize-button");
+    if (resizeButton) {
+      resizeButton.click();
+    }
+  }
+
   const handleWorkspace = () => {
     setAuthJwt(
       constants.AUTH_TOKEN,
