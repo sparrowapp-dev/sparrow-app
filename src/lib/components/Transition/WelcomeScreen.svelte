@@ -5,10 +5,10 @@
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import { onDestroy, onMount } from "svelte";
-  const workspaceLoadtime: number = 5000;
-  import { fly, fade } from "svelte/transition";
 
+  import { fly, fade } from "svelte/transition";
   export let onClick: (flag: boolean) => void;
+  const workspaceLoadtime = constants.API_SEND_TIMEOUT;
 
   let registerUser;
 
