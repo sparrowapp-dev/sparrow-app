@@ -98,7 +98,7 @@
 
   function handleFileUpload() {
     const fileInput = document.getElementById("file-input") as HTMLInputElement;
-    console.log(fileInput);
+
     const file = fileInput.files[0];
     console.log(file);
 
@@ -212,7 +212,6 @@
   >
     <button
       class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
-      on:click|preventDefault={handleImportJsonObject}
     >
       <span class="me-3">
         {#if isLoading}

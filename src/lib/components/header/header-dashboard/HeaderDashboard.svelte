@@ -323,7 +323,9 @@
                   : "border: 2.2px solid #45494D;"
               } `}
             >
-              {firstLetter?.toUpperCase()}
+              {!firstLetter
+                ? email[0]?.toUpperCase()
+                : firstLetter?.toUpperCase()}
             </p>
           </button>
 
