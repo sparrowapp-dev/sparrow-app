@@ -115,7 +115,7 @@ export class HeaderDashboardViewModel {
       });
 
       await this.workspaceRepository.bulkInsertData(data);
-      return data;
+      return;
     }
   };
 

@@ -27,7 +27,7 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
-  // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
@@ -42,8 +42,10 @@
   let activeWorkspaceName: string;
   let searchData: string = "";
   let ownerName: string = "";
-  // let isLoadingPage: boolean = false;
-  let hideHeaders=false;
+
+
+
+  let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -75,6 +77,7 @@
           },
         );
         allworkspaces = workspaceArr;
+
         if (!activeWorkspaceRxDoc) {
           _viewModel.activateWorkspace(value[0].get("_id"));
           updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
@@ -89,6 +92,13 @@
         activeWorkspaceRxDoc = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
+        ownerName = value._data.owner.name;
+        if (ownerName) {
+          name = ownerName;
+          firstLetter = name[0];
+        } else {
+          name = name;
+        }
       }
     },
   );
@@ -97,7 +107,6 @@
   let email: string = "";
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
-    console.log(activeWorkspaceRxDoc);
     if (value) {
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
@@ -145,23 +154,9 @@
     profile = false;
   });
 
-  let response;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      response = await _viewModel.refreshWorkspaces(value._id);
-    }
-    response?.map((items) => {
-      if (items) {
-        ownerName = items.owner?.name;
-      
-      }
-    });
-
-    if (ownerName) {
-      name = ownerName;
-      firstLetter = name[0];
-    } else {
-      name = name;
+      await _viewModel.refreshWorkspaces(value._id);
     }
   });
 
@@ -185,7 +180,7 @@
   function handleWindowSize() {
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
-    hideHeaders=window.innerWidth<=700;
+    hideHeaders = window.innerWidth <= 700;
   }
 
   let isOpen: boolean = false;
@@ -232,7 +227,8 @@
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup && hideHeaders
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup &&
+      hideHeaders
         ? ''
         : ''}"
       style="height: 36px; width:116px"
@@ -248,7 +244,8 @@
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup && hideHeaders
+    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup &&
+    hideHeaders
       ? 'left:50%;transform: translateX(-50%);'
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
@@ -289,13 +286,10 @@
     {/if}
   </div>
 
-
   {#if showGlobalSearchPopup && hideHeaders}
-   <div
-    style="height:32px; width:400px;position: relative;">
-  </div>
+    <div style="height:32px; width:400px;position: relative;"></div>
   {/if}
-  
+
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
@@ -323,9 +317,9 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
-          ? 'd-none'
-          : ''}"
+        class="my-auto col-{!isSearchVisible
+          ? '1'
+          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -334,9 +328,9 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
-          ? 'd-none'
-          : ''}"
+        class="my-auto col-{!isSearchVisible
+          ? '1'
+          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <div class="position-relative" style="z-index: 9;">
           <button
@@ -346,7 +340,9 @@
             on:click={toggleDropdown}
           >
             <p
-              class="{showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}{`profile-circle ${
+              class="{showGlobalSearchPopup && hideHeaders
+                ? 'd-none'
+                : ''}{`profile-circle ${
                 isOpen
                   ? 'bg-plusButton text-black'
                   : 'profile-btn text-defaultColor'

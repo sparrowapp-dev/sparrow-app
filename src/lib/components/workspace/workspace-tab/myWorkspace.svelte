@@ -7,12 +7,17 @@
   import icons from "$lib/assets/app.asset";
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
   let tabName: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
+  let ownerName: string;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -50,23 +55,23 @@
     }
   });
 
-  let response;
-  let ownerName: string;
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    (value: WorkspaceDocument) => {
+      if (value) {
+        ownerName = value._data.owner.name;
+        if (ownerName) {
+          name = ownerName;
+          firstLetter = name[0];
+        } else {
+          name = name;
+        }
+      }
+    },
+  );
+
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      response = await _viewModel.refreshWorkspaces(value._id);
-    }
-    response?.map((items) => {
-      if (items) {
-        ownerName = items.owner?.name;
-      }
-    });
-
-    if (ownerName) {
-      name = ownerName;
-      firstLetter = name[0];
-    } else {
-      name = name;
+      await _viewModel.refreshWorkspaces(value._id);
     }
   });
 
@@ -80,6 +85,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 
