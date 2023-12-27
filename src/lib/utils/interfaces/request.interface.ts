@@ -1,5 +1,6 @@
 import type { AuthSection } from "../enums/authorization.enum";
 import type { ItemType } from "../enums/item-type.enum";
+import type { ContentTypeEnum } from "../enums/request.enum";
 import type {
   RequestAuthTypes,
   RequestDatasetType,
@@ -37,8 +38,8 @@ export interface RequestBody {
   body?: unknown;
   headers?: KeyValuePair[];
   queryParams?: KeyValuePair[];
+  selectedRequestBodyType?: ContentTypeEnum;
 }
-
 export interface KeyValuePair {
   key: string;
   value: string;

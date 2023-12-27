@@ -43,6 +43,9 @@ const requestItems = {
     type: "array",
     properties: requestBody,
   },
+  selectedRequestBodyType: {
+    type: "string",
+  },
   queryParams: {
     type: "array",
     properties: params,
@@ -112,7 +115,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 0,
+  version: 1,
   properties: {
     collectionId: {
       type: "string",
