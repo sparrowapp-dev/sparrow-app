@@ -107,6 +107,7 @@
       autoIndent: "brackets",
       formatOnPaste: true,
       formatOnType: true,
+      wordWrap:"on",
       fixedOverflowWidgets: true,
       autoDetectHighContrast: false,
       scrollbar: {
