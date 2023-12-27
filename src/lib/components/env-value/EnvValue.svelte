@@ -178,7 +178,7 @@
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width:55vw; overflow-y: scroll;"
+        style="cursor:default; width:55vw; "
         data-list-key={JSON.stringify({
           name: element.variable,
           description: element.value,

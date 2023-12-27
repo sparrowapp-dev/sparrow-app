@@ -22,7 +22,7 @@
   </header>
   <section class={`var-value-container`}>
     <EnvValue
-      keyValue={[{ variable: "a", value: "ss", locked: true }]}
+      keyValue={[{ variable: "a", value: "ss", checked: true }]}
       callback={() => {}}
     />
   </section>

@@ -9,7 +9,7 @@ export class EnvironmentService {
 
   public fetchEnvironment = async (workspaceId: string) => {
     const response = await makeRequest(
-      "POST",
+      "GET",
       `${this.apiUrl}/api/environment/${workspaceId}`,
       { headers: getAuthHeaders() },
     );

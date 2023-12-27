@@ -1,6 +1,38 @@
-<script>
+<script lang="ts">
   import { PlusIcon, SelectIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { EnvironmentMethods } from "$lib/utils/interfaces/environment.interface";
+  import type { Observable } from "rxjs";
+  import { onDestroy } from "svelte";
+  export let environmentMethods: EnvironmentMethods;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    environmentMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
+  let currWorkspaceName: string;
+  let currentWorkspaceId: string = "";
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        const response =
+          await environmentMethods.getAllEnvironments(workspaceId);
+        if (response.isSuccessful && response.data.data) {
+          const environments = response.data.data;
+          console.log("response: ", response);
+          environmentMethods.bulkInsert(environments);
+          return;
+        }
+      }
+    },
+  );
+
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <div class={`env-sidebar`} style={``}>
@@ -11,7 +43,7 @@
       class={`fw-medium lh-1 curr-workspace`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
-      Veloxa
+      {currWorkspaceName || ""}
     </h1>
     <Tooltip text={`Add Environment`}>
       <PlusIcon width={15} height={15} color={`#8A9299`} />

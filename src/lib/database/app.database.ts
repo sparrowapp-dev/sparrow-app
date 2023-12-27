@@ -24,6 +24,10 @@ import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
+import {
+  enviromentSchema,
+  type EnvironmentDocType,
+} from "$lib/models/environment.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -32,6 +36,8 @@ export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
+export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
+export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -44,6 +50,7 @@ export type DatabaseCollections = {
   workspace: WorkspaceContainer;
   tab: TabContainer;
   collection: CollectionContainer;
+  environment: EnvironmentContainer;
   activesidebartab: ActiveSideBarTabContainer;
 };
 
@@ -97,6 +104,9 @@ export class RxDB {
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
+      },
+      enviroment: {
+        schema: enviromentSchema,
       },
     });
     return { rxdb: this.rxdb };
