@@ -26,6 +26,7 @@
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
+  import { items } from "$lib/models/collection.model";
   // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
@@ -40,6 +41,7 @@
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
+  let ownerName: string = "";
   // let isLoadingPage: boolean = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
@@ -60,21 +62,6 @@
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
-
-  let name: string = "";
-  let email: string = "";
-  let firstLetter;
-  const unsubscribeUser = user.subscribe((value) => {
-    if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
-      email = value?.email;
-      if (name) {
-        firstLetter = name[0];
-      }
-    }
-  });
 
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
@@ -104,6 +91,22 @@
       }
     },
   );
+
+  let name: string = "";
+  let email: string = "";
+  let firstLetter;
+  const unsubscribeUser = user.subscribe((value) => {
+    console.log(activeWorkspaceRxDoc);
+    if (value) {
+      if (value.personalWorkspaces) {
+        name = value?.personalWorkspaces[0]?.name;
+      }
+      email = value?.email;
+      if (name) {
+        firstLetter = name[0];
+      }
+    }
+  });
 
   let isMaximizeWindow: boolean = false;
 
@@ -141,9 +144,23 @@
     profile = false;
   });
 
-  const userUnsubscribe = user.subscribe((value) => {
+  let response;
+  const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      _viewModel.refreshWorkspaces(value._id);
+      response = await _viewModel.refreshWorkspaces(value._id);
+    }
+    response?.map((items) => {
+      if (items) {
+        ownerName = items.owner?.name;
+      
+      }
+    });
+
+    if (ownerName) {
+      name = ownerName;
+      firstLetter = name[0];
+    } else {
+      name = name;
     }
   });
 
@@ -319,12 +336,12 @@
                 isOpen
                   ? 'bg-plusButton text-black'
                   : 'profile-btn text-defaultColor'
-              } m-auto text-center align-items-center justify-content-center `}"
-              style={`font-size: 12px; width: 24px; height: 24px; display:flex; padding-right: 0.5px; ${
+              } m-auto text-center d-flex align-items-center justify-content-center `}"
+              style={`font-size: 12px; width: 100%; height: 100%; margin: 0; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
                   : "border: 2.2px solid #45494D;"
-              } `}
+              }`}
             >
               {!firstLetter
                 ? email[0]?.toUpperCase()
@@ -348,7 +365,7 @@
               >
                 <p
                   class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
                 >
                   {!firstLetter
                     ? email[0]?.toUpperCase()

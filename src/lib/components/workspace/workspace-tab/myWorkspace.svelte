@@ -50,6 +50,26 @@
     }
   });
 
+  let response;
+  let ownerName: string;
+  const userUnsubscribe = user.subscribe(async (value) => {
+    if (value) {
+      response = await _viewModel.refreshWorkspaces(value._id);
+    }
+    response?.map((items) => {
+      if (items) {
+        ownerName = items.owner?.name;
+      }
+    });
+
+    if (ownerName) {
+      name = ownerName;
+      firstLetter = name[0];
+    } else {
+      name = name;
+    }
+  });
+
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
     isWorkspaceCreatedFirstTime.subscribe((value) => {
@@ -141,17 +161,18 @@
           <button
             class="bg-backgroundColor border-0"
             id="profile-dropdown"
-            style="width: 24px; height: 24px;"
+            style="width: 24px; height: 24px;border-radius:50%"
           >
             <p
-              class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
+              class="mb-0 profile-circle bg-plusButton text-black m-auto text-center d-flex align-items-center justify-content-center"
+              style="width: 100%; height: 100%; margin: 0;"
             >
-              {firstLetter?.toUpperCase() === undefined
+              {!firstLetter
                 ? email[0]?.toUpperCase()
                 : firstLetter?.toUpperCase()}
             </p>
           </button>
-          <p class="mb-0">{name === undefined ? email : name}</p>
+          <p class="mb-0">{!name ? email : name}</p>
         </div>
       </div>
     </div>
@@ -180,7 +201,7 @@
   }
 
   .profile-circle {
-    border-radius: 70%;
+    border-radius: 50%;
   }
 
   .info-setting-hover:hover {
