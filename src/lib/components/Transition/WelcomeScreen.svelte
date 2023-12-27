@@ -103,7 +103,7 @@
   {/if}
 
   {#if showSpinner}
-    <div style="font-size: 14px;text-align:center" class="text-lightGray mt-4">
+    <div class="welcome-spinner text-lightGray mt-4">
       <p>Please wait while we setup your account....</p>
     </div>
   {/if}
@@ -140,5 +140,10 @@
     border-radius: 4px;
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
     border: none;
+  }
+
+  .welcome-spinner {
+    font-size: 14px;
+    text-align: center;
   }
 </style>
