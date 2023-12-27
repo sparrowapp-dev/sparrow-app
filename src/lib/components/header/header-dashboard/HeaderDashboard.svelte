@@ -43,6 +43,7 @@
   let searchData: string = "";
   let ownerName: string = "";
   // let isLoadingPage: boolean = false;
+  let hideHeaders=false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -184,6 +185,7 @@
   function handleWindowSize() {
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
+    hideHeaders=window.innerWidth<=700;
   }
 
   let isOpen: boolean = false;
@@ -230,8 +232,8 @@
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup
-        ? 'd-none'
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup && hideHeaders
+        ? ''
         : ''}"
       style="height: 36px; width:116px"
     >
@@ -246,8 +248,12 @@
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;"
-    class="search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup && hideHeaders
+      ? 'left:50%;transform: translateX(-50%);'
+      : ''}"
+    class="{showGlobalSearchPopup && hideHeaders
+      ? 'position-absolute'
+      : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
@@ -282,6 +288,14 @@
       />
     {/if}
   </div>
+
+
+  {#if showGlobalSearchPopup && hideHeaders}
+   <div
+    style="height:32px; width:400px;position: relative;">
+  </div>
+  {/if}
+  
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
@@ -299,7 +313,7 @@
     <div
       class="my-auto gap-{!isSearchVisible
         ? '0'
-        : '4'} d-flex {showGlobalSearchPopup ? 'd-none' : ''}"
+        : '4'} d-flex {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
     >
       <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
@@ -309,7 +323,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
           ? 'd-none'
           : ''}"
       >
@@ -320,7 +334,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
           ? 'd-none'
           : ''}"
       >
@@ -332,7 +346,7 @@
             on:click={toggleDropdown}
           >
             <p
-              class="{showGlobalSearchPopup ? 'd-none' : ''}{`profile-circle ${
+              class="{showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}{`profile-circle ${
                 isOpen
                   ? 'bg-plusButton text-black'
                   : 'profile-btn text-defaultColor'
@@ -403,7 +417,7 @@
       </div>
     </div>
 
-    <div class=" d-flex {isSearchVisible ? 'gap-4' : ' gap-3'} ">
+    <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
       <div class="col-2">
         <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
           <img src={icons.minimizeIcon} alt="" />
@@ -474,7 +488,7 @@
     cursor: pointer;
   }
   .search-bar {
-    z-index: 8;
+    z-index: 11;
   }
   .background-overlay {
     position: fixed;
@@ -484,7 +498,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 4;
+    z-index: 10;
   }
   .input-search-bar {
     width: 100%;
