@@ -9,6 +9,8 @@
     NewTab,
     RequestBody,
   } from "$lib/utils/interfaces/request.interface";
+  import { RequestDataset } from "$lib/utils/enums/request.enum";
+  import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
@@ -22,13 +24,17 @@
     loader = true;
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-
+      const bodyType =
+    componentData.property.request.state.dataset === RequestDataset.RAW
+          ? componentData.property.request.state.raw
+          : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
+      selectedRequestBodyType:setContentTypeHeader(bodyType),
     };
 
     if (!folderId) {

@@ -26,6 +26,7 @@
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
+  import { items } from "$lib/models/collection.model";
   // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
@@ -40,7 +41,9 @@
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
-
+  let ownerName: string = "";
+  // let isLoadingPage: boolean = false;
+  let hideHeaders=false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -60,22 +63,6 @@
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
-
-  let name: string = "";
-  let email: string = "";
-  let firstLetter, currentUser;
-  const unsubscribeUser = user.subscribe((value) => {
-    if (value) {
-      currentUser = value;
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
-      email = value?.email;
-      if (name) {
-        firstLetter = name[0];
-      }
-    }
-  });
 
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
@@ -105,6 +92,22 @@
       }
     },
   );
+
+  let name: string = "";
+  let email: string = "";
+  let firstLetter;
+  const unsubscribeUser = user.subscribe((value) => {
+    console.log(activeWorkspaceRxDoc);
+    if (value) {
+      if (value.personalWorkspaces) {
+        name = value?.personalWorkspaces[0]?.name;
+      }
+      email = value?.email;
+      if (name) {
+        firstLetter = name[0];
+      }
+    }
+  });
 
   let isMaximizeWindow: boolean = false;
 
@@ -142,9 +145,23 @@
     profile = false;
   });
 
-  const userUnsubscribe = user.subscribe((value) => {
+  let response;
+  const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      _viewModel.refreshWorkspaces(value._id);
+      response = await _viewModel.refreshWorkspaces(value._id);
+    }
+    response?.map((items) => {
+      if (items) {
+        ownerName = items.owner?.name;
+      
+      }
+    });
+
+    if (ownerName) {
+      name = ownerName;
+      firstLetter = name[0];
+    } else {
+      name = name;
     }
   });
 
@@ -168,6 +185,7 @@
   function handleWindowSize() {
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
+    hideHeaders=window.innerWidth<=700;
   }
 
   let isOpen: boolean = false;
@@ -197,6 +215,7 @@
   });
 </script>
 
+<!-- {#if !isLoadingPage} -->
 <div
   class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
   style="height:44px;"
@@ -213,7 +232,9 @@
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2"
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup && hideHeaders
+        ? ''
+        : ''}"
       style="height: 36px; width:116px"
     >
       <HeaderDropdown
@@ -221,13 +242,18 @@
         onclick={handleDropdown}
         {collectionsMethods}
         {activeSideBarTabMethods}
+        {activeWorkspaceId}
       />
     </div>
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;"
-    class="search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup && hideHeaders
+      ? 'left:50%;transform: translateX(-50%);'
+      : ''}"
+    class="{showGlobalSearchPopup && hideHeaders
+      ? 'position-absolute'
+      : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <img src={icons.searchIcon} alt="" />
@@ -259,9 +285,17 @@
         workspaces={allworkspaces}
         {activeWorkspaceId}
         {handleDropdown}
-      ></GlobalSearchBarPopup>
+      />
     {/if}
   </div>
+
+
+  {#if showGlobalSearchPopup && hideHeaders}
+   <div
+    style="height:32px; width:400px;position: relative;">
+  </div>
+  {/if}
+  
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
@@ -269,7 +303,7 @@
       on:click={() => {
         handleGlobalSearchPopup(false);
       }}
-    ></div>
+    />
   {/if}
 
   <div
@@ -279,7 +313,7 @@
     <div
       class="my-auto gap-{!isSearchVisible
         ? '0'
-        : '4'} d-flex {showGlobalSearchPopup ? 'd-none' : ''}"
+        : '4'} d-flex {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
     >
       <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
@@ -289,7 +323,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
           ? 'd-none'
           : ''}"
       >
@@ -300,7 +334,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup
+        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
           ? 'd-none'
           : ''}"
       >
@@ -312,16 +346,16 @@
             on:click={toggleDropdown}
           >
             <p
-              class={`profile-circle ${
+              class="{showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}{`profile-circle ${
                 isOpen
-                  ? "bg-plusButton text-black"
-                  : "profile-btn text-defaultColor"
-              } m-auto text-center align-items-center justify-content-center `}
-              style={`font-size: 12px; width: 24px; height: 24px; display:flex; padding-right: 0.5px; ${
+                  ? 'bg-plusButton text-black'
+                  : 'profile-btn text-defaultColor'
+              } m-auto text-center d-flex align-items-center justify-content-center `}"
+              style={`font-size: 12px; width: 100%; height: 100%; margin: 0; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
                   : "border: 2.2px solid #45494D;"
-              } `}
+              }`}
             >
               {!firstLetter
                 ? email[0]?.toUpperCase()
@@ -329,59 +363,61 @@
             </p>
           </button>
 
-          <div
-            class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
-            style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
-              ? 'block'
-              : 'none'}; top: 40px; right: -10px; width: 219px;"
-            on:click={() => {
-              isOpen = false;
-            }}
-          >
+          {#if isOpen}
             <div
-              class="text-center align-items-center justify-content-center pt-3"
-            >
-              <p
-                class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                style={`font-size: 40px; width: 33%; border: 2px solid #45494D;`}
-              >
-                {!firstLetter
-                  ? email[0]?.toUpperCase()
-                  : firstLetter?.toUpperCase()}
-              </p>
-              <h1
-                class="text-white fw-normal mt-3"
-                style="color: #999; font-family: Roboto; font-size: 12px;"
-              >
-                {!name ? email[0]?.toUpperCase() : name}
-              </h1>
-              <p
-                class="text-requestBodyColor fw-medium mb-0"
-                style="font-size: 12px;"
-              >
-                {email}
-              </p>
-            </div>
-
-            <div
-              class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
+              class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
+              style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
+                ? 'block'
+                : 'none'}; top: 40px; right: -10px; width: 219px;"
               on:click={() => {
-                if (_viewModel.logout(currentUser)) {
-                  navigate("/login");
-                }
+                isOpen = false;
               }}
+              transition:slide={{ duration: 300 }}
             >
-              <img src={icons.signout} alt="" /><span
-                class="m-2"
-                style="font-size: 12px;">Sign Out</span
+              <div
+                class="text-center align-items-center justify-content-center pt-3"
               >
+                <p
+                  class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                >
+                  {!firstLetter
+                    ? email[0]?.toUpperCase()
+                    : firstLetter?.toUpperCase()}
+                </p>
+                <h1
+                  class="text-white fw-normal mt-3"
+                  style="color: #999; font-family: Roboto; font-size: 12px;"
+                >
+                  {!name ? email[0]?.toUpperCase() : name}
+                </h1>
+                <p
+                  class="text-requestBodyColor fw-medium mb-0"
+                  style="font-size: 12px;"
+                >
+                  {email}
+                </p>
+              </div>
+              <hr class="" />
+
+              <div
+                class="cursor-pointer d-flex align-items-center flex-start px-3 height: 26px signOut"
+                on:click={async () => {
+                  await _viewModel.logout();
+                }}
+              >
+                <img src={icons.signout} alt="" /><span
+                  class="m-2"
+                  style="font-size: 12px;">Sign Out</span
+                >
+              </div>
             </div>
-          </div>
+          {/if}
         </div>
       </div>
     </div>
 
-    <div class=" d-flex {isSearchVisible ? 'gap-4' : ' gap-3'} ">
+    <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
       <div class="col-2">
         <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
           <img src={icons.minimizeIcon} alt="" />
@@ -409,6 +445,10 @@
     </div>
   </div>
 </div>
+
+<!-- {:else}
+  <PageLoader />
+{/if} -->
 
 <style>
   .signOut:hover {
@@ -448,7 +488,7 @@
     cursor: pointer;
   }
   .search-bar {
-    z-index: 8;
+    z-index: 11;
   }
   .background-overlay {
     position: fixed;
@@ -458,7 +498,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 4;
+    z-index: 10;
   }
   .input-search-bar {
     width: 100%;

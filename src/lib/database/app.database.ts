@@ -88,6 +88,12 @@ export class RxDB {
       },
       collection: {
         schema: collectionSchema,
+        migrationStrategies: {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,

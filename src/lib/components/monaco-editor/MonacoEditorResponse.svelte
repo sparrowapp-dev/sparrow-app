@@ -106,6 +106,7 @@
       formatOnType: true,
       fixedOverflowWidgets: true,
       autoDetectHighContrast: false,
+      wordWrap: "on", 
       scrollbar: {
         useShadows: false,
         verticalHasArrows: false,
@@ -249,5 +250,6 @@
   .code-editor {
     width: 99%;
     height: calc(100vh - 360px);
+    text-wrap: wrap;
   }
 </style>
