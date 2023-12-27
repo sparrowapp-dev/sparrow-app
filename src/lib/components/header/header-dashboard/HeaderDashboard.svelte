@@ -26,7 +26,6 @@
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
-  // import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
@@ -41,7 +40,6 @@
   let activeWorkspaceName: string;
   let searchData: string = "";
   let hideHeaders=false;
-  // let isLoadingPage: boolean = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -169,7 +167,6 @@
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
     hideHeaders=window.innerWidth<=700;
-    console.log(hideHeaders);
   }
 
   let isOpen: boolean = false;
