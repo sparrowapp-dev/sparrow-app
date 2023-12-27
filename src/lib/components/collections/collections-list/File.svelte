@@ -335,9 +335,9 @@
     font-weight: 500;
     margin-right: 8px;
     border: 1px solid var(--border-color);
+    width: 56px;
     height: 30px;
     border-radius: 8px;
-    padding: 8px 12px 8px 8px;
     display: flex;
     justify-content: center;
     align-items: center;
