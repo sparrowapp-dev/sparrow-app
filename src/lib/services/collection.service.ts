@@ -171,6 +171,8 @@ export class CollectionService {
       },
     );
 
+    console.log(response);
+
     return response;
   };
 

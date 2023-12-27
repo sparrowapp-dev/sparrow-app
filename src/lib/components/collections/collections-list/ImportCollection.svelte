@@ -26,58 +26,56 @@
     text = e.target.value;
   };
 
-  // const handleImportUrl = async () => {
-  //   isLoading = true;
-  //   const response = await _viewImportCollection.importCollectionData(
-  //     currentWorkspaceId,
-  //     { url: text },
-  //   );
+  const handleImportUrl = async () => {
+    isLoading = true;
+    const response = await _viewImportCollection.importCollectionData(
+      currentWorkspaceId,
+      text,
+    );
 
-  //   console.log(response);
+    onClick(false);
+    if (response.isSuccessful) {
+      const res = response.data.data;
+      isLoading = false;
+      // collectionUnderCreation = true;
+      isCollectionCreatedFirstTime.set(true);
 
-  //   onClick(false);
-  //   if (response.isSuccessful) {
-  //     const res = response.data.data;
-  //     isLoading = false;
-  //     // collectionUnderCreation = true;
-  //     isCollectionCreatedFirstTime.set(true);
+      const newCollection = {
+        id: res.id,
+        name: res.name,
+        items: [],
+        createdAt: new Date().toISOString(),
+      };
 
-  //     const newCollection = {
-  //       id: res.id,
-  //       name: res.name,
-  //       items: [],
-  //       createdAt: new Date().toISOString(),
-  //     };
+      collectionsMethods.addCollection(newCollection);
 
-  //     collectionsMethods.addCollection(newCollection);
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: res.id,
+      };
 
-  //     let path: Path = {
-  //       workspaceId: currentWorkspaceId,
-  //       collectionId: res.id,
-  //     };
+      const Samplecollection = generateSampleCollection(
+        res.id,
+        new Date().toString(),
+      );
 
-  //     const Samplecollection = generateSampleCollection(
-  //       res.id,
-  //       new Date().toString(),
-  //     );
+      Samplecollection.id = res.id;
+      Samplecollection.path = path;
+      Samplecollection.name = res.name;
+      Samplecollection.save = true;
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
 
-  //     Samplecollection.id = res.id;
-  //     Samplecollection.path = path;
-  //     Samplecollection.name = res.name;
-  //     Samplecollection.save = true;
-  //     collectionsMethods.handleCreateTab(Samplecollection);
-  //     moveNavigation("right");
-
-  //     collectionsMethods.updateCollection(res.id, res);
-  //     _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-  //       id: res.id,
-  //       name: newCollection.name,
-  //     });
-  //     notifications.success(response.data.message);
-  //   } else {
-  //     isLoading = false;
-  //   }
-  // };
+      collectionsMethods.updateCollection(res.id, res);
+      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: res.id,
+        name: newCollection.name,
+      });
+      notifications.success(response.data.message);
+    } else {
+      isLoading = false;
+    }
+  };
 
   const handleImportFile = async (fileContent) => {
     isLoading = true;
@@ -212,6 +210,7 @@
   >
     <button
       class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
+      on:click={handleImportUrl}
     >
       <span class="me-3">
         {#if isLoading}
