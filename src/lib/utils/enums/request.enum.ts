@@ -82,3 +82,12 @@ export enum RequestAuthProperty {
   BASIC_AUTH = "basicAuth",
   API_KEY = "apiKey",
 }
+export enum ContentTypeEnum {
+  "application/json" = "application/json",
+  "application/xml" = "application/xml",
+  "application/x-www-form-urlencoded" = "application/x-www-form-urlencoded",
+  "multipart/form-data" = "multipart/form-data",
+  "application/javascript" = "application/javascript",
+  "text/plain" = "text/plain",
+  "text/html" = "text/html",
+}
