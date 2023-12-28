@@ -61,6 +61,7 @@
 
 <div
   class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+  style="height:{showSpinner ? '433px' : '340px'}"
   transition:fly={{ y: 50, delay: 0, duration: 100 }}
   on:introstart
   on:outroend
@@ -108,9 +109,11 @@
     </div>
   {/if}
 
-  <div style="font-size: 14px;text-align:center" class="text-lightGray mt-4">
-    <p>Please wait while we setup your account....</p>
-  </div>
+  {#if showSpinner}
+    <div class="welcome-spinner text-lightGray mt-4">
+      <p>Please wait while we setup your account....</p>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -144,5 +147,10 @@
     border-radius: 4px;
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
     border: none;
+  }
+
+  .welcome-spinner {
+    font-size: 14px;
+    text-align: center;
   }
 </style>
