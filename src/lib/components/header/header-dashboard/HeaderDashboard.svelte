@@ -26,6 +26,8 @@
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
+  import { items } from "$lib/models/collection.model";
+
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
@@ -39,7 +41,11 @@
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
-  let hideHeaders=false;
+  let ownerName: string = "";
+
+
+
+  let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
 
@@ -60,21 +66,6 @@
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
 
-  let name: string = "";
-  let email: string = "";
-  let firstLetter;
-  const unsubscribeUser = user.subscribe((value) => {
-    if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
-      email = value?.email;
-      if (name) {
-        firstLetter = name[0];
-      }
-    }
-  });
-
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
       if (value && value.length > 0) {
@@ -86,6 +77,7 @@
           },
         );
         allworkspaces = workspaceArr;
+
         if (!activeWorkspaceRxDoc) {
           _viewModel.activateWorkspace(value[0].get("_id"));
           updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
@@ -100,9 +92,31 @@
         activeWorkspaceRxDoc = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
+        ownerName = value._data.owner.name;
+        if (ownerName) {
+          name = ownerName;
+          firstLetter = name[0];
+        } else {
+          name = name;
+        }
       }
     },
   );
+
+  let name: string = "";
+  let email: string = "";
+  let firstLetter;
+  const unsubscribeUser = user.subscribe((value) => {
+    if (value) {
+      if (value.personalWorkspaces) {
+        name = value?.personalWorkspaces[0]?.name;
+      }
+      email = value?.email;
+      if (name) {
+        firstLetter = name[0];
+      }
+    }
+  });
 
   let isMaximizeWindow: boolean = false;
 
@@ -140,9 +154,9 @@
     profile = false;
   });
 
-  const userUnsubscribe = user.subscribe((value) => {
+  const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      _viewModel.refreshWorkspaces(value._id);
+      await _viewModel.refreshWorkspaces(value._id);
     }
   });
 
@@ -166,7 +180,7 @@
   function handleWindowSize() {
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
-    hideHeaders=window.innerWidth<=700;
+    hideHeaders = window.innerWidth <= 700;
   }
 
   let isOpen: boolean = false;
@@ -213,7 +227,8 @@
       </div>
     </div>
     <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup && hideHeaders
+      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup &&
+      hideHeaders
         ? ''
         : ''}"
       style="height: 36px; width:116px"
@@ -229,7 +244,8 @@
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup && hideHeaders
+    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup &&
+    hideHeaders
       ? 'left:50%;transform: translateX(-50%);'
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
@@ -270,13 +286,10 @@
     {/if}
   </div>
 
-
   {#if showGlobalSearchPopup && hideHeaders}
-   <div
-    style="height:32px; width:400px;position: relative;">
-  </div>
+    <div style="height:32px; width:400px;position: relative;"></div>
   {/if}
-  
+
   {#if showGlobalSearchPopup}
     <div
       class="background-overlay"
@@ -304,9 +317,9 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
-          ? 'd-none'
-          : ''}"
+        class="my-auto col-{!isSearchVisible
+          ? '1'
+          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <Tooltip>
           <button class="bg-blackColor border-0">
@@ -315,9 +328,9 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible ? '1' : '2'} {showGlobalSearchPopup && hideHeaders
-          ? 'd-none'
-          : ''}"
+        class="my-auto col-{!isSearchVisible
+          ? '1'
+          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <div class="position-relative" style="z-index: 9;">
           <button
@@ -327,16 +340,18 @@
             on:click={toggleDropdown}
           >
             <p
-              class="{showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}{`profile-circle ${
+              class="{showGlobalSearchPopup && hideHeaders
+                ? 'd-none'
+                : ''}{`profile-circle ${
                 isOpen
                   ? 'bg-plusButton text-black'
                   : 'profile-btn text-defaultColor'
-              } m-auto text-center align-items-center justify-content-center `}"
-              style={`font-size: 12px; width: 24px; height: 24px; display:flex; padding-right: 0.5px; ${
+              } m-auto text-center d-flex align-items-center justify-content-center `}"
+              style={`font-size: 12px; width: 100%; height: 100%; margin: 0; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
                   : "border: 2.2px solid #45494D;"
-              } `}
+              }`}
             >
               {!firstLetter
                 ? email[0]?.toUpperCase()
@@ -360,7 +375,7 @@
               >
                 <p
                   class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
                 >
                   {!firstLetter
                     ? email[0]?.toUpperCase()
