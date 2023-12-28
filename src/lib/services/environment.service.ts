@@ -1,16 +1,31 @@
 import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
-import type { CreateEnvironmentPostBody } from "$lib/utils/dto";
+import type {
+  CreateEnvironmentPostBody,
+  UpdateEnvironmentPostBody,
+} from "$lib/utils/dto";
 
 export class EnvironmentService {
   constructor() {}
 
   private apiUrl: string = constants.API_URL;
 
-  public fetchEnvironment = async (workspaceId: string) => {
+  public fetchAllEnvironments = async (workspaceId: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/environment/${workspaceId}`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/environment`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public fetchEnvironment = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -19,7 +34,7 @@ export class EnvironmentService {
   public addEnvironment = async (environment: CreateEnvironmentPostBody) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/environment`,
+      `${this.apiUrl}/api/workspace/environment`,
       {
         body: environment,
         headers: getAuthHeaders(),
@@ -29,6 +44,21 @@ export class EnvironmentService {
     return response;
   };
 
+  public updateEnvironment = async (
+    environmentId: string,
+    workspaceId: string,
+    environment: UpdateEnvironmentPostBody,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
+      {
+        body: environment,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
   public deleteEnvironment = async (
     environmentId: string,
     workspaceId: string,

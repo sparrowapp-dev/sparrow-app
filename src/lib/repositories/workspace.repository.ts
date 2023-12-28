@@ -46,6 +46,22 @@ export class WorkspaceRepository {
     });
   };
 
+  public updateEnvironmentInWorkspace = async (
+    workspaceId: string,
+    environmentObj,
+  ) => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    workspace.incrementalPatch({
+      environments: [...workspace.environments, environmentObj],
+    });
+  };
+
   public clearWorkspaces = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.workspace.find().remove();
   };

@@ -111,7 +111,7 @@
         {autofocus}
         maxlength={100}
         id="renameInputFieldCollection"
-        value={tabName}
+        value={tabName + "Names"}
         class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
         on:input={(event) => {
           handleCollectionInput(event);

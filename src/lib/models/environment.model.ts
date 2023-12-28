@@ -6,11 +6,22 @@ import {
 
 export const environmentSchemaLiteral = {
   title: "environment",
-  primaryKey: "_id",
+  primaryKey: {
+    // where should the composed string be stored
+    key: "environmentId",
+    // fields that will be used to create the composed key
+    fields: ["createdAt"],
+    // separator which is used to concat the fields values.
+    separator: "|",
+  },
   type: "object",
-  version: 0,
+  version: 3,
   properties: {
-    _id: {
+    id: {
+      type: "string",
+      maxLength: 100,
+    },
+    environmentId: {
       type: "string",
       maxLength: 100,
     },
@@ -37,6 +48,9 @@ export const environmentSchemaLiteral = {
     type: {
       type: "string",
     },
+    isActive: {
+      type: "boolean",
+    },
     createdAt: {
       type: "string",
     },
@@ -50,13 +64,13 @@ export const environmentSchemaLiteral = {
       type: "string",
     },
   },
-  required: ["_id", "name", "variable", "type", "createdAt", "createdBy"],
-};
+  required: ["id", "name", "variable", "type", "createdAt", "createdBy"],
+} as const;
 
 const schemaTyped = toTypedRxJsonSchema(environmentSchemaLiteral);
 export type EnvironmentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
 
-export const enviromentSchema: RxJsonSchema<EnvironmentDocType> =
+export const environmentSchema: RxJsonSchema<EnvironmentDocType> =
   environmentSchemaLiteral;

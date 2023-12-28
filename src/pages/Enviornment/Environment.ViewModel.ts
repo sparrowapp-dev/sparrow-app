@@ -1,4 +1,4 @@
-import { EnvironmentRepository } from "$lib/repositories/evironment.repository";
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 
 export class EnvironmentViewModel {
@@ -9,4 +9,16 @@ export class EnvironmentViewModel {
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
   };
+
+  public addEnvironment = (environment) => {
+    this.environmentRepository.addEnvironment(environment);
+  };
+
+  public updateEnvironment = (uuid, data) => {
+    this.environmentRepository.updateEnvironment(uuid, data);
+  };
+
+  public get activeEnvironment() {
+    return this.environmentRepository.getParticularEnvironment();
+  }
 }

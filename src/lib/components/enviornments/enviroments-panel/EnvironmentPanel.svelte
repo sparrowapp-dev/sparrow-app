@@ -1,6 +1,19 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import EnvValue from "$lib/components/env-value/EnvValue.svelte";
+  import type { EnvironmentDocument } from "$lib/database/app.database";
+  import type {
+    EnvironmentRepositoryMethods,
+    EnvironmentServiceMethods,
+  } from "$lib/utils/interfaces/environment.interface";
+  import type { Observable } from "rxjs";
+  import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
+  import { onDestroy } from "svelte";
+  const _environmentPanelViewModel = new EnvironmentPanelViewModel();
+  export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
+  export let environmentServiceMethods: EnvironmentServiceMethods;
+  export let currentEnvironment: any;
+  console.log("currEnvironment: ", currentEnvironment);
 </script>
 
 <div class={`env-panel`}>

@@ -5,3 +5,8 @@ export interface CreateEnvironmentPostBody {
   workspaceId: string;
   variable: EnvValuePair[];
 }
+
+export interface UpdateEnvironmentPostBody {
+  name: string;
+  variable: EnvValuePair[];
+}

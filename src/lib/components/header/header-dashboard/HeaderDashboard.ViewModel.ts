@@ -57,6 +57,16 @@ export class HeaderDashboardViewModel {
     );
   };
 
+  public updateEnvironmentInWorkspace = (
+    workspaceId: string,
+    environmentObj,
+  ) => {
+    this.workspaceRepository.updateEnvironmentInWorkspace(
+      workspaceId,
+      environmentObj,
+    );
+  };
+
   public modifyWorkspace = async (
     componentData,
     collectionsMethods: CollectionsMethods,

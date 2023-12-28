@@ -1,3 +1,6 @@
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
+
 import {
   createRxDatabase,
   type RxCollection,
@@ -25,7 +28,7 @@ import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
 import {
-  enviromentSchema,
+  environmentSchema,
   type EnvironmentDocType,
 } from "$lib/models/environment.model";
 
@@ -36,8 +39,8 @@ export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
-export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
+export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -83,6 +86,12 @@ export class RxDB {
     await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
+        migrationStrategies: {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
       tab: {
         schema: tabSchema,
@@ -105,8 +114,20 @@ export class RxDB {
       activesidebartab: {
         schema: activeSideBarTabSchema,
       },
-      enviroment: {
-        schema: enviromentSchema,
+      environment: {
+        schema: environmentSchema,
+        migrationStrategies: {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
     });
     return { rxdb: this.rxdb };

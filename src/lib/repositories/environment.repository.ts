@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RxDB } from "$lib/database/app.database";
+import { RxDB, type EnvironmentDocument } from "$lib/database/app.database";
+import type { Observable } from "rxjs";
 
 export class EnvironmentRepository {
   constructor() {}
-
+  public getDocument = (elem: EnvironmentDocument) => {
+    return elem.toMutableJSON();
+  };
   /**
    * @description
    * Adds a new environment to workspace.
@@ -48,6 +51,38 @@ export class EnvironmentRepository {
         },
       })
       .exec();
+  };
+
+  public getEnvironment = (): Observable<EnvironmentDocument[]> => {
+    return RxDB.getInstance().rxdb.environment.find().sort({ updatedAt: "asc" })
+      .$;
+  };
+
+  public getParticularEnvironment = (): Observable<EnvironmentDocument> => {
+    return RxDB.getInstance().rxdb.environment.findOne({
+      selector: {
+        isActive: true,
+      },
+    }).$;
+  };
+
+  public setActiveEnvironment = async (
+    environmentId: string,
+  ): Promise<void> => {
+    const workspaces: EnvironmentDocument[] = await RxDB.getInstance()
+      .rxdb.workspace.find()
+      .exec();
+    const data = workspaces.map((elem: EnvironmentDocument) => {
+      const res = this.getDocument(elem);
+      if (res.id === environmentId) {
+        res.isActive = true;
+      } else {
+        res.isActive = false;
+      }
+      return res;
+    });
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    return;
   };
 
   public bulkInsertData = async (environment: any[]): Promise<void> => {

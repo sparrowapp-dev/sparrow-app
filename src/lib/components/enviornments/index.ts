@@ -1,3 +1,3 @@
-import { EnvironmentList } from "./enviornments-list";
+import { EnvironmentList } from "./environments-list";
 import { EnvironmentPanel } from "./enviroments-panel";
 export { EnvironmentList, EnvironmentPanel };
