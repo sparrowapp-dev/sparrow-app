@@ -141,7 +141,7 @@
 </script>
 
 <div
-  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
+  class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-auto"
   style="height: 100vh;"
 >
   <Header />
@@ -169,7 +169,7 @@
         <p class="card-subtitle fs-4 mb-3">Create Account</p>
         <div class="form-group gap-0 mb-3">
           <div>
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label mb-0">Email</label>
             <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
           </div>
           <input
@@ -234,7 +234,7 @@
             <label for="password" id="password">Password</label>
             <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
           </div>
-          <div class="d-flex">
+          <div class="d-flex position-relative">
             <input
               class="form-control mt-1 bg-black border:{validationErrors.password
                 ? '3px'
@@ -259,6 +259,7 @@
               type="button"
               on:click={togglePasswordVisibility}
               class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+              style="right:15px; transform: translateY(-1%);"
             >
               {#if isPasswordVisible}
                 <img src={eyeShow} alt="eye-show" />
