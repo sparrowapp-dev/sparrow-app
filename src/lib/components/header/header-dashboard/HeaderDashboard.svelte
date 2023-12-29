@@ -43,8 +43,6 @@
   let searchData: string = "";
   let ownerName: string = "";
 
-
-
   let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
@@ -413,7 +411,7 @@
       </div>
     </div>
 
-    <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
+    <!-- <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
       <div class="col-2">
         <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
           <img src={icons.minimizeIcon} alt="" />
@@ -438,7 +436,7 @@
           <img src={icons.closeIcon} alt="" />
         </button>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 

@@ -23,9 +23,7 @@
               <td class="tab-data py-3">{list?.name}</td>
               <td class="tab-data py-3">{list?.owner?.type}</td>
 
-              <td class="tab-data py-3"
-                >{list?.collections?.length ? list.collections.length : 0}</td
-              >
+              <td class="tab-data py-3">{list?.collections?.length ?? 0}</td>
               <td class="tab-data py-3"
                 >{calculateTimeDifferenceInDays(
                   new Date(),
@@ -38,9 +36,7 @@
               <td class="tab-data py-3">{list?.name}</td>
               <td class="tab-data py-3">{list?.owner?.type}</td>
 
-              <td class="tab-data py-3"
-                >{list?.collections?.length ? list.collections.length : 0}</td
-              >
+              <td class="tab-data py-3">{list?.collections?.length ?? 0}</td>
               <td class="tab-data py-3"
                 >{calculateTimeDifferenceInDays(
                   new Date(),

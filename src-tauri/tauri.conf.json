@@ -50,13 +50,14 @@
     "windows": [
       {
         "label": "main",
-        "decorations": false,
+        "decorations": true,
         "fullscreen": false,
         "resizable": true,
-        "title": "sparrow-app",
+        "title": "Sparrow",
         "minWidth": 570,
         "minHeight": 700,
-        "center": true
+        "center": true,
+        "theme": "Dark"
       }
     ]
   }
