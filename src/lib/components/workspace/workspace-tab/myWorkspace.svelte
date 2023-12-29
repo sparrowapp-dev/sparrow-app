@@ -7,12 +7,17 @@
   import icons from "$lib/assets/app.asset";
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
   let tabName: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
+  let ownerName: string;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -50,6 +55,26 @@
     }
   });
 
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    (value: WorkspaceDocument) => {
+      if (value) {
+        ownerName = value._data.owner.name;
+        if (ownerName) {
+          name = ownerName;
+          firstLetter = name[0];
+        } else {
+          name = name;
+        }
+      }
+    },
+  );
+
+  const userUnsubscribe = user.subscribe(async (value) => {
+    if (value) {
+      await _viewModel.refreshWorkspaces(value._id);
+    }
+  });
+
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
     isWorkspaceCreatedFirstTime.subscribe((value) => {
@@ -60,6 +85,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 
@@ -141,17 +167,18 @@
           <button
             class="bg-backgroundColor border-0"
             id="profile-dropdown"
-            style="width: 24px; height: 24px;"
+            style="width: 24px; height: 24px;border-radius:50%"
           >
             <p
-              class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
+              class="mb-0 profile-circle bg-plusButton text-black m-auto text-center d-flex align-items-center justify-content-center"
+              style="width: 100%; height: 100%; margin: 0;"
             >
-              {firstLetter?.toUpperCase() === undefined
+              {!firstLetter
                 ? email[0]?.toUpperCase()
                 : firstLetter?.toUpperCase()}
             </p>
           </button>
-          <p class="mb-0">{name === undefined ? email : name}</p>
+          <p class="mb-0">{!name ? email : name}</p>
         </div>
       </div>
     </div>
@@ -180,7 +207,7 @@
   }
 
   .profile-circle {
-    border-radius: 70%;
+    border-radius: 50%;
   }
 
   .info-setting-hover:hover {

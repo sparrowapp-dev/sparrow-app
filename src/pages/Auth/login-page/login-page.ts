@@ -52,5 +52,6 @@ export const handleLoginValidation = async (
   if (isError) {
     return errorObject;
   }
+
   return handleLogin(loginCredentials);
 };
