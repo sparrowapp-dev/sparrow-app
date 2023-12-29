@@ -180,7 +180,7 @@
       <p class="card-subtitle fs-4 mb-3">Create Account</p>
       <div class="form-group gap-0 mb-3">
         <div>
-          <label for="email" class="form-label">Email</label>
+          <label for="email" class="form-label mb-0">Email</label>
           <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
         </div>
         <input
