@@ -105,7 +105,7 @@
     return;
   };
   const handleActivateEnvironment = (id: string) => {
-    
+    _environmentListViewModel.activateEnvironment(id);
   };
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -177,7 +177,10 @@
   <ul class={`env-side-tab-list overflow-y-scroll`}>
     {#if environment && environment.length > 0}
       {#each environment as env}
-        <div class={`d-flex rounded`} on:click={handleActivateEnvironment(env)}>
+        <div
+          class={`d-flex rounded`}
+          on:click={handleActivateEnvironment(env.id)}
+        >
           <SelectIcon classProp={`my-auto`} width={14} height={14} />
           <p class={`env-item my-auto fw-normal`}>{env?.name}</p>
         </div>

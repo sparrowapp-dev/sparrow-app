@@ -11,6 +11,7 @@
   import { EnvironmentPanelViewModel } from "$lib/components/enviornments/enviroments-panel/EnvironmentPanel.ViewModel";
   import type { Observable } from "rxjs";
   import type { EnvironmentDocument } from "$lib/database/app.database";
+  import { onDestroy } from "svelte";
   const _viewModel = new EnvironmentViewModel();
   const _environmentListViewModel = new EnvironmentListViewModel();
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
@@ -30,15 +31,18 @@
     getEnvironment: _environmentPanelViewModel.getEnvironment,
   };
   let currentEnvironment: any = {};
+  console.log("active: ", activeEnvironment);
   const activeEnvironmentSubscribe = activeEnvironment.subscribe(
     (value: EnvironmentDocument) => {
-      console.log("value: ", value);
       if (value) {
         currentEnvironment = value;
-        return value;
+        return;
       }
     },
   );
+  onDestroy(() => {
+    activeEnvironmentSubscribe.unsubscribe();
+  });
 </script>
 
 <Motion {...scaleMotionProps} let:motion>

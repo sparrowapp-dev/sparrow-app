@@ -13,7 +13,6 @@
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment: any;
-  console.log("currEnvironment: ", currentEnvironment);
 </script>
 
 <div class={`env-panel`}>

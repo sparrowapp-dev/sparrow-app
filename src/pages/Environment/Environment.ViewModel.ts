@@ -19,6 +19,6 @@ export class EnvironmentViewModel {
   };
 
   public get activeEnvironment() {
-    return this.environmentRepository.getParticularEnvironment();
+    return this.environmentRepository.getActiveEnvironment();
   }
 }

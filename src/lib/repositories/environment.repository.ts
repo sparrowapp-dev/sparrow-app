@@ -12,7 +12,12 @@ export class EnvironmentRepository {
    * Adds a new environment to workspace.
    */
   public addEnvironment = async (environment: any) => {
-    await RxDB.getInstance().rxdb.environment.insert(environment);
+    const modifiedEnvironment = {
+      ...environment,
+      isAcive: true,
+    };
+
+    await RxDB.getInstance().rxdb.environment.insert(modifiedEnvironment);
     return;
   };
 
@@ -58,7 +63,7 @@ export class EnvironmentRepository {
       .$;
   };
 
-  public getParticularEnvironment = (): Observable<EnvironmentDocument> => {
+  public getActiveEnvironment = (): Observable<EnvironmentDocument> => {
     return RxDB.getInstance().rxdb.environment.findOne({
       selector: {
         isActive: true,
@@ -69,10 +74,10 @@ export class EnvironmentRepository {
   public setActiveEnvironment = async (
     environmentId: string,
   ): Promise<void> => {
-    const workspaces: EnvironmentDocument[] = await RxDB.getInstance()
-      .rxdb.workspace.find()
+    const environments: EnvironmentDocument[] = await RxDB.getInstance()
+      .rxdb.environment.find()
       .exec();
-    const data = workspaces.map((elem: EnvironmentDocument) => {
+    const data = environments.map((elem: EnvironmentDocument) => {
       const res = this.getDocument(elem);
       if (res.id === environmentId) {
         res.isActive = true;
@@ -81,7 +86,7 @@ export class EnvironmentRepository {
       }
       return res;
     });
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    await RxDB.getInstance().rxdb.environment.bulkUpsert(data);
     return;
   };
 
