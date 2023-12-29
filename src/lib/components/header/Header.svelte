@@ -28,7 +28,7 @@
       <img src={sparrowicon} alt="" class="w-100" />
     </div>
   </div>
-  <div class="d-flex gap-2">
+  <!-- <div class="d-flex gap-2">
     <button on:click={onMinimize} class="button-minus py-1 px-2">
       <img src={icons.minimizeIcon} alt="" class="w-100" />
     </button>
@@ -46,7 +46,7 @@
     <button on:click={onClose} class="button-close py-1 px-2">
       <img src={icons.closeIcon} alt="" class="w-100" />
     </button>
-  </div>
+  </div> -->
 </section>
 
 <style>
