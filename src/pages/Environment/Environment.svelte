@@ -6,9 +6,9 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import { EnvironmentListViewModel } from "$lib/components/enviornments/environments-list/EnvironmentList.ViewModel";
+  import { EnvironmentListViewModel } from "$lib/components/environments/environments-list/EnvironmentList.ViewModel";
   import { EnvironmentViewModel } from "./Environment.ViewModel";
-  import { EnvironmentPanelViewModel } from "$lib/components/enviornments/enviroments-panel/EnvironmentPanel.ViewModel";
+  import { EnvironmentPanelViewModel } from "$lib/components/environments/enviroments-panel/EnvironmentPanel.ViewModel";
   import type { Observable } from "rxjs";
   import type { EnvironmentDocument } from "$lib/database/app.database";
   import { onDestroy } from "svelte";
@@ -29,13 +29,25 @@
   const environmentServiceMethods: EnvironmentServiceMethods = {
     getAllEnvironments: _environmentListViewModel.getAllEnvironments,
     getEnvironment: _environmentPanelViewModel.getEnvironment,
+    updateEnvironment: _environmentPanelViewModel.updateEnvironment,
   };
-  let currentEnvironment: any = {};
-  console.log("active: ", activeEnvironment);
+  let activeEnvironmentRxDoc: EnvironmentDocument;
+  let currentEnvironment: any = {
+    id: "",
+    name: "",
+    variable: [{ variable: "", value: "", checked: true }],
+    isActive: true,
+  };
   const activeEnvironmentSubscribe = activeEnvironment.subscribe(
     (value: EnvironmentDocument) => {
       if (value) {
-        currentEnvironment = value;
+        activeEnvironmentRxDoc = value;
+        if (activeEnvironmentRxDoc) {
+          currentEnvironment.name = activeEnvironmentRxDoc.get("name");
+          currentEnvironment.id = activeEnvironmentRxDoc.get("id");
+          currentEnvironment.variable = activeEnvironmentRxDoc.get("variable");
+          currentEnvironment.isActive = activeEnvironmentRxDoc.get("isActive");
+        }
         return;
       }
     },

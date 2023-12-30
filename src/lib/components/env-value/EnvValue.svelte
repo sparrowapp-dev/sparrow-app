@@ -1,8 +1,6 @@
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import { LockIcon } from "$lib/assets/app.asset";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: EnvValuePair[];
@@ -16,44 +14,43 @@
   let pairs: EnvValuePair[] = keyValue;
   let controller: boolean = false;
 
-  //   $: {
-  //     if (keyValue) {
-  //       pairs = keyValue;
-  //       let flag: boolean = false;
-  //       for (let i = 0; i < pairs.length - 1; i++) {
-  //         if (pairs[i].checked === false) {
-  //           flag = true;
-  //         }
-  //       }
-  //       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-  //         flag = true;
-  //       }
-  //       if (flag) {
-  //         controller = false;
-  //       } else {
-  //         controller = true;
-  //       }
-  //     }
-  //   }
+  $: {
+    if (keyValue) {
+      pairs = keyValue;
+      let flag: boolean = false;
+      for (let i = 0; i < pairs.length - 1; i++) {
+        if (pairs[i].checked === false) {
+          flag = true;
+        }
+      }
+      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
+        flag = true;
+      }
+      if (flag) {
+        controller = false;
+      } else {
+        controller = true;
+      }
+    }
+  }
 
   const updateParam = (index: number): void => {
     pairs.forEach((elem, i) => {
       if (i === index) {
-        // elem.checked = true;
+        elem.checked = true;
       }
     });
     pairs = pairs;
     if (pairs.length - 1 === index) {
-      pairs.push({ variable: "", value: "", checked: false });
+      pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
     }
     callback(pairs);
   };
-
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
-        if (i !== index) {
+        if (i != index) {
           return true;
         }
         return false;
@@ -180,7 +177,7 @@
         class="sortable > div"
         style="cursor:default; width:55vw; "
         data-list-key={JSON.stringify({
-          name: element.variable,
+          name: element.key,
           description: element.value,
           checked: element.checked,
         })}
@@ -211,7 +208,7 @@
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   disabled={mode == "READ" ? true : false}
-                  bind:value={element.variable}
+                  bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
                   }}

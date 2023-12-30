@@ -23,6 +23,7 @@ export { default as NotifyIcon } from "$lib/assets/notify.svelte";
 export { default as SettingIcon } from "$lib/assets/setting.svelte";
 export { default as LockIcon } from "$lib/assets/lock.svelte";
 export { default as SelectIcon } from "$lib/assets/select.svelte";
+export { default as ShowMoreIcon } from "$lib/assets/showmore.svelte";
 import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {

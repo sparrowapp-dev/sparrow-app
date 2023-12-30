@@ -45,8 +45,8 @@ export class EnvironmentService {
   };
 
   public updateEnvironment = async (
-    environmentId: string,
     workspaceId: string,
+    environmentId: string,
     environment: UpdateEnvironmentPostBody,
   ) => {
     const response = await makeRequest(

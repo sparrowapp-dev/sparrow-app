@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { PlusIcon, SelectIcon } from "$lib/assets/app.asset";
+  import { PlusIcon, SelectIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
+  import threedotIcon from "$lib/assets/3dot.svg";
+
   import { v4 as uuidv4 } from "uuid";
   import type {
     EnvironmentDocument,
@@ -28,7 +30,9 @@
   export let currentEnvironment: any;
   const activeWorkspace: Observable<WorkspaceDocument> =
     environmentRepositoryMethods.getActiveWorkspace();
+  let pos = { x: 0, y: 0 };
 
+  let showMenu: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let currWorkspaceName: string;
   let currentWorkspaceId: string = "";
@@ -66,9 +70,9 @@
           },
         );
         environment = environmentArr;
-        if (!activeEnvironmentRxDoc) {
-          _environmentListViewModel.activateEnvironment(value[0].get("id"));
-        }
+        // if (!activeEnvironmentRxDoc) {
+        //   _environmentListViewModel.activateEnvironment(value[0].get("id"));
+        // }
       }
     },
   );
@@ -93,12 +97,12 @@
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       environmentUnderCreation = false;
-
       environmentRepositoryMethods.updateEnvironment(newEnvironment._id, res);
       _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspaceId, {
         _id: response.data.data._id,
         name: newEnvironment.name,
       });
+      _environmentListViewModel.activateEnvironment(newEnvironment._id);
       notifications.success("New Environment Created!");
       return;
     }
@@ -131,14 +135,94 @@
     activeWorkspaceSubscribe.unsubscribe();
     environmentSubscribe.unsubscribe();
   });
+  let isCollectionPopup: boolean = false;
+  let containerRef;
+  function rightClickContextMenu(e) {
+    e.preventDefault();
+    setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY + 20 };
+      showMenu = true;
+    }, 100);
+  }
+  const handleCollectionPopUp = (flag) => {
+    isCollectionPopup = flag;
+  };
+  let menuItems = [
+    {
+      // onClick: openEnvironment,
+      displayText: "Open Environment",
+      disabled: false,
+    },
+    {
+      // onClick: renameEnvironment,
+      displayText: "Rename",
+      disabled: false,
+    },
+    {
+      // onClick: unselectEnvironment,
+      displayText: "Unselect Environment",
+      disabled: false,
+    },
+    {
+      // onClick: deleteEnvironment,
+      displayText: "Delete",
+      disabled: false,
+    },
+
+    // {
+    //   onClick: () => {
+    //     handleCollectionPopUp(true);
+    //   },
+    //   displayText: "Delete",
+    //   disabled: false,
+    // },
+  ];
+  function closeRightClickContextMenu() {
+    showMenu = false;
+  }
 </script>
 
-<div class={`env-sidebar`} style={``}>
+<svelte:window
+  on:click={closeRightClickContextMenu}
+  on:contextmenu|preventDefault={closeRightClickContextMenu}
+/>
+{#if showMenu}
+  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
+    <div
+      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+      id="navbar"
+    >
+      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
+        {#each menuItems as item}
+          <li class="align-items-center">
+            <button
+              disabled={item.disabled}
+              class={` lign-items-center mb-1 px-3 py-2 ${
+                item.disabled && "text-requestBodyColor"
+              }`}
+              on:click={item.onClick}
+              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
+              >{item.displayText}</button
+            >
+          </li>
+        {/each}
+      </ul>
+    </div>
+  </nav>
+{/if}
+<div
+  class={`env-sidebar`}
+  style={``}
+  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container mb-2`}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace`}
+      class={`fw-medium lh-1 curr-workspace ps-2`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currWorkspaceName || ""}
@@ -156,7 +240,7 @@
       </button>
     </Tooltip>
   </div>
-  <p class={`fw-normal env-item rounded active`}>Global Variables</p>
+  <p class={`fw-normal env-item rounded `}>Global Variables</p>
   <hr />
 
   {#if environment && environment.length == 0}
@@ -174,15 +258,33 @@
       </button>
     </div>
   {/if}
-  <ul class={`env-side-tab-list overflow-y-scroll`}>
+  <ul class={`env-side-tab-list overflow-y-scroll ps-0`}>
     {#if environment && environment.length > 0}
       {#each environment as env}
         <div
-          class={`d-flex rounded`}
+          class={`d-flex rounded env-tab env-item ps-3 ${
+            env.isActive && "active"
+          }`}
+          style="cursor: pointer; "
           on:click={handleActivateEnvironment(env.id)}
         >
-          <SelectIcon classProp={`my-auto`} width={14} height={14} />
-          <p class={`env-item my-auto fw-normal`}>{env?.name}</p>
+          <Tooltip text={`${env?.isActive ? "unselect" : "select"}`}>
+            <SelectIcon
+              classProp={`my-auto`}
+              width={14}
+              height={14}
+              selected={env.isActive}
+            />
+          </Tooltip>
+          <p class={`ps-3 my-auto fw-normal`}>{env?.name}</p>
+          <button
+            class={` show-more-btn rounded border-0`}
+            on:click={(e) => {
+              rightClickContextMenu(e);
+            }}
+          >
+            <ShowMoreIcon />
+          </button>
         </div>
       {/each}
     {/if}
@@ -190,11 +292,34 @@
 </div>
 
 <style lang="scss">
+  .navbar {
+    width: 180px;
+    height: auto;
+    overflow: hidden;
+  }
+  ul li {
+    display: block;
+  }
+
+  ul li button {
+    font-size: 12px;
+    display: flex;
+    width: 100%;
+    border: 0px;
+    background-color: var(--blackColor);
+  }
+
+  ul li button:hover {
+    width: 100%;
+    color: var(--white-color);
+    border-radius: 8px;
+    background-color: #232527;
+  }
   .env-sidebar {
     background-color: var(--background-color);
     height: 100vh;
     border-right: 1px solid var(--border-color);
-    padding: 0px 24px 8px 12px;
+    padding: 0px 0px 8px 2px;
     width: 20vw;
   }
   .curr-workspace-heading-container {
@@ -202,7 +327,10 @@
   }
   .add-env-container {
     padding: 32px 0px;
-    gap: 24px;
+    gap: 4px;
+  }
+  .env-item:hover {
+    background: var(--border-color);
   }
   .add-env-desc-text {
     color: #999;
@@ -214,6 +342,7 @@
   .env-item {
     padding: 6px 6px 6px 12px;
     font-size: 14px;
+    cursor: pointer;
   }
   .env-item.active {
     background: var(--selected-active-sidebar);
@@ -228,5 +357,12 @@
   }
   .env-side-tab-list::-webkit-scrollbar-thumb {
     background: #888;
+  }
+  .show-more-btn {
+    background-color: transparent;
+  }
+  .show-more-btn:hover {
+    color: black;
+    background-color: var(--workspace-hover-color);
   }
 </style>

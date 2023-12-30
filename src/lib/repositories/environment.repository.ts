@@ -33,12 +33,11 @@ export class EnvironmentRepository {
         },
       })
       .exec();
-
     environment.incrementalModify((value) => {
       if (data.name) value.name = data.name;
       if (data.variable) value.variable = data.variable;
       if (data.type) value.type = data.type;
-      if (data._id) value.id = value._id;
+      if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdAt) value.createdAt = data.createdAt;
@@ -59,8 +58,7 @@ export class EnvironmentRepository {
   };
 
   public getEnvironment = (): Observable<EnvironmentDocument[]> => {
-    return RxDB.getInstance().rxdb.environment.find().sort({ updatedAt: "asc" })
-      .$;
+    return RxDB.getInstance().rxdb.environment.find().$;
   };
 
   public getActiveEnvironment = (): Observable<EnvironmentDocument> => {

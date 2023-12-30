@@ -13,4 +13,9 @@ export interface EnvironmentRepositoryMethods {
 export interface EnvironmentServiceMethods {
   getAllEnvironments: (workspaceId: string) => any;
   getEnvironment: (workspaceId: string, environmentId: string) => any;
+  updateEnvironment: (
+    workspaceId: string,
+    environmentId: string,
+    data: any,
+  ) => any;
 }
