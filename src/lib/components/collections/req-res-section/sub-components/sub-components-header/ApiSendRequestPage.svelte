@@ -41,6 +41,26 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   let currentTabId: string = "";
+  let trackParanthesis: number;
+  let trackCursor: number;
+
+  const mockData = [
+    {
+      key: "asus",
+      value: "val asus",
+      type: "G",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+    },
+  ];
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       currentTabId = event?.id;
@@ -50,6 +70,28 @@
       request = event?.property?.request;
     }
   });
+  let filterData = [];
+  const filterEnvironments = () => {
+    filterData = mockData.filter((element) => {
+      if (
+        element.key
+          .toLowerCase()
+          .includes(
+            urlText?.substring(trackParanthesis + 1, trackCursor).toLowerCase(),
+          )
+      ) {
+        return true;
+      }
+    });
+  };
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis) filterEnvironments();
+    }
+    if (trackParanthesis) {
+      if (trackCursor) filterEnvironments();
+    }
+  }
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -170,6 +212,29 @@
   };
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
+  const balanceParanthesis = (url: string) => {
+    const stack = [];
+    let response: number;
+    for (let i = 0; i < url.length; i++) {
+      if (url[i] === "{") {
+        stack.push({
+          index: i,
+          character: "{",
+        });
+      } else if (url[i] === "}") {
+        stack.pop();
+      }
+    }
+    if (
+      stack.length >= 2 &&
+      stack[0].character === "{" &&
+      stack[1].character === "{"
+    ) {
+      response = stack[1].index;
+    }
+    return response;
+  };
+
   let handleInputValue = () => {
     collectionsMethods.updateRequestProperty(
       urlText,
@@ -181,6 +246,7 @@
       RequestProperty.QUERY_PARAMS,
       currentTabId,
     );
+    trackParanthesis = balanceParanthesis(urlText);
   };
   onDestroy(() => {
     isHorizontalUnsubscribe();
@@ -210,6 +276,10 @@
       inputElement.focus();
     }
   };
+  const func = (event) => {
+    trackCursor = event.target.selectionStart;
+    console.log("cursor", trackCursor);
+  };
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -219,7 +289,7 @@
       : 'pt-3 px-3'}"
     style="width:calc(100%-312px);"
   >
-    <div class="d-flex gap-2 w-100">
+    <div class="d-flex gap-2 w-100 position-relative">
       <ColorDropdown
         data={[
           {
@@ -254,6 +324,7 @@
       <input
         required
         type="text"
+        id="input-request-url"
         placeholder="Enter URL or paste text"
         class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
@@ -262,8 +333,50 @@
         bind:value={urlText}
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
+        on:keyup={(e) => {
+          func(e);
+        }}
+        on:blur={() => {
+          setTimeout(() => {
+            trackParanthesis = undefined;
+            trackCursor = undefined;
+            filterData = [];
+          }, 200);
+        }}
+        on:focus={(e) => {
+          handleInputValue();
+        }}
         bind:this={inputElement}
       />
+      {#if trackParanthesis && filterData.length > 0}
+        <div class="select-environment-popup d-flex p-3">
+          <div class="left-panel w-50">
+            {#each filterData as mock}
+              <p
+                on:click={() => {
+                  const preUrl = urlText?.substring(0, trackParanthesis - 1);
+                  const postUrl = urlText?.substring(
+                    trackCursor,
+                    urlText.length,
+                  );
+                  urlText = preUrl + "{{" + mock.key + "}}" + postUrl;
+                  handleInputValue();
+                }}
+              >
+                <span>{mock.type}</span>
+                <span>{mock.key}</span>
+              </p>
+            {/each}
+          </div>
+          <div class="right-panel w-50">
+            <p>ENVIRONMENT</p>
+            <p>VALUE</p>
+          </div>
+          <div class="w-100">
+            <p>showing Dev environment variables and Global variables</p>
+          </div>
+        </div>
+      {/if}
 
       <button
         disabled={disabledSend}
@@ -354,5 +467,22 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .select-environment-popup {
+    width: 700px;
+    height: 400px;
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    z-index: 5;
+    flex-wrap: wrap;
+  }
+  .select-environment-popup .left-panel {
+    height: 300px;
+  }
+  .select-environment-popup .right-panel {
+    height: 300px;
   }
 </style>
