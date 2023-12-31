@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { CollectionDocument } from "$lib/database/app.database";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
@@ -6,6 +7,9 @@ import {
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
+import { ItemType } from "$lib/utils/enums/item-type.enum";
+import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
+import type { Collection } from "$lib/utils/interfaces/request.interface";
 
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -128,6 +132,16 @@ export class CollectionsViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   };
 
+  public deleteCollectioninWorkspace = (
+    workspaceId: string,
+    collectionId: string,
+  ) => {
+    return this.workspaceRepository.deleteCollectionInWorkspace(
+      workspaceId,
+      collectionId,
+    );
+  };
+
   public addRequestInFolder = (
     collectionId: string,
     folderId: string,
@@ -165,7 +179,7 @@ export class CollectionsViewModel {
     );
   };
 
-  public readCollection = (uuid: string) => {
+  public readCollection = (uuid: string): Promise<CollectionDocument> => {
     return this.collectionRepository.readCollection(uuid);
   };
 
@@ -219,7 +233,7 @@ export class CollectionsViewModel {
   public readRequestOrFolderInCollection = (
     collectionId: string,
     uuid: string,
-  ) => {
+  ): Promise<CollectionItem> => {
     return this.collectionRepository.readRequestOrFolderInCollection(
       collectionId,
       uuid,
@@ -244,5 +258,39 @@ export class CollectionsViewModel {
 
   public updateCollection = (uuid, data) => {
     this.collectionRepository.updateCollection(uuid, data);
+  };
+
+  public getNoOfApisandFolders = async (
+    collection: CollectionDocument,
+    folderId?: string,
+  ): Promise<Collection> => {
+    let folderCount: number = 0;
+    let requestCount: number = 0;
+    let dataObj: Collection;
+    const items = collection._data.items as CollectionItem[];
+    if (folderId) {
+      items.map((item) => {
+        if (item.type === ItemType.FOLDER && item.id === folderId) {
+          dataObj = {
+            requestCount: item.items.length,
+          };
+          return;
+        }
+      });
+      return dataObj;
+    }
+    items.map((item) => {
+      if (item.type === ItemType.FOLDER) {
+        requestCount += item.items.length;
+        folderCount++;
+      } else if (item.type === ItemType.REQUEST) {
+        requestCount++;
+      }
+    });
+    dataObj = {
+      requestCount: requestCount,
+      folderCount: folderCount,
+    };
+    return dataObj;
   };
 }
