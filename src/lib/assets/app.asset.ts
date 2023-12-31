@@ -2,7 +2,7 @@ import closeIcon from "$lib/assets/xmark.svg";
 import resizeIcon from "$lib/assets/window-resize-close.svg";
 import minimizeIcon from "$lib/assets/minus.svg";
 import circleIcon from "$lib/assets/Ellipse.svg";
-import searchIcon from "$lib/assets/search.svg";
+export { default as SearchIcon } from "$lib/assets/search.svelte";
 import profileIcon from "$lib/assets/profile.svg";
 import NotifyIcon from "$lib/assets/notify.svelte";
 import signout from "$lib/assets/signout.svg";
@@ -31,7 +31,6 @@ export default {
   resizeIcon,
   minimizeIcon,
   circleIcon,
-  searchIcon,
   profileIcon,
   NotifyIcon,
   signout,

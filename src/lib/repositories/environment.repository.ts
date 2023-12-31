@@ -58,7 +58,8 @@ export class EnvironmentRepository {
   };
 
   public getEnvironment = (): Observable<EnvironmentDocument[]> => {
-    return RxDB.getInstance().rxdb.environment.find().$;
+    return RxDB.getInstance().rxdb.environment.find().sort({ updatedAt: "asc" })
+      .$;
   };
 
   public getActiveEnvironment = (): Observable<EnvironmentDocument> => {
@@ -92,9 +93,11 @@ export class EnvironmentRepository {
     if (environment.length > 0) {
       const updatedEnvironments = environment.map((environmentObj) => {
         environmentObj["id"] = environmentObj._id;
+        environmentObj["isActive"] = false;
         delete environmentObj._id;
         return environmentObj;
       });
+
       await RxDB.getInstance().rxdb.environment.find().remove();
       await RxDB.getInstance().rxdb.environment.bulkInsert(updatedEnvironments);
     } else {

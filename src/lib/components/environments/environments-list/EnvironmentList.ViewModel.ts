@@ -13,6 +13,7 @@ export class EnvironmentListViewModel {
     return {
       id: elem.get("id"),
       name: elem.get("name"),
+      type: elem.get("type"),
       isActive: elem.get("isActive"),
       variable: elem.get("variable"),
       createdBy: elem.get("createdBy"),

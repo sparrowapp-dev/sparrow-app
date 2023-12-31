@@ -120,16 +120,19 @@ export class RxDB {
       environment: {
         schema: environmentSchema,
         migrationStrategies: {
-          // database  migration functions
+          //   // database  migration functions
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
-          2: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
+          // 2: function (oldDoc: TabDocument) {
+          //   return oldDoc;
+          // },
+          // 3: function (oldDoc: TabDocument) {
+          //   return oldDoc;
+          // },
+          // 4: function (oldDoc: TabDocument) {
+          //   return oldDoc;
+          // },
         },
       },
     });

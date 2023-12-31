@@ -15,7 +15,7 @@ export const environmentSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 3,
+  version: 1,
   properties: {
     id: {
       type: "string",
@@ -30,6 +30,7 @@ export const environmentSchemaLiteral = {
     },
     variable: {
       type: "array",
+      default: [],
       items: {
         type: "object",
         properties: {
@@ -64,7 +65,6 @@ export const environmentSchemaLiteral = {
       type: "string",
     },
   },
-  required: ["id", "name", "variable", "type", "createdAt", "createdBy"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(environmentSchemaLiteral);

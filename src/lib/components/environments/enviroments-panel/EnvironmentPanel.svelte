@@ -63,7 +63,6 @@
   );
 
   const handleSaveEnvironment = () => {
-    console.log("saved!");
     environmentServiceMethods.updateEnvironment(
       currentWorkspaceId,
       currentEnvironment.id,
@@ -93,7 +92,7 @@
   <header class={`env-header justify-content-between d-flex`}>
     <input
       type="text"
-      class={`env-heading fw-normal bg-transparent border-0`}
+      class={`env-heading fw-normal px-2 border-0`}
       value={currentEnvironment?.name}
       on:change={(e) => handleCurrentEnvironmentNameChange(e)}
     />
@@ -121,6 +120,7 @@
     </div>
   </header>
   <section class={`var-value-container`}>
+    
     <EnvValue
       keyValue={currentEnvironment.variable.length == 0
         ? initialKeyValuePair
@@ -142,6 +142,12 @@
   }
   .env-heading {
     font-size: 18px;
+    background-color: transparent;
+  }
+  .env-heading:focus{
+    outline: none;
+    background-color: var(--border-color);
+    border-bottom: 1px solid #85C2FF !important;
   }
 
   .env-help-btn {

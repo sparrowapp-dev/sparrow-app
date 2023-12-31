@@ -1,7 +1,6 @@
 <script lang="ts">
   import { PlusIcon, SelectIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
-  import threedotIcon from "$lib/assets/3dot.svg";
 
   import { v4 as uuidv4 } from "uuid";
   import type {
@@ -21,6 +20,7 @@
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   let environment: any[] = [];
+  let globalEnvrionment: any;
   let environmentUnderCreation: boolean = false;
   let activeEnvironmentRxDoc: EnvironmentDocument;
   const _environmentListViewModel = new EnvironmentListViewModel();
@@ -28,14 +28,44 @@
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment: any;
+  const environments: Observable<EnvironmentDocument[]> =
+    _environmentListViewModel.environment;
+
   const activeWorkspace: Observable<WorkspaceDocument> =
     environmentRepositoryMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let activeWorkspaceRxDoc: WorkspaceDocument;
   let currWorkspaceName: string;
   let currentWorkspaceId: string = "";
+  const environmentSubscribe = environments.subscribe(
+    (value: EnvironmentDocument[]) => {
+      if (value) {
+        const environmentArr = value.map(
+          (environmentDocument: EnvironmentDocument) => {
+            const environmentObj =
+              environmentRepositoryMethods.getEnvironmentDocument(
+                environmentDocument,
+              );
+            return environmentObj;
+          },
+        );
+        let isAnyEnvironmentActive: boolean = false;
+        const filteredEnvironments = environmentArr.filter((env) => {
+          if (env.type == "LOCAL") {
+            isAnyEnvironmentActive = env.isActive == true;
+            return true;
+          } else globalEnvrionment = env;
+        });
+        if (!isAnyEnvironmentActive)
+          handleActivateEnvironment(globalEnvrionment.id);
+        environment = filteredEnvironments;
+        return;
+      }
+    },
+  );
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
@@ -50,29 +80,6 @@
           environmentRepositoryMethods.bulkInsert(environments);
           return;
         }
-      }
-    },
-  );
-
-  const environments: Observable<EnvironmentDocument[]> =
-    _environmentListViewModel.environment;
-
-  const environmentSubscribe = environments.subscribe(
-    (value: EnvironmentDocument[]) => {
-      if (value) {
-        const environmentArr = value.map(
-          (environmentDocument: EnvironmentDocument) => {
-            const environmentObj =
-              environmentRepositoryMethods.getEnvironmentDocument(
-                environmentDocument,
-              );
-            return environmentObj;
-          },
-        );
-        environment = environmentArr;
-        // if (!activeEnvironmentRxDoc) {
-        //   _environmentListViewModel.activateEnvironment(value[0].get("id"));
-        // }
       }
     },
   );
@@ -114,7 +121,7 @@
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
     name,
-  ) => {
+  ) => { 
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -132,8 +139,8 @@
     return null;
   };
   onDestroy(() => {
-    activeWorkspaceSubscribe.unsubscribe();
     environmentSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
   let isCollectionPopup: boolean = false;
   let containerRef;
@@ -219,17 +226,17 @@
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
 >
   <div
-    class={`d-flex justify-content-between curr-workspace-heading-container mb-2`}
+    class={`d-flex justify-content-between curr-workspace-heading-container my-2`}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace ps-2`}
+      class={`fw-medium lh-1 curr-workspace ps-3`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currWorkspaceName || ""}
     </h1>
     <Tooltip text={`Add Environment`}>
       <button
-        class={`border-0 bg-transparent`}
+        class={`border-0 bg-transparent mx-3`}
         on:click={handleCreateEnvironmentClick}
       >
         {#if environmentUnderCreation}
@@ -240,17 +247,26 @@
       </button>
     </Tooltip>
   </div>
-  <p class={`fw-normal env-item rounded `}>Global Variables</p>
+  {#if globalEnvrionment}
+    <p
+      class={`fw-normal env-item rounded m-2 ps-3 ${
+        globalEnvrionment?.isActive && "active"
+      }`}
+      on:click={handleActivateEnvironment(globalEnvrionment?.id)}
+    >
+      {globalEnvrionment?.name}
+    </p>
+  {/if}
   <hr />
 
   {#if environment && environment.length == 0}
     <div class={`add-env-container `}>
-      <p class={`add-env-desc-text fw-light text-center mb-5`}>
+      <p class={`add-env-desc-text fw-light text-center mb-5 p-2 pe-4`}>
         Add Environments to your Workspace to test your APIs with the relevant
         set of resources and constraints.
       </p>
       <button
-        class={`add-env-btn d-flex rounded py-1 px-3 border-0 mx-auto w-fit`}
+        class={`add-env-btn d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
         on:click={handleCreateEnvironmentClick}
       >
         <PlusIcon classProp={`my-auto me-2`} />
@@ -270,21 +286,23 @@
         >
           <Tooltip text={`${env?.isActive ? "unselect" : "select"}`}>
             <SelectIcon
-              classProp={`my-auto`}
+              classProp={`my-auto border-blue`}
               width={14}
               height={14}
               selected={env.isActive}
             />
           </Tooltip>
           <p class={`ps-3 my-auto fw-normal`}>{env?.name}</p>
-          <button
-            class={` show-more-btn rounded border-0`}
-            on:click={(e) => {
-              rightClickContextMenu(e);
-            }}
-          >
-            <ShowMoreIcon />
-          </button>
+          <Tooltip text={`More options`}>
+            <button
+              class={` show-more-btn rounded border-0`}
+              on:click={(e) => {
+                rightClickContextMenu(e);
+              }}
+            >
+              <ShowMoreIcon />
+            </button>
+          </Tooltip>
         </div>
       {/each}
     {/if}
@@ -317,7 +335,7 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    height: 100vh;
+    height: 79vh;
     border-right: 1px solid var(--border-color);
     padding: 0px 0px 8px 2px;
     width: 20vw;

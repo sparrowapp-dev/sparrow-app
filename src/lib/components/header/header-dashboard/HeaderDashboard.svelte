@@ -4,7 +4,7 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
+  import icons, { NotifyIcon, SearchIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
@@ -251,7 +251,7 @@
       : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
-      <img src={icons.searchIcon} alt="" />
+      <SearchIcon />
     </div>
 
     <div class="w-100">

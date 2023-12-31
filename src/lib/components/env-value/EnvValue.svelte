@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SearchIcon } from "$lib/assets/app.asset";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   type Mode = "READ" | "WRITE";
@@ -90,12 +91,19 @@
 </script>
 
 <div class="mt-3 me-0 w-100" style="width: 60vw;">
+  <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
+    <SearchIcon width={12} height={12} classProp={`my-auto me-3`} />
+    <input
+      type="text"
+      class={`bg-transparent w-100 border-0 my-auto`}
+      placeholder="Search environment variables"
+    />
+  </div>
   <div class="d-flex gap-2">
     <div style="width:40px;">
       <input
         class="form-check-input"
         type="checkbox"
-        bind:checked={controller}
         on:input={handleCheckAll}
       />
     </div>
@@ -134,12 +142,7 @@
               style="cursor:grabbing;"
             /> -->
             <div style="width:30px;">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                disabled
-                checked={true}
-              />
+              <input class="form-check-input" type="checkbox" disabled />
             </div>
 
             <div class="w-100 d-flex gap-2">
@@ -269,3 +272,16 @@
     {/each}
   </div>
 </div>
+
+<style>
+  .search-input-container {
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+  }
+  .form-check-input {
+    border-radius: 2px;
+  }
+  .form-check-input:checked {
+    background-color: #1193f0;
+  }
+</style>
