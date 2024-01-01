@@ -41,7 +41,7 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   let currentTabId: string = "";
-  let trackParanthesis: number;
+  let trackParanthesis: unknown[] = [];
   let trackCursor: number;
 
   const mockData = [
@@ -77,7 +77,9 @@
         element.key
           .toLowerCase()
           .includes(
-            urlText?.substring(trackParanthesis + 1, trackCursor).toLowerCase(),
+            urlText
+              ?.substring(trackParanthesis[1] + 1, trackCursor)
+              .toLowerCase(),
           )
       ) {
         return true;
@@ -86,10 +88,10 @@
   };
   $: {
     if (trackCursor) {
-      if (trackParanthesis) filterEnvironments();
+      if (trackParanthesis.length === 2) filterEnvironments();
     }
     if (trackParanthesis) {
-      if (trackCursor) filterEnvironments();
+      if (trackParanthesis.length === 2 && trackCursor) filterEnvironments();
     }
   }
 
@@ -214,7 +216,7 @@
 
   const balanceParanthesis = (url: string) => {
     const stack = [];
-    let response: number;
+    let response: unknown[] = [];
     for (let i = 0; i < url.length; i++) {
       if (url[i] === "{") {
         stack.push({
@@ -226,11 +228,10 @@
       }
     }
     if (
-      stack.length >= 2 &&
-      stack[0].character === "{" &&
-      stack[1].character === "{"
+      stack.length >= 1
+      //  && stack[1].character === "{"
     ) {
-      response = stack[1].index;
+      response = [stack[0].index, stack[stack.length - 1].index];
     }
     return response;
   };
@@ -338,7 +339,7 @@
         }}
         on:blur={() => {
           setTimeout(() => {
-            trackParanthesis = undefined;
+            trackParanthesis = [];
             trackCursor = undefined;
             filterData = [];
           }, 200);
@@ -348,13 +349,13 @@
         }}
         bind:this={inputElement}
       />
-      {#if trackParanthesis && filterData.length > 0}
+      {#if trackParanthesis.length === 2 && filterData.length > 0}
         <div class="select-environment-popup d-flex p-3">
           <div class="left-panel w-50">
             {#each filterData as mock}
               <p
                 on:click={() => {
-                  const preUrl = urlText?.substring(0, trackParanthesis - 1);
+                  const preUrl = urlText?.substring(0, trackParanthesis[0]);
                   const postUrl = urlText?.substring(
                     trackCursor,
                     urlText.length,
