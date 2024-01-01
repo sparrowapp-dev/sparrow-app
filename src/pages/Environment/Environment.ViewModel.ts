@@ -18,6 +18,10 @@ export class EnvironmentViewModel {
     this.environmentRepository.updateEnvironment(uuid, data);
   };
 
+  public deleteEnvironment = (id) => {
+    this.environmentRepository.removeEnvironment(id);
+  };
+
   public get activeEnvironment() {
     return this.environmentRepository.getActiveEnvironment();
   }

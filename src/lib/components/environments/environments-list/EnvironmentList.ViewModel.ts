@@ -42,4 +42,14 @@ export class EnvironmentListViewModel {
   public bulkInsert = (data: any) => {
     this.environmentRepository.bulkInsertData(data);
   };
+
+  public removeEnvironment = (environmentId: string): void => {
+    this.environmentRepository.removeEnvironment(environmentId);
+  };
+  public deleteEnvironment = (
+    workspaceId: string,
+    environmentId: string,
+  ): void => {
+    this.EnvironmentService.deleteEnvironment(workspaceId, environmentId);
+  };
 }

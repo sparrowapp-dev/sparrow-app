@@ -14,7 +14,7 @@
     {height}
     viewBox="0 0 16 16"
     fill="none"
-    class={classProp}
+    class={`${classProp} select-icon`}
   >
     <g clip-path="url(#clip0_7331_14643)">
       <path
@@ -35,7 +35,7 @@
     {height}
     viewBox="0 0 16 16"
     fill="none"
-    class={classProp}
+    class={`${classProp} select-icon`}
   >
     <g clip-path="url(#clip0_7331_14638)">
       <path
@@ -50,3 +50,14 @@
     </defs>
   </svg>
 {/if}
+
+<style>
+  .select-icon {
+    padding: 3px;
+  }
+  .select-icon:hover {
+    padding: 3px;
+    border-radius: 50%;
+    border: 2px solid #85c2ff;
+  }
+</style>

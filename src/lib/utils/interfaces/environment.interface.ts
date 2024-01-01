@@ -8,6 +8,7 @@ export interface EnvironmentRepositoryMethods {
   addEnvironment: (environment) => void;
   updateEnvironment: (uuid: string, data) => void;
   getParticularEnvironment: (environmentId: string) => any;
+  removeEnvironment: (environmentId: string) => void;
 }
 
 export interface EnvironmentServiceMethods {
@@ -18,4 +19,5 @@ export interface EnvironmentServiceMethods {
     environmentId: string,
     data: any,
   ) => any;
+  deleteEnvironment: (environentId: string, workspaceId: string) => void;
 }

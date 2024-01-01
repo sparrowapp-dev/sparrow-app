@@ -6,6 +6,7 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
+  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { EnvironmentListViewModel } from "$lib/components/environments/environments-list/EnvironmentList.ViewModel";
   import { EnvironmentViewModel } from "./Environment.ViewModel";
   import { EnvironmentPanelViewModel } from "$lib/components/environments/enviroments-panel/EnvironmentPanel.ViewModel";
@@ -25,18 +26,25 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getParticularEnvironment:
       _environmentPanelViewModel.getParticularEnvironment,
+    removeEnvironment: _environmentListViewModel.removeEnvironment,
   };
   const environmentServiceMethods: EnvironmentServiceMethods = {
     getAllEnvironments: _environmentListViewModel.getAllEnvironments,
     getEnvironment: _environmentPanelViewModel.getEnvironment,
     updateEnvironment: _environmentPanelViewModel.updateEnvironment,
+    deleteEnvironment: _environmentListViewModel.deleteEnvironment,
   };
   let activeEnvironmentRxDoc: EnvironmentDocument;
   let currentEnvironment: any = {
     id: "",
     name: "",
-    variable: [{ variable: "", value: "", checked: true }],
+    type: "",
+    variable: [{ key: "", value: "", checked: true }],
     isActive: true,
+  };
+  let environmentChanged = {
+    name: false,
+    variable: false,
   };
   const activeEnvironmentSubscribe = activeEnvironment.subscribe(
     (value: EnvironmentDocument) => {
@@ -45,8 +53,16 @@
         if (activeEnvironmentRxDoc) {
           currentEnvironment.name = activeEnvironmentRxDoc.get("name");
           currentEnvironment.id = activeEnvironmentRxDoc.get("id");
-          currentEnvironment.variable = activeEnvironmentRxDoc.get("variable");
+          currentEnvironment.variable =
+            activeEnvironmentRxDoc.get("variable").length > 0
+              ? createDeepCopy(activeEnvironmentRxDoc.get("variable"))
+              : [{ key: "", value: "", checked: true }];
           currentEnvironment.isActive = activeEnvironmentRxDoc.get("isActive");
+          currentEnvironment.type = activeEnvironmentRxDoc.get("type");
+          environmentChanged = {
+            name: false,
+            variable: false,
+          };
         }
         return;
       }
@@ -68,6 +84,7 @@
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       {currentEnvironment}
+      {environmentChanged}
     />
   </div>
 </Motion>

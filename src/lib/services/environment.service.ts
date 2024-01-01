@@ -60,12 +60,12 @@ export class EnvironmentService {
     return response;
   };
   public deleteEnvironment = async (
-    environmentId: string,
     workspaceId: string,
+    environmentId: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/environment/${environmentId}/workspace/${workspaceId}`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       { headers: getAuthHeaders() },
     );
     return response;

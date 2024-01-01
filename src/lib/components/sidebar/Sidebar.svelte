@@ -49,7 +49,7 @@
       heading="Environment"
       logo={environment}
       isSelected={"environment" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
+      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
     <hr class="m-1 border-2" />

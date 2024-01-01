@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  export let text = "Coming Soon!";
+  export let text = "Coming Soon!",
+    classProp = "";
   let mouseX = 0,
     mouseY = 0,
     displayLeft = true,
@@ -24,7 +25,7 @@
   }
 </script>
 
-<div class="tooltip opacity-100">
+<div class={"tooltip opacity-100 "}>
   <span
     class="tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 z-1 opacity-0"
     style={`${

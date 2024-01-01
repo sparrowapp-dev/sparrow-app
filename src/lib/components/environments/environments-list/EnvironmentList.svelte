@@ -19,10 +19,14 @@
   import { notifications } from "$lib/utils/notifications";
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { isActiveTab } from "$lib/store/collection";
+  import { isWorkspaceLoaded } from "$lib/store/workspace.store";
   let environment: any[] = [];
   let globalEnvrionment: any;
+  let currentSelectedId: string;
   let environmentUnderCreation: boolean = false;
   let activeEnvironmentRxDoc: EnvironmentDocument;
+  let environmentUnderRename: string | undefined = undefined;
   const _environmentListViewModel = new EnvironmentListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
@@ -39,6 +43,8 @@
   let showMenu: boolean = false;
   let currWorkspaceName: string;
   let currentWorkspaceId: string = "";
+  let isLoading: boolean = false;
+
   const environmentSubscribe = environments.subscribe(
     (value: EnvironmentDocument[]) => {
       if (value) {
@@ -51,21 +57,27 @@
             return environmentObj;
           },
         );
-        let isAnyEnvironmentActive: boolean = false;
         const filteredEnvironments = environmentArr.filter((env) => {
-          if (env.type == "LOCAL") {
-            isAnyEnvironmentActive = env.isActive == true;
+          if (env.type == "LOCAL" || env.type == undefined) {
             return true;
-          } else globalEnvrionment = env;
+          } else {
+            globalEnvrionment = env;
+          }
         });
-        if (!isAnyEnvironmentActive)
-          handleActivateEnvironment(globalEnvrionment.id);
+        const isPresent = environmentArr.find((env) => {
+          if (env.id == currentEnvironment.id) return true;
+        });
+        if (!isPresent) {
+          handleActivateEnvironment(globalEnvrionment?.id);
+        }
         environment = filteredEnvironments;
         return;
       }
     },
   );
-
+  const workspaceLoadingSubscribe = isWorkspaceLoaded.subscribe((value) => {
+    isLoading = !value;
+  });
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
@@ -121,7 +133,7 @@
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
     name,
-  ) => { 
+  ) => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -138,14 +150,22 @@
     }
     return null;
   };
+
+  const deleteEnvironment = (id: string) => {
+    environmentServiceMethods.deleteEnvironment(currentWorkspaceId, id);
+    environmentRepositoryMethods.removeEnvironment(id);
+  };
   onDestroy(() => {
     environmentSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    workspaceLoadingSubscribe();
   });
   let isCollectionPopup: boolean = false;
   let containerRef;
-  function rightClickContextMenu(e) {
+  function rightClickContextMenu(e, id) {
     e.preventDefault();
+    currentSelectedId = id;
+    e.target.classList.toggle("active");
     setTimeout(() => {
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
@@ -154,27 +174,70 @@
       showMenu = true;
     }, 100);
   }
+  const renameEnvironment = (id: string) => {
+    environmentUnderRename = id;
+    setTimeout(() => {
+      document.getElementById(`rename-input-${id}`).focus();
+    }, 100);
+  };
+  const handleRenameEnvironment = async (
+    e,
+    oldName: string,
+    variable: any,
+    id: string,
+  ) => {
+    environmentUnderRename = undefined;
+    document.getElementById(`rename-input-${id}`).blur();
+    if (e.target.value !== oldName) {
+      await environmentServiceMethods.updateEnvironment(
+        currentWorkspaceId,
+        id,
+        {
+          name: e.target.value,
+          variable: variable,
+        },
+      );
+      await environmentRepositoryMethods.updateEnvironment(id, {
+        name: e.target.value,
+        isActive: currentEnvironment.id == id,
+        variable: variable,
+      });
+    }
+  };
+  const handleEnterRenameEnvironment = async (e, oldName, variable, id) => {
+    if (e.key == "Enter") {
+      handleRenameEnvironment(e, oldName, variable, id);
+    }
+  };
   const handleCollectionPopUp = (flag) => {
     isCollectionPopup = flag;
   };
   let menuItems = [
     {
-      // onClick: openEnvironment,
+      onClick: (id) => {
+        handleActivateEnvironment(id);
+      },
       displayText: "Open Environment",
       disabled: false,
     },
     {
-      // onClick: renameEnvironment,
+      onClick: (id) => {
+        renameEnvironment(id);
+      },
       displayText: "Rename",
       disabled: false,
     },
     {
-      // onClick: unselectEnvironment,
+      onClick: (id) => {
+        handleActivateEnvironment(globalEnvrionment?.id);
+      },
       displayText: "Unselect Environment",
       disabled: false,
     },
     {
-      // onClick: deleteEnvironment,
+      onClick: (id) => {
+        deleteEnvironment(id);
+      },
       displayText: "Delete",
       disabled: false,
     },
@@ -202,15 +265,15 @@
       class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
       id="navbar"
     >
-      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
+      <ul class="ps-1 pt-1 pe-1 pb-0 w-100">
         {#each menuItems as item}
           <li class="align-items-center">
             <button
               disabled={item.disabled}
-              class={` lign-items-center mb-1 px-3 py-2 ${
+              class={` lign-items-center mb-0 px-2 py-2 ${
                 item.disabled && "text-requestBodyColor"
               }`}
-              on:click={item.onClick}
+              on:click={() => item.onClick(currentSelectedId)}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
             >
@@ -229,18 +292,20 @@
     class={`d-flex justify-content-between curr-workspace-heading-container my-2`}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace ps-3`}
+      class={`fw-medium lh-1 curr-workspace ps-3 my-auto`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currWorkspaceName || ""}
     </h1>
     <Tooltip text={`Add Environment`}>
       <button
-        class={`border-0 bg-transparent mx-3`}
+        class={`border-0 mx-3 rounded add-env-mini-btn  ${
+          !environmentUnderCreation ? "pb-2 py-1" : 'py-2'
+        } px-2`}
         on:click={handleCreateEnvironmentClick}
       >
         {#if environmentUnderCreation}
-          <Spinner size={"15px"} />
+          <Spinner size={"18px"} />
         {:else}
           <PlusIcon width={15} height={15} color={`#8A9299`} />
         {/if}
@@ -252,13 +317,17 @@
       class={`fw-normal env-item rounded m-2 ps-3 ${
         globalEnvrionment?.isActive && "active"
       }`}
-      on:click={handleActivateEnvironment(globalEnvrionment?.id)}
+      on:click={() => {
+        handleActivateEnvironment(globalEnvrionment?.id);
+      }}
     >
       {globalEnvrionment?.name}
     </p>
   {/if}
   <hr />
-
+  {#if isLoading}
+    <Spinner size={"30px"} />
+  {/if}
   {#if environment && environment.length == 0}
     <div class={`add-env-container `}>
       <p class={`add-env-desc-text fw-light text-center mb-5 p-2 pe-4`}>
@@ -270,7 +339,7 @@
         on:click={handleCreateEnvironmentClick}
       >
         <PlusIcon classProp={`my-auto me-2`} />
-        <span class={`my-auto`}>Environment</span>
+        <span class={`my-auto ps-2`}>Environment</span>
       </button>
     </div>
   {/if}
@@ -278,29 +347,54 @@
     {#if environment && environment.length > 0}
       {#each environment as env}
         <div
-          class={`d-flex rounded env-tab env-item ps-3 ${
+          class={`d-flex rounded env-tab align-items-center justify-content-between env-item ps-3 ${
             env.isActive && "active"
           }`}
           style="cursor: pointer; "
-          on:click={handleActivateEnvironment(env.id)}
+          on:click={() => handleActivateEnvironment(env.id)}
         >
-          <Tooltip text={`${env?.isActive ? "unselect" : "select"}`}>
-            <SelectIcon
-              classProp={`my-auto border-blue`}
-              width={14}
-              height={14}
-              selected={env.isActive}
-            />
-          </Tooltip>
-          <p class={`ps-3 my-auto fw-normal`}>{env?.name}</p>
+          <div class="show-more-in d-flex">
+            <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>
+              <SelectIcon
+                classProp={`my-auto`}
+                width={20}
+                height={20}
+                selected={env.isActive}
+              />
+            </Tooltip>
+            {#if env.id == environmentUnderRename}
+              <input
+                type="text"
+                class="ps-3 my-auto fw-normal border-0 rename-input"
+                value={env?.name}
+                id={`rename-input-${env.id}`}
+                on:blur={(e) =>
+                  handleRenameEnvironment(e, env.name, env.variable, env.id)}
+                on:keydown={(e) =>
+                  handleEnterRenameEnvironment(
+                    e,
+                    env.name,
+                    env.variable,
+                    env.id,
+                  )}
+              />
+            {:else}
+              <p class={`ps-3 my-auto fw-normal`}>{env?.name}</p>
+            {/if}
+          </div>
           <Tooltip text={`More options`}>
             <button
               class={` show-more-btn rounded border-0`}
               on:click={(e) => {
-                rightClickContextMenu(e);
+                e.stopPropagation();
+                rightClickContextMenu(e, env.id);
               }}
             >
-              <ShowMoreIcon />
+              {#if env.type == undefined && environmentUnderCreation}
+                <Spinner size={"15px"} />
+              {:else}
+                <ShowMoreIcon />
+              {/if}
             </button>
           </Tooltip>
         </div>
@@ -335,7 +429,7 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    height: 79vh;
+    height: 95vh;
     border-right: 1px solid var(--border-color);
     padding: 0px 0px 8px 2px;
     width: 20vw;
@@ -347,8 +441,14 @@
     padding: 32px 0px;
     gap: 4px;
   }
-  .env-item:hover {
-    background: var(--border-color);
+  .add-env-mini-btn {
+    background-color: transparent;
+  }
+  .add-env-mini-btn:hover {
+    background-color: var(--border-color);
+  }
+  .add-env-mini-btn:active {
+    background: var(--workspace-hover-color);
   }
   .add-env-desc-text {
     color: #999;
@@ -362,13 +462,16 @@
     font-size: 14px;
     cursor: pointer;
   }
+  .env-item:hover{
+    background: var(--border-color);
+  }
   .env-item.active {
     background: var(--selected-active-sidebar);
   }
   .env-side-tab-list {
     list-style: none;
     overflow-y: scroll;
-    height: 100%;
+    height: 78vh;
   }
   .env-side-tab-list::-webkit-scrollbar {
     width: 2px;
@@ -377,10 +480,20 @@
     background: #888;
   }
   .show-more-btn {
+    margin-right: 0;
+    background-color: transparent;
+    visibility: hidden;
+  }
+
+  .env-item:hover .show-more-btn {
+    visibility: visible;
+  }
+  .rename-input {
     background-color: transparent;
   }
-  .show-more-btn:hover {
-    color: black;
-    background-color: var(--workspace-hover-color);
+  .rename-input:focus {
+    outline: none;
+    background-color: var(--border-color);
+    border-bottom: 1px solid #85c2ff !important;
   }
 </style>

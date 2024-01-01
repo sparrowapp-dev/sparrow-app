@@ -47,6 +47,17 @@ export class EnvironmentRepository {
     return;
   };
 
+  public removeEnvironment = async (environentId: string) => {
+    const environment = await RxDB.getInstance()
+      .rxdb.environment.findOne({
+        selector: {
+          id: environentId,
+        },
+      })
+      .exec();
+    environment.remove();
+  };
+
   public readEnvironment = async (uuid: string): Promise<unknown> => {
     return await RxDB.getInstance()
       .rxdb.environment.findOne({

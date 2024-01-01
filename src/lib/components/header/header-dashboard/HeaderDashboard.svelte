@@ -7,6 +7,7 @@
   import icons, { NotifyIcon, SearchIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
@@ -77,8 +78,10 @@
         allworkspaces = workspaceArr;
 
         if (!activeWorkspaceRxDoc) {
+          isWorkspaceLoaded.set(false);
           _viewModel.activateWorkspace(value[0].get("_id"));
           updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
+          isWorkspaceLoaded.set(true);
         }
       }
     },
@@ -159,9 +162,11 @@
   });
 
   const handleDropdown = (id: string, tab: string) => {
+    isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
     isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
+    isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {

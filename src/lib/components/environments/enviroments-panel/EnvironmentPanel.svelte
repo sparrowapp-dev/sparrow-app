@@ -2,6 +2,7 @@
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import EnvValue from "$lib/components/env-value/EnvValue.svelte";
   import type { EnvironmentDocument } from "$lib/database/app.database";
+  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
@@ -11,11 +12,12 @@
   import { onDestroy } from "svelte";
   import { currentWorkspace } from "$lib/store/workspace.store";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
+    import { notifications } from "$lib/utils/notifications";
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment: any;
-  let environmentChanged: {
+  export let environmentChanged: {
     name: boolean;
     variable: boolean;
   } = {
@@ -24,9 +26,7 @@
   };
   let changedName: string;
   let changedKeyValuePair: EnvValuePair[];
-  let initialKeyValuePair: EnvValuePair[] = [
-    { key: "", value: "", checked: true },
-  ];
+  let initialKeyValuePair: EnvValuePair[] = currentEnvironment.variable;
   const handleCurrentEnvironmentNameChange = (e: any) => {
     if (e.target.value !== currentEnvironment.name) {
       environmentChanged.name = true;
@@ -39,12 +39,12 @@
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    if (pairs == currentEnvironment.variable) {
+    if (pairs == createDeepCopy(currentEnvironment.variable)) {
       environmentChanged.variable = false;
       changedKeyValuePair = undefined;
     } else {
       environmentChanged.variable = true;
-      initialKeyValuePair = pairs;
+      currentEnvironment.variable = pairs;
       changedKeyValuePair = pairs;
     }
   };
@@ -61,7 +61,6 @@
       }
     },
   );
-
   const handleSaveEnvironment = () => {
     environmentServiceMethods.updateEnvironment(
       currentWorkspaceId,
@@ -80,6 +79,7 @@
         ? changedKeyValuePair
         : currentEnvironment.variable,
     });
+    notifications.success(`Changes saved for ${changedName ? changedName : currentEnvironment.name} environment.`);
     environmentChanged.name = false;
     environmentChanged.variable = false;
   };
@@ -90,12 +90,19 @@
 
 <div class={`env-panel`}>
   <header class={`env-header justify-content-between d-flex`}>
+    <!-- {#if currentEnvironment.type == "GLOBAL"}
+      <p class={`env-heading fw-normal border-0`}>
+        {currentEnvironment?.name}
+      </p>
+    {:else} -->
     <input
       type="text"
       class={`env-heading fw-normal px-2 border-0`}
       value={currentEnvironment?.name}
       on:change={(e) => handleCurrentEnvironmentNameChange(e)}
+      disabled={currentEnvironment.type == "GLOBAL"}
     />
+    <!-- {/if} -->
     <div class={`d-flex env-btn-container`}>
       <button class={`d-flex env-help-btn border-0 my-auto`}>
         <HelpIcon width={19} height={19} classProp={`me-2`} />
@@ -115,16 +122,17 @@
           width={16}
           height={16}
           classProp={`me-2 my-auto rounded`}
-        /><span>Save</span></button
-      >
+        /><span>Save</span><span
+          class={`${
+            (environmentChanged.name || environmentChanged.variable) && "badge"
+          }`}>{" "}</span
+        >
+      </button>
     </div>
   </header>
   <section class={`var-value-container`}>
-    
     <EnvValue
-      keyValue={currentEnvironment.variable.length == 0
-        ? initialKeyValuePair
-        : currentEnvironment.variable}
+      keyValue={currentEnvironment.variable}
       callback={handleCurrentEnvironmentKeyValuePairChange}
     />
   </section>
@@ -144,10 +152,13 @@
     font-size: 18px;
     background-color: transparent;
   }
-  .env-heading:focus{
+  .env-heading:disabled {
+    color: white;
+  }
+  .env-heading:focus {
     outline: none;
     background-color: var(--border-color);
-    border-bottom: 1px solid #85C2FF !important;
+    border-bottom: 1px solid #85c2ff !important;
   }
 
   .env-help-btn {
@@ -165,6 +176,16 @@
     padding: 6px 16px;
     opacity: 1;
     background-color: var(--border-color);
+    position: relative;
+    color: white;
+  }
+  .env-save-btn-enabled .badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    padding: 4px 4px;
+    border-radius: 50%;
+    background-color: #FF7878;
     color: white;
   }
   .env-btn-container {
