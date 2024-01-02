@@ -47,10 +47,12 @@
 
   const mockData = [
     {
-      key: "asus",
-      value: "val asus",
+      key: "asus deffde fefguyerf fruerugf fuerfurf fuyeiryf freiufriu",
+      value:
+        "val asus gyude deueudd euiydyiue dieudioe dieudioed dieuduid deoded eiduoiejddj deio",
       type: "G",
-      environment: "global variable",
+      environment:
+        "global variable deidoiueodned ed doed eldje dedjm edlejde dljed ededjld dedjlee ddled",
     },
     {
       key: "dell",

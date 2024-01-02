@@ -67,7 +67,7 @@
         }}
       >
         <p
-          class="variable-title mb-0"
+          class="variable-title mb-0 ellipsis"
           on:click={() => {
             const preUrl = urlText?.substring(0, trackParanthesis[0]);
             const postUrl = urlText?.substring(trackCursor, urlText.length);
@@ -87,7 +87,7 @@
   </div>
   <div
     class="right-panel ps-2 w-50 {activeVariable === undefined
-      ? 'd-flex align-items-center justify-content-center'
+      ? 'd-flex align-items-center justify-content-center ps-3 pe-3'
       : ''}"
   >
     {#if activeVariable === undefined}
@@ -155,6 +155,12 @@
   }
   .env-value {
     font-size: 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3; /* Number of lines to show */
+    text-overflow: ellipsis;
+    white-space: normal; /* Use 'normal' instead of 'nowrap' */
   }
   .default-environment {
     font-size: 10px;
