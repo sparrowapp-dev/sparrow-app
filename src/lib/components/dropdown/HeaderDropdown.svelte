@@ -27,7 +27,7 @@
     isOpen = !isOpen;
   };
 
-  const handleWorkspaceTab = (id: string, name) => {
+  const handleWorkspaceTab = (id: string, name, description: string) => {
     isWorkspaceCreatedFirstTime.set(false);
     let totalCollection: number = 0;
     let totalRequest: number = 0;
@@ -49,6 +49,7 @@
     const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
     sampleWorkspace.id = id;
     sampleWorkspace.name = name;
+    sampleWorkspace.description = description;
     sampleWorkspace.path = path;
     sampleWorkspace.property.workspace.requestCount = totalRequest;
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
@@ -97,6 +98,7 @@
 
       workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
+      workspaceObj.description = response.data.data?.description;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
@@ -181,7 +183,7 @@
                     onclick(list._id, list.name);
                   }}
                   on:click={() => {
-                    handleWorkspaceTab(list._id, list.name);
+                    handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
                   {list.name}
