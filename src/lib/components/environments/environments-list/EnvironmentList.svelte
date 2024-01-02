@@ -165,6 +165,7 @@
   let containerRef;
   function rightClickContextMenu(e, id) {
     e.preventDefault();
+    document.querySelectorAll('.show-more-icon').forEach(item => item.classList.remove('active'));
     currentSelectedId = id;
     e.target.classList.toggle("active");
     setTimeout(() => {
@@ -245,6 +246,7 @@
   ];
   function closeRightClickContextMenu() {
     showMenu = false;
+    document.querySelectorAll('.show-more-icon').forEach(item => item.classList.remove('active'));
   }
 </script>
 
@@ -377,7 +379,7 @@
           </div>
           <Tooltip text={`More options`}>
             <button
-              class={` show-more-btn rounded border-0`}
+              class={`${showMenu && ""} show-more-btn rounded border-0`}
               on:click={(e) => {
                 e.stopPropagation();
                 rightClickContextMenu(e, env.id);
@@ -483,6 +485,9 @@
   }
 
   .env-item:hover .show-more-btn {
+    visibility: visible;
+  }
+  .show-more-btn.active {
     visibility: visible;
   }
   .rename-input {

@@ -18,6 +18,7 @@
   }
   .show-more-icon.active {
     color: black;
+    visibility: visible;
     background-color: var(--workspace-hover-color);
   }
 </style>
