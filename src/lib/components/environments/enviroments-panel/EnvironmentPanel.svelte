@@ -97,7 +97,7 @@
     {:else} -->
     <input
       type="text"
-      class={`env-heading fw-normal px-2 border-0`}
+      class={`env-heading ellipsis fw-normal px-2 border-0`}
       value={currentEnvironment?.name}
       on:change={(e) => handleCurrentEnvironmentNameChange(e)}
       disabled={currentEnvironment.type == "GLOBAL"}
@@ -113,7 +113,7 @@
           !environmentChanged.name && !environmentChanged.variable
             ? "env-save-btn"
             : "env-save-btn-enabled"
-        } border-0`}
+        } border-0 rounded`}
         disabled={!environmentChanged.name && !environmentChanged.variable}
         on:click={() =>
           (environmentChanged.name || environmentChanged.variable) &&
@@ -150,6 +150,7 @@
   }
   .env-heading {
     font-size: 18px;
+    width: 50vw;
     background-color: transparent;
   }
   .env-heading:disabled {
@@ -171,6 +172,9 @@
     padding: 6px 16px;
     opacity: 0.3;
     background-color: var(--border-color);
+  }
+  .env-save-btn:disabled{
+    color: white;
   }
   .env-save-btn-enabled {
     padding: 6px 16px;

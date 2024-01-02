@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
+  import Crossicon from "$lib/assets/crossicon.svelte";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "../tooltip/Tooltip.svelte";
@@ -12,11 +13,19 @@
     key: "",
     value: "",
   };
+  let filterText: string = "";
   let pairs: EnvValuePair[] = keyValue;
+  let filteredKeyValuePairs: EnvValuePair[] = pairs;
+  const updateFilteredKeyValuePairs = (pairs: EnvValuePair[]) => {
+    return (filteredKeyValuePairs = pairs.filter((elem, index) => {
+      if (elem.key.startsWith(filterText) || filterText == "") return true;
+    }));
+  };
   let controller: boolean = false;
   $: {
     if (keyValue) {
       pairs = keyValue;
+      updateFilteredKeyValuePairs(pairs);
       let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
@@ -46,6 +55,7 @@
       pairs = pairs;
     }
     callback(pairs);
+    updateFilteredKeyValuePairs(pairs);
   };
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
@@ -58,6 +68,7 @@
       pairs = filteredKeyValue;
     }
     callback(pairs);
+    updateFilteredKeyValuePairs(pairs);
   };
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
@@ -68,6 +79,7 @@
     });
     pairs = filteredKeyValue;
     callback(pairs);
+    updateFilteredKeyValuePairs(pairs);
   };
   const handleCheckAll = (): void => {
     let flag: boolean;
@@ -86,20 +98,38 @@
     });
     pairs = filteredKeyValue;
     callback(pairs);
+    updateFilteredKeyValuePairs(pairs);
+  };
+  const handleFilterTextChange = (e) => {
+    filterText = e.target.value;
+    updateFilteredKeyValuePairs(pairs);
+  };
+  const handleEraseSearch = () => {
+    filterText = "";
+    updateFilteredKeyValuePairs(pairs);
+    document.getElementById("search-input").focus();
   };
 </script>
 
 <div class="mt-3 me-0" style="width: 60vw;">
-  <div class={`d-flex search-input-container rounded py-1 px-2 mb-4`}>
-    <SearchIcon width={12} height={12} classProp={`my-auto me-3`} />
+  <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+    <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
     <input
       type="text"
+      id="search-input"
       class={`bg-transparent w-100 border-0 my-auto`}
       placeholder="Search environment variables"
+      bind:value={filterText}
+      on:input={(e) => handleFilterTextChange(e)}
     />
+    {#if filterText !== ""}
+      <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>
+        <Crossicon color="#45494D" />
+      </button>
+    {/if}
   </div>
-  <div class="d-flex gap-3">
-    <div class="form-check-input-container" style="width:30px;">
+  <div class="d-flex gap-4">
+    <div class="form-check-input-container" style="width:25px;">
       <Tooltip text={`${controller ? "Unselect" : "Select"}`}>
         <input
           class="form-check-input"
@@ -113,8 +143,8 @@
       class="d-flex gap-5 text-requestBodyColor align-items-center"
       style="font-size: 12px; font-weight: 500; width: 46vw;"
     >
-      <p class="flex-grow-1 w-100">Variable</p>
-      <p class="flex-grow-1 w-100">Value</p>
+      <p class="flex-grow-1 w-100 ps-2">Variable</p>
+      <p class="flex-grow-1 w-100 ps-2">Value</p>
     </div>
     <!-- <div style="width:60px;" /> -->
   </div>
@@ -152,12 +182,12 @@
                   <input
                     type="text"
                     placeholder="Enter Variable"
-                    class="form-control bg-keyValuePairColor py-1 border-0"
+                    class="form-control py-1"
                     style="font-size: 13px;"
                     disabled
                     bind:value={readable.key}
                   />
-                  <div class="me-2">
+                  <div class="me-2 edit-icon">
                     <EditIcon />
                   </div>
                 </div>
@@ -167,12 +197,12 @@
                   <input
                     type="text"
                     placeholder="Enter Value"
-                    class="form-control bg-keyValuePairColor py-1 border-0"
+                    class="form-control py-1"
                     style="font-size: 13px;"
                     disabled
                     bind:value={readable.value}
                   />
-                  <div class="me-2">
+                  <div class="me-2 edit-icon">
                     <EditIcon />
                   </div>
                 </div>
@@ -185,78 +215,82 @@
         </div>
       </div>
     {/if}
-    {#each pairs as element, index}
-      <div
-        aria-label="Toggle Hover"
-        class="sortable > div"
-        style="cursor:default; width:55vw; "
-        data-list-key={JSON.stringify({
-          name: element.key,
-          description: element.value,
-          checked: element.checked,
-        })}
-      >
+    {#if filteredKeyValuePairs.length > 0}
+      {#each filteredKeyValuePairs as element, index}
         <div
-          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+          aria-label="Toggle Hover"
+          class="sortable > div"
+          style="cursor:default; width:55vw; "
+          data-list-key={JSON.stringify({
+            name: element.key,
+            description: element.value,
+            checked: element.checked,
+          })}
         >
           <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+            style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
           >
-            <div class="form-check-input-container" style="width:30px;">
-              {#if pairs.length - 1 != index || mode === "READ"}
-                <Tooltip text={`${element.checked ? "Unselect" : "Select"}`}>
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    bind:checked={element.checked}
-                    on:input={() => {
-                      updateCheck(index);
-                    }}
-                  />
-                </Tooltip>
-              {/if}
-            </div>
-            <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
-                <div class="bg-keyValuePairColor d-flex rounded">
-                  <input
-                    type="text"
-                    placeholder="Enter Variable"
-                    class="form-control bg-keyValuePairColor py-1 border-0"
-                    style="font-size: 13px;"
-                    disabled={mode == "READ" ? true : false}
-                    bind:value={element.key}
-                    on:input={() => {
-                      updateParam(index);
-                    }}
-                  />
-                  <div class="me-2 edit-icon">
-                    <EditIcon />
+            <div
+              class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+            >
+              <div class="form-check-input-container" style="width:30px; ">
+                {#if filteredKeyValuePairs.length - 1 != index || mode === "READ"}
+                  <Tooltip text={`${element.checked ? "Unselect" : "Select"}`}>
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      bind:checked={element.checked}
+                      on:input={() => {
+                        updateCheck(index);
+                      }}
+                    />
+                  </Tooltip>
+                {/if}
+              </div>
+              <div class="w-100 d-flex gap-2">
+                <div class="flex-grow-1 w-100">
+                  <div
+                    class="bg-keyValuePairColor input-container d-flex rounded"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter Variable"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={mode == "READ" ? true : false}
+                      bind:value={element.key}
+                      on:input={(e) => {
+                        updateParam(index);
+                      }}
+                    />
+                    <div class="me-2 edit-icon">
+                      <EditIcon />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-grow-1 w-100">
+                  <div class="bg-keyValuePairColor d-flex rounded">
+                    <input
+                      type="text"
+                      placeholder="Enter Value"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={mode == "READ" ? true : false}
+                      bind:value={element.value}
+                      on:input={() => {
+                        updateParam(index);
+                      }}
+                    />
+                    <div class="me-2 edit-icon">
+                      <EditIcon />
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="flex-grow-1 w-100">
-                <div class="bg-keyValuePairColor d-flex rounded">
-                  <input
-                    type="text"
-                    placeholder="Enter Value"
-                    class="form-control bg-keyValuePairColor py-1 border-0"
-                    style="font-size: 13px;"
-                    disabled={mode == "READ" ? true : false}
-                    bind:value={element.value}
-                    on:input={() => {
-                      updateParam(index);
-                    }}
-                  />
-                  <div class="me-2">
-                    <EditIcon />
-                  </div>
-                </div>
-              </div>
-            </div>
-            {#if pairs.length - 1 != index}
-              <div class="h-75 pe-1 d-flex">
-                <!-- <button
+              {#if filteredKeyValuePairs.length - 1 != index}
+                <div class="h-75 pe-1 d-flex">
+                  <!-- <button
                 class="bg-backgroundColor border-0"
                   style="width: 40px;"
                   on:click={() => {
@@ -265,12 +299,11 @@
                 >
                   <LockIcon locked={element.locked} />
                 </button> -->
-                <Tooltip text="Delete">
-                  <button
-                    class="border-0 delete-btn rounded"
-                    style="width:30px;"
-                  >
-                    {#if mode !== "READ"}
+                  <Tooltip text="Delete">
+                    <button
+                      class="border-0 delete-btn pb-1 rounded"
+                      style="width:30px;"
+                    >
                       <img
                         src={trashIcon}
                         on:click={() => {
@@ -278,26 +311,30 @@
                         }}
                         alt=""
                       />
-                    {/if}
-                  </button>
-                </Tooltip>
-              </div>
-            {:else}
-              <div class="h-75 pe-1 d-flex">
-                <!-- <button
+                    </button>
+                  </Tooltip>
+                </div>
+              {:else}
+                <div class="h-75 pe-1 d-flex">
+                  <!-- <button
                   class="bg-backgroundColor border-0"
                   style="width:40px;"
                 /> -->
-                <button
-                  class="bg-backgroundColor border-0"
-                  style="width:30px;"
-                />
-              </div>
-            {/if}
+                  <button
+                    class="bg-backgroundColor border-0"
+                    style="width:30px;"
+                  />
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
+      {/each}
+    {:else}
+      <span class="p-2" style="color: #8A9299; font-size: 12px;"
+        >No such variable found in this environment. Please check the spelling.</span
+      >
+    {/if}
   </div>
 </div>
 
@@ -306,8 +343,18 @@
     border: 1px solid var(--border-color);
     background: var(--background-color);
     width: 27vw;
+    font-size: 12px;
   }
-
+  .search-input-container > input:focus {
+    outline: none;
+    caret-color: var(--workspace-hover-color);
+  }
+  .search-input-container:focus-within {
+    border: 1px solid var(--workspace-hover-color);
+  }
+  .search-input-container:focus-within svg {
+    visibility: hidden;
+  }
   .form-check-input {
     border-radius: 2px;
     margin: auto;
@@ -335,5 +382,41 @@
   }
   .delete-btn:active {
     background: var(--workspace-hover-color);
+  }
+
+  .edit-icon {
+    opacity: 0;
+  }
+  .bg-keyValuePairColor:hover .edit-icon {
+    opacity: 1;
+  }
+
+  .bg-keyValuePairColor > input:focus {
+    box-shadow: none;
+  }
+
+  .bg-keyValuePairColor,
+  .bg-keyValuePairColor > input {
+    caret-color: #85c2ff;
+    background-color: var(--keyvalue-pair);
+    border: 1px solid transparent;
+  }
+
+  .bg-keyValuePairColor:focus-within {
+    border: 1px solid var(--workspace-hover-color);
+  }
+  .form-check-input-container:hover {
+    background-color: var(--keyvalue-pair);
+  }
+  .form-check-input-container {
+    height: 25px;
+    background-color: transparent;
+    padding: 5px 0px;
+  }
+  .form-check-input {
+    /* width: 50%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

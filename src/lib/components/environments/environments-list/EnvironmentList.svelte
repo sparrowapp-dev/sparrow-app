@@ -100,7 +100,7 @@
     environmentUnderCreation = true;
     isEnvironmentCreatedFirstTime.set(true);
     const newEnvironment = {
-      _id: UntrackedItems.UNTRACKED + uuidv4(),
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextEnvironment(environment, "New Environment"),
       variable: [],
       createdAt: new Date().toISOString(),
@@ -116,19 +116,20 @@
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       environmentUnderCreation = false;
-      environmentRepositoryMethods.updateEnvironment(newEnvironment._id, res);
+      environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
       _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspaceId, {
         _id: response.data.data._id,
         name: newEnvironment.name,
       });
-      _environmentListViewModel.activateEnvironment(newEnvironment._id);
+      _environmentListViewModel.activateEnvironment(newEnvironment.id);
       notifications.success("New Environment Created!");
       return;
     }
     return;
   };
+
   const handleActivateEnvironment = (id: string) => {
-    _environmentListViewModel.activateEnvironment(id);
+    if (id) _environmentListViewModel.activateEnvironment(id);
   };
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -241,14 +242,6 @@
       displayText: "Delete",
       disabled: false,
     },
-
-    // {
-    //   onClick: () => {
-    //     handleCollectionPopUp(true);
-    //   },
-    //   displayText: "Delete",
-    //   disabled: false,
-    // },
   ];
   function closeRightClickContextMenu() {
     showMenu = false;
@@ -289,10 +282,10 @@
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
 >
   <div
-    class={`d-flex justify-content-between curr-workspace-heading-container my-2`}
+    class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace ps-3 my-auto`}
+      class={`fw-medium lh-1 curr-workspace ps-3 my-auto ellipsis`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currWorkspaceName || ""}
@@ -300,7 +293,7 @@
     <Tooltip text={`Add Environment`}>
       <button
         class={`border-0 mx-3 rounded add-env-mini-btn  ${
-          !environmentUnderCreation ? "pb-2 py-1" : 'py-2'
+          !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
         on:click={handleCreateEnvironmentClick}
       >
@@ -353,7 +346,7 @@
           style="cursor: pointer; "
           on:click={() => handleActivateEnvironment(env.id)}
         >
-          <div class="show-more-in d-flex">
+          <div class="show-more-in d-flex ellipsis">
             <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>
               <SelectIcon
                 classProp={`my-auto`}
@@ -362,10 +355,10 @@
                 selected={env.isActive}
               />
             </Tooltip>
-            {#if env.id == environmentUnderRename}
+            {#if env.id && env.id == environmentUnderRename}
               <input
                 type="text"
-                class="ps-3 my-auto fw-normal border-0 rename-input"
+                class="ms-3 my-auto fw-normal border-0 rename-input"
                 value={env?.name}
                 id={`rename-input-${env.id}`}
                 on:blur={(e) =>
@@ -379,7 +372,7 @@
                   )}
               />
             {:else}
-              <p class={`ps-3 my-auto fw-normal`}>{env?.name}</p>
+              <p class={`ps-3 my-auto fw-normal ellipsis`}>{env?.name}</p>
             {/if}
           </div>
           <Tooltip text={`More options`}>
@@ -434,6 +427,9 @@
     padding: 0px 0px 8px 2px;
     width: 20vw;
   }
+  .curr-workspace {
+    max-height: 20vw;
+  }
   .curr-workspace-heading-container {
     padding: 18px 4px 6px 0px;
   }
@@ -462,7 +458,7 @@
     font-size: 14px;
     cursor: pointer;
   }
-  .env-item:hover{
+  .env-item:hover {
     background: var(--border-color);
   }
   .env-item.active {
@@ -470,6 +466,7 @@
   }
   .env-side-tab-list {
     list-style: none;
+    overflow-x: hidden;
     overflow-y: scroll;
     height: 78vh;
   }
