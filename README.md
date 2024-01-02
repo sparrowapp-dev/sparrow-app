@@ -66,8 +66,8 @@ Environment variables are :
 |       `VITE_API_URL`        | Host on which the API will be available |    ✅     |  `127.0.0.1/9000`  |          If set, can't be empty string           |
 
 ## <a name="contributors">❤️ How to Contribue ?</a>
- 
-![Atom](https://img.shields.io/badge/Coming%20Soon-%2366595C.svg?style=for-the-badge&logo=atom&logoColor=white)
+
+You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
  
 ## <a name="subscribe-to-our-newsletter">📨 Newsletter</a>
  
