@@ -8,7 +8,11 @@
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import type { Observable } from "rxjs";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
@@ -17,9 +21,9 @@
   let componentData: NewTab;
   let newWorkspaceName: string;
   let ownerName: string;
+  let noOfCollections = 0;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
-
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       tabName = event?.name;
@@ -27,6 +31,9 @@
       componentData = event;
     }
   });
+  export let _collectionListViewModel: CollectionListViewModel;
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
 
   const handleWorkspaceInput = (event) => {
     newWorkspaceName = event.target.value;
@@ -59,6 +66,13 @@
       workspaceDescription,
     );
   };
+  const collectionSubscribe = collections.subscribe(
+    (collectionArr: CollectionDocument[]) => {
+      if (collectionArr) {
+        noOfCollections = collectionArr.length;
+      }
+    },
+  );
 
   let name: string = "";
   let email: string = "";
@@ -220,10 +234,8 @@
       </div>
     </div>
     <div class="workspace-info gap-3 text-defaultColor">
-      <p><span class="me-1 fs-6 text-plusButton">{0}</span>API REQUESTS</p>
       <p>
-        <span class="me-1 fs-6 text-plusButton"
-          >{componentData?.property?.workspace?.collectionCount ?? 0}</span
+        <span class="me-1 fs-6 text-plusButton">{noOfCollections}</span
         >COLLECTION
       </p>
     </div>
