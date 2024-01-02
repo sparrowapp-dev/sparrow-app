@@ -126,11 +126,15 @@
     <form
       class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
       style="width:408px;"
+      novalidate
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
-        console.log(validationErrors);
+
         if (validationErrors) {
           errorMessage = "Please enter an email id";
+        }
+        if (validationErrors.isSuccessful) {
+          isSignInPopup = true;
         }
       }}
     >

@@ -171,6 +171,7 @@
       novalidate
       on:submit|preventDefault={async () => {
         validationErrors = await handleRegisterValidation(userData);
+
         if (validationErrors.isSuccessful) {
           isWelcomeScreenPopup = true;
         }
