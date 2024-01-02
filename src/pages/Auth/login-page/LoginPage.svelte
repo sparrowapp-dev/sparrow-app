@@ -103,7 +103,7 @@
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
-  style="height:100vh;overflow:hidden"
+  style="height:100vh;overflow:auto;"
 >
   <Header />
   {#if isLoadingPage}
@@ -155,7 +155,7 @@
           {/if}
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3 position-relative">
           <label for="exampleInputPassword1" class="form-label">Password</label>
           <div class="d-flex">
             <input
@@ -176,6 +176,7 @@
               type="button"
               on:click={togglePasswordVisibility}
               class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+              style="right:15px; transform: translateY(-1%);"
             >
               {#if isPasswordVisible}
                 <img src={eyeShow} alt="eye-show" />
@@ -200,7 +201,7 @@
           <img src={sparrowicon} alt="" />
         </span> -->
 
-        <div class="d-flex mb-4 align-items-center justify-content-end">
+        <div class="d-flex mb-3 align-items-center justify-content-end">
           <Link
             to="/forgot/password"
             class="text-decoration-none text-primaryColor"
