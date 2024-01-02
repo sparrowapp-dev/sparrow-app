@@ -1,6 +1,3 @@
-import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-addRxPlugin(RxDBDevModePlugin);
-
 import {
   createRxDatabase,
   type RxCollection,
@@ -124,15 +121,6 @@ export class RxDB {
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
-          // 2: function (oldDoc: TabDocument) {
-          //   return oldDoc;
-          // },
-          // 3: function (oldDoc: TabDocument) {
-          //   return oldDoc;
-          // },
-          // 4: function (oldDoc: TabDocument) {
-          //   return oldDoc;
-          // },
         },
       },
     });
