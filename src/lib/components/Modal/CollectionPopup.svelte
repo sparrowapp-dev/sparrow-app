@@ -44,6 +44,7 @@
 
     if (response.isSuccessful) {
       collectionsMethods.deleteCollection(collectionId);
+      collectionsMethods.deleteCollectioninWorkspace(workspaceId,collectionId);
       closePopup(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
       collectionsMethods.removeMultipleTabs(deleteIds);
