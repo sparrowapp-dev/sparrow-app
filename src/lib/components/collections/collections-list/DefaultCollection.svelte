@@ -7,7 +7,7 @@
   import { v4 as uuidv4 } from "uuid";
   export let handleCreateCollection:any;
   export let collectionsMethods: CollectionsMethods;
-
+  export let showDefault:boolean;
   const addApiRequest = () => {
     collectionsMethods.handleCreateTab(
       generateSampleRequest(
@@ -19,6 +19,7 @@
   };
 </script>
 
+{#if showDefault}
 <div
   class="container-fluid row d-flex flex-column align-items-center ps-4 pe-3 pt-3"
 >
@@ -42,6 +43,7 @@ font-weight: 300;"
     >
   </div>
 </div>
+{/if}
 
 <style>
   .buttons {

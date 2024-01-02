@@ -67,14 +67,6 @@
     );
 
     if (response.isSuccessful && response.data.data) {
-      response.data.data.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-        }
-      });
-
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: collectionId,
@@ -90,8 +82,6 @@
       SampleFolder.id = response.data.data.id;
       SampleFolder.path = path;
       SampleFolder.name = response.data.data.name;
-      SampleFolder.property.folder.requestCount = totalRequest;
-      SampleFolder.property.folder.folderCount = totalFolder;
       SampleFolder.save = true;
       collectionsMethods.handleCreateTab(SampleFolder);
       moveNavigation("right");
