@@ -26,16 +26,19 @@
       key: "asus",
       value: "val asus",
       type: "G",
+      environment: "Global Variables",
     },
     {
       key: "dell",
       value: "val dell",
       type: "E",
+      environment: "NT Variables",
     },
     {
       key: "lenovo",
       value: "val lenovo",
       type: "E",
+      environment: "NJ Variables",
     },
   ];
 

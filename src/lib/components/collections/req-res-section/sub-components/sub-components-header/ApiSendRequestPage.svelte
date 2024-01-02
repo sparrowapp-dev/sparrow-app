@@ -19,6 +19,7 @@
   import type { RequestMethodType } from "$lib/utils/types/request.type";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -49,16 +50,55 @@
       key: "asus",
       value: "val asus",
       type: "G",
+      environment: "global variable",
     },
     {
       key: "dell",
       value: "val dell",
       type: "E",
+      environment: "n2n variable",
     },
     {
       key: "lenovo",
       value: "val lenovo",
       type: "E",
+      environment: "NJ variable",
+    },
+    {
+      key: "asus",
+      value: "val asus",
+      type: "G",
+      environment: "global variable",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+      environment: "n2n variable",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+      environment: "NJ variable",
+    },
+    {
+      key: "asus",
+      value: "val asus",
+      type: "G",
+      environment: "global variable",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+      environment: "n2n variable",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+      environment: "NJ variable",
     },
   ];
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
@@ -271,6 +311,9 @@
   });
 
   const handleKeyPress = (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
     if (event.ctrlKey && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
@@ -330,6 +373,10 @@
         class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
+        autocomplete="off"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
         style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
@@ -342,7 +389,7 @@
             trackParanthesis = [];
             trackCursor = undefined;
             filterData = [];
-          }, 200);
+          }, 300);
         }}
         on:focus={(e) => {
           handleInputValue();
@@ -350,33 +397,16 @@
         bind:this={inputElement}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
-        <div class="select-environment-popup d-flex p-3">
-          <div class="left-panel w-50">
-            {#each filterData as mock}
-              <p
-                on:click={() => {
-                  const preUrl = urlText?.substring(0, trackParanthesis[0]);
-                  const postUrl = urlText?.substring(
-                    trackCursor,
-                    urlText.length,
-                  );
-                  urlText = preUrl + "{{" + mock.key + "}}" + postUrl;
-                  handleInputValue();
-                }}
-              >
-                <span>{mock.type}</span>
-                <span>{mock.key}</span>
-              </p>
-            {/each}
-          </div>
-          <div class="right-panel w-50">
-            <p>ENVIRONMENT</p>
-            <p>VALUE</p>
-          </div>
-          <div class="w-100">
-            <p>showing Dev environment variables and Global variables</p>
-          </div>
-        </div>
+        <EnvironmentPicker
+          {filterData}
+          {urlText}
+          {trackCursor}
+          {trackParanthesis}
+          {handleInputValue}
+          updateUrl={(url) => {
+            urlText = url;
+          }}
+        />
       {/if}
 
       <button
@@ -468,22 +498,5 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
-  }
-  .select-environment-popup {
-    width: 700px;
-    height: 400px;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: black;
-    z-index: 5;
-    flex-wrap: wrap;
-  }
-  .select-environment-popup .left-panel {
-    height: 300px;
-  }
-  .select-environment-popup .right-panel {
-    height: 300px;
   }
 </style>
