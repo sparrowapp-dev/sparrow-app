@@ -120,8 +120,8 @@
     class="container d-flex flex-column align-items-center justify-content-center"
   >
     <p
-      class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-      style="font-size: 40px; width:100%; height:48px;font-weight:500;"
+      class="container-header text-whiteColor mt-5 ms-2 me-2 mb-4"
+      style="width:100%; height:48px;font-weight:500;"
     >
       Welcome to Sparrow!
     </p>
@@ -285,6 +285,9 @@
   .container {
     width: 80%;
   }
+  .container-header {
+    font-size: 40px;
+  }
 
   @media (min-width: 1000px) {
     .eye-icon > img {
@@ -311,6 +314,9 @@
     }
     .container {
       width: 35%;
+    }
+    .container-header {
+      font-size: 35px;
     }
   }
 </style>

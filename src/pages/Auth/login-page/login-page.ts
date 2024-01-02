@@ -34,6 +34,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     navigate("/home");
     return response;
   } else {
+    navigate("/");
     resizeWindowOnLogOut();
     isResponseError.set(true);
     notifications.error(response.message);

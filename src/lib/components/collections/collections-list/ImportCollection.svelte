@@ -27,110 +27,110 @@
   };
 
   const handleImportUrl = async () => {
-    // isLoading = true;
-    // const response = await _viewImportCollection.importCollectionData(
-    //   currentWorkspaceId,
-    //   text,
-    // );
+    isLoading = true;
+    const response = await _viewImportCollection.importCollectionData(
+      currentWorkspaceId,
+      text,
+    );
 
-    // onClick(false);
-    // if (response.isSuccessful) {
-    //   const res = response.data.data;
-    //   isLoading = false;
-    //   // collectionUnderCreation = true;
-    //   isCollectionCreatedFirstTime.set(true);
+    onClick(false);
+    if (response.isSuccessful) {
+      const res = response.data.data;
+      isLoading = false;
+      // collectionUnderCreation = true;
+      isCollectionCreatedFirstTime.set(true);
 
-    //   const newCollection = {
-    //     id: res.id,
-    //     name: res.name,
-    //     items: [],
-    //     createdAt: new Date().toISOString(),
-    //   };
+      const newCollection = {
+        id: res.id,
+        name: res.name,
+        items: [],
+        createdAt: new Date().toISOString(),
+      };
 
-    //   collectionsMethods.addCollection(newCollection);
+      collectionsMethods.addCollection(newCollection);
 
-    //   let path: Path = {
-    //     workspaceId: currentWorkspaceId,
-    //     collectionId: res.id,
-    //   };
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: res.id,
+      };
 
-    //   const Samplecollection = generateSampleCollection(
-    //     res.id,
-    //     new Date().toString(),
-    //   );
+      const Samplecollection = generateSampleCollection(
+        res.id,
+        new Date().toString(),
+      );
 
-    //   Samplecollection.id = res.id;
-    //   Samplecollection.path = path;
-    //   Samplecollection.name = res.name;
-    //   Samplecollection.save = true;
-    //   collectionsMethods.handleCreateTab(Samplecollection);
-    //   moveNavigation("right");
+      Samplecollection.id = res.id;
+      Samplecollection.path = path;
+      Samplecollection.name = res.name;
+      Samplecollection.save = true;
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
 
-    //   collectionsMethods.updateCollection(res.id, res);
-    //   _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-    //     id: res.id,
-    //     name: newCollection.name,
-    //   });
-    //   notifications.success(response.data.message);
-    // } else {
-    //   isLoading = false;
-    // }
+      collectionsMethods.updateCollection(res.id, res);
+      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: res.id,
+        name: newCollection.name,
+      });
+      notifications.success(response.data.message);
+    } else {
+      isLoading = false;
+    }
   };
 
   const handleImportFile = async (fileContent) => {
-    // isLoading = true;
-    // const response = await _viewImportCollection.importCollectionFile(
-    //   currentWorkspaceId,
-    //   fileContent,
-    // );
-    // console.log(response);
-    // if (response.isSuccessful) {
-    //   onClick(false);
-    //   isLoading = false;
-    //   notifications.success(response.data.message);
-    // } else {
-    //   isLoading = false;
-    //   notifications.error(response.message);
-    // }
+    isLoading = true;
+    const response = await _viewImportCollection.importCollectionFile(
+      currentWorkspaceId,
+      fileContent,
+    );
+    console.log(response);
+    if (response.isSuccessful) {
+      onClick(false);
+      isLoading = false;
+      notifications.success(response.data.message);
+    } else {
+      isLoading = false;
+      notifications.error(response.message);
+    }
   };
 
   function handleFileUpload() {
-    // const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
 
-    // const file = fileInput.files[0];
-    // console.log(file);
+    const file = fileInput.files[0];
+    console.log(file);
 
-    // if (file) {
-    //   const reader = new FileReader();
+    if (file) {
+      const reader = new FileReader();
 
-    //   reader.onload = function (e) {
-    //     const fileContent = e.target.result;
-    //     console.log(fileContent);
-    //     handleImportFile(fileContent);
-    //   };
-    //   reader.readAsText(file);
-    // }
+      reader.onload = function (e) {
+        const fileContent =e.target.result;
+        console.log(fileContent);
+        handleImportFile(fileContent);
+      };
+      reader.readAsText(file);
+    }
   }
 
-  // const handleImportJsonObject = async () => {
-  //   isLoading = true;
-  //   console.log(text);
+  const handleImportJsonObject = async () => {
+    isLoading = true;
+    console.log(text);
 
-  //   const response = await _viewImportCollection.importCollectionFromJsonObject(
-  //     currentWorkspaceId,
-  //     { jsonObj: text },
-  //   );
+    const response = await _viewImportCollection.importCollectionFromJsonObject(
+      currentWorkspaceId,
+      { jsonObj: text },
+    );
 
-  //   console.log(response);
-  //   if (response.isSuccessful) {
-  //     onClick(false);
-  //     isLoading = false;
-  //     notifications.success(response.data.message);
-  //   } else {
-  //     isLoading = false;
-  //     notifications.error(response.message);
-  //   }
-  // };
+    console.log(response);
+    if (response.isSuccessful) {
+      onClick(false);
+      isLoading = false;
+      notifications.success(response.data.message);
+    } else {
+      isLoading = false;
+      notifications.error(response.message);
+    }
+  };
 </script>
 
 {#if isLoading}
