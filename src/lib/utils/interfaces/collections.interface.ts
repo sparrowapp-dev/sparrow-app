@@ -2,6 +2,7 @@ import type { CollectionDocument } from "$lib/database/app.database";
 
 import type { CreateApiRequestPostBody, CreateDirectoryPostBody } from "../dto";
 import type { Observable } from "rxjs";
+import type { Collection } from "./request.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CollectionsMethods {
   handleActiveTab: (id: string) => void;
@@ -60,7 +61,10 @@ export interface CollectionsMethods {
   ) => unknown;
 
   readCollection: (uuid: string) => unknown;
-
+  getNoOfApisandFolders: (
+    collection: CollectionDocument,
+    folderId?: string,
+  ) => Promise<Collection>;
   deleteRequestInFolder: (
     collectionId: string,
     folderId: string,
@@ -83,4 +87,8 @@ export interface CollectionsMethods {
   ) => void;
   removeMultipleTabs: (ids: string[]) => void;
   setRequestSave: (data: boolean, route: string, id: string) => void;
+  deleteCollectioninWorkspace: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
 }

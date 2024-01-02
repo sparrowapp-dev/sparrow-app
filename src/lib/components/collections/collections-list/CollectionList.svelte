@@ -42,13 +42,17 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
   import { notifications } from "$lib/utils/notifications";
-
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   const [, , searchNode] = useTree();
-  let collection: any[] = [];
+  let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
+  let isComponentRenderedFirstTime=false;
+  let showDefault=false;
+  let isLoading=true;
+  const workspacesArr=_workspaceViewModel.workspaces;
 
   const usernameUnsubscribe = username.subscribe((value) => {
     if (value) {
@@ -83,6 +87,14 @@
       }
     },
   );
+  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces)=>{
+    workspaces.map((workspace)=>{
+      if(workspace._data.isActiveWorkspace){
+        showDefault=workspace._data.collections.length===0?true:false;
+        return;
+      }
+    })
+  })
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       selectedApiMethods = value;
@@ -126,6 +138,10 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        if(isComponentRenderedFirstTime){
+          isLoading=true;
+           isComponentRenderedFirstTime=false;
+        }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
@@ -133,6 +149,7 @@
           await collectionsMethods.getAllCollections(workspaceId);
         if (response.isSuccessful && response.data.data) {
           const collections = response.data.data;
+          isLoading=false;
           collectionsMethods.bulkInsert(collections);
           return;
         }
@@ -141,6 +158,7 @@
   );
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
+    showDefault=false;
     collectionUnderCreation = true;
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
@@ -394,6 +412,11 @@
     style="overflow:auto;margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
+      {#if isLoading}
+      <div class="spinner">
+        <Spinner size={`32px`} />
+      </div>
+      {:else}
       {#if showfilterDropdown}
         <FilterDropDown {handleSearch} />
       {/if}
@@ -448,7 +471,7 @@
             {activePath}
           />
         {/each}
-      {:else if collection.length > 0}
+      {:else if collection && collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList={collection}
@@ -461,12 +484,8 @@
             {activePath}
           />
         {/each}
-      {:else if collection && collection.length === 0}
-        <DefaultCollection
-          {handleCreateCollection}
-          {collectionsMethods}
-          {currentWorkspaceId}
-        />
+        {/if}
+        <DefaultCollection {handleCreateCollection} {collectionsMethods} {showDefault} />
       {/if}
     </div>
   </div>
@@ -551,5 +570,13 @@
   .increase-width {
     animation: increaseWidth 0.3s;
     max-width: 280px;
+  }
+  .spinner{
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 </style>
