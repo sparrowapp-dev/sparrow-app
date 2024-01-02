@@ -1,38 +1,56 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-
-  import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
   import {
     collapsibleState,
     isApiCreatedFirstTime,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let _collectionListViewModel: CollectionListViewModel;
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
   let isLoading: boolean = false;
+  let activeTabId: string;
 
   let tabName: string = "";
   let componentData: NewTab;
-  const collectionService = new CollectionService();
   let totalFolder: number = 0;
   let totalRequest: number = 0;
   let newCollectionName: string = "";
   const _myColllectionViewModel = new MyCollectionViewModel();
 
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.collection?.requestCount;
-    totalFolder = event?.property?.collection?.folderCount;
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
+    if (event) {
+      tabName = event?.name;
+      componentData = event;
+      activeTabId = event.id;
     }
   });
+  const collectionSubscribe = collections.subscribe(
+    (collectionArr: CollectionDocument[]) => {
+      if (collectionArr) {
+        collectionArr.forEach(async (collection) => {
+          if (collection._data.id === activeTabId) {
+            const collectionData = await collectionsMethods.getNoOfApisandFolders(
+             collection
+            );
+            totalRequest = collectionData.requestCount;
+            totalFolder = collectionData.folderCount;
+            return;
+          }
+        });
+      }
+    },
+  );
 
   const handleCollectionInput = (event) => {
     newCollectionName = event.target.value;
@@ -114,6 +132,7 @@
         type="text"
         required
         {autofocus}
+        maxlength={100}
         id="renameInputFieldCollection"
         value={tabName}
         class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"

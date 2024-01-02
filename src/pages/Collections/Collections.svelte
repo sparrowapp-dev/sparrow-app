@@ -27,7 +27,6 @@
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
     handleRemoveTab: _viewModel.handleRemoveTab,
-
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
@@ -57,17 +56,18 @@
       _viewModel.updateRequestOrFolderInCollection,
     readRequestOrFolderInCollection: _viewModel.readRequestOrFolderInCollection,
     readCollection: _viewModel.readCollection,
+    getNoOfApisandFolders: _viewModel.getNoOfApisandFolders,
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
+    deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
   };
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
-
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -83,7 +83,11 @@
 <Motion {...scaleMotionProps} let:motion>
   <div class="d-flex collection" use:motion>
     <div class="collections__list">
-      <CollectionsList {collectionsMethods} />
+      <CollectionsList
+        activeTabId={$activeTab?.id}
+        activePath={$activeTab?.path}
+        {collectionsMethods}
+      />
     </div>
     <div
       class="collections__tools bg-backgroundColor {$collapseCollectionPanel
@@ -104,11 +108,23 @@
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
             <RequestResponse {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace {activeTab} {collectionsMethods} />
+            <MyWorkspace
+              {activeTab}
+              {collectionsMethods}
+              {_collectionListViewModel}
+            />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-            <MyFolder {collectionsMethods} {activeTab} />
+            <MyFolder
+              {collectionsMethods}
+              {activeTab}
+              {_collectionListViewModel}
+            />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-            <MyCollection {collectionsMethods} {activeTab} />
+            <MyCollection
+              {collectionsMethods}
+              {activeTab}
+              {_collectionListViewModel}
+            />
           {/if}
         </div>
         <!-- <SidebarRight /> -->
@@ -122,10 +138,29 @@
   .collections__tools {
     height: calc(100vh - 44px);
   }
+  @keyframes increaseWidth {
+    0% {
+      width: calc(100vw - 352px);
+    }
+
+    100% {
+      width: calc(100vw - 72px);
+    }
+  }
+  @keyframes decreaseWidth {
+    0% {
+      width: calc(100vw - 72px);
+    }
+    100% {
+      width: calc(100vw - 352px);
+    }
+  }
   .sidebar-expand {
     width: calc(100vw - 352px);
+    animation: decreaseWidth 0.3s;
   }
   .sidebar-collapse {
     width: calc(100vw - 72px);
+    animation: increaseWidth 0.3s;
   }
 </style>

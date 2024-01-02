@@ -38,7 +38,7 @@
   export let onClick;
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
-  export let type : "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
+  export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
 
   interface Path {
     name: string;
@@ -67,8 +67,8 @@
   };
 
   const saveType = {
-    SAVE_DESCRIPTION : "SAVE_DESCRIPTION"
-  }
+    SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
+  };
   let tabName: string;
   let description: string;
   if (!componentData.path.workspaceId && !componentData.path.collectionId) {
@@ -147,26 +147,52 @@
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
-      
       let existingRequest;
       if (path[path.length - 1].type === ItemType.COLLECTION) {
-        existingRequest = await collectionsMethods.readRequestOrFolderInCollection(path[path.length - 1].id, _id);
+        existingRequest =
+          await collectionsMethods.readRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            _id,
+          );
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        existingRequest = await collectionsMethods.readRequestInFolder(path[0].id, path[path.length - 1].id, _id);
+        existingRequest = await collectionsMethods.readRequestInFolder(
+          path[0].id,
+          path[path.length - 1].id,
+          _id,
+        );
       }
 
-      const randomRequest: NewTab = generateSampleRequest("id", new Date().toString())
-      
-      const request = !existingRequest ? randomRequest.property.request : existingRequest.request;
+      const randomRequest: NewTab = generateSampleRequest(
+        "id",
+        new Date().toString(),
+      );
+
+      const request = !existingRequest
+        ? randomRequest.property.request
+        : existingRequest.request;
       const expectedRequest = {
-        method: type === saveType.SAVE_DESCRIPTION ? request.method : componentData.property.request.method,
-        url: type === saveType.SAVE_DESCRIPTION ? request.url :  componentData.property.request.url,
-        body: type === saveType.SAVE_DESCRIPTION ?  request.body :  componentData.property.request.body,
-        headers: type === saveType.SAVE_DESCRIPTION ? request.headers : componentData.property.request.headers,
-        queryParams: type === saveType.SAVE_DESCRIPTION ? request.queryParams : componentData.property.request.queryParams,
-      };  
-      
-    
+        method:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.method
+            : componentData.property.request.method,
+        url:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.url
+            : componentData.property.request.url,
+        body:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.body
+            : componentData.property.request.body,
+        headers:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.headers
+            : componentData.property.request.headers,
+        queryParams:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.queryParams
+            : componentData.property.request.queryParams,
+      };
+
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         // create new request
         const res = await insertCollectionRequest({
@@ -181,7 +207,7 @@
         });
 
         if (res.isSuccessful) {
-          if(type !== saveType.SAVE_DESCRIPTION){
+          if (type !== saveType.SAVE_DESCRIPTION) {
             notifications.success("API request saved");
           }
           collectionsMethods.addRequestOrFolderInCollection(
@@ -200,14 +226,25 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
-            collectionsMethods.updateTab(res.data.data.description, "description", _id);
+            collectionsMethods.updateTab(
+              res.data.data.description,
+              "description",
+              _id,
+            );
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            if(type === saveType.SAVE_DESCRIPTION){
-              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
-            }
-            else{
-              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
-              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            if (type === saveType.SAVE_DESCRIPTION) {
+              collectionsMethods.setRequestSave(
+                true,
+                "description",
+                res.data.data.id,
+              );
+            } else {
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);
+              collectionsMethods.setRequestSave(
+                true,
+                "description",
+                res.data.data.id,
+              );
             }
           } else {
             let sampleRequest = generateSampleRequest(
@@ -252,7 +289,7 @@
         });
 
         if (res.isSuccessful) {
-          if(type !== saveType.SAVE_DESCRIPTION){
+          if (type !== saveType.SAVE_DESCRIPTION) {
             notifications.success("API request saved");
           }
           collectionsMethods.addRequestInFolder(
@@ -272,14 +309,25 @@
           ) {
             collectionsMethods.updateTab(expectedPath, "path", _id);
             collectionsMethods.updateTab(res.data.data.name, "name", _id);
-            collectionsMethods.updateTab(res.data.data.description, "description", _id)
+            collectionsMethods.updateTab(
+              res.data.data.description,
+              "description",
+              _id,
+            );
             collectionsMethods.updateTab(res.data.data.id, "id", _id);
-            if(type === saveType.SAVE_DESCRIPTION){
-              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
-            }
-            else{
-              collectionsMethods.setRequestSave(true, "api", res.data.data.id);  
-              collectionsMethods.setRequestSave(true, "description", res.data.data.id);
+            if (type === saveType.SAVE_DESCRIPTION) {
+              collectionsMethods.setRequestSave(
+                true,
+                "description",
+                res.data.data.id,
+              );
+            } else {
+              collectionsMethods.setRequestSave(true, "api", res.data.data.id);
+              collectionsMethods.setRequestSave(
+                true,
+                "description",
+                res.data.data.id,
+              );
             }
           } else {
             let sampleRequest = generateSampleRequest(
@@ -962,6 +1010,7 @@
     font-size: 12px;
     color: #999999;
     font-family: monospace;
+    align-self: center;
   }
   .save-request input:focus,
   .save-request textarea:focus {
@@ -1013,10 +1062,5 @@
   .instruction-btn {
     width: 24px;
     height: 24px;
-  }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 </style>

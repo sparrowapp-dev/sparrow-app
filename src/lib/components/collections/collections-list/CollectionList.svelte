@@ -33,6 +33,8 @@
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
+  export let activeTabId: string;
+  export let activePath;
 
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
@@ -40,13 +42,17 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
   import { notifications } from "$lib/utils/notifications";
-
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   const [, , searchNode] = useTree();
-  let collection: any[] = [];
+  let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
+  let isComponentRenderedFirstTime=false;
+  let showDefault=false;
+  let isLoading=true;
+  const workspacesArr=_workspaceViewModel.workspaces;
 
   const usernameUnsubscribe = username.subscribe((value) => {
     if (value) {
@@ -57,6 +63,7 @@
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
   let collapsExpandToggle: boolean = false;
+
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
   const activeWorkspace: Observable<WorkspaceDocument> =
@@ -80,6 +87,14 @@
       }
     },
   );
+  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces)=>{
+    workspaces.map((workspace)=>{
+      if(workspace._data.isActiveWorkspace){
+        showDefault=workspace._data.collections.length===0?true:false;
+        return;
+      }
+    })
+  })
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       selectedApiMethods = value;
@@ -123,6 +138,10 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        if(isComponentRenderedFirstTime){
+          isLoading=true;
+           isComponentRenderedFirstTime=false;
+        }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
@@ -130,6 +149,7 @@
           await collectionsMethods.getAllCollections(workspaceId);
         if (response.isSuccessful && response.data.data) {
           const collections = response.data.data;
+          isLoading=false;
           collectionsMethods.bulkInsert(collections);
           return;
         }
@@ -138,6 +158,7 @@
   );
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
+    showDefault=false;
     collectionUnderCreation = true;
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
@@ -215,6 +236,22 @@
   const setcollapsExpandToggle = () => {
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
+
+    if (collapsExpandToggle) {
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.add("decrease-width");
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.remove("increase-width");
+    } else {
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.add("increase-width");
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.remove("decrease-width");
+    }
   };
 
   let filteredCollection = [];
@@ -294,158 +331,164 @@
   </div>
 {/if}
 
-{#if !collapsExpandToggle}
+<div
+  style="border-right: {collapsExpandToggle
+    ? '0px'
+    : '1px solid #313233'};overflow:auto"
+  class={`sidebar ${
+    collapsExpandToggle ? "decrease-width" : "increase-width"
+  } d-flex flex-column bg-backgroundColor scroll`}
+>
   <div
-    style="width:{collapsExpandToggle
-      ? '0px'
-      : '280px'};border-right: {collapsExpandToggle
-      ? '0px'
-      : '1px solid #313233'};overflow:auto"
-    class="sidebar d-flex flex-column bg-backgroundColor scroll"
-    transition:slide={{ axis: "0 | 500" }}
+    class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
+  >
+    <p class="mb-0 text-whiteColor" style="font-size: 18px;">
+      {currentWorkspaceName || ""}
+    </p>
+    <button
+      class=" border-0 rounded px-2 angleButton"
+      on:click={setcollapsExpandToggle}
+      id="doubleAngleButton"
+    >
+      <img
+        src={doubleangleLeft}
+        alt=""
+        class="filter-green"
+        on:click={() => {
+          selectedView = "grid";
+        }}
+        class:view-active={selectedView === "grid"}
+      />
+    </button>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
+      style="height:32px; width:180px "
+      class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
     >
-      <p class="mb-0 text-whiteColor" style="font-size: 18px;">
-        {currentWorkspaceName || ""}
-      </p>
+      <img src={searchIcon} alt="" />
+      <input
+        type="search"
+        style="  font-size: 12px;font-weight:500;"
+        class="inputField border-0 w-100 h-100 bg-blackColor"
+        placeholder="Search APIs in {currentWorkspaceName || ''}"
+        bind:value={searchData}
+        on:input={() => {
+          handleSearch();
+        }}
+      />
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
       <button
-        class=" border-0 rounded px-2 angleButton"
-        on:click={setcollapsExpandToggle}
-        id="doubleAngleButton"
+        id="filter-btn"
+        class="btn btn-blackColor d-flex align-items-center justify-content-center"
+        style="width: 32px; height:32px; position:relative"
+        on:click={handleFilterDropdown}
       >
-        <img
-          src={doubleangleLeft}
-          alt=""
-          class="filter-green"
-          on:click={() => {
-            selectedView = "grid";
-          }}
-          class:view-active={selectedView === "grid"}
-        />
+        <img src={filterIcon} alt="" />
+        {#if showfilterDropdown}
+          <span
+            class="position-absolute"
+            style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+          />
+        {/if}
       </button>
     </div>
-    <div
-      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
-    >
-      <div
-        style="height:32px; width:180px "
-        class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
-      >
-        <img src={searchIcon} alt="" />
-        <input
-          type="search"
-          style="  font-size: 12px;font-weight:500;"
-          class="inputField border-0 w-100 h-100 bg-blackColor"
-          placeholder="Search APIs in {currentWorkspaceName || ''}"
-          bind:value={searchData}
-          on:input={() => {
-            handleSearch();
-          }}
-        />
-      </div>
-
-      <div class="d-flex align-items-center justify-content-center">
-        <button
-          id="filter-btn"
-          class="btn btn-blackColor d-flex align-items-center justify-content-center"
-          style="width: 32px; height:32px; position:relative"
-          on:click={handleFilterDropdown}
-        >
-          <img src={filterIcon} alt="" />
-          {#if showfilterDropdown}
-            <span
-              class="position-absolute"
-              style="right:4px; top:5px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
-            />
-          {/if}
-        </button>
-      </div>
-      <div>
-        <RequestDropdown
-          {collectionsMethods}
-          {handleCreateCollection}
-          {collectionUnderCreation}
-        />
-      </div>
-    </div>
-
-    <div
-      class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
-      style="overflow:auto;margin-top:5px;"
-    >
-      <div class="d-flex flex-column justify-content-center">
-        {#if showfilterDropdown}
-          <FilterDropDown {handleSearch} />
-        {/if}
-        {#if searchData.length > 0}
-          <div class="p-4 pt-0">
-            {#if filteredFile.length > 0}
-              {#each filteredFile as exp}
-                <SearchTree
-                  editable={true}
-                  collectionId={exp.collectionId}
-                  workspaceId={currentWorkspaceId}
-                  path={exp.path}
-                  explorer={exp.tree}
-                  {searchData}
-                  folderDetails={exp.folderDetails}
-                />
-              {/each}
-            {/if}
-            {#if filteredFolder.length > 0}
-              {#each filteredFolder as exp}
-                <SearchTree
-                  editable={true}
-                  collectionId={exp.collectionId}
-                  workspaceId={currentWorkspaceId}
-                  explorer={exp.tree}
-                  {searchData}
-                />
-              {/each}
-            {/if}
-            {#if filteredCollection.length > 0}
-              {#each filteredCollection as exp}
-                <SearchTree
-                  editable={true}
-                  collectionId={exp.collectionId}
-                  workspaceId={currentWorkspaceId}
-                  explorer={exp.tree}
-                  {searchData}
-                />
-              {/each}
-            {/if}
-          </div>
-        {:else if selectedApiMethods.length > 0}
-          {#each filteredSelectedMethodsCollection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-            />
-          {/each}
-        {:else if collection.length > 0}
-          {#each collection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-            />
-          {/each}
-        {:else if collection && collection.length === 0}
-          <DefaultCollection {handleCreateCollection} {collectionsMethods} />
-        {/if}
-      </div>
+    <div>
+      <RequestDropdown
+        {collectionsMethods}
+        {handleCreateCollection}
+        {collectionUnderCreation}
+      />
     </div>
   </div>
-{/if}
+
+  <div
+    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
+    style="overflow:auto;margin-top:5px;"
+  >
+    <div class="d-flex flex-column justify-content-center">
+      {#if isLoading}
+      <div class="spinner">
+        <Spinner size={`32px`} />
+      </div>
+      {:else}
+      {#if showfilterDropdown}
+        <FilterDropDown {handleSearch} />
+      {/if}
+      {#if searchData.length > 0}
+        <div class="p-4 pt-0">
+          {#if filteredFile.length > 0}
+            {#each filteredFile as exp}
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                path={exp.path}
+                explorer={exp.tree}
+                {searchData}
+                folderDetails={exp.folderDetails}
+              />
+            {/each}
+          {/if}
+          {#if filteredFolder.length > 0}
+            {#each filteredFolder as exp}
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                explorer={exp.tree}
+                {searchData}
+              />
+            {/each}
+          {/if}
+          {#if filteredCollection.length > 0}
+            {#each filteredCollection as exp}
+              <SearchTree
+                editable={true}
+                collectionId={exp.collectionId}
+                workspaceId={currentWorkspaceId}
+                explorer={exp.tree}
+                {searchData}
+              />
+            {/each}
+          {/if}
+        </div>
+      {:else if selectedApiMethods.length > 0}
+        {#each filteredSelectedMethodsCollection as col}
+          <Folder
+            collectionList={collection}
+            collectionId={col.id}
+            {currentWorkspaceId}
+            collection={col}
+            title={col.name}
+            {collectionsMethods}
+            {activeTabId}
+            {activePath}
+          />
+        {/each}
+      {:else if collection && collection.length > 0}
+        {#each collection as col}
+          <Folder
+            collectionList={collection}
+            collectionId={col.id}
+            {currentWorkspaceId}
+            collection={col}
+            title={col.name}
+            {collectionsMethods}
+            {activeTabId}
+            {activePath}
+          />
+        {/each}
+        {/if}
+        <DefaultCollection {handleCreateCollection} {collectionsMethods} {showDefault} />
+      {/if}
+    </div>
+  </div>
+</div>
 
 <style>
   .view-active {
@@ -498,5 +541,41 @@
   }
   .collections-list::-webkit-scrollbar-thumb {
     background: #888;
+  }
+
+  @keyframes increaseWidth {
+    0% {
+      width: 0;
+    }
+
+    100% {
+      width: 280px;
+    }
+  }
+  @keyframes decreaseWidth {
+    0% {
+      width: 280px;
+    }
+    100% {
+      width: 0px;
+    }
+  }
+
+  .decrease-width {
+    animation: decreaseWidth 0.3s;
+    width: 0;
+    max-width: 280px;
+  }
+  .increase-width {
+    animation: increaseWidth 0.3s;
+    max-width: 280px;
+  }
+  .spinner{
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 </style>

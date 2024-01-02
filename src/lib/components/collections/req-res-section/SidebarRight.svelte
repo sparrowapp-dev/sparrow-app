@@ -10,9 +10,10 @@
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import SaveIcon from "$lib/assets/save-desc.svg";
-    import EditIcon from "$lib/assets/edit-desc.svg";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import SaveIcon from "$lib/assets/save-desc.svg";
+  import EditIcon from "$lib/assets/edit-desc.svg";
+  import { notifications } from "$lib/utils/notifications";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -23,7 +24,7 @@
   let collectionName: string;
   let folderName;
 
-  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     collectionName = "";
     folderName = "";
     componentData = event;
@@ -31,13 +32,18 @@
     isSaveDescription = event?.property?.request?.state?.isSaveDescription;
     additions = event?.property?.request?.state?.additions;
     const path = event?.path;
-    if(path?.folderId){
-      const folder = await collectionsMethods.readRequestOrFolderInCollection(path.collectionId, path.folderId);
-      folderName = "/"+folder?.name;
+    if (path?.folderId) {
+      const folder = await collectionsMethods.readRequestOrFolderInCollection(
+        path.collectionId,
+        path.folderId,
+      );
+      folderName = "/" + folder?.name;
     }
-    if(path?.collectionId){
-      const collection = await collectionsMethods.readCollection(path.collectionId);
-      collectionName = "/"+collection?.name;
+    if (path?.collectionId) {
+      const collection = await collectionsMethods.readCollection(
+        path.collectionId,
+      );
+      collectionName = "/" + collection?.name;
     }
   });
 
@@ -95,6 +101,7 @@
           res.data.data,
         );
         collectionsMethods.setRequestSave(true, "description", _id);
+        notifications.success("Documentation updated");
       } else {
       }
     } else {
@@ -122,6 +129,7 @@
           res.data.data,
         );
         collectionsMethods.setRequestSave(true, "description", _id);
+        notifications.success("Documentation updated");
       } else {
       }
     }
@@ -138,73 +146,89 @@
   <WorkspaceSidebar></WorkspaceSidebar>
 {/if} -->
 
-
 <div class="d-flex">
   {#if additions === "description"}
-  <div class="sidebar-content p-3 bg-backgroundColor">
-    <div class="d-flex">
-      <div>
-        <MethodButton method={componentData?.property.request.method} />
-      </div>
-      <div style="width: calc(100% - 70px);">
-        <p class="ellipsis mb-0" style="font-size:12px;">{componentData?.name}</p>
-        {#if !collectionName}
-          <p class="ellipsis mb-0">
-            <span class="text-textColor" style="font-size:12px;">{'Unsaved'}</span>
+    <div class="sidebar-content p-3 bg-backgroundColor">
+      <div class="d-flex">
+        <div>
+          <MethodButton method={componentData?.property.request.method} />
+        </div>
+        <div style="width: calc(100% - 70px);">
+          <p class="ellipsis mb-0" style="font-size:12px;">
+            {componentData?.name}
           </p>
+          {#if !collectionName}
+            <p class="ellipsis mb-0">
+              <span class="text-textColor" style="font-size:12px;"
+                >{"Unsaved"}</span
+              >
+            </p>
+          {:else}
+            <p class="ellipsis mb-0">
+              <span class="text-textColor" style="font-size:12px;"
+                >{collectionName || ""}</span
+              ><span class="text-textColor" style="font-size:12px;"
+                >{folderName || ""}</span
+              >
+            </p>
+          {/if}
+        </div>
+      </div>
+      <div>
+        {#if isSaveDescription}
+          <p
+            class="description-field text-labelColor"
+            on:click={() => {
+              collectionsMethods.updateRequestState(
+                !isSaveDescription,
+                "isSaveDescription",
+              );
+            }}
+          >
+            <img src={EditIcon} alt="" />
+            Edit
+          </p>
+          {#if description?.length === 0}
+            <small class="description-head"
+              >Click edit button to add description.</small
+            >
+          {:else}
+            <small class="description-head">{description}</small>
+          {/if}
         {:else}
-        <p class="ellipsis mb-0">
-          <span class="text-textColor" style="font-size:12px;">{collectionName || ''}</span><span class="text-textColor" style="font-size:12px;">{folderName || ''}</span>
-        </p>
+          <p
+            class="description-field text-labelColor"
+            on:click={() => {
+              if (
+                componentData?.path.collectionId &&
+                componentData?.path.workspaceId
+              ) {
+                handleSaveRequest();
+                collectionsMethods.updateRequestState(
+                  !isSaveDescription,
+                  "isSaveDescription",
+                );
+              } else {
+                visibility = true;
+              }
+            }}
+          >
+            <img src={SaveIcon} alt="save" />
+            Save Changes
+          </p>
+          <textarea
+            autofocus
+            placeholder="Describe how to use this API request to your team. Simply start typing here."
+            bind:value={description}
+            on:input={handleInputValue}
+            disabled={isSaveDescription}
+            maxlength="1024"
+            rows="10"
+            class="p-1 api-description w-100"
+          />
         {/if}
       </div>
     </div>
-    <div>
-      {#if isSaveDescription}
-        <p class="description-field text-labelColor"
-        on:click={()=>{
-          collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
-        }}
-        >
-        <img src={EditIcon} alt="">
-        Edit</p>
-        {#if description?.length === 0}
-        <small class="description-head">Click edit button to add description.</small>
-        {:else}
-        <small class="description-head">{description}</small>
-        {/if}
-      {:else}
-        <p
-        class="description-field text-labelColor"
-          on:click={() => {
-            if (
-              componentData?.path.collectionId &&
-              componentData?.path.workspaceId
-            ) {
-              handleSaveRequest();
-              collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
-            } else {
-              visibility = true;
-            }
-          }}
-        >
-        <img src={SaveIcon} alt="save">
-          Save Changes
-        </p>
-        <textarea
-        autofocus
-        placeholder="Describe how to use this API request to your team. Simply start typing here."
-        bind:value={description}
-        on:input={handleInputValue}
-        disabled={isSaveDescription}
-        maxlength="1024"
-        rows="10"
-        class="p-1 api-description w-100"
-      />
-      {/if}
-      
-    </div>
-  </div>
   {/if}
   <div class="sidebar-right bg-backgroundColor">
     <div class="d-flex flex-column">
@@ -215,18 +239,18 @@
             <img src={commetIcon} alt="" />
           </button>
         </Tooltip> -->
-        <button class="bg-backgroundColor border-0 mb-4" 
-        on:click={()=>{
-          if(additions === "description"){
-            collectionsMethods.updateRequestState("","additions");
-          }
-          else{
-            collectionsMethods.updateRequestState("description","additions");
+      <button
+        class="bg-backgroundColor border-0 mb-4"
+        on:click={() => {
+          if (additions === "description") {
+            collectionsMethods.updateRequestState("", "additions");
+          } else {
+            collectionsMethods.updateRequestState("description", "additions");
           }
         }}
-        >
-        <BookIcon color={additions === "description"? '#85C2FF' :'#8A9299'} />
-        </button>
+      >
+        <BookIcon color={additions === "description" ? "#85C2FF" : "#8A9299"} />
+      </button>
       <!-- comment for future use -->
 
       <!-- <Tooltip>
@@ -243,48 +267,45 @@
     {collectionsMethods}
     {componentData}
     onClick={handleBackdrop}
-    onFinish={()=>{
-      collectionsMethods.updateRequestState(!isSaveDescription,"isSaveDescription");
+    onFinish={() => {
+      collectionsMethods.updateRequestState(
+        !isSaveDescription,
+        "isSaveDescription",
+      );
     }}
     type="SAVE_DESCRIPTION"
   />
 {/if}
 
 <style>
-   .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .sidebar-right {
     width: 32px;
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
   }
   .sidebar-content {
-    width: 320px;
+    width: 250px;
     border-left: 1px solid var(--border-color);
     height: calc(100vh - 80px);
     overflow: hidden;
+    overflow-y: auto;
   }
   .api-description {
     background-color: transparent;
     font-size: 12px;
     outline: none;
-    caret-color: #85C2FF;
-    resize:none;
+    caret-color: #85c2ff;
+    resize: none;
     border-radius: 4px;
   }
-  .api-description:focus{
-    border: 1px solid #85C2FF;
-
+  .api-description:focus {
+    border: 1px solid #85c2ff;
   }
-  .description-field{
+  .description-field {
     font-size: 12px;
   }
-  .description-head{
+  .description-head {
     font-size: 12px;
-    color: #CCCCCC;
+    color: #cccccc;
   }
-
 </style>

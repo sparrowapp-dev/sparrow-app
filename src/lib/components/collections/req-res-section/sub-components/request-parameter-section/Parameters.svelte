@@ -13,6 +13,7 @@
   export let params: KeyValuePair[] = [];
   export let url: string = "";
   export let collectionsMethods: CollectionsMethods;
+  export let currentTabId;
 
   let authValue: { key: string; value: string } = {
     key: "",
@@ -79,8 +80,8 @@
       params.push({ key: "", value: "", checked: false });
       params = params;
     }
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
   };
 
   const deleteParam = (index) => {
@@ -93,8 +94,8 @@
       });
       params = filteredParam;
     }
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
   };
   const updateCheck = (index) => {
     let filteredParam = params.map((elem, i) => {
@@ -104,8 +105,8 @@
       return elem;
     });
     params = filteredParam;
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
   };
 
   const handleCheckAll = (): void => {
@@ -122,8 +123,8 @@
       return elem;
     });
     params = filteredKeyValue;
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
+    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
   };
 </script>
 
