@@ -146,6 +146,16 @@
     return;
   };
 
+  const handleWorkspaceClick = async () => {
+    const workspace = generateSampleWorkspace(
+      currentWorkspaceId,
+      new Date().toString(),
+    );
+    workspace.path.workspaceId = currentWorkspaceId;
+    collectionsMethods.handleCreateTab(workspace);
+    moveNavigation("right");
+  };
+
   onDestroy(() => {
     collectionSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
@@ -158,13 +168,7 @@
     <button
       class="about-btn"
       on:click={() => {
-        collectionsMethods.handleCreateTab(
-          generateSampleWorkspace(
-            "UNTRACKED-" + uuidv4(),
-            new Date().toString(),
-          ),
-        );
-        moveNavigation("right");
+        handleWorkspaceClick();
       }}
     >
       <img src={about} alt="" style="font-size: 12px;" />

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
+import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 
 import type { Observable } from "rxjs";
 
@@ -59,6 +60,27 @@ export class WorkspaceRepository {
       .exec();
     workspace.incrementalPatch({
       environments: [...workspace.environments, environmentObj],
+    });
+  };
+
+  public deleteCollectionInWorkspace = async (
+    workspaceId: string,
+    collectionId: string,
+  ) => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    const updatedCollections = workspace._data.collections.filter(
+      (element: CollectionItem) => {
+        return element.id !== collectionId;
+      },
+    );
+    workspace.incrementalPatch({
+      collections: [...updatedCollections],
     });
   };
 
