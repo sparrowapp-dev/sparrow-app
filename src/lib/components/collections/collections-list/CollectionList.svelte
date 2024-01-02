@@ -49,9 +49,9 @@
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
-  let isLoading=false;
+  let isComponentRenderedFirstTime=false;
   let showDefault=false;
-  let flag=true;
+  let isLoading=true;
   const workspacesArr=_workspaceViewModel.workspaces;
 
   const usernameUnsubscribe = username.subscribe((value) => {
@@ -138,9 +138,9 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
-        if(flag){
+        if(isComponentRenderedFirstTime){
           isLoading=true;
-           flag=false;
+           isComponentRenderedFirstTime=false;
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");

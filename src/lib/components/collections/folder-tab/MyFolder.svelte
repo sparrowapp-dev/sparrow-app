@@ -41,7 +41,7 @@
   const collectionSubscribe = collections.subscribe(
     (collectionArr: CollectionDocument[]) => {
       if (collectionArr) {
-        collectionArr.map(async (collection) => {
+        collectionArr.forEach(async (collection) => {
           if (collection._data.id === collectionId) {
             const collectionData = await collectionsMethods.getNoOfApisandFolders(
              collection,

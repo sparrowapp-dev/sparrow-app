@@ -269,7 +269,7 @@ export class CollectionsViewModel {
     let dataObj: Collection;
     const items = collection._data.items as CollectionItem[];
     if (folderId) {
-      items.map((item) => {
+      items.forEach((item) => {
         if (item.type === ItemType.FOLDER && item.id === folderId) {
           dataObj = {
             requestCount: item.items.length,
@@ -279,7 +279,7 @@ export class CollectionsViewModel {
       });
       return dataObj;
     }
-    items.map((item) => {
+    items.forEach((item) => {
       if (item.type === ItemType.FOLDER) {
         requestCount += item.items.length;
         folderCount++;
