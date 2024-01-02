@@ -116,16 +116,18 @@
   style="height:100vh;overflow:hidden"
 >
   <Header />
-  <div class="d-flex flex-column align-items-center justify-content-center">
+  <div
+    class="container d-flex flex-column align-items-center justify-content-center"
+  >
     <p
       class="text-whiteColor mt-5 ms-2 me-2 mb-4"
-      style="font-size: 40px; width:408px; height:48px;font-weight:500;"
+      style="font-size: 40px; width:100%; height:48px;font-weight:500;"
     >
       Welcome to Sparrow!
     </p>
     <form
       class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
-      style="width:408px;"
+      style="width:100%;"
       novalidate
       on:submit|preventDefault={async () => {
         validationErrors = await handleLoginValidation(loginCredentials);
@@ -207,10 +209,6 @@
           >
         {/if}
       </div>
-      <!-- <span on:click={togglePasswordVisibility}>
-          <img src={sparrowicon} alt="" />
-        </span> -->
-
       <div class="d-flex mb-4 align-items-center justify-content-end">
         <Link
           to="/forgot/password"
@@ -284,6 +282,10 @@
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
+  .container {
+    width: 80%;
+  }
+
   @media (min-width: 1000px) {
     .eye-icon > img {
       position: absolute;
@@ -301,12 +303,14 @@
     }
 
     .login-form {
-      width: 488px;
       margin: 0px auto;
       padding: 0px;
       border-radius: 8px;
       gap: 16px;
       height: auto;
+    }
+    .container {
+      width: 35%;
     }
   }
 </style>

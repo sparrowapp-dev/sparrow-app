@@ -52,10 +52,6 @@ export interface ImportBodyUrl {
   url: string;
 }
 
-export interface ImportBodyFile {
-  url: string;
-}
-
 export interface CreateApiRequestPostBody {
   collectionId: string;
   workspaceId: string;

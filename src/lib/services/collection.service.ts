@@ -170,9 +170,6 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-
-    console.log(response);
-
     return response;
   };
 
@@ -193,7 +190,6 @@ export class CollectionService {
     workspaceId: string,
     jsonObject,
   ) => {
-    console.log(workspaceId, jsonObject);
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importJson/collection`,

@@ -39,12 +39,12 @@ const getAuthHeaders = () => {
   };
 };
 
-const getHeaders = () => {
-  return {
-    "Content-type": "application/json",
-    Authorization: `Bearer ${getUserToken()}`,
-  };
-};
+// const getHeaders = () => {
+//   return {
+//     "Content-type": "application/json",
+//     Authorization: `Bearer ${getUserToken()}`,
+//   };
+// };
 
 const getRefHeaders = () => {
   return {
@@ -163,5 +163,5 @@ export {
   getAuthHeaders,
   getRefHeaders,
   makeHttpRequest,
-  getHeaders,
+  // getHeaders,
 };

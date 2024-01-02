@@ -27,89 +27,89 @@
   };
 
   const handleImportUrl = async () => {
-    isLoading = true;
-    const response = await _viewImportCollection.importCollectionData(
-      currentWorkspaceId,
-      text,
-    );
+    // isLoading = true;
+    // const response = await _viewImportCollection.importCollectionData(
+    //   currentWorkspaceId,
+    //   text,
+    // );
 
-    onClick(false);
-    if (response.isSuccessful) {
-      const res = response.data.data;
-      isLoading = false;
-      // collectionUnderCreation = true;
-      isCollectionCreatedFirstTime.set(true);
+    // onClick(false);
+    // if (response.isSuccessful) {
+    //   const res = response.data.data;
+    //   isLoading = false;
+    //   // collectionUnderCreation = true;
+    //   isCollectionCreatedFirstTime.set(true);
 
-      const newCollection = {
-        id: res.id,
-        name: res.name,
-        items: [],
-        createdAt: new Date().toISOString(),
-      };
+    //   const newCollection = {
+    //     id: res.id,
+    //     name: res.name,
+    //     items: [],
+    //     createdAt: new Date().toISOString(),
+    //   };
 
-      collectionsMethods.addCollection(newCollection);
+    //   collectionsMethods.addCollection(newCollection);
 
-      let path: Path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: res.id,
-      };
+    //   let path: Path = {
+    //     workspaceId: currentWorkspaceId,
+    //     collectionId: res.id,
+    //   };
 
-      const Samplecollection = generateSampleCollection(
-        res.id,
-        new Date().toString(),
-      );
+    //   const Samplecollection = generateSampleCollection(
+    //     res.id,
+    //     new Date().toString(),
+    //   );
 
-      Samplecollection.id = res.id;
-      Samplecollection.path = path;
-      Samplecollection.name = res.name;
-      Samplecollection.save = true;
-      collectionsMethods.handleCreateTab(Samplecollection);
-      moveNavigation("right");
+    //   Samplecollection.id = res.id;
+    //   Samplecollection.path = path;
+    //   Samplecollection.name = res.name;
+    //   Samplecollection.save = true;
+    //   collectionsMethods.handleCreateTab(Samplecollection);
+    //   moveNavigation("right");
 
-      collectionsMethods.updateCollection(res.id, res);
-      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: res.id,
-        name: newCollection.name,
-      });
-      notifications.success(response.data.message);
-    } else {
-      isLoading = false;
-    }
+    //   collectionsMethods.updateCollection(res.id, res);
+    //   _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+    //     id: res.id,
+    //     name: newCollection.name,
+    //   });
+    //   notifications.success(response.data.message);
+    // } else {
+    //   isLoading = false;
+    // }
   };
 
   const handleImportFile = async (fileContent) => {
-    isLoading = true;
-    const response = await _viewImportCollection.importCollectionFile(
-      currentWorkspaceId,
-      fileContent,
-    );
-    console.log(response);
-    if (response.isSuccessful) {
-      onClick(false);
-      isLoading = false;
-      notifications.success(response.data.message);
-    } else {
-      isLoading = false;
-      notifications.error(response.message);
-    }
+    // isLoading = true;
+    // const response = await _viewImportCollection.importCollectionFile(
+    //   currentWorkspaceId,
+    //   fileContent,
+    // );
+    // console.log(response);
+    // if (response.isSuccessful) {
+    //   onClick(false);
+    //   isLoading = false;
+    //   notifications.success(response.data.message);
+    // } else {
+    //   isLoading = false;
+    //   notifications.error(response.message);
+    // }
   };
 
   function handleFileUpload() {
-    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    // const fileInput = document.getElementById("file-input") as HTMLInputElement;
 
-    const file = fileInput.files[0];
-    console.log(file);
+    // const file = fileInput.files[0];
+    // console.log(file);
 
-    if (file) {
-      const reader = new FileReader();
+    // if (file) {
+    //   const reader = new FileReader();
 
-      reader.onload = function (e) {
-        const fileContent = e.target.result;
-        console.log(fileContent);
-        handleImportFile(fileContent);
-      };
-      reader.readAsText(file);
-    }
+    //   reader.onload = function (e) {
+    //     const fileContent = e.target.result;
+    //     console.log(fileContent);
+    //     handleImportFile(fileContent);
+    //   };
+    //   reader.readAsText(file);
+    // }
   }
 
   // const handleImportJsonObject = async () => {
@@ -151,7 +151,7 @@
   on:introstart
   on:outroend
 >
-  <div class="d-flex align-items-center justify-content-between mb-3">
+  <div class=" d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       New Collection
     </h5>
@@ -167,7 +167,7 @@
   <div style="font-size: 14px;" class="text-lightGray">
     <p>Paste your OAS/YAML/JSON file</p>
   </div>
-  <div class="rounded border-0">
+  <div class="textarea-div rounded border-0">
     <textarea
       on:input={(e) => handleInputField(e)}
       bind:value={text}
@@ -242,7 +242,9 @@
 
   textarea {
     width: 100%;
-    height: 95px;
+    resize: vertical; 
+    height: 80%;
+    max-height: 100%;
     background-color: var(--blackColor);
   }
   .background-overlay {
@@ -255,17 +257,21 @@
     backdrop-filter: blur(3px);
     z-index: 9;
   }
-
+  
   .container {
     position: fixed;
-    height: 501px;
-    width: 488px;
+    height: 80%;
+    width: 40%; 
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
     z-index: 10;
     border-radius: 10px;
+  }
+  .textarea-div{
+    height:25%;
+    border:2px solid red;
   }
 
   .btn-close1 {
