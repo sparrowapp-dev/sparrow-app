@@ -118,7 +118,7 @@
       </p>
       <form
         class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
-        style="width:408px;"
+        style="width:408px;height:auto;"
         on:submit|preventDefault={async () => {
           validationErrors = await handleLoginValidation(loginCredentials);
           if (validationErrors) {
@@ -147,11 +147,13 @@
           />
 
           {#if validationErrors.email && loginCredentials.email.length > 0}
-            <small class="form-text text-dangerColor">
+            <small class="form-text text-dangerColor mb-0">
               {validationErrors.email}</small
             >
           {:else if loginCredentials.email.length === 0}
-            <small class="form-text text-dangerColor"> {errorMessage}</small>
+            <small class="form-text text-dangerColor mb-0">
+              {errorMessage}</small
+            >
           {/if}
         </div>
 
@@ -187,7 +189,7 @@
           </div>
 
           {#if validationErrors.password || validationErrors.password?.length === 0}
-            <small class="form-text text-dangerColor"
+            <small class="form-text text-dangerColor mb-0"
               >{validationErrors.password}</small
             >
           {:else if isPasswordError === true || validationErrors.password?.length > 0}
