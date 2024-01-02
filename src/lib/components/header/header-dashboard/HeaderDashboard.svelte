@@ -27,6 +27,7 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
+
   export let activeSideBarTabMethods;
 
   const navigate = useNavigate();
