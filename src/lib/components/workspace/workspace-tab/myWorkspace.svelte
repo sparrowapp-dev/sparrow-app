@@ -9,7 +9,6 @@
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
-  import { event } from "@tauri-apps/api";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
@@ -37,7 +36,7 @@
   const handleWorkspaceDescription = (event) => {
     workspaceDescription = event.target.value;
     collectionsMethods.updateTab(
-      event.target.value,
+      workspaceDescription,
       "description",
       componentData.path.workspaceId,
     );
@@ -161,11 +160,6 @@
       </Tooltip>
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
-      <!-- <textarea
-        type="text"
-        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
-      /> -->
       <textarea
         value={workspaceDescription}
         id="updateDescriptionFieldWorkspace"
