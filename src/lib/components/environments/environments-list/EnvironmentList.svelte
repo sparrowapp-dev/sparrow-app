@@ -282,11 +282,7 @@
     </div>
   </nav>
 {/if}
-<div
-  class={`env-sidebar`}
-  style={``}
-  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
->
+<div class={`env-sidebar`} style={``}>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
   >
@@ -349,6 +345,7 @@
           }`}
           style="cursor: pointer; "
           on:click={() => handleActivateEnvironment(env.id)}
+          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, env.id)}
         >
           <div class="show-more-in d-flex ellipsis">
             <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>

@@ -129,7 +129,7 @@
     {/if}
   </div>
   <div class="d-flex gap-4">
-    <div class="form-check-input-container" style="width:25px;">
+    <div class="form-check-input-container " style="width:27.5px; margin-top: -3px;">
       <Tooltip text={`${controller ? "Unselect" : "Select"}`}>
         <input
           class="form-check-input"
@@ -187,7 +187,7 @@
                     disabled
                     bind:value={readable.key}
                   />
-                  <div class="me-2 edit-icon">
+                  <div class="me-2 my-auto edit-icon">
                     <EditIcon />
                   </div>
                 </div>
@@ -202,7 +202,7 @@
                     disabled
                     bind:value={readable.value}
                   />
-                  <div class="me-2 edit-icon">
+                  <div class="me-2 my-auto edit-icon">
                     <EditIcon />
                   </div>
                 </div>
@@ -263,7 +263,7 @@
                         updateParam(index);
                       }}
                     />
-                    <div class="me-2 edit-icon">
+                    <div class="me-2 my-auto edit-icon">
                       <EditIcon />
                     </div>
                   </div>
@@ -282,7 +282,7 @@
                         updateParam(index);
                       }}
                     />
-                    <div class="me-2 edit-icon">
+                    <div class="me-2 my-auto edit-icon">
                       <EditIcon />
                     </div>
                   </div>
