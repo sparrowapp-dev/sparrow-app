@@ -6,35 +6,23 @@ on:
 
 
 jobs:
-  sonarqube:
+  test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # Disabling shallow clone is recommended for improving relevancy of reporting.
-        fetch-depth: 0
+      - uses: some/scan-actions@v1 # Step for scanning your project
 
-    # Triggering SonarQube analysis as results of it are required by Quality Gate check.
-    - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Wait for the quality gate result
+        run: sleep 5
 
-    # # Check the Quality Gate status.
-    # - name: SonarQube Quality Gate check
-    #   id: sonarqube-quality-gate-check
-    #   uses: sonarsource/sonarqube-quality-gate-action@master
-    #   # Force to fail step after specific time.
-    #   timeout-minutes: 5
-    #   env:
-    #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    #    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} #OPTIONAL
-    - name: SonarQube Pull Request Comment
-      if: always()
-      uses: campos-pay/sonarqube-pr-comment@main
-      with:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        SONAR_PROJECTKEY: sparrow
-        GITHUB-TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      - uses: phwt/sonarqube-quality-gate-action@v1
+        id: quality-gate-check
+        with:
+          sonar-project-key: sparrow
+          sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
+
+      - name: Output result
+        run: |
+          echo "${{ steps.quality-gate-check.outputs.project-status }}"
+          echo "${{ steps.quality-gate-check.outputs.quality-gate-result }}"
