@@ -17,6 +17,9 @@ export const workspaceSchemaLiteral = {
     name: {
       type: "string",
     },
+    description: {
+      type: "string",
+    },
     owner: {
       type: "object",
       properties: {

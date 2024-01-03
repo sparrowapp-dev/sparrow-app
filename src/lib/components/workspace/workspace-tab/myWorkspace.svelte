@@ -8,12 +8,16 @@
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import type { Observable } from "rxjs";
-  import type { CollectionDocument, WorkspaceDocument } from "$lib/database/app.database";
-    import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
   let tabName: string = "";
+  let workspaceDescription: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
   let ownerName: string;
@@ -23,6 +27,7 @@
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       tabName = event?.name;
+      workspaceDescription = event.description ?? "";
       componentData = event;
     }
   });
@@ -30,10 +35,18 @@
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
 
-
   const handleWorkspaceInput = (event) => {
     newWorkspaceName = event.target.value;
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
+  };
+
+  const handleWorkspaceDescription = (event) => {
+    workspaceDescription = event.target.value;
+    collectionsMethods.updateTab(
+      workspaceDescription,
+      "description",
+      componentData.path.workspaceId,
+    );
   };
 
   const onRenameBlur = async () => {
@@ -45,10 +58,18 @@
     );
   };
 
+  const onUpdateBlur = async () => {
+    await _viewModel.modifyWorkspaceDescription(
+      componentData,
+      collectionsMethods,
+      tabName,
+      workspaceDescription,
+    );
+  };
   const collectionSubscribe = collections.subscribe(
     (collectionArr: CollectionDocument[]) => {
       if (collectionArr) {
-        noOfCollections=collectionArr.length;
+        noOfCollections = collectionArr.length;
       }
     },
   );
@@ -117,6 +138,15 @@
       inputField.blur();
     }
   };
+
+  const onUpdateWorkspaceDescription = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "updateDescriptionFieldWorkspace",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -145,8 +175,16 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-        type="text"
+        value={workspaceDescription}
+        id="updateDescriptionFieldWorkspace"
+        {autofocus}
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        on:input={(event) => {
+          handleWorkspaceDescription(event);
+        }}
+        on:blur={onUpdateBlur}
+        on:keydown={onUpdateWorkspaceDescription}
+        bind:this={inputElement}
         placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
       />
     </div>

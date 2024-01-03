@@ -107,7 +107,11 @@ export class WorkspaceRepository {
     return;
   };
 
-  public updateWorkspace = async (workspaceId: string, name: string) => {
+  public updateWorkspace = async (
+    workspaceId: string,
+    name: string,
+    description?: string,
+  ) => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
         selector: {
@@ -115,9 +119,9 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-
     workspace.incrementalModify((value) => {
       value.name = name;
+      value.description = description;
       return value;
     });
   };
