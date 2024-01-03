@@ -21,7 +21,6 @@ jobs:
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           github-token: ${{ secrets.PR_GITHUB_TOKEN }}
-          branch: main # Optional input
 
       - name: Output result
         run: |
