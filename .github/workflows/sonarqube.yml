@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: some/scan-actions@v1 # Step for scanning your project
+      - uses: actions/checkout@master # Step for scanning your project
 
       - name: Wait for the quality gate result
         run: sleep 5
