@@ -36,5 +36,5 @@ jobs:
       with:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        SONAR_PROJECTKEY: my-app
+        SONAR_PROJECTKEY: sparrow
         GITHUB-TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
