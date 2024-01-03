@@ -311,9 +311,10 @@
           url={createDeepCopy(request.url)}
           {currentTabId}
           {collectionsMethods}
+          {environmentVariables}
         />
       {:else if selectedTab === RequestSection.REQUEST_BODY}
-        <RequestBody {activeTab} {collectionsMethods} />
+        <RequestBody {activeTab} {collectionsMethods} {environmentVariables} />
       {:else if selectedTab === RequestSection.HEADERS}
         <Headers
           request={createDeepCopy(request)}
@@ -322,7 +323,11 @@
           {environmentVariables}
         />
       {:else if selectedTab === RequestSection.AUTHORIZATION}
-        <Authorization request={createDeepCopy(request)} {collectionsMethods} />
+        <Authorization
+          request={createDeepCopy(request)}
+          {collectionsMethods}
+          {environmentVariables}
+        />
       {/if}
     </div>
   </Pane>

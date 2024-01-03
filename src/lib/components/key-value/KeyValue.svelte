@@ -270,7 +270,7 @@
                       trackParanthesis = [];
                       trackCursor = undefined;
                       filterData = [];
-                    }, 200);
+                    }, 300);
                   }}
                   on:focus={(e) => {
                     tempText = element.key;
@@ -319,7 +319,7 @@
                       trackParanthesis = [];
                       trackCursor = undefined;
                       filterData = [];
-                    }, 200);
+                    }, 300);
                   }}
                   on:focus={(e) => {
                     tempText = element.value;

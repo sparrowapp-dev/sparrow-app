@@ -2,25 +2,54 @@
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import { findAuthParameter } from "$lib/utils/helpers/auth.helper";
-  import type {
-    KeyValuePair,
-  } from "$lib/utils/interfaces/request.interface";
+  import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
   import { onMount } from "svelte";
-    import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-    import { RequestProperty } from "$lib/utils/enums/request.enum";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { RequestProperty } from "$lib/utils/enums/request.enum";
+  import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
 
   export let request;
   export let params: KeyValuePair[] = [];
   export let url: string = "";
   export let collectionsMethods: CollectionsMethods;
   export let currentTabId;
+  export let environmentVariables;
 
   let authValue: { key: string; value: string } = {
     key: "",
     value: "",
   };
   let controller: boolean = false;
+  const environmentHelper = new EnvironmentHeper();
 
+  let trackParanthesis: unknown[] = [];
+  let trackCursor: number;
+  let tempText = "";
+  let focusedInput;
+  let focusedElement;
+
+  let filterData = [];
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+    if (trackParanthesis) {
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+  }
   $: {
     if (params) {
       authValue = findAuthParameter(request);
@@ -80,8 +109,16 @@
       params.push({ key: "", value: "", checked: false });
       params = params;
     }
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
+    collectionsMethods.updateRequestProperty(
+      params,
+      RequestProperty.QUERY_PARAMS,
+      currentTabId,
+    );
+    collectionsMethods.updateRequestProperty(
+      extractQueryParamstoURL(params),
+      RequestProperty.URL,
+      currentTabId,
+    );
   };
 
   const deleteParam = (index) => {
@@ -94,8 +131,16 @@
       });
       params = filteredParam;
     }
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
+    collectionsMethods.updateRequestProperty(
+      params,
+      RequestProperty.QUERY_PARAMS,
+      currentTabId,
+    );
+    collectionsMethods.updateRequestProperty(
+      extractQueryParamstoURL(params),
+      RequestProperty.URL,
+      currentTabId,
+    );
   };
   const updateCheck = (index) => {
     let filteredParam = params.map((elem, i) => {
@@ -105,8 +150,16 @@
       return elem;
     });
     params = filteredParam;
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
+    collectionsMethods.updateRequestProperty(
+      params,
+      RequestProperty.QUERY_PARAMS,
+      currentTabId,
+    );
+    collectionsMethods.updateRequestProperty(
+      extractQueryParamstoURL(params),
+      RequestProperty.URL,
+      currentTabId,
+    );
   };
 
   const handleCheckAll = (): void => {
@@ -123,8 +176,16 @@
       return elem;
     });
     params = filteredKeyValue;
-    collectionsMethods.updateRequestProperty(params, RequestProperty.QUERY_PARAMS,currentTabId);
-    collectionsMethods.updateRequestProperty(extractQueryParamstoURL(params), RequestProperty.URL,currentTabId);
+    collectionsMethods.updateRequestProperty(
+      params,
+      RequestProperty.QUERY_PARAMS,
+      currentTabId,
+    );
+    collectionsMethods.updateRequestProperty(
+      extractQueryParamstoURL(params),
+      RequestProperty.URL,
+      currentTabId,
+    );
   };
 </script>
 
@@ -247,29 +308,105 @@
             </div>
 
             <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-keyValuePairColor  py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   bind:value={param.key}
                   on:input={() => {
                     updateParam(index);
+                    tempText = param.key;
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
+                  }}
+                  on:keyup={(e) => {
+                    trackCursor = e.target.selectionStart;
+                  }}
+                  on:blur={() => {
+                    setTimeout(() => {
+                      tempText = "";
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }, 300);
+                  }}
+                  on:focus={(e) => {
+                    tempText = param.key;
+                    focusedInput = index;
+                    focusedElement = "key";
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
                   }}
                 />
+                {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
+                  <EnvironmentPicker
+                    {filterData}
+                    inputText={param.key}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      param.key = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
+                {/if}
               </div>
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control  bg-keyValuePairColor py-1 border-0"
+                  class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
                   bind:value={param.value}
                   on:input={() => {
                     updateParam(index);
+                    tempText = param.value;
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
+                  }}
+                  on:keyup={(e) => {
+                    trackCursor = e.target.selectionStart;
+                  }}
+                  on:blur={() => {
+                    setTimeout(() => {
+                      tempText = "";
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }, 300);
+                  }}
+                  on:focus={(e) => {
+                    tempText = param.value;
+                    focusedInput = index;
+                    focusedElement = "value";
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
                   }}
                 />
+                {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
+                  <EnvironmentPicker
+                    {filterData}
+                    inputText={param.value}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      param.value = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
+                {/if}
               </div>
             </div>
             {#if params.length - 1 != index}
@@ -297,4 +434,3 @@
     {/each}
   </div>
 </div>
-

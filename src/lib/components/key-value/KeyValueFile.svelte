@@ -5,11 +5,42 @@
   import type { KeyValuePairWithBase } from "$lib/utils/interfaces/request.interface";
   import close from "$lib/assets/close.svg";
   import { invoke } from "@tauri-apps/api";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
   export let keyValue: KeyValuePairWithBase[];
   export let callback;
+  export let environmentVariables;
 
   let pairs: KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
+  const environmentHelper = new EnvironmentHeper();
+
+  let trackParanthesis: unknown[] = [];
+  let trackCursor: number;
+  let tempText = "";
+  let focusedInput;
+
+  let filterData = [];
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+    if (trackParanthesis) {
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+  }
 
   $: {
     if (keyValue) {
@@ -67,14 +98,14 @@
   let files;
 
   const extractFileName = (url) => {
-  const parts = url.split('\\');
-  const fileName = parts[parts.length - 1];
-  return fileName;
-  }
+    const parts = url.split("\\");
+    const fileName = parts[parts.length - 1];
+    return fileName;
+  };
 
   const uploadFormFile = async (index) => {
     const filePathResponse = await invoke("fetch_file_command");
-    if(filePathResponse !== "Canceled") { 
+    if (filePathResponse !== "Canceled") {
       const filename = extractFileName(filePathResponse);
       const updatedFilePath = "#@#" + filePathResponse;
       let filteredPair = pairs.map((elem, i) => {
@@ -185,7 +216,7 @@
             </div>
 
             <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
@@ -194,8 +225,45 @@
                   bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
+                    tempText = element.key;
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
+                  }}
+                  on:keyup={(e) => {
+                    trackCursor = e.target.selectionStart;
+                  }}
+                  on:blur={() => {
+                    setTimeout(() => {
+                      tempText = "";
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }, 300);
+                  }}
+                  on:focus={(e) => {
+                    tempText = element.key;
+                    focusedInput = index;
+                    trackParanthesis =
+                      environmentHelper.balanceParanthesis(tempText);
                   }}
                 />
+                {#if focusedInput === index && trackParanthesis.length === 2 && filterData.length > 0}
+                  <EnvironmentPicker
+                    {filterData}
+                    inputText={element.key}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      element.key = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
+                {/if}
               </div>
               <div class="flex-grow-1 w-100">
                 <div
