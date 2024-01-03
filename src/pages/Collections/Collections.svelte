@@ -76,6 +76,65 @@
   };
 
   const collapseCollectionPanel = collapsibleState;
+
+  const mockData = [
+    {
+      key: "asus deffde fefguyerf fruerugf fuerfurf fuyeiryf freiufriu",
+      value:
+        "val asus gyude deueudd euiydyiue dieudioe dieudioed dieuduid deoded eiduoiejddj deio",
+      type: "G",
+      environment:
+        "global variable deidoiueodned ed doed eldje dedjm edlejde dljed ededjld dedjlee ddled",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+      environment: "n2n variable",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+      environment: "NJ variable",
+    },
+    {
+      key: "asus",
+      value: "val asus",
+      type: "G",
+      environment: "global variable",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+      environment: "n2n variable",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+      environment: "NJ variable",
+    },
+    {
+      key: "asus",
+      value: "val asus",
+      type: "G",
+      environment: "global variable",
+    },
+    {
+      key: "dell",
+      value: "val dell",
+      type: "E",
+      environment: "n2n variable",
+    },
+    {
+      key: "lenovo",
+      value: "val lenovo",
+      type: "E",
+      environment: "NJ variable",
+    },
+  ];
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
@@ -104,12 +163,16 @@
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-            <RequestResponse {activeTab} {collectionsMethods} />
+            <RequestResponse
+              {activeTab}
+              {collectionsMethods}
+              environmentVariables={mockData}
+            />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type=== ItemType.FOLDER}
+          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
             <MyFolder {collectionsMethods} {activeTab} />
-          {:else if $activeTab && $activeTab.type=== ItemType.COLLECTION}
+          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
             <MyCollection {collectionsMethods} {activeTab} />
           {/if}
         </div>

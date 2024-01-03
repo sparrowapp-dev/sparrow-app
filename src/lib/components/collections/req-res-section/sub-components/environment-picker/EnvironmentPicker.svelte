@@ -1,10 +1,10 @@
 <script>
   export let filterData = [];
-  export let urlText;
+  export let inputText;
   export let trackCursor;
   export let trackParanthesis;
-  export let handleInputValue;
-  export let updateUrl;
+  export let handleInputValue = () => {};
+  export let updateText;
   let activeVariable;
 
   let scrollPosition = 0;
@@ -41,9 +41,9 @@
       }
     }
     if (event.key === "Enter") {
-      const preUrl = urlText?.substring(0, trackParanthesis[0]);
-      const postUrl = urlText?.substring(trackCursor, urlText.length);
-      updateUrl(
+      const preUrl = inputText?.substring(0, trackParanthesis[0]);
+      const postUrl = inputText?.substring(trackCursor, inputText.length);
+      updateText(
         preUrl + "{{" + filterData[activeVariable].key + "}}" + postUrl,
       );
       handleInputValue();
@@ -69,9 +69,9 @@
         <p
           class="variable-title mb-0 ellipsis"
           on:click={() => {
-            const preUrl = urlText?.substring(0, trackParanthesis[0]);
-            const postUrl = urlText?.substring(trackCursor, urlText.length);
-            updateUrl(preUrl + "{{" + mock.key + "}}" + postUrl);
+            const preUrl = inputText?.substring(0, trackParanthesis[0]);
+            const postUrl = inputText?.substring(trackCursor, inputText.length);
+            updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
             handleInputValue();
           }}
         >

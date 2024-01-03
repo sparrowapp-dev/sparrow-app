@@ -20,16 +20,19 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
 
   export const loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let environmentVariables;
   //this for expand and collapse condition
   const _apiSendRequest = new ApiSendRequestViewModel();
 
   let isCollaps: boolean;
 
   collapsibleState.subscribe((value) => (isCollaps = value));
+  const environmentHelper = new EnvironmentHeper();
 
   let isInputEmpty: boolean = false;
   let isInputValid: boolean = true;
@@ -45,64 +48,6 @@
   let trackParanthesis: unknown[] = [];
   let trackCursor: number;
 
-  const mockData = [
-    {
-      key: "asus deffde fefguyerf fruerugf fuerfurf fuyeiryf freiufriu",
-      value:
-        "val asus gyude deueudd euiydyiue dieudioe dieudioed dieuduid deoded eiduoiejddj deio",
-      type: "G",
-      environment:
-        "global variable deidoiueodned ed doed eldje dedjm edlejde dljed ededjld dedjlee ddled",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-    {
-      key: "asus",
-      value: "val asus",
-      type: "G",
-      environment: "global variable",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-    {
-      key: "asus",
-      value: "val asus",
-      type: "G",
-      environment: "global variable",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-  ];
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       currentTabId = event?.id;
@@ -113,27 +58,24 @@
     }
   });
   let filterData = [];
-  const filterEnvironments = () => {
-    filterData = mockData.filter((element) => {
-      if (
-        element.key
-          .toLowerCase()
-          .includes(
-            urlText
-              ?.substring(trackParanthesis[1] + 1, trackCursor)
-              .toLowerCase(),
-          )
-      ) {
-        return true;
-      }
-    });
-  };
   $: {
     if (trackCursor) {
-      if (trackParanthesis.length === 2) filterEnvironments();
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
     }
     if (trackParanthesis) {
-      if (trackParanthesis.length === 2 && trackCursor) filterEnvironments();
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
     }
   }
 
@@ -256,28 +198,6 @@
   };
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
-  const balanceParanthesis = (url: string) => {
-    const stack = [];
-    let response: unknown[] = [];
-    for (let i = 0; i < url.length; i++) {
-      if (url[i] === "{") {
-        stack.push({
-          index: i,
-          character: "{",
-        });
-      } else if (url[i] === "}") {
-        stack.pop();
-      }
-    }
-    if (
-      stack.length >= 1
-      //  && stack[1].character === "{"
-    ) {
-      response = [stack[0].index, stack[stack.length - 1].index];
-    }
-    return response;
-  };
-
   let handleInputValue = () => {
     collectionsMethods.updateRequestProperty(
       urlText,
@@ -289,7 +209,7 @@
       RequestProperty.QUERY_PARAMS,
       currentTabId,
     );
-    trackParanthesis = balanceParanthesis(urlText);
+    trackParanthesis = environmentHelper.balanceParanthesis(urlText);
   };
   onDestroy(() => {
     isHorizontalUnsubscribe();
@@ -321,10 +241,6 @@
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
     }
-  };
-  const func = (event) => {
-    trackCursor = event.target.selectionStart;
-    console.log("cursor", trackCursor);
   };
 </script>
 
@@ -384,7 +300,7 @@
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
         on:keyup={(e) => {
-          func(e);
+          trackCursor = e.target.selectionStart;
         }}
         on:blur={() => {
           setTimeout(() => {
@@ -401,13 +317,13 @@
       {#if trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
           {filterData}
-          {urlText}
+          inputText={urlText}
           {trackCursor}
           {trackParanthesis}
-          {handleInputValue}
-          updateUrl={(url) => {
-            urlText = url;
+          updateText={(txt) => {
+            urlText = txt;
           }}
+          {handleInputValue}
         />
       {/if}
 

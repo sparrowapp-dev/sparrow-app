@@ -1,7 +1,9 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
 
   type Mode = "READ" | "WRITE";
 
@@ -12,7 +14,8 @@
     key: "",
     value: "",
   };
-
+  export let environmentVariables;
+  const environmentHelper = new EnvironmentHeper();
   let pairs: KeyValuePair[] = keyValue;
   let controller: boolean = false;
 
@@ -21,26 +24,6 @@
   let tempText = "";
   let focusedInput;
   let focusedElement;
-  const mockData = [
-    {
-      key: "asus",
-      value: "val asus",
-      type: "G",
-      environment: "Global Variables",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "NT Variables",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ Variables",
-    },
-  ];
 
   $: {
     if (keyValue) {
@@ -63,51 +46,26 @@
   }
 
   let filterData = [];
-  const filterEnvironments = () => {
-    filterData = mockData.filter((element) => {
-      if (
-        element.key
-          .toLowerCase()
-          .includes(
-            tempText
-              ?.substring(trackParanthesis[1] + 1, trackCursor)
-              .toLowerCase(),
-          )
-      ) {
-        return true;
-      }
-    });
-  };
   $: {
     if (trackCursor) {
-      if (trackParanthesis.length === 2) filterEnvironments();
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
     }
     if (trackParanthesis) {
-      if (trackParanthesis.length === 2 && trackCursor) filterEnvironments();
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
     }
   }
-
-  const balanceParanthesis = (url: string) => {
-    const stack = [];
-    let response: unknown[] = [];
-    for (let i = 0; i < url.length; i++) {
-      if (url[i] === "{") {
-        stack.push({
-          index: i,
-          character: "{",
-        });
-      } else if (url[i] === "}") {
-        stack.pop();
-      }
-    }
-    if (
-      stack.length >= 1
-      //  && stack[1].character === "{"
-    ) {
-      response = [stack[0].index, stack[stack.length - 1].index];
-    }
-    return response;
-  };
 
   const updateParam = (index: number): void => {
     pairs.forEach((elem, i) => {
@@ -166,13 +124,8 @@
     callback(pairs);
   };
 
-  const func = (event) => {
-    trackCursor = event.target.selectionStart;
-    console.log("cursor", trackCursor);
-  };
   let handleInputValue = () => {
-    trackParanthesis = balanceParanthesis(tempText);
-    console.log(trackParanthesis);
+    trackParanthesis = environmentHelper.balanceParanthesis(tempText);
   };
 </script>
 
@@ -261,7 +214,7 @@
     {#each pairs as element, index}
       <div
         aria-label="Toggle Hover"
-        class="sortable > div position-relative"
+        class="sortable > div"
         style="cursor:default; width:100%;"
         data-list-key={JSON.stringify({
           name: element.key,
@@ -295,7 +248,7 @@
             </div>
 
             <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
@@ -309,7 +262,7 @@
                     handleInputValue();
                   }}
                   on:keyup={(e) => {
-                    func(e);
+                    trackCursor = e.target.selectionStart;
                   }}
                   on:blur={() => {
                     setTimeout(() => {
@@ -327,43 +280,24 @@
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
-                  <div class="select-environment-popup d-flex p-3">
-                    <div class="left-panel w-50">
-                      {#each filterData as mock}
-                        <p
-                          on:click={() => {
-                            const preUrl = element.key?.substring(
-                              0,
-                              trackParanthesis[0],
-                            );
-                            const postUrl = element.key?.substring(
-                              trackCursor,
-                              element.key.length,
-                            );
-                            element.key =
-                              preUrl + "{{" + mock.key + "}}" + postUrl;
-                            updateParam(index);
-                            handleInputValue;
-                          }}
-                        >
-                          <span>{mock.type}</span>
-                          <span>{mock.key}</span>
-                        </p>
-                      {/each}
-                    </div>
-                    <div class="right-panel w-50">
-                      <p>ENVIRONMENT</p>
-                      <p>VALUE</p>
-                    </div>
-                    <div class="w-100">
-                      <p>
-                        showing Dev environment variables and Global variables
-                      </p>
-                    </div>
-                  </div>
+                  <EnvironmentPicker
+                    {filterData}
+                    inputText={element.key}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      element.key = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
                 {/if}
               </div>
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
@@ -377,7 +311,7 @@
                     handleInputValue();
                   }}
                   on:keyup={(e) => {
-                    func(e);
+                    trackCursor = e.target.selectionStart;
                   }}
                   on:blur={() => {
                     setTimeout(() => {
@@ -395,40 +329,21 @@
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
-                  <div class="select-environment-popup d-flex p-3">
-                    <div class="left-panel w-50">
-                      {#each filterData as mock}
-                        <p
-                          on:click={() => {
-                            const preUrl = element.value?.substring(
-                              0,
-                              trackParanthesis[0],
-                            );
-                            const postUrl = element.value?.substring(
-                              trackCursor,
-                              element.value.length,
-                            );
-                            element.value =
-                              preUrl + "{{" + mock.key + "}}" + postUrl;
-                            updateParam(index);
-                            handleInputValue;
-                          }}
-                        >
-                          <span>{mock.type}</span>
-                          <span>{mock.key}</span>
-                        </p>
-                      {/each}
-                    </div>
-                    <div class="right-panel w-50">
-                      <p>ENVIRONMENT</p>
-                      <p>VALUE</p>
-                    </div>
-                    <div class="w-100">
-                      <p>
-                        showing Dev environment variables and Global variables
-                      </p>
-                    </div>
-                  </div>
+                  <EnvironmentPicker
+                    {filterData}
+                    inputText={element.value}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      element.value = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
                 {/if}
               </div>
             </div>
@@ -460,23 +375,3 @@
     {/each}
   </div>
 </div>
-
-<style>
-  .select-environment-popup {
-    width: 400px;
-    height: 300px;
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: black;
-    z-index: 5;
-    flex-wrap: wrap;
-  }
-  .select-environment-popup .left-panel {
-    height: 300px;
-  }
-  .select-environment-popup .right-panel {
-    height: 300px;
-  }
-</style>
