@@ -23,3 +23,11 @@ jobs:
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Pull Request Comment
+       if: always()
+       uses: campos-pay/sonarqube-pr-comment@main
+       with:
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+         SONAR_PROJECTKEY: my-app
+         GITHUB-TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
