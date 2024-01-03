@@ -1,4 +1,4 @@
-name: sonarqube-development
+name: Sonarqube
 
 on:
   pull_request:
