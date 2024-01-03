@@ -41,8 +41,6 @@ export class EnvironmentRepository {
       if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
-      if (data.createdAt) value.createdAt = data.createdAt;
-      if (data.createdBy) value.createdBy = data.createdBy;
       return value;
     });
     return;
@@ -59,7 +57,7 @@ export class EnvironmentRepository {
     environment.remove();
   };
 
-  public readEnvironment = async (uuid: string): Promise<unknown> => {
+  public readEnvironment = async (uuid: string): Promise<any> => {
     return await RxDB.getInstance()
       .rxdb.environment.findOne({
         selector: {
@@ -82,6 +80,16 @@ export class EnvironmentRepository {
     }).$;
   };
 
+  public getCurrentEnvironment = async (id: string): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.findOne({
+        selector: {
+          id: id,
+        },
+      })
+      .exec();
+  };
+
   public setActiveEnvironment = async (
     environmentId: string,
   ): Promise<void> => {
@@ -90,13 +98,15 @@ export class EnvironmentRepository {
       .exec();
     const data = environments.map((elem: EnvironmentDocument) => {
       const res = this.getDocument(elem);
+      if (res.type == "GLOBAL") res.isActive = true;
       if (res.id === environmentId) {
-        res.isActive = true;
-      } else {
+        res.isActive = !res.isActive;
+      } else if (res.type !== "GLOBAL") {
         res.isActive = false;
       }
       return res;
     });
+    console.log("data: ", data);
     await RxDB.getInstance().rxdb.environment.bulkUpsert(data);
     return;
   };

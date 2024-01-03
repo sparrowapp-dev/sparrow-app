@@ -6,18 +6,16 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { EnvironmentListViewModel } from "$lib/components/environments/environments-list/EnvironmentList.ViewModel";
   import { EnvironmentViewModel } from "./Environment.ViewModel";
   import { EnvironmentPanelViewModel } from "$lib/components/environments/enviroments-panel/EnvironmentPanel.ViewModel";
   import type { Observable } from "rxjs";
-  import type { EnvironmentDocument } from "$lib/database/app.database";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { onDestroy } from "svelte";
   const _viewModel = new EnvironmentViewModel();
   const _environmentListViewModel = new EnvironmentListViewModel();
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
-  const activeEnvironment: Observable<EnvironmentDocument> =
-    _viewModel.activeEnvironment;
+  let activeWorkspaceRxDoc: WorkspaceDocument;
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     bulkInsert: _environmentListViewModel.bulkInsert,
     addEnvironment: _viewModel.addEnvironment,
@@ -34,7 +32,8 @@
     updateEnvironment: _environmentPanelViewModel.updateEnvironment,
     deleteEnvironment: _environmentListViewModel.deleteEnvironment,
   };
-  let activeEnvironmentRxDoc: EnvironmentDocument;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    environmentRepositoryMethods.getActiveWorkspace();
   let currentEnvironment: any = {
     id: "",
     name: "",
@@ -42,34 +41,93 @@
     variable: [{ key: "", value: "", checked: true }],
     isActive: true,
   };
+
+  let currentWorkspace: any = {
+    id: "",
+    name: "",
+    currentEnvironmentId: "",
+  };
+
   let environmentChanged = {
     name: false,
     variable: false,
   };
-  const activeEnvironmentSubscribe = activeEnvironment.subscribe(
-    (value: EnvironmentDocument) => {
-      if (value) {
-        activeEnvironmentRxDoc = value;
-        if (activeEnvironmentRxDoc) {
-          currentEnvironment.name = activeEnvironmentRxDoc.get("name");
-          currentEnvironment.id = activeEnvironmentRxDoc.get("id");
-          currentEnvironment.variable =
-            activeEnvironmentRxDoc.get("variable").length > 0
-              ? createDeepCopy(activeEnvironmentRxDoc.get("variable"))
-              : [{ key: "", value: "", checked: true }];
-          currentEnvironment.isActive = activeEnvironmentRxDoc.get("isActive");
-          currentEnvironment.type = activeEnvironmentRxDoc.get("type");
-          environmentChanged = {
-            name: false,
-            variable: false,
-          };
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currentWorkspace.name = activeWorkspaceRxDoc.get("name");
+        currentWorkspace.id = activeWorkspaceRxDoc.get("_id");
+        currentWorkspace.currentEnvironmentId = activeWorkspaceRxDoc.get(
+          "currentEnvironmentId",
+        );
+        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        const response =
+          await environmentServiceMethods.getAllEnvironments(workspaceId);
+        let data = await _viewModel.currentEnvironment(
+          currentWorkspace.currentEnvironmentId,
+        );
+        currentEnvironment.id = data?.get("id");
+        currentEnvironment.name = data?.get("name");
+        currentEnvironment.type = data?.get("type");
+        currentEnvironment.isActive = data?.get("isActive");
+        currentEnvironment.variable = data?.get("variable");
+        // debugger;
+        if (response.isSuccessful && response.data.data) {
+          const environments = response.data.data;
+          environmentRepositoryMethods.bulkInsert(environments);
+          return;
         }
-        return;
       }
     },
   );
+
+  // const currEnvironmentSubscribe = currEnvironment.subscribe(
+  //   (value: EnvironmentDocument) => {
+  //     if (value) {
+  //       currEnvironmentRxDoc = value;
+  //       if (currEnvironmentRxDoc) {
+  //         currentEnvironment.name = currEnvironmentRxDoc.get("name");
+  //         currentEnvironment.id = currEnvironmentRxDoc.get("id");
+  //         currentEnvironment.variable =
+  //           activeEnvironmentRxDoc.get("variable").length > 0
+  //             ? createDeepCopy(currEnvironmentRxDoc.get("variable"))
+  //             : [{ key: "", value: "", checked: true }];
+  //         currentEnvironment.isActive = currEnvironmentRxDoc.get("isActive");
+  //         currentEnvironment.type = currEnvironmentRxDoc.get("type");
+  //         environmentChanged = {
+  //           name: false,
+  //           variable: false,
+  //         };
+  //       }
+  //       return;
+  //     }
+  //   },
+  // );
+  // const activeEnvironmentSubscribe = activeEnvironment.subscribe(
+  //   (value: EnvironmentDocument) => {
+  //     if (value) {
+  //       activeEnvironmentRxDoc = value;
+  //       if (activeEnvironmentRxDoc) {
+  //         currentEnvironment.name = activeEnvironmentRxDoc.get("name");
+  //         currentEnvironment.id = activeEnvironmentRxDoc.get("id");
+  //         currentEnvironment.variable =
+  //           activeEnvironmentRxDoc.get("variable").length > 0
+  //             ? createDeepCopy(activeEnvironmentRxDoc.get("variable"))
+  //             : [{ key: "", value: "", checked: true }];
+  //         currentEnvironment.isActive = activeEnvironmentRxDoc.get("isActive");
+  //         currentEnvironment.type = activeEnvironmentRxDoc.get("type");
+  //         environmentChanged = {
+  //           name: false,
+  //           variable: false,
+  //         };
+  //       }
+  //       return;
+  //     }
+  //   },
+  // );
   onDestroy(() => {
-    activeEnvironmentSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
@@ -79,11 +137,13 @@
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       {currentEnvironment}
+      {currentWorkspace}
     />
     <EnvironmentPanel
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       {currentEnvironment}
+      {currentWorkspace}
       {environmentChanged}
     />
   </div>

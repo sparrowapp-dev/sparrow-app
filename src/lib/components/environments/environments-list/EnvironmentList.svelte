@@ -3,10 +3,7 @@
   import { Tooltip } from "$lib/components";
 
   import { v4 as uuidv4 } from "uuid";
-  import type {
-    EnvironmentDocument,
-    WorkspaceDocument,
-  } from "$lib/database/app.database";
+  import type { EnvironmentDocument } from "$lib/database/app.database";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
@@ -19,32 +16,33 @@
   import { notifications } from "$lib/utils/notifications";
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { isActiveTab } from "$lib/store/collection";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
   let environment: any[] = [];
   let globalEnvrionment: any;
-  let currentSelectedId: string;
+  let rightClickEnv = {
+    id: "",
+    isActive: false,
+  };
   let environmentUnderCreation: boolean = false;
-  let activeEnvironmentRxDoc: EnvironmentDocument;
   let environmentUnderRename: string | undefined = undefined;
   const _environmentListViewModel = new EnvironmentListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment: any;
+  export let currentWorkspace: any;
   const environments: Observable<EnvironmentDocument[]> =
     _environmentListViewModel.environment;
 
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    environmentRepositoryMethods.getActiveWorkspace();
-  let activeWorkspaceRxDoc: WorkspaceDocument;
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
-  let currWorkspaceName: string;
-  let currentWorkspaceId: string = "";
+
   let isLoading: boolean = false;
 
+  const handleOpenEnvironment = (id: string) => {
+    _environmentListViewModel.setCurrentEnvironment(currentWorkspace.id, id);
+  };
   const environmentSubscribe = environments.subscribe(
     (value: EnvironmentDocument[]) => {
       if (value) {
@@ -65,10 +63,11 @@
           }
         });
         const isPresent = environmentArr.find((env) => {
-          if (env.id == currentEnvironment.id) return true;
+          if (env.id == currentWorkspace.currentEnvironmentId) return true;
         });
         if (!isPresent) {
-          handleActivateEnvironment(globalEnvrionment?.id);
+          // debugger;
+          handleOpenEnvironment(globalEnvrionment?.id);
         }
         environment = filteredEnvironments;
         return;
@@ -78,23 +77,6 @@
   const workspaceLoadingSubscribe = isWorkspaceLoaded.subscribe((value) => {
     isLoading = !value;
   });
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currWorkspaceName = activeWorkspaceRxDoc.get("name");
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response =
-          await environmentServiceMethods.getAllEnvironments(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const environments = response.data.data;
-          environmentRepositoryMethods.bulkInsert(environments);
-          return;
-        }
-      }
-    },
-  );
 
   const handleCreateEnvironmentClick = async () => {
     environmentUnderCreation = true;
@@ -109,7 +91,7 @@
     environmentRepositoryMethods.addEnvironment(newEnvironment);
     const response = await _environmentListViewModel.addEnvironment({
       name: newEnvironment.name,
-      workspaceId: currentWorkspaceId,
+      workspaceId: currentWorkspace.id,
       variable: newEnvironment.variable,
     });
 
@@ -117,11 +99,11 @@
       const res = response.data.data;
       environmentUnderCreation = false;
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
-      _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspaceId, {
+      _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspace.id, {
         _id: response.data.data._id,
         name: newEnvironment.name,
       });
-      _environmentListViewModel.activateEnvironment(newEnvironment.id);
+      handleOpenEnvironment(newEnvironment.id);
       notifications.success("New Environment Created!");
       return;
     }
@@ -131,6 +113,7 @@
   const handleActivateEnvironment = (id: string) => {
     _environmentListViewModel.activateEnvironment(id);
   };
+
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
     name,
@@ -153,22 +136,23 @@
   };
 
   const deleteEnvironment = (id: string) => {
-    environmentServiceMethods.deleteEnvironment(currentWorkspaceId, id);
+    environmentServiceMethods.deleteEnvironment(currentWorkspace.id, id);
     environmentRepositoryMethods.removeEnvironment(id);
   };
   onDestroy(() => {
     environmentSubscribe.unsubscribe();
-    activeWorkspaceSubscribe.unsubscribe();
     workspaceLoadingSubscribe();
   });
   let isCollectionPopup: boolean = false;
   let containerRef;
-  function rightClickContextMenu(e, id) {
+  function rightClickContextMenu(e, id, isActive) {
     e.preventDefault();
     document
       .querySelectorAll(".show-more-icon")
       .forEach((item) => item.classList.remove("active"));
-    currentSelectedId = id;
+    rightClickEnv.id = id;
+    rightClickEnv.isActive = isActive;
+    console.log("r: ", rightClickEnv);
     e.target.classList.toggle("active");
     setTimeout(() => {
       const containerRect = containerRef?.getBoundingClientRect();
@@ -194,7 +178,7 @@
     document.getElementById(`rename-input-${id}`).blur();
     if (e.target.value !== oldName) {
       await environmentServiceMethods.updateEnvironment(
-        currentWorkspaceId,
+        currentWorkspace.id,
         id,
         {
           name: e.target.value,
@@ -219,7 +203,7 @@
   let menuItems = [
     {
       onClick: (id) => {
-        handleActivateEnvironment(id);
+        handleOpenEnvironment(id);
       },
       displayText: "Open Environment",
       disabled: false,
@@ -233,9 +217,11 @@
     },
     {
       onClick: (id) => {
-        handleActivateEnvironment(globalEnvrionment?.id);
+        handleActivateEnvironment(id);
       },
-      displayText: "Unselect Environment",
+      displayText: rightClickEnv.isActive
+        ? "Unselect Environment"
+        : "Select Environment",
       disabled: false,
     },
     {
@@ -272,7 +258,7 @@
               class={` lign-items-center mb-0 px-2 py-2 ${
                 item.disabled && "text-requestBodyColor"
               }`}
-              on:click={() => item.onClick(currentSelectedId)}
+              on:click={() => item.onClick(rightClickEnv.id)}
               style={item.displayText === "Delete" ? "color: #ff7878" : ""}
               >{item.displayText}</button
             >
@@ -290,7 +276,7 @@
       class={`fw-medium lh-1 curr-workspace ps-3 my-auto ellipsis`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
-      {currWorkspaceName || ""}
+      {currentWorkspace.name || ""}
     </h1>
     <Tooltip text={`Add Environment`}>
       <button
@@ -310,10 +296,10 @@
   {#if globalEnvrionment}
     <p
       class={`fw-normal env-item rounded m-2 ps-3 ${
-        globalEnvrionment?.isActive && "active"
+        globalEnvrionment?.id == currentEnvironment.id && "active"
       }`}
       on:click={() => {
-        handleActivateEnvironment(globalEnvrionment?.id);
+        handleOpenEnvironment(globalEnvrionment?.id);
       }}
     >
       {globalEnvrionment?.name}
@@ -341,20 +327,29 @@
       {#each environment as env}
         <div
           class={`d-flex rounded env-tab align-items-center justify-content-between env-item ps-3 ${
-            env.isActive && "active"
+            env.id == currentEnvironment.id && "active"
           }`}
           style="cursor: pointer; "
-          on:click={() => handleActivateEnvironment(env.id)}
-          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, env.id)}
+          on:click={() => handleOpenEnvironment(env.id)}
+          on:contextmenu|preventDefault={(e) =>
+            rightClickContextMenu(e, env.id, env.isActive)}
         >
           <div class="show-more-in d-flex ellipsis">
             <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>
-              <SelectIcon
-                classProp={`my-auto`}
-                width={20}
-                height={20}
-                selected={env.isActive}
-              />
+              <button
+                class="p-0 m-0 border-0 bg-transparent"
+                on:click={(e) => {
+                  e.stopPropagation();
+                  handleActivateEnvironment(env.id);
+                }}
+              >
+                <SelectIcon
+                  classProp={`my-auto`}
+                  width={20}
+                  height={20}
+                  selected={env.isActive}
+                />
+              </button>
             </Tooltip>
             {#if env.id && env.id == environmentUnderRename}
               <input
@@ -381,7 +376,7 @@
               class={`${showMenu && ""} show-more-btn rounded border-0`}
               on:click={(e) => {
                 e.stopPropagation();
-                rightClickContextMenu(e, env.id);
+                rightClickContextMenu(e, env.id, env.isActive);
               }}
             >
               {#if env.type == undefined && environmentUnderCreation}

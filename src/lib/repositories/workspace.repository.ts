@@ -107,6 +107,21 @@ export class WorkspaceRepository {
     return;
   };
 
+  public setCurrentEnvironmentId = async (
+    workspaceId: string,
+    environmentId: string,
+  ): Promise<void> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+
+    await workspace.patch({ currentEnvironmentId: environmentId });
+  };
+
   public updateWorkspace = async (
     workspaceId: string,
     name: string,

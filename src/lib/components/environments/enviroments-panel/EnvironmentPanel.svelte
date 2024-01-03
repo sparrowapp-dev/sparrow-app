@@ -1,22 +1,19 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import EnvValue from "$lib/components/env-value/EnvValue.svelte";
-  import type { EnvironmentDocument } from "$lib/database/app.database";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import type { Observable } from "rxjs";
   import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
-  import { onDestroy } from "svelte";
-  import { currentWorkspace } from "$lib/store/workspace.store";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-    import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/utils/notifications";
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment: any;
+  export let currentWorkspace: any;
   export let environmentChanged: {
     name: boolean;
     variable: boolean;
@@ -48,22 +45,9 @@
       changedKeyValuePair = pairs;
     }
   };
-  let activeWorkspaceRxDoc: EnvironmentDocument;
-  let currentWorkspaceId: string;
-  const activeWorkspace: Observable<EnvironmentDocument> =
-    environmentRepositoryMethods.getActiveWorkspace();
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: EnvironmentDocument) => {
-      activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        return;
-      }
-    },
-  );
   const handleSaveEnvironment = () => {
     environmentServiceMethods.updateEnvironment(
-      currentWorkspaceId,
+      currentWorkspace.id,
       currentEnvironment.id,
       {
         name: changedName ? changedName : currentEnvironment.name,
@@ -79,18 +63,18 @@
         ? changedKeyValuePair
         : currentEnvironment.variable,
     });
-    notifications.success(`Changes saved for ${changedName ? changedName : currentEnvironment.name} environment.`);
+    notifications.success(
+      `Changes saved for ${
+        changedName ? changedName : currentEnvironment.name
+      } environment.`,
+    );
     environmentChanged.name = false;
     environmentChanged.variable = false;
   };
-  onDestroy(() => {
-    activeWorkspaceSubscribe.unsubscribe();
-  });
 </script>
 
 <div class={`env-panel`}>
   <header class={`env-header justify-content-between d-flex`}>
-   
     <input
       type="text"
       class={`env-heading ellipsis fw-normal px-2 border-0`}
@@ -168,7 +152,7 @@
     opacity: 0.3;
     background-color: var(--border-color);
   }
-  .env-save-btn:disabled{
+  .env-save-btn:disabled {
     color: white;
   }
   .env-save-btn-enabled {
@@ -184,7 +168,7 @@
     right: -2px;
     padding: 4px 4px;
     border-radius: 50%;
-    background-color: #FF7878;
+    background-color: #ff7878;
     color: white;
   }
   .env-btn-container {

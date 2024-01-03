@@ -28,7 +28,8 @@ import {
   environmentSchema,
   type EnvironmentDocType,
 } from "$lib/models/environment.model";
-
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -89,6 +90,9 @@ export class RxDB {
             return oldDoc;
           },
           2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },

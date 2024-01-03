@@ -25,4 +25,8 @@ export class EnvironmentViewModel {
   public get activeEnvironment() {
     return this.environmentRepository.getActiveEnvironment();
   }
+
+  public currentEnvironment = async (id: string) => {
+    return await this.environmentRepository.getCurrentEnvironment(id);
+  };
 }

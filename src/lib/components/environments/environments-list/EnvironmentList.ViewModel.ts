@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { EnvironmentDocument } from "$lib/database/app.database";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
 import type { CreateEnvironmentPostBody } from "$lib/utils/dto";
 
 export class EnvironmentListViewModel {
   private environmentRepository = new EnvironmentRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private EnvironmentService = new EnvironmentService();
   constructor() {}
 
@@ -21,6 +23,16 @@ export class EnvironmentListViewModel {
       updatedBy: elem.get("updatedBy"),
       updatedAt: elem.get("updatedAt"),
     };
+  };
+
+  public setCurrentEnvironment = (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.setCurrentEnvironmentId(
+      workspaceId,
+      environmentId,
+    );
   };
 
   public activateEnvironment = (id: string): void => {
