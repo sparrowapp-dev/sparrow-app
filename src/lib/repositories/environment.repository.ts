@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type EnvironmentDocument } from "$lib/database/app.database";
+import type { EnvironmentDto } from "$lib/utils/dto";
 import type { Observable } from "rxjs";
 
 export class EnvironmentRepository {
@@ -100,7 +101,9 @@ export class EnvironmentRepository {
     return;
   };
 
-  public bulkInsertData = async (environment: any[]): Promise<void> => {
+  public bulkInsertData = async (
+    environment: EnvironmentDto[],
+  ): Promise<void> => {
     if (environment.length > 0) {
       const updatedEnvironments = environment.map((environmentObj) => {
         environmentObj["id"] = environmentObj._id;

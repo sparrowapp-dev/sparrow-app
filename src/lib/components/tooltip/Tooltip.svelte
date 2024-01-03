@@ -48,7 +48,6 @@
     z-index: 2 !important;
   }
   .tooltip-text {
-    /* width: 120px; */
     font-family: Roboto;
     transition: opacity 0.3s;
   }

@@ -90,11 +90,7 @@
 
 <div class={`env-panel`}>
   <header class={`env-header justify-content-between d-flex`}>
-    <!-- {#if currentEnvironment.type == "GLOBAL"}
-      <p class={`env-heading fw-normal border-0`}>
-        {currentEnvironment?.name}
-      </p>
-    {:else} -->
+   
     <input
       type="text"
       class={`env-heading ellipsis fw-normal px-2 border-0`}
@@ -102,7 +98,6 @@
       on:change={(e) => handleCurrentEnvironmentNameChange(e)}
       disabled={currentEnvironment.type == "GLOBAL"}
     />
-    <!-- {/if} -->
     <div class={`d-flex env-btn-container`}>
       <button class={`d-flex env-help-btn border-0 my-auto`}>
         <HelpIcon width={19} height={19} classProp={`me-2`} />

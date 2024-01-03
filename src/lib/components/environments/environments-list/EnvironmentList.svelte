@@ -129,7 +129,7 @@
   };
 
   const handleActivateEnvironment = (id: string) => {
-    if (id) _environmentListViewModel.activateEnvironment(id);
+    _environmentListViewModel.activateEnvironment(id);
   };
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -165,7 +165,9 @@
   let containerRef;
   function rightClickContextMenu(e, id) {
     e.preventDefault();
-    document.querySelectorAll('.show-more-icon').forEach(item => item.classList.remove('active'));
+    document
+      .querySelectorAll(".show-more-icon")
+      .forEach((item) => item.classList.remove("active"));
     currentSelectedId = id;
     e.target.classList.toggle("active");
     setTimeout(() => {
@@ -246,7 +248,9 @@
   ];
   function closeRightClickContextMenu() {
     showMenu = false;
-    document.querySelectorAll('.show-more-icon').forEach(item => item.classList.remove('active'));
+    document
+      .querySelectorAll(".show-more-icon")
+      .forEach((item) => item.classList.remove("active"));
   }
 </script>
 
@@ -320,9 +324,7 @@
     </p>
   {/if}
   <hr />
-  {#if isLoading}
-    <Spinner size={"30px"} />
-  {/if}
+
   {#if environment && environment.length == 0}
     <div class={`add-env-container `}>
       <p class={`add-env-desc-text fw-light text-center mb-5 p-2 pe-4`}>
