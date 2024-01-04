@@ -17,6 +17,8 @@
   let trackCursor: number;
   let tempText = "";
   let focusedInput;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   let filterData = [];
   $: {
@@ -51,6 +53,7 @@
       <input
         type="text"
         style="outline: none;"
+        id={"basic-auth-key"}
         class="w-100 bg-backgroundColor border-0 h-75 ps-2"
         placeholder="Enter Username"
         bind:value={basicAuth.username}
@@ -74,10 +77,15 @@
           tempText = basicAuth.username;
           focusedInput = "username";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
+          const elem = document.getElementById("basic-auth-key");
+          environmentAxisY = elem.getBoundingClientRect().top + 30;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
       />
       {#if focusedInput === "username" && trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={basicAuth.username}
           {trackCursor}
@@ -106,6 +114,7 @@
       <input
         type="text"
         style="outline: none;"
+        id={"basic-auth-value"}
         class="w-100 bg-backgroundColor border-0 h-75 ps-2"
         placeholder="Enter Password"
         bind:value={basicAuth.password}
@@ -129,10 +138,15 @@
           tempText = basicAuth.password;
           focusedInput = "password";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
+          const elem = document.getElementById("basic-auth-value");
+          environmentAxisY = elem.getBoundingClientRect().top + 30;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
       />
       {#if focusedInput === "password" && trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={basicAuth.password}
           {trackCursor}

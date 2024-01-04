@@ -28,7 +28,8 @@
   let tempText = "";
   let focusedInput;
   let focusedElement;
-
+  let environmentAxisY: number;
+  let environmentAxisX: number;
   let filterData = [];
   $: {
     if (trackCursor) {
@@ -314,6 +315,7 @@
                   placeholder="Enter Key"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"query-param-key" + index}
                   bind:value={param.key}
                   on:input={() => {
                     updateParam(index);
@@ -338,10 +340,17 @@
                     focusedElement = "key";
                     trackParanthesis =
                       environmentHelper.balanceParanthesis(tempText);
+                    const elem = document.getElementById(
+                      "query-param-key" + index,
+                    );
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
                   <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
                     {filterData}
                     inputText={param.key}
                     {trackCursor}
@@ -358,12 +367,13 @@
                   />
                 {/if}
               </div>
-              <div class="flex-grow-1 w-100 position-relative">
+              <div class="flex-grow-1 w-100">
                 <input
                   type="text"
                   placeholder="Enter Value"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"query-param-value" + index}
                   bind:value={param.value}
                   on:input={() => {
                     updateParam(index);
@@ -388,10 +398,17 @@
                     focusedElement = "value";
                     trackParanthesis =
                       environmentHelper.balanceParanthesis(tempText);
+                    const elem = document.getElementById(
+                      "query-param-value" + index,
+                    );
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
                   <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
                     {filterData}
                     inputText={param.value}
                     {trackCursor}

@@ -5,6 +5,8 @@
   export let trackParanthesis;
   export let handleInputValue = () => {};
   export let updateText;
+  export let environmentAxisX;
+  export let environmentAxisY;
   let activeVariable;
 
   let scrollPosition = 0;
@@ -51,7 +53,13 @@
   };
 </script>
 
-<div class="select-environment-popup d-flex p-3 rounded">
+<div
+  class="select-environment-popup d-flex p-3 rounded"
+  style="
+  top:{environmentAxisY}px;
+  left:{environmentAxisX}px;
+  "
+>
   <div
     class="left-panel pe-2 w-50"
     id="left-panel-environment"
@@ -118,10 +126,8 @@
   .select-environment-popup {
     width: 400px;
     height: 250px;
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100%);
+    position: fixed;
+    /* transform: translateX(-50%); */
     background-color: black;
     z-index: 5;
     flex-wrap: wrap;

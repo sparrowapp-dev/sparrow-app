@@ -19,6 +19,8 @@
   let trackCursor: number;
   let tempText = "";
   let focusedInput;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   let filterData = [];
   $: {
@@ -222,6 +224,7 @@
                   placeholder="Enter Key"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"pair-file-key" + index}
                   bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
@@ -245,10 +248,17 @@
                     focusedInput = index;
                     trackParanthesis =
                       environmentHelper.balanceParanthesis(tempText);
+                    const elem = document.getElementById(
+                      "pair-file-key" + index,
+                    );
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
                 {#if focusedInput === index && trackParanthesis.length === 2 && filterData.length > 0}
                   <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
                     {filterData}
                     inputText={element.key}
                     {trackCursor}

@@ -14,6 +14,8 @@
   let trackParanthesis: unknown[] = [];
   let trackCursor: number;
   let tempText = "";
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   let filterData = [];
   $: {
@@ -47,6 +49,7 @@
     <div class="position-relative w-75">
       <textarea
         style="outline: none;"
+        id={"bearer-token-key"}
         class="w-100 bg-backgroundColor border-0 ps-2"
         placeholder="Enter Token"
         bind:value={bearerToken}
@@ -69,10 +72,15 @@
         on:focus={(e) => {
           tempText = bearerToken;
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
+          const elem = document.getElementById("bearer-token-key");
+          environmentAxisY = elem.getBoundingClientRect().top + 30;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={bearerToken}
           {trackCursor}

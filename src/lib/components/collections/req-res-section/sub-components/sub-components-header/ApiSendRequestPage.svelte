@@ -47,6 +47,8 @@
   let currentTabId: string = "";
   let trackParanthesis: unknown[] = [];
   let trackCursor: number;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -311,11 +313,16 @@
         }}
         on:focus={(e) => {
           handleInputValue();
+          const elem = document.getElementById("input-request-url");
+          environmentAxisY = elem.getBoundingClientRect().top + 40;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
         bind:this={inputElement}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={urlText}
           {trackCursor}

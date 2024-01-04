@@ -24,6 +24,8 @@
   let tempText = "";
   let focusedInput;
   let focusedElement;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   $: {
     if (keyValue) {
@@ -254,6 +256,7 @@
                   placeholder="Enter Key"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"pair-key" + index}
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.key}
                   on:input={() => {
@@ -277,10 +280,15 @@
                     focusedInput = index;
                     focusedElement = "key";
                     handleInputValue();
+                    const elem = document.getElementById("pair-key" + index);
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
                   <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
                     {filterData}
                     inputText={element.key}
                     {trackCursor}
@@ -303,6 +311,7 @@
                   placeholder="Enter Value"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"pair-value" + index}
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.value}
                   on:input={() => {
@@ -326,10 +335,15 @@
                     focusedInput = index;
                     focusedElement = "value";
                     handleInputValue();
+                    const elem = document.getElementById("pair-value" + index);
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
                   <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
                     {filterData}
                     inputText={element.value}
                     {trackCursor}

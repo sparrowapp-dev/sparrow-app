@@ -24,6 +24,8 @@
   let trackCursor: number;
   let tempText = "";
   let focusedInput;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   let filterData = [];
   $: {
@@ -59,6 +61,7 @@
       <input
         type="text"
         style="outline: none;"
+        id={"auth-key"}
         class="w-100 bg-backgroundColor border-0 h-75 p-2"
         placeholder="Enter Auth Key"
         bind:value={apiData.authKey}
@@ -82,10 +85,15 @@
           tempText = apiData.authKey;
           focusedInput = "first";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
+          const elem = document.getElementById("auth-key");
+          environmentAxisY = elem.getBoundingClientRect().top + 30;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
       />
       {#if focusedInput === "first" && trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={apiData.authKey}
           {trackCursor}
@@ -113,6 +121,7 @@
         type="text"
         style="outline: none;"
         class="w-100 h-75 p-2 border-0 bg-backgroundColor"
+        id={"auth-value"}
         placeholder="Enter Auth Value"
         bind:value={apiData.authValue}
         on:input={() => {
@@ -135,10 +144,15 @@
           tempText = apiData.authValue;
           focusedInput = "second";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
+          const elem = document.getElementById("auht-value");
+          environmentAxisY = elem.getBoundingClientRect().top + 30;
+          environmentAxisX = elem.getBoundingClientRect().left;
         }}
       />
       {#if focusedInput === "second" && trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
           {filterData}
           inputText={apiData.authValue}
           {trackCursor}
