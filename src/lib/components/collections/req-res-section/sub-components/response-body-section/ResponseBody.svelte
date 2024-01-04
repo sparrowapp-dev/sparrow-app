@@ -14,6 +14,7 @@
   export let response;
   export let apiState;
   export let collectionsMethods: CollectionsMethods;
+  export let currentTabId;
 
   let fileExtension: string;
   /**
@@ -149,6 +150,7 @@
       rawTab={apiState.responseRaw}
       rawValue={response.body}
       formatter={apiState.responseFormatter}
+      currentTabId={currentTabId}
     />
   </div>
 </div>

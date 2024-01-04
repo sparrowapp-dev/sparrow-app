@@ -1,5 +1,6 @@
 import type { AuthSection } from "../enums/authorization.enum";
 import type { ItemType } from "../enums/item-type.enum";
+import type { ContentTypeEnum } from "../enums/request.enum";
 import type {
   RequestAuthTypes,
   RequestDatasetType,
@@ -37,8 +38,8 @@ export interface RequestBody {
   body?: unknown;
   headers?: KeyValuePair[];
   queryParams?: KeyValuePair[];
+  selectedRequestBodyType?: ContentTypeEnum;
 }
-
 export interface KeyValuePair {
   key: string;
   value: string;
@@ -75,6 +76,8 @@ export interface State {
   responseSection?: ResponseSectionType;
   responseRaw?: RequestRawType;
   responseFormatter?: ResponseFormatterType;
+  additions: string;
+  isSaveDescription: boolean;
 }
 
 export interface BasicAuth {
@@ -94,6 +97,11 @@ export interface Auth {
   apiKey?: ApiKey;
 }
 
+export interface Save {
+  api?: boolean;
+  description?: boolean;
+}
+
 export interface Request {
   method: RequestMethodType;
   body?: Body;
@@ -105,6 +113,7 @@ export interface Request {
   state?: State;
   auth?: Auth;
   requestInProgress?: boolean;
+  save?: Save;
 }
 
 export interface Collection {
@@ -117,7 +126,7 @@ export interface WorkSpace {
   collectionCount?: number;
 }
 
-export interface FOLDER {
+export interface Folder {
   requestCount?: number;
   folderCount?: number;
 }
@@ -132,10 +141,10 @@ export interface NewTab {
     | ItemType.WORKSPACE;
   description: string;
   property: {
-    request: Request;
-    collection: Collection;
-    workspace: WorkSpace;
-    folder: FOLDER;
+    request?: Request;
+    collection?: Collection;
+    workspace?: WorkSpace;
+    folder?: Folder;
   };
   isActive: boolean;
   save: boolean;

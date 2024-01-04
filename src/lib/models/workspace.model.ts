@@ -8,13 +8,16 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 2,
+  version: 1,
   properties: {
     _id: {
       type: "string",
       maxLength: 100,
     },
     name: {
+      type: "string",
+    },
+    description: {
       type: "string",
     },
     owner: {

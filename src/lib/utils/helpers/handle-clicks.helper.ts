@@ -67,16 +67,6 @@ export const handleFolderClick = (
   collectionId: string,
 ) => {
   isFolderCreatedFirstTime.set(false);
-  let totalFolder: number = 0;
-  let totalRequest: number = 0;
-  folder.items.map((item) => {
-    if (item.type === ItemType.REQUEST) {
-      totalRequest++;
-    } else {
-      totalFolder++;
-    }
-  });
-
   const path: Path = {
     workspaceId: currentWorkspaceId,
     collectionId: collectionId,
@@ -89,8 +79,6 @@ export const handleFolderClick = (
   sampleFolder.id = folder.id;
   sampleFolder.path = path;
   sampleFolder.name = folder.name;
-  sampleFolder.property.folder.requestCount = totalRequest;
-  sampleFolder.property.folder.folderCount = totalFolder;
   sampleFolder.save = true;
 
   _collectionMethods.handleCreateTab(sampleFolder);

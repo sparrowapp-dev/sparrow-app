@@ -25,6 +25,8 @@
     isFolderCreatedFirstTime,
   } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+  import folderIcon from "$lib/assets/create_folder.svg";
+  import requestIcon from "$lib/assets/create_request.svg";
 
   export let title: string;
   export let collection: any;
@@ -34,6 +36,8 @@
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
+  export let activeTabId: string;
+  export let activePath;
 
   const collectionService = new CollectionService();
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -63,14 +67,6 @@
     );
 
     if (response.isSuccessful && response.data.data) {
-      response.data.data.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-        }
-      });
-
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: collectionId,
@@ -86,8 +82,6 @@
       SampleFolder.id = response.data.data.id;
       SampleFolder.path = path;
       SampleFolder.name = response.data.data.name;
-      SampleFolder.property.folder.requestCount = totalRequest;
-      SampleFolder.property.folder.folderCount = totalFolder;
       SampleFolder.save = true;
       collectionsMethods.handleCreateTab(SampleFolder);
       moveNavigation("right");
@@ -139,7 +133,8 @@
       request.id = res.id;
       request.path.workspaceId = currentWorkspaceId;
       request.path.collectionId = collectionId;
-      request.save = true;
+      request.property.request.save.api = true;
+      request.property.request.save.description = true;
 
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
@@ -212,7 +207,7 @@
       );
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
-        collectionsMethods.updateTab(newCollectionName,"name",collectionId);
+        collectionsMethods.updateTab(newCollectionName, "name", collectionId);
       }
     }
     isRenaming = false;
@@ -245,6 +240,7 @@
 
   //add folder in collection
   const addFolder = () => {
+    visibility = true;
     handleFolderClick();
     if (collectionId === openCollectionId) {
       visibility = true;
@@ -282,7 +278,13 @@
       disabled: false,
     },
   ];
-
+  $: {
+    if (activePath) {
+      if (activePath.collectionId === collection.id) {
+        visibility = true;
+      }
+    }
+  }
 </script>
 
 {#if isCollectionPopup}
@@ -327,16 +329,22 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 py-1 ps-2 my-button"
+  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
+  activeTabId
+    ? 'active-collection-tab'
+    : ''}"
 >
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+<<<<<<< HEAD
     on:click={() => {
       if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
         visibility = !visibility;
         handleCollectionClick(collection,currentWorkspaceId,collectionId);
       }
     }}
+=======
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     class="d-flex main-collection align-items-center"
   >
     <img
@@ -346,6 +354,11 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
+      on:click={() => {
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          visibility = !visibility;
+        }
+      }}
     />
     {#if isRenaming}
       <input
@@ -355,14 +368,27 @@
         style="font-size: 12px;"
         value={title}
         autofocus
+        maxlength={100}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <p class="mb-0 ellipsis" style="font-size: 12px;">
-        {title}
-      </p>
+      <div
+        class="collection-title d-flex align-items-center py-1 mb-0"
+        style="height: 36px;"
+        on:click={() => {
+          isCollectionCreatedFirstTime.set(false);
+
+          if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+            handleCollectionClick(collection, currentWorkspaceId, collectionId);
+          }
+        }}
+      >
+        <p class="ellipsis w-100 mb-0" style="font-size: 12px;">
+          {title}
+        </p>
+      </div>
     {/if}
   </div>
   {#if collection._id.includes(UntrackedItems.UNTRACKED)}
@@ -395,12 +421,24 @@
         {currentWorkspaceId}
         explorer={exp}
         {visibility}
+        {activeTabId}
+        {activePath}
       />
     {/each}
     {#if showFolderAPIButtons}
       <div class="mt-2 mb-2">
-        <IconButton text={"+ Folder"} onClick={handleFolderClick} />
-        <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+        <img
+          class="list-icons"
+          src={folderIcon}
+          alt="+ Folder"
+          on:click={handleFolderClick}
+        />
+        <img
+          class="list-icons"
+          src={requestIcon}
+          alt="+ API Request"
+          on:click={handleAPIClick}
+        />
       </div>
     {/if}
   </div>
@@ -410,10 +448,18 @@
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }
-
+  .list-icons {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+  .list-icons:hover {
+    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
+      brightness(100%) contrast(100%);
+  }
   .threedot-icon-container {
     visibility: hidden;
-    background-color: var(--border-color);
+    background-color: transparent;
   }
 
   .threedot-active {
@@ -428,10 +474,10 @@
     background-color: var(--background-color);
     color: var(--white-color);
     padding-right: 5px;
+    border-radius: 8px;
   }
 
   .btn-primary:hover {
-    border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
   }
@@ -470,12 +516,14 @@
   .sub-folders {
     border-left: 1px solid var(--border-color);
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .main-collection {
     width: calc(100% - 24px);
+  }
+  .active-collection-tab {
+    background-color: var(--selected-active-sidebar) !important;
+  }
+  .collection-title {
+    width: calc(100% - 30px);
+    text-align: left;
   }
 </style>

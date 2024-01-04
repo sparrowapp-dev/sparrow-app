@@ -1,18 +1,29 @@
 <script lang="ts">
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
 
-  import WorkspaceContent from "./WorkspaceContent.svelte";
+  import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
+  import { WorkspaceViewModel } from "./workspace.viewModel";
+  import { scaleMotionProps } from "$lib/utils/animations";
+  import { Motion } from "svelte-motion";
   export let data: any;
-  export let tabList: any;
 
-  export let collectionsMethods: CollectionsMethods;
+  const _viewModel = new WorkspaceViewModel();
+
+  const workspaceMethods: WorkspaceMethods = {
+    handleCreateTab: _viewModel.handleCreateTab,
+  };
+
+  const tabList = _viewModel.tabs;
+  const collectionList = _viewModel.collection;
 </script>
 
-<div class="workspace bg-backgroundColor">
-  <WorkspaceList {data} />
-  <WorkspaceContent {data} {collectionsMethods} />
-</div>
+<Motion {...scaleMotionProps} let:motion>
+  <div class="workspace bg-backgroundColor" use:motion>
+    <WorkspaceList {data} tabList={$tabList} collectionList={$collectionList} />
+    <WorkspaceContent {data} {workspaceMethods} />
+  </div>
+</Motion>
 
 <style>
   .workspace {

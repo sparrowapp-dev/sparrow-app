@@ -13,7 +13,6 @@
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
   import {
-    RequestDataType,
     RequestMethod,
     RequestProperty,
   } from "$lib/utils/enums/request.enum";
@@ -21,11 +20,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  export let loaderColor = "default";
+  export const loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  //this for expand and collaps condition
+  //this for expand and collapse condition
   const _apiSendRequest = new ApiSendRequestViewModel();
 
   let isCollaps: boolean;
@@ -42,11 +40,22 @@
   let request;
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
+  let currentTabId: string = "";
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+<<<<<<< HEAD
     urlText = event?.property?.request?.url;
     method = event?.property?.request?.method;
     disabledSend = event?.property?.request?.requestInProgress;
     request = event?.property?.request;
+=======
+    if (event) {
+      currentTabId = event?.id;
+      urlText = event?.property?.request?.url;
+      method = event?.property?.request?.method;
+      disabledSend = event?.property?.request?.requestInProgress;
+      request = event?.property?.request;
+    }
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   const handleSendRequest = async () => {
@@ -60,16 +69,20 @@
       collectionsMethods.updateRequestProperty(
         true,
         RequestProperty.REQUEST_IN_PROGRESS,
+        currentTabId,
       );
 
       isInputEmpty = false;
       if (isInputValid) {
         let start = Date.now();
         isLoading = true;
-        createApiRequest(_apiSendRequest.decodeRestApiData(request))
+
+        createApiRequest(
+          _apiSendRequest.decodeRestApiData(request),
+          currentTabId,
+        )
           .then((response) => {
             let end = Date.now();
-
             const byteLength = new TextEncoder().encode(
               JSON.stringify(response),
             ).length;
@@ -86,6 +99,7 @@
             collectionsMethods.updateRequestProperty(
               false,
               RequestProperty.REQUEST_IN_PROGRESS,
+              response.tabId,
             );
             collectionsMethods.updateRequestProperty(
               {
@@ -96,6 +110,7 @@
                 size: responseSizeKB,
               },
               RequestProperty.RESPONSE,
+              response.tabId,
             );
             isLoading = false;
           })
@@ -116,8 +131,6 @@
             );
             isLoading = false;
           });
-        // For Test purpose (BUG NOT RESOLVED YET)
-        // console.log("running", Date.now() - start )
       }
     }
   };
@@ -156,15 +169,24 @@
   });
 
   const handleDropdown = (tab: RequestMethodType) => {
-    collectionsMethods.updateRequestProperty(tab, RequestProperty.METHOD);
+    collectionsMethods.updateRequestProperty(
+      tab,
+      RequestProperty.METHOD,
+      currentTabId,
+    );
   };
   let selectedView: string = isHorizontalMode ? "horizontal" : "vertical";
 
   let handleInputValue = () => {
-    collectionsMethods.updateRequestProperty(urlText, RequestProperty.URL);
+    collectionsMethods.updateRequestProperty(
+      urlText,
+      RequestProperty.URL,
+      currentTabId,
+    );
     collectionsMethods.updateRequestProperty(
       extractKeyValueFromUrl(urlText),
       RequestProperty.QUERY_PARAMS,
+      currentTabId,
     );
   };
   onDestroy(() => {
@@ -175,9 +197,10 @@
     const windowWidth = window.innerWidth;
 
     if (windowWidth <= 1300) {
-      document.querySelector("#barIcon").click();
+      document.querySelector<HTMLElement>("#barIcon").click();
       isHorizontal.set(true);
     } else {
+      document.querySelector<HTMLElement>("#lineIcon").click();
       isHorizontal.set(false);
     }
   };
@@ -189,7 +212,7 @@
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.key === "Enter") {
-      handleSendRequest();
+      if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
     }
@@ -262,6 +285,7 @@
 
     <div class="d-flex gap-1 ps-2">
       <span style="cursor:pointer;">
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <img
           on:click={() => isHorizontal.set(false)}
           on:click={() => {
@@ -277,6 +301,7 @@
           class:view-active={selectedView === "vertical"}
           src={tableColumnIcon}
           alt=""
+          id="lineIcon"
         />
       </span>
       <span style="cursor:pointer;">

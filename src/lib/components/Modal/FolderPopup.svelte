@@ -3,17 +3,18 @@
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-    import CoverButton from "../buttons/CoverButton.svelte";
+  import { fade, fly } from "svelte/transition";
+  import CoverButton from "../buttons/CoverButton.svelte";
   export let collectionId: string;
   export let folderId: string;
   export let workspaceId: string;
   export let folder;
   export let collectionsMethods: CollectionsMethods;
-  export let closePopup : (flag: boolean) => void;
+  export let closePopup: (flag: boolean) => void;
   const collectionService = new CollectionService();
 
   let requestCount: number = folder.items.length;
-  let requestIds = folder.items.map((element)=>{
+  let requestIds = folder.items.map((element) => {
     return element.id;
   });
   requestIds.push(folderId);
@@ -29,8 +30,11 @@
     );
 
     if (response.isSuccessful) {
-      collectionsMethods.deleteRequestOrFolderInCollection(collectionId, folderId);
-    
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        folderId,
+      );
+
       notifications.success(`"${folder.name}" Folder deleted.`);
       deleteLoader = false;
       collectionsMethods.removeMultipleTabs(requestIds);
@@ -42,20 +46,30 @@
   };
 </script>
 
-  <div class="background-overlay" 
-  on:click={()=>{
+<div
+  class="background-overlay"
+  on:click={() => {
     closePopup(false);
-  }}/>
+  }}
+  transition:fade={{ delay: 0, duration: 100 }}
+/>
 
-
-<div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
+<div
+  class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Folder?
     </h5>
-    <button class="btn-close1 border-0 rounded" on:click={()=>{
-      closePopup(false);
-    }}>
+    <button
+      class="btn-close1 border-0 rounded"
+      on:click={() => {
+        closePopup(false);
+      }}
+    >
       <img src={closeIcon} alt="" />
     </button>
   </div>

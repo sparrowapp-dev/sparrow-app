@@ -6,7 +6,7 @@
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
 
-  import book from "$lib/assets/book.svg";
+  import BookIcon from "$lib/assets/book.svelte";
   export let tab: NewTab;
   export let updateCurrentTab: (id: string) => void;
   export let tabWidth: number;
@@ -31,11 +31,9 @@
       on:click={() => {
         updateCurrentTab(tab.id);
       }}
-      class="position-relative border-0"
+      class="position-relative border-0 ellipsis"
       style="    width: 80%;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden; text-align: left; background-color:transparent;"
+       text-align: left; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span
@@ -61,7 +59,7 @@
         </span>
       {:else if tab.type === ItemType.WORKSPACE}
         <span>
-          <img src={book} alt="book" />
+          <BookIcon/>
         </span>
       {/if}
       <span
@@ -72,7 +70,7 @@
       >
         {tab.name}
       </span>
-      {#if !tab.save}
+      {#if (tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
         <span
           class="position-absolute"
           style="right:0; top:6px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"

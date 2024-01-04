@@ -11,8 +11,11 @@
   import { navigate } from "svelte-navigator";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { notifications } from "$lib/utils/notifications";
+  import { slide } from "svelte/transition";
+  import checkIcon from "$lib/assets/check.svg";
+  export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
-
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
@@ -24,7 +27,7 @@
     isOpen = !isOpen;
   };
 
-  const handleWorkspaceTab = (id: string, name) => {
+  const handleWorkspaceTab = (id: string, name, description: string) => {
     isWorkspaceCreatedFirstTime.set(false);
     let totalCollection: number = 0;
     let totalRequest: number = 0;
@@ -47,6 +50,7 @@
     const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
     sampleWorkspace.id = id;
     sampleWorkspace.name = name;
+    sampleWorkspace.description = description;
     sampleWorkspace.path = path;
     sampleWorkspace.property.workspace.requestCount = totalRequest;
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
@@ -79,7 +83,7 @@
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data_id) {
+          if (item._data._id === response.data.data._id) {
             // totalCollection = item?._data?.collections?.length;
             totalCollection = 0;
           } else {
@@ -89,12 +93,13 @@
       });
 
       let path: Path = {
-        workspaceId: response.data.data_id,
+        workspaceId: response.data.data._id,
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data_id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
+      workspaceObj.description = response.data.data?.description;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
@@ -104,6 +109,7 @@
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
+      notifications.success("New Workspace Created");
     }
   };
 
@@ -160,8 +166,9 @@
         style="height:20px;width:20px">+</span
       >
     </p>
-    <hr class="m-0 p-0" />
+    <hr class="m-0 p-0 mb-1" />
     {#if $data}
+<<<<<<< HEAD
       {#each $data as list, index}
         <!-- {#if index < workspaceLimit} -->
         <p
@@ -179,6 +186,39 @@
         </p>
         <!-- {/if} -->
       {/each}
+=======
+      {#if isOpen}
+        <div transition:slide={{ duration: 500 }} class="gap-2">
+          {#each $data.slice().reverse() as list, index}
+            {#if index < workspaceLimit}
+              <div
+                class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
+              >
+                <p
+                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  style="cursor: pointer;overflow:auto"
+                  on:click={() => {
+                    isOpen = false;
+
+                    onclick(list._id, list.name);
+                  }}
+                  on:click={() => {
+                    handleWorkspaceTab(list._id, list.name, list?.description);
+                  }}
+                >
+                  {list.name}
+                </p>
+                <div>
+                  {#if activeWorkspaceId === list._id}
+                    <img src={checkIcon} alt="checkIcon" />
+                  {/if}
+                </div>
+              </div>
+            {/if}
+          {/each}
+        </div>
+      {/if}
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     {/if}
     <hr class="m-0 p-0 mt-1" />
     <p
