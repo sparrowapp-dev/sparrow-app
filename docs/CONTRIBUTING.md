@@ -60,10 +60,6 @@ git add .
 
 git commit -m "fix: your-commit-message"
 
-# Fetch and merge with upstream/master again
-git fetch upstream
-git merge upstream/master
-
 # Push changes to your forked repository
 git push origin <type>/<issue-issueNumber>/{<additional-fixes>}
 
