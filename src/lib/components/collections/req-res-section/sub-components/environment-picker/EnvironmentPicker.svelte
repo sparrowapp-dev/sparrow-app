@@ -143,6 +143,7 @@
     font-size: 12px;
     font-weight: 400;
     padding: 4px 8px 4px 4px;
+    color: white;
   }
   .global-environment {
     color: #58c6b9;
@@ -167,6 +168,7 @@
     -webkit-line-clamp: 3; /* Number of lines to show */
     text-overflow: ellipsis;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
+    color: white;
   }
   .default-environment {
     font-size: 10px;
