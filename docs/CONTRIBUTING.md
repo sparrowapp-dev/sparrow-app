@@ -6,9 +6,10 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Pull Request Process
 
-1. Ensure any install or build dependencies are removed before the end of the layer when doing a build. Add only relevant files to commit and ignore the rest to keep the repo clean.
-2. Update the README.md with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and container parameters.
-3. You should request review from the maintainers once you submit the Pull Request.
+1. Please name your PR's using Conventional Commits e.g. "fix: ..." or "feat: ..."
+2. Ensure any install or build dependencies are removed before the end of the layer when doing a build. Add only relevant files to commit and ignore the rest to keep the repo clean.
+3. Update the README.md with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and container parameters.
+4. You should request review from the maintainers once you submit the Pull Request.
 
 ## Instructions
 
@@ -16,10 +17,9 @@ When contributing to this repository, please first discuss the change you wish t
 
 #### Step 1
 
-```bash
-## Step 1: Fork Repository
+- Fork the repository to your GitHub account
 
-## Step 2: Git Set Up & Download
+```bash
 # Clone the repo
 git clone https://github.com/<User-Name>/sparrow-app.git
 
@@ -28,42 +28,37 @@ cd sparrow-app
 
 # Add upstream remote
 git remote add upstream https://github.com/sparrowapp-dev/sparrow-app.git
-
-# Fetch and merge with upstream/master
-git fetch upstream
-git merge upstream/master
-
-## Step 2: Create and Publish Working Branch
-git checkout -b <type>/<issue-issueNumber>/{<additional-fixes>}
-
-# Example: fix/issue-21
-git push origin <type>/<issue-issueNumber>/{<additional-fixes>}
-
-## Types:
-# wip - Work in Progress; long term work; mainstream changes;
-# feat - New Feature; future planned; non-mainstream changes;
-# bug - Bug Fixes
-# exp - Experimental; random experimental features;
 ```
-#### Step 2
-- [Setup project locally](https://github.com/sparrowapp-dev/sparrow-app#installation)
 
-#### Step 4
+#### Step 2
+- [Setup project locally](https://github.com/sparrowapp-dev/sparrow-app#installation)  
+
+#### Step 3
+
+- Commit your changes and push your branch to GitHub:
+
 ```bash
 ## Committing and pushing your work
 
 # Ensure branch
 git branch
 
-# Fetch and merge with upstream/master
+# Fetch and merge with upstream/main
 git fetch upstream
-git merge upstream/master
+git merge upstream/main
 
 # Add untracked files
 git add .
 
 # Commit all changes with appropriate commit message and description
-git commit -m "your-commit-message"
+# Before comminting, make sure you have followed the commit message standards
+# use the following prefix for commit messages
+# wip - Work in Progress; long term work; mainstream changes;
+# feat - New Feature; future planned; non-mainstream changes;
+# bug - Bug Fixes
+# exp - Experimental; random experimental features;
+
+git commit -m "fix: your-commit-message"
 
 # Fetch and merge with upstream/master again
 git fetch upstream
@@ -86,8 +81,8 @@ git push origin <type>/<issue-issueNumber>/{<additional-fixes>}
 git branch -d <type>/<issue-issueNumber>/{<additional-fixes>}
 git push --delete origin <type>/<issue-issueNumber>/{<additional-fixes>}
 
-# Fetch and merge with upstream/master
-git checkout master
+# Fetch and merge with upstream/main
+git checkout main
 git pull upstream
 git push origin
 ```
