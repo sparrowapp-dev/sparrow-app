@@ -23,9 +23,9 @@ One-stop API management tool
 1. 🐦 [What is Sparrow ?](#what-is-sparrow)
 2. 🔨 [Installation](#installation)
 3. 👨‍💻 [Recommended IDE Setup](#recommended-ide-setup)
-5. 📖 [Env variables](#env-variables)
-6. ❤️ [Subscribe to our Newsletter](#subscribe-to-our-newsletter)
-6. ❤️ [How to Contribute ?](#contributors)
+4. 📖 [Env variables](#env-variables)
+5. ❤️ [How to Contribute ?](#contributors)
+6. 📨 [Subscribe to our Newsletter](#subscribe-to-our-newsletter)
  
 ## <a name="what-is-sparrow">🐦 What is Sparrow ?</a>
  
@@ -38,10 +38,22 @@ To install this project, you will need to have the following installed on your m
 ![NODE](https://img.shields.io/badge/-Node.js-black?style=for-the-badge&logoColor=white&logo=nodedotjs&color=339933)
 ![Yarn](https://img.shields.io/badge/-Yarn-black?style=for-the-badge&logoColor=white&logo=yarn&color=2C8EBB)
 ![Rust](https://img.shields.io/badge/-Rust-black?style=for-the-badge&logoColor=white&logo=rust&color=000000)
+
+Install the above dependencies by heading over to the links below,
+
+1) [Node](https://nodejs.org/en)
+2) [Tauri](https://tauri.app/v1/guides/getting-started/prerequisites)
+3) [Yarn](https://classic.yarnpkg.com/lang/en/docs/install)
  
 Then, run the following commands :
  
 ```bash
+# Clone the repo
+git clone https://github.com/sparrowapp-dev/sparrow-app
+
+# Move into the project root
+cd sparrow-app
+	
 # Install dependencies and Husky hooks
 yarn
  
@@ -63,7 +75,7 @@ Environment variables are :
  
 |        Name         |               Description               | Required | Default value |                   Limitations                    |
 |:-------------------:|:---------------------------------------:|:--------:|:-------------:|:------------------------------------------------:|
-|       `VITE_API_URL`        | Host on which the API will be available |    ✅     |  `127.0.0.1/9000`  |          If set, can't be empty string           |
+|       `VITE_API_URL`        | Host on which the API will be available |    ✅     |  `https://dev-api.sparrow.techdomeaks.com`  |          If set, can't be empty string           |
 
 ## <a name="contributors">❤️ How to Contribue ?</a>
 
