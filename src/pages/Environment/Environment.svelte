@@ -72,12 +72,13 @@
         currentEnvironment.type = data?.get("type");
         currentEnvironment.isActive = data?.get("isActive");
         currentEnvironment.variable = data?.get("variable");
-        // debugger;
         if (response.isSuccessful && response.data.data) {
           const environments = response.data.data;
           environmentRepositoryMethods.bulkInsert(environments);
           return;
         }
+
+        // debugger;
       }
     },
   );

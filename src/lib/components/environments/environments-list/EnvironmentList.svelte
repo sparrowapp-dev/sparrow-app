@@ -43,6 +43,7 @@
   const handleOpenEnvironment = (id: string) => {
     _environmentListViewModel.setCurrentEnvironment(currentWorkspace.id, id);
   };
+
   const environmentSubscribe = environments.subscribe(
     (value: EnvironmentDocument[]) => {
       if (value) {
@@ -58,18 +59,22 @@
         const filteredEnvironments = environmentArr.filter((env) => {
           if (env.type == "LOCAL" || env.type == undefined) {
             return true;
-          } else {
+          } else if (env.type == "GLOBAL") {
             globalEnvrionment = env;
           }
         });
-        const isPresent = environmentArr.find((env) => {
-          if (env.id == currentWorkspace.currentEnvironmentId) return true;
-        });
+
+        const isPresent =
+          environmentArr.length > 0 &&
+          environmentArr.find((env) => {
+            if (env.id == currentWorkspace.currentEnvironmentId) return env;
+          });
+
         if (!isPresent) {
-          // debugger;
           handleOpenEnvironment(globalEnvrionment?.id);
         }
         environment = filteredEnvironments;
+        console.log("Environment: ", environment);
         return;
       }
     },
@@ -85,6 +90,8 @@
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextEnvironment(environment, "New Environment"),
       variable: [],
+      type: "LOCAL",
+      isActive: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -94,7 +101,6 @@
       workspaceId: currentWorkspace.id,
       variable: newEnvironment.variable,
     });
-
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       environmentUnderCreation = false;
@@ -103,7 +109,7 @@
         _id: response.data.data._id,
         name: newEnvironment.name,
       });
-      handleOpenEnvironment(newEnvironment.id);
+      handleOpenEnvironment(res._id);
       notifications.success("New Environment Created!");
       return;
     }
@@ -152,7 +158,6 @@
       .forEach((item) => item.classList.remove("active"));
     rightClickEnv.id = id;
     rightClickEnv.isActive = isActive;
-    console.log("r: ", rightClickEnv);
     e.target.classList.toggle("active");
     setTimeout(() => {
       const containerRect = containerRef?.getBoundingClientRect();

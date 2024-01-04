@@ -34,13 +34,9 @@ export class EnvironmentRepository {
         },
       })
       .exec();
+
     environment.incrementalModify((value) => {
-      if (data.name) value.name = data.name;
-      if (data.variable) value.variable = data.variable;
-      if (data.type) value.type = data.type;
       if (data._id) value.id = data._id;
-      if (data.updatedAt) value.updatedAt = data.updatedAt;
-      if (data.updatedBy) value.updatedBy = data.updatedBy;
       return value;
     });
     return;
@@ -106,7 +102,6 @@ export class EnvironmentRepository {
       }
       return res;
     });
-    console.log("data: ", data);
     await RxDB.getInstance().rxdb.environment.bulkUpsert(data);
     return;
   };
@@ -114,16 +109,16 @@ export class EnvironmentRepository {
   public bulkInsertData = async (
     environment: EnvironmentDto[],
   ): Promise<void> => {
+    // debugger;
     if (environment.length > 0) {
       const updatedEnvironments = environment.map((environmentObj) => {
         environmentObj["id"] = environmentObj._id;
         environmentObj["isActive"] = false;
+        environmentObj["environmentId"] = environmentObj.createdAt;
         delete environmentObj._id;
         return environmentObj;
       });
-
-      await RxDB.getInstance().rxdb.environment.find().remove();
-      await RxDB.getInstance().rxdb.environment.bulkInsert(updatedEnvironments);
+      await RxDB.getInstance().rxdb.environment.bulkUpsert(updatedEnvironments);
     } else {
       await RxDB.getInstance().rxdb.environment.find().remove();
     }
