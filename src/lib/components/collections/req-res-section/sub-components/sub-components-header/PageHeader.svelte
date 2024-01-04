@@ -15,6 +15,9 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import lockicon from "$lib/assets/lock-icon.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+    import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+    import { RequestDataset } from "$lib/utils/enums/request.enum";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -40,22 +43,40 @@
     collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-
+      let existingRequest;
+    if (!folderId) {
+      existingRequest =
+        await collectionsMethods.readRequestOrFolderInCollection(
+          collectionId,
+          _id,
+        );
+    } else {
+      existingRequest = await collectionsMethods.readRequestInFolder(
+        collectionId,
+        folderId,
+        _id,
+      );
+    }
+    const bodyType =
+    componentData.property.request.state.dataset === RequestDataset.RAW
+          ? componentData.property.request.state.raw
+          : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
+      selectedRequestBodyType:setContentTypeHeader(bodyType),
     };
-
-    if (!folderId && !folderName) {
-      let res = await updateCollectionRequest(componentData.id, {
+    if (!folderId) {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         items: {
-          id: componentData.id,
+          id: _id,
           name: tabName,
+          description: existingRequest?.description,
           type: ItemType.REQUEST,
           request: expectedRequest,
         },
@@ -63,16 +84,16 @@
       if (res.isSuccessful) {
         collectionsMethods.updateRequestOrFolderInCollection(
           collectionId,
-          componentData.id,
+          _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "api", _id);
         collectionsMethods.updateTab(false, "saveInProgress", _id);
-        collectionsMethods.updateTab(true, "save", _id);
       } else {
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     } else {
-      let res = await updateCollectionRequest(componentData.id, {
+      let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
@@ -80,8 +101,9 @@
           name: folderName,
           type: ItemType.FOLDER,
           items: {
-            id: componentData.id,
+            id: _id,
             name: tabName,
+            description: existingRequest.description,
             type: ItemType.REQUEST,
             request: expectedRequest,
           },
@@ -91,11 +113,11 @@
         collectionsMethods.updateRequestInFolder(
           collectionId,
           folderId,
-          componentData.id,
+          _id,
           res.data.data,
         );
+        collectionsMethods.setRequestSave(true, "api", _id);
         collectionsMethods.updateTab(false, "saveInProgress", _id);
-        collectionsMethods.updateTab(true, "save", _id);
       } else {
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
@@ -157,6 +179,38 @@
       inputElement.select();
     }
   });
+
+  const onRenameBlur = async () => {
+    if (!tabName) {
+      const {collectionId, folderId} = componentData?.path; 
+      if(collectionId && folderId){
+        const req = await collectionsMethods.readRequestInFolder(collectionId, folderId, componentData?.id);
+        if(req?.name){
+          collectionsMethods.updateTab(req.name, "name", componentData.id);
+        }
+      } else if (collectionId) {
+        const req = await collectionsMethods.readRequestOrFolderInCollection(
+          collectionId,
+          componentData.id,
+        );
+        if (req?.name) {
+          collectionsMethods.updateTab(req.name, "name", componentData.id);
+        }
+      } else {
+        const req = generateSampleRequest("id", new Date().toString());
+        collectionsMethods.updateTab(req.name, "name", componentData.id);
+      }
+    }
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldNamePageHeader",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
   onDestroy(() => {
     unsubscribeisApiCreatedFirstTime();
   });
@@ -171,12 +225,15 @@
     <div class="w-100 me-3">
       <input
         {autofocus}
-        placeholder="Enter API Request Name"
+        id="renameInputFieldNamePageHeader"
         bind:value={tabName}
         on:input={handleInputValue}
         class="tabbar-tabName w-100"
         bind:this={inputElement}
         style="outline: none;"
+        maxlength={100}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
       />
     </div>
 

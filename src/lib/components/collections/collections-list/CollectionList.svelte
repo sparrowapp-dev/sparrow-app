@@ -11,6 +11,7 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
+  import { slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -23,7 +24,7 @@
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
   import type { Observable } from "rxjs";
-  
+
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -32,22 +33,47 @@
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   export let deleteCollectionData;
   export let collectionsMethods: CollectionsMethods;
+  export let activeTabId: string;
+  export let activePath;
 
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
+<<<<<<< HEAD
 
  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
 
+=======
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { username } from "$lib/store/auth.store";
+  import { notifications } from "$lib/utils/notifications";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   const [, , searchNode] = useTree();
-  let collection: any[] = [];
+  let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
+<<<<<<< HEAD
+=======
+  let searchData: string = "";
+  let userName: string = "";
+  let isComponentRenderedFirstTime=false;
+  let showDefault=false;
+  let isLoading=true;
+  const workspacesArr=_workspaceViewModel.workspaces;
+
+  const usernameUnsubscribe = username.subscribe((value) => {
+    if (value) {
+      userName = value;
+    }
+  });
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
 
   let selectedApiMethods: string[] = [];
   let filteredSelectedMethodsCollection = [];
   let collapsExpandToggle: boolean = false;
+
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
   const activeWorkspace: Observable<WorkspaceDocument> =
@@ -66,12 +92,19 @@
         );
         collection = collectionArr;
       }
-      if(searchData || selectedApiMethods.length>0){
+      if (searchData || selectedApiMethods.length > 0) {
         handleSearch();
-
       }
     },
   );
+  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces)=>{
+    workspaces.map((workspace)=>{
+      if(workspace._data.isActiveWorkspace){
+        showDefault=workspace._data.collections.length===0?true:false;
+        return;
+      }
+    })
+  })
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       selectedApiMethods = value;
@@ -115,6 +148,10 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        if(isComponentRenderedFirstTime){
+          isLoading=true;
+           isComponentRenderedFirstTime=false;
+        }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
@@ -122,14 +159,17 @@
           await collectionsMethods.getAllCollections(workspaceId);
         if (response.isSuccessful && response.data.data.length > 0) {
           const collections = response.data.data;
+          isLoading=false;
           collectionsMethods.bulkInsert(collections);
           return;
         }
       }
     },
   );
-
+  let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
+    showDefault=false;
+    collectionUnderCreation = true;
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -148,7 +188,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-
+      collectionUnderCreation = false;
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -181,6 +221,7 @@
         id: Samplecollection.id,
         name: newCollection.name,
       });
+      notifications.success("New Collection Created");
       return;
     }
     return;
@@ -192,11 +233,10 @@
     filterBtn.style.backgroundColor = showfilterDropdown
       ? "#85C2FF"
       : "#000000";
-    if(!showfilterDropdown){
-      selectMethodsStore.update(()=>[]);
+    if (!showfilterDropdown) {
+      selectMethodsStore.update(() => []);
       handleSearch();
     }
-      
   };
 
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
@@ -206,6 +246,22 @@
   const setcollapsExpandToggle = () => {
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
+
+    if (collapsExpandToggle) {
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.add("decrease-width");
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.remove("increase-width");
+    } else {
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.add("increase-width");
+      document
+        .getElementsByClassName("sidebar")[0]
+        .classList.remove("decrease-width");
+    }
   };
 
   let searchData: string = "";
@@ -223,7 +279,7 @@
       filteredFile,
       collection,
     );
-  };
+  }
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
@@ -236,6 +292,7 @@
 
     if (windowWidth <= 800) {
       // Programmatically trigger a click on the button
+      //@ts-ignore
       document.querySelector("#doubleAngleButton").click();
       collapsibleState.set(true);
     } else {
@@ -252,6 +309,7 @@
     collectionSubscribe.unsubscribe();
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    usernameUnsubscribe();
   });
 
   let selectedView: string = "grid";
@@ -285,12 +343,12 @@
 {/if}
 
 <div
-  style="width:{collapsExpandToggle
-    ? '0px'
-    : '280px'};border-right: {collapsExpandToggle
+  style="border-right: {collapsExpandToggle
     ? '0px'
     : '1px solid #313233'};overflow:auto"
-  class="sidebar d-flex flex-column bg-backgroundColor scroll"
+  class={`sidebar ${
+    collapsExpandToggle ? "decrease-width" : "increase-width"
+  } d-flex flex-column bg-backgroundColor scroll`}
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
@@ -351,7 +409,11 @@
       </button>
     </div>
     <div>
-      <RequestDropdown {collectionsMethods} {handleCreateCollection} />
+      <RequestDropdown
+        {collectionsMethods}
+        {handleCreateCollection}
+        {collectionUnderCreation}
+      />
     </div>
   </div>
 
@@ -360,6 +422,11 @@
     style="overflow:auto;margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
+      {#if isLoading}
+      <div class="spinner">
+        <Spinner size={`32px`} />
+      </div>
+      {:else}
       {#if showfilterDropdown}
         <FilterDropDown {handleSearch} />
       {/if}
@@ -410,9 +477,11 @@
             collection={col}
             title={col.name}
             {collectionsMethods}
+            {activeTabId}
+            {activePath}
           />
         {/each}
-      {:else if collection.length > 0}
+      {:else if collection && collection.length > 0}
         {#each collection as col}
           <Folder
             collectionList={collection}
@@ -421,10 +490,12 @@
             collection={col}
             title={col.name}
             {collectionsMethods}
+            {activeTabId}
+            {activePath}
           />
         {/each}
-      {:else if collection && collection.length === 0}
-        <DefaultCollection {handleCreateCollection} {collectionsMethods} />
+        {/if}
+        <DefaultCollection {handleCreateCollection} {collectionsMethods} {showDefault} />
       {/if}
     </div>
   </div>
@@ -481,5 +552,41 @@
   }
   .collections-list::-webkit-scrollbar-thumb {
     background: #888;
+  }
+
+  @keyframes increaseWidth {
+    0% {
+      width: 0;
+    }
+
+    100% {
+      width: 280px;
+    }
+  }
+  @keyframes decreaseWidth {
+    0% {
+      width: 280px;
+    }
+    100% {
+      width: 0px;
+    }
+  }
+
+  .decrease-width {
+    animation: decreaseWidth 0.3s;
+    width: 0;
+    max-width: 280px;
+  }
+  .increase-width {
+    animation: increaseWidth 0.3s;
+    max-width: 280px;
+  }
+  .spinner{
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 </style>

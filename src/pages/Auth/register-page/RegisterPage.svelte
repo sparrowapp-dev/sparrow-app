@@ -9,26 +9,27 @@
   import starIcon from "$lib/assets/starIcon.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
-
+  import { Link } from "svelte-navigator";
+ 
   let userData = {
     email: "",
     name: "",
     password: "",
     tnsCheckbox: false,
   };
-
+ 
   let validationErrors: any = {};
-
+ 
   let isPasswordValid1 = false;
   let isPasswordValid2 = false;
   let isPasswordValid3 = false;
-
+ 
   let isCheckboxTouched = false;
-
+ 
   let isEmailTouched = false;
   let isNameTouched = false;
   let isPasswordTouched = false;
-
+ 
   let isEmailValid = false;
   const validateEmail = () => {
     const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
@@ -40,13 +41,13 @@
       validationErrors.email = "";
     }
   };
-
+ 
   let isNameValid = false;
   const validateName = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
     let isNameTouched = true;
     isNameValid = nameRegex.test(userData.name);
-
+ 
     if (isNameValid && isNameTouched) {
       validationErrors.name = "";
     } else {
@@ -54,17 +55,17 @@
         "Your first name cannot have numbers or special characters.";
     }
   };
-
+ 
   let isValidPassword = false;
-
+ 
   const validatePassword = () => {
     const password = userData.password;
-
+ 
     isPasswordValid1 = isValidPassword1(password);
     isPasswordValid2 = isValidPassword2(password);
     isPasswordValid3 = isValidPassword3(password);
     isValidPassword = isValid(password);
-
+ 
     if (isPasswordValid1 && isPasswordValid2 && isPasswordValid3) {
       validationErrors.password = "";
     } else if (isPasswordTouched) {
@@ -74,7 +75,7 @@
       validationErrors.password = isPasswordValid3;
     }
   };
-
+ 
   const isValid = (password) => {
     if (
       isValidPassword1(password) &&
@@ -85,16 +86,16 @@
     }
     return false;
   };
-
+ 
   const isValidPassword1 = (password) => {
     isPasswordTouched = true;
-
+ 
     if (password.length >= 8) {
       return (isPasswordValid1 = true);
     }
     return (isPasswordValid1 = false);
   };
-
+ 
   const isValidPassword2 = (password) => {
     isPasswordTouched = true;
     if (/(?=.*[0-9])/.test(password)) {
@@ -102,18 +103,18 @@
     }
     return (isPasswordValid2 = false);
   };
-
+ 
   const isValidPassword3 = (password) => {
     isPasswordTouched = true;
-
+ 
     if (/(?=.*[!@#$%^&*])/.test(password)) {
       return (isPasswordValid3 = true);
     }
     return (isPasswordValid3 = false);
   };
-
+ 
   let ischeckBoxValid = false;
-
+ 
   const validateCheckbox = () => {
     isCheckboxTouched = true;
     ischeckBoxValid = userData.tnsCheckbox;
@@ -122,14 +123,14 @@
     } else if (isCheckboxTouched) {
     }
   };
-
+ 
   let isLoadingPage: boolean;
   isLoading.subscribe((value) => {
     isLoadingPage = value;
   });
-
+ 
   let isPasswordVisible = false;
-
+ 
   const togglePasswordVisibility = () => {
     isPasswordVisible = !isPasswordVisible;
     const passwordInput = document.getElementById("expamplePassword");
@@ -138,7 +139,7 @@
     }
   };
 </script>
-
+ 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded overflow-hidden"
   style="height: 100vh;"
@@ -156,7 +157,7 @@
       >
         Welcome to Sparrow!
       </p>
-
+ 
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"
         style="width:408px;"
@@ -189,7 +190,7 @@
             bind:value={userData.email}
             on:input={validateEmail}
           />
-
+ 
           {#if validationErrors.email}
             <small class="text-dangerColor form-text"
               >{validationErrors.email}</small
@@ -201,7 +202,7 @@
             <label for="name">Full Name</label>
             <img src={starIcon} alt="" class="mb-3" style="width: 7px;" />
           </div>
-
+ 
           <input
             class="form-control mt-1 bg-black border:{validationErrors.email
               ? '3px'
@@ -220,14 +221,14 @@
             bind:value={userData.name}
             on:input={validateName}
           />
-
+ 
           {#if validationErrors.name}
             <small class="text-dangerColor form-text"
               >{validationErrors.name}</small
             >
           {/if}
         </div>
-
+ 
         <div class="form-group">
           <div>
             <label for="password" id="password">Password</label>
@@ -267,7 +268,7 @@
             </button>
           </div>
         </div>
-
+ 
         <div class="row">
           <div class="col-12 col-md-12 col-lg-12">
             <div
@@ -330,6 +331,7 @@
                     : isPasswordTouched
                     ? 'text-dangerColor'
                     : 'text-defaultColor'}"
+                  style="text:{!isPasswordValid3 ? 'red' : 'red'}"
                 >
                   Has at least one special character
                 </p>
@@ -337,7 +339,7 @@
             </div>
           </div>
         </div>
-
+ 
         <div class="form-group mt-2" data-tauri-drag-region>
           <input
             type="checkbox"
@@ -361,20 +363,20 @@
             >{validationErrors.tnsCheckbox}</small
           >
         {/if}
-
+ 
         <div class="mb-3 mt-4">
           <button class="btn btn-primary w-100 text-whiteColor border-0"
             >Sign Up</button
           >
         </div>
-
+ 
         <div
           class="d-flex flex-column align-items-center justify-content-center"
         >
           <div class="gap-3 d-flex align-items-center justify-content-center">
             <p class="fs-6 mb-0">Already have an account?</p>
-            <a href="/login" class=" text-decoration-none text-primaryColor"
-              >Sign In</a
+            <Link to="/login" class=" text-decoration-none text-primaryColor"
+              >Sign In</Link
             >
           </div>
         </div>
@@ -382,22 +384,22 @@
     </div>
   {/if}
 </div>
-
+ 
 <style>
   input::-ms-reveal,
   input::-ms-clear {
     display: none;
   }
-
+ 
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
-
+ 
   .eye-icon > img {
     position: absolute;
     transform: translateX(-4vmax);
   }
-
+ 
   @media (min-width: 1000px) {
     .eye-icon > img {
       position: absolute;

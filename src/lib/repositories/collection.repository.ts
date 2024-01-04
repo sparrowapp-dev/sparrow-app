@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type CollectionDocument } from "$lib/database/app.database";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
+<<<<<<< HEAD
+=======
+import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
 import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
@@ -39,6 +44,16 @@ export class CollectionRepository {
     });
 
     return;
+  };
+
+  public readCollection = async (uuid: string): Promise<CollectionDocument> => {
+    return await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: uuid,
+        },
+      })
+      .exec();
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
@@ -131,6 +146,10 @@ export class CollectionRepository {
       .exec();
     collection.incrementalPatch({
       items: [...collection.items, items],
+      totalRequests:
+        items.type === ItemType.REQUEST
+          ? collection.totalRequests + 1
+          : collection.totalRequests,
     });
   };
 
@@ -160,6 +179,31 @@ export class CollectionRepository {
       value.items = [...updatedItems];
       return value;
     });
+  };
+
+  /**
+   * @description
+   * Updates an API request or folder within a collection.
+   */
+  public readRequestOrFolderInCollection = async (
+    collectionId: string,
+    uuid: string,
+  ): Promise<CollectionItem> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response: CollectionItem;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === uuid) {
+        response = element;
+        return;
+      }
+    });
+    return response;
   };
 
   /**
@@ -222,6 +266,36 @@ export class CollectionRepository {
       value.items = [...updatedItems];
       return value;
     });
+  };
+
+  /**
+   * @description
+   * Read an API request within a folder.
+   */
+  public readRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ): Promise<unknown> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === folderId) {
+        for (let i = 0; i < element.items.length; i++) {
+          if (element.items[i].id === uuid) {
+            response = element.items[i];
+            break;
+          }
+        }
+      }
+    });
+    return response;
   };
 
   public updateRequestInFolderCollection = async (

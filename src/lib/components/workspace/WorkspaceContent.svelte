@@ -1,24 +1,22 @@
 <script lang="ts">
-  import { Link, Route } from "svelte-navigator";
+  import { Link, Route, navigate } from "svelte-navigator";
   import Workspaces from "$lib/components/teams/teams-content/workspaces/Workspaces.svelte";
 
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
   export let data: any;
-  import Navigate from "../../routing/Navigate.svelte";
+  import Navigate from "../../../routing/Navigate.svelte";
   import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { v4 as uuidv4 } from "uuid";
-
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { WorkspaceViewModel } from "./workspace.viewModel";
-  export let collectionsMethods: CollectionsMethods;
+  import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
+  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
+  export let workspaceMethods: WorkspaceMethods;
   export let loaderColor = "default";
 
   let isLoading: boolean = false;
@@ -41,6 +39,7 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
+      navigate("/dashboard");
       isLoading = false;
       _viewModel.addWorkspace(response.data.data);
 
@@ -50,7 +49,7 @@
       if ($data) {
         $data.map((item) => {
           if (item) {
-            if (item._data._id === response.data.data_id) {
+            if (item._data._id === response.data.data._id) {
               totalCollection = item?._data?.collections?.length;
             } else {
               totalRequest = 0;
@@ -71,7 +70,7 @@
       workspaceObj.save = true;
       _viewModel.addWorkspace(workspaceObj);
 
-      collectionsMethods.handleCreateTab(workspaceObj);
+      workspaceMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
     } else {
@@ -166,9 +165,7 @@
       </div>
     </div>
 
-    <Route path="/recent"
-      ><Workspaces {data} {selectedView} {selectedTab} /></Route
-    >
+    <Route path="/recent"><PersonalWorkspace {data} {selectedTab} /></Route>
     <Route path="/all-workspace"
       ><PersonalWorkspace {data} {selectedTab} /></Route
     >

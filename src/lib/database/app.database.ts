@@ -1,6 +1,5 @@
 import {
   createRxDatabase,
-  removeRxDatabase,
   type RxCollection,
   type RxDatabase,
   type RxDocument,
@@ -24,6 +23,7 @@ import { addRxPlugin } from "rxdb";
 import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+import constants from "$lib/utils/constants";
 
 /* Uncomment to Enable RxDB Debug Mode
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
@@ -58,12 +58,11 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 //RxDB Class
 export class RxDB {
   private static instance: RxDB | null = null;
-  public db = null;
   public rxdb = null;
   private constructor() {}
 
   public static getInstance(): RxDB {
-    if (!(RxDB.instance?.db && RxDB.instance?.rxdb)) {
+    if (!RxDB.instance?.rxdb) {
       RxDB.instance = new RxDB();
       RxDB.instance.getDb();
     }
@@ -71,24 +70,21 @@ export class RxDB {
   }
 
   public async getDb() {
-    if (this.rxdb && this.db) return { rxdb: this.rxdb, db: this.db };
+    if (this.rxdb) return { rxdb: this.rxdb };
     // create the Rx database
     this.rxdb = await createRxDatabase<DatabaseCollections>({
-      name: "mydatabase",
+      name: constants.RXDB_DB_NAME,
       storage: getRxStorageDexie(),
       ignoreDuplicate: true,
     });
 
     // add all collections
-    this.db = await this.rxdb.addCollections({
+    await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
         migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },
@@ -97,6 +93,7 @@ export class RxDB {
         schema: tabSchema,
         migrationStrategies: {
           // database  migration functions
+<<<<<<< HEAD
           1: function (oldDoc) {
             return oldDoc;
           },
@@ -114,6 +111,9 @@ export class RxDB {
             return oldDoc;
           },
           5: function (oldDoc) {
+=======
+          1: function (oldDoc: TabDocument) {
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             return oldDoc;
           },
         },
@@ -121,6 +121,7 @@ export class RxDB {
       collection: {
         schema: collectionSchema,
         migrationStrategies: {
+<<<<<<< HEAD
           // data migration from version 0 to version 1
           1: function (oldDoc) {
             return oldDoc;
@@ -130,12 +131,17 @@ export class RxDB {
           },
           3: function (oldDoc) {
             oldDoc.collectionId = oldDoc._id;
+=======
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             return oldDoc;
           },
         },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
+<<<<<<< HEAD
         migrationStrategies: {
           // data migration from version 0 to version 1
           1: function (oldDoc) {
@@ -159,8 +165,17 @@ export class RxDB {
 
   public async destroyDb(): Promise<void> {
     await removeRxDatabase("mydatabase", getRxStorageDexie());
+=======
+      },
+    });
+    return { rxdb: this.rxdb };
+  }
+
+  public async destroyDb(): Promise<void> {
+    await this.rxdb.destroy();
+    await this.rxdb.remove();
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     this.rxdb = null;
-    this.db = null;
     return;
   }
 }

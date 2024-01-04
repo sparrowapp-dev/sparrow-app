@@ -22,7 +22,9 @@
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-    import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import requestIcon from "$lib/assets/create_request.svg";
+  import angleRight from "$lib/assets/angleRight.svg";
 
   let expand: boolean = false;
   export let explorer;
@@ -32,6 +34,8 @@
   export let folderName: string = "";
   export let collectionList;
   export let visibility;
+  export let activeTabId: string;
+  export let activePath;
 
   const collectionService = new CollectionService();
 
@@ -40,7 +44,6 @@
 
   let showFolderAPIButtons: boolean = true;
 
- 
   const handleAPIClick = async () => {
     isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
@@ -94,7 +97,8 @@
       sampleRequest.path.collectionId = collectionId;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
-      sampleRequest.save = true;
+      sampleRequest.property.request.save.api = true;
+      sampleRequest.property.request.save.description = true;
 
       collectionsMethods.handleCreateTab(sampleRequest);
       moveNavigation("right");
@@ -166,11 +170,11 @@
           explorer.id,
           response.data.data,
         );
-        collectionsMethods.updateTab(newFolderName,"name",explorer.id);
+        collectionsMethods.updateTab(newFolderName, "name", explorer.id);
       }
-      isRenaming = false;
-      newFolderName = "";
     }
+    isRenaming = false;
+    newFolderName = "";
   };
 
   const onRenameInputKeyPress = (event) => {
@@ -192,8 +196,8 @@
   }
 
   function addRequest() {
-    handleAPIClick();
     expand = true;
+    handleAPIClick();
   }
 
   let menuItems = [
@@ -223,6 +227,14 @@
   ];
 
   let workspaceId = currentWorkspaceId;
+
+  $: {
+    if (activePath) {
+      if (activePath.folderId === explorer.id) {
+        expand = true;
+      }
+    }
+  }
 </script>
 
 {#if isFolderPopup}
@@ -269,29 +281,28 @@
 {#if explorer.type === "FOLDER"}
   <div
     style="height:36px;"
-    class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2"
-    on:click={()=>{handleFolderClick(explorer,currentWorkspaceId,collectionId)}}
+    class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
+    activeTabId
+      ? 'active-folder-tab'
+      : ''}"
   >
     <div
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-      on:click={() => {
-        if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-          expand = !expand;
-        }
-      }}
-      class="main-folder d-flex align-items-center gap-2 pe-0"
+      class="main-folder d-flex align-items-center pe-0"
     >
-      {#if expand}
-        <div
-          style="height:16px; width:16px;"
-          class="d-flex align-items-center justify-content-center gap-0"
-        >
-          <img src={folderOpenIcon} alt="" class="pe-0" />
-        </div>
-      {:else}
-        <img src={folder} alt="" style="height:16px; width:16px;" />
-      {/if}
-
+      <img
+        src={angleRight}
+        class=""
+        style="height:14px; width:14px; margin-right:8px; {expand
+          ? 'transform:rotate(90deg);'
+          : 'transform:rotate(0deg);'}"
+        alt="angleRight"
+        on:click={() => {
+          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+            expand = !expand;
+          }
+        }}
+      />
       {#if isRenaming}
         <input
           class="form-control py-0 renameInputFieldFolder"
@@ -299,17 +310,38 @@
           type="text"
           style="font-size: 12px;"
           autofocus
+          maxlength={100}
           value={explorer.name}
           on:input={handleRenameInput}
           on:blur={onRenameBlur}
           on:keydown={onRenameInputKeyPress}
         />
       {:else}
-        <span
-          class="ellipsis"
-          style="padding-left: 8px; cursor:pointer; font-size:12px; font-weight:400;"
-          >{explorer.name}</span
+        <div
+          on:click={() => {
+            handleFolderClick(explorer, currentWorkspaceId, collectionId);
+          }}
+          class="folder-title d-flex align-items-center"
+          style="cursor:pointer; font-size:12px;
+          height: 36px;
+           font-weight:400;"
         >
+          {#if expand}
+            <div
+              style="height:16px; width:16px;"
+              class="d-flex align-items-center justify-content-center me-2"
+            >
+              <img src={folderOpenIcon} alt="" class="pe-0" />
+            </div>
+          {:else}
+            <div class="d-flex me-2" style="height:16px; width:16px;">
+              <img src={folder} alt="" style="height:16px; width:16px;" />
+            </div>
+          {/if}
+          <p class="ellipsis mb-0">
+            {explorer.name}
+          </p>
+        </div>
       {/if}
     </div>
 
@@ -342,11 +374,17 @@
           {collectionId}
           {currentWorkspaceId}
           {collectionsMethods}
+          {activeTabId}
         />
       {/each}
       {#if showFolderAPIButtons}
         <div class="mt-2 mb-2 ms-0">
-          <IconButton text={"+ API Request"} onClick={handleAPIClick} />
+          <img
+            class="list-icons"
+            src={requestIcon}
+            alt="+ API Request"
+            on:click={handleAPIClick}
+          />
         </div>
       {/if}
     </div>
@@ -362,6 +400,7 @@
       {currentWorkspaceId}
       name={explorer.name}
       id={explorer.id}
+      {activeTabId}
     />
   </div>
 {/if}
@@ -371,14 +410,22 @@
     background-color: var(--background-color);
     color: var(--white-color);
     padding-right: 5px;
+    border-radius: 8px;
   }
 
   .btn-primary:hover {
-    border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
   }
-
+  .list-icons {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+  .list-icons:hover {
+    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
+      brightness(100%) contrast(100%);
+  }
   .navbar {
     width: 180px;
     height: auto;
@@ -410,7 +457,7 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: var(--border-color);
+    background-color: transparent;
   }
 
   .threedot-active {
@@ -441,12 +488,14 @@
   .sub-files {
     border-left: 1px solid var(--border-color);
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  
   .main-folder {
     width: calc(100% - 24px);
+  }
+  .active-folder-tab {
+    background-color: var(--selected-active-sidebar) !important;
+  }
+  .folder-title {
+    width: calc(100% - 30px);
   }
 </style>

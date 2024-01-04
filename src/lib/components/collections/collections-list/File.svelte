@@ -5,11 +5,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import {
-    getPathFromUrl,
-    truncatePath,
-  } from "$lib/utils/helpers/common.helper";
+  import type {
+    Path,
+  } from "$lib/utils/interfaces/request.interface";
+  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
@@ -17,6 +16,7 @@
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import FilePopup from "$lib/components/Modal/FilePopup.svelte";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
+  import { setBodyType } from "$lib/utils/helpers/auth.helper";
 
   export let name: string;
   export let id: string;
@@ -26,6 +26,8 @@
   export let folderName: string;
   export let api;
   export let collectionsMethods: CollectionsMethods;
+  export let activeTabId: string;
+
   let showPath = false;
   let isFilePopup: boolean = false;
 
@@ -36,7 +38,14 @@
     folderName: folderName,
   });
 
-  let url, method, body, headers, queryParams, type, description;
+  let url,
+    method,
+    body,
+    headers,
+    queryParams,
+    type,
+    description,
+    selectedRequestBodyType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -47,7 +56,7 @@
   };
 
   const handleClick = () => {
-    const request = generateSampleRequest(id, new Date().toString());
+    let request = generateSampleRequest(id,   new Date().toString());
     request.path = path;
     request.name = name;
     if (description) request.description = description;
@@ -56,7 +65,9 @@
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
     if (headers) request.property.request.headers = headers;
-    request.save = true;
+    if (selectedRequestBodyType) request= setBodyType(request,selectedRequestBodyType);
+    request.property.request.save.api = true;
+    request.property.request.save.description = true;
     collectionsMethods.handleCreateTab(request);
     moveNavigation("right");
   };
@@ -73,6 +84,7 @@
       body = api.request?.body;
       type = api.request?.type;
       description = api.description;
+      selectedRequestBodyType = api.request?.selectedRequestBodyType;
     }
   }
 
@@ -109,7 +121,6 @@
     showMenu = false;
   }
 
-
   let newRequestName: string = "";
   let isRenaming = false;
 
@@ -118,7 +129,6 @@
   };
 
   const onRenameBlur = async () => {
-  
     if (newRequestName) {
       if (!folderId) {
         let storage = api;
@@ -137,7 +147,7 @@
             api.id,
             response.data.data,
           );
-          collectionsMethods.updateTab(newRequestName,"name",api.id);
+          collectionsMethods.updateTab(newRequestName, "name", api.id);
         }
       } else if (collectionId && currentWorkspaceId && folderId) {
         let storage = api;
@@ -187,7 +197,13 @@
 
   let menuItems = [
     {
+<<<<<<< HEAD
       onClick: () => {},
+=======
+      onClick: () => {
+        handleClick();
+      },
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
       displayText: "Open Request",
       disabled: false,
     },
@@ -248,7 +264,10 @@
 />
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary"
+  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {id ===
+  activeTabId
+    ? 'active-request-tab'
+    : ''}"
   style="height:32px;"
   on:click={() => {
     isApiCreatedFirstTime.set(false);
@@ -265,7 +284,11 @@
       ? 'unclickable'
       : ''}"
   >
-    <div class="api-method text-{getMethodStyle(method)}">
+    <div
+      class="api-method text-{getMethodStyle(method)}  {id === activeTabId
+        ? ' active-request-method'
+        : ''}"
+    >
       {method?.toUpperCase()}
     </div>
 
@@ -277,6 +300,7 @@
         type="text"
         autofocus
         value={name}
+        maxlength={100}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
@@ -285,8 +309,8 @@
       <div class="api-name ellipsis">
         {name}
         {#if showPath}
-          <span class="path-name"
-            >{`${url ? truncatePath(getPathFromUrl(url), 14) : ""}`}</span
+          <span class="path-name ellipsis"
+            >{`${url ? getPathFromUrl(url) : ""}`}</span
           >
         {/if}
       </div>
@@ -315,9 +339,9 @@
     font-weight: 500;
     margin-right: 8px;
     border: 1px solid var(--border-color);
+    width: 56px;
     height: 30px;
     border-radius: 8px;
-    padding: 8px 12px 8px 8px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -350,7 +374,7 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: var(--border-color);
+    background-color: transparent;
   }
 
   .threedot-active {
@@ -366,10 +390,10 @@
     color: var(--white-color);
     padding-left: 0 !important;
     padding-right: 5px;
+    border-radius: 8px;
   }
 
   .btn-primary:hover {
-    border-radius: 8px;
     background-color: var(--border-color);
     color: var(--white-color);
   }
@@ -407,12 +431,13 @@
     color: var(--white-color);
     padding-left: 0;
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .main-file {
     width: calc(100% - 24px);
+  }
+  .active-request-tab {
+    background-color: var(--selected-active-sidebar) !important;
+  }
+  .active-request-method {
+    background-color: var(--selected-active-sidebar) !important;
   }
 </style>

@@ -2,14 +2,15 @@ import type { CollectionDocument } from "$lib/database/app.database";
 
 import type { CreateApiRequestPostBody, CreateDirectoryPostBody } from "../dto";
 import type { Observable } from "rxjs";
+import type { Collection } from "./request.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CollectionsMethods {
   handleActiveTab: (id: string) => void;
   handleRemoveTab: (id: string) => void;
   handleCreateTab: (data) => void;
   updateTab: (data, route: string, _id: string) => void;
-  updateRequestProperty: (data, route: string) => void;
-  updateRequestState: (data, route: string) => void;
+  updateRequestProperty: (data, route: string, id?: string) => void;
+  updateRequestState: (data, route: string, id?: string) => void;
   updateRequestAuth: (data, route: string) => void;
   updateRequestBody: (data, route: string) => void;
   updateRequestBodyFormData: (data, route: string) => void;
@@ -43,13 +44,27 @@ export interface CollectionsMethods {
     uuid: string,
     request,
   ) => void;
+  readRequestInFolder: (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => unknown;
   addRequestOrFolderInCollection: (collectionId: string, items) => void;
   updateRequestOrFolderInCollection: (
     collectionId: string,
     uuid: string,
     items: any,
   ) => void;
+  readRequestOrFolderInCollection: (
+    collectionId: string,
+    uuid: string,
+  ) => unknown;
 
+  readCollection: (uuid: string) => unknown;
+  getNoOfApisandFolders: (
+    collection: CollectionDocument,
+    folderId?: string,
+  ) => Promise<Collection>;
   deleteRequestInFolder: (
     collectionId: string,
     folderId: string,
@@ -71,4 +86,9 @@ export interface CollectionsMethods {
     folderId: string,
   ) => void;
   removeMultipleTabs: (ids: string[]) => void;
+  setRequestSave: (data: boolean, route: string, id: string) => void;
+  deleteCollectioninWorkspace: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
 }

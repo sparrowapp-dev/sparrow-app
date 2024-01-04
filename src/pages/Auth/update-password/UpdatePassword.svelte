@@ -8,7 +8,7 @@
 
   import { writable } from "svelte/store";
   import { onDestroy } from "svelte";
-  import { navigate } from "svelte-navigator";
+  import { Link, navigate } from "svelte-navigator";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
 
   const seconds = writable(59);
@@ -40,8 +40,15 @@
 
   let emailText: string = "";
   username.subscribe((value) => {
+<<<<<<< HEAD
     emailText = value;
     verifyCodeCredential.email = emailText;
+=======
+    if (value) {
+      emailText = value;
+      verifyCodeCredential.email = emailText;
+    }
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   const handleVerificationCode = () => {
@@ -58,7 +65,13 @@
   };
 
   verifyString.subscribe((value) => {
+<<<<<<< HEAD
     verifyLength = value;
+=======
+    if (value) {
+      verifyLength = value;
+    }
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   let isLoadingPage: boolean;
@@ -73,7 +86,13 @@
 
   let errorMessage: string = "";
   errorMessageText.subscribe((value) => {
+<<<<<<< HEAD
     errorMessage = value;
+=======
+    if (value) {
+      errorMessage = value;
+    }
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 </script>
 
@@ -281,9 +300,8 @@
             <button
               class="btn btn-primary bg-labelColor border-0 mb-2"
               on:click|preventDefault={async () => {
-                validationErrors = await handleVerifyEmail(
-                  verifyCodeCredential,
-                );
+                validationErrors =
+                  await handleVerifyEmail(verifyCodeCredential);
               }}>Verify</button
             >
           {:else}
@@ -302,12 +320,12 @@
               No email in your inbox or spam folder?
             </p>
 
-            <a
-              href="/forgot/password"
+            <Link
+              to="/forgot/password"
               style="font-size: 13px;"
               class="text-decoration-none text-primaryColor fw-bold"
               >Resend
-            </a>
+            </Link>
           </div>
         {/if}
       </div>

@@ -18,11 +18,3 @@ export function replaceSlashWithGreaterThanSymbol(str: string) {
 
   return replacedStringwithoutSlash;
 }
-
-//add dots after certain length cross
-export function truncatePath(path: string, maxlength: number) {
-  if (path.length > maxlength) {
-    return path.substring(0, maxlength) + "...";
-  }
-  return path;
-}

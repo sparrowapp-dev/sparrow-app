@@ -16,7 +16,6 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { string } from "yup";
 
   export let collectionsMethods: CollectionsMethods;
   export let tabList: TabDocument[];
@@ -50,12 +49,12 @@
     closePopup = flag;
   };
   const closeTab = (id, tab: NewTab) => {
-    if (tab.save) {
-      collectionsMethods.handleRemoveTab(id);
-    } else {
+    if ((tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description) ) {
       tabId = id;
       removeTab = tab;
       closePopup = true;
+    } else {
+      collectionsMethods.handleRemoveTab(id);
     }
   };
 

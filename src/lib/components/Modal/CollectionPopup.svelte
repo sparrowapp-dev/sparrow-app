@@ -5,7 +5,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import CoverButton from "../buttons/CoverButton.svelte";
-
+  import { fly, fade } from "svelte/transition";
   export let collectionId: string;
   export let workspaceId: string;
   export let collection;
@@ -17,13 +17,13 @@
   let requestCount: number = 0;
   let folderCount: number = 0;
 
-  let deleteIds : string[] = [];
+  let deleteIds: string[] = [];
   collection.items.forEach((item) => {
     if (item.type === ItemType.FOLDER) {
       deleteIds.push(item.id);
       folderCount++;
       requestCount += item.items.length;
-      for(let i = 0; i < item.items.length; i++){
+      for (let i = 0; i < item.items.length; i++) {
         deleteIds.push(item.items[i].id);
       }
     }
@@ -44,6 +44,7 @@
 
     if (response.isSuccessful) {
       collectionsMethods.deleteCollection(collectionId);
+      collectionsMethods.deleteCollectioninWorkspace(workspaceId,collectionId);
       closePopup(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
       collectionsMethods.removeMultipleTabs(deleteIds);
@@ -60,9 +61,15 @@
   on:click={() => {
     closePopup(false);
   }}
+  transition:fade={{ delay: 0, duration: 100 }}
 />
 
-<div class="container d-flex flex-column mb-0 px-4 pb-0 pt-4">
+<div
+  class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
       Delete Collection?

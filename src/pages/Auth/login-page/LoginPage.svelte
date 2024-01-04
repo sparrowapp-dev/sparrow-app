@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigate } from "svelte-navigator";
+  import { Link, navigate } from "svelte-navigator";
   import { isLoading, isResponseError, setUser } from "$lib/store/auth.store";
   import { jwtDecode } from "$lib/utils/jwt";
   import Header from "$lib/components/header/Header.svelte";
@@ -13,7 +13,7 @@
   import { authNavigate, handleLoginValidation } from "./login-page";
   import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
-  import { once } from '@tauri-apps/api/event'
+  import { once } from "@tauri-apps/api/event";
   import { WebviewWindow } from "@tauri-apps/api/window";
 
   let isEmailTouched = false;
@@ -63,14 +63,13 @@
     await authNavigate();
   };
 
-  once('onclose', async (event) => {
-    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => { 
+  once("onclose", async (event) => {
+    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => {
       isLoadingPage = false;
     });
-  })
+  });
 
   let isPasswordtouched: boolean = false;
-
 
   isLoading.subscribe((value) => {
     isLoadingPage = value;
@@ -104,7 +103,7 @@
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
-  style="height:100vh;overflow:hidden"
+  style="height:100vh;overflow:auto;"
 >
   <Header />
   {#if isLoadingPage}
@@ -119,7 +118,7 @@
       </p>
       <form
         class="login-form text-whiteColor ps-1 pe-1 gap-16 mb-2"
-        style="width:408px;"
+        style="width:408px;height:auto;"
         on:submit|preventDefault={async () => {
           validationErrors = await handleLoginValidation(loginCredentials);
           if (validationErrors) {
@@ -148,15 +147,17 @@
           />
 
           {#if validationErrors.email && loginCredentials.email.length > 0}
-            <small class="form-text text-dangerColor">
+            <small class="form-text text-dangerColor mb-0">
               {validationErrors.email}</small
             >
           {:else if loginCredentials.email.length === 0}
-            <small class="form-text text-dangerColor"> {errorMessage}</small>
+            <small class="form-text text-dangerColor mb-0">
+              {errorMessage}</small
+            >
           {/if}
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3 position-relative">
           <label for="exampleInputPassword1" class="form-label">Password</label>
           <div class="d-flex">
             <input
@@ -177,6 +178,7 @@
               type="button"
               on:click={togglePasswordVisibility}
               class="bg-blackColor border-0 eye-icon d-flex align-items-center"
+              style="right:15px; transform: translateY(-1%);"
             >
               {#if isPasswordVisible}
                 <img src={eyeShow} alt="eye-show" />
@@ -187,7 +189,7 @@
           </div>
 
           {#if validationErrors.password || validationErrors.password?.length === 0}
-            <small class="form-text text-dangerColor"
+            <small class="form-text text-dangerColor mb-0"
               >{validationErrors.password}</small
             >
           {:else if isPasswordError === true || validationErrors.password?.length > 0}
@@ -201,10 +203,11 @@
           <img src={sparrowicon} alt="" />
         </span> -->
 
-        <div class="d-flex mb-4 align-items-center justify-content-end">
-          <a
-            href="/forgot/password"
-            class="text-decoration-none text-primaryColor">Forgot Password?</a
+        <div class="d-flex mb-3 align-items-center justify-content-end">
+          <Link
+            to="/forgot/password"
+            class="text-decoration-none text-primaryColor"
+            >Forgot Password?</Link
           >
         </div>
 
@@ -242,10 +245,10 @@
         <!-- "New to the website? Create an account" link -->
         <div class="gap-3 d-flex align-items-center">
           <p class="fs-6 mt-3">New to sparrow?</p>
-          <a
-            href="/register"
+          <Link
+            to="/register"
             style="color: #007BFF;"
-            class=" text-decoration-none text-primaryColor">Create Account</a
+            class=" text-decoration-none text-primaryColor">Create Account</Link
           >
         </div>
       </div>

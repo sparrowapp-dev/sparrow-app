@@ -28,7 +28,12 @@
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+<<<<<<< HEAD
     import { invoke } from "@tauri-apps/api";
+=======
+  import { invoke } from "@tauri-apps/api";
+  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -41,8 +46,13 @@
       if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
+<<<<<<< HEAD
           let temp = elem.toJSON();
           if(temp?.property?.request){
+=======
+          let temp = createDeepCopy(elem.toJSON());
+          if (temp?.property?.request) {
+>>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             temp.property.request.state.responseSection =
               sample.property.request.state.responseSection;
             temp.property.request.state.responseRaw =

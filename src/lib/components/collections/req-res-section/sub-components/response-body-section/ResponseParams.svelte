@@ -12,7 +12,8 @@
   export let response;
   export let apiState;
   export let collectionsMethods: CollectionsMethods;
-
+  export let currentTabId;
+ 
   let responseBody;
   let responseHeader;
   let statusCode: string;
@@ -100,7 +101,7 @@
             UntrackedItems.UNTRACKED + uuidv4(),
             new Date().toString(),
           ).property.request.response;
-          collectionsMethods.updateRequestProperty(response,RequestProperty.RESPONSE)
+          collectionsMethods.updateRequestProperty(response,RequestProperty.RESPONSE,currentTabId)
           notifications.success("Response Cleared");
         }}
       >
@@ -112,7 +113,7 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if apiState.responseSection === ResponseSection.RESPONSE}
-    <ResponseBody {apiState} {collectionsMethods} {response} />
+    <ResponseBody {apiState} {collectionsMethods} {response}  currentTabId={currentTabId}/>
   {:else if apiState.responseSection === ResponseSection.HEADERS}
     <ResponseHeader {responseHeader} />
   {/if}
