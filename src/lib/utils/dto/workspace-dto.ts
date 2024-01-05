@@ -5,5 +5,6 @@ export interface WorkspacePostBody {
 }
 
 export interface WorkspacePutBody {
-  name: string;
+  name?: string;
+  description?: string;
 }

@@ -76,6 +76,12 @@ export class RxDB {
     await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
+        migrationStrategies: {
+          // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
       tab: {
         schema: tabSchema,

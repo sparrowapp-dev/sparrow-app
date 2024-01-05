@@ -7,23 +7,46 @@
   import icons from "$lib/assets/app.asset";
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import type { Observable } from "rxjs";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
   let tabName: string = "";
+  let workspaceDescription: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
-
+  let ownerName: string;
+  let noOfCollections = 0;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.activeWorkspace;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       tabName = event?.name;
+      workspaceDescription = event.description ?? "";
       componentData = event;
     }
   });
+  export let _collectionListViewModel: CollectionListViewModel;
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
 
   const handleWorkspaceInput = (event) => {
     newWorkspaceName = event.target.value;
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
+  };
+
+  const handleWorkspaceDescription = (event) => {
+    workspaceDescription = event.target.value;
+    collectionsMethods.updateTab(
+      workspaceDescription,
+      "description",
+      componentData.path.workspaceId,
+    );
   };
 
   const onRenameBlur = async () => {
@@ -34,6 +57,22 @@
       tabName,
     );
   };
+
+  const onUpdateBlur = async () => {
+    await _viewModel.modifyWorkspaceDescription(
+      componentData,
+      collectionsMethods,
+      tabName,
+      workspaceDescription,
+    );
+  };
+  const collectionSubscribe = collections.subscribe(
+    (collectionArr: CollectionDocument[]) => {
+      if (collectionArr) {
+        noOfCollections = collectionArr.length;
+      }
+    },
+  );
 
   let name: string = "";
   let email: string = "";
@@ -50,6 +89,26 @@
     }
   });
 
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    (value: WorkspaceDocument) => {
+      if (value) {
+        ownerName = value._data.owner.name;
+        if (ownerName) {
+          name = ownerName;
+          firstLetter = name[0];
+        } else {
+          name = name;
+        }
+      }
+    },
+  );
+
+  const userUnsubscribe = user.subscribe(async (value) => {
+    if (value) {
+      await _viewModel.refreshWorkspaces(value._id);
+    }
+  });
+
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
     isWorkspaceCreatedFirstTime.subscribe((value) => {
@@ -60,6 +119,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 
@@ -74,6 +134,15 @@
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldWorkspace",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
+
+  const onUpdateWorkspaceDescription = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "updateDescriptionFieldWorkspace",
       ) as HTMLInputElement;
       inputField.blur();
     }
@@ -106,8 +175,16 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-        type="text"
+        value={workspaceDescription}
+        id="updateDescriptionFieldWorkspace"
+        {autofocus}
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        on:input={(event) => {
+          handleWorkspaceDescription(event);
+        }}
+        on:blur={onUpdateBlur}
+        on:keydown={onUpdateWorkspaceDescription}
+        bind:this={inputElement}
         placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
       />
     </div>
@@ -141,25 +218,24 @@
           <button
             class="bg-backgroundColor border-0"
             id="profile-dropdown"
-            style="width: 24px; height: 24px;"
+            style="width: 24px; height: 24px;border-radius:50%"
           >
             <p
-              class=" mb-0 profile-circle bg-plusButton text-black m-auto text-center align-items-center justify-content-center"
+              class="mb-0 profile-circle bg-plusButton text-black m-auto text-center d-flex align-items-center justify-content-center"
+              style="width: 100%; height: 100%; margin: 0;"
             >
-              {firstLetter?.toUpperCase() === undefined
+              {!firstLetter
                 ? email[0]?.toUpperCase()
                 : firstLetter?.toUpperCase()}
             </p>
           </button>
-          <p class="mb-0">{name === undefined ? email : name}</p>
+          <p class="mb-0">{!name ? email : name}</p>
         </div>
       </div>
     </div>
     <div class="workspace-info gap-3 text-defaultColor">
-      <p><span class="me-1 fs-6 text-plusButton">{0}</span>API REQUESTS</p>
       <p>
-        <span class="me-1 fs-6 text-plusButton"
-          >{componentData?.property?.workspace?.collectionCount}</span
+        <span class="me-1 fs-6 text-plusButton">{noOfCollections}</span
         >COLLECTION
       </p>
     </div>
@@ -180,7 +256,7 @@
   }
 
   .profile-circle {
-    border-radius: 70%;
+    border-radius: 50%;
   }
 
   .info-setting-hover:hover {

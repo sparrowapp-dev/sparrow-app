@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
+import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 
 import type { Observable } from "rxjs";
 
@@ -46,6 +47,27 @@ export class WorkspaceRepository {
     });
   };
 
+  public deleteCollectionInWorkspace = async (
+    workspaceId: string,
+    collectionId: string,
+  ) => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    const updatedCollections = workspace._data.collections.filter(
+      (element: CollectionItem) => {
+        return element.id !== collectionId;
+      },
+    );
+    workspace.incrementalPatch({
+      collections: [...updatedCollections],
+    });
+  };
+
   public clearWorkspaces = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.workspace.find().remove();
   };
@@ -69,7 +91,11 @@ export class WorkspaceRepository {
     return;
   };
 
-  public updateWorkspace = async (workspaceId: string, name: string) => {
+  public updateWorkspace = async (
+    workspaceId: string,
+    name: string,
+    description?: string,
+  ) => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
         selector: {
@@ -77,9 +103,9 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-
     workspace.incrementalModify((value) => {
       value.name = name;
+      value.description = description;
       return value;
     });
   };

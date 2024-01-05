@@ -2,6 +2,7 @@
 import { RxDB, type CollectionDocument } from "$lib/database/app.database";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type { Observable } from "rxjs";
 export class CollectionRepository {
   constructor() {}
@@ -42,7 +43,7 @@ export class CollectionRepository {
     return;
   };
 
-  public readCollection = async (uuid: string): Promise<unknown> => {
+  public readCollection = async (uuid: string): Promise<CollectionDocument> => {
     return await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
@@ -149,6 +150,10 @@ export class CollectionRepository {
       .exec();
     collection.incrementalPatch({
       items: [...collection.items, items],
+      totalRequests:
+        items.type === ItemType.REQUEST
+          ? collection.totalRequests + 1
+          : collection.totalRequests,
     });
   };
 
@@ -187,7 +192,7 @@ export class CollectionRepository {
   public readRequestOrFolderInCollection = async (
     collectionId: string,
     uuid: string,
-  ): Promise<unknown> => {
+  ): Promise<CollectionItem> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
         selector: {
@@ -195,7 +200,7 @@ export class CollectionRepository {
         },
       })
       .exec();
-    let response;
+    let response: CollectionItem;
     collection.toJSON().items.forEach((element) => {
       if (element.id === uuid) {
         response = element;

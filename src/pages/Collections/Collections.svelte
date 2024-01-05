@@ -56,12 +56,14 @@
       _viewModel.updateRequestOrFolderInCollection,
     readRequestOrFolderInCollection: _viewModel.readRequestOrFolderInCollection,
     readCollection: _viewModel.readCollection,
+    getNoOfApisandFolders: _viewModel.getNoOfApisandFolders,
     addCollection: _viewModel.addCollection,
     updateCollection: _viewModel.updateCollection,
     deleteRequestInFolderCollection: _viewModel.deleteRequestInFolderCollection,
     deleteRequestInFolder: _viewModel.deleteRequestInFolder,
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
+    deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
   };
 
   const activeTab = _viewModel.activeTab;
@@ -169,11 +171,31 @@
               environmentVariables={mockData}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+<<<<<<< HEAD
             <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
             <MyFolder {collectionsMethods} {activeTab} />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
             <MyCollection {collectionsMethods} {activeTab} />
+=======
+            <MyWorkspace
+              {activeTab}
+              {collectionsMethods}
+              {_collectionListViewModel}
+            />
+          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+            <MyFolder
+              {collectionsMethods}
+              {activeTab}
+              {_collectionListViewModel}
+            />
+          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+            <MyCollection
+              {collectionsMethods}
+              {activeTab}
+              {_collectionListViewModel}
+            />
+>>>>>>> development
           {/if}
         </div>
         <!-- <SidebarRight /> -->

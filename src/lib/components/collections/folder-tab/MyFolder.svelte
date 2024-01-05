@@ -10,26 +10,49 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { MyFolderViewModel } from "./MyFolder.viewModel";
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
+  import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let _collectionListViewModel:CollectionListViewModel;
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
   let isLoading: boolean = false;
   let collapsExpandToggle: boolean = false;
   let tabName: string = "";
   let componentData: NewTab;
-  let totalFolder: number = 0;
   let totalRequest: number = 0;
   let newFolderName: string = "";
+  let collectionId:string;
+  let folderId:string;
   const _myFolderViewModel = new MyFolderViewModel();
 
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
-      totalRequest = event?.property?.folder?.requestCount;
-      totalFolder = event?.property?.folder?.folderCount;
+      collectionId=event.path?.collectionId;
+      folderId=event.path?.folderId;
     }
   });
+
+  const collectionSubscribe = collections.subscribe(
+    (collectionArr: CollectionDocument[]) => {
+      if (collectionArr) {
+        collectionArr.forEach(async (collection) => {
+          if (collection._data.id === collectionId) {
+            const collectionData = await collectionsMethods.getNoOfApisandFolders(
+             collection,
+             folderId
+            );
+            totalRequest = collectionData.requestCount;
+          }
+        });
+      }
+    },
+  );
 
   const handleFolderInput = (event) => {
     newFolderName = event.target.value;
@@ -123,10 +146,6 @@
       <div class="d-flex align-items-center gap-2">
         <span class="fs-4 text-plusButton">{totalRequest}</span>
         <p style="font-size: 12px;" class="mb-0">API Requests</p>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-plusButton">{totalFolder}</span>
-        <p style="font-size: 12px;" class="mb-0">Folder</p>
       </div>
     </div>
     <div class="d-flex align-items-start ps-0 h-100">

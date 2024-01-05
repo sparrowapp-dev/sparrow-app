@@ -165,9 +165,7 @@
       </div>
     </div>
 
-    <Route path="/recent"
-      ><Workspaces {data} {selectedView} {selectedTab} /></Route
-    >
+    <Route path="/recent"><PersonalWorkspace {data} {selectedTab} /></Route>
     <Route path="/all-workspace"
       ><PersonalWorkspace {data} {selectedTab} /></Route
     >
