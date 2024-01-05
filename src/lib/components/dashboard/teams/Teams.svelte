@@ -3,7 +3,7 @@
     export let teams : any; 
 </script>
 
-<section class="pb-2">
+<section class="pb-4">
     <div class="sidebar-teams-header d-flex justify-content-between">
         <h6 class="teams-heading">Teams</h6>
         <div><img src={plus} alt=""/></div>

@@ -3,7 +3,7 @@
   import mock from "$lib/assets/mock.svg";
   import environment from "$lib/assets/environment.svg";
   import teams from "$lib/assets/teams.svg";
-  import workspaces from "$lib/assets/workspaces.svg";
+  import home from "$lib/assets/home.svg";
   import help from "$lib/assets/circle-question.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
@@ -18,29 +18,20 @@
   <div class="sidebar__main">
     <Helper
       {activeSideBarTabMethods}
-      route="collections"
-      heading="Collections"
-      logo={collections}
-      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
       route="workspaces"
-      heading="Workspaces"
-      logo={workspaces}
+      heading="Home"
+      logo={home}
       isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
       disabled={false}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
       {activeSideBarTabMethods}
-      route="mock"
-      heading="Mock"
-      logo={mock}
-      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
+      route="collections"
+      heading="Collections"
+      logo={collections}
+      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
+      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
@@ -52,7 +43,16 @@
       disabled={true}
       {changeSelectedActiveSideBarTab}
     />
-    <hr class="m-1 border-2" />
+    <Helper
+      {activeSideBarTabMethods}
+      route="mock"
+      heading="Mock"
+      logo={mock}
+      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      disabled={true}
+      {changeSelectedActiveSideBarTab}
+    />
+    <!-- <hr class="m-1 border-2" />
     <Helper
       {activeSideBarTabMethods}
       route="teams"
@@ -61,7 +61,7 @@
       isSelected={"teams" === selectedActiveSideBarTab ? true : false}
       disabled={true}
       {changeSelectedActiveSideBarTab}
-    />
+    /> -->
   </div>
   <div class="sidebar__help">
     <Tooltip>
@@ -69,9 +69,7 @@
         <div class="sidebar__container--icon pt-2">
           <img src={help} alt="help-icon" />
         </div>
-        <div
-          class={`sidebar__container--text mt-1 text-textColor`}
-        >
+        <div class={`sidebar__container--text mt-1 text-textColor`}>
           <p>Help</p>
         </div>
       </div>

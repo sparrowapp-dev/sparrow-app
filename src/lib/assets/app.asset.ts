@@ -18,6 +18,12 @@ import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
 export { default as NotifyIcon } from "$lib/assets/notify.svelte";
 export { default as SettingIcon } from "$lib/assets/setting.svelte";
+export { default as SearchIcon } from "$lib/assets/search.svelte";
+export { default as CrossIcon } from "$lib/assets/crossicon.svelte";
+export { default as DoubleLeftIcon } from "$lib/assets/double-left.svelte";
+export { default as DoubleRightIcon } from "$lib/assets/double-right.svelte";
+export { default as LeftIcon } from "$lib/assets/left.svelte";
+export { default as RightIcon } from "$lib/assets/right.svelte";
 import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {

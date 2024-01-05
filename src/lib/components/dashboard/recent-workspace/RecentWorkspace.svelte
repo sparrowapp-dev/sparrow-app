@@ -7,8 +7,9 @@
   {#if $data}
     {#each $data.slice().reverse() as list, index}
       {#if index < 5}
-        <div class="d-flex pb-3">
+        <div class=" pb-3">
           <p class="mb-0 recent-workspace">{list.name}</p>
+          <span class="team-name">John's Team</span>
         </div>
       {/if}
     {/each}
@@ -25,5 +26,8 @@
   .recent-workspace {
     font-size: 12px;
     color: #f5f5f5;
+  }
+  .team-name {
+    color: var(--request-arc);
   }
 </style>

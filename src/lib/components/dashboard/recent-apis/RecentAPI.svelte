@@ -23,8 +23,8 @@
     {/each}
   {/if}
 
-  {#if tabList.length === 0}
-    <p>No Recent APIs present</p>
+  {#if !tabList.find((api) => api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED"))}
+    <p class="not-found-text pt-1">Recently opened APIs show up here.</p>
   {/if}
 </section>
 
@@ -33,5 +33,9 @@
     font-size: 14px;
     font-weight: 700;
     line-height: 21px;
+  }
+  .not-found-text {
+    color: var(--request-arc);
+    font-size: 12px;
   }
 </style>

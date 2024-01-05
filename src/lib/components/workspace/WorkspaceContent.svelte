@@ -6,7 +6,7 @@
   import hamburger from "$lib/assets/hamburger.svg";
   export let data: any;
   import Navigate from "../../../routing/Navigate.svelte";
-  import PersonalWorkspace from "$lib/components/table/personal-workspace/PersonalWorkspace.svelte";
+  import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -16,6 +16,7 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
   import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
+  import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   export let workspaceMethods: WorkspaceMethods;
   export let loaderColor = "default";
 
@@ -78,7 +79,7 @@
     }
   };
 
-  let selectedTab = "recent";
+  let selectedTab = "all-workspace";
   let selectedView = "table";
 </script>
 
@@ -88,8 +89,21 @@
       <div class="row">
         <div class="col-12 pb-3">
           <div class="team-heading d-flex justify-content-between">
-            <h2>Workspaces</h2>
+            <h2 class="d-flex">
+              <p
+                class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+              >
+                J
+              </p>
+              <span class="ms-4 my-auto">John's Team</span>
+            </h2>
             <div class="d-flex">
+              <button
+                style="font-size: 12px;"
+                class="d-flex align-items-center me-4 justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
+                >Invite</button
+              >
               <button
                 style="font-size: 12px;"
                 on:click={handleCreateWorkSpace}
@@ -112,29 +126,21 @@
             class="teams-menu d-flex justify-content-between align-items-center pb-4"
           >
             <div class="teams-menu__left gap-4">
-              <Link style="text-decoration:none;" to="recent"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "recent")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "recent"}>Recent</span
-                ></Link
-              >
               <Link style="text-decoration:none;" to="all-workspace"
                 ><span
                   style="padding: 8px 8px;"
                   on:click={() => (selectedTab = "all-workspace")}
                   class="team-menu__link"
-                  class:tab-active={selectedTab === "all-workspace"}>All</span
+                  class:tab-active={selectedTab === "all-workspace"}
+                  >Workspaces ({$data?.length})</span
                 ></Link
               >
               <Link style="text-decoration:none;" to="personal-workspaces"
                 ><span
                   style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "personal-workspaces")}
+                  on:click={() => (selectedTab = "settings")}
                   class="team-menu__link"
-                  class:tab-active={selectedTab === "personal-workspaces"}
-                  >Personal Workspaces</span
+                  class:tab-active={selectedTab === "settings"}>Settings</span
                 ></Link
               >
             </div>
@@ -142,7 +148,7 @@
               <span class="mx-3" style="cursor:pointer;">
                 <img
                   on:click={() => {
-                    selectedView = "table";
+                    selectedView = "grid";
                   }}
                   class:view-active={selectedView === "grid"}
                   src={table}
@@ -165,15 +171,13 @@
       </div>
     </div>
 
-    <Route path="/recent"><PersonalWorkspace {data} {selectedTab} /></Route>
-    <Route path="/all-workspace"
-      ><PersonalWorkspace {data} {selectedTab} /></Route
-    >
-    <Route path="/personal-workspaces"
-      ><PersonalWorkspace {data} {selectedTab} /></Route
-    >
-    <!-- <Route path="/team-workspace">Team workspace</Route> -->
-    <Route path="/"><Navigate to="recent" /></Route>
+    <!-- <Route path="/all-workspace"> -->
+    {#if selectedView == "table" && selectedTab == "all-workspace"}
+      <AllWorkspace {data} {selectedTab} />
+    {:else if selectedView == "grid" && selectedTab == "all-workspace"}
+      <WorkspaceCardList workspaces={$data.slice().reverse()} />
+    {/if}
+    <!-- </Route> -->
   </div>
 </div>
 
@@ -183,13 +187,18 @@
   }
   .content-teams__btn-new-workspace {
     height: 30px;
+    background-color: var(--send-button);
+  }
+  .content-teams__btn-invite {
+    height: 30px;
+    background-color: var(--border-color);
   }
   .tab-active {
     color: var(--white-color);
     border-bottom: 3px solid var(--workspace-hover-color);
   }
   .view-active {
-    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
-      brightness(100%) contrast(100%);
+    filter: invert(65%) sepia(63%) saturate(551%) hue-rotate(185deg)
+      brightness(103%) contrast(104%);
   }
 </style>

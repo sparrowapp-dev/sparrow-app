@@ -1,21 +1,40 @@
 <script lang="ts">
   import RecentApi from "$lib/components/dashboard/recent-apis/RecentAPI.svelte";
   import RecentWorkspace from "$lib/components/dashboard/recent-workspace/RecentWorkspace.svelte";
+  import Teams from "$lib/components/dashboard/teams/Teams.svelte";
   export let data: any;
   export let tabList;
   export let collectionList;
+
+  let teams = [
+    {
+      name: "Techdome",
+      icon: "https://media.licdn.com/dms/image/C4D0BAQFfIHYVwIh9Sg/company-logo_200_200/0/1673252621612/techdome_solutions_logo?e=2147483647&v=beta&t=qtBSoQK4rWfcefg6BU4d-EiHAzyR0metwD_lHh3SWnU",
+    },
+    {
+      name: "Microsoft",
+      icon: "https://media.licdn.com/dms/image/C4D0BAQFfIHYVwIh9Sg/company-logo_200_200/0/1673252621612/techdome_solutions_logo?e=2147483647&v=beta&t=qtBSoQK4rWfcefg6BU4d-EiHAzyR0metwD_lHh3SWnU",
+    },
+  ];
 </script>
 
 <div
   style="border-right: 1px solid #313233; overflow: auto;"
-  class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-5"
+  class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-3"
 >
+  <Teams {teams} />
   <RecentApi {tabList} {data} {collectionList} />
   <hr />
   <RecentWorkspace {data} />
 </div>
 
 <style>
+  .sidebar::-webkit-scrollbar {
+    width: 2px;
+  }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+  }
   .sidebar {
     width: 282px;
     position: fixed;
