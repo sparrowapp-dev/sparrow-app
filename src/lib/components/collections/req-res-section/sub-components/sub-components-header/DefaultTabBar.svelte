@@ -155,8 +155,10 @@
     const workspace = generateSampleWorkspace(
       currentWorkspaceId,
       new Date().toString(),
+      currentWorkspaceName
     );
     workspace.path.workspaceId = currentWorkspaceId;
+    workspace.name=currentWorkspaceName;
     collectionsMethods.handleCreateTab(workspace);
     moveNavigation("right");
   };

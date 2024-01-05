@@ -5,13 +5,17 @@
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
   import { notifications } from "$lib/utils/notifications";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ProgressBar from "$lib/components/Transition/ProgressBar .svelte";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
+  import ProgressBar from "$lib/components/Transition/SyntaxCheckProgressBar .svelte";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import InvalidSyntaxPopup from "$lib/components/Modal/InvalidSyntaxPopup.svelte";
+  import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
+  import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
+  import File from "./File.svelte";
+
   export let handleCreateCollection;
   export let currentWorkspaceId;
   export let collectionsMethods: CollectionsMethods;
@@ -20,220 +24,229 @@
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
   let isLoading: boolean = false;
-  let text: string = "";
+  let isDataEmpty: boolean = false;
+  let isSyntaxError: boolean = false;
+  let isResponseLoading: boolean = false;
+  let importData: string = "";
+  let importFile: File;
 
+  let fileName = "";
+  function handleFilesSelect(event: CustomEvent) {
+    fileName = event.detail ? event.detail.acceptedFiles[0]?.name : "";
+    importFile = event.detail ? event.detail.acceptedFiles[0] : "";
+  }
+  const handleError = () => {
+    isSyntaxError = false;
+    isDataEmpty = false;
+  };
   const handleInputField = (e) => {
-    text = e.target.value;
+    importData = e.target.value;
   };
 
-  const handleImportUrl = async () => {
+  async function handleFileUpload(file: File) {
+    if (file) {
+      const response = await _viewImportCollection.importCollectionFromFile(
+        currentWorkspaceId,
+        file,
+      );
+      if (response.isSuccessful) {
+        onClick(false);
+        isLoading = false;
+        let path: Path = {
+          workspaceId: currentWorkspaceId,
+          collectionId: response.data.data._id,
+        };
+        const Samplecollection = generateSampleCollection(
+          response.data.data._id,
+          new Date().toString(),
+        );
+
+        Samplecollection.id = response.data.data._id;
+        Samplecollection.path = path;
+        Samplecollection.name = response.data.data.name;
+        Samplecollection.save = true;
+        collectionsMethods.handleCreateTab(Samplecollection);
+        moveNavigation("right");
+
+        _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+          id: Samplecollection.id,
+          name: Samplecollection.name,
+        });
+        notifications.success("New Collection Created");
+        return;
+      } else {
+        isLoading = false;
+        isSyntaxError = true;
+      }
+    }
+  }
+
+  const handleImport = () => {
+    if (importData) {
+      handleImportJsonObject();
+      return;
+    }
+    if (importFile) {
+      handleFileUpload(importFile);
+      return;
+    }
+    isDataEmpty = true;
+  };
+
+  const handleImportJsonObject = async () => {
     isLoading = true;
-    const response = await _viewImportCollection.importCollectionData(
+    const contentType = _viewImportCollection.validateImportBody(importData);
+    if (!contentType) {
+      isLoading = false;
+      isSyntaxError = true;
+      return;
+    }
+    isLoading = false;
+    isResponseLoading = true;
+    const response = await _viewImportCollection.importCollectionFromJsonObject(
       currentWorkspaceId,
-      text,
+      importData,
+      contentType,
     );
 
-    onClick(false);
     if (response.isSuccessful) {
-      const res = response.data.data;
-      isLoading = false;
-      // collectionUnderCreation = true;
-      isCollectionCreatedFirstTime.set(true);
-
-      const newCollection = {
-        id: res.id,
-        name: res.name,
-        items: [],
-        createdAt: new Date().toISOString(),
-      };
-
-      collectionsMethods.addCollection(newCollection);
-
+      onClick(false);
+      isResponseLoading = false;
       let path: Path = {
         workspaceId: currentWorkspaceId,
-        collectionId: res.id,
+        collectionId: response.data.data._id,
       };
-
       const Samplecollection = generateSampleCollection(
-        res.id,
+        response.data.data._id,
         new Date().toString(),
       );
 
-      Samplecollection.id = res.id;
+      Samplecollection.id = response.data.data._id;
       Samplecollection.path = path;
-      Samplecollection.name = res.name;
+      Samplecollection.name = response.data.data.name;
       Samplecollection.save = true;
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(res.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: res.id,
-        name: newCollection.name,
+        id: Samplecollection.id,
+        name: Samplecollection.name,
       });
-      notifications.success(response.data.message);
+      notifications.success("New Collection Created");
+      return;
     } else {
       isLoading = false;
-    }
-  };
-
-  const handleImportFile = async (fileContent) => {
-    isLoading = true;
-    const response = await _viewImportCollection.importCollectionFile(
-      currentWorkspaceId,
-      fileContent,
-    );
-    console.log(response);
-    if (response.isSuccessful) {
-      onClick(false);
-      isLoading = false;
-      notifications.success(response.data.message);
-    } else {
-      isLoading = false;
-      notifications.error(response.message);
-    }
-  };
-
-  function handleFileUpload() {
-    const fileInput = document.getElementById("file-input") as HTMLInputElement;
-
-    const file = fileInput.files[0];
-    console.log(file);
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        const fileContent =e.target.result;
-        console.log(fileContent);
-        handleImportFile(fileContent);
-      };
-      reader.readAsText(file);
-    }
-  }
-
-  const handleImportJsonObject = async () => {
-    isLoading = true;
-    console.log(text);
-
-    const response = await _viewImportCollection.importCollectionFromJsonObject(
-      currentWorkspaceId,
-      { jsonObj: text },
-    );
-
-    console.log(response);
-    if (response.isSuccessful) {
-      onClick(false);
-      isLoading = false;
-      notifications.success(response.data.message);
-    } else {
-      isLoading = false;
-      notifications.error(response.message);
+      isResponseLoading = false;
+      isSyntaxError = true;
     }
   };
 </script>
 
 {#if isLoading}
-  <ProgressBar />
+  <ProgressBar {onClick} />
 {/if}
-
-<div
-  class="background-overlay"
-  on:click={() => {
-    onClick(false);
-  }}
-  transition:fade={{ delay: 0, duration: 100 }}
-/>
-
-<div
-  class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
-  transition:fly={{ y: 50, delay: 0, duration: 100 }}
-  on:introstart
-  on:outroend
->
-  <div class=" d-flex align-items-center justify-content-between mb-3">
-    <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-      New Collection
-    </h5>
-    <button
-      class="btn-close1 border-0 rounded"
-      on:click={() => {
-        onClick(false);
-      }}
-    >
-      <img src={closeIcon} alt="" />
-    </button>
-  </div>
-  <div style="font-size: 14px;" class="text-lightGray">
-    <p>Paste your OAS/YAML/JSON file</p>
-  </div>
-  <div class="textarea-div rounded border-0">
-    <textarea
-      on:input={(e) => handleInputField(e)}
-      bind:value={text}
-      class="form-control border-0 rounded bg-blackColor"
-    />
-  </div>
-
-  <div style="font-size: 14px;" class="text-lightGray mt-2">
-    <p>Drag and drop your OAS/YAML/JSON file</p>
-  </div>
+{#if isSyntaxError}
+  <InvalidSyntaxPopup {onClick} {handleError}></InvalidSyntaxPopup>
+{/if}
+{#if isResponseLoading}
+  <FetchDataProgressBar {onClick}></FetchDataProgressBar>
+{/if}
+{#if !isLoading && !isSyntaxError}
+  <div
+    class="background-overlay"
+    on:click={() => {
+      onClick(false);
+    }}
+    transition:fade={{ delay: 0, duration: 100 }}
+  />
 
   <div
-    style="font-size: 14px;border:1px dashed #8A9299;"
-    class="text-lightGray d-flex flex-column align-items-center justify-content-center"
+    class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+    transition:fly={{ y: 50, delay: 0, duration: 100 }}
+    on:introstart
+    on:outroend
   >
-    <p style="text-align:center" class="mt-3 text-textColor">
-      Drag and Drop or
-    </p>
+    <div class=" d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0 importData-whiteColor" style="font-weight: 500;">
+        New Collection
+      </h5>
+      <button
+        class="btn-close1 border-0 rounded"
+        on:click={() => {
+          onClick(false);
+        }}
+      >
+        <img src={closeIcon} alt="" />
+      </button>
+    </div>
+    <div style="font-size: 14px;" class="importData-lightGray">
+      <p>Paste your YAML/JSON file</p>
+    </div>
+    <div class="textarea-div rounded border-0">
+      <textarea
+        on:input={(e) => handleInputField(e)}
+        bind:value={importData}
+        class="form-control border-0 rounded bg-blackColor"
+      />
+    </div>
 
-    <input
-      type="file"
-      id="file-input"
-      name="file-input"
-      required
-      accept=".json"
-      on:input={handleFileUpload}
-    />
-    <label
-      id="file-input-label"
-      for="file-input"
-      class="text-labelColor d-flex align-items-left justify-content-center mb-3 w-25"
-      style="font-size: 12px;cursor:pointer;"
+    <div style="font-size: 14px;" class="importData-lightGray mt-2">
+      <p>Drag and drop your YAML/JSON file</p>
+    </div>
+
+    <div>
+      <Dropzone
+        containerStyles="background-color:#1e1e1e; width:100%;"
+        accept=".yaml"
+        inputElement
+        on:drop={handleFilesSelect}
+        on:change={handleFilesSelect}
+      >
+        <p class="importData-textColor">Drag and Drop or</p>
+        <p>
+          <span><img src={icons.uploadIcon} alt="" />Choose File</span>
+          <span>{fileName}</span>
+        </p>
+      </Dropzone>
+    </div>
+
+    <div
+      class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
     >
-      <span class="me-2"><img src={icons.uploadIcon} alt="" /></span>Choose FIle</label
-    >
+      <button
+        class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
+        on:click={() => {
+          handleImport();
+        }}
+      >
+        <span class="me-3">
+          {#if isLoading}
+            <Spinner size={"16px"} />
+          {/if}</span
+        > Import Collection</button
+      >
+
+      <p class="empty-data-error">
+        {#if isDataEmpty}
+          Please Paste or Upload your file in order to import the workspace
+        {/if}
+      </p>
+      <p
+        class="importData-whiteColor mb-2"
+        style="font-size: 14px;font-weight:300"
+      >
+        OR
+      </p>
+      <button
+        class="btn-primary border-0 w-100 py-2 fs-6 rounded"
+        on:click={() => {
+          onClick(false);
+          handleCreateCollection();
+        }}>Create Collection</button
+      >
+    </div>
   </div>
-
-  <div
-    class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
-  >
-    <button
-      class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
-      on:click={handleImportUrl}
-    >
-      <span class="me-3">
-        {#if isLoading}
-          <Spinner size={"16px"} />
-        {/if}</span
-      > Import Collection</button
-    >
-
-    <p
-      class="text-whiteColor mt-2 mb-2"
-      style="font-size: 14px;font-weight:300"
-    >
-      OR
-    </p>
-    <button
-      class="btn-primary border-0 w-100 py-2 fs-6 rounded"
-      on:click={() => {
-        onClick(false);
-        handleCreateCollection();
-      }}>Create Collection</button
-    >
-  </div>
-</div>
+{/if}
 
 <style>
   #file-input {
@@ -255,19 +268,45 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 9;
+    z-index: 14;
   }
-  
+  .empty-data-error {
+    color: var(--error--color);
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0em;
+    width: 100%;
+    text-align: left;
+    padding: 2px;
+  }
   .container {
+    display: flex;
     position: fixed;
-    height: 80%;
-    width: 40%; 
+    height:90%;
+    width: 50%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 10;
+    z-index: 14;
     border-radius: 10px;
+  }
+
+  @media (min-width: 1000px) {
+    .container {
+      display: flex;
+      position: fixed;
+      height: 90%;
+      width: 40%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--background-color);
+      z-index: 14;
+      border-radius: 10px;
+    }
   }
   .textarea-div{
     height:25%;

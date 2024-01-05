@@ -87,14 +87,14 @@
       }
     },
   );
-  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces)=>{
-    workspaces.map((workspace)=>{
-      if(workspace._data.isActiveWorkspace){
-        showDefault=workspace._data.collections.length===0?true:false;
+  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces) => {
+    workspaces.map((workspace) => {
+      if (workspace._data.isActiveWorkspace) {
+        showDefault=workspace._data.collections.length === 0 ? true : false;
         return;
       }
-    })
-  })
+    });
+  });
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       selectedApiMethods = value;
@@ -413,79 +413,83 @@
   >
     <div class="d-flex flex-column justify-content-center">
       {#if isLoading}
-      <div class="spinner">
-        <Spinner size={`32px`} />
-      </div>
-      {:else}
-      {#if showfilterDropdown}
-        <FilterDropDown {handleSearch} />
-      {/if}
-      {#if searchData.length > 0}
-        <div class="p-4 pt-0">
-          {#if filteredFile.length > 0}
-            {#each filteredFile as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                path={exp.path}
-                explorer={exp.tree}
-                {searchData}
-                folderDetails={exp.folderDetails}
-              />
-            {/each}
-          {/if}
-          {#if filteredFolder.length > 0}
-            {#each filteredFolder as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
-          {#if filteredCollection.length > 0}
-            {#each filteredCollection as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
+        <div class="spinner">
+          <Spinner size={`32px`} />
         </div>
-      {:else if selectedApiMethods.length > 0}
-        {#each filteredSelectedMethodsCollection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-            {activeTabId}
-            {activePath}
-          />
-        {/each}
-      {:else if collection && collection.length > 0}
-        {#each collection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-            {activeTabId}
-            {activePath}
-          />
-        {/each}
+      {:else}
+        {#if showfilterDropdown}
+          <FilterDropDown {handleSearch} />
         {/if}
-        <DefaultCollection {handleCreateCollection} {collectionsMethods} {showDefault} />
+        {#if searchData.length > 0}
+          <div class="p-4 pt-0">
+            {#if filteredFile.length > 0}
+              {#each filteredFile as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  path={exp.path}
+                  explorer={exp.tree}
+                  {searchData}
+                  folderDetails={exp.folderDetails}
+                />
+              {/each}
+            {/if}
+            {#if filteredFolder.length > 0}
+              {#each filteredFolder as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+            {#if filteredCollection.length > 0}
+              {#each filteredCollection as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+          </div>
+        {:else if selectedApiMethods.length > 0}
+          {#each filteredSelectedMethodsCollection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+              {activeTabId}
+              {activePath}
+            />
+          {/each}
+        {:else if collection && collection.length > 0}
+          {#each collection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+              {activeTabId}
+              {activePath}
+            />
+          {/each}
+        {/if}
+        <DefaultCollection
+          {handleCreateCollection}
+          {collectionsMethods}
+          {showDefault}
+        />
       {/if}
     </div>
   </div>

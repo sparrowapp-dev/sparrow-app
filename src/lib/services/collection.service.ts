@@ -8,6 +8,7 @@ import type {
   ImportBodyUrl,
   UpdateCollectionName,
 } from "$lib/utils/dto";
+import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
 
 export class CollectionService {
   constructor() {}
@@ -188,17 +189,31 @@ export class CollectionService {
 
   public importCollectionFromJsonObject = async (
     workspaceId: string,
-    jsonObject,
+    jsonObject: string,
+    contentType: ContentTypeEnum,
   ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importJson/collection`,
       {
-        body: jsonObject,
-        headers: getAuthHeaders(),
+        body: { jsonObject },
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
       },
     );
-
+    return response;
+  };
+  public importCollectionFromFile = async (workspaceId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+      {
+        body: formData,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
     return response;
   };
 }

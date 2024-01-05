@@ -56,7 +56,8 @@
         "title": "sparrow-app",
         "minWidth": 570,
         "minHeight": 700,
-        "center": true
+        "center": true,
+        "fileDropEnabled":true
       }
     ]
   }

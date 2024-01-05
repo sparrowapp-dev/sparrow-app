@@ -147,7 +147,7 @@
       <textarea
         type="text"
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
+        placeholder="This is your personal workspace.Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
       />
     </div>
   </div>

@@ -1,5 +1,7 @@
 import { CollectionService } from "$lib/services/collection.service";
 import type { ImportBodyUrl } from "$lib/utils/dto";
+import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+import yaml from "js-yaml";
 
 export class ImportCollectionViewModel {
   private collectionService = new CollectionService();
@@ -18,11 +20,38 @@ export class ImportCollectionViewModel {
 
   public importCollectionFromJsonObject = async (
     workspaceId: string,
-    jsonObject,
+    jsonObject: string,
+    contentType: ContentTypeEnum,
   ) => {
     return await this.collectionService.importCollectionFromJsonObject(
       workspaceId,
       jsonObject,
+      contentType,
     );
+  };
+  public importCollectionFromFile = async (workspaceId: string, file: File) => {
+    return await this.collectionService.importCollectionFromFile(
+      workspaceId,
+      file,
+    );
+  };
+
+  public validateImportBody = (data: string): ContentTypeEnum => {
+    let contentType: ContentTypeEnum;
+    try {
+      JSON.parse(data);
+      return (contentType = ContentTypeEnum["application/json"]);
+    } catch (jsonError) {
+      if (jsonError instanceof SyntaxError) {
+        try {
+          yaml.load(data);
+          return (contentType = ContentTypeEnum["text/plain"]);
+        } catch (yamlError) {
+          return contentType;
+        }
+      } else {
+        return contentType;
+      }
+    }
   };
 }
