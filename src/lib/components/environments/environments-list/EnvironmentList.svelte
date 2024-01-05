@@ -17,23 +17,42 @@
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
-  let environment: any[] = [];
-  let globalEnvrionment: any;
+  // let environment: any[] = [];
+  // let globalEnvrionment: any;
   let rightClickEnv = {
     id: "",
     isActive: false,
   };
   let environmentUnderCreation: boolean = false;
   let environmentUnderRename: string | undefined = undefined;
-  const _environmentListViewModel = new EnvironmentListViewModel();
+  const _viewModel = new EnvironmentListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
-  export let currentEnvironment: any;
   export let currentWorkspace: any;
-  const environments: Observable<EnvironmentDocument[]> =
-    _environmentListViewModel.environment;
+  export let environments;
 
+  let localEnvironment;
+  let globalEnvironment;
+  // const environments: Observable<EnvironmentDocument[]> =
+  //   _viewModel.environment;
+
+  $: {
+    if (environments) {
+      // console.log("env", environments);
+      localEnvironment = [];
+      globalEnvironment = [];
+      environments.forEach((element) => {
+        const _element = element.toMutableJSON();
+        if (_element.type === "GLOBAL") {
+          globalEnvironment.push(_element);
+        } else if (_element.type === "LOCAL") {
+          localEnvironment.push(_element);
+        }
+        // console.log(_element);
+      });
+    }
+  }
   let pos = { x: 0, y: 0 };
 
   let showMenu: boolean = false;
@@ -41,84 +60,57 @@
   let isLoading: boolean = false;
 
   const handleOpenEnvironment = (id: string) => {
-    _environmentListViewModel.setCurrentEnvironment(currentWorkspace.id, id);
+    environmentRepositoryMethods.activateEnvironment(id);
   };
 
-  const environmentSubscribe = environments.subscribe(
-    (value: EnvironmentDocument[]) => {
-      if (value) {
-        const environmentArr = value.map(
-          (environmentDocument: EnvironmentDocument) => {
-            const environmentObj =
-              environmentRepositoryMethods.getEnvironmentDocument(
-                environmentDocument,
-              );
-            return environmentObj;
-          },
-        );
-        const filteredEnvironments = environmentArr.filter((env) => {
-          if (env.type == "LOCAL" || env.type == undefined) {
-            return true;
-          } else if (env.type == "GLOBAL") {
-            globalEnvrionment = env;
-          }
-        });
-
-        const isPresent =
-          environmentArr.length > 0 &&
-          environmentArr.find((env) => {
-            if (env.id == currentWorkspace.currentEnvironmentId) return env;
-          });
-
-        if (!isPresent) {
-          handleOpenEnvironment(globalEnvrionment?.id);
-        }
-        environment = filteredEnvironments;
-        console.log("Environment: ", environment);
-        return;
-      }
-    },
-  );
   const workspaceLoadingSubscribe = isWorkspaceLoaded.subscribe((value) => {
     isLoading = !value;
   });
 
-  const handleCreateEnvironmentClick = async () => {
+  const handleCreateEnvironment = async () => {
     environmentUnderCreation = true;
     isEnvironmentCreatedFirstTime.set(true);
     const newEnvironment = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: getNextEnvironment(environment, "New Environment"),
-      variable: [],
-      type: "LOCAL",
+      name: getNextEnvironment(localEnvironment, "New Environment"),
+      variable: [
+        {
+          key: "",
+          value: "",
+          checked: true,
+        },
+      ],
       isActive: false,
+      type: "LOCAL",
       createdAt: new Date().toISOString(),
     };
 
-    environmentRepositoryMethods.addEnvironment(newEnvironment);
-    const response = await _environmentListViewModel.addEnvironment({
+    environmentRepositoryMethods.createEnvironment(newEnvironment);
+    const response = await environmentServiceMethods.createEnvironment({
       name: newEnvironment.name,
-      workspaceId: currentWorkspace.id,
+      workspaceId: currentWorkspace._id,
       variable: newEnvironment.variable,
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       environmentUnderCreation = false;
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
-      _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspace.id, {
-        _id: response.data.data._id,
-        name: newEnvironment.name,
-      });
-      handleOpenEnvironment(res._id);
+      // _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspace.id, {
+      //   _id: response.data.data._id,
+      //   name: newEnvironment.name,
+      // });
+      // handleOpenEnvironment(res._id);
       notifications.success("New Environment Created!");
       return;
+    } else {
+      notifications.error("Failed to create environment. Please try again.");
     }
     return;
   };
 
-  const handleActivateEnvironment = (id: string) => {
-    _environmentListViewModel.activateEnvironment(id);
-  };
+  // const handleActivateEnvironment = (id: string) => {
+  //   _viewModel.activateEnvironment(id);
+  // };
 
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -146,7 +138,6 @@
     environmentRepositoryMethods.removeEnvironment(id);
   };
   onDestroy(() => {
-    environmentSubscribe.unsubscribe();
     workspaceLoadingSubscribe();
   });
   let isCollectionPopup: boolean = false;
@@ -182,19 +173,19 @@
     environmentUnderRename = undefined;
     document.getElementById(`rename-input-${id}`).blur();
     if (e.target.value !== oldName) {
-      await environmentServiceMethods.updateEnvironment(
-        currentWorkspace.id,
-        id,
-        {
-          name: e.target.value,
-          variable: variable,
-        },
-      );
-      await environmentRepositoryMethods.updateEnvironment(id, {
-        name: e.target.value,
-        isActive: currentEnvironment.id == id,
-        variable: variable,
-      });
+      // await environmentServiceMethods.updateEnvironment(
+      //   currentWorkspace.id,
+      //   id,
+      //   {
+      //     name: e.target.value,
+      //     variable: variable,
+      //   },
+      // );
+      // await environmentRepositoryMethods.updateEnvironment(id, {
+      //   name: e.target.value,
+      //   isActive: currentEnvironment.id == id,
+      //   variable: variable,
+      // });
     }
   };
   const handleEnterRenameEnvironment = async (e, oldName, variable, id) => {
@@ -222,7 +213,7 @@
     },
     {
       onClick: (id) => {
-        handleActivateEnvironment(id);
+        // handleActivateEnvironment(id);
       },
       displayText: rightClickEnv.isActive
         ? "Unselect Environment"
@@ -245,7 +236,7 @@
   }
 </script>
 
-<svelte:window
+<!-- <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
@@ -272,7 +263,7 @@
       </ul>
     </div>
   </nav>
-{/if}
+{/if} -->
 <div class={`env-sidebar`} style={``}>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
@@ -281,14 +272,14 @@
       class={`fw-medium lh-1 curr-workspace ps-3 my-auto ellipsis`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
-      {currentWorkspace.name || ""}
+      {currentWorkspace?.name || ""}
     </h1>
     <Tooltip text={`Add Environment`}>
       <button
         class={`border-0 mx-3 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
-        on:click={handleCreateEnvironmentClick}
+        on:click={handleCreateEnvironment}
       >
         {#if environmentUnderCreation}
           <Spinner size={"18px"} />
@@ -298,21 +289,22 @@
       </button>
     </Tooltip>
   </div>
-  {#if globalEnvrionment}
+
+  {#if globalEnvironment && globalEnvironment.length > 0}
     <p
       class={`fw-normal env-item rounded m-2 ps-3 ${
-        globalEnvrionment?.id == currentEnvironment.id && "active"
+        globalEnvironment[0]?.isActive && "active"
       }`}
       on:click={() => {
-        handleOpenEnvironment(globalEnvrionment?.id);
+        handleOpenEnvironment(globalEnvironment[0]?.id);
       }}
     >
-      {globalEnvrionment?.name}
+      {globalEnvironment[0]?.name}
     </p>
   {/if}
   <hr />
 
-  {#if environment && environment.length == 0}
+  {#if localEnvironment && localEnvironment.length === 0}
     <div class={`add-env-container `}>
       <p class={`add-env-desc-text fw-light text-center mb-5 p-2 pe-4`}>
         Add Environments to your Workspace to test your APIs with the relevant
@@ -320,7 +312,7 @@
       </p>
       <button
         class={`add-env-btn d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
-        on:click={handleCreateEnvironmentClick}
+        on:click={handleCreateEnvironment}
       >
         <PlusIcon classProp={`my-auto me-2`} />
         <span class={`my-auto ps-2`}>Environment</span>
@@ -328,11 +320,11 @@
     </div>
   {/if}
   <ul class={`env-side-tab-list overflow-y-scroll ps-0`}>
-    {#if environment && environment.length > 0}
-      {#each environment as env}
+    {#if localEnvironment && localEnvironment.length > 0}
+      {#each localEnvironment as env}
         <div
           class={`d-flex rounded env-tab align-items-center justify-content-between env-item ps-3 ${
-            env.id == currentEnvironment.id && "active"
+            env.isActive && "active"
           }`}
           style="cursor: pointer; "
           on:click={() => handleOpenEnvironment(env.id)}
@@ -341,13 +333,7 @@
         >
           <div class="show-more-in d-flex ellipsis">
             <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>
-              <button
-                class="p-0 m-0 border-0 bg-transparent"
-                on:click={(e) => {
-                  e.stopPropagation();
-                  handleActivateEnvironment(env.id);
-                }}
-              >
+              <button class="p-0 m-0 border-0 bg-transparent">
                 <SelectIcon
                   classProp={`my-auto`}
                   width={20}

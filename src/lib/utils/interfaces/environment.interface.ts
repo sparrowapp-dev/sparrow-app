@@ -1,23 +1,22 @@
-import type { EnvironmentDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
+import type { CreateEnvironmentPostBody } from "../dto";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface EnvironmentRepositoryMethods {
   getActiveWorkspace: () => Observable<any>;
-  bulkInsert: (data: any) => any;
-  getEnvironmentDocument: (data: EnvironmentDocument) => any;
-  addEnvironment: (environment) => void;
+  createEnvironment: (environment) => void;
   updateEnvironment: (uuid: string, data) => void;
-  getParticularEnvironment: (environmentId: string) => any;
   removeEnvironment: (environmentId: string) => void;
+  activateEnvironment: (id: string) => void;
+  refeshEnvironment: (data) => void;
 }
 
 export interface EnvironmentServiceMethods {
-  getAllEnvironments: (workspaceId: string) => any;
-  getEnvironment: (workspaceId: string, environmentId: string) => any;
+  getEnvironments: (workspaceId: string) => any;
   updateEnvironment: (
     workspaceId: string,
     environmentId: string,
     data: any,
   ) => any;
   deleteEnvironment: (environentId: string, workspaceId: string) => void;
+  createEnvironment: (environment: CreateEnvironmentPostBody) => any;
 }

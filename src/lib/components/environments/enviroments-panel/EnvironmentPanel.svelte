@@ -1,7 +1,6 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import EnvValue from "$lib/components/env-value/EnvValue.svelte";
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
@@ -9,113 +8,81 @@
   import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
-  const _environmentPanelViewModel = new EnvironmentPanelViewModel();
+
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
-  export let currentEnvironment: any;
-  export let currentWorkspace: any;
-  export let environmentChanged: {
-    name: boolean;
-    variable: boolean;
-  } = {
-    name: false,
-    variable: false,
-  };
-  let changedName: string;
-  let changedKeyValuePair: EnvValuePair[];
-  let initialKeyValuePair: EnvValuePair[] = currentEnvironment.variable;
+  export let currentEnvironment;
+  export let activeWorkspace;
+
+  const _environmentPanelViewModel = new EnvironmentPanelViewModel();
+
   const handleCurrentEnvironmentNameChange = (e: any) => {
-    if (e.target.value !== currentEnvironment.name) {
-      environmentChanged.name = true;
-      changedName = e.target.value;
-    } else {
-      changedName = undefined;
-      environmentChanged.name = false;
-    }
+    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
+      name: e.target.value,
+    });
   };
+
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    if (pairs == createDeepCopy(currentEnvironment.variable)) {
-      environmentChanged.variable = false;
-      changedKeyValuePair = undefined;
-    } else {
-      environmentChanged.variable = true;
-      currentEnvironment.variable = pairs;
-      changedKeyValuePair = pairs;
-    }
+    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
+      variable: pairs,
+    });
   };
-  const handleSaveEnvironment = () => {
-    environmentServiceMethods.updateEnvironment(
-      currentWorkspace.id,
+
+  const handleSaveEnvironment = async () => {
+    const response = await environmentServiceMethods.updateEnvironment(
+      activeWorkspace._id,
       currentEnvironment.id,
       {
-        name: changedName ? changedName : currentEnvironment.name,
-        variable: changedKeyValuePair
-          ? changedKeyValuePair
-          : currentEnvironment.variable,
+        name: currentEnvironment.name,
+        variable: currentEnvironment.variable,
       },
     );
-    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
-      name: changedName ? changedName : currentEnvironment.name,
-      isActive: true,
-      variable: changedKeyValuePair
-        ? changedKeyValuePair
-        : currentEnvironment.variable,
-    });
-    notifications.success(
-      `Changes saved for ${
-        changedName ? changedName : currentEnvironment.name
-      } environment.`,
-    );
-    environmentChanged.name = false;
-    environmentChanged.variable = false;
+    if (response.isSuccessful) {
+      notifications.success(
+        `Changes saved for ${currentEnvironment.name} environment.`,
+      );
+    } else {
+      notifications.error("Failed to save changes for Dev environment.");
+    }
   };
 </script>
 
-<div class={`env-panel`}>
-  <header class={`env-header justify-content-between d-flex`}>
-    <input
-      type="text"
-      class={`env-heading ellipsis fw-normal px-2 border-0`}
-      value={currentEnvironment?.name}
-      on:change={(e) => handleCurrentEnvironmentNameChange(e)}
-      disabled={currentEnvironment.type == "GLOBAL"}
-    />
-    <div class={`d-flex env-btn-container`}>
-      <button class={`d-flex env-help-btn border-0 my-auto`}>
-        <HelpIcon width={19} height={19} classProp={`me-2`} />
-        <span class={``}>How to use variables</span>
-      </button>
-      <button
-        class={`d-flex ${
-          !environmentChanged.name && !environmentChanged.variable
-            ? "env-save-btn"
-            : "env-save-btn-enabled"
-        } border-0 rounded`}
-        disabled={!environmentChanged.name && !environmentChanged.variable}
-        on:click={() =>
-          (environmentChanged.name || environmentChanged.variable) &&
-          handleSaveEnvironment()}
-        ><SaveIcon
-          width={16}
-          height={16}
-          classProp={`me-2 my-auto rounded`}
-        /><span>Save</span><span
-          class={`${
-            (environmentChanged.name || environmentChanged.variable) && "badge"
-          }`}>{" "}</span
-        >
-      </button>
-    </div>
-  </header>
-  <section class={`var-value-container`}>
-    <EnvValue
-      keyValue={currentEnvironment.variable}
-      callback={handleCurrentEnvironmentKeyValuePairChange}
-    />
-  </section>
-</div>
+{#if currentEnvironment}
+  <div class={`env-panel`}>
+    <header class={`env-header justify-content-between d-flex`}>
+      <input
+        type="text"
+        class={`env-heading ellipsis fw-normal px-2 border-0`}
+        value={currentEnvironment?.name}
+        on:change={(e) => handleCurrentEnvironmentNameChange(e)}
+        disabled={currentEnvironment?.type == "GLOBAL"}
+      />
+      <div class={`d-flex env-btn-container`}>
+        <button class={`d-flex env-help-btn border-0 my-auto`}>
+          <HelpIcon width={19} height={19} classProp={`me-2`} />
+          <span class={``}>How to use variables</span>
+        </button>
+        <button
+          class="d-flex border-0 rounded env-save-btn env-save-btn-enabled"
+          on:click={handleSaveEnvironment}
+          ><SaveIcon
+            width={16}
+            height={16}
+            classProp={`me-2 my-auto rounded `}
+          /><span>Save</span>
+        </button>
+      </div>
+    </header>
+    <section class={`var-value-container`}>
+      <EnvValue
+        keyValue={currentEnvironment.variable}
+        callback={handleCurrentEnvironmentKeyValuePairChange}
+      />
+    </section>
+  </div>
+{/if}
 
 <style lang="scss">
   .env-panel {
