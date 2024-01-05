@@ -171,13 +171,6 @@
               environmentVariables={mockData}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-<<<<<<< HEAD
-            <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-            <MyFolder {collectionsMethods} {activeTab} />
-          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-            <MyCollection {collectionsMethods} {activeTab} />
-=======
             <MyWorkspace
               {activeTab}
               {collectionsMethods}
@@ -195,7 +188,6 @@
               {activeTab}
               {_collectionListViewModel}
             />
->>>>>>> development
           {/if}
         </div>
         <!-- <SidebarRight /> -->
