@@ -42,12 +42,6 @@
   let isLoading: boolean = false;
   let currentTabId: string = "";
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-<<<<<<< HEAD
-    urlText = event?.property?.request?.url;
-    method = event?.property?.request?.method;
-    disabledSend = event?.property?.request?.requestInProgress;
-    request = event?.property?.request;
-=======
     if (event) {
       currentTabId = event?.id;
       urlText = event?.property?.request?.url;
@@ -55,7 +49,6 @@
       disabledSend = event?.property?.request?.requestInProgress;
       request = event?.property?.request;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   const handleSendRequest = async () => {

@@ -115,11 +115,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-<<<<<<< HEAD
-  version: 3,
-=======
   version: 1,
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   properties: {
     collectionId: {
       type: "string",

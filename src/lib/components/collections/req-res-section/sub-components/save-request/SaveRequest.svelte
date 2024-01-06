@@ -99,17 +99,11 @@
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
-<<<<<<< HEAD
-      collection = value;
-      directory = JSON.parse(JSON.stringify(collection));
-      if (latestRoute.id) navigateToDirectory(latestRoute);
-=======
       if (value) {
         collection = value;
         directory = JSON.parse(JSON.stringify(collection));
         if (latestRoute.id) navigateToDirectory(latestRoute);
       }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(

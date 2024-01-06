@@ -162,11 +162,6 @@ export class HeaderDashboardViewModel {
     isLoggout.set(true);
     isResponseError.set(false);
     clearAuthJwt();
-<<<<<<< HEAD
-    setUser(null);
-    setCurrentWorkspace("", "");
-=======
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   };
 
   // logout to backend - expires jwt - auth and refresh tokens

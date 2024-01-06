@@ -4,13 +4,6 @@
   import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-<<<<<<< HEAD
-  let tabList = [];
-  let currentTabId: string;
-  let selectedTab: Partial<NewTab> = {};
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-=======
   import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
@@ -52,7 +45,6 @@
       );
       collectionName = "/" + collection?.name;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   let handleInputValue = () => {

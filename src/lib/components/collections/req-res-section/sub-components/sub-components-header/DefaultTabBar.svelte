@@ -20,11 +20,8 @@
   import { onDestroy } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-<<<<<<< HEAD
-=======
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -136,9 +133,6 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-<<<<<<< HEAD
-      collectionsMethods.updateCollection(newCollection._id, res);
-=======
       collectionsMethods.updateCollection(newCollection.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
@@ -146,7 +140,6 @@
       });
       notifications.success("New Collection Created");
 
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
       return;
     }
     return;
