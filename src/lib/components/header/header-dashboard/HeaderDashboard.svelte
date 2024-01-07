@@ -503,6 +503,9 @@
     border: none;
     outline: none;
   }
+  .search-container {
+    border: 1px solid transparent;
+  }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);
   }
