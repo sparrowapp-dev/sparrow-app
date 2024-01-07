@@ -51,7 +51,7 @@
   let userName: string = "";
   let isComponentRenderedFirstTime = false;
   let showDefault = false;
-  let isLoading = true;
+  let isLoading = false;
   const workspacesArr = _workspaceViewModel.workspaces;
 
   const usernameUnsubscribe = username.subscribe((value) => {
@@ -259,6 +259,7 @@
   let filteredFolder = [];
   let filteredFile = [];
   function handleSearch() {
+    isLoading = true;
     filteredCollection.length = 0;
     filteredFolder.length = 0;
     filteredFile.length = 0;
@@ -269,6 +270,7 @@
       filteredFile,
       collection,
     );
+    isLoading = false;
   }
 
   onDestroy(() => {
