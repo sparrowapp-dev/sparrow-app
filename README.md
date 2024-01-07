@@ -90,6 +90,3 @@ You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
  
 Subscribe to our newsletter by applying [here!](https://code.visualstudio.com/) 
  
-## <a name="license">©️ License</a>
- 
-![Atom](https://img.shields.io/badge/Coming%20Soon-%2366595C.svg?style=for-the-badge&logo=atom&logoColor=white)
