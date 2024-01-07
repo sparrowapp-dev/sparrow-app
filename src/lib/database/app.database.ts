@@ -24,7 +24,12 @@ import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
-
+import {
+  environmentSchema,
+  type EnvironmentDocType,
+} from "$lib/models/environment.model";
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -32,6 +37,8 @@ export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
+export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
+export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -44,6 +51,7 @@ export type DatabaseCollections = {
   workspace: WorkspaceContainer;
   tab: TabContainer;
   collection: CollectionContainer;
+  environment: EnvironmentContainer;
   activesidebartab: ActiveSideBarTabContainer;
 };
 
@@ -81,6 +89,12 @@ export class RxDB {
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -103,6 +117,15 @@ export class RxDB {
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
+      },
+      environment: {
+        schema: environmentSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
     });
     return { rxdb: this.rxdb };

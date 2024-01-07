@@ -1,7 +1,7 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-  import searchIcon from "$lib/assets/search.svg";
+  import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
@@ -11,7 +11,6 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
-  import { slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -368,7 +367,7 @@
       style="height:32px; width:180px "
       class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
     >
-      <img src={searchIcon} alt="" />
+      <SearchIcon />
       <input
         type="search"
         style="  font-size: 12px;font-weight:500;"
