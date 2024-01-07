@@ -8,7 +8,7 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     _id: {
       type: "string",
@@ -57,6 +57,10 @@ export const workspaceSchemaLiteral = {
       type: "string",
     },
     isActiveWorkspace: {
+      type: "boolean",
+      default: false,
+    },
+    environmentId: {
       type: "boolean",
       default: false,
     },

@@ -2,7 +2,7 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import IconButton from "$lib/components/buttons/IconButton.svelte";
-
+  import { SelectIcon } from "$lib/assets/app.asset";
   import { CollectionService } from "$lib/services/collection.service";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -191,7 +191,7 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center"
   >
-    <img
+    <!-- <img
       src={angleRight}
       class=""
       style="height:14px; width:14px; margin-right:8px; {visibility
@@ -203,7 +203,15 @@
           visibility = !visibility;
         }
       }}
-    />
+    /> -->
+    <button class="p-0 m-0 border-0 bg-transparent">
+      <SelectIcon
+        classProp={`my-auto`}
+        width={20}
+        height={20}
+        selected={env.isActive}
+      />
+    </button>
     {#if isRenaming}
       <input
         class="form-control py-0 renameInputFieldCollection"
