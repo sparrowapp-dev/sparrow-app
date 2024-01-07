@@ -23,6 +23,8 @@
     removeEnvironment: _viewModel.deleteEnvironment,
     updateEnvironment: _viewModel.updateEnvironment,
     refeshEnvironment: _viewModel.refreshEnvironment,
+    initActiveEnvironmentToWorkspace:
+      _viewModel.initActiveEnvironmentToWorkspace,
   };
 
   const environmentServiceMethods: EnvironmentServiceMethods = {

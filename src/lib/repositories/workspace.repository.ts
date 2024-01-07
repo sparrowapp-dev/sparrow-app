@@ -19,6 +19,7 @@ export class WorkspaceRepository {
   public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
     return RxDB.getInstance().rxdb.workspace.find().$;
   };
+
   /**
    * get active workspace of the user.
    */
@@ -122,11 +123,7 @@ export class WorkspaceRepository {
     await workspace.patch({ currentEnvironmentId: environmentId });
   };
 
-  public updateWorkspace = async (
-    workspaceId: string,
-    name: string,
-    description?: string,
-  ) => {
+  public updateWorkspace = async (workspaceId: string, data) => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
         selector: {
@@ -135,8 +132,12 @@ export class WorkspaceRepository {
       })
       .exec();
     workspace.incrementalModify((value) => {
-      value.name = name;
-      value.description = description;
+      if (data.name) value.name = data.name;
+      if (data.environmentId) value.environmentId = data.environmentId;
+      if (data.updatedAt) value.updatedAt = data.updatedAt;
+      if (data.updatedBy) value.updatedBy = data.updatedBy;
+      if (data.createdBy) value.createdBy = data.createdBy;
+      if (data.description) value.description = data.description;
       return value;
     });
   };

@@ -1,29 +1,8 @@
 <script lang="ts">
-  import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import IconButton from "$lib/components/buttons/IconButton.svelte";
   import { SelectIcon } from "$lib/assets/app.asset";
-  import { CollectionService } from "$lib/services/collection.service";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { selectMethodsStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
-  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
-  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
-  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import {
-    isCollectionCreatedFirstTime,
-    isFolderCreatedFirstTime,
-  } from "$lib/store/collection";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import folderIcon from "$lib/assets/create_folder.svg";
-  import requestIcon from "$lib/assets/create_request.svg";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
@@ -35,15 +14,13 @@
   export let currentWorkspace;
   export let env;
 
-  let visibility = false;
-
-  let openCollectionId: string;
-
   let pos = { x: 0, y: 0 };
-
   let showMenu: boolean = false;
-
   let containerRef;
+  let isEnvironmentPopup: boolean = false;
+  let newEnvironmentName: string = "";
+  let isRenaming = false;
+
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
@@ -55,50 +32,43 @@
     }, 100);
   }
 
-  let isCollectionPopup: boolean = false;
-
   const handleEnvironmentPopUp = (flag) => {
-    isCollectionPopup = flag;
+    isEnvironmentPopup = flag;
   };
 
   function closeRightClickContextMenu() {
     showMenu = false;
   }
 
-  //open collection
-  function openCollections() {
-    if (!visibility) {
-      visibility = !visibility;
-    }
+  //open environment
+  function openEnvironment() {
+    environmentRepositoryMethods.activateEnvironment(env.id);
     showMenu = false;
   }
 
-  let newCollectionName: string = "";
-  let isRenaming = false;
-
   const handleRenameInput = (event) => {
-    newCollectionName = event.target.value;
+    newEnvironmentName = event.target.value;
   };
 
   const onRenameBlur = async () => {
-    if (newCollectionName) {
+    if (newEnvironmentName) {
       const response = await environmentServiceMethods.updateEnvironment(
         currentWorkspace._id,
         env.id,
-        { name: newCollectionName },
+        { name: newEnvironmentName },
       );
       if (response.isSuccessful) {
         environmentRepositoryMethods.updateEnvironment(env.id, {
-          name: newCollectionName,
+          name: newEnvironmentName,
         });
       }
     }
     isRenaming = false;
-    newCollectionName = "";
+    newEnvironmentName = "";
   };
 
-  //rename collection name
-  const renameCollection = () => {
+  //rename environment name
+  const renameEnvironment = () => {
     isRenaming = true;
     showMenu = false;
   };
@@ -106,24 +76,36 @@
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-        "renameInputFieldCollection",
+        "renameInputFieldEnvironment",
       ) as HTMLInputElement;
       inputField.blur();
     }
   };
 
+  // select environment
+  const selectEnvironment = () => {
+    environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
+      currentWorkspace._id,
+      env.id,
+    );
+  };
+
   let menuItems = [
     {
-      onClick: openCollections,
-      displayText: "Open collection",
+      onClick: openEnvironment,
+      displayText: "Open Environment",
       disabled: false,
     },
     {
-      onClick: renameCollection,
-      displayText: "Rename collection",
+      onClick: renameEnvironment,
+      displayText: "Rename",
       disabled: false,
     },
-
+    {
+      onClick: selectEnvironment,
+      displayText: "Select Environment",
+      disabled: false,
+    },
     {
       onClick: () => {
         handleEnvironmentPopUp(true);
@@ -132,16 +114,9 @@
       disabled: false,
     },
   ];
-  //   $: {
-  //     if (activePath) {
-  //       if (activePath.collectionId === collection.id) {
-  //         visibility = true;
-  //       }
-  //     }
-  //   }
 </script>
 
-{#if isCollectionPopup}
+{#if isEnvironmentPopup}
   <EnvironmentDeletePopup
     {env}
     {currentWorkspace}
@@ -191,31 +166,23 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center"
   >
-    <!-- <img
-      src={angleRight}
-      class=""
-      style="height:14px; width:14px; margin-right:8px; {visibility
-        ? 'transform:rotate(90deg);'
-        : 'transform:rotate(0deg);'}"
-      alt="angleRight"
+    <button
+      class="p-0 m-0 me-2 border-0 bg-transparent"
       on:click={() => {
-        if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-          visibility = !visibility;
-        }
+        selectEnvironment();
       }}
-    /> -->
-    <button class="p-0 m-0 border-0 bg-transparent">
+    >
       <SelectIcon
         classProp={`my-auto`}
         width={20}
         height={20}
-        selected={env.isActive}
+        selected={currentWorkspace?.environmentId === env.id}
       />
     </button>
     {#if isRenaming}
       <input
         class="form-control py-0 renameInputFieldCollection"
-        id="renameInputFieldCollection"
+        id="renameInputFieldEnvironment"
         type="text"
         style="font-size: 12px;"
         value={env.name}
@@ -230,10 +197,8 @@
         class="collection-title d-flex align-items-center py-1 mb-0"
         style="height: 36px;"
         on:click={() => {
-          isCollectionCreatedFirstTime.set(false);
-
           if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-            // handleCollectionClick(collection, currentWorkspaceId, collectionId);
+            openEnvironment();
           }
         }}
       >
@@ -324,9 +289,15 @@
 
   .renameInputFieldCollection {
     border: none;
-    background-color: transparent;
     color: var(--white-color);
+    background-color: transparent;
     padding-left: 0;
+    border-radius: 0 !important;
+  }
+  .renameInputFieldCollection:focus {
+    background-color: #313233;
+    outline: none !important;
+    border-bottom: 1px solid #85c2ff;
   }
   .sub-folders {
     border-left: 1px solid var(--border-color);

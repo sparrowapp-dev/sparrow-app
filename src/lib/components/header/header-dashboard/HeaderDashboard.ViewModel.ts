@@ -51,7 +51,10 @@ export class HeaderDashboardViewModel {
     name: string,
     description?: string,
   ) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, name, description);
+    this.workspaceRepository.updateWorkspace(workspaceId, {
+      name,
+      description,
+    });
   };
 
   public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {

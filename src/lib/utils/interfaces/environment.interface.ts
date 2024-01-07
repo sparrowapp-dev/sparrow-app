@@ -8,6 +8,10 @@ export interface EnvironmentRepositoryMethods {
   removeEnvironment: (environmentId: string) => void;
   activateEnvironment: (id: string) => void;
   refeshEnvironment: (data) => void;
+  initActiveEnvironmentToWorkspace: (
+    workspaceId: string,
+    environmentId: string,
+  ) => void;
 }
 
 export interface EnvironmentServiceMethods {

@@ -7,6 +7,7 @@ export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
+
   constructor() {}
 
   public getActiveWorkspace = () => {
@@ -44,6 +45,13 @@ export class EnvironmentViewModel {
 
   public refreshEnvironment = async (data) => {
     this.environmentRepository.refreshEnvironment(data);
+  };
+
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
   };
 
   // services -----------------------------------------------------------

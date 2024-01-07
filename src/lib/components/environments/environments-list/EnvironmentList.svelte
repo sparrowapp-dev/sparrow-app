@@ -1,33 +1,19 @@
 <script lang="ts">
-  import { PlusIcon, SelectIcon, ShowMoreIcon } from "$lib/assets/app.asset";
+  import { PlusIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
-
   import { v4 as uuidv4 } from "uuid";
-  import type { EnvironmentDocument } from "$lib/database/app.database";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
-  import { EnvironmentListViewModel } from "./EnvironmentList.ViewModel";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
   import EnvironmentTab from "./sub-components/environment-tab/EnvironmentTab.svelte";
-  // let environment: any[] = [];
-  // let globalEnvrionment: any;
-  let rightClickEnv = {
-    id: "",
-    isActive: false,
-  };
-  let environmentUnderCreation: boolean = false;
-  let environmentUnderRename: string | undefined = undefined;
-  const _viewModel = new EnvironmentListViewModel();
-  const _workspaceViewModel = new HeaderDashboardViewModel();
+
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentWorkspace;
@@ -35,12 +21,11 @@
 
   let localEnvironment;
   let globalEnvironment;
-  // const environments: Observable<EnvironmentDocument[]> =
-  //   _viewModel.environment;
+  let isLoading: boolean = false;
+  let environmentUnderCreation: boolean = false;
 
   $: {
     if (environments) {
-      // console.log("env", environments);
       localEnvironment = [];
       globalEnvironment = [];
       environments.forEach((element) => {
@@ -50,12 +35,9 @@
         } else if (_element.type === "LOCAL") {
           localEnvironment.push(_element);
         }
-        // console.log(_element);
       });
     }
   }
-
-  let isLoading: boolean = false;
 
   const handleOpenEnvironment = (id: string) => {
     environmentRepositoryMethods.activateEnvironment(id);
@@ -93,11 +75,6 @@
       const res = response.data.data;
       environmentUnderCreation = false;
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
-      // _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspace.id, {
-      //   _id: response.data.data._id,
-      //   name: newEnvironment.name,
-      // });
-      // handleOpenEnvironment(res._id);
       notifications.success("New Environment Created!");
       return;
     } else {
@@ -105,10 +82,6 @@
     }
     return;
   };
-
-  // const handleActivateEnvironment = (id: string) => {
-  //   _viewModel.activateEnvironment(id);
-  // };
 
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -131,10 +104,6 @@
     return null;
   };
 
-  const deleteEnvironment = (id: string) => {
-    environmentServiceMethods.deleteEnvironment(currentWorkspace.id, id);
-    environmentRepositoryMethods.removeEnvironment(id);
-  };
   onDestroy(() => {
     workspaceLoadingSubscribe();
   });
@@ -168,7 +137,7 @@
 
   {#if globalEnvironment && globalEnvironment.length > 0}
     <p
-      class={`fw-normal env-item rounded m-2 ps-3 ${
+      class={`fw-normal env-item rounded m-2 px-2 ${
         globalEnvironment[0]?.isActive && "active"
       }`}
       on:click={() => {
@@ -195,7 +164,7 @@
       </button>
     </div>
   {/if}
-  <ul class={`env-side-tab-list overflow-y-scroll ps-0`}>
+  <ul class={`env-side-tab-list overflow-y-scroll px-2`}>
     {#if localEnvironment && localEnvironment.length > 0}
       {#each localEnvironment as env}
         <EnvironmentTab
