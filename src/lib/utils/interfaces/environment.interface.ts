@@ -17,6 +17,6 @@ export interface EnvironmentServiceMethods {
     environmentId: string,
     data: any,
   ) => any;
-  deleteEnvironment: (environentId: string, workspaceId: string) => void;
+  deleteEnvironment: (environentId: string, workspaceId: string) => any;
   createEnvironment: (environment: CreateEnvironmentPostBody) => any;
 }

@@ -52,10 +52,13 @@ export class EnvironmentViewModel {
   };
 
   public deleteServerEnvironment = (
-    workspaceId: string,
     environmentId: string,
-  ): void => {
-    this.environmentService.deleteEnvironment(workspaceId, environmentId);
+    workspaceId: string,
+  ) => {
+    return this.environmentService.deleteEnvironment(
+      workspaceId,
+      environmentId,
+    );
   };
 
   public createServerEnvironment = async (
