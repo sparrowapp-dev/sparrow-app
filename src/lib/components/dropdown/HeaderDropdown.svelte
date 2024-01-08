@@ -168,25 +168,6 @@
     </p>
     <hr class="m-0 p-0 mb-1" />
     {#if $data}
-<<<<<<< HEAD
-      {#each $data as list, index}
-        <!-- {#if index < workspaceLimit} -->
-        <p
-          class="d-flex dropdown-btn align-items-center px-2 mt-2 p-1 rounded gap-0 mb-0"
-          style="cursor: pointer;overflow:auto"
-          on:click={() => {
-            isOpen = false;
-            onclick(list._id, list.name);
-          }}
-          on:click={() => {
-            handleWorkspaceTab(list._id, list.name);
-          }}
-        >
-          {list.name}
-        </p>
-        <!-- {/if} -->
-      {/each}
-=======
       {#if isOpen}
         <div transition:slide={{ duration: 500 }} class="gap-2">
           {#each $data.slice().reverse() as list, index}
@@ -218,7 +199,6 @@
           {/each}
         </div>
       {/if}
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     {/if}
     <hr class="m-0 p-0 mt-1" />
     <p

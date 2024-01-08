@@ -232,11 +232,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-<<<<<<< HEAD
-  version: 5,
-=======
   version: 1,
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   properties: {
     tabId: {
       type: "string",

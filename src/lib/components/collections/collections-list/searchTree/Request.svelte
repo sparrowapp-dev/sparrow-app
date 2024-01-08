@@ -9,10 +9,6 @@
   export let request: any;
   export let workspaceId: string = "";
   export let collectionId: string = "";
-<<<<<<< HEAD
- 
-=======
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
 </script>
 
 <div

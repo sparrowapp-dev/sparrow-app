@@ -48,16 +48,6 @@
   const collection = _colllectionListViewModel.collection;
 
   collection.subscribe((value) => {
-<<<<<<< HEAD
-    const collectionArr = value.map(
-      (collectionDocument: CollectionDocument) => {
-        const collectionObj =
-          _colllectionListViewModel.getCollectionDocument(collectionDocument);
-        return collectionObj;
-      },
-    );
-    collections = collectionArr;
-=======
     if (value) {
       const collectionArr = value.map(
         (collectionDocument: CollectionDocument) => {
@@ -68,7 +58,6 @@
       );
       collections = collectionArr;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   let profile: boolean = false;

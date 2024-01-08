@@ -6,7 +6,7 @@
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
-  import Dashboard from "./pages/Dashboard/Dashboard.svelte";
+  import Dashboard from "./pages/dashboard/Dashboard.svelte";
   import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
@@ -28,12 +28,8 @@
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-<<<<<<< HEAD
-    import { invoke } from "@tauri-apps/api";
-=======
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -46,13 +42,8 @@
       if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
-<<<<<<< HEAD
-          let temp = elem.toJSON();
-          if(temp?.property?.request){
-=======
           let temp = createDeepCopy(elem.toJSON());
           if (temp?.property?.request) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             temp.property.request.state.responseSection =
               sample.property.request.state.responseSection;
             temp.property.request.state.responseRaw =

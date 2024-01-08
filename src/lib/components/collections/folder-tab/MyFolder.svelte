@@ -16,7 +16,7 @@
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  export let _collectionListViewModel:CollectionListViewModel;
+  export let _collectionListViewModel: CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
   let isLoading: boolean = false;
@@ -25,25 +25,17 @@
   let componentData: NewTab;
   let totalRequest: number = 0;
   let newFolderName: string = "";
-  let collectionId:string;
-  let folderId:string;
+  let collectionId: string;
+  let folderId: string;
   const _myFolderViewModel = new MyFolderViewModel();
 
-<<<<<<< HEAD
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.folder?.requestCount;
-    totalFolder = event?.property?.folder?.folderCount;
-=======
-  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
-      collectionId=event.path?.collectionId;
-      folderId=event.path?.folderId;
+      collectionId = event.path?.collectionId;
+      folderId = event.path?.folderId;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   const collectionSubscribe = collections.subscribe(
@@ -51,10 +43,11 @@
       if (collectionArr) {
         collectionArr.forEach(async (collection) => {
           if (collection._data.id === collectionId) {
-            const collectionData = await collectionsMethods.getNoOfApisandFolders(
-             collection,
-             folderId
-            );
+            const collectionData =
+              await collectionsMethods.getNoOfApisandFolders(
+                collection,
+                folderId,
+              );
             totalRequest = collectionData.requestCount;
           }
         });

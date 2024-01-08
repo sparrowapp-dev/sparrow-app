@@ -8,11 +8,7 @@ export const activeSideBarTabSchemaLiteral = {
   title: "activesidebartab",
   primaryKey: "activeTabId",
   type: "object",
-<<<<<<< HEAD
-  version: 4,
-=======
   version: 0,
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   properties: {
     activeTabId: {
       type: "string",

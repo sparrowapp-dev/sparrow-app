@@ -93,27 +93,7 @@ export class RxDB {
         schema: tabSchema,
         migrationStrategies: {
           // database  migration functions
-<<<<<<< HEAD
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          5: function (oldDoc) {
-=======
           1: function (oldDoc: TabDocument) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             return oldDoc;
           },
         },
@@ -121,51 +101,14 @@ export class RxDB {
       collection: {
         schema: collectionSchema,
         migrationStrategies: {
-<<<<<<< HEAD
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.collectionId = oldDoc._id;
-=======
           // database  migration functions
           1: function (oldDoc: TabDocument) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             return oldDoc;
           },
         },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
-<<<<<<< HEAD
-        migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            return oldDoc;
-          },
-        },
-      },
-    });
-
-    return { rxdb: this.rxdb, db: this.db };
-  }
-
-  public async destroyDb(): Promise<void> {
-    await removeRxDatabase("mydatabase", getRxStorageDexie());
-=======
       },
     });
     return { rxdb: this.rxdb };
@@ -174,7 +117,6 @@ export class RxDB {
   public async destroyDb(): Promise<void> {
     await this.rxdb.destroy();
     await this.rxdb.remove();
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     this.rxdb = null;
     return;
   }

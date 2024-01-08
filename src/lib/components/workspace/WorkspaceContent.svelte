@@ -91,7 +91,7 @@
             <h2>Workspaces</h2>
             <div class="d-flex">
               <button
-                style="font-size: 12px;"
+                style="font-size: 12px; width: 125px;"
                 on:click={handleCreateWorkSpace}
                 class=" d-flex align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
                 >{#if isLoading}
@@ -100,8 +100,8 @@
                       <Spinner size={"15px"} />
                     {/if}
                   </span>
-                {/if}New Workspace</button
-              >
+                {:else}New Workspace{/if}
+              </button>
             </div>
           </div>
         </div>

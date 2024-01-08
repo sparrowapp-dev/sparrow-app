@@ -25,16 +25,11 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-<<<<<<< HEAD
-    tabName = event?.name;
-    componentData = event;
-=======
     if (event) {
       tabName = event?.name;
       workspaceDescription = event.description ?? "";
       componentData = event;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
   export let _collectionListViewModel: CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
