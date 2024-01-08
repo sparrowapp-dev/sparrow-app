@@ -137,6 +137,7 @@
   };
   let currentWorkspaceName: string;
   let currentEnvironment;
+  let trackWorkspaceId: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
@@ -161,13 +162,16 @@
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response =
-          await collectionsMethods.getAllCollections(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const collections = response.data.data;
-          isLoading = false;
-          collectionsMethods.bulkInsert(collections);
+        if (trackWorkspaceId !== workspaceId) {
+          const response =
+            await collectionsMethods.getAllCollections(workspaceId);
+          if (response.isSuccessful && response.data.data) {
+            const collections = response.data.data;
+            isLoading = false;
+            collectionsMethods.bulkInsert(collections);
+          }
         }
+        trackWorkspaceId = workspaceId;
       }
     },
   );
