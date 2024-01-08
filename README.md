@@ -79,9 +79,7 @@ Environment variables are :
  
 |        Name         |               Description               | Required | Default value |                   Limitations                    |
 |:-------------------:|:---------------------------------------:|:--------:|:-------------:|:------------------------------------------------:|
-
 |       `VITE_API_URL`        | Host on which the API will be available |    ✅     |  `https://dev-api.sparrow.techdomeaks.com`  |          If set, can't be empty string           |
-
 ## <a name="contributors">❤️ How to Contribue ?</a>
 
 You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
