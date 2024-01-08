@@ -102,51 +102,53 @@
   </div>
 </div>
 
-<style>
-  .dropdown-btn {
-    background: none;
-    outline: none;
-    border: none;
-    height: 26px;
-  }
-  .dropdown-btn:hover {
-    border-bottom: 1px solid #85c2ff;
-  }
-  .dropdown-data {
-    background-color: black;
-    color: white;
-    position: absolute;
-    top: 32px;
-    left: 0;
-    right: 0;
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid rgb(44, 44, 44);
-  }
-  .dropdown-btn p,
-  .dropdown-data p {
-    font-size: 12px;
-    font-weight: 400;
-  }
-  .dropdown-active {
-    display: block !important;
-  }
-  .dropdown-logo-active {
-    transform: rotateX(180deg) !important;
-  }
-  .highlight {
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .highlight:hover {
-    background-color: #232424;
-  }
-  .dropdown-btn {
-    cursor: pointer;
-    border-bottom: 1px solid transparent;
-  }
-  .dropdown-btn-active {
-    background-color: var(--border-color);
-    border-bottom: 1px solid #85c2ff;
+<style lang="scss">
+  .parent-dropdown {
+    .dropdown-btn {
+      background: none;
+      outline: none;
+      border: none;
+      height: 26px;
+    }
+    .dropdown-btn:hover {
+      border-bottom: 1px solid #85c2ff;
+    }
+    .dropdown-data {
+      background-color: black;
+      color: white;
+      position: absolute;
+      top: 32px;
+      left: 0;
+      right: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid rgb(44, 44, 44);
+    }
+    .dropdown-btn p,
+    .dropdown-data p {
+      font-size: 12px;
+      font-weight: 400;
+    }
+    .dropdown-active {
+      display: block !important;
+    }
+    .dropdown-logo-active {
+      transform: rotateX(180deg) !important;
+    }
+    .highlight {
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .highlight:hover {
+      background-color: #232424;
+    }
+    .dropdown-btn {
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+    }
+    .dropdown-btn-active {
+      background-color: var(--border-color);
+      border-bottom: 1px solid #85c2ff;
+    }
   }
 </style>
