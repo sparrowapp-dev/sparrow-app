@@ -84,36 +84,52 @@
 
   // select environment
   const selectEnvironment = () => {
-    environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
-      currentWorkspace._id,
-      env.id,
-    );
+    if (currentWorkspace?.environmentId === env.id) {
+      environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
+        currentWorkspace._id,
+        "none",
+      );
+    } else {
+      environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
+        currentWorkspace._id,
+        env.id,
+      );
+    }
   };
 
-  let menuItems = [
-    {
-      onClick: openEnvironment,
-      displayText: "Open Environment",
-      disabled: false,
-    },
-    {
-      onClick: renameEnvironment,
-      displayText: "Rename",
-      disabled: false,
-    },
-    {
-      onClick: selectEnvironment,
-      displayText: "Select Environment",
-      disabled: false,
-    },
-    {
-      onClick: () => {
-        handleEnvironmentPopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
+
+  $: {
+    if (currentWorkspace) {
+      menuItems = [
+        {
+          onClick: openEnvironment,
+          displayText: "Open Environment",
+          disabled: false,
+        },
+        {
+          onClick: renameEnvironment,
+          displayText: "Rename",
+          disabled: false,
+        },
+        {
+          onClick: selectEnvironment,
+          displayText:
+            currentWorkspace?.environmentId === env.id
+              ? "Unselect Environment"
+              : "Select Environment",
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            handleEnvironmentPopUp(true);
+          },
+          displayText: "Delete",
+          disabled: false,
+        },
+      ];
+    }
+  }
 </script>
 
 {#if isEnvironmentPopup}
