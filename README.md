@@ -1,13 +1,14 @@
 <p align="center">
-<a href="https://sparrows-newsletter.beehiiv.com/subscribe">
-<img src="https://sparrowassets.blob.core.windows.net/publicassest/sparrow-logo.png" width="400" alt="logo"/>
-</a>
+    <a href="https://sparrowapp.dev">
+    <img src="https://sparrowassets.blob.core.windows.net/publicassest/sparrow-logo.png" width="350" alt="logo"/>
+    </a>
+	<h4 align="center">One-stop API management tool </h4>
 </p>
+
  
-<h1 align="center">
-One-stop API management tool
-</h1>
- 
+![screenshot](https://sparrowassets.blob.core.windows.net/publicassest/Improved-API-Workflow.png)
+
+
 ![TypeScript](https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=2F73BF)
 ![Nest](https://img.shields.io/badge/-NestJs-black?style=for-the-badge&logo=nestjs&color=E0234D)
 ![Mongoose](https://img.shields.io/badge/-MongoDB-black?style=for-the-badge&logoColor=white&logo=mongodb&color=127237)
@@ -86,5 +87,4 @@ You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
  
 ## <a name="subscribe-to-our-newsletter">📨 Newsletter</a>
  
-Subscribe to our newsletter by applying [here!](https://code.visualstudio.com/) 
- 
+Subscribe to our newsletter by applying [here!](https://sparrows-newsletter.beehiiv.com/subscribe) 
