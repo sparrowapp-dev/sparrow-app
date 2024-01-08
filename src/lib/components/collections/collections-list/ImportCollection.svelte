@@ -95,6 +95,7 @@
 
   const handleImportJsonObject = async () => {
     isLoading = true;
+    debugger;
     const contentType = _viewImportCollection.validateImportBody(importData);
     if (!contentType) {
       isLoading = false;

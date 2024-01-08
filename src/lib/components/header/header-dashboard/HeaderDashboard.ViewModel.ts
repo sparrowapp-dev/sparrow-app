@@ -46,8 +46,12 @@ export class HeaderDashboardViewModel {
     this.workspaceRepository.addWorkspace(workspace);
   };
 
-  public updateWorkspace = (workspaceId: string, name: string) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, name);
+  public updateWorkspace = (
+    workspaceId: string,
+    name: string,
+    description?: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, name, description);
   };
 
   public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {
@@ -87,6 +91,34 @@ export class HeaderDashboardViewModel {
     }
   };
 
+  public modifyWorkspaceDescription = async (
+    componentData,
+    collectionsMethods: CollectionsMethods,
+    tabName: string,
+    workspaceDescription: string,
+  ) => {
+    if (workspaceDescription) {
+      const workspace = await this.workspaceService.updateWorkspace(
+        componentData.id,
+        {
+          description: workspaceDescription,
+        },
+      );
+      tabName = workspace?.data?.data.name;
+      this.updateWorkspace(componentData.id, tabName, workspaceDescription);
+      collectionsMethods.updateTab(
+        workspaceDescription,
+        "description",
+        componentData.path.workspaceId,
+      );
+      collectionsMethods.updateTab(
+        true,
+        "save",
+        componentData.path.workspaceId,
+      );
+    }
+  };
+
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
@@ -96,6 +128,7 @@ export class HeaderDashboardViewModel {
         const {
           _id,
           name,
+          description,
           owner,
           permissions,
           createdAt,
@@ -105,6 +138,7 @@ export class HeaderDashboardViewModel {
         return {
           _id,
           name,
+          description,
           owner,
           permissions,
           collections: collection ? collection : [],

@@ -196,7 +196,7 @@ export class CollectionService {
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importJson/collection`,
       {
-        body: { jsonObject },
+        body: jsonObject,
         headers: { ...getAuthHeaders(), "Content-type": contentType },
       },
     );
