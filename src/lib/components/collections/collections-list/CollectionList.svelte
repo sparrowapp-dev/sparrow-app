@@ -45,6 +45,7 @@
   import { notifications } from "$lib/utils/notifications";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -387,6 +388,23 @@
       />
     </button>
   </div>
+  <div class="px-3 pt-2">
+    <EnvironmentDropdown
+      dropdownId={"hash129"}
+      title={currentEnvironment?.id}
+      data={[
+        {
+          name: "None",
+          id: "none",
+          type: environmentType.LOCAL,
+        },
+        ...environments,
+      ].filter((elem) => {
+        return elem.type === environmentType.LOCAL;
+      })}
+      onclick={handleDropdown}
+    />
+  </div>
   <div
     class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
   >
@@ -430,23 +448,6 @@
         {collectionUnderCreation}
       />
     </div>
-  </div>
-  <div class="px-3 pt-2">
-    <EnvironmentDropdown
-      dropdownId={"hash129"}
-      title={currentEnvironment?.id}
-      data={[
-        {
-          name: "None",
-          id: "none",
-          type: "LOCAL",
-        },
-        ...environments,
-      ].filter((elem) => {
-        return elem.type === "LOCAL";
-      })}
-      onclick={handleDropdown}
-    />
   </div>
   <div
     class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
