@@ -1,45 +1,31 @@
 <script lang="ts">
-  import { PlusIcon, SelectIcon, ShowMoreIcon } from "$lib/assets/app.asset";
+  import { PlusIcon } from "$lib/assets/app.asset";
   import { Tooltip } from "$lib/components";
-
   import { v4 as uuidv4 } from "uuid";
-  import type { EnvironmentDocument } from "$lib/database/app.database";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import type { Observable } from "rxjs";
   import { onDestroy } from "svelte";
-  import { EnvironmentListViewModel } from "./EnvironmentList.ViewModel";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
-  // let environment: any[] = [];
-  // let globalEnvrionment: any;
-  let rightClickEnv = {
-    id: "",
-    isActive: false,
-  };
-  let environmentUnderCreation: boolean = false;
-  let environmentUnderRename: string | undefined = undefined;
-  const _viewModel = new EnvironmentListViewModel();
-  const _workspaceViewModel = new HeaderDashboardViewModel();
+  import EnvironmentTab from "./sub-components/environment-tab/EnvironmentTab.svelte";
+
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
-  export let currentWorkspace: any;
+  export let currentWorkspace;
   export let environments;
 
   let localEnvironment;
   let globalEnvironment;
-  // const environments: Observable<EnvironmentDocument[]> =
-  //   _viewModel.environment;
+  let isLoading: boolean = false;
+  let environmentUnderCreation: boolean = false;
 
   $: {
     if (environments) {
-      // console.log("env", environments);
       localEnvironment = [];
       globalEnvironment = [];
       environments.forEach((element) => {
@@ -49,15 +35,9 @@
         } else if (_element.type === "LOCAL") {
           localEnvironment.push(_element);
         }
-        // console.log(_element);
       });
     }
   }
-  let pos = { x: 0, y: 0 };
-
-  let showMenu: boolean = false;
-
-  let isLoading: boolean = false;
 
   const handleOpenEnvironment = (id: string) => {
     environmentRepositoryMethods.activateEnvironment(id);
@@ -95,11 +75,6 @@
       const res = response.data.data;
       environmentUnderCreation = false;
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
-      // _workspaceViewModel.updateEnvironmentInWorkspace(currentWorkspace.id, {
-      //   _id: response.data.data._id,
-      //   name: newEnvironment.name,
-      // });
-      // handleOpenEnvironment(res._id);
       notifications.success("New Environment Created!");
       return;
     } else {
@@ -107,10 +82,6 @@
     }
     return;
   };
-
-  // const handleActivateEnvironment = (id: string) => {
-  //   _viewModel.activateEnvironment(id);
-  // };
 
   const getNextEnvironment: (list: any[], name: string) => any = (
     list,
@@ -133,137 +104,11 @@
     return null;
   };
 
-  const deleteEnvironment = (id: string) => {
-    environmentServiceMethods.deleteEnvironment(currentWorkspace.id, id);
-    environmentRepositoryMethods.removeEnvironment(id);
-  };
   onDestroy(() => {
     workspaceLoadingSubscribe();
   });
-  let isCollectionPopup: boolean = false;
-  let containerRef;
-  function rightClickContextMenu(e, id, isActive) {
-    e.preventDefault();
-    document
-      .querySelectorAll(".show-more-icon")
-      .forEach((item) => item.classList.remove("active"));
-    rightClickEnv.id = id;
-    rightClickEnv.isActive = isActive;
-    e.target.classList.toggle("active");
-    setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
-      showMenu = true;
-    }, 100);
-  }
-  const renameEnvironment = (id: string) => {
-    environmentUnderRename = id;
-    setTimeout(() => {
-      document.getElementById(`rename-input-${id}`).focus();
-    }, 100);
-  };
-  const handleRenameEnvironment = async (
-    e,
-    oldName: string,
-    variable: any,
-    id: string,
-  ) => {
-    environmentUnderRename = undefined;
-    document.getElementById(`rename-input-${id}`).blur();
-    if (e.target.value !== oldName) {
-      // await environmentServiceMethods.updateEnvironment(
-      //   currentWorkspace.id,
-      //   id,
-      //   {
-      //     name: e.target.value,
-      //     variable: variable,
-      //   },
-      // );
-      // await environmentRepositoryMethods.updateEnvironment(id, {
-      //   name: e.target.value,
-      //   isActive: currentEnvironment.id == id,
-      //   variable: variable,
-      // });
-    }
-  };
-  const handleEnterRenameEnvironment = async (e, oldName, variable, id) => {
-    if (e.key == "Enter") {
-      handleRenameEnvironment(e, oldName, variable, id);
-    }
-  };
-  const handleCollectionPopUp = (flag) => {
-    isCollectionPopup = flag;
-  };
-  let menuItems = [
-    {
-      onClick: (id) => {
-        handleOpenEnvironment(id);
-      },
-      displayText: "Open Environment",
-      disabled: false,
-    },
-    {
-      onClick: (id) => {
-        renameEnvironment(id);
-      },
-      displayText: "Rename",
-      disabled: false,
-    },
-    {
-      onClick: (id) => {
-        // handleActivateEnvironment(id);
-      },
-      displayText: rightClickEnv.isActive
-        ? "Unselect Environment"
-        : "Select Environment",
-      disabled: false,
-    },
-    {
-      onClick: (id) => {
-        deleteEnvironment(id);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
-  function closeRightClickContextMenu() {
-    showMenu = false;
-    document
-      .querySelectorAll(".show-more-icon")
-      .forEach((item) => item.classList.remove("active"));
-  }
 </script>
 
-<!-- <svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
-/>
-{#if showMenu}
-  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-    <div
-      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-      id="navbar"
-    >
-      <ul class="ps-1 pt-1 pe-1 pb-0 w-100">
-        {#each menuItems as item}
-          <li class="align-items-center">
-            <button
-              disabled={item.disabled}
-              class={` lign-items-center mb-0 px-2 py-2 ${
-                item.disabled && "text-requestBodyColor"
-              }`}
-              on:click={() => item.onClick(rightClickEnv.id)}
-              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-              >{item.displayText}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </nav>
-{/if} -->
 <div class={`env-sidebar`} style={``}>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
@@ -292,7 +137,7 @@
 
   {#if globalEnvironment && globalEnvironment.length > 0}
     <p
-      class={`fw-normal env-item rounded m-2 ps-3 ${
+      class={`fw-normal env-item rounded m-2 px-2 ${
         globalEnvironment[0]?.isActive && "active"
       }`}
       on:click={() => {
@@ -319,65 +164,15 @@
       </button>
     </div>
   {/if}
-  <ul class={`env-side-tab-list overflow-y-scroll ps-0`}>
+  <ul class={`env-side-tab-list overflow-y-scroll px-2`}>
     {#if localEnvironment && localEnvironment.length > 0}
       {#each localEnvironment as env}
-        <div
-          class={`d-flex rounded env-tab align-items-center justify-content-between env-item ps-3 ${
-            env.isActive && "active"
-          }`}
-          style="cursor: pointer; "
-          on:click={() => handleOpenEnvironment(env.id)}
-          on:contextmenu|preventDefault={(e) =>
-            rightClickContextMenu(e, env.id, env.isActive)}
-        >
-          <div class="show-more-in d-flex ellipsis">
-            <Tooltip text={`${env?.isActive ? "Unselect" : "Select"}`}>
-              <button class="p-0 m-0 border-0 bg-transparent">
-                <SelectIcon
-                  classProp={`my-auto`}
-                  width={20}
-                  height={20}
-                  selected={env.isActive}
-                />
-              </button>
-            </Tooltip>
-            {#if env.id && env.id == environmentUnderRename}
-              <input
-                type="text"
-                class="ms-3 my-auto fw-normal border-0 rename-input"
-                value={env?.name}
-                id={`rename-input-${env.id}`}
-                on:blur={(e) =>
-                  handleRenameEnvironment(e, env.name, env.variable, env.id)}
-                on:keydown={(e) =>
-                  handleEnterRenameEnvironment(
-                    e,
-                    env.name,
-                    env.variable,
-                    env.id,
-                  )}
-              />
-            {:else}
-              <p class={`ps-3 my-auto fw-normal ellipsis`}>{env?.name}</p>
-            {/if}
-          </div>
-          <Tooltip text={`More options`}>
-            <button
-              class={`${showMenu && ""} show-more-btn rounded border-0`}
-              on:click={(e) => {
-                e.stopPropagation();
-                rightClickContextMenu(e, env.id, env.isActive);
-              }}
-            >
-              {#if env.type == undefined && environmentUnderCreation}
-                <Spinner size={"15px"} />
-              {:else}
-                <ShowMoreIcon />
-              {/if}
-            </button>
-          </Tooltip>
-        </div>
+        <EnvironmentTab
+          {env}
+          {environmentServiceMethods}
+          {environmentRepositoryMethods}
+          {currentWorkspace}
+        />
       {/each}
     {/if}
   </ul>

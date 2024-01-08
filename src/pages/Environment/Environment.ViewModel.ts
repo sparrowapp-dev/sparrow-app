@@ -7,6 +7,7 @@ export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
+
   constructor() {}
 
   public getActiveWorkspace = () => {
@@ -46,16 +47,26 @@ export class EnvironmentViewModel {
     this.environmentRepository.refreshEnvironment(data);
   };
 
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
+  };
+
   // services -----------------------------------------------------------
   public getServerEnvironments = async (workspaceId: string) => {
     return await this.environmentService.fetchAllEnvironments(workspaceId);
   };
 
   public deleteServerEnvironment = (
-    workspaceId: string,
     environmentId: string,
-  ): void => {
-    this.environmentService.deleteEnvironment(workspaceId, environmentId);
+    workspaceId: string,
+  ) => {
+    return this.environmentService.deleteEnvironment(
+      workspaceId,
+      environmentId,
+    );
   };
 
   public createServerEnvironment = async (
