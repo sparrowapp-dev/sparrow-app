@@ -111,7 +111,7 @@
   };
 </script>
 
-<div class="mt-3 me-0" style="width: 60vw;">
+<div class="mt-3 me-0">
   <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
     <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
     <input
@@ -129,7 +129,10 @@
     {/if}
   </div>
   <div class="d-flex gap-4">
-    <div class="form-check-input-container " style="width:27.5px; margin-top: -3px;">
+    <div
+      class="form-check-input-container"
+      style="width:27.5px; margin-top: -3px;"
+    >
       <Tooltip text={`${controller ? "Unselect" : "Select"}`}>
         <input
           class="form-check-input"
@@ -158,7 +161,7 @@
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width:60vw;"
+        style="cursor:default;"
       >
         <div
           style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
@@ -220,7 +223,7 @@
         <div
           aria-label="Toggle Hover"
           class="sortable > div"
-          style="cursor:default; width:55vw; "
+          style="cursor:default; "
           data-list-key={JSON.stringify({
             name: element.key,
             description: element.value,
