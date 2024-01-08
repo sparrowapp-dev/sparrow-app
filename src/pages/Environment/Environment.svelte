@@ -15,6 +15,7 @@
   const environments = _viewModel.environments;
   const activeEnvironment = _viewModel.activeEnvironment;
   let activeWorkspaceRxDoc: WorkspaceDocument;
+  let trackWorkspaceId: string;
 
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     createEnvironment: _viewModel.createEnvironment,
@@ -42,12 +43,14 @@
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response = await _viewModel.getServerEnvironments(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const environments = response.data.data;
-          _viewModel.refreshEnvironment(environments);
-          return;
+        if (trackWorkspaceId !== workspaceId) {
+          const response = await _viewModel.getServerEnvironments(workspaceId);
+          if (response.isSuccessful && response.data.data) {
+            const environments = response.data.data;
+            _viewModel.refreshEnvironment(environments);
+          }
         }
+        trackWorkspaceId = workspaceId;
       }
     },
   );
