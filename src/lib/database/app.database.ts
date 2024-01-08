@@ -24,6 +24,7 @@ import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
+import type { TeamDocType } from "$lib/models/team.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -32,6 +33,8 @@ export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
+export type TeamDocument = RxDocument<TeamDocType>;
+export type TeamContainer = RxCollection<TeamDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -45,6 +48,7 @@ export type DatabaseCollections = {
   tab: TabContainer;
   collection: CollectionContainer;
   activesidebartab: ActiveSideBarTabContainer;
+  team: TeamContainer;
 };
 
 // define the Rx database type

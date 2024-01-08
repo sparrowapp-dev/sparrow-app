@@ -35,4 +35,10 @@
     height: calc(100% - 44px);
     overflow: auto;
   }
+  .workspace::-webkit-scrollbar {
+    width: 2px;
+  }
+  .workspace::-webkit-scrollbar-thumb {
+    background: #888;
+  }
 </style>

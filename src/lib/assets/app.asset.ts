@@ -24,6 +24,7 @@ export { default as DoubleLeftIcon } from "$lib/assets/double-left.svelte";
 export { default as DoubleRightIcon } from "$lib/assets/double-right.svelte";
 export { default as LeftIcon } from "$lib/assets/left.svelte";
 export { default as RightIcon } from "$lib/assets/right.svelte";
+export { default as ThreeDotIcon } from "$lib/assets/3dot.svelte";
 import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {

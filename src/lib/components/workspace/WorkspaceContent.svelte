@@ -7,7 +7,10 @@
   export let data: any;
   import Navigate from "../../../routing/Navigate.svelte";
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
-  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import {
+    isWorkspaceCreatedFirstTime,
+    workspaceView,
+  } from "$lib/store/workspace.store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -17,6 +20,7 @@
   import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
   import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
+  import { onDestroy } from "svelte";
   export let workspaceMethods: WorkspaceMethods;
   export let loaderColor = "default";
 
@@ -80,7 +84,15 @@
   };
 
   let selectedTab = "all-workspace";
-  let selectedView = "table";
+  let selectedView: string;
+ 
+  let selectedViewSubscribe = workspaceView.subscribe((value) => {
+    selectedView = value;
+  });
+
+  onDestroy(() => {
+    selectedViewSubscribe();
+  });
 </script>
 
 <div class="teams-content bg-backgroundColor">
@@ -148,9 +160,9 @@
               <span class="mx-3" style="cursor:pointer;">
                 <img
                   on:click={() => {
-                    selectedView = "grid";
+                    workspaceView.set("GRID");
                   }}
-                  class:view-active={selectedView === "grid"}
+                  class:view-active={selectedView === "GRID"}
                   src={table}
                   alt=""
                 />
@@ -158,9 +170,9 @@
               <span style="cursor:pointer;">
                 <img
                   on:click={() => {
-                    selectedView = "table";
+                    workspaceView.set("TABLE");
                   }}
-                  class:view-active={selectedView === "table"}
+                  class:view-active={selectedView === "TABLE"}
                   src={hamburger}
                   alt=""
                 />
@@ -172,9 +184,9 @@
     </div>
 
     <!-- <Route path="/all-workspace"> -->
-    {#if selectedView == "table" && selectedTab == "all-workspace"}
+    {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
       <AllWorkspace {data} {selectedTab} />
-    {:else if selectedView == "grid" && selectedTab == "all-workspace"}
+    {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList workspaces={$data.slice().reverse()} />
     {/if}
     <!-- </Route> -->

@@ -5,7 +5,7 @@
   export let data: any;
   export let tabList;
   export let collectionList;
-
+  
   let teams = [
     {
       name: "Techdome",
@@ -19,7 +19,7 @@
 </script>
 
 <div
-  style="border-right: 1px solid #313233; overflow: auto;"
+  style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
   class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-3"
 >
   <Teams {teams} />
