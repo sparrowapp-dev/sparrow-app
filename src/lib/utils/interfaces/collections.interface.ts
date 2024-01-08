@@ -91,4 +91,10 @@ export interface CollectionsMethods {
     collectionId: string,
     workspaceId: string,
   ) => void;
+
+  initActiveEnvironmentToWorkspace: (
+    workspaceId: string,
+    environmentId: string,
+  ) => void;
+  currentEnvironment: (environmentId: string) => any;
 }
