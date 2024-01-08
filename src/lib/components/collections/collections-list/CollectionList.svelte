@@ -153,7 +153,7 @@
             id: "none",
           };
         }
-        console.log("curenv", currentEnvironment);
+
         if (isComponentRenderedFirstTime) {
           isLoading = true;
           isComponentRenderedFirstTime = false;
