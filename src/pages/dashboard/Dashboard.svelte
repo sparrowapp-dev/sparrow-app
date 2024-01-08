@@ -10,7 +10,7 @@
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel";
   import Mock from "../Mock/Mock.svelte";
-  import Enviornment from "../Enviornment/Enviornment.svelte";
+  import Environment from "../Environment/Environment.svelte";
   import Workspaces from "../Workspaces/Workspaces.svelte";
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
@@ -108,7 +108,7 @@
       <Route path="/collections/*"><CollectionsHome /></Route>
       <Route path="/workspaces/*"><Workspaces data={workspaces} /></Route>
       <Route path="/mock/*"><Mock /></Route>
-      <Route path="/environment/*"><Enviornment /></Route>
+      <Route path="/environment/*"><Environment /></Route>
       <Route path="/teams/*"><Teams /></Route>
       <Route path="/help">Help</Route>
       <Route path="/*">

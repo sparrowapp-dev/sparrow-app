@@ -4,9 +4,10 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
+  import icons, { NotifyIcon, SearchIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
@@ -79,8 +80,10 @@
         allworkspaces = workspaceArr;
 
         if (!activeWorkspaceRxDoc) {
+          isWorkspaceLoaded.set(false);
           _viewModel.activateWorkspace(value[0].get("_id"));
           updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
+          isWorkspaceLoaded.set(true);
         }
       }
     },
@@ -161,9 +164,11 @@
   });
 
   const handleDropdown = (id: string, tab: string) => {
+    isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
     isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
+    isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {
@@ -253,7 +258,7 @@
       : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
-      <img src={icons.searchIcon} alt="" />
+      <SearchIcon />
     </div>
 
     <div class="w-100">

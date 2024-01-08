@@ -2,9 +2,9 @@
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
-  
+
   type Mode = "READ" | "WRITE";
-  
+
   export let keyValue: KeyValuePair[];
   export let callback: (pairs: KeyValuePair[]) => void;
   export let mode: Mode = "WRITE";
@@ -12,32 +12,31 @@
     key: "",
     value: "",
   };
-  
+
   let pairs: KeyValuePair[] = keyValue;
-  let controller : boolean = false;
+  let controller: boolean = false;
 
   $: {
     if (keyValue) {
       pairs = keyValue;
-      let flag : boolean = false;
-      for(let i = 0; i < pairs.length - 1; i++){
-        if(pairs[i].checked === false){
+      let flag: boolean = false;
+      for (let i = 0; i < pairs.length - 1; i++) {
+        if (pairs[i].checked === false) {
           flag = true;
         }
       }
-      if(mode === "READ" && pairs[pairs.length - 1].checked === false) {
-         flag = true;
-      } 
-      if(flag){
-        controller = false;
+      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
+        flag = true;
       }
-      else{
+      if (flag) {
+        controller = false;
+      } else {
         controller = true;
       }
     }
   }
 
-  const updateParam = (index : number) : void => {
+  const updateParam = (index: number): void => {
     pairs.forEach((elem, i) => {
       if (i === index) {
         elem.checked = true;
@@ -51,7 +50,7 @@
     callback(pairs);
   };
 
-  const deleteParam = (index: number) : void => {
+  const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
         if (i !== index) {
@@ -64,7 +63,7 @@
     callback(pairs);
   };
 
-  const updateCheck = (index : number) : void => {
+  const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i === index) {
         elem.checked = !elem.checked;
@@ -75,19 +74,17 @@
     callback(pairs);
   };
 
-  const handleCheckAll = () : void => {
-    let flag : boolean;
-    if(controller === true){
+  const handleCheckAll = (): void => {
+    let flag: boolean;
+    if (controller === true) {
       flag = false;
-    }
-    else{
+    } else {
       flag = true;
     }
     let filteredKeyValue = pairs.map((elem, i) => {
-      if(i !== pairs.length - 1){
+      if (i !== pairs.length - 1) {
         elem.checked = flag;
-      }
-      else if (mode === "READ"){
+      } else if (mode === "READ") {
         elem.checked = flag;
       }
       return elem;
@@ -95,18 +92,17 @@
     pairs = filteredKeyValue;
     callback(pairs);
   };
-
 </script>
 
 <div class="mt-3 me-0 w-100">
   <div class="d-flex gap-2">
-    <div style="width:40px;" >
+    <div style="width:40px;">
       <input
-      class="form-check-input"
-      type="checkbox"
-      bind:checked={controller}
-      on:input={handleCheckAll}
-    />
+        class="form-check-input"
+        type="checkbox"
+        bind:checked={controller}
+        on:input={handleCheckAll}
+      />
     </div>
     <div
       class=" d-flex gap-2 text-requestBodyColor align-items-center"
@@ -136,12 +132,6 @@
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
           >
-            <img
-              src={dragIcon}
-              alt=""
-              class="d-none"
-              style="cursor:grabbing;"
-            />
             <div style="width:30px;">
               <input
                 class="form-check-input"
@@ -205,15 +195,15 @@
             />
             <div style="width:30px;">
               {#if pairs.length - 1 != index || mode === "READ"}
-              <input
-              class="form-check-input"
-              type="checkbox"
-              bind:checked={element.checked}
-              on:input={() => {
-                updateCheck(index);
-              }}
-            />
-            {/if}
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  bind:checked={element.checked}
+                  on:input={() => {
+                    updateCheck(index);
+                  }}
+                />
+              {/if}
             </div>
 
             <div class="w-100 d-flex gap-2">
@@ -272,4 +262,3 @@
     {/each}
   </div>
 </div>
-
