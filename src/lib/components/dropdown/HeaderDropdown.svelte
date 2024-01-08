@@ -175,7 +175,7 @@
                 class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
               >
                 <p
-                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100 ellipsis overflow-hidden"
                   style="cursor: pointer;overflow:auto"
                   on:click={() => {
                     isOpen = false;
