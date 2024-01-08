@@ -85,13 +85,11 @@
   // select environment
   const selectEnvironment = () => {
     if (currentWorkspace?.environmentId === env.id) {
-      console.log("unselect");
       environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
         currentWorkspace._id,
         "none",
       );
     } else {
-      console.log("select");
       environmentRepositoryMethods.initActiveEnvironmentToWorkspace(
         currentWorkspace._id,
         env.id,
