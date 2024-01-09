@@ -113,7 +113,7 @@
 
 <div
   class="card-body d-flex flex-column bg-black text-white mx-auto rounded"
-  style="height:100vh;overflow:auto;"
+  style="height:100vh;"
 >
   <Header />
   <div
