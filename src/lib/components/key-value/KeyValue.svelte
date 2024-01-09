@@ -169,12 +169,6 @@
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
           >
-            <img
-              src={dragIcon}
-              alt=""
-              class="d-none"
-              style="cursor:grabbing;"
-            />
             <div style="width:30px;">
               <input
                 class="form-check-input"

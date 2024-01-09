@@ -8,7 +8,7 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 1,
+  version: 5,
   properties: {
     _id: {
       type: "string",
@@ -60,6 +60,10 @@ export const workspaceSchemaLiteral = {
       type: "boolean",
       default: false,
     },
+    environmentId: {
+      type: "string",
+      default: "",
+    },
     collections: {
       type: "array",
       items: {
@@ -74,7 +78,25 @@ export const workspaceSchemaLiteral = {
         },
       },
     },
+    currentEnvironmentId: {
+      type: "string",
+    },
+    environments: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          _id: {
+            type: "string",
+          },
+          name: {
+            type: "string",
+          },
+        },
+      },
+    },
   },
+
   required: ["_id", "name", "owner", "permissions", "createdAt", "createdBy"],
 } as const;
 

@@ -9,7 +9,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
-  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import {
+    isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
+  } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
   import { slide } from "svelte/transition";
@@ -60,6 +63,7 @@
 
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
+    isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED,
       new Date().toString(),
@@ -109,6 +113,7 @@
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
+      isWorkspaceLoaded.set(true);
     }
   };
 

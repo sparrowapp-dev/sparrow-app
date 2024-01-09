@@ -1,7 +1,7 @@
 <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
-  import searchIcon from "$lib/assets/search.svg";
+  import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
@@ -11,7 +11,6 @@
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
-  import { slide } from "svelte/transition";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
@@ -20,6 +19,7 @@
   import DefaultCollection from "./DefaultCollection.svelte";
   import {
     type CollectionDocument,
+    type EnvironmentDocument,
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
@@ -35,6 +35,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activePath;
+  export let environments = [];
 
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
@@ -43,16 +44,18 @@
   import { username } from "$lib/store/auth.store";
   import { notifications } from "$lib/utils/notifications";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
-  let isComponentRenderedFirstTime=false;
-  let showDefault=false;
-  let isLoading=true;
-  const workspacesArr=_workspaceViewModel.workspaces;
+  let isComponentRenderedFirstTime = false;
+  let showDefault = false;
+  let isLoading = true;
+  const workspacesArr = _workspaceViewModel.workspaces;
 
   const usernameUnsubscribe = username.subscribe((value) => {
     if (value) {
@@ -87,14 +90,14 @@
       }
     },
   );
-  const workspaceUnsubscribe=workspacesArr.subscribe((workspaces)=>{
-    workspaces.map((workspace)=>{
-      if(workspace._data.isActiveWorkspace){
-        showDefault=workspace._data.collections.length===0?true:false;
+  const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
+    workspaces.map((workspace) => {
+      if (workspace._data.isActiveWorkspace) {
+        showDefault = workspace._data.collections.length === 0 ? true : false;
         return;
       }
-    })
-  })
+    });
+  });
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       selectedApiMethods = value;
@@ -134,31 +137,48 @@
     return null;
   };
   let currentWorkspaceName: string;
+  let currentEnvironment;
+  let trackWorkspaceId: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
-        if(isComponentRenderedFirstTime){
-          isLoading=true;
-           isComponentRenderedFirstTime=false;
+        const env: EnvironmentDocument =
+          await collectionsMethods.currentEnvironment(
+            activeWorkspaceRxDoc.get("environmentId"),
+          );
+        if (env) {
+          currentEnvironment = env.toMutableJSON();
+        } else {
+          currentEnvironment = {
+            name: "None",
+            id: "none",
+          };
+        }
+
+        if (isComponentRenderedFirstTime) {
+          isLoading = true;
+          isComponentRenderedFirstTime = false;
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         const workspaceId = activeWorkspaceRxDoc.get("_id");
-        const response =
-          await collectionsMethods.getAllCollections(workspaceId);
-        if (response.isSuccessful && response.data.data) {
-          const collections = response.data.data;
-          isLoading=false;
-          collectionsMethods.bulkInsert(collections);
-          return;
+        if (trackWorkspaceId !== workspaceId) {
+          const response =
+            await collectionsMethods.getAllCollections(workspaceId);
+          if (response.isSuccessful && response.data.data) {
+            const collections = response.data.data;
+            isLoading = false;
+            collectionsMethods.bulkInsert(collections);
+          }
         }
+        trackWorkspaceId = workspaceId;
       }
     },
   );
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
-    showDefault=false;
+    showDefault = false;
     collectionUnderCreation = true;
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
@@ -270,6 +290,13 @@
     );
   }
 
+  let handleDropdown = (tabId: string) => {
+    collectionsMethods.initActiveEnvironmentToWorkspace(
+      currentWorkspaceId,
+      tabId,
+    );
+  };
+
   onDestroy(() => {
     collapsibleStateUnsubscribe();
     selectedMethodsCollectionUnsubscribe();
@@ -361,6 +388,23 @@
       />
     </button>
   </div>
+  <div class="px-3 pt-2">
+    <EnvironmentDropdown
+      dropdownId={"hash129"}
+      title={currentEnvironment?.id}
+      data={[
+        {
+          name: "None",
+          id: "none",
+          type: environmentType.LOCAL,
+        },
+        ...environments,
+      ].filter((elem) => {
+        return elem.type === environmentType.LOCAL;
+      })}
+      onclick={handleDropdown}
+    />
+  </div>
   <div
     class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
   >
@@ -368,7 +412,7 @@
       style="height:32px; width:180px "
       class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
     >
-      <img src={searchIcon} alt="" />
+      <SearchIcon />
       <input
         type="search"
         style="  font-size: 12px;font-weight:500;"
@@ -405,86 +449,89 @@
       />
     </div>
   </div>
-
   <div
     class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
     style="overflow:auto;margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
       {#if isLoading}
-      <div class="spinner">
-        <Spinner size={`32px`} />
-      </div>
-      {:else}
-      {#if showfilterDropdown}
-        <FilterDropDown {handleSearch} />
-      {/if}
-      {#if searchData.length > 0}
-        <div class="p-4 pt-0">
-          {#if filteredFile.length > 0}
-            {#each filteredFile as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                path={exp.path}
-                explorer={exp.tree}
-                {searchData}
-                folderDetails={exp.folderDetails}
-              />
-            {/each}
-          {/if}
-          {#if filteredFolder.length > 0}
-            {#each filteredFolder as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
-          {#if filteredCollection.length > 0}
-            {#each filteredCollection as exp}
-              <SearchTree
-                editable={true}
-                collectionId={exp.collectionId}
-                workspaceId={currentWorkspaceId}
-                explorer={exp.tree}
-                {searchData}
-              />
-            {/each}
-          {/if}
+        <div class="spinner">
+          <Spinner size={`32px`} />
         </div>
-      {:else if selectedApiMethods.length > 0}
-        {#each filteredSelectedMethodsCollection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-            {activeTabId}
-            {activePath}
-          />
-        {/each}
-      {:else if collection && collection.length > 0}
-        {#each collection as col}
-          <Folder
-            collectionList={collection}
-            collectionId={col.id}
-            {currentWorkspaceId}
-            collection={col}
-            title={col.name}
-            {collectionsMethods}
-            {activeTabId}
-            {activePath}
-          />
-        {/each}
+      {:else}
+        {#if showfilterDropdown}
+          <FilterDropDown {handleSearch} />
         {/if}
-        <DefaultCollection {handleCreateCollection} {collectionsMethods} {showDefault} />
+        {#if searchData.length > 0}
+          <div class="p-4 pt-0">
+            {#if filteredFile.length > 0}
+              {#each filteredFile as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  path={exp.path}
+                  explorer={exp.tree}
+                  {searchData}
+                  folderDetails={exp.folderDetails}
+                />
+              {/each}
+            {/if}
+            {#if filteredFolder.length > 0}
+              {#each filteredFolder as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+            {#if filteredCollection.length > 0}
+              {#each filteredCollection as exp}
+                <SearchTree
+                  editable={true}
+                  collectionId={exp.collectionId}
+                  workspaceId={currentWorkspaceId}
+                  explorer={exp.tree}
+                  {searchData}
+                />
+              {/each}
+            {/if}
+          </div>
+        {:else if selectedApiMethods.length > 0}
+          {#each filteredSelectedMethodsCollection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+              {activeTabId}
+              {activePath}
+            />
+          {/each}
+        {:else if collection && collection.length > 0}
+          {#each collection as col}
+            <Folder
+              collectionList={collection}
+              collectionId={col.id}
+              {currentWorkspaceId}
+              collection={col}
+              title={col.name}
+              {collectionsMethods}
+              {activeTabId}
+              {activePath}
+            />
+          {/each}
+        {/if}
+        <DefaultCollection
+          {handleCreateCollection}
+          {collectionsMethods}
+          {showDefault}
+        />
       {/if}
     </div>
   </div>
@@ -570,7 +617,7 @@
     animation: increaseWidth 0.3s;
     max-width: 280px;
   }
-  .spinner{
+  .spinner {
     width: 100%;
     height: 70vh;
     display: flex;
