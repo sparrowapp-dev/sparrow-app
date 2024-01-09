@@ -158,7 +158,7 @@ export class HeaderDashboardViewModel {
           description,
           owner,
           permissions,
-          collections: collection,
+          collections: collection ? collection : [],
           isActiveWorkspace: !index ? true : false,
           createdAt,
           createdBy,

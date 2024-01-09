@@ -15,12 +15,26 @@
   import { type WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
   const workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let currentWorkspaceId: string;
+  let currentWorkspaceName:string;
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      if (value) {
+        currentWorkspaceId = value.get("_id");
+        currentWorkspaceName=value.get("name");
+      }
+    },
+  );
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
   const _viewModels = new CollectionsViewModel();
@@ -53,6 +67,14 @@
     } else {
       await activeSideBarTabMethods.addActiveTab("collections");
       selectedActiveSideBar = "collections";
+      const workspace = generateSampleWorkspace(
+        currentWorkspaceId,
+        new Date().toString(),
+        currentWorkspaceName
+      );
+      workspace.path.workspaceId = currentWorkspaceId;
+      collectionsMethods.handleCreateTab(workspace);
+      moveNavigation("right");
     }
     return selectedActiveSideBar;
   }

@@ -446,6 +446,7 @@
         {collectionsMethods}
         {handleCreateCollection}
         {collectionUnderCreation}
+        {currentWorkspaceId}
       />
     </div>
   </div>

@@ -8,6 +8,7 @@
   import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
+  import QuickHelp from "./sub-components/quick-help/QuickHelp.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -15,6 +16,7 @@
   export let activeWorkspace;
 
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
+  let quickHelp: boolean = false;
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
     environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
@@ -50,53 +52,67 @@
 </script>
 
 {#if currentEnvironment}
-  <div class={`env-panel`}>
-    <header class={`env-header justify-content-between d-flex`}>
-      <input
-        type="text"
-        class={`env-heading ellipsis fw-normal px-2 border-0`}
-        value={currentEnvironment?.name}
-        on:change={(e) => handleCurrentEnvironmentNameChange(e)}
-        disabled={currentEnvironment?.type == "GLOBAL"}
-      />
-      <div class={`d-flex env-btn-container`}>
-        <button class={`d-flex env-help-btn border-0 my-auto`}>
-          <HelpIcon width={19} height={19} classProp={`me-2`} />
-          <span class={``}>How to use variables</span>
-        </button>
-        <button
-          class="d-flex border-0 rounded env-save-btn env-save-btn-enabled"
-          on:click={handleSaveEnvironment}
-          ><SaveIcon
-            width={16}
-            height={16}
-            classProp={`me-2 my-auto rounded `}
-          /><span>Save</span>
-        </button>
+  <div class={`env-panel d-flex`}>
+    <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
+      <header class={`env-header justify-content-between d-flex`}>
+        <input
+          type="text"
+          class={`env-heading ellipsis fw-normal px-2 border-0`}
+          value={currentEnvironment?.name}
+          on:change={(e) => handleCurrentEnvironmentNameChange(e)}
+          disabled={currentEnvironment?.type == "GLOBAL"}
+        />
+        <div class={`d-flex env-btn-container`}>
+          <button class={`d-flex env-help-btn border-0 my-auto`}>
+            <HelpIcon width={19} height={19} classProp={`me-2`} />
+            <span
+              class={``}
+              on:click={() => {
+                quickHelp = true;
+              }}>How to use variables</span
+            >
+          </button>
+          <button
+            class="d-flex border-0 rounded env-save-btn env-save-btn-enabled"
+            on:click={handleSaveEnvironment}
+            ><SaveIcon
+              width={16}
+              height={16}
+              classProp={`me-2 my-auto rounded `}
+            /><span>Save</span>
+          </button>
+        </div>
+      </header>
+      <section class={`var-value-container`}>
+        <EnvValue
+          keyValue={currentEnvironment.variable}
+          callback={handleCurrentEnvironmentKeyValuePairChange}
+        />
+      </section>
+    </div>
+    {#if quickHelp}
+      <div class="quick-help">
+        <QuickHelp
+          closeQuickHelp={() => {
+            quickHelp = false;
+          }}
+        />
       </div>
-    </header>
-    <section class={`var-value-container`}>
-      <EnvValue
-        keyValue={currentEnvironment.variable}
-        callback={handleCurrentEnvironmentKeyValuePairChange}
-      />
-    </section>
+    {/if}
   </div>
 {/if}
 
 <style lang="scss">
   .env-panel {
     background-color: var(--background-color);
-    width: 75vw;
-    height: 94vh;
-    padding: 3vw;
+    width: 76vw;
+    height: calc(100vh - 44px);
   }
   .env-header {
     margin-bottom: 24px;
   }
   .env-heading {
     font-size: 18px;
-    width: 50vw;
     background-color: transparent;
   }
   .env-heading:disabled {
@@ -143,5 +159,15 @@
   }
   .var-value-container {
     width: 40vw;
+  }
+  .quick-help {
+    width: 280px;
+    overflow-y: auto;
+  }
+  .env-parent {
+    padding: 3vw;
+  }
+  .quick-help-active {
+    width: calc(100% - 280px) !important;
   }
 </style>
