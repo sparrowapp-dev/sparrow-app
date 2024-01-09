@@ -13,17 +13,17 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   const _viewModel = new EnvironmentViewModel();
   const environments = _viewModel.environments;
-  const activeEnvironment = _viewModel.activeEnvironment;
+  const activeEnvironment = _viewModel.getactiveEnvironmentTab;
 
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     createEnvironment: _viewModel.createEnvironment,
     getActiveWorkspace: _viewModel.getActiveWorkspace,
-    activateEnvironment: _viewModel.activateEnvironment,
     removeEnvironment: _viewModel.deleteEnvironment,
     updateEnvironment: _viewModel.updateEnvironment,
-    refeshEnvironment: _viewModel.refreshEnvironment,
     initActiveEnvironmentToWorkspace:
       _viewModel.initActiveEnvironmentToWorkspace,
+    createEnvironmentTab: _viewModel.createEnvironmentTab,
+    setEnvironmentTabProperty: _viewModel.setEnvironmentTabProperty,
   };
 
   const environmentServiceMethods: EnvironmentServiceMethods = {
@@ -44,6 +44,7 @@
       {environmentServiceMethods}
       currentWorkspace={$activeWorkspace}
       environments={$environments}
+      currentEnvironment={$activeEnvironment}
     />
     <EnvironmentPanel
       {environmentRepositoryMethods}

@@ -4,9 +4,6 @@ import type { Observable } from "rxjs";
 
 export class EnvironmentRepository {
   constructor() {}
-  public getDocument = (elem: EnvironmentDocument) => {
-    return elem.toMutableJSON();
-  };
   /**
    * @description
    * Adds a new environment to workspace.
@@ -28,7 +25,6 @@ export class EnvironmentRepository {
         },
       })
       .exec();
-
     environment.incrementalModify((value) => {
       if (data._id) value.id = data._id;
       if (data.name) value.name = data.name;
@@ -79,52 +75,6 @@ export class EnvironmentRepository {
   public getEnvironment = (): Observable<EnvironmentDocument[]> => {
     return RxDB.getInstance().rxdb.environment.find().sort({ createdAt: "asc" })
       .$;
-  };
-
-  public getActiveEnvironment = (): Observable<EnvironmentDocument> => {
-    return RxDB.getInstance().rxdb.environment.findOne({
-      selector: {
-        isActive: true,
-      },
-    }).$;
-  };
-
-  public getCurrentEnvironment = async (id: string): Promise<any> => {
-    return await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          id: id,
-        },
-      })
-      .exec();
-  };
-
-  public setActiveEnvironment = async (
-    environmentId: string,
-  ): Promise<void> => {
-    const activeEnvironment: EnvironmentDocument = await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    activeEnvironment?.incrementalModify((value) => {
-      value.isActive = false;
-      return value;
-    });
-    const inactiveEnvironment: EnvironmentDocument = await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          id: environmentId,
-        },
-      })
-      .exec();
-    inactiveEnvironment.incrementalModify((value) => {
-      value.isActive = true;
-      return value;
-    });
-    return;
   };
 
   public refreshEnvironment = async (data): Promise<void> => {

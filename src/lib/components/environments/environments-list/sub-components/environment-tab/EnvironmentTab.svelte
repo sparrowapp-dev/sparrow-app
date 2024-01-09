@@ -8,11 +8,13 @@
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
   import EnvironmentDeletePopup from "$lib/components/Modal/EnvironmentDeletePopup.svelte";
+  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentWorkspace;
   export let env;
+  export let currentEnvironment;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -42,7 +44,18 @@
 
   //open environment
   function openEnvironment() {
-    environmentRepositoryMethods.activateEnvironment(env.id);
+    let sampleEnvironment = generateSampleEnvironment(
+      env.id,
+      currentWorkspace._id,
+      new Date().toString(),
+    );
+    sampleEnvironment.name = env.name;
+    sampleEnvironment.isActive = true;
+    sampleEnvironment.variable = env.variable;
+    environmentRepositoryMethods.createEnvironmentTab(
+      sampleEnvironment,
+      currentWorkspace._id,
+    );
     showMenu = false;
   }
 
@@ -177,7 +190,8 @@
 <div class="environment-tab">
   <button
     style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env.isActive
+    class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env?.id ===
+    currentEnvironment?.id
       ? 'active-collection-tab'
       : ''}"
   >

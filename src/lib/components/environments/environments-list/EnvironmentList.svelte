@@ -13,11 +13,14 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
   import EnvironmentTab from "./sub-components/environment-tab/EnvironmentTab.svelte";
+  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentWorkspace;
   export let environments;
+  export let currentEnvironment;
 
   let localEnvironment;
   let globalEnvironment;
@@ -40,7 +43,19 @@
   }
 
   const handleOpenEnvironment = (id: string) => {
-    environmentRepositoryMethods.activateEnvironment(id);
+    let sampleEnvironment = generateSampleEnvironment(
+      globalEnvironment[0]?.id,
+      currentWorkspace._id,
+      new Date().toString(),
+    );
+    sampleEnvironment.name = globalEnvironment[0]?.name;
+    sampleEnvironment.isActive = true;
+    sampleEnvironment.type = environmentType.GLOBAL;
+    sampleEnvironment.variable = globalEnvironment[0]?.variable;
+    environmentRepositoryMethods.createEnvironmentTab(
+      sampleEnvironment,
+      currentWorkspace._id,
+    );
   };
 
   const workspaceLoadingSubscribe = isWorkspaceLoaded.subscribe((value) => {
@@ -73,6 +88,17 @@
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+      let sampleEnvironment = generateSampleEnvironment(
+        res._id,
+        currentWorkspace._id,
+        new Date().toString(),
+      );
+      sampleEnvironment.name = res.name;
+      sampleEnvironment.isActive = true;
+      environmentRepositoryMethods.createEnvironmentTab(
+        sampleEnvironment,
+        currentWorkspace._id,
+      );
       environmentUnderCreation = false;
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
       notifications.success("New Environment Created!");
@@ -138,7 +164,7 @@
   {#if globalEnvironment && globalEnvironment.length > 0}
     <p
       class={`fw-normal env-item rounded m-2 px-2 ${
-        globalEnvironment[0]?.isActive && "active"
+        globalEnvironment[0]?.id === currentEnvironment?.id && "active"
       }`}
       on:click={() => {
         handleOpenEnvironment(globalEnvironment[0]?.id);
@@ -172,6 +198,7 @@
           {environmentServiceMethods}
           {environmentRepositoryMethods}
           {currentWorkspace}
+          {currentEnvironment}
         />
       {/each}
     {/if}

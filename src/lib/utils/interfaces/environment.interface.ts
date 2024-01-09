@@ -6,12 +6,13 @@ export interface EnvironmentRepositoryMethods {
   createEnvironment: (environment) => void;
   updateEnvironment: (uuid: string, data) => void;
   removeEnvironment: (environmentId: string) => void;
-  activateEnvironment: (id: string) => void;
-  refeshEnvironment: (data) => void;
   initActiveEnvironmentToWorkspace: (
     workspaceId: string,
     environmentId: string,
   ) => void;
+
+  createEnvironmentTab: (tab, workspaceId: string) => void;
+  setEnvironmentTabProperty: (data, route, environmentId) => void;
 }
 
 export interface EnvironmentServiceMethods {

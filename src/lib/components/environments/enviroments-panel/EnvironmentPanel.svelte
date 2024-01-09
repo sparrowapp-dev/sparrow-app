@@ -19,17 +19,21 @@
   let quickHelp: boolean = false;
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
-    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
-      name: e.target.value,
-    });
+    environmentRepositoryMethods.setEnvironmentTabProperty(
+      e.target.value,
+      "name",
+      currentEnvironment.id,
+    );
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
-      variable: pairs,
-    });
+    environmentRepositoryMethods.setEnvironmentTabProperty(
+      pairs,
+      "variable",
+      currentEnvironment.id,
+    );
   };
 
   const handleSaveEnvironment = async () => {
@@ -42,6 +46,10 @@
       },
     );
     if (response.isSuccessful) {
+      environmentRepositoryMethods.updateEnvironment(
+        response.data.data._id,
+        response.data.data,
+      );
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
