@@ -21,6 +21,8 @@
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
+  let movedTabStartIndex:number;
+  let movedTabEndIndex:number;
   let closePopup: boolean = false;
 
   $: {
@@ -57,13 +59,27 @@
       collectionsMethods.handleRemoveTab(id);
     }
   };
+ const onDropOver=(event:Event)=>{
+  event.preventDefault();
+ }
+ const onDropEvent=(event:Event)=>{
+  event.preventDefault();  
+  const element=tabList.splice(movedTabStartIndex,1);
+  tabList.splice(movedTabEndIndex,0,element[0]);
+  tabList=tabList;
+ }
 
+ const handleDropOnStart=(index:number)=>{
+  movedTabStartIndex=index;
+ }
+const handleDropOnEnd=(index:number)=>{
+  movedTabEndIndex=index;
+}
   onDestroy(() => {});
 </script>
 
-<div class="tab">
-  <div
-    style="border-top: 1px solid #313233;width:{$collapsibleState
+<div class="tab" on:drop={(event)=>{onDropEvent(event)}}>
+  <div style="width:{$collapsibleState
       ? '100%'
       : '100%'}"
     class="tabbar bg-blackColor d-flex bg-backgroundColor;"
@@ -81,12 +97,11 @@
         </button>
       </div>
     {/if}
-    <div
+    <div  on:dragover={(event)=>{ onDropOver(event)}}
       class=" d-inline-block tab-scroller"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
-    >
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);">
       {#if tabList}
         {#each tabList as tab, index}
           <Tab
@@ -96,6 +111,8 @@
             {closeTab}
             {index}
             {tabWidth}
+            handleDropOnStart={handleDropOnStart}
+            handleDropOnEnd={handleDropOnEnd}
           />
         {/each}
       {/if}

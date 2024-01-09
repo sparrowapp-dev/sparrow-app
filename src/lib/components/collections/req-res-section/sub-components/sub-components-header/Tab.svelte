@@ -12,10 +12,12 @@
   export let tabWidth: number;
   export let index: number;
   export let closeTab;
+  export let handleDropOnStart:(index:number)=>void;
+  export let handleDropOnEnd:(index:number)=>void
 
 </script>
 
-<div
+<div draggable={true} on:drop={()=>{handleDropOnEnd(index)}}  on:dragstart={()=>{ handleDropOnStart(index)} }
   class="d-inline-block position-relative pt-1"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
