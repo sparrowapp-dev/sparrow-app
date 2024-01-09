@@ -40,7 +40,7 @@
       heading="Environment"
       logo={environment}
       isSelected={"environment" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
+      disabled={false}
       {changeSelectedActiveSideBarTab}
     />
     <Helper
@@ -52,25 +52,6 @@
       disabled={true}
       {changeSelectedActiveSideBarTab}
     />
-    <Helper
-      {activeSideBarTabMethods}
-      route="environment"
-      heading="Environment"
-      logo={environment}
-      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
-      {changeSelectedActiveSideBarTab}
-    />
-    <hr class="m-1 border-2" />
-    <Helper
-      {activeSideBarTabMethods}
-      route="teams"
-      heading="Teams"
-      logo={teams}
-      isSelected={"teams" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
-      {changeSelectedActiveSideBarTab}
-    /> -->
   </div>
   <div class="sidebar__help">
     <Tooltip>

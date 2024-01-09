@@ -50,8 +50,6 @@
   let searchData: string = "";
   let ownerName: string = "";
 
-
-
   let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
@@ -89,7 +87,7 @@
           },
         );
         allworkspaces = workspaceArr;
-       
+
         if (!activeWorkspaceRxDoc && currWorkspace) {
           isWorkspaceLoaded.set(false);
           _viewModel.activateWorkspace(currWorkspace.id);
@@ -244,8 +242,8 @@
   data-tauri-drag-region
 >
   <div
-    class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px; height:20px ;padding: 0px, 6px, 0px, 6px;"
+    class="d-flex d-flex align-items-center justify-content-between"
+    style="width: 358px; height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
@@ -258,7 +256,7 @@
       hideHeaders
         ? ''
         : ''}"
-      style="height: 36px; width:116px"
+      style="height: 36px; width:216px"
     >
       <HeaderDropdown
         data={workspaces}

@@ -1,7 +1,22 @@
 <script lang="ts">
   import plus from "$lib/assets/plus.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { openedTeam } from "$lib/store/team.store";
+  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
+  import { onDestroy } from "svelte";
   export let teams: any;
+  let currOpenedTeam: CurrentTeam;
+  const handleOpenTeam = (teamId: string, teamName) => {
+    openedTeam.set({ id: teamId, name: teamName });
+  };
+
+  const openedTeamSubscribe = openedTeam.subscribe((value) => {
+    if (value) currOpenedTeam = value;
+  });
+
+  onDestroy(() => {
+    openedTeamSubscribe();
+  });
 </script>
 
 <section class="pb-4">
@@ -9,17 +24,22 @@
     <h6 class="teams-heading">Teams</h6>
     <div>
       <Tooltip text="New Team">
-        <button class="new-team-btn border-0">
+        <button class="new-team-btn rounded border-0">
           <img src={plus} alt="" />
         </button>
       </Tooltip>
     </div>
   </div>
   {#each teams as team}
-    <div class="d-flex align-items-center rounded teams-outer">
+    <button
+      class={`d-flex w-100 align-items-center rounded teams-outer border-0 ${
+        currOpenedTeam.id == team.teamId && "active"
+      }`}
+      on:click={() => handleOpenTeam(team.teamId, team.name)}
+    >
       <img src={team.icon} alt="" />
       <p class=" mb-0">{team.name}</p>
-    </div>
+    </button>
   {/each}
 </section>
 
@@ -31,6 +51,10 @@
   }
   .teams-outer {
     padding: 8px 7px;
+    background-color: transparent;
+  }
+  .teams-outer.active {
+    background-color: var(--border-color);
   }
   .new-team-btn {
     background-color: transparent;

@@ -6,6 +6,11 @@ const currentTeam = writable<CurrentTeam>({
   id: "",
 });
 
+const openedTeam = writable<CurrentTeam>({
+  name: "",
+  id: "",
+});
+
 /**
  * Sets the current team with the provided id and name (force over writes)..
  */
@@ -14,4 +19,12 @@ const setCurrentTeam = (teamId: string, teamName: string): void => {
   currentTeam.set({ id: teamId, name: teamName });
 };
 
-export { setCurrentTeam, currentTeam };
+/**
+ * Sets the opened team with the provided id and name (force over writes)..
+ */
+
+const setOpenedTeam = (teamId: string, teamName: string): void => {
+  openedTeam.set({ id: teamId, name: teamName });
+};
+
+export { setCurrentTeam, currentTeam, openedTeam, setOpenedTeam };

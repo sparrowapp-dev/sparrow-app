@@ -11,9 +11,7 @@
   import { navigate } from "svelte-navigator";
   import {
     currentWorkspace,
-   
     isWorkspaceCreatedFirstTime,
- 
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -21,6 +19,7 @@
   import { slide } from "svelte/transition";
   import checkIcon from "$lib/assets/check.svg";
   import { currentTeam } from "$lib/store/team.store";
+  import { TickIcon } from "$lib/assets/app.asset";
   export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
   export let data: any;
@@ -156,7 +155,7 @@
   {#if currWorkspaceName}
     <button
       style="font-size: 12px;"
-      class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
+      class="dropdown-btn rounded border-0 ps-2 py-2 gap-2 ellipsis"
       on:click={toggleDropdown}
       id="workspace-dropdown"
       >{currTeamName} / {currWorkspaceName}
@@ -196,7 +195,7 @@
                 class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
               >
                 <p
-                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100 ellipsis overflow-hidden"
+                  class=" align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100 ellipsis overflow-hidden"
                   style="cursor: pointer;overflow:auto"
                   on:click={() => {
                     isOpen = false;
@@ -207,13 +206,15 @@
                     handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
-                  {list.name + "/" + list.team.teamName}
+                  <span>{list.name}</span>
+                  <span class="list-team-name d-block" style="font-size: 12px;"
+                    >{list.team.teamName}</span
+                  >
                 </p>
-                <div>
-                  {#if activeWorkspaceId === list._id}
-                    <img src={checkIcon} alt="checkIcon" />
-                  {/if}
-                </div>
+
+                {#if activeWorkspaceId === list._id}
+                  <TickIcon width={20} height={20} />
+                {/if}
               </div>
             {/if}
           {/each}
@@ -298,5 +299,8 @@
   .dropdown-btn-active {
     border: 1px solid #85c2ff;
     background-color: var(--blackColor);
+  }
+  .list-team-name {
+    color: var(--request-arc);
   }
 </style>
