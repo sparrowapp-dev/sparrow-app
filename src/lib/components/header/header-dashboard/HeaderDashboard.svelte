@@ -48,6 +48,8 @@
   let searchData: string = "";
   let ownerName: string = "";
 
+
+
   let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
