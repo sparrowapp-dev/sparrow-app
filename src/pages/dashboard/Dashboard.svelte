@@ -65,8 +65,8 @@
     if (activeTab) {
       selectedActiveSideBar = activeTab;
     } else {
-      await activeSideBarTabMethods.addActiveTab("collections");
-      selectedActiveSideBar = "collections";
+      await activeSideBarTabMethods.addActiveTab("workspaces");
+      selectedActiveSideBar = "workspaces";
       const workspace = generateSampleWorkspace(
         currentWorkspaceId,
         new Date().toString(),

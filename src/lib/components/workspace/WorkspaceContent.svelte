@@ -21,9 +21,14 @@
   import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import { onDestroy } from "svelte";
+  import { openedTeam } from "$lib/store/team.store";
+  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   export let workspaceMethods: WorkspaceMethods;
   export let loaderColor = "default";
-
+  let currOpenedTeam: CurrentTeam;
+  const openedTeamSubscribe = openedTeam.subscribe((value) => {
+    if (value) currOpenedTeam = value;
+  });
   let isLoading: boolean = false;
 
   const _viewModel = new WorkspaceViewModel();
@@ -85,13 +90,14 @@
 
   let selectedTab = "all-workspace";
   let selectedView: string;
- 
+
   let selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
   });
 
   onDestroy(() => {
     selectedViewSubscribe();
+    openedTeamSubscribe();
   });
 </script>
 
@@ -106,9 +112,9 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
-                J
+                A
               </p>
-              <span class="ms-4 my-auto">John's Team</span>
+              <span class="ms-4 my-auto">{currOpenedTeam.name}</span>
             </h2>
             <div class="d-flex">
               <button

@@ -9,7 +9,7 @@
       {#if index < 5}
         <div class=" pb-3">
           <p class="mb-0 recent-workspace ellipsis">{list.name}</p>
-          <span class="team-name">John's Team</span>
+          <span class="team-name">{list.team.teamName}</span>
         </div>
       {/if}
     {/each}

@@ -10,7 +10,7 @@
   import { onDestroy } from "svelte";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import { setCurrentTeam } from "$lib/store/team.store";
+  import { setCurrentTeam, setOpenedTeam } from "$lib/store/team.store";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
   export let data: any;
   let allTeams = [];
@@ -45,6 +45,7 @@
           value[0].get("workspaces")[0].workspaceId,
           value[0].get("workspaces")[0].name,
         );
+        setOpenedTeam(value[0].get("teamId"), value[0].get("name"));
       }
     }
   });
