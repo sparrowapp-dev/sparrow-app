@@ -19,16 +19,20 @@
   import type { RequestMethodType } from "$lib/utils/types/request.type";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
 
   export const loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let environmentVariables;
   //this for expand and collapse condition
   const _apiSendRequest = new ApiSendRequestViewModel();
 
   let isCollaps: boolean;
 
   collapsibleState.subscribe((value) => (isCollaps = value));
+  const environmentHelper = new EnvironmentHeper();
 
   let isInputEmpty: boolean = false;
   let isInputValid: boolean = true;
@@ -41,6 +45,11 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   let currentTabId: string = "";
+  let trackParanthesis: unknown[] = [];
+  let trackCursor: number;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
+
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       currentTabId = event?.id;
@@ -50,6 +59,27 @@
       request = event?.property?.request;
     }
   });
+  let filterData = [];
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+    if (trackParanthesis) {
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+  }
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -71,7 +101,7 @@
         isLoading = true;
 
         createApiRequest(
-          _apiSendRequest.decodeRestApiData(request),
+          _apiSendRequest.decodeRestApiData(request, environmentVariables),
           currentTabId,
         )
           .then((response) => {
@@ -181,6 +211,7 @@
       RequestProperty.QUERY_PARAMS,
       currentTabId,
     );
+    trackParanthesis = environmentHelper.balanceParanthesis(urlText);
   };
   onDestroy(() => {
     isHorizontalUnsubscribe();
@@ -204,6 +235,9 @@
   });
 
   const handleKeyPress = (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
     if (event.ctrlKey && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
@@ -219,7 +253,7 @@
       : 'pt-3 px-3'}"
     style="width:calc(100%-312px);"
   >
-    <div class="d-flex gap-2 w-100">
+    <div class="d-flex gap-2 w-100 position-relative">
       <ColorDropdown
         data={[
           {
@@ -254,16 +288,51 @@
       <input
         required
         type="text"
+        id="input-request-url"
         placeholder="Enter URL or paste text"
         class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
+        autocomplete="off"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
         style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
         bind:value={urlText}
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
+        on:keyup={(e) => {
+          trackCursor = e.target.selectionStart;
+        }}
+        on:blur={() => {
+          setTimeout(() => {
+            trackParanthesis = [];
+            trackCursor = undefined;
+            filterData = [];
+          }, 300);
+        }}
+        on:focus={(e) => {
+          handleInputValue();
+          const elem = document.getElementById("input-request-url");
+          environmentAxisY = elem.getBoundingClientRect().top + 40;
+          environmentAxisX = elem.getBoundingClientRect().left;
+        }}
         bind:this={inputElement}
       />
+      {#if trackParanthesis.length === 2 && filterData.length > 0}
+        <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
+          {filterData}
+          inputText={urlText}
+          {trackCursor}
+          {trackParanthesis}
+          updateText={(txt) => {
+            urlText = txt;
+          }}
+          {handleInputValue}
+        />
+      {/if}
 
       <button
         disabled={disabledSend}

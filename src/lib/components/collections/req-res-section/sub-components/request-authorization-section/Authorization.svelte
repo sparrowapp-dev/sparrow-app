@@ -9,6 +9,7 @@
 
   export let request;
   export let collectionsMethods: CollectionsMethods;
+  export let environmentVariables;
 
   let currentTab: string;
 
@@ -66,16 +67,19 @@
     <ApiKey
       apiData={request.auth.apiKey}
       callback={collectionsMethods.updateRequestAuth}
+      {environmentVariables}
     />
   {:else if currentTab === AuthType.BEARER_TOKEN}
     <BearerToken
       bearerToken={request.auth.bearerToken}
       callback={collectionsMethods.updateRequestAuth}
+      {environmentVariables}
     />
   {:else if currentTab === AuthType.BASIC_AUTH}
     <BasicAuth
       basicAuth={request.auth.basicAuth}
       callback={collectionsMethods.updateRequestAuth}
+      {environmentVariables}
     />
   {/if}
 </div>

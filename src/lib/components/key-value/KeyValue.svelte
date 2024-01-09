@@ -1,7 +1,9 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
 
   type Mode = "READ" | "WRITE";
 
@@ -12,9 +14,18 @@
     key: "",
     value: "",
   };
-
+  export let environmentVariables;
+  const environmentHelper = new EnvironmentHeper();
   let pairs: KeyValuePair[] = keyValue;
   let controller: boolean = false;
+
+  let trackParanthesis: unknown[] = [];
+  let trackCursor: number;
+  let tempText = "";
+  let focusedInput;
+  let focusedElement;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
 
   $: {
     if (keyValue) {
@@ -33,6 +44,28 @@
       } else {
         controller = true;
       }
+    }
+  }
+
+  let filterData = [];
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+    if (trackParanthesis) {
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          tempText,
+          trackParanthesis,
+          trackCursor,
+        );
     }
   }
 
@@ -91,6 +124,10 @@
     });
     pairs = filteredKeyValue;
     callback(pairs);
+  };
+
+  let handleInputValue = () => {
+    trackParanthesis = environmentHelper.balanceParanthesis(tempText);
   };
 </script>
 
@@ -207,31 +244,115 @@
             </div>
 
             <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"pair-key" + index}
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.key}
                   on:input={() => {
                     updateParam(index);
+                    tempText = element.key;
+                    handleInputValue();
+                  }}
+                  on:keyup={(e) => {
+                    trackCursor = e.target.selectionStart;
+                  }}
+                  on:blur={() => {
+                    setTimeout(() => {
+                      tempText = "";
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }, 300);
+                  }}
+                  on:focus={(e) => {
+                    tempText = element.key;
+                    focusedInput = index;
+                    focusedElement = "key";
+                    handleInputValue();
+                    const elem = document.getElementById("pair-key" + index);
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
+                {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
+                  <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
+                    {filterData}
+                    inputText={element.key}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      element.key = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
+                {/if}
               </div>
-              <div class="flex-grow-1 w-100">
+              <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
                   class="form-control bg-keyValuePairColor py-1 border-0"
                   style="font-size: 13px;"
+                  id={"pair-value" + index}
                   disabled={mode == "READ" ? true : false}
                   bind:value={element.value}
                   on:input={() => {
                     updateParam(index);
+                    tempText = element.value;
+                    handleInputValue();
+                  }}
+                  on:keyup={(e) => {
+                    trackCursor = e.target.selectionStart;
+                  }}
+                  on:blur={() => {
+                    setTimeout(() => {
+                      tempText = "";
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }, 300);
+                  }}
+                  on:focus={(e) => {
+                    tempText = element.value;
+                    focusedInput = index;
+                    focusedElement = "value";
+                    handleInputValue();
+                    const elem = document.getElementById("pair-value" + index);
+                    environmentAxisY = elem.getBoundingClientRect().top + 30;
+                    environmentAxisX = elem.getBoundingClientRect().left;
                   }}
                 />
+                {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
+                  <EnvironmentPicker
+                    {environmentAxisX}
+                    {environmentAxisY}
+                    {filterData}
+                    inputText={element.value}
+                    {trackCursor}
+                    {trackParanthesis}
+                    updateText={(url) => {
+                      element.value = url;
+                    }}
+                    handleInputValue={() => {
+                      updateParam(index);
+                      trackParanthesis = [];
+                      trackCursor = undefined;
+                      filterData = [];
+                    }}
+                  />
+                {/if}
               </div>
             </div>
             {#if pairs.length - 1 != index}

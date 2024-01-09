@@ -20,6 +20,7 @@
   import crossIcon from "$lib/assets/cross.svg";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
+  export let environmentVariables;
 
   import MonacoEditor from "./MonacoEditor.svelte";
 
@@ -212,12 +213,24 @@
       if you need to send body.
     </p>
   {:else if mainTab === RequestDataset.URLENCODED}
-    <KeyValue keyValue={urlEncoded} callback={handleUrlEncodeChange} />
+    <KeyValue
+      keyValue={urlEncoded}
+      callback={handleUrlEncodeChange}
+      {environmentVariables}
+    />
   {:else if mainTab === RequestDataset.FORMDATA}
     <p>Text</p>
-    <KeyValue keyValue={formDataText} callback={handleFormDataTextChange} />
+    <KeyValue
+      keyValue={formDataText}
+      callback={handleFormDataTextChange}
+      {environmentVariables}
+    />
     <p>File</p>
-    <KeyValueFile keyValue={formDataFile} callback={handleFormDataFileChange} />
+    <KeyValueFile
+      keyValue={formDataFile}
+      callback={handleFormDataFileChange}
+      {environmentVariables}
+    />
   {/if}
 </div>
 
