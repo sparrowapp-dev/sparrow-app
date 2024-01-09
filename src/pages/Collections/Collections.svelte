@@ -18,7 +18,6 @@
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
-  import { blur } from "svelte/transition";
   import { onDestroy } from "svelte";
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
@@ -95,7 +94,6 @@
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         const environmentId = activeWorkspaceRxDoc.get("environmentId");
-        console.log(environmentId);
         if (environments) {
           const env = $environments;
           if (env?.length > 0) {
@@ -107,7 +105,6 @@
                 return true;
               }
             });
-            // console.log(filteredEnv);
             if (filteredEnv?.length > 0) {
               environmentVariables.length = 0;
               filteredEnv.forEach((elem) => {
@@ -126,72 +123,12 @@
             }
           }
         }
-        console.log(environmentVariables);
       }
     },
   );
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
-
-  const mockData = [
-    {
-      key: "asus deffde fefguyerf fruerugf fuerfurf fuyeiryf freiufriu",
-      value:
-        "val asus gyude deueudd euiydyiue dieudioe dieudioed dieuduid deoded eiduoiejddj deio",
-      type: "G",
-      environment:
-        "global variable deidoiueodned ed doed eldje dedjm edlejde dljed ededjld dedjlee ddled",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-    {
-      key: "asus",
-      value: "val asus",
-      type: "G",
-      environment: "global variable",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-    {
-      key: "asus",
-      value: "val asus",
-      type: "G",
-      environment: "global variable",
-    },
-    {
-      key: "dell",
-      value: "val dell",
-      type: "E",
-      environment: "n2n variable",
-    },
-    {
-      key: "lenovo",
-      value: "val lenovo",
-      type: "E",
-      environment: "NJ variable",
-    },
-  ];
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
@@ -246,7 +183,6 @@
             />
           {/if}
         </div>
-        <!-- <SidebarRight /> -->
       </div>
     </div>
   </div>

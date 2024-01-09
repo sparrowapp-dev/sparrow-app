@@ -101,7 +101,7 @@
         isLoading = true;
 
         createApiRequest(
-          _apiSendRequest.decodeRestApiData(request),
+          _apiSendRequest.decodeRestApiData(request, environmentVariables),
           currentTabId,
         )
           .then((response) => {
