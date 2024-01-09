@@ -18,7 +18,10 @@
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
-  import { blur } from "svelte/transition";
+  import { onDestroy } from "svelte";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
 
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -64,10 +67,15 @@
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
     deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
+
+    initActiveEnvironmentToWorkspace:
+      _viewModel.initActiveEnvironmentToWorkspace,
+    currentEnvironment: _viewModel.currentEnvironment,
   };
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  const environments = _viewModel.environments;
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -78,6 +86,49 @@
   };
 
   const collapseCollectionPanel = collapsibleState;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.getActiveWorkspace();
+  let environmentVariables = [];
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        const environmentId = activeWorkspaceRxDoc.get("environmentId");
+        if (environments) {
+          const env = $environments;
+          if (env?.length > 0) {
+            const filteredEnv = env.filter((elem) => {
+              if (
+                elem.type === environmentType.GLOBAL ||
+                elem.id === environmentId
+              ) {
+                return true;
+              }
+            });
+            if (filteredEnv?.length > 0) {
+              environmentVariables.length = 0;
+              filteredEnv.forEach((elem) => {
+                const temp = elem.toMutableJSON();
+                temp.variable.forEach((variable) => {
+                  if (variable.key) {
+                    environmentVariables.push({
+                      key: variable.key,
+                      value: variable.value,
+                      type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                      environment: temp.name,
+                    });
+                  }
+                });
+              });
+            }
+          }
+        }
+      }
+    },
+  );
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
@@ -86,6 +137,7 @@
       <CollectionsList
         activeTabId={$activeTab?.id}
         activePath={$activeTab?.path}
+        environments={$environments}
         {collectionsMethods}
       />
     </div>
@@ -106,7 +158,11 @@
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-            <RequestResponse {activeTab} {collectionsMethods} />
+            <RequestResponse
+              {activeTab}
+              {collectionsMethods}
+              {environmentVariables}
+            />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace
               {activeTab}
@@ -127,7 +183,6 @@
             />
           {/if}
         </div>
-        <!-- <SidebarRight /> -->
       </div>
     </div>
   </div>

@@ -5,8 +5,10 @@ import type {
   CreateCollectionPostBody,
   CreateDirectoryPostBody,
   DeleteRequestName,
+  ImportBodyUrl,
   UpdateCollectionName,
 } from "$lib/utils/dto";
+import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
 
 export class CollectionService {
   constructor() {}
@@ -157,6 +159,61 @@ export class CollectionService {
       },
     );
 
+    return response;
+  };
+
+  public importCollection = async (workspaceId: string, url: ImportBodyUrl) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importUrl/collection`,
+      {
+        body: url,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public importCollectionFile = async (workspaceId: string, file) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+      {
+        body: file,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public importCollectionFromJsonObject = async (
+    workspaceId: string,
+    jsonObject: string,
+    contentType: ContentTypeEnum,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importJson/collection`,
+      {
+        body: jsonObject,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
+    return response;
+  };
+  public importCollectionFromFile = async (workspaceId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/importFile/collection`,
+      {
+        body: formData,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
     return response;
   };
 }

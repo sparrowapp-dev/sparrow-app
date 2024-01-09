@@ -25,7 +25,12 @@ import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
 import { teamSchema, type TeamDocType } from "$lib/models/team.model";
-
+import {
+  environmentSchema,
+  type EnvironmentDocType,
+} from "$lib/models/environment.model";
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+// addRxPlugin(RxDBDevModePlugin);
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
 addRxPlugin(RxDBUpdatePlugin);
@@ -35,6 +40,8 @@ export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
+export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
+export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -47,6 +54,7 @@ export type DatabaseCollections = {
   workspace: WorkspaceContainer;
   tab: TabContainer;
   collection: CollectionContainer;
+  environment: EnvironmentContainer;
   activesidebartab: ActiveSideBarTabContainer;
   team: TeamContainer;
 };
@@ -91,6 +99,12 @@ export class RxDB {
           3: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          4: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -116,6 +130,15 @@ export class RxDB {
       },
       team: {
         schema: teamSchema,
+      },
+      environment: {
+        schema: environmentSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
       },
     });
     return { rxdb: this.rxdb };

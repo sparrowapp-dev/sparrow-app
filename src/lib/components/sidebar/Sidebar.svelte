@@ -4,9 +4,9 @@
   import environment from "$lib/assets/environment.svg";
   import teams from "$lib/assets/teams.svg";
   import home from "$lib/assets/home.svg";
-  import help from "$lib/assets/circle-question.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { HelpIcon } from "$lib/assets/app.asset";
   export let activeSideBarTabMethods;
   export let selectedActiveSideBarTab;
   function changeSelectedActiveSideBarTab(tab: string) {
@@ -52,7 +52,16 @@
       disabled={true}
       {changeSelectedActiveSideBarTab}
     />
-    <!-- <hr class="m-1 border-2" />
+    <Helper
+      {activeSideBarTabMethods}
+      route="environment"
+      heading="Environment"
+      logo={environment}
+      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
+      disabled={false}
+      {changeSelectedActiveSideBarTab}
+    />
+    <hr class="m-1 border-2" />
     <Helper
       {activeSideBarTabMethods}
       route="teams"
@@ -67,7 +76,7 @@
     <Tooltip>
       <div class="sidebar__container sidebar__container_background2">
         <div class="sidebar__container--icon pt-2">
-          <img src={help} alt="help-icon" />
+          <HelpIcon />
         </div>
         <div class={`sidebar__container--text mt-1 text-textColor`}>
           <p>Help</p>

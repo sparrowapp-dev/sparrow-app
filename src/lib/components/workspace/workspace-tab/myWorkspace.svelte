@@ -102,12 +102,12 @@
       }
     },
   );
-
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-    }
-  });
+  // Not required for now may be used in future if things breaks
+  // const userUnsubscribe = user.subscribe(async (value) => {
+  //   if (value) {
+  //     await _viewModel.refreshWorkspaces(value._id);
+  //   }
+  // });
 
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
@@ -119,7 +119,8 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
-    userUnsubscribe();
+    // Not required for now may be used in future if things breaks
+    // userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 
@@ -179,13 +180,7 @@
         id="updateDescriptionFieldWorkspace"
         {autofocus}
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        on:input={(event) => {
-          handleWorkspaceDescription(event);
-        }}
-        on:blur={onUpdateBlur}
-        on:keydown={onUpdateWorkspaceDescription}
-        bind:this={inputElement}
-        placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
+        placeholder="This is your personal workspace.Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
       />
     </div>
   </div>

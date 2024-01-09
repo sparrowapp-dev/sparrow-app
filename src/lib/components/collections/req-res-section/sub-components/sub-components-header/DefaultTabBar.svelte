@@ -22,6 +22,7 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
+  import ImportCollection from "$lib/components/collections/collections-list/ImportCollection.svelte";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -146,12 +147,18 @@
     return;
   };
 
+  let isImportCollectionPopup: boolean = false;
+  const handleImportCollectionPopup = (flag) => {
+    isImportCollectionPopup = flag;
+  }
   const handleWorkspaceClick = async () => {
     const workspace = generateSampleWorkspace(
       currentWorkspaceId,
       new Date().toString(),
+      currentWorkspaceName
     );
     workspace.path.workspaceId = currentWorkspaceId;
+    workspace.name=currentWorkspaceName;
     collectionsMethods.handleCreateTab(workspace);
     moveNavigation("right");
   };
@@ -161,6 +168,15 @@
     activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
+
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
 
 <div class="main-container">
   <div class="header-container">
@@ -195,7 +211,12 @@
         <img src={apiRequest} alt="" style="width: 20px;" />
         API Request</button
       >
-      <button class="create-container-btn" on:click={handleCreateCollection}>
+      <button
+        class="create-container-btn"
+        on:click={() => {
+          handleImportCollectionPopup(true);
+        }}
+      >
         <img src={collectionss} alt="" style="width: 26px;" />
         Collection</button
       >

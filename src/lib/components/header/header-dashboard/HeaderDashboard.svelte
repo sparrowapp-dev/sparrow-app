@@ -4,10 +4,15 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
+  import icons, {
+    NotifyIcon,
+    SearchIcon,
+    SettingIcon,
+  } from "$lib/assets/app.asset";
   import {
     currentWorkspace,
     isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
     setCurrentWorkspace,
     updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
@@ -44,6 +49,8 @@
   let activeWorkspaceName: string;
   let searchData: string = "";
   let ownerName: string = "";
+
+
 
   let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -82,16 +89,19 @@
           },
         );
         allworkspaces = workspaceArr;
-        console.log(allworkspaces);
+       
         if (!activeWorkspaceRxDoc && currWorkspace) {
+          isWorkspaceLoaded.set(false);
           _viewModel.activateWorkspace(currWorkspace.id);
+          isWorkspaceLoaded.set(true);
         }
       }
     },
   );
 
+  let trackWorkspaceId: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    (value: WorkspaceDocument) => {
+    async (value: WorkspaceDocument) => {
       if (value) {
         activeWorkspaceRxDoc = value;
         activeWorkspaceId = value._data._id;
@@ -103,6 +113,16 @@
         } else {
           name = name;
         }
+        if (trackWorkspaceId !== value.get("_id")) {
+          const response = await _viewModel.getServerEnvironments(
+            value.get("_id"),
+          );
+          if (response.isSuccessful && response.data.data) {
+            const environments = response.data.data;
+            _viewModel.refreshEnvironment(environments);
+          }
+        }
+        trackWorkspaceId = value.get("_id");
       }
     },
   );
@@ -165,9 +185,11 @@
   });
 
   const handleDropdown = (id: string, tab: string) => {
+    isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
     isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
+    isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {
@@ -258,7 +280,7 @@
       : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
-      <img src={icons.searchIcon} alt="" />
+      <SearchIcon />
     </div>
 
     <div class="w-100">

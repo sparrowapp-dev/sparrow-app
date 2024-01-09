@@ -44,6 +44,7 @@ $sparrow-key-value-pair: #262626;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-recentApiText: #f3e4e4d7;
+$sparrow-errorTextColor:#fe8c98;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -79,6 +80,7 @@ $sparrow-recentApiText: #f3e4e4d7;
   --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
   --sparrow-blue: #{$sparrow-blue};
   --sparrow-button-background: #{$sparrow-button-background};
+  --error--color:#{$sparrow-errorTextColor};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
