@@ -24,7 +24,7 @@ import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
-import type { TeamDocType } from "$lib/models/team.model";
+import { teamSchema, type TeamDocType } from "$lib/models/team.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -85,6 +85,12 @@ export class RxDB {
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -107,6 +113,9 @@ export class RxDB {
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
+      },
+      team: {
+        schema: teamSchema,
       },
     });
     return { rxdb: this.rxdb };

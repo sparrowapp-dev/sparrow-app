@@ -6,6 +6,7 @@
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons, { NotifyIcon, SettingIcon } from "$lib/assets/app.asset";
   import {
+    currentWorkspace,
     isWorkspaceCreatedFirstTime,
     setCurrentWorkspace,
     updateCurrentWorkspace,
@@ -27,6 +28,7 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
+  import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
 
   export let activeSideBarTabMethods;
 
@@ -63,6 +65,11 @@
   let profile: boolean = false;
   let activeWorkspaceRxDoc: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
+  let currWorkspace: CurrentWorkspace;
+
+  const currWorkspaceSubscribe = currentWorkspace.subscribe((value) => {
+    if (value) currWorkspace = value;
+  });
 
   const workspaceSubscribe = workspaces.subscribe(
     (value: WorkspaceDocument[]) => {
@@ -75,10 +82,9 @@
           },
         );
         allworkspaces = workspaceArr;
-
-        if (!activeWorkspaceRxDoc) {
-          _viewModel.activateWorkspace(value[0].get("_id"));
-          updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
+        console.log(allworkspaces);
+        if (!activeWorkspaceRxDoc && currWorkspace) {
+          _viewModel.activateWorkspace(currWorkspace.id);
         }
       }
     },
@@ -201,6 +207,7 @@
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
     unsubscribeUser();
+    currWorkspaceSubscribe();
   });
 
   onMount(() => {

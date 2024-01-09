@@ -9,11 +9,15 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
-  import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
+  import {
+    currentWorkspace,
+    isWorkspaceCreatedFirstTime,
+  } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
   import { slide } from "svelte/transition";
   import checkIcon from "$lib/assets/check.svg";
+  import { currentTeam } from "$lib/store/team.store";
   export let activeWorkspaceId: string;
   export let activeSideBarTabMethods;
   export let data: any;
@@ -22,7 +26,8 @@
   const _viewModel = new HeaderDashboardViewModel();
 
   let isOpen: boolean = false;
-
+  let currWorkspaceName: string = "",
+    currTeamName: string = "";
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
@@ -111,7 +116,6 @@
       notifications.success("New Workspace Created");
     }
   };
-
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById("workspace-dropdown");
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
@@ -119,8 +123,18 @@
     }
   }
 
+  const currentWorkspaceSubscribe = currentWorkspace.subscribe((value) => {
+    if (value) currWorkspaceName = value.name;
+  });
+
+  const currentTeamSubscribe = currentTeam.subscribe((value) => {
+    if (value) currTeamName = value.name;
+  });
+
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
+    currentWorkspaceSubscribe();
+    currentTeamSubscribe();
   });
 
   onMount(() => {
@@ -134,21 +148,23 @@
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}
 >
-  <button
-    style="font-size: 12px;"
-    class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
-    on:click={toggleDropdown}
-    id="workspace-dropdown"
-    >Workspace
-    <span class="px-2" class:dropdown-logo-active={isOpen}
-      ><img
-        style="height:15px; width:20px;"
-        src={dropdown}
-        alt=""
-        class:dropdown-logo-active={isOpen}
-      /></span
-    ></button
-  >
+  {#if currWorkspaceName}
+    <button
+      style="font-size: 12px;"
+      class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
+      on:click={toggleDropdown}
+      id="workspace-dropdown"
+      >{currTeamName} / {currWorkspaceName}
+      <span class="px-2" class:dropdown-logo-active={isOpen}
+        ><img
+          style="height:15px; width:20px;"
+          src={dropdown}
+          alt=""
+          class:dropdown-logo-active={isOpen}
+        /></span
+      ></button
+    >
+  {/if}
   <div
     style="display:none;overflow:auto;"
     class="dropdown-data rounded px-2"
@@ -186,7 +202,7 @@
                     handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
-                  {list.name}
+                  {list.name + "/" + list.team.teamName}
                 </p>
                 <div>
                   {#if activeWorkspaceId === list._id}

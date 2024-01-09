@@ -8,7 +8,7 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 1,
+  version: 3,
   properties: {
     _id: {
       type: "string",
@@ -19,6 +19,18 @@ export const workspaceSchemaLiteral = {
     },
     description: {
       type: "string",
+    },
+    team: {
+      type: "array",
+      items: {
+        type: "object",
+        teamId: {
+          type: "string",
+        },
+        teamName: {
+          type: "string",
+        },
+      },
     },
     owner: {
       type: "object",

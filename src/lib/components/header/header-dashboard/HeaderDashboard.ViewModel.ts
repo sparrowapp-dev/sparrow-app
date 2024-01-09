@@ -25,6 +25,7 @@ export class HeaderDashboardViewModel {
     return {
       _id: elem.get("_id"),
       name: elem.get("name"),
+      team: elem.get("team"),
       collections: elem.get("collections"),
     };
   };
@@ -131,6 +132,7 @@ export class HeaderDashboardViewModel {
           description,
           owner,
           permissions,
+          team,
           createdAt,
           createdBy,
           collection,
@@ -142,6 +144,10 @@ export class HeaderDashboardViewModel {
           owner,
           permissions,
           collections: collection,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+          },
           isActiveWorkspace: !index ? true : false,
           createdAt,
           createdBy,

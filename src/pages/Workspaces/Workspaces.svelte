@@ -6,21 +6,70 @@
   import { WorkspaceViewModel } from "./workspace.viewModel";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { Motion } from "svelte-motion";
+  import { user } from "$lib/store/auth.store";
+  import { onDestroy } from "svelte";
+  import type { Observable } from "rxjs";
+  import type { TeamDocument } from "$lib/database/app.database";
+  import { setCurrentTeam } from "$lib/store/team.store";
+  import { setCurrentWorkspace } from "$lib/store/workspace.store";
   export let data: any;
-
+  let allTeams = [];
   const _viewModel = new WorkspaceViewModel();
-
+  const teams: Observable<TeamDocument[]> = _viewModel.teams;
+  const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
   };
 
+  const userSubscribe = user.subscribe(async (value) => {
+    if (value) await _viewModel.refreshTeams(value._id);
+  });
+
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
+  let activeTeamRxDoc: TeamDocument;
+  const teamSubscribe = teams.subscribe((value: TeamDocument[]) => {
+    if (value && value.length > 0) {
+      const teamArr = value.map((teamDocument: TeamDocument) => {
+        const teamObj = _viewModel.getTeamDocument(teamDocument);
+        return teamObj;
+      });
+      allTeams = teamArr;
+      if (!activeTeamRxDoc) {
+        _viewModel.activateTeamWorkspace(
+          value[0].get("teamId"),
+          value[0].get("workspaces")[0].workspaceId,
+        );
+        setCurrentTeam(value[0].get("teamId"), value[0].get("name"));
+        setCurrentWorkspace(
+          value[0].get("workspaces")[0].workspaceId,
+          value[0].get("workspaces")[0].name,
+        );
+      }
+    }
+  });
+
+  const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
+    if (value) {
+      activeTeamRxDoc = value;
+    }
+  });
+
+  onDestroy(() => {
+    userSubscribe();
+    teamSubscribe.unsubscribe();
+    activeTeamSubscribe.unsubscribe();
+  });
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg-backgroundColor" use:motion>
-    <WorkspaceList {data} tabList={$tabList} collectionList={$collectionList} />
+    <WorkspaceList
+      teams={allTeams}
+      {data}
+      tabList={$tabList}
+      collectionList={$collectionList}
+    />
     <WorkspaceContent {data} {workspaceMethods} />
   </div>
 </Motion>
