@@ -102,12 +102,12 @@
       }
     },
   );
-
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-    }
-  });
+  // Not required for now may be used in future if things breaks
+  // const userUnsubscribe = user.subscribe(async (value) => {
+  //   if (value) {
+  //     await _viewModel.refreshWorkspaces(value._id);
+  //   }
+  // });
 
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
@@ -119,7 +119,8 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
-    userUnsubscribe();
+    // Not required for now may be used in future if things breaks
+    // userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 

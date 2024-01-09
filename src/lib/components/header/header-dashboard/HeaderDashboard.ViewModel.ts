@@ -12,6 +12,8 @@ import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-ta
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import { requestResponseStore } from "$lib/store/request-response-section";
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
+import { EnvironmentService } from "$lib/services/environment.service";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -20,6 +22,8 @@ export class HeaderDashboardViewModel {
   private workspaceService = new WorkspaceService();
   private collectionRepository = new CollectionRepository();
   private activeSideBarTabRepository = new ActiveSideBarTabReposistory();
+  private environmentRepository = new EnvironmentRepository();
+  private environmentService = new EnvironmentService();
 
   public getWorkspaceDocument = (elem: WorkspaceDocument) => {
     return {
@@ -51,7 +55,10 @@ export class HeaderDashboardViewModel {
     name: string,
     description?: string,
   ) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, name, description);
+    this.workspaceRepository.updateWorkspace(workspaceId, {
+      name,
+      description,
+    });
   };
 
   public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {
@@ -190,5 +197,13 @@ export class HeaderDashboardViewModel {
   public createWorkspace = async (workspace) => {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
+  };
+
+  public refreshEnvironment = async (data) => {
+    this.environmentRepository.refreshEnvironment(data);
+  };
+
+  public getServerEnvironments = async (workspaceId: string) => {
+    return await this.environmentService.fetchAllEnvironments(workspaceId);
   };
 }

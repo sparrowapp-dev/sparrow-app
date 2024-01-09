@@ -4,7 +4,11 @@
   import { Observable } from "rxjs";
 
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
-  import icons, { NotifyIcon, SearchIcon, SettingIcon } from "$lib/assets/app.asset";
+  import icons, {
+    NotifyIcon,
+    SearchIcon,
+    SettingIcon,
+  } from "$lib/assets/app.asset";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
@@ -89,8 +93,9 @@
     },
   );
 
+  let trackWorkspaceId: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    (value: WorkspaceDocument) => {
+    async (value: WorkspaceDocument) => {
       if (value) {
         activeWorkspaceRxDoc = value;
         activeWorkspaceId = value._data._id;
@@ -102,6 +107,16 @@
         } else {
           name = name;
         }
+        if (trackWorkspaceId !== value.get("_id")) {
+          const response = await _viewModel.getServerEnvironments(
+            value.get("_id"),
+          );
+          if (response.isSuccessful && response.data.data) {
+            const environments = response.data.data;
+            _viewModel.refreshEnvironment(environments);
+          }
+        }
+        trackWorkspaceId = value.get("_id");
       }
     },
   );
