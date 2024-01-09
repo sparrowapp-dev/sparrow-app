@@ -64,10 +64,15 @@
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
     deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
+
+    initActiveEnvironmentToWorkspace:
+      _viewModel.initActiveEnvironmentToWorkspace,
+    currentEnvironment: _viewModel.currentEnvironment,
   };
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  const environments = _viewModel.environments;
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -86,6 +91,7 @@
       <CollectionsList
         activeTabId={$activeTab?.id}
         activePath={$activeTab?.path}
+        environments={$environments}
         {collectionsMethods}
       />
     </div>
