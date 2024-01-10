@@ -71,4 +71,40 @@ export class TeamRepository {
       },
     }).$;
   };
+
+  /**
+   * Create a new team
+   */
+  public createTeam = async (team: any): Promise<void> => {
+    await RxDB.getInstance().rxdb.team.insert(team);
+    return;
+  };
+
+  /**
+   * Update a team
+   */
+
+  public modifyTeam = async (teamId: string, data) => {
+    const team = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+        },
+      })
+      .exec();
+    team.incrementalModify((value) => {
+      if (data.name) value.name = data.name;
+      if (data.workspaces) value.workspaces = data.workspaces;
+      if (data.users) value.users = data.users;
+      if (data.owner) value.owner = data.owner;
+      if (data.admins) value.admins = data.admins;
+      if (data.isActiveTeam) value.isActiveTeam = data.isActiveTeam;
+      if (data.createdAt) value.createdAt = data.createdAt;
+      if (data.updatedAt) value.updatedAt = data.updatedAt;
+      if (data.updatedBy) value.updatedBy = data.updatedBy;
+      if (data.createdBy) value.createdBy = data.createdBy;
+      // if (data.description) value.description = data.description;
+      return value;
+    });
+  };
 }

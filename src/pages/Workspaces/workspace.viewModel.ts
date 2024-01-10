@@ -89,6 +89,10 @@ export class WorkspaceViewModel {
     this.workspaceRepository.addWorkspace(workspace);
   };
 
+  public createTeam = async (team) => {
+    const response = await this.teamService.createTeam(team);
+    return response;
+  };
   public createWorkspace = async (workspace) => {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;

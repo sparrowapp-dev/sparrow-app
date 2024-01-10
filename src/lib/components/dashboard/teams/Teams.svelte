@@ -1,10 +1,16 @@
 <script lang="ts">
   import plus from "$lib/assets/plus.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { openedTeam } from "$lib/store/team.store";
+  import { isTeamCreatedFirstTime, openedTeam } from "$lib/store/team.store";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
+  import { generateSamepleTeam } from "$lib/utils/sample/team.sample";
   import { onDestroy } from "svelte";
+  import { TeamsViewModel } from "./Teams.ViewModel";
+  import { notification } from "@tauri-apps/api";
+  import { notifications } from "$lib/utils/notifications";
   export let teams: any;
+  const _viewModel = new TeamsViewModel();
   let currOpenedTeam: CurrentTeam;
   const handleOpenTeam = (teamId: string, teamName) => {
     openedTeam.set({ id: teamId, name: teamName });
@@ -13,6 +19,27 @@
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
   });
+
+  const handleCreateTeam = async (name: string) => {
+    isTeamCreatedFirstTime.set(true);
+    const teamObj = generateSamepleTeam(UntrackedItems.UNTRACKED, name);
+
+    const teamData = {
+      name: teamObj.name,
+      description: teamObj.description,
+    };
+
+    _viewModel.addTeam(teamData);
+    const response = await _viewModel.createTeam(teamData);
+
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      _viewModel.modifyTeam(21, res);
+      notifications.success("Team Created Successfully!");
+    } else {
+      notifications.error("Failed to Create Team");
+    }
+  };
 
   onDestroy(() => {
     openedTeamSubscribe();

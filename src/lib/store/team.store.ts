@@ -1,6 +1,6 @@
 import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
 import { writable } from "svelte/store";
-
+export const isTeamCreatedFirstTime = writable(false);
 const currentTeam = writable<CurrentTeam>({
   name: "",
   id: "",
