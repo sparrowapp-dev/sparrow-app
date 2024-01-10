@@ -157,6 +157,7 @@ export interface NewTab {
   createdAt: string;
   path?: Path;
   saveInProgress?: boolean;
+  index?: number;
 }
 
 export interface CurrentTab {

@@ -151,6 +151,7 @@
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
+          viewModel={ _viewModel}
         />
       </div>
       <div class="tab__content d-flex">

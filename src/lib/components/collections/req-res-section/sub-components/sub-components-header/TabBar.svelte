@@ -5,6 +5,7 @@
   import {
     collapsibleState,
     isApiCreatedFirstTime,
+    tabs,
   } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
   import { v4 as uuidv4 } from "uuid";
@@ -16,13 +17,15 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { CollectionsViewModel } from "../../../../../../pages/Collections/Collections.ViewModel";
 
   export let collectionsMethods: CollectionsMethods;
+  export let viewModel: CollectionsViewModel;
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
-  let movedTabStartIndex:number;
-  let movedTabEndIndex:number;
+  let movedTabStartIndex: number;
+  let movedTabEndIndex: number;
   let closePopup: boolean = false;
 
   $: {
@@ -51,7 +54,11 @@
     closePopup = flag;
   };
   const closeTab = (id, tab: NewTab) => {
-    if ((tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description) ) {
+    if (
+      tab?.property?.request &&
+      (!tab?.property?.request?.save?.api ||
+        !tab?.property?.request?.save?.description)
+    ) {
       tabId = id;
       removeTab = tab;
       closePopup = true;
@@ -59,29 +66,39 @@
       collectionsMethods.handleRemoveTab(id);
     }
   };
- const onDropOver=(event:Event)=>{
-  event.preventDefault();
- }
- const onDropEvent=(event:Event)=>{
-  event.preventDefault();  
-  const element=tabList.splice(movedTabStartIndex,1);
-  tabList.splice(movedTabEndIndex,0,element[0]);
-  tabList=tabList;
- }
+  const onDropOver = (event: Event) => {
+    event.preventDefault();
+  };
+  const onDropEvent = (event: Event) => {
+    event.preventDefault();
+    const element = tabList.splice(movedTabStartIndex, 1);
+    tabList.splice(movedTabEndIndex, 0, element[0]);
+     tabList= tabList.map((tab, index) => {
+      tab.index = index;
+      return tab;
+    });
+    const newTabList:NewTab[]=tabList as NewTab[];
+    tabs.set(newTabList);
+    viewModel.syncTabWithStore();
+  };
 
- const handleDropOnStart=(index:number)=>{
-  movedTabStartIndex=index;
- }
-const handleDropOnEnd=(index:number)=>{
-  movedTabEndIndex=index;
-}
+  const handleDropOnStart = (index: number) => {
+    movedTabStartIndex = index;
+  };
+  const handleDropOnEnd = (index: number) => {
+    movedTabEndIndex = index;
+  };
   onDestroy(() => {});
 </script>
 
-<div class="tab" on:drop={(event)=>{onDropEvent(event)}}>
-  <div style="width:{$collapsibleState
-      ? '100%'
-      : '100%'}"
+<div
+  class="tab"
+  on:drop={(event) => {
+    onDropEvent(event);
+  }}
+>
+  <div
+    style="width:{$collapsibleState ? '100%' : '100%'}"
     class="tabbar bg-blackColor d-flex bg-backgroundColor;"
     bind:offsetWidth={scrollerParent}
   >
@@ -97,11 +114,15 @@ const handleDropOnEnd=(index:number)=>{
         </button>
       </div>
     {/if}
-    <div  on:dragover={(event)=>{ onDropOver(event)}}
+    <div
+      on:dragover={(event) => {
+        onDropOver(event);
+      }}
       class=" d-inline-block tab-scroller"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);">
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
+    >
       {#if tabList}
         {#each tabList as tab, index}
           <Tab
@@ -111,8 +132,8 @@ const handleDropOnEnd=(index:number)=>{
             {closeTab}
             {index}
             {tabWidth}
-            handleDropOnStart={handleDropOnStart}
-            handleDropOnEnd={handleDropOnEnd}
+            {handleDropOnStart}
+            {handleDropOnEnd}
           />
         {/each}
       {/if}
