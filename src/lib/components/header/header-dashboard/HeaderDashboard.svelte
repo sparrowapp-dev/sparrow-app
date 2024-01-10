@@ -48,8 +48,6 @@
   let searchData: string = "";
   let ownerName: string = "";
 
-
-
   let hideHeaders = false;
   const _colllectionListViewModel = new CollectionListViewModel();
   const collection = _colllectionListViewModel.collection;
@@ -113,7 +111,7 @@
           );
           if (response.isSuccessful && response.data.data) {
             const environments = response.data.data;
-            _viewModel.refreshEnvironment(environments);
+            _viewModel.refreshEnvironment(environments, value.get("_id"));
           }
         }
         trackWorkspaceId = value.get("_id");

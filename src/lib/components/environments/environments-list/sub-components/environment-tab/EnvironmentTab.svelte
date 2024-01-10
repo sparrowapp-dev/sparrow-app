@@ -74,6 +74,11 @@
         environmentRepositoryMethods.updateEnvironment(env.id, {
           name: newEnvironmentName,
         });
+        environmentRepositoryMethods.setEnvironmentTabProperty(
+          newEnvironmentName,
+          "name",
+          env.id,
+        );
       }
     }
     isRenaming = false;

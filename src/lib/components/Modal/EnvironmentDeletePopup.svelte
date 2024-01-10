@@ -1,8 +1,5 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import { CollectionService } from "$lib/services/collection.service";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type {
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
@@ -26,6 +23,7 @@
     );
     if (response.isSuccessful) {
       environmentRepositoryMethods.removeEnvironment(env.id);
+      environmentRepositoryMethods.deleteEnvironmentTab(env.id);
       closePopup(false);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,

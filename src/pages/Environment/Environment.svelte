@@ -11,9 +11,10 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
 
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+  import { onDestroy } from "svelte";
   const _viewModel = new EnvironmentViewModel();
   const environments = _viewModel.environments;
-  const activeEnvironment = _viewModel.getactiveEnvironmentTab;
+  let activeEnvironment = _viewModel.getactiveEnvironmentTab("as");
 
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     createEnvironment: _viewModel.createEnvironment,
@@ -24,6 +25,7 @@
       _viewModel.initActiveEnvironmentToWorkspace,
     createEnvironmentTab: _viewModel.createEnvironmentTab,
     setEnvironmentTabProperty: _viewModel.setEnvironmentTabProperty,
+    deleteEnvironmentTab: _viewModel.deleteEnvironmentTab,
   };
 
   const environmentServiceMethods: EnvironmentServiceMethods = {
@@ -32,9 +34,25 @@
     deleteEnvironment: _viewModel.deleteServerEnvironment,
     updateEnvironment: _viewModel.updateServerEnvironment,
   };
-
+  let trackWorkspaceId;
   const activeWorkspace: Observable<WorkspaceDocument> =
     environmentRepositoryMethods.getActiveWorkspace();
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        if (trackWorkspaceId !== workspaceId) {
+          activeEnvironment = _viewModel.getactiveEnvironmentTab(workspaceId);
+        }
+        trackWorkspaceId = workspaceId;
+      }
+    },
+  );
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <Motion {...scaleMotionProps} let:motion>

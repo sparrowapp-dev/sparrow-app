@@ -13,6 +13,7 @@ export interface EnvironmentRepositoryMethods {
 
   createEnvironmentTab: (tab, workspaceId: string) => void;
   setEnvironmentTabProperty: (data, route, environmentId) => void;
+  deleteEnvironmentTab: (environmentId: string) => void;
 }
 
 export interface EnvironmentServiceMethods {

@@ -8,7 +8,11 @@ export class EnvironmentTabRepository {
   /**
    * Creates a new tab and adds it to the tab bar.
    */
-  public createTab = async (environmentTab: any): Promise<void> => {
+  public createTab = async (
+    environmentTab: any,
+    workspaceId: string,
+  ): Promise<void> => {
+    console.log(environmentTab);
     const existedTab = await RxDB.getInstance()
       .rxdb.environmentTab.findOne({
         selector: {
@@ -20,6 +24,7 @@ export class EnvironmentTabRepository {
       .rxdb.environmentTab.findOne({
         selector: {
           isActive: true,
+          workspaceId,
         },
       })
       .exec();
@@ -34,12 +39,35 @@ export class EnvironmentTabRepository {
   };
 
   /**
+   * Creates a new tab and adds it to the tab bar.
+   */
+  public deleteEnvironmentTab = async (
+    environmentId: string,
+  ): Promise<boolean> => {
+    const existedTab = await RxDB.getInstance()
+      .rxdb.environmentTab.findOne({
+        selector: {
+          id: environmentId,
+        },
+      })
+      .exec();
+    const del = existedTab;
+    if (existedTab) {
+      await existedTab.remove();
+    }
+    return del?.get("isActive");
+  };
+
+  /**
    * Extracts all data of the active tab.
    */
-  public getEnvironmentTab = (): Observable<EnvironmentTabDocument> => {
+  public getEnvironmentTab = (
+    workspaceId,
+  ): Observable<EnvironmentTabDocument> => {
     return RxDB.getInstance().rxdb.environmentTab.findOne({
       selector: {
         isActive: true,
+        workspaceId,
       },
     }).$;
   };

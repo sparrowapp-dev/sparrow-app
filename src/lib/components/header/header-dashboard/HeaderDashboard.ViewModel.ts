@@ -199,8 +199,8 @@ export class HeaderDashboardViewModel {
     return response;
   };
 
-  public refreshEnvironment = async (data) => {
-    this.environmentRepository.refreshEnvironment(data);
+  public refreshEnvironment = async (data, workspaceId) => {
+    this.environmentRepository.refreshEnvironment(data, workspaceId);
   };
 
   public getServerEnvironments = async (workspaceId: string) => {

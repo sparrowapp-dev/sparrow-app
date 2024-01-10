@@ -15,13 +15,17 @@ export const environmentSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 1,
+  version: 2,
   properties: {
     id: {
       type: "string",
       maxLength: 100,
     },
     environmentId: {
+      type: "string",
+      maxLength: 100,
+    },
+    workspaceId: {
       type: "string",
       maxLength: 100,
     },

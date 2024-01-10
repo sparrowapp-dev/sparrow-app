@@ -77,6 +77,7 @@
       ],
       isActive: false,
       type: "LOCAL",
+      workspaceId: currentWorkspace._id,
       createdAt: new Date().toISOString(),
     };
 
@@ -100,7 +101,10 @@
         currentWorkspace._id,
       );
       environmentUnderCreation = false;
-      environmentRepositoryMethods.updateEnvironment(newEnvironment.id, res);
+      environmentRepositoryMethods.updateEnvironment(newEnvironment.id, {
+        ...res,
+        workspaceId: currentWorkspace._id,
+      });
       notifications.success("New Environment Created!");
       return;
     } else {

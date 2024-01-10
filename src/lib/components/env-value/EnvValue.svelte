@@ -143,7 +143,7 @@
       </Tooltip>
     </div>
     <div
-      class="d-flex gap-5 text-requestBodyColor align-items-center"
+      class="d-flex pe-5 text-requestBodyColor align-items-center"
       style="font-size: 12px; font-weight: 500; width: 46vw;"
     >
       <p class="flex-grow-1 w-100 ps-2">Variable</p>
@@ -238,16 +238,16 @@
             >
               <div class="form-check-input-container" style="width:30px; ">
                 {#if filteredKeyValuePairs.length - 1 != index || mode === "READ"}
-                  <Tooltip text={`${element.checked ? "Unselect" : "Select"}`}>
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      bind:checked={element.checked}
-                      on:input={() => {
-                        updateCheck(index);
-                      }}
-                    />
-                  </Tooltip>
+                  <!-- <Tooltip text={`${element.checked ? "Unselect" : "Select"}`}> -->
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    bind:checked={element.checked}
+                    on:input={() => {
+                      updateCheck(index);
+                    }}
+                  />
+                  <!-- </Tooltip> -->
                 {/if}
               </div>
               <div class="w-100 d-flex gap-2">
@@ -302,20 +302,20 @@
                 >
                   <LockIcon locked={element.locked} />
                 </button> -->
-                  <Tooltip text="Delete">
-                    <button
-                      class="border-0 delete-btn pb-1 rounded"
-                      style="width:30px;"
-                    >
-                      <img
-                        src={trashIcon}
-                        on:click={() => {
-                          deleteParam(index);
-                        }}
-                        alt=""
-                      />
-                    </button>
-                  </Tooltip>
+                  <!-- <Tooltip text="Delete"> -->
+                  <button
+                    class="border-0 delete-btn pb-1 rounded"
+                    style="width:30px;"
+                  >
+                    <img
+                      src={trashIcon}
+                      on:click={() => {
+                        deleteParam(index);
+                      }}
+                      alt=""
+                    />
+                  </button>
+                  <!-- </Tooltip> -->
                 </div>
               {:else}
                 <div class="h-75 pe-1 d-flex">

@@ -3,6 +3,8 @@ import { EnvironmentRepository } from "$lib/repositories/environment.repository"
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
 import type { CreateEnvironmentPostBody } from "$lib/utils/dto";
+import { environmentType } from "$lib/utils/enums/environment.enum";
+import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -16,9 +18,9 @@ export class EnvironmentViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-  public get getactiveEnvironmentTab() {
-    return this.environmentTabRepository.getEnvironmentTab();
-  }
+  public getactiveEnvironmentTab = (workspaceId: string) => {
+    return this.environmentTabRepository.getEnvironmentTab(workspaceId);
+  };
 
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
@@ -53,6 +55,29 @@ export class EnvironmentViewModel {
       route,
       environmentId,
     );
+  };
+
+  public deleteEnvironmentTab = async (environmentId) => {
+    const flag =
+      await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
+    if (flag) {
+      const globalEnvironment =
+        await this.environmentRepository.getGlobalEnvironment();
+      const sampleEnvironment = generateSampleEnvironment(
+        globalEnvironment.id,
+        globalEnvironment.workspaceId,
+        new Date().toString(),
+      );
+      sampleEnvironment.name = globalEnvironment.name;
+      sampleEnvironment.isActive = true;
+      sampleEnvironment.type = environmentType.GLOBAL;
+      sampleEnvironment.variable = globalEnvironment.variable;
+
+      this.createEnvironmentTab(
+        sampleEnvironment,
+        sampleEnvironment.workspaceId,
+      );
+    }
   };
 
   // services -----------------------------------------------------------
