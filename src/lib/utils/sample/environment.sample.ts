@@ -15,6 +15,8 @@ const generateSampleEnvironment = (
     ],
     isActive: false,
     type: "LOCAL",
+    isSave: true,
+    isSaveInProgress: false,
     workspaceId,
     createdAt: date,
   };

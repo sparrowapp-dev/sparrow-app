@@ -15,7 +15,7 @@ export const environmentTabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 3,
+  version: 5,
   properties: {
     id: {
       type: "string",
@@ -50,6 +50,12 @@ export const environmentTabSchemaLiteral = {
       type: "string",
     },
     isActive: {
+      type: "boolean",
+    },
+    isSave: {
+      type: "boolean",
+    },
+    isSaveInProgress: {
       type: "boolean",
     },
     workspaceId: {

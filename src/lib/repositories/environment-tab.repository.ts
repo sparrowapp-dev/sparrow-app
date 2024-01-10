@@ -6,7 +6,7 @@ export class EnvironmentTabRepository {
   constructor() {}
 
   /**
-   * Creates a new tab and adds it to the tab bar.
+   * Creates a new environment tab.
    */
   public createTab = async (
     environmentTab: any,
@@ -38,7 +38,7 @@ export class EnvironmentTabRepository {
   };
 
   /**
-   * Creates a new tab and adds it to the tab bar.
+   * delete environment tab.
    */
   public deleteEnvironmentTab = async (
     environmentId: string,
@@ -58,7 +58,7 @@ export class EnvironmentTabRepository {
   };
 
   /**
-   * Extracts all data of the active tab.
+   * Extracts all data of the active environment tab.
    */
   public getEnvironmentTab = (
     workspaceId,
@@ -72,7 +72,7 @@ export class EnvironmentTabRepository {
   };
 
   /**
-   * Responsible to change tab property like :
+   * Responsible to change environment tab property like :
    * id, name, description, save.
    */
   public setEnvironmentTabProperty = async (
@@ -89,6 +89,9 @@ export class EnvironmentTabRepository {
       .exec();
     (await query).incrementalModify((value) => {
       value[route] = data;
+      if (route === "name" || route === "variable") {
+        value["isSave"] = false;
+      }
       return value;
     });
   };

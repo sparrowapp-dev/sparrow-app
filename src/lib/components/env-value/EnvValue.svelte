@@ -143,8 +143,8 @@
       </Tooltip>
     </div>
     <div
-      class="d-flex pe-5 text-requestBodyColor align-items-center"
-      style="font-size: 12px; font-weight: 500; width: 46vw;"
+      class="d-flex pe-5 text-requestBodyColor align-items-center w-100"
+      style="font-size: 12px; font-weight: 500; "
     >
       <p class="flex-grow-1 w-100 ps-2">Variable</p>
       <p class="flex-grow-1 w-100 ps-2">Value</p>
@@ -345,7 +345,7 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--background-color);
-    width: 27vw;
+    max-width: 400px;
     font-size: 12px;
   }
   .search-input-container > input:focus {

@@ -155,6 +155,12 @@ export class RxDB {
           3: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
+          4: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
         },
       },
     });
