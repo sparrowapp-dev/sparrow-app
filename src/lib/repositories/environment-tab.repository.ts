@@ -12,7 +12,6 @@ export class EnvironmentTabRepository {
     environmentTab: any,
     workspaceId: string,
   ): Promise<void> => {
-    console.log(environmentTab);
     const existedTab = await RxDB.getInstance()
       .rxdb.environmentTab.findOne({
         selector: {
