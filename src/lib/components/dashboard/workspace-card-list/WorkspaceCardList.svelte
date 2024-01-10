@@ -8,7 +8,7 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-
+  export let currTeamName: string;
   export let workspaces: any;
   let filterText: string = "";
   let workspacePerPage: number = 5,
@@ -28,7 +28,7 @@
       type="text"
       id="search-input"
       class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search workspaces in John’s Team"
+      placeholder="Search workspaces in {currTeamName}"
       bind:value={filterText}
       on:input={(e) => handleFilterTextChange(e)}
     />
@@ -48,9 +48,15 @@
         workspace using the term '{filterText}'.</span
       >
     {/if}
-    <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
-      + Add New Workspace
-    </button>
+    {#if currPage === 1 && workspaces.filter( (item) => item.name.startsWith(filterText), ).length > 0}
+      <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
+        + Add New Workspace
+      </button>
+    {:else if currPage == 1}
+      <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace empty">
+        + Add New Workspace
+      </button>
+    {/if}
     {#each workspaces
       .filter((item) => item.name.startsWith(filterText))
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as workspace, index}
@@ -169,6 +175,11 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 16px;
+    max-width: 50%;
+    max-height: 32%;
+  }
+  .add-new-workspace.empty {
+    max-width: 80%;
   }
   .add-new-workspace:hover {
     border: 2px dashed var(--workspace-hover-color);

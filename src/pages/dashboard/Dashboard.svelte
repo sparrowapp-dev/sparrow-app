@@ -6,7 +6,7 @@
   import Teams from "../Teams/Teams.svelte";
   import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel";
   import Mock from "../Mock/Mock.svelte";
@@ -17,24 +17,33 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { currentTeam } from "$lib/store/team.store";
 
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
-  const workspaces: Observable<WorkspaceDocument[]> =
+  let workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let currentWorkspaceId: string;
-  let currentWorkspaceName:string;
+  let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
         currentWorkspaceId = value.get("_id");
-        currentWorkspaceName=value.get("name");
+        currentWorkspaceName = value.get("name");
       }
     },
   );
+  const currTeamSubscribe = currentTeam.subscribe((value) => {
+    if (value) {
+      workspaces = _viewModelWorkspace.filterWorkspace({
+        teamId: value.id,
+        teamName: value.name,
+      });
+    }
+  });
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
   const _viewModels = new CollectionsViewModel();
@@ -70,7 +79,7 @@
       const workspace = generateSampleWorkspace(
         currentWorkspaceId,
         new Date().toString(),
-        currentWorkspaceName
+        currentWorkspaceName,
       );
       workspace.path.workspaceId = currentWorkspaceId;
       collectionsMethods.handleCreateTab(workspace);
@@ -88,6 +97,10 @@
       window.removeEventListener("resize", handleResize);
     };
   });
+
+  onDestroy(() => {
+    currTeamSubscribe();
+  });
 </script>
 
 <div class="dashboard">
@@ -101,7 +114,7 @@
     {:catch}
       <Sidebar
         {activeSideBarTabMethods}
-        selectedActiveSideBarTab={"collections"}
+        selectedActiveSideBarTab={"workspaces"}
       />
     {/await}
     <section class="w-100">

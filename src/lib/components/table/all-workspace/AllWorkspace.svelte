@@ -6,10 +6,12 @@
     LeftIcon,
     RightIcon,
     DoubleRightIcon,
+    ShowMoreIcon,
   } from "$lib/assets/app.asset";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   export let data: any;
   export let selectedTab: string;
+  export let currTeamName: string;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
@@ -30,7 +32,7 @@
         type="text"
         id="search-input"
         class={`bg-transparent w-100 border-0 my-auto`}
-        placeholder="Search workspaces in John’s Team"
+        placeholder="Search workspaces in {currTeamName}"
         bind:value={filterText}
         on:input={(e) => handleFilterTextChange(e)}
       />
@@ -49,11 +51,12 @@
         data-search="true"
       >
         <thead class="position-sticky top-0 z-3">
-          <tr>
+          <tr class="">
             <th data-sortable="true" class="tab-head">Workspace</th>
 
             <th class="tab-head">Collections</th>
             <th class="tab-head">Last Updated</th>
+            <th class="tab-head"></th>
           </tr>
         </thead>
         <tbody>
@@ -63,8 +66,8 @@
               .reverse()
               .filter((item) => item.name.startsWith(filterText))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
-              <tr>
-                <td class="tab-data py-3">{list?.name}</td>
+              <tr class="workspace-list-item cursor-pointer">
+                <td class="tab-data rounded-start py-3">{list?.name}</td>
 
                 <td class="tab-data py-3"
                   >{list?.collections?.length ? list.collections.length : 0}</td
@@ -75,86 +78,116 @@
                     new Date(list?.createdAt),
                   )}</td
                 >
+                <td class="tab-data rounded-end py-3"
+                  ><button
+                    class="show-more-btn rounded border-0"
+                    on:click={(e) => e.stopPropagation()}
+                    ><ShowMoreIcon /></button
+                  ></td
+                >
               </tr>
             {/each}
           {/if}
         </tbody>
-        <tfoot class="position-sticky bottom-0 z-3">
-          <tr>
-            <th class="tab-head"
-              >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
-                currPage * workspacePerPage,
-                $data?.filter((item) => item.name.startsWith(filterText))
-                  .length,
-              )} of {$data?.filter((item) => item.name.startsWith(filterText))
-                .length}
-            </th>
-            <th class="tab-head gap-2">
-              <button
-                on:click={() => (currPage = 1)}
-                class="bg-transparent border-0"
-                ><DoubleLeftIcon
-                  color={currPage === 1 ? "#313233" : "white"}
-                /></button
-              >
-              <button
-                on:click={() => {
-                  if (currPage > 1) currPage -= 1;
-                }}
-                class="bg-transparent border-0"
-                ><LeftIcon
-                  color={currPage === 1 ? "#313233" : "white"}
-                /></button
-              >
-              <button
-                on:click={() => {
-                  if (
-                    currPage <
+        {#if $data
+          .slice()
+          .reverse()
+          .filter((item) => item.name.startsWith(filterText))
+          .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
+          <tfoot class="position-sticky bottom-0 z-3">
+            <tr>
+              <th class="tab-head"
+                >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
+                  currPage * workspacePerPage,
+                  $data
+                    ?.filter((item) => item.name.startsWith(filterText))
+                    .slice(
+                      (currPage - 1) * workspacePerPage,
+                      currPage * workspacePerPage,
+                    ).length,
+                )} of {$data
+                  ?.filter((item) => item.name.startsWith(filterText))
+                  .slice(
+                    (currPage - 1) * workspacePerPage,
+                    currPage * workspacePerPage,
+                  ).length}
+              </th>
+              <th class="tab-head gap-2">
+                <button
+                  on:click={() => (currPage = 1)}
+                  class="bg-transparent border-0"
+                  ><DoubleLeftIcon
+                    color={currPage === 1 ? "#313233" : "white"}
+                  /></button
+                >
+                <button
+                  on:click={() => {
+                    if (currPage > 1) currPage -= 1;
+                  }}
+                  class="bg-transparent border-0"
+                  ><LeftIcon
+                    color={currPage === 1 ? "#313233" : "white"}
+                  /></button
+                >
+                <button
+                  on:click={() => {
+                    if (
+                      currPage <
+                      Math.ceil(
+                        $data?.filter((item) =>
+                          item.name.startsWith(filterText),
+                        ).length / workspacePerPage,
+                      )
+                    )
+                      currPage += 1;
+                  }}
+                  class="bg-transparent border-0"
+                  ><RightIcon
+                    color={currPage ===
                     Math.ceil(
                       $data?.filter((item) => item.name.startsWith(filterText))
                         .length / workspacePerPage,
                     )
-                  )
-                    currPage += 1;
-                }}
-                class="bg-transparent border-0"
-                ><RightIcon
-                  color={currPage ===
-                  Math.ceil(
-                    $data?.filter((item) => item.name.startsWith(filterText))
-                      .length / workspacePerPage,
-                  )
-                    ? "#313233"
-                    : "white"}
-                /></button
-              >
-              <button
-                on:click={() =>
-                  (currPage = Math.ceil(
-                    $data?.filter((item) => item.name.startsWith(filterText))
-                      .length / workspacePerPage,
-                  ))}
-                class="bg-transparent border-0"
-                ><DoubleRightIcon
-                  color={currPage ===
-                  Math.ceil(
-                    $data?.filter((item) => item.name.startsWith(filterText))
-                      .length / workspacePerPage,
-                  )
-                    ? "#313233"
-                    : "white"}
-                /></button
-              >
-            </th>
-            <th class="tab-head"></th>
-          </tr>
-        </tfoot>
+                      ? "#313233"
+                      : "white"}
+                  /></button
+                >
+                <button
+                  on:click={() =>
+                    (currPage = Math.ceil(
+                      $data?.filter((item) => item.name.startsWith(filterText))
+                        .length / workspacePerPage,
+                    ))}
+                  class="bg-transparent border-0"
+                  ><DoubleRightIcon
+                    color={currPage ===
+                    Math.ceil(
+                      $data?.filter((item) => item.name.startsWith(filterText))
+                        .length / workspacePerPage,
+                    )
+                      ? "#313233"
+                      : "white"}
+                  /></button
+                >
+              </th>
+              <th class="tab-head"></th>
+              <th class="tab-head"></th>
+            </tr>
+          </tfoot>
+        {:else}
+          <p class="not-found-text mt-3">No results found.</p>
+        {/if}
       </table>
     </div>
   </div>
 {/if}
 
 <style>
+  .not-found-text {
+    color: var(--request-arc);
+    font-size: 16px;
+    font-weight: 400;
+  }
   .table-container::-webkit-scrollbar {
     width: 2px;
   }
@@ -174,9 +207,7 @@
   .search-input-container:focus-within {
     border: 1px solid var(--workspace-hover-color);
   }
-  .search-input-container:focus-within svg {
-    visibility: hidden;
-  }
+
   .tab-data {
     font-size: 12px;
     font-weight: 500;
@@ -198,5 +229,29 @@
   .table thead,
   .table tfoot {
     background-color: var(--background-color);
+  }
+
+  .workspace-row:hover {
+    background-color: var(--border-color);
+  }
+  .show-more-btn {
+    background-color: transparent;
+  }
+  .show-more-btn:hover {
+    background-color: var(--background-color);
+  }
+  .show-more-btn:active {
+    background-color: var(--workspace-hover-color);
+  }
+  .show-more-btn:active .workspace-list-item {
+    background-color: var(--border-color) !important;
+  }
+  .workspace-list-item:active {
+    background-color: var(--sparrow-input-slider-button) !important;
+  }
+
+  .workspace-list-item:hover {
+    cursor: pointer !important;
+    background-color: var(--border-color);
   }
 </style>

@@ -67,6 +67,9 @@
   .show-more-btn:hover {
     background-color: var(--blackColor);
   }
+  .show-more-btn:active{
+    background-color: var(--workspace-hover-color);
+  }
   .remove-workspace-btn {
     padding: 4px 8px;
     background-color: var(--blackColor);

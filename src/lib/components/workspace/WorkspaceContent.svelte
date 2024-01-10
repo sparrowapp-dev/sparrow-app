@@ -191,9 +191,12 @@
 
     <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
-      <AllWorkspace {data} {selectedTab} />
+      <AllWorkspace currTeamName={currOpenedTeam.name} {data} {selectedTab} />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
-      <WorkspaceCardList workspaces={$data.slice().reverse()} />
+      <WorkspaceCardList
+        currTeamName={currOpenedTeam.name}
+        workspaces={$data.slice().reverse()}
+      />
     {/if}
     <!-- </Route> -->
   </div>

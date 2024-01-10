@@ -21,6 +21,19 @@ export class WorkspaceRepository {
   };
 
   /**
+   * get filtered workspaces
+   */
+  public getFilteredWorkspaces = (
+    team: any,
+  ): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        team: team,
+      },
+    }).$;
+  };
+
+  /**
    * get active workspace of the user.
    */
   public getActiveWorkspace = (): Observable<WorkspaceDocument> => {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { userLogout } from "$lib/services/auth.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
@@ -14,6 +16,7 @@ import type { CollectionsMethods } from "$lib/utils/interfaces/collections.inter
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
+import type { Observable } from "rxjs";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -40,6 +43,10 @@ export class HeaderDashboardViewModel {
   get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
   }
+
+  public filterWorkspace = (team: any): Observable<WorkspaceDocument[]> => {
+    return this.workspaceRepository.getFilteredWorkspaces(team);
+  };
 
   // Function to set a workspace as active
   public activateWorkspace = (id: string): void => {
