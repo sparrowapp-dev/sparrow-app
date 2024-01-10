@@ -57,7 +57,7 @@
         "minWidth": 570,
         "minHeight": 700,
         "center": true,
-        "fileDropEnabled":true
+        "fileDropEnabled":false
       }
     ]
   }

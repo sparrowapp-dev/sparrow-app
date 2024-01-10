@@ -22,7 +22,7 @@ export const registrationSchema = yup.object().shape({
     .email()
     .required("Please enter an email")
     .matches(
-      /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/,
+      /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4})$/,
       "Must be a valid email address",
     ),
   name: yup.string().required("Please enter your full name"),
