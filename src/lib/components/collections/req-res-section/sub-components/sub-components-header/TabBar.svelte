@@ -17,10 +17,10 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { CollectionsViewModel } from "../../../../../../pages/Collections/Collections.ViewModel";
+
 
   export let collectionsMethods: CollectionsMethods;
-  export let viewModel: CollectionsViewModel;
+  export let syncTabsonSwitch:()=>void;
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
@@ -79,7 +79,7 @@
     });
     const newTabList:NewTab[]=tabList as NewTab[];
     tabs.set(newTabList);
-    viewModel.syncTabWithStore();
+    syncTabsonSwitch();
   };
 
   const handleDropOnStart = (index: number) => {

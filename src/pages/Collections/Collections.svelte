@@ -126,6 +126,10 @@
       }
     },
   );
+
+  const syncTabsonSwitch=()=>{
+    _viewModel.syncTabWithStore();
+  }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -151,7 +155,7 @@
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
-          viewModel={ _viewModel}
+          syncTabsonSwitch={syncTabsonSwitch}
         />
       </div>
       <div class="tab__content d-flex">
