@@ -127,7 +127,7 @@
     },
   );
 
-  const syncTabsonSwitch=()=>{
+  const onTabsSwitched=()=>{
     _viewModel.syncTabWithStore();
   }
   onDestroy(() => {
@@ -155,7 +155,7 @@
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
-          syncTabsonSwitch={syncTabsonSwitch}
+          onTabsSwitched={onTabsSwitched}
         />
       </div>
       <div class="tab__content d-flex">

@@ -20,7 +20,7 @@
 
 
   export let collectionsMethods: CollectionsMethods;
-  export let syncTabsonSwitch:()=>void;
+  export let onTabsSwitched:()=>void;
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
@@ -79,7 +79,7 @@
     });
     const newTabList:NewTab[]=tabList as NewTab[];
     tabs.set(newTabList);
-    syncTabsonSwitch();
+    onTabsSwitched();
   };
 
   const handleDropOnStart = (index: number) => {
