@@ -4,15 +4,8 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import { notifications } from "$lib/utils/notifications";
   import CoverButton from "../buttons/CoverButton.svelte";
   import { fly, fade } from "svelte/transition";
-
-  export let currentWorkspace;
-  export let env;
-  // export let closePopup: (flag: boolean) => void;
-  export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
-  export let environmentServiceMethods: EnvironmentServiceMethods;
 
   export let title;
   export let description;
