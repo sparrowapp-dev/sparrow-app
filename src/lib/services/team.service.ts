@@ -1,4 +1,8 @@
-import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
+import {
+  getAuthHeaders,
+  getMultipartAuthHeaders,
+  makeRequest,
+} from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
 import type { TeamPostBody } from "$lib/utils/dto/team-dto";
 const apiUrl: string = constants.API_URL;
@@ -19,7 +23,7 @@ export class TeamService {
   public createTeam = async (team: TeamPostBody) => {
     const response = await makeRequest("POST", `${apiUrl}/api/team`, {
       body: team,
-      headers: getAuthHeaders(),
+      headers: getMultipartAuthHeaders(),
     });
     return response;
   };

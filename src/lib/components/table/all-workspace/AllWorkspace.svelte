@@ -8,14 +8,18 @@
     DoubleRightIcon,
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
+  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   export let data: any;
   export let selectedTab: string;
-  export let currTeamName: string;
+  export let openedTeam: CurrentTeam;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
-
+  let currTeam = {
+    teamId: "",
+    teamName: "",
+  };
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
   };
@@ -26,31 +30,33 @@
 
 {#if selectedTab == "all-workspace"}
   <div class="ps-3">
-    <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-      <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-      <input
-        type="text"
-        id="search-input"
-        class={`bg-transparent w-100 border-0 my-auto`}
-        placeholder="Search workspaces in {currTeamName}"
-        bind:value={filterText}
-        on:input={(e) => handleFilterTextChange(e)}
-      />
-      {#if filterText !== ""}
-        <button
-          class="border-0 bg-transparent ms-2"
-          on:click={handleEraseSearch}
-        >
-          <CrossIcon color="#45494D" />
-        </button>
-      {/if}
-    </div>
+    {#if $data && $data.length > 0}
+      <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+        <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+        <input
+          type="text"
+          id="search-input"
+          class={`bg-transparent w-100 border-0 my-auto`}
+          placeholder="Search workspaces in {openedTeam.name}"
+          bind:value={filterText}
+          on:input={(e) => handleFilterTextChange(e)}
+        />
+        {#if filterText !== ""}
+          <button
+            class="border-0 bg-transparent ms-2"
+            on:click={handleEraseSearch}
+          >
+            <CrossIcon color="#45494D" />
+          </button>
+        {/if}
+      </div>
+    {/if}
     <div class="table-container overflow-y-auto" style="height: 60vh;">
       <table
         class="table p-0 table-responsive bg-backgroundColor overflow-y-auto"
         data-search="true"
       >
-        <thead class="position-sticky top-0 z-3">
+        <thead class="position-sticky top-0">
           <tr class="">
             <th data-sortable="true" class="tab-head">Workspace</th>
 
@@ -64,7 +70,7 @@
             {#each $data
               .slice()
               .reverse()
-              .filter((item) => item.name.startsWith(filterText))
+              .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <tr class="workspace-list-item cursor-pointer">
                 <td class="tab-data rounded-start py-3">{list?.name}</td>
@@ -92,21 +98,29 @@
         {#if $data
           .slice()
           .reverse()
-          .filter((item) => item.name.startsWith(filterText))
+          .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
-          <tfoot class="position-sticky bottom-0 z-3">
+          <tfoot class="position-sticky bottom-0 z-0">
             <tr>
               <th class="tab-head"
                 >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
                   currPage * workspacePerPage,
                   $data
-                    ?.filter((item) => item.name.startsWith(filterText))
+                    ?.filter(
+                      (item) =>
+                        item.name.startsWith(filterText) &&
+                        item.team.teamId == openedTeam.id,
+                    )
                     .slice(
                       (currPage - 1) * workspacePerPage,
                       currPage * workspacePerPage,
                     ).length,
                 )} of {$data
-                  ?.filter((item) => item.name.startsWith(filterText))
+                  ?.filter(
+                    (item) =>
+                      item.name.startsWith(filterText) &&
+                      item.team.teamId == openedTeam.id,
+                  )
                   .slice(
                     (currPage - 1) * workspacePerPage,
                     currPage * workspacePerPage,
@@ -134,8 +148,10 @@
                     if (
                       currPage <
                       Math.ceil(
-                        $data?.filter((item) =>
-                          item.name.startsWith(filterText),
+                        $data?.filter(
+                          (item) =>
+                            item.name.startsWith(filterText) &&
+                            item.team.teamId == openedTeam.id,
                         ).length / workspacePerPage,
                       )
                     )
@@ -145,8 +161,11 @@
                   ><RightIcon
                     color={currPage ===
                     Math.ceil(
-                      $data?.filter((item) => item.name.startsWith(filterText))
-                        .length / workspacePerPage,
+                      $data?.filter(
+                        (item) =>
+                          item.name.startsWith(filterText) &&
+                          item.team.teamId == openedTeam.id,
+                      ).length / workspacePerPage,
                     )
                       ? "#313233"
                       : "white"}
@@ -155,8 +174,11 @@
                 <button
                   on:click={() =>
                     (currPage = Math.ceil(
-                      $data?.filter((item) => item.name.startsWith(filterText))
-                        .length / workspacePerPage,
+                      $data?.filter(
+                        (item) =>
+                          item.name.startsWith(filterText) &&
+                          item.team.teamId == openedTeam.id,
+                      ).length / workspacePerPage,
                     ))}
                   class="bg-transparent border-0"
                   ><DoubleRightIcon

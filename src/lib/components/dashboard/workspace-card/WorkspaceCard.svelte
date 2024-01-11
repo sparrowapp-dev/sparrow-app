@@ -53,6 +53,9 @@
 </div>
 
 <style>
+  .workspace-card{
+    z-index: 1 !important;
+  }
   .workspace-card:hover {
     background-color: #313233 !important;
   }

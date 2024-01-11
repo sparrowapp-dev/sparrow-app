@@ -33,6 +33,7 @@ export { default as LockIcon } from "$lib/assets/lock.svelte";
 export { default as SelectIcon } from "$lib/assets/select.svelte";
 export { default as ShowMoreIcon } from "$lib/assets/showmore.svelte";
 export { default as EditIcon } from "$lib/assets/edit.svelte";
+export { default as UploadIcon } from "$lib/assets/upload.svelte";
 import logoSparrow from "$lib/assets/logoSparrow.svg";
 
 export default {

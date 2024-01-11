@@ -147,7 +147,7 @@
 </script>
 
 <div
-  class="rounded z-3"
+  class="rounded z-2"
   style="position: relative; display:inline-block;"
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}

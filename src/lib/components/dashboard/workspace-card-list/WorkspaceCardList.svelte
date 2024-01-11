@@ -8,7 +8,8 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  export let currTeamName: string;
+  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
+  export let openedTeam: CurrentTeam;
   export let workspaces: any;
   let filterText: string = "";
   let workspacePerPage: number = 5,
@@ -28,7 +29,7 @@
       type="text"
       id="search-input"
       class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search workspaces in {currTeamName}"
+      placeholder="Search workspaces in {openedTeam.name}"
       bind:value={filterText}
       on:input={(e) => handleFilterTextChange(e)}
     />
@@ -42,13 +43,13 @@
     class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto workspace-scrollbar"
     style="height: 59vh;"
   >
-    {#if workspaces.filter( (item) => item.name.startsWith(filterText), ).length == 0}
+    {#if workspaces.filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id).length == 0}
       <span class="not-found-text mx-auto ellipsis"
         >No existing workspace found with the given keyword. You can add a new
         workspace using the term '{filterText}'.</span
       >
     {/if}
-    {#if currPage === 1 && workspaces.filter( (item) => item.name.startsWith(filterText), ).length > 0}
+    {#if currPage === 1 && workspaces.filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id).length > 0}
       <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
         + Add New Workspace
       </button>
@@ -58,20 +59,26 @@
       </button>
     {/if}
     {#each workspaces
-      .filter((item) => item.name.startsWith(filterText))
+      .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as workspace, index}
       <WorkspaceCard {workspace} />
     {/each}
   </div>
   <div
-    class="justify-content-between bottom-0 position-sticky bg-backgroundColor d-flex z-3"
+    class="justify-content-between bottom-0 position-sticky bg-backgroundColor d-flex"
   >
     <div class="tab-head">
       showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
         currPage * workspacePerPage,
-        workspaces?.filter((item) => item.name.startsWith(filterText)).length,
-      )} of {workspaces?.filter((item) => item.name.startsWith(filterText))
-        .length}
+        workspaces?.filter(
+          (item) =>
+            item.name.startsWith(filterText) &&
+            item.team.teamId == openedTeam.id,
+        ).length,
+      )} of {workspaces?.filter(
+        (item) =>
+          item.name.startsWith(filterText) && item.team.teamId == openedTeam.id,
+      ).length}
     </div>
     <div class="tab-head tab-change">
       <button on:click={() => (currPage = 1)} class="bg-transparent border-0"
@@ -89,8 +96,11 @@
           if (
             currPage <
             Math.ceil(
-              workspaces?.filter((item) => item.name.startsWith(filterText))
-                .length / workspacePerPage,
+              workspaces?.filter(
+                (item) =>
+                  item.name.startsWith(filterText) &&
+                  item.team.teamId == openedTeam.id,
+              ).length / workspacePerPage,
             )
           )
             currPage += 1;
@@ -99,8 +109,11 @@
         ><RightIcon
           color={currPage ===
           Math.ceil(
-            workspaces?.filter((item) => item.name.startsWith(filterText))
-              .length / workspacePerPage,
+            workspaces?.filter(
+              (item) =>
+                item.name.startsWith(filterText) &&
+                item.team.teamId == openedTeam.id,
+            ).length / workspacePerPage,
           )
             ? "#313233"
             : "white"}
@@ -109,15 +122,21 @@
       <button
         on:click={() =>
           (currPage = Math.ceil(
-            workspaces?.filter((item) => item.name.startsWith(filterText))
-              .length / workspacePerPage,
+            workspaces?.filter(
+              (item) =>
+                item.name.startsWith(filterText) &&
+                item.team.teamId == openedTeam.id,
+            ).length / workspacePerPage,
           ))}
         class="bg-transparent border-0"
         ><DoubleRightIcon
           color={currPage ===
           Math.ceil(
-            workspaces?.filter((item) => item.name.startsWith(filterText))
-              .length / workspacePerPage,
+            workspaces?.filter(
+              (item) =>
+                item.name.startsWith(filterText) &&
+                item.team.teamId == openedTeam.id,
+            ).length / workspacePerPage,
           )
             ? "#313233"
             : "white"}

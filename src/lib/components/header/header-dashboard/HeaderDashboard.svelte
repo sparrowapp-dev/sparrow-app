@@ -14,7 +14,6 @@
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
     setCurrentWorkspace,
-    updateCurrentWorkspace,
   } from "$lib/store/workspace.store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
@@ -386,7 +385,7 @@
 
           {#if isOpen}
             <div
-              class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
+              class="rounded profile-explorer position-absolute text-color-white py-1"
               style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
                 ? 'block'
                 : 'none'}; top: 40px; right: -10px; width: 219px;"

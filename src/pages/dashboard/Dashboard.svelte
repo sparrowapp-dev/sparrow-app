@@ -17,7 +17,6 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { currentTeam } from "$lib/store/team.store";
 
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
@@ -36,14 +35,7 @@
       }
     },
   );
-  const currTeamSubscribe = currentTeam.subscribe((value) => {
-    if (value) {
-      workspaces = _viewModelWorkspace.filterWorkspace({
-        teamId: value.id,
-        teamName: value.name,
-      });
-    }
-  });
+
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
   const _viewModels = new CollectionsViewModel();
@@ -97,9 +89,8 @@
       window.removeEventListener("resize", handleResize);
     };
   });
-
   onDestroy(() => {
-    currTeamSubscribe();
+    // currTeamSubscribe();
   });
 </script>
 

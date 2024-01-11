@@ -112,7 +112,9 @@
                 class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                 style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
-                A
+                {currOpenedTeam.name[0]
+                  ? currOpenedTeam.name[0].toUpperCase()
+                  : ""}
               </p>
               <span class="ms-4 my-auto">{currOpenedTeam.name}</span>
             </h2>
@@ -150,7 +152,7 @@
                   on:click={() => (selectedTab = "all-workspace")}
                   class="team-menu__link"
                   class:tab-active={selectedTab === "all-workspace"}
-                  >Workspaces ({$data?.length})</span
+                  >Workspaces ({$data?.slice().filter((item) => item.team.teamId == currOpenedTeam.id).length})</span
                 ></Link
               >
               <Link style="text-decoration:none;" to="personal-workspaces"
@@ -191,10 +193,10 @@
 
     <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
-      <AllWorkspace currTeamName={currOpenedTeam.name} {data} {selectedTab} />
+      <AllWorkspace openedTeam={currOpenedTeam} {data} {selectedTab} />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
-        currTeamName={currOpenedTeam.name}
+        openedTeam={currOpenedTeam}
         workspaces={$data.slice().reverse()}
       />
     {/if}

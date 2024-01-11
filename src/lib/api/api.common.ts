@@ -39,6 +39,13 @@ const getAuthHeaders = () => {
   };
 };
 
+const getMultipartAuthHeaders = () => {
+  return {
+    "Content-Type": "multipart/form-data",
+    Authorization: `Bearer ${getUserToken()}`,
+  };
+};
+
 // const getHeaders = () => {
 //   return {
 //     "Content-type": "application/json",
@@ -163,5 +170,6 @@ export {
   getAuthHeaders,
   getRefHeaders,
   makeHttpRequest,
+  getMultipartAuthHeaders,
   // getHeaders,
 };
