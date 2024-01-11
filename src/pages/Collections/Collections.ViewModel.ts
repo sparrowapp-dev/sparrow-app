@@ -308,6 +308,6 @@ export class CollectionsViewModel {
   };
 
   public currentEnvironment = async (id: string) => {
-    return await this.environmentRepository.getCurrentEnvironment(id);
+    return await this.environmentRepository.readEnvironment(id);
   };
 }

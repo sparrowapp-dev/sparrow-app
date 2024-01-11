@@ -9,6 +9,7 @@
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { notifications } from "$lib/utils/notifications";
   import QuickHelp from "./sub-components/quick-help/QuickHelp.svelte";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -19,20 +20,29 @@
   let quickHelp: boolean = false;
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
-    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
-      name: e.target.value,
-    });
+    environmentRepositoryMethods.setEnvironmentTabProperty(
+      e.target.value,
+      "name",
+      currentEnvironment.id,
+    );
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    environmentRepositoryMethods.updateEnvironment(currentEnvironment.id, {
-      variable: pairs,
-    });
+    environmentRepositoryMethods.setEnvironmentTabProperty(
+      pairs,
+      "variable",
+      currentEnvironment.id,
+    );
   };
 
   const handleSaveEnvironment = async () => {
+    await environmentRepositoryMethods.setEnvironmentTabProperty(
+      true,
+      "isSaveInProgress",
+      currentEnvironment.id,
+    );
     const response = await environmentServiceMethods.updateEnvironment(
       activeWorkspace._id,
       currentEnvironment.id,
@@ -42,11 +52,32 @@
       },
     );
     if (response.isSuccessful) {
+      environmentRepositoryMethods.updateEnvironment(
+        response.data.data._id,
+        response.data.data,
+      );
+      await environmentRepositoryMethods.setEnvironmentTabProperty(
+        false,
+        "isSaveInProgress",
+        currentEnvironment.id,
+      );
+      environmentRepositoryMethods.setEnvironmentTabProperty(
+        true,
+        "isSave",
+        currentEnvironment.id,
+      );
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
     } else {
-      notifications.error("Failed to save changes for Dev environment.");
+      await environmentRepositoryMethods.setEnvironmentTabProperty(
+        false,
+        "isSaveInProgress",
+        currentEnvironment.id,
+      );
+      notifications.error(
+        `Failed to save changes for ${currentEnvironment.name} environment.`,
+      );
     }
   };
 </script>
@@ -73,13 +104,27 @@
             >
           </button>
           <button
-            class="d-flex border-0 rounded env-save-btn env-save-btn-enabled"
+            disabled={currentEnvironment.isSaveInProgress}
+            class="d-flex border-0 rounded env-save-btn env-save-btn-enabled d-flex align-items-center"
             on:click={handleSaveEnvironment}
-            ><SaveIcon
-              width={16}
-              height={16}
-              classProp={`me-2 my-auto rounded `}
-            /><span>Save</span>
+          >
+            <div class="badge"></div>
+
+            {#if currentEnvironment.isSaveInProgress}
+              <span style="padding-right: 10px;">
+                <Spinner size={`${12}px`} />
+              </span>
+            {:else}
+              <SaveIcon
+                width={16}
+                height={16}
+                classProp={`me-2 my-auto rounded `}
+              />
+            {/if}
+
+            <span>Save</span>
+            <span class={`${!currentEnvironment.isSave && "badge"}`}>{" "}</span
+            >
           </button>
         </div>
       </header>
@@ -114,6 +159,7 @@
   .env-heading {
     font-size: 18px;
     background-color: transparent;
+    width: calc(100% - 300px);
   }
   .env-heading:disabled {
     color: white;
@@ -158,7 +204,7 @@
     gap: 24px;
   }
   .var-value-container {
-    width: 40vw;
+    width: 100%;
   }
   .quick-help {
     width: 280px;

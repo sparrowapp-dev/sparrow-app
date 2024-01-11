@@ -110,7 +110,7 @@
               filteredEnv.forEach((elem) => {
                 const temp = elem.toMutableJSON();
                 temp.variable.forEach((variable) => {
-                  if (variable.key) {
+                  if (variable.key && variable.checked) {
                     environmentVariables.push({
                       key: variable.key,
                       value: variable.value,
@@ -166,7 +166,7 @@
             <RequestResponse
               {activeTab}
               {collectionsMethods}
-              {environmentVariables}
+              environmentVariables={environmentVariables.reverse()}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace

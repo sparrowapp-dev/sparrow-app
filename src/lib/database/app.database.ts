@@ -28,6 +28,10 @@ import {
   environmentSchema,
   type EnvironmentDocType,
 } from "$lib/models/environment.model";
+import {
+  environmentTabSchema,
+  type EnvironmentTabDocType,
+} from "$lib/models/environment-tab.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 addRxPlugin(RxDBQueryBuilderPlugin);
@@ -39,6 +43,8 @@ export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
 export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
+export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
+export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -132,6 +138,18 @@ export class RxDB {
         migrationStrategies: {
           //   // database  migration functions
           1: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+        },
+      },
+      environmentTab: {
+        schema: environmentTabSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },

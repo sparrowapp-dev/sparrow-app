@@ -14,6 +14,9 @@ import type { CollectionsMethods } from "$lib/utils/interfaces/collections.inter
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
+import { environmentType } from "$lib/utils/enums/environment.enum";
+import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
+import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -24,6 +27,7 @@ export class HeaderDashboardViewModel {
   private activeSideBarTabRepository = new ActiveSideBarTabReposistory();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
+  private environmentTabRepository = new EnvironmentTabRepository();
 
   public getWorkspaceDocument = (elem: WorkspaceDocument) => {
     return {
@@ -199,8 +203,28 @@ export class HeaderDashboardViewModel {
     return response;
   };
 
-  public refreshEnvironment = async (data) => {
-    this.environmentRepository.refreshEnvironment(data);
+  public refreshEnvironment = async (data, workspaceId) => {
+    this.environmentRepository.refreshEnvironment(data, workspaceId);
+    if (data) {
+      data.forEach((environment) => {
+        if (environment.type === environmentType.GLOBAL) {
+          const sampleEnvironment = generateSampleEnvironment(
+            environment.id,
+            workspaceId,
+            new Date().toString(),
+          );
+          sampleEnvironment.name = environment.name;
+          sampleEnvironment.isActive = true;
+          sampleEnvironment.type = environmentType.GLOBAL;
+          sampleEnvironment.variable = environment.variable;
+          this.environmentTabRepository.createTab(
+            sampleEnvironment,
+            workspaceId,
+          );
+        }
+      });
+    }
+    return;
   };
 
   public getServerEnvironments = async (workspaceId: string) => {

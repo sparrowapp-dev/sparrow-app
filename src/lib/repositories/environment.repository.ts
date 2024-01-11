@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type EnvironmentDocument } from "$lib/database/app.database";
+import { environmentType } from "$lib/utils/enums/environment.enum";
 import type { Observable } from "rxjs";
 
 export class EnvironmentRepository {
   constructor() {}
-  public getDocument = (elem: EnvironmentDocument) => {
-    return elem.toMutableJSON();
-  };
   /**
    * @description
    * Adds a new environment to workspace.
@@ -28,10 +26,10 @@ export class EnvironmentRepository {
         },
       })
       .exec();
-
     environment.incrementalModify((value) => {
       if (data._id) value.id = data._id;
       if (data.name) value.name = data.name;
+      if (data.workspaceId) value.workspaceId = data.workspaceId;
       if (data.type) value.type = data.type;
       if (data.variable) value.variable = data.variable;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
@@ -81,55 +79,20 @@ export class EnvironmentRepository {
       .$;
   };
 
-  public getActiveEnvironment = (): Observable<EnvironmentDocument> => {
-    return RxDB.getInstance().rxdb.environment.findOne({
-      selector: {
-        isActive: true,
-      },
-    }).$;
-  };
-
-  public getCurrentEnvironment = async (id: string): Promise<any> => {
+  public getGlobalEnvironment = async () => {
     return await RxDB.getInstance()
       .rxdb.environment.findOne({
         selector: {
-          id: id,
+          type: environmentType.GLOBAL,
         },
       })
       .exec();
   };
 
-  public setActiveEnvironment = async (
-    environmentId: string,
-  ): Promise<void> => {
-    const activeEnvironment: EnvironmentDocument = await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    activeEnvironment?.incrementalModify((value) => {
-      value.isActive = false;
-      return value;
-    });
-    const inactiveEnvironment: EnvironmentDocument = await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          id: environmentId,
-        },
-      })
-      .exec();
-    inactiveEnvironment.incrementalModify((value) => {
-      value.isActive = true;
-      return value;
-    });
-    return;
-  };
-
-  public refreshEnvironment = async (data): Promise<void> => {
+  public refreshEnvironment = async (data, workspaceId): Promise<void> => {
     const env = data.map((environment) => {
       environment["id"] = environment._id;
+      environment["workspaceId"] = workspaceId;
       delete environment._id;
       return environment;
     });

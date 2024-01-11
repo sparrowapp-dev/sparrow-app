@@ -4,7 +4,7 @@ import {
   type RxJsonSchema,
 } from "rxdb";
 
-export const environmentSchemaLiteral = {
+export const environmentTabSchemaLiteral = {
   title: "environment",
   primaryKey: {
     // where should the composed string be stored
@@ -15,17 +15,13 @@ export const environmentSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 2,
+  version: 1,
   properties: {
     id: {
       type: "string",
       maxLength: 100,
     },
     environmentId: {
-      type: "string",
-      maxLength: 100,
-    },
-    workspaceId: {
       type: "string",
       maxLength: 100,
     },
@@ -56,25 +52,25 @@ export const environmentSchemaLiteral = {
     isActive: {
       type: "boolean",
     },
+    isSave: {
+      type: "boolean",
+    },
+    isSaveInProgress: {
+      type: "boolean",
+    },
+    workspaceId: {
+      type: "string",
+    },
     createdAt: {
-      type: "string",
-    },
-    updatedAt: {
-      type: "string",
-    },
-    createdBy: {
-      type: "string",
-    },
-    updatedBy: {
       type: "string",
     },
   },
 } as const;
 
-const schemaTyped = toTypedRxJsonSchema(environmentSchemaLiteral);
-export type EnvironmentDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+const schemaTyped = toTypedRxJsonSchema(environmentTabSchemaLiteral);
+export type EnvironmentTabDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
 
-export const environmentSchema: RxJsonSchema<EnvironmentDocType> =
-  environmentSchemaLiteral;
+export const environmentTabSchema: RxJsonSchema<EnvironmentTabDocType> =
+  environmentTabSchemaLiteral;
