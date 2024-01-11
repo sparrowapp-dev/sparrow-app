@@ -23,11 +23,12 @@
     const emailRegex =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     isEmailValid = emailRegex.test(forgotPasswordCredential.email);
-    if (isEmailValid) {
-      validationErrors.email = "";
+
+    if (!isEmailValid) {
+      validationErrors.email = "Please enter a valid email ID.";
     } else if (isEmailTouched) {
       validationErrors.email = "";
-    }
+    } 
 
     if (forgotPasswordCredential.email === "") {
       validationErrors.email =
