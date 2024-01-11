@@ -14,7 +14,7 @@
   import { onDestroy } from "svelte";
   const _viewModel = new EnvironmentViewModel();
   const environments = _viewModel.environments;
-  let activeEnvironment = _viewModel.getactiveEnvironmentTab("as");
+  let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
 
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     createEnvironment: _viewModel.createEnvironment,
