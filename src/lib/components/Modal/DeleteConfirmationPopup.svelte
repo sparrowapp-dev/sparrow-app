@@ -10,31 +10,20 @@
 
   export let currentWorkspace;
   export let env;
-  export let closePopup: (flag: boolean) => void;
+  // export let closePopup: (flag: boolean) => void;
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
+
+  export let title;
+  export let description;
+  export let onSuccess;
+  export let onCancel;
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
     deleteLoader = true;
-    const response = await environmentServiceMethods.deleteEnvironment(
-      env.id,
-      currentWorkspace._id,
-    );
-    if (response.isSuccessful) {
-      environmentRepositoryMethods.removeEnvironment(env.id);
-      environmentRepositoryMethods.deleteEnvironmentTab(env.id);
-      closePopup(false);
-      notifications.success(
-        `${env.name} environment is removed from ${currentWorkspace.name}.`,
-      );
-      deleteLoader = false;
-    } else {
-      notifications.error(
-        `Failed to remove ${env.name} environment from ${currentWorkspace.mame}.`,
-      );
-      deleteLoader = false;
-    }
+    await onSuccess();
+    deleteLoader = false;
   };
 </script>
 
@@ -42,7 +31,7 @@
   <div
     class="background-overlay"
     on:click={() => {
-      closePopup(false);
+      onCancel(false);
     }}
     transition:fade={{ delay: 0, duration: 100 }}
   />
@@ -55,26 +44,19 @@
   >
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-        Delete Environment?
+        {title}
       </h5>
       <button
         class="btn-close1 border-0 rounded"
         on:click={() => {
-          closePopup(false);
+          onCancel(false);
         }}
       >
         <img src={closeIcon} alt="" />
       </button>
     </div>
     <div style="font-size: 14px;" class="text-lightGray mb-1">
-      <p>
-        Are you sure you want to delete this Environment? <span
-          style="font-weight:700;"
-          class="text-whiteColor">"{env.name}"</span
-        >
-        and all its variables will be removed and cannot be restored. It will also
-        impact all the API requests that use the variables in this environment.
-      </p>
+      {@html description}
     </div>
     <div
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
@@ -87,7 +69,7 @@
         type={"dark"}
         loader={false}
         onClick={() => {
-          closePopup(false);
+          onCancel(false);
         }}
       />
 
