@@ -56,11 +56,18 @@
           workspaceId: currentWorkspaceId,
           collectionId: response.data.data._id,
         };
+
+        const newCollection = {
+          id: response.data.data._id,
+          name: response.data.data.name,
+          items: response.data.data.items,
+          createdAt: response.data.data.createdAt,
+        };
+        collectionsMethods.addCollection(newCollection);
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
           new Date().toString(),
         );
-
         Samplecollection.id = response.data.data._id;
         Samplecollection.path = path;
         Samplecollection.name = response.data.data.name;
@@ -117,6 +124,13 @@
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
       };
+      const newCollection = {
+        id: response.data.data._id,
+        name: response.data.data.name,
+        items: response.data.data.items,
+        createdAt: response.data.data.createdAt,
+      };
+      collectionsMethods.addCollection(newCollection);
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),
