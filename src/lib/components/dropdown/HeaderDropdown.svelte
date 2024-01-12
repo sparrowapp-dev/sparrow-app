@@ -200,7 +200,7 @@
                   on:click={() => {
                     isOpen = false;
 
-                    onclick(list._id, list.name);
+                    onclick(list._id, list.name, list.team);
                   }}
                   on:click={() => {
                     handleWorkspaceTab(list._id, list.name, list?.description);

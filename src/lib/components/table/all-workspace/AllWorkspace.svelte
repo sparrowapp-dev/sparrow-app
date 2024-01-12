@@ -8,18 +8,61 @@
     DoubleRightIcon,
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
+  import { ShowMoreOptions } from "$lib/components";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import { navigate } from "svelte-navigator";
   export let data: any;
   export let selectedTab: string;
-  export let openedTeam: CurrentTeam;
+  export let openedTeam: CurrentTeam,
+    handleWorkspaceSwitch: any,
+    activeSideBarTabMethods: any,
+    handleWorkspaceTab: any;
+  let isShowMoreVisible = false;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
-  let currTeam = {
-    teamId: "",
-    teamName: "",
+  const handleOpenCollection = (workspace) => {
+    handleWorkspaceSwitch(
+      workspace._id,
+      workspace.name,
+      openedTeam.id,
+      openedTeam.name,
+    );
+    handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
+    navigate("/dashboard/collections");
+    activeSideBarTabMethods.updateActiveTab("collections");
   };
+  const handleShowMore = () => {
+    isShowMoreVisible = !isShowMoreVisible;
+  };
+  const closeShowMore = () => {
+    isShowMoreVisible = false;
+  };
+  let menuItems = [
+    {
+      onClick: (workspace) => {
+        handleOpenCollection(workspace);
+        handleShowMore();
+      },
+      displayText: "Open Workspace",
+      disabled: false,
+    },
+    {
+      onClick: (e) => {
+        e.stopPropagation();
+      },
+      displayText: "Rename Request",
+      disabled: false,
+    },
+    {
+      onClick: (e) => {
+        e.stopPropagation();
+      },
+      displayText: "Delete",
+      disabled: false,
+    },
+  ];
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
   };
@@ -30,7 +73,9 @@
 
 {#if selectedTab == "all-workspace"}
   <div class="ps-3">
-    {#if $data && $data.length > 0}
+    {#if $data && $data
+        .slice()
+        .filter((item) => item.team.teamId == openedTeam.id).length > 0}
       <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
         <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
         <input
@@ -53,7 +98,7 @@
     {/if}
     <div class="table-container overflow-y-auto" style="height: 60vh;">
       <table
-        class="table p-0 table-responsive bg-backgroundColor overflow-y-auto"
+        class="table p-0 table-responsive bg-backgroundColor overflow-y-auto w-100"
         data-search="true"
       >
         <thead class="position-sticky top-0">
@@ -70,7 +115,9 @@
             {#each $data
               .slice()
               .reverse()
-              .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
+              .filter((item) => item.name
+                    .toLowerCase()
+                    .startsWith(filterText) && item.team.teamId == openedTeam.id)
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <tr class="workspace-list-item cursor-pointer">
                 <td class="tab-data rounded-start py-3">{list?.name}</td>
@@ -91,6 +138,7 @@
                     ><ShowMoreIcon /></button
                   ></td
                 >
+                <ShowMoreOptions showMenu={isShowMoreVisible} {menuItems} />
               </tr>
             {/each}
           {/if}
@@ -98,7 +146,9 @@
         {#if $data
           .slice()
           .reverse()
-          .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
+          .filter((item) => item.name
+                .toLowerCase()
+                .startsWith(filterText) && item.team.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
           <tfoot class="position-sticky bottom-0 z-0">
             <tr>
@@ -108,7 +158,7 @@
                   $data
                     ?.filter(
                       (item) =>
-                        item.name.startsWith(filterText) &&
+                        item.name.toLowerCase().startsWith(filterText) &&
                         item.team.teamId == openedTeam.id,
                     )
                     .slice(
@@ -118,7 +168,7 @@
                 )} of {$data
                   ?.filter(
                     (item) =>
-                      item.name.startsWith(filterText) &&
+                      item.name.toLowerCase().startsWith(filterText) &&
                       item.team.teamId == openedTeam.id,
                   )
                   .slice(
@@ -150,7 +200,7 @@
                       Math.ceil(
                         $data?.filter(
                           (item) =>
-                            item.name.startsWith(filterText) &&
+                            item.name.toLowerCase().startsWith(filterText) &&
                             item.team.teamId == openedTeam.id,
                         ).length / workspacePerPage,
                       )
@@ -163,7 +213,7 @@
                     Math.ceil(
                       $data?.filter(
                         (item) =>
-                          item.name.startsWith(filterText) &&
+                          item.name.toLowerCase().startsWith(filterText) &&
                           item.team.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     )
@@ -176,7 +226,7 @@
                     (currPage = Math.ceil(
                       $data?.filter(
                         (item) =>
-                          item.name.startsWith(filterText) &&
+                          item.name.toLowerCase().startsWith(filterText) &&
                           item.team.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     ))}
@@ -184,8 +234,9 @@
                   ><DoubleRightIcon
                     color={currPage ===
                     Math.ceil(
-                      $data?.filter((item) => item.name.startsWith(filterText))
-                        .length / workspacePerPage,
+                      $data?.filter((item) =>
+                        item.name.toLowerCase().startsWith(filterText),
+                      ).length / workspacePerPage,
                     )
                       ? "#313233"
                       : "white"}
@@ -196,10 +247,21 @@
               <th class="tab-head"></th>
             </tr>
           </tfoot>
-        {:else}
-          <p class="not-found-text mt-3">No results found.</p>
         {/if}
       </table>
+      {#if $data && $data
+          .slice()
+          .filter((item) => item.team.teamId == openedTeam.id).length == 0}
+        <p class="not-found-text mt-3">Add Workspaces to this team</p>
+      {:else if filterText !== "" && $data
+          .slice()
+          .reverse()
+          .filter((item) => item.name
+                .toLowerCase()
+                .startsWith(filterText) && item.team.teamId == openedTeam.id)
+          .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
+        <p class="not-found-text mt-3">No results found.</p>
+      {/if}
     </div>
   </div>
 {/if}
@@ -209,6 +271,7 @@
     color: var(--request-arc);
     font-size: 16px;
     font-weight: 400;
+    text-align: center;
   }
   .table-container::-webkit-scrollbar {
     width: 2px;

@@ -12,17 +12,33 @@
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../Environment/Environment.svelte";
   import Workspaces from "../Workspaces/Workspaces.svelte";
-  import { type WorkspaceDocument } from "$lib/database/app.database";
+  import {
+    type ActiveSideBarTabDocument,
+    type WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-
+  import {
+    isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
+    setCurrentWorkspace,
+  } from "$lib/store/workspace.store";
+  import { WorkspaceViewModel } from "../Workspaces/workspace.viewModel";
+  import { setCurrentTeam } from "$lib/store/team.store";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  let activeSidebar: string;
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
+  const _viewModelHome = new WorkspaceViewModel();
+  let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
+  let activeSidebarTabName: string;
   let workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
+  let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
+    _viewModel.getActiveTab();
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let currentWorkspaceId: string;
@@ -36,6 +52,70 @@
     },
   );
 
+  const activeSidbarTabSubscribe = activeSidebarTab.subscribe(
+    async (value: ActiveSideBarTabDocument) => {
+      if (value) {
+        activeSidbarTabRxDoc = value;
+        activeSidebarTabName = activeSidbarTabRxDoc.get("activeTabName");
+      } else {
+        await activeSideBarTabMethods.addActiveTab("workspaces");
+      }
+    },
+  );
+
+  const handleWorkspaceSwitch = (
+    workspaceId: string,
+    workspaceName: string,
+    teamId: string,
+    teamName: string,
+  ) => {
+    isWorkspaceLoaded.set(false);
+    _viewModelWorkspace.activateWorkspace(workspaceId);
+    isWorkspaceCreatedFirstTime.set(false);
+    _viewModelHome.activateTeamWorkspace(teamId, workspaceId);
+
+    setCurrentWorkspace(workspaceId, workspaceName);
+    setCurrentTeam(teamId, teamName);
+    isWorkspaceLoaded.set(true);
+  };
+
+  const handleWorkspaceTab = (
+    workspaceId: string,
+    workspaceName: string,
+    workspaceDesc: string,
+  ) => {
+    isWorkspaceCreatedFirstTime.set(false);
+    let totalCollection: number = 0;
+    let totalRequest: number = 0;
+    $workspaces.map((item) => {
+      if (item) {
+        if (item._data._id === workspaceId) {
+          totalCollection = item?._data?.collections?.length;
+        } else {
+          totalRequest = 0;
+        }
+      }
+    });
+
+    let path: Path = {
+      workspaceId: workspaceId,
+      collectionId: "",
+    };
+
+    const sampleWorkspace = generateSampleWorkspace(
+      workspaceId,
+      new Date().toString(),
+    );
+    sampleWorkspace.id = workspaceId;
+    sampleWorkspace.name = workspaceName;
+    sampleWorkspace.description = workspaceDesc;
+    sampleWorkspace.path = path;
+    sampleWorkspace.property.workspace.requestCount = totalRequest;
+    sampleWorkspace.property.workspace.collectionCount = totalCollection;
+    sampleWorkspace.save = true;
+    collectionsMethods.handleCreateTab(sampleWorkspace);
+    moveNavigation("right");
+  };
   let collapsExpandToggle = false;
   let selectedActiveSideBar: string = "collections";
   const _viewModels = new CollectionsViewModel();
@@ -60,7 +140,6 @@
     const windowWidth = window.innerWidth;
     isCollaps = windowWidth <= 800;
   };
-
   async function handleActiveTab() {
     const activeTab = await activeSideBarTabMethods.getActiveTab();
     if (activeTab) {
@@ -91,36 +170,42 @@
   });
   onDestroy(() => {
     // currTeamSubscribe();
+    activeSidbarTabSubscribe.unsubscribe();
   });
 </script>
 
 <div class="dashboard">
-  <HeaderDashboard {collectionsMethods} {activeSideBarTabMethods} />
+  <HeaderDashboard
+    {collectionsMethods}
+    {handleWorkspaceSwitch}
+    {activeSideBarTabMethods}
+  />
   <div class="dashboard-teams d-flex">
-    {#await getActiveTab then selectedActiveSideBar}
-      <Sidebar
-        {activeSideBarTabMethods}
-        selectedActiveSideBarTab={selectedActiveSideBar}
-      />
-    {:catch}
-      <Sidebar
-        {activeSideBarTabMethods}
-        selectedActiveSideBarTab={"workspaces"}
-      />
-    {/await}
+    {#if activeSidebarTabName}
+      <Sidebar {activeSideBarTabMethods} {activeSidebarTabName} />
+    {:else}
+      <Sidebar {activeSideBarTabMethods} activeSidebarTabName="workspaces" />
+    {/if}
     <section class="w-100">
       <Route path="/collections/*"><CollectionsHome /></Route>
-      <Route path="/workspaces/*"><Workspaces data={workspaces} /></Route>
+      <Route path="/workspaces/*"
+        ><Workspaces
+          data={workspaces}
+          {handleWorkspaceSwitch}
+          {handleWorkspaceTab}
+          {activeSideBarTabMethods}
+        /></Route
+      >
       <Route path="/mock/*"><Mock /></Route>
       <Route path="/environment/*"><Environment /></Route>
       <Route path="/teams/*"><Teams /></Route>
       <Route path="/help">Help</Route>
       <Route path="/*">
-        {#await getActiveTab then activeTab}
-          <Navigate to={activeTab} />
-        {:catch}
-          <Navigate to={"collections"} />
-        {/await}
+        {#if activeSidebarTabName}
+          <Navigate to={activeSidebarTabName} />
+        {:else}
+          <Navigate to={"workspaces"} />
+        {/if}
       </Route>
     </section>
   </div>

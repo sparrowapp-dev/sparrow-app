@@ -13,6 +13,7 @@
 {#if isOpen}
   <div
     class="sparrow-modal-bg-overlay"
+    on:click={handleOpen}
     transition:fade={{ delay: 0, duration: 100 }}
   />
   <div
@@ -48,7 +49,6 @@
           class="sparrow-modal-primary-btn border-0 py-1 px-3"
           on:click={() => {
             handleSubmit();
-           
           }}>{btnText}</button
         >
       {/if}

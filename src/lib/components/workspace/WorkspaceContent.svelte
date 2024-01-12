@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { Link, Route, navigate } from "svelte-navigator";
-  import Workspaces from "$lib/components/teams/teams-content/workspaces/Workspaces.svelte";
-
+  import { Link, navigate } from "svelte-navigator";
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
   export let data: any;
-  import Navigate from "../../../routing/Navigate.svelte";
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
   import {
     isWorkspaceCreatedFirstTime,
     workspaceView,
-  } from "$lib/store/workspace.store";
+    openedTeam,
+    currentTeam,
+  } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -18,16 +17,20 @@
   import { v4 as uuidv4 } from "uuid";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
-  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy } from "svelte";
-  import { openedTeam } from "$lib/store/team.store";
-  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
-  export let workspaceMethods: WorkspaceMethods;
-  export let loaderColor = "default";
-  let currOpenedTeam: CurrentTeam;
+  import { onDestroy, onMount } from "svelte";
+  import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
+  export let loaderColor = "default",
+    handleWorkspaceSwitch: any,
+    handleWorkspaceTab: any,
+    workspaceMethods: WorkspaceMethods,
+    activeSideBarTabMethods: any;
+  let currOpenedTeam: CurrentTeam, currActiveTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
+  });
+  const currentTeamSubscribe = currentTeam.subscribe((value) => {
+    if (value) currActiveTeam = value;
   });
   let isLoading: boolean = false;
 
@@ -98,6 +101,7 @@
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
+    currentTeamSubscribe();
   });
 </script>
 
@@ -152,7 +156,19 @@
                   on:click={() => (selectedTab = "all-workspace")}
                   class="team-menu__link"
                   class:tab-active={selectedTab === "all-workspace"}
-                  >Workspaces ({$data?.slice().filter((item) => item.team.teamId == currOpenedTeam.id).length})</span
+                  >Workspaces {$data &&
+                  $data
+                    .slice()
+                    .filter((item) => item.team.teamId == currOpenedTeam.id)
+                    .length > 0
+                    ? `(${
+                        $data
+                          ?.slice()
+                          .filter(
+                            (item) => item.team.teamId == currOpenedTeam.id,
+                          ).length
+                      })`
+                    : ""}</span
                 ></Link
               >
               <Link style="text-decoration:none;" to="personal-workspaces"
@@ -193,11 +209,22 @@
 
     <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
-      <AllWorkspace openedTeam={currOpenedTeam} {data} {selectedTab} />
+      <AllWorkspace
+        openedTeam={currOpenedTeam}
+        {data}
+        {selectedTab}
+        {handleWorkspaceSwitch}
+        {handleWorkspaceTab}
+        {activeSideBarTabMethods}
+      />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
         openedTeam={currOpenedTeam}
+        {currActiveTeam}
         workspaces={$data.slice().reverse()}
+        {handleWorkspaceSwitch}
+        {handleWorkspaceTab}
+        {activeSideBarTabMethods}
       />
     {/if}
     <!-- </Route> -->

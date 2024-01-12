@@ -12,7 +12,10 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import { setCurrentTeam, setOpenedTeam } from "$lib/store/team.store";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
-  export let data: any;
+  export let data: any,
+    handleWorkspaceSwitch: any,
+    handleWorkspaceTab: any,
+    activeSideBarTabMethods: any;
   let allTeams = [];
   const _viewModel = new WorkspaceViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
@@ -45,8 +48,8 @@
           value[0].get("workspaces")[0].workspaceId,
           value[0].get("workspaces")[0].name,
         );
-        setOpenedTeam(value[0].get("teamId"), value[0].get("name"));
       }
+      setOpenedTeam(value[0].get("teamId"), value[0].get("name"));
     }
   });
 
@@ -71,7 +74,13 @@
       tabList={$tabList}
       collectionList={$collectionList}
     />
-    <WorkspaceContent {data} {workspaceMethods} />
+    <WorkspaceContent
+      {handleWorkspaceSwitch}
+      {handleWorkspaceTab}
+      {data}
+      {workspaceMethods}
+      {activeSideBarTabMethods}
+    />
   </div>
 </Motion>
 

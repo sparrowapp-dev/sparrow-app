@@ -2,16 +2,13 @@
   import collections from "$lib/assets/collections.svg";
   import mock from "$lib/assets/mock.svg";
   import environment from "$lib/assets/environment.svg";
-  import teams from "$lib/assets/teams.svg";
   import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { HelpIcon } from "$lib/assets/app.asset";
   export let activeSideBarTabMethods;
-  export let selectedActiveSideBarTab;
-  function changeSelectedActiveSideBarTab(tab: string) {
-    selectedActiveSideBarTab = tab;
-  }
+  export let activeSidebarTabName: string;
+
 </script>
 
 <div class="sidebar">
@@ -21,36 +18,32 @@
       route="workspaces"
       heading="Home"
       logo={home}
-      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
-      {changeSelectedActiveSideBarTab}
     />
     <Helper
       {activeSideBarTabMethods}
       route="collections"
       heading="Collections"
       logo={collections}
-      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
+      isSelected={"collections" === activeSidebarTabName ? true : false}
       disabled={false}
-      {changeSelectedActiveSideBarTab}
     />
     <Helper
       {activeSideBarTabMethods}
       route="environment"
       heading="Environment"
       logo={environment}
-      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
+      isSelected={"environment" === activeSidebarTabName ? true : false}
       disabled={false}
-      {changeSelectedActiveSideBarTab}
     />
     <Helper
       {activeSideBarTabMethods}
       route="mock"
       heading="Mock"
       logo={mock}
-      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      isSelected={"mock" === activeSidebarTabName ? true : false}
       disabled={true}
-      {changeSelectedActiveSideBarTab}
     />
   </div>
   <div class="sidebar__help">

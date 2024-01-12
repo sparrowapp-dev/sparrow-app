@@ -8,9 +8,9 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
-  export let openedTeam: CurrentTeam;
-  export let workspaces: any;
+  import type { CurrentTeam } from "$lib/utils/interfaces";
+  export let openedTeam: CurrentTeam, currActiveTeam: CurrentTeam, handleWorkspaceTab: any, activeSideBarTabMethods: any;
+  export let workspaces: any, handleWorkspaceSwitch: any;
   let filterText: string = "";
   let workspacePerPage: number = 5,
     currPage = 1;
@@ -23,45 +23,45 @@
 </script>
 
 <div class="p-2">
-  <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-    <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-    <input
-      type="text"
-      id="search-input"
-      class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search workspaces in {openedTeam.name}"
-      bind:value={filterText}
-      on:input={(e) => handleFilterTextChange(e)}
-    />
-    {#if filterText !== ""}
-      <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>
-        <CrossIcon color="#45494D" />
-      </button>
-    {/if}
-  </div>
+  {#if workspaces && workspaces.filter((item) => item.team.teamId == openedTeam.id).length > 0}
+    <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+      <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+      <input
+        type="text"
+        id="search-input"
+        class={`bg-transparent w-100 border-0 my-auto`}
+        placeholder="Search workspaces in {openedTeam.name}"
+        bind:value={filterText}
+        on:input={(e) => handleFilterTextChange(e)}
+      />
+      {#if filterText !== ""}
+        <button
+          class="border-0 bg-transparent ms-2"
+          on:click={handleEraseSearch}
+        >
+          <CrossIcon color="#45494D" />
+        </button>
+      {/if}
+    </div>
+  {/if}
   <div
     class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto workspace-scrollbar"
     style="height: 59vh;"
   >
-    {#if workspaces.filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id).length == 0}
+    {#if filterText !== "" && workspaces.filter((item) => item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id).length == 0}
       <span class="not-found-text mx-auto ellipsis"
-        >No existing workspace found with the given keyword. You can add a new
-        workspace using the term '{filterText}'.</span
+        >No results found.</span
       >
     {/if}
-    {#if currPage === 1 && workspaces.filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id).length > 0}
+    {#if currPage === 1 && filterText === ""}
       <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
-        + Add New Workspace
-      </button>
-    {:else if currPage == 1}
-      <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace empty">
         + Add New Workspace
       </button>
     {/if}
     {#each workspaces
-      .filter((item) => item.name.startsWith(filterText) && item.team.teamId == openedTeam.id)
+      .filter((item) => item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id)
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as workspace, index}
-      <WorkspaceCard {workspace} />
+      <WorkspaceCard {workspace} {handleWorkspaceSwitch} {currActiveTeam} {openedTeam} {handleWorkspaceTab} {activeSideBarTabMethods} />
     {/each}
   </div>
   <div
@@ -72,12 +72,12 @@
         currPage * workspacePerPage,
         workspaces?.filter(
           (item) =>
-            item.name.startsWith(filterText) &&
+            item.name.toLowerCase().startsWith(filterText) &&
             item.team.teamId == openedTeam.id,
         ).length,
       )} of {workspaces?.filter(
         (item) =>
-          item.name.startsWith(filterText) && item.team.teamId == openedTeam.id,
+          item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id,
       ).length}
     </div>
     <div class="tab-head tab-change">
@@ -98,7 +98,7 @@
             Math.ceil(
               workspaces?.filter(
                 (item) =>
-                  item.name.startsWith(filterText) &&
+                  item.name.toLowerCase().startsWith(filterText) &&
                   item.team.teamId == openedTeam.id,
               ).length / workspacePerPage,
             )
@@ -111,7 +111,7 @@
           Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           )
@@ -124,7 +124,7 @@
           (currPage = Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           ))}
@@ -134,7 +134,7 @@
           Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           )

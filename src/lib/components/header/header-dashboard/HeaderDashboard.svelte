@@ -33,10 +33,13 @@
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
   import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
+  import { WorkspaceViewModel } from "../../../../pages/Workspaces/workspace.viewModel";
+  import { setCurrentTeam } from "$lib/store";
 
   export let activeSideBarTabMethods;
-
+  export let handleWorkspaceSwitch;
   const navigate = useNavigate();
+  const _workspaceViewModel = new WorkspaceViewModel();
   const _viewModel = new HeaderDashboardViewModel();
   const _collectionMethods = new CollectionsViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -170,22 +173,23 @@
       activeWorkspaceName,
     );
   };
-
   window.addEventListener("click", () => {
     profile = false;
   });
-
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
       await _viewModel.refreshWorkspaces(value._id);
     }
   });
 
-  const handleDropdown = (id: string, tab: string) => {
+  const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
+    
+    _workspaceViewModel.activateTeamWorkspace(team.teamId, id);
     isWorkspaceCreatedFirstTime.set(false);
     setCurrentWorkspace(id, tab);
+    setCurrentTeam(team.teamId, team.teamName);
     isWorkspaceLoaded.set(true);
   };
 
