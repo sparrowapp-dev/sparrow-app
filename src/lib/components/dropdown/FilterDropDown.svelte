@@ -17,7 +17,7 @@
   });
 
   function addInSelectedMethods(event: any, id: string) {
-    const methodType = event.currentTarget.innerText.slice(0, -1);
+    const methodType = event.currentTarget.innerText;
     const methodItemButton = document.getElementById(id) as HTMLButtonElement;
     const methodAddButton = document.getElementById(
       id + "ADD",
@@ -112,13 +112,7 @@
           }}
           on:click={(event) => {
             addInSelectedMethods(event, "GET");
-          }}
-          ><span>GET</span><img
-            class="plus"
-            id="GETADD"
-            src={plus}
-            alt="+"
-          /></button
+          }}>GET<img class="plus" id="GETADD" src={plus} alt="+" /></button
         >
         <button
           class="method-button yellow-api"
@@ -131,13 +125,7 @@
           }}
           on:click={(event) => {
             addInSelectedMethods(event, "POST");
-          }}
-          ><span>POST</span><img
-            class="plus"
-            id="POSTADD"
-            src={plus}
-            alt="+"
-          /></button
+          }}>POST<img class="plus" id="POSTADD" src={plus} alt="+" /></button
         >
         <button
           class="method-button blue-api"
@@ -150,13 +138,7 @@
           }}
           on:click={(event) => {
             addInSelectedMethods(event, "PUT");
-          }}
-          ><span>PUT</span><img
-            class="plus"
-            id="PUTADD"
-            src={plus}
-            alt="+"
-          /></button
+          }}>PUT<img class="plus" id="PUTADD" src={plus} alt="+" /></button
         >
         <button
           class="method-button pink-api"
@@ -169,13 +151,7 @@
           }}
           on:click={(event) => {
             addInSelectedMethods(event, "PATCH");
-          }}
-          ><span>PATCH</span><img
-            class="plus"
-            id="PATCHADD"
-            src={plus}
-            alt="+"
-          /></button
+          }}>PATCH<img class="plus" id="PATCHADD" src={plus} alt="+" /></button
         >
         <button
           class="method-button red-api"
@@ -189,12 +165,7 @@
           on:click={(event) => {
             addInSelectedMethods(event, "DELETE");
           }}
-          ><span>DELETE</span><img
-            class="plus"
-            id="DELETEADD"
-            src={plus}
-            alt="+"
-          /></button
+          >DELETE<img class="plus" id="DELETEADD" src={plus} alt="+" /></button
         >
       </div>
     {/if}
@@ -312,5 +283,9 @@
 
   .slider.round:before {
     border-radius: 50%;
+  }
+
+  .dropdown-active {
+    cursor: pointer;
   }
 </style>
