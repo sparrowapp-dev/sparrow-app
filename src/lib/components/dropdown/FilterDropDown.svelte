@@ -17,7 +17,7 @@
   });
 
   function addInSelectedMethods(event: any, id: string) {
-    const methodType = event.currentTarget.innerText;
+    const methodType = event.currentTarget.innerText.slice(0, -1);
     const methodItemButton = document.getElementById(id) as HTMLButtonElement;
     const methodAddButton = document.getElementById(
       id + "ADD",
@@ -88,15 +88,16 @@
   <div class="filter-by-methods">
     <div class="methods-header">
       <p style="font-size: 14px;">Filter By Methods</p>
-        <span class="dropdown-active"  on:click={() => {
+      <span
+        class="dropdown-active"
+        on:click={() => {
           showMethods = !showMethods;
           if (!showMethods) {
             selectMethodsStore.update(() => []);
             handleSearch();
           }
-        }}
-          ><img src={showMethods ? angleUp : angleDown} alt="angledown" /></span
-        >
+        }}><img src={showMethods ? angleUp : angleDown} alt="angledown" /></span
+      >
     </div>
     {#if showMethods}
       <div class="all-methods" transition:slide>
