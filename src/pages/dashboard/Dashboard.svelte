@@ -26,12 +26,12 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let currentWorkspaceId: string;
-  let currentWorkspaceName:string;
+  let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
         currentWorkspaceId = value.get("_id");
-        currentWorkspaceName=value.get("name");
+        currentWorkspaceName = value.get("name");
       }
     },
   );
@@ -70,7 +70,7 @@
       const workspace = generateSampleWorkspace(
         currentWorkspaceId,
         new Date().toString(),
-        currentWorkspaceName
+        currentWorkspaceName,
       );
       workspace.path.workspaceId = currentWorkspaceId;
       collectionsMethods.handleCreateTab(workspace);

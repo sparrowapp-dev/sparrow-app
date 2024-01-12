@@ -30,6 +30,7 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
+  import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -106,6 +107,7 @@
       <Route path="/update/password" component={UpdatePassword} />
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/waiting" component={Waiting} />
+      <Route path="/welcome" component={WelcomeScreen} />
 
       <Route path="/*"><Navigate to="/login" /></Route>
     </section>
