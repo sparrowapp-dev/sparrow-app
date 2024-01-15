@@ -98,7 +98,7 @@
     padding: 12px 4px 12px 4px;
     border-right: 1px solid #313233;
     justify-content: space-between;
-    background: #1e1e1e;
+    background: var(--background-color);
   }
   .sidebar__main {
     display: flex;

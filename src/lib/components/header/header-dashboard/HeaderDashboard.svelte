@@ -230,7 +230,7 @@
 
 <!-- {#if !isLoadingPage} -->
 <div
-  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-backgroundColor header"
   style="height:44px;"
   data-tauri-drag-region
 >
@@ -271,7 +271,7 @@
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
       ? 'position-absolute'
-      : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+      : ''} search-container bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <SearchIcon />
@@ -281,7 +281,7 @@
       <input
         type="search"
         style="font-size: 12px;"
-        class="input-search-bar bg-backgroundColor"
+        class="input-search-bar bg-backgroundLight"
         placeholder="Search Sparrow"
         bind:value={searchData}
         on:input={() => {
@@ -526,6 +526,9 @@
     border: none;
     outline: none;
   }
+  .search-container {
+    border: 1px solid transparent;
+  }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);
   }
@@ -540,5 +543,8 @@
     width: 17.5px;
     margin-left: 20px;
     margin-right: 30px;
+  }
+  .header {
+    border-bottom: 1px solid var(--border-color);
   }
 </style>
