@@ -355,3 +355,9 @@
     {/each}
   </div>
 </div>
+
+<style>
+  input:checked {
+    background-color: var(--send-button) !important;
+  }
+</style>

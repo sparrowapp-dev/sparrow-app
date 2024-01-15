@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { RequestProperty, ResponseSection } from "$lib/utils/enums/request.enum";
+  import {
+    RequestProperty,
+    ResponseSection,
+  } from "$lib/utils/enums/request.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import ResponseBody from "./ResponseBody.svelte";
@@ -13,7 +16,7 @@
   export let apiState;
   export let collectionsMethods: CollectionsMethods;
   export let currentTabId;
- 
+
   let responseBody;
   let responseHeader;
   let statusCode: string;
@@ -101,7 +104,11 @@
             UntrackedItems.UNTRACKED + uuidv4(),
             new Date().toString(),
           ).property.request.response;
-          collectionsMethods.updateRequestProperty(response,RequestProperty.RESPONSE,currentTabId)
+          collectionsMethods.updateRequestProperty(
+            response,
+            RequestProperty.RESPONSE,
+            currentTabId,
+          );
           notifications.success("Response Cleared");
         }}
       >
@@ -113,7 +120,7 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if apiState.responseSection === ResponseSection.RESPONSE}
-    <ResponseBody {apiState} {collectionsMethods} {response}  currentTabId={currentTabId}/>
+    <ResponseBody {apiState} {collectionsMethods} {response} {currentTabId} />
   {:else if apiState.responseSection === ResponseSection.HEADERS}
     <ResponseHeader {responseHeader} />
   {/if}
@@ -126,7 +133,7 @@
 
   .tab-active {
     color: white;
-    border-bottom: 3px solid #85c2ff;
+    border-bottom: 3px solid var(--send-button);
   }
 
   .status-primary1 {

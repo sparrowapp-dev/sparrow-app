@@ -148,6 +148,6 @@
     cursor: pointer;
   }
   .dropdown-btn-active {
-    border: 1px solid #85c2ff;
+    border: 1px solid var(--send-button);
   }
 </style>

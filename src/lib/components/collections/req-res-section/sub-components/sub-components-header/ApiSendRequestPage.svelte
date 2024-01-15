@@ -392,7 +392,7 @@
 
 <style>
   .btn-primary {
-    background: var(--send-button);
+    background: var(--sparrow-blue);
   }
 
   .view-active {
