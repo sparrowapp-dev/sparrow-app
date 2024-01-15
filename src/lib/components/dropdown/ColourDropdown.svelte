@@ -58,7 +58,7 @@
     <div
       id="request-dropdown"
       class="dropdown-btn rounded d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={true}
+      class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0 text-{selectedRequest?.color}">
         {selectedRequest?.name}

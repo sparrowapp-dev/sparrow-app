@@ -290,7 +290,7 @@
         type="text"
         id="input-request-url"
         placeholder="Enter URL or paste text"
-        class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
+        class="url-input form-control input-outline border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
         autocomplete="off"
@@ -423,5 +423,8 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .url-input {
+    background-color: #111111;
   }
 </style>
