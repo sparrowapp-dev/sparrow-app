@@ -262,8 +262,11 @@
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup &&
-    hideHeaders
+    style="height:32px;
+    
+    {!showGlobalSearchPopup ? 'width:160px;' : 'width:400px;'}
+    
+     position: relative;{showGlobalSearchPopup && hideHeaders
       ? 'left:50%;transform: translateX(-50%);'
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
@@ -279,7 +282,7 @@
         type="search"
         style="font-size: 12px;"
         class="input-search-bar bg-backgroundColor"
-        placeholder="Search your workspaces, collections and endpoints"
+        placeholder="Search Sparrow"
         bind:value={searchData}
         on:input={() => {
           handleGlobalSearchPopup(true);
@@ -529,5 +532,8 @@
   .controller-btn button {
     height: 44px;
     width: 44px;
+  }
+  .search-container {
+    transition: 0.1s ease-in-out;
   }
 </style>
