@@ -145,12 +145,12 @@
       </button>
     </div>
   </div>
-  <div class="w-100" style="background-color:black;">
+  <div class="w-100 backgroundColor">
     <MonacoEditorResponse
       rawTab={apiState.responseRaw}
       rawValue={response.body}
       formatter={apiState.responseFormatter}
-      currentTabId={currentTabId}
+      {currentTabId}
     />
   </div>
 </div>

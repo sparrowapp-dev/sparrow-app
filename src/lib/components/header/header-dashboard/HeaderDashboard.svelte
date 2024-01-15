@@ -264,7 +264,7 @@
   <div
     style="height:32px;
     
-    {!showGlobalSearchPopup ? 'width:160px;' : 'width:400px;'}
+    {!showGlobalSearchPopup ? 'width:180px;' : 'width:400px;'}
     
      position: relative;{showGlobalSearchPopup && hideHeaders
       ? 'left:50%;transform: translateX(-50%);'
@@ -332,7 +332,7 @@
     >
       <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
         <Tooltip>
-          <button class="bg-blackColor border-0">
+          <button class="bg-backgroundColor border-0">
             <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
@@ -343,7 +343,7 @@
           : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <Tooltip>
-          <button class="bg-blackColor border-0">
+          <button class="bg-backgroundColor border-0">
             <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>
@@ -355,7 +355,7 @@
       >
         <div class="position-relative" style="z-index: 9;">
           <button
-            class={`bg-blackColor border-0`}
+            class={`bg-backgroundLight border-0`}
             id="profile-dropdown"
             style="width: 24px; height: 24px;"
             on:click={toggleDropdown}
