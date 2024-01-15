@@ -10,6 +10,9 @@
   import { slide } from "svelte/transition";
   import Spinner from "../Transition/Spinner.svelte";
   import ImportCollection from "../collections/collections-list/ImportCollection.svelte";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -18,6 +21,7 @@
 
   let isImportCollectionPopup: boolean = false;
   const handleImportCollectionPopup = (flag) => {
+    createCollectionSource.set("AddIcon");
     isImportCollectionPopup = flag;
   };
 
@@ -38,6 +42,7 @@
       generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
     );
     moveNavigation("right");
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { Source: "Side Panel TopBar" });
   };
 </script>
 

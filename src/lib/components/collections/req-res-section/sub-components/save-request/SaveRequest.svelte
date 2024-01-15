@@ -33,6 +33,8 @@
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import questionIcon from "$lib/assets/question.svg";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -355,6 +357,7 @@
           isLoading = false;
         }
       }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
 
@@ -403,6 +406,11 @@
       storage.id = _id;
       collectionsMethods.addCollection(storage);
       notifications.success("New Collection Created");
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "SaveRequest",
+        collectionName: res.data.data.name,
+        collectionId: res.data.data._id,
+      });
     } else {
       createDirectoryLoader = false;
     }

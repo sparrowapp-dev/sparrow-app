@@ -13,6 +13,7 @@ import {
 import { invoke } from "@tauri-apps/api";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -35,9 +36,9 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
     mixpanel.identify(userDetails._id);
     mixpanel.people.set({ $email: userDetails.email });
-    MixpanelEvent({
-      eventName: "User_Login",
-      properties: { Login_Method: "Email", Success: response.isSuccessful },
+    MixpanelEvent(Events.USER_LOGIN, {
+      Login_Method: "Email",
+      Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
     navigate("/home");

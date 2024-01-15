@@ -1,8 +1,7 @@
-import type { MixpanelEvents } from "$lib/utils/interfaces/mixpanel.interface";
 import mixpanel from "mixpanel-browser";
 
-const MixpanelEvent = (props?: MixpanelEvents) => {
-  mixpanel.track(props.eventName, { ...props.properties });
+const MixpanelEvent = (eventName: string, properties?: object) => {
+  mixpanel.track(eventName, { ...properties });
 };
 
 export default MixpanelEvent;

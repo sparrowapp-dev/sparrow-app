@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { RequestProperty, ResponseSection } from "$lib/utils/enums/request.enum";
+  import {
+    RequestProperty,
+    ResponseSection,
+  } from "$lib/utils/enums/request.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import ResponseBody from "./ResponseBody.svelte";
@@ -8,12 +11,14 @@
   import ResponseHeader from "./ResponseHeader.svelte";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let response;
   export let apiState;
   export let collectionsMethods: CollectionsMethods;
   export let currentTabId;
- 
+
   let responseBody;
   let responseHeader;
   let statusCode: string;
@@ -101,8 +106,13 @@
             UntrackedItems.UNTRACKED + uuidv4(),
             new Date().toString(),
           ).property.request.response;
-          collectionsMethods.updateRequestProperty(response,RequestProperty.RESPONSE,currentTabId)
+          collectionsMethods.updateRequestProperty(
+            response,
+            RequestProperty.RESPONSE,
+            currentTabId,
+          );
           notifications.success("Response Cleared");
+          MixpanelEvent(Events.CLEAR_API_RESPONSE);
         }}
       >
         Clear
@@ -113,7 +123,7 @@
 
 <div class="d-flex align-items-center justify-content-center w-100">
   {#if apiState.responseSection === ResponseSection.RESPONSE}
-    <ResponseBody {apiState} {collectionsMethods} {response}  currentTabId={currentTabId}/>
+    <ResponseBody {apiState} {collectionsMethods} {response} {currentTabId} />
   {:else if apiState.responseSection === ResponseSection.HEADERS}
     <ResponseHeader {responseHeader} />
   {/if}

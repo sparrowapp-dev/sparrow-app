@@ -2,7 +2,9 @@
   import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
   import Crossicon from "$lib/assets/crossicon.svelte";
   import trashIcon from "$lib/assets/trash-icon.svg";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import Tooltip from "../tooltip/Tooltip.svelte";
   type Mode = "READ" | "WRITE";
 
@@ -126,6 +128,7 @@
       placeholder="Search environment variables"
       bind:value={filterText}
       on:input={(e) => handleFilterTextChange(e)}
+      on:click={() => MixpanelEvent(Events.SEARCH_ENVIRONMENT_VARIABLES)}
     />
     {#if filterText !== ""}
       <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>

@@ -6,6 +6,7 @@ import { notifications } from "$lib/utils/notifications";
 import { checkValidation, registrationSchema } from "$lib/utils/validation";
 import mixpanel from "mixpanel-browser";
 import { navigate } from "svelte-navigator";
+import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
 const handleRegister = async (userData) => {
   const response = await registerUser(userData);
@@ -14,9 +15,9 @@ const handleRegister = async (userData) => {
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     mixpanel.identify(userDetails._id);
     mixpanel.people.set({ $email: userDetails.email });
-    MixpanelEvent({
-      eventName: "User_Signup",
-      properties: { Login_Method: "Email", Success: response.isSuccessful },
+    MixpanelEvent(Events.USER_SIGNUP, {
+      Login_Method: "Email",
+      Success: response.isSuccessful,
     });
     notifications.success("Registration successful!");
     navigate("/welcome");

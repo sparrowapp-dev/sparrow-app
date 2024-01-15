@@ -25,6 +25,8 @@
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
   import angleRight from "$lib/assets/angleRight.svg";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   let expand: boolean = false;
   export let explorer;
@@ -198,6 +200,9 @@
   function addRequest() {
     expand = true;
     handleAPIClick();
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+      Source: "Side Panel Dropdown",
+    });
   }
 
   let menuItems = [
@@ -383,7 +388,12 @@
             class="list-icons"
             src={requestIcon}
             alt="+ API Request"
-            on:click={handleAPIClick}
+            on:click={() => {
+              handleAPIClick(),
+                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                  Source: "Side Panel Collection List",
+                });
+            }}
           />
         </div>
       {/if}
@@ -488,7 +498,7 @@
   .sub-files {
     border-left: 1px solid var(--border-color);
   }
-  
+
   .main-folder {
     width: calc(100% - 24px);
   }

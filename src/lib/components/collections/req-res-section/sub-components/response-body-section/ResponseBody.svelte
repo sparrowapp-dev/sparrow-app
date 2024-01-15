@@ -10,6 +10,8 @@
   } from "$lib/utils/enums/request.enum";
   import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let response;
   export let apiState;
@@ -24,6 +26,7 @@
     const jsonString = response?.body;
     await copyToClipBoard(jsonString);
     notifications.success("Copied to Clipboard");
+    MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
@@ -65,6 +68,7 @@
     await writableStream.write(response?.body);
     await writableStream.close();
     notifications.success("Response downloaded");
+    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
 
@@ -150,7 +154,7 @@
       rawTab={apiState.responseRaw}
       rawValue={response.body}
       formatter={apiState.responseFormatter}
-      currentTabId={currentTabId}
+      {currentTabId}
     />
   </div>
 </div>
