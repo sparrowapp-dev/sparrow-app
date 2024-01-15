@@ -17,6 +17,7 @@ import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
 import uploadIcon from "$lib/assets/upload.svg";
 export { default as PlusIcon } from "./plus.svelte";
+export { default as PeopleIcon } from "$lib/assets/people.svelte";
 export { default as TickIcon } from "./tick.svelte";
 export { default as HelpIcon } from "./help.svelte";
 export { default as SaveIcon } from "./save.svelte";

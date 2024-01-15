@@ -43,7 +43,7 @@
     class="sidebar d-flex flex-column bg-backgroundColor p-3">
     <Teams {teams} />
     <hr />
-    <RecentApi {recentAPI} />
+    <RecentApi {recentAPI}  />
     <hr />
     <RecentWorkspace {workspace} />
   </div>

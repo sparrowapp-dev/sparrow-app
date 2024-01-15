@@ -1,17 +1,53 @@
 <script lang="ts">
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { setBodyType } from "$lib/utils/helpers/auth.helper";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { navigate } from "svelte-navigator";
   export let api: any;
   export let data: any;
   export let collectionList;
+  export let collectionsMethods, activeSideBarTabMethods;
 
+  const handleClick = (api) => {
+    let request = generateSampleRequest(api.id, new Date().toString());
+    request.path = api.path;
+    request.name = api.name;
+    if (api.description) request.description = api.description;
+    if (api.property.request.url)
+      request.property.request.url = api.property.request.url;
+    if (api.property.request.body)
+      request.property.request.body = api.property.request.body;
+    if (api.property.request.method)
+      request.property.request.method = api.property.request.method;
+    if (api.property.request.queryParams)
+      request.property.request.queryParams = api.property.request.queryParams;
+    if (api.property.request.headers)
+      request.property.request.headers = api.property.request.headers;
+    if (api.property.request.selectedRequestBodyType)
+      request = setBodyType(
+        request,
+        api.property.request.selectedRequestBodyType,
+      );
+    request.property.request.save.api = true;
+    request.property.request.save.description = true;
+    collectionsMethods.handleCreateTab(request);
+    moveNavigation("right");
+    navigate("/dashboard/collections");
+    activeSideBarTabMethods.updateActiveTab("collections");
+  };
   let apiClass = "api-yellow";
-  if (api?.property?.request?.method === "DEL") apiClass = "red-api";
+  if (api?.property?.request?.method === "DELETE") apiClass = "red-api";
   if (api?.property?.request?.method === "GET") apiClass = "green-api";
   if (api?.property?.request?.method === "POST") apiClass = "yellow-api";
   if (api?.property?.request?.method === "PUT") apiClass = "blue-api";
-  if (api?.property?.request?.method === "ARC") apiClass = "grey-api";
+  if (api?.property?.request?.method === "PATCH") apiClass = "pink-api";
 </script>
 
-<div class="d-flex flex-start pb-2" style=" overflow: auto;">
+<div
+  class="d-flex flex-start helper-container py-2 rounded"
+  style=" overflow: auto;"
+  on:click={() => handleClick(api)}
+>
   <div
     class="api-type rounded d-flex align-items-center justify-content-center"
   >
@@ -62,6 +98,11 @@
 </div>
 
 <style>
+  .helper-container:hover,
+  .helper-container:hover .api-type {
+    background-color: var(--border-color);
+    cursor: pointer;
+  }
   .api-type {
     height: 34px;
     width: 56px;
@@ -103,7 +144,7 @@
   .blue-api {
     color: #9685ff;
   }
-  .grey-api {
-    color: #8a9299;
+  .pink-api {
+    color: #df77f9;
   }
 </style>

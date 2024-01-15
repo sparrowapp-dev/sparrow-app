@@ -46,9 +46,9 @@
   {/if}
   <div
     class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto workspace-scrollbar"
-    style="height: 59vh;"
+    style="max-height: 59vh; height: auto;"
   >
-    {#if filterText !== "" && workspaces.filter((item) => item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id).length == 0}
+    {#if filterText !== "" && workspaces.filter((item) => item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
       <span class="not-found-text mx-auto ellipsis"
         >No results found.</span
       >
@@ -59,25 +59,25 @@
       </button>
     {/if}
     {#each workspaces
-      .filter((item) => item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id)
+      .filter((item) => item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as workspace, index}
       <WorkspaceCard {workspace} {handleWorkspaceSwitch} {currActiveTeam} {openedTeam} {handleWorkspaceTab} {activeSideBarTabMethods} />
     {/each}
   </div>
   <div
-    class="justify-content-between bottom-0 position-sticky bg-backgroundColor d-flex"
+    class="justify-content-between bottom-0 position-sticky z-3 bg-backgroundColor d-flex"
   >
     <div class="tab-head">
       showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
         currPage * workspacePerPage,
         workspaces?.filter(
           (item) =>
-            item.name.toLowerCase().startsWith(filterText) &&
+            item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
             item.team.teamId == openedTeam.id,
         ).length,
       )} of {workspaces?.filter(
         (item) =>
-          item.name.toLowerCase().startsWith(filterText) && item.team.teamId == openedTeam.id,
+          item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id,
       ).length}
     </div>
     <div class="tab-head tab-change">
@@ -98,7 +98,7 @@
             Math.ceil(
               workspaces?.filter(
                 (item) =>
-                  item.name.toLowerCase().startsWith(filterText) &&
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
                   item.team.teamId == openedTeam.id,
               ).length / workspacePerPage,
             )
@@ -111,7 +111,7 @@
           Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.toLowerCase().startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           )
@@ -124,7 +124,7 @@
           (currPage = Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.toLowerCase().startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           ))}
@@ -134,7 +134,7 @@
           Math.ceil(
             workspaces?.filter(
               (item) =>
-                item.name.toLowerCase().startsWith(filterText) &&
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
                 item.team.teamId == openedTeam.id,
             ).length / workspacePerPage,
           )
@@ -179,9 +179,7 @@
   .search-input-container:focus-within {
     border: 1px solid var(--workspace-hover-color);
   }
-  .search-input-container:focus-within svg {
-    visibility: hidden;
-  }
+
   .add-new-workspace {
     border-radius: 8px;
     background: transparent;

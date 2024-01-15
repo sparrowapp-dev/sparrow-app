@@ -1,15 +1,50 @@
 <script lang="ts">
+  import { openedTeam } from "$lib/store";
+  import { navigate } from "svelte-navigator";
+  import { onDestroy } from "svelte";
+  import { PeopleIcon } from "$lib/assets/app.asset";
   export let data: any;
+  export let handleWorkspaceSwitch, handleWorkspaceTab, activeSideBarTabMethods;
+  let currOpenedTeam: any;
+  const openedTeamSubscribe = openedTeam.subscribe((value) => {
+    if (value) currOpenedTeam = value;
+  });
+  onDestroy(() => {
+    openedTeamSubscribe();
+  });
+  const handleOpenCollection = (workspace) => {
+    handleWorkspaceSwitch(
+      workspace._id,
+      workspace.name,
+      currOpenedTeam.id,
+      currOpenedTeam.name,
+    );
+    handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
+    navigate("/dashboard/collections");
+    activeSideBarTabMethods.updateActiveTab("collections");
+  };
 </script>
 
-<section>
+<section class="p-1">
   <h6 class="teams-heading">Recent Workspace</h6>
   {#if $data}
     {#each $data.slice().reverse() as list, index}
       {#if index < 5}
-        <div class=" pb-3">
-          <p class="mb-0 recent-workspace ellipsis">{list.name}</p>
-          <span class="team-name">{list.team.teamName}</span>
+        <div class="pb-3" on:click={() => handleOpenCollection(list)}>
+          <div
+            class="recent-workspace-item p-1 ps-2 rounded justify-content-between d-flex"
+          >
+            <div class="">
+              <p class="mb-0 recent-workspace ellipsis">{list.name}</p>
+              <span class="team-name">{list.team.teamName}</span>
+            </div>
+            <PeopleIcon
+              color={currOpenedTeam.id == list.team.teamId
+                ? "#8A9299"
+                : "#45494D"}
+              classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}
+            />
+          </div>
         </div>
       {/if}
     {/each}
@@ -26,6 +61,10 @@
   .recent-workspace {
     font-size: 12px;
     color: #f5f5f5;
+  }
+  .recent-workspace-item:hover {
+    background-color: var(--border-color);
+    cursor: pointer;
   }
   .team-name {
     color: var(--request-arc);

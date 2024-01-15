@@ -155,7 +155,7 @@ export class HeaderDashboardViewModel {
           name,
           description,
           owner,
-          permissions,
+          users,
           team,
           createdAt,
           createdBy,
@@ -166,7 +166,7 @@ export class HeaderDashboardViewModel {
           name,
           description,
           owner,
-          permissions,
+          users,
           collections: collection ? collection : [],
           team: {
             teamId: team.id,

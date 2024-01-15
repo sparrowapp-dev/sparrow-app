@@ -4,6 +4,8 @@
   export let tabList;
   export let data: any;
   export let collectionList;
+  export let collectionsMethods: any = undefined, activeSideBarTabMethods: any;
+
 
   let requestCount: number = 0;
   tabList.map((item) => {
@@ -18,7 +20,7 @@
   {#if tabList}
     {#each tabList.slice().reverse() as api, index}
       {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED")}
-        <Helper {api} {data} {collectionList} />
+        <Helper {api} {data} {collectionList} {collectionsMethods} {activeSideBarTabMethods} />
       {/if}
     {/each}
   {/if}

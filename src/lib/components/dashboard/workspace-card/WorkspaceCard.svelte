@@ -78,6 +78,7 @@
 <div
   class="flex-grow-1 col-5 pb-4"
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+  style="max-width: 47.5%; max-height: 32%; "
 >
   <div
     class="bg-black workspace-card rounded position-relative p-4 position-relative"
@@ -101,7 +102,12 @@
       </button>
     </div>
 
-    <ShowMoreOptions showMenu={isShowMoreVisible} {menuItems} />
+    <ShowMoreOptions
+      showMenu={isShowMoreVisible}
+      {menuItems}
+      topDistance={4}
+      rightDistance={5}
+    />
     <p class="teams-workspace__para mb-1">
       <!-- <span>{workspace}</span> APIs <span class="px-1"></span> -->
       <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS

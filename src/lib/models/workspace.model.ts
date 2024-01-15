@@ -8,7 +8,7 @@ export const workspaceSchemaLiteral = {
   title: "workspace",
   primaryKey: "_id",
   type: "object",
-  version: 5,
+  version: 6,
   properties: {
     _id: {
       type: "string",
@@ -46,9 +46,8 @@ export const workspaceSchemaLiteral = {
         },
       },
     },
-    permissions: {
+    users: {
       type: "array",
-      maxItems: 5,
       uniqueItems: true,
       items: {
         type: "object",
@@ -109,7 +108,7 @@ export const workspaceSchemaLiteral = {
     },
   },
 
-  required: ["_id", "name", "owner", "permissions", "createdAt", "createdBy"],
+  required: ["_id", "name", "owner", "users", "createdAt", "createdBy"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(workspaceSchemaLiteral);

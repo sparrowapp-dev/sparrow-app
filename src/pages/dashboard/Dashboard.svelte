@@ -194,6 +194,7 @@
           {handleWorkspaceSwitch}
           {handleWorkspaceTab}
           {activeSideBarTabMethods}
+          {collectionsMethods}
         /></Route
       >
       <Route path="/mock/*"><Mock /></Route>

@@ -11,6 +11,7 @@
   import { notifications } from "$lib/utils/notifications";
   import CustomPopup from "$lib/components/Modal/CustomPopup.svelte";
   import { FileInput, ParaInput, TextInput } from "$lib/components";
+  import { PeopleIcon } from "$lib/assets/app.asset";
   export let teams: any;
   let newTeam: {
     name: {
@@ -69,7 +70,7 @@
     if (value) currOpenedTeam = value;
   });
   const handleTeamNameChange = (e: any) => {
-    if(e.target.value !== '') newTeam.name.invalid = false;
+    if (e.target.value !== "") newTeam.name.invalid = false;
     newTeam.name.value = e.target.value;
   };
   const handleTeamDescChange = (e: any) => {
@@ -120,13 +121,19 @@
   </div>
   {#each teams as team}
     <button
-      class={`d-flex w-100 align-items-center rounded teams-outer border-0 ${
+      class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
         currOpenedTeam.id == team.teamId && "active"
       }`}
       on:click={() => handleOpenTeam(team.teamId, team.name)}
     >
-      <img src={team.icon} alt="" />
-      <p class=" mb-0">{team.name}</p>
+      <div class="d-flex">
+        <img src={team.icon} alt="" />
+        <p class=" mb-0">{team.name}</p>
+      </div>
+      <PeopleIcon
+        color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
+        classProp={team.users.length <= 1 && "d-none"}
+      />
     </button>
   {/each}
 </section>

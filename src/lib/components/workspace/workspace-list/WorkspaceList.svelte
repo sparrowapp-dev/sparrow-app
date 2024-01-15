@@ -6,8 +6,10 @@
   export let tabList;
   export let collectionList;
   export let teams;
-  
-
+  export let handleWorkspaceSwitch,
+    handleWorkspaceTab,
+    activeSideBarTabMethods,
+    collectionsMethods;
 </script>
 
 <div
@@ -15,9 +17,20 @@
   class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-3"
 >
   <Teams {teams} />
-  <RecentApi {tabList} {data} {collectionList} />
+  <RecentApi
+    {tabList}
+    {data}
+    {collectionList}
+    {collectionsMethods}
+    {activeSideBarTabMethods}
+  />
   <hr />
-  <RecentWorkspace {data} />
+  <RecentWorkspace
+    {data}
+    {handleWorkspaceSwitch}
+    {handleWorkspaceTab}
+    {activeSideBarTabMethods}
+  />
 </div>
 
 <style>

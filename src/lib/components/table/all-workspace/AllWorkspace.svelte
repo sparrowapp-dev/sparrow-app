@@ -18,7 +18,7 @@
     handleWorkspaceSwitch: any,
     activeSideBarTabMethods: any,
     handleWorkspaceTab: any;
-  let isShowMoreVisible = false;
+  let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
@@ -33,17 +33,18 @@
     navigate("/dashboard/collections");
     activeSideBarTabMethods.updateActiveTab("collections");
   };
-  const handleShowMore = () => {
-    isShowMoreVisible = !isShowMoreVisible;
+  const handleShowMore = (index) => {
+    isShowMoreVisible = index;
   };
   const closeShowMore = () => {
-    isShowMoreVisible = false;
+    isShowMoreVisible = undefined;
   };
-  let menuItems = [
+
+  const menuItems = (workspace, index) => [
     {
-      onClick: (workspace) => {
+      onClick: () => {
         handleOpenCollection(workspace);
-        handleShowMore();
+        handleShowMore(index);
       },
       displayText: "Open Workspace",
       disabled: false,
@@ -63,14 +64,26 @@
       disabled: false,
     },
   ];
+
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
   };
   const handleEraseSearch = () => {
     filterText = "";
   };
+  const rightClickContextMenu = (e) => {
+    e.preventDefault();
+    setTimeout(() => {
+      isShowMoreVisible = undefined;
+    }, 100);
+  };
+
 </script>
 
+<svelte:window
+  on:click={closeShowMore}
+  on:contextmenu|preventDefault={closeShowMore}
+/>
 {#if selectedTab == "all-workspace"}
   <div class="ps-3">
     {#if $data && $data
@@ -96,12 +109,15 @@
         {/if}
       </div>
     {/if}
-    <div class="table-container overflow-y-auto" style="height: 60vh;">
+    <div class="table-container overflow-y-auto" style="max-height: 60vh; height: auto;">
       <table
-        class="table p-0 table-responsive bg-backgroundColor overflow-y-auto w-100"
+        class="table p-0 table-responsive bg-backgroundColor w-100"
+        style="max-height: 100%;"
         data-search="true"
       >
-        <thead class="position-sticky top-0">
+        <thead
+          class="position-sticky workspace-table-heading bg-backgroundColor top-0 z-1"
+        >
           <tr class="">
             <th data-sortable="true" class="tab-head">Workspace</th>
 
@@ -110,16 +126,30 @@
             <th class="tab-head"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="position-relative overflow-y-auto z-0">
           {#if $data}
             {#each $data
               .slice()
               .reverse()
               .filter((item) => item.name
                     .toLowerCase()
-                    .startsWith(filterText) && item.team.teamId == openedTeam.id)
+                    .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
-              <tr class="workspace-list-item cursor-pointer">
+              <ShowMoreOptions
+                showMenu={isShowMoreVisible == index}
+                menuItems={menuItems(list, index)}
+                rightDistance={9}
+                topDistance={4}
+              />
+              <tr
+                class="workspace-list-item cursor-pointer"
+                on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+                on:click={() => {
+                  !isShowMoreVisible
+                    ? handleOpenCollection(list)
+                    : isShowMoreVisible && handleShowMore(index);
+                }}
+              >
                 <td class="tab-data rounded-start py-3">{list?.name}</td>
 
                 <td class="tab-data py-3"
@@ -134,11 +164,14 @@
                 <td class="tab-data rounded-end py-3"
                   ><button
                     class="show-more-btn rounded border-0"
-                    on:click={(e) => e.stopPropagation()}
-                    ><ShowMoreIcon /></button
+                    on:click={(e) => {
+                      handleShowMore(
+                        isShowMoreVisible == index ? undefined : index,
+                      );
+                      e.stopPropagation();
+                    }}><ShowMoreIcon /></button
                   ></td
                 >
-                <ShowMoreOptions showMenu={isShowMoreVisible} {menuItems} />
               </tr>
             {/each}
           {/if}
@@ -148,7 +181,7 @@
           .reverse()
           .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(filterText) && item.team.teamId == openedTeam.id)
+                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
           <tfoot class="position-sticky bottom-0 z-0">
             <tr>
@@ -158,7 +191,9 @@
                   $data
                     ?.filter(
                       (item) =>
-                        item.name.toLowerCase().startsWith(filterText) &&
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()) &&
                         item.team.teamId == openedTeam.id,
                     )
                     .slice(
@@ -168,7 +203,9 @@
                 )} of {$data
                   ?.filter(
                     (item) =>
-                      item.name.toLowerCase().startsWith(filterText) &&
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()) &&
                       item.team.teamId == openedTeam.id,
                   )
                   .slice(
@@ -200,7 +237,9 @@
                       Math.ceil(
                         $data?.filter(
                           (item) =>
-                            item.name.toLowerCase().startsWith(filterText) &&
+                            item.name
+                              .toLowerCase()
+                              .startsWith(filterText.toLowerCase()) &&
                             item.team.teamId == openedTeam.id,
                         ).length / workspacePerPage,
                       )
@@ -213,7 +252,9 @@
                     Math.ceil(
                       $data?.filter(
                         (item) =>
-                          item.name.toLowerCase().startsWith(filterText) &&
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()) &&
                           item.team.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     )
@@ -226,7 +267,9 @@
                     (currPage = Math.ceil(
                       $data?.filter(
                         (item) =>
-                          item.name.toLowerCase().startsWith(filterText) &&
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()) &&
                           item.team.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     ))}
@@ -235,7 +278,9 @@
                     color={currPage ===
                     Math.ceil(
                       $data?.filter((item) =>
-                        item.name.toLowerCase().startsWith(filterText),
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
                       ).length / workspacePerPage,
                     )
                       ? "#313233"
@@ -258,7 +303,7 @@
           .reverse()
           .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(filterText) && item.team.teamId == openedTeam.id)
+                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
         <p class="not-found-text mt-3">No results found.</p>
       {/if}
@@ -278,6 +323,9 @@
   }
   .table-container::-webkit-scrollbar-thumb {
     background: #888;
+  }
+  .workspace-table-heading {
+    background-color: var(--background-color) !important;
   }
   .search-input-container {
     border: 1px solid var(--border-color);
@@ -308,9 +356,6 @@
     background-color: transparent;
   }
 
-  .table {
-    overflow: auto;
-  }
   .table thead,
   .table tfoot {
     background-color: var(--background-color);
@@ -329,12 +374,14 @@
     background-color: var(--workspace-hover-color);
   }
   .show-more-btn:active .workspace-list-item {
-    background-color: var(--border-color) !important;
   }
   .workspace-list-item:active {
     background-color: var(--sparrow-input-slider-button) !important;
   }
 
+  .show-more-btn:active .workspace-list-item:active {
+    background-color: var(--border-color) !important;
+  }
   .workspace-list-item:hover {
     cursor: pointer !important;
     background-color: var(--border-color);

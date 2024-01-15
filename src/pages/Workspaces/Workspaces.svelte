@@ -15,7 +15,8 @@
   export let data: any,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
-    activeSideBarTabMethods: any;
+    activeSideBarTabMethods: any,
+    collectionsMethods: any;
   let allTeams = [];
   const _viewModel = new WorkspaceViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
@@ -73,6 +74,10 @@
       {data}
       tabList={$tabList}
       collectionList={$collectionList}
+      {handleWorkspaceSwitch}
+      {handleWorkspaceTab}
+      {activeSideBarTabMethods}
+      {collectionsMethods}
     />
     <WorkspaceContent
       {handleWorkspaceSwitch}
