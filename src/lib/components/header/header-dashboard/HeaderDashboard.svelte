@@ -353,7 +353,7 @@
           ? '1'
           : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
-        <div class="position-relative" style="z-index: 9;">
+        <div class="position-relative" style="z-index: 6;">
           <button
             class={`bg-backgroundLight border-0`}
             id="profile-dropdown"
@@ -505,7 +505,7 @@
     cursor: pointer;
   }
   .search-bar {
-    z-index: 11;
+    z-index: 8;
   }
   .background-overlay {
     position: fixed;
@@ -515,7 +515,7 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 10;
+    z-index: 7;
   }
   .input-search-bar {
     width: 100%;
