@@ -249,7 +249,7 @@
           <button
             disabled={componentData?.save}
             style="width:140px;"
-            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+            class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
               if (
                 componentData?.path.collectionId &&
@@ -277,7 +277,7 @@
             <button
               id="save-dropdown"
               on:click={toggleDropdown}
-              class="px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
+              class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
             >
               <img src={angleDown} alt="" class="w-100 h-100" />
             </button>
@@ -327,11 +327,11 @@
 
 <style>
   .btn-primary {
-    background-color: #313233;
+    background-color: #232424;
   }
 
   .btn-primary:hover {
-    background-color: #616364;
+    background-color: #232424;
   }
   .save-options {
     position: absolute;
@@ -361,5 +361,13 @@
     outline: none;
     font-size: 18px;
     font-weight: 400;
+  }
+  .save-request-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  .save-request-dropdown-btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
   }
 </style>
