@@ -7,6 +7,8 @@
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { HelpIcon } from "$lib/assets/app.asset";
+  import SettingsIcon from "$lib/assets/setting.svelte";
+
   export let activeSideBarTabMethods;
   export let selectedActiveSideBarTab;
   function changeSelectedActiveSideBarTab(tab: string) {
@@ -63,7 +65,7 @@
       {changeSelectedActiveSideBarTab}
     />
   </div>
-  <div class="sidebar__help">
+  <div class="sidebar__secondary">
     <Tooltip>
       <div class="sidebar__container sidebar__container_background2">
         <div class="sidebar__container--icon pt-2">
@@ -71,6 +73,16 @@
         </div>
         <div class={`sidebar__container--text mt-1 text-textColor`}>
           <p>Help</p>
+        </div>
+      </div>
+    </Tooltip>
+    <Tooltip>
+      <div class="sidebar__container sidebar__container_background2">
+        <div class="sidebar__container--icon pt-2">
+          <SettingsIcon color={"#8A9299"} />
+        </div>
+        <div class={`sidebar__container--text mt-1 text-textColor`}>
+          <p>Settings</p>
         </div>
       </div>
     </Tooltip>
@@ -92,10 +104,16 @@
     display: flex;
     flex-direction: column;
   }
-  .sidebar__help {
+  .sidebar__secondary {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+  .sidebar__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .sidebar__container--text {
     font-family: Roboto;
