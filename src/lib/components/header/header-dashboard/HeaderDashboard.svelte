@@ -431,14 +431,14 @@
       </div>
     </div>
 
-    <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
-      <div class="col-2">
+    <div class="d-flex">
+      <div class="controller-btn">
         <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
           <img src={icons.minimizeIcon} alt="" />
         </button>
       </div>
 
-      <div class="col-2">
+      <div class="controller-btn">
         <button
           on:click={toggleSize}
           class="button-resize border-0 py-1 px-1"
@@ -451,7 +451,7 @@
           {/if}
         </button>
       </div>
-      <div class="col-2">
+      <div class="controller-btn">
         <button on:click={onClose} class="button-close border-0 py-1 px-1">
           <img src={icons.closeIcon} alt="" />
         </button>
@@ -525,5 +525,9 @@
   }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);
+  }
+  .controller-btn button {
+    height: 44px;
+    width: 44px;
   }
 </style>
