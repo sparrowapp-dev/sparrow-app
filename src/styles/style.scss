@@ -16,6 +16,7 @@ $sparrow-light-gray: #cccccc;
 $sparrow-gradient: red;
 $sparrow-background: #19191A;
 $sparrow-background-light: #1E1E1E;
+$sparrow-background-dark: #1E1E1E;
 $sparrow-plusbutton: #85c2ff;
 $sparrow-border-color: #313233;
 $sparrow-get: #69d696;
@@ -58,6 +59,7 @@ $sparrow-errorTextColor:#fe8c98;
   --white-color: #{$sparrow-white};
   --background-color: #{$sparrow-background};
   --background-light: #{$sparrow-background-light};
+  --background-dark: #{$sparrow-background-dark};
   --border-color: #{$sparrow-border-color};
   --request-get: #{$sparrow-get};
   --request-put: #{$sparrow-put};
@@ -102,6 +104,7 @@ $theme-colors: map-merge(
     "lightGray": $sparrow-light-gray,
     "backgroundColor": $sparrow-background,
     "backgroundLight": $sparrow-background-light,
+    "backgroundDark": $sparrow-background-dark,
     "plusButton": $sparrow-plusbutton,
     "lightBackground": $sparrow-border-color,
     "requestBodyColor": $sparrow-request-body,
@@ -128,6 +131,9 @@ $theme-colors: map-merge(
 @import "bootstrap/scss/root";
 @import "bootstrap";
 
+body{
+  background-color: var(--background-color);
+}
 .border-error {
   border-color: $sparrow-error;
   border-width: 3px;

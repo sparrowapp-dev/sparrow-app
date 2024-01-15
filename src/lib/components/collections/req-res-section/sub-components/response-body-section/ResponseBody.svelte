@@ -145,7 +145,7 @@
       </button>
     </div>
   </div>
-  <div class="w-100 backgroundColor">
+  <div class="w-100 mt-3 backgroundColor">
     <MonacoEditorResponse
       rawTab={apiState.responseRaw}
       rawValue={response.body}

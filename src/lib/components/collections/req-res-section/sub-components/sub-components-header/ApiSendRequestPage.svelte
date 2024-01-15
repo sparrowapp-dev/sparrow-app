@@ -425,7 +425,8 @@
     outline: 2px solid var(--sparrow-blue);
   }
   .url-input {
-    background-color: #111111;
+    background-color: var(--background-dark);
+    border: 1px solid #272727 !important;
     font-size: 12px;
   }
 </style>
