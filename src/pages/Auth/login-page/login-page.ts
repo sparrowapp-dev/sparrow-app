@@ -11,6 +11,8 @@ import {
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
 import { invoke } from "@tauri-apps/api";
+import mixpanel from "mixpanel-browser";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -29,7 +31,14 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     resizeWindowOnLogin();
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
+    const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
+    mixpanel.identify(userDetails._id);
+    mixpanel.people.set({ $email: userDetails.email });
+    MixpanelEvent({
+      eventName: "User_Login",
+      properties: { Login_Method: "Email", Success: response.isSuccessful },
+    });
     notifications.success("Login successful!");
     navigate("/home");
     return response;
