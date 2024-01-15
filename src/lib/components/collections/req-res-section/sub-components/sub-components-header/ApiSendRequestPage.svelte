@@ -297,7 +297,7 @@
         spellcheck="false"
         autocorrect="off"
         autocapitalize="off"
-        style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
+        style="width:{isCollaps ? '100%' : ''}; height:34px;"
         bind:value={urlText}
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
@@ -426,5 +426,6 @@
   }
   .url-input {
     background-color: #111111;
+    font-size: 12px;
   }
 </style>

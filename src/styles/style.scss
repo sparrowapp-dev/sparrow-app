@@ -149,3 +149,10 @@ $theme-colors: map-merge(
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}

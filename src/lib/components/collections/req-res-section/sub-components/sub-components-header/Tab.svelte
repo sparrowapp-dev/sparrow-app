@@ -46,7 +46,7 @@
       {#if tab.type === ItemType.REQUEST}
         <span
           class="text-{getMethodStyle(tab.property.request.method)}"
-          style="font-size: 12px; height: 31px; "
+          style="font-size: 10px; height: 31px; "
           >{tab.property.request.method || ""}</span
         >
       {:else if tab.type === ItemType.FOLDER}
