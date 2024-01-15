@@ -236,12 +236,12 @@
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px; height:20px ;padding: 0px, 6px, 0px, 6px;"
+    style="height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={icons.sparrowicon} alt="sparrowLogo" />
+        <img src={icons.appIcon} class="app-icon" alt="sparrowLogo" />
       </div>
     </div>
     <div
@@ -535,5 +535,10 @@
   }
   .search-container {
     transition: 0.1s ease-in-out;
+  }
+  .app-icon {
+    width: 17.5px;
+    margin-left: 20px;
+    margin-right: 30px;
   }
 </style>

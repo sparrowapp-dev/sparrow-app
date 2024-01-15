@@ -27,6 +27,7 @@ export { default as SelectIcon } from "$lib/assets/select.svelte";
 export { default as ShowMoreIcon } from "$lib/assets/showmore.svelte";
 export { default as EditIcon } from "$lib/assets/edit.svelte";
 import logoSparrow from "$lib/assets/logoSparrow.svg";
+import appIcon from "$lib/assets/sparrow-favicon.svg";
 
 export default {
   closeIcon,
@@ -48,4 +49,5 @@ export default {
   line,
   uploadIcon,
   logoSparrow,
+  appIcon,
 };
