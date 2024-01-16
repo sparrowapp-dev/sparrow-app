@@ -1,14 +1,26 @@
+import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
 import type { CreateEnvironmentPostBody } from "$lib/utils/dto";
+import { environmentType } from "$lib/utils/enums/environment.enum";
+import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
+  private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
 
   constructor() {}
+
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
+  public getactiveEnvironmentTab = (workspaceId: string) => {
+    return this.environmentTabRepository.getEnvironmentTab(workspaceId);
+  };
 
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
@@ -26,32 +38,46 @@ export class EnvironmentViewModel {
     this.environmentRepository.removeEnvironment(id);
   };
 
-  // activates environment
-  public activateEnvironment = (id: string): void => {
-    this.environmentRepository.setActiveEnvironment(id);
-  };
-
-  public get activeEnvironment() {
-    return this.environmentRepository.getActiveEnvironment();
-  }
-
-  public get environments() {
-    return this.environmentRepository.getEnvironment();
-  }
-
-  public currentEnvironment = async (id: string) => {
-    return await this.environmentRepository.getCurrentEnvironment(id);
-  };
-
-  public refreshEnvironment = async (data) => {
-    this.environmentRepository.refreshEnvironment(data);
-  };
-
   public initActiveEnvironmentToWorkspace = async (
     workspaceId: string,
     environmentId: string,
   ) => {
     this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
+  };
+
+  public createEnvironmentTab = async (tab, workspaceId: string) => {
+    this.environmentTabRepository.createTab(tab, workspaceId);
+  };
+
+  public setEnvironmentTabProperty = async (data, route, environmentId) => {
+    this.environmentTabRepository.setEnvironmentTabProperty(
+      data,
+      route,
+      environmentId,
+    );
+  };
+
+  public deleteEnvironmentTab = async (environmentId) => {
+    const flag =
+      await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
+    if (flag) {
+      const globalEnvironment =
+        await this.environmentRepository.getGlobalEnvironment();
+      const sampleEnvironment = generateSampleEnvironment(
+        globalEnvironment.id,
+        globalEnvironment.workspaceId,
+        new Date().toString(),
+      );
+      sampleEnvironment.name = globalEnvironment.name;
+      sampleEnvironment.isActive = true;
+      sampleEnvironment.type = environmentType.GLOBAL;
+      sampleEnvironment.variable = globalEnvironment.variable;
+
+      this.createEnvironmentTab(
+        sampleEnvironment,
+        sampleEnvironment.workspaceId,
+      );
+    }
   };
 
   // services -----------------------------------------------------------

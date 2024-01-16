@@ -15,9 +15,9 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import lockicon from "$lib/assets/lock-icon.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-    import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
-    import { RequestDataset } from "$lib/utils/enums/request.enum";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+  import { RequestDataset } from "$lib/utils/enums/request.enum";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -34,9 +34,9 @@
   let componentData: NewTab;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    if(event){
-    tabName = event?.name;
-    componentData = event;
+    if (event) {
+      tabName = event?.name;
+      componentData = event;
     }
   });
 
@@ -45,7 +45,7 @@
     collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-      let existingRequest;
+    let existingRequest;
     if (!folderId) {
       existingRequest =
         await collectionsMethods.readRequestOrFolderInCollection(
@@ -60,16 +60,16 @@
       );
     }
     const bodyType =
-    componentData.property.request.state.dataset === RequestDataset.RAW
-          ? componentData.property.request.state.raw
-          : componentData.property.request.state.dataset;
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
-      selectedRequestBodyType:setContentTypeHeader(bodyType),
+      selectedRequestBodyType: setContentTypeHeader(bodyType),
     };
     if (!folderId) {
       let res = await updateCollectionRequest(_id, {
@@ -184,10 +184,14 @@
 
   const onRenameBlur = async () => {
     if (!tabName) {
-      const {collectionId, folderId} = componentData?.path; 
-      if(collectionId && folderId){
-        const req = await collectionsMethods.readRequestInFolder(collectionId, folderId, componentData?.id);
-        if(req?.name){
+      const { collectionId, folderId } = componentData?.path;
+      if (collectionId && folderId) {
+        const req = await collectionsMethods.readRequestInFolder(
+          collectionId,
+          folderId,
+          componentData?.id,
+        );
+        if (req?.name) {
           collectionsMethods.updateTab(req.name, "name", componentData.id);
         }
       } else if (collectionId) {
@@ -277,9 +281,10 @@
             >
               <img src={angleDown} alt="" class="w-100 h-100" />
             </button>
-            <div class="rounded save-options {isOpen ? 'd-block' : 'd-none'}">
+            <div
+              class="rounded z-2 save-options {isOpen ? 'd-block' : 'd-none'}"
+            >
               <p
-                style="width:120px;"
                 class="bg-black m-0 py-1 px-3 cursor-pointer rounded fs-6"
                 on:click={() => {
                   isOpen = false;
@@ -330,8 +335,11 @@
   }
   .save-options {
     position: absolute;
+    width: 180px;
     top: 40px;
     right: 0;
+    border: 1px solid var(--border-color);
+    background-color: black;
   }
   .cursor-pointer {
     cursor: pointer;

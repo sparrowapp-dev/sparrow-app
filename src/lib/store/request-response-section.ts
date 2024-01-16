@@ -37,6 +37,7 @@ export const progressiveTab = writable({});
 const createTab = async (tab: NewTab): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     let flag: boolean = false;
+    tab.index = value.length;
     value.forEach((element: NewTab) => {
       if (tab.id === element.id) {
         flag = true;
@@ -69,9 +70,14 @@ const removeTab = async (id: string): Promise<void> => {
         }
       }
     }
+    let index = 0;
     const filteredTabs = doc.filter((elem) => {
       if (elem.id === id) return false;
-      else return true;
+      else {
+        elem.index = index;
+        index++;
+        return true;
+      }
     });
     if (filteredTabs.length === 0) {
       progressiveTab.set({});

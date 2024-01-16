@@ -110,7 +110,7 @@
               filteredEnv.forEach((elem) => {
                 const temp = elem.toMutableJSON();
                 temp.variable.forEach((variable) => {
-                  if (variable.key) {
+                  if (variable.key && variable.checked) {
                     environmentVariables.push({
                       key: variable.key,
                       value: variable.value,
@@ -126,6 +126,10 @@
       }
     },
   );
+
+  const onTabsSwitched=()=>{
+    _viewModel.syncTabWithStore();
+  }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -151,6 +155,7 @@
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
+          onTabsSwitched={onTabsSwitched}
         />
       </div>
       <div class="tab__content d-flex">
@@ -161,7 +166,7 @@
             <RequestResponse
               {activeTab}
               {collectionsMethods}
-              {environmentVariables}
+              environmentVariables={environmentVariables.reverse()}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace

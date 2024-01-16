@@ -7,12 +7,15 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import EnvironmentDeletePopup from "$lib/components/Modal/EnvironmentDeletePopup.svelte";
+  import DeleteConfirmationPopup from "$lib/components/Modal/DeleteConfirmationPopup.svelte";
+  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+  import { notifications } from "$lib/utils/notifications";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentWorkspace;
   export let env;
+  export let currentEnvironment;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -32,8 +35,27 @@
     }, 100);
   }
 
-  const handleEnvironmentPopUp = (flag) => {
+  const handleEnvironmentPopUpCancel = (flag) => {
     isEnvironmentPopup = flag;
+  };
+
+  const handleEnvironmentPopUpSuccess = async () => {
+    const response = await environmentServiceMethods.deleteEnvironment(
+      env.id,
+      currentWorkspace._id,
+    );
+    if (response.isSuccessful) {
+      environmentRepositoryMethods.removeEnvironment(env.id);
+      environmentRepositoryMethods.deleteEnvironmentTab(env.id);
+      handleEnvironmentPopUpCancel(false);
+      notifications.success(
+        `${env.name} environment is removed from ${currentWorkspace.name}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to remove ${env.name} environment from ${currentWorkspace.mame}.`,
+      );
+    }
   };
 
   function closeRightClickContextMenu() {
@@ -42,7 +64,18 @@
 
   //open environment
   function openEnvironment() {
-    environmentRepositoryMethods.activateEnvironment(env.id);
+    let sampleEnvironment = generateSampleEnvironment(
+      env.id,
+      currentWorkspace._id,
+      new Date().toString(),
+    );
+    sampleEnvironment.name = env.name;
+    sampleEnvironment.isActive = true;
+    sampleEnvironment.variable = env.variable;
+    environmentRepositoryMethods.createEnvironmentTab(
+      sampleEnvironment,
+      currentWorkspace._id,
+    );
     showMenu = false;
   }
 
@@ -61,6 +94,11 @@
         environmentRepositoryMethods.updateEnvironment(env.id, {
           name: newEnvironmentName,
         });
+        environmentRepositoryMethods.setEnvironmentTabProperty(
+          newEnvironmentName,
+          "name",
+          env.id,
+        );
       }
     }
     isRenaming = false;
@@ -122,7 +160,7 @@
         },
         {
           onClick: () => {
-            handleEnvironmentPopUp(true);
+            handleEnvironmentPopUpCancel(true);
           },
           displayText: "Delete",
           disabled: false,
@@ -133,12 +171,22 @@
 </script>
 
 {#if isEnvironmentPopup}
-  <EnvironmentDeletePopup
+  <DeleteConfirmationPopup
     {env}
     {currentWorkspace}
+    title={`Delete Environment?`}
+    description={`<p>
+      Are you sure you want to delete this Environment? <span
+        style="font-weight:700;"
+        class="text-whiteColor">"${env.name}"</span
+      >
+      and all its variables will be removed and cannot be restored. It will also
+      impact all the API requests that use the variables in this environment.
+    </p>`}
+    onSuccess={handleEnvironmentPopUpSuccess}
+    onCancel={handleEnvironmentPopUpCancel}
     {environmentRepositoryMethods}
     {environmentServiceMethods}
-    closePopup={handleEnvironmentPopUp}
   />
 {/if}
 
@@ -177,7 +225,8 @@
 <div class="environment-tab">
   <button
     style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env.isActive
+    class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env?.id ===
+    currentEnvironment?.id
       ? 'active-collection-tab'
       : ''}"
   >

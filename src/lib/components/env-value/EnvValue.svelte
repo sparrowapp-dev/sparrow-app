@@ -18,7 +18,12 @@
   let filteredKeyValuePairs: EnvValuePair[] = pairs;
   const updateFilteredKeyValuePairs = (pairs: EnvValuePair[]) => {
     return (filteredKeyValuePairs = pairs.filter((elem, index) => {
-      if (elem.key.startsWith(filterText) || filterText == "") return true;
+      if (
+        elem.key.includes(filterText) ||
+        elem.value.includes(filterText) ||
+        filterText == ""
+      )
+        return true;
     }));
   };
   let controller: boolean = false;
@@ -143,13 +148,12 @@
       </Tooltip>
     </div>
     <div
-      class="d-flex gap-5 text-requestBodyColor align-items-center"
-      style="font-size: 12px; font-weight: 500; width: 46vw;"
+      class="d-flex pe-5 text-requestBodyColor align-items-center w-100"
+      style="font-size: 12px; font-weight: 500; "
     >
       <p class="flex-grow-1 w-100 ps-2">Variable</p>
       <p class="flex-grow-1 w-100 ps-2">Value</p>
     </div>
-    <!-- <div style="width:60px;" /> -->
   </div>
 
   <div
@@ -169,12 +173,6 @@
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
           >
-            <!-- <img
-              src={dragIcon}
-              alt=""
-              class="d-none"
-              style="cursor:grabbing;"
-            /> -->
             <div class="form-check-input-container" style="width:30px;">
               <input class="form-check-input" type="checkbox" disabled />
             </div>
@@ -238,16 +236,14 @@
             >
               <div class="form-check-input-container" style="width:30px; ">
                 {#if filteredKeyValuePairs.length - 1 != index || mode === "READ"}
-                  <Tooltip text={`${element.checked ? "Unselect" : "Select"}`}>
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      bind:checked={element.checked}
-                      on:input={() => {
-                        updateCheck(index);
-                      }}
-                    />
-                  </Tooltip>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    bind:checked={element.checked}
+                    on:input={() => {
+                      updateCheck(index);
+                    }}
+                  />
                 {/if}
               </div>
               <div class="w-100 d-flex gap-2">
@@ -293,36 +289,21 @@
               </div>
               {#if filteredKeyValuePairs.length - 1 != index}
                 <div class="h-75 pe-1 d-flex">
-                  <!-- <button
-                class="bg-backgroundColor border-0"
-                  style="width: 40px;"
-                  on:click={() => {
-                    lockParam(index);
-                  }}
-                >
-                  <LockIcon locked={element.locked} />
-                </button> -->
-                  <Tooltip text="Delete">
-                    <button
-                      class="border-0 delete-btn pb-1 rounded"
-                      style="width:30px;"
-                    >
-                      <img
-                        src={trashIcon}
-                        on:click={() => {
-                          deleteParam(index);
-                        }}
-                        alt=""
-                      />
-                    </button>
-                  </Tooltip>
+                  <button
+                    class="border-0 delete-btn pb-1 rounded"
+                    style="width:30px;"
+                  >
+                    <img
+                      src={trashIcon}
+                      on:click={() => {
+                        deleteParam(index);
+                      }}
+                      alt=""
+                    />
+                  </button>
                 </div>
               {:else}
                 <div class="h-75 pe-1 d-flex">
-                  <!-- <button
-                  class="bg-backgroundColor border-0"
-                  style="width:40px;"
-                /> -->
                   <button
                     class="bg-backgroundColor border-0"
                     style="width:30px;"
@@ -345,7 +326,7 @@
   .search-input-container {
     border: 1px solid var(--border-color);
     background: var(--background-color);
-    width: 27vw;
+    max-width: 400px;
     font-size: 12px;
   }
   .search-input-container > input:focus {
@@ -417,7 +398,6 @@
     padding: 5px 0px;
   }
   .form-check-input {
-    /* width: 50%; */
     display: flex;
     align-items: center;
     justify-content: center;
