@@ -35,6 +35,7 @@
 
   export let activeSideBarTabMethods;
 
+  const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
   const _collectionMethods = new CollectionsViewModel();
@@ -239,6 +240,13 @@
     style="height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
+    {#if !isWin}
+      <div class="d-flex mac-container">
+        <div on:click={onClose} class="mac-nav"></div>
+        <div on:click={onMinimize} class="mac-nav mx-3"></div>
+        <div on:click={toggleSize} class="mac-nav"></div>
+      </div>
+    {/if}
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
         <img src={icons.appIcon} class="app-icon" alt="sparrowLogo" />
@@ -434,32 +442,34 @@
       </div>
     </div>
 
-    <div class="d-flex">
-      <div class="controller-btn">
-        <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
-          <img src={icons.minimizeIcon} alt="" />
-        </button>
-      </div>
+    {#if isWin}
+      <div class="d-flex">
+        <div class="controller-btn">
+          <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
+            <img src={icons.minimizeIcon} alt="" />
+          </button>
+        </div>
 
-      <div class="controller-btn">
-        <button
-          on:click={toggleSize}
-          class="button-resize border-0 py-1 px-1"
-          id="resize-button"
-        >
-          {#if isMaximizeWindow === true}
-            <img src={icons.doubleResizeIcon} alt="" />
-          {:else}
-            <img src={icons.resizeIcon} alt="" />
-          {/if}
-        </button>
+        <div class="controller-btn">
+          <button
+            on:click={toggleSize}
+            class="button-resize border-0 py-1 px-1"
+            id="resize-button"
+          >
+            {#if isMaximizeWindow === true}
+              <img src={icons.doubleResizeIcon} alt="" />
+            {:else}
+              <img src={icons.resizeIcon} alt="" />
+            {/if}
+          </button>
+        </div>
+        <div class="controller-btn">
+          <button on:click={onClose} class="button-close border-0 py-1 px-1">
+            <img src={icons.closeIcon} alt="" />
+          </button>
+        </div>
       </div>
-      <div class="controller-btn">
-        <button on:click={onClose} class="button-close border-0 py-1 px-1">
-          <img src={icons.closeIcon} alt="" />
-        </button>
-      </div>
-    </div>
+    {/if}
   </div>
 </div>
 
@@ -546,5 +556,23 @@
   }
   .header {
     border-bottom: 1px solid var(--border-color);
+  }
+  .mac-container {
+    margin-left: 20px;
+  }
+  .mac-nav {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .mac-nav:nth-child(1) {
+    background-color: #ff605c;
+  }
+  .mac-nav:nth-child(2) {
+    background-color: #ffbd44;
+  }
+  .mac-nav:nth-child(3) {
+    background-color: #00ca4e;
   }
 </style>
