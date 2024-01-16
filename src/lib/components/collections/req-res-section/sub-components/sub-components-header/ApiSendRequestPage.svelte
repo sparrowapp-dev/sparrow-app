@@ -396,8 +396,8 @@
   }
 
   .view-active {
-    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
-      brightness(100%) contrast(100%);
+    filter: invert(60%) sepia(99%) saturate(302%) hue-rotate(183deg)
+      brightness(102%) contrast(105%);
   }
 
   .btn-primary:hover {
