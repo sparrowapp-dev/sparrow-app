@@ -163,7 +163,7 @@
             ),
           );
           moveNavigation("right");
-          MixpanelEvent(Events.ADD_NEW_API_REQUEST, { Source: "TabBar" });
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
         }}
       >
         <img src={plusIcon} alt="" />

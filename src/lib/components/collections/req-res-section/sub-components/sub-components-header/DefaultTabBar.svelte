@@ -220,7 +220,7 @@
           );
           moveNavigation("right");
           MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-            Source: "ClosedTabView",
+            source: "ClosedTabView",
           });
         }}
       >

@@ -201,7 +201,7 @@
     expand = true;
     handleAPIClick();
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-      Source: "Side Panel Dropdown",
+      source: "Side Panel Dropdown",
     });
   }
 
@@ -389,10 +389,10 @@
             src={requestIcon}
             alt="+ API Request"
             on:click={() => {
-              handleAPIClick(),
-                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                  Source: "Side Panel Collection List",
-                });
+              handleAPIClick();
+              MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                source: "Side Panel Collection List",
+              });
             }}
           />
         </div>

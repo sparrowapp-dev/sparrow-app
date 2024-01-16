@@ -241,7 +241,7 @@
       });
       notifications.success("New Collection Created");
       MixpanelEvent(Events.CREATE_COLLECTION, {
-        Source: collectionSource,
+        source: collectionSource,
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
       });

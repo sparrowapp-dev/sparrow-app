@@ -42,7 +42,7 @@
       generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
     );
     moveNavigation("right");
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { Source: "Side Panel TopBar" });
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "Side Panel TopBar" });
   };
 </script>
 
