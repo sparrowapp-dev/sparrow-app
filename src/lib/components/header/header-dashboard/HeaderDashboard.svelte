@@ -243,7 +243,7 @@
     {#if !isWin}
       <div class="d-flex mac-container">
         <div on:click={onClose} class="mac-nav"></div>
-        <div on:click={onMinimize} class="mac-nav mx-3"></div>
+        <div on:click={onMinimize} class="mac-nav"></div>
         <div on:click={toggleSize} class="mac-nav"></div>
       </div>
     {/if}
@@ -571,6 +571,7 @@
   }
   .mac-nav:nth-child(2) {
     background-color: #ffbd44;
+    margin: 0 10px;
   }
   .mac-nav:nth-child(3) {
     background-color: #00ca4e;
