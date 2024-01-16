@@ -13,8 +13,6 @@
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
-  import mixpanel from "mixpanel-browser";
-
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
@@ -34,7 +32,6 @@
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
 
   export let url = "/";
-  mixpanel.init("00f34b97cafab7c0e5a4ea2e00ea7bfb", { debug: true });
   const tabRepository = new TabRepository();
   let flag: boolean = true;
 
