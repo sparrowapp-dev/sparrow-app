@@ -20,26 +20,33 @@
         <span class="sparrow-input-required">*</span>
       {/if}
     </div>
-    <span class="sparrow-input-label-desc">{labelDescription}</span>
+    {#if value.length === 0}
+      <span class="sparrow-input-label-desc">{labelDescription}</span>
+    {/if}
   </div>
-  <div class="sparrow-file-input w-100 px-auto">
-    <span
-      class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
-      >Drag and Drop or</span
-    >
-    <div
-      class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
-    >
-      <UploadIcon classProp="my-auto" />
-      <input
-        class="sparrow-choose-file-input"
-        type="file"
-        {value}
-        id={inputId}
-        placeholder={inputPlaceholder}
-        on:change={(e) => onChange(e)}
-      />
+  {#if value.length == 0}
+    <div class="sparrow-file-input w-100 px-auto">
+      <span
+        class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
+        >Drag and Drop or</span
+      >
+      <div
+        class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
+      >
+        <UploadIcon classProp="my-auto" />
+        <input
+          class="sparrow-choose-file-input"
+          type="file"
+          {value}
+          id={inputId}
+          placeholder={inputPlaceholder}
+          on:change={(e) => onChange(e)}
+        />
+      </div>
     </div>
+  {/if}
+  <div>
+    <img src="" alt=""/>
   </div>
 </div>
 

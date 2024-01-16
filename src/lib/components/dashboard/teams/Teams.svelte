@@ -74,6 +74,7 @@
     newTeam.name.value = e.target.value;
   };
   const handleTeamDescChange = (e: any) => {
+    console.log(teams);
     newTeam.description.value = e.target.value;
   };
   const handleLogoInputChange = (e: any) => {
@@ -107,20 +108,12 @@
       notifications.error("Failed to create a new team.");
     }
   };
-  const getImgData = (buffer) => {
-    const files = buffer;
-    if (files) {
-      const imgPreview = document.getElementById("img-preview");
-
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(files);
-      fileReader.addEventListener("load", function () {
-        imgPreview.style.display = "block";
-        imgPreview.innerHTML = '<img src="' + this.result + '" />';
-      });
-    }
+  const ret = (base64str) => {
+    if (!base64str) return "";
+    console.log(base64str.buffer);
+    return `data:image/png;base64,${base64str?.buffer}`;
   };
-
+ 
   onDestroy(() => {
     openedTeamSubscribe();
   });
@@ -141,7 +134,6 @@
     </div>
   </div>
   <div class="sidebar-teams-list sparrow-thin-scrollbar overflow-y-auto">
-    <div id="img-preview"></div>
     {#each teams as team, index}
       <button
         class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
@@ -149,12 +141,10 @@
         }`}
         on:click={() => {
           handleOpenTeam(team.teamId, team.name);
-          // bufferToDataURL(team.logo);
-          getImgData(team.logo);
         }}
       >
         <div class="d-flex overflow-hidden">
-          <!-- <img id={index == 1 && "myimage"} src={undefined} alt="" /> -->
+          <img src={ret(team.logo)} alt="" />
           <p class="ellipsis overflow-hidden mb-0">{team.name}</p>
         </div>
         <PeopleIcon
@@ -205,6 +195,10 @@
     inputPlaceholder="Drag and Drop or"
     isRequired={false}
   />
+  <div>
+    <!-- <img src={bufferToDataURL(newTeam.file.value)} alt="img" /> -->
+    <div id="img-preview"></div>
+  </div>
 </CustomPopup>
 
 <style>
@@ -240,16 +234,5 @@
   }
   .sidebar-teams-list {
     max-height: 30vh;
-  }
-  #img-preview {
-    display: none;
-    width: 155px;
-    border: 2px dashed #333;
-    margin-bottom: 20px;
-  }
-  #img-preview img {
-    width: 100%;
-    height: auto;
-    display: block;
   }
 </style>
