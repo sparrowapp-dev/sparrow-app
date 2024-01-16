@@ -285,7 +285,7 @@
               class="rounded z-2 save-options {isOpen ? 'd-block' : 'd-none'}"
             >
               <p
-                class="bg-black m-0 py-1 px-3 cursor-pointer rounded fs-6"
+                class="m-1 saveas-text m-0 py-1 px-3 cursor-pointer rounded fs-6"
                 on:click={() => {
                   isOpen = false;
                   visibility = true;
@@ -339,7 +339,7 @@
     top: 40px;
     right: 0;
     border: 1px solid var(--border-color);
-    background-color: black;
+    background-color: var(--background-dropdown);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -369,5 +369,8 @@
   .save-request-dropdown-btn {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+  }
+  .saveas-text:hover {
+    background-color: #232424;
   }
 </style>

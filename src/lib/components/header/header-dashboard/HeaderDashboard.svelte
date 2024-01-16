@@ -382,8 +382,8 @@
 
           {#if isOpen}
             <div
-              class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
-              style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
+              class="rounded z-3 profile-explorer bg-backgroundDropdown position-absolute text-color-white py-1"
+              style="border: 1px solid #313233; backdrop-filter: blur(15px); display: {isOpen
                 ? 'block'
                 : 'none'}; top: 40px; right: -10px; width: 219px;"
               on:click={() => {

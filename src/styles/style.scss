@@ -17,6 +17,7 @@ $sparrow-gradient: red;
 $sparrow-background: #19191A;
 $sparrow-background-light: #1E1E1E;
 $sparrow-background-dark: #1E1E1E;
+$sparrow-background-dropdown :#141414;
 $sparrow-plusbutton: #85c2ff;
 $sparrow-border-color: #313233;
 $sparrow-get: #69d696;
@@ -60,6 +61,7 @@ $sparrow-errorTextColor:#fe8c98;
   --background-color: #{$sparrow-background};
   --background-light: #{$sparrow-background-light};
   --background-dark: #{$sparrow-background-dark};
+  --background-dropdown: #{$sparrow-background-dropdown};
   --border-color: #{$sparrow-border-color};
   --request-get: #{$sparrow-get};
   --request-put: #{$sparrow-put};
@@ -105,6 +107,7 @@ $theme-colors: map-merge(
     "backgroundColor": $sparrow-background,
     "backgroundLight": $sparrow-background-light,
     "backgroundDark": $sparrow-background-dark,
+    "backgroundDropdown": $sparrow-background-dropdown,
     "plusButton": $sparrow-plusbutton,
     "lightBackground": $sparrow-border-color,
     "requestBodyColor": $sparrow-request-body,

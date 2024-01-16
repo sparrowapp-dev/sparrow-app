@@ -14,6 +14,8 @@
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { RequestProperty } from "$lib/utils/enums/request.enum";
+  import StatusSuccess from "$lib/assets/status-success.svelte";
+  import StatusError from "$lib/assets/status-error.svelte";
 
   export let response;
   export let apiState;
@@ -156,10 +158,48 @@
         >
           {#if statusCode?.length > 12}
             <div class="position-absolute tooltip-statuscode">
-              <span class="ellipsis">{statusCode}</span>
+              <span class="ellipsis">
+                <span class="me-1">
+                  {#if statusCode === "200 OK"}
+                    <StatusSuccess
+                      height={8}
+                      width={8}
+                      backgroundColor={"var(--success-color)"}
+                      textColor={"var(--background-color)"}
+                    />
+                  {:else}
+                    <StatusError
+                      height={8}
+                      width={8}
+                      backgroundColor={"var(--request-delete)"}
+                      textColor={"var(--background-color)"}
+                    />
+                  {/if}
+                </span>
+                {statusCode}</span
+              >
             </div>
           {/if}
-          <span class="ellipsis">{statusCode}</span>
+          <span class="ellipsis">
+            <span class="me-1">
+              {#if statusCode === "200 OK"}
+                <StatusSuccess
+                  height={8}
+                  width={8}
+                  backgroundColor={"var(--success-color)"}
+                  textColor={"var(--background-color)"}
+                />
+              {:else}
+                <StatusError
+                  height={8}
+                  width={8}
+                  backgroundColor={"var(--request-delete)"}
+                  textColor={"var(--background-color)"}
+                />
+              {/if}
+            </span>
+            {statusCode}</span
+          >
         </button>
         <button
           class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"

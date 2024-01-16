@@ -117,7 +117,7 @@
     background-color: var(--border-color);
   }
   .dropdown-data {
-    background-color: black;
+    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
     top: 40px;

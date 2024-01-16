@@ -108,7 +108,7 @@
     border-bottom: 1px solid var(--send-button);
   }
   .dropdown-data {
-    background-color: black;
+    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
     top: 32px;
