@@ -77,7 +77,6 @@
       isShowMoreVisible = undefined;
     }, 100);
   };
-
 </script>
 
 <svelte:window
@@ -109,14 +108,17 @@
         {/if}
       </div>
     {/if}
-    <div class="table-container overflow-y-auto" style="max-height: 60vh; height: auto;">
+    <div
+      class=" table-container sparrow-thin-scrollbar overflow-y-auto"
+      style="max-height: 60vh; height: auto;"
+    >
       <table
         class="table p-0 table-responsive bg-backgroundColor w-100"
         style="max-height: 100%;"
         data-search="true"
       >
         <thead
-          class="position-sticky workspace-table-heading bg-backgroundColor top-0 z-1"
+          class="position-sticky workspace-table-heading bg-backgroundColor top-0 z-2"
         >
           <tr class="">
             <th data-sortable="true" class="tab-head">Workspace</th>
@@ -126,7 +128,7 @@
             <th class="tab-head"></th>
           </tr>
         </thead>
-        <tbody class="position-relative overflow-y-auto z-0">
+        <tbody class="position-relative overflow-y-auto">
           {#if $data}
             {#each $data
               .slice()
@@ -139,18 +141,21 @@
                 showMenu={isShowMoreVisible == index}
                 menuItems={menuItems(list, index)}
                 rightDistance={9}
-                topDistance={4}
+                topDistance={index * 8 + 3}
               />
               <tr
-                class="workspace-list-item cursor-pointer"
+                class="workspace-list-item cursor-pointer overflow-hidden ellipsis w-100"
                 on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-                on:click={() => {
+                on:click={(e) => {
                   !isShowMoreVisible
                     ? handleOpenCollection(list)
                     : isShowMoreVisible && handleShowMore(index);
+                  e.stopPropagation();
                 }}
               >
-                <td class="tab-data rounded-start py-3">{list?.name}</td>
+                <td class="tab-data rounded-start py-3 overflow-hidden ellipsis"
+                  >{list?.name}</td
+                >
 
                 <td class="tab-data py-3"
                   >{list?.collections?.length ? list.collections.length : 0}</td
@@ -183,35 +188,25 @@
                 .toLowerCase()
                 .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
-          <tfoot class="position-sticky bottom-0 z-0">
+          <tfoot class="position-sticky bottom-0">
             <tr>
               <th class="tab-head"
                 >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
                   currPage * workspacePerPage,
-                  $data
-                    ?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
-                    )
-                    .slice(
-                      (currPage - 1) * workspacePerPage,
-                      currPage * workspacePerPage,
-                    ).length,
-                )} of {$data
-                  ?.filter(
+                  $data?.filter(
                     (item) =>
                       item.name
                         .toLowerCase()
                         .startsWith(filterText.toLowerCase()) &&
                       item.team.teamId == openedTeam.id,
-                  )
-                  .slice(
-                    (currPage - 1) * workspacePerPage,
-                    currPage * workspacePerPage,
-                  ).length}
+                  ).length,
+                )} of {$data?.filter(
+                  (item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()) &&
+                    item.team.teamId == openedTeam.id,
+                ).length}
               </th>
               <th class="tab-head gap-2">
                 <button
@@ -277,10 +272,12 @@
                   ><DoubleRightIcon
                     color={currPage ===
                     Math.ceil(
-                      $data?.filter((item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()),
+                      $data?.filter(
+                        (item) =>
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()) &&
+                          item.team.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     )
                       ? "#313233"
@@ -318,12 +315,7 @@
     font-weight: 400;
     text-align: center;
   }
-  .table-container::-webkit-scrollbar {
-    width: 2px;
-  }
-  .table-container::-webkit-scrollbar-thumb {
-    background: #888;
-  }
+
   .workspace-table-heading {
     background-color: var(--background-color) !important;
   }
@@ -373,13 +365,12 @@
   .show-more-btn:active {
     background-color: var(--workspace-hover-color);
   }
-  .show-more-btn:active .workspace-list-item {
-  }
+
   .workspace-list-item:active {
     background-color: var(--sparrow-input-slider-button) !important;
   }
 
-  .show-more-btn:active .workspace-list-item:active {
+  .show-more-btn:active .workspace-list-item {
     background-color: var(--border-color) !important;
   }
   .workspace-list-item:hover {

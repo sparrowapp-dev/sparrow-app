@@ -194,7 +194,7 @@
       </button>
     </div>
   {/if}
-  <ul class={`env-side-tab-list overflow-y-scroll px-2`}>
+  <ul class={`env-side-tab-list sparrow-thin-scrollbar overflow-y-scroll px-2`}>
     {#if localEnvironment && localEnvironment.length > 0}
       {#each localEnvironment as env}
         <EnvironmentTab
@@ -283,12 +283,7 @@
     overflow-y: scroll;
     height: 78vh;
   }
-  .env-side-tab-list::-webkit-scrollbar {
-    width: 2px;
-  }
-  .env-side-tab-list::-webkit-scrollbar-thumb {
-    background: #888;
-  }
+
   .show-more-btn {
     margin-right: 0;
     background-color: transparent;

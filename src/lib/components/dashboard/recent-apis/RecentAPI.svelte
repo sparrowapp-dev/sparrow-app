@@ -1,11 +1,12 @@
 <script lang="ts">
+  import constants from "$lib/utils/constants";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import Helper from "./Helper.svelte";
   export let tabList;
   export let data: any;
   export let collectionList;
-  export let collectionsMethods: any = undefined, activeSideBarTabMethods: any;
-
+  export let collectionsMethods: any = undefined,
+    activeSideBarTabMethods: any;
 
   let requestCount: number = 0;
   tabList.map((item) => {
@@ -19,8 +20,14 @@
   <h6 class="teams-heading">Recent APIs</h6>
   {#if tabList}
     {#each tabList.slice().reverse() as api, index}
-      {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED")}
-        <Helper {api} {data} {collectionList} {collectionsMethods} {activeSideBarTabMethods} />
+      {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
+        <Helper
+          {api}
+          {data}
+          {collectionList}
+          {collectionsMethods}
+          {activeSideBarTabMethods}
+        />
       {/if}
     {/each}
   {/if}

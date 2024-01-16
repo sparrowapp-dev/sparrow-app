@@ -81,7 +81,7 @@
   style="max-width: 47.5%; max-height: 32%; "
 >
   <div
-    class="bg-black workspace-card rounded position-relative p-4 position-relative"
+    class="bg-black workspace-card rounded p-4 {isShowMoreVisible && 'position-relative'}"
     on:mouseleave={() => isShowMoreVisible && handleShowMore()}
     on:click={() => {
       !isShowMoreVisible
@@ -89,8 +89,8 @@
         : isShowMoreVisible && handleShowMore();
     }}
   >
-    <div class="d-flex justify-content-between">
-      <h4>{workspace.name}</h4>
+    <div class="d-flex overflow-hidden justify-content-between">
+      <h4 class="ellipsis overflow-hidden">{workspace.name}</h4>
       <button
         class="border-0 my-auto show-more-btn rounded"
         on:click={(e) => {
@@ -120,7 +120,7 @@
 
 <style>
   .workspace-card {
-    z-index: 1 !important;
+    z-index: 0 !important;
   }
   .workspace-card:hover {
     background-color: #313233 !important;

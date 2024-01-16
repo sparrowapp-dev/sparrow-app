@@ -5,7 +5,7 @@
 </script>
 
 {#if showMenu}
-  <div class="sparrow-show-more-container">
+  <div class="sparrow-show-more-container z-1">
     <nav class="p-0" style="position: absolute; right: {rightDistance}vw; top: {topDistance}vh; z-index:4;">
       <div
         class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor sparrow-navbar"

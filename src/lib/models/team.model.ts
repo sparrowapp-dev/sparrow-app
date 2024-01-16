@@ -17,6 +17,9 @@ export const teamSchemaLiteral = {
     name: {
       type: "string",
     },
+    logo: {
+      type: "object",
+    },
     workspaces: {
       type: "array",
       uniqueItems: true,

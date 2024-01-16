@@ -95,6 +95,7 @@ export class TeamRepository {
     team.incrementalModify((value) => {
       if (data.name) value.name = data.name;
       if (data.workspaces) value.workspaces = data.workspaces;
+      if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;
       if (data.owner) value.owner = data.owner;
       if (data.admins) value.admins = data.admins;

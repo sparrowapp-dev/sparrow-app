@@ -6,7 +6,8 @@
     labelDescription: string = "",
     inputId: string,
     inputPlaceholder: string,
-    isRequired: boolean = false;
+    isRequired: boolean = false,
+    onChange: (e: any) => void;
 </script>
 
 <div class="sparrow-text-input-container mt-3">
@@ -36,6 +37,7 @@
         {value}
         id={inputId}
         placeholder={inputPlaceholder}
+        on:change={(e) => onChange(e)}
       />
     </div>
   </div>

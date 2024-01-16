@@ -155,10 +155,12 @@
   {#if currWorkspaceName}
     <button
       style="font-size: 12px;"
-      class="dropdown-btn rounded border-0 ps-2 py-2 gap-2 ellipsis"
+      class="dropdown-btn rounded border-0 ps-2 py-2 gap-2 ellipsis overflow-hidden"
       on:click={toggleDropdown}
       id="workspace-dropdown"
-      >{currTeamName} / {currWorkspaceName}
+    >
+      <span class="ellipsis overflow-hidden">{currTeamName}</span>
+      / <span class="ellipsis overflow-hidden">{currWorkspaceName}</span>
       <span class="px-2" class:dropdown-logo-active={isOpen}
         ><img
           style="height:15px; width:20px;"
@@ -244,6 +246,7 @@
     outline: none;
     cursor: pointer;
     border: none;
+    max-width: 19vw;
   }
 
   .drop-btn {

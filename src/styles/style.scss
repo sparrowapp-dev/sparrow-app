@@ -150,3 +150,10 @@ $theme-colors: map-merge(
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.sparrow-thin-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+.sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+}

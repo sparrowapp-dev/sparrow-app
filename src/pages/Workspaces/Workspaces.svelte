@@ -10,14 +10,20 @@
   import { onDestroy } from "svelte";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import { setCurrentTeam, setOpenedTeam } from "$lib/store/team.store";
+  import {
+    openedTeam,
+    setCurrentTeam,
+    setOpenedTeam,
+  } from "$lib/store/team.store";
   import { setCurrentWorkspace } from "$lib/store/workspace.store";
+  import type { CurrentTeam } from "$lib/utils/interfaces";
   export let data: any,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     activeSideBarTabMethods: any,
     collectionsMethods: any;
-  let allTeams = [];
+  let allTeams = [],
+    currOpenedTeam: CurrentTeam;
   const _viewModel = new WorkspaceViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
@@ -28,7 +34,9 @@
   const userSubscribe = user.subscribe(async (value) => {
     if (value) await _viewModel.refreshTeams(value._id);
   });
-
+  const openedTeamSubscribe = openedTeam.subscribe((value) => {
+    if (value) currOpenedTeam = value;
+  });
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
   let activeTeamRxDoc: TeamDocument;
@@ -50,7 +58,10 @@
           value[0].get("workspaces")[0].name,
         );
       }
-      setOpenedTeam(value[0].get("teamId"), value[0].get("name"));
+      setOpenedTeam(
+        currOpenedTeam.id ? currOpenedTeam.id : value[0].get("teamId"),
+        currOpenedTeam.name ? currOpenedTeam.name : value[0].get("name"),
+      );
     }
   });
 
@@ -62,6 +73,7 @@
 
   onDestroy(() => {
     userSubscribe();
+    openedTeamSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });

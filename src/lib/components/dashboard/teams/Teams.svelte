@@ -23,7 +23,7 @@
       invalid: boolean;
     };
     file: {
-      value: [];
+      value: any;
       invalid: boolean;
     };
   };
@@ -76,7 +76,14 @@
   const handleTeamDescChange = (e: any) => {
     newTeam.description.value = e.target.value;
   };
-  const handleCreateTeam = async (name: string, description: string) => {
+  const handleLogoInputChange = (e: any) => {
+    newTeam.file.value = e.target.files[0];
+  };
+  const handleCreateTeam = async (
+    name: string,
+    description: string,
+    file: any,
+  ) => {
     if (name == "") newTeam.name.invalid = true;
     if (description == "") newTeam.description.invalid = true;
     isTeamCreatedFirstTime.set(true);
@@ -85,6 +92,7 @@
     const teamData = {
       name: teamObj.name,
       description: teamObj.description,
+      image: file,
     };
 
     _viewModel.addTeam(teamData);
@@ -92,11 +100,24 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      _viewModel.modifyTeam(21, res);
+      _viewModel.modifyTeam(res._id, res);
       notifications.success("New team Techdome is created.");
       handleCreateTeamModal();
     } else {
       notifications.error("Failed to create a new team.");
+    }
+  };
+  const getImgData = (buffer) => {
+    const files = buffer;
+    if (files) {
+      const imgPreview = document.getElementById("img-preview");
+
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files);
+      fileReader.addEventListener("load", function () {
+        imgPreview.style.display = "block";
+        imgPreview.innerHTML = '<img src="' + this.result + '" />';
+      });
     }
   };
 
@@ -119,23 +140,30 @@
       </Tooltip>
     </div>
   </div>
-  {#each teams as team}
-    <button
-      class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
-        currOpenedTeam.id == team.teamId && "active"
-      }`}
-      on:click={() => handleOpenTeam(team.teamId, team.name)}
-    >
-      <div class="d-flex">
-        <img src={team.icon} alt="" />
-        <p class=" mb-0">{team.name}</p>
-      </div>
-      <PeopleIcon
-        color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
-        classProp={team.users.length <= 1 && "d-none"}
-      />
-    </button>
-  {/each}
+  <div class="sidebar-teams-list sparrow-thin-scrollbar overflow-y-auto">
+    <div id="img-preview"></div>
+    {#each teams as team, index}
+      <button
+        class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
+          currOpenedTeam.id == team.teamId && "active"
+        }`}
+        on:click={() => {
+          handleOpenTeam(team.teamId, team.name);
+          // bufferToDataURL(team.logo);
+          getImgData(team.logo);
+        }}
+      >
+        <div class="d-flex overflow-hidden">
+          <!-- <img id={index == 1 && "myimage"} src={undefined} alt="" /> -->
+          <p class="ellipsis overflow-hidden mb-0">{team.name}</p>
+        </div>
+        <PeopleIcon
+          color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
+          classProp={team.users.length <= 1 && "d-none"}
+        />
+      </button>
+    {/each}
+  </div>
 </section>
 <CustomPopup
   isOpen={isCreateTeamModalOpen}
@@ -143,7 +171,11 @@
   btnText={"Create Team"}
   handleOpen={handleCreateTeamModal}
   handleSubmit={() =>
-    handleCreateTeam(newTeam.name.value, newTeam.description.value)}
+    handleCreateTeam(
+      newTeam.name.value,
+      newTeam.description.value,
+      newTeam.file.value,
+    )}
 >
   <TextInput
     value={newTeam.name.value}
@@ -156,7 +188,7 @@
     errorText={"Team name cannot be empty."}
   />
   <ParaInput
-    value=""
+    value={newTeam.description.value}
     labelText="About"
     labelDescription="max: 500 characters"
     inputId="team-desc-input"
@@ -165,7 +197,8 @@
   />
 
   <FileInput
-    value={""}
+    value={newTeam.file.value}
+    onChange={handleLogoInputChange}
     labelText="Logo"
     labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 2 MB. Supported formats are .jpg, .jpeg, .png "
     inputId="team-file-input"
@@ -204,5 +237,19 @@
     width: 20px;
     height: 20px;
     margin-right: 10px;
+  }
+  .sidebar-teams-list {
+    max-height: 30vh;
+  }
+  #img-preview {
+    display: none;
+    width: 155px;
+    border: 2px dashed #333;
+    margin-bottom: 20px;
+  }
+  #img-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 </style>

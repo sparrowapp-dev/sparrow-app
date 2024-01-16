@@ -68,6 +68,7 @@ export class WorkspaceViewModel {
     return {
       teamId: elem.get("teamId"),
       name: elem.get("name"),
+      logo: elem.get("logo"),
       workspaces: elem.get("workspaces"),
       users: elem.get("users"),
       owner: elem.get("owner"),
@@ -108,6 +109,7 @@ export class WorkspaceViewModel {
           _id,
           name,
           users,
+          logo,
           workspaces,
           owner,
           admins,
@@ -125,6 +127,7 @@ export class WorkspaceViewModel {
           teamId: _id,
           name,
           users,
+          logo,
           workspaces: updatedWorkspaces,
           owner,
           admins,

@@ -3,6 +3,7 @@
   import { navigate } from "svelte-navigator";
   import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
+    import constants from "$lib/utils/constants";
   export let data: any;
   export let handleWorkspaceSwitch, handleWorkspaceTab, activeSideBarTabMethods;
   let currOpenedTeam: any;
@@ -29,14 +30,14 @@
   <h6 class="teams-heading">Recent Workspace</h6>
   {#if $data}
     {#each $data.slice().reverse() as list, index}
-      {#if index < 5}
+      {#if index < constants.WORKSPACE_LIMIT}
         <div class="pb-3" on:click={() => handleOpenCollection(list)}>
-          <div
-            class="recent-workspace-item p-1 ps-2 rounded justify-content-between d-flex"
+          <div  
+            class="recent-workspace-item p-1 overflow-hidden ps-2 rounded justify-content-between d-flex"
           >
-            <div class="">
-              <p class="mb-0 recent-workspace ellipsis">{list.name}</p>
-              <span class="team-name">{list.team.teamName}</span>
+            <div class="overflow-hidden ellipsis">
+              <p class="mb-0 recent-workspace ellipsis overflow-hidden">{list.name}</p>
+              <span class="team-name ellipsis overflow-hidden">{list.team.teamName}</span>
             </div>
             <PeopleIcon
               color={currOpenedTeam.id == list.team.teamId

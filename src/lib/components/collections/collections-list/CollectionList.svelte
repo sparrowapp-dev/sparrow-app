@@ -451,7 +451,7 @@
     </div>
   </div>
   <div
-    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list pb-4"
+    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list sparrow-thin-scrollbar pb-4"
     style="overflow:auto;margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
@@ -583,12 +583,6 @@
   }
   .inputField:hover {
     border: 1px solid var(--workspace-hover-color);
-  }
-  .collections-list::-webkit-scrollbar {
-    width: 2px;
-  }
-  .collections-list::-webkit-scrollbar-thumb {
-    background: #888;
   }
 
   @keyframes increaseWidth {

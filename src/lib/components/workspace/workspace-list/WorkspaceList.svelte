@@ -14,7 +14,7 @@
 
 <div
   style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
-  class="sidebar d-flex flex-column bg-backgroundColor p-3 pe-3"
+  class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-3 pe-3"
 >
   <Teams {teams} />
   <RecentApi
@@ -34,12 +34,6 @@
 </div>
 
 <style>
-  .sidebar::-webkit-scrollbar {
-    width: 2px;
-  }
-  .sidebar::-webkit-scrollbar-thumb {
-    background: #888;
-  }
   .sidebar {
     width: 282px;
     position: fixed;

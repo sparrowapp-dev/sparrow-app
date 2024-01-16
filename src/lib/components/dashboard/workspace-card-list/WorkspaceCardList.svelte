@@ -9,11 +9,15 @@
     SearchIcon,
   } from "$lib/assets/app.asset";
   import type { CurrentTeam } from "$lib/utils/interfaces";
-  export let openedTeam: CurrentTeam, currActiveTeam: CurrentTeam, handleWorkspaceTab: any, activeSideBarTabMethods: any;
+  export let openedTeam: CurrentTeam,
+    currActiveTeam: CurrentTeam,
+    handleWorkspaceTab: any,
+    activeSideBarTabMethods: any;
   export let workspaces: any, handleWorkspaceSwitch: any;
   let filterText: string = "";
   let workspacePerPage: number = 5,
     currPage = 1;
+
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
   };
@@ -45,13 +49,13 @@
     </div>
   {/if}
   <div
-    class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto workspace-scrollbar"
+    class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
     style="max-height: 59vh; height: auto;"
   >
-    {#if filterText !== "" && workspaces.filter((item) => item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
-      <span class="not-found-text mx-auto ellipsis"
-        >No results found.</span
-      >
+    {#if filterText !== "" && workspaces.filter((item) => item.name
+            .toLowerCase()
+            .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
+      <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
     {#if currPage === 1 && filterText === ""}
       <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
@@ -59,101 +63,127 @@
       </button>
     {/if}
     {#each workspaces
-      .filter((item) => item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
-      .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as workspace, index}
-      <WorkspaceCard {workspace} {handleWorkspaceSwitch} {currActiveTeam} {openedTeam} {handleWorkspaceTab} {activeSideBarTabMethods} />
+      .filter((item) => item.name
+            .toLowerCase()
+            .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+      .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage) as workspace, index}
+      <WorkspaceCard
+        {workspace}
+        {handleWorkspaceSwitch}
+        {currActiveTeam}
+        {openedTeam}
+        {handleWorkspaceTab}
+        {activeSideBarTabMethods}
+      />
     {/each}
   </div>
-  <div
-    class="justify-content-between bottom-0 position-sticky z-3 bg-backgroundColor d-flex"
-  >
-    <div class="tab-head">
-      showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
-        currPage * workspacePerPage,
-        workspaces?.filter(
+  {#if !workspaces || workspaces.filter((item) => item.name
+          .toLowerCase()
+          .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length > 0}
+    <div
+      class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
+    >
+      <div class="tab-head">
+        showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} - {Math.min(
+          currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
+          workspaces?.filter(
+            (item) =>
+              item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
+              item.team.teamId == openedTeam.id,
+          ).length,
+        )} of {workspaces?.filter(
           (item) =>
             item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
             item.team.teamId == openedTeam.id,
-        ).length,
-      )} of {workspaces?.filter(
-        (item) =>
-          item.name.toLowerCase().startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id,
-      ).length}
-    </div>
-    <div class="tab-head tab-change">
-      <button on:click={() => (currPage = 1)} class="bg-transparent border-0"
-        ><DoubleLeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
-      >
-      <button
-        on:click={() => {
-          if (currPage > 1) currPage -= 1;
-        }}
-        class="bg-transparent border-0"
-        ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
-      >
-      <button
-        on:click={() => {
-          if (
-            currPage <
+        ).length}
+      </div>
+      <div class="tab-head tab-change">
+        <button
+          on:click={() => (
+            (currPage = 1), (workspacePerPage = currPage > 1 ? 6 : 5)
+          )}
+          class="bg-transparent border-0"
+          ><DoubleLeftIcon
+            color={currPage === 1 ? "#313233" : "white"}
+          /></button
+        >
+        <button
+          on:click={() => {
+            if (currPage > 1) currPage -= 1;
+            workspacePerPage = currPage > 1 ? 6 : 5;
+          }}
+          class="bg-transparent border-0"
+          ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
+        >
+        <button
+          on:click={() => {
+            if (
+              currPage <
+              Math.ceil(
+                workspaces?.filter(
+                  (item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()) &&
+                    item.team.teamId == openedTeam.id,
+                ).length / workspacePerPage,
+              )
+            )
+              currPage += 1;
+            workspacePerPage = currPage > 1 ? 6 : 5;
+          }}
+          class="bg-transparent border-0"
+          ><RightIcon
+            color={currPage ===
             Math.ceil(
               workspaces?.filter(
                 (item) =>
-                  item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
+                  item.name
+                    .toLowerCase()
+                    .startsWith(filterText.toLowerCase()) &&
                   item.team.teamId == openedTeam.id,
               ).length / workspacePerPage,
             )
-          )
-            currPage += 1;
-        }}
-        class="bg-transparent border-0"
-        ><RightIcon
-          color={currPage ===
-          Math.ceil(
-            workspaces?.filter(
-              (item) =>
-                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
-                item.team.teamId == openedTeam.id,
-            ).length / workspacePerPage,
-          )
-            ? "#313233"
-            : "white"}
-        /></button
-      >
-      <button
-        on:click={() =>
-          (currPage = Math.ceil(
-            workspaces?.filter(
-              (item) =>
-                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
-                item.team.teamId == openedTeam.id,
-            ).length / workspacePerPage,
-          ))}
-        class="bg-transparent border-0"
-        ><DoubleRightIcon
-          color={currPage ===
-          Math.ceil(
-            workspaces?.filter(
-              (item) =>
-                item.name.toLowerCase().startsWith(filterText.toLowerCase()) &&
-                item.team.teamId == openedTeam.id,
-            ).length / workspacePerPage,
-          )
-            ? "#313233"
-            : "white"}
-        /></button
-      >
+              ? "#313233"
+              : "white"}
+          /></button
+        >
+        <button
+          on:click={() => (
+            (currPage = Math.ceil(
+              workspaces?.filter(
+                (item) =>
+                  item.name
+                    .toLowerCase()
+                    .startsWith(filterText.toLowerCase()) &&
+                  item.team.teamId == openedTeam.id,
+              ).length / workspacePerPage,
+            )),
+            (workspacePerPage = currPage > 1 ? 6 : 5)
+          )}
+          class="bg-transparent border-0"
+          ><DoubleRightIcon
+            color={currPage ===
+            Math.ceil(
+              workspaces?.filter(
+                (item) =>
+                  item.name
+                    .toLowerCase()
+                    .startsWith(filterText.toLowerCase()) &&
+                  item.team.teamId == openedTeam.id,
+              ).length / workspacePerPage,
+            )
+              ? "#313233"
+              : "white"}
+          /></button
+        >
+      </div>
+      <div></div>
     </div>
-    <div></div>
-  </div>
+  {/if}
 </div>
 
 <style>
-  .workspace-scrollbar::-webkit-scrollbar {
-    width: 2px;
-  }
-  .workspace-scrollbar::-webkit-scrollbar-thumb {
-    background: #888;
-  }
   .tab-head {
     padding: 8px;
     font-size: 12px;
@@ -194,6 +224,7 @@
     font-size: 16px;
     max-width: 50%;
     max-height: 32%;
+    min-height: 18vh;
   }
   .add-new-workspace.empty {
     max-width: 80%;

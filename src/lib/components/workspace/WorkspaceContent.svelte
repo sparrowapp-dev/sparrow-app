@@ -111,27 +111,29 @@
       <div class="row">
         <div class="col-12 pb-3">
           <div class="team-heading d-flex justify-content-between">
-            <h2 class="d-flex">
+            <h2 class="d-flex ellipsis overflow-hidden w-75">
               <p
-                class={`text-defaultColor m-auto text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                style={`font-size: 40px; padding-top: 2px; width: 60px; height: 60px; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
               >
                 {currOpenedTeam.name[0]
                   ? currOpenedTeam.name[0].toUpperCase()
                   : ""}
               </p>
-              <span class="ms-4 my-auto">{currOpenedTeam.name}</span>
+              <span class="ms-4 w-75 my-auto my-auto ellipsis overflow-hidden"
+                >{currOpenedTeam.name}</span
+              >
             </h2>
-            <div class="d-flex">
+            <div class="d-flex w-25">
               <button
                 style="font-size: 12px;"
-                class="d-flex align-items-center me-4 justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
+                class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
                 >Invite</button
               >
               <button
                 style="font-size: 12px;"
                 on:click={handleCreateWorkSpace}
-                class=" d-flex align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
+                class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
                 >{#if isLoading}
                   <span class="ms-0 me-1">
                     {#if loaderColor === "default"}
