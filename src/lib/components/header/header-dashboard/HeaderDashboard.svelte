@@ -35,6 +35,8 @@
   import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
   import { WorkspaceViewModel } from "../../../../pages/Workspaces/workspace.viewModel";
   import { setCurrentTeam } from "$lib/store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let activeSideBarTabMethods;
   export let handleWorkspaceSwitch;
@@ -227,6 +229,7 @@
 
   function handleGlobalSearchPopup(show: boolean) {
     showGlobalSearchPopup = show;
+    MixpanelEvent(Events.GLOBAL_SEARCH, { clicked: true });
   }
 
   onDestroy(() => {

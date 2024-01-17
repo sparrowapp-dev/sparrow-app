@@ -6,6 +6,7 @@ on:
       - development
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
+ VITE_MIX_PANEL_TOKEN: ${{secrets.VITE_MIX_PANEL_TOKEN}}
 
  
 jobs:

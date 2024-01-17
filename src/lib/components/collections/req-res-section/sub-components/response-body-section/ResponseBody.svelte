@@ -10,6 +10,8 @@
   } from "$lib/utils/enums/request.enum";
   import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
@@ -33,6 +35,7 @@
     const jsonString = response?.body;
     await copyToClipBoard(jsonString);
     notifications.success("Copied to Clipboard");
+    MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
@@ -74,6 +77,7 @@
     await writableStream.write(response?.body);
     await writableStream.close();
     notifications.success("Response downloaded");
+    MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
   };
 </script>
 
@@ -229,6 +233,7 @@
               currentTabId,
             );
             notifications.success("Response Cleared");
+            MixpanelEvent(Events.CLEAR_API_RESPONSE);
           }}
         >
           Clear

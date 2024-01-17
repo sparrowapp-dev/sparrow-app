@@ -15,6 +15,8 @@
   import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
   import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
   import File from "./File.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -80,6 +82,11 @@
           name: Samplecollection.name,
         });
         notifications.success("New Collection Created");
+        MixpanelEvent(Events.IMPORT_COLLECTION, {
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+          importThrough: "ByFile",
+        });
         return;
       } else {
         isLoading = false;
@@ -148,6 +155,11 @@
         name: Samplecollection.name,
       });
       notifications.success("New Collection Created");
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+        importThrough: "ByObject",
+      });
       return;
     } else {
       isLoading = false;

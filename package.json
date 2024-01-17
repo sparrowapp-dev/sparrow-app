@@ -23,6 +23,7 @@
     "font-awesome": "^4.7.0",
     "js-yaml": "^4.1.0",
     "jsoneditor": "^9.10.3",
+    "mixpanel-browser": "^2.48.1",
     "monaco-editor": "^0.44.0",
     "path": "^0.12.7",
     "rxdb": "^14.17.1",

@@ -13,7 +13,6 @@
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
-
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,

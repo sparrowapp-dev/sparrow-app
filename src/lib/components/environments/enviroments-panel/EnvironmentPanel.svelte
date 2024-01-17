@@ -10,6 +10,9 @@
   import { notifications } from "$lib/utils/notifications";
   import QuickHelp from "./sub-components/quick-help/QuickHelp.svelte";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -78,6 +81,17 @@
       notifications.error(
         `Failed to save changes for ${currentEnvironment.name} environment.`,
       );
+    }
+    if (currentEnvironment.type === environmentType.GLOBAL) {
+      MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
+        environmentName: currentEnvironment.name,
+        environmanetId: currentEnvironment.id,
+      });
+    } else {
+      MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
+        environmentName: currentEnvironment.name,
+        environmanetId: currentEnvironment.id,
+      });
     }
   };
 </script>
