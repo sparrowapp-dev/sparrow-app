@@ -5,8 +5,6 @@
   export let handleError: () => void;
 </script>
 
-
-
 <div
   class="background-overlay"
   on:click={() => {
@@ -45,13 +43,20 @@
     <p class="format-type">.JSON</p>
   </div>
   <div class="format-btns">
-    <button class="format-btn" on:click={()=>{onClick(false)}}>Close</button>
-    <button class="format-btn collection-btn" on:click={()=>{handleError()}}>+ Collection</button>
+    <button
+      class="format-btn"
+      on:click={() => {
+        onClick(false);
+      }}>Close</button
+    >
+    <button
+      class="format-btn collection-btn"
+      on:click={() => {
+        handleError();
+      }}>+ Collection</button
+    >
   </div>
 </div>
-
-
-
 
 <style>
   .background-overlay {
@@ -61,6 +66,7 @@
     width: 100vw;
     height: 100vh;
     background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 14;
   }
@@ -128,7 +134,7 @@
     text-align: center;
     padding: 4px;
   }
-  .format-btn:hover{
+  .format-btn:hover {
     background-color: #616364;
   }
   .collection-btn {
@@ -141,7 +147,7 @@
     letter-spacing: 0em;
     text-align: center;
   }
-  .collection-btn:hover{
+  .collection-btn:hover {
     background-color: var(--send1-hoverbutton);
   }
   .btn-close1 {

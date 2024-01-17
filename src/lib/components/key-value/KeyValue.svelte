@@ -131,9 +131,9 @@
   };
 </script>
 
-<div class="mt-3 me-0 w-100">
-  <div class="d-flex gap-2">
-    <div style="width:40px;">
+<div class="mt-3 mb-3 me-0 w-100">
+  <div class="d-flex gap-3 pb-2">
+    <div style="width:30px;">
       <input
         class="form-check-input"
         type="checkbox"
@@ -142,13 +142,15 @@
       />
     </div>
     <div
-      class=" d-flex gap-2 text-requestBodyColor align-items-center"
+      class="d-flex text-requestBodyColor pair-title align-items-center"
       style="font-size: 12px; font-weight: 500; width:100%;"
     >
-      <p class="flex-grow-1 w-100">Key</p>
-      <p class="flex-grow-1 w-100">Value</p>
+      <p class="flex-grow-1 mb-0 w-100 key-container">Key</p>
+      <p class="flex-grow-1 mb-0 w-100 value-container">Value</p>
     </div>
-    <div style="width:60px;" />
+    <div class="h-75 pe-1">
+      <button class="border-0" style="width:40px;" />
+    </div>
   </div>
 
   <div
@@ -178,12 +180,12 @@
               />
             </div>
 
-            <div class="w-100 d-flex gap-2">
+            <div class="w-100 d-flex gap-0">
               <div class="flex-grow-1 w-100">
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-keyValuePairColor py-1 border-0"
+                  class="form-control keyValuePair py-1"
                   style="font-size: 13px;"
                   disabled
                   bind:value={readable.key}
@@ -193,7 +195,7 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control bg-keyValuePairColor py-1 border-0"
+                  class="form-control keyValuePair py-1"
                   style="font-size: 13px;"
                   disabled
                   bind:value={readable.value}
@@ -210,7 +212,7 @@
     {#each pairs as element, index}
       <div
         aria-label="Toggle Hover"
-        class="sortable > div"
+        class="sortable > div pair-container"
         style="cursor:default; width:100%;"
         data-list-key={JSON.stringify({
           name: element.key,
@@ -222,7 +224,7 @@
           style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
         >
           <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
           >
             <img
               src={dragIcon}
@@ -243,12 +245,12 @@
               {/if}
             </div>
 
-            <div class="w-100 d-flex gap-2">
+            <div class="w-100 d-flex gap-0">
               <div class="flex-grow-1 w-100 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control bg-keyValuePairColor py-1 border-0"
+                  class="form-control keyValuePair py-1"
                   style="font-size: 13px;"
                   id={"pair-key" + index}
                   disabled={mode == "READ" ? true : false}
@@ -303,7 +305,7 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control bg-keyValuePairColor py-1 border-0"
+                  class="form-control keyValuePair py-1"
                   style="font-size: 13px;"
                   id={"pair-value" + index}
                   disabled={mode == "READ" ? true : false}
@@ -383,3 +385,38 @@
     {/each}
   </div>
 </div>
+
+<style>
+  input[type="checkbox"] {
+    margin-top: 6px;
+    border-radius: 2px;
+    height: 12px;
+    width: 12px;
+  }
+
+  input[type="text"] {
+    padding: 4px 12px !important;
+  }
+
+  input:checked {
+    background-color: var(--send-button) !important;
+  }
+  .keyValuePair {
+    background-color: transparent;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
+  }
+  .pair-container:nth-child(odd) {
+    margin-top: -1px;
+  }
+  .pair-title {
+    background-color: var(--background-light);
+  }
+  .key-container {
+    padding: 4px 12px;
+  }
+  .value-container {
+    padding: 4px 12px;
+    border-left: 2px solid var(--border-color);
+  }
+</style>

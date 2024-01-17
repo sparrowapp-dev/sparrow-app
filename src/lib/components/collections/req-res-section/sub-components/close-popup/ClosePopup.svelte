@@ -24,17 +24,17 @@
     loader = true;
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-      const bodyType =
-    componentData.property.request.state.dataset === RequestDataset.RAW
-          ? componentData.property.request.state.raw
-          : componentData.property.request.state.dataset;
+    const bodyType =
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
-      selectedRequestBodyType:setContentTypeHeader(bodyType),
+      selectedRequestBodyType: setContentTypeHeader(bodyType),
     };
 
     if (!folderId) {
@@ -180,6 +180,7 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 9;
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
   }
   .close-request {
