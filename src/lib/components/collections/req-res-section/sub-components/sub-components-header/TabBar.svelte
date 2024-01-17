@@ -100,7 +100,7 @@
 >
   <div
     style="width:{$collapsibleState ? '100%' : '100%'}"
-    class="tabbar bg-blackColor d-flex bg-backgroundColor;"
+    class="tabbar d-flex"
     bind:offsetWidth={scrollerParent}
   >
     {#if scrollerParent <= scrollerWidth + 105}
@@ -198,6 +198,7 @@
 <style>
   .tabbar {
     height: 36px;
+    background-color: var(--background-light);
   }
 
   .tab-scroller::-webkit-scrollbar {

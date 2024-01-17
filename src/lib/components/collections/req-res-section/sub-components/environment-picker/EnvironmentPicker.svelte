@@ -128,9 +128,10 @@
     height: 250px;
     position: fixed;
     /* transform: translateX(-50%); */
-    background-color: black;
+    background-color: var(--background-dropdown);
     z-index: 5;
     flex-wrap: wrap;
+    border: 1px solid var(--border-color);
   }
   .select-environment-popup .left-panel {
     height: 190px;

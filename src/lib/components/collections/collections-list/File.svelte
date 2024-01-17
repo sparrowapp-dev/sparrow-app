@@ -279,11 +279,7 @@
       ? 'unclickable'
       : ''}"
   >
-    <div
-      class="api-method text-{getMethodStyle(method)}  {id === activeTabId
-        ? ' active-request-method'
-        : ''}"
-    >
+    <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 
@@ -330,20 +326,20 @@
 
 <style>
   .api-method {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
-    margin-right: 8px;
-    border: 1px solid var(--border-color);
-    width: 56px;
+    width: 48px;
     height: 30px;
+    padding-left: 6px;
+    padding-right: 4px;
     border-radius: 8px;
     display: flex;
-    justify-content: center;
     align-items: center;
   }
   .api-name {
     font-size: 12px;
     font-weight: 400;
+    width: calc(100% - 48px);
   }
   .api-info {
     display: flex;
@@ -430,9 +426,6 @@
     width: calc(100% - 24px);
   }
   .active-request-tab {
-    background-color: var(--selected-active-sidebar) !important;
-  }
-  .active-request-method {
     background-color: var(--selected-active-sidebar) !important;
   }
 </style>

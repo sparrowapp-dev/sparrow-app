@@ -294,6 +294,7 @@
     width: 100vw;
     height: 100vh;
     background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 14;
   }

@@ -37,6 +37,7 @@
 
   export let activeSideBarTabMethods;
 
+  const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
   const _viewModel = new HeaderDashboardViewModel();
   const _collectionMethods = new CollectionsViewModel();
@@ -233,18 +234,25 @@
 
 <!-- {#if !isLoadingPage} -->
 <div
-  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-blackColor header"
+  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-backgroundColor header"
   style="height:44px;"
   data-tauri-drag-region
 >
   <div
     class="d-flex d-flex align-items-center justify-content-center"
-    style="width: 238px; height:20px ;padding: 0px, 6px, 0px, 6px;"
+    style="height:20px ;padding: 0px, 6px, 0px, 6px;"
     data-tauri-drag-region
   >
+    {#if !isWin}
+      <div class="d-flex mac-container">
+        <div on:click={onClose} class="mac-nav"></div>
+        <div on:click={onMinimize} class="mac-nav"></div>
+        <div on:click={toggleSize} class="mac-nav"></div>
+      </div>
+    {/if}
     <div class="d-flex align-items-center justify-content-center gap-2">
       <div>
-        <img src={icons.sparrowicon} alt="sparrowLogo" />
+        <img src={icons.appIcon} class="app-icon" alt="sparrowLogo" />
       </div>
     </div>
     <div
@@ -265,13 +273,16 @@
   </div>
 
   <div
-    style="height:32px; width:400px;position: relative;{showGlobalSearchPopup &&
-    hideHeaders
+    style="height:32px;
+    
+    {!showGlobalSearchPopup ? 'width:180px;' : 'width:400px;'}
+    
+     position: relative;{showGlobalSearchPopup && hideHeaders
       ? 'left:50%;transform: translateX(-50%);'
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
       ? 'position-absolute'
-      : ''} search-container bg-backgroundColor pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+      : ''} search-container sc-desktop bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <SearchIcon />
@@ -281,8 +292,8 @@
       <input
         type="search"
         style="font-size: 12px;"
-        class="input-search-bar bg-backgroundColor"
-        placeholder="Search your workspaces, collections and endpoints"
+        class="input-search-bar bg-backgroundLight"
+        placeholder="Search Sparrow"
         bind:value={searchData}
         on:input={() => {
           handleGlobalSearchPopup(true);
@@ -326,36 +337,91 @@
     style="margin-left: 10px;"
   >
     <div
-      class="my-auto gap-{!isSearchVisible
+      class="my-auto align-items-center pe-3 gap-{!isSearchVisible
         ? '0'
-        : '4'} d-flex {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        : '2'} d-flex"
     >
-      <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
+      <div
+        style="height:32px;
+    
+    {!showGlobalSearchPopup ? 'width:40px; z-index:1;' : 'width:400px;'}
+    
+     position: relative;{showGlobalSearchPopup
+          ? 'left:50%;transform: translateX(-50%);'
+          : ''}"
+        class="{showGlobalSearchPopup
+          ? 'position-absolute'
+          : ''} search-container sc-mobile bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+      >
+        <div class="w-100 position-relative">
+          <div
+            on:click={() => {
+              handleGlobalSearchPopup(true);
+            }}
+            class="position-absolute"
+            style="
+        
+        left: 12px;
+          top:2px;
+          width:20px;
+        "
+          >
+            <SearchIcon />
+          </div>
+          <input
+            type="search"
+            style="font-size: 12px;"
+            class="input-search-bar bg-backgroundLight"
+            placeholder="Search Sparrow"
+            bind:value={searchData}
+            on:input={() => {
+              handleGlobalSearchPopup(true);
+              handleSearch();
+            }}
+            on:click={() => {
+              handleGlobalSearchPopup(true);
+            }}
+          />
+        </div>
+        {#if showGlobalSearchPopup}
+          <GlobalSearchBarPopup
+            {searchData}
+            {handleGlobalSearchPopup}
+            {filteredCollection}
+            {filteredFolder}
+            {filteredRequest}
+            workspaces={allworkspaces}
+            {activeWorkspaceId}
+            {handleDropdown}
+          />
+        {/if}
+      </div>
+      <div
+        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+      >
         <Tooltip>
-          <button class="bg-blackColor border-0">
+          <button class="bg-backgroundColor border-0">
             <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible
-          ? '1'
-          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <Tooltip>
-          <button class="bg-blackColor border-0">
+          <button class="bg-backgroundColor border-0">
             <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible
-          ? '1'
-          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        class="my-auto px-1 {showGlobalSearchPopup && hideHeaders
+          ? 'd-none'
+          : ''}"
       >
-        <div class="position-relative" style="z-index: 9;">
+        <div class="position-relative" style="z-index: 6;">
           <button
-            class={`bg-blackColor border-0`}
+            class={`bg-backgroundColor border-0`}
             id="profile-dropdown"
             style="width: 24px; height: 24px;"
             on:click={toggleDropdown}
@@ -382,8 +448,8 @@
 
           {#if isOpen}
             <div
-              class="rounded z-3 profile-explorer position-absolute text-color-white py-1"
-              style="border: 1px solid #313233; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(15px); display: {isOpen
+              class="rounded z-3 profile-explorer bg-backgroundDropdown position-absolute text-color-white py-1"
+              style="border: 1px solid #313233; backdrop-filter: blur(15px); display: {isOpen
                 ? 'block'
                 : 'none'}; top: 40px; right: -10px; width: 219px;"
               on:click={() => {
@@ -434,32 +500,34 @@
       </div>
     </div>
 
-    <div class=" d-flex {hideHeaders ? 'gap-3' : ' gap-4'} ">
-      <div class="col-2">
-        <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
-          <img src={icons.minimizeIcon} alt="" />
-        </button>
-      </div>
+    {#if isWin}
+      <div class="d-flex">
+        <div class="controller-btn">
+          <button on:click={onMinimize} class="button-minus border-0 py-1 px-1">
+            <img src={icons.minimizeIcon} alt="" />
+          </button>
+        </div>
 
-      <div class="col-2">
-        <button
-          on:click={toggleSize}
-          class="button-resize border-0 py-1 px-1"
-          id="resize-button"
-        >
-          {#if isMaximizeWindow === true}
-            <img src={icons.doubleResizeIcon} alt="" />
-          {:else}
-            <img src={icons.resizeIcon} alt="" />
-          {/if}
-        </button>
+        <div class="controller-btn">
+          <button
+            on:click={toggleSize}
+            class="button-resize border-0 py-1 px-1"
+            id="resize-button"
+          >
+            {#if isMaximizeWindow === true}
+              <img src={icons.doubleResizeIcon} alt="" />
+            {:else}
+              <img src={icons.resizeIcon} alt="" />
+            {/if}
+          </button>
+        </div>
+        <div class="controller-btn">
+          <button on:click={onClose} class="button-close border-0 py-1 px-1">
+            <img src={icons.closeIcon} alt="" />
+          </button>
+        </div>
       </div>
-      <div class="col-2">
-        <button on:click={onClose} class="button-close border-0 py-1 px-1">
-          <img src={icons.closeIcon} alt="" />
-        </button>
-      </div>
-    </div>
+    {/if}
   </div>
 </div>
 
@@ -505,7 +573,7 @@
     cursor: pointer;
   }
   .search-bar {
-    z-index: 11;
+    z-index: 8;
   }
   .background-overlay {
     position: fixed;
@@ -514,19 +582,71 @@
     width: 100vw;
     height: 100vh;
     background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    z-index: 10;
+    z-index: 7;
   }
   .input-search-bar {
     width: 100%;
-    padding: 6px 12px;
     font-size: 16px;
     line-height: 1.5;
     border-radius: 4px;
     border: none;
     outline: none;
+    padding: 6px 12px;
+  }
+  .search-container {
+    border: 1px solid transparent;
   }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);
+  }
+  .controller-btn button {
+    height: 44px;
+    width: 44px;
+  }
+  .search-container {
+    transition: 0.1s ease-in-out;
+  }
+  .app-icon {
+    width: 17.5px;
+    margin-left: 20px;
+    margin-right: 30px;
+  }
+  .header {
+    border-bottom: 1px solid var(--border-color);
+  }
+  .mac-container {
+    margin-left: 20px;
+  }
+  .mac-nav {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .mac-nav:nth-child(1) {
+    background-color: #ff605c;
+  }
+  .mac-nav:nth-child(2) {
+    background-color: #ffbd44;
+    margin: 0 10px;
+  }
+  .mac-nav:nth-child(3) {
+    background-color: #00ca4e;
+  }
+  @media only screen and (max-width: 992px) {
+    .sc-desktop {
+      display: none !important;
+    }
+    .input-search-bar {
+      padding: 6px;
+      padding-left: 32px;
+    }
+  }
+  @media only screen and (min-width: 993px) {
+    .sc-mobile {
+      display: none !important;
+    }
   }
 </style>

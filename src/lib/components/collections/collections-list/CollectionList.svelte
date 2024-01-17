@@ -423,13 +423,13 @@
   >
     <div
       style="height:32px; width:180px "
-      class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+      class="inputField bg-backgroundDark ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
     >
       <SearchIcon />
       <input
         type="search"
         style="  font-size: 12px;font-weight:500;"
-        class="inputField border-0 w-100 h-100 bg-blackColor"
+        class="inputField searchField border-0 w-100 h-100 bg-backgroundDark"
         placeholder="Search APIs in {currentWorkspaceName || ''}"
         bind:value={searchData}
         on:input={() => {
@@ -441,7 +441,8 @@
     <div class="d-flex align-items-center justify-content-center">
       <button
         id="filter-btn"
-        class="btn btn-blackColor d-flex align-items-center justify-content-center"
+        class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center
+        {showfilterDropdown ? 'filter-active' : ''}"
         style="width: 32px; height:32px; position:relative"
         on:click={handleFilterDropdown}
       >
@@ -638,5 +639,13 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+  }
+  .searchField {
+  }
+  .filter-btn {
+    /* border: 1px solid var(--border-color) !important; */
+  }
+  .filter-active {
+    background-color: var(--send-button) !important;
   }
 </style>
