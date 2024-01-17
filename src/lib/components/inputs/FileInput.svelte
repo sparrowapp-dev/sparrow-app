@@ -1,13 +1,32 @@
 <script lang="ts">
-  import { UploadIcon } from "$lib/assets/app.asset";
-
-  export let value: string = "",
+  import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
+  import { imageDataToURL } from "$lib/utils/helpers";
+  export let value: any = [],
     labelText: string,
     labelDescription: string = "",
     inputId: string,
     inputPlaceholder: string,
+    maxFileSize: number,
     isRequired: boolean = false,
-    onChange: (e: any) => void;
+    resetValue: (e: any) => void,
+    editValue: (e: any) => void,
+    showFileTypeError: boolean = false,
+    showFileSizeError: boolean = false,
+    fileTypeError: string =
+      "This file type is not supported. Please reupload in any of the following file formats.",
+    fileSizeError: string =
+      "The size of the file you are trying to upload is more than 100 KB.",
+    supportedFileTypes: string[] = [],
+    onChange: (
+      e: any,
+      maxFileSize: number,
+      supportedFileTypes: string[],
+    ) => void;
+
+  const generateAcceptString = (): string => {
+    const acceptString = supportedFileTypes.map((type) => `${type}`).join(", ");
+    return acceptString;
+  };
 </script>
 
 <div class="sparrow-text-input-container mt-3">
@@ -25,7 +44,12 @@
     {/if}
   </div>
   {#if value.length == 0}
-    <div class="sparrow-file-input w-100 px-auto">
+    <div
+      style="border: 1px dashed {showFileTypeError || showFileSizeError
+        ? 'var(--dangerColor)'
+        : 'var(--request-arc)'}"
+      class="sparrow-file-input w-100 px-auto"
+    >
       <span
         class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
         >Drag and Drop or</span
@@ -40,14 +64,53 @@
           {value}
           id={inputId}
           placeholder={inputPlaceholder}
-          on:change={(e) => onChange(e)}
+          accept={generateAcceptString()}
+          on:change={(e) => {
+            onChange(e, maxFileSize, supportedFileTypes);
+          }}
         />
       </div>
     </div>
   {/if}
-  <div>
-    <img src="" alt=""/>
-  </div>
+  <p class="sparrow-file-input-error-text mt-2">
+    {#if showFileTypeError}
+      {fileTypeError}
+    {:else if showFileSizeError}
+      {fileSizeError}
+    {/if}
+  </p>
+  {#if showFileTypeError}
+    <div class="d-flex gap-2">
+      {#each supportedFileTypes as fileType}
+        <span class="px-2 py-1 sparrow-input-file-type rounded">
+          {fileType}
+        </span>
+      {/each}
+    </div>
+  {/if}
+  {#if !Array.isArray(value)}
+    <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
+      <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
+      <div class="align-items-end justify-content-end d-flex gap-2">
+        <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
+          <EditIcon />
+        </button>
+        <button on:click={resetValue} class="del-btn border-0 p-2 rounded">
+          <DeleteIcon />
+        </button>
+      </div>
+    </div>
+    <input
+      class="sparrow-choose-file-input d-none"
+      type="file"
+      id={inputId}
+      placeholder={inputPlaceholder}
+      accept={generateAcceptString()}
+      on:change={(e) => {
+        onChange(e, maxFileSize, supportedFileTypes);
+      }}
+    />
+  {/if}
 </div>
 
 <style lang="scss">
@@ -59,7 +122,7 @@
   }
   .sparrow-file-input {
     outline: none;
-    border: 1px dashed var(--request-arc);
+
     border-radius: 4px;
     font-size: 14px;
   }
@@ -75,5 +138,27 @@
     color: var(--send-button);
     border: 0;
     font-size: 12px;
+  }
+  .sparrow-input-image-preview > img {
+    width: 80px;
+    border: 1px solid #313233;
+    height: 80px;
+  }
+  .sparrow-input-image-preview {
+    .edit-btn,
+    .del-btn {
+      background-color: transparent;
+    }
+    .edit-btn:hover,
+    .del-btn:hover {
+      background-color: var(--border-color);
+    }
+  }
+  .sparrow-file-input-error-text {
+    color: var(--dangerColor);
+  }
+
+  .sparrow-input-file-type {
+    border: 1px solid var(--border-color);
   }
 </style>

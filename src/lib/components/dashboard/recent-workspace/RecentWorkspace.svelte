@@ -31,7 +31,7 @@
   {#if $data}
     {#each $data.slice().reverse() as list, index}
       {#if index < constants.WORKSPACE_LIMIT}
-        <div class="pb-3" on:click={() => handleOpenCollection(list)}>
+        <div class="pb-1" on:click={() => handleOpenCollection(list)}>
           <div  
             class="recent-workspace-item p-1 overflow-hidden ps-2 rounded justify-content-between d-flex"
           >

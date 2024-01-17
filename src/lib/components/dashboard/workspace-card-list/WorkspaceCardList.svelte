@@ -58,7 +58,7 @@
       <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
     {#if currPage === 1 && filterText === ""}
-      <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
+      <button class="col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace">
         + Add New Workspace
       </button>
     {/if}
@@ -202,6 +202,11 @@
     width: 27vw;
     font-size: 12px;
   }
+  @media only screen and (max-width: 1100px){
+    .search-input-container{
+      width: 50vw;
+    }
+  }
   .search-input-container > input:focus {
     outline: none;
     caret-color: var(--workspace-hover-color);
@@ -225,6 +230,11 @@
     max-width: 50%;
     max-height: 32%;
     min-height: 18vh;
+  }
+  @media only screen and (max-width: 1100px){
+    .add-new-workspace{
+      max-width: 100%;
+    }
   }
   .add-new-workspace.empty {
     max-width: 80%;

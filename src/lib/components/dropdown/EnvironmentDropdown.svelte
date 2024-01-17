@@ -52,7 +52,7 @@
 </script>
 
 <div
-  class="parent-dropdown display-inline-block z-2"
+  class="parent-dropdown display-inline-block z-1"
   style=" position: relative;"
   on:click={handleDropdownClick}
 >

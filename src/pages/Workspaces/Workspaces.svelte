@@ -23,6 +23,7 @@
     activeSideBarTabMethods: any,
     collectionsMethods: any;
   let allTeams = [],
+    userId = undefined,
     currOpenedTeam: CurrentTeam;
   const _viewModel = new WorkspaceViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
@@ -32,7 +33,10 @@
   };
 
   const userSubscribe = user.subscribe(async (value) => {
-    if (value) await _viewModel.refreshTeams(value._id);
+    if (value) {
+      userId = value._id;
+      await _viewModel.refreshTeams(value._id);
+    }
   });
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
@@ -52,15 +56,23 @@
           value[0].get("teamId"),
           value[0].get("workspaces")[0].workspaceId,
         );
-        setCurrentTeam(value[0].get("teamId"), value[0].get("name"));
+        setCurrentTeam(
+          value[0].get("teamId"),
+          value[0].get("name"),
+          value[0].get("logo"),
+        );
         setCurrentWorkspace(
           value[0].get("workspaces")[0].workspaceId,
           value[0].get("workspaces")[0].name,
         );
       }
+
       setOpenedTeam(
         currOpenedTeam.id ? currOpenedTeam.id : value[0].get("teamId"),
         currOpenedTeam.name ? currOpenedTeam.name : value[0].get("name"),
+        currOpenedTeam.base64String
+          ? currOpenedTeam.base64String
+          : value[0].get("logo"),
       );
     }
   });
@@ -83,6 +95,7 @@
   <div class="workspace bg-backgroundColor" use:motion>
     <WorkspaceList
       teams={allTeams}
+      {userId}
       {data}
       tabList={$tabList}
       collectionList={$collectionList}
@@ -105,11 +118,18 @@
   .workspace {
     font-size: 12px;
     top: 44px;
-    left: 352px;
-    width: calc(100% - 352px);
+    left: calc(21vw + 70px);
+    width: calc(79vw - 72px);
     position: fixed;
     height: calc(100% - 44px);
     overflow: auto;
+  }
+
+  @media only screen and (max-width: 900px) {
+    .workspace {
+      left: calc(31vw + 72px);
+      width: calc(69vw - 72px);
+    }
   }
   .workspace::-webkit-scrollbar {
     width: 2px;

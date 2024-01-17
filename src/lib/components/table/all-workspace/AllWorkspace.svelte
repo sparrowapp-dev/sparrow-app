@@ -71,10 +71,11 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
-  const rightClickContextMenu = (e) => {
+  const rightClickContextMenu = (e, index) => {
     e.preventDefault();
+  
     setTimeout(() => {
-      isShowMoreVisible = undefined;
+      isShowMoreVisible = index;
     }, 100);
   };
 </script>
@@ -128,7 +129,7 @@
             <th class="tab-head"></th>
           </tr>
         </thead>
-        <tbody class="position-relative overflow-y-auto">
+        <tbody class="overflow-y-auto position-relative">
           {#if $data}
             {#each $data
               .slice()
@@ -145,7 +146,7 @@
               />
               <tr
                 class="workspace-list-item cursor-pointer overflow-hidden ellipsis w-100"
-                on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+                on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, index)}
                 on:click={(e) => {
                   !isShowMoreVisible
                     ? handleOpenCollection(list)
@@ -153,7 +154,9 @@
                   e.stopPropagation();
                 }}
               >
-                <td class="tab-data rounded-start py-3 overflow-hidden ellipsis"
+                <td
+                  style="max-width: 15vw; padding-right: 10px;"
+                  class="tab-data rounded-start py-3 overflow-hidden ellipsis"
                   >{list?.name}</td
                 >
 
@@ -373,6 +376,7 @@
   .show-more-btn:active .workspace-list-item {
     background-color: var(--border-color) !important;
   }
+
   .workspace-list-item:hover {
     cursor: pointer !important;
     background-color: var(--border-color);

@@ -57,6 +57,7 @@ export class TeamRepository {
    */
   public bulkInsertData = async (data: any): Promise<void> => {
     await this.clearTeams();
+
     await RxDB.getInstance().rxdb.team.bulkInsert(data);
     return;
   };

@@ -1,5 +1,6 @@
 <script lang="ts">
   export let value: string = "",
+    maxCharacter: number = 100,
     labelText: string,
     labelDescription: string = "",
     inputId: string,
@@ -25,6 +26,7 @@
     {value}
     id={inputId}
     placeholder={inputPlaceholder}
+    maxlength={maxCharacter}
     on:change={(e) => onChange(e)}
   />
 </div>

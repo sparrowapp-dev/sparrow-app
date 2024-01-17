@@ -138,7 +138,6 @@ export class WorkspaceViewModel {
           updatedBy,
         };
       });
-
       await this.teamRepository.bulkInsertData(data);
       return;
     }

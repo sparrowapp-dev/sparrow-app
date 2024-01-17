@@ -20,6 +20,8 @@
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
+  import { base64ToURL, imageDataToURL } from "$lib/utils/helpers";
+  import { blobToBase64String } from "rxdb";
   export let loaderColor = "default",
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
@@ -106,20 +108,28 @@
 </script>
 
 <div class="teams-content bg-backgroundColor">
-  <div class="content-teams px-3 pt-5">
+  <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
     <div class="container-fluid">
       <div class="row">
         <div class="col-12 pb-3">
           <div class="team-heading d-flex justify-content-between">
             <h2 class="d-flex ellipsis overflow-hidden w-75">
-              <p
-                class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-              >
-                {currOpenedTeam.name[0]
-                  ? currOpenedTeam.name[0].toUpperCase()
-                  : ""}
-              </p>
+              {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
+                <img
+                  class="text-center align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
+                  style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                  src={base64ToURL(currOpenedTeam.base64String)}
+                  alt=""
+                />{:else}
+                <p
+                  class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                >
+                  {currOpenedTeam.name[0]
+                    ? currOpenedTeam.name[0].toUpperCase()
+                    : ""}
+                </p>
+              {/if}
               <span class="ms-4 w-75 my-auto my-auto ellipsis overflow-hidden"
                 >{currOpenedTeam.name}</span
               >
@@ -234,6 +244,16 @@
 </div>
 
 <style>
+  @media only screen and (max-width: 1000px) {
+    .team-heading {
+      display: block !important;
+    }
+    .team-heading > h2,
+    .team-heading > div {
+      width: 100% !important;
+    }
+
+  }
   .team-menu__link {
     color: var(--button-color);
   }
