@@ -331,11 +331,16 @@
               style="height:16px; width:16px;"
               class="d-flex align-items-center justify-content-center me-2"
             >
-              <img src={folderOpenIcon} alt="" class="pe-0" />
+              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
             </div>
           {:else}
             <div class="d-flex me-2" style="height:16px; width:16px;">
-              <img src={folder} alt="" style="height:16px; width:16px;" />
+              <img
+                src={folder}
+                alt=""
+                style="height:16px; width:16px;"
+                class="folder-icon"
+              />
             </div>
           {/if}
           <p class="ellipsis mb-0">
@@ -488,7 +493,7 @@
   .sub-files {
     border-left: 1px solid var(--border-color);
   }
-  
+
   .main-folder {
     width: calc(100% - 24px);
   }
@@ -497,5 +502,8 @@
   }
   .folder-title {
     width: calc(100% - 30px);
+  }
+  .folder-icon {
+    width: 16px;
   }
 </style>

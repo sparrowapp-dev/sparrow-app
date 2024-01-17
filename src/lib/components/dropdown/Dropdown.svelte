@@ -105,10 +105,10 @@
     height: 26px;
   }
   .dropdown-btn:hover {
-    border-bottom: 1px solid #85c2ff;
+    border-bottom: 1px solid var(--send-button);
   }
   .dropdown-data {
-    background-color: black;
+    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
     top: 32px;
@@ -139,6 +139,6 @@
   }
   .dropdown-btn-active {
     background-color: var(--border-color);
-    border-bottom: 1px solid #85c2ff;
+    border-bottom: 1px solid var(--send-button);
   }
 </style>

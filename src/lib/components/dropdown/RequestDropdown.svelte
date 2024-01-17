@@ -58,7 +58,9 @@
 >
   <button
     id="dropdown-btn-color"
-    class="dropdown dropdown-btn btn p-0 d-flex align-items-center justify-content-center"
+    class="dropdown dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
+      ? 'drop-active'
+      : ''}"
     style="width: 32px; height:32px;"
     on:click={() => {
       visibilty = !visibilty;
@@ -89,10 +91,11 @@
   .dropdown {
     position: relative;
     display: inline-block;
+    /* border: 1px solid var(--border-color) !important; */
   }
   .dropdown-content {
     position: absolute;
-    top: 25px;
+    top: 32px;
     right: 0px;
     background-color: #f1f1f1;
     overflow: auto;
@@ -115,7 +118,7 @@
   .dropdown-content > button:hover {
     background-color: #232424;
   }
-  #dropdown-btn-color {
-    background-color: var(--blackColor);
+  .drop-active {
+    background-color: var(--send-button) !important;
   }
 </style>

@@ -12,13 +12,19 @@
   export let tabWidth: number;
   export let index: number;
   export let closeTab;
-  export let handleDropOnStart:(index:number)=>void;
-  export let handleDropOnEnd:(index:number)=>void
-
+  export let handleDropOnStart: (index: number) => void;
+  export let handleDropOnEnd: (index: number) => void;
 </script>
 
-<div draggable={true} on:drop={()=>{handleDropOnEnd(index)}}  on:dragstart={()=>{ handleDropOnStart(index)} }
-  class="d-inline-block position-relative pt-1"
+<div
+  draggable={true}
+  on:drop={() => {
+    handleDropOnEnd(index);
+  }}
+  on:dragstart={() => {
+    handleDropOnStart(index);
+  }}
+  class="d-inline-block position-relative pt-1 individual-tab"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
@@ -40,7 +46,7 @@
       {#if tab.type === ItemType.REQUEST}
         <span
           class="text-{getMethodStyle(tab.property.request.method)}"
-          style="font-size: 12px; height: 31px; "
+          style="font-size: 10px; height: 31px; "
           >{tab.property.request.method || ""}</span
         >
       {:else if tab.type === ItemType.FOLDER}
@@ -61,7 +67,7 @@
         </span>
       {:else if tab.type === ItemType.WORKSPACE}
         <span>
-          <BookIcon/>
+          <BookIcon />
         </span>
       {/if}
       <span
@@ -72,7 +78,7 @@
       >
         {tab.name}
       </span>
-      {#if (tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
+      {#if tab?.property?.request && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
         <span
           class="position-absolute"
           style="right:0; top:6px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
@@ -81,7 +87,9 @@
     </button>
 
     <button
-      class="btn border-0 d-flex align-items-center"
+      class="{tab.isActive
+        ? 'active-close-btn'
+        : 'inactive-close-btn'} btn border-0 d-flex align-items-center"
       on:click={() => {
         closeTab(tab.id, tab);
       }}
@@ -103,5 +111,11 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     overflow: hidden;
+  }
+  .individual-tab:hover .inactive-close-btn {
+    opacity: 1 !important;
+  }
+  .inactive-close-btn {
+    opacity: 0 !important;
   }
 </style>

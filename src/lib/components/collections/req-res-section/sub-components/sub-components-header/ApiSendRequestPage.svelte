@@ -290,14 +290,14 @@
         type="text"
         id="input-request-url"
         placeholder="Enter URL or paste text"
-        class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
+        class="url-input form-control input-outline border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
         autocomplete="off"
         spellcheck="false"
         autocorrect="off"
         autocapitalize="off"
-        style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
+        style="width:{isCollaps ? '100%' : ''}; height:34px;"
         bind:value={urlText}
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
@@ -392,12 +392,12 @@
 
 <style>
   .btn-primary {
-    background: var(--send-button);
+    background: var(--sparrow-blue);
   }
 
   .view-active {
-    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
-      brightness(100%) contrast(100%);
+    filter: invert(60%) sepia(99%) saturate(302%) hue-rotate(183deg)
+      brightness(102%) contrast(105%);
   }
 
   .btn-primary:hover {
@@ -423,5 +423,10 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .url-input {
+    background-color: var(--background-dark);
+    border: 1px solid #272727 !important;
+    font-size: 12px;
   }
 </style>

@@ -57,14 +57,19 @@
   <div on:click={toggleDropdown}>
     <div
       id="request-dropdown"
-      class="dropdown-btn rounded px-3 d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={true}
+      class="dropdown-btn rounded d-flex align-items-center justify-content-between"
+      class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0 text-{selectedRequest?.color}">
         {selectedRequest?.name}
       </p>
-      <span class:dropdown-logo-active={isOpen}
-        ><img style="height:12px; width:12px;" src={dropdown} alt="" /></span
+      <span class="d-flex" class:dropdown-logo-active={isOpen}
+        ><img
+          style="height:12px; width:12px;"
+          class="ms-2"
+          src={dropdown}
+          alt=""
+        /></span
       >
     </div>
   </div>
@@ -105,13 +110,14 @@
     outline: none;
     border: none;
     height: 34px;
-    width: 110px;
+    width: auto;
+    padding: 0 10px;
   }
   .dropdown-btn:hover {
     background-color: var(--border-color);
   }
   .dropdown-data {
-    background-color: black;
+    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
     top: 40px;
@@ -142,6 +148,6 @@
     cursor: pointer;
   }
   .dropdown-btn-active {
-    border: 1px solid #85c2ff;
+    border: 1px solid var(--send-button);
   }
 </style>
