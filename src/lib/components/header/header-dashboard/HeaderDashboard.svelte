@@ -279,7 +279,7 @@
       : ''}"
     class="{showGlobalSearchPopup && hideHeaders
       ? 'position-absolute'
-      : ''} search-container bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+      : ''} search-container sc-desktop bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
     <div class="ps-3 d-flex align-items-center justify-content-center">
       <SearchIcon />
@@ -334,11 +334,68 @@
     style="margin-left: 10px;"
   >
     <div
-      class="my-auto gap-{!isSearchVisible
+      class="my-auto align-items-center pe-3 gap-{!isSearchVisible
         ? '0'
-        : '4'} d-flex {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        : '2'} d-flex"
     >
-      <div class="my-auto col-{!isSearchVisible ? '1' : '1'}">
+      <div
+        style="height:32px;
+    
+    {!showGlobalSearchPopup ? 'width:40px; z-index:1;' : 'width:400px;'}
+    
+     position: relative;{showGlobalSearchPopup
+          ? 'left:50%;transform: translateX(-50%);'
+          : ''}"
+        class="{showGlobalSearchPopup
+          ? 'position-absolute'
+          : ''} search-container sc-mobile bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
+      >
+        <div class="w-100 position-relative">
+          <div
+            on:click={() => {
+              handleGlobalSearchPopup(true);
+            }}
+            class="position-absolute"
+            style="
+        
+        left: 12px;
+          top:2px;
+          width:20px;
+        "
+          >
+            <SearchIcon />
+          </div>
+          <input
+            type="search"
+            style="font-size: 12px;"
+            class="input-search-bar bg-backgroundLight"
+            placeholder="Search Sparrow"
+            bind:value={searchData}
+            on:input={() => {
+              handleGlobalSearchPopup(true);
+              handleSearch();
+            }}
+            on:click={() => {
+              handleGlobalSearchPopup(true);
+            }}
+          />
+        </div>
+        {#if showGlobalSearchPopup}
+          <GlobalSearchBarPopup
+            {searchData}
+            {handleGlobalSearchPopup}
+            {filteredCollection}
+            {filteredFolder}
+            {filteredRequest}
+            workspaces={allworkspaces}
+            {activeWorkspaceId}
+            {handleDropdown}
+          />
+        {/if}
+      </div>
+      <div
+        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+      >
         <Tooltip>
           <button class="bg-backgroundColor border-0">
             <SettingIcon width={33} height={33} />
@@ -346,9 +403,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible
-          ? '1'
-          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
         <Tooltip>
           <button class="bg-backgroundColor border-0">
@@ -357,13 +412,13 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto col-{!isSearchVisible
-          ? '1'
-          : '2'} {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
+        class="my-auto px-1 {showGlobalSearchPopup && hideHeaders
+          ? 'd-none'
+          : ''}"
       >
         <div class="position-relative" style="z-index: 6;">
           <button
-            class={`bg-backgroundLight border-0`}
+            class={`bg-backgroundColor border-0`}
             id="profile-dropdown"
             style="width: 24px; height: 24px;"
             on:click={toggleDropdown}
@@ -529,12 +584,12 @@
   }
   .input-search-bar {
     width: 100%;
-    padding: 6px 12px;
     font-size: 16px;
     line-height: 1.5;
     border-radius: 4px;
     border: none;
     outline: none;
+    padding: 6px 12px;
   }
   .search-container {
     border: 1px solid transparent;
@@ -575,5 +630,19 @@
   }
   .mac-nav:nth-child(3) {
     background-color: #00ca4e;
+  }
+  @media only screen and (max-width: 992px) {
+    .sc-desktop {
+      display: none !important;
+    }
+    .input-search-bar {
+      padding: 6px;
+      padding-left: 32px;
+    }
+  }
+  @media only screen and (min-width: 993px) {
+    .sc-mobile {
+      display: none !important;
+    }
   }
 </style>
