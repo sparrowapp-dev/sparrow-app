@@ -256,7 +256,7 @@
 
   textarea {
     width: 100%;
-    resize: vertical; 
+    resize: vertical;
     height: 80%;
     max-height: 100%;
     background-color: var(--blackColor);
@@ -268,6 +268,7 @@
     width: 100vw;
     height: 100vh;
     background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 14;
   }
@@ -285,7 +286,7 @@
   .container {
     display: flex;
     position: fixed;
-    height:90%;
+    height: 90%;
     width: 50%;
     top: 50%;
     left: 50%;
@@ -309,9 +310,9 @@
       border-radius: 10px;
     }
   }
-  .textarea-div{
-    height:25%;
-    border:2px solid red;
+  .textarea-div {
+    height: 25%;
+    border: 2px solid red;
   }
 
   .btn-close1 {
