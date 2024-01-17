@@ -9,6 +9,8 @@ import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
 
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
@@ -130,6 +132,7 @@ const makeHttpRequest = async (
   tabId: string,
 ) => {
   let response;
+  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
 
   return Promise.race([
     timeout(apiTimeOut),

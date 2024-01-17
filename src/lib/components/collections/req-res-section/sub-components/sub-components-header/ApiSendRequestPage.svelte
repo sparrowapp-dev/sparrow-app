@@ -21,6 +21,8 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -378,6 +380,7 @@
             splitter.style.width = "100%";
             rightPanel.style.width = `${rightPanelWidth}%`;
             leftPanel.style.width = `${leftPanelWidth}%`;
+            MixpanelEvent(Events.CHANGE_DEFAULT_VIEW);
           }}
           class:view-active={selectedView === "horizontal"}
           src={barIcon}

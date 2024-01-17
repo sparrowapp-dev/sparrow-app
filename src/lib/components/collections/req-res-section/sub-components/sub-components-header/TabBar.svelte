@@ -17,6 +17,8 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;
@@ -161,6 +163,7 @@
             ),
           );
           moveNavigation("right");
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
         }}
       >
         <img src={plusIcon} alt="" />

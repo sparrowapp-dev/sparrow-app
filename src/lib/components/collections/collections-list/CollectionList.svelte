@@ -46,6 +46,9 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -176,6 +179,11 @@
       }
     },
   );
+  let collectionSource = "";
+  createCollectionSource.subscribe((value) => {
+    collectionSource = value;
+  });
+
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
     showDefault = false;
@@ -232,6 +240,11 @@
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: collectionSource,
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+      });
       return;
     }
     return;

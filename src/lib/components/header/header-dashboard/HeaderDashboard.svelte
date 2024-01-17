@@ -32,6 +32,8 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let activeSideBarTabMethods;
 
@@ -217,6 +219,7 @@
 
   function handleGlobalSearchPopup(show: boolean) {
     showGlobalSearchPopup = show;
+    MixpanelEvent(Events.GLOBAL_SEARCH, { clicked: true });
   }
 
   onDestroy(() => {
