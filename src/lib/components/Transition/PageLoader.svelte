@@ -17,6 +17,7 @@
   .loading-spinner {
     width: 100%;
     height: 100%;
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 999;
   }
