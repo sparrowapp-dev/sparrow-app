@@ -28,6 +28,7 @@
       workspace.name,
       openedTeam.id,
       openedTeam.name,
+      openedTeam.base64String
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");

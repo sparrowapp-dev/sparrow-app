@@ -121,6 +121,26 @@ export class WorkspaceRepository {
     return;
   };
 
+  /**
+   * Activate Initial Workspace
+   */
+  public activateInitialWorkspace = async (): Promise<string> => {
+    const workspaces: WorkspaceDocument[] = await RxDB.getInstance()
+      .rxdb.workspace.find()
+      .exec();
+    let teamId: string;
+    const data = workspaces.map((elem: WorkspaceDocument, index) => {
+      const res = this.getDocument(elem);
+      if (index == 0) {
+        res.isActiveWorkspace = true;
+        teamId = res.team?.teamId;
+      } else res.isActiveWorkspace = false;
+      return res;
+    });
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    return teamId;
+  };
+
   public setCurrentEnvironmentId = async (
     workspaceId: string,
     environmentId: string,

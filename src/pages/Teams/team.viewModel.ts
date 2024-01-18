@@ -11,7 +11,7 @@ import { TeamService } from "$lib/services/team.service";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
 
-export class WorkspaceViewModel {
+export class TeamViewModel {
   constructor() {}
   private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
@@ -48,6 +48,10 @@ export class WorkspaceViewModel {
     return this.collectionRepository.getCollection();
   }
 
+  public get workspaces() {
+    return this.workspaceRepository.getWorkspaces();
+  }
+
   public get teams() {
     return this.teamRepository.getTeams();
   }
@@ -56,11 +60,20 @@ export class WorkspaceViewModel {
     return this.teamRepository.getActiveTeam();
   }
 
-  public activateTeamWorkspace = (
-    teamId: string,
-    workspaceId: string,
-  ): void => {
-    this.teamRepository.setActiveTeamWorkspace(teamId, workspaceId);
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public activateTeam = (teamId: string): void => {
+    this.teamRepository.setActiveTeam(teamId);
+    return;
+  };
+
+  public activateInitialTeamWorkspace = async (): Promise<void> => {
+    const workspaceIdToActivate =
+      await this.teamRepository.activateInitialTeamWithWorkspace();
+    if (workspaceIdToActivate)
+      await this.workspaceRepository.setActiveWorkspace(workspaceIdToActivate);
     return;
   };
 

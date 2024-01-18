@@ -13,7 +13,7 @@
   import { FileInput, ParaInput, TextInput } from "$lib/components";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { base64ToURL } from "$lib/utils/helpers";
-  import { WorkspaceViewModel } from "../../../../pages/Workspaces/workspace.viewModel";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
 
   export let teams: any, userId: string;
   let isEditingLogo: boolean = false;
@@ -52,13 +52,13 @@
     };
   });
   const _viewModel = new TeamsViewModel();
-  const _workspaceViewModel = new WorkspaceViewModel();
+  const _workspaceViewModel = new TeamViewModel();
 
   let currOpenedTeam: CurrentTeam;
   let isCreateTeamModalOpen: boolean;
   const handleOpenTeam = (
     teamId: string,
-    teamName,
+    teamName: string,
     teamBase64String: object,
   ) => {
     openedTeam.set({
@@ -155,7 +155,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-       _viewModel.modifyTeam(res._id, res);
+      _viewModel.modifyTeam(res._id, res);
       await _workspaceViewModel.refreshTeams(userId);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();

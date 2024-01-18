@@ -3,7 +3,6 @@
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
-  import Teams from "../Teams/Teams.svelte";
   import CollectionsHome from "../Collections/Collections.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import { onDestroy, onMount } from "svelte";
@@ -11,9 +10,10 @@
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel";
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../Environment/Environment.svelte";
-  import Workspaces from "../Workspaces/Workspaces.svelte";
+  import Teams from "../Teams/Teams.svelte";
   import {
     type ActiveSideBarTabDocument,
+    type TeamDocument,
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
@@ -25,15 +25,17 @@
     isWorkspaceLoaded,
     setCurrentWorkspace,
   } from "$lib/store/workspace.store";
-  import { WorkspaceViewModel } from "../Workspaces/workspace.viewModel";
-  import { setCurrentTeam } from "$lib/store/team.store";
+  import { TeamViewModel } from "../Teams/team.viewModel";
   import type { Path } from "$lib/utils/interfaces/request.interface";
-  let activeSidebar: string;
+  import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
-  const _viewModelHome = new WorkspaceViewModel();
+  const _viewModelHome = new TeamViewModel();
   let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
+  const activeWorkspaceRxDoc: Observable<WorkspaceDocument> =
+    _viewModelHome.activeWorkspace;
+  const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
   let activeSidebarTabName: string;
   let workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
@@ -43,12 +45,32 @@
     collectionsMethods.getActiveWorkspace();
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
+
+  let currentTeam: CurrentTeam;
+  let currentWorkspace: CurrentWorkspace;
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
         currentWorkspaceId = value.get("_id");
         currentWorkspaceName = value.get("name");
+        currentWorkspace = {
+          id: value.get("_id"),
+          name: value.get("name"),
+        };
       }
+    },
+  );
+
+  const activeTeamSubscribe = activeTeamRxDoc.subscribe(
+    async (value: TeamDocument) => {
+      if (value) {
+        currentTeam = {
+          id: value.get("teamId"),
+          name: value.get("name"),
+          base64String: value.get("logo"),
+        };
+      } else _viewModelHome.activateInitialTeamWorkspace();
     },
   );
 
@@ -68,14 +90,14 @@
     workspaceName: string,
     teamId: string,
     teamName: string,
+    base64String: object,
   ) => {
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
-    _viewModelHome.activateTeamWorkspace(teamId, workspaceId);
+    _viewModelHome.activateTeam(teamId);
 
     setCurrentWorkspace(workspaceId, workspaceName);
-    setCurrentTeam(teamId, teamName);
     isWorkspaceLoaded.set(true);
   };
 
@@ -162,34 +184,41 @@
   const getActiveTab = handleActiveTab();
 
   onMount(() => {
-    window.addEventListener("resize", handleResize);
     handleResize();
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   });
   onDestroy(() => {
-    // currTeamSubscribe();
+    activeTeamSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
     activeSidbarTabSubscribe.unsubscribe();
   });
 </script>
 
 <div class="dashboard">
   <HeaderDashboard
+    {currentWorkspace}
+    {currentTeam}
     {collectionsMethods}
     {handleWorkspaceSwitch}
     {activeSideBarTabMethods}
   />
   <div class="dashboard-teams d-flex">
     {#if activeSidebarTabName}
-      <Sidebar {activeSideBarTabMethods} {activeSidebarTabName} />
+      <Sidebar {activeSideBarTabMethods} {activeSidebarTabName} {workspaces} />
     {:else}
-      <Sidebar {activeSideBarTabMethods} activeSidebarTabName="workspaces" />
+      <Sidebar
+        {activeSideBarTabMethods}
+        activeSidebarTabName="workspaces"
+        {workspaces}
+      />
     {/if}
     <section class="w-100">
       <Route path="/collections/*"><CollectionsHome /></Route>
       <Route path="/workspaces/*"
-        ><Workspaces
+        ><Teams
+          {currentTeam}
           data={workspaces}
           {handleWorkspaceSwitch}
           {handleWorkspaceTab}
@@ -199,7 +228,6 @@
       >
       <Route path="/mock/*"><Mock /></Route>
       <Route path="/environment/*"><Environment /></Route>
-      <Route path="/teams/*"><Teams /></Route>
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#if activeSidebarTabName}

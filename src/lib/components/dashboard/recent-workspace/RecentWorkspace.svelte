@@ -3,9 +3,11 @@
   import { navigate } from "svelte-navigator";
   import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
-    import constants from "$lib/utils/constants";
+  import constants from "$lib/utils/constants";
   export let data: any;
-  export let handleWorkspaceSwitch, handleWorkspaceTab, activeSideBarTabMethods;
+  export let handleWorkspaceSwitch: any,
+    handleWorkspaceTab: any,
+    activeSideBarTabMethods: any;
   let currOpenedTeam: any;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
@@ -13,12 +15,13 @@
   onDestroy(() => {
     openedTeamSubscribe();
   });
-  const handleOpenCollection = (workspace) => {
+  const handleOpenCollection = (workspace: any) => {
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
-      currOpenedTeam.id,
-      currOpenedTeam.name,
+      workspace.team.teamId,
+      workspace.team.teamName,
+      currOpenedTeam.base64String,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
@@ -32,12 +35,16 @@
     {#each $data.slice().reverse() as list, index}
       {#if index < constants.WORKSPACE_LIMIT}
         <div class="pb-1" on:click={() => handleOpenCollection(list)}>
-          <div  
+          <div
             class="recent-workspace-item p-1 overflow-hidden ps-2 rounded justify-content-between d-flex"
           >
             <div class="overflow-hidden ellipsis">
-              <p class="mb-0 recent-workspace ellipsis overflow-hidden">{list.name}</p>
-              <span class="team-name ellipsis overflow-hidden">{list.team.teamName}</span>
+              <p class="mb-0 recent-workspace ellipsis overflow-hidden">
+                {list.name}
+              </p>
+              <span class="team-name ellipsis overflow-hidden"
+                >{list.team.teamName}</span
+              >
             </div>
             <PeopleIcon
               color={currOpenedTeam.id == list.team.teamId

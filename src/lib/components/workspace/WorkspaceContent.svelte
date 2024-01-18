@@ -8,7 +8,6 @@
     isWorkspaceCreatedFirstTime,
     workspaceView,
     openedTeam,
-    currentTeam,
   } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -16,27 +15,25 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { v4 as uuidv4 } from "uuid";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
+  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
-  import { base64ToURL, imageDataToURL } from "$lib/utils/helpers";
-  import { blobToBase64String } from "rxdb";
+  import { base64ToURL } from "$lib/utils/helpers";
   export let loaderColor = "default",
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
-    activeSideBarTabMethods: any;
-  let currOpenedTeam: CurrentTeam, currActiveTeam: CurrentTeam;
+    activeSideBarTabMethods: any,
+    currentTeam: CurrentTeam;
+  let currOpenedTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
   });
-  const currentTeamSubscribe = currentTeam.subscribe((value) => {
-    if (value) currActiveTeam = value;
-  });
+
   let isLoading: boolean = false;
 
-  const _viewModel = new WorkspaceViewModel();
+  const _viewModel = new TeamViewModel();
 
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
@@ -103,7 +100,6 @@
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
-    currentTeamSubscribe();
   });
 </script>
 
@@ -232,7 +228,7 @@
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
         openedTeam={currOpenedTeam}
-        {currActiveTeam}
+        currActiveTeam={currentTeam}
         workspaces={$data.slice().reverse()}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
@@ -252,14 +248,13 @@
     .team-heading > div {
       width: 100% !important;
     }
-
   }
   .team-menu__link {
     color: var(--button-color);
   }
   .content-teams__btn-new-workspace {
     height: 30px;
-    background-color: var(--send-button);
+    background-color: #1193f0;
   }
   .content-teams__btn-invite {
     height: 30px;

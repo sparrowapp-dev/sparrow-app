@@ -20,6 +20,7 @@ import type { Observable } from "rxjs";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -151,7 +152,6 @@ export class HeaderDashboardViewModel {
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
-
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem, index) => {
         const {
@@ -190,6 +190,8 @@ export class HeaderDashboardViewModel {
   // logout to frontend - clears local db, store, and cookies.
   public clientLogout = async (): Promise<void> => {
     setUser(null);
+    setCurrentWorkspace("", "");
+    setOpenedTeam("", "", {});
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();

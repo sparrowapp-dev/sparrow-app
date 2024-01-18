@@ -10,26 +10,25 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
-    currentWorkspace,
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
   import { slide } from "svelte/transition";
-  import checkIcon from "$lib/assets/check.svg";
-  import { currentTeam } from "$lib/store/team.store";
   import { TickIcon } from "$lib/assets/app.asset";
+  import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
+
   export let activeWorkspaceId: string;
-  export let activeSideBarTabMethods;
+  export let activeSideBarTabMethods: any;
+  export let currentTeam: CurrentTeam, currentWorkspace: CurrentWorkspace;
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
   const _viewModel = new HeaderDashboardViewModel();
 
   let isOpen: boolean = false;
-  let currWorkspaceName: string = "",
-    currTeamName: string = "";
+
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
@@ -127,18 +126,8 @@
     }
   }
 
-  const currentWorkspaceSubscribe = currentWorkspace.subscribe((value) => {
-    if (value) currWorkspaceName = value.name;
-  });
-
-  const currentTeamSubscribe = currentTeam.subscribe((value) => {
-    if (value) currTeamName = value.name;
-  });
-
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
-    currentWorkspaceSubscribe();
-    currentTeamSubscribe();
   });
 
   onMount(() => {
@@ -152,15 +141,15 @@
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}
 >
-  {#if currWorkspaceName}
+  {#if currentWorkspace && currentWorkspace?.name}
     <button
       style="font-size: 12px;"
       class="dropdown-btn rounded border-0 ps-2 py-2 gap-2 ellipsis overflow-hidden"
       on:click={toggleDropdown}
       id="workspace-dropdown"
     >
-      <span class="ellipsis overflow-hidden">{currTeamName}</span>
-      / <span class="ellipsis overflow-hidden">{currWorkspaceName}</span>
+      <span class="ellipsis overflow-hidden">{currentTeam?.name}</span>
+      / <span class="ellipsis overflow-hidden">{currentWorkspace?.name}</span>
       <span class="px-2" class:dropdown-logo-active={isOpen}
         ><img
           style="height:15px; width:20px;"

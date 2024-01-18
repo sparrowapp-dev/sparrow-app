@@ -1,16 +1,19 @@
 <script lang="ts">
   import collections from "$lib/assets/collections.svg";
+  import collectionsFaded from "$lib/assets/collections-faded.svg";
   import mock from "$lib/assets/mock.svg";
   import environment from "$lib/assets/environment.svg";
+  import environmentFaded from "$lib/assets/environment-faded.svg";
   import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { HelpIcon } from "$lib/assets/app.asset";
   import SettingsIcon from "$lib/assets/setting.svelte";
-
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  export let workspaces: Observable<WorkspaceDocument[]>;
   export let activeSideBarTabMethods;
   export let activeSidebarTabName: string;
-
 </script>
 
 <div class="sidebar">
@@ -23,22 +26,48 @@
       isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
     />
-    <Helper
-      {activeSideBarTabMethods}
-      route="collections"
-      heading="Collections"
-      logo={collections}
-      isSelected={"collections" === activeSidebarTabName ? true : false}
-      disabled={false}
-    />
-    <Helper
-      {activeSideBarTabMethods}
-      route="environment"
-      heading="Environment"
-      logo={environment}
-      isSelected={"environment" === activeSidebarTabName ? true : false}
-      disabled={false}
-    />
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route="collections"
+        heading="Collections"
+        logo={collections}
+        isSelected={"collections" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route=""
+          heading="Collections"
+          logo={collectionsFaded}
+          isSelected={"collections" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route={"environment"}
+        heading="Environment"
+        logo={environment}
+        isSelected={"environment" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route={""}
+          heading="Environment"
+          logo={environmentFaded}
+          isSelected={"environment" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
     <Helper
       {activeSideBarTabMethods}
       route="mock"
