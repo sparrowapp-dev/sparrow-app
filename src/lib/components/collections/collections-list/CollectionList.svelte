@@ -50,6 +50,9 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -181,6 +184,11 @@
       }
     },
   );
+  let collectionSource = "";
+  createCollectionSource.subscribe((value) => {
+    collectionSource = value;
+  });
+
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
     showDefault = false;
@@ -237,6 +245,11 @@
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: collectionSource,
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+      });
       return;
     }
     return;
@@ -426,13 +439,13 @@
   >
     <div
       style="height:32px; width:180px "
-      class="inputField bg-blackColor ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+      class="inputField bg-backgroundDark ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
     >
       <SearchIcon />
       <input
         type="search"
         style="  font-size: 12px;font-weight:500;"
-        class="inputField border-0 w-100 h-100 bg-blackColor"
+        class="inputField searchField border-0 w-100 h-100 bg-backgroundDark"
         placeholder="Search APIs in {currentWorkspaceName || ''}"
         bind:value={searchData}
         on:input={() => {
@@ -444,7 +457,8 @@
     <div class="d-flex align-items-center justify-content-center">
       <button
         id="filter-btn"
-        class="btn btn-blackColor d-flex align-items-center justify-content-center"
+        class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center
+        {showfilterDropdown ? 'filter-active' : ''}"
         style="width: 32px; height:32px; position:relative"
         on:click={handleFilterDropdown}
       >
@@ -635,5 +649,13 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+  }
+  .searchField {
+  }
+  .filter-btn {
+    /* border: 1px solid var(--border-color) !important; */
+  }
+  .filter-active {
+    background-color: var(--send-button) !important;
   }
 </style>

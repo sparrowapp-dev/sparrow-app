@@ -23,6 +23,9 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
   import ImportCollection from "$lib/components/collections/collections-list/ImportCollection.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -75,6 +78,11 @@
 
     return null;
   };
+
+  let collectionSource = "";
+  createCollectionSource.subscribe((value) => {
+    collectionSource = value;
+  });
 
   let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
@@ -141,7 +149,11 @@
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
-
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: collectionSource,
+        collectionName: res.data.data.name,
+        collectionId: res.data.data._id,
+      });
       return;
     }
     return;
@@ -149,16 +161,17 @@
 
   let isImportCollectionPopup: boolean = false;
   const handleImportCollectionPopup = (flag) => {
+    createCollectionSource.set("ClosedTabView");
     isImportCollectionPopup = flag;
-  }
+  };
   const handleWorkspaceClick = async () => {
     const workspace = generateSampleWorkspace(
       currentWorkspaceId,
       new Date().toString(),
-      currentWorkspaceName
+      currentWorkspaceName,
     );
     workspace.path.workspaceId = currentWorkspaceId;
-    workspace.name=currentWorkspaceName;
+    workspace.name = currentWorkspaceName;
     collectionsMethods.handleCreateTab(workspace);
     moveNavigation("right");
   };
@@ -206,6 +219,9 @@
             ),
           );
           moveNavigation("right");
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+            source: "ClosedTabView",
+          });
         }}
       >
         <img src={apiRequest} alt="" style="width: 20px;" />

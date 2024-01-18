@@ -44,7 +44,7 @@
 
     if (response.isSuccessful) {
       collectionsMethods.deleteCollection(collectionId);
-      collectionsMethods.deleteCollectioninWorkspace(workspaceId,collectionId);
+      collectionsMethods.deleteCollectioninWorkspace(workspaceId, collectionId);
       closePopup(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
       collectionsMethods.removeMultipleTabs(deleteIds);
@@ -138,6 +138,7 @@
     width: 100vw;
     height: 100vh;
     background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 9;
   }

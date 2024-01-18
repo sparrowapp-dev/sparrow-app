@@ -17,10 +17,11 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let collectionsMethods: CollectionsMethods;
-  export let onTabsSwitched:()=>void;
+  export let onTabsSwitched: () => void;
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
@@ -73,11 +74,11 @@
     event.preventDefault();
     const element = tabList.splice(movedTabStartIndex, 1);
     tabList.splice(movedTabEndIndex, 0, element[0]);
-     tabList= tabList.map((tab, index) => {
+    tabList = tabList.map((tab, index) => {
       tab.index = index;
       return tab;
     });
-    const newTabList:NewTab[]=tabList as NewTab[];
+    const newTabList: NewTab[] = tabList as NewTab[];
     tabs.set(newTabList);
     onTabsSwitched();
   };
@@ -99,7 +100,7 @@
 >
   <div
     style="width:{$collapsibleState ? '100%' : '100%'}"
-    class="tabbar bg-blackColor d-flex bg-backgroundColor;"
+    class="tabbar d-flex"
     bind:offsetWidth={scrollerParent}
   >
     {#if scrollerParent <= scrollerWidth + 105}
@@ -162,6 +163,7 @@
             ),
           );
           moveNavigation("right");
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
         }}
       >
         <img src={plusIcon} alt="" />
@@ -196,6 +198,7 @@
 <style>
   .tabbar {
     height: 36px;
+    background-color: var(--background-light);
   }
 
   .tab-scroller::-webkit-scrollbar {

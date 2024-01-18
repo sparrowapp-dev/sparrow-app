@@ -3,6 +3,8 @@
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let data: Array<{
     name: string;
@@ -21,6 +23,7 @@
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
+    MixpanelEvent(Events.ENVIRONMENT_SIDE_PANEL);
   };
 
   $: {
@@ -111,10 +114,10 @@
       height: 26px;
     }
     .dropdown-btn:hover {
-      border-bottom: 1px solid #85c2ff;
+      border-bottom: 1px solid var(--send-button);
     }
     .dropdown-data {
-      background-color: black;
+      background-color: var(--background-dropdown);
       color: white;
       position: absolute;
       top: 32px;
@@ -148,7 +151,7 @@
     }
     .dropdown-btn-active {
       background-color: var(--border-color);
-      border-bottom: 1px solid #85c2ff;
+      border-bottom: 1px solid var(--send-button);
     }
   }
 </style>

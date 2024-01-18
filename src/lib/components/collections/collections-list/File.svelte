@@ -5,9 +5,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type {
-    Path,
-  } from "$lib/utils/interfaces/request.interface";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
@@ -56,7 +54,7 @@
   };
 
   const handleClick = () => {
-    let request = generateSampleRequest(id,   new Date().toString());
+    let request = generateSampleRequest(id, new Date().toString());
     request.path = path;
     request.name = name;
     if (description) request.description = description;
@@ -65,7 +63,8 @@
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
     if (headers) request.property.request.headers = headers;
-    if (selectedRequestBodyType) request= setBodyType(request,selectedRequestBodyType);
+    if (selectedRequestBodyType)
+      request = setBodyType(request, selectedRequestBodyType);
     request.property.request.save.api = true;
     request.property.request.save.description = true;
     collectionsMethods.handleCreateTab(request);
@@ -280,11 +279,7 @@
       ? 'unclickable'
       : ''}"
   >
-    <div
-      class="api-method text-{getMethodStyle(method)}  {id === activeTabId
-        ? ' active-request-method'
-        : ''}"
-    >
+    <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
 
@@ -331,20 +326,20 @@
 
 <style>
   .api-method {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
-    margin-right: 8px;
-    border: 1px solid var(--border-color);
-    width: 56px;
+    width: 48px;
     height: 30px;
+    padding-left: 6px;
+    padding-right: 4px;
     border-radius: 8px;
     display: flex;
-    justify-content: center;
     align-items: center;
   }
   .api-name {
     font-size: 12px;
     font-weight: 400;
+    width: calc(100% - 48px);
   }
   .api-info {
     display: flex;
@@ -431,9 +426,6 @@
     width: calc(100% - 24px);
   }
   .active-request-tab {
-    background-color: var(--selected-active-sidebar) !important;
-  }
-  .active-request-method {
     background-color: var(--selected-active-sidebar) !important;
   }
 </style>

@@ -17,6 +17,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.706);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 999;
   }

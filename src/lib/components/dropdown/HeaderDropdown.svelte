@@ -279,7 +279,7 @@
     background-color: var(--border-color);
   }
   .dropdown-data {
-    background-color: black;
+    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
     top: 40px;
@@ -301,7 +301,7 @@
 
   .dropdown-btn-active {
     border: 1px solid #85c2ff;
-    background-color: var(--blackColor);
+    background-color: var(--background-dropdown);
   }
   .list-team-name {
     color: var(--request-arc);
