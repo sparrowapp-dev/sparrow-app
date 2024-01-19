@@ -21,11 +21,13 @@
   import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
   import { base64ToURL } from "$lib/utils/helpers";
   export let loaderColor = "default",
+    userId: string,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
     activeSideBarTabMethods: any,
-    currentTeam: CurrentTeam;
+    currentTeam: CurrentTeam,
+    handleCreateWorkspace: any;
   let currOpenedTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
@@ -34,61 +36,6 @@
   let isLoading: boolean = false;
 
   const _viewModel = new TeamViewModel();
-
-  const handleCreateWorkSpace = async () => {
-    isWorkspaceCreatedFirstTime.set(true);
-    const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
-    );
-
-    const workspaceData = {
-      name: workspaceObj.name,
-      type: ItemType.PERSONAL,
-    };
-    _viewModel.addWorkspace(workspaceObj);
-    isLoading = true;
-    const response = await _viewModel.createWorkspace(workspaceData);
-
-    if (response.isSuccessful) {
-      navigate("/dashboard");
-      isLoading = false;
-      _viewModel.addWorkspace(response.data.data);
-
-      let totalCollection: number = 0;
-      let totalRequest: number = 0;
-
-      if ($data) {
-        $data.map((item) => {
-          if (item) {
-            if (item._data._id === response.data.data._id) {
-              totalCollection = item?._data?.collections?.length;
-            } else {
-              totalRequest = 0;
-            }
-          }
-        });
-      }
-      let path: Path = {
-        workspaceId: response?.data?.data?._id,
-        collectionId: "",
-      };
-
-      workspaceObj.id = response.data.data._id;
-      workspaceObj.name = response.data.data.name;
-      workspaceObj.path = path;
-      workspaceObj.property.workspace.requestCount = totalRequest;
-      workspaceObj.property.workspace.collectionCount = totalCollection;
-      workspaceObj.save = true;
-      _viewModel.addWorkspace(workspaceObj);
-
-      workspaceMethods.handleCreateTab(workspaceObj);
-      moveNavigation("right");
-      isWorkspaceCreatedFirstTime.set(true);
-    } else {
-      isLoading = false;
-    }
-  };
 
   let selectedTab = "all-workspace";
   let selectedView: string;
@@ -138,7 +85,7 @@
               >
               <button
                 style="font-size: 12px;"
-                on:click={handleCreateWorkSpace}
+                on:click={handleCreateWorkspace}
                 class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
                 >{#if isLoading}
                   <span class="ms-0 me-1">
@@ -227,6 +174,8 @@
       />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
+        {handleCreateWorkspace}
+        {userId}
         openedTeam={currOpenedTeam}
         currActiveTeam={currentTeam}
         workspaces={$data.slice().reverse()}

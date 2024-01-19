@@ -12,6 +12,15 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
   import type { CurrentTeam } from "$lib/utils/interfaces";
+  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { moveNavigation } from "$lib/utils/helpers";
+  import { navigate } from "svelte-navigator";
+  import { notification } from "@tauri-apps/api";
+  import { notifications } from "$lib/utils/notifications";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   export let data: any,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
@@ -22,6 +31,7 @@
     userId: string | undefined = undefined,
     currOpenedTeam: CurrentTeam;
   const _viewModel = new TeamViewModel();
+  const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
   const workspaceMethods: WorkspaceMethods = {
@@ -62,7 +72,68 @@
       allTeams = teamArr;
     }
   });
+  const handleCreateWorkspace = async () => {
+    isWorkspaceCreatedFirstTime.set(true);
+    isWorkspaceLoaded.set(false);
+    const workspaceObj = generateSampleWorkspace(
+      UntrackedItems.UNTRACKED,
+      new Date().toString(),
+    );
 
+    const workspaceData = {
+      name: workspaceObj.name,
+      id: currOpenedTeam.id,
+    };
+    _viewModel.addWorkspace(workspaceObj);
+
+    const response = await _viewModel.createWorkspace(workspaceData);
+
+    if (response.isSuccessful) {
+      _viewModel.addWorkspace(response.data.data);
+
+      let totalCollection: number = 0;
+      let totalRequest: number = 0;
+
+      $data.map((item) => {
+        if (item) {
+          if (item._data._id === response.data.data._id) {
+            // totalCollection = item?._data?.collections?.length;
+            totalCollection = 0;
+          } else {
+            totalRequest = 0;
+          }
+        }
+      });
+
+      let path: Path = {
+        workspaceId: response.data.data._id,
+        collectionId: "",
+      };
+
+      workspaceObj._id = response.data.data._id;
+      workspaceObj.name = response.data.data.name;
+      workspaceObj.description = response.data.data?.description;
+      workspaceObj.team = response.data.data?.team;
+      workspaceObj.owner = response.data.data?.owner;
+      workspaceObj.users = response.data.data?.users;
+      workspaceObj.createdAt = response.data.data?.createdAt;
+      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.isActiveWorkspace = false;
+      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.path = path;
+      workspaceObj.property.workspace.requestCount = totalRequest;
+      workspaceObj.property.workspace.collectionCount = 0;
+      workspaceObj.save = true;
+      _viewModel.addWorkspace(workspaceObj);
+      if (userId) _viewModelWorkspace.refreshWorkspaces(userId);
+      collectionsMethods.handleCreateTab(workspaceObj);
+      moveNavigation("right");
+      navigate("/collections");
+      isWorkspaceCreatedFirstTime.set(true);
+      notifications.success("New Workspace Created");
+      isWorkspaceLoaded.set(true);
+    }
+  };
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
@@ -85,6 +156,8 @@
       {collectionsMethods}
     />
     <WorkspaceContent
+      {handleCreateWorkspace}
+      {userId}
       {currentTeam}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}

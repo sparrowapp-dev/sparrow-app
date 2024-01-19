@@ -29,6 +29,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
+    import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -190,7 +191,7 @@
     }
     return selectedActiveSideBar;
   }
-
+ 
   const getActiveTab = handleActiveTab();
 
   onMount(() => {
