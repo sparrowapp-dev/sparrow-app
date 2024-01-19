@@ -19,6 +19,21 @@ export class TeamRepository {
   };
 
   /**
+   * get all teams
+   */
+  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+    const team = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+          isActiveTeam: true,
+        },
+      })
+      .exec();
+    console.log(team, ": team");
+    return team ? true : false;
+  };
+  /**
    * clear teams data
    */
   public clearTeams = async (): Promise<any> => {
@@ -69,9 +84,7 @@ export class TeamRepository {
    * sync / refresh teams data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearTeams();
-
-    await RxDB.getInstance().rxdb.team.bulkInsert(data);
+    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
     return;
   };
 

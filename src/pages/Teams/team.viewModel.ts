@@ -64,6 +64,10 @@ export class TeamViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   }
 
+  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+    return await this.teamRepository.checkActiveTeam(teamId);
+  };
+
   public activateTeam = (teamId: string): void => {
     this.teamRepository.setActiveTeam(teamId);
     return;
@@ -115,9 +119,10 @@ export class TeamViewModel {
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
     const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamActive = false;
 
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem) => {
+      const data = response.data.data.map(async (elem) => {
         const {
           _id,
           name,
@@ -134,8 +139,9 @@ export class TeamViewModel {
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
-          isActiveWorkspace: false,
         }));
+        const isActiveTeam = await this.checkActiveTeam(_id);
+        if (isActiveTeam) isAnyTeamActive = true;
         return {
           teamId: _id,
           name,
@@ -144,7 +150,7 @@ export class TeamViewModel {
           workspaces: updatedWorkspaces,
           owner,
           admins,
-          isActiveTeam: false,
+          isActiveTeam: isActiveTeam,
           createdAt,
           createdBy,
           updatedAt,
@@ -152,6 +158,7 @@ export class TeamViewModel {
         };
       });
       await this.teamRepository.bulkInsertData(data);
+      if (!isAnyTeamActive) await this.activateInitialTeamWorkspace();
       return;
     }
   };

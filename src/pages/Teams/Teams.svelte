@@ -31,7 +31,6 @@
   const userSubscribe = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
-      await _viewModel.refreshTeams(value._id);
     }
   });
 

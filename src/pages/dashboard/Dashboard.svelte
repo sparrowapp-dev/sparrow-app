@@ -70,7 +70,7 @@
           name: value.get("name"),
           base64String: value.get("logo"),
         };
-      } else _viewModelHome.activateInitialTeamWorkspace();
+      }
     },
   );
 
@@ -94,8 +94,8 @@
   ) => {
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
-    isWorkspaceCreatedFirstTime.set(false);
     _viewModelHome.activateTeam(teamId);
+    isWorkspaceCreatedFirstTime.set(false);
 
     setCurrentWorkspace(workspaceId, workspaceName);
     isWorkspaceLoaded.set(true);
