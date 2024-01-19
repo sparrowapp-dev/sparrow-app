@@ -91,6 +91,16 @@
       resizeWindowOnLogin();
     }
   });
+
+  const handleKeyPress = (event) => {
+    console.log(event.code);
+    console.log(event.ctrlKey);
+    if (event.ctrlKey && event.code === "Equal") {
+      invoke("zoom_window", { scaleFactor: 1.2 });
+    } else if (event.ctrlKey && event.code === "Minus") {
+      invoke("zoom_window", { scaleFactor: 1.0 });
+    }
+  };
 </script>
 
 <Router {url}>
@@ -114,6 +124,7 @@
 </Router>
 
 <Toast />
+<svelte:window on:keydown={handleKeyPress} />;
 
 <style>
 </style>
