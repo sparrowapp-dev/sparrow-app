@@ -143,20 +143,13 @@ export class WorkspaceRepository {
    * Activate Initial Workspace
    */
   public activateInitialWorkspace = async (): Promise<string> => {
-    const workspaces: WorkspaceDocument[] = await RxDB.getInstance()
-      .rxdb.workspace.find()
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne()
       .exec();
-    let teamId: string;
-    const data = workspaces.map((elem: WorkspaceDocument, index) => {
-      const res = this.getDocument(elem);
-      if (index == 0) {
-        res.isActiveWorkspace = true;
-        teamId = res.team?.teamId;
-      } else res.isActiveWorkspace = false;
-      return res;
-    });
-
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    const rxDoc = workspace.toMutableJSON();
+    rxDoc.isActiveWorkspace = true;
+    const teamId = rxDoc.team.teamId;
+    await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
     return teamId;
   };
 

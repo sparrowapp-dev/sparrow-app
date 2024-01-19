@@ -41,7 +41,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
       Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
-    navigate("/home");
+    navigate("/dashboard/collections");
     return response;
   } else {
     navigate("/");

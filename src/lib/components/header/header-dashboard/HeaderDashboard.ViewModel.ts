@@ -203,7 +203,7 @@ export class HeaderDashboardViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
-      if (isAnyWorkspaceActive) this.activateInitialWorkspaceWithTeam();
+      if (!isAnyWorkspaceActive) this.activateInitialWorkspaceWithTeam();
       return;
     }
   };

@@ -75,7 +75,7 @@
         setAuthJwt(constants.REF_TOKEN, refreshToken);
         setUser(jwtDecode(accessToken));
         notifications.success("Login successful!");
-        navigate("/home");
+        navigate("/dashboard/collections");
         await resizeWindowOnLogin();
       }
     });
