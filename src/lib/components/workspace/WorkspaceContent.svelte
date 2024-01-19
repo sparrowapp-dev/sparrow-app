@@ -18,13 +18,23 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
+  import Members from "$lib/components/workspace/members/Members.svelte";
   import { onDestroy, onMount } from "svelte";
-  import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
+  import type {
+    CurrentTeam,
+    TeamRepositoryMethods,
+    WorkspaceMethods,
+    workspaceServiceMethods,
+  } from "$lib/utils/interfaces";
+  import TeamInvitePopup from "../Modal/TeamInvitePopup.svelte";
   export let loaderColor = "default",
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
-    activeSideBarTabMethods: any;
+    activeSideBarTabMethods: any,
+    activeTeam,
+    workspaceServiceMethods: workspaceServiceMethods,
+    teamRepositoryMethods: TeamRepositoryMethods;
   let currOpenedTeam: CurrentTeam, currActiveTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
@@ -103,8 +113,20 @@
     openedTeamSubscribe();
     currentTeamSubscribe();
   });
+  let teamInvitePopup = false;
 </script>
 
+{#if teamInvitePopup}
+  <TeamInvitePopup
+    onSubmit={workspaceServiceMethods.inviteMembersAtTeam}
+    updateRepo={teamRepositoryMethods.modifyTeam}
+    teamName={activeTeam?.name}
+    teamId={activeTeam?.teamId}
+    handleInvitePopup={(flag) => {
+      teamInvitePopup = flag;
+    }}
+  />
+{/if}
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-3 pt-5">
     <div class="container-fluid">
@@ -126,6 +148,9 @@
             </h2>
             <div class="d-flex w-25">
               <button
+                on:click={() => {
+                  teamInvitePopup = true;
+                }}
                 style="font-size: 12px;"
                 class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
                 >Invite</button
@@ -176,9 +201,9 @@
               <Link style="text-decoration:none;" to="personal-workspaces"
                 ><span
                   style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "settings")}
+                  on:click={() => (selectedTab = "members")}
                   class="team-menu__link"
-                  class:tab-active={selectedTab === "settings"}>Settings</span
+                  class:tab-active={selectedTab === "members"}>Members</span
                 ></Link
               >
             </div>
@@ -228,6 +253,8 @@
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
       />
+    {:else if selectedTab === "members"}
+      <Members {activeTeam} />
     {/if}
     <!-- </Route> -->
   </div>

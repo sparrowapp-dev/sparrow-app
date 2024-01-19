@@ -4,7 +4,7 @@ import {
   makeRequest,
 } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
-import type { TeamPostBody } from "$lib/utils/dto/team-dto";
+import type { InviteBody, TeamPostBody } from "$lib/utils/dto/team-dto";
 const apiUrl: string = constants.API_URL;
 export class TeamService {
   constructor() {}
@@ -25,6 +25,21 @@ export class TeamService {
       body: team,
       headers: getMultipartAuthHeaders(),
     });
+    return response;
+  };
+
+  public inviteMembersAtTeam = async (
+    teamId: string,
+    inviteBody: InviteBody,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/team/${teamId}/user`,
+      {
+        body: inviteBody,
+        headers: getAuthHeaders(),
+      },
+    );
     return response;
   };
 }

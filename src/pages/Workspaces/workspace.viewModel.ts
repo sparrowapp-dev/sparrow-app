@@ -10,6 +10,7 @@ import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TeamService } from "$lib/services/team.service";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
+import type { InviteBody } from "$lib/utils/dto/team-dto";
 
 export class WorkspaceViewModel {
   constructor() {}
@@ -142,5 +143,24 @@ export class WorkspaceViewModel {
       await this.teamRepository.bulkInsertData(data);
       return;
     }
+  };
+
+  // service
+  public inviteMembersAtTeam = async (
+    teamId: string,
+    inviteBody: InviteBody,
+  ) => {
+    const response = await this.teamService.inviteMembersAtTeam(
+      teamId,
+      inviteBody,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public modifyTeam = async (teamId, team) => {
+    this.teamRepository.modifyTeam(teamId, team);
   };
 }

@@ -155,7 +155,7 @@
       <div class="d-flex gap-2">
         <button
           class="statuscode position-relative cursor-pointer ps-1 pe-1 border-0 rounded d-flex align-items-center justify-content-center text-backgroundColor gap-1 {statusCode ===
-          '200 OK'
+            '200 OK' || statusCode === '201 Created'
             ? 'status-primary1'
             : 'status-danger'} "
           style="font-size: 10px;"
@@ -164,7 +164,7 @@
             <div class="position-absolute tooltip-statuscode">
               <span class="ellipsis">
                 <span class="me-1">
-                  {#if statusCode === "200 OK"}
+                  {#if statusCode === "200 OK" || statusCode === "201 Created"}
                     <StatusSuccess
                       height={8}
                       width={8}
@@ -186,7 +186,7 @@
           {/if}
           <span class="ellipsis">
             <span class="me-1">
-              {#if statusCode === "200 OK"}
+              {#if statusCode === "200 OK" || statusCode === "201 Created"}
                 <StatusSuccess
                   height={8}
                   width={8}

@@ -1,5 +1,9 @@
 <script lang="ts">
-  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
+  import type {
+    TeamRepositoryMethods,
+    WorkspaceMethods,
+    workspaceServiceMethods,
+  } from "$lib/utils/interfaces/workspace.interface";
 
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
@@ -29,6 +33,12 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
+  };
+  const teamRepositoryMethods: TeamRepositoryMethods = {
+    modifyTeam: _viewModel.modifyTeam,
+  };
+  const workspaceServiceMethods: workspaceServiceMethods = {
+    inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
   };
 
   const userSubscribe = user.subscribe(async (value) => {
@@ -96,7 +106,10 @@
       {handleWorkspaceTab}
       {data}
       {workspaceMethods}
+      activeTeam={$activeTeam}
       {activeSideBarTabMethods}
+      {workspaceServiceMethods}
+      {teamRepositoryMethods}
     />
   </div>
 </Motion>
