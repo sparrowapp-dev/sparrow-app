@@ -54,7 +54,7 @@
     };
 
     const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
-    sampleWorkspace.id = id;
+    sampleWorkspace._id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
     sampleWorkspace.path = path;
