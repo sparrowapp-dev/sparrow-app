@@ -130,12 +130,14 @@
 
   let name: string = "";
   let email: string = "";
+  let userId: string | undefined;
   let firstLetter: string;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
+      userId = value._id;
       email = value?.email;
       if (name) {
         firstLetter = name[0];
@@ -177,23 +179,17 @@
   window.addEventListener("click", () => {
     profile = false;
   });
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-      await _workspaceViewModel.refreshTeams(value._id);
-    }
-  });
+
 
   const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
-    _workspaceViewModel.activateTeam(team.teamId);
+    // _workspaceViewModel.activateTeam(team.teamId);
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {
-    userUnsubscribe();
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -268,6 +264,7 @@
       style="height: 36px; width:216px"
     >
       <HeaderDropdown
+        {userId}
         {currentTeam}
         {currentWorkspace}
         data={workspaces}

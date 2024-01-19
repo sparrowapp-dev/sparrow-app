@@ -18,7 +18,8 @@
   import { slide } from "svelte/transition";
   import { TickIcon } from "$lib/assets/app.asset";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
-
+  import { user } from "$lib/store";
+  export let userId: string | undefined;
   export let activeWorkspaceId: string;
   export let activeSideBarTabMethods: any;
   export let currentTeam: CurrentTeam, currentWorkspace: CurrentWorkspace;
@@ -74,9 +75,8 @@
 
     const workspaceData = {
       name: workspaceObj.name,
-      type: ItemType.PERSONAL,
+      id: currentTeam.id,
     };
-
     _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
@@ -103,17 +103,25 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
+      workspaceObj.team = response.data.data?.team;
+      workspaceObj.owner = response.data.data?.owner;
+      workspaceObj.users = response.data.data?.users;
+      workspaceObj.createdAt = response.data.data?.createdAt;
+      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.isActiveWorkspace = false;
+      workspaceObj.environments = response.data.data?.environemnts;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
       _viewModel.addWorkspace(workspaceObj);
-
+      if (userId) _viewModel.refreshWorkspaces(userId);
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
+      navigate("/collections");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);

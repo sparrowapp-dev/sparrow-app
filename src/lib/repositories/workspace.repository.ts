@@ -44,6 +44,23 @@ export class WorkspaceRepository {
     }).$;
   };
 
+  /**
+   * Check active Workspace
+   */
+  public checkActiveWorkspace = async (
+    workspaceId: string,
+  ): Promise<boolean> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          _id: workspaceId,
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    return workspace ? true : false;
+  };
+
   public updateCollectionInWorkspace = async (
     workspaceId: string,
     collectionObj,
@@ -101,6 +118,7 @@ export class WorkspaceRepository {
   public clearWorkspaces = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.workspace.find().remove();
   };
+
   /**
    * Sets a workspace as active.
    */
@@ -137,6 +155,7 @@ export class WorkspaceRepository {
       } else res.isActiveWorkspace = false;
       return res;
     });
+
     await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return teamId;
   };

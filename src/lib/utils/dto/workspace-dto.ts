@@ -1,7 +1,7 @@
 //------- workspace Interface ------------//
 export interface WorkspacePostBody {
   name: string;
-  type: string;
+  id: string;
 }
 
 export interface WorkspacePutBody {

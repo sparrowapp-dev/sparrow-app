@@ -30,7 +30,6 @@ export class TeamRepository {
         },
       })
       .exec();
-    console.log(team, ": team");
     return team ? true : false;
   };
   /**

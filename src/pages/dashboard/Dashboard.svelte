@@ -28,6 +28,7 @@
   import { TeamViewModel } from "../Teams/team.viewModel";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
+  import { user } from "$lib/store";
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -49,6 +50,13 @@
   let currentTeam: CurrentTeam;
   let currentWorkspace: CurrentWorkspace;
 
+  const userUnsubscribe = user.subscribe(async (value) => {
+    if (value) {
+      await _viewModelWorkspace.refreshWorkspaces(value._id);
+      await _viewModelHome.refreshTeams(value._id);
+    }
+  });
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -58,6 +66,8 @@
           id: value.get("_id"),
           name: value.get("name"),
         };
+        let currentTeam = value.get("team");
+        _viewModelHome.activateTeam(currentTeam.teamId);
       }
     },
   );
@@ -94,7 +104,7 @@
   ) => {
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
-    _viewModelHome.activateTeam(teamId);
+    // _viewModelHome.activateTeam(teamId);
     isWorkspaceCreatedFirstTime.set(false);
 
     setCurrentWorkspace(workspaceId, workspaceName);
@@ -128,7 +138,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace.id = workspaceId;
+    sampleWorkspace._id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -190,6 +200,7 @@
     };
   });
   onDestroy(() => {
+    userUnsubscribe();
     activeTeamSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     activeSidbarTabSubscribe.unsubscribe();
