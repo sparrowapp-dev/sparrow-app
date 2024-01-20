@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {
     TeamRepositoryMethods,
+    TeamServiceMethods,
     WorkspaceMethods,
     workspaceServiceMethods,
   } from "$lib/utils/interfaces/workspace.interface";
@@ -37,8 +38,11 @@
   const teamRepositoryMethods: TeamRepositoryMethods = {
     modifyTeam: _viewModel.modifyTeam,
   };
-  const workspaceServiceMethods: workspaceServiceMethods = {
+  const teamServiceMethods: TeamServiceMethods = {
     inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
+    removeMembersAtTeam: _viewModel.removeMembersAtTeam,
+    promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
+    demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
   };
 
   const userSubscribe = user.subscribe(async (value) => {
@@ -108,7 +112,7 @@
       {workspaceMethods}
       activeTeam={$activeTeam}
       {activeSideBarTabMethods}
-      {workspaceServiceMethods}
+      {teamServiceMethods}
       {teamRepositoryMethods}
     />
   </div>

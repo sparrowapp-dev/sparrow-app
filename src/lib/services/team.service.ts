@@ -42,4 +42,37 @@ export class TeamService {
     );
     return response;
   };
+
+  public removeMembersAtTeam = async (teamId: string, userId: string) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${apiUrl}/api/team/${teamId}/user/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/team/${teamId}/admin/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
+    const response = await makeRequest(
+      "PUT",
+      `${apiUrl}/api/team/${teamId}/admin/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

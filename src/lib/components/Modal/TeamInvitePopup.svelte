@@ -77,28 +77,7 @@
       const response = await onSubmit(teamId, data);
       updateRepo(teamId, response);
       console.log(response);
-      // const usr = response.users.filter((elem) => {
-      //   for (let i = 0; i < emailstoBeSentArr.length; i++) {
-      //     if (elem.email === emailstoBeSentArr[i]) {
-      //       return true;
-      //     }
-      //   }
-      //   return false;
-      // });
-      // console.log(usr);
     }
-    // const data: addUsersInWorkspacePayload = {
-    //   users: emailstoBeSentArr,
-    //   role: selectedRole.role,
-    // };
-    // const response = await addUsersInWorkspace(
-    //   currentWorkspaceDetails.id,
-    //   data,
-    // );
-    // if (response && response.data.data) {
-    //   const newTeam = response.data.data.users;
-    //   updateUsersInWorkspace(currentWorkspaceDetails.id, newTeam);
-    // }
   };
 </script>
 

@@ -9,8 +9,11 @@ export interface WorkspaceMethods {
   handleCreateTab: (data) => void;
 }
 
-export interface workspaceServiceMethods {
+export interface TeamServiceMethods {
   inviteMembersAtTeam: (teamId: string, inviteBody: InviteBody) => unknown;
+  removeMembersAtTeam: (teamId: string, userId: string) => unknown;
+  promoteToAdminAtTeam: (teamId: string, userId: string) => unknown;
+  demoteToMemberAtTeam: (teamId: string, userId: string) => unknown;
 }
 export interface TeamRepositoryMethods {
   modifyTeam: (teamId: string, team) => void;

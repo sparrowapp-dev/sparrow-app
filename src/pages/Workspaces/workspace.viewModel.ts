@@ -160,6 +160,36 @@ export class WorkspaceViewModel {
     return;
   };
 
+  public removeMembersAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.removeMembersAtTeam(teamId, userId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToAdminAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.demoteToMemberAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
   public modifyTeam = async (teamId, team) => {
     this.teamRepository.modifyTeam(teamId, team);
   };

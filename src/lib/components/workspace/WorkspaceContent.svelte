@@ -23,8 +23,8 @@
   import type {
     CurrentTeam,
     TeamRepositoryMethods,
+    TeamServiceMethods,
     WorkspaceMethods,
-    workspaceServiceMethods,
   } from "$lib/utils/interfaces";
   import TeamInvitePopup from "../Modal/TeamInvitePopup.svelte";
   export let loaderColor = "default",
@@ -33,7 +33,7 @@
     workspaceMethods: WorkspaceMethods,
     activeSideBarTabMethods: any,
     activeTeam,
-    workspaceServiceMethods: workspaceServiceMethods,
+    teamServiceMethods: TeamServiceMethods,
     teamRepositoryMethods: TeamRepositoryMethods;
   let currOpenedTeam: CurrentTeam, currActiveTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
@@ -118,7 +118,7 @@
 
 {#if teamInvitePopup}
   <TeamInvitePopup
-    onSubmit={workspaceServiceMethods.inviteMembersAtTeam}
+    onSubmit={teamServiceMethods.inviteMembersAtTeam}
     updateRepo={teamRepositoryMethods.modifyTeam}
     teamName={activeTeam?.name}
     teamId={activeTeam?.teamId}
@@ -254,7 +254,7 @@
         {activeSideBarTabMethods}
       />
     {:else if selectedTab === "members"}
-      <Members {activeTeam} />
+      <Members {activeTeam} {teamServiceMethods} {teamRepositoryMethods} />
     {/if}
     <!-- </Route> -->
   </div>

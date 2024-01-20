@@ -13,6 +13,7 @@
   }>;
   export let onclick: (tab: string) => void;
   export let method: string;
+  export let id;
   let selectedRequest: {
     name: string;
     id: string;
@@ -34,7 +35,7 @@
   }
 
   function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById("dropdown-member");
+    const dropdownElement = document.getElementById(`dropdown-member-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
     }
@@ -56,7 +57,7 @@
 >
   <div on:click={toggleDropdown}>
     <div
-      id="dropdown-member"
+      id={`dropdown-member-${id}`}
       class="dropdown-btn rounded d-flex align-items-center justify-content-between"
       class:dropdown-btn-active={isOpen}
     >
