@@ -5,6 +5,7 @@
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
+  import { onDestroy } from "svelte";
   export let activeTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
@@ -30,10 +31,12 @@
   }
   $: {
     if (activeTeam) {
-      console.log(activeTeam);
       findUserType();
     }
   }
+  onDestroy(() => {
+    unsubscribeUser();
+  });
 </script>
 
 <section>

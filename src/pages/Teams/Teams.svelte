@@ -39,11 +39,6 @@
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
 
-  let act;
-  activeTeam.subscribe((elem) => {
-    act = elem.toMutableJSON();
-    // console.log("act", act);
-  });
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
   };
@@ -158,6 +153,7 @@
       isWorkspaceLoaded.set(true);
     }
   };
+
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
@@ -182,13 +178,12 @@
     <WorkspaceContent
       {handleCreateWorkspace}
       {userId}
-      {currentTeam}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
       {workspaceMethods}
-      activeTeam={act}
       {activeSideBarTabMethods}
+      activeTeam={$activeTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}
     />

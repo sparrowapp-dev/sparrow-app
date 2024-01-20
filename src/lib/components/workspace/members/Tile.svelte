@@ -110,7 +110,6 @@
     </div>
   </div>
   <div class="position">
-    {console.log(user.role)}
     {#if userType === "owner"}
       <MemberDropdown
         id={user.id}
