@@ -30,6 +30,7 @@
   }
   $: {
     if (activeTeam) {
+      console.log(activeTeam);
       findUserType();
     }
   }

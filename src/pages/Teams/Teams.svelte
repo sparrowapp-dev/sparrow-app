@@ -7,30 +7,43 @@
 
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
+  import { TeamViewModel } from "./team.viewModel";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { Motion } from "svelte-motion";
   import { user } from "$lib/store/auth.store";
   import { onDestroy } from "svelte";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import {
-    openedTeam,
-    setCurrentTeam,
-    setOpenedTeam,
-  } from "$lib/store/team.store";
-  import { setCurrentWorkspace } from "$lib/store/workspace.store";
+  import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
   import type { CurrentTeam } from "$lib/utils/interfaces";
-  import { TeamViewModel } from "./team.viewModel";
+  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { moveNavigation } from "$lib/utils/helpers";
+  import { navigate } from "svelte-navigator";
+  import { notification } from "@tauri-apps/api";
+  import { notifications } from "$lib/utils/notifications";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   export let data: any,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     activeSideBarTabMethods: any,
-    collectionsMethods: any;
-  let allTeams = [],
+    collectionsMethods: any,
+    currentTeam: CurrentTeam;
+  let allTeams: any[] = [],
+    userId: string | undefined = undefined,
     currOpenedTeam: CurrentTeam;
   const _viewModel = new TeamViewModel();
+  const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
+
+  let act;
+  activeTeam.subscribe((elem) => {
+    act = elem.toMutableJSON();
+    // console.log("act", act);
+  });
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
   };
@@ -44,15 +57,36 @@
     demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
   };
 
+  // const userSubscribe = user.subscribe(async (value) => {
+  // if (value) await _viewModel.refreshTeams(value._id);
+  // });
+
   const userSubscribe = user.subscribe(async (value) => {
-    if (value) await _viewModel.refreshTeams(value._id);
+    if (value) {
+      userId = value._id;
+      // await _viewModel.refreshTeams(value._id);
+    }
   });
+
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
   });
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
   let activeTeamRxDoc: TeamDocument;
+
+  const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
+    if (value) {
+      activeTeamRxDoc = value;
+      setOpenedTeam(
+        currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
+        currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
+        currOpenedTeam.base64String
+          ? currOpenedTeam.base64String
+          : value.get("logo"),
+      );
+    }
+  });
   const teamSubscribe = teams.subscribe((value: TeamDocument[]) => {
     if (value && value.length > 0) {
       const teamArr = value.map((teamDocument: TeamDocument) => {
@@ -60,30 +94,70 @@
         return teamObj;
       });
       allTeams = teamArr;
-      if (!activeTeamRxDoc) {
-        _viewModel.activateTeamWorkspace(
-          value[0].get("teamId"),
-          value[0].get("workspaces")[0].workspaceId,
-        );
-        setCurrentTeam(value[0].get("teamId"), value[0].get("name"));
-        setCurrentWorkspace(
-          value[0].get("workspaces")[0].workspaceId,
-          value[0].get("workspaces")[0].name,
-        );
-      }
-      setOpenedTeam(
-        currOpenedTeam.id ? currOpenedTeam.id : value[0].get("teamId"),
-        currOpenedTeam.name ? currOpenedTeam.name : value[0].get("name"),
-      );
     }
   });
+  const handleCreateWorkspace = async () => {
+    isWorkspaceCreatedFirstTime.set(true);
+    isWorkspaceLoaded.set(false);
+    const workspaceObj = generateSampleWorkspace(
+      UntrackedItems.UNTRACKED,
+      new Date().toString(),
+    );
 
-  const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
-    if (value) {
-      activeTeamRxDoc = value;
+    const workspaceData = {
+      name: workspaceObj.name,
+      id: currOpenedTeam.id,
+    };
+    _viewModel.addWorkspace(workspaceObj);
+
+    const response = await _viewModel.createWorkspace(workspaceData);
+
+    if (response.isSuccessful) {
+      _viewModel.addWorkspace(response.data.data);
+
+      let totalCollection: number = 0;
+      let totalRequest: number = 0;
+
+      $data.map((item) => {
+        if (item) {
+          if (item._data._id === response.data.data._id) {
+            // totalCollection = item?._data?.collections?.length;
+            totalCollection = 0;
+          } else {
+            totalRequest = 0;
+          }
+        }
+      });
+
+      let path: Path = {
+        workspaceId: response.data.data._id,
+        collectionId: "",
+      };
+
+      workspaceObj._id = response.data.data._id;
+      workspaceObj.name = response.data.data.name;
+      workspaceObj.description = response.data.data?.description;
+      workspaceObj.team = response.data.data?.team;
+      workspaceObj.owner = response.data.data?.owner;
+      workspaceObj.users = response.data.data?.users;
+      workspaceObj.createdAt = response.data.data?.createdAt;
+      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.isActiveWorkspace = false;
+      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.path = path;
+      workspaceObj.property.workspace.requestCount = totalRequest;
+      workspaceObj.property.workspace.collectionCount = 0;
+      workspaceObj.save = true;
+      _viewModel.addWorkspace(workspaceObj);
+      if (userId) _viewModelWorkspace.refreshWorkspaces(userId);
+      collectionsMethods.handleCreateTab(workspaceObj);
+      moveNavigation("right");
+      navigate("/collections");
+      isWorkspaceCreatedFirstTime.set(true);
+      notifications.success("New Workspace Created");
+      isWorkspaceLoaded.set(true);
     }
-  });
-
+  };
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
@@ -96,6 +170,7 @@
   <div class="workspace bg-backgroundColor" use:motion>
     <WorkspaceList
       teams={allTeams}
+      {userId}
       {data}
       tabList={$tabList}
       collectionList={$collectionList}
@@ -105,11 +180,14 @@
       {collectionsMethods}
     />
     <WorkspaceContent
+      {handleCreateWorkspace}
+      {userId}
+      {currentTeam}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
       {workspaceMethods}
-      activeTeam={$activeTeam}
+      activeTeam={act}
       {activeSideBarTabMethods}
       {teamServiceMethods}
       {teamRepositoryMethods}
@@ -121,11 +199,18 @@
   .workspace {
     font-size: 12px;
     top: 44px;
-    left: 352px;
-    width: calc(100% - 352px);
+    left: calc(21vw + 70px);
+    width: calc(79vw - 72px);
     position: fixed;
     height: calc(100% - 44px);
     overflow: auto;
+  }
+
+  @media only screen and (max-width: 900px) {
+    .workspace {
+      left: calc(31vw + 72px);
+      width: calc(69vw - 72px);
+    }
   }
   .workspace::-webkit-scrollbar {
     width: 2px;

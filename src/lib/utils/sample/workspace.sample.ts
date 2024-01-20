@@ -1,9 +1,9 @@
 import { ItemType } from "../enums/item-type.enum";
 import { WorkspaceDefault } from "../enums/request.enum";
 
-const generateSampleWorkspace = (id: string, date: string, name?: string) => {
+const generateSampleWorkspace = (_id: string, date: string, name?: string) => {
   return {
-    id,
+    _id,
     name: name ? name : WorkspaceDefault.NAME,
     type: ItemType.WORKSPACE,
     description: "",
@@ -13,10 +13,18 @@ const generateSampleWorkspace = (id: string, date: string, name?: string) => {
         collectionCount: 0,
       },
     },
+    team: [],
+    owner: "",
+    users: [],
+    isActiveWorkspace: true,
+    environmentId: "",
+    collections: [],
+    currentEnvironmentId: "",
+    environments: [],
     save: true,
     path: { workspaceId: "", collectionId: "" },
-    isActive: true,
     createdAt: date,
+    createdBy: "",
   };
 };
 export { generateSampleWorkspace };

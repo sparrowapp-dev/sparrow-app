@@ -8,7 +8,6 @@
     isWorkspaceCreatedFirstTime,
     workspaceView,
     openedTeam,
-    currentTeam,
   } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -16,7 +15,7 @@
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { v4 as uuidv4 } from "uuid";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { WorkspaceViewModel } from "../../../pages/Workspaces/workspace.viewModel";
+  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import Members from "$lib/components/workspace/members/Members.svelte";
   import { onDestroy, onMount } from "svelte";
@@ -27,79 +26,24 @@
     WorkspaceMethods,
   } from "$lib/utils/interfaces";
   import TeamInvitePopup from "../Modal/TeamInvitePopup.svelte";
+  import { base64ToURL } from "$lib/utils/helpers";
   export let loaderColor = "default",
+    userId: string,
     handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
     activeSideBarTabMethods: any,
     activeTeam,
+    currentTeam: CurrentTeam,
+    handleCreateWorkspace: any,
     teamServiceMethods: TeamServiceMethods,
     teamRepositoryMethods: TeamRepositoryMethods;
-  let currOpenedTeam: CurrentTeam, currActiveTeam: CurrentTeam;
+  let currOpenedTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
   });
-  const currentTeamSubscribe = currentTeam.subscribe((value) => {
-    if (value) currActiveTeam = value;
-  });
+
   let isLoading: boolean = false;
-
-  const _viewModel = new WorkspaceViewModel();
-
-  const handleCreateWorkSpace = async () => {
-    isWorkspaceCreatedFirstTime.set(true);
-    const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
-    );
-
-    const workspaceData = {
-      name: workspaceObj.name,
-      type: ItemType.PERSONAL,
-    };
-    _viewModel.addWorkspace(workspaceObj);
-    isLoading = true;
-    const response = await _viewModel.createWorkspace(workspaceData);
-
-    if (response.isSuccessful) {
-      navigate("/dashboard");
-      isLoading = false;
-      _viewModel.addWorkspace(response.data.data);
-
-      let totalCollection: number = 0;
-      let totalRequest: number = 0;
-
-      if ($data) {
-        $data.map((item) => {
-          if (item) {
-            if (item._data._id === response.data.data._id) {
-              totalCollection = item?._data?.collections?.length;
-            } else {
-              totalRequest = 0;
-            }
-          }
-        });
-      }
-      let path: Path = {
-        workspaceId: response?.data?.data?._id,
-        collectionId: "",
-      };
-
-      workspaceObj.id = response.data.data._id;
-      workspaceObj.name = response.data.data.name;
-      workspaceObj.path = path;
-      workspaceObj.property.workspace.requestCount = totalRequest;
-      workspaceObj.property.workspace.collectionCount = totalCollection;
-      workspaceObj.save = true;
-      _viewModel.addWorkspace(workspaceObj);
-
-      workspaceMethods.handleCreateTab(workspaceObj);
-      moveNavigation("right");
-      isWorkspaceCreatedFirstTime.set(true);
-    } else {
-      isLoading = false;
-    }
-  };
 
   let selectedTab = "all-workspace";
   let selectedView: string;
@@ -111,7 +55,6 @@
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
-    currentTeamSubscribe();
   });
   let teamInvitePopup = false;
 </script>
@@ -128,20 +71,28 @@
   />
 {/if}
 <div class="teams-content bg-backgroundColor">
-  <div class="content-teams px-3 pt-5">
+  <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
     <div class="container-fluid">
       <div class="row">
         <div class="col-12 pb-3">
           <div class="team-heading d-flex justify-content-between">
             <h2 class="d-flex ellipsis overflow-hidden w-75">
-              <p
-                class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
-                style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
-              >
-                {currOpenedTeam.name[0]
-                  ? currOpenedTeam.name[0].toUpperCase()
-                  : ""}
-              </p>
+              {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
+                <img
+                  class="text-center align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
+                  style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
+                  src={base64ToURL(currOpenedTeam.base64String)}
+                  alt=""
+                />{:else}
+                <p
+                  class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                  style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
+                >
+                  {currOpenedTeam.name[0]
+                    ? currOpenedTeam.name[0].toUpperCase()
+                    : ""}
+                </p>
+              {/if}
               <span class="ms-4 w-75 my-auto my-auto ellipsis overflow-hidden"
                 >{currOpenedTeam.name}</span
               >
@@ -157,7 +108,7 @@
               >
               <button
                 style="font-size: 12px;"
-                on:click={handleCreateWorkSpace}
+                on:click={handleCreateWorkspace}
                 class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
                 >{#if isLoading}
                   <span class="ms-0 me-1">
@@ -246,8 +197,10 @@
       />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
+        {handleCreateWorkspace}
+        {userId}
         openedTeam={currOpenedTeam}
-        {currActiveTeam}
+        currActiveTeam={currentTeam}
         workspaces={$data.slice().reverse()}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
@@ -261,12 +214,21 @@
 </div>
 
 <style>
+  @media only screen and (max-width: 1000px) {
+    .team-heading {
+      display: block !important;
+    }
+    .team-heading > h2,
+    .team-heading > div {
+      width: 100% !important;
+    }
+  }
   .team-menu__link {
     color: var(--button-color);
   }
   .content-teams__btn-new-workspace {
     height: 30px;
-    background-color: var(--send-button);
+    background-color: #1193f0;
   }
   .content-teams__btn-invite {
     height: 30px;

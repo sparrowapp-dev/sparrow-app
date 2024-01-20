@@ -18,7 +18,7 @@
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
@@ -75,7 +75,7 @@
         setAuthJwt(constants.REF_TOKEN, refreshToken);
         setUser(jwtDecode(accessToken));
         notifications.success("Login successful!");
-        navigate("/home");
+        navigate("/dashboard/collections");
         await resizeWindowOnLogin();
       }
     });

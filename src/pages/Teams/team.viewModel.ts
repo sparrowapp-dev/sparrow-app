@@ -49,6 +49,10 @@ export class TeamViewModel {
     return this.collectionRepository.getCollection();
   }
 
+  public get workspaces() {
+    return this.workspaceRepository.getWorkspaces();
+  }
+
   public get teams() {
     return this.teamRepository.getTeams();
   }
@@ -57,11 +61,24 @@ export class TeamViewModel {
     return this.teamRepository.getActiveTeam();
   }
 
-  public activateTeamWorkspace = (
-    teamId: string,
-    workspaceId: string,
-  ): void => {
-    this.teamRepository.setActiveTeamWorkspace(teamId, workspaceId);
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+    return await this.teamRepository.checkActiveTeam(teamId);
+  };
+
+  public activateTeam = (teamId: string): void => {
+    this.teamRepository.setActiveTeam(teamId);
+    return;
+  };
+
+  public activateInitialTeamWorkspace = async (): Promise<void> => {
+    const workspaceIdToActivate =
+      await this.teamRepository.activateInitialTeamWithWorkspace();
+    if (workspaceIdToActivate)
+      await this.workspaceRepository.setActiveWorkspace(workspaceIdToActivate);
     return;
   };
 
@@ -122,7 +139,6 @@ export class TeamViewModel {
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
-          isActiveWorkspace: false,
         }));
         return {
           teamId: _id,
@@ -139,7 +155,6 @@ export class TeamViewModel {
           updatedBy,
         };
       });
-
       await this.teamRepository.bulkInsertData(data);
       return;
     }

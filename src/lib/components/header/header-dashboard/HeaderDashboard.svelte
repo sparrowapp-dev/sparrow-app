@@ -10,15 +10,14 @@
     SettingIcon,
   } from "$lib/assets/app.asset";
   import {
-    currentWorkspace,
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-    setCurrentWorkspace,
   } from "$lib/store/workspace.store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import {
     type CollectionDocument,
+    type TeamDocument,
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
@@ -33,17 +32,20 @@
   import { fade, slide } from "svelte/transition";
   import { items } from "$lib/models/collection.model";
   import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
-  import { WorkspaceViewModel } from "../../../../pages/Workspaces/workspace.viewModel";
-  import { setCurrentTeam } from "$lib/store";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import type { CurrentTeam } from "$lib/utils/interfaces";
 
-  export let activeSideBarTabMethods;
   export let handleWorkspaceSwitch;
 
+  export let activeSideBarTabMethods: any;
+  export let activeWorkspaceRxDoc: Observable<WorkspaceDocument>;
+  export let currentTeam: CurrentTeam;
+  export let currentWorkspace: CurrentWorkspace;
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
-  const _workspaceViewModel = new WorkspaceViewModel();
+  const _workspaceViewModel = new TeamViewModel();
   const _viewModel = new HeaderDashboardViewModel();
   const _collectionMethods = new CollectionsViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -74,43 +76,16 @@
   });
 
   let profile: boolean = false;
-  let activeWorkspaceRxDoc: WorkspaceDocument;
+  let activeWorkspaceRxDocVal: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
-  let currWorkspace: CurrentWorkspace;
-
-  const currWorkspaceSubscribe = currentWorkspace.subscribe((value) => {
-    if (value) currWorkspace = value;
-  });
-
-  const workspaceSubscribe = workspaces.subscribe(
-    (value: WorkspaceDocument[]) => {
-      if (value && value.length > 0) {
-        const workspaceArr = value.map(
-          (workspaceDocument: WorkspaceDocument) => {
-            const workspaceObj =
-              _viewModel.getWorkspaceDocument(workspaceDocument);
-            return workspaceObj;
-          },
-        );
-        allworkspaces = workspaceArr;
-
-        if (!activeWorkspaceRxDoc && currWorkspace) {
-          isWorkspaceLoaded.set(false);
-          _viewModel.activateWorkspace(currWorkspace.id);
-          isWorkspaceLoaded.set(true);
-        }
-      }
-    },
-  );
-
-  let trackWorkspaceId: string;
+  export let currWorkspace: CurrentWorkspace;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
-        activeWorkspaceRxDoc = value;
+        activeWorkspaceRxDocVal = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
-        ownerName = value._data.owner.name;
+        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
@@ -131,14 +106,39 @@
     },
   );
 
+  const workspaceSubscribe = workspaces.subscribe(
+    (value: WorkspaceDocument[]) => {
+      if (value && value.length > 0) {
+        const workspaceArr = value.map(
+          (workspaceDocument: WorkspaceDocument) => {
+            const workspaceObj =
+              _viewModel.getWorkspaceDocument(workspaceDocument);
+            return workspaceObj;
+          },
+        );
+        allworkspaces = workspaceArr;
+
+        if (!activeWorkspaceRxDoc && currWorkspace) {
+          isWorkspaceLoaded.set(false);
+          // _workspaceViewModel.activateInitialTeamWorkspace();
+          isWorkspaceLoaded.set(true);
+        }
+      }
+    },
+  );
+
+  let trackWorkspaceId: string;
+
   let name: string = "";
   let email: string = "";
-  let firstLetter;
+  let userId: string | undefined;
+  let firstLetter: string;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
+      userId = value._id;
       email = value?.email;
       if (name) {
         firstLetter = name[0];
@@ -180,25 +180,18 @@
   window.addEventListener("click", () => {
     profile = false;
   });
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-    }
-  });
 
   const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
 
-    _workspaceViewModel.activateTeamWorkspace(team.teamId, id);
+    // _workspaceViewModel.activateTeamWorkspace(team.teamId, id);
+    // _workspaceViewModel.activateTeam(team.teamId);
     isWorkspaceCreatedFirstTime.set(false);
-    setCurrentWorkspace(id, tab);
-    setCurrentTeam(team.teamId, team.teamName);
     isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {
-    userUnsubscribe();
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -235,7 +228,6 @@
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
     unsubscribeUser();
-    currWorkspaceSubscribe();
   });
 
   onMount(() => {
@@ -274,6 +266,9 @@
       style="height: 36px; width:216px"
     >
       <HeaderDropdown
+        {userId}
+        {currentTeam}
+        {currentWorkspace}
         data={workspaces}
         onclick={handleDropdown}
         {collectionsMethods}

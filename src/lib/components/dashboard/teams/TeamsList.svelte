@@ -12,7 +12,11 @@
   import CustomPopup from "$lib/components/Modal/CustomPopup.svelte";
   import { FileInput, ParaInput, TextInput } from "$lib/components";
   import { PeopleIcon } from "$lib/assets/app.asset";
-  export let teams: any;
+  import { base64ToURL } from "$lib/utils/helpers";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
+
+  export let teams: any, userId: string;
+  let isEditingLogo: boolean = false;
   let newTeam: {
     name: {
       value: string;
@@ -25,6 +29,8 @@
     file: {
       value: any;
       invalid: boolean;
+      showFileTypeError: boolean;
+      showFileSizeError: boolean;
     };
   };
   onMount(() => {
@@ -40,14 +46,26 @@
       file: {
         value: [],
         invalid: false,
+        showFileSizeError: false,
+        showFileTypeError: false,
       },
     };
   });
   const _viewModel = new TeamsViewModel();
+  const _workspaceViewModel = new TeamViewModel();
+
   let currOpenedTeam: CurrentTeam;
   let isCreateTeamModalOpen: boolean;
-  const handleOpenTeam = (teamId: string, teamName) => {
-    openedTeam.set({ id: teamId, name: teamName });
+  const handleOpenTeam = (
+    teamId: string,
+    teamName: string,
+    teamBase64String: object,
+  ) => {
+    openedTeam.set({
+      id: teamId,
+      name: teamName,
+      base64String: teamBase64String,
+    });
   };
   const handleCreateTeamModal = () => {
     isCreateTeamModalOpen = !isCreateTeamModalOpen;
@@ -63,6 +81,8 @@
       file: {
         value: [],
         invalid: false,
+        showFileSizeError: false,
+        showFileTypeError: false,
       },
     };
   };
@@ -70,23 +90,57 @@
     if (value) currOpenedTeam = value;
   });
   const handleTeamNameChange = (e: any) => {
-    if (e.target.value !== "") newTeam.name.invalid = false;
+    if (e.target.value !== "") {
+      newTeam.name.invalid = false;
+    }
     newTeam.name.value = e.target.value;
   };
   const handleTeamDescChange = (e: any) => {
-    console.log(teams);
     newTeam.description.value = e.target.value;
   };
-  const handleLogoInputChange = (e: any) => {
+  const handleLogoInputChange = (
+    e: any,
+    maxSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    if (e.target.files[0].size > maxSize * 1024) {
+      newTeam.file.showFileSizeError = true;
+      newTeam.file.invalid = true;
+      return;
+    }
+    const fileType = `.${e.target.files[0].name
+      .split(".")
+      .pop()
+      .toLowerCase()}`;
+    if (!supportedFileTypes.includes(fileType)) {
+      newTeam.file.showFileTypeError = true;
+      newTeam.file.invalid = true;
+      return;
+    }
+    newTeam.file.showFileSizeError = false;
+    newTeam.file.showFileTypeError = false;
+    newTeam.file.invalid = false;
     newTeam.file.value = e.target.files[0];
+  };
+  const handleLogoReset = (e: any) => {
+    newTeam.file.value = [];
+  };
+  const handleLogoEdit = (e: any) => {
+    const fileInput = document.getElementById("team-file-input");
+    fileInput.click();
   };
   const handleCreateTeam = async (
     name: string,
     description: string,
     file: any,
   ) => {
-    if (name == "") newTeam.name.invalid = true;
+    if (name == "") {
+      newTeam.name.invalid = true;
+      return;
+    }
     if (description == "") newTeam.description.invalid = true;
+    if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
+      return;
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description);
 
@@ -102,18 +156,14 @@
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       _viewModel.modifyTeam(res._id, res);
-      notifications.success("New team Techdome is created.");
+      await _workspaceViewModel.refreshTeams(userId);
+      notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
       notifications.error("Failed to create a new team.");
     }
   };
-  const ret = (base64str) => {
-    if (!base64str) return "";
-    console.log(base64str.buffer);
-    return `data:image/png;base64,${base64str?.buffer}`;
-  };
- 
+
   onDestroy(() => {
     openedTeamSubscribe();
   });
@@ -140,12 +190,21 @@
           currOpenedTeam.id == team.teamId && "active"
         }`}
         on:click={() => {
-          handleOpenTeam(team.teamId, team.name);
+          handleOpenTeam(team.teamId, team.name, team.logo);
         }}
       >
         <div class="d-flex overflow-hidden">
-          <img src={ret(team.logo)} alt="" />
-          <p class="ellipsis overflow-hidden mb-0">{team.name}</p>
+          {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
+            <p
+              class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor `}
+              style={`font-size: 15px; padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+            >
+              {team.name[0] ? team.name[0].toUpperCase() : ""}
+            </p>
+          {:else}
+            <img src={base64ToURL(team.logo)} alt="" />
+          {/if}
+          <p class=" ellipsis overflow-hidden my-auto">{team.name}</p>
         </div>
         <PeopleIcon
           color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
@@ -178,6 +237,7 @@
     errorText={"Team name cannot be empty."}
   />
   <ParaInput
+    maxCharacter={500}
     value={newTeam.description.value}
     labelText="About"
     labelDescription="max: 500 characters"
@@ -185,20 +245,23 @@
     inputPlaceholder="Write a little about your team"
     onChange={handleTeamDescChange}
   />
-
   <FileInput
     value={newTeam.file.value}
+    maxFileSize={100}
     onChange={handleLogoInputChange}
+    resetValue={handleLogoReset}
+    editValue={handleLogoEdit}
     labelText="Logo"
-    labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 2 MB. Supported formats are .jpg, .jpeg, .png "
+    labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 100 KB. Supported formats are .jpg, .jpeg, .png "
     inputId="team-file-input"
     inputPlaceholder="Drag and Drop or"
     isRequired={false}
+    supportedFileTypes={[".png", ".jpg", ".jpeg"]}
+    showFileSizeError={newTeam.file.showFileSizeError}
+    showFileTypeError={newTeam.file.showFileTypeError}
+    fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+    fileSizeError="The size of the file you are trying to upload is more than 100 KB."
   />
-  <div>
-    <!-- <img src={bufferToDataURL(newTeam.file.value)} alt="img" /> -->
-    <div id="img-preview"></div>
-  </div>
 </CustomPopup>
 
 <style>

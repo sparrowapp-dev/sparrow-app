@@ -19,6 +19,20 @@ export class TeamRepository {
   };
 
   /**
+   * get all teams
+   */
+  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+    const team = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+          isActiveTeam: true,
+        },
+      })
+      .exec();
+    return team ? true : false;
+  };
+  /**
    * clear teams data
    */
   public clearTeams = async (): Promise<any> => {
@@ -28,36 +42,48 @@ export class TeamRepository {
   /**
    * Sets a team as active
    */
-  public setActiveTeamWorkspace = async (
-    teamId: string,
-    workspaceId: string,
-  ): Promise<void> => {
+  public setActiveTeam = async (teamId: string): Promise<void> => {
     const teams: TeamDocument[] = await RxDB.getInstance()
       .rxdb.team.find()
       .exec();
     const data = teams.map((elem: TeamDocument) => {
       const res = this.getDocument(elem);
-      const workspaces = res.workspaces.map((workspace: any) => {
-        if (workspace?.workspaceId == workspaceId)
-          workspace.isActiveWorkspace = true;
-        else workspace.isActiveWorkspace = false;
-        return workspace;
-      });
-      if (res.teamId == teamId)
-        (res.isActiveTeam = true), (res.workspaces = workspaces);
-      else (res.isActiveTeam = false), (res.workspaces = workspaces);
+
+      if (res.teamId == teamId) res.isActiveTeam = true;
+      else res.isActiveTeam = false;
       return res;
     });
     await RxDB.getInstance().rxdb.team.bulkUpsert(data);
     return;
   };
 
+  /***
+   * Sets a team as Active which have Workspace
+   */
+  public activateInitialTeamWithWorkspace = async (): Promise<string> => {
+    const teams: TeamDocument[] = await RxDB.getInstance()
+      .rxdb.team.find()
+      .exec();
+    let workspaceToActivate: string | undefined = undefined;
+    const data = teams.map((elem: TeamDocument) => {
+      const res = this.getDocument(elem);
+      if (res.workspaces.length > 0 && !workspaceToActivate) {
+        res.isActiveTeam = true;
+        workspaceToActivate = res.workspaces[0].workspaceId;
+      } else {
+        res.isActiveTeam = false;
+      }
+      return res;
+    });
+    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+    return workspaceToActivate;
+  };
+
   /**
    * sync / refresh teams data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearTeams();
-    await RxDB.getInstance().rxdb.team.bulkInsert(data);
+    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
     return;
   };
 

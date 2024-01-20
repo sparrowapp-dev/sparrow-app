@@ -10,26 +10,26 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
-    currentWorkspace,
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
   import { slide } from "svelte/transition";
-  import checkIcon from "$lib/assets/check.svg";
-  import { currentTeam } from "$lib/store/team.store";
   import { TickIcon } from "$lib/assets/app.asset";
+  import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
+  import { user } from "$lib/store";
+  export let userId: string | undefined;
   export let activeWorkspaceId: string;
-  export let activeSideBarTabMethods;
+  export let activeSideBarTabMethods: any;
+  export let currentTeam: CurrentTeam, currentWorkspace: CurrentWorkspace;
   export let data: any;
   export let onclick: any;
   export let collectionsMethods: CollectionsMethods;
   const _viewModel = new HeaderDashboardViewModel();
 
   let isOpen: boolean = false;
-  let currWorkspaceName: string = "",
-    currTeamName: string = "";
+
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
@@ -54,7 +54,7 @@
     };
 
     const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
-    sampleWorkspace.id = id;
+    sampleWorkspace._id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
     sampleWorkspace.path = path;
@@ -75,9 +75,8 @@
 
     const workspaceData = {
       name: workspaceObj.name,
-      type: ItemType.PERSONAL,
+      id: currentTeam.id,
     };
-
     _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
@@ -104,17 +103,25 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
+      workspaceObj.team = response.data.data?.team;
+      workspaceObj.owner = response.data.data?.owner;
+      workspaceObj.users = response.data.data?.users;
+      workspaceObj.createdAt = response.data.data?.createdAt;
+      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.isActiveWorkspace = false;
+      workspaceObj.environments = response.data.data?.environemnts;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
       _viewModel.addWorkspace(workspaceObj);
-
+      if (userId) _viewModel.refreshWorkspaces(userId);
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
+      navigate("/collections");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
@@ -127,18 +134,8 @@
     }
   }
 
-  const currentWorkspaceSubscribe = currentWorkspace.subscribe((value) => {
-    if (value) currWorkspaceName = value.name;
-  });
-
-  const currentTeamSubscribe = currentTeam.subscribe((value) => {
-    if (value) currTeamName = value.name;
-  });
-
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
-    currentWorkspaceSubscribe();
-    currentTeamSubscribe();
   });
 
   onMount(() => {
@@ -152,15 +149,15 @@
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}
 >
-  {#if currWorkspaceName}
+  {#if currentWorkspace && currentWorkspace?.name}
     <button
       style="font-size: 12px;"
       class="dropdown-btn rounded border-0 ps-2 py-2 gap-2 ellipsis overflow-hidden"
       on:click={toggleDropdown}
       id="workspace-dropdown"
     >
-      <span class="ellipsis overflow-hidden">{currTeamName}</span>
-      / <span class="ellipsis overflow-hidden">{currWorkspaceName}</span>
+      <span class="ellipsis overflow-hidden">{currentTeam?.name}</span>
+      / <span class="ellipsis overflow-hidden">{currentWorkspace?.name}</span>
       <span class="px-2" class:dropdown-logo-active={isOpen}
         ><img
           style="height:15px; width:20px;"

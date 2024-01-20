@@ -76,12 +76,13 @@
   on:contextmenu|preventDefault={closeShowMore}
 />
 <div
-  class="flex-grow-1 col-5 pb-4"
+  class="flex-grow-1 col-lg-5 col-md-10 pb-4 workspace-card-container"
   on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
   style="max-width: 47.5%; max-height: 32%; "
 >
   <div
-    class="bg-black workspace-card rounded p-4 {isShowMoreVisible && 'position-relative'}"
+    class="bg-black workspace-card rounded p-4 {isShowMoreVisible &&
+      'position-relative'}"
     on:mouseleave={() => isShowMoreVisible && handleShowMore()}
     on:click={() => {
       !isShowMoreVisible
@@ -119,6 +120,11 @@
 </div>
 
 <style>
+  @media only screen and (max-width: 1000px) {
+    .workspace-card-container {
+      max-width: 100% !important;
+    }
+  }
   .workspace-card {
     z-index: 0 !important;
   }

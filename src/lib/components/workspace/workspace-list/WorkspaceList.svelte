@@ -1,22 +1,23 @@
 <script lang="ts">
   import RecentApi from "$lib/components/dashboard/recent-apis/RecentAPI.svelte";
   import RecentWorkspace from "$lib/components/dashboard/recent-workspace/RecentWorkspace.svelte";
-  import Teams from "$lib/components/dashboard/teams/Teams.svelte";
+  import TeamsList from "$lib/components/dashboard/teams/TeamsList.svelte";
   export let data: any;
-  export let tabList;
-  export let collectionList;
-  export let teams;
-  export let handleWorkspaceSwitch,
-    handleWorkspaceTab,
-    activeSideBarTabMethods,
-    collectionsMethods;
+  export let tabList: any;
+  export let collectionList: any;
+  export let teams: any;
+  export let userId: any;
+  export let handleWorkspaceSwitch: any,
+    handleWorkspaceTab: any,
+    activeSideBarTabMethods: any,
+    collectionsMethods: any;
 </script>
 
 <div
   style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
-  class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-3 pe-3"
+  class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-sm-1 p-md-2 p-lg-3 p-3 pe-3"
 >
-  <Teams {teams} />
+  <TeamsList {teams} {userId} />
   <RecentApi
     {tabList}
     {data}
@@ -35,10 +36,15 @@
 
 <style>
   .sidebar {
-    width: 282px;
+    width: 21vw;
     position: fixed;
     top: 44px;
     left: 69px;
     height: calc(100vh - 44px);
+  }
+  @media only screen and (max-width: 900px) {
+    .sidebar {
+      width: 31vw;
+    }
   }
 </style>

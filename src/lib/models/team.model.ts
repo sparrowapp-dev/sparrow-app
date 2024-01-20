@@ -32,10 +32,6 @@ export const teamSchemaLiteral = {
           name: {
             type: "string",
           },
-          isActiveWorkspace: {
-            type: "boolean",
-            default: false,
-          },
         },
       },
     },

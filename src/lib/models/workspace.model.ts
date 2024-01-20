@@ -108,7 +108,7 @@ export const workspaceSchemaLiteral = {
     },
   },
 
-  required: ["_id", "name", "owner", "users", "createdAt", "createdBy"],
+  required: ["_id", "name", "createdAt"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(workspaceSchemaLiteral);

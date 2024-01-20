@@ -166,6 +166,9 @@ body{
 .sparrow-thin-scrollbar::-webkit-scrollbar {
   width: 2px;
 }
+.sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+}
 ::-webkit-scrollbar {
   width: 5px;
 }

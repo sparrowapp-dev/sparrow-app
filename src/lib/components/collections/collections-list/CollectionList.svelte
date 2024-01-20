@@ -6,7 +6,10 @@
   import Folder from "./Folder.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-  import { collapsibleState } from "$lib/store/request-response-section";
+  import {
+    collapseAnimationAppliedStore,
+    collapsibleState,
+  } from "$lib/store/request-response-section";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import { useTree } from "./collectionList";
   import { v4 as uuidv4 } from "uuid";
@@ -36,7 +39,8 @@
   export let activeTabId: string;
   export let activePath;
   export let environments = [];
-
+  export let runAnimation: boolean = false;
+  export let changeAnimation: () => void;
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
@@ -49,6 +53,7 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { currentWorkspace, setCurrentWorkspace } from "$lib/store";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -70,6 +75,7 @@
   let filteredSelectedMethodsCollection = [];
   let collapsExpandToggle: boolean = false;
 
+  let collapseAnimationApplied: boolean = false;
   const collections: Observable<CollectionDocument[]> =
     _colllectionListViewModel.collection;
   const activeWorkspace: Observable<WorkspaceDocument> =
@@ -165,6 +171,10 @@
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+        setCurrentWorkspace(
+          activeWorkspaceRxDoc.get("_id"),
+          activeWorkspaceRxDoc.get("name"),
+        );
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
           const response =
@@ -265,11 +275,15 @@
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
-
+  // const collapseAnimationAppliedSubscribe =
+  //   collapseAnimationAppliedStore.subscribe((value) => {
+  //     collapseAnimationApplied = value;
+  //   });
   const setcollapsExpandToggle = () => {
+    collapseAnimationApplied = true;
+    changeAnimation();
     collapsExpandToggle = !collapsExpandToggle;
     collapsibleState.set(collapsExpandToggle);
-
     if (collapsExpandToggle) {
       document
         .getElementsByClassName("sidebar")[0]
@@ -277,6 +291,7 @@
       document
         .getElementsByClassName("sidebar")[0]
         .classList.remove("increase-width");
+      collapseAnimationAppliedStore.set(true);
     } else {
       document
         .getElementsByClassName("sidebar")[0]
@@ -284,6 +299,7 @@
       document
         .getElementsByClassName("sidebar")[0]
         .classList.remove("decrease-width");
+      collapseAnimationAppliedStore.set(true);
     }
   };
 
@@ -312,6 +328,7 @@
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
+    // collapseAnimationAppliedSubscribe();
     selectedMethodsCollectionUnsubscribe();
     selectedMethodUnsubscibe();
   });
@@ -374,15 +391,19 @@
 <div
   style="border-right: {collapsExpandToggle
     ? '0px'
-    : '1px solid #313233'};overflow:auto"
-  class={`sidebar ${
-    collapsExpandToggle ? "decrease-width" : "increase-width"
+    : '1px solid #313233'};overflow:auto; width: {collapsExpandToggle
+    ? '0'
+    : '280px'}"
+  class={`sidebar overflow-y-auto  ${
+    collapsExpandToggle && runAnimation
+      ? "decrease-width"
+      : runAnimation && " increase-width"
   } d-flex flex-column bg-backgroundColor scroll`}
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
   >
-    <p class="mb-0 text-whiteColor" style="font-size: 18px;">
+    <p class="mb-0 text-whiteColor ellipsis" style="font-size: 18px;">
       {currentWorkspaceName || ""}
     </p>
     <button

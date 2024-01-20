@@ -98,6 +98,7 @@
     onCancel={handleMemberDemotePopUpCancel}
   />
 {/if}
+
 <div class="d-flex tile">
   <div class="info d-flex">
     <div class="icon d-flex align-items-center justify-content-center">
@@ -109,6 +110,7 @@
     </div>
   </div>
   <div class="position">
+    {console.log(user.role)}
     {#if userType === "owner"}
       <MemberDropdown
         id={user.id}

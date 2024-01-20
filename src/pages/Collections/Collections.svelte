@@ -22,7 +22,7 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
-
+  let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
 
@@ -127,9 +127,12 @@
     },
   );
 
-  const onTabsSwitched=()=>{
+  const onTabsSwitched = () => {
     _viewModel.syncTabWithStore();
-  }
+  };
+  const changeAnimation = () => {
+    runAnimation = true;
+  };
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -139,6 +142,8 @@
   <div class="d-flex collection" use:motion>
     <div class="collections__list">
       <CollectionsList
+        {runAnimation}
+        {changeAnimation}
         activeTabId={$activeTab?.id}
         activePath={$activeTab?.path}
         environments={$environments}
@@ -146,16 +151,20 @@
       />
     </div>
     <div
-      class="collections__tools bg-backgroundColor {$collapseCollectionPanel
+      style="width: {$collapseCollectionPanel
+        ? 'calc(100vw - 72px)'
+        : 'calc(100vw - 352px)'};"
+      class="collections__tools bg-backgroundColor {$collapseCollectionPanel &&
+      runAnimation
         ? 'sidebar-collapse'
-        : 'sidebar-expand'}"
+        : runAnimation &&'sidebar-expand'}"
     >
       <div class="tab__bar">
         <TabBar
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
-          onTabsSwitched={onTabsSwitched}
+          {onTabsSwitched}
         />
       </div>
       <div class="tab__content d-flex">

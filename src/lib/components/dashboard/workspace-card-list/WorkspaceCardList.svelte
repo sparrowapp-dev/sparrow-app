@@ -9,10 +9,16 @@
     SearchIcon,
   } from "$lib/assets/app.asset";
   import type { CurrentTeam } from "$lib/utils/interfaces";
+  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
   export let openedTeam: CurrentTeam,
     currActiveTeam: CurrentTeam,
     handleWorkspaceTab: any,
-    activeSideBarTabMethods: any;
+    activeSideBarTabMethods: any,
+    userId: string,
+    handleCreateWorkspace: any;
   export let workspaces: any, handleWorkspaceSwitch: any;
   let filterText: string = "";
   let workspacePerPage: number = 5,
@@ -58,7 +64,9 @@
       <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
     {#if currPage === 1 && filterText === ""}
-      <button class="col-5 flex-grow-1 py-0 mb-4 add-new-workspace">
+      <button on:click={handleCreateWorkspace}
+        class="col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+      >
         + Add New Workspace
       </button>
     {/if}
@@ -202,6 +210,11 @@
     width: 27vw;
     font-size: 12px;
   }
+  @media only screen and (max-width: 1100px) {
+    .search-input-container {
+      width: 50vw;
+    }
+  }
   .search-input-container > input:focus {
     outline: none;
     caret-color: var(--workspace-hover-color);
@@ -225,6 +238,11 @@
     max-width: 50%;
     max-height: 32%;
     min-height: 18vh;
+  }
+  @media only screen and (max-width: 1100px) {
+    .add-new-workspace {
+      max-width: 100%;
+    }
   }
   .add-new-workspace.empty {
     max-width: 80%;

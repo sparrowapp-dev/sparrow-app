@@ -9,6 +9,7 @@
   import { fly, fade } from "svelte/transition";
   import { resizeWindowOnLogin } from "../header/window-resize";
   import Header from "../header/Header.svelte";
+  import { navigate } from "svelte-navigator";
   export let onClick: (flag: boolean) => void;
   const workspaceLoadtime = constants.API_SEND_TIMEOUT;
 
@@ -29,6 +30,7 @@
       registerUser?.data?.data?.refreshToken.token,
     );
     setUser(jwtDecode(registerUser.data?.data?.accessToken?.token));
+    navigate("/dashboard/collections");
   };
 
   let showSpinner: boolean = true;

@@ -20,10 +20,13 @@ import type { Observable } from "rxjs";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
+import { TeamRepository } from "$lib/repositories/team.repository";
 
 export class HeaderDashboardViewModel {
   constructor() {}
   private workspaceRepository = new WorkspaceRepository();
+  private teamRepository = new TeamRepository();
   private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
   private collectionRepository = new CollectionRepository();
@@ -40,7 +43,7 @@ export class HeaderDashboardViewModel {
       collections: elem.get("collections"),
     };
   };
-  get workspaces() {
+  public get workspaces() {
     return this.workspaceRepository.getWorkspaces();
   }
 
@@ -50,6 +53,14 @@ export class HeaderDashboardViewModel {
 
   public filterWorkspace = (team: any): Observable<WorkspaceDocument[]> => {
     return this.workspaceRepository.getFilteredWorkspaces(team);
+  };
+
+  public activateInitialWorkspaceWithTeam = async (): Promise<void> => {
+    const teamIdToActivate =
+      await this.workspaceRepository.activateInitialWorkspace();
+    if (teamIdToActivate)
+      await this.teamRepository.setActiveTeam(teamIdToActivate);
+    return;
   };
 
   // Function to set a workspace as active
@@ -148,12 +159,19 @@ export class HeaderDashboardViewModel {
     }
   };
 
+  public checkActiveWorkspace = async (
+    workspaceId: string,
+  ): Promise<boolean> => {
+    return await this.workspaceRepository.checkActiveWorkspace(workspaceId);
+  };
+
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
-
+    let isAnyWorkspaceActive = false;
+    const data = [];
     if (response?.isSuccessful && response?.data?.data) {
-      const data = response.data.data.map((elem, index) => {
+      for (const elem of response.data.data) {
         const {
           _id,
           name,
@@ -165,7 +183,9 @@ export class HeaderDashboardViewModel {
           createdBy,
           collection,
         } = elem;
-        return {
+        const isActiveWorkspace = await this.checkActiveWorkspace(_id);
+        if (isActiveWorkspace) isAnyWorkspaceActive = true;
+        const item = {
           _id,
           name,
           description,
@@ -176,13 +196,14 @@ export class HeaderDashboardViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-          isActiveWorkspace: !index ? true : false,
+          isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
         };
-      });
-
+        data.push(item);
+      }
       await this.workspaceRepository.bulkInsertData(data);
+      if (!isAnyWorkspaceActive) this.activateInitialWorkspaceWithTeam();
       return;
     }
   };
@@ -190,6 +211,8 @@ export class HeaderDashboardViewModel {
   // logout to frontend - clears local db, store, and cookies.
   public clientLogout = async (): Promise<void> => {
     setUser(null);
+    setCurrentWorkspace("", "");
+    setOpenedTeam("", "", {});
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
