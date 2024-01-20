@@ -9,6 +9,7 @@
   export let activeTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
+  export let workspaces = [];
 
   let userId: string = "";
   let userType: string = "";
@@ -66,6 +67,9 @@
           {user}
           {userType}
           {activeTeam}
+          workspaces={workspaces.filter((elem) => {
+            return elem?.team?.teamId === activeTeam?.teamId;
+          })}
           {teamServiceMethods}
           {teamRepositoryMethods}
         />

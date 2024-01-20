@@ -7,11 +7,13 @@
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
+  import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
   export let user;
   export let userType;
   export let activeTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
+  export let workspaces;
 
   const handleDropdown = (id) => {
     if (id === "remove") {
@@ -25,6 +27,7 @@
   let isMemberRemovePopup = false;
   let isMemberPromotePopup = false;
   let isMemberDemotePopup = false;
+  let isMemberInfoPopup = false;
 
   const handleMemberPopUpCancel = (flag) => {
     isMemberRemovePopup = flag;
@@ -35,6 +38,9 @@
 
   const handleMemberDemotePopUpCancel = (flag) => {
     isMemberDemotePopup = flag;
+  };
+  const handleMemberInfoPopUpCancel = (flag) => {
+    isMemberInfoPopup = flag;
   };
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
@@ -99,8 +105,33 @@
   />
 {/if}
 
+{#if isMemberInfoPopup}
+  <MemberInfoPopup
+    title={`Access to ${activeTeam.name}`}
+    {user}
+    workspaces={workspaces.map((elem) => {
+      for (let i = 0; i < elem.users.length; i++) {
+        if (elem.users[i].id === user.id) {
+          elem.position = elem.users[i].role;
+          break;
+        }
+      }
+      return elem;
+    })}
+    {userType}
+    onCancel={handleMemberInfoPopUpCancel}
+    {handleMemberPopUpCancel}
+    {handleMemberPromotePopUpCancel}
+    {handleMemberDemotePopUpCancel}
+  />
+{/if}
 <div class="d-flex tile">
-  <div class="info d-flex">
+  <div
+    class="info d-flex"
+    on:click={() => {
+      isMemberInfoPopup = true;
+    }}
+  >
     <div class="icon d-flex align-items-center justify-content-center">
       <span>{user.name[0].toUpperCase()}</span>
     </div>

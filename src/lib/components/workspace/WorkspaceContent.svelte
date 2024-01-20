@@ -37,7 +37,8 @@
     currentTeam: CurrentTeam,
     handleCreateWorkspace: any,
     teamServiceMethods: TeamServiceMethods,
-    teamRepositoryMethods: TeamRepositoryMethods;
+    teamRepositoryMethods: TeamRepositoryMethods,
+    workspaces;
   let currOpenedTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
@@ -207,7 +208,12 @@
         {activeSideBarTabMethods}
       />
     {:else if selectedTab === "members"}
-      <Members {activeTeam} {teamServiceMethods} {teamRepositoryMethods} />
+      <Members
+        {activeTeam}
+        {teamServiceMethods}
+        {workspaces}
+        {teamRepositoryMethods}
+      />
     {/if}
     <!-- </Route> -->
   </div>

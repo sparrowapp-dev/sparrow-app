@@ -13,7 +13,10 @@
   import { user } from "$lib/store/auth.store";
   import { onDestroy } from "svelte";
   import type { Observable } from "rxjs";
-  import type { TeamDocument } from "$lib/database/app.database";
+  import type {
+    TeamDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
   import type { CurrentTeam } from "$lib/utils/interfaces";
   import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
@@ -38,6 +41,7 @@
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
+  const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
 
   const workspaceMethods: WorkspaceMethods = {
     handleCreateTab: _viewModel.handleCreateTab,
@@ -186,6 +190,7 @@
       activeTeam={$activeTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}
+      workspaces={$workspaces}
     />
   </div>
 </Motion>
