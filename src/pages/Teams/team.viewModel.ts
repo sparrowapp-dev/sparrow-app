@@ -12,7 +12,7 @@ import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 
-export class WorkspaceViewModel {
+export class TeamViewModel {
   constructor() {}
   private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
