@@ -6,7 +6,7 @@
   import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { base64ToURL } from "$lib/utils/helpers";
-  export let handleCreateWorkspace: any;
+  export let handleCreateTeamModal: any;
   export let teams: any;
   let currOpenedTeam: CurrentTeam;
 
@@ -38,7 +38,7 @@
       <Tooltip text="New Team">
         <button
           class="new-team-btn rounded border-0"
-          on:click={handleCreateWorkspace}
+          on:click={handleCreateTeamModal}
         >
           <img src={plus} alt="" />
         </button>

@@ -16,6 +16,7 @@
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import {
     type CollectionDocument,
+    type TeamDocument,
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
@@ -42,6 +43,7 @@
   export let currentTeam: CurrentTeam;
   export let currentWorkspace: CurrentWorkspace;
   export let currWorkspace: CurrentWorkspace;
+  export let teams: Observable<TeamDocument[]>;
 
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
@@ -74,7 +76,7 @@
   let filteredFolder = [];
   let filteredRequest = [];
   let isOpen: boolean = false;
-  
+
   collection.subscribe((value) => {
     if (value) {
       const collectionArr = value.map(
@@ -87,8 +89,6 @@
       collections = collectionArr;
     }
   });
-
-
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -138,7 +138,6 @@
     },
   );
 
-
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
       if (value.personalWorkspaces) {
@@ -152,8 +151,6 @@
     }
   });
 
-
-
   const onMinimize = () => {
     appWindow.minimize();
   };
@@ -166,7 +163,6 @@
     appWindow.toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
-
 
   const handleSearch = () => {
     filteredCollection.length = 0;
@@ -208,8 +204,6 @@
     isSearchVisible = window.innerWidth >= minWidthThreshold;
     hideHeaders = window.innerWidth <= 700;
   }
-
-
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
@@ -268,6 +262,7 @@
       style="height: 36px; width:216px"
     >
       <HeaderDropdown
+        {teams}
         {userId}
         {currentTeam}
         {currentWorkspace}

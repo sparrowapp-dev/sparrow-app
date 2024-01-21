@@ -32,7 +32,7 @@
     );
     setUser(jwtDecode(registerUser.data?.data?.accessToken?.token));
     navigate("/dashboard/collections");
-    _activeSidebarViewModel.updateActiveTab("collections");
+    _activeSidebarViewModel.addActiveTab("collections");
   };
 
   let showSpinner: boolean = true;

@@ -7,7 +7,7 @@
   export let collectionList: any;
   export let teams: any;
   export let handleWorkspaceSwitch: any;
-  export let handleCreateWorkspace: any;
+  export let handleCreateTeamModal: any;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
   export let collectionsMethods: any;
@@ -17,7 +17,7 @@
   style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
   class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-sm-1 p-md-2 p-lg-3 p-3 pe-3"
 >
-  <TeamsList {handleCreateWorkspace} {teams} />
+  <TeamsList {handleCreateTeamModal} {teams} />
   <RecentApi
     {tabList}
     {data}

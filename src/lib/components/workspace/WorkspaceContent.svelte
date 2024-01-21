@@ -2,7 +2,6 @@
   import { Link } from "svelte-navigator";
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
-  export let data: any;
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
   import { workspaceView, openedTeam } from "$lib/store";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -11,6 +10,7 @@
   import { onDestroy } from "svelte";
   import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
   import { base64ToURL } from "$lib/utils/helpers";
+  export let data: any;
   export let loaderColor = "default",
     userId: string,
     handleWorkspaceSwitch: any,

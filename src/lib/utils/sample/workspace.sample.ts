@@ -13,7 +13,10 @@ const generateSampleWorkspace = (_id: string, date: string, name?: string) => {
         collectionCount: 0,
       },
     },
-    team: [],
+    team: {
+      teamId: "",
+      teamName: "",
+    },
     owner: "",
     users: [],
     isActiveWorkspace: true,

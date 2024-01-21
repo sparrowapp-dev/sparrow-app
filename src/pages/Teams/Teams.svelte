@@ -121,7 +121,6 @@
   });
 
   const handleCreateWorkspace = async () => {
-
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -162,7 +161,10 @@
       workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
-      workspaceObj.team = response.data.data?.team;
+      workspaceObj.team = {
+        teamId: response.data.data?.team?.id,
+        teamName: response?.data?.data?.team?.teamName,
+      };
       workspaceObj.owner = response.data.data?.owner;
       workspaceObj.users = response.data.data?.users;
       workspaceObj.createdAt = response.data.data?.createdAt;
@@ -173,8 +175,8 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       // await _viewModelWorkspace.addWorkspace(workspaceObj);
+      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj.id);
       collectionsMethods.handleCreateTab(workspaceObj);
       moveNavigation("right");
@@ -368,9 +370,9 @@
 </CustomPopup>
 
 <Motion {...scaleMotionProps} let:motion>
-  <div class="workspace bg-backgroundColor" use:motion>
+  <div class="workspace bg -backgroundColor" use:motion>
     <WorkspaceList
-      {handleCreateWorkspace}
+      {handleCreateTeamModal}
       teams={allTeams}
       {data}
       tabList={$tabList}

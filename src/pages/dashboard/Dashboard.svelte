@@ -29,6 +29,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
+  import { TeamRepository } from "$lib/repositories/team.repository";
 
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
@@ -39,6 +40,7 @@
   const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
+  const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
 
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
@@ -57,7 +59,6 @@
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
-
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -139,7 +140,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace._id = workspaceId;
+    sampleWorkspace.id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -215,6 +216,7 @@
     {collectionsMethods}
     {handleWorkspaceSwitch}
     {activeSideBarTabMethods}
+    {teams}
   />
   <div class="dashboard-teams d-flex">
     {#if activeSidebarTabName}

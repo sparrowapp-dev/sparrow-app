@@ -25,6 +25,8 @@
     InvalidWorkspacePostBody,
     WorkspacePostBody,
   } from "$lib/utils/dto";
+  import type { Observable } from "rxjs";
+  import type { TeamDocument } from "$lib/database/app.database";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -32,6 +34,7 @@
   export let currentTeam: CurrentTeam, currentWorkspace: CurrentWorkspace;
   export let data: any;
   export let onclick: any;
+  export let teams: Observable<TeamDocument[]>;
   export let collectionsMethods: CollectionsMethods;
 
   let workspaceLimit = constants.WORKSPACE_LIMIT;
@@ -92,6 +95,9 @@
     workspacePostInput.name = e.target.value;
     if (e.target.value !== "") invalidWorkspacePostInput.name = false;
   };
+  const handleTeamSelect = (e) => {
+    workspacePostInput.id = e.target.value;
+  };
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
@@ -103,7 +109,7 @@
 
     const workspaceData = {
       name: workspaceObj.name,
-      id: currentTeam.id,
+      id: workspacePostInput.id,
     };
     _viewModel.addWorkspace(workspaceObj);
 
@@ -145,16 +151,16 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      await _viewModel.addWorkspace(workspaceObj);
-      await _viewModel.activateWorkspace(workspaceObj.id);
-      if (userId) _viewModel.refreshWorkspaces(userId);
-      collectionsMethods.handleCreateTab(workspaceObj);
-      moveNavigation("right");
+      // await _viewModel.addWorkspace(workspaceObj);
+      if (userId) await _viewModel.refreshWorkspaces(userId);
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      navigate("/dashboard/collections");
       openCreateWorkspaceModal = false;
+      moveNavigation("right");
+      navigate("/dashboard/collections");
+      await _viewModel.activateWorkspace(workspaceObj.id);
+      collectionsMethods.handleCreateTab(workspaceObj);
       activeSideBarTabMethods.updateActiveTab("collections");
     }
   };
@@ -180,7 +186,7 @@
   title="New Workspace"
   isOpen={openCreateWorkspaceModal}
   btnText="Create"
-  underSubmission={!workspaceUnderCreation}
+  underSubmission={workspaceUnderCreation}
   handleOpen={handleCreateWorkspaceModal}
   handleSubmit={handleCreateWorkSpace}
 >
@@ -200,7 +206,11 @@
     errorText="Please select a team."
     selectInputPlaceholder="Select team"
     inputId="select-team-input"
-    options={["Hello", "Dear"]}
+    options={$teams.map((team) => ({
+      id: team._data.teamId,
+      name: team._data.name,
+    }))}
+    handleOnSelect={handleTeamSelect}
   />
 </CustomPopup>
 
@@ -244,10 +254,12 @@
       class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
       on:click={() => {
         isOpen = true;
+        handleCreateWorkspaceModal();
       }}
     >
-      <span on:click={handleCreateWorkspaceModal}>Create New Workspace</span
-      ><span style="height:20px;width:20px">+</span>
+      <span>Create New Workspace</span><span style="height:20px;width:20px"
+        >+</span
+      >
     </p>
     <hr class="m-0 p-0 mb-1" />
     {#if $data}
@@ -272,7 +284,7 @@
                 >
                   <span>{list.name}</span>
                   <span class="list-team-name d-block" style="font-size: 12px;"
-                    >{list.team.teamName}</span
+                    >{list.team.teamName ? list.team.teamName : ""}</span
                   >
                 </p>
 

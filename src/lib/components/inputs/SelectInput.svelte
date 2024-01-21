@@ -7,6 +7,7 @@
   export let options: any[];
   export let invalidValue: boolean = false;
   export let errorText: string = "Invalid Value.";
+  export let handleOnSelect: (e: any) => void;
 </script>
 
 <div class="sparrow-select-input-container mt-3">
@@ -22,6 +23,7 @@
     <span class="sparrow-input-label-desc">{labelDescription}</span>
   </div>
   <select
+    on:change={(e) => handleOnSelect(e)}
     class={`${invalidValue && "invalid"} sparrow-select-input py-2 px-3 w-100`}
   >
     {#if selectInputPlaceholder !== ""}
@@ -30,7 +32,7 @@
       >
     {/if}
     {#each options as option}
-      <option>{option}</option>
+      <option value={option.id}>{option.name}</option>
     {/each}
   </select>
   {#if invalidValue}
