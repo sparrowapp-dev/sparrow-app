@@ -70,7 +70,7 @@
         </div>
         <PeopleIcon
           color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
-          classProp={team.users.length <= 1 && "d-none"}
+          classProp={team.users?.length <= 1 && "d-none"}
         />
       </button>
     {/each}

@@ -191,7 +191,7 @@
   const handleCreateTeam = async (
     name: string,
     description: string,
-    file: any,
+    file: File,
   ) => {
     if (name == "") {
       newTeam.name.invalid = true;
@@ -201,20 +201,14 @@
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
     isTeamCreatedFirstTime.set(true);
-    const teamObj = generateSamepleTeam(name, description);
+    const teamObj = generateSamepleTeam(name, description, file, userId);
 
-    const teamData = {
-      name: teamObj.name,
-      description: teamObj.description,
-      image: file,
-    };
-
-    _viewModel.addTeam(teamData);
-    const response = await _viewModel.createTeam(teamData);
+    await _viewModel.addTeam(teamObj);
+    const response = await _viewModel.createTeam(teamObj);
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      _viewModel.modifyTeam(res._id, res);
+      await _viewModel.modifyTeam(teamObj.teamId, res);
       await _viewModel.refreshTeams(userId);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();

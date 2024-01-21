@@ -73,11 +73,11 @@ export class TeamViewModel {
     return;
   };
 
-  public addTeam = (team) => {
-    this.teamRepository.createTeam(team);
+  public addTeam = async (team) => {
+    await this.teamRepository.createTeam(team);
   };
-  public modifyTeam = (teamId, team) => {
-    this.teamRepository.modifyTeam(teamId, team);
+  public modifyTeam = async (teamId, team) => {
+    await this.teamRepository.modifyTeam(teamId, team);
   };
 
   public createTeam = async (team) => {
@@ -127,7 +127,6 @@ export class TeamViewModel {
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
     const response = await this.teamService.fetchTeams(userId);
-
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
         const {

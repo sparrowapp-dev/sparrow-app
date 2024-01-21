@@ -31,6 +31,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
+    import { RxDB } from "$lib/database/app.database";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -66,6 +67,7 @@
   });
 
   onMount(async () => {
+    // RxDB.getInstance().destroyDb()
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");

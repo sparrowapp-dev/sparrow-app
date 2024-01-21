@@ -102,7 +102,10 @@
   const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
     workspaces.map((workspace) => {
       if (workspace._data.isActiveWorkspace) {
-        showDefault = workspace._data.collections.length === 0 ? true : false;
+        showDefault = true;
+        if (workspace._data.collections && workspace._data.collections.length) {
+          showDefault = false;
+        }
         return;
       }
     });
