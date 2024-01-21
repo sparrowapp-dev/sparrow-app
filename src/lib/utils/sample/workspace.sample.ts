@@ -3,7 +3,7 @@ import { WorkspaceDefault } from "../enums/request.enum";
 
 const generateSampleWorkspace = (_id: string, date: string, name?: string) => {
   return {
-    _id,
+    id: _id,
     name: name ? name : WorkspaceDefault.NAME,
     type: ItemType.WORKSPACE,
     description: "",

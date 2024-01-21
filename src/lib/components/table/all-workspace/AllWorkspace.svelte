@@ -28,7 +28,7 @@
       workspace.name,
       openedTeam.id,
       openedTeam.name,
-      openedTeam.base64String
+      openedTeam.base64String,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
@@ -74,7 +74,7 @@
   };
   const rightClickContextMenu = (e, index) => {
     e.preventDefault();
-  
+
     setTimeout(() => {
       isShowMoreVisible = index;
     }, 100);
@@ -111,7 +111,7 @@
       </div>
     {/if}
     <div
-      class=" table-container sparrow-thin-scrollbar overflow-y-auto"
+      class="table-container sparrow-thin-scrollbar overflow-y-auto"
       style="max-height: 60vh; height: auto;"
     >
       <table
@@ -147,7 +147,8 @@
               />
               <tr
                 class="workspace-list-item cursor-pointer overflow-hidden ellipsis w-100"
-                on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, index)}
+                on:contextmenu|preventDefault={(e) =>
+                  rightClickContextMenu(e, index)}
                 on:click={(e) => {
                   !isShowMoreVisible
                     ? handleOpenCollection(list)

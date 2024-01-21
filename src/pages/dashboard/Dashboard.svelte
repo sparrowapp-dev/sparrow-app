@@ -29,32 +29,32 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
-    import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
   const _viewModelHome = new TeamViewModel();
-  let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
   const activeWorkspaceRxDoc: Observable<WorkspaceDocument> =
     _viewModelHome.activeWorkspace;
   const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+
+  let currentWorkspaceId: string;
+  let currentWorkspaceName: string;
+  let currentTeam: CurrentTeam;
+  let currentWorkspace: CurrentWorkspace;
   let activeSidebarTabName: string;
   let workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    collectionsMethods.getActiveWorkspace();
-  let currentWorkspaceId: string;
-  let currentWorkspaceName: string;
-
-  let currentTeam: CurrentTeam;
-  let currentWorkspace: CurrentWorkspace;
+  let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      await _viewModelWorkspace.refreshWorkspaces(value._id);
       await _viewModelHome.refreshTeams(value._id);
+      await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
 
@@ -191,7 +191,7 @@
     }
     return selectedActiveSideBar;
   }
- 
+
   const getActiveTab = handleActiveTab();
 
   onMount(() => {

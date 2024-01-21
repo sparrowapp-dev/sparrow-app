@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
     import spin from "$lib/assets/spin.svg";
     export let size;
+    export let classProp: string = "";
   </script>
   
-  <div class="loading-spinner spinner-item" style="height: {size}; width : {size};">
+  <div class={`${classProp} loading-spinner spinner-item`} style="height: {size}; width : {size};">
     <img class="load-spin" src={spin} style="width: 100%; height:100%;" alt="spinner" />
   </div>
   

@@ -1,13 +1,15 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
   import { fade, fly } from "svelte/transition";
+  import Spinner from "../Transition/Spinner.svelte";
 
-  export let isOpen: boolean,
-    title: string,
-    isDanger: boolean = false,
-    btnText: string,
-    handleOpen: () => void,
-    handleSubmit: () => void;
+  export let isOpen: boolean;
+  export let title: string;
+  export let isDanger: boolean = false;
+  export let btnText: string;
+  export let underSubmission: boolean = false;
+  export let handleOpen: () => void;
+  export let handleSubmit: () => void;
 </script>
 
 {#if isOpen}
@@ -46,10 +48,15 @@
         >
       {:else}
         <button
-          class="sparrow-modal-primary-btn border-0 py-1 px-3"
+          class="sparrow-modal-primary-btn d-flex border-0 py-1 px-3"
           on:click={() => {
             handleSubmit();
-          }}>{btnText}</button
+          }}
+        >
+          {#if underSubmission}
+            <Spinner classProp="" size="18px" />
+          {/if}
+          <span class="ms-2 my-auto">{btnText}</span></button
         >
       {/if}
     </div>
@@ -91,7 +98,7 @@
     background-color: var(--border-color);
   }
   .sparrow-modal-primary-btn {
-    background-color: var(--send-button);
+    background-color: var(--primary-btn-color);
   }
   .sparrow-modal-close-icon-btn {
     background-color: transparent;

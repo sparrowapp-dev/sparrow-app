@@ -73,6 +73,18 @@ export class TeamViewModel {
     return;
   };
 
+  public addTeam = (team) => {
+    this.teamRepository.createTeam(team);
+  };
+  public modifyTeam = (teamId, team) => {
+    this.teamRepository.modifyTeam(teamId, team);
+  };
+
+  public createTeam = async (team) => {
+    const response = await this.teamService.createTeam(team);
+    return response;
+  };
+
   public activateInitialTeamWorkspace = async (): Promise<void> => {
     const workspaceIdToActivate =
       await this.teamRepository.activateInitialTeamWithWorkspace();
@@ -107,10 +119,6 @@ export class TeamViewModel {
     this.workspaceRepository.addWorkspace(workspace);
   };
 
-  public createTeam = async (team) => {
-    const response = await this.teamService.createTeam(team);
-    return response;
-  };
   public createWorkspace = async (workspace) => {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;

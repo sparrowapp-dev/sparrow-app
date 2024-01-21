@@ -64,13 +64,13 @@ export class HeaderDashboardViewModel {
   };
 
   // Function to set a workspace as active
-  public activateWorkspace = (id: string): void => {
-    this.workspaceRepository.setActiveWorkspace(id);
+  public activateWorkspace = async (id: string): Promise<void> => {
+    await this.workspaceRepository.setActiveWorkspace(id);
     return;
   };
 
-  public addWorkspace = (workspace) => {
-    this.workspaceRepository.addWorkspace(workspace);
+  public addWorkspace = async (workspace) => {
+    await this.workspaceRepository.addWorkspace(workspace);
   };
 
   public updateWorkspace = (
@@ -170,7 +170,11 @@ export class HeaderDashboardViewModel {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive = false;
     const data = [];
-    if (response?.isSuccessful && response?.data?.data) {
+    if (
+      response?.isSuccessful &&
+      response?.data?.data &&
+      response?.data?.data?.length > 0
+    ) {
       for (const elem of response.data.data) {
         const {
           _id,

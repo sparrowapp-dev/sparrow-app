@@ -1,19 +1,10 @@
 <script lang="ts">
-  import { Link, navigate } from "svelte-navigator";
+  import { Link } from "svelte-navigator";
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
   export let data: any;
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
-  import {
-    isWorkspaceCreatedFirstTime,
-    workspaceView,
-    openedTeam,
-  } from "$lib/store";
-  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { v4 as uuidv4 } from "uuid";
+  import { workspaceView, openedTeam } from "$lib/store";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
@@ -175,7 +166,6 @@
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
         {handleCreateWorkspace}
-        {userId}
         openedTeam={currOpenedTeam}
         currActiveTeam={currentTeam}
         workspaces={$data.slice().reverse()}
@@ -189,6 +179,9 @@
 </div>
 
 <style>
+  .teams-content {
+    width: 100%;
+  }
   @media only screen and (max-width: 1000px) {
     .team-heading {
       display: block !important;
@@ -211,6 +204,7 @@
   }
   .tab-active {
     color: var(--white-color);
+
     border-bottom: 3px solid var(--workspace-hover-color);
   }
   .view-active {

@@ -6,18 +6,18 @@
   export let tabList: any;
   export let collectionList: any;
   export let teams: any;
-  export let userId: any;
-  export let handleWorkspaceSwitch: any,
-    handleWorkspaceTab: any,
-    activeSideBarTabMethods: any,
-    collectionsMethods: any;
+  export let handleWorkspaceSwitch: any;
+  export let handleCreateWorkspace: any;
+  export let handleWorkspaceTab: any;
+  export let activeSideBarTabMethods: any;
+  export let collectionsMethods: any;
 </script>
 
 <div
   style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
   class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-sm-1 p-md-2 p-lg-3 p-3 pe-3"
 >
-  <TeamsList {teams} {userId} />
+  <TeamsList {handleCreateWorkspace} {teams} />
   <RecentApi
     {tabList}
     {data}
@@ -42,6 +42,7 @@
     left: 69px;
     height: calc(100vh - 44px);
   }
+
   @media only screen and (max-width: 900px) {
     .sidebar {
       width: 31vw;

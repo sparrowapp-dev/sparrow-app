@@ -15,6 +15,7 @@ $sparrow-white: #ffffff;
 $sparrow-light-gray: #cccccc;
 $sparrow-gradient: red;
 $sparrow-background: #19191A;
+$sparrow-primary-btn: #1193F0;
 $sparrow-background-light: #1E1E1E;
 $sparrow-background-dark: #1E1E1E;
 $sparrow-background-dropdown :#141414;
@@ -52,7 +53,7 @@ $sparrow-errorTextColor:#fe8c98;
 :root {
   --blackColor: #{$sparrow-black};
   --recentApiText: #{$sparrow-recentApiText};
-
+  --primary-btn-color: #{$sparrow-primary-btn};
   --success-color: #{$sparrow-success};
   --button-color: #{$sparrow-request-body};
   --send-button: #{$sparrow-send-button};

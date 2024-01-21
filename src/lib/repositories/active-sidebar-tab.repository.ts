@@ -28,7 +28,6 @@ export class ActiveSideBarTabReposistory {
 
   public updateActiveTab = async (newActiveTabName: string) => {
     const activeTab = await this.activeTab();
-    debugger;
     await activeTab.incrementalPatch({
       activeTabName: newActiveTabName,
     });
