@@ -14,6 +14,8 @@
   export let onclick: (tab: string) => void;
   export let method: string;
   export let id;
+  export let disabled: boolean = true;
+  let isHover: boolean = false;
   let selectedRequest: {
     name: string;
     id: string;
@@ -51,14 +53,33 @@
 </script>
 
 <div
-  class="parent-dropdown display-inline-block z-1"
+  class="parent-dropdown display-inline-block"
   style=" position: relative;"
-  on:click={handleDropdownClick}
+  on:mouseover={() => {
+    isHover = true;
+  }}
+  on:mouseout={() => {
+    isHover = false;
+  }}
+  on:click={(event) => {
+    if (!disabled) {
+      handleDropdownClick(event);
+    }
+  }}
 >
-  <div on:click={toggleDropdown}>
+  <div
+    on:click={() => {
+      if (!disabled) {
+        toggleDropdown();
+      }
+    }}
+  >
     <div
       id={`dropdown-member-${id}`}
-      class="dropdown-btn rounded d-flex align-items-center justify-content-between"
+      class="dropdown-btn rounded d-flex align-items-center justify-content-between {!disabled &&
+      isHover
+        ? 'dropdown-btn-hover'
+        : ''}"
       class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0 text-{selectedRequest?.color}">
@@ -75,9 +96,9 @@
     </div>
   </div>
 
-  {#if isOpen}
+  {#if isOpen && !disabled}
     <div
-      class="d-none dropdown-data p-1 rounded"
+      class="d-none dropdown-data p-1 rounded z-2"
       class:dropdown-active={isOpen}
       transition:slide={{ duration: 100 }}
     >
@@ -113,8 +134,10 @@
     height: 34px;
     width: auto;
     padding: 0 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
   }
-  .dropdown-btn:hover {
+  .dropdown-btn-hover {
     background-color: var(--border-color);
   }
   .dropdown-data {
@@ -144,11 +167,7 @@
   .highlight:hover {
     background-color: #232424;
   }
-  .dropdown-btn {
-    border: 1px solid #313233;
-    cursor: pointer;
-  }
   .dropdown-btn-active {
-    border: 1px solid var(--send-button);
+    border: 1px solid var(--send-button) !important;
   }
 </style>

@@ -2,6 +2,7 @@
   import closeIcon from "$lib/assets/close.svg";
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { fly, fade } from "svelte/transition";
+  import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
 
   export let title;
   export let user;
@@ -139,10 +140,7 @@
     <hr />
     <div style="font-size: 14px;" class="text-lightGray mb-1">
       {#each workspaces as workspace}
-        <div class="d-flex justify-content-between">
-          <span>{workspace.name}</span>
-          <span>{workspace.position}</span>
-        </div>
+        <MemberWorkspace {workspace} {userType} {user} />
       {/each}
     </div>
     <div
