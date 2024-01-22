@@ -15,6 +15,14 @@ import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "./../../dashboard/ActiveSideBarTab.ViewModel";
+//------------------------------MixPanel-------------------------------//
+export const sendUserDataToMixpanel = (userDetails) => {
+  if (constants.ENABLE_MIX_PANEL === "true") {
+    mixpanel.identify(userDetails._id);
+    mixpanel.people.set({ $email: userDetails.email });
+  }
+};
+
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
   navigate("/register");
@@ -35,8 +43,7 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
-    mixpanel.identify(userDetails._id);
-    mixpanel.people.set({ $email: userDetails.email });
+    sendUserDataToMixpanel(userDetails);
     MixpanelEvent(Events.USER_LOGIN, {
       Login_Method: "Email",
       Success: response.isSuccessful,
