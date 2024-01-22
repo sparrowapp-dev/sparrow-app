@@ -30,13 +30,11 @@
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
-  import { platform } from "@tauri-apps/api/os";
-  import { handleZoomOnMac, handleZoomOnWindows } from "$lib/utils/zoom";
+  import { handleShortcuts } from "$lib/utils/shortcuts";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
-  let platformName: string;
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -66,7 +64,6 @@
   });
 
   onMount(async () => {
-    platformName = await platform();
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");
@@ -94,15 +91,6 @@
       resizeWindowOnLogin();
     }
   });
-
-  //Handle zoom functionality
-  const handleKeyPress = async (event) => {
-    if (platformName == "darwin") {
-      handleZoomOnMac(event);
-    } else {
-      handleZoomOnWindows(event);
-    }
-  };
 </script>
 
 <Router {url}>
@@ -126,7 +114,7 @@
 </Router>
 
 <Toast />
-<svelte:window on:keydown={handleKeyPress} />;
+<svelte:window on:keydown={handleShortcuts} />;
 
 <style>
 </style>

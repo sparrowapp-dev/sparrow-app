@@ -247,7 +247,7 @@
       <div class="d-flex mac-container">
         <div on:click={onClose} class="mac-nav"></div>
         <div on:click={onMinimize} class="mac-nav"></div>
-        <div on:click={toggleSize} class="mac-nav"></div>
+        <div on:click={toggleSize} id="resize-button" class="mac-nav"></div>
       </div>
     {/if}
     <div class="d-flex align-items-center justify-content-center gap-2">

@@ -1,20 +1,13 @@
 import { WindowSettingReposistory } from "$lib/repositories/window-settings.repository";
 import { invoke } from "@tauri-apps/api";
+import { Shortcuts } from "./enums/shortcuts-enum";
 
 const windowSettingRepository = new WindowSettingReposistory();
 
-export async function handleZoomOnMac(event) {
-  if (event.metaKey && event.code === "Equal") {
+export async function handleZoom(event) {
+  if (event.code === Shortcuts.ZoomInKey) {
     await zoomIn();
-  } else if (event.metaKey && event.code === "Minus") {
-    await zoomOut();
-  }
-}
-
-export async function handleZoomOnWindows(event) {
-  if (event.ctrlKey && event.code === "Equal") {
-    await zoomIn();
-  } else if (event.ctrlKey && event.code === "Minus") {
+  } else if (event.code === Shortcuts.ZoomOutKey) {
     await zoomOut();
   }
 }
