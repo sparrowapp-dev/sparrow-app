@@ -29,6 +29,7 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import { setOpenedTeam } from "$lib/store";
+  import { v4 as uuidv4 } from "uuid";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -98,14 +99,14 @@
     workspacePostInput.name = e.target.value;
     if (e.target.value !== "") invalidWorkspacePostInput.name = false;
   };
-  const handleTeamSelect = (e) => {
-    workspacePostInput.id = e.target.value;
+  const handleTeamSelect = (value) => {
+    workspacePostInput.id = value;
   };
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED,
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
       workspacePostInput?.name,
     );
@@ -113,13 +114,14 @@
     const workspaceData = {
       name: workspaceObj.name,
       id: workspacePostInput.id,
+      createdAt: new Date(workspaceObj.createdAt).toISOString(),
     };
-    _viewModel.addWorkspace(workspaceObj);
+    await _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      _viewModel.addWorkspace(response.data.data);
+      // await _viewModel.updateWorkspace(workspaceObj._id, response.data.data);
 
       let totalCollection: number = 0;
       let totalRequest: number = 0;
@@ -154,16 +156,16 @@
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
       if (userId) await _viewModel.refreshWorkspaces(userId);
+      await _viewModel.activateWorkspace(response.data.data._id);
+      collectionsMethods.handleCreateTab(workspaceObj);
+      collectionsMethods.handleActiveTab(response.data.data._id);
+      moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      openCreateWorkspaceModal = false;
-      moveNavigation("right");
       navigate("/dashboard/collections");
-      await _viewModel.activateWorkspace(workspaceObj._id);
-      collectionsMethods.handleCreateTab(workspaceObj);
-      collectionsMethods.handleActiveTab(workspaceObj._id);
       activeSideBarTabMethods.updateActiveTab("collections");
+      openCreateWorkspaceModal = false;
     }
   };
 
@@ -212,6 +214,7 @@
       id: team._data.teamId,
       name: team._data.name,
       logo: base64ToURL(team._data.logo),
+      endIconVisible: team._data.users.length > 1,
     }))}
     handleOnSelect={handleTeamSelect}
   />

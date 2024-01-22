@@ -140,7 +140,7 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      await _viewModel.updateWorkspace(workspaceObj.id, response.data.data);
+      // await _viewModel.updateWorkspace(workspaceObj._id, response.data.data);
 
       let totalCollection: number = 0;
       let totalRequest: number = 0;
@@ -161,7 +161,7 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
       workspaceObj.team = {
@@ -180,9 +180,9 @@
       workspaceObj.save = true;
       // await _viewModelWorkspace.addWorkspace(workspaceObj);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj.id);
+      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
-      collectionsMethods.handleActiveTab(workspaceObj.id);
+      collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");

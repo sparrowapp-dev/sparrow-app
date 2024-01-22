@@ -176,13 +176,19 @@ export class WorkspaceRepository {
         },
       })
       .exec();
+    // await workspace.upsert(data);
     workspace.incrementalModify((value) => {
+      if (data._id) value._id = data._id;
       if (data.name) value.name = data.name;
-      if (data.environmentId) value.environmentId = data.environmentId;
+      if (data.description) value.description = data.description;
+      if (data.team) value.team = data.team;
+      if (data.owner) value.owner = data.owner;
+      if (data.users) value.users = data.users;
+      // if (data.environmentId) value.environmentId = data.environmentId;
+
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
-      if (data.description) value.description = data.description;
       return value;
     });
   };

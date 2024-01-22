@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DownArrow } from "$lib/assets";
-  import { onMount } from "svelte";
+  import { PeopleIcon } from "$lib/assets/app.asset";
   import { fly } from "svelte/transition";
 
   export let labelText: string = "Select";
@@ -10,23 +10,27 @@
   export let selectInputPlaceholder: string = "Select an option";
   export let options: any[];
   export let invalidValue: boolean = false;
+  export let endIconVisible: boolean = false;
   export let errorText: string = "Invalid Value.";
-  export let handleOnSelect: (e: any) => void;
+  export let handleOnSelect: (value: any) => void;
+
   let isDropdownVisible: boolean = false;
+  let selectedOption: string = "";
+
   const closeSparrowDropdown = () => {
     isDropdownVisible = false;
   };
-  const openSparrowDropdown = () => {
-    isDropdownVisible = true;
+
+  const handleSelectOption = (name: string, e) => {
+    e.stopPropagation();
+    selectedOption = name;
   };
+
   const toggleSparrowDropdown = (e) => {
     e.preventDefault();
     e.stopPropagation();
     isDropdownVisible = !isDropdownVisible;
   };
-  onMount(() => {
-    console.log(options);
-  });
 </script>
 
 <svelte:window
@@ -48,13 +52,14 @@
   <div
     on:click={(e) => {
       toggleSparrowDropdown(e);
-      handleOnSelect(e);
     }}
     class={`${
       invalidValue && "invalid"
     } sparrow-select-input py-2 justify-content-between d-flex px-3 w-100`}
   >
-    {#if selectInputPlaceholder !== ""}
+    {#if selectedOption !== ""}
+      <span class="sparrow-selected-option">{selectedOption}</span>
+    {:else if selectInputPlaceholder !== ""}
       <span class="sparrow-placeholder-option">{selectInputPlaceholder}</span>
     {/if}
     <DownArrow classProp="my-auto" />
@@ -62,20 +67,40 @@
   {#if isDropdownVisible}
     <div
       transition:fly={{ y: -20, duration: 100 }}
-      class="{isDropdownVisible
-        ? ''
-        : 'd-none'} mt-2 position-absolute sparrow-dropdown-options ellipsis w-100 sparrow-thin-scrollbar"
+      class="mt-2 position-absolute sparrow-dropdown-options ellipsis w-100 sparrow-thin-scrollbar"
     >
       {#each options as option}
-        <option
-          class="sparrow-select-option border-0 px-2 py-1 w-100 ellipsis"
-          value={option.id}
+        <div
+          class="sparrow-select-option border-0 d-flex justify-content-between w-100 ellipsis"
+          on:click={(e) => {
+            handleSelectOption(option.name, e);
+            handleOnSelect(option.id);
+            closeSparrowDropdown();
+          }}
         >
-          {#if option && option.logo}
-            <img src={option.logo} alt="sparrow-dropdown-img" />
+          <div class="d-flex">
+            <div class="sparrow-img-logo-container mx-2 overflow-hidden">
+              {#if option.logo == "" || option.logo == undefined}
+                <div
+                  class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor sparrow-option-name`}
+                  style={`font-size: 15px; padding-top: 2px; width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+                >
+                  {option.name[0] ? option.name[0].toUpperCase() : ""}
+                </div>
+              {:else}
+                <img
+                  class="w-100"
+                  src={option.logo}
+                  alt="sparrow-dropdown-img"
+                />
+              {/if}
+            </div>
+            <span>{option.name}</span>
+          </div>
+          {#if option.endIconVisible}
+            <PeopleIcon color={"#45494D"} />
           {/if}
-          <span>{option.name}</span>
-        </option>
+        </div>
       {/each}
     </div>
   {/if}
@@ -102,8 +127,13 @@
   .sparrow-placeholder-option {
     color: var(--request-arc) !important;
   }
+  .sparrow-select-option:hover {
+    background: rgba(19, 19, 19, 0.8);
+    backdrop-filter: blur(10px);
+  }
   .sparrow-select-option {
     border-radius: 4px;
+    padding: 8px 7px;
     border: 1px solid var(--border-color);
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
@@ -115,5 +145,11 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     overflow-y: scroll;
+  }
+  .sparrow-option-name {
+  }
+  .sparrow-img-logo-container {
+    width: 20px !important;
+    height: 20px !important;
   }
 </style>

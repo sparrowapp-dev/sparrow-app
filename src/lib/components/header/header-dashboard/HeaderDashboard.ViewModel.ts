@@ -73,15 +73,8 @@ export class HeaderDashboardViewModel {
     await this.workspaceRepository.addWorkspace(workspace);
   };
 
-  public updateWorkspace = (
-    workspaceId: string,
-    name: string,
-    description?: string,
-  ) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, {
-      name,
-      description,
-    });
+  public updateWorkspace = async (workspaceId: string, data: any) => {
+    await this.workspaceRepository.updateWorkspace(workspaceId, data);
   };
 
   public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {
