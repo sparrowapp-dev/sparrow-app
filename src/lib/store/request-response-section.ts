@@ -7,7 +7,7 @@ import type {
 export const isApiCreatedFirstTime = writable(false);
 //this store is for collaps and expand section
 export const collapsibleState = writable(false);
-
+export const collapseAnimationAppliedStore = writable(false);
 //this is for horizaontal and vertical mode
 export const isHorizontal = writable(false);
 export const leftPanelWidth = writable(50);

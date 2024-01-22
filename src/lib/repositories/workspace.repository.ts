@@ -21,6 +21,19 @@ export class WorkspaceRepository {
   };
 
   /**
+   * get filtered workspaces
+   */
+  public getFilteredWorkspaces = (
+    team: any,
+  ): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        team: team,
+      },
+    }).$;
+  };
+
+  /**
    * get active workspace of the user.
    */
   public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
@@ -29,6 +42,23 @@ export class WorkspaceRepository {
         isActiveWorkspace: true,
       },
     }).$;
+  };
+
+  /**
+   * Check active Workspace
+   */
+  public checkActiveWorkspace = async (
+    workspaceId: string,
+  ): Promise<boolean> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    return workspace ? true : false;
   };
 
   public updateCollectionInWorkspace = async (
@@ -88,6 +118,7 @@ export class WorkspaceRepository {
   public clearWorkspaces = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.workspace.find().remove();
   };
+
   /**
    * Sets a workspace as active.
    */
@@ -106,6 +137,20 @@ export class WorkspaceRepository {
     });
     await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
+  };
+
+  /**
+   * Activate Initial Workspace
+   */
+  public activateInitialWorkspace = async (): Promise<string> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne()
+      .exec();
+    const rxDoc = workspace.toMutableJSON();
+    rxDoc.isActiveWorkspace = true;
+    const teamId = rxDoc.team.teamId;
+    await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
+    return teamId;
   };
 
   public setCurrentEnvironmentId = async (
@@ -151,8 +196,7 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearWorkspaces();
-    await RxDB.getInstance().rxdb.workspace.bulkInsert(data);
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 }

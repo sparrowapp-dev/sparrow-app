@@ -13,3 +13,13 @@ export function calculateTimeDifferenceInDays(currentTime, previousTime) {
 
   return "just now";
 }
+
+export function formatDateInString(inputDate: string): string {
+  const date = new Date(inputDate);
+  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(
+    date.getUTCMinutes(),
+  ).padStart(2, "0")}, ${date.toLocaleString("en-US", {
+    month: "short",
+    day: "2-digit",
+  })}`;
+}
