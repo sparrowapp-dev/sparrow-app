@@ -48,13 +48,13 @@
         >
       {:else}
         <button
-          class="sparrow-modal-primary-btn d-flex border-0 py-1 px-3"
+          class="sparrow-modal-primary-btn d-flex border-0 py-1 me-1 px-3"
           on:click={() => {
             handleSubmit();
           }}
         >
           {#if underSubmission}
-            <Spinner classProp="" size="18px" />
+            <Spinner size="18px" />
           {/if}
           <span class="ms-2 my-auto">{btnText}</span></button
         >

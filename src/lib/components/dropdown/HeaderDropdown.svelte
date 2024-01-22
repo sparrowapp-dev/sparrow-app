@@ -4,7 +4,7 @@
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { moveNavigation, base64ToURL } from "$lib/utils/helpers";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
@@ -20,7 +20,7 @@
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import { CustomPopup, SelectInput, TextInput } from "$lib/components";
+  import { CustomPopup, CustomDropdown, TextInput } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -79,7 +79,7 @@
       new Date().toString(),
       name,
     );
-    sampleWorkspace.id = id;
+    sampleWorkspace._id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
     sampleWorkspace.path = path;
@@ -87,7 +87,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-    collectionsMethods.handleActiveTab(sampleWorkspace.id);
+    collectionsMethods.handleActiveTab(sampleWorkspace._id);
     moveNavigation("right");
   };
   const handleCreateWorkspaceModal = () => {
@@ -139,7 +139,7 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
       workspaceObj.team = response.data.data?.team;
@@ -160,9 +160,9 @@
       openCreateWorkspaceModal = false;
       moveNavigation("right");
       navigate("/dashboard/collections");
-      await _viewModel.activateWorkspace(workspaceObj.id);
+      await _viewModel.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
-      collectionsMethods.handleActiveTab(workspaceObj.id);
+      collectionsMethods.handleActiveTab(workspaceObj._id);
       activeSideBarTabMethods.updateActiveTab("collections");
     }
   };
@@ -202,7 +202,7 @@
     errorText="Workspace name cannot be empty."
     onChange={handleCreateWorkspaceNameChange}
   />
-  <SelectInput
+  <CustomDropdown
     labelText="Team"
     isRequired={true}
     errorText="Please select a team."
@@ -211,6 +211,7 @@
     options={$teams.map((team) => ({
       id: team._data.teamId,
       name: team._data.name,
+      logo: base64ToURL(team._data.logo),
     }))}
     handleOnSelect={handleTeamSelect}
   />
