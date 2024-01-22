@@ -3,7 +3,7 @@ export interface TeamPostBody {
   name: string;
   description: string;
   owner: string;
-  logo?: File;
+  image?: File;
   createdAt: string;
   createdBy: string;
 }

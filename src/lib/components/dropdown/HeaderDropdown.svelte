@@ -27,6 +27,7 @@
   } from "$lib/utils/dto";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
+  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -48,6 +49,7 @@
   };
 
   const _viewModel = new HeaderDashboardViewModel();
+  const _teamViewModel = new TeamViewModel();
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
@@ -76,7 +78,7 @@
       new Date().toString(),
       name,
     );
-    sampleWorkspace._id = id;
+    sampleWorkspace.id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
     sampleWorkspace.path = path;

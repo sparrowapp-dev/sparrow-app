@@ -168,7 +168,7 @@
         {handleCreateWorkspace}
         openedTeam={currOpenedTeam}
         currActiveTeam={currentTeam}
-        workspaces={$data.slice().reverse()}
+        workspaces={data}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
         {activeSideBarTabMethods}

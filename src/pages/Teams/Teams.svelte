@@ -121,6 +121,8 @@
   });
 
   const handleCreateWorkspace = async () => {
+    debugger;
+    
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -208,7 +210,7 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      await _viewModel.modifyTeam(teamObj.teamId, res);
+      // await _viewModel.modifyTeam(teamObj.teamwId, res);
       await _viewModel.refreshTeams(userId);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
