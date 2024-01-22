@@ -8,6 +8,7 @@
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import SelectRoleDropdown from "../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../dropdown/CheckSelectDropdown.svelte";
+  import CoverButton from "../buttons/CoverButton.svelte";
 
   export let onSubmit;
   export let updateRepo;
@@ -78,20 +79,61 @@
     document.getElementById("input-email").appendChild(emailDiv);
     currentEmailEntered = "";
   };
+
+  const countCheckedList = (ls) => {
+    let count = 0;
+    ls.forEach((element) => {
+      if (element.checked) {
+        count++;
+      }
+    });
+    return count;
+  };
+  let loader: boolean = false;
   const handleInvite = async () => {
     // showErrors = true;
+    loader = true;
     if (
       selectedRole &&
       selectedRole !== "select" &&
       emailstoBeSentArr?.length > 0
     ) {
-      let data = {
-        users: emailstoBeSentArr,
-        role: selectedRole,
-      };
-      const response = await onSubmit(teamId, data);
-      updateRepo(teamId, response);
-      console.log(response);
+      if (selectedRole === "editor" || selectedRole === "viewer") {
+        if (countCheckedList(teamSpecificWorkspace)) {
+          let data = {
+            users: emailstoBeSentArr,
+            role: selectedRole,
+            workspaces: teamSpecificWorkspace
+              .filter((elem) => {
+                if (elem.checked) {
+                  return true;
+                }
+                return false;
+              })
+              .map((elem) => {
+                return {
+                  id: elem.id,
+                  name: elem.name,
+                };
+              }),
+          };
+          const response = await onSubmit(teamId, data);
+          updateRepo(teamId, response);
+          handleInvitePopup(false);
+        } else {
+          // spec error true
+        }
+      } else {
+        let data = {
+          users: emailstoBeSentArr,
+          role: selectedRole,
+        };
+        const response = await onSubmit(teamId, data);
+        updateRepo(teamId, response);
+        handleInvitePopup(false);
+        // console.log(response);
+      }
+      loader = false;
     }
   };
 
@@ -100,7 +142,6 @@
   };
   const handleCheckSelectDropdown = (data) => {
     teamSpecificWorkspace = data;
-    console.log(data);
   };
 </script>
 
@@ -153,22 +194,9 @@
 
   <div class="mt-4">
     <p class="role-title mb-0">Role<span class="asterik">*</span></p>
-    <!-- <select
-      class="w-100 mt-1 p-1"
-      style="background-color: black;"
-      bind:value={selectedRole}
-      on:change={() => {}}
-    >
-      <option value="" disabled selected>Select </option>
-      {#each roles as roleObj}
-        <option value={roleObj.id}>
-          {roleObj.role}
-        </option>
-      {/each}
-    </select>
     {#if showErrors && !selectedRole}
       <p class="error-text">Role Cannot Be Empty</p>
-    {/if} -->
+    {/if}
     <SelectRoleDropdown
       id={"invite-member-workspace"}
       data={[
@@ -202,46 +230,39 @@
       onclick={handleDropdown}
     />
   </div>
-  <div class="mt-4">
-    <p class="role-title mb-0">
-      Specify Workspace<span class="asterik">*</span>
-    </p>
-    <p class="invite-subheader text-textColor mt-0 mb-3">
-      Select Workspaces you would want to give access to.
-    </p>
-    <!-- <select
-      class="w-100 mt-1 p-1"
-      style="background-color: black;"
-      bind:value={selectedRole}
-      on:change={() => {}}
-    >
-      <option value="" disabled selected>Select </option>
-      {#each roles as roleObj}
-        <option value={roleObj.id}>
-          {roleObj.role}
-        </option>
-      {/each}
-    </select>
-    {#if showErrors && !selectedRole}
-      <p class="error-text">Role Cannot Be Empty</p>
-    {/if} -->
-    <CheckSelectDropdown
-      id={"check-select-workspace"}
-      list={teamSpecificWorkspace}
-      onclick={handleCheckSelectDropdown}
-    />
-  </div>
-  <div class="d-flex align-items-center justify-content-between">
-    <div class="description mt-4">
+
+  {#if selectedRole === "editor" || selectedRole === "viewer"}
+    <div class="mt-4">
+      <p class="role-title mb-0">
+        Specify Workspace<span class="asterik">*</span>
+      </p>
+      <p class="invite-subheader text-textColor mt-0 mb-3">
+        Select Workspaces you would want to give access to.
+      </p>
+      <CheckSelectDropdown
+        id={"check-select-workspace"}
+        list={teamSpecificWorkspace}
+        onclick={handleCheckSelectDropdown}
+      />
+    </div>
+  {/if}
+  <div class="d-flex align-items-center justify-content-between mt-4">
+    <div class="description">
       <p class="text-textColor">
         Team:<span style="color:white">: {teamName}</span>
       </p>
     </div>
     <div>
-      <button
-        class="invite-btn btn rounded border-0 py-2"
-        on:click={handleInvite}>Send Invite</button
-      >
+      <CoverButton
+        disable={loader}
+        text={"Send Invite"}
+        size={14}
+        type={"primary"}
+        {loader}
+        onClick={() => {
+          handleInvite();
+        }}
+      />
     </div>
   </div>
 </div>
@@ -261,8 +282,7 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    height: 50%;
-    width: 60%;
+    max-width: 540px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -295,14 +315,14 @@
   }
 
   .btn-close1:hover {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
 
   .btn-close1:active {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
   .invite-btn {
-    background-color: var(--send-button);
+    background-color: var(--sparrow-blue);
   }
   .invite-btn:hover {
     background: var(--send1-hoverbutton);
@@ -316,7 +336,7 @@
   .email-container {
     display: flex;
     flex-wrap: wrap;
-    background-color: black;
+    background-color: transparent;
     border: 1px solid;
     padding: 3px 5px 3px 5px;
   }
@@ -326,23 +346,5 @@
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 5px;
-  }
-
-  @media (min-width: 1000px) {
-    .container {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      min-height: 54%;
-      height: auto;
-      width: 42%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: var(--background-color);
-      z-index: 12;
-      padding: 2%;
-      border-radius: 10px;
-    }
   }
 </style>

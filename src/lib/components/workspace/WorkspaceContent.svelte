@@ -53,6 +53,25 @@
     selectedView = value;
   });
 
+  let userType: string;
+  const findUserType = () => {
+    activeTeam?.users.forEach((user) => {
+      if (user.id === userId) {
+        userType = user.role;
+      }
+    });
+  };
+  $: {
+    if (userId) {
+      findUserType();
+    }
+  }
+  $: {
+    if (activeTeam) {
+      findUserType();
+    }
+  }
+
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
@@ -106,6 +125,7 @@
                 on:click={() => {
                   teamInvitePopup = true;
                 }}
+                disabled={userType === "member"}
                 style="font-size: 12px;"
                 class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
                 >Invite</button
@@ -158,7 +178,8 @@
                   style="padding: 8px 8px;"
                   on:click={() => (selectedTab = "members")}
                   class="team-menu__link"
-                  class:tab-active={selectedTab === "members"}>Members</span
+                  class:tab-active={selectedTab === "members"}
+                  >Members {`(${activeTeam?.users?.length})` || ""}</span
                 ></Link
               >
             </div>
@@ -212,6 +233,8 @@
       />
     {:else if selectedTab === "members"}
       <Members
+        {userId}
+        {userType}
         {activeTeam}
         {teamServiceMethods}
         {workspaces}

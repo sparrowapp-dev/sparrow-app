@@ -48,20 +48,9 @@
       {@html description}
     </div>
     <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 pb-3 mb-0 rounded"
       style="font-size: 16px;"
     >
-      <!-- <CoverButton
-        disable={deleteLoader}
-        text={"Cancel"}
-        size={14}
-        type={"dark"}
-        loader={false}
-        onClick={() => {
-          onCancel(false);
-        }}
-      /> -->
-
       <CoverButton
         disable={deleteLoader}
         text={"Update Access"}
@@ -91,14 +80,16 @@
     }
 
     .container {
+      display: flex;
+      flex-direction: column;
       position: fixed;
-      height: 244px;
-      width: 540px;
+      max-width: 540px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--background-color);
       z-index: 10;
+      padding: 2%;
       border-radius: 10px;
     }
 
@@ -107,11 +98,11 @@
     }
 
     .btn-close1:hover {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
 
     .btn-close1:active {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
     .btn-primary {
       background-color: var(--border-color);

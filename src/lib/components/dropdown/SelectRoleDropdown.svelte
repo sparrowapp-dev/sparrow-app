@@ -53,7 +53,7 @@
 </script>
 
 <div
-  class="parent-dropdown display-inline-block z-1"
+  class="parent-dropdown display-inline-block"
   style=" position: relative;"
   on:click={handleDropdownClick}
 >
@@ -79,7 +79,7 @@
 
   {#if isOpen}
     <div
-      class="d-none dropdown-data p-1 rounded"
+      class="d-none z-2 dropdown-data p-1 rounded"
       class:dropdown-active={isOpen}
       transition:slide={{ duration: 100 }}
     >

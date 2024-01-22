@@ -11,53 +11,26 @@
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let workspaces = [];
 
-  let userId: string = "";
-  let userType: string = "";
-  const unsubscribeUser = user.subscribe((value) => {
-    if (value) {
-      userId = value._id;
-    }
-  });
-  const findUserType = () => {
-    activeTeam?.users.forEach((user) => {
-      if (user.id === userId) {
-        userType = user.role;
-      }
-    });
-  };
-  $: {
-    if (userId) {
-      findUserType();
-    }
-  }
-  $: {
-    if (activeTeam) {
-      findUserType();
-    }
-  }
-  onDestroy(() => {
-    unsubscribeUser();
-  });
+  export let userId: string = "";
+  export let userType: string = "";
 </script>
 
 <section>
   {#if activeTeam?.users}
     {#each activeTeam?.users as user}
       {#if user.id === userId}
-        <div class="d-flex tile">
-          <div class="info d-flex">
-            <div class="icon d-flex align-items-center justify-content-center">
-              <span>{user.name[0].toUpperCase()}</span>
-            </div>
-            <div class="name px-2">
-              <span>{user.name} (You)</span><br />
-              <span>{user.email}</span>
-            </div>
-          </div>
-          <div class="position">
-            {user.role}
-          </div>
-        </div>
+        <Tile
+          owner={true}
+          {user}
+          {userType}
+          {activeTeam}
+          workspaces={workspaces.filter((elem) => {
+            return elem?.team?.teamId === activeTeam?.teamId;
+          })}
+          {teamServiceMethods}
+          {teamRepositoryMethods}
+          {userId}
+        />
       {/if}
     {/each}
     <hr />
@@ -72,6 +45,7 @@
           })}
           {teamServiceMethods}
           {teamRepositoryMethods}
+          {userId}
         />
       {/if}
     {/each}

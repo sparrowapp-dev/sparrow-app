@@ -59,14 +59,41 @@
             <span>{user.name[0].toUpperCase()}</span>
           </div>
           <div class="name px-2">
-            <span>{user.name}</span><br />
-            <span>{user.email}</span>
+            <span style="font-size:12px;" class="text-whiteColor"
+              >{user.name}</span
+            ><br />
+            <span style="font-size:12px;" class="text-textColor"
+              >{user.email}</span
+            >
           </div>
         </div>
         <div class="position">
-          {#if userType === "owner"}
+          {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
             <MemberDropdown
-              id={user.id + "drop"}
+              id={user.id}
+              data={[
+                {
+                  name: "Admin",
+                  id: "admin",
+                  color: "whiteColor",
+                },
+                {
+                  name: "Member",
+                  id: "member",
+                  color: "whiteColor",
+                },
+                {
+                  name: "Remove",
+                  id: "remove",
+                  color: "dangerColor",
+                },
+              ]}
+              method={user.role ? user.role : ""}
+              onclick={handleDropdown}
+            />
+          {:else if userType === "owner" && user.role === "admin"}
+            <MemberDropdown
+              id={user.id}
               data={[
                 {
                   name: "Owner",
@@ -92,33 +119,16 @@
               method={user.role ? user.role : ""}
               onclick={handleDropdown}
             />
-          {:else if userType === "admin" && user.role === "member"}
+          {:else}
             <MemberDropdown
-              id={user.id + "drop"}
+              id={user.id}
+              disabled={true}
               data={[
                 {
-                  name: "Admin",
-                  id: "admin",
+                  name: "Owner",
+                  id: "owner",
                   color: "whiteColor",
                 },
-                {
-                  name: "Member",
-                  id: "member",
-                  color: "whiteColor",
-                },
-                {
-                  name: "Remove",
-                  id: "remove",
-                  color: "dangerColor",
-                },
-              ]}
-              method={user.role ? user.role : ""}
-              onclick={handleDropdown}
-            />
-          {:else if userType === "admin" && user.role === "admin"}
-            <MemberDropdown
-              id={user.id + "drop"}
-              data={[
                 {
                   name: "Admin",
                   id: "admin",
@@ -165,14 +175,16 @@
     }
 
     .container {
+      display: flex;
+      flex-direction: column;
       position: fixed;
-      height: 334px;
-      width: 540px;
+      max-width: 540px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--background-color);
       z-index: 8;
+      padding: 2%;
       border-radius: 10px;
     }
 
@@ -181,11 +193,11 @@
     }
 
     .btn-close1:hover {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
 
     .btn-close1:active {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
     .btn-primary {
       background-color: var(--border-color);
@@ -209,9 +221,9 @@
       background-color: var(--delete-hover);
     }
     .icon {
-      width: 40px;
+      width: 36px;
       height: 36px;
-      background-color: var(--background-dropdown) !important;
+      border: 1px solid var(--border-color);
       border-radius: 50%;
     }
     .info {

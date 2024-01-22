@@ -8,13 +8,17 @@
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   export let user;
   export let userType;
   export let activeTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let workspaces;
+  export let userId;
+  export let owner: boolean = false;
 
+  const hd = new HeaderDashboardViewModel();
   const handleDropdown = (id) => {
     if (id === "remove") {
       isMemberRemovePopup = true;
@@ -56,6 +60,7 @@
       user.id,
     );
     teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+    await hd.refreshWorkspaces(userId);
     isMemberDemotePopup = false;
   };
   const handleMemberPromotePopUpSuccess = async () => {
@@ -64,6 +69,7 @@
       user.id,
     );
     teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+    await hd.refreshWorkspaces(userId);
     isMemberPromotePopup = false;
   };
 </script>
@@ -71,13 +77,11 @@
 {#if isMemberRemovePopup}
   <RemoveConfirmationPopup
     title={`Remove user?`}
-    description={`<p>
+    description={`<p style="font-size:12px;" class="text-textColor">
       Are you sure you want to remove <span
-        style="font-weight:700;"
         class="text-whiteColor">"${user.name}"</span
       >
       ? They will lose access to the <span
-        style="font-weight:700;"
         class="text-whiteColor">"${activeTeam?.name}"</span> team.
     </p>`}
     onSuccess={handleMemberPopUpSuccess}
@@ -88,8 +92,39 @@
 {#if isMemberPromotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
-    description={`<p>
-    Upon transitioning an Member to Admin, 'Edit' access will be automatically provided for all assigned workspaces.</p>`}
+    description={`
+    <div class="d-flex tile rounded mb-3">
+  <div
+    class="info d-flex align-items-center"
+  >
+    <div class="d-flex align-items-center justify-content-center" style="width: 36px;
+    border: 1px solid var(--border-color);
+    height: 36px;
+    border-radius: 50%;">
+      <span>${user.name[0].toUpperCase()}</span>
+    </div>
+    <div class="name px-2">
+      <span style="font-size:12px;" class="text-whiteColor">${
+        user.name
+      }</span><br />
+      <span style="font-size:12px;" class="text-textColor">${user.email}</span>
+    </div>
+  </div>
+</div>
+    
+    <p style="font-size:12px;" class="text-textColor">
+    You are assigning the role of an '<span class="text-whiteColor">Admin</span>' to ${
+      user.name
+    }. Following access will be provided to ${user.name}:</p>
+    <ul class="ps-4 text-textColor" style="font-size:12px;">
+      <li>Create New Workspaces.</li>
+      <li>Send Invites.</li>
+      <li>Change role of Admin and Members.</li>
+      <li>View/edit all the workspaces in the team.</li>
+      <li>See all the user, their email and roles.</li>
+      <li>See access details of a user.</li>
+    </ul>
+    `}
     onSuccess={handleMemberPromotePopUpSuccess}
     onCancel={handleMemberPromotePopUpCancel}
   />
@@ -98,8 +133,32 @@
 {#if isMemberDemotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
-    description={`<p>
-    Upon transitioning an Admin to a Member, 'Edit' access will be automatically provided for all assigned workspaces.</p>`}
+    description={`
+      <div class="d-flex tile rounded mb-3">
+    <div
+      class="info d-flex align-items-center"
+    >
+      <div class="d-flex align-items-center justify-content-center" style="width: 36px;
+      border: 1px solid var(--border-color);
+      height: 36px;
+      border-radius: 50%;">
+        <span>${user.name[0].toUpperCase()}</span>
+      </div>
+      <div class="name px-2">
+        <span style="font-size:12px;" class="text-whiteColor">${
+          user.name
+        }</span><br />
+        <span style="font-size:12px;" class="text-textColor">${
+          user.email
+        }</span>
+      </div>
+    </div>
+  </div>
+      
+      <p style="font-size:12px;" class="text-textColor">
+        Upon transitioning an Admin to a Member, 'Edit' access will be automatically provided for all assigned workspaces.</p>
+      
+      `}
     onSuccess={handleMemberDemotePopUpSuccess}
     onCancel={handleMemberDemotePopUpCancel}
   />
@@ -125,9 +184,9 @@
     {handleMemberDemotePopUpCancel}
   />
 {/if}
-<div class="d-flex tile">
+<div class="d-flex tile rounded">
   <div
-    class="info d-flex"
+    class="info d-flex align-items-center"
     on:click={() => {
       isMemberInfoPopup = true;
     }}
@@ -136,8 +195,10 @@
       <span>{user.name[0].toUpperCase()}</span>
     </div>
     <div class="name px-2">
-      <span>{user.name}</span><br />
-      <span>{user.email}</span>
+      <span style="font-size:12px;" class="text-whiteColor"
+        >{user.name} {owner ? "(You)" : ""}</span
+      ><br />
+      <span style="font-size:12px;" class="text-textColor">{user.email}</span>
     </div>
   </div>
   <div class="position">
@@ -228,10 +289,10 @@
     background-color: var(--background-light) !important;
   }
   .icon {
-    width: 40px;
+    width: 36px;
     height: 36px;
-    background-color: var(--background-dropdown) !important;
     border-radius: 50%;
+    border: 1px solid var(--border-color);
   }
   .info {
     width: calc(100% - 100px);

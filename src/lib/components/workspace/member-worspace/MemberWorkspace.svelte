@@ -17,8 +17,9 @@
 </script>
 
 <section>
-  <div class="d-flex justify-content-between">
-    <span>{workspace.name}</span>
+  <div class="d-flex justify-content-between align-items-center">
+    <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
+    >
     <div class="dropdown-workspace-access">
       {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
         <MemberDropdown
@@ -40,10 +41,7 @@
               color: "dangerColor",
             },
           ]}
-          method={workspace.position === "admin" ||
-          workspace.position === "editor"
-            ? "editor"
-            : ""}
+          method={workspace.position ? workspace.position : ""}
           onclick={handleDropdown}
         />
       {:else}
@@ -72,11 +70,11 @@
               color: "whiteColor",
             },
           ]}
-          method={workspace.position === "admin" ||
-          workspace.position === "editor" ||
-          workspace.position === "viewer"
+          method={user.role === "owner"
+            ? "owner"
+            : workspace.position
             ? workspace.position
-            : "owner"}
+            : ""}
           onclick={handleDropdown}
         />
       {/if}

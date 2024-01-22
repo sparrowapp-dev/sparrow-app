@@ -48,7 +48,7 @@
       {@html description}
     </div>
     <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
       style="font-size: 16px;"
     >
       <CoverButton
@@ -91,14 +91,16 @@
     }
 
     .container {
+      display: flex;
+      flex-direction: column;
       position: fixed;
-      height: 244px;
-      width: 540px;
+      max-width: 540px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--background-color);
       z-index: 10;
+      padding: 2%;
       border-radius: 10px;
     }
 

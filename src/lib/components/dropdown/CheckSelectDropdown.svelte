@@ -14,25 +14,10 @@
   let data = list;
   export let onclick: (tab) => void;
   export let id;
-  //   let selectedRequest: {
-  //     name: string;
-  //     id: string;
-  //     color: string;
-  //   };
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
-
-  //   $: {
-  //     if (method) {
-  //       data.forEach((element) => {
-  //         if (element.id === method) {
-  //           selectedRequest = element;
-  //         }
-  //       });
-  //     }
-  //   }
 
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(`check-dropdown-${id}`);
@@ -207,7 +192,7 @@
     left: 0;
     right: 0;
     border: 1px solid rgb(44, 44, 44);
-    height: 200px;
+    max-height: 200px;
     overflow-y: auto;
   }
   .dropdown-btn p,
