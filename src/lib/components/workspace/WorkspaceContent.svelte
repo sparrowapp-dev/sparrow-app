@@ -66,6 +66,9 @@
     updateRepo={teamRepositoryMethods.modifyTeam}
     teamName={activeTeam?.name}
     teamId={activeTeam?.teamId}
+    workspaces={workspaces.filter((elem) => {
+      return elem?.team?.teamId === activeTeam?.teamId;
+    })}
     handleInvitePopup={(flag) => {
       teamInvitePopup = flag;
     }}

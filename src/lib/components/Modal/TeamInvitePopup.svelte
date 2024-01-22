@@ -6,30 +6,40 @@
   import { fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close-icon-normal.svg";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
+  import SelectRoleDropdown from "../dropdown/SelectRoleDropdown.svelte";
+  import CheckSelectDropdown from "../dropdown/CheckSelectDropdown.svelte";
   export let onSubmit;
   export let updateRepo;
+  export let workspaces;
   //   import type { addUsersInWorkspacePayload
   //   import { UserRoles } from "$lib/utils/enums/enums";
   const emailstoBeSentArr: string[] = [];
   let showErrors = false;
-  const roles = [
-    {
-      id: "admin",
-      role: "ADMIN",
-      info: "Add & edit resources within a workspace,add & remove members to workspace",
-    },
-    {
-      id: "editor",
-      role: "EDITOR",
-      info: "Add & edit resources within a workspace",
-    },
-    {
-      id: "viewer",
-      role: "VIEWER",
-      info: "View Resources within a workspace.",
-    },
-  ];
-  let selectedRole;
+  // const data = [
+  //   {
+  //     id: "admin",
+  //     role: "ADMIN",
+  //     info: "Add & edit resources within a workspace,add & remove members to workspace",
+  //   },
+  //   {
+  //     id: "editor",
+  //     role: "EDITOR",
+  //     info: "Add & edit resources within a workspace",
+  //   },
+  //   {
+  //     id: "viewer",
+  //     role: "VIEWER",
+  //     info: "View Resources within a workspace.",
+  //   },
+  // ];
+  let teamSpecificWorkspace = workspaces.map((elem) => {
+    return {
+      id: elem._id,
+      name: elem.name,
+      checked: false,
+    };
+  });
+  let selectedRole: string = "select";
   let currentEmailEntered: string;
   const handleEmailOnAdd = (email: string) => {
     email = email.trim();
@@ -69,7 +79,11 @@
   };
   const handleInvite = async () => {
     // showErrors = true;
-    if (selectedRole && emailstoBeSentArr?.length > 0) {
+    if (
+      selectedRole &&
+      selectedRole !== "select" &&
+      emailstoBeSentArr?.length > 0
+    ) {
       let data = {
         users: emailstoBeSentArr,
         role: selectedRole,
@@ -78,6 +92,14 @@
       updateRepo(teamId, response);
       console.log(response);
     }
+  };
+
+  const handleDropdown = (id) => {
+    selectedRole = id;
+  };
+  const handleCheckSelectDropdown = (data) => {
+    teamSpecificWorkspace = data;
+    console.log(data);
   };
 </script>
 
@@ -130,7 +152,7 @@
 
   <div class="mt-4">
     <p class="role-title mb-0">Role<span class="asterik">*</span></p>
-    <select
+    <!-- <select
       class="w-100 mt-1 p-1"
       style="background-color: black;"
       bind:value={selectedRole}
@@ -145,7 +167,63 @@
     </select>
     {#if showErrors && !selectedRole}
       <p class="error-text">Role Cannot Be Empty</p>
-    {/if}
+    {/if} -->
+    <SelectRoleDropdown
+      id={"invite-member-workspace"}
+      data={[
+        {
+          name: "Select",
+          id: "select",
+          description: "Select role",
+          color: "whiteColor",
+        },
+        {
+          name: "Admin",
+          id: "admin",
+          description:
+            "Add & edit resources within a workspace,add & remove members to workspace",
+          color: "whiteColor",
+        },
+        {
+          name: "Editor",
+          id: "editor",
+          description: "Add & edit resources within a workspace",
+          color: "whiteColor",
+        },
+        {
+          name: "Viewer",
+          id: "viewer",
+          description: "View Resources within a workspace.",
+          color: "whiteColor",
+        },
+      ]}
+      method={selectedRole ? selectedRole : ""}
+      onclick={handleDropdown}
+    />
+  </div>
+  <div class="mt-4">
+    <p class="role-title mb-0">Role<span class="asterik">*</span></p>
+    <!-- <select
+      class="w-100 mt-1 p-1"
+      style="background-color: black;"
+      bind:value={selectedRole}
+      on:change={() => {}}
+    >
+      <option value="" disabled selected>Select </option>
+      {#each roles as roleObj}
+        <option value={roleObj.id}>
+          {roleObj.role}
+        </option>
+      {/each}
+    </select>
+    {#if showErrors && !selectedRole}
+      <p class="error-text">Role Cannot Be Empty</p>
+    {/if} -->
+    <CheckSelectDropdown
+      id={"check-select-workspace"}
+      list={teamSpecificWorkspace}
+      onclick={handleCheckSelectDropdown}
+    />
   </div>
   <div class="d-flex align-items-center justify-content-between">
     <div class="description mt-4">
