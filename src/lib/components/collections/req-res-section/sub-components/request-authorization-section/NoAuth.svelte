@@ -1,5 +1,9 @@
 <script lang="ts">
   import linkIcon from "$lib/assets/linkIcon.svg";
+
+  function handleLinkClick(event){
+    event.preventDefault();
+  }
 </script>
 
 <div class="ps-1 pe-1 w-100">
@@ -7,8 +11,8 @@
     class="d-flex align-items-center justify-content-center mt-4 text-requestBodyColor"
     style="font-size: 14px;font-weight:500;"
   >
-    <p>
-      This request does not use any authorization. Please specify the
+    <p class="text-center">
+      This request does not use any authorization.<br>Please specify the
       authorization type, if needed.
     </p>
   </div>
@@ -35,4 +39,17 @@
       headers of the request. Remember to keep your tokens secure.
     </p>
   </div>
+  <div class="d-flex align-items-center gap-2">
+    <a class="learn-auth-link" href="" on:click={handleLinkClick}>Learn more about Authorization</a> <img src={linkIcon} alt="" />
+  </div>
 </div>
+
+<style>
+  .learn-auth-link{
+    color: var(--sparrow-blue);
+  }
+
+  img{
+    width: 20px;
+  } 
+</style>

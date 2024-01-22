@@ -40,17 +40,17 @@
   }
 </script>
 
-<div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
+<div class="d-flex flex-column w-100 pt-4 pe-1">
   <div
-    class="d-flex justify-content-between text-requestBodyColor mb-3"
+    class="col-12 d-flex justify-content-between text-requestBodyColor mb-3"
     style="font-size: 12px; font-weight:500"
   >
-    <p class="mb-0">Token</p>
-    <div class="position-relative w-75">
+    <p class="col-2 mb-0">Token</p>
+    <div class="col-10 position-relative">
       <textarea
         style="outline: none;"
         id={"bearer-token-key"}
-        class="w-100 bg-backgroundColor border-0 ps-2"
+        class="w-100 bg-backgroundColor border-0 ps-1"
         placeholder="Enter Token"
         bind:value={bearerToken}
         on:input={() => {

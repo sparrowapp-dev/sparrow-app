@@ -45,16 +45,16 @@
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor mb-4"
+    class="col-12 d-flex align-items-center justify-content-between text-requestBodyColor mb-4"
     style="font-size: 12px; font-weight:500"
   >
-    <p class="mb-0">Username</p>
-    <div class="position-relative w-75">
+    <p class="col-2 mb-0">Username</p>
+    <div class="col-10 position-relative">
       <input
         type="text"
         style="outline: none;"
         id={"basic-auth-key"}
-        class="w-100 bg-backgroundColor border-0 h-75 ps-2"
+        class="w-100 bg-backgroundColor border-0 h-75"
         placeholder="Enter Username"
         bind:value={basicAuth.username}
         on:input={() => {
@@ -105,17 +105,17 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
+    class="col-12 d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
     style="font-size: 12px; font-weight:500"
   >
-    <p class="mb-0">Password</p>
+    <p class="col-2 mb-0">Password</p>
 
-    <div class="position-relative w-75">
+    <div class="col-10 position-relative">
       <input
         type="text"
         style="outline: none;"
         id={"basic-auth-value"}
-        class="w-100 bg-backgroundColor border-0 h-75 ps-2"
+        class="w-100 bg-backgroundColor border-0 h-75"
         placeholder="Enter Password"
         bind:value={basicAuth.password}
         on:input={() => {

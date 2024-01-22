@@ -278,9 +278,9 @@ const setTabProperty = async (
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.id === _id) {
         elem[route] = data;
-        if (route === "name") {
+        if (route === "name" && elem.property.request) {
           elem.property.request.save.api = false;
-        } else if (route === "description") {
+        } else if (route === "description" && elem.property.request) {
           elem.property.request.save.description = false;
         }
         progressiveTab.set(elem);
