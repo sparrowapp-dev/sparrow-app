@@ -18,7 +18,7 @@
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
@@ -30,9 +30,12 @@
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
+  import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
+    import { RxDB } from "$lib/database/app.database";
 
   export let url = "/";
   const tabRepository = new TabRepository();
+  const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let flag: boolean = true;
 
   let tabList = tabRepository.getTabList();
@@ -75,7 +78,7 @@
         setAuthJwt(constants.REF_TOKEN, refreshToken);
         setUser(jwtDecode(accessToken));
         notifications.success("Login successful!");
-        navigate("/home");
+        navigate("/dashboard/collections");
         await resizeWindowOnLogin();
       }
     });

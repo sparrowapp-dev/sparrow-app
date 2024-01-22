@@ -20,7 +20,7 @@
   export let filteredCollection: any[];
   export let workspaces: any[];
   export let activeWorkspaceId: string;
-  export let handleDropdown: (id: string, name: string) => void;
+  export let handleDropdown: (id: string, name: string, team: any) => void;
   let currentSelectedId = "all";
 
   function getIndex(text: string, searchData: string): number {
@@ -43,9 +43,9 @@
     button.style.backgroundColor = "#313233";
   });
 
-  const handleWorkspaceClick = (id: string, name: string) => {
+  const handleWorkspaceClick = (id: string, name: string, team: any) => {
     if (id !== activeWorkspaceId) {
-      handleDropdown(id, name);
+      handleDropdown(id, name, team);
     }
     handleGlobalSearchPopup(false);
   };
@@ -267,7 +267,11 @@
             <button
               class="workspace-btn"
               on:click={() => {
-                handleWorkspaceClick(workspace._id, workspace.name);
+                handleWorkspaceClick(
+                  workspace._id,
+                  workspace.name,
+                  workspace.team,
+                );
               }}
             >
               <div

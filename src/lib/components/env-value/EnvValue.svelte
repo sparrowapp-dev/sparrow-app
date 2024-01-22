@@ -160,7 +160,7 @@
   </div>
 
   <div
-    class="w-100 env-var-container"
+    class="w-100 env-var-container sparrow-thin-scrollbar"
     style="display:block;
         "
   >
@@ -355,12 +355,7 @@
     overflow-y: auto;
     height: 68vh;
   }
-  .env-var-container::-webkit-scrollbar {
-    width: 4px;
-  }
-  .env-var-container::-webkit-scrollbar-thumb {
-    background: #888;
-  }
+
   .delete-btn {
     background: transparent;
   }

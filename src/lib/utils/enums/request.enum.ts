@@ -21,6 +21,10 @@ export enum WorkspaceDefault {
   NAME = "My Workspace",
 }
 
+export enum TeamDefault {
+  NAME = "My Team",
+}
+
 export enum FolderDefault {
   NAME = "New Folder",
 }

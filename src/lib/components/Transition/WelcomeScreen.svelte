@@ -9,9 +9,11 @@
   import { fly, fade } from "svelte/transition";
   import { resizeWindowOnLogin } from "../header/window-resize";
   import Header from "../header/Header.svelte";
+  import { navigate } from "svelte-navigator";
+  import ActiveSideBarTabViewModel from "../../../pages/Dashboard/ActiveSideBarTab.ViewModel";
   export let onClick: (flag: boolean) => void;
   const workspaceLoadtime = constants.API_SEND_TIMEOUT;
-
+  const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let registerUser;
 
   const unsubscribeRegisterUser = register_user.subscribe((value) => {
@@ -29,6 +31,8 @@
       registerUser?.data?.data?.refreshToken.token,
     );
     setUser(jwtDecode(registerUser.data?.data?.accessToken?.token));
+    navigate("/dashboard/collections");
+    _activeSidebarViewModel.addActiveTab("collections");
   };
 
   let showSpinner: boolean = true;

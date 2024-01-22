@@ -1,68 +1,80 @@
 <script lang="ts">
   import collections from "$lib/assets/collections.svg";
+  import collectionsFaded from "$lib/assets/collections-faded.svg";
   import mock from "$lib/assets/mock.svg";
   import environment from "$lib/assets/environment.svg";
-  import teams from "$lib/assets/teams.svg";
-  import workspaces from "$lib/assets/workspaces.svg";
+  import environmentFaded from "$lib/assets/environment-faded.svg";
+  import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { HelpIcon } from "$lib/assets/app.asset";
   import SettingsIcon from "$lib/assets/setting.svelte";
-
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  export let workspaces: Observable<WorkspaceDocument[]>;
   export let activeSideBarTabMethods;
-  export let selectedActiveSideBarTab;
-  function changeSelectedActiveSideBarTab(tab: string) {
-    selectedActiveSideBarTab = tab;
-  }
+  export let activeSidebarTabName: string;
 </script>
 
 <div class="sidebar">
   <div class="sidebar__main">
     <Helper
       {activeSideBarTabMethods}
-      route="collections"
-      heading="Collections"
-      logo={collections}
-      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
       route="workspaces"
-      heading="Workspaces"
-      logo={workspaces}
-      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      heading="Home"
+      logo={home}
+      isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
-      {changeSelectedActiveSideBarTab}
     />
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route="collections"
+        heading="Collections"
+        logo={collections}
+        isSelected={"collections" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route=""
+          heading="Collections"
+          logo={collectionsFaded}
+          isSelected={"collections" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route={"environment"}
+        heading="Environment"
+        logo={environment}
+        isSelected={"environment" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route={""}
+          heading="Environment"
+          logo={environmentFaded}
+          isSelected={"environment" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
     <Helper
       {activeSideBarTabMethods}
       route="mock"
       heading="Mock"
       logo={mock}
-      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      isSelected={"mock" === activeSidebarTabName ? true : false}
       disabled={true}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
-      route="environment"
-      heading="Environment"
-      logo={environment}
-      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
-      {changeSelectedActiveSideBarTab}
-    />
-    <hr class="m-1 border-2" />
-    <Helper
-      {activeSideBarTabMethods}
-      route="teams"
-      heading="Teams"
-      logo={teams}
-      isSelected={"teams" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
-      {changeSelectedActiveSideBarTab}
     />
   </div>
   <div class="sidebar__secondary">

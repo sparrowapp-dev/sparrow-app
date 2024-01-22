@@ -4,28 +4,53 @@
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  let workspaceLimit = constants.WORKSPACE_LIMIT;
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { notifications } from "$lib/utils/notifications";
   import { slide } from "svelte/transition";
-  import checkIcon from "$lib/assets/check.svg";
+  import { TickIcon } from "$lib/assets/app.asset";
+  import type {
+    CurrentTeam,
+    CurrentWorkspace,
+    CollectionsMethods,
+  } from "$lib/utils/interfaces";
+  import { CustomPopup, SelectInput, TextInput } from "$lib/components";
+  import type {
+    InvalidWorkspacePostBody,
+    WorkspacePostBody,
+  } from "$lib/utils/dto";
+  import type { Observable } from "rxjs";
+  import type { TeamDocument } from "$lib/database/app.database";
+  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
+  import { setOpenedTeam } from "$lib/store";
+
+  export let userId: string | undefined;
   export let activeWorkspaceId: string;
-  export let activeSideBarTabMethods;
+  export let activeSideBarTabMethods: any;
+  export let currentTeam: CurrentTeam, currentWorkspace: CurrentWorkspace;
   export let data: any;
   export let onclick: any;
+  export let teams: Observable<TeamDocument[]>;
   export let collectionsMethods: CollectionsMethods;
-  const _viewModel = new HeaderDashboardViewModel();
 
+  let workspaceLimit = constants.WORKSPACE_LIMIT;
   let isOpen: boolean = false;
+  let openCreateWorkspaceModal: boolean = false;
+  let workspaceUnderCreation: boolean = false;
+  let workspacePostInput: WorkspacePostBody = { name: "", id: "" };
+  let invalidWorkspacePostInput: InvalidWorkspacePostBody = {
+    name: false,
+    id: false,
+  };
 
+  const _viewModel = new HeaderDashboardViewModel();
+  const _teamViewModel = new TeamViewModel();
   const toggleDropdown = () => {
     isOpen = !isOpen;
   };
@@ -49,7 +74,11 @@
       collectionId: "",
     };
 
-    const sampleWorkspace = generateSampleWorkspace(id, new Date().toString());
+    const sampleWorkspace = generateSampleWorkspace(
+      id,
+      new Date().toString(),
+      name,
+    );
     sampleWorkspace.id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
@@ -58,22 +87,33 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
+    collectionsMethods.handleActiveTab(sampleWorkspace.id);
     moveNavigation("right");
   };
+  const handleCreateWorkspaceModal = () => {
+    openCreateWorkspaceModal = !openCreateWorkspaceModal;
+  };
 
+  const handleCreateWorkspaceNameChange = (e) => {
+    workspacePostInput.name = e.target.value;
+    if (e.target.value !== "") invalidWorkspacePostInput.name = false;
+  };
+  const handleTeamSelect = (e) => {
+    workspacePostInput.id = e.target.value;
+  };
   const handleCreateWorkSpace = async () => {
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED,
       new Date().toString(),
+      workspacePostInput?.name,
     );
 
     const workspaceData = {
       name: workspaceObj.name,
-      type: ItemType.PERSONAL,
+      id: workspacePostInput.id,
     };
-
     _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
@@ -87,7 +127,6 @@
       $data.map((item) => {
         if (item) {
           if (item._data._id === response.data.data._id) {
-            // totalCollection = item?._data?.collections?.length;
             totalCollection = 0;
           } else {
             totalRequest = 0;
@@ -103,17 +142,28 @@
       workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
+      workspaceObj.team = response.data.data?.team;
+      workspaceObj.owner = response.data.data?.owner;
+      workspaceObj.users = response.data.data?.users;
+      workspaceObj.createdAt = response.data.data?.createdAt;
+      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.isActiveWorkspace = false;
+      workspaceObj.environments = response.data.data?.environemnts;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      _viewModel.addWorkspace(workspaceObj);
-
-      collectionsMethods.handleCreateTab(workspaceObj);
-      moveNavigation("right");
+      if (userId) await _viewModel.refreshWorkspaces(userId);
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
+      openCreateWorkspaceModal = false;
+      moveNavigation("right");
+      navigate("/dashboard/collections");
+      await _viewModel.activateWorkspace(workspaceObj.id);
+      collectionsMethods.handleCreateTab(workspaceObj);
+      collectionsMethods.handleActiveTab(workspaceObj.id);
+      activeSideBarTabMethods.updateActiveTab("collections");
     }
   };
 
@@ -133,27 +183,69 @@
   });
 </script>
 
+<!-- Create New Workspace POP UP -->
+<CustomPopup
+  title="New Workspace"
+  isOpen={openCreateWorkspaceModal}
+  btnText="Create"
+  underSubmission={workspaceUnderCreation}
+  handleOpen={handleCreateWorkspaceModal}
+  handleSubmit={handleCreateWorkSpace}
+>
+  <TextInput
+    value={workspacePostInput?.name}
+    labelText="Workspace Name"
+    isRequired={true}
+    inputPlaceholder="Enter workspace name"
+    inputId="workspace-name-input"
+    invalidValue={invalidWorkspacePostInput.name}
+    errorText="Workspace name cannot be empty."
+    onChange={handleCreateWorkspaceNameChange}
+  />
+  <SelectInput
+    labelText="Team"
+    isRequired={true}
+    errorText="Please select a team."
+    selectInputPlaceholder="Select team"
+    inputId="select-team-input"
+    options={$teams.map((team) => ({
+      id: team._data.teamId,
+      name: team._data.name,
+    }))}
+    handleOnSelect={handleTeamSelect}
+  />
+</CustomPopup>
+
 <div
-  class="rounded z-3"
+  class="rounded z-2"
   style="position: relative; display:inline-block;"
   on:click={handleDropdownClick}
   class:dropdown-btn-active={isOpen}
 >
-  <button
-    style="font-size: 12px;"
-    class="dropdown-btn rounded border-0 ps-2 py-2 gap-2"
-    on:click={toggleDropdown}
-    id="workspace-dropdown"
-    >Workspace
-    <span class="px-2" class:dropdown-logo-active={isOpen}
-      ><img
-        style="height:15px; width:20px;"
-        src={dropdown}
-        alt=""
-        class:dropdown-logo-active={isOpen}
-      /></span
-    ></button
-  >
+  {#if currentWorkspace && currentWorkspace?.name}
+    <button
+      style="font-size: 12px;"
+      class=" rounded border-0 ps-2 py-2 d-flex gap-2 dropdown-btn ellipsis"
+      on:click={toggleDropdown}
+      id="workspace-dropdown"
+    >
+      <p class="ellipsis my-auto team-name overflow-hidden">
+        {currentTeam?.name}
+      </p>
+      /
+      <p class="ellipsis my-auto workspace-name overflow-hidden">
+        {currentWorkspace?.name}
+      </p>
+      <span class="px-2" class:dropdown-logo-active={isOpen}
+        ><img
+          style="height:15px; width:20px;"
+          src={dropdown}
+          alt=""
+          class:dropdown-logo-active={isOpen}
+        /></span
+      ></button
+    >
+  {/if}
   <div
     style="display:none;overflow:auto;"
     class="dropdown-data rounded px-2"
@@ -164,10 +256,11 @@
       class="d-flex align-items-center justify-content-between m-0 p-1 mt-1 drop-btn2 rounded"
       on:click={() => {
         isOpen = true;
+        handleCreateWorkspaceModal();
       }}
     >
-      <span on:click={handleCreateWorkSpace}>Create New Workspace</span><span
-        style="height:20px;width:20px">+</span
+      <span>Create New Workspace</span><span style="height:20px;width:20px"
+        >+</span
       >
     </p>
     <hr class="m-0 p-0 mb-1" />
@@ -180,24 +273,26 @@
                 class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
               >
                 <p
-                  class="d-flex align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100"
+                  class=" align-items-center px-2 mt-2 mb-2 rounded gap-0 mb-0 w-100 ellipsis overflow-hidden"
                   style="cursor: pointer;overflow:auto"
                   on:click={() => {
                     isOpen = false;
 
-                    onclick(list._id, list.name);
+                    onclick(list._id, list.name, list.team);
                   }}
                   on:click={() => {
                     handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
-                  {list.name}
+                  <span>{list.name}</span>
+                  <span class="list-team-name d-block" style="font-size: 12px;"
+                    >{list.team.teamName ? list.team.teamName : ""}</span
+                  >
                 </p>
-                <div>
-                  {#if activeWorkspaceId === list._id}
-                    <img src={checkIcon} alt="checkIcon" />
-                  {/if}
-                </div>
+
+                {#if activeWorkspaceId === list._id}
+                  <TickIcon width={20} height={20} />
+                {/if}
               </div>
             {/if}
           {/each}
@@ -210,10 +305,13 @@
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
       on:click={() => {
         navigate("/dashboard/workspaces");
-        activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
-      }}
-      on:click={() => {
+        activeSideBarTabMethods.updateActiveTab("workspaces");
         isOpen = true;
+        setOpenedTeam(
+          currentTeam.id,
+          currentTeam.name,
+          currentTeam.base64String,
+        );
       }}
     >
       View All Workspaces
@@ -221,12 +319,13 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .dropdown-btn {
     background: none;
     outline: none;
     cursor: pointer;
     border: none;
+    max-width: 15vw;
   }
 
   .drop-btn {
@@ -282,5 +381,8 @@
   .dropdown-btn-active {
     border: 1px solid #85c2ff;
     background-color: var(--background-dropdown);
+  }
+  .list-team-name {
+    color: var(--request-arc);
   }
 </style>

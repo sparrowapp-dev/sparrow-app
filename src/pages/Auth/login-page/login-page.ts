@@ -14,7 +14,7 @@ import { invoke } from "@tauri-apps/api";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-
+import ActiveSideBarTabViewModel from "./../../dashboard/ActiveSideBarTab.ViewModel";
 //------------------------------MixPanel-------------------------------//
 export const sendUserDataToMixpanel = (userDetails) => {
   if (constants.ENABLE_MIX_PANEL === "true") {
@@ -31,6 +31,7 @@ export const navigateToRegister = () => {
 export const authNavigate = async () => {
   await invoke("open_oauth_window");
 };
+const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
@@ -48,7 +49,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
       Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
-    navigate("/home");
+    navigate("/dashboard/collections");
+    _activeSidebarTabViewModel.addActiveTab("collections");
     return response;
   } else {
     navigate("/");

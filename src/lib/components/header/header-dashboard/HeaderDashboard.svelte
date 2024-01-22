@@ -1,8 +1,6 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import { user } from "$lib/store/auth.store";
   import { Observable } from "rxjs";
-
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons, {
     NotifyIcon,
@@ -12,13 +10,13 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-    setCurrentWorkspace,
-    updateCurrentWorkspace,
-  } from "$lib/store/workspace.store";
+    user,
+  } from "$lib/store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import {
     type CollectionDocument,
+    type TeamDocument,
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
@@ -27,33 +25,57 @@
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
   const [, , searchNode] = useTree();
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type {
+    CollectionsMethods,
+    CurrentTeam,
+    CurrentWorkspace,
+  } from "$lib/utils/interfaces";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
-  import { items } from "$lib/models/collection.model";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
-  export let activeSideBarTabMethods;
+  export let activeSideBarTabMethods: any;
+  export let handleWorkspaceSwitch;
+  export let activeWorkspaceRxDoc: Observable<WorkspaceDocument>;
+  export let currentTeam: CurrentTeam;
+  export let currentWorkspace: CurrentWorkspace;
+  export let currWorkspace: CurrentWorkspace;
+  export let teams: Observable<TeamDocument[]>;
 
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
+  const _workspaceViewModel = new TeamViewModel();
   const _viewModel = new HeaderDashboardViewModel();
   const _collectionMethods = new CollectionsViewModel();
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const collection = _colllectionListViewModel.collection;
+
   let collections = [];
   let allworkspaces = [];
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
   let ownerName: string = "";
-
   let hideHeaders = false;
-  const _colllectionListViewModel = new CollectionListViewModel();
-  const collection = _colllectionListViewModel.collection;
+  let profile: boolean = false;
+  let activeWorkspaceRxDocVal: WorkspaceDocument;
+  let showGlobalSearchPopup: boolean = false;
+  let trackWorkspaceId: string;
+  let name: string = "";
+  let email: string = "";
+  let userId: string | undefined;
+  let firstLetter: string;
+  let isMaximizeWindow: boolean = false;
+  let filteredCollection = [];
+  let filteredFolder = [];
+  let filteredRequest = [];
+  let isOpen: boolean = false;
 
   collection.subscribe((value) => {
     if (value) {
@@ -68,40 +90,13 @@
     }
   });
 
-  let profile: boolean = false;
-  let activeWorkspaceRxDoc: WorkspaceDocument;
-  let showGlobalSearchPopup: boolean = false;
-
-  const workspaceSubscribe = workspaces.subscribe(
-    (value: WorkspaceDocument[]) => {
-      if (value && value.length > 0) {
-        const workspaceArr = value.map(
-          (workspaceDocument: WorkspaceDocument) => {
-            const workspaceObj =
-              _viewModel.getWorkspaceDocument(workspaceDocument);
-            return workspaceObj;
-          },
-        );
-        allworkspaces = workspaceArr;
-
-        if (!activeWorkspaceRxDoc) {
-          isWorkspaceLoaded.set(false);
-          _viewModel.activateWorkspace(value[0].get("_id"));
-          updateCurrentWorkspace(value[0].get("_id"), value[0].get("name"));
-          isWorkspaceLoaded.set(true);
-        }
-      }
-    },
-  );
-
-  let trackWorkspaceId: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
-        activeWorkspaceRxDoc = value;
+        activeWorkspaceRxDocVal = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
-        ownerName = value._data.owner.name;
+        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
@@ -122,22 +117,38 @@
     },
   );
 
-  let name: string = "";
-  let email: string = "";
-  let firstLetter;
+  const workspaceSubscribe = workspaces.subscribe(
+    (value: WorkspaceDocument[]) => {
+      if (value && value.length > 0) {
+        const workspaceArr = value.map(
+          (workspaceDocument: WorkspaceDocument) => {
+            const workspaceObj =
+              _viewModel.getWorkspaceDocument(workspaceDocument);
+            return workspaceObj;
+          },
+        );
+        allworkspaces = workspaceArr;
+
+        if (!activeWorkspaceRxDoc && currWorkspace) {
+          isWorkspaceLoaded.set(false);
+          isWorkspaceLoaded.set(true);
+        }
+      }
+    },
+  );
+
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
       if (value.personalWorkspaces) {
         name = value?.personalWorkspaces[0]?.name;
       }
+      userId = value._id;
       email = value?.email;
       if (name) {
         firstLetter = name[0];
       }
     }
   });
-
-  let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -152,9 +163,6 @@
     isMaximizeWindow = !isMaximizeWindow;
   };
 
-  let filteredCollection = [];
-  let filteredFolder = [];
-  let filteredRequest = [];
   const handleSearch = () => {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
@@ -168,27 +176,18 @@
       activeWorkspaceName,
     );
   };
-
   window.addEventListener("click", () => {
     profile = false;
   });
 
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-    }
-  });
-
-  const handleDropdown = (id: string, tab: string) => {
+  const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
     isWorkspaceCreatedFirstTime.set(false);
-    setCurrentWorkspace(id, tab);
     isWorkspaceLoaded.set(true);
   };
 
   onDestroy(() => {
-    userUnsubscribe();
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -203,8 +202,6 @@
     isSearchVisible = window.innerWidth >= minWidthThreshold;
     hideHeaders = window.innerWidth <= 700;
   }
-
-  let isOpen: boolean = false;
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
@@ -260,9 +257,13 @@
       hideHeaders
         ? ''
         : ''}"
-      style="height: 36px; width:116px"
+      style="height: 36px; width:216px"
     >
       <HeaderDropdown
+        {teams}
+        {userId}
+        {currentTeam}
+        {currentWorkspace}
         data={workspaces}
         onclick={handleDropdown}
         {collectionsMethods}
