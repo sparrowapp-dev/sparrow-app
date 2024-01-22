@@ -4,10 +4,11 @@
   export let teamName: string = "";
   export let teamId: string = "";
   import { fade } from "svelte/transition";
-  import closeIcon from "$lib/assets/close-icon-normal.svg";
+  import closeIcon from "$lib/assets/close.svg";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import SelectRoleDropdown from "../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../dropdown/CheckSelectDropdown.svelte";
+
   export let onSubmit;
   export let updateRepo;
   export let workspaces;
@@ -202,7 +203,12 @@
     />
   </div>
   <div class="mt-4">
-    <p class="role-title mb-0">Role<span class="asterik">*</span></p>
+    <p class="role-title mb-0">
+      Specify Workspace<span class="asterik">*</span>
+    </p>
+    <p class="invite-subheader text-textColor mt-0 mb-3">
+      Select Workspaces you would want to give access to.
+    </p>
     <!-- <select
       class="w-100 mt-1 p-1"
       style="background-color: black;"
