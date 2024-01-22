@@ -115,8 +115,12 @@ export class TeamViewModel {
     this.debouncedTab();
   };
 
-  public addWorkspace = (workspace) => {
-    this.workspaceRepository.addWorkspace(workspace);
+  public addWorkspace = async (workspace) => {
+    await this.workspaceRepository.addWorkspace(workspace);
+  };
+
+  public updateWorkspace = async (id, data) => {
+    await this.workspaceRepository.updateWorkspace(id, data);
   };
 
   public createWorkspace = async (workspace) => {
