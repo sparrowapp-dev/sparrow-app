@@ -28,6 +28,7 @@
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
+  import { setOpenedTeam } from "$lib/store";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -306,10 +307,13 @@
       class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
       on:click={() => {
         navigate("/dashboard/workspaces");
-        activeSideBarTabMethods.updateActiveTab("/dashboard/workspaces");
-      }}
-      on:click={() => {
+        activeSideBarTabMethods.updateActiveTab("workspaces");
         isOpen = true;
+        setOpenedTeam(
+          currentTeam.id,
+          currentTeam.name,
+          currentTeam.base64String,
+        );
       }}
     >
       View All Workspaces
