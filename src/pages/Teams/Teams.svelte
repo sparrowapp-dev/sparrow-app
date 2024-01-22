@@ -38,6 +38,7 @@
     TextInput,
     CustomPopup,
   } from "$lib/components";
+  import { v4 as uuidv4 } from "uuid";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -121,25 +122,25 @@
   });
 
   const handleCreateWorkspace = async () => {
-    debugger;
-    
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED,
-      new Date().toString(),
+      UntrackedItems.UNTRACKED + uuidv4(),
+      new Date().toISOString(),
     );
 
     const workspaceData = {
       name: workspaceObj.name,
       id: currOpenedTeam.id,
+      createdAt: workspaceObj.createdAt,
     };
-    _viewModel.addWorkspace(workspaceObj);
+
+    await _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      _viewModel.addWorkspace(response.data.data);
+      await _viewModel.updateWorkspace(workspaceObj.id, response.data.data);
 
       let totalCollection: number = 0;
       let totalRequest: number = 0;
