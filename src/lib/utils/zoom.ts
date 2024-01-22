@@ -1,18 +1,9 @@
 import { WindowSettingReposistory } from "$lib/repositories/window-settings.repository";
 import { invoke } from "@tauri-apps/api";
-import { Shortcuts } from "./enums/shortcuts-enum";
 
 const windowSettingRepository = new WindowSettingReposistory();
 
-export async function handleZoom(event) {
-  if (event.code === Shortcuts.ZoomInKey) {
-    await zoomIn();
-  } else if (event.code === Shortcuts.ZoomOutKey) {
-    await zoomOut();
-  }
-}
-
-async function zoomIn() {
+export async function zoomIn() {
   let windowScaleFactor =
     await windowSettingRepository.getWindowSetting("windowScaleFactor");
   windowScaleFactor = windowScaleFactor
@@ -22,7 +13,7 @@ async function zoomIn() {
   setScaleFactorToDb(windowScaleFactor);
 }
 
-async function zoomOut() {
+export async function zoomOut() {
   let windowScaleFactor =
     await windowSettingRepository.getWindowSetting("windowScaleFactor");
   windowScaleFactor = windowScaleFactor

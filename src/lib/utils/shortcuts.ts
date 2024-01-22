@@ -1,9 +1,13 @@
 import { Shortcuts } from "./enums/shortcuts-enum";
-import { handleZoom } from "./zoom";
+import { zoomIn, zoomOut } from "./zoom";
 
 export function handleShortcuts(event) {
   if (isZoomShortcutPressed(event)) {
-    handleZoom(event);
+    if (event.code === Shortcuts.ZoomInKey) {
+      zoomIn();
+    } else {
+      zoomOut();
+    }
   }
 }
 
