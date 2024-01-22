@@ -1,7 +1,10 @@
 import mixpanel from "mixpanel-browser";
+import constants from "../constants";
 
 const MixpanelEvent = (eventName: string, properties?: object) => {
-  mixpanel.track(eventName, { ...properties });
+  if (constants.ENABLE_MIX_PANEL === "true") {
+    mixpanel.track(eventName, { ...properties });
+  }
 };
 
 export default MixpanelEvent;
