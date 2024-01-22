@@ -1,5 +1,5 @@
 <script lang="ts">
-  import dropdown from "$lib/assets/dropdown.svg";
+  import Dropdown from "$lib/assets/dropdown.svelte";
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
@@ -14,7 +14,7 @@
   export let onclick: (tab: string) => void;
   export let method: string;
   export let id;
-  export let disabled: boolean = true;
+  export let disabled: boolean = false;
   let isHover: boolean = false;
   let selectedRequest: {
     name: string;
@@ -82,15 +82,18 @@
         : ''}"
       class:dropdown-btn-active={isOpen}
     >
-      <p class=" mb-0 text-{selectedRequest?.color}">
+      <p
+        class="{disabled
+          ? 'disabled-text'
+          : ''} mb-0 text-{selectedRequest?.color}"
+      >
         {selectedRequest?.name}
       </p>
-      <span class="d-flex" class:dropdown-logo-active={isOpen}
-        ><img
-          style="height:12px; width:12px;"
-          class="ms-2"
-          src={dropdown}
-          alt=""
+      <span class="d-flex ps-2" class:dropdown-logo-active={isOpen}>
+        <Dropdown
+          height={12}
+          width={12}
+          color={disabled ? "var(--sparrow-text-color)" : "white"}
         /></span
       >
     </div>
@@ -146,7 +149,7 @@
     position: absolute;
     top: 40px;
     left: 0;
-    min-width: 120px;
+    right: 0;
     border: 1px solid rgb(44, 44, 44);
   }
   .dropdown-btn p,
@@ -169,5 +172,8 @@
   }
   .dropdown-btn-active {
     border: 1px solid var(--send-button) !important;
+  }
+  .disabled-text {
+    color: var(--sparrow-text-color) !important;
   }
 </style>

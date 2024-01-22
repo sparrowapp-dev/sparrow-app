@@ -141,7 +141,30 @@
     </div>
   </div>
   <div class="position">
-    {#if userType === "owner"}
+    {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
+      <MemberDropdown
+        id={user.id}
+        data={[
+          {
+            name: "Admin",
+            id: "admin",
+            color: "whiteColor",
+          },
+          {
+            name: "Member",
+            id: "member",
+            color: "whiteColor",
+          },
+          {
+            name: "Remove",
+            id: "remove",
+            color: "dangerColor",
+          },
+        ]}
+        method={user.role ? user.role : ""}
+        onclick={handleDropdown}
+      />
+    {:else if userType === "owner" && user.role === "admin"}
       <MemberDropdown
         id={user.id}
         data={[
@@ -169,33 +192,16 @@
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
-    {:else if userType === "admin" && user.role === "member"}
+    {:else}
       <MemberDropdown
         id={user.id}
+        disabled={true}
         data={[
           {
-            name: "Admin",
-            id: "admin",
+            name: "Owner",
+            id: "owner",
             color: "whiteColor",
           },
-          {
-            name: "Member",
-            id: "member",
-            color: "whiteColor",
-          },
-          {
-            name: "Remove",
-            id: "remove",
-            color: "dangerColor",
-          },
-        ]}
-        method={user.role ? user.role : ""}
-        onclick={handleDropdown}
-      />
-    {:else if userType === "admin" && user.role === "admin"}
-      <MemberDropdown
-        id={user.id}
-        data={[
           {
             name: "Admin",
             id: "admin",

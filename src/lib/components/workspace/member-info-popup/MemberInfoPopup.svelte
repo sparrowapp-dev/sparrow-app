@@ -138,7 +138,7 @@
       </div>
     </div>
     <hr />
-    <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <div style="font-size: 14px;" class="team-workspace mb-1">
       {#each workspaces as workspace}
         <MemberWorkspace {workspace} {userType} {user} />
       {/each}
@@ -166,7 +166,7 @@
 
     .container {
       position: fixed;
-      height: 244px;
+      height: 334px;
       width: 540px;
       top: 50%;
       left: 50%;
@@ -220,6 +220,10 @@
     }
     .position {
       width: 100px;
+    }
+    .team-workspace {
+      height: 170px;
+      overflow-y: auto;
     }
   }
 </style>
