@@ -12,6 +12,7 @@
   export let handleMemberPromotePopUpCancel;
   export let handleMemberDemotePopUpCancel;
   export let handleMemberPopUpCancel;
+  export let owner: boolean = false;
 
   const handleDropdown = (id) => {
     if (id === "remove") {
@@ -60,7 +61,7 @@
           </div>
           <div class="name px-2">
             <span style="font-size:12px;" class="text-whiteColor"
-              >{user.name}</span
+              >{user.name} {owner ? "(You)" : ""}</span
             ><br />
             <span style="font-size:12px;" class="text-textColor"
               >{user.email}</span

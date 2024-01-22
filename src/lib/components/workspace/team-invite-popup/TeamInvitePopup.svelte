@@ -1,39 +1,20 @@
 <script lang="ts">
   export let handleInvitePopup: (flag: boolean) => void;
-  // export let workspaceName:string;
   export let teamName: string = "";
   export let teamId: string = "";
   import { fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
-  import SelectRoleDropdown from "../dropdown/SelectRoleDropdown.svelte";
-  import CheckSelectDropdown from "../dropdown/CheckSelectDropdown.svelte";
-  import CoverButton from "../buttons/CoverButton.svelte";
+  import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
+  import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
+  import CoverButton from "../../buttons/CoverButton.svelte";
 
   export let onSubmit;
   export let updateRepo;
   export let workspaces;
-  //   import type { addUsersInWorkspacePayload
-  //   import { UserRoles } from "$lib/utils/enums/enums";
+
   const emailstoBeSentArr: string[] = [];
   let showErrors = false;
-  // const data = [
-  //   {
-  //     id: "admin",
-  //     role: "ADMIN",
-  //     info: "Add & edit resources within a workspace,add & remove members to workspace",
-  //   },
-  //   {
-  //     id: "editor",
-  //     role: "EDITOR",
-  //     info: "Add & edit resources within a workspace",
-  //   },
-  //   {
-  //     id: "viewer",
-  //     role: "VIEWER",
-  //     info: "View Resources within a workspace.",
-  //   },
-  // ];
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,

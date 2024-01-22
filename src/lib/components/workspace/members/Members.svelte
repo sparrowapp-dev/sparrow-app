@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { user } from "$lib/store/auth.store";
+  import { SearchIcon, CrossIcon } from "$lib/assets/app.asset";
   import Tile from "$lib/components/workspace/members/Tile.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
-  import { onDestroy } from "svelte";
   export let activeTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
@@ -13,12 +12,58 @@
 
   export let userId: string = "";
   export let userType: string = "";
+
+  let filterText: string = "";
+
+  const handleEraseSearch = () => {
+    filterText = "";
+  };
+  let filteredUser;
+  const calculateFilteredUser = () => {
+    filteredUser = activeTeam.users.filter((elem) => {
+      if (
+        elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        elem.role.toLowerCase().includes(filterText.toLowerCase())
+      ) {
+        return true;
+      } else return false;
+    });
+  };
+  $: {
+    if (activeTeam) {
+      calculateFilteredUser();
+    }
+  }
+  $: {
+    if (filterText) {
+      calculateFilteredUser();
+    }
+  }
 </script>
 
 <section>
+  <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
+    <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
+    <input
+      type="text"
+      id="search-input-team-member"
+      class={`bg-transparent w-100 border-0 my-auto`}
+      placeholder="Search people in {activeTeam.name}"
+      bind:value={filterText}
+    />
+    {#if filterText !== ""}
+      <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>
+        <CrossIcon color="#45494D" />
+      </button>
+    {/if}
+  </div>
   {#if activeTeam?.users}
     {#each activeTeam?.users as user}
-      {#if user.id === userId}
+      {#if user.id === userId && (user.name
+          .toLowerCase()
+          .includes(filterText.toLowerCase()) || user.role
+            .toLowerCase()
+            .includes(filterText.toLowerCase()))}
         <Tile
           owner={true}
           {user}
@@ -31,11 +76,15 @@
           {teamRepositoryMethods}
           {userId}
         />
+        <hr />
       {/if}
     {/each}
-    <hr />
     {#each activeTeam?.users as user}
-      {#if user.id !== userId}
+      {#if user.id !== userId && (user.name
+          .toLowerCase()
+          .includes(filterText.toLowerCase()) || user.role
+            .toLowerCase()
+            .includes(filterText.toLowerCase()))}
         <Tile
           {user}
           {userType}
@@ -49,6 +98,9 @@
         />
       {/if}
     {/each}
+    <!-- {#if filteredUser?.length === 0} -->
+    <!-- <p class="not-found-text mt-3">{filteredUser?.length} No members found.</p> -->
+    <!-- {/if} -->
   {/if}
 </section>
 
@@ -71,5 +123,25 @@
   }
   .position {
     width: 100px;
+  }
+
+  .search-input-container {
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    width: 27vw;
+    font-size: 12px;
+  }
+  .search-input-container > input:focus {
+    outline: none;
+    caret-color: var(--workspace-hover-color);
+  }
+  .search-input-container:focus-within {
+    border: 1px solid var(--workspace-hover-color);
+  }
+  .not-found-text {
+    color: var(--request-arc);
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
   }
 </style>

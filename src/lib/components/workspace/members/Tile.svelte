@@ -166,6 +166,7 @@
 
 {#if isMemberInfoPopup}
   <MemberInfoPopup
+    {owner}
     title={`Access to ${activeTeam.name}`}
     {user}
     workspaces={workspaces.map((elem) => {

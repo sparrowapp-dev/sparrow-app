@@ -25,7 +25,7 @@
     TeamServiceMethods,
     WorkspaceMethods,
   } from "$lib/utils/interfaces";
-  import TeamInvitePopup from "../Modal/TeamInvitePopup.svelte";
+  import TeamInvitePopup from "./team-invite-popup/TeamInvitePopup.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   export let loaderColor = "default",
     userId: string,
@@ -179,31 +179,35 @@
                   on:click={() => (selectedTab = "members")}
                   class="team-menu__link"
                   class:tab-active={selectedTab === "members"}
-                  >Members {`(${activeTeam?.users?.length})` || ""}</span
+                  >Members {activeTeam?.users?.length
+                    ? `(${activeTeam.users.length})`
+                    : ""}</span
                 ></Link
               >
             </div>
             <div class="teams-menu__right">
-              <span class="mx-3" style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("GRID");
-                  }}
-                  class:view-active={selectedView === "GRID"}
-                  src={table}
-                  alt=""
-                />
-              </span>
-              <span style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("TABLE");
-                  }}
-                  class:view-active={selectedView === "TABLE"}
-                  src={hamburger}
-                  alt=""
-                />
-              </span>
+              {#if selectedTab === "all-workspace"}
+                <span class="mx-3" style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("GRID");
+                    }}
+                    class:view-active={selectedView === "GRID"}
+                    src={table}
+                    alt=""
+                  />
+                </span>
+                <span style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("TABLE");
+                    }}
+                    class:view-active={selectedView === "TABLE"}
+                    src={hamburger}
+                    alt=""
+                  />
+                </span>
+              {/if}
             </div>
           </div>
         </div>
