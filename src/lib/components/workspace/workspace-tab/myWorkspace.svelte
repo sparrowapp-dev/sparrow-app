@@ -25,16 +25,11 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-<<<<<<< HEAD
-    tabName = event?.name;
-    componentData = event;
-=======
     if (event) {
       tabName = event?.name;
       workspaceDescription = event.description ?? "";
       componentData = event;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
   export let _collectionListViewModel: CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
@@ -97,7 +92,7 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
       if (value) {
-        ownerName = value._data.owner.name;
+        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
@@ -107,12 +102,12 @@
       }
     },
   );
-
-  const userUnsubscribe = user.subscribe(async (value) => {
-    if (value) {
-      await _viewModel.refreshWorkspaces(value._id);
-    }
-  });
+  // Not required for now may be used in future if things breaks
+  // const userUnsubscribe = user.subscribe(async (value) => {
+  //   if (value) {
+  //     await _viewModel.refreshWorkspaces(value._id);
+  //   }
+  // });
 
   let isWorkspaceNameVisibility: boolean;
   const unsubscribeisWorkspaceCreatedFirstTime =
@@ -124,7 +119,8 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
-    userUnsubscribe();
+    // Not required for now may be used in future if things breaks
+    // userUnsubscribe();
   });
   let autofocus = isWorkspaceNameVisibility;
 
@@ -190,7 +186,7 @@
         on:blur={onUpdateBlur}
         on:keydown={onUpdateWorkspaceDescription}
         bind:this={inputElement}
-        placeholder="Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
+        placeholder="This is your personal workspace.Start typing. Describe the objectives of the workspace and how it is meant to be used.  Or create a comprehensive API documentation by including links to your collections and requests."
       />
     </div>
   </div>

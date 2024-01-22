@@ -4,13 +4,6 @@
   import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-<<<<<<< HEAD
-  let tabList = [];
-  let currentTabId: string;
-  let selectedTab: Partial<NewTab> = {};
-  const tabsUnsubscribe = tabs.subscribe((value) => {
-    tabList = value;
-=======
   import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
@@ -52,7 +45,6 @@
       );
       collectionName = "/" + collection?.name;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   let handleInputValue = () => {
@@ -156,7 +148,7 @@
 
 <div class="d-flex">
   {#if additions === "description"}
-    <div class="sidebar-content p-3 bg-backgroundColor">
+    <div class="sidebar-content p-3 bg-backgroundLight">
       <div class="d-flex">
         <div>
           <MethodButton method={componentData?.property.request.method} />
@@ -238,7 +230,7 @@
       </div>
     </div>
   {/if}
-  <div class="sidebar-right bg-backgroundColor">
+  <div class="sidebar-right">
     <div class="d-flex flex-column">
       <!-- comment for future use -->
 
@@ -248,7 +240,7 @@
           </button>
         </Tooltip> -->
       <button
-        class="bg-backgroundColor border-0 mb-4"
+        class="bg-backgroundLight border-0 mb-4"
         on:click={() => {
           if (additions === "description") {
             collectionsMethods.updateRequestState("", "additions");
@@ -289,11 +281,14 @@
   .sidebar-right {
     width: 32px;
     border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    background-color: var(--background-light);
     height: calc(100vh - 80px);
   }
   .sidebar-content {
     width: 250px;
     border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
     height: calc(100vh - 80px);
     overflow: hidden;
     overflow-y: auto;

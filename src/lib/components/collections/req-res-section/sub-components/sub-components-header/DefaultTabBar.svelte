@@ -20,11 +20,12 @@
   import { onDestroy } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-<<<<<<< HEAD
-=======
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { notifications } from "$lib/utils/notifications";
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
+  import ImportCollection from "$lib/components/collections/collections-list/ImportCollection.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   export let collectionsMethods: CollectionsMethods;
 
   const collections: Observable<CollectionDocument[]> =
@@ -35,6 +36,7 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
+  const _workspaceViewModel = new HeaderDashboardViewModel();
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
@@ -77,6 +79,11 @@
     return null;
   };
 
+  let collectionSource = "";
+  createCollectionSource.subscribe((value) => {
+    collectionSource = value;
+  });
+
   let currentWorkspaceName: string;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -94,7 +101,7 @@
     let totalFolder: number = 0;
     let totalRequest: number = 0;
     const newCollection = {
-      _id: UntrackedItems.UNTRACKED + uuidv4(),
+      id: UntrackedItems.UNTRACKED + uuidv4(),
       name: getNextCollection(collection, "New collection"),
       items: [],
       createdAt: new Date().toISOString(),
@@ -136,28 +143,35 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-<<<<<<< HEAD
-      collectionsMethods.updateCollection(newCollection._id, res);
-=======
       collectionsMethods.updateCollection(newCollection.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
-
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: collectionSource,
+        collectionName: res.data.data.name,
+        collectionId: res.data.data._id,
+      });
       return;
     }
     return;
   };
 
+  let isImportCollectionPopup: boolean = false;
+  const handleImportCollectionPopup = (flag) => {
+    createCollectionSource.set("ClosedTabView");
+    isImportCollectionPopup = flag;
+  };
   const handleWorkspaceClick = async () => {
     const workspace = generateSampleWorkspace(
       currentWorkspaceId,
       new Date().toString(),
+      currentWorkspaceName,
     );
     workspace.path.workspaceId = currentWorkspaceId;
+    workspace.name = currentWorkspaceName;
     collectionsMethods.handleCreateTab(workspace);
     moveNavigation("right");
   };
@@ -167,6 +181,15 @@
     activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
+
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
 
 <div class="main-container">
   <div class="header-container">
@@ -196,12 +219,20 @@
             ),
           );
           moveNavigation("right");
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+            source: "ClosedTabView",
+          });
         }}
       >
         <img src={apiRequest} alt="" style="width: 20px;" />
         API Request</button
       >
-      <button class="create-container-btn" on:click={handleCreateCollection}>
+      <button
+        class="create-container-btn"
+        on:click={() => {
+          handleImportCollectionPopup(true);
+        }}
+      >
         <img src={collectionss} alt="" style="width: 26px;" />
         Collection</button
       >

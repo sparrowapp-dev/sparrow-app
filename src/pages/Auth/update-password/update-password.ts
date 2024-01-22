@@ -11,7 +11,6 @@ export const handleVerifyEmail = async (
   verifyCodeCredential: verifyPostbody,
 ) => {
   const response = await verifyEmail(verifyCodeCredential);
-
   if (response.isSuccessful) {
     notifications.success("Email Verified Successfully");
     navigate("/reset/password");
@@ -21,11 +20,10 @@ export const handleVerifyEmail = async (
       errorMessageText.set("Please enter the 6-digit verification code.");
     }
 
-    if (response.message === "Unauthorized Access") {
+    if (response.message === "unauthorized") {
       errorMessageText.set(
         "You have entered wrong code, please check your email.",
       );
     }
-    throw "error login user: " + response.message;
   }
 };

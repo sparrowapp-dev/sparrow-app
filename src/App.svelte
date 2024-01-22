@@ -13,13 +13,12 @@
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
-
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
@@ -28,15 +27,15 @@
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-<<<<<<< HEAD
-    import { invoke } from "@tauri-apps/api";
-=======
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
+  import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
+  import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
+    import { RxDB } from "$lib/database/app.database";
 
   export let url = "/";
   const tabRepository = new TabRepository();
+  const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let flag: boolean = true;
 
   let tabList = tabRepository.getTabList();
@@ -46,13 +45,8 @@
       if (flag) {
         let progressiveTab;
         const tabList = val.map((elem) => {
-<<<<<<< HEAD
-          let temp = elem.toJSON();
-          if(temp?.property?.request){
-=======
           let temp = createDeepCopy(elem.toJSON());
           if (temp?.property?.request) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             temp.property.request.state.responseSection =
               sample.property.request.state.responseSection;
             temp.property.request.state.responseRaw =
@@ -84,7 +78,7 @@
         setAuthJwt(constants.REF_TOKEN, refreshToken);
         setUser(jwtDecode(accessToken));
         notifications.success("Login successful!");
-        navigate("/home");
+        navigate("/dashboard/collections");
         await resizeWindowOnLogin();
       }
     });
@@ -115,6 +109,7 @@
       <Route path="/update/password" component={UpdatePassword} />
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/waiting" component={Waiting} />
+      <Route path="/welcome" component={WelcomeScreen} />
 
       <Route path="/*"><Navigate to="/login" /></Route>
     </section>

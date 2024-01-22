@@ -5,9 +5,19 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  export let handleCreateCollection:any;
+  import ImportCollection from "./ImportCollection.svelte";
+  import { createCollectionSource } from "$lib/store/event-source.store";
+  export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;
-  export let showDefault:boolean;
+  export let currentWorkspaceId;
+
+  let isImportCollectionPopup: boolean = false;
+  const handleImportCollectionPopup = (flag) => {
+    createCollectionSource.set("SidePanel");
+    isImportCollectionPopup = flag;
+  };
+
+  export let showDefault: boolean;
   const addApiRequest = () => {
     collectionsMethods.handleCreateTab(
       generateSampleRequest(
@@ -19,30 +29,41 @@
   };
 </script>
 
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
+
 {#if showDefault}
-<div
-  class="container-fluid row d-flex flex-column align-items-center ps-4 pe-3 pt-3"
->
-  <p
-    style="font-size: 14px;
-font-weight: 300;"
+  <div
+    class="container-fluid row d-flex flex-column align-items-center ps-4 pe-3 pt-3"
   >
-    Add Collections to your Workspace to group your requests or send an API
-    request directly
-  </p>
-  <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
-    <button
-      class="buttons d-flex justify-content-center align-items-center gap-1"
-      on:click={handleCreateCollection}
+    <p
+      style="font-size: 14px;
+font-weight: 300;"
     >
-      <img src={whitePlus} alt="+" />Collection
-    </button>
-    <button class="buttons" on:click={addApiRequest}>
-      <img src={whitePlus} alt="+" />
-      API Request</button
-    >
+      Add Collections to your Workspace to group your requests or send an API
+      request directly
+    </p>
+    <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
+      <button
+        class="buttons d-flex justify-content-center align-items-center gap-1"
+        on:click={() => {
+          handleImportCollectionPopup(true);
+        }}
+      >
+        <img src={whitePlus} alt="+" />Collection
+      </button>
+      <button class="buttons" on:click={addApiRequest}>
+        <img src={whitePlus} alt="+" />
+        API Request</button
+      >
+    </div>
   </div>
-</div>
 {/if}
 
 <style>

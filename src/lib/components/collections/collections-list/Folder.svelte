@@ -336,15 +336,6 @@
 >
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-<<<<<<< HEAD
-    on:click={() => {
-      if (!collection._id.includes(UntrackedItems.UNTRACKED)) {
-        visibility = !visibility;
-        handleCollectionClick(collection,currentWorkspaceId,collectionId);
-      }
-    }}
-=======
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     class="d-flex main-collection align-items-center"
   >
     <img
@@ -391,7 +382,7 @@
       </div>
     {/if}
   </div>
-  {#if collection._id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <button

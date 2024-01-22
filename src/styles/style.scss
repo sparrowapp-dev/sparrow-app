@@ -14,7 +14,11 @@ $sparrow-danger: #fe8c98;
 $sparrow-white: #ffffff;
 $sparrow-light-gray: #cccccc;
 $sparrow-gradient: red;
-$sparrow-background: #1e1e1e;
+$sparrow-background: #19191A;
+$sparrow-primary-btn: #1193F0;
+$sparrow-background-light: #1E1E1E;
+$sparrow-background-dark: #1E1E1E;
+$sparrow-background-dropdown :#141414;
 $sparrow-plusbutton: #85c2ff;
 $sparrow-border-color: #313233;
 $sparrow-get: #69d696;
@@ -28,7 +32,7 @@ $sparrow-patc: #df77f9;
 $sparrow-opt: #f15ea5;
 $sparrow-arc: #8a9299;
 $sparrow-request-body: #8a9299;
-$sparrow-send-button: #1193f0;
+$sparrow-send-button: #85C2FF;
 $sparrow-send-hoverbutton: #04416d;
 $sparrow-button-background: #2d2c2c;
 $sparrow-button-color: #e5e5e5;
@@ -44,17 +48,22 @@ $sparrow-key-value-pair: #262626;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-recentApiText: #f3e4e4d7;
+$sparrow-errorTextColor:#fe8c98;
 
 :root {
   --blackColor: #{$sparrow-black};
   --recentApiText: #{$sparrow-recentApiText};
-
+  --primary-btn-color: #{$sparrow-primary-btn};
   --success-color: #{$sparrow-success};
   --button-color: #{$sparrow-request-body};
   --send-button: #{$sparrow-send-button};
   --send1-hoverbutton: #{$sparrow-send-hoverbutton};
   --white-color: #{$sparrow-white};
   --background-color: #{$sparrow-background};
+  --dull-background-color: #{$sparrow-dull-background};
+  --background-light: #{$sparrow-background-light};
+  --background-dark: #{$sparrow-background-dark};
+  --background-dropdown: #{$sparrow-background-dropdown};
   --border-color: #{$sparrow-border-color};
   --request-get: #{$sparrow-get};
   --request-put: #{$sparrow-put};
@@ -78,6 +87,7 @@ $sparrow-recentApiText: #f3e4e4d7;
   --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
   --sparrow-blue: #{$sparrow-blue};
   --sparrow-button-background: #{$sparrow-button-background};
+  --error--color:#{$sparrow-errorTextColor};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -97,6 +107,9 @@ $theme-colors: map-merge(
     "whiteColor": $sparrow-white,
     "lightGray": $sparrow-light-gray,
     "backgroundColor": $sparrow-background,
+    "backgroundLight": $sparrow-background-light,
+    "backgroundDark": $sparrow-background-dark,
+    "backgroundDropdown": $sparrow-background-dropdown,
     "plusButton": $sparrow-plusbutton,
     "lightBackground": $sparrow-border-color,
     "requestBodyColor": $sparrow-request-body,
@@ -123,6 +136,9 @@ $theme-colors: map-merge(
 @import "bootstrap/scss/root";
 @import "bootstrap";
 
+body{
+  background-color: var(--background-color);
+}
 .border-error {
   border-color: $sparrow-error;
   border-width: 3px;
@@ -146,4 +162,17 @@ $theme-colors: map-merge(
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sparrow-thin-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+.sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
 }

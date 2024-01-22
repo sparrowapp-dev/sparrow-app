@@ -8,15 +8,15 @@
   export let isSelected: boolean;
   export let disabled: boolean;
   let collapsExpandToggle = false;
-  export let changeSelectedActiveSideBarTab;
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
   const setcollapsExpandToggle = () => {
-    collapsExpandToggle = !collapsExpandToggle;
-    collapsibleState.set(collapsExpandToggle);
+    if (heading === "Collections" && isSelected) {
+      collapsExpandToggle = !collapsExpandToggle;
+      collapsibleState.set(collapsExpandToggle);
+    }
     activeSideBarTabMethods.updateActiveTab(route);
-    changeSelectedActiveSideBarTab(route);
   };
   collapsibleStateUnsubscribe();
 </script>

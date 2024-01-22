@@ -18,7 +18,11 @@ export enum RequestDefault {
 }
 
 export enum WorkspaceDefault {
-  NAME = "MY WORKSPACE",
+  NAME = "My Workspace",
+}
+
+export enum TeamDefault {
+  NAME = "My Team",
 }
 
 export enum FolderDefault {

@@ -28,20 +28,12 @@
   let newCollectionName: string = "";
   const _myColllectionViewModel = new MyCollectionViewModel();
 
-<<<<<<< HEAD
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.collection?.requestCount;
-    totalFolder = event?.property?.collection?.folderCount;
-=======
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
       activeTabId = event.id;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
   const collectionSubscribe = collections.subscribe(
     (collectionArr: CollectionDocument[]) => {

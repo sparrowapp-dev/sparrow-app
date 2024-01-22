@@ -11,7 +11,7 @@ export class TabRepository {
   public getDocuments = async (): Promise<TabDocument[]> => {
     return await RxDB.getInstance()
       .rxdb.tab.find()
-      .sort({ createdAt: "asc" })
+      .sort({ index: "asc" })
       .exec();
   };
 
@@ -100,7 +100,7 @@ export class TabRepository {
    * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return RxDB.getInstance().rxdb.tab.find().sort({ createdAt: "asc" }).$;
+    return RxDB.getInstance().rxdb.tab.find().sort({ index: "asc" }).$;
   };
   /**
    * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.

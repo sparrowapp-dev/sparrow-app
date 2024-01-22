@@ -18,11 +18,15 @@
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
-  import { blur } from "svelte/transition";
-
+  import { onDestroy, onMount } from "svelte";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import { environmentType } from "$lib/utils/enums/environment.enum";
+  import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+  let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
-
+  const _activeSidebarTabViewModel = new ActiveSideBarTabReposistory();
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
@@ -64,10 +68,15 @@
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
     deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
+
+    initActiveEnvironmentToWorkspace:
+      _viewModel.initActiveEnvironmentToWorkspace,
+    currentEnvironment: _viewModel.currentEnvironment,
   };
 
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  const environments = _viewModel.environments;
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
@@ -78,27 +87,86 @@
   };
 
   const collapseCollectionPanel = collapsibleState;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    _viewModel.getActiveWorkspace();
+  let environmentVariables = [];
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        const environmentId = activeWorkspaceRxDoc.get("environmentId");
+        if (environments) {
+          const env = $environments;
+          if (env?.length > 0) {
+            const filteredEnv = env.filter((elem) => {
+              if (
+                elem.type === environmentType.GLOBAL ||
+                elem.id === environmentId
+              ) {
+                return true;
+              }
+            });
+            if (filteredEnv?.length > 0) {
+              environmentVariables.length = 0;
+              filteredEnv.forEach((elem) => {
+                const temp = elem.toMutableJSON();
+                temp.variable.forEach((variable) => {
+                  if (variable.key && variable.checked) {
+                    environmentVariables.push({
+                      key: variable.key,
+                      value: variable.value,
+                      type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                      environment: temp.name,
+                    });
+                  }
+                });
+              });
+            }
+          }
+        }
+      }
+    },
+  );
+
+  const onTabsSwitched = () => {
+    _viewModel.syncTabWithStore();
+  };
+  const changeAnimation = () => {
+    runAnimation = true;
+  };
+
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
   <div class="d-flex collection" use:motion>
     <div class="collections__list">
       <CollectionsList
+        {runAnimation}
+        {changeAnimation}
         activeTabId={$activeTab?.id}
         activePath={$activeTab?.path}
+        environments={$environments}
         {collectionsMethods}
       />
     </div>
     <div
-      class="collections__tools bg-backgroundColor {$collapseCollectionPanel
+      style="width: {$collapseCollectionPanel
+        ? 'calc(100vw - 72px)'
+        : 'calc(100vw - 352px)'};"
+      class="collections__tools bg-backgroundColor {$collapseCollectionPanel &&
+      runAnimation
         ? 'sidebar-collapse'
-        : 'sidebar-expand'}"
+        : runAnimation && 'sidebar-expand'}"
     >
       <div class="tab__bar">
         <TabBar
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
+          {onTabsSwitched}
         />
       </div>
       <div class="tab__content d-flex">
@@ -106,7 +174,11 @@
           {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-            <RequestResponse {activeTab} {collectionsMethods} />
+            <RequestResponse
+              {activeTab}
+              {collectionsMethods}
+              environmentVariables={environmentVariables.reverse()}
+            />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace
               {activeTab}
@@ -127,7 +199,6 @@
             />
           {/if}
         </div>
-        <!-- <SidebarRight /> -->
       </div>
     </div>
   </div>

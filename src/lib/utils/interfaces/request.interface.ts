@@ -46,6 +46,12 @@ export interface KeyValuePair {
   checked: boolean;
 }
 
+export interface EnvValuePair {
+  key: string;
+  value: string;
+  checked: boolean;
+}
+
 export interface KeyValuePairWithBase {
   key: string;
   value: string;
@@ -151,6 +157,7 @@ export interface NewTab {
   createdAt: string;
   path?: Path;
   saveInProgress?: boolean;
+  index?: number;
 }
 
 export interface CurrentTab {

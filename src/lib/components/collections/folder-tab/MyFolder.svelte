@@ -29,13 +29,6 @@
   let folderId:string;
   const _myFolderViewModel = new MyFolderViewModel();
 
-<<<<<<< HEAD
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    tabName = event?.name;
-    componentData = event;
-    totalRequest = event?.property?.folder?.requestCount;
-    totalFolder = event?.property?.folder?.folderCount;
-=======
   const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
     if (event) {
       tabName = event?.name;
@@ -43,7 +36,6 @@
       collectionId=event.path?.collectionId;
       folderId=event.path?.folderId;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   const collectionSubscribe = collections.subscribe(

@@ -2,7 +2,15 @@ import { RxDB } from "$lib/database/app.database";
 
 export class ActiveSideBarTabReposistory {
   constructor() {}
-
+  public activeTab = () => {
+    return RxDB.getInstance()
+      .rxdb.activesidebartab.findOne({
+        selector: {
+          activeTabId: "activeTabId",
+        },
+      })
+      .exec();
+  };
   public setActiveTab = async (activeTabName: string) => {
     const activTab = await RxDB.getInstance().rxdb.activesidebartab.insert({
       activeTabId: "activeTabId",
@@ -10,19 +18,16 @@ export class ActiveSideBarTabReposistory {
     });
     return activTab;
   };
-  public getActiveTab = async () => {
-    const activeTabData = await RxDB.getInstance()
-      .rxdb.activesidebartab.findOne({
-        selector: {
-          activeTabId: "activeTabId",
-        },
-      })
-      .exec();
-    return activeTabData;
+  public getActiveTab = () => {
+    return RxDB.getInstance().rxdb.activesidebartab.findOne({
+      selector: {
+        activeTabId: "activeTabId",
+      },
+    }).$;
   };
 
   public updateActiveTab = async (newActiveTabName: string) => {
-    const activeTab = await this.getActiveTab();
+    const activeTab = await this.activeTab();
     await activeTab.incrementalPatch({
       activeTabName: newActiveTabName,
     });

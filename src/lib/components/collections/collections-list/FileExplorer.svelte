@@ -25,6 +25,8 @@
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
   import angleRight from "$lib/assets/angleRight.svg";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   let expand: boolean = false;
   export let explorer;
@@ -198,6 +200,9 @@
   function addRequest() {
     expand = true;
     handleAPIClick();
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+      source: "Side Panel Dropdown",
+    });
   }
 
   let menuItems = [
@@ -331,11 +336,16 @@
               style="height:16px; width:16px;"
               class="d-flex align-items-center justify-content-center me-2"
             >
-              <img src={folderOpenIcon} alt="" class="pe-0" />
+              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
             </div>
           {:else}
             <div class="d-flex me-2" style="height:16px; width:16px;">
-              <img src={folder} alt="" style="height:16px; width:16px;" />
+              <img
+                src={folder}
+                alt=""
+                style="height:16px; width:16px;"
+                class="folder-icon"
+              />
             </div>
           {/if}
           <p class="ellipsis mb-0">
@@ -383,7 +393,12 @@
             class="list-icons"
             src={requestIcon}
             alt="+ API Request"
-            on:click={handleAPIClick}
+            on:click={() => {
+              handleAPIClick();
+              MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                source: "Side Panel Collection List",
+              });
+            }}
           />
         </div>
       {/if}
@@ -488,7 +503,7 @@
   .sub-files {
     border-left: 1px solid var(--border-color);
   }
-  
+
   .main-folder {
     width: calc(100% - 24px);
   }
@@ -497,5 +512,8 @@
   }
   .folder-title {
     width: calc(100% - 30px);
+  }
+  .folder-icon {
+    width: 16px;
   }
 </style>

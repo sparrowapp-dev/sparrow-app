@@ -15,9 +15,9 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import lockicon from "$lib/assets/lock-icon.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-    import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-    import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
-    import { RequestDataset } from "$lib/utils/enums/request.enum";
+  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+  import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+  import { RequestDataset } from "$lib/utils/enums/request.enum";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
 
@@ -34,8 +34,10 @@
   let componentData: NewTab;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-    tabName = event?.name;
-    componentData = event;
+    if (event) {
+      tabName = event?.name;
+      componentData = event;
+    }
   });
 
   const handleSaveRequest = async () => {
@@ -43,7 +45,7 @@
     collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
-      let existingRequest;
+    let existingRequest;
     if (!folderId) {
       existingRequest =
         await collectionsMethods.readRequestOrFolderInCollection(
@@ -58,16 +60,16 @@
       );
     }
     const bodyType =
-    componentData.property.request.state.dataset === RequestDataset.RAW
-          ? componentData.property.request.state.raw
-          : componentData.property.request.state.dataset;
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
-      selectedRequestBodyType:setContentTypeHeader(bodyType),
+      selectedRequestBodyType: setContentTypeHeader(bodyType),
     };
     if (!folderId) {
       let res = await updateCollectionRequest(_id, {
@@ -182,10 +184,14 @@
 
   const onRenameBlur = async () => {
     if (!tabName) {
-      const {collectionId, folderId} = componentData?.path; 
-      if(collectionId && folderId){
-        const req = await collectionsMethods.readRequestInFolder(collectionId, folderId, componentData?.id);
-        if(req?.name){
+      const { collectionId, folderId } = componentData?.path;
+      if (collectionId && folderId) {
+        const req = await collectionsMethods.readRequestInFolder(
+          collectionId,
+          folderId,
+          componentData?.id,
+        );
+        if (req?.name) {
           collectionsMethods.updateTab(req.name, "name", componentData.id);
         }
       } else if (collectionId) {
@@ -243,7 +249,7 @@
           <button
             disabled={componentData?.save}
             style="width:140px;"
-            class="btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+            class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
               if (
                 componentData?.path.collectionId &&
@@ -271,14 +277,15 @@
             <button
               id="save-dropdown"
               on:click={toggleDropdown}
-              class="px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
+              class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
             >
               <img src={angleDown} alt="" class="w-100 h-100" />
             </button>
-            <div class="rounded save-options {isOpen ? 'd-block' : 'd-none'}">
+            <div
+              class="rounded z-2 save-options {isOpen ? 'd-block' : 'd-none'}"
+            >
               <p
-                style="width:120px;"
-                class="bg-black m-0 py-1 px-3 cursor-pointer rounded fs-6"
+                class="m-1 saveas-text m-0 py-1 px-3 cursor-pointer rounded fs-6"
                 on:click={() => {
                   isOpen = false;
                   visibility = true;
@@ -320,16 +327,19 @@
 
 <style>
   .btn-primary {
-    background-color: #313233;
+    background-color: #232424;
   }
 
   .btn-primary:hover {
-    background-color: #616364;
+    background-color: #232424;
   }
   .save-options {
     position: absolute;
+    width: 180px;
     top: 40px;
     right: 0;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-dropdown);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -351,5 +361,16 @@
     outline: none;
     font-size: 18px;
     font-weight: 400;
+  }
+  .save-request-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  .save-request-dropdown-btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+  .saveas-text:hover {
+    background-color: #232424;
   }
 </style>

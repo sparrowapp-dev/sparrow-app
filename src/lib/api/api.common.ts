@@ -9,6 +9,8 @@ import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api";
 
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const _viewModel = new HeaderDashboardViewModel();
@@ -38,6 +40,20 @@ const getAuthHeaders = () => {
     Authorization: `Bearer ${getUserToken()}`,
   };
 };
+
+const getMultipartAuthHeaders = () => {
+  return {
+    "Content-Type": "multipart/form-data",
+    Authorization: `Bearer ${getUserToken()}`,
+  };
+};
+
+// const getHeaders = () => {
+//   return {
+//     "Content-type": "application/json",
+//     Authorization: `Bearer ${getUserToken()}`,
+//   };
+// };
 
 const getRefHeaders = () => {
   return {
@@ -123,6 +139,7 @@ const makeHttpRequest = async (
   tabId: string,
 ) => {
   let response;
+  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
 
   return Promise.race([
     timeout(apiTimeOut),
@@ -151,4 +168,11 @@ const makeHttpRequest = async (
     });
 };
 
-export { makeRequest, getAuthHeaders, getRefHeaders, makeHttpRequest };
+export {
+  makeRequest,
+  getAuthHeaders,
+  getRefHeaders,
+  makeHttpRequest,
+  getMultipartAuthHeaders,
+  // getHeaders,
+};

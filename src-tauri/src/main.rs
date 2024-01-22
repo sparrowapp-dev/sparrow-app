@@ -20,7 +20,7 @@ use std::{thread, time};
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
-
+use window_shadows::set_shadow;
 // Commands
 #[tauri::command]
 fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
@@ -230,6 +230,11 @@ fn main() {
             close_oauth_window,
             make_http_request
         ])
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            set_shadow(&window, true).expect("Unsupported platform!");
+            Ok(())
+        })
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
                 wry_window

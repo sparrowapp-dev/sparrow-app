@@ -11,6 +11,17 @@ import {
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
 import { invoke } from "@tauri-apps/api";
+import mixpanel from "mixpanel-browser";
+import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+import ActiveSideBarTabViewModel from "./../../dashboard/ActiveSideBarTab.ViewModel";
+//------------------------------MixPanel-------------------------------//
+export const sendUserDataToMixpanel = (userDetails) => {
+  if (constants.ENABLE_MIX_PANEL === "true") {
+    mixpanel.identify(userDetails._id);
+    mixpanel.people.set({ $email: userDetails.email });
+  }
+};
 
 //------------------------------Navigation-------------------------------//
 export const navigateToRegister = () => {
@@ -20,6 +31,7 @@ export const navigateToRegister = () => {
 export const authNavigate = async () => {
   await invoke("open_oauth_window");
 };
+const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
@@ -29,10 +41,19 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     resizeWindowOnLogin();
     setAuthJwt(constants.AUTH_TOKEN, response?.data?.data?.accessToken.token);
     setAuthJwt(constants.REF_TOKEN, response?.data?.data?.refreshToken.token);
+    const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
     setUser(jwtDecode(response.data?.data?.accessToken?.token));
+    sendUserDataToMixpanel(userDetails);
+    MixpanelEvent(Events.USER_LOGIN, {
+      Login_Method: "Email",
+      Success: response.isSuccessful,
+    });
     notifications.success("Login successful!");
-    navigate("/home");
+    navigate("/dashboard/collections");
+    _activeSidebarTabViewModel.addActiveTab("collections");
+    return response;
   } else {
+    navigate("/");
     resizeWindowOnLogOut();
     isResponseError.set(true);
     notifications.error(response.message);
@@ -51,6 +72,6 @@ export const handleLoginValidation = async (
   if (isError) {
     return errorObject;
   }
-  handleLogin(loginCredentials);
-  return {};
+
+  return handleLogin(loginCredentials);
 };

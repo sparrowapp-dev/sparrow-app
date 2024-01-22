@@ -16,6 +16,16 @@ export class WorkspaceService {
     return response;
   };
 
+  public fetchTeamsWorkspaces = async (teamId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/team/${teamId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
   public updateWorkspace = async (
     workspaceId: string,
     workspace: WorkspacePutBody,

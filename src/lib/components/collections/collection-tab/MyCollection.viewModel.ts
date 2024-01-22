@@ -104,6 +104,7 @@ export class MyCollectionViewModel {
       request.path.workspaceId = componentData.path.workspaceId;
       request.path.collectionId = componentData.path.collectionId;
       collectionsMethods.handleCreateTab(request);
+
       moveNavigation("right");
       return response;
     }

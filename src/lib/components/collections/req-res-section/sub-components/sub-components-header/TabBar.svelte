@@ -5,6 +5,7 @@
   import {
     collapsibleState,
     isApiCreatedFirstTime,
+    tabs,
   } from "$lib/store/request-response-section";
   import Tab from "./Tab.svelte";
   import { v4 as uuidv4 } from "uuid";
@@ -16,11 +17,16 @@
   import SaveRequest from "../save-request/SaveRequest.svelte";
   import ClosePopup from "../close-popup/ClosePopup.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let collectionsMethods: CollectionsMethods;
+  export let onTabsSwitched: () => void;
   export let tabList: TabDocument[];
   export let _tabId: string;
   let removeTab;
+  let movedTabStartIndex: number;
+  let movedTabEndIndex: number;
   let closePopup: boolean = false;
 
   $: {
@@ -49,7 +55,11 @@
     closePopup = flag;
   };
   const closeTab = (id, tab: NewTab) => {
-    if ((tab?.property?.request) && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description) ) {
+    if (
+      tab?.property?.request &&
+      (!tab?.property?.request?.save?.api ||
+        !tab?.property?.request?.save?.description)
+    ) {
       tabId = id;
       removeTab = tab;
       closePopup = true;
@@ -57,16 +67,40 @@
       collectionsMethods.handleRemoveTab(id);
     }
   };
+  const onDropOver = (event: Event) => {
+    event.preventDefault();
+  };
+  const onDropEvent = (event: Event) => {
+    event.preventDefault();
+    const element = tabList.splice(movedTabStartIndex, 1);
+    tabList.splice(movedTabEndIndex, 0, element[0]);
+    tabList = tabList.map((tab, index) => {
+      tab.index = index;
+      return tab;
+    });
+    const newTabList: NewTab[] = tabList as NewTab[];
+    tabs.set(newTabList);
+    onTabsSwitched();
+  };
 
+  const handleDropOnStart = (index: number) => {
+    movedTabStartIndex = index;
+  };
+  const handleDropOnEnd = (index: number) => {
+    movedTabEndIndex = index;
+  };
   onDestroy(() => {});
 </script>
 
-<div class="tab">
+<div
+  class="tab"
+  on:drop={(event) => {
+    onDropEvent(event);
+  }}
+>
   <div
-    style="border-top: 1px solid #313233;width:{$collapsibleState
-      ? '100%'
-      : '100%'}"
-    class="tabbar bg-blackColor d-flex bg-backgroundColor;"
+    style="width:{$collapsibleState ? '100%' : '100%'}"
+    class="tabbar d-flex"
     bind:offsetWidth={scrollerParent}
   >
     {#if scrollerParent <= scrollerWidth + 105}
@@ -82,6 +116,9 @@
       </div>
     {/if}
     <div
+      on:dragover={(event) => {
+        onDropOver(event);
+      }}
       class=" d-inline-block tab-scroller"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
@@ -96,6 +133,8 @@
             {closeTab}
             {index}
             {tabWidth}
+            {handleDropOnStart}
+            {handleDropOnEnd}
           />
         {/each}
       {/if}
@@ -124,6 +163,7 @@
             ),
           );
           moveNavigation("right");
+          MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
         }}
       >
         <img src={plusIcon} alt="" />
@@ -158,6 +198,7 @@
 <style>
   .tabbar {
     height: 36px;
+    background-color: var(--background-light);
   }
 
   .tab-scroller::-webkit-scrollbar {
