@@ -10,16 +10,7 @@ export class WorkspaceRepository {
    * extracts RxDocument of workspace.
    */
   public getDocument = (elem: WorkspaceDocument) => {
-    return {
-      _id: elem.get("_id"),
-      name: elem.get("name"),
-      owner: elem.get("owner"),
-      permissions: elem.get("permissions"),
-      isActiveWorkspace: elem.get("isActiveWorkspace"),
-      createdBy: elem.get("createdBy"),
-      createdAt: elem.get("createdAt"),
-      collections: elem.get("collections"),
-    };
+    return elem.toMutableJSON();
   };
 
   /**
@@ -28,6 +19,20 @@ export class WorkspaceRepository {
   public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
     return RxDB.getInstance().rxdb.workspace.find().$;
   };
+
+  /**
+   * get filtered workspaces
+   */
+  public getFilteredWorkspaces = (
+    team: any,
+  ): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        team: team,
+      },
+    }).$;
+  };
+
   /**
    * get active workspace of the user.
    */
@@ -37,6 +42,23 @@ export class WorkspaceRepository {
         isActiveWorkspace: true,
       },
     }).$;
+  };
+
+  /**
+   * Check active Workspace
+   */
+  public checkActiveWorkspace = async (
+    workspaceId: string,
+  ): Promise<boolean> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    return workspace ? true : false;
   };
 
   public updateCollectionInWorkspace = async (
@@ -53,6 +75,22 @@ export class WorkspaceRepository {
 
     workspace.incrementalPatch({
       collections: [...workspace.collections, collectionObj],
+    });
+  };
+
+  public updateEnvironmentInWorkspace = async (
+    workspaceId: string,
+    environmentObj,
+  ) => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    workspace.incrementalPatch({
+      environments: [...workspace.environments, environmentObj],
     });
   };
 
@@ -80,6 +118,7 @@ export class WorkspaceRepository {
   public clearWorkspaces = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.workspace.find().remove();
   };
+
   /**
    * Sets a workspace as active.
    */
@@ -100,11 +139,36 @@ export class WorkspaceRepository {
     return;
   };
 
-  public updateWorkspace = async (
+  /**
+   * Activate Initial Workspace
+   */
+  public activateInitialWorkspace = async (): Promise<string> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne()
+      .exec();
+    const rxDoc = workspace.toMutableJSON();
+    rxDoc.isActiveWorkspace = true;
+    const teamId = rxDoc.team.teamId;
+    await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
+    return teamId;
+  };
+
+  public setCurrentEnvironmentId = async (
     workspaceId: string,
-    name: string,
-    description?: string,
-  ) => {
+    environmentId: string,
+  ): Promise<void> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+
+    await workspace.patch({ currentEnvironmentId: environmentId });
+  };
+
+  public updateWorkspace = async (workspaceId: string, data) => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
         selector: {
@@ -113,8 +177,12 @@ export class WorkspaceRepository {
       })
       .exec();
     workspace.incrementalModify((value) => {
-      value.name = name;
-      value.description = description;
+      if (data.name) value.name = data.name;
+      if (data.environmentId) value.environmentId = data.environmentId;
+      if (data.updatedAt) value.updatedAt = data.updatedAt;
+      if (data.updatedBy) value.updatedBy = data.updatedBy;
+      if (data.createdBy) value.createdBy = data.createdBy;
+      if (data.description) value.description = data.description;
       return value;
     });
   };
@@ -128,8 +196,7 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearWorkspaces();
-    await RxDB.getInstance().rxdb.workspace.bulkInsert(data);
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 }

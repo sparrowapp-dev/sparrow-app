@@ -28,6 +28,7 @@
         "startDragging": true,
         "setSize": true,
         "setFocus": true,
+        "setFullscreen": true,
         "center": true
       }
     },
@@ -55,7 +56,8 @@
         "title": "sparrow-app",
         "minWidth": 570,
         "minHeight": 700,
-        "center": true
+        "center": true,
+        "fileDropEnabled":false
       }
     ]
   }

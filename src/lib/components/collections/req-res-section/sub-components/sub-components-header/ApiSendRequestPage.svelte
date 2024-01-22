@@ -19,16 +19,22 @@
   import type { RequestMethodType } from "$lib/utils/types/request.type";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
+  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export const loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let environmentVariables;
   //this for expand and collapse condition
   const _apiSendRequest = new ApiSendRequestViewModel();
 
   let isCollaps: boolean;
 
   collapsibleState.subscribe((value) => (isCollaps = value));
+  const environmentHelper = new EnvironmentHeper();
 
   let isInputEmpty: boolean = false;
   let isInputValid: boolean = true;
@@ -41,13 +47,12 @@
   let disabledSend: boolean = false;
   let isLoading: boolean = false;
   let currentTabId: string = "";
+  let trackParanthesis: unknown[] = [];
+  let trackCursor: number;
+  let environmentAxisY: number;
+  let environmentAxisX: number;
+
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-<<<<<<< HEAD
-    urlText = event?.property?.request?.url;
-    method = event?.property?.request?.method;
-    disabledSend = event?.property?.request?.requestInProgress;
-    request = event?.property?.request;
-=======
     if (event) {
       currentTabId = event?.id;
       urlText = event?.property?.request?.url;
@@ -55,8 +60,28 @@
       disabledSend = event?.property?.request?.requestInProgress;
       request = event?.property?.request;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
+  let filterData = [];
+  $: {
+    if (trackCursor) {
+      if (trackParanthesis.length === 2)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+    if (trackParanthesis) {
+      if (trackParanthesis.length === 2 && trackCursor)
+        filterData = environmentHelper.filterEnvironments(
+          environmentVariables,
+          urlText,
+          trackParanthesis,
+          trackCursor,
+        );
+    }
+  }
 
   const handleSendRequest = async () => {
     isInputValid = true;
@@ -78,7 +103,7 @@
         isLoading = true;
 
         createApiRequest(
-          _apiSendRequest.decodeRestApiData(request),
+          _apiSendRequest.decodeRestApiData(request, environmentVariables),
           currentTabId,
         )
           .then((response) => {
@@ -188,6 +213,7 @@
       RequestProperty.QUERY_PARAMS,
       currentTabId,
     );
+    trackParanthesis = environmentHelper.balanceParanthesis(urlText);
   };
   onDestroy(() => {
     isHorizontalUnsubscribe();
@@ -211,6 +237,9 @@
   });
 
   const handleKeyPress = (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+    }
     if (event.ctrlKey && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
@@ -226,7 +255,7 @@
       : 'pt-3 px-3'}"
     style="width:calc(100%-312px);"
   >
-    <div class="d-flex gap-2 w-100">
+    <div class="d-flex gap-2 w-100 position-relative">
       <ColorDropdown
         data={[
           {
@@ -261,16 +290,51 @@
       <input
         required
         type="text"
+        id="input-request-url"
         placeholder="Enter URL or paste text"
-        class="form-control input-outline bg-blackColor border-0 p-3 rounded {isInputEmpty
+        class="url-input form-control input-outline border-0 p-3 rounded {isInputEmpty
           ? 'border-red'
           : ''}"
-        style="width:{isCollaps ? '100%' : ''}; height:34px;font-size:14px;"
+        autocomplete="off"
+        spellcheck="false"
+        autocorrect="off"
+        autocapitalize="off"
+        style="width:{isCollaps ? '100%' : ''}; height:34px;"
         bind:value={urlText}
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
+        on:keyup={(e) => {
+          trackCursor = e.target.selectionStart;
+        }}
+        on:blur={() => {
+          setTimeout(() => {
+            trackParanthesis = [];
+            trackCursor = undefined;
+            filterData = [];
+          }, 300);
+        }}
+        on:focus={(e) => {
+          handleInputValue();
+          const elem = document.getElementById("input-request-url");
+          environmentAxisY = elem.getBoundingClientRect().top + 40;
+          environmentAxisX = elem.getBoundingClientRect().left;
+        }}
         bind:this={inputElement}
       />
+      {#if trackParanthesis.length === 2 && filterData.length > 0}
+        <EnvironmentPicker
+          {environmentAxisX}
+          {environmentAxisY}
+          {filterData}
+          inputText={urlText}
+          {trackCursor}
+          {trackParanthesis}
+          updateText={(txt) => {
+            urlText = txt;
+          }}
+          {handleInputValue}
+        />
+      {/if}
 
       <button
         disabled={disabledSend}
@@ -316,6 +380,7 @@
             splitter.style.width = "100%";
             rightPanel.style.width = `${rightPanelWidth}%`;
             leftPanel.style.width = `${leftPanelWidth}%`;
+            MixpanelEvent(Events.CHANGE_DEFAULT_VIEW);
           }}
           class:view-active={selectedView === "horizontal"}
           src={barIcon}
@@ -330,12 +395,12 @@
 
 <style>
   .btn-primary {
-    background: var(--send-button);
+    background: var(--sparrow-blue);
   }
 
   .view-active {
-    filter: invert(78%) sepia(86%) saturate(3113%) hue-rotate(177deg)
-      brightness(100%) contrast(100%);
+    filter: invert(60%) sepia(99%) saturate(302%) hue-rotate(183deg)
+      brightness(102%) contrast(105%);
   }
 
   .btn-primary:hover {
@@ -361,5 +426,10 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .url-input {
+    background-color: var(--background-dark);
+    border: 1px solid #272727 !important;
+    font-size: 12px;
   }
 </style>

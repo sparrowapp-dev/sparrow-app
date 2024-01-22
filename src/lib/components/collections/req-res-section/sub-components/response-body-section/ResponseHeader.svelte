@@ -15,7 +15,7 @@
         <input
           type="text"
           placeholder={key}
-          class="form-control bg-blackColor py-1 border-0"
+          class="form-control bg-keyValuePairColor py-1 border-0"
           style="font-size: 13px;"
           readonly
         />
@@ -24,7 +24,7 @@
         <input
           type="text"
           placeholder={value}
-          class="form-control bg-blackColor py-1 border-0"
+          class="form-control bg-keyValuePairColor py-1 border-0"
           style="font-size: 13px;"
           readonly
         />

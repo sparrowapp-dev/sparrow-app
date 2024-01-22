@@ -15,7 +15,7 @@ export class CollectionListViewModel {
 
   public getCollectionDocument = (elem: CollectionDocument) => {
     return {
-      _id: elem.get("_id"),
+      id: elem.get("id"),
       name: elem.get("name"),
       totalRequests: elem.get("totalRequests"),
       items: elem.get("items"),

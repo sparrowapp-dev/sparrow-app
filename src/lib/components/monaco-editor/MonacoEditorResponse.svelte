@@ -93,7 +93,7 @@
         { token: "delimiter", foreground: "#FFFFFF" },
       ],
       colors: {
-        "editor.background": "#1E1E1E",
+        "editor.background": "#19191A",
       },
     });
     monaco.editor.setTheme("myTheme");
@@ -106,7 +106,7 @@
       formatOnType: true,
       fixedOverflowWidgets: true,
       autoDetectHighContrast: false,
-      wordWrap: "on", 
+      wordWrap: "on",
       scrollbar: {
         useShadows: false,
         verticalHasArrows: false,

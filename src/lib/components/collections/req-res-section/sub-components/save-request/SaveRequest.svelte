@@ -33,6 +33,8 @@
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import questionIcon from "$lib/assets/question.svg";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -99,17 +101,11 @@
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
-<<<<<<< HEAD
-      collection = value;
-      directory = JSON.parse(JSON.stringify(collection));
-      if (latestRoute.id) navigateToDirectory(latestRoute);
-=======
       if (value) {
         collection = value;
         directory = JSON.parse(JSON.stringify(collection));
         if (latestRoute.id) navigateToDirectory(latestRoute);
       }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     });
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
@@ -361,6 +357,7 @@
           isLoading = false;
         }
       }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
 
@@ -409,6 +406,11 @@
       storage.id = _id;
       collectionsMethods.addCollection(storage);
       notifications.success("New Collection Created");
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "SaveRequest",
+        collectionName: res.data.data.name,
+        collectionId: res.data.data._id,
+      });
     } else {
       createDirectoryLoader = false;
     }
@@ -993,6 +995,7 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 9;
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
   }
   .save-request {

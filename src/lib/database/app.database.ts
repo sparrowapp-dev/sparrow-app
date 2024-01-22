@@ -24,11 +24,17 @@ import { RxDBMigrationPlugin } from "rxdb/plugins/migration";
 import { RxDBUpdatePlugin } from "rxdb/plugins/update";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
-
-/* Uncomment to Enable RxDB Debug Mode
+import { teamSchema, type TeamDocType } from "$lib/models/team.model";
+import {
+  environmentSchema,
+  type EnvironmentDocType,
+} from "$lib/models/environment.model";
+import {
+  environmentTabSchema,
+  type EnvironmentTabDocType,
+} from "$lib/models/environment-tab.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
-*/
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -37,6 +43,12 @@ export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
+export type TeamDocument = RxDocument<TeamDocType>;
+export type TeamContainer = RxCollection<TeamDocType>;
+export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
+export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
+export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
+export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -49,7 +61,9 @@ export type DatabaseCollections = {
   workspace: WorkspaceContainer;
   tab: TabContainer;
   collection: CollectionContainer;
+  environment: EnvironmentContainer;
   activesidebartab: ActiveSideBarTabContainer;
+  team: TeamContainer;
 };
 
 // define the Rx database type
@@ -64,7 +78,6 @@ export class RxDB {
   public static getInstance(): RxDB {
     if (!RxDB.instance?.rxdb) {
       RxDB.instance = new RxDB();
-      RxDB.instance.getDb();
     }
     return RxDB.instance;
   }
@@ -87,33 +100,31 @@ export class RxDB {
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          6: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
         schema: tabSchema,
         migrationStrategies: {
           // database  migration functions
-<<<<<<< HEAD
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          4: function (oldDoc) {
-            oldDoc.tabId = oldDoc.id;
-            oldDoc.saveInProgress = false;
-            return oldDoc;
-          },
-          5: function (oldDoc) {
-=======
           1: function (oldDoc: TabDocument) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
+            return oldDoc;
+          },
+          2: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },
@@ -121,51 +132,38 @@ export class RxDB {
       collection: {
         schema: collectionSchema,
         migrationStrategies: {
-<<<<<<< HEAD
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
-            return oldDoc;
-          },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            oldDoc.collectionId = oldDoc._id;
-=======
           // database  migration functions
           1: function (oldDoc: TabDocument) {
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
             return oldDoc;
           },
         },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
-<<<<<<< HEAD
+      },
+      team: {
+        schema: teamSchema,
+      },
+      environment: {
+        schema: environmentSchema,
         migrationStrategies: {
-          // data migration from version 0 to version 1
-          1: function (oldDoc) {
+          //   // database  migration functions
+          1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
-          2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
-            return oldDoc;
-          },
-          4: function (oldDoc) {
+          2: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },
       },
-    });
-
-    return { rxdb: this.rxdb, db: this.db };
-  }
-
-  public async destroyDb(): Promise<void> {
-    await removeRxDatabase("mydatabase", getRxStorageDexie());
-=======
+      environmentTab: {
+        schema: environmentTabSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+        },
       },
     });
     return { rxdb: this.rxdb };
@@ -174,7 +172,6 @@ export class RxDB {
   public async destroyDb(): Promise<void> {
     await this.rxdb.destroy();
     await this.rxdb.remove();
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
     this.rxdb = null;
     return;
   }

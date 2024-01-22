@@ -37,7 +37,7 @@
 
 <style>
   .custom-btn-primary {
-    background-color: var(--send-button);
+    background-color: var(--sparrow-blue);
     color: var(--white-color);
   }
   .custom-btn-dark {

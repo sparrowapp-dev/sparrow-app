@@ -25,9 +25,8 @@
 1. 🐦 [What is Sparrow ?](#what-is-sparrow)
 2. 🔨 [Installation](#installation)
 3. 👨‍💻 [Recommended IDE Setup](#recommended-ide-setup)
-4. 📖 [Env variables](#env-variables)
-5. ❤️ [How to Contribute ?](#contributors)
-6. 📨 [Subscribe to our Newsletter](#subscribe-to-our-newsletter)
+4. ❤️ [How to Contribute ?](#contributors)
+5. 📨 [Subscribe to our Newsletter](#subscribe-to-our-newsletter)
 
  
 ## <a name="what-is-sparrow">🐦 What is Sparrow ?</a>
@@ -61,6 +60,9 @@ cd sparrow-app
 	
 # Install dependencies and Husky hooks
 yarn
+
+# Copy .env.example to .env
+cp .env.example .env
  
 # Run the app in dev mode
 yarn tauri dev
@@ -72,15 +74,7 @@ The above command will start the app in development mode and watch for changes o
  
 [VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
  
-## <a name="env-variables">📖 Env variables</a>
- 
-You can create a `.env` file in this directory to override the default values when starting the API locally with `npm run start` command.
- 
-Environment variables are :
- 
-|        Name         |               Description               | Required | Default value |                   Limitations                    |
-|:-------------------:|:---------------------------------------:|:--------:|:-------------:|:------------------------------------------------:|
-|       `VITE_API_URL`        | Host on which the API will be available |    ✅     |  `https://dev-api.sparrow.techdomeaks.com`  |          If set, can't be empty string           |
+   
 ## <a name="contributors">❤️ How to Contribue ?</a>
 
 You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
@@ -88,3 +82,6 @@ You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
 ## <a name="subscribe-to-our-newsletter">📨 Newsletter</a>
  
 Subscribe to our newsletter by applying [here!](https://sparrows-newsletter.beehiiv.com/subscribe) 
+ 
+Copy the values from `.env.example` into `.env` to begin.
+You have to create a `.env` file in this directory to override the default values when starting the API locally with `yarn tauri dev` command. 

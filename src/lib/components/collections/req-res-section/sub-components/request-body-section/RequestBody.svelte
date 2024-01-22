@@ -20,6 +20,7 @@
   import crossIcon from "$lib/assets/cross.svg";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
+  export let environmentVariables;
 
   import MonacoEditor from "./MonacoEditor.svelte";
 
@@ -40,16 +41,6 @@
       getMessage = true;
       deleteMessage = true;
     }
-<<<<<<< HEAD
-    currentTabId = event?.id;
-    rawValue = event?.property?.request?.body.raw;
-    urlEncoded = event?.property?.request.body.urlencoded;
-    formDataText = event?.property?.request.body.formdata.text;
-    formDataFile = event?.property?.request.body.formdata.file;
-    method = event?.property?.request.method;
-    mainTab = event?.property?.request.state.dataset;
-    rawTab = event?.property?.request.state.raw;
-=======
     if (event && event.property) {
       currentTabId = event?.id;
       rawValue = event?.property?.request?.body?.raw;
@@ -60,7 +51,6 @@
       mainTab = event?.property?.request?.state?.dataset;
       rawTab = event?.property?.request?.state?.raw;
     }
->>>>>>> b605dab95add771bc925459f2c65dffbe2604a6b
   });
 
   let handleDropdown = (tab: string) => {
@@ -223,12 +213,24 @@
       if you need to send body.
     </p>
   {:else if mainTab === RequestDataset.URLENCODED}
-    <KeyValue keyValue={urlEncoded} callback={handleUrlEncodeChange} />
+    <KeyValue
+      keyValue={urlEncoded}
+      callback={handleUrlEncodeChange}
+      {environmentVariables}
+    />
   {:else if mainTab === RequestDataset.FORMDATA}
     <p>Text</p>
-    <KeyValue keyValue={formDataText} callback={handleFormDataTextChange} />
+    <KeyValue
+      keyValue={formDataText}
+      callback={handleFormDataTextChange}
+      {environmentVariables}
+    />
     <p>File</p>
-    <KeyValueFile keyValue={formDataFile} callback={handleFormDataFileChange} />
+    <KeyValueFile
+      keyValue={formDataFile}
+      callback={handleFormDataFileChange}
+      {environmentVariables}
+    />
   {/if}
 </div>
 

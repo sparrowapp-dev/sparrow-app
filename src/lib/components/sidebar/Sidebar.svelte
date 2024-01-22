@@ -1,78 +1,100 @@
 <script lang="ts">
   import collections from "$lib/assets/collections.svg";
+  import collectionsFaded from "$lib/assets/collections-faded.svg";
   import mock from "$lib/assets/mock.svg";
   import environment from "$lib/assets/environment.svg";
-  import teams from "$lib/assets/teams.svg";
-  import workspaces from "$lib/assets/workspaces.svg";
-  import help from "$lib/assets/circle-question.svg";
+  import environmentFaded from "$lib/assets/environment-faded.svg";
+  import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { HelpIcon } from "$lib/assets/app.asset";
+  import SettingsIcon from "$lib/assets/setting.svelte";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  export let workspaces: Observable<WorkspaceDocument[]>;
   export let activeSideBarTabMethods;
-  export let selectedActiveSideBarTab;
-  function changeSelectedActiveSideBarTab(tab: string) {
-    selectedActiveSideBarTab = tab;
-  }
+  export let activeSidebarTabName: string;
 </script>
 
 <div class="sidebar">
   <div class="sidebar__main">
     <Helper
       {activeSideBarTabMethods}
-      route="collections"
-      heading="Collections"
-      logo={collections}
-      isSelected={"collections" === selectedActiveSideBarTab ? true : false}
-      disabled={false}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
       route="workspaces"
-      heading="Workspaces"
-      logo={workspaces}
-      isSelected={"workspaces" === selectedActiveSideBarTab ? true : false}
+      heading="Home"
+      logo={home}
+      isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
-      {changeSelectedActiveSideBarTab}
     />
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route="collections"
+        heading="Collections"
+        logo={collections}
+        isSelected={"collections" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route=""
+          heading="Collections"
+          logo={collectionsFaded}
+          isSelected={"collections" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
+    {#if $workspaces && $workspaces.length > 0}
+      <Helper
+        {activeSideBarTabMethods}
+        route={"environment"}
+        heading="Environment"
+        logo={environment}
+        isSelected={"environment" === activeSidebarTabName && true}
+        disabled={false}
+      />
+    {:else}
+      <Tooltip text="Add New Workspace">
+        <Helper
+          {activeSideBarTabMethods}
+          route={""}
+          heading="Environment"
+          logo={environmentFaded}
+          isSelected={"environment" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {/if}
     <Helper
       {activeSideBarTabMethods}
       route="mock"
       heading="Mock"
       logo={mock}
-      isSelected={"mock" === selectedActiveSideBarTab ? true : false}
+      isSelected={"mock" === activeSidebarTabName ? true : false}
       disabled={true}
-      {changeSelectedActiveSideBarTab}
-    />
-    <Helper
-      {activeSideBarTabMethods}
-      route="environment"
-      heading="Environment"
-      logo={environment}
-      isSelected={"environment" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
-      {changeSelectedActiveSideBarTab}
-    />
-    <hr class="m-1 border-2" />
-    <Helper
-      {activeSideBarTabMethods}
-      route="teams"
-      heading="Teams"
-      logo={teams}
-      isSelected={"teams" === selectedActiveSideBarTab ? true : false}
-      disabled={true}
-      {changeSelectedActiveSideBarTab}
     />
   </div>
-  <div class="sidebar__help">
+  <div class="sidebar__secondary">
     <Tooltip>
       <div class="sidebar__container sidebar__container_background2">
         <div class="sidebar__container--icon pt-2">
-          <img src={help} alt="help-icon" />
+          <HelpIcon />
         </div>
-        <div
-          class={`sidebar__container--text mt-1 text-textColor`}
-        >
+        <div class={`sidebar__container--text mt-1 text-textColor`}>
           <p>Help</p>
+        </div>
+      </div>
+    </Tooltip>
+    <Tooltip>
+      <div class="sidebar__container sidebar__container_background2">
+        <div class="sidebar__container--icon pt-2">
+          <SettingsIcon color={"#8A9299"} />
+        </div>
+        <div class={`sidebar__container--text mt-1 text-textColor`}>
+          <p>Settings</p>
         </div>
       </div>
     </Tooltip>
@@ -88,16 +110,22 @@
     padding: 12px 4px 12px 4px;
     border-right: 1px solid #313233;
     justify-content: space-between;
-    background: #1e1e1e;
+    background: var(--background-color);
   }
   .sidebar__main {
     display: flex;
     flex-direction: column;
   }
-  .sidebar__help {
+  .sidebar__secondary {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+  .sidebar__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .sidebar__container--text {
     font-family: Roboto;

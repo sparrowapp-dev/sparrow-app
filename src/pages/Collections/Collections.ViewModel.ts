@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CollectionDocument } from "$lib/database/app.database";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
@@ -15,6 +16,7 @@ export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private environmentRepository = new EnvironmentRepository();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -43,6 +45,10 @@ export class CollectionsViewModel {
 
   get activeTab() {
     return requestResponseStore.getTab();
+  }
+
+  get environments() {
+    return this.environmentRepository.getEnvironment();
   }
 
   public handleCreateTab = (data: any) => {
@@ -292,5 +298,16 @@ export class CollectionsViewModel {
       folderCount: folderCount,
     };
     return dataObj;
+  };
+
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
+  };
+
+  public currentEnvironment = async (id: string) => {
+    return await this.environmentRepository.readEnvironment(id);
   };
 }
