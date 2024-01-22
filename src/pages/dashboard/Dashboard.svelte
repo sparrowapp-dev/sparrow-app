@@ -106,7 +106,6 @@
   ) => {
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
-    // _viewModelHome.activateTeam(teamId);
     isWorkspaceCreatedFirstTime.set(false);
 
     setCurrentWorkspace(workspaceId, workspaceName);

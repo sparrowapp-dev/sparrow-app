@@ -131,7 +131,6 @@
 
         if (!activeWorkspaceRxDoc && currWorkspace) {
           isWorkspaceLoaded.set(false);
-          // _workspaceViewModel.activateInitialTeamWorkspace();
           isWorkspaceLoaded.set(true);
         }
       }
@@ -184,7 +183,6 @@
   const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
-    // _workspaceViewModel.activateTeam(team.teamId);
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };

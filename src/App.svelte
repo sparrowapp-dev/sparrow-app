@@ -67,7 +67,6 @@
   });
 
   onMount(async () => {
-    // RxDB.getInstance().destroyDb()
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");

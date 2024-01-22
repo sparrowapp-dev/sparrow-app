@@ -278,10 +278,7 @@
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
-  // const collapseAnimationAppliedSubscribe =
-  //   collapseAnimationAppliedStore.subscribe((value) => {
-  //     collapseAnimationApplied = value;
-  //   });
+
   const setcollapsExpandToggle = () => {
     collapseAnimationApplied = true;
     changeAnimation();
@@ -331,7 +328,6 @@
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
-    // collapseAnimationAppliedSubscribe();
     selectedMethodsCollectionUnsubscribe();
     selectedMethodUnsubscibe();
   });

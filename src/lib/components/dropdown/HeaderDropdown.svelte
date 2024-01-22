@@ -127,7 +127,6 @@
       $data.map((item) => {
         if (item) {
           if (item._data._id === response.data.data._id) {
-            // totalCollection = item?._data?.collections?.length;
             totalCollection = 0;
           } else {
             totalRequest = 0;
@@ -154,7 +153,6 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      // await _viewModel.addWorkspace(workspaceObj);
       if (userId) await _viewModel.refreshWorkspaces(userId);
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
