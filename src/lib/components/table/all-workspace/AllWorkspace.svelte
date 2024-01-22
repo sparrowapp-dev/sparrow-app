@@ -150,10 +150,10 @@
                 on:contextmenu|preventDefault={(e) =>
                   rightClickContextMenu(e, index)}
                 on:click={(e) => {
+                  e.stopPropagation();
                   !isShowMoreVisible
                     ? handleOpenCollection(list)
                     : isShowMoreVisible && handleShowMore(index);
-                  e.stopPropagation();
                 }}
               >
                 <td
@@ -371,12 +371,11 @@
     background-color: var(--workspace-hover-color);
   }
 
+  .show-more-btn:active .workspace-list-item:active {
+    background-color: red !important;
+  }
   .workspace-list-item:active {
     background-color: var(--sparrow-input-slider-button) !important;
-  }
-
-  .show-more-btn:active .workspace-list-item {
-    background-color: var(--border-color) !important;
   }
 
   .workspace-list-item:hover {

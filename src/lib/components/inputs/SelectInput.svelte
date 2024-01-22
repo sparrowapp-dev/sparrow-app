@@ -55,6 +55,6 @@
     color: var(--dangerColor);
   }
   .sparrow-placeholder-option {
-    color: var(--request-arc);
+    color: var(--request-arc) !important;
   }
 </style>

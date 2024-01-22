@@ -58,8 +58,11 @@
         class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
       >
         <UploadIcon classProp="my-auto" />
+        <label for={inputId} class="sparrow-choose-file-label ps-2"
+          >Choose File</label
+        >
         <input
-          class="sparrow-choose-file-input"
+          class="sparrow-choose-file-input visually-hidden"
           type="file"
           {value}
           id={inputId}
@@ -101,7 +104,7 @@
       </div>
     </div>
     <input
-      class="sparrow-choose-file-input d-none"
+      class="sparrow-choose-file-input d-none overflow-hidden"
       type="file"
       id={inputId}
       placeholder={inputPlaceholder}
@@ -140,6 +143,11 @@
     border: 0;
     font-size: 12px;
   }
+
+  .sparrow-choose-file-label {
+    color: var(--primary-btn-color);
+  }
+
   .sparrow-input-image-preview > img {
     width: 80px;
     border: 1px solid #313233;
@@ -157,6 +165,7 @@
   }
   .sparrow-file-input-error-text {
     color: var(--dangerColor);
+    font-size: 12px;
   }
 
   .sparrow-input-file-type {

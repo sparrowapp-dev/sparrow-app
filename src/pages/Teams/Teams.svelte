@@ -181,6 +181,7 @@
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj.id);
       collectionsMethods.handleCreateTab(workspaceObj);
+      collectionsMethods.handleActiveTab(workspaceObj.id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
@@ -405,7 +406,7 @@
 
   @media only screen and (max-width: 900px) {
     .workspace {
-      left: calc(31vw + 72px);
+      margin-left: calc(22vw + 72px);
       width: calc(69vw - 72px);
     }
   }

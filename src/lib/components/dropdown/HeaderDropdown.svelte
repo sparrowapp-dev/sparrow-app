@@ -86,7 +86,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-
+    collectionsMethods.handleActiveTab(sampleWorkspace.id);
     moveNavigation("right");
   };
   const handleCreateWorkspaceModal = () => {
@@ -163,6 +163,7 @@
       navigate("/dashboard/collections");
       await _viewModel.activateWorkspace(workspaceObj.id);
       collectionsMethods.handleCreateTab(workspaceObj);
+      collectionsMethods.handleActiveTab(workspaceObj.id);
       activeSideBarTabMethods.updateActiveTab("collections");
     }
   };

@@ -148,6 +148,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
+    collectionsMethods.handleActiveTab(sampleWorkspace.id);
     moveNavigation("right");
   };
   let collapsExpandToggle = false;
@@ -188,6 +189,7 @@
       );
       workspace.path.workspaceId = currentWorkspaceId;
       collectionsMethods.handleCreateTab(workspace);
+      collectionsMethods.handleActiveTab(currentWorkspaceId);
       moveNavigation("right");
     }
     return selectedActiveSideBar;
