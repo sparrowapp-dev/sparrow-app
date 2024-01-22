@@ -1,4 +1,4 @@
-name: PR Title Check
+name: "📋 Semantic Pull Requests"
 
 on:
   pull_request_target:
@@ -7,21 +7,29 @@ on:
       - edited
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  Development:
-    name: Validate PR Title 
+  main:
+    name: Validate Pull Request title
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Validate PR Title 
-        run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-
-          if [[ ! $PR_TITLE =~ ^(feat: |chore: |fix: |test: |build: |docs: |refactor: |bug: ) ]]; then
-            echo "Error: PR title  doesn't start with a valid prefix"
-            exit 1
-          fi
+      - uses: amannn/action-semantic-pull-request@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            build
+            ci
+            chore
+            revert
+            l10n
+            taxonomy
