@@ -414,19 +414,8 @@
   .workspace {
     font-size: 12px;
     display: flex;
-    top: 44px;
-    margin-left: calc(16.5vw + 72px);
-    width: calc(79vw - 72px);
-    position: fixed;
-    height: calc(100% - 44px);
-    overflow: auto;
-  }
-
-  @media only screen and (max-width: 900px) {
-    .workspace {
-      margin-left: calc(22vw + 72px);
-      width: calc(69vw - 72px);
-    }
+    height: calc(100vh - 44px);
+    overflow: hidden;
   }
   .workspace::-webkit-scrollbar {
     width: 2px;

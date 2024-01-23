@@ -36,16 +36,7 @@
 
 <style>
   .sidebar {
-    width: 21vw;
-    position: fixed;
-    top: 44px;
-    left: 69px;
+    width: 280px;
     height: calc(100vh - 44px);
-  }
-
-  @media only screen and (max-width: 900px) {
-    .sidebar {
-      width: 31vw;
-    }
   }
 </style>
