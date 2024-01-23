@@ -2,7 +2,7 @@
     <a href="https://sparrowapp.dev">
     <img src="https://sparrowassets.blob.core.windows.net/publicassest/sparrow-logo.png" width="350" alt="logo"/>
     </a>
-	<h4 align="center">One-stop API management tool </h4>
+	<h4 align="center">One-stop API manageme </h4>
 </p>
 
  
