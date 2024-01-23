@@ -31,6 +31,7 @@
   let workspaceError: boolean = false;
 
   const handleEmailOnAdd = (email: string) => {
+    email = email.replace(",", "");
     email = email.trim();
     emailstoBeSentArr.push(email);
     const emailDiv = document.createElement("div");
@@ -189,7 +190,7 @@
         style="outline:none;border:none;flex-grow:1; background:transparent;"
         bind:value={currentEmailEntered}
         class="input-container mt-2"
-        on:keydown={(event) => {
+        on:keyup={(event) => {
           if (event.key === "," || event.key === "Enter") {
             handleEmailOnAdd(currentEmailEntered);
           }
