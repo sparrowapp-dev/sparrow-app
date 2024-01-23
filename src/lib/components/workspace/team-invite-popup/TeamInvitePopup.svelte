@@ -4,7 +4,6 @@
   export let teamId: string = "";
   import { fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
-  import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import CoverButton from "../../buttons/CoverButton.svelte";
@@ -17,7 +16,6 @@
   export let teamLogo;
 
   const emailstoBeSentArr: string[] = [];
-  let showErrors = false;
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
@@ -27,6 +25,11 @@
   });
   let selectedRole: string = "select";
   let currentEmailEntered: string;
+
+  let emailError: boolean = false;
+  let roleError: boolean = false;
+  let workspaceError: boolean = false;
+
   const handleEmailOnAdd = (email: string) => {
     email = email.trim();
     emailstoBeSentArr.push(email);
@@ -41,7 +44,7 @@
       document.getElementById("input-email").removeChild(removeElement);
     });
     closeIconBtn.addEventListener("mouseenter", () => {
-      closeIconBtn.src = closeIconWhite;
+      closeIconBtn.src = closeIcon;
     });
     closeIconBtn.addEventListener("mouseleave", () => {
       closeIconBtn.src = closeIcon;
@@ -74,8 +77,21 @@
     return count;
   };
   let loader: boolean = false;
+
+  const checkInviteValidation = () => {
+    if (emailstoBeSentArr?.length === 0) {
+      emailError = true;
+    }
+    if (!selectedRole || selectedRole === "select") {
+      roleError = true;
+    }
+    if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
+      workspaceError = true;
+    }
+  };
+
   const handleInvite = async () => {
-    // showErrors = true;
+    checkInviteValidation();
     loader = true;
     if (
       selectedRole &&
@@ -109,8 +125,6 @@
           } else {
             notifications.error("Failed to sent invite. Please try again.");
           }
-        } else {
-          // spec error true
         }
       } else {
         let data = {
@@ -126,8 +140,8 @@
           notifications.error("Failed to sent invite. Please try again.");
         }
       }
-      loader = false;
     }
+    loader = false;
   };
 
   const handleDropdown = (id) => {
@@ -162,14 +176,16 @@
     <p class="invite-header mb-0">
       Invite By Email<span class="asterik">*</span>
     </p>
-    <p class="invite-subheader text-textColor mt-0 mb-0">
+    <p class="invite-subheader text-textColor mt-0 mb-1">
       use commas to separate emails
     </p>
-    <div class="email-container">
+    <div class="email-container rounded">
       <div id="input-email"></div>
       <input
         id="input"
         placeholder="Enter email ID"
+        autocomplete="off"
+        autocapitalize="none"
         style="outline:none;border:none;flex-grow:1; background:transparent;"
         bind:value={currentEmailEntered}
         class="input-container mt-2"
@@ -180,16 +196,13 @@
         }}
       />
     </div>
-    {#if showErrors && emailstoBeSentArr.length === 0}
-      <p class="error-text">Email ID cannot be Empty</p>
+    {#if emailError && emailstoBeSentArr.length === 0}
+      <p class="error-text">Email ID cannot be Empty.</p>
     {/if}
   </div>
 
   <div class="mt-4">
-    <p class="role-title mb-0">Role<span class="asterik">*</span></p>
-    {#if showErrors && !selectedRole}
-      <p class="error-text">Role Cannot Be Empty</p>
-    {/if}
+    <p class="role-title mb-1">Role<span class="asterik">*</span></p>
     <SelectRoleDropdown
       id={"invite-member-workspace"}
       data={[
@@ -223,13 +236,22 @@
       onclick={handleDropdown}
     />
   </div>
+  {#if selectedRole === "admin"}
+    <p class="invite-subheader text-textColor mt-1 mb-1">
+      Admins will get access to all the current workspaces as well as any future
+      workspaces in the team.
+    </p>
+  {/if}
+  {#if roleError && selectedRole === "select"}
+    <p class="error-text">Role cannot be empty.</p>
+  {/if}
 
   {#if selectedRole === "editor" || selectedRole === "viewer"}
     <div class="mt-4">
       <p class="role-title mb-0">
         Specify Workspace<span class="asterik">*</span>
       </p>
-      <p class="invite-subheader text-textColor mt-0 mb-3">
+      <p class="invite-subheader text-textColor mt-0 mb-1">
         Select Workspaces you would want to give access to.
       </p>
       <CheckSelectDropdown
@@ -238,6 +260,12 @@
         onclick={handleCheckSelectDropdown}
       />
     </div>
+    {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
+      <p class="error-text">
+        You need to select at least one workspace. If you wish to give access to
+        all workspaces, plese click on select all.
+      </p>
+    {/if}
   {/if}
   <div class="d-flex align-items-center justify-content-between mt-4">
     <div class="description">
@@ -325,6 +353,7 @@
   }
   .error-text {
     margin-top: 4px;
+    margin-bottom: 0 !important;
     color: var(--error--color);
     font-size: 12px;
   }
@@ -334,9 +363,15 @@
     flex-wrap: wrap;
     background-color: transparent;
     border: 1px solid;
-    padding: 3px 5px 3px 5px;
+    padding: 3px 8px 3px 8px;
+    border: 1px solid var(--border-color);
+    max-height: 100px;
+    overflow-y: auto;
   }
-
+  input {
+    margin-bottom: 4px !important;
+    margin-top: 4px !important;
+  }
   #input-email {
     display: flex;
     align-items: flex-start;
