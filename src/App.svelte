@@ -30,14 +30,13 @@
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
+  import { handleShortcuts } from "$lib/utils/shortcuts";
   import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
-    import { RxDB } from "$lib/database/app.database";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let flag: boolean = true;
-
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -117,6 +116,7 @@
 </Router>
 
 <Toast />
+<svelte:window on:keydown={handleShortcuts} />;
 
 <style>
 </style>
