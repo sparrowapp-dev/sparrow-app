@@ -216,7 +216,18 @@ export class TeamViewModel {
     return;
   };
 
-  public modifyTeam = async (teamId, team) => {
-    this.teamRepository.modifyTeam(teamId, team);
+  public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToOwnerAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
   };
+
+  // public modifyTeam = async (teamId, team) => {
+  //   this.teamRepository.modifyTeam(teamId, team);
+  // };
 }

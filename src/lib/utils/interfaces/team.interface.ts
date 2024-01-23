@@ -31,5 +31,6 @@ export interface TeamServiceMethods {
   removeMembersAtTeam?: (teamId: string, userId: string) => unknown;
   promoteToAdminAtTeam?: (teamId: string, userId: string) => unknown;
   demoteToMemberAtTeam?: (teamId: string, userId: string) => unknown;
+  promoteToOwnerAtTeam?: (teamId: string, userId: string) => unknown;
   refreshWorkspace?: (userId: string) => void;
 }

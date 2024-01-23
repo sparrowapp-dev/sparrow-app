@@ -12,6 +12,7 @@
   export let handleMemberPromotePopUpCancel;
   export let handleMemberDemotePopUpCancel;
   export let handleMemberPopUpCancel;
+  export let handleMemberOwnershipPopUpCancel;
   export let owner: boolean = false;
 
   const handleDropdown = (id) => {
@@ -21,6 +22,8 @@
       handleMemberDemotePopUpCancel(true);
     } else if (user.role === "member" && id === "admin") {
       handleMemberPromotePopUpCancel(true);
+    } else if (user.role === "admin" && id === "owner") {
+      handleMemberOwnershipPopUpCancel(true);
     }
   };
 </script>

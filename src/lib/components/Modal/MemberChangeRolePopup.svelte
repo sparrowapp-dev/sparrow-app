@@ -10,6 +10,10 @@
   export let teamLogo;
   export let onSuccess;
   export let onCancel;
+  export let auth = false;
+
+  let confirmationText = "";
+  let confirmationError = "";
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -50,6 +54,39 @@
     <div style="font-size: 14px;" class="text-lightGray mb-1">
       {@html description}
     </div>
+    {#if auth}
+      <p class="confirm-header mb-0">
+        Enter Team name to confirm<span class="asterik">*</span>
+      </p>
+      <input
+        id="input"
+        placeholder=""
+        autocomplete="off"
+        autocapitalize="none"
+        autofocus
+        style="outline:none;border:none;flex-grow:1;"
+        bind:value={confirmationText}
+        on:input={() => {
+          confirmationError = "";
+        }}
+        on:blur={() => {
+          if (confirmationText === "") {
+            confirmationError = "Team name cannot be empty.";
+          } else if (confirmationText !== teamName) {
+            confirmationError = "Team name does not match.";
+          } else {
+            confirmationError = "";
+          }
+        }}
+        class="input-container mt-2 mb-1 {confirmationError
+          ? 'error-border'
+          : ''}"
+      />
+      {#if confirmationError}
+        <p class="error-text">{confirmationError}</p>
+      {/if}
+      <br />
+    {/if}
     <div
       class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
       style="font-size: 16px;"
@@ -61,7 +98,7 @@
         <p style="font-size:16px;" class="mb-0">{teamName}</p>
       </div>
       <CoverButton
-        disable={deleteLoader}
+        disable={deleteLoader || (confirmationText !== teamName && auth)}
         text={"Update Access"}
         size={14}
         type={"primary"}
@@ -137,6 +174,28 @@
     .team-icon {
       height: 24px;
       width: 24px;
+    }
+    .asterik {
+      color: var(--dangerColor);
+      margin-left: 4px;
+    }
+    .confirm-header {
+      font-size: 14px;
+    }
+    .input-container {
+      background-color: var(--background-dropdown);
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color) !important;
+    }
+    .error-text {
+      margin-top: 2px;
+      margin-bottom: 0 !important;
+      color: var(--error--color);
+      font-size: 12px;
+    }
+    .error-border {
+      border: 1px solid var(--error--color) !important;
     }
   }
 </style>

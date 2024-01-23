@@ -88,6 +88,7 @@
     removeMembersAtTeam: _viewModel.removeMembersAtTeam,
     promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
     demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
+    promoteToOwnerAtTeam: _viewModel.promoteToOwnerAtTeam,
     refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
   };
 

@@ -75,4 +75,15 @@ export class TeamService {
     );
     return response;
   };
+
+  public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/team/${teamId}/owner/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

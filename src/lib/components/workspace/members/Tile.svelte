@@ -25,12 +25,15 @@
       isMemberDemotePopup = true;
     } else if (user.role === "member" && id === "admin") {
       isMemberPromotePopup = true;
+    } else if (user.role === "admin" && id === "owner") {
+      isMemberOwnershipPopup = true;
     }
   };
   let isMemberRemovePopup = false;
   let isMemberPromotePopup = false;
   let isMemberDemotePopup = false;
   let isMemberInfoPopup = false;
+  let isMemberOwnershipPopup = false;
 
   const handleMemberPopUpCancel = (flag) => {
     isMemberRemovePopup = flag;
@@ -45,6 +48,11 @@
   const handleMemberInfoPopUpCancel = (flag) => {
     isMemberInfoPopup = flag;
   };
+
+  const handleMemberOwnershipPopUpCancel = (flag) => {
+    isMemberOwnershipPopup = flag;
+  };
+
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
       activeTeam.teamId,
@@ -89,6 +97,25 @@
     } else {
       notifications.error(
         `Failed to change role for ${user.name}. Please try again.`,
+      );
+    }
+  };
+
+  const handleMemberOwnershipPopUpSuccess = async () => {
+    const response = await teamServiceMethods.promoteToOwnerAtTeam(
+      activeTeam.teamId,
+      user.id,
+    );
+    if (response) {
+      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      await teamServiceMethods.refreshWorkspace(userId);
+      isMemberOwnershipPopup = false;
+      notifications.success(
+        `${user.name} is now the new Owner of ${activeTeam.name}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to update access of Owner. Please try again.`,
       );
     }
   };
@@ -188,6 +215,47 @@
   />
 {/if}
 
+{#if isMemberOwnershipPopup}
+  <MemberChangeRolePopup
+    auth={true}
+    title={`Changing Role?`}
+    teamName={activeTeam?.name}
+    teamLogo={activeTeam?.logo}
+    description={`
+      <div class="d-flex tile rounded mb-3">
+    <div
+      class="info d-flex align-items-center"
+    >
+      <div class="d-flex align-items-center justify-content-center" style="width: 36px;
+      border: 1px solid var(--border-color);
+      height: 36px;
+      border-radius: 50%;">
+        <span>${user.name[0].toUpperCase()}</span>
+      </div>
+      <div class="name px-2">
+        <span style="font-size:12px;" class="text-whiteColor">${
+          user.name
+        }</span><br />
+        <span style="font-size:12px;" class="text-textColor">${
+          user.email
+        }</span>
+      </div>
+    </div>
+  </div>
+      
+      <p style="font-size:12px;" class="text-textColor">
+        You are assigning the role of <span class="text-whiteColor">‘Owner’</span> to ${
+          user.name
+        }. All the Owner’s access will be transferred to ${
+          user.name
+        } and you will be demoted to Admin. This action cannot be undone.  </p>
+      
+      `}
+    onSuccess={handleMemberOwnershipPopUpSuccess}
+    onCancel={handleMemberOwnershipPopUpCancel}
+  />
+{/if}
+
 {#if isMemberInfoPopup}
   <MemberInfoPopup
     {owner}
@@ -207,6 +275,7 @@
     {handleMemberPopUpCancel}
     {handleMemberPromotePopUpCancel}
     {handleMemberDemotePopUpCancel}
+    {handleMemberOwnershipPopUpCancel}
   />
 {/if}
 <div class="d-flex tile rounded">
