@@ -175,6 +175,7 @@ export class HeaderDashboardViewModel {
           description,
           owner,
           users,
+          admins,
           team,
           createdAt,
           createdBy,
@@ -189,10 +190,12 @@ export class HeaderDashboardViewModel {
           owner,
           users,
           collections: collection ? collection : [],
+          admins: admins,
           team: {
             teamId: team.id,
             teamName: team.name,
           },
+
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,

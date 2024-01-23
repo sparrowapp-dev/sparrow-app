@@ -1,7 +1,28 @@
 <script lang="ts">
-    export let text: string;
-    export let onClick;
+  export let classProp: string = "";
+  export let onClick: (e) => void;
+  export let disabled: boolean = false;
+  export let width: number = undefined;
+  export let height: number = undefined;
 </script>
-<button style="color: #85C2FF; border: 1px solid #85C2FF; font-size: 12px; margin-bottom:4px;" class="btn" on:click={()=>{
-    onClick();
-}}>{text}</button>
+
+<button
+  class={`${classProp} sparrow-icon-btn p-2`}
+  style={`width: ${width ? width + "px" : "auto"}; height: ${
+    height ? height + "px" : "auto"
+  };`}
+  on:click={(e) => onClick(e)}
+  {disabled}
+>
+  <slot />
+</button>
+
+<style lang="scss">
+  .sparrow-icon-btn {
+    background-color: transparent;
+    border: 0px;
+  }
+  .sparrow-icon-btn:hover {
+    background-color: var(--blackColor);
+  }
+</style>

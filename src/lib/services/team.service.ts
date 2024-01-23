@@ -27,4 +27,15 @@ export class TeamService {
     });
     return response;
   };
+
+  public leaveTeam = async (teamId: string) => {
+    const response = await makeRequest(
+      "PUT",
+      `${apiUrl}/api/team/${teamId}/leave`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

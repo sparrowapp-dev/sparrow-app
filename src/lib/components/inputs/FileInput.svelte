@@ -1,6 +1,7 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
   import { imageDataToURL } from "$lib/utils/helpers";
+
   export let value: any = [];
   export let labelText: string;
   export let labelDescription: string = "";
@@ -23,9 +24,19 @@
     supportedFileTypes: string[],
   ) => void;
 
+  let isDragOver: boolean = false;
+
   const generateAcceptString = (): string => {
     const acceptString = supportedFileTypes.map((type) => `${type}`).join(", ");
     return acceptString;
+  };
+
+  const handleDrop = (
+    event: DragEvent,
+    maxFileSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    onChange(event, maxFileSize, supportedFileTypes);
   };
 </script>
 
@@ -45,10 +56,22 @@
   </div>
   {#if value.length == 0}
     <div
-      style="border: 1px dashed {showFileTypeError || showFileSizeError
+      style="border: 3px dashed {showFileTypeError || showFileSizeError
         ? 'var(--dangerColor)'
-        : 'var(--request-arc)'}"
-      class="sparrow-file-input w-100 px-auto"
+        : 'var(--request-arc)'}; border-width: 2px;"
+      class="sparrow-file-input w-100 px-auto {isDragOver && 'opacity-75 bg-lightBackground'}"
+      on:dragover={(e) => {
+        e.preventDefault();
+        isDragOver = true;
+      }}
+      on:dragleave={() => {
+        isDragOver = false;
+      }}
+      on:drop={(e) => {
+        e.preventDefault();
+        isDragOver = false;
+        handleDrop(e, maxFileSize, supportedFileTypes);
+      }}
     >
       <span
         class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
@@ -125,7 +148,6 @@
   }
   .sparrow-file-input {
     outline: none;
-
     border-radius: 4px;
     font-size: 14px;
   }

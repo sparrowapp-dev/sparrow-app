@@ -78,7 +78,7 @@
             closeSparrowDropdown();
           }}
         >
-          <div class="d-flex">
+          <div class="d-flex ellipsis overflow-hidden">
             <div class="sparrow-img-logo-container mx-2 overflow-hidden">
               {#if option.logo == "" || option.logo == undefined}
                 <div
@@ -95,7 +95,7 @@
                 />
               {/if}
             </div>
-            <span>{option.name}</span>
+            <span class="ellipsis overflow-hidden">{option.name}</span>
           </div>
           {#if option.endIconVisible}
             <PeopleIcon color={"#45494D"} />
@@ -105,7 +105,7 @@
     </div>
   {/if}
   {#if invalidValue}
-    <span class="sparrow-input-error-text">{errorText}</span>
+    <span class="sparrow-input-error-text ms-1">{errorText}</span>
   {/if}
 </div>
 
@@ -146,7 +146,9 @@
     border-radius: 4px;
     overflow-y: scroll;
   }
-  .sparrow-option-name {
+  .sparrow-input-error-text {
+    font-size: 12px;
+    color: var(--dangerColor);
   }
   .sparrow-img-logo-container {
     width: 20px !important;

@@ -12,6 +12,19 @@ export class TeamRepository {
   };
 
   /**
+   * Get teams RxDoc
+   */
+  public getTeam = async (
+    teamId: string,
+  ): Promise<Observable<TeamDocument>> => {
+    return RxDB.getInstance().rxdb.team.findOne({
+      selector: {
+        teamId: teamId,
+      },
+    }).$;
+  };
+
+  /**
    * get all teams observable of user
    */
   public getTeams = (): Observable<TeamDocument[]> => {
@@ -25,12 +38,11 @@ export class TeamRepository {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {
-          teamId: teamId,
           isActiveTeam: true,
         },
       })
       .exec();
-    return team ? true : false;
+    return team.teamId == teamId ? true : false;
   };
   /**
    * clear teams data
@@ -134,5 +146,16 @@ export class TeamRepository {
       return value;
     });
     return;
+  };
+
+  public leaveTeam = async (teamId: string) => {
+    const team = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+        },
+      })
+      .exec();
+    return await team.remove();
   };
 }

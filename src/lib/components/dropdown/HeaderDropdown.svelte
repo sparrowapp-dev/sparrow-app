@@ -101,8 +101,15 @@
   };
   const handleTeamSelect = (value) => {
     workspacePostInput.id = value;
+    if (value && value !== "") invalidWorkspacePostInput.id = false;
   };
   const handleCreateWorkSpace = async () => {
+    if (!workspacePostInput?.name || workspacePostInput?.name === "") {
+      invalidWorkspacePostInput.name = true;
+    }
+    if (!workspacePostInput?.name || workspacePostInput?.id === "") {
+      invalidWorkspacePostInput.id = true;
+    }
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -166,6 +173,10 @@
       navigate("/dashboard/collections");
       activeSideBarTabMethods.updateActiveTab("collections");
       openCreateWorkspaceModal = false;
+    } else {
+      openCreateWorkspaceModal = false;
+      isWorkspaceLoaded.set(true);
+      notifications.error("Failed to create new Workspace!");
     }
   };
 
@@ -210,12 +221,19 @@
     errorText="Please select a team."
     selectInputPlaceholder="Select team"
     inputId="select-team-input"
-    options={$teams.map((team) => ({
-      id: team._data.teamId,
-      name: team._data.name,
-      logo: base64ToURL(team._data.logo),
-      endIconVisible: team._data.users.length > 1,
-    }))}
+    options={$teams
+      .filter((team) => {
+        return (
+          team?._data?.admins?.includes(userId) || team?._data?.owner == userId
+        );
+      })
+      .map((team) => ({
+        id: team?._data?.teamId,
+        name: team?._data?.name,
+        logo: base64ToURL(team?._data?.logo),
+        endIconVisible: team?._data?.users?.length > 1,
+      }))}
+    invalidValue={invalidWorkspacePostInput.id}
     handleOnSelect={handleTeamSelect}
   />
 </CustomPopup>

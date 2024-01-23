@@ -100,6 +100,10 @@
   .sparrow-modal-primary-btn {
     background-color: var(--primary-btn-color);
   }
+  .sparrow-modal-danger-btn {
+    background-color: var(--dangerColor);
+    color: var(--blackColor);
+  }
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
   }

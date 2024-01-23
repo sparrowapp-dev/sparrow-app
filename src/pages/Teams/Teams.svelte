@@ -4,7 +4,6 @@
   import type {
     CollectionsMethods,
     CurrentTeam,
-    WorkspaceMethods,
   } from "$lib/utils/interfaces";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
@@ -51,9 +50,11 @@
   let userId: string | undefined = undefined;
   let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
-
   let workspaceUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
+  let isShowMoreVisible: boolean = false;
+  let openLeaveTeamModal: boolean = false;
+
   let newTeam: {
     name: {
       value: string;
@@ -78,10 +79,6 @@
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
 
-  const workspaceMethods: WorkspaceMethods = {
-    handleCreateTab: _viewModel.handleCreateTab,
-  };
-
   const userSubscribe = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -89,7 +86,9 @@
   });
 
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
+    if (value) {
+      currOpenedTeam = value;
+    }
   });
 
   const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
@@ -221,6 +220,26 @@
     }
   };
 
+  const handleLeaveTeam = async () => {
+    if (!currOpenedTeam?.id) return;
+    const response = await _viewModel.leaveTeam(currOpenedTeam.id);
+    if (response.isSuccessful) {
+      await _viewModelWorkspace.refreshWorkspaces(userId);
+      await _viewModel.refreshTeams(userId);
+      notifications.success("You left a team.");
+      setOpenedTeam(
+        activeTeamRxDoc?._data?.teamId,
+        activeTeamRxDoc?._data?.name,
+        //@ts-ignore
+        activeTeamRxDoc?._data?.logo,
+      );
+      isShowMoreVisible = false;
+    } else {
+      notifications.error("Failed to leave the team. Please try again.");
+      isShowMoreVisible = false;
+    }
+  };
+
   const handleCreateTeamModal = () => {
     isCreateTeamModalOpen = !isCreateTeamModalOpen;
     newTeam = {
@@ -257,12 +276,19 @@
     maxSize: number,
     supportedFileTypes: string[],
   ) => {
-    if (e.target.files[0].size > maxSize * 1024) {
+    if (
+      (e?.target?.files && e?.target?.files[0].size > maxSize * 1024) ||
+      (e?.dataTransfer?.files &&
+        e?.dataTransfer?.files[0].size > maxSize * 1024)
+    ) {
       newTeam.file.showFileSizeError = true;
       newTeam.file.invalid = true;
       return;
     }
-    const fileType = `.${e.target.files[0].name
+    const fileType = `.${(
+      (e?.target?.files && e?.target?.files[0]?.name) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]?.name)
+    )
       .split(".")
       .pop()
       .toLowerCase()}`;
@@ -274,7 +300,9 @@
     newTeam.file.showFileSizeError = false;
     newTeam.file.showFileTypeError = false;
     newTeam.file.invalid = false;
-    newTeam.file.value = e.target.files[0];
+    newTeam.file.value =
+      (e?.target?.files && e?.target?.files[0]) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]);
   };
 
   const handleLogoReset = (e: any) => {
@@ -284,6 +312,15 @@
   const handleLogoEdit = (e: any) => {
     const fileInput = document.getElementById("team-file-input");
     fileInput.click();
+  };
+
+  const handleOnShowMoreClick = (e) => {
+    e.stopPropagation();
+    isShowMoreVisible = !isShowMoreVisible;
+  };
+
+  const handleLeaveTeamModal = () => {
+    openLeaveTeamModal = !openLeaveTeamModal;
   };
 
   onMount(() => {
@@ -314,6 +351,14 @@
   });
 </script>
 
+<svelte:window
+  on:click={() => {
+    (openLeaveTeamModal = false), (isShowMoreVisible = false);
+  }}
+  on:contextmenu|preventDefault={() => {
+    (openLeaveTeamModal = false), (isShowMoreVisible = false);
+  }}
+/>
 <!-- Create New Team POP UP -->
 <CustomPopup
   isOpen={isCreateTeamModalOpen}
@@ -367,6 +412,20 @@
   />
 </CustomPopup>
 
+<!-- Leave Team POP UP -->
+<CustomPopup
+  isOpen={openLeaveTeamModal}
+  title="Leave Team?"
+  isDanger={true}
+  btnText="Leave"
+  handleOpen={handleLeaveTeamModal}
+  handleSubmit={handleLeaveTeam}
+>
+  <p class="warning-text text-lightGray mt-3">
+    Are you sure you want to leave team {currOpenedTeam?.name}? You will lose
+    access to all the resources in this team.
+  </p>
+</CustomPopup>
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>
     <WorkspaceList
@@ -381,14 +440,16 @@
       {collectionsMethods}
     />
     <WorkspaceContent
-      {handleCreateWorkspace}
       {userId}
+      {handleCreateWorkspace}
       {currentTeam}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
-      {workspaceMethods}
       {activeSideBarTabMethods}
+      {isShowMoreVisible}
+      {handleLeaveTeamModal}
+      {handleOnShowMoreClick}
     />
   </div>
 </Motion>
@@ -416,5 +477,12 @@
   }
   .workspace::-webkit-scrollbar-thumb {
     background: #888;
+  }
+
+  .warning-text {
+    color: var(--colors-neutral-text-3, #ccc);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
   }
 </style>

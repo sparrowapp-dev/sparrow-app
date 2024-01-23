@@ -17,17 +17,23 @@
       >
         <ul class="px-2 pt-0 pb-0 w-100 sparrow-menu-list">
           {#each menuItems as item}
-            <li class="align-items-center sparrow-menu-item list-unstyled">
-              <button
-                disabled={item.disabled}
-                class={`sparrow-menu-item-btn align-items-center bg-transparent mb-0 px-2 py-2 border-0  ${
-                  item.disabled && "text-requestBodyColor "
-                }`}
-                on:click={item.onClick}
-                style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-                >{item.displayText}</button
-              >
-            </li>
+            {#if item.visible}
+              <li class="align-items-center sparrow-menu-item list-unstyled">
+                <button
+                  disabled={item.disabled}
+                  class={`sparrow-menu-item-btn align-items-center bg-transparent mb-0 ${
+                    menuItems?.filter((item) => item.visible) && "px-2 py-2"
+                  } border-0  ${item.disabled && "text-requestBodyColor "}`}
+                  on:click={item.onClick}
+                  style={item.disabled
+                    ? "color: var(--request-arc);"
+                    : item.displayText === "Delete" ||
+                      item.displayText === "Leave Team"
+                    ? "color: #ff7878"
+                    : ""}>{item.displayText}</button
+                >
+              </li>
+            {/if}
           {/each}
         </ul>
       </div>

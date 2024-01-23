@@ -5,36 +5,58 @@
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
   import { workspaceView, openedTeam } from "$lib/store";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy } from "svelte";
-  import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
+  import { onDestroy, onMount } from "svelte";
+  import type { CurrentTeam } from "$lib/utils/interfaces";
   import { base64ToURL } from "$lib/utils/helpers";
+  import type { TeamDocument } from "$lib/database/app.database";
+  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
+  import type { Observable } from "rxjs";
+  import { ShowMoreIcon } from "$lib/assets/app.asset";
+  import { IconButton, Tooltip } from "$lib/components";
+
+  export let userId: string;
   export let data: any;
-  export let loaderColor = "default",
-    userId: string,
-    handleWorkspaceSwitch: any,
-    handleWorkspaceTab: any,
-    workspaceMethods: WorkspaceMethods,
-    activeSideBarTabMethods: any,
-    currentTeam: CurrentTeam,
-    handleCreateWorkspace: any;
+  export let loaderColor = "default";
+  export let handleWorkspaceSwitch: any;
+  export let handleWorkspaceTab: any;
+  export let activeSideBarTabMethods: any;
+  export let currentTeam: CurrentTeam;
+  export let handleCreateWorkspace: any;
+  export let handleLeaveTeamModal: () => void;
+  export let handleOnShowMoreClick: (e) => void;
+  export let isShowMoreVisible: boolean = false;
+
   let currOpenedTeam: CurrentTeam;
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
-  });
-
   let isLoading: boolean = false;
-
-  const _viewModel = new TeamViewModel();
-
   let selectedTab = "all-workspace";
   let selectedView: string;
+  let currOpenedTeamRxDoc: Observable<TeamDocument>;
 
-  let selectedViewSubscribe = workspaceView.subscribe((value) => {
+  const _teamViewModel = new TeamViewModel();
+
+  const openedTeamSubscribe = openedTeam.subscribe(async (value) => {
+    if (value) {
+      currOpenedTeam = value;
+      currOpenedTeamRxDoc = await _teamViewModel.getTeam(value.id);
+    }
+  });
+  const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
   });
 
+  let menuItems = [
+    {
+      onClick: (e) => {
+        handleLeaveTeamModal();
+        handleOnShowMoreClick(e);
+      },
+      displayText: "Leave Team",
+      disabled: $currOpenedTeamRxDoc?._data?.owner == userId ? true : false,
+      visible: true,
+    },
+  ];
+  onMount(() => {});
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
@@ -46,7 +68,9 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-12 pb-3">
-          <div class="team-heading d-flex justify-content-between">
+          <div
+            class="team-heading d-flex justify-content-between position-relative"
+          >
             <h2 class="d-flex ellipsis overflow-hidden w-75">
               {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
                 <img
@@ -56,7 +80,7 @@
                   alt=""
                 />{:else}
                 <p
-                  class={`text-defaultColor w-25 text-center align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
+                  class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                   style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
                 >
                   {currOpenedTeam.name[0]
@@ -64,29 +88,76 @@
                     : ""}
                 </p>
               {/if}
-              <span class="ms-4 w-75 my-auto my-auto ellipsis overflow-hidden"
+              <span class="ms-4 w-75 my-auto ellipsis overflow-hidden"
                 >{currOpenedTeam.name}</span
               >
             </h2>
-            <div class="d-flex w-25">
-              <button
-                style="font-size: 12px;"
-                class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
-                >Invite</button
+            <div class="p-4 position-relative">
+              <IconButton
+                classProp="rounded {isShowMoreVisible
+                  ? 'bg-blackColor'
+                  : 'bg-plusButton'}"
+                onClick={handleOnShowMoreClick}><ShowMoreIcon /></IconButton
               >
-              <button
-                style="font-size: 12px;"
-                on:click={handleCreateWorkspace}
-                class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
-                >{#if isLoading}
-                  <span class="ms-0 me-1">
-                    {#if loaderColor === "default"}
-                      <Spinner size={"15px"} />
-                    {/if}
-                  </span>
-                {/if}New Workspace</button
-              >
+              {#if $currOpenedTeamRxDoc?._data?.owner == userId}
+                <button
+                  on:click={(e) => {
+                    handleLeaveTeamModal();
+                    handleOnShowMoreClick(e);
+                  }}
+                  disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
+                  class="position-absolute {isShowMoreVisible &&
+                    'd-none'} {isShowMoreVisible
+                    ? 'bg-plusButton'
+                    : 'bg-blackColor'} border-0 w-100 p-2 mt-2 ms-2 rounded {$currOpenedTeamRxDoc
+                    ?._data?.owner == userId
+                    ? 'text-lightGray'
+                    : 'text-dangerColor'}
+              ">Leave Team</button
+                >
+              {:else}
+                <button
+                  on:click={(e) => {
+                    handleLeaveTeamModal();
+                    handleOnShowMoreClick(e);
+                  }}
+                  disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
+                  class="position-absolute {isShowMoreVisible &&
+                    'd-none'} bg-blackColor border-0 w-100 p-2 mt-5 rounded {$currOpenedTeamRxDoc
+                    ?._data?.owner == userId
+                    ? 'text-lightGray'
+                    : 'text-dangerColor'}
+                ">Leave Team</button
+                >
+              {/if}
             </div>
+            <!-- <ShowMoreOptions
+              rightDistance={12}
+              topDistance={10}
+              showMenu={isShowMoreVisible}
+              {menuItems}
+            /> -->
+            {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
+              <div class="d-flex w-25">
+                <button
+                  style="font-size: 12px;"
+                  class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
+                  >Invite</button
+                >
+                <button
+                  style="font-size: 12px;"
+                  on:click={handleCreateWorkspace}
+                  class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
+                  >{#if isLoading}
+                    <span class="ms-0 me-1">
+                      {#if loaderColor === "default"}
+                        <Spinner size={"15px"} />
+                      {/if}
+                    </span>
+                  {/if}New Workspace</button
+                >
+              </div>
+            {/if}
           </div>
         </div>
       </div>
@@ -117,14 +188,16 @@
                     : ""}</span
                 ></Link
               >
-              <Link style="text-decoration:none;" to="personal-workspaces"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "settings")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "settings"}>Settings</span
-                ></Link
-              >
+              {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
+                <Link style="text-decoration:none;" to="personal-workspaces"
+                  ><span
+                    style="padding: 8px 8px;"
+                    on:click={() => (selectedTab = "settings")}
+                    class="team-menu__link"
+                    class:tab-active={selectedTab === "settings"}>Settings</span
+                  ></Link
+                >
+              {/if}
             </div>
             <div class="teams-menu__right">
               <span class="mx-3" style="cursor:pointer;">
@@ -156,15 +229,18 @@
     <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
       <AllWorkspace
+        {userId}
         openedTeam={currOpenedTeam}
         {data}
         {selectedTab}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
+        {currOpenedTeamRxDoc}
       />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList
+        {userId}
         {handleCreateWorkspace}
         openedTeam={currOpenedTeam}
         currActiveTeam={currentTeam}
@@ -172,6 +248,7 @@
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
+        {currOpenedTeamRxDoc}
       />
     {/if}
     <!-- </Route> -->

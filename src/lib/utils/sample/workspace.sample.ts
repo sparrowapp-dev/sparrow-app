@@ -4,7 +4,6 @@ import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboar
 const _workspaceViewModel = new HeaderDashboardViewModel();
 
 const generateSampleWorkspace = (id: string, date: string, name?: string) => {
-  console.log(name);
   const defaultWorkspaceName = generateUniqueWorkspaceName();
   return {
     _id: id,

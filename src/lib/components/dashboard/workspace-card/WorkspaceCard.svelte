@@ -6,12 +6,13 @@
   import { onDestroy } from "svelte";
   import { navigate } from "svelte-navigator";
 
-  export let workspace: any,
-    handleWorkspaceSwitch: any,
-    handleWorkspaceTab: any,
-    currActiveTeam: CurrentTeam,
-    openedTeam: CurrentTeam,
-    activeSideBarTabMethods: any;
+  export let workspace: any;
+  export let handleWorkspaceSwitch: any;
+  export let handleWorkspaceTab: any;
+  export let currActiveTeam: CurrentTeam;
+  export let openedTeam: CurrentTeam;
+  export let activeSideBarTabMethods: any;
+  export let isAdminOrOwner: boolean;
   let isShowMoreVisible = false;
 
   const handleShowMore = () => {
@@ -53,13 +54,15 @@
       },
       displayText: "Open Workspace",
       disabled: false,
+      visible: true,
     },
     {
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Rename Request",
+      displayText: "Add Members",
       disabled: false,
+      visible: isAdminOrOwner,
     },
     {
       onClick: (e) => {
@@ -67,6 +70,7 @@
       },
       displayText: "Delete",
       disabled: false,
+      visible: isAdminOrOwner,
     },
   ];
 </script>

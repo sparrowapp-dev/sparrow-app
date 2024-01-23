@@ -9,8 +9,10 @@
     SearchIcon,
   } from "$lib/assets/app.asset";
   import type { CurrentTeam } from "$lib/utils/interfaces";
-  import { onMount } from "svelte";
+  import type { TeamDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
 
+  export let userId: string;
   export let openedTeam: CurrentTeam;
   export let currActiveTeam: CurrentTeam;
   export let handleWorkspaceTab: any;
@@ -18,6 +20,7 @@
   export let handleCreateWorkspace: any;
   export let workspaces: any;
   export let handleWorkspaceSwitch: any;
+  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
 
   let filterText: string = "";
   let workspacePerPage: number = 5;
@@ -29,9 +32,6 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
-  onMount(() => {
-    console.log($workspaces);
-  });
 </script>
 
 <div class="p-2">
@@ -72,7 +72,7 @@
                 .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
-      {#if currPage === 1 && filterText === ""}
+      {#if currPage === 1 && filterText === "" && ($currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId)}
         <button
           on:click={handleCreateWorkspace}
           class="col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
@@ -88,6 +88,9 @@
               .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceCard
+          isAdminOrOwner={$currOpenedTeamRxDoc?._data?.admins?.includes(
+            userId,
+          ) || $currOpenedTeamRxDoc?._data?.owner == userId}
           {workspace}
           {handleWorkspaceSwitch}
           {currActiveTeam}

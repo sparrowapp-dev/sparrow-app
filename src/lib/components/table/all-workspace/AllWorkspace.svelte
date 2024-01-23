@@ -9,19 +9,27 @@
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
   import { ShowMoreOptions } from "$lib/components";
+  import UserProfileSm from "$lib/components/profile/UserProfileSM.svelte";
+  import type { TeamDocument } from "$lib/database/app.database";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
+
+  export let userId: string;
   export let data: any;
   export let selectedTab: string;
-  export let openedTeam: CurrentTeam,
-    handleWorkspaceSwitch: any,
-    activeSideBarTabMethods: any,
-    handleWorkspaceTab: any;
+  export let openedTeam: CurrentTeam;
+  export let handleWorkspaceSwitch: any;
+  export let activeSideBarTabMethods: any;
+  export let handleWorkspaceTab: any;
+  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+
   let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
+
   const handleOpenCollection = (workspace) => {
     handleWorkspaceSwitch(
       workspace._id,
@@ -49,13 +57,17 @@
       },
       displayText: "Open Workspace",
       disabled: false,
+      visible: true,
     },
     {
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Rename Request",
+      displayText: "Add Members",
       disabled: false,
+      visible:
+        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
+        $currOpenedTeamRxDoc?._data?.owner == userId,
     },
     {
       onClick: (e) => {
@@ -63,6 +75,9 @@
       },
       displayText: "Delete",
       disabled: false,
+      visible:
+        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
+        $currOpenedTeamRxDoc?._data?.owner == userId,
     },
   ];
 
@@ -126,6 +141,9 @@
             <th data-sortable="true" class="tab-head">Workspace</th>
 
             <th class="tab-head">Collections</th>
+            {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
+              <th class="tab-head">Contributors</th>
+            {/if}
             <th class="tab-head">Last Updated</th>
             <th class="tab-head"></th>
           </tr>
@@ -165,6 +183,13 @@
                 <td class="tab-data py-3"
                   >{list?.collections?.length ? list.collections.length : 0}</td
                 >
+                {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
+                  <td class="tab-data py-3">
+                    <UserProfileSm
+                      username={list?.users?.length > 0 && list?.users[0].name}
+                    />
+                  </td>
+                {/if}
                 <td class="tab-data py-3"
                   >{calculateTimeDifferenceInDays(
                     new Date(),

@@ -2,7 +2,7 @@
   import Collection from "$lib/components/file-types/collection/Collection.svelte";
   import Folder from "$lib/components/file-types/folder/Folder.svelte";
   import Request from "$lib/components/file-types/request/Request.svelte";
-  import { fade, fly, slide } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
@@ -10,7 +10,6 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import crossAsset from "$lib/assets/close.svg";
-  import IconButton from "$lib/components/buttons/IconButton.svelte";
   import CoverButton from "$lib/components/buttons/CoverButton.svelte";
   import {
     insertCollection,
@@ -35,6 +34,7 @@
   import questionIcon from "$lib/assets/question.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import TextButton from "$lib/components/buttons/TextButton.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -945,14 +945,14 @@
     <div class="controllers mt-3 d-flex justify-content-between">
       <div>
         {#if path.length === 0}
-          <IconButton
+          <TextButton
             text={"+ Collection"}
             onClick={() => {
               createCollectionNameVisibility = true;
             }}
           />
         {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-          <IconButton
+          <TextButton
             text={"+ Folder"}
             onClick={() => {
               createFolderNameVisibility = true;
