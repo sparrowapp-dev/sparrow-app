@@ -51,11 +51,15 @@ jobs:
           filename: 'release.zip'
           path: 'D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow-app_0.0.0_x64_en-US.msi'
       
-      - name: Upload Release
-        uses: ncipollo/release-action@v1.12.0
+      # - name: Upload Release
+      #   uses: ncipollo/release-action@v1.12.0
+      #   with:
+      #     artifacts: "release.zip"
+      #     token: ${{ secrets.GITHUB }}
+      - uses: actions/upload-artifact@v4
         with:
-          artifacts: "release.zip"
-          token: ${{ secrets.GITHUB }}
+          name: artifact
+          path: release.zip
 
       - uses: google-github-actions/release-please-action@v4
         id: release
