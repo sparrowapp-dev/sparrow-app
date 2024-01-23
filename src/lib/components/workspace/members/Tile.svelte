@@ -8,7 +8,7 @@
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import { notifications } from "$lib/utils/notifications";
   export let user;
   export let userType;
   export let activeTeam;
@@ -18,7 +18,6 @@
   export let userId;
   export let owner: boolean = false;
 
-  const hd = new HeaderDashboardViewModel();
   const handleDropdown = (id) => {
     if (id === "remove") {
       isMemberRemovePopup = true;
@@ -51,26 +50,47 @@
       activeTeam.teamId,
       user.id,
     );
-    teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
-    isMemberRemovePopup = false;
+    if (response) {
+      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      isMemberRemovePopup = false;
+      notifications.success(`${user.name} is removed from ${activeTeam.name}`);
+    } else {
+      notifications.error(
+        `Failed to remove ${user.name} from ${activeTeam.name}`,
+      );
+    }
   };
   const handleMemberDemotePopUpSuccess = async () => {
     const response = await teamServiceMethods.demoteToMemberAtTeam(
       activeTeam.teamId,
       user.id,
     );
-    teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
-    await hd.refreshWorkspaces(userId);
-    isMemberDemotePopup = false;
+    if (response) {
+      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      await teamServiceMethods.refreshWorkspace(userId);
+      isMemberDemotePopup = false;
+      notifications.success(`${user.name} is now a member`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${user.name}. Please try again.`,
+      );
+    }
   };
   const handleMemberPromotePopUpSuccess = async () => {
     const response = await teamServiceMethods.promoteToAdminAtTeam(
       activeTeam.teamId,
       user.id,
     );
-    teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
-    await hd.refreshWorkspaces(userId);
-    isMemberPromotePopup = false;
+    if (response) {
+      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      await teamServiceMethods.refreshWorkspace(userId);
+      isMemberPromotePopup = false;
+      notifications.success(`${user.name} is now an admin`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${user.name}. Please try again.`,
+      );
+    }
   };
 </script>
 

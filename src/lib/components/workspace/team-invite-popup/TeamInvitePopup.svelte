@@ -9,6 +9,7 @@
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import CoverButton from "../../buttons/CoverButton.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
+  import { notifications } from "$lib/utils/notifications";
 
   export let onSubmit;
   export let updateRepo;
@@ -101,8 +102,13 @@
               }),
           };
           const response = await onSubmit(teamId, data);
-          updateRepo(teamId, response);
-          handleInvitePopup(false);
+          if (response) {
+            updateRepo(teamId, response);
+            handleInvitePopup(false);
+            notifications.success("Invite sent.");
+          } else {
+            notifications.error("Failed to sent invite. Please try again.");
+          }
         } else {
           // spec error true
         }
@@ -112,9 +118,13 @@
           role: selectedRole,
         };
         const response = await onSubmit(teamId, data);
-        updateRepo(teamId, response);
-        handleInvitePopup(false);
-        // console.log(response);
+        if (response) {
+          updateRepo(teamId, response);
+          handleInvitePopup(false);
+          notifications.success("Invite sent.");
+        } else {
+          notifications.error("Failed to sent invite. Please try again.");
+        }
       }
       loader = false;
     }

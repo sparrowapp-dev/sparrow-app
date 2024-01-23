@@ -54,6 +54,7 @@
     removeMembersAtTeam: _viewModel.removeMembersAtTeam,
     promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
     demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
+    refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
   };
 
   // const userSubscribe = user.subscribe(async (value) => {
