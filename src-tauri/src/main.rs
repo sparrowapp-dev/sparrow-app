@@ -21,7 +21,28 @@ use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use window_shadows::set_shadow;
+
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
+
 // Commands
+#[tauri::command]
+fn zoom_window(window: tauri::Window, scale_factor: f64) {
+    let _ = window.with_webview(move |webview| {
+        #[cfg(windows)]
+        unsafe {
+            // see https://docs.rs/webview2-com/0.19.1/webview2_com/Microsoft/Web/WebView2/Win32/struct.ICoreWebView2Controller.html
+            webview.controller().SetZoomFactor(scale_factor).unwrap();
+        }
+
+        #[cfg(target_os = "macos")]
+        unsafe {
+            let () = msg_send![webview.inner(), setPageZoom: scale_factor];
+        }
+    });
+}
+
 #[tauri::command]
 fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Value {
     let response = import_swagger_url(url, headers, workspaceid);
@@ -228,7 +249,8 @@ fn main() {
             fetch_file_command,
             open_oauth_window,
             close_oauth_window,
-            make_http_request
+            make_http_request,
+            zoom_window
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
