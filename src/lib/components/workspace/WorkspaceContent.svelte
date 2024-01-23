@@ -113,27 +113,28 @@
               >
             </h2>
             <div class="d-flex w-25">
-              <button
-                on:click={() => {
-                  teamInvitePopup = true;
-                }}
-                disabled={userType === "member"}
-                style="font-size: 12px;"
-                class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
-                >Invite</button
-              >
-              <button
-                style="font-size: 12px;"
-                on:click={handleCreateWorkspace}
-                class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
-                >{#if isLoading}
-                  <span class="ms-0 me-1">
-                    {#if loaderColor === "default"}
-                      <Spinner size={"15px"} />
-                    {/if}
-                  </span>
-                {/if}New Workspace</button
-              >
+              {#if userType && userType !== "member"}
+                <button
+                  on:click={() => {
+                    teamInvitePopup = true;
+                  }}
+                  style="font-size: 12px;"
+                  class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
+                  >Invite</button
+                >
+                <button
+                  style="font-size: 12px;"
+                  on:click={handleCreateWorkspace}
+                  class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
+                  >{#if isLoading}
+                    <span class="ms-0 me-1">
+                      {#if loaderColor === "default"}
+                        <Spinner size={"15px"} />
+                      {/if}
+                    </span>
+                  {/if}New Workspace</button
+                >
+              {/if}
             </div>
           </div>
         </div>
