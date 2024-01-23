@@ -21,6 +21,7 @@ export interface TeamRepositoryMethods {
   getActiveTeam?: () => Observable<TeamDocument>;
   createTeam?: (team: any) => Promise<void>;
   modifyTeam?: (teamId: string, data) => any;
+  setOpenTeam?: (teamId: string) => any;
 }
 
 export interface TeamServiceMethods {

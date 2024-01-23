@@ -72,7 +72,7 @@
   const _viewModel = new TeamViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
-  const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
+  const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
@@ -82,6 +82,7 @@
   };
   const teamRepositoryMethods: TeamRepositoryMethods = {
     modifyTeam: _viewModel.modifyTeam,
+    setOpenTeam: _viewModel.setOpenTeam,
   };
   const teamServiceMethods: TeamServiceMethods = {
     inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
@@ -393,6 +394,7 @@
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {activeSideBarTabMethods}
+      {teamRepositoryMethods}
       {collectionsMethods}
     />
     <WorkspaceContent

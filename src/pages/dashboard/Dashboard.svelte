@@ -30,7 +30,9 @@
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
   import { TeamRepository } from "$lib/repositories/team.repository";
+  import { DashboardViewModel } from "./Dashboard.ViewModel";
 
+  const _dashboardViewModel = new DashboardViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -55,10 +57,23 @@
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
+      let openTeamId = "";
+      let teamsData = await _dashboardViewModel.getTeamData();
       await _viewModelHome.refreshTeams(value._id);
       await _viewModelWorkspace.refreshWorkspaces(value._id);
+      teamsData.forEach((element) => {
+        const elem = element.toMutableJSON();
+        if (elem.isOpen) openTeamId = elem.teamId;
+      });
+      if (openTeamId) {
+        _dashboardViewModel.setOpenTeam(openTeamId);
+      } else {
+        teamsData = await _dashboardViewModel.getTeamData();
+        _dashboardViewModel.setOpenTeam(teamsData[0].toMutableJSON().teamId);
+      }
     }
   });
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {

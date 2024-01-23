@@ -61,6 +61,10 @@ export class TeamViewModel {
     return this.teamRepository.getActiveTeam();
   }
 
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
+  }
+
   public get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
   }
@@ -226,7 +230,9 @@ export class TeamViewModel {
     }
     return;
   };
-
+  public setOpenTeam = async (teamId) => {
+    await this.teamRepository.setOpenTeam(teamId);
+  };
   // public modifyTeam = async (teamId, team) => {
   //   this.teamRepository.modifyTeam(teamId, team);
   // };
