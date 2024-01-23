@@ -150,21 +150,21 @@
       title={mainTab}
       data={[
         {
-          name: "None",
-          id: RequestDataset.NONE,
-        },
-        {
           name: "Raw",
           id: RequestDataset.RAW,
         },
         {
-          name: "Form Data",
+          name: "Form data",
           id: RequestDataset.FORMDATA,
         },
         {
-          name: "URL Encoded",
+          name: "Encoded URL",
           id: RequestDataset.URLENCODED,
         },
+        {
+          name: "None",
+          id: RequestDataset.NONE,
+        }
       ]}
       onclick={handleDropdown}
     />
