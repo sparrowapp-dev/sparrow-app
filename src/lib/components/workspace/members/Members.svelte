@@ -48,7 +48,7 @@
       type="text"
       id="search-input-team-member"
       class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search people in {activeTeam.name}"
+      placeholder="Search people in {activeTeam?.name}"
       bind:value={filterText}
     />
     {#if filterText !== ""}

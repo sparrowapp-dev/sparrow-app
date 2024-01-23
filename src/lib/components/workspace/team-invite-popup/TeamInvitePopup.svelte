@@ -8,10 +8,12 @@
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import CoverButton from "../../buttons/CoverButton.svelte";
+  import { base64ToURL } from "$lib/utils/helpers";
 
   export let onSubmit;
   export let updateRepo;
   export let workspaces;
+  export let teamLogo;
 
   const emailstoBeSentArr: string[] = [];
   let showErrors = false;
@@ -229,9 +231,12 @@
   {/if}
   <div class="d-flex align-items-center justify-content-between mt-4">
     <div class="description">
-      <p class="text-textColor">
-        Team:<span style="color:white">: {teamName}</span>
-      </p>
+      <div class="d-flex align-items-center">
+        {#if teamLogo}
+          <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+        {/if}
+        <p style="font-size:16px;" class="mb-0">{teamName}</p>
+      </div>
     </div>
     <div>
       <CoverButton
@@ -327,5 +332,9 @@
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 5px;
+  }
+  .team-icon {
+    height: 24px;
+    width: 24px;
   }
 </style>

@@ -109,11 +109,11 @@
     }
 
     .btn-close1:hover {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
 
     .btn-close1:active {
-      background-color: var(--dangerColor);
+      background-color: var(--background-dropdown);
     }
     .btn-primary {
       background-color: var(--border-color);

@@ -92,6 +92,8 @@
 {#if isMemberPromotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
+    teamName={activeTeam?.name}
+    teamLogo={activeTeam?.logo}
     description={`
     <div class="d-flex tile rounded mb-3">
   <div
@@ -133,6 +135,8 @@
 {#if isMemberDemotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
+    teamName={activeTeam?.name}
+    teamLogo={activeTeam?.logo}
     description={`
       <div class="d-flex tile rounded mb-3">
     <div

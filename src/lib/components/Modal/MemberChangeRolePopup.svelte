@@ -1,10 +1,13 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
+  import { base64ToURL } from "$lib/utils/helpers";
   import CoverButton from "../buttons/CoverButton.svelte";
   import { fly, fade } from "svelte/transition";
 
   export let title;
   export let description;
+  export let teamName;
+  export let teamLogo;
   export let onSuccess;
   export let onCancel;
 
@@ -48,9 +51,15 @@
       {@html description}
     </div>
     <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 pb-3 mb-0 rounded"
+      class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
       style="font-size: 16px;"
     >
+      <div class="d-flex align-items-center">
+        {#if teamLogo}
+          <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+        {/if}
+        <p style="font-size:16px;" class="mb-0">{teamName}</p>
+      </div>
       <CoverButton
         disable={deleteLoader}
         text={"Update Access"}
@@ -124,6 +133,10 @@
 
     .btn-secondary:hover {
       background-color: var(--delete-hover);
+    }
+    .team-icon {
+      height: 24px;
+      width: 24px;
     }
   }
 </style>
