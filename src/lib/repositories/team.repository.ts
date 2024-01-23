@@ -83,6 +83,7 @@ export class TeamRepository {
    * sync / refresh teams data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
+    await this.clearTeams();
     await RxDB.getInstance().rxdb.team.bulkUpsert(data);
     return;
   };
@@ -110,28 +111,28 @@ export class TeamRepository {
    * Update a team
    */
 
-  public modifyTeam = async (teamId: string, data) => {
+  public modifyTeam = async (teamId: string, data): Promise<void> => {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {
-          teamId: teamId,
+          teamId,
         },
       })
       .exec();
-    team.incrementalModify((value) => {
+    await team.incrementalModify((value) => {
       if (data.name) value.name = data.name;
+      if (data.description) value.description = data.description;
       if (data.workspaces) value.workspaces = data.workspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;
       if (data.owner) value.owner = data.owner;
       if (data.admins) value.admins = data.admins;
-      if (data.isActiveTeam) value.isActiveTeam = data.isActiveTeam;
       if (data.createdAt) value.createdAt = data.createdAt;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
-      // if (data.description) value.description = data.description;
       return value;
     });
+    return;
   };
 }

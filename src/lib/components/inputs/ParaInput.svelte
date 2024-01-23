@@ -1,12 +1,12 @@
 <script lang="ts">
-  export let value: string = "",
-    maxCharacter: number = 100,
-    labelText: string,
-    labelDescription: string = "",
-    inputId: string,
-    inputPlaceholder: string,
-    isRequired: boolean = false,
-    onChange: (e: any) => void;
+  export let value: string = "";
+  export let maxCharacter: number = 100;
+  export let labelText: string;
+  export let labelDescription: string = "";
+  export let inputId: string;
+  export let inputPlaceholder: string;
+  export let isRequired: boolean = false;
+  export let onChange: (e: any) => void;
 </script>
 
 <div class="sparrow-text-input-container mt-3">
@@ -27,7 +27,7 @@
     id={inputId}
     placeholder={inputPlaceholder}
     maxlength={maxCharacter}
-    on:change={(e) => onChange(e)}
+    on:input={(e) => onChange(e)}
   />
 </div>
 
@@ -35,16 +35,20 @@
   .sparrow-input-label {
     font-size: 14px;
   }
+
   .sparrow-input-required {
     color: var(--dangerColor);
   }
+
   .sparrow-para-input {
     background-color: var(--blackColor);
     outline: none;
     border-radius: 4px;
     font-size: 14px;
   }
+
   .sparrow-input-label-desc {
     color: var(--request-arc);
+    font-size: 12px;
   }
 </style>

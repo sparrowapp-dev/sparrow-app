@@ -1,12 +1,16 @@
 <script lang="ts">
-  export let showMenu: boolean = false,
-    menuItems = [],
-    rightDistance = 2, topDistance = 0;
+  export let showMenu: boolean = false;
+  export let menuItems = [];
+  export let rightDistance = 2;
+  export let topDistance = 0;
 </script>
 
 {#if showMenu}
   <div class="sparrow-show-more-container z-1">
-    <nav class="p-0" style="position: absolute; right: {rightDistance}vw; top: {topDistance}vh; z-index:4;">
+    <nav
+      class="p-0"
+      style="position: absolute; right: {rightDistance}vw; top: {topDistance}vh; z-index:4;"
+    >
       <div
         class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor sparrow-navbar"
         id="navbar"

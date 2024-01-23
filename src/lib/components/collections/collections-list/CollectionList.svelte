@@ -102,7 +102,10 @@
   const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
     workspaces.map((workspace) => {
       if (workspace._data.isActiveWorkspace) {
-        showDefault = workspace._data.collections.length === 0 ? true : false;
+        showDefault = true;
+        if (workspace._data.collections && workspace._data.collections.length) {
+          showDefault = false;
+        }
         return;
       }
     });
@@ -275,10 +278,7 @@
   const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
     collapsExpandToggle = value;
   });
-  // const collapseAnimationAppliedSubscribe =
-  //   collapseAnimationAppliedStore.subscribe((value) => {
-  //     collapseAnimationApplied = value;
-  //   });
+
   const setcollapsExpandToggle = () => {
     collapseAnimationApplied = true;
     changeAnimation();
@@ -328,7 +328,6 @@
 
   onDestroy(() => {
     collapsibleStateUnsubscribe();
-    // collapseAnimationAppliedSubscribe();
     selectedMethodsCollectionUnsubscribe();
     selectedMethodUnsubscibe();
   });

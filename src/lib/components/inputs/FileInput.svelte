@@ -1,27 +1,27 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
   import { imageDataToURL } from "$lib/utils/helpers";
-  export let value: any = [],
-    labelText: string,
-    labelDescription: string = "",
-    inputId: string,
-    inputPlaceholder: string,
+  export let value: any = [];
+  export let labelText: string;
+  export let labelDescription: string = "";
+  export let inputId: string;
+  export let inputPlaceholder: string;
+  export let maxFileSize: number;
+  export let isRequired: boolean = false;
+  export let resetValue: (e: any) => void;
+  export let editValue: (e: any) => void;
+  export let showFileTypeError: boolean = false;
+  export let showFileSizeError: boolean = false;
+  export let fileTypeError: string =
+    "This file type is not supported. Please reupload in any of the following file formats.";
+  export let fileSizeError: string =
+    "The size of the file you are trying to upload is more than 100 KB.";
+  export let supportedFileTypes: string[] = [];
+  export let onChange: (
+    e: any,
     maxFileSize: number,
-    isRequired: boolean = false,
-    resetValue: (e: any) => void,
-    editValue: (e: any) => void,
-    showFileTypeError: boolean = false,
-    showFileSizeError: boolean = false,
-    fileTypeError: string =
-      "This file type is not supported. Please reupload in any of the following file formats.",
-    fileSizeError: string =
-      "The size of the file you are trying to upload is more than 100 KB.",
-    supportedFileTypes: string[] = [],
-    onChange: (
-      e: any,
-      maxFileSize: number,
-      supportedFileTypes: string[],
-    ) => void;
+    supportedFileTypes: string[],
+  ) => void;
 
   const generateAcceptString = (): string => {
     const acceptString = supportedFileTypes.map((type) => `${type}`).join(", ");
@@ -58,8 +58,11 @@
         class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
       >
         <UploadIcon classProp="my-auto" />
+        <label for={inputId} class="sparrow-choose-file-label ps-2"
+          >Choose File</label
+        >
         <input
-          class="sparrow-choose-file-input"
+          class="sparrow-choose-file-input visually-hidden"
           type="file"
           {value}
           id={inputId}
@@ -101,7 +104,7 @@
       </div>
     </div>
     <input
-      class="sparrow-choose-file-input d-none"
+      class="sparrow-choose-file-input d-none overflow-hidden"
       type="file"
       id={inputId}
       placeholder={inputPlaceholder}
@@ -128,6 +131,7 @@
   }
   .sparrow-input-label-desc {
     color: var(--request-arc);
+    font-size: 12px;
   }
   .sparrow-file-input-placeholder {
     color: var(--request-arc);
@@ -135,10 +139,15 @@
   }
   .sparrow-choose-file-input::file-selector-button {
     background-color: transparent;
-    color: var(--send-button);
+    color: var(--primary-btn-color);
     border: 0;
     font-size: 12px;
   }
+
+  .sparrow-choose-file-label {
+    color: var(--primary-btn-color);
+  }
+
   .sparrow-input-image-preview > img {
     width: 80px;
     border: 1px solid #313233;
@@ -156,6 +165,7 @@
   }
   .sparrow-file-input-error-text {
     color: var(--dangerColor);
+    font-size: 12px;
   }
 
   .sparrow-input-file-type {

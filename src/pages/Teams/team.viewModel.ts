@@ -74,6 +74,18 @@ export class TeamViewModel {
     return;
   };
 
+  public addTeam = async (team) => {
+    await this.teamRepository.createTeam(team);
+  };
+  public modifyTeam = async (teamId, team) => {
+    await this.teamRepository.modifyTeam(teamId, team);
+  };
+
+  public createTeam = async (team) => {
+    const response = await this.teamService.createTeam(team);
+    return response;
+  };
+
   public activateInitialTeamWorkspace = async (): Promise<void> => {
     const workspaceIdToActivate =
       await this.teamRepository.activateInitialTeamWithWorkspace();
@@ -104,14 +116,14 @@ export class TeamViewModel {
     this.debouncedTab();
   };
 
-  public addWorkspace = (workspace) => {
-    this.workspaceRepository.addWorkspace(workspace);
+  public addWorkspace = async (workspace) => {
+    await this.workspaceRepository.addWorkspace(workspace);
   };
 
-  public createTeam = async (team) => {
-    const response = await this.teamService.createTeam(team);
-    return response;
+  public updateWorkspace = async (id, data) => {
+    await this.workspaceRepository.updateWorkspace(id, data);
   };
+
   public createWorkspace = async (workspace) => {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
@@ -120,7 +132,6 @@ export class TeamViewModel {
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
     const response = await this.teamService.fetchTeams(userId);
-
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
         const {

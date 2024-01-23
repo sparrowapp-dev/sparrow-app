@@ -29,35 +29,36 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
-    import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { TeamRepository } from "$lib/repositories/team.repository";
+
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
   const _viewModelHome = new TeamViewModel();
-  let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
   const activeWorkspaceRxDoc: Observable<WorkspaceDocument> =
     _viewModelHome.activeWorkspace;
   const activeTeamRxDoc: Observable<TeamDocument> = _viewModelHome.activeTeam;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
+
+  let currentWorkspaceId: string;
+  let currentWorkspaceName: string;
+  let currentTeam: CurrentTeam;
+  let currentWorkspace: CurrentWorkspace;
   let activeSidebarTabName: string;
   let workspaces: Observable<WorkspaceDocument[]> =
     _viewModelWorkspace.workspaces;
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    collectionsMethods.getActiveWorkspace();
-  let currentWorkspaceId: string;
-  let currentWorkspaceName: string;
-
-  let currentTeam: CurrentTeam;
-  let currentWorkspace: CurrentWorkspace;
+  let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      await _viewModelWorkspace.refreshWorkspaces(value._id);
       await _viewModelHome.refreshTeams(value._id);
+      await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
-
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -105,7 +106,6 @@
   ) => {
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
-    // _viewModelHome.activateTeam(teamId);
     isWorkspaceCreatedFirstTime.set(false);
 
     setCurrentWorkspace(workspaceId, workspaceName);
@@ -139,7 +139,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace._id = workspaceId;
+    sampleWorkspace.id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -147,6 +147,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
+    collectionsMethods.handleActiveTab(sampleWorkspace.id);
     moveNavigation("right");
   };
   let collapsExpandToggle = false;
@@ -187,11 +188,12 @@
       );
       workspace.path.workspaceId = currentWorkspaceId;
       collectionsMethods.handleCreateTab(workspace);
+      collectionsMethods.handleActiveTab(currentWorkspaceId);
       moveNavigation("right");
     }
     return selectedActiveSideBar;
   }
- 
+
   const getActiveTab = handleActiveTab();
 
   onMount(() => {
@@ -215,6 +217,7 @@
     {collectionsMethods}
     {handleWorkspaceSwitch}
     {activeSideBarTabMethods}
+    {teams}
   />
   <div class="dashboard-teams d-flex">
     {#if activeSidebarTabName}

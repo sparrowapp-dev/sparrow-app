@@ -1,8 +1,6 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
-  import { user } from "$lib/store/auth.store";
   import { Observable } from "rxjs";
-
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons, {
     NotifyIcon,
@@ -12,7 +10,8 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-  } from "$lib/store/workspace.store";
+    user,
+  } from "$lib/store";
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "./HeaderDashboard.ViewModel";
   import {
@@ -26,16 +25,17 @@
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
   const [, , searchNode] = useTree();
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type {
+    CollectionsMethods,
+    CurrentTeam,
+    CurrentWorkspace,
+  } from "$lib/utils/interfaces";
   export let collectionsMethods: CollectionsMethods;
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { fade, slide } from "svelte/transition";
-  import { items } from "$lib/models/collection.model";
-  import type { CurrentWorkspace } from "$lib/utils/interfaces/workspace.interface";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import type { CurrentTeam } from "$lib/utils/interfaces";
 
   export let handleWorkspaceSwitch;
 
@@ -43,6 +43,9 @@
   export let activeWorkspaceRxDoc: Observable<WorkspaceDocument>;
   export let currentTeam: CurrentTeam;
   export let currentWorkspace: CurrentWorkspace;
+  export let currWorkspace: CurrentWorkspace;
+  export let teams: Observable<TeamDocument[]>;
+
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
   const _workspaceViewModel = new TeamViewModel();
@@ -51,16 +54,29 @@
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
+  const _colllectionListViewModel = new CollectionListViewModel();
+  const collection = _colllectionListViewModel.collection;
+
   let collections = [];
   let allworkspaces = [];
   let activeWorkspaceId: string;
   let activeWorkspaceName: string;
   let searchData: string = "";
   let ownerName: string = "";
-
   let hideHeaders = false;
-  const _colllectionListViewModel = new CollectionListViewModel();
-  const collection = _colllectionListViewModel.collection;
+  let profile: boolean = false;
+  let activeWorkspaceRxDocVal: WorkspaceDocument;
+  let showGlobalSearchPopup: boolean = false;
+  let trackWorkspaceId: string;
+  let name: string = "";
+  let email: string = "";
+  let userId: string | undefined;
+  let firstLetter: string;
+  let isMaximizeWindow: boolean = false;
+  let filteredCollection = [];
+  let filteredFolder = [];
+  let filteredRequest = [];
+  let isOpen: boolean = false;
 
   collection.subscribe((value) => {
     if (value) {
@@ -75,10 +91,6 @@
     }
   });
 
-  let profile: boolean = false;
-  let activeWorkspaceRxDocVal: WorkspaceDocument;
-  let showGlobalSearchPopup: boolean = false;
-  export let currWorkspace: CurrentWorkspace;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -120,19 +132,12 @@
 
         if (!activeWorkspaceRxDoc && currWorkspace) {
           isWorkspaceLoaded.set(false);
-          // _workspaceViewModel.activateInitialTeamWorkspace();
           isWorkspaceLoaded.set(true);
         }
       }
     },
   );
 
-  let trackWorkspaceId: string;
-
-  let name: string = "";
-  let email: string = "";
-  let userId: string | undefined;
-  let firstLetter: string;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
       if (value.personalWorkspaces) {
@@ -145,8 +150,6 @@
       }
     }
   });
-
-  let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
     appWindow.minimize();
@@ -161,9 +164,6 @@
     isMaximizeWindow = !isMaximizeWindow;
   };
 
-  let filteredCollection = [];
-  let filteredFolder = [];
-  let filteredRequest = [];
   const handleSearch = () => {
     filteredCollection.length = 0;
     filteredFolder.length = 0;
@@ -206,8 +206,6 @@
     isSearchVisible = window.innerWidth >= minWidthThreshold;
     hideHeaders = window.innerWidth <= 700;
   }
-
-  let isOpen: boolean = false;
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
@@ -266,6 +264,7 @@
       style="height: 36px; width:216px"
     >
       <HeaderDropdown
+        {teams}
         {userId}
         {currentTeam}
         {currentWorkspace}

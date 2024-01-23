@@ -18,14 +18,15 @@
   import MyFolder from "$lib/components/collections/folder-tab/MyFolder.svelte";
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
+  import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
   let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
-
+  const _activeSidebarTabViewModel = new ActiveSideBarTabReposistory();
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
@@ -133,6 +134,7 @@
   const changeAnimation = () => {
     runAnimation = true;
   };
+
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
@@ -157,7 +159,7 @@
       class="collections__tools bg-backgroundColor {$collapseCollectionPanel &&
       runAnimation
         ? 'sidebar-collapse'
-        : runAnimation &&'sidebar-expand'}"
+        : runAnimation && 'sidebar-expand'}"
     >
       <div class="tab__bar">
         <TabBar

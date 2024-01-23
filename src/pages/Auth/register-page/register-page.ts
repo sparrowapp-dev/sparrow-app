@@ -4,17 +4,16 @@ import { register_user } from "$lib/store/auth.store";
 import { jwtDecode } from "$lib/utils/jwt";
 import { notifications } from "$lib/utils/notifications";
 import { checkValidation, registrationSchema } from "$lib/utils/validation";
-import mixpanel from "mixpanel-browser";
 import { navigate } from "svelte-navigator";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+import { sendUserDataToMixpanel } from "../login-page/login-page";
 
 const handleRegister = async (userData) => {
   const response = await registerUser(userData);
   register_user.set(response);
   if (response.isSuccessful) {
     const userDetails = jwtDecode(response.data?.data?.accessToken?.token);
-    mixpanel.identify(userDetails._id);
-    mixpanel.people.set({ $email: userDetails.email });
+    sendUserDataToMixpanel(userDetails);
     MixpanelEvent(Events.USER_SIGNUP, {
       Login_Method: "Email",
       Success: response.isSuccessful,

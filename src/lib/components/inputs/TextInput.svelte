@@ -1,13 +1,13 @@
 <script lang="ts">
-  export let value: string = "",
-    labelText: string,
-    labelDescription: string = "",
-    inputId: string,
-    inputPlaceholder: string,
-    isRequired: boolean = false,
-    invalidValue: boolean = false,
-    errorText: string = "Invalid Value",
-    onChange: (e: any) => void;
+  export let value: string = "";
+  export let labelText: string;
+  export let labelDescription: string = "";
+  export let inputId: string;
+  export let inputPlaceholder: string;
+  export let isRequired: boolean = false;
+  export let invalidValue: boolean = false;
+  export let errorText: string = "Invalid Value";
+  export let onChange: (e: any) => void;
 </script>
 
 <div class="sparrow-text-input-container mt-3">

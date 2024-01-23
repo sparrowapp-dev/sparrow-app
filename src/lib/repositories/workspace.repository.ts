@@ -51,7 +51,7 @@ export class WorkspaceRepository {
     workspaceId: string,
   ): Promise<boolean> => {
     const workspace = await RxDB.getInstance()
-      .rxdb.team.findOne({
+      .rxdb.workspace.findOne({
         selector: {
           _id: workspaceId,
           isActiveWorkspace: true,
@@ -196,8 +196,7 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearWorkspaces();
-    await RxDB.getInstance().rxdb.workspace.bulkInsert(data);
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 }
