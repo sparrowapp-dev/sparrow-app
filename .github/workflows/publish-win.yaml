@@ -3,7 +3,7 @@ name: Widows Build
 on:
   push:
     branches:
-      - development
+      - main
 env: 
  VITE_API_URL: ${{secrets.VITE_API_URL}}
 
