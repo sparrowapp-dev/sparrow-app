@@ -15,6 +15,7 @@
   export let onclick: (tab: string) => void;
   export let method: string;
   export let id: string;
+  export let isError: boolean = false;
 
   let selectedRequest: {
     name: string;
@@ -60,7 +61,9 @@
   <div on:click={toggleDropdown}>
     <div
       id={`color-dropdown-${id}`}
-      class="dropdown-btn rounded d-flex align-items-center justify-content-between"
+      class="dropdown-btn rounded d-flex align-items-center justify-content-between {isError
+        ? 'isError'
+        : ''}"
       class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0 text-{selectedRequest?.color}">
@@ -124,13 +127,15 @@
     background-color: var(--border-color);
   }
   .dropdown-data {
-    background-color: var(--background-dropdown);
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     position: absolute;
     top: 40px;
     left: 0;
     right: 0;
     border: 1px solid rgb(44, 44, 44);
+    -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
+    backdrop-filter: blur(10px);
   }
   .dropdown-btn p,
   .dropdown-data p {
@@ -153,6 +158,9 @@
   .dropdown-btn {
     border: 1px solid #313233;
     cursor: pointer;
+  }
+  .isError {
+    border: 1px solid var(--error--color) !important;
   }
   .dropdown-btn-active {
     border: 1px solid var(--send-button);

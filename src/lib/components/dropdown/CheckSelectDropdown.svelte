@@ -5,7 +5,7 @@
   import { fade, fly, slide } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   let isOpen: boolean = false;
-
+  export let isError: boolean = false;
   export let list: Array<{
     name: string;
     id: string;
@@ -102,7 +102,9 @@
   >
     <div on:click={toggleDropdown}>
       <div
-        class="dropdown-btn rounded d-flex align-items-center justify-content-between"
+        class="dropdown-btn rounded d-flex align-items-center justify-content-between {isError
+          ? 'isError'
+          : ''}"
         class:dropdown-btn-active={isOpen}
       >
         {#if !countCheckedList(data)}
@@ -161,7 +163,7 @@
           </p>
         </div>
         {#each data as list, index}
-          <div class="d-flex px-2 py-1 highlight">
+          <div class="d-flex px-2 py-2 highlight">
             <input
               class="form-check-input"
               type="checkbox"
@@ -198,7 +200,7 @@
     padding: 0 10px;
   }
   .dropdown-data {
-    background-color: var(--background-dropdown);
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     position: absolute;
     top: 40px;
@@ -207,6 +209,8 @@
     border: 1px solid rgb(44, 44, 44);
     max-height: 200px;
     overflow-y: auto;
+    -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
+    backdrop-filter: blur(10px);
   }
   .dropdown-btn p,
   .dropdown-data p {
@@ -232,6 +236,9 @@
   }
   .dropdown-btn-active {
     border: 1px solid var(--send-button);
+  }
+  .isError {
+    border: 1px solid var(--error--color) !important;
   }
   .navigator {
     white-space: nowrap;

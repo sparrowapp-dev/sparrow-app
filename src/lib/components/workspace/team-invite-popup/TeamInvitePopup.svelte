@@ -188,7 +188,12 @@
     <p class="invite-subheader text-textColor mt-0 mb-1">
       use commas to separate emails
     </p>
-    <div class="email-container rounded">
+    <div
+      class="email-container rounded {emailError &&
+      emailstoBeSentArr.length === 0
+        ? 'isError'
+        : ''}"
+    >
       <div id="input-email"></div>
       <input
         id="input"
@@ -213,6 +218,7 @@
   <div class="mt-4">
     <p class="role-title mb-1">Role<span class="asterik">*</span></p>
     <SelectRoleDropdown
+      isError={roleError && selectedRole === "select"}
       id={"invite-member-workspace"}
       data={[
         {
@@ -264,6 +270,7 @@
         Select Workspaces you would want to give access to.
       </p>
       <CheckSelectDropdown
+        isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}
         id={"check-select-workspace"}
         list={teamSpecificWorkspace}
         onclick={handleCheckSelectDropdown}
@@ -390,5 +397,8 @@
   .team-icon {
     height: 24px;
     width: 24px;
+  }
+  .isError {
+    border: 1px solid var(--error--color) !important;
   }
 </style>
