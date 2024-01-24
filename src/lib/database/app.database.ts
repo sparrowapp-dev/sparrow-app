@@ -33,6 +33,10 @@ import {
   environmentTabSchema,
   type EnvironmentTabDocType,
 } from "$lib/models/environment-tab.model";
+import {
+  windowSettingsSchema,
+  type WindowSettingsDocType,
+} from "$lib/models/window-settings-model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -55,6 +59,7 @@ export type TabDocument = RxDocument<TabDocType>;
 export type TabContainer = RxCollection<TabDocType>;
 export type ActiveSideBarTabDocument = RxDocument<ActiveSideBarTabDocType>;
 export type ActiveSideBarTabContainer = RxCollection<ActiveSideBarTabDocType>;
+export type WindowSettingsContainer = RxCollection<WindowSettingsDocType>;
 
 // collate all the Rx collections
 export type DatabaseCollections = {
@@ -63,6 +68,7 @@ export type DatabaseCollections = {
   collection: CollectionContainer;
   environment: EnvironmentContainer;
   activesidebartab: ActiveSideBarTabContainer;
+  windowSettings: WindowSettingsContainer;
   team: TeamContainer;
 };
 
@@ -143,6 +149,9 @@ export class RxDB {
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,
+      },
+      windowsettings: {
+        schema: windowSettingsSchema,
       },
       team: {
         schema: teamSchema,

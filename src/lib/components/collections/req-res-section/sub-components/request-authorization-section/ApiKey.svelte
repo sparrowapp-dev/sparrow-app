@@ -52,17 +52,17 @@
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
+    class="col-12 d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
     style="font-size: 12px; font-weight:500"
   >
-    <p class="mb-0">Auth Key</p>
+    <p class="col-2 mb-0">Auth Key</p>
 
-    <div class="position-relative w-75">
+    <div class="col-10 position-relative">
       <input
         type="text"
         style="outline: none;"
         id={"auth-key"}
-        class="w-100 bg-backgroundColor border-0 h-75 p-2"
+        class="w-100 bg-backgroundColor border-0 h-75 p-2 ps-0"
         placeholder="Enter Auth Key"
         bind:value={apiData.authKey}
         on:input={() => {
@@ -112,15 +112,15 @@
     </div>
   </div>
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
+    class="col-12 d-flex align-items-center justify-content-between text-requestBodyColor mb-3"
     style="font-size: 12px; font-weight:500"
   >
-    <p class="mb-0">Auth Value</p>
-    <div class="position-relative w-75">
+    <p class="col-2 mb-0">Auth Value</p>
+    <div class="col-10 position-relative">
       <input
         type="text"
         style="outline: none;"
-        class="w-100 h-75 p-2 border-0 bg-backgroundColor"
+        class="w-100 h-75 p-2 ps-0 border-0 bg-backgroundColor"
         id={"auth-value"}
         placeholder="Enter Auth Value"
         bind:value={apiData.authValue}
@@ -171,11 +171,11 @@
     </div>
   </div>
   <div
-    class="d-flex align-items-center justify-content-between text-requestBodyColor gap-4"
+    class="col-12 d-flex justify-content-between text-requestBodyColor"
     style="font-size: 12px; font-weight:500"
   >
-    <p>Add to</p>
-    <div class="w-75 p-2">
+    <p class="col-2 mt-3 mb-0" style="margin-top: 0.8rem !important;">Add to</p>
+    <div class="col-10 p-2 ps-0 position-relative">
       <button class="bg-backgroundColor border-0">
         <p class="">
           <Dropdown
