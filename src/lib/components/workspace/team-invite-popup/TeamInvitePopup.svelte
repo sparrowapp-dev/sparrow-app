@@ -16,6 +16,7 @@
   export let onRefresh;
   export let workspaces;
   export let teamLogo;
+  export let userId;
 
   const emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {
@@ -125,7 +126,7 @@
           };
           const response = await onSubmit(teamId, data);
           if (response) {
-            onRefresh();
+            onRefresh(userId);
             updateRepo(teamId, response);
             handleInvitePopup(false);
             notifications.success("Invite sent.");
@@ -140,7 +141,7 @@
         };
         const response = await onSubmit(teamId, data);
         if (response) {
-          onRefresh();
+          onRefresh(userId);
           updateRepo(teamId, response);
           handleInvitePopup(false);
           notifications.success("Invite sent.");

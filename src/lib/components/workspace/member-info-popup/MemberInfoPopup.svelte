@@ -16,6 +16,7 @@
   export let handleMemberOwnershipPopUpCancel;
   export let owner: boolean = false;
 
+  console.log(workspaces);
   const handleDropdown = (id) => {
     if (id === "remove") {
       handleMemberPopUpCancel(true);
