@@ -182,7 +182,6 @@ export class WorkspaceRepository {
       if (data.name) value.name = data.name;
       if (data.description) value.description = data.description;
       if (data.team) value.team = data.team;
-      if (data.owner) value.owner = data.owner;
       if (data.users) value.users = data.users;
       // if (data.environmentId) value.environmentId = data.environmentId;
 
@@ -202,7 +201,19 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
+    await this.clearWorkspaces();
     await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
+  };
+
+  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    return await workspace.remove();
   };
 }

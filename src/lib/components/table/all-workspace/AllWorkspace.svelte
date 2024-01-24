@@ -8,7 +8,7 @@
     DoubleRightIcon,
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
-  import { ShowMoreOptions } from "$lib/components";
+  import { ShowMoreOptions, UserProfileList } from "$lib/components";
   import UserProfileSm from "$lib/components/profile/UserProfileSM.svelte";
   import type { TeamDocument } from "$lib/database/app.database";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
@@ -185,9 +185,21 @@
                 >
                 {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
                   <td class="tab-data py-3">
-                    <UserProfileSm
-                      username={list?.users?.length > 0 && list?.users[0].name}
-                    />
+                    <div class="d-flex">
+                      <UserProfileList
+                        width={24}
+                        height={25}
+                        borderRadius={24}
+                        users={list?.users?.filter(
+                          (user) =>
+                            user.role == "admin" ||
+                            user.role == "editor" ||
+                            user.role == "viewer",
+                        )}
+                        maxProfiles={3}
+                        classProp="position-absolute"
+                      />
+                    </div>
                   </td>
                 {/if}
                 <td class="tab-data py-3"

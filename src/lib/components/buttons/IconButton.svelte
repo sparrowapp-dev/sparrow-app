@@ -7,7 +7,7 @@
 </script>
 
 <button
-  class={`${classProp} sparrow-icon-btn p-2`}
+  class={`${classProp}  sparrow-icon-btn p-2`}
   style={`width: ${width ? width + "px" : "auto"}; height: ${
     height ? height + "px" : "auto"
   };`}

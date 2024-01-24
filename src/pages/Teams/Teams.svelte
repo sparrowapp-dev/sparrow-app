@@ -1,10 +1,7 @@
 <script lang="ts">
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import type {
-    CollectionsMethods,
-    CurrentTeam,
-  } from "$lib/utils/interfaces";
+  import type { CollectionsMethods, CurrentTeam } from "$lib/utils/interfaces";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
@@ -51,6 +48,7 @@
   let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
+  let teamUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
   let isShowMoreVisible: boolean = false;
   let openLeaveTeamModal: boolean = false;
@@ -126,6 +124,8 @@
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toISOString(),
+      undefined,
+      currOpenedTeam.id,
     );
 
     const workspaceData = {
@@ -139,8 +139,6 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      // await _viewModel.updateWorkspace(workspaceObj._id, response.data.data);
-
       let totalCollection: number = 0;
       let totalRequest: number = 0;
 
@@ -178,6 +176,7 @@
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
       // await _viewModelWorkspace.addWorkspace(workspaceObj);
+      if (userId) await _viewModel.refreshTeams(userId);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
@@ -188,6 +187,10 @@
       isWorkspaceLoaded.set(true);
       navigate("/dashboard/collections");
       activeSideBarTabMethods.updateActiveTab("collections");
+    } else {
+      await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
+      isWorkspaceLoaded.set(true);
+      notifications.error("Failed to create new Workspace!");
     }
   };
 
@@ -200,9 +203,11 @@
       newTeam.name.invalid = true;
       return;
     }
-    if (description == "") newTeam.description.invalid = true;
+    // if (description == "") newTeam.description.invalid = true;
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
+
+    teamUnderCreation = true;
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
 
@@ -215,7 +220,11 @@
       await _viewModel.refreshTeams(userId);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
+      teamUnderCreation = false;
     } else {
+      await _viewModel.leaveTeam(teamObj.teamId);
+      teamUnderCreation = false;
+      handleCreateTeamModal();
       notifications.error("Failed to create a new team.");
     }
   };
@@ -319,6 +328,10 @@
     isShowMoreVisible = !isShowMoreVisible;
   };
 
+  const handleCloseShowMoreClick = (e) => {
+    if (!isShowMoreVisible) isShowMoreVisible = !isShowMoreVisible;
+  };
+
   const handleLeaveTeamModal = () => {
     openLeaveTeamModal = !openLeaveTeamModal;
   };
@@ -352,17 +365,18 @@
 </script>
 
 <svelte:window
-  on:click={() => {
-    (openLeaveTeamModal = false), (isShowMoreVisible = false);
+  on:click={(e) => {
+    handleCloseShowMoreClick(e);
   }}
-  on:contextmenu|preventDefault={() => {
-    (openLeaveTeamModal = false), (isShowMoreVisible = false);
+  on:contextmenu|preventDefault={(e) => {
+    handleCloseShowMoreClick(e);
   }}
 />
 <!-- Create New Team POP UP -->
 <CustomPopup
   isOpen={isCreateTeamModalOpen}
   title={"New Team"}
+  underSubmission={teamUnderCreation}
   btnText={"Create Team"}
   handleOpen={handleCreateTeamModal}
   handleSubmit={() =>
@@ -426,6 +440,7 @@
     access to all the resources in this team.
   </p>
 </CustomPopup>
+
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>
     <WorkspaceList

@@ -40,6 +40,7 @@
   export let teams: Observable<TeamDocument[]>;
   export let collectionsMethods: CollectionsMethods;
 
+  let workspaceNameExistsErr: boolean = false;
   let workspaceLimit = constants.WORKSPACE_LIMIT;
   let isOpen: boolean = false;
   let openCreateWorkspaceModal: boolean = false;
@@ -92,17 +93,23 @@
     moveNavigation("right");
   };
   const handleCreateWorkspaceModal = () => {
+    if (openCreateWorkspaceModal) {
+      workspacePostInput.name = "";
+      workspacePostInput.id = "";
+    }
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
+    workspaceNameExistsErr = false;
     if (e.target.value !== "") invalidWorkspacePostInput.name = false;
   };
   const handleTeamSelect = (value) => {
     workspacePostInput.id = value;
     if (value && value !== "") invalidWorkspacePostInput.id = false;
   };
+
   const handleCreateWorkSpace = async () => {
     if (!workspacePostInput?.name || workspacePostInput?.name === "") {
       invalidWorkspacePostInput.name = true;
@@ -112,10 +119,25 @@
     }
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
+    if (
+      $teams
+        ?.filter((teamData) => teamData._data.teamId == workspacePostInput?.id)
+        ?.find((teamData) =>
+          teamData._data.workspaces.find(
+            (workspace) => workspace.name == workspacePostInput?.name,
+          ),
+        )
+    ) {
+      invalidWorkspacePostInput.name = true;
+      workspaceNameExistsErr = true;
+      return;
+    }
+    workspaceUnderCreation = true;
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
       workspacePostInput?.name,
+      workspacePostInput.id,
     );
 
     const workspaceData = {
@@ -162,6 +184,7 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
+      if (userId) await _teamViewModel.refreshTeams(userId);
       if (userId) await _viewModel.refreshWorkspaces(userId);
       await _viewModel.activateWorkspace(response.data.data._id);
       collectionsMethods.handleCreateTab(workspaceObj);
@@ -172,9 +195,12 @@
       isWorkspaceLoaded.set(true);
       navigate("/dashboard/collections");
       activeSideBarTabMethods.updateActiveTab("collections");
-      openCreateWorkspaceModal = false;
+      workspaceUnderCreation = false;
+      handleCreateWorkspaceModal();
     } else {
-      openCreateWorkspaceModal = false;
+      await _viewModel.removeWorkspace(workspaceObj._id);
+      handleCreateWorkspaceModal();
+      workspaceUnderCreation = false;
       isWorkspaceLoaded.set(true);
       notifications.error("Failed to create new Workspace!");
     }
@@ -212,7 +238,9 @@
     inputPlaceholder="Enter workspace name"
     inputId="workspace-name-input"
     invalidValue={invalidWorkspacePostInput.name}
-    errorText="Workspace name cannot be empty."
+    errorText={workspaceNameExistsErr
+      ? "Workspace with this name already exists."
+      : "Workspace name cannot be empty."}
     onChange={handleCreateWorkspaceNameChange}
   />
   <CustomDropdown

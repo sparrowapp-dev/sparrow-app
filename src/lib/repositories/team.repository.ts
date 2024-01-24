@@ -148,7 +148,7 @@ export class TeamRepository {
     return;
   };
 
-  public leaveTeam = async (teamId: string) => {
+  public removeTeam = async (teamId: string) => {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {

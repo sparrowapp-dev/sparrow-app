@@ -45,18 +45,6 @@
     selectedView = value;
   });
 
-  let menuItems = [
-    {
-      onClick: (e) => {
-        handleLeaveTeamModal();
-        handleOnShowMoreClick(e);
-      },
-      displayText: "Leave Team",
-      disabled: $currOpenedTeamRxDoc?._data?.owner == userId ? true : false,
-      visible: true,
-    },
-  ];
-  onMount(() => {});
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
@@ -71,10 +59,10 @@
           <div
             class="team-heading d-flex justify-content-between position-relative"
           >
-            <h2 class="d-flex ellipsis overflow-hidden w-75">
+            <h2 class="d-flex ellipsis w-75 overflow-visible">
               {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
                 <img
-                  class="text-center align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
+                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
                   style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                   src={base64ToURL(currOpenedTeam.base64String)}
                   alt=""
@@ -88,55 +76,56 @@
                     : ""}
                 </p>
               {/if}
-              <span class="ms-4 w-75 my-auto ellipsis overflow-hidden"
-                >{currOpenedTeam.name}</span
-              >
-            </h2>
-            <div class="p-4 position-relative">
-              <IconButton
-                classProp="rounded {isShowMoreVisible
-                  ? 'bg-blackColor'
-                  : 'bg-plusButton'}"
-                onClick={handleOnShowMoreClick}><ShowMoreIcon /></IconButton
-              >
-              {#if $currOpenedTeamRxDoc?._data?.owner == userId}
-                <button
-                  on:click={(e) => {
-                    handleLeaveTeamModal();
-                    handleOnShowMoreClick(e);
-                  }}
-                  disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
-                  class="position-absolute {isShowMoreVisible &&
-                    'd-none'} {isShowMoreVisible
-                    ? 'bg-plusButton'
-                    : 'bg-blackColor'} border-0 w-100 p-2 mt-2 ms-2 rounded {$currOpenedTeamRxDoc
-                    ?._data?.owner == userId
-                    ? 'text-lightGray'
-                    : 'text-dangerColor'}
-              ">Leave Team</button
+              <span class="ms-4 my-auto ellipsis overflow-hidden"
+                >{currOpenedTeam.name}
+              </span>
+              <div class="mr-4 position-relative">
+                <IconButton
+                  classProp="rounded mx-2 my-auto {isShowMoreVisible
+                    ? 'transparent'
+                    : 'bg-plusButton'}"
+                  onClick={handleOnShowMoreClick}><ShowMoreIcon /></IconButton
                 >
-              {:else}
-                <button
-                  on:click={(e) => {
-                    handleLeaveTeamModal();
-                    handleOnShowMoreClick(e);
-                  }}
-                  disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
-                  class="position-absolute {isShowMoreVisible &&
-                    'd-none'} bg-blackColor border-0 w-100 p-2 mt-5 rounded {$currOpenedTeamRxDoc
-                    ?._data?.owner == userId
-                    ? 'text-lightGray'
-                    : 'text-dangerColor'}
+                {#if $currOpenedTeamRxDoc?._data?.owner == userId}
+                  <button
+                    on:click={(e) => {
+                      handleLeaveTeamModal();
+                      handleOnShowMoreClick(e);
+                    }}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="bottom"
+                    title="Tooltip on bottom"
+                    disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
+                    style="font-size: 12px;"
+                    data-bs-custom-class="custom-tooltip"
+                    class="position-absolute {isShowMoreVisible &&
+                      'd-none'} {isShowMoreVisible
+                      ? 'bg-plusButton'
+                      : 'bg-blackColor'} border-0 p-2 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      ?._data?.owner == userId
+                      ? 'text-lightGray'
+                      : 'text-dangerColor'}
                 ">Leave Team</button
-                >
-              {/if}
-            </div>
-            <!-- <ShowMoreOptions
-              rightDistance={12}
-              topDistance={10}
-              showMenu={isShowMoreVisible}
-              {menuItems}
-            /> -->
+                  >
+                {:else}
+                  <button
+                    on:click={(e) => {
+                      handleLeaveTeamModal();
+                      handleOnShowMoreClick(e);
+                    }}
+                    disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
+                    style="font-size: 12px;"
+                    class="position-absolute {isShowMoreVisible &&
+                      'd-none'} bg-blackColor border-0 p-2 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      ?._data?.owner == userId
+                      ? 'text-lightGray'
+                      : 'text-dangerColor'}
+                  ">Leave Team</button
+                  >
+                {/if}
+              </div>
+            </h2>
+
             {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
               <div class="d-flex w-25">
                 <button
@@ -188,7 +177,7 @@
                     : ""}</span
                 ></Link
               >
-              {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
+              {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                 <Link style="text-decoration:none;" to="personal-workspaces"
                   ><span
                     style="padding: 8px 8px;"
@@ -256,6 +245,10 @@
 </div>
 
 <style>
+  .custom-tooltip {
+    --bs-tooltip-bg: var(--bs-primary);
+  }
+
   .teams-content {
     width: 100%;
   }

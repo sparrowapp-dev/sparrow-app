@@ -32,20 +32,7 @@ export const workspaceSchemaLiteral = {
         },
       },
     },
-    owner: {
-      type: "object",
-      properties: {
-        id: {
-          type: "string",
-        },
-        name: {
-          type: "string",
-        },
-        type: {
-          type: "string",
-        },
-      },
-    },
+
     admins: {
       type: "array",
       uniqueItems: true,
@@ -72,6 +59,12 @@ export const workspaceSchemaLiteral = {
           },
           id: {
             type: "number",
+          },
+          name: {
+            type: "string",
+          },
+          email: {
+            type: "string",
           },
         },
       },
