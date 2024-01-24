@@ -57,6 +57,8 @@
       </button>
     {/if}
   </div>
+</section>
+<section class="member-list">
   {#if openTeam?.users}
     {#each openTeam?.users as user}
       {#if user.id === userId && (user.name
@@ -143,5 +145,9 @@
     font-size: 16px;
     font-weight: 400;
     text-align: center;
+  }
+  .member-list {
+    height: calc(100vh - 310px);
+    overflow-y: auto;
   }
 </style>

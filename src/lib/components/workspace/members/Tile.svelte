@@ -281,7 +281,7 @@
     {handleMemberOwnershipPopUpCancel}
   />
 {/if}
-<div class="d-flex tile rounded">
+<div class="d-flex tile rounded align-items-center">
   <div
     class="info d-flex align-items-center"
     on:click={() => {
@@ -379,9 +379,6 @@
 </div>
 
 <style>
-  .tile {
-    padding: 8px;
-  }
   .tile:hover {
     background-color: var(--background-light) !important;
   }
@@ -393,9 +390,11 @@
   }
   .info {
     width: calc(100% - 100px);
-    height: 36px;
+    height: 48px;
+    padding: 8px !important;
   }
   .position {
     width: 100px;
+    padding: 8px;
   }
 </style>

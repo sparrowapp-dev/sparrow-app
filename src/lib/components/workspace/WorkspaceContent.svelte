@@ -147,37 +147,32 @@
             class="teams-menu d-flex justify-content-between align-items-center pb-4"
           >
             <div class="teams-menu__left gap-4">
-              <Link style="text-decoration:none;" to="all-workspace"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "all-workspace")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "all-workspace"}
-                  >Workspaces {$data &&
-                  $data
-                    .slice()
-                    .filter((item) => item.team.teamId == currOpenedTeam.id)
-                    .length > 0
-                    ? `(${
-                        $data
-                          ?.slice()
-                          .filter(
-                            (item) => item.team.teamId == currOpenedTeam.id,
-                          ).length
-                      })`
-                    : ""}</span
-                ></Link
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "all-workspace")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "all-workspace"}
+                >Workspaces {$data &&
+                $data
+                  .slice()
+                  .filter((item) => item.team.teamId == currOpenedTeam.id)
+                  .length > 0
+                  ? `(${
+                      $data
+                        ?.slice()
+                        .filter((item) => item.team.teamId == currOpenedTeam.id)
+                        .length
+                    })`
+                  : ""}</span
               >
-              <Link style="text-decoration:none;" to="personal-workspaces"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "members")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "members"}
-                  >Members {openTeam?.users?.length
-                    ? `(${openTeam.users.length})`
-                    : ""}</span
-                ></Link
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "members")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "members"}
+                >Members {openTeam?.users?.length
+                  ? `(${openTeam.users.length})`
+                  : ""}</span
               >
             </div>
             <div class="teams-menu__right">
@@ -209,7 +204,6 @@
       </div>
     </div>
 
-    <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
       <AllWorkspace
         openedTeam={currOpenedTeam}
@@ -239,7 +233,6 @@
         {teamRepositoryMethods}
       />
     {/if}
-    <!-- </Route> -->
   </div>
 </div>
 
