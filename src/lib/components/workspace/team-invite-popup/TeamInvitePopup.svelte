@@ -2,7 +2,7 @@
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import { fade } from "svelte/transition";
+  import { fly, fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
@@ -169,7 +169,12 @@
   transition:fade={{ delay: 0, duration: 100 }}
 />
 
-<div class="container">
+<div
+  class="container"
+  transition:fly={{ y: 50, delay: 0, duration: 100 }}
+  on:introstart
+  on:outroend
+>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <p class="mb-0 header-title">Invite Team Members</p>
     <button

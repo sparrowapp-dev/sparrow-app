@@ -392,12 +392,12 @@
     border: 1px solid var(--border-color);
   }
   .info {
-    width: calc(100% - 100px);
+    width: calc(100% - 120px);
     height: 48px;
     padding: 8px !important;
   }
   .position {
-    width: 100px;
+    width: 120px;
     padding: 8px;
   }
 </style>
