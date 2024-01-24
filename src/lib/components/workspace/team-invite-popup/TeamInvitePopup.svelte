@@ -129,7 +129,22 @@
             onRefresh(userId);
             updateRepo(teamId, response);
             handleInvitePopup(false);
-            notifications.success("Invite sent.");
+            if (response?.nonExistingUsers?.length > 0) {
+              response.nonExistingUsers.forEach((elem) => {
+                notifications.error(`${elem} doesn't exist.`);
+              });
+            }
+            if (response?.alreadyTeamMember?.length > 0) {
+              response.alreadyTeamMember.forEach((elem) => {
+                notifications.error(`${elem} already in team.`);
+              });
+            }
+            if (
+              !response?.nonExistingUsers?.length &&
+              !response?.alreadyTeamMember?.length
+            ) {
+              notifications.success("Invite sent.");
+            }
           } else {
             notifications.error("Failed to sent invite. Please try again.");
           }
@@ -144,7 +159,22 @@
           onRefresh(userId);
           updateRepo(teamId, response);
           handleInvitePopup(false);
-          notifications.success("Invite sent.");
+          if (response?.nonExistingUsers?.length > 0) {
+            response.nonExistingUsers.forEach((elem) => {
+              notifications.error(`${elem} doesn't exist.`);
+            });
+          }
+          if (response?.alreadyTeamMember?.length > 0) {
+            response.alreadyTeamMember.forEach((elem) => {
+              notifications.error(`${elem} already in team.`);
+            });
+          }
+          if (
+            !response?.nonExistingUsers?.length &&
+            !response?.alreadyTeamMember?.length
+          ) {
+            notifications.success("Invite sent.");
+          }
         } else {
           notifications.error("Failed to sent invite. Please try again.");
         }
