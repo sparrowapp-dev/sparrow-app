@@ -100,9 +100,6 @@
         />
       {/if}
     {/each}
-    <!-- {#if filteredUser?.length === 0} -->
-    <!-- <p class="not-found-text mt-3">{filteredUser?.length} No members found.</p> -->
-    <!-- {/if} -->
   {/if}
 </section>
 

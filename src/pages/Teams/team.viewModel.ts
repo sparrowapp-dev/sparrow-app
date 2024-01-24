@@ -141,7 +141,6 @@ export class TeamViewModel {
     const teamsData = await this.getTeamData();
     teamsData.forEach((element) => {
       const elem = element.toMutableJSON();
-      console.log(elem);
       if (elem.isOpen) openTeamId = elem.teamId;
     });
     const response = await this.teamService.fetchTeams(userId);
@@ -284,7 +283,4 @@ export class TeamViewModel {
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
   };
-  // public modifyTeam = async (teamId, team) => {
-  //   this.teamRepository.modifyTeam(teamId, team);
-  // };
 }
