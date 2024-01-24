@@ -41,24 +41,20 @@
         class="sparrow-modal-cancel-btn border-0 py-1 px-3 me-2"
         on:click={handleOpen}>Cancel</button
       >
-      {#if isDanger}
-        <button
-          class="sparrow-modal-danger-btn border-0 py-1 px-3"
-          on:click={handleSubmit}>{btnText}</button
-        >
-      {:else}
-        <button
-          class="sparrow-modal-primary-btn d-flex border-0 py-1 me-1 px-3"
-          on:click={() => {
-            handleSubmit();
-          }}
-        >
-          {#if underSubmission}
-            <Spinner size="18px" />
-          {/if}
-          <span class="ms-2 my-auto">{btnText}</span></button
-        >
-      {/if}
+
+      <button
+        class="{isDanger
+          ? 'sparrow-modal-danger-btn'
+          : 'sparrow-modal-primary-btn'} d-flex border-0 py-1 me-1 px-3"
+        on:click={() => {
+          handleSubmit();
+        }}
+      >
+        {#if underSubmission}
+          <Spinner size="18px" />
+        {/if}
+        <span class="ms-2 my-auto">{btnText}</span></button
+      >
     </div>
   </div>
 {/if}

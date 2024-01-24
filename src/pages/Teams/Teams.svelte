@@ -52,6 +52,7 @@
   let isCreateTeamModalOpen: boolean;
   let isShowMoreVisible: boolean = false;
   let openLeaveTeamModal: boolean = false;
+  let isLeavingTeam: boolean = false;
 
   let newTeam: {
     name: {
@@ -231,10 +232,11 @@
 
   const handleLeaveTeam = async () => {
     if (!currOpenedTeam?.id) return;
+    isLeavingTeam = true;
     const response = await _viewModel.leaveTeam(currOpenedTeam.id);
     if (response.isSuccessful) {
-      await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModel.refreshTeams(userId);
+      await _viewModelWorkspace.refreshWorkspaces(userId);
       notifications.success("You left a team.");
       setOpenedTeam(
         activeTeamRxDoc?._data?.teamId,
@@ -243,9 +245,13 @@
         activeTeamRxDoc?._data?.logo,
       );
       isShowMoreVisible = false;
+      isLeavingTeam = false;
+      handleLeaveTeamModal();
     } else {
       notifications.error("Failed to leave the team. Please try again.");
       isShowMoreVisible = false;
+      isLeavingTeam = false;
+      handleLeaveTeamModal();
     }
   };
 
@@ -430,6 +436,7 @@
 <CustomPopup
   isOpen={openLeaveTeamModal}
   title="Leave Team?"
+  underSubmission={isLeavingTeam}
   isDanger={true}
   btnText="Leave"
   handleOpen={handleLeaveTeamModal}

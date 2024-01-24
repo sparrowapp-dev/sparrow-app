@@ -96,12 +96,12 @@
                     data-bs-placement="bottom"
                     title="Tooltip on bottom"
                     disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
-                    style="font-size: 12px;"
+                    style="font-size: 14px;"
                     data-bs-custom-class="custom-tooltip"
                     class="position-absolute {isShowMoreVisible &&
                       'd-none'} {isShowMoreVisible
                       ? 'bg-plusButton'
-                      : 'bg-blackColor'} border-0 p-2 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      : 'bg-blackColor'} border-0 py-2 px-3 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
                       ?._data?.owner == userId
                       ? 'text-lightGray'
                       : 'text-dangerColor'}
@@ -114,9 +114,9 @@
                       handleOnShowMoreClick(e);
                     }}
                     disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
-                    style="font-size: 12px;"
+                    style="font-size: 14px;"
                     class="position-absolute {isShowMoreVisible &&
-                      'd-none'} bg-blackColor border-0 p-2 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      'd-none'} bg-blackColor border-0 py-2 px-3 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
                       ?._data?.owner == userId
                       ? 'text-lightGray'
                       : 'text-dangerColor'}
