@@ -13,7 +13,7 @@
   import { v4 as uuidv4 } from "uuid";
   export let user;
   export let userType;
-  export let activeTeam;
+  export let openTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let workspaces;
@@ -57,26 +57,26 @@
 
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
-      activeTeam.teamId,
+      openTeam.teamId,
       user.id,
     );
     if (response) {
-      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       isMemberRemovePopup = false;
-      notifications.success(`${user.name} is removed from ${activeTeam.name}`);
+      notifications.success(`${user.name} is removed from ${openTeam.name}`);
     } else {
       notifications.error(
-        `Failed to remove ${user.name} from ${activeTeam.name}`,
+        `Failed to remove ${user.name} from ${openTeam.name}`,
       );
     }
   };
   const handleMemberDemotePopUpSuccess = async () => {
     const response = await teamServiceMethods.demoteToMemberAtTeam(
-      activeTeam.teamId,
+      openTeam.teamId,
       user.id,
     );
     if (response) {
-      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       isMemberDemotePopup = false;
       notifications.success(`${user.name} is now a member`);
@@ -88,11 +88,11 @@
   };
   const handleMemberPromotePopUpSuccess = async () => {
     const response = await teamServiceMethods.promoteToAdminAtTeam(
-      activeTeam.teamId,
+      openTeam.teamId,
       user.id,
     );
     if (response) {
-      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       isMemberPromotePopup = false;
       notifications.success(`${user.name} is now an admin`);
@@ -105,15 +105,15 @@
 
   const handleMemberOwnershipPopUpSuccess = async () => {
     const response = await teamServiceMethods.promoteToOwnerAtTeam(
-      activeTeam.teamId,
+      openTeam.teamId,
       user.id,
     );
     if (response) {
-      teamRepositoryMethods.modifyTeam(activeTeam.teamId, response);
+      teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       isMemberOwnershipPopup = false;
       notifications.success(
-        `${user.name} is now the new Owner of ${activeTeam.name}.`,
+        `${user.name} is now the new Owner of ${openTeam.name}.`,
       );
     } else {
       notifications.error(
@@ -131,7 +131,7 @@
         class="text-whiteColor">"${user.name}"</span
       >
       ? They will lose access to the <span
-        class="text-whiteColor">"${activeTeam?.name}"</span> team.
+        class="text-whiteColor">"${openTeam?.name}"</span> team.
     </p>`}
     onSuccess={handleMemberPopUpSuccess}
     onCancel={handleMemberPopUpCancel}
@@ -141,8 +141,8 @@
 {#if isMemberPromotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
-    teamName={activeTeam?.name}
-    teamLogo={activeTeam?.logo}
+    teamName={openTeam?.name}
+    teamLogo={openTeam?.logo}
     description={`
     <div class="d-flex tile rounded mb-3">
   <div
@@ -184,8 +184,8 @@
 {#if isMemberDemotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
-    teamName={activeTeam?.name}
-    teamLogo={activeTeam?.logo}
+    teamName={openTeam?.name}
+    teamLogo={openTeam?.logo}
     description={`
       <div class="d-flex tile rounded mb-3">
     <div
@@ -221,8 +221,8 @@
   <MemberChangeRolePopup
     auth={true}
     title={`Changing Role?`}
-    teamName={activeTeam?.name}
-    teamLogo={activeTeam?.logo}
+    teamName={openTeam?.name}
+    teamLogo={openTeam?.logo}
     description={`
       <div class="d-flex tile rounded mb-3">
     <div
@@ -261,7 +261,7 @@
 {#if isMemberInfoPopup}
   <MemberInfoPopup
     {owner}
-    title={`Access to ${activeTeam.name}`}
+    title={`Access to ${openTeam.name}`}
     {user}
     workspaces={workspaces.map((elem) => {
       let element = elem.toMutableJSON();

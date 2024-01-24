@@ -5,7 +5,7 @@
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
-  export let activeTeam;
+  export let openTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let workspaces = [];
@@ -20,7 +20,7 @@
   };
   let filteredUser;
   const calculateFilteredUser = () => {
-    filteredUser = activeTeam.users.filter((elem) => {
+    filteredUser = openTeam.users.filter((elem) => {
       if (
         elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
         elem.role.toLowerCase().includes(filterText.toLowerCase())
@@ -30,7 +30,7 @@
     });
   };
   $: {
-    if (activeTeam) {
+    if (openTeam) {
       calculateFilteredUser();
     }
   }
@@ -48,7 +48,7 @@
       type="text"
       id="search-input-team-member"
       class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search people in {activeTeam?.name}"
+      placeholder="Search people in {openTeam?.name}"
       bind:value={filterText}
     />
     {#if filterText !== ""}
@@ -57,8 +57,8 @@
       </button>
     {/if}
   </div>
-  {#if activeTeam?.users}
-    {#each activeTeam?.users as user}
+  {#if openTeam?.users}
+    {#each openTeam?.users as user}
       {#if user.id === userId && (user.name
           .toLowerCase()
           .includes(filterText.toLowerCase()) || user.role
@@ -68,9 +68,9 @@
           owner={true}
           {user}
           {userType}
-          {activeTeam}
+          {openTeam}
           workspaces={workspaces.filter((elem) => {
-            return elem?.team?.teamId === activeTeam?.teamId;
+            return elem?.team?.teamId === openTeam?.teamId;
           })}
           {teamServiceMethods}
           {teamRepositoryMethods}
@@ -79,7 +79,7 @@
         <hr />
       {/if}
     {/each}
-    {#each activeTeam?.users as user}
+    {#each openTeam?.users as user}
       {#if user.id !== userId && (user.name
           .toLowerCase()
           .includes(filterText.toLowerCase()) || user.role
@@ -88,9 +88,9 @@
         <Tile
           {user}
           {userType}
-          {activeTeam}
+          {openTeam}
           workspaces={workspaces.filter((elem) => {
-            return elem?.team?.teamId === activeTeam?.teamId;
+            return elem?.team?.teamId === openTeam?.teamId;
           })}
           {teamServiceMethods}
           {teamRepositoryMethods}

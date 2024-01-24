@@ -24,7 +24,7 @@
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
     activeSideBarTabMethods: any,
-    activeTeam,
+    openTeam,
     currentTeam: CurrentTeam,
     handleCreateWorkspace: any,
     teamServiceMethods: TeamServiceMethods,
@@ -46,7 +46,7 @@
 
   let userType: string;
   const findUserType = () => {
-    activeTeam?.users.forEach((user) => {
+    openTeam?.users.forEach((user) => {
       if (user.id === userId) {
         userType = user.role;
       }
@@ -58,7 +58,7 @@
     }
   }
   $: {
-    if (activeTeam) {
+    if (openTeam) {
       findUserType();
     }
   }
@@ -73,14 +73,14 @@
 {#if teamInvitePopup}
   <TeamInvitePopup
     {userId}
-    teamLogo={activeTeam?.logo}
+    teamLogo={openTeam?.logo}
     onSubmit={teamServiceMethods.inviteMembersAtTeam}
     onRefresh={teamServiceMethods.refreshWorkspace}
     updateRepo={teamRepositoryMethods.modifyTeam}
-    teamName={activeTeam?.name}
-    teamId={activeTeam?.teamId}
+    teamName={openTeam?.name}
+    teamId={openTeam?.teamId}
     workspaces={workspaces.filter((elem) => {
-      return elem?.team?.teamId === activeTeam?.teamId;
+      return elem?.team?.teamId === openTeam?.teamId;
     })}
     handleInvitePopup={(flag) => {
       teamInvitePopup = flag;
@@ -174,8 +174,8 @@
                   on:click={() => (selectedTab = "members")}
                   class="team-menu__link"
                   class:tab-active={selectedTab === "members"}
-                  >Members {activeTeam?.users?.length
-                    ? `(${activeTeam.users.length})`
+                  >Members {openTeam?.users?.length
+                    ? `(${openTeam.users.length})`
                     : ""}</span
                 ></Link
               >
@@ -233,7 +233,7 @@
       <Members
         {userId}
         {userType}
-        {activeTeam}
+        {openTeam}
         {teamServiceMethods}
         {workspaces}
         {teamRepositoryMethods}
