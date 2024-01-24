@@ -9,6 +9,8 @@
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
   import { notifications } from "$lib/utils/notifications";
+  import { TeamRole } from "$lib/utils/enums/team.enum";
+  import { v4 as uuidv4 } from "uuid";
   export let user;
   export let userType;
   export let activeTeam;
@@ -21,11 +23,11 @@
   const handleDropdown = (id) => {
     if (id === "remove") {
       isMemberRemovePopup = true;
-    } else if (user.role === "admin" && id === "member") {
+    } else if (user.role === TeamRole.ADMIN && id === TeamRole.MEMBER) {
       isMemberDemotePopup = true;
-    } else if (user.role === "member" && id === "admin") {
+    } else if (user.role === TeamRole.MEMBER && id === TeamRole.ADMIN) {
       isMemberPromotePopup = true;
-    } else if (user.role === "admin" && id === "owner") {
+    } else if (user.role === TeamRole.ADMIN && id === TeamRole.OWNER) {
       isMemberOwnershipPopup = true;
     }
   };
@@ -262,13 +264,14 @@
     title={`Access to ${activeTeam.name}`}
     {user}
     workspaces={workspaces.map((elem) => {
-      for (let i = 0; i < elem.users.length; i++) {
-        if (elem.users[i].id === user.id) {
-          elem.position = elem.users[i].role;
+      let element = elem.toMutableJSON();
+      for (let i = 0; i < element.users.length; i++) {
+        if (element.users[i].id === user.id) {
+          element.position = elem.users[i].role;
           break;
         }
       }
-      return elem;
+      return element;
     })}
     {userType}
     onCancel={handleMemberInfoPopUpCancel}
@@ -296,18 +299,18 @@
     </div>
   </div>
   <div class="position">
-    {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
+    {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
       <MemberDropdown
-        id={user.id}
+        id={user.id + uuidv4()}
         data={[
           {
             name: "Admin",
-            id: "admin",
+            id: TeamRole.ADMIN,
             color: "whiteColor",
           },
           {
             name: "Member",
-            id: "member",
+            id: TeamRole.MEMBER,
             color: "whiteColor",
           },
           {
@@ -319,23 +322,23 @@
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
-    {:else if userType === "owner" && user.role === "admin"}
+    {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
       <MemberDropdown
-        id={user.id}
+        id={user.id + uuidv4()}
         data={[
           {
             name: "Owner",
-            id: "owner",
+            id: TeamRole.OWNER,
             color: "whiteColor",
           },
           {
             name: "Admin",
-            id: "admin",
+            id: TeamRole.ADMIN,
             color: "whiteColor",
           },
           {
             name: "Member",
-            id: "member",
+            id: TeamRole.MEMBER,
             color: "whiteColor",
           },
           {
@@ -349,22 +352,22 @@
       />
     {:else}
       <MemberDropdown
-        id={user.id}
+        id={user.id + uuidv4()}
         disabled={true}
         data={[
           {
             name: "Owner",
-            id: "owner",
+            id: TeamRole.OWNER,
             color: "whiteColor",
           },
           {
             name: "Admin",
-            id: "admin",
+            id: TeamRole.ADMIN,
             color: "whiteColor",
           },
           {
             name: "Member",
-            id: "member",
+            id: TeamRole.MEMBER,
             color: "whiteColor",
           },
         ]}

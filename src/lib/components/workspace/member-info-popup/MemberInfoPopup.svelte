@@ -3,6 +3,7 @@
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { fly, fade } from "svelte/transition";
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
+  import { TeamRole } from "$lib/utils/enums/team.enum";
 
   export let title;
   export let user;
@@ -18,11 +19,11 @@
   const handleDropdown = (id) => {
     if (id === "remove") {
       handleMemberPopUpCancel(true);
-    } else if (user.role === "admin" && id === "member") {
+    } else if (user.role === TeamRole.ADMIN && id === TeamRole.MEMBER) {
       handleMemberDemotePopUpCancel(true);
-    } else if (user.role === "member" && id === "admin") {
+    } else if (user.role === TeamRole.MEMBER && id === TeamRole.ADMIN) {
       handleMemberPromotePopUpCancel(true);
-    } else if (user.role === "admin" && id === "owner") {
+    } else if (user.role === TeamRole.ADMIN && id === TeamRole.OWNER) {
       handleMemberOwnershipPopUpCancel(true);
     }
   };
@@ -72,18 +73,18 @@
           </div>
         </div>
         <div class="position">
-          {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
+          {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
             <MemberDropdown
               id={user.id}
               data={[
                 {
                   name: "Admin",
-                  id: "admin",
+                  id: TeamRole.ADMIN,
                   color: "whiteColor",
                 },
                 {
                   name: "Member",
-                  id: "member",
+                  id: TeamRole.MEMBER,
                   color: "whiteColor",
                 },
                 {
@@ -95,23 +96,23 @@
               method={user.role ? user.role : ""}
               onclick={handleDropdown}
             />
-          {:else if userType === "owner" && user.role === "admin"}
+          {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
             <MemberDropdown
               id={user.id}
               data={[
                 {
                   name: "Owner",
-                  id: "owner",
+                  id: TeamRole.OWNER,
                   color: "whiteColor",
                 },
                 {
                   name: "Admin",
-                  id: "admin",
+                  id: TeamRole.ADMIN,
                   color: "whiteColor",
                 },
                 {
                   name: "Member",
-                  id: "member",
+                  id: TeamRole.MEMBER,
                   color: "whiteColor",
                 },
                 {
@@ -130,17 +131,17 @@
               data={[
                 {
                   name: "Owner",
-                  id: "owner",
+                  id: TeamRole.OWNER,
                   color: "whiteColor",
                 },
                 {
                   name: "Admin",
-                  id: "admin",
+                  id: TeamRole.ADMIN,
                   color: "whiteColor",
                 },
                 {
                   name: "Member",
-                  id: "member",
+                  id: TeamRole.MEMBER,
                   color: "whiteColor",
                 },
               ]}
@@ -154,7 +155,9 @@
     <hr />
     <div style="font-size: 14px;" class="team-workspace mb-1">
       {#each workspaces as workspace}
-        <MemberWorkspace {workspace} {userType} {user} />
+        {#if workspace.position}
+          <MemberWorkspace {workspace} {userType} {user} />
+        {/if}
       {/each}
     </div>
     <div

@@ -99,7 +99,8 @@
             style="font-size: 12px;"
             class:selected-request={list.id === selectedRequest?.id}
           >
-            {list.name}
+            {list.name}<br />
+            <small class="text-textColor">{list.description}</small>
           </p>
           {#if selectedRequest?.id === list.id}
             <img src={checkIcon} alt="" />

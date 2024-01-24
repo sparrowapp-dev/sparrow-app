@@ -11,7 +11,12 @@
     id: string;
     checked: boolean;
   }>;
-  let data = list;
+  let data;
+  if (list && list.length > 0) {
+    data = list;
+  } else {
+    data = [];
+  }
   export let onclick: (tab) => void;
   export let id;
 
@@ -35,7 +40,7 @@
           flag = true;
         }
       }
-      if (data[data.length - 1].checked === false) {
+      if (data[data?.length - 1]?.checked === false) {
         flag = true;
       }
       if (flag) {
@@ -170,6 +175,14 @@
             </p>
           </div>
         {/each}
+        {#if !data?.length}
+          <p
+            class="m-0 ps-2 p-0 pt-1 pb-1 text-whiteColor"
+            style="font-size: 12px;"
+          >
+            {"Workspace not found!"}
+          </p>
+        {/if}
       </div>
     {/if}
   </div>

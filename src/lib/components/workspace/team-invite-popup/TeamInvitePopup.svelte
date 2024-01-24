@@ -9,6 +9,7 @@
   import CoverButton from "../../buttons/CoverButton.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
+  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
 
   export let onSubmit;
   export let updateRepo;
@@ -100,7 +101,10 @@
       selectedRole !== "select" &&
       emailstoBeSentArr?.length > 0
     ) {
-      if (selectedRole === "editor" || selectedRole === "viewer") {
+      if (
+        selectedRole === WorkspaceRole.EDITOR ||
+        selectedRole === WorkspaceRole.VIEWER
+      ) {
         if (countCheckedList(teamSpecificWorkspace)) {
           let data = {
             users: emailstoBeSentArr,
@@ -218,20 +222,20 @@
         },
         {
           name: "Admin",
-          id: "admin",
+          id: TeamRole.ADMIN,
           description:
             "Add & edit resources within a workspace,add & remove members to workspace",
           color: "whiteColor",
         },
         {
           name: "Editor",
-          id: "editor",
+          id: WorkspaceRole.EDITOR,
           description: "Add & edit resources within a workspace",
           color: "whiteColor",
         },
         {
           name: "Viewer",
-          id: "viewer",
+          id: WorkspaceRole.VIEWER,
           description: "View Resources within a workspace.",
           color: "whiteColor",
         },
@@ -240,7 +244,7 @@
       onclick={handleDropdown}
     />
   </div>
-  {#if selectedRole === "admin"}
+  {#if selectedRole === TeamRole.ADMIN}
     <p class="invite-subheader text-textColor mt-1 mb-1">
       Admins will get access to all the current workspaces as well as any future
       workspaces in the team.
@@ -250,7 +254,7 @@
     <p class="error-text">Role cannot be empty.</p>
   {/if}
 
-  {#if selectedRole === "editor" || selectedRole === "viewer"}
+  {#if selectedRole === WorkspaceRole.EDITOR || selectedRole === WorkspaceRole.VIEWER}
     <div class="mt-4">
       <p class="role-title mb-0">
         Specify Workspace<span class="asterik">*</span>

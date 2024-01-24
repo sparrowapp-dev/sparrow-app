@@ -1,5 +1,6 @@
 <script>
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
+  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
 
   export let workspace;
   export let user;
@@ -8,9 +9,15 @@
   const handleDropdown = (id) => {
     if (id === "remove") {
       // perform remove perations
-    } else if (workspace.position === "editor" && id === "viewer") {
+    } else if (
+      workspace.position === WorkspaceRole.EDITOR &&
+      id === WorkspaceRole.VIEWER
+    ) {
       // demote editor to viewer
-    } else if (workspace.position === "viewer" && id === "editor") {
+    } else if (
+      workspace.position === WorkspaceRole.VIEWER &&
+      id === WorkspaceRole.EDITOR
+    ) {
       // promote viewer to editor
     }
   };
@@ -21,18 +28,18 @@
     <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
-      {#if (userType === "owner" && user.role === "member") || (userType === "admin" && user.role === "member")}
+      {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
         <MemberDropdown
           id={workspace._id + "member-workspace"}
           data={[
             {
               name: "Editor",
-              id: "editor",
+              id: WorkspaceRole.EDITOR,
               color: "whiteColor",
             },
             {
               name: "Viewer",
-              id: "viewer",
+              id: WorkspaceRole.VIEWER,
               color: "whiteColor",
             },
             {
@@ -51,27 +58,27 @@
           data={[
             {
               name: "Editor",
-              id: "editor",
+              id: WorkspaceRole.EDITOR,
               color: "whiteColor",
             },
             {
               name: "Viewer",
-              id: "viewer",
+              id: WorkspaceRole.VIEWER,
               color: "whiteColor",
             },
             {
               name: "Admin",
-              id: "admin",
+              id: TeamRole.ADMIN,
               color: "whiteColor",
             },
             {
               name: "Owner",
-              id: "owner",
+              id: TeamRole.OWNER,
               color: "whiteColor",
             },
           ]}
-          method={user.role === "owner"
-            ? "owner"
+          method={user.role === TeamRole.OWNER
+            ? TeamRole.OWNER
             : workspace.position
             ? workspace.position
             : ""}
