@@ -92,16 +92,13 @@
     demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
     promoteToOwnerAtTeam: _viewModel.promoteToOwnerAtTeam,
     refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
+    changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
+    removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
   };
-
-  // const userSubscribe = user.subscribe(async (value) => {
-  // if (value) await _viewModel.refreshTeams(value._id);
-  // });
 
   const userSubscribe = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
-      // await _viewModel.refreshTeams(value._id);
     }
   });
 

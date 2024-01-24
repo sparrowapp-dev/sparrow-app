@@ -250,6 +250,37 @@ export class TeamViewModel {
     }
     return;
   };
+
+  public changeUserRoleAtWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    body,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      workspaceId,
+      userId,
+      body,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public removeUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      workspaceId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
   };

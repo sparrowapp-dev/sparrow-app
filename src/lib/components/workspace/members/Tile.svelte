@@ -62,6 +62,7 @@
     );
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
+      await teamServiceMethods.refreshWorkspace(userId);
       isMemberRemovePopup = false;
       notifications.success(`${user.name} is removed from ${openTeam.name}`);
     } else {
@@ -274,11 +275,13 @@
       return element;
     })}
     {userType}
+    {userId}
     onCancel={handleMemberInfoPopUpCancel}
     {handleMemberPopUpCancel}
     {handleMemberPromotePopUpCancel}
     {handleMemberDemotePopUpCancel}
     {handleMemberOwnershipPopUpCancel}
+    {teamServiceMethods}
   />
 {/if}
 <div class="d-flex tile rounded align-items-center">

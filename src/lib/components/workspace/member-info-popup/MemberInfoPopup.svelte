@@ -4,6 +4,10 @@
   import { fly, fade } from "svelte/transition";
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
   import { TeamRole } from "$lib/utils/enums/team.enum";
+  import type {
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+  } from "$lib/utils/interfaces";
 
   export let title;
   export let user;
@@ -15,8 +19,9 @@
   export let handleMemberPopUpCancel;
   export let handleMemberOwnershipPopUpCancel;
   export let owner: boolean = false;
+  export let teamServiceMethods: TeamServiceMethods;
+  export let userId: string;
 
-  console.log(workspaces);
   const handleDropdown = (id) => {
     if (id === "remove") {
       handleMemberPopUpCancel(true);
@@ -157,7 +162,13 @@
     <div style="font-size: 14px;" class="team-workspace mb-1">
       {#each workspaces as workspace}
         {#if workspace.position}
-          <MemberWorkspace {workspace} {userType} {user} />
+          <MemberWorkspace
+            {workspace}
+            {userType}
+            {user}
+            {teamServiceMethods}
+            {userId}
+          />
         {/if}
       {/each}
     </div>

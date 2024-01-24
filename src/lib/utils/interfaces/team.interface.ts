@@ -3,6 +3,7 @@
 import type { TeamDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 import type { InviteBody, TeamPostBody } from "../dto/team-dto";
+import type { ChangeRoleBody } from "../dto";
 
 export interface CurrentTeam {
   name: string;
@@ -34,4 +35,11 @@ export interface TeamServiceMethods {
   demoteToMemberAtTeam?: (teamId: string, userId: string) => unknown;
   promoteToOwnerAtTeam?: (teamId: string, userId: string) => unknown;
   refreshWorkspace?: (userId: string) => void;
+
+  changeUserRoleAtWorkspace?: (
+    workspaceId: string,
+    userId: string,
+    body: ChangeRoleBody,
+  ) => unknown;
+  removeUserFromWorkspace?: (workspaceId: string, userId: string) => unknown;
 }

@@ -1,24 +1,73 @@
-<script>
+<script lang="ts">
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-
+  import type { TeamServiceMethods } from "$lib/utils/interfaces";
+  import { notifications } from "$lib/utils/notifications";
   export let workspace;
   export let user;
   export let userType;
+  export let teamServiceMethods: TeamServiceMethods;
+  export let userId: string;
 
-  const handleDropdown = (id) => {
+  const handleDropdown = async (id) => {
     if (id === "remove") {
       // perform remove perations
+      const response = await teamServiceMethods.removeUserFromWorkspace(
+        workspace._id,
+        user.id,
+      );
+      if (response) {
+        await teamServiceMethods.refreshWorkspace(userId);
+        notifications.success(`${user.name} is removed from ${workspace.name}`);
+      } else {
+        notifications.error(
+          `Failed to remove ${user.name} from ${workspace.name}`,
+        );
+      }
     } else if (
       workspace.position === WorkspaceRole.EDITOR &&
       id === WorkspaceRole.VIEWER
     ) {
       // demote editor to viewer
+      const response = await teamServiceMethods.changeUserRoleAtWorkspace(
+        workspace._id,
+        user.id,
+        {
+          role: WorkspaceRole.VIEWER,
+        },
+      );
+      if (response) {
+        await teamServiceMethods.refreshWorkspace(userId);
+        notifications.success(
+          `${user.name} is now a viewer on ${workspace.name}`,
+        );
+      } else {
+        notifications.error(
+          `Failed to change role for ${user.name}. Please try again.`,
+        );
+      }
     } else if (
       workspace.position === WorkspaceRole.VIEWER &&
       id === WorkspaceRole.EDITOR
     ) {
       // promote viewer to editor
+      const response = await teamServiceMethods.changeUserRoleAtWorkspace(
+        workspace._id,
+        user.id,
+        {
+          role: WorkspaceRole.EDITOR,
+        },
+      );
+      if (response) {
+        await teamServiceMethods.refreshWorkspace(userId);
+        notifications.success(
+          `${user.name} is now a editor on ${workspace.name}`,
+        );
+      } else {
+        notifications.error(
+          `Failed to change role for ${user.name}. Please try again.`,
+        );
+      }
     }
   };
 </script>
