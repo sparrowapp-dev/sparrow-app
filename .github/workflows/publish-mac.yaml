@@ -1,4 +1,4 @@
-name: Mac Build, Sign, and Download Tauri App 
+name: Mac Build
 
 on:
   push:

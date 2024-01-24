@@ -1,4 +1,4 @@
-name: Development
+name: Widows Build
 
 on:
   push:

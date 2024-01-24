@@ -82,6 +82,3 @@ You can checkout [Contributing Guidelines](./docs/CONTRIBUTING.md)
 ## <a name="subscribe-to-our-newsletter">📨 Newsletter</a>
  
 Subscribe to our newsletter by applying [here!](https://sparrows-newsletter.beehiiv.com/subscribe) 
- 
-Copy the values from `.env.example` into `.env` to begin.
-You have to create a `.env` file in this directory to override the default values when starting the API locally with `yarn tauri dev` command. 
