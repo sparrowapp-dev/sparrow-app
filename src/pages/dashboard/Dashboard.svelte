@@ -57,20 +57,8 @@
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      let openTeamId = "";
-      let teamsData = await _dashboardViewModel.getTeamData();
       await _viewModelHome.refreshTeams(value._id);
       await _viewModelWorkspace.refreshWorkspaces(value._id);
-      teamsData.forEach((element) => {
-        const elem = element.toMutableJSON();
-        if (elem.isOpen) openTeamId = elem.teamId;
-      });
-      if (openTeamId) {
-        _dashboardViewModel.setOpenTeam(openTeamId);
-      } else {
-        teamsData = await _dashboardViewModel.getTeamData();
-        _dashboardViewModel.setOpenTeam(teamsData[0].toMutableJSON().teamId);
-      }
     }
   });
 

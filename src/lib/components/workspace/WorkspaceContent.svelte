@@ -72,8 +72,9 @@
 
 {#if teamInvitePopup}
   <TeamInvitePopup
-    teamLogo={activeTeam.logo}
+    teamLogo={activeTeam?.logo}
     onSubmit={teamServiceMethods.inviteMembersAtTeam}
+    onRefresh={teamServiceMethods.refreshWorkspace}
     updateRepo={teamRepositoryMethods.modifyTeam}
     teamName={activeTeam?.name}
     teamId={activeTeam?.teamId}

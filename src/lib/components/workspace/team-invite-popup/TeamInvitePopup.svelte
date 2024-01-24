@@ -12,6 +12,7 @@
 
   export let onSubmit;
   export let updateRepo;
+  export let onRefresh;
   export let workspaces;
   export let teamLogo;
 
@@ -120,6 +121,7 @@
           };
           const response = await onSubmit(teamId, data);
           if (response) {
+            onRefresh();
             updateRepo(teamId, response);
             handleInvitePopup(false);
             notifications.success("Invite sent.");
@@ -134,6 +136,7 @@
         };
         const response = await onSubmit(teamId, data);
         if (response) {
+          onRefresh();
           updateRepo(teamId, response);
           handleInvitePopup(false);
           notifications.success("Invite sent.");

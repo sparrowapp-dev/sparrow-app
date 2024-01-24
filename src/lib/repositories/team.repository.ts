@@ -36,7 +36,7 @@ export class TeamRepository {
    * clear teams data
    */
   public clearTeams = async (): Promise<any> => {
-    return RxDB.getInstance().rxdb.team.find().remove();
+    return await RxDB.getInstance().rxdb.team.find().remove();
   };
 
   /**

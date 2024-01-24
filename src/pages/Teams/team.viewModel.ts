@@ -132,9 +132,18 @@ export class TeamViewModel {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
   };
-
+  public getTeamData = async () => {
+    return await this.teamRepository.getTeamData();
+  };
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
+    let openTeamId: string = "";
+    const teamsData = await this.getTeamData();
+    teamsData.forEach((element) => {
+      const elem = element.toMutableJSON();
+      console.log(elem);
+      if (elem.isOpen) openTeamId = elem.teamId;
+    });
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
@@ -170,8 +179,19 @@ export class TeamViewModel {
           updatedBy,
         };
       });
+      if (openTeamId) {
+        data.forEach((elem) => {
+          if (elem.teamId === openTeamId) {
+            elem.isOpen = true;
+          } else {
+            elem.isOpen = false;
+          }
+        });
+      } else {
+        data[0].isOpen = true;
+      }
+
       await this.teamRepository.bulkInsertData(data);
-      return;
     }
   };
 
