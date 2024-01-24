@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    # tags:
+    #   - 'v*' 
+    branches:
+      - main
+
+env:
+  VITE_API_URL: ${{ secrets.VITE_API_URL }}
+  VITE_MIX_PANEL_TOKEN: ${{secrets.VITE_MIX_PANEL_TOKEN}}
+  VITE_ENABLE_MIX_PANEL: ${{secrets.VITE_ENABLE_MIX_PANEL}}
+
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+
+      - name: Install Windows SDK
+        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
+        shell: powershell
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+
+      - name: Install dependencies and deploy
+        run: |
+          yarn install
+          yarn tauri build --debug
+          
+          
+      # - name: Create GitHub release
+      #   id: create-new-release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.run_number }}
+      #     release_name: Release ${{ github.run_number }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release v1.0.0-beta
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Asset for msi
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/Sparrow-app_0.0.0_x64_en-US.msi"
+          asset_name: Sparrow-app_0.0.0_x64_en-US.msi
+          asset_content_type: application/zip
+      
+      - name: Upload Release Asset for nsis
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_0.0.0_x64-setup.exe"
+          asset_name: sparrow-app_0.0.0_x64-setup.exe
+          asset_content_type: application/zip
