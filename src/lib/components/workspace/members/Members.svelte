@@ -18,12 +18,13 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
-  let filteredUser;
+  let filteredUser = [];
   const calculateFilteredUser = () => {
     filteredUser = openTeam.users.filter((elem) => {
       if (
         elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        elem.role.toLowerCase().includes(filterText.toLowerCase())
+        elem.role.toLowerCase().includes(filterText.toLowerCase()) ||
+        elem.email.toLowerCase().includes(filterText.toLowerCase())
       ) {
         return true;
       } else return false;
@@ -36,6 +37,9 @@
   }
   $: {
     if (filterText) {
+      calculateFilteredUser();
+    }
+    if (!filterText) {
       calculateFilteredUser();
     }
   }
@@ -65,6 +69,8 @@
           .toLowerCase()
           .includes(filterText.toLowerCase()) || user.role
             .toLowerCase()
+            .includes(filterText.toLowerCase()) || user.email
+            .toLowerCase()
             .includes(filterText.toLowerCase()))}
         <Tile
           owner={true}
@@ -86,6 +92,8 @@
           .toLowerCase()
           .includes(filterText.toLowerCase()) || user.role
             .toLowerCase()
+            .includes(filterText.toLowerCase()) || user.email
+            .toLowerCase()
             .includes(filterText.toLowerCase()))}
         <Tile
           {user}
@@ -100,6 +108,9 @@
         />
       {/if}
     {/each}
+  {/if}
+  {#if !filteredUser.length}
+    <p class="not-found-text mt-3">No results found.</p>
   {/if}
 </section>
 
