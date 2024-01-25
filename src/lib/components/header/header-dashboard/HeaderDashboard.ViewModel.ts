@@ -131,7 +131,7 @@ export class HeaderDashboardViewModel {
     }
   };
 
-  public modifyWorkspaceDescription = async (
+  public modifyWorkspaceNameDescription = async (
     componentData,
     collectionsMethods: CollectionsMethods,
     tabName: string,

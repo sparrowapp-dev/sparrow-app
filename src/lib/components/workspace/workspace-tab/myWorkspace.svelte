@@ -37,7 +37,11 @@
 
   const handleWorkspaceInput = (event) => {
     newWorkspaceName = event.target.value;
-    collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
+    collectionsMethods.updateTab(
+      newWorkspaceName,
+      "name",
+      componentData.path.workspaceId,
+    );
   };
 
   const handleWorkspaceDescription = (event) => {
@@ -49,17 +53,8 @@
     );
   };
 
-  const onRenameBlur = async () => {
-    await _viewModel.modifyWorkspace(
-      componentData,
-      collectionsMethods,
-      newWorkspaceName,
-      tabName,
-    );
-  };
-
   const onUpdateBlur = async () => {
-    await _viewModel.modifyWorkspaceDescription(
+    await _viewModel.modifyWorkspaceNameDescription(
       componentData,
       collectionsMethods,
       tabName,
@@ -165,7 +160,7 @@
         on:input={(event) => {
           handleWorkspaceInput(event);
         }}
-        on:blur={onRenameBlur}
+        on:blur={onUpdateBlur}
         on:keydown={onRenameInputKeyPress}
         bind:this={inputElement}
       />
