@@ -89,7 +89,7 @@
   <div class="ps-3">
     {#if $data && $data
         .slice()
-        .filter((item) => item.team.teamId == openedTeam.id).length > 0}
+        .filter((item) => item?.team?.teamId == openedTeam.id).length > 0}
       <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
         <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
         <input
@@ -137,7 +137,7 @@
               .reverse()
               .filter((item) => item.name
                     .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+                    .startsWith(filterText.toLowerCase()) && item?.team?.teamId == openedTeam.id)
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <ShowMoreOptions
                 showMenu={isShowMoreVisible == index}
@@ -191,7 +191,7 @@
           .reverse()
           .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+                .startsWith(filterText.toLowerCase()) && item?.team?.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
           <tfoot class="position-sticky bottom-0">
             <tr>
@@ -203,14 +203,14 @@
                       item.name
                         .toLowerCase()
                         .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                      item?.team?.teamId == openedTeam.id,
                   ).length,
                 )} of {$data?.filter(
                   (item) =>
                     item.name
                       .toLowerCase()
                       .startsWith(filterText.toLowerCase()) &&
-                    item.team.teamId == openedTeam.id,
+                    item?.team?.teamId == openedTeam.id,
                 ).length}
               </th>
               <th class="tab-head gap-2">
@@ -240,7 +240,7 @@
                             item.name
                               .toLowerCase()
                               .startsWith(filterText.toLowerCase()) &&
-                            item.team.teamId == openedTeam.id,
+                            item?.team?.teamId == openedTeam.id,
                         ).length / workspacePerPage,
                       )
                     )
@@ -255,7 +255,7 @@
                           item.name
                             .toLowerCase()
                             .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
+                          item?.team?.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     )
                       ? "#313233"
@@ -270,7 +270,7 @@
                           item.name
                             .toLowerCase()
                             .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
+                          item?.team?.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     ))}
                   class="bg-transparent border-0"
@@ -282,7 +282,7 @@
                           item.name
                             .toLowerCase()
                             .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
+                          item?.team?.teamId == openedTeam.id,
                       ).length / workspacePerPage,
                     )
                       ? "#313233"
@@ -298,14 +298,14 @@
       </table>
       {#if $data && $data
           .slice()
-          .filter((item) => item.team.teamId == openedTeam.id).length == 0}
+          .filter((item) => item?.team?.teamId == openedTeam.id).length == 0}
         <p class="not-found-text mt-3">Add Workspaces to this team</p>
       {:else if filterText !== "" && $data
           .slice()
           .reverse()
           .filter((item) => item.name
                 .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+                .startsWith(filterText.toLowerCase()) && item?.team?.teamId == openedTeam.id)
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
         <p class="not-found-text mt-3">No results found.</p>
       {/if}

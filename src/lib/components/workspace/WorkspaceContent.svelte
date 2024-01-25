@@ -155,13 +155,14 @@
                 >Workspaces {$data &&
                 $data
                   .slice()
-                  .filter((item) => item.team.teamId == currOpenedTeam.id)
+                  .filter((item) => item?.team?.teamId == currOpenedTeam?.id)
                   .length > 0
                   ? `(${
                       $data
                         ?.slice()
-                        .filter((item) => item.team.teamId == currOpenedTeam.id)
-                        .length
+                        .filter(
+                          (item) => item?.team?.teamId == currOpenedTeam?.id,
+                        ).length
                     })`
                   : ""}</span
               >

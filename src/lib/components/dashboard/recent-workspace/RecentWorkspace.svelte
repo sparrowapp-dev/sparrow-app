@@ -43,14 +43,14 @@
                 {list.name}
               </p>
               <span class="team-name ellipsis overflow-hidden"
-                >{list.team.teamName ? list.team.teamName : ""}</span
+                >{list?.team?.teamName ? list?.team?.teamName : ""}</span
               >
             </div>
             <PeopleIcon
-              color={currOpenedTeam.id == list.team.teamId
+              color={currOpenedTeam.id == list?.team?.teamId
                 ? "#8A9299"
                 : "#45494D"}
-              classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}
+              classProp={`${list?.users?.length <= 1 && "d-none"} my-auto me-1`}
             />
           </div>
         </div>

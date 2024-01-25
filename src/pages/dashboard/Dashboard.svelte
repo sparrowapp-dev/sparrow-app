@@ -72,7 +72,7 @@
           name: value.get("name"),
         };
         let currentTeam = value.get("team");
-        _viewModelHome.activateTeam(currentTeam.teamId);
+        _viewModelHome.activateTeam(currentTeam?.teamId);
       }
     },
   );

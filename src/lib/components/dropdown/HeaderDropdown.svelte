@@ -286,7 +286,7 @@
                 >
                   <span>{list.name}</span>
                   <span class="list-team-name d-block" style="font-size: 12px;"
-                    >{list.team.teamName ? list.team.teamName : ""}</span
+                    >{list?.team?.teamName ? list?.team?.teamName : ""}</span
                   >
                 </p>
 

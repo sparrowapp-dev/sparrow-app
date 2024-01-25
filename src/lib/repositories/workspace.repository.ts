@@ -148,7 +148,7 @@ export class WorkspaceRepository {
       .exec();
     const rxDoc = workspace.toMutableJSON();
     rxDoc.isActiveWorkspace = true;
-    const teamId = rxDoc.team.teamId;
+    const teamId = rxDoc?.team?.teamId;
     await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
     return teamId;
   };
