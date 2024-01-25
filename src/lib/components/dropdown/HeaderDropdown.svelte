@@ -20,7 +20,11 @@
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import { CustomPopup, CustomDropdown, TextInput } from "$lib/components";
+  import {
+    CustomPopup,
+    TextInput,
+    SelectInput,
+  } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -155,8 +159,6 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      // await _viewModel.updateWorkspace(workspaceObj._id, response.data.data);
-
       let totalCollection: number = 0;
       let totalRequest: number = 0;
 
@@ -248,7 +250,7 @@
       : "Workspace name cannot be empty."}
     onChange={handleCreateWorkspaceNameChange}
   />
-  <CustomDropdown
+  <SelectInput
     labelText="Team"
     isRequired={true}
     errorText="Please select a team."
@@ -352,9 +354,12 @@
             {/if}
           {/each}
           {#if $data && $data.length < workspaceLimit}
-            <p style="font-size: 12px; color: #636566; " class="text-wrap text-center px-2 py-1"
-              >You will see your five most recent workspaces here.</p
+            <p
+              style="font-size: 12px; color: #636566; "
+              class="text-wrap text-center px-2 py-1"
             >
+              You will see your five most recent workspaces here.
+            </p>
           {/if}
         </div>
       {/if}

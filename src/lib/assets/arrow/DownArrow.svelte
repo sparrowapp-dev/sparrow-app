@@ -1,8 +1,8 @@
 <script lang="ts">
-  export let classProp: string = "",
-    color: string = "#8A9299",
-    width: number = 14,
-    height: number = 16;
+  export let classProp = "",
+    color = "#8A9299",
+    width = 14,
+    height = 16;
 </script>
 
 <svg

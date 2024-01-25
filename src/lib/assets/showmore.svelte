@@ -1,8 +1,8 @@
 <script lang="ts">
-  export let width: number = 24,
-    height: number = 24,
-    classProp: string = "",
-    color: string = "white";
+  export let width = 24,
+    height = 24,
+    classProp = "",
+    color = "white";
 </script>
 
 <svg

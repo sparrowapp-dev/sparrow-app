@@ -5,11 +5,11 @@
   export let users: any[];
   export let width: number;
   export let height: number;
-  export let classProp: string = "";
-  export let stypeProp: string = "";
+  export let classProp = "";
+  export let stypeProp = "";
   export let borderRadius: number;
   export let userProfileUrl: string | undefined = undefined;
-  export let maxProfiles: number = 3;
+  export let maxProfiles = 3;
 
   let generatedUsersList: any[];
 

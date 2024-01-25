@@ -4,18 +4,18 @@
 
   export let value: any = [];
   export let labelText: string;
-  export let labelDescription: string = "";
+  export let labelDescription = "";
   export let inputId: string;
   export let inputPlaceholder: string;
   export let maxFileSize: number;
-  export let isRequired: boolean = false;
+  export let isRequired = false;
   export let resetValue: (e: any) => void;
   export let editValue: (e: any) => void;
-  export let showFileTypeError: boolean = false;
-  export let showFileSizeError: boolean = false;
-  export let fileTypeError: string =
+  export let showFileTypeError = false;
+  export let showFileSizeError = false;
+  export let fileTypeError =
     "This file type is not supported. Please reupload in any of the following file formats.";
-  export let fileSizeError: string =
+  export let fileSizeError =
     "The size of the file you are trying to upload is more than 100 KB.";
   export let supportedFileTypes: string[] = [];
   export let onChange: (
@@ -24,7 +24,7 @@
     supportedFileTypes: string[],
   ) => void;
 
-  let isDragOver: boolean = false;
+  let isDragOver = false;
 
   const generateAcceptString = (): string => {
     const acceptString = supportedFileTypes.map((type) => `${type}`).join(", ");
@@ -59,7 +59,8 @@
       style="border: 3px dashed {showFileTypeError || showFileSizeError
         ? 'var(--dangerColor)'
         : 'var(--request-arc)'}; border-width: 2px;"
-      class="sparrow-file-input w-100 px-auto {isDragOver && 'opacity-75 bg-lightBackground'}"
+      class="sparrow-file-input w-100 px-auto {isDragOver &&
+        'opacity-75 bg-lightBackground'}"
       on:dragover={(e) => {
         e.preventDefault();
         isDragOver = true;

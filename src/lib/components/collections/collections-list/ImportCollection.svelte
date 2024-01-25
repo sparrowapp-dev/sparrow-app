@@ -17,6 +17,7 @@
   import File from "./File.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { FileInput } from "$lib/components";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -221,6 +222,7 @@
     </div>
 
     <div>
+      <!-- <FileInput /> -->
       <Dropzone
         containerStyles="background-color:#1e1e1e; width:100%;"
         accept=".yaml"

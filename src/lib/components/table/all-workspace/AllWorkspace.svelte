@@ -10,6 +10,7 @@
   } from "$lib/assets/app.asset";
   import { ShowMoreOptions, UserProfileList } from "$lib/components";
   import type { TeamDocument } from "$lib/database/app.database";
+  import { WorkspaceMemberRole } from "$lib/utils/enums";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   import type { Observable } from "rxjs";
@@ -168,11 +169,10 @@
                 menuItems={menuItems(list, index)}
                 leftDistance={pos.x}
                 topDistance={pos.y}
+              />
 
-                />
-       
               <tr
-                class="workspace-list-item cursor-pointer  ellipsis w-100"
+                class="workspace-list-item cursor-pointer ellipsis w-100"
                 on:contextmenu|preventDefault={(e) =>
                   rightClickContextMenu(e, index)}
                 on:click={(e) => {
@@ -200,9 +200,8 @@
                         borderRadius={24}
                         users={list?.users?.filter(
                           (user) =>
-                            user.role == "admin" ||
-                            user.role == "editor" ||
-                            user.role == "viewer",
+                            user.role === WorkspaceMemberRole.ADMIN ||
+                            user.role === WorkspaceMemberRole.EDITOR,
                         )}
                         maxProfiles={3}
                         classProp="position-absolute"

@@ -10,7 +10,7 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import crossAsset from "$lib/assets/close.svg";
-  import CoverButton from "$lib/components/buttons/CoverButton.svelte";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import {
     insertCollection,
     insertCollectionDirectory,
@@ -788,9 +788,9 @@
                     Collection to easily organize and use your API requests.
                   </p>
                   <div class="w-100 d-flex justify-content-center">
-                    <CoverButton
+                    <CustomButton
                       text={"+ Collection"}
-                      size={14}
+                      fontSize={14}
                       type={"primary"}
                       onClick={() => {
                         createCollectionNameVisibility = true;
@@ -962,19 +962,19 @@
       </div>
       <div class="d-flex">
         <span class="mx-2">
-          <CoverButton
+          <CustomButton
             text={"Cancel"}
-            size={16}
+            fontSize={16}
             type={"dark"}
             onClick={() => {
               onClick(false);
             }}
           />
         </span>
-        <CoverButton
+        <CustomButton
           disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
           text={"Save"}
-          size={16}
+          fontSize={16}
           type={"primary"}
           loader={isLoading}
           onClick={() => {

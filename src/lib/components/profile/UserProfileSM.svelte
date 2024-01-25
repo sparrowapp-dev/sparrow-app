@@ -3,8 +3,8 @@
   export let width: number;
   export let height: number;
   export let borderRadius: number;
-  export let classProp: string = "";
-  export let stypeProp: string = "";
+  export let classProp = "";
+  export let stypeProp = "";
   export let userProfileUrl: string | undefined = undefined;
 </script>
 

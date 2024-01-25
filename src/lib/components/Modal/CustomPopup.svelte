@@ -1,13 +1,13 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
   import { fade, fly } from "svelte/transition";
-  import Spinner from "../Transition/Spinner.svelte";
+  import { CustomButton } from "..";
 
-  export let isOpen: boolean;
+  export let isOpen = false;
   export let title: string;
-  export let isDanger: boolean = false;
+  export let isDanger = false;
   export let btnText: string;
-  export let underSubmission: boolean = false;
+  export let underSubmission = false;
   export let handleOpen: () => void;
   export let handleSubmit: () => void;
 </script>
@@ -37,25 +37,21 @@
       <slot />
     </div>
     <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
-      <button
-        class="sparrow-modal-cancel-btn border-0 py-1 px-3 me-2"
-        on:click={handleOpen}>Cancel</button
-      >
-
-      <button
-        disabled={underSubmission}
-        class="{isDanger
-          ? 'sparrow-modal-danger-btn'
-          : 'sparrow-modal-primary-btn'} d-flex border-0 py-1 me-1 px-3"
-        on:click={() => {
-          handleSubmit();
-        }}
-      >
-        {#if underSubmission}
-          <Spinner size="18px" />
-        {/if}
-        <span class="ms-2 my-auto">{btnText}</span></button
-      >
+      <CustomButton
+        text={`Cancel`}
+        type="dark"
+        disable={false}
+        classProp={`me-2`}
+        onClick={handleOpen}
+      />
+      <CustomButton
+        text={btnText}
+        type="primary"
+        disable={underSubmission}
+        loader={underSubmission}
+        classProp={`me-1`}
+        onClick={() => handleSubmit()}
+      />
     </div>
   </div>
 {/if}
@@ -85,22 +81,7 @@
   .sparrow-modal-heading {
     font-size: 20px;
   }
-  .sparrow-modal-cancel-btn,
-  .sparrow-modal-primary-btn,
-  .sparrow-modal-danger-btn {
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  .sparrow-modal-cancel-btn {
-    background-color: var(--border-color);
-  }
-  .sparrow-modal-primary-btn {
-    background-color: var(--primary-btn-color);
-  }
-  .sparrow-modal-danger-btn {
-    background-color: var(--dangerColor);
-    color: var(--blackColor);
-  }
+
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
   }

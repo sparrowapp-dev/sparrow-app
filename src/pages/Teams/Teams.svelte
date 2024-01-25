@@ -200,7 +200,6 @@
     description: string,
     file: File,
   ) => {
-
     if (name == "") {
       newTeam.name.invalid = true;
       return;
@@ -218,7 +217,11 @@
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
-      setOpenedTeam(response.data.data?._id, response?.data?.data?.name, response?.data?.data?.logo);
+      setOpenedTeam(
+        response.data.data?._id,
+        response?.data?.data?.name,
+        response?.data?.data?.logo,
+      );
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
       teamUnderCreation = false;
@@ -443,8 +446,9 @@
   handleSubmit={handleLeaveTeam}
 >
   <p class="warning-text text-lightGray mt-3">
-    Are you sure you want to leave team <span class="fw-semibold">"{currOpenedTeam?.name}"</span>? You will lose
-    access to all the resources in this team.
+    Are you sure you want to leave team <span class="fw-semibold"
+      >"{currOpenedTeam?.name}"</span
+    >? You will lose access to all the resources in this team.
   </p>
 </CustomPopup>
 

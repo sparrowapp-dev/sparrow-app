@@ -43,7 +43,7 @@
                 {list.name}
               </p>
               <span class="team-name ellipsis overflow-hidden"
-                >{list.team.teamName}</span
+                >{list?.team?.teamName}</span
               >
             </div>
             <PeopleIcon

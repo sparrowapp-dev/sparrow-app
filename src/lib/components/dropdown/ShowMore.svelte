@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { CustomButton } from "..";
+
   export let showMenu: boolean = false;
   export let menuItems = [];
   export let leftDistance = 2;
@@ -19,19 +21,22 @@
           {#each menuItems as item}
             {#if item.visible}
               <li class="align-items-center sparrow-menu-item list-unstyled">
-                <button
-                  disabled={item.disabled}
-                  class={`sparrow-menu-item-btn align-items-center bg-transparent mb-0 ${
-                    menuItems?.filter((item) => item.visible) && "px-2 py-2"
-                  } border-0  ${item.disabled && "text-requestBodyColor "}`}
-                  on:click={item.onClick}
-                  style={item.disabled
-                    ? "color: var(--request-arc);"
-                    : item.displayText === "Delete" ||
-                      item.displayText === "Leave Team"
-                    ? "color: #ff7878"
-                    : ""}>{item.displayText}</button
-                >
+                <CustomButton
+                  disable={item.disabled}
+                  text={item.displayText}
+                  type={"transparent"}
+                  fontSize={12}
+                  classProp={`${item.disabled && "text-requestBodyColor"}`}
+                  styleProp={`${
+                    item.disabled
+                      ? "color: var(--request-arc);"
+                      : item.displayText === "Delete" ||
+                        item.displayText === "Leave Team"
+                      ? "color: #ff7878"
+                      : ""
+                  }`}
+                  onClick={item.onClick}
+                />
               </li>
             {/if}
           {/each}

@@ -3,19 +3,19 @@
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { fly } from "svelte/transition";
 
-  export let labelText: string = "Select";
-  export let isRequired: boolean = false;
-  export let inputId: string = "";
-  export let labelDescription: string = "";
-  export let selectInputPlaceholder: string = "Select an option";
+  export let labelText = "Select";
+  export let isRequired = false;
+  export let inputId = "";
+  export let labelDescription = "";
+  export let selectInputPlaceholder = "Select an option";
   export let options: any[];
-  export let invalidValue: boolean = false;
-  export let endIconVisible: boolean = false;
-  export let errorText: string = "Invalid Value.";
+  export let invalidValue = false;
+  export let endIconVisible = false;
+  export let errorText = "Invalid Value.";
   export let handleOnSelect: (value: any) => void;
 
-  let isDropdownVisible: boolean = false;
-  let selectedOption: string = "";
+  let isDropdownVisible = false;
+  let selectedOption = "";
 
   const closeSparrowDropdown = () => {
     isDropdownVisible = false;

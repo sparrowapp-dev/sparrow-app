@@ -1,9 +1,9 @@
 <script lang="ts">
-  export let classProp: string = "";
+  export let classProp = "";
   export let onClick: (e) => void;
-  export let disabled: boolean = false;
-  export let width: number = undefined;
-  export let height: number = undefined;
+  export let disabled = false;
+  export let width: number | undefined = undefined;
+  export let height: number | undefined = undefined;
 </script>
 
 <button

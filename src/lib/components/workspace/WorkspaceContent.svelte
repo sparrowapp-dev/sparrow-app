@@ -6,14 +6,14 @@
   import { workspaceView, openedTeam } from "$lib/store";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type { CurrentTeam } from "$lib/utils/interfaces";
   import { base64ToURL } from "$lib/utils/helpers";
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
-  import { IconButton, Tooltip } from "$lib/components";
+  import { CustomButton, IconButton } from "$lib/components";
 
   export let userId: string;
   export let data: any;
@@ -151,23 +151,25 @@
                     >
                   </p>
                 {/if}
-                <button
-                  style="font-size: 12px;"
-                  class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
-                  >Invite</button
-                >
-                <button
-                  style="font-size: 12px;"
-                  on:click={handleCreateWorkspace}
-                  class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
-                  >{#if isLoading}
-                    <span class="ms-0 me-1">
-                      {#if loaderColor === "default"}
-                        <Spinner size={"15px"} />
-                      {/if}
-                    </span>
-                  {/if}New Workspace</button
-                >
+                <CustomButton
+                  text={`Invite`}
+                  type={`dark`}
+                  fontSize={12}
+                  onClick={() => {
+                    return;
+                  }}
+                  classProp={`my-auto px-3 pt-1 me-4`}
+                  styleProp={`height: 30px;`}
+                />
+                <CustomButton
+                  text={`New Workspace`}
+                  type={`primary`}
+                  loader={isLoading}
+                  fontSize={12}
+                  onClick={handleCreateWorkspace}
+                  classProp={`my-auto `}
+                  styleProp={`height: 30px;`}
+                />
               </div>
             {/if}
           </div>
