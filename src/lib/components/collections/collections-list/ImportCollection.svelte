@@ -222,7 +222,6 @@
     </div>
 
     <div>
-      <!-- <FileInput /> -->
       <Dropzone
         containerStyles="background-color:#1e1e1e; width:100%;"
         accept=".yaml"
