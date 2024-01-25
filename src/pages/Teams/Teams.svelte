@@ -200,11 +200,11 @@
     description: string,
     file: File,
   ) => {
+
     if (name == "") {
       newTeam.name.invalid = true;
       return;
     }
-    // if (description == "") newTeam.description.invalid = true;
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
 
@@ -217,12 +217,11 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      // await _viewModel.modifyTeam(teamObj.teamwId, res);
       await _viewModel.refreshTeams(userId);
+      setOpenedTeam(response.data.data?._id, response?.data?.data?.name, response?.data?.data?.logo);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
       teamUnderCreation = false;
-      setOpenedTeam(response.data.data?.id, response?.data?.data?.name, response?.data?.data?.logo);
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
       teamUnderCreation = false;
