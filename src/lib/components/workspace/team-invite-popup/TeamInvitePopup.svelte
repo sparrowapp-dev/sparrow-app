@@ -94,6 +94,28 @@
     }
   };
 
+  const refreshMembers = async (_userId, _teamId, _response) => {
+    onRefresh(_userId);
+    updateRepo(_teamId, _response);
+    handleInvitePopup(false);
+    if (_response?.nonExistingUsers?.length > 0) {
+      _response.nonExistingUsers.forEach((elem) => {
+        notifications.error(`${elem} doesn't exist.`);
+      });
+    }
+    if (_response?.alreadyTeamMember?.length > 0) {
+      _response.alreadyTeamMember.forEach((elem) => {
+        notifications.error(`${elem} already in team.`);
+      });
+    }
+    if (
+      !_response?.nonExistingUsers?.length &&
+      !_response?.alreadyTeamMember?.length
+    ) {
+      notifications.success("Invite sent.");
+    }
+  };
+
   const handleInvite = async () => {
     checkInviteValidation();
     loader = true;
@@ -126,25 +148,7 @@
           };
           const response = await onSubmit(teamId, data);
           if (response) {
-            onRefresh(userId);
-            updateRepo(teamId, response);
-            handleInvitePopup(false);
-            if (response?.nonExistingUsers?.length > 0) {
-              response.nonExistingUsers.forEach((elem) => {
-                notifications.error(`${elem} doesn't exist.`);
-              });
-            }
-            if (response?.alreadyTeamMember?.length > 0) {
-              response.alreadyTeamMember.forEach((elem) => {
-                notifications.error(`${elem} already in team.`);
-              });
-            }
-            if (
-              !response?.nonExistingUsers?.length &&
-              !response?.alreadyTeamMember?.length
-            ) {
-              notifications.success("Invite sent.");
-            }
+            await refreshMembers(userId, teamId, response);
           } else {
             notifications.error("Failed to sent invite. Please try again.");
           }
@@ -156,25 +160,7 @@
         };
         const response = await onSubmit(teamId, data);
         if (response) {
-          onRefresh(userId);
-          updateRepo(teamId, response);
-          handleInvitePopup(false);
-          if (response?.nonExistingUsers?.length > 0) {
-            response.nonExistingUsers.forEach((elem) => {
-              notifications.error(`${elem} doesn't exist.`);
-            });
-          }
-          if (response?.alreadyTeamMember?.length > 0) {
-            response.alreadyTeamMember.forEach((elem) => {
-              notifications.error(`${elem} already in team.`);
-            });
-          }
-          if (
-            !response?.nonExistingUsers?.length &&
-            !response?.alreadyTeamMember?.length
-          ) {
-            notifications.success("Invite sent.");
-          }
+          await refreshMembers(userId, teamId, response);
         } else {
           notifications.error("Failed to sent invite. Please try again.");
         }
