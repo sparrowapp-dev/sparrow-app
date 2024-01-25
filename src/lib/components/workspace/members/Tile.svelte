@@ -282,6 +282,7 @@
     {handleMemberDemotePopUpCancel}
     {handleMemberOwnershipPopUpCancel}
     {teamServiceMethods}
+    {handleMemberPopUpSuccess}
   />
 {/if}
 <div class="d-flex tile rounded align-items-center">

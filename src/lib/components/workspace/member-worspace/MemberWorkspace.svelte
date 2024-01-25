@@ -8,21 +8,30 @@
   export let userType;
   export let teamServiceMethods: TeamServiceMethods;
   export let userId: string;
+  export let handleMemberPopUpSuccess;
+  export let workspaceCount;
+  console.log(workspaceCount);
 
   const handleDropdown = async (id) => {
     if (id === "remove") {
       // perform remove perations
-      const response = await teamServiceMethods.removeUserFromWorkspace(
-        workspace._id,
-        user.id,
-      );
-      if (response) {
-        await teamServiceMethods.refreshWorkspace(userId);
-        notifications.success(`${user.name} is removed from ${workspace.name}`);
+      if (workspaceCount === 1) {
+        handleMemberPopUpSuccess();
       } else {
-        notifications.error(
-          `Failed to remove ${user.name} from ${workspace.name}`,
+        const response = await teamServiceMethods.removeUserFromWorkspace(
+          workspace._id,
+          user.id,
         );
+        if (response) {
+          await teamServiceMethods.refreshWorkspace(userId);
+          notifications.success(
+            `${user.name} is removed from ${workspace.name}`,
+          );
+        } else {
+          notifications.error(
+            `Failed to remove ${user.name} from ${workspace.name}`,
+          );
+        }
       }
     } else if (
       workspace.position === WorkspaceRole.EDITOR &&

@@ -21,6 +21,7 @@
   export let owner: boolean = false;
   export let teamServiceMethods: TeamServiceMethods;
   export let userId: string;
+  export let handleMemberPopUpSuccess;
 
   const handleDropdown = (id) => {
     if (id === "remove") {
@@ -33,6 +34,18 @@
       handleMemberOwnershipPopUpCancel(true);
     }
   };
+
+  let workspaceCount: number;
+  $: {
+    workspaceCount = 0;
+    if (workspaces) {
+      workspaces.forEach((element) => {
+        if (element.position) {
+          workspaceCount++;
+        }
+      });
+    }
+  }
 </script>
 
 <div class="environment-delete-popup">
@@ -168,6 +181,8 @@
             {user}
             {teamServiceMethods}
             {userId}
+            {workspaceCount}
+            {handleMemberPopUpSuccess}
           />
         {/if}
       {/each}
