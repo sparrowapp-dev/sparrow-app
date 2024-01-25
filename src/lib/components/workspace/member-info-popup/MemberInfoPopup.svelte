@@ -22,6 +22,7 @@
   export let teamServiceMethods: TeamServiceMethods;
   export let userId: string;
   export let handleMemberPopUpSuccess;
+  export let getPermissionsData;
 
   const handleDropdown = (id) => {
     if (id === "remove") {
@@ -95,51 +96,14 @@
           {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
             <MemberDropdown
               id={user.id}
-              data={[
-                {
-                  name: "Admin",
-                  id: TeamRole.ADMIN,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Member",
-                  id: TeamRole.MEMBER,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Remove",
-                  id: "remove",
-                  color: "dangerColor",
-                },
-              ]}
+              data={getPermissionsData()}
               method={user.role ? user.role : ""}
               onclick={handleDropdown}
             />
           {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
             <MemberDropdown
               id={user.id}
-              data={[
-                {
-                  name: "Owner",
-                  id: TeamRole.OWNER,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Admin",
-                  id: TeamRole.ADMIN,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Member",
-                  id: TeamRole.MEMBER,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Remove",
-                  id: "remove",
-                  color: "dangerColor",
-                },
-              ]}
+              data={getPermissionsData()}
               method={user.role ? user.role : ""}
               onclick={handleDropdown}
             />
@@ -147,23 +111,7 @@
             <MemberDropdown
               id={user.id}
               disabled={true}
-              data={[
-                {
-                  name: "Owner",
-                  id: TeamRole.OWNER,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Admin",
-                  id: TeamRole.ADMIN,
-                  color: "whiteColor",
-                },
-                {
-                  name: "Member",
-                  id: TeamRole.MEMBER,
-                  color: "whiteColor",
-                },
-              ]}
+              data={getPermissionsData()}
               method={user.role ? user.role : ""}
               onclick={handleDropdown}
             />

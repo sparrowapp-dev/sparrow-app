@@ -12,7 +12,6 @@
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  // import AdminLevelPermissions from "$lib/utils/c";
   export let user;
   export let userType;
   export let openTeam;
@@ -122,6 +121,56 @@
       notifications.error(
         `Failed to update access of Owner. Please try again.`,
       );
+    }
+  };
+  let getPermissionsData = () => {
+    const commonPermissions = [
+      {
+        name: "Admin",
+        id: TeamRole.ADMIN,
+        color: "whiteColor",
+      },
+      {
+        name: "Member",
+        id: TeamRole.MEMBER,
+        color: "whiteColor",
+      },
+    ];
+    if (
+      (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) ||
+      (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)
+    ) {
+      return [
+        ...commonPermissions,
+        {
+          name: "Remove",
+          id: "remove",
+          color: "dangerColor",
+        },
+      ];
+    } else if (userType === TeamRole.OWNER && user.role === TeamRole.ADMIN) {
+      return [
+        {
+          name: "Owner",
+          id: TeamRole.OWNER,
+          color: "whiteColor",
+        },
+        ...commonPermissions,
+        {
+          name: "Remove",
+          id: "remove",
+          color: "dangerColor",
+        },
+      ];
+    } else {
+      return [
+        {
+          name: "Owner",
+          id: TeamRole.OWNER,
+          color: "whiteColor",
+        },
+        ...commonPermissions,
+      ];
     }
   };
 </script>
@@ -282,6 +331,7 @@
     {handleMemberOwnershipPopUpCancel}
     {teamServiceMethods}
     {handleMemberPopUpSuccess}
+    {getPermissionsData}
   />
 {/if}
 <div class="d-flex tile rounded align-items-center">
@@ -305,51 +355,14 @@
     {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
       <MemberDropdown
         id={user.id + uuidv4()}
-        data={[
-          {
-            name: "Admin",
-            id: TeamRole.ADMIN,
-            color: "whiteColor",
-          },
-          {
-            name: "Member",
-            id: TeamRole.MEMBER,
-            color: "whiteColor",
-          },
-          {
-            name: "Remove",
-            id: "remove",
-            color: "dangerColor",
-          },
-        ]}
+        data={getPermissionsData()}
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
       <MemberDropdown
         id={user.id + uuidv4()}
-        data={[
-          {
-            name: "Owner",
-            id: TeamRole.OWNER,
-            color: "whiteColor",
-          },
-          {
-            name: "Admin",
-            id: TeamRole.ADMIN,
-            color: "whiteColor",
-          },
-          {
-            name: "Member",
-            id: TeamRole.MEMBER,
-            color: "whiteColor",
-          },
-          {
-            name: "Remove",
-            id: "remove",
-            color: "dangerColor",
-          },
-        ]}
+        data={getPermissionsData()}
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
@@ -357,23 +370,7 @@
       <MemberDropdown
         id={user.id + uuidv4()}
         disabled={true}
-        data={[
-          {
-            name: "Owner",
-            id: TeamRole.OWNER,
-            color: "whiteColor",
-          },
-          {
-            name: "Admin",
-            id: TeamRole.ADMIN,
-            color: "whiteColor",
-          },
-          {
-            name: "Member",
-            id: TeamRole.MEMBER,
-            color: "whiteColor",
-          },
-        ]}
+        data={getPermissionsData()}
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
