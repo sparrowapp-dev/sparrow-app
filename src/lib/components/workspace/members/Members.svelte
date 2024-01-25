@@ -64,14 +64,8 @@
 </section>
 <section class="member-list">
   {#if openTeam?.users}
-    {#each openTeam?.users as user}
-      {#if user.id === userId && (user.name
-          .toLowerCase()
-          .includes(filterText.toLowerCase()) || user.role
-            .toLowerCase()
-            .includes(filterText.toLowerCase()) || user.email
-            .toLowerCase()
-            .includes(filterText.toLowerCase()))}
+    {#each filteredUser as user}
+      {#if user.id === userId}
         <Tile
           owner={true}
           {user}
@@ -87,14 +81,8 @@
         <hr />
       {/if}
     {/each}
-    {#each openTeam?.users as user}
-      {#if user.id !== userId && (user.name
-          .toLowerCase()
-          .includes(filterText.toLowerCase()) || user.role
-            .toLowerCase()
-            .includes(filterText.toLowerCase()) || user.email
-            .toLowerCase()
-            .includes(filterText.toLowerCase()))}
+    {#each filteredUser as user}
+      {#if user.id !== userId}
         <Tile
           {user}
           {userType}
