@@ -7,3 +7,14 @@ export interface TeamPostBody {
   createdAt: string;
   createdBy: string;
 }
+
+interface Workspace {
+  id: string;
+  name: string;
+}
+
+export interface InviteBody {
+  users: string[];
+  role: string;
+  workspaces?: Workspace[];
+}

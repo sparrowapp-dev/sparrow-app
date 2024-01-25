@@ -107,42 +107,63 @@
           currentTabId,
         )
           .then((response) => {
-            let end = Date.now();
-            const byteLength = new TextEncoder().encode(
-              JSON.stringify(response),
-            ).length;
-            let responseSizeKB = byteLength / 1024;
-            let duration = end - start;
+            if (response.isSuccessful === false) {
+              collectionsMethods.updateRequestProperty(
+                false,
+                RequestProperty.REQUEST_IN_PROGRESS,
+                currentTabId,
+              );
+              collectionsMethods.updateRequestProperty(
+                {
+                  body: "",
+                  headers: "",
+                  status: "Not Found",
+                  time: 0,
+                  size: 0,
+                },
+                RequestProperty.RESPONSE,
+                currentTabId,
+              );
+              isLoading = false;
+            } else {
+              let end = Date.now();
+              const byteLength = new TextEncoder().encode(
+                JSON.stringify(response),
+              ).length;
+              let responseSizeKB = byteLength / 1024;
+              let duration = end - start;
 
-            let responseBody = response.data.response;
-            let responseHeaders = response.data.headers;
-            let responseStatus = response.data.status;
-            _apiSendRequest.setResponseContentType(
-              responseHeaders,
-              collectionsMethods,
-            );
-            collectionsMethods.updateRequestProperty(
-              false,
-              RequestProperty.REQUEST_IN_PROGRESS,
-              response.tabId,
-            );
-            collectionsMethods.updateRequestProperty(
-              {
-                body: responseBody,
-                headers: JSON.stringify(responseHeaders),
-                status: responseStatus,
-                time: duration,
-                size: responseSizeKB,
-              },
-              RequestProperty.RESPONSE,
-              response.tabId,
-            );
-            isLoading = false;
+              let responseBody = response.data.response;
+              let responseHeaders = response.data.headers;
+              let responseStatus = response.data.status;
+              _apiSendRequest.setResponseContentType(
+                responseHeaders,
+                collectionsMethods,
+              );
+              collectionsMethods.updateRequestProperty(
+                false,
+                RequestProperty.REQUEST_IN_PROGRESS,
+                response.tabId,
+              );
+              collectionsMethods.updateRequestProperty(
+                {
+                  body: responseBody,
+                  headers: JSON.stringify(responseHeaders),
+                  status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
+                },
+                RequestProperty.RESPONSE,
+                response.tabId,
+              );
+              isLoading = false;
+            }
           })
           .catch((error) => {
             collectionsMethods.updateRequestProperty(
               false,
               RequestProperty.REQUEST_IN_PROGRESS,
+              currentTabId,
             );
             collectionsMethods.updateRequestProperty(
               {
@@ -153,6 +174,7 @@
                 size: 0,
               },
               RequestProperty.RESPONSE,
+              currentTabId,
             );
             isLoading = false;
           });

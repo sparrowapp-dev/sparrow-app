@@ -10,6 +10,7 @@ import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TeamService } from "$lib/services/team.service";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
+import type { InviteBody } from "$lib/utils/dto/team-dto";
 
 export class TeamViewModel {
   constructor() {}
@@ -58,6 +59,10 @@ export class TeamViewModel {
 
   public get activeTeam() {
     return this.teamRepository.getActiveTeam();
+  }
+
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
   }
 
   public get activeWorkspace() {
@@ -127,9 +132,17 @@ export class TeamViewModel {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
   };
-
+  public getTeamData = async () => {
+    return await this.teamRepository.getTeamData();
+  };
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
+    let openTeamId: string = "";
+    const teamsData = await this.getTeamData();
+    teamsData.forEach((element) => {
+      const elem = element.toMutableJSON();
+      if (elem.isOpen) openTeamId = elem.teamId;
+    });
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
@@ -165,8 +178,109 @@ export class TeamViewModel {
           updatedBy,
         };
       });
+      if (openTeamId) {
+        data.forEach((elem) => {
+          if (elem.teamId === openTeamId) {
+            elem.isOpen = true;
+          } else {
+            elem.isOpen = false;
+          }
+        });
+      } else {
+        data[0].isOpen = true;
+      }
+
       await this.teamRepository.bulkInsertData(data);
-      return;
     }
+  };
+
+  // service
+  public inviteMembersAtTeam = async (
+    teamId: string,
+    inviteBody: InviteBody,
+  ) => {
+    const response = await this.teamService.inviteMembersAtTeam(
+      teamId,
+      inviteBody,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public removeMembersAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.removeMembersAtTeam(teamId, userId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToAdminAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.demoteToMemberAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToOwnerAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public changeUserRoleAtWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    body,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      workspaceId,
+      userId,
+      body,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public removeUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      workspaceId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public setOpenTeam = async (teamId) => {
+    await this.teamRepository.setOpenTeam(teamId);
   };
 }

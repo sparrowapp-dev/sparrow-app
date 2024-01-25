@@ -7,8 +7,15 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy } from "svelte";
-  import type { CurrentTeam, WorkspaceMethods } from "$lib/utils/interfaces";
+  import Members from "$lib/components/workspace/members/Members.svelte";
+  import { onDestroy, onMount } from "svelte";
+  import type {
+    CurrentTeam,
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+    WorkspaceMethods,
+  } from "$lib/utils/interfaces";
+  import TeamInvitePopup from "./team-invite-popup/TeamInvitePopup.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   export let data: any;
   export let loaderColor = "default",
@@ -17,16 +24,18 @@
     handleWorkspaceTab: any,
     workspaceMethods: WorkspaceMethods,
     activeSideBarTabMethods: any,
+    openTeam,
     currentTeam: CurrentTeam,
-    handleCreateWorkspace: any;
+    handleCreateWorkspace: any,
+    teamServiceMethods: TeamServiceMethods,
+    teamRepositoryMethods: TeamRepositoryMethods,
+    workspaces;
   let currOpenedTeam: CurrentTeam;
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
     if (value) currOpenedTeam = value;
   });
 
   let isLoading: boolean = false;
-
-  const _viewModel = new TeamViewModel();
 
   let selectedTab = "all-workspace";
   let selectedView: string;
@@ -35,12 +44,49 @@
     selectedView = value;
   });
 
+  let userType: string;
+  const findUserType = () => {
+    openTeam?.users.forEach((user) => {
+      if (user.id === userId) {
+        userType = user.role;
+      }
+    });
+  };
+  $: {
+    if (userId) {
+      findUserType();
+    }
+  }
+  $: {
+    if (openTeam) {
+      findUserType();
+    }
+  }
+
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
   });
+  let teamInvitePopup = false;
 </script>
 
+{#if teamInvitePopup}
+  <TeamInvitePopup
+    {userId}
+    teamLogo={openTeam?.logo}
+    onSubmit={teamServiceMethods.inviteMembersAtTeam}
+    onRefresh={teamServiceMethods.refreshWorkspace}
+    updateRepo={teamRepositoryMethods.modifyTeam}
+    teamName={openTeam?.name}
+    teamId={openTeam?.teamId}
+    workspaces={workspaces.filter((elem) => {
+      return elem?.team?.teamId === openTeam?.teamId;
+    })}
+    handleInvitePopup={(flag) => {
+      teamInvitePopup = flag;
+    }}
+  />
+{/if}
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
     <div class="container-fluid">
@@ -69,23 +115,28 @@
               >
             </h2>
             <div class="d-flex w-25">
-              <button
-                style="font-size: 12px;"
-                class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
-                >Invite</button
-              >
-              <button
-                style="font-size: 12px;"
-                on:click={handleCreateWorkspace}
-                class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
-                >{#if isLoading}
-                  <span class="ms-0 me-1">
-                    {#if loaderColor === "default"}
-                      <Spinner size={"15px"} />
-                    {/if}
-                  </span>
-                {/if}New Workspace</button
-              >
+              {#if userType && userType !== "member"}
+                <button
+                  on:click={() => {
+                    teamInvitePopup = true;
+                  }}
+                  style="font-size: 12px;"
+                  class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
+                  >Invite</button
+                >
+                <button
+                  style="font-size: 12px;"
+                  on:click={handleCreateWorkspace}
+                  class=" d-flex my-auto align-item-center justify-content-center btn pt-1 btn-primary px-3 content-teams__btn-new-workspace btn-sm text-white"
+                  >{#if isLoading}
+                    <span class="ms-0 me-1">
+                      {#if loaderColor === "default"}
+                        <Spinner size={"15px"} />
+                      {/if}
+                    </span>
+                  {/if}New Workspace</button
+                >
+              {/if}
             </div>
           </div>
         </div>
@@ -96,64 +147,63 @@
             class="teams-menu d-flex justify-content-between align-items-center pb-4"
           >
             <div class="teams-menu__left gap-4">
-              <Link style="text-decoration:none;" to="all-workspace"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "all-workspace")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "all-workspace"}
-                  >Workspaces {$data &&
-                  $data
-                    .slice()
-                    .filter((item) => item.team.teamId == currOpenedTeam.id)
-                    .length > 0
-                    ? `(${
-                        $data
-                          ?.slice()
-                          .filter(
-                            (item) => item.team.teamId == currOpenedTeam.id,
-                          ).length
-                      })`
-                    : ""}</span
-                ></Link
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "all-workspace")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "all-workspace"}
+                >Workspaces {$data &&
+                $data
+                  .slice()
+                  .filter((item) => item.team.teamId == currOpenedTeam.id)
+                  .length > 0
+                  ? `(${
+                      $data
+                        ?.slice()
+                        .filter((item) => item.team.teamId == currOpenedTeam.id)
+                        .length
+                    })`
+                  : ""}</span
               >
-              <Link style="text-decoration:none;" to="personal-workspaces"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "settings")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "settings"}>Settings</span
-                ></Link
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "members")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "members"}
+                >Members {openTeam?.users?.length
+                  ? `(${openTeam.users.length})`
+                  : ""}</span
               >
             </div>
             <div class="teams-menu__right">
-              <span class="mx-3" style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("GRID");
-                  }}
-                  class:view-active={selectedView === "GRID"}
-                  src={table}
-                  alt=""
-                />
-              </span>
-              <span style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("TABLE");
-                  }}
-                  class:view-active={selectedView === "TABLE"}
-                  src={hamburger}
-                  alt=""
-                />
-              </span>
+              {#if selectedTab === "all-workspace"}
+                <span class="mx-3" style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("GRID");
+                    }}
+                    class:view-active={selectedView === "GRID"}
+                    src={table}
+                    alt=""
+                  />
+                </span>
+                <span style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("TABLE");
+                    }}
+                    class:view-active={selectedView === "TABLE"}
+                    src={hamburger}
+                    alt=""
+                  />
+                </span>
+              {/if}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
       <AllWorkspace
         openedTeam={currOpenedTeam}
@@ -173,14 +223,23 @@
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
       />
+    {:else if selectedTab === "members"}
+      <Members
+        {userId}
+        {userType}
+        {openTeam}
+        {teamServiceMethods}
+        {workspaces}
+        {teamRepositoryMethods}
+      />
     {/if}
-    <!-- </Route> -->
   </div>
 </div>
 
 <style>
   .teams-content {
-    width: 100%;
+    width: calc(100vw - 352px);
+    height: calc(100vh - 44px);
   }
   @media only screen and (max-width: 1000px) {
     .team-heading {

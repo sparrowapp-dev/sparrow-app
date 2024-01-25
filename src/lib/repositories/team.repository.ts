@@ -36,7 +36,7 @@ export class TeamRepository {
    * clear teams data
    */
   public clearTeams = async (): Promise<any> => {
-    return RxDB.getInstance().rxdb.team.find().remove();
+    return await RxDB.getInstance().rxdb.team.find().remove();
   };
 
   /**
@@ -51,6 +51,24 @@ export class TeamRepository {
 
       if (res.teamId == teamId) res.isActiveTeam = true;
       else res.isActiveTeam = false;
+      return res;
+    });
+    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+    return;
+  };
+
+  /**
+   * Sets a team as opened
+   */
+  public setOpenTeam = async (teamId: string): Promise<void> => {
+    const teams: TeamDocument[] = await RxDB.getInstance()
+      .rxdb.team.find()
+      .exec();
+    const data = teams.map((elem: TeamDocument) => {
+      const res = this.getDocument(elem);
+
+      if (res.teamId === teamId) res.isOpen = true;
+      else res.isOpen = false;
       return res;
     });
     await RxDB.getInstance().rxdb.team.bulkUpsert(data);
@@ -97,6 +115,24 @@ export class TeamRepository {
         isActiveTeam: true,
       },
     }).$;
+  };
+
+  /**
+   * get open team
+   */
+  public getOpenTeam = (): Observable<TeamDocument> => {
+    return RxDB.getInstance().rxdb.team.findOne({
+      selector: {
+        isOpen: true,
+      },
+    }).$;
+  };
+
+  /**
+   * get teams data
+   */
+  public getTeamData = (): Observable<TeamDocument> => {
+    return RxDB.getInstance().rxdb.team.find().exec();
   };
 
   /**
