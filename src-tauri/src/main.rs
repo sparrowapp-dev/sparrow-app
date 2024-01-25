@@ -166,6 +166,8 @@ async fn make_request(
         _ => reqwest::Method::GET,
     };
 
+    println!("Just to check");
+
     // Convert header string into hashmap
     let header_map: HashMap<_, _> = headers
         .split('&')

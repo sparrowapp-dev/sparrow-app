@@ -49,6 +49,12 @@ $sparrow-selectedSideBarTab: #11253a;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-recentApiText: #f3e4e4d7;
 $sparrow-errorTextColor:#fe8c98;
+$sparrow-editor-operator-color: #FE2E2E;
+$sparrow-editor-bool-color: #82DB42;
+$sparrow-editor-name-color: #6CBEF2;
+$sparrow-editor-varible-color: #ECCD43;
+$sparrow-editor-bracket-color: #9217F6;
+$sparrow-editor-square-bracket-color: #FF8000;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -88,6 +94,12 @@ $sparrow-errorTextColor:#fe8c98;
   --sparrow-blue: #{$sparrow-blue};
   --sparrow-button-background: #{$sparrow-button-background};
   --error--color:#{$sparrow-errorTextColor};
+  --editor-operator:#{$sparrow-editor-operator-color};
+  --editor-bool:#{$sparrow-editor-bool-color};
+  --editor-name:#{$sparrow-editor-name-color};
+  --editor-variable:#{$sparrow-editor-varible-color};
+  --editor-bracket:#{$sparrow-editor-bracket-color};
+  --edior-square-bracket:#{$sparrow-editor-square-bracket-color};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
