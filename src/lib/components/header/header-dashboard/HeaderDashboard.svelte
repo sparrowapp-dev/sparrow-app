@@ -185,8 +185,6 @@
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
 
-    // _workspaceViewModel.activateTeamWorkspace(team.teamId, id);
-    // _workspaceViewModel.activateTeam(team.teamId);
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };

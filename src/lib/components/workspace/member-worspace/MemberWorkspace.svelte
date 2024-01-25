@@ -14,7 +14,7 @@
 
   const handleDropdown = async (id) => {
     if (id === "remove") {
-      // perform remove perations
+      // perform remove operations
       if (workspaceCount === 1) {
         handleMemberPopUpSuccess();
       } else {

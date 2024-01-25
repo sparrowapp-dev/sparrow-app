@@ -7,6 +7,7 @@
   import {
     RequestDataType,
     ResponseFormatter,
+    ResponseStatusCode,
   } from "$lib/utils/enums/request.enum";
   import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -164,7 +165,7 @@
             <div class="position-absolute tooltip-statuscode">
               <span class="ellipsis">
                 <span class="me-1">
-                  {#if statusCode === "200 OK" || statusCode === "201 Created"}
+                  {#if statusCode === ResponseStatusCode.OK || statusCode === ResponseStatusCode.CREATED}
                     <StatusSuccess
                       height={8}
                       width={8}
@@ -186,7 +187,7 @@
           {/if}
           <span class="ellipsis">
             <span class="me-1">
-              {#if statusCode === "200 OK" || statusCode === "201 Created"}
+              {#if statusCode === ResponseStatusCode.OK || statusCode === ResponseStatusCode.CREATED}
                 <StatusSuccess
                   height={8}
                   width={8}

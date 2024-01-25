@@ -11,6 +11,8 @@
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
+  import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
+  // import AdminLevelPermissions from "$lib/utils/c";
   export let user;
   export let userType;
   export let openTeam;
@@ -169,12 +171,9 @@
       user.name
     }. Following access will be provided to ${user.name}:</p>
     <ul class="ps-4 text-textColor" style="font-size:12px;">
-      <li>Create New Workspaces.</li>
-      <li>Send Invites.</li>
-      <li>Change role of Admin and Members.</li>
-      <li>View/edit all the workspaces in the team.</li>
-      <li>See all the user, their email and roles.</li>
-      <li>See access details of a user.</li>
+      ${AdminLevelPermission.map((element) => {
+        return `<li>${element}</li>`;
+      }).join("")}
     </ul>
     `}
     onSuccess={handleMemberPromotePopUpSuccess}
