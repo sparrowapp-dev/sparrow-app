@@ -17,7 +17,7 @@ jobs:
       - uses: phwt/sonarqube-quality-gate-action@v1
         id: quality-gate-check
         with:
-          sonar-project-key: sparrow
+          # sonar-project-key: sparrow
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           github-token: ${{ secrets.PR_GITHUB_TOKEN }}
