@@ -87,7 +87,7 @@
       background: var(--background-hover);
       -webkit-backdrop-filter: blur(3px);
       backdrop-filter: blur(3px);
-      z-index: 9;
+      z-index: 11;
     }
 
     .container {
@@ -99,7 +99,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--background-color);
-      z-index: 10;
+      z-index: 12;
       padding: 2%;
       border-radius: 10px;
     }
