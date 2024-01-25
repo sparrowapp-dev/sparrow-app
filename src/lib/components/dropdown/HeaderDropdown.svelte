@@ -96,6 +96,8 @@
     if (openCreateWorkspaceModal) {
       workspacePostInput.name = "";
       workspacePostInput.id = "";
+      invalidWorkspacePostInput.name = false;
+      invalidWorkspacePostInput.id = false;
     }
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
@@ -113,12 +115,13 @@
   const handleCreateWorkSpace = async () => {
     if (!workspacePostInput?.name || workspacePostInput?.name === "") {
       invalidWorkspacePostInput.name = true;
+      if (!workspacePostInput?.id || workspacePostInput?.id === "") {
+        invalidWorkspacePostInput.id = true;
+        return;
+      }
+      return;
     }
-    if (!workspacePostInput?.name || workspacePostInput?.id === "") {
-      invalidWorkspacePostInput.id = true;
-    }
-    isWorkspaceCreatedFirstTime.set(true);
-    isWorkspaceLoaded.set(false);
+
     if (
       $teams
         ?.filter((teamData) => teamData._data.teamId == workspacePostInput?.id)
@@ -132,6 +135,8 @@
       workspaceNameExistsErr = true;
       return;
     }
+    isWorkspaceCreatedFirstTime.set(true);
+    isWorkspaceLoaded.set(false);
     workspaceUnderCreation = true;
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -275,7 +280,7 @@
   {#if currentWorkspace && currentWorkspace?.name}
     <button
       style="font-size: 12px;"
-      class=" rounded border-0 ps-2 py-2 d-flex gap-2 dropdown-btn ellipsis"
+      class=" rounded border-0 ps-2 py-2 d-flex gap-2 dropdown-btn text-white ellipsis"
       on:click={toggleDropdown}
       id="workspace-dropdown"
     >
@@ -317,7 +322,7 @@
     {#if $data}
       {#if isOpen}
         <div transition:slide={{ duration: 500 }} class="gap-2">
-          {#each $data.slice().reverse() as list, index}
+          {#each $data?.slice().reverse() as list, index}
             {#if index < workspaceLimit}
               <div
                 class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
@@ -334,7 +339,7 @@
                     handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
-                  <span>{list.name}</span>
+                  <span class="workspace-name">{list.name}</span>
                   <span class="list-team-name d-block" style="font-size: 12px;"
                     >{list.team.teamName ? list.team.teamName : ""}</span
                   >
@@ -346,26 +351,33 @@
               </div>
             {/if}
           {/each}
+          {#if $data && $data.length < workspaceLimit}
+            <p style="font-size: 12px; color: #636566; " class="text-wrap text-center px-2 py-1"
+              >You will see your five most recent workspaces here.</p
+            >
+          {/if}
         </div>
       {/if}
     {/if}
-    <hr class="m-0 p-0 mt-1" />
-    <p
-      style="cursor:pointer"
-      class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
-      on:click={() => {
-        navigate("/dashboard/workspaces");
-        activeSideBarTabMethods.updateActiveTab("workspaces");
-        isOpen = true;
-        setOpenedTeam(
-          currentTeam.id,
-          currentTeam.name,
-          currentTeam.base64String,
-        );
-      }}
-    >
-      View All Workspaces
-    </p>
+    {#if $data && $data.length > 0}
+      <hr class="m-0 p-0 mt-1" />
+      <p
+        style="cursor:pointer"
+        class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
+        on:click={() => {
+          navigate("/dashboard/workspaces");
+          activeSideBarTabMethods.updateActiveTab("workspaces");
+          isOpen = true;
+          setOpenedTeam(
+            currentTeam.id,
+            currentTeam.name,
+            currentTeam.base64String,
+          );
+        }}
+      >
+        View All Workspaces
+      </p>
+    {/if}
   </div>
 </div>
 
@@ -405,7 +417,14 @@
   }
 
   .dropdown-btn:hover {
+    background-color: var(--dull-background-color);
+    color: var(--workspace-hover-color);
+  }
+  .dropdown-btn:active {
     background-color: var(--border-color);
+  }
+  .dropdown-btn:active .workspace-name {
+    color: white;
   }
   .dropdown-data {
     background-color: var(--background-dropdown);

@@ -44,6 +44,7 @@ function generateUniqueWorkspaceName(teamId: string) {
   const workspacesObservable = _workspaceViewModel.workspaces;
   workspacesObservable.subscribe((workspaces) => {
     workspaces
+      .sort((a, b) => a._data.name.localeCompare(b._data.name))
       ?.filter((workspace) => workspace._data.team?.teamId == teamId)
       .map((workspace) => {
         existingWorkspaces.push(workspace._data.name);
@@ -52,7 +53,7 @@ function generateUniqueWorkspaceName(teamId: string) {
   if (!existingWorkspaces.length) {
     return WorkspaceDefault.NAME;
   }
-  let counter = 2;
+  let counter = 1;
   while (
     existingWorkspaces.includes(
       WorkspaceDefault.NAME + (counter > 1 ? ` ${counter}` : ""),

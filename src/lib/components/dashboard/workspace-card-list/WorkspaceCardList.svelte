@@ -86,6 +86,7 @@
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
               .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceCard
           isAdminOrOwner={$currOpenedTeamRxDoc?._data?.admins?.includes(

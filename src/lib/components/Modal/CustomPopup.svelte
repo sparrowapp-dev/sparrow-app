@@ -19,7 +19,7 @@
     transition:fade={{ delay: 0, duration: 100 }}
   />
   <div
-    class="sparrow-modal-container gap-2 p-3"
+    class="sparrow-modal-container gap-2 p-4"
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
@@ -36,13 +36,14 @@
     <div class="sparrow-modal-body">
       <slot />
     </div>
-    <div class="sparrow-modal-footer d-flex justify-content-end mt-5">
+    <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
       <button
         class="sparrow-modal-cancel-btn border-0 py-1 px-3 me-2"
         on:click={handleOpen}>Cancel</button
       >
 
       <button
+        disabled={underSubmission}
         class="{isDanger
           ? 'sparrow-modal-danger-btn'
           : 'sparrow-modal-primary-btn'} d-flex border-0 py-1 me-1 px-3"

@@ -9,7 +9,6 @@
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
   import { ShowMoreOptions, UserProfileList } from "$lib/components";
-  import UserProfileSm from "$lib/components/profile/UserProfileSM.svelte";
   import type { TeamDocument } from "$lib/database/app.database";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
@@ -29,7 +28,9 @@
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
-
+  let containerRef;
+  let pos = { x: 0, y: 0 };
+  let showMenu: boolean = false;
   const handleOpenCollection = (workspace) => {
     handleWorkspaceSwitch(
       workspace._id,
@@ -89,8 +90,12 @@
   };
   const rightClickContextMenu = (e, index) => {
     e.preventDefault();
-
     setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY + 20 };
+      showMenu = true;
       isShowMoreVisible = index;
     }, 100);
   };
@@ -156,15 +161,18 @@
               .filter((item) => item.name
                     .toLowerCase()
                     .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <ShowMoreOptions
                 showMenu={isShowMoreVisible == index}
                 menuItems={menuItems(list, index)}
-                rightDistance={9}
-                topDistance={index * 8 + 3}
-              />
+                leftDistance={pos.x}
+                topDistance={pos.y}
+
+                />
+       
               <tr
-                class="workspace-list-item cursor-pointer overflow-hidden ellipsis w-100"
+                class="workspace-list-item cursor-pointer  ellipsis w-100"
                 on:contextmenu|preventDefault={(e) =>
                   rightClickContextMenu(e, index)}
                 on:click={(e) => {
@@ -210,7 +218,9 @@
                 >
                 <td class="tab-data rounded-end py-3"
                   ><button
-                    class="show-more-btn rounded border-0"
+                    class="{isShowMoreVisible == index
+                      ? 'bg-plusButton'
+                      : ''} show-more-btn rounded border-0"
                     on:click={(e) => {
                       handleShowMore(
                         isShowMoreVisible == index ? undefined : index,

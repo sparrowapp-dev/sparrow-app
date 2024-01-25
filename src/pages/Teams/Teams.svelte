@@ -222,6 +222,7 @@
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
       teamUnderCreation = false;
+      setOpenedTeam(response.data.data?.id, response?.data?.data?.name, response?.data?.data?.logo);
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
       teamUnderCreation = false;
@@ -443,7 +444,7 @@
   handleSubmit={handleLeaveTeam}
 >
   <p class="warning-text text-lightGray mt-3">
-    Are you sure you want to leave team {currOpenedTeam?.name}? You will lose
+    Are you sure you want to leave team <span class="fw-semibold">"{currOpenedTeam?.name}"</span>? You will lose
     access to all the resources in this team.
   </p>
 </CustomPopup>

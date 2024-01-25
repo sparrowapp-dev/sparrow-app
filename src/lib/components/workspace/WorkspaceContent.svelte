@@ -12,7 +12,7 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
-  import { ShowMoreIcon } from "$lib/assets/app.asset";
+  import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { IconButton, Tooltip } from "$lib/components";
 
   export let userId: string;
@@ -32,6 +32,7 @@
   let selectedTab = "all-workspace";
   let selectedView: string;
   let currOpenedTeamRxDoc: Observable<TeamDocument>;
+  let isTooltipVisible: boolean = false;
 
   const _teamViewModel = new TeamViewModel();
 
@@ -53,13 +54,18 @@
 
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
-    <div class="container-fluid">
+    <div
+      class="container-fluid"
+      on:mouseleave={(e) => {
+        if (!isShowMoreVisible) handleOnShowMoreClick(e);
+      }}
+    >
       <div class="row">
         <div class="col-12 pb-3">
           <div
             class="team-heading d-flex justify-content-between position-relative"
           >
-            <h2 class="d-flex ellipsis w-75 overflow-visible">
+            <h2 class="d-flex ellipsis overflow-visible">
               {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
                 <img
                   class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
@@ -79,12 +85,13 @@
               <span class="ms-4 my-auto ellipsis overflow-hidden"
                 >{currOpenedTeam.name}
               </span>
-              <div class="mr-4 position-relative">
+              <div class="mr-4 position-relative my-auto">
                 <IconButton
-                  classProp="rounded mx-2 my-auto {isShowMoreVisible
+                  classProp="rounded mx-2 my-auto p-0 d-flex {isShowMoreVisible
                     ? 'transparent'
                     : 'bg-plusButton'}"
-                  onClick={handleOnShowMoreClick}><ShowMoreIcon /></IconButton
+                  onClick={handleOnShowMoreClick}
+                  ><ShowMoreIcon classProp="" /></IconButton
                 >
                 {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                   <button
@@ -92,21 +99,26 @@
                       handleLeaveTeamModal();
                       handleOnShowMoreClick(e);
                     }}
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="bottom"
-                    title="Tooltip on bottom"
+                    on:mouseenter={() => (isTooltipVisible = true)}
+                    on:mouseleave={() => (isTooltipVisible = false)}
                     disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
                     style="font-size: 14px;"
-                    data-bs-custom-class="custom-tooltip"
                     class="position-absolute {isShowMoreVisible &&
                       'd-none'} {isShowMoreVisible
                       ? 'bg-plusButton'
-                      : 'bg-blackColor'} border-0 py-2 px-3 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      : 'bg-blackColor'} border-0 py-2 px-3 mt-2 ms-2 rounded {$currOpenedTeamRxDoc
                       ?._data?.owner == userId
                       ? 'text-lightGray'
                       : 'text-dangerColor'}
                 ">Leave Team</button
                   >
+                  <p
+                    style="font-size: 10px;"
+                    class="position-absolute mt-5 ms-2 {!isTooltipVisible &&
+                      'd-none'} bg-backgroundDark py-1 px-2 rounded text-dangerColor"
+                  >
+                    Owner cannot leave the team!
+                  </p>
                 {:else}
                   <button
                     on:click={(e) => {
@@ -116,7 +128,7 @@
                     disabled={$currOpenedTeamRxDoc?._data?.owner == userId}
                     style="font-size: 14px;"
                     class="position-absolute {isShowMoreVisible &&
-                      'd-none'} bg-blackColor border-0 py-2 px-3 mt-5 ms-2 rounded {$currOpenedTeamRxDoc
+                      'd-none'} bg-blackColor border-0 py-2 px-3 mt-3 ms-2 rounded {$currOpenedTeamRxDoc
                       ?._data?.owner == userId
                       ? 'text-lightGray'
                       : 'text-dangerColor'}
@@ -127,7 +139,18 @@
             </h2>
 
             {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
-              <div class="d-flex w-25">
+              <div class="d-flex align-items-end justify-content-end">
+                {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
+                  <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
+                    <PeopleIcon
+                      color={"#8A9299"}
+                      classProp="mx-2 my-auto d-flex"
+                    />
+                    <span class="my-auto"
+                      >{$currOpenedTeamRxDoc?._data?.users.length} Members</span
+                    >
+                  </p>
+                {/if}
                 <button
                   style="font-size: 12px;"
                   class="d-flex align-items-center me-4 my-auto justify-content-center btn px-3 pt-1 d-flex btn-sm content-teams__btn-invite text-white"
