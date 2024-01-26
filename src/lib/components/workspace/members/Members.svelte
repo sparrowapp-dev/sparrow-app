@@ -18,12 +18,13 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
-  let filteredUser;
+  let filteredUser = [];
   const calculateFilteredUser = () => {
-    filteredUser = openTeam.users.filter((elem) => {
+    filteredUser = openTeam?.users?.filter((elem) => {
       if (
         elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        elem.role.toLowerCase().includes(filterText.toLowerCase())
+        elem.role.toLowerCase().includes(filterText.toLowerCase()) ||
+        elem.email.toLowerCase().includes(filterText.toLowerCase())
       ) {
         return true;
       } else return false;
@@ -36,6 +37,9 @@
   }
   $: {
     if (filterText) {
+      calculateFilteredUser();
+    }
+    if (!filterText) {
       calculateFilteredUser();
     }
   }
@@ -59,13 +63,9 @@
   </div>
 </section>
 <section class="member-list">
-  {#if openTeam?.users}
-    {#each openTeam?.users as user}
-      {#if user.id === userId && (user.name
-          .toLowerCase()
-          .includes(filterText.toLowerCase()) || user.role
-            .toLowerCase()
-            .includes(filterText.toLowerCase()))}
+  {#if filteredUser}
+    {#each filteredUser as user}
+      {#if user.id === userId}
         <Tile
           owner={true}
           {user}
@@ -81,12 +81,8 @@
         <hr />
       {/if}
     {/each}
-    {#each openTeam?.users as user}
-      {#if user.id !== userId && (user.name
-          .toLowerCase()
-          .includes(filterText.toLowerCase()) || user.role
-            .toLowerCase()
-            .includes(filterText.toLowerCase()))}
+    {#each filteredUser as user}
+      {#if user.id !== userId}
         <Tile
           {user}
           {userType}
@@ -100,6 +96,9 @@
         />
       {/if}
     {/each}
+  {/if}
+  {#if !filteredUser?.length}
+    <p class="not-found-text mt-3">No results found.</p>
   {/if}
 </section>
 
