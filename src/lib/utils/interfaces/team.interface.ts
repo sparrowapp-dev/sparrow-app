@@ -13,6 +13,7 @@ export interface CurrentTeam {
 
 export interface TeamRepositoryMethods {
   getDocument?: (elem: TeamDocument) => any;
+  getTeam?: (teamId: string) => Promise<Observable<TeamDocument>>;
   getTeams?: () => Observable<TeamDocument[]>;
   checkActiveTeam?: (teamId: string) => Promise<boolean>;
   clearTeams?: () => Promise<any>;

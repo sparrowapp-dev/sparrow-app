@@ -44,12 +44,11 @@
   let currOpenedTeamRxDoc: Observable<TeamDocument>;
   let isTooltipVisible: boolean = false;
 
-  const _teamViewModel = new TeamViewModel();
 
   const openedTeamSubscribe = openedTeam.subscribe(async (value) => {
     if (value) {
       currOpenedTeam = value;
-      currOpenedTeamRxDoc = await _teamViewModel.getTeam(value.id);
+      currOpenedTeamRxDoc = await teamRepositoryMethods.getTeam(value.id);
     }
   });
   const selectedViewSubscribe = workspaceView.subscribe((value) => {

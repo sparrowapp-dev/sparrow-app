@@ -88,6 +88,7 @@
   const teamRepositoryMethods: TeamRepositoryMethods = {
     modifyTeam: _viewModel.modifyTeam,
     setOpenTeam: _viewModel.setOpenTeam,
+    getTeam: _viewModel.getTeam,
   };
   const teamServiceMethods: TeamServiceMethods = {
     inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
@@ -489,6 +490,7 @@
       {collectionsMethods}
     />
     <WorkspaceContent
+      {currentTeam}
       {userId}
       {handleCreateWorkspace}
       {handleWorkspaceSwitch}
