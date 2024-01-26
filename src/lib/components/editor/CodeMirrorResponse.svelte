@@ -15,22 +15,16 @@
   export let rawTab: RequestDataType;
   export let rawValue: string;
   export let formatter: string;
-  // export let handleRawChange: (data: string) => void;
   let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
-  const updateExtensionView = EditorView.updateListener.of((update) => {
-    const userInput = update.state.doc.toString();
-    // handleRawChange(userInput);
-  });
   function initalizeCodeMirrorEditor(value: string) {
     let state = EditorState.create({
       doc: value,
       extensions: [
         basicSetup,
         baseTheme,
-        // updateExtensionView,
         languageConf.of([]),
         EditorState.readOnly.of(true),
       ],
@@ -54,6 +48,15 @@
       });
       selectedTabId = currentTabId;
     }
+    if (rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: rawValue,
+        },
+      });
+    }
     if (formatter === ResponseFormatter.PRETTY) {
       if (rawTab === RequestDataType.HTML) {
         codeMirrorView.dispatch({
@@ -72,8 +75,6 @@
           ),
         });
       } else if (rawTab === RequestDataType.JSON) {
-        // let temp = JSON.parse(rawValue);
-        // rawValue = JSON.stringify(temp);
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure(jsonSetup),
         });
@@ -87,6 +88,9 @@
         });
       }
     } else {
+      codeMirrorView.dispatch({
+        effects: languageConf.reconfigure([]),
+      });
     }
   });
 
