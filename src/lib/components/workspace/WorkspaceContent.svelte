@@ -4,10 +4,16 @@
   import hamburger from "$lib/assets/hamburger.svg";
   import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
   import { workspaceView, openedTeam } from "$lib/store";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
-  import { onDestroy } from "svelte";
-  import type { CurrentTeam } from "$lib/utils/interfaces";
+  import Members from "$lib/components/workspace/members/Members.svelte";
+  import { onDestroy, onMount } from "svelte";
+  import type {
+    CurrentTeam,
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+    WorkspaceMethods,
+  } from "$lib/utils/interfaces";
+  import TeamInvitePopup from "./team-invite-popup/TeamInvitePopup.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
@@ -21,8 +27,12 @@
   export let handleWorkspaceSwitch: any;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
+  export let openTeam;
   export let currentTeam: CurrentTeam;
-  export let handleCreateWorkspace: any;
+  export let handleCreateWorkspace: any,
+    teamServiceMethods: TeamServiceMethods,
+    teamRepositoryMethods: TeamRepositoryMethods,
+    workspaces;
   export let handleLeaveTeamModal: () => void;
   export let handleOnShowMoreClick: (e) => void;
   export let isShowMoreVisible: boolean = false;
@@ -46,12 +56,49 @@
     selectedView = value;
   });
 
+  let userType: string;
+  const findUserType = () => {
+    openTeam?.users.forEach((user) => {
+      if (user.id === userId) {
+        userType = user.role;
+      }
+    });
+  };
+  $: {
+    if (userId) {
+      findUserType();
+    }
+  }
+  $: {
+    if (openTeam) {
+      findUserType();
+    }
+  }
+
   onDestroy(() => {
     selectedViewSubscribe();
     openedTeamSubscribe();
   });
+  let teamInvitePopup = false;
 </script>
 
+{#if teamInvitePopup}
+  <TeamInvitePopup
+    {userId}
+    teamLogo={openTeam?.logo}
+    onSubmit={teamServiceMethods.inviteMembersAtTeam}
+    onRefresh={teamServiceMethods.refreshWorkspace}
+    updateRepo={teamRepositoryMethods.modifyTeam}
+    teamName={openTeam?.name}
+    teamId={openTeam?.teamId}
+    workspaces={workspaces.filter((elem) => {
+      return elem?.team?.teamId === openTeam?.teamId;
+    })}
+    handleInvitePopup={(flag) => {
+      teamInvitePopup = flag;
+    }}
+  />
+{/if}
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
     <div
@@ -138,7 +185,7 @@
               </div>
             </h2>
 
-            {#if $currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId}
+            {#if userType && userType !== "member"}
               <div class="d-flex align-items-end justify-content-end">
                 {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
                   <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
@@ -181,26 +228,32 @@
             class="teams-menu d-flex justify-content-between align-items-center pb-4"
           >
             <div class="teams-menu__left gap-4">
-              <Link style="text-decoration:none;" to="all-workspace"
-                ><span
-                  style="padding: 8px 8px;"
-                  on:click={() => (selectedTab = "all-workspace")}
-                  class="team-menu__link"
-                  class:tab-active={selectedTab === "all-workspace"}
-                  >Workspaces {$data &&
-                  $data
-                    .slice()
-                    .filter((item) => item.team.teamId == currOpenedTeam.id)
-                    .length > 0
-                    ? `(${
-                        $data
-                          ?.slice()
-                          .filter(
-                            (item) => item.team.teamId == currOpenedTeam.id,
-                          ).length
-                      })`
-                    : ""}</span
-                ></Link
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "all-workspace")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "all-workspace"}
+                >Workspaces {$data &&
+                $data
+                  .slice()
+                  .filter((item) => item.team.teamId == currOpenedTeam.id)
+                  .length > 0
+                  ? `(${
+                      $data
+                        ?.slice()
+                        .filter((item) => item.team.teamId == currOpenedTeam.id)
+                        .length
+                    })`
+                  : ""}</span
+              >
+              <span
+                style="padding: 8px 8px;"
+                on:click={() => (selectedTab = "members")}
+                class="team-menu__link"
+                class:tab-active={selectedTab === "members"}
+                >Members {openTeam?.users?.length
+                  ? `(${openTeam.users.length})`
+                  : ""}</span
               >
               {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                 <Link style="text-decoration:none;" to="personal-workspaces"
@@ -214,33 +267,34 @@
               {/if}
             </div>
             <div class="teams-menu__right">
-              <span class="mx-3" style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("GRID");
-                  }}
-                  class:view-active={selectedView === "GRID"}
-                  src={table}
-                  alt=""
-                />
-              </span>
-              <span style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set("TABLE");
-                  }}
-                  class:view-active={selectedView === "TABLE"}
-                  src={hamburger}
-                  alt=""
-                />
-              </span>
+              {#if selectedTab === "all-workspace"}
+                <span class="mx-3" style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("GRID");
+                    }}
+                    class:view-active={selectedView === "GRID"}
+                    src={table}
+                    alt=""
+                  />
+                </span>
+                <span style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set("TABLE");
+                    }}
+                    class:view-active={selectedView === "TABLE"}
+                    src={hamburger}
+                    alt=""
+                  />
+                </span>
+              {/if}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- <Route path="/all-workspace"> -->
     {#if selectedView == "TABLE" && selectedTab == "all-workspace"}
       <AllWorkspace
         {userId}
@@ -264,8 +318,16 @@
         {activeSideBarTabMethods}
         {currOpenedTeamRxDoc}
       />
+      {:else if selectedTab === "members"}
+      <Members
+        {userId}
+        {userType}
+        {openTeam}
+        {teamServiceMethods}
+        {workspaces}
+        {teamRepositoryMethods}
+      />
     {/if}
-    <!-- </Route> -->
   </div>
 </div>
 
@@ -275,7 +337,8 @@
   }
 
   .teams-content {
-    width: 100%;
+    width: calc(100vw - 352px);
+    height: calc(100vh - 44px);
   }
   @media only screen and (max-width: 1000px) {
     .team-heading {

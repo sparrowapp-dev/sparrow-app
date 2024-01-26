@@ -35,7 +35,7 @@ const error = (message: string, obj?: notifySetting) => {
     description: message,
     duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
-    placement: obj?.position ?? "bottom-center",
+    placement: obj?.position ?? "bottom-right",
   });
 };
 
@@ -45,7 +45,7 @@ const info = (message: string, obj?: notifySetting) => {
     description: message,
     duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
-    placement: obj?.position ?? "top-right",
+    placement: obj?.position ?? "bottom-right",
   });
 };
 
@@ -55,7 +55,7 @@ const warning = (message: string, obj?: notifySetting) => {
     description: message,
     duration: obj?.duration ?? 4000,
     theme: obj?.theme ?? "dark",
-    placement: obj?.position ?? "top-right",
+    placement: obj?.position ?? "bottom-right",
   });
 };
 

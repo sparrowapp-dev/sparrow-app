@@ -30,7 +30,9 @@
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
   import { TeamRepository } from "$lib/repositories/team.repository";
+  import { DashboardViewModel } from "./Dashboard.ViewModel";
 
+  const _dashboardViewModel = new DashboardViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -59,6 +61,7 @@
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {

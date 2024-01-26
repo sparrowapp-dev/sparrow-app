@@ -1,29 +1,31 @@
 <script lang="ts">
+  import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
+
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import type { CollectionsMethods, CurrentTeam } from "$lib/utils/interfaces";
+  import type {
+    CollectionsMethods,
+    CurrentTeam,
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+  } from "$lib/utils/interfaces";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import WorkspaceContent from "../../lib/components/workspace/WorkspaceContent.svelte";
   import WorkspaceList from "../../lib/components/workspace/workspace-list/WorkspaceList.svelte";
   import { TeamViewModel } from "./team.viewModel";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { Motion } from "svelte-motion";
+  import { user } from "$lib/store/auth.store";
+
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
+  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
-  import {
-    isTeamCreatedFirstTime,
-    openedTeam,
-    setOpenedTeam,
-  } from "$lib/store/team.store";
-  import {
-    isWorkspaceCreatedFirstTime,
-    isWorkspaceLoaded,
-    user,
-  } from "$lib/store";
-  import {
-    generateSamepleTeam,
-    generateSampleWorkspace,
-  } from "$lib/utils/sample";
-  import { UntrackedItems } from "$lib/utils/enums";
+  import { isTeamCreatedFirstTime } from "$lib/store/team.store";
+  import {} from "$lib/store";
+  import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
@@ -75,8 +77,28 @@
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const teams: Observable<TeamDocument[]> = _viewModel.teams;
   const activeTeam: Observable<TeamDocument> = _viewModel.activeTeam;
+  const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
+  const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const tabList = _viewModel.tabs;
   const collectionList = _viewModel.collection;
+
+  const workspaceMethods: WorkspaceMethods = {
+    handleCreateTab: _viewModel.handleCreateTab,
+  };
+  const teamRepositoryMethods: TeamRepositoryMethods = {
+    modifyTeam: _viewModel.modifyTeam,
+    setOpenTeam: _viewModel.setOpenTeam,
+  };
+  const teamServiceMethods: TeamServiceMethods = {
+    inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
+    removeMembersAtTeam: _viewModel.removeMembersAtTeam,
+    promoteToAdminAtTeam: _viewModel.promoteToAdminAtTeam,
+    demoteToMemberAtTeam: _viewModel.demoteToMemberAtTeam,
+    promoteToOwnerAtTeam: _viewModel.promoteToOwnerAtTeam,
+    refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
+    changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
+    removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
+  };
 
   const userSubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -463,12 +485,12 @@
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {activeSideBarTabMethods}
+      {teamRepositoryMethods}
       {collectionsMethods}
     />
     <WorkspaceContent
       {userId}
       {handleCreateWorkspace}
-      {currentTeam}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
@@ -476,6 +498,10 @@
       {isShowMoreVisible}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
+      openTeam={$openTeam}
+      {teamServiceMethods}
+      {teamRepositoryMethods}
+      workspaces={$workspaces}
     />
   </div>
 </Motion>
@@ -484,19 +510,8 @@
   .workspace {
     font-size: 12px;
     display: flex;
-    top: 44px;
-    margin-left: calc(16.5vw + 72px);
-    width: calc(79vw - 72px);
-    position: fixed;
-    height: calc(100% - 44px);
-    overflow: auto;
-  }
-
-  @media only screen and (max-width: 900px) {
-    .workspace {
-      margin-left: calc(22vw + 72px);
-      width: calc(69vw - 72px);
-    }
+    height: calc(100vh - 44px);
+    overflow: hidden;
   }
   .workspace::-webkit-scrollbar {
     width: 2px;

@@ -8,7 +8,7 @@ export const teamSchemaLiteral = {
   title: "team",
   primaryKey: "teamId",
   type: "object",
-  version: 1,
+  version: 2,
   properties: {
     teamId: {
       type: "string",
@@ -66,6 +66,10 @@ export const teamSchemaLiteral = {
       },
     },
     isActiveTeam: {
+      type: "boolean",
+      default: false,
+    },
+    isOpen: {
       type: "boolean",
       default: false,
     },

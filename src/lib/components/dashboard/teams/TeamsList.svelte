@@ -2,12 +2,17 @@
   import plus from "$lib/assets/plus.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { openedTeam } from "$lib/store/team.store";
-  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
+  import type {
+    CurrentTeam,
+    TeamRepositoryMethods,
+  } from "$lib/utils/interfaces/team.interface";
   import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { base64ToURL } from "$lib/utils/helpers";
+  import { TeamRepository } from "$lib/repositories/team.repository";
   export let handleCreateTeamModal: any;
   export let teams: any;
+  export let teamRepositoryMethods: TeamRepositoryMethods;
   let currOpenedTeam: CurrentTeam;
 
   const handleOpenTeam = (
@@ -53,6 +58,7 @@
         }`}
         on:click={() => {
           handleOpenTeam(team.teamId, team.name, team.logo);
+          teamRepositoryMethods.setOpenTeam(team.teamId);
         }}
       >
         <div class="d-flex overflow-hidden">
