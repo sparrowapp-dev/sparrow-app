@@ -13,7 +13,7 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import InvalidSyntaxPopup from "$lib/components/Modal/InvalidSyntaxPopup.svelte";
   import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
-  // import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
+  import Dropzone from "svelte-file-dropzone";
   import File from "./File.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -222,7 +222,7 @@
     </div>
 
     <div>
-      <!-- <Dropzone
+      <Dropzone
         containerStyles="background-color:#1e1e1e; width:100%;"
         accept=".yaml"
         inputElement
@@ -234,7 +234,7 @@
           <span><img src={icons.uploadIcon} alt="" />Choose File</span>
           <span>{fileName}</span>
         </p>
-      </Dropzone> -->
+      </Dropzone>
     </div>
 
     <div
