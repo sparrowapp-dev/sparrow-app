@@ -1,7 +1,7 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
   import { base64ToURL } from "$lib/utils/helpers";
-  import CoverButton from "../buttons/CoverButton.svelte";
+  import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
 
   export let title;
@@ -97,10 +97,10 @@
         {/if}
         <p style="font-size:16px;" class="mb-0">{teamName}</p>
       </div>
-      <CoverButton
+      <CustomButton
         disable={deleteLoader || (confirmationText !== teamName && auth)}
         text={"Update Access"}
-        size={14}
+        fontSize={14}
         type={"primary"}
         loader={deleteLoader}
         onClick={() => {
