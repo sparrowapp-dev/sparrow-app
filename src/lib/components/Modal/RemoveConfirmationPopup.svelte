@@ -1,6 +1,6 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import CoverButton from "../buttons/CoverButton.svelte";
+  import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
 
   export let title;
@@ -51,10 +51,10 @@
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
       style="font-size: 16px;"
     >
-      <CoverButton
+      <CustomButton
         disable={deleteLoader}
         text={"Cancel"}
-        size={14}
+        fontSize={14}
         type={"dark"}
         loader={false}
         onClick={() => {
@@ -62,10 +62,10 @@
         }}
       />
 
-      <CoverButton
+      <CustomButton
         disable={deleteLoader}
         text={"Remove"}
-        size={14}
+        fontSize={14}
         type={"danger"}
         loader={deleteLoader}
         onClick={() => {

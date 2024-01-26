@@ -6,7 +6,7 @@
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
-  import CoverButton from "../../buttons/CoverButton.svelte";
+  import { CustomButton } from "$lib/components";
   import { base64ToURL } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
@@ -314,10 +314,10 @@
       </div>
     </div>
     <div>
-      <CoverButton
+      <CustomButton
         disable={loader}
         text={"Send Invite"}
-        size={14}
+        fontSize={14}
         type={"primary"}
         {loader}
         onClick={() => {
