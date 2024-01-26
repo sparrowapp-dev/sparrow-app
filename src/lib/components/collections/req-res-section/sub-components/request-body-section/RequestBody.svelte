@@ -22,7 +22,6 @@
   export let activeTab;
   export let environmentVariables;
 
-  import MonacoEditor from "./MonacoEditor.svelte";
   import CodeMirror from "../../../../editor/CodeMirror.svelte";
 
   let currentTabId: string = "";
@@ -201,13 +200,6 @@
     {/if}
   </div>
   {#if mainTab === RequestDataset.RAW}
-    <!-- <MonacoEditor
-      bind:value={inputValue}
-      callback={handleRawChange}
-      {rawTab}
-      {rawValue}
-      {currentTabId}
-    /> -->
     <CodeMirror {handleRawChange} {rawTab} {rawValue} {currentTabId} />
   {:else if mainTab === RequestDataset.NONE}
     <p class="team-menu__link pb-1" style="font-size: 12px; margin-top:4px;">
