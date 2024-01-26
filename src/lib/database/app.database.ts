@@ -121,6 +121,9 @@ export class RxDB {
           6: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          7: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {

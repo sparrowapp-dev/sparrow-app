@@ -1,7 +1,6 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import IconButton from "$lib/components/buttons/IconButton.svelte";
   import FileExplorer from "./FileExplorer.svelte";
   import { getNextName } from "./collectionList";
   import { CollectionListViewModel } from "./CollectionList.ViewModel";
@@ -16,8 +15,7 @@
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
-  import type { NewTab, Path } from "$lib/utils/interfaces/request.interface";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
   import {

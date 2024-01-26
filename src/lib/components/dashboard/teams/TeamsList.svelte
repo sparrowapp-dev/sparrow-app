@@ -107,7 +107,8 @@
       brightness(101%) contrast(100%);
   }
   .teams-outer:hover {
-    background-color: #313233;
+    background-color: var(--dull-background-color);
+    color: var(--workspace-hover-color);
   }
   .teams-outer img {
     width: 20px;

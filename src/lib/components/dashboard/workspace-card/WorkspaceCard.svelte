@@ -6,14 +6,17 @@
   import { onDestroy } from "svelte";
   import { navigate } from "svelte-navigator";
 
-  export let workspace: any,
-    handleWorkspaceSwitch: any,
-    handleWorkspaceTab: any,
-    currActiveTeam: CurrentTeam,
-    openedTeam: CurrentTeam,
-    activeSideBarTabMethods: any;
+  export let workspace: any;
+  export let handleWorkspaceSwitch: any;
+  export let handleWorkspaceTab: any;
+  export let currActiveTeam: CurrentTeam;
+  export let openedTeam: CurrentTeam;
+  export let activeSideBarTabMethods: any;
+  export let isAdminOrOwner: boolean;
   let isShowMoreVisible = false;
-
+  let pos = { x: 0, y: 0 };
+  let showMenu: boolean = false;
+  let containerRef;
   const handleShowMore = () => {
     isShowMoreVisible = !isShowMoreVisible;
   };
@@ -21,7 +24,7 @@
     isShowMoreVisible = false;
   };
 
-  const handleOpenCollection = () => {
+  const handleOpenWorkspace = () => {
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
@@ -42,24 +45,31 @@
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY + 20 };
+      showMenu = true;
       isShowMoreVisible = true;
     }, 100);
   };
   let menuItems = [
     {
       onClick: () => {
-        handleOpenCollection();
+        handleOpenWorkspace();
         handleShowMore();
       },
       displayText: "Open Workspace",
       disabled: false,
+      visible: true,
     },
     {
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Rename Request",
+      displayText: "Add Members",
       disabled: false,
+      visible: isAdminOrOwner,
     },
     {
       onClick: (e) => {
@@ -67,6 +77,7 @@
       },
       displayText: "Delete",
       disabled: false,
+      visible: isAdminOrOwner,
     },
   ];
 </script>
@@ -82,18 +93,19 @@
 >
   <div
     class="bg-black workspace-card rounded p-4 {isShowMoreVisible &&
-      'position-relative'}"
+      'position-relative '}"
     on:mouseleave={() => isShowMoreVisible && handleShowMore()}
     on:click={() => {
       !isShowMoreVisible
-        ? handleOpenCollection()
+        ? handleOpenWorkspace()
         : isShowMoreVisible && handleShowMore();
     }}
   >
     <div class="d-flex overflow-hidden justify-content-between">
       <h4 class="ellipsis overflow-hidden">{workspace.name}</h4>
       <button
-        class="border-0 my-auto show-more-btn rounded"
+        class="border-0 my-auto show-more-btn {isShowMoreVisible &&
+          'bg-plusButton'} rounded"
         on:click={(e) => {
           e.stopPropagation();
           handleShowMore();
@@ -106,8 +118,8 @@
     <ShowMoreOptions
       showMenu={isShowMoreVisible}
       {menuItems}
-      topDistance={4}
-      rightDistance={5}
+      topDistance={pos.y}
+      leftDistance={pos.x}
     />
     <p class="teams-workspace__para mb-1">
       <!-- <span>{workspace}</span> APIs <span class="px-1"></span> -->

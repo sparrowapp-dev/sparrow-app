@@ -142,7 +142,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace.id = workspaceId;
+    sampleWorkspace._id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -150,7 +150,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-    collectionsMethods.handleActiveTab(sampleWorkspace.id);
+    collectionsMethods.handleActiveTab(sampleWorkspace._id);
     moveNavigation("right");
   };
   let collapsExpandToggle = false;

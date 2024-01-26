@@ -49,9 +49,13 @@
   let userId: string | undefined = undefined;
   let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
-
   let workspaceUnderCreation: boolean = false;
+  let teamUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
+  let isShowMoreVisible: boolean = false;
+  let openLeaveTeamModal: boolean = false;
+  let isLeavingTeam: boolean = false;
+
   let newTeam: {
     name: {
       value: string;
@@ -84,6 +88,7 @@
   const teamRepositoryMethods: TeamRepositoryMethods = {
     modifyTeam: _viewModel.modifyTeam,
     setOpenTeam: _viewModel.setOpenTeam,
+    getTeam: _viewModel.getTeam,
   };
   const teamServiceMethods: TeamServiceMethods = {
     inviteMembersAtTeam: _viewModel.inviteMembersAtTeam,
@@ -103,7 +108,9 @@
   });
 
   const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
+    if (value) {
+      currOpenedTeam = value;
+    }
   });
 
   const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
@@ -141,6 +148,8 @@
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toISOString(),
+      undefined,
+      currOpenedTeam.id,
     );
 
     const workspaceData = {
@@ -154,8 +163,6 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      await _viewModel.updateWorkspace(workspaceObj.id, response.data.data);
-
       let totalCollection: number = 0;
       let totalRequest: number = 0;
 
@@ -175,7 +182,7 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
       workspaceObj.team = {
@@ -193,16 +200,21 @@
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
       // await _viewModelWorkspace.addWorkspace(workspaceObj);
+      if (userId) await _viewModel.refreshTeams(userId);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj.id);
+      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
-      collectionsMethods.handleActiveTab(workspaceObj.id);
+      collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
       navigate("/dashboard/collections");
       activeSideBarTabMethods.updateActiveTab("collections");
+    } else {
+      await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
+      isWorkspaceLoaded.set(true);
+      notifications.error("Failed to create new Workspace!");
     }
   };
 
@@ -215,9 +227,10 @@
       newTeam.name.invalid = true;
       return;
     }
-    if (description == "") newTeam.description.invalid = true;
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
+
+    teamUnderCreation = true;
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
 
@@ -226,12 +239,45 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      // await _viewModel.modifyTeam(teamObj.teamwId, res);
       await _viewModel.refreshTeams(userId);
+      setOpenedTeam(
+        response.data.data?._id,
+        response?.data?.data?.name,
+        response?.data?.data?.logo,
+      );
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
+      teamUnderCreation = false;
     } else {
+      await _viewModel.leaveTeam(teamObj.teamId);
+      teamUnderCreation = false;
+      handleCreateTeamModal();
       notifications.error("Failed to create a new team.");
+    }
+  };
+
+  const handleLeaveTeam = async () => {
+    if (!currOpenedTeam?.id) return;
+    isLeavingTeam = true;
+    const response = await _viewModel.leaveTeam(currOpenedTeam.id);
+    if (response.isSuccessful) {
+      await _viewModel.refreshTeams(userId);
+      await _viewModelWorkspace.refreshWorkspaces(userId);
+      notifications.success("You left a team.");
+      setOpenedTeam(
+        activeTeamRxDoc?._data?.teamId,
+        activeTeamRxDoc?._data?.name,
+        //@ts-ignore
+        activeTeamRxDoc?._data?.logo,
+      );
+      isShowMoreVisible = false;
+      isLeavingTeam = false;
+      handleLeaveTeamModal();
+    } else {
+      notifications.error("Failed to leave the team. Please try again.");
+      isShowMoreVisible = false;
+      isLeavingTeam = false;
+      handleLeaveTeamModal();
     }
   };
 
@@ -271,12 +317,19 @@
     maxSize: number,
     supportedFileTypes: string[],
   ) => {
-    if (e.target.files[0].size > maxSize * 1024) {
+    if (
+      (e?.target?.files && e?.target?.files[0].size > maxSize * 1024) ||
+      (e?.dataTransfer?.files &&
+        e?.dataTransfer?.files[0].size > maxSize * 1024)
+    ) {
       newTeam.file.showFileSizeError = true;
       newTeam.file.invalid = true;
       return;
     }
-    const fileType = `.${e.target.files[0].name
+    const fileType = `.${(
+      (e?.target?.files && e?.target?.files[0]?.name) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]?.name)
+    )
       .split(".")
       .pop()
       .toLowerCase()}`;
@@ -288,7 +341,9 @@
     newTeam.file.showFileSizeError = false;
     newTeam.file.showFileTypeError = false;
     newTeam.file.invalid = false;
-    newTeam.file.value = e.target.files[0];
+    newTeam.file.value =
+      (e?.target?.files && e?.target?.files[0]) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]);
   };
 
   const handleLogoReset = (e: any) => {
@@ -298,6 +353,19 @@
   const handleLogoEdit = (e: any) => {
     const fileInput = document.getElementById("team-file-input");
     fileInput.click();
+  };
+
+  const handleOnShowMoreClick = (e) => {
+    e.stopPropagation();
+    isShowMoreVisible = !isShowMoreVisible;
+  };
+
+  const handleCloseShowMoreClick = (e) => {
+    if (!isShowMoreVisible) isShowMoreVisible = !isShowMoreVisible;
+  };
+
+  const handleLeaveTeamModal = () => {
+    openLeaveTeamModal = !openLeaveTeamModal;
   };
 
   onMount(() => {
@@ -328,10 +396,19 @@
   });
 </script>
 
+<svelte:window
+  on:click={(e) => {
+    handleCloseShowMoreClick(e);
+  }}
+  on:contextmenu|preventDefault={(e) => {
+    handleCloseShowMoreClick(e);
+  }}
+/>
 <!-- Create New Team POP UP -->
 <CustomPopup
   isOpen={isCreateTeamModalOpen}
   title={"New Team"}
+  underSubmission={teamUnderCreation}
   btnText={"Create Team"}
   handleOpen={handleCreateTeamModal}
   handleSubmit={() =>
@@ -381,6 +458,23 @@
   />
 </CustomPopup>
 
+<!-- Leave Team POP UP -->
+<CustomPopup
+  isOpen={openLeaveTeamModal}
+  title="Leave Team?"
+  underSubmission={isLeavingTeam}
+  isDanger={true}
+  btnText="Leave"
+  handleOpen={handleLeaveTeamModal}
+  handleSubmit={handleLeaveTeam}
+>
+  <p class="warning-text text-lightGray mt-3">
+    Are you sure you want to leave team <span class="fw-semibold"
+      >"{currOpenedTeam?.name}"</span
+    >? You will lose access to all the resources in this team.
+  </p>
+</CustomPopup>
+
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>
     <WorkspaceList
@@ -396,13 +490,16 @@
       {collectionsMethods}
     />
     <WorkspaceContent
-      {handleCreateWorkspace}
+      {currentTeam}
       {userId}
+      {handleCreateWorkspace}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
-      {workspaceMethods}
       {activeSideBarTabMethods}
+      {isShowMoreVisible}
+      {handleLeaveTeamModal}
+      {handleOnShowMoreClick}
       openTeam={$openTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}
@@ -423,5 +520,12 @@
   }
   .workspace::-webkit-scrollbar-thumb {
     background: #888;
+  }
+
+  .warning-text {
+    color: var(--colors-neutral-text-3, #ccc);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
   }
 </style>

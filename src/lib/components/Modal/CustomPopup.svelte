@@ -1,13 +1,13 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
   import { fade, fly } from "svelte/transition";
-  import Spinner from "../Transition/Spinner.svelte";
+  import { CustomButton } from "..";
 
-  export let isOpen: boolean;
+  export let isOpen = false;
   export let title: string;
-  export let isDanger: boolean = false;
+  export let isDanger = false;
   export let btnText: string;
-  export let underSubmission: boolean = false;
+  export let underSubmission = false;
   export let handleOpen: () => void;
   export let handleSubmit: () => void;
 </script>
@@ -19,7 +19,7 @@
     transition:fade={{ delay: 0, duration: 100 }}
   />
   <div
-    class="sparrow-modal-container gap-2 p-3"
+    class="sparrow-modal-container gap-2 p-4"
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
@@ -36,29 +36,22 @@
     <div class="sparrow-modal-body">
       <slot />
     </div>
-    <div class="sparrow-modal-footer d-flex justify-content-end mt-5">
-      <button
-        class="sparrow-modal-cancel-btn border-0 py-1 px-3 me-2"
-        on:click={handleOpen}>Cancel</button
-      >
-      {#if isDanger}
-        <button
-          class="sparrow-modal-danger-btn border-0 py-1 px-3"
-          on:click={handleSubmit}>{btnText}</button
-        >
-      {:else}
-        <button
-          class="sparrow-modal-primary-btn d-flex border-0 py-1 px-3"
-          on:click={() => {
-            handleSubmit();
-          }}
-        >
-          {#if underSubmission}
-            <Spinner classProp="" size="18px" />
-          {/if}
-          <span class="ms-2 my-auto">{btnText}</span></button
-        >
-      {/if}
+    <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+      <CustomButton
+        text={`Cancel`}
+        type="dark"
+        disable={false}
+        classProp={`me-2`}
+        onClick={handleOpen}
+      />
+      <CustomButton
+        text={btnText}
+        type="primary"
+        disable={underSubmission}
+        loader={underSubmission}
+        classProp={`me-1`}
+        onClick={() => handleSubmit()}
+      />
     </div>
   </div>
 {/if}
@@ -88,18 +81,7 @@
   .sparrow-modal-heading {
     font-size: 20px;
   }
-  .sparrow-modal-cancel-btn,
-  .sparrow-modal-primary-btn,
-  .sparrow-modal-danger-btn {
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  .sparrow-modal-cancel-btn {
-    background-color: var(--border-color);
-  }
-  .sparrow-modal-primary-btn {
-    background-color: var(--primary-btn-color);
-  }
+
   .sparrow-modal-close-icon-btn {
     background-color: transparent;
   }

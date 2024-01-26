@@ -1,4 +1,5 @@
 import { WorkspaceService } from "$lib/services/workspace.service";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
@@ -10,6 +11,7 @@ import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TeamService } from "$lib/services/team.service";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
+import type { Observable } from "rxjs";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 
 export class TeamViewModel {
@@ -68,6 +70,34 @@ export class TeamViewModel {
   public get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
   }
+
+  /**
+   * Get team By it's ID
+   * @param teamId
+   * @returns RxDoc (Observable) of the team with that ID
+   */
+  public getTeam = async (
+    teamId: string,
+  ): Promise<Observable<TeamDocument>> => {
+    return await this.teamRepository.getTeam(teamId);
+  };
+
+  /**
+   * Leave team from RxDB
+   * @param teamId
+   * @returns Left Team Success or Failure
+   */
+  public leaveTeam = async (teamId: string): Promise<any> => {
+    const rxDBResponse = await this.teamRepository.removeTeam(teamId);
+    if ((await this.teamRepository.checkActiveTeam(teamId)) && rxDBResponse) {
+      const teamIdToActivate =
+        await this.workspaceRepository.activateInitialWorkspace();
+      if (teamIdToActivate)
+        await this.teamRepository.setActiveTeam(teamIdToActivate);
+    }
+    const resp = await this.teamService.leaveTeam(teamId);
+    return resp;
+  };
 
   public checkActiveTeam = async (teamId: string): Promise<boolean> => {
     return await this.teamRepository.checkActiveTeam(teamId);

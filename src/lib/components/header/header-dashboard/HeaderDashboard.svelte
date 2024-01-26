@@ -97,7 +97,6 @@
         activeWorkspaceRxDocVal = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
-        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
