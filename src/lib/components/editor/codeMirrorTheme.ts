@@ -91,11 +91,11 @@ export const baseTheme = EditorView.theme({
   },
 });
 
-const editorNameColor = "var(--editor-name)";
+const editorBasicColor = "var(--editor-name)";
 const editorOperatorColor = "var(--editor-name)";
 const editorInvalidColor = "var(--editor-operator)";
 const editorSeparatorColor = "var(--sparrow-blue)";
-const editorMetaColor = "var(--success-color)";
+const editorInfoColor = "var(--success-color)";
 const editorVariableColor = "var(--editor-variable)";
 const editorLinkColor = "var(--sparrow-blue)";
 const editorConstantColor = "var(--editor-bool)";
@@ -115,7 +115,7 @@ export const baseHighlightStyle = HighlightStyle.define([
   },
   {
     tag: [t.name, t.deleted, t.character],
-    color: editorNameColor,
+    color: editorBasicColor,
   },
   {
     tag: [t.function(t.variableName), t.labelName],
@@ -135,7 +135,7 @@ export const baseHighlightStyle = HighlightStyle.define([
       t.modifier,
       t.namespace,
     ],
-    color: editorMetaColor,
+    color: editorInfoColor,
   },
   { tag: t.number, color: editorSquareBracket },
   {
@@ -149,8 +149,8 @@ export const baseHighlightStyle = HighlightStyle.define([
     ],
     color: editorOperatorColor,
   },
-  { tag: [t.meta, t.comment], color: editorMetaColor },
-  { tag: t.link, color: editorLinkColor, textDecoration: "underline" },
+  { tag: [t.meta, t.comment], color: editorInfoColor },
+  { tag: t.link, textDecoration: "underline", color: editorLinkColor },
   {
     tag: [t.atom, t.bool, t.special(t.variableName)],
     color: editorConstantColor,
