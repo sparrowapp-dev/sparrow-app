@@ -181,6 +181,7 @@ export class WorkspaceRepository {
       if (data.name) value.name = data.name;
       if (data.description) value.description = data.description;
       if (data.team) value.team = data.team;
+      if (data.environmentId) value.environmentId = data.environmentId;
       if (data.users) value.users = data.users;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
