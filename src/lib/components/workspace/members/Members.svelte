@@ -20,7 +20,7 @@
   };
   let filteredUser = [];
   const calculateFilteredUser = () => {
-    filteredUser = openTeam.users.filter((elem) => {
+    filteredUser = openTeam?.users?.filter((elem) => {
       if (
         elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
         elem.role.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -63,7 +63,7 @@
   </div>
 </section>
 <section class="member-list">
-  {#if openTeam?.users}
+  {#if filteredUser}
     {#each filteredUser as user}
       {#if user.id === userId}
         <Tile
@@ -97,7 +97,7 @@
       {/if}
     {/each}
   {/if}
-  {#if !filteredUser.length}
+  {#if !filteredUser?.length}
     <p class="not-found-text mt-3">No results found.</p>
   {/if}
 </section>
