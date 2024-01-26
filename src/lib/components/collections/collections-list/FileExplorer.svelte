@@ -1,7 +1,6 @@
 <script lang="ts">
   import folder from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
-  import IconButton from "$lib/components/buttons/IconButton.svelte";
 
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
 

@@ -13,3 +13,7 @@ export interface InvalidWorkspacePostBody {
   name: boolean;
   id: boolean;
 }
+
+export interface ChangeRoleBody {
+  role: string;
+}

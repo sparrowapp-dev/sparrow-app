@@ -4,7 +4,7 @@
   import { onDestroy, onMount } from "svelte";
   import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { moveNavigation, base64ToURL } from "$lib/utils/helpers";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { navigate } from "svelte-navigator";
   import {
@@ -20,7 +20,11 @@
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import { CustomPopup, SelectInput, TextInput } from "$lib/components";
+  import {
+    CustomPopup,
+    TextInput,
+    SelectInput,
+  } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -29,6 +33,7 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import { setOpenedTeam } from "$lib/store";
+  import { v4 as uuidv4 } from "uuid";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -39,6 +44,7 @@
   export let teams: Observable<TeamDocument[]>;
   export let collectionsMethods: CollectionsMethods;
 
+  let workspaceNameExistsErr: boolean = false;
   let workspaceLimit = constants.WORKSPACE_LIMIT;
   let isOpen: boolean = false;
   let openCreateWorkspaceModal: boolean = false;
@@ -79,7 +85,7 @@
       new Date().toString(),
       name,
     );
-    sampleWorkspace.id = id;
+    sampleWorkspace._id = id;
     sampleWorkspace.name = name;
     sampleWorkspace.description = description;
     sampleWorkspace.path = path;
@@ -87,40 +93,72 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-    collectionsMethods.handleActiveTab(sampleWorkspace.id);
+    collectionsMethods.handleActiveTab(sampleWorkspace._id);
     moveNavigation("right");
   };
   const handleCreateWorkspaceModal = () => {
+    if (openCreateWorkspaceModal) {
+      workspacePostInput.name = "";
+      workspacePostInput.id = "";
+      invalidWorkspacePostInput.name = false;
+      invalidWorkspacePostInput.id = false;
+    }
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
+    workspaceNameExistsErr = false;
     if (e.target.value !== "") invalidWorkspacePostInput.name = false;
   };
-  const handleTeamSelect = (e) => {
-    workspacePostInput.id = e.target.value;
+  const handleTeamSelect = (value) => {
+    workspacePostInput.id = value;
+    if (value && value !== "") invalidWorkspacePostInput.id = false;
   };
+
   const handleCreateWorkSpace = async () => {
+    if (!workspacePostInput?.name || workspacePostInput?.name === "") {
+      invalidWorkspacePostInput.name = true;
+      if (!workspacePostInput?.id || workspacePostInput?.id === "") {
+        invalidWorkspacePostInput.id = true;
+        return;
+      }
+      return;
+    }
+
+    if (
+      $teams
+        ?.filter((teamData) => teamData._data.teamId == workspacePostInput?.id)
+        ?.find((teamData) =>
+          teamData._data.workspaces.find(
+            (workspace) => workspace.name == workspacePostInput?.name,
+          ),
+        )
+    ) {
+      invalidWorkspacePostInput.name = true;
+      workspaceNameExistsErr = true;
+      return;
+    }
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
+    workspaceUnderCreation = true;
     const workspaceObj = generateSampleWorkspace(
-      UntrackedItems.UNTRACKED,
+      UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
       workspacePostInput?.name,
+      workspacePostInput.id,
     );
 
     const workspaceData = {
       name: workspaceObj.name,
       id: workspacePostInput.id,
+      createdAt: new Date(workspaceObj.createdAt).toISOString(),
     };
-    _viewModel.addWorkspace(workspaceObj);
+    await _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      _viewModel.addWorkspace(response.data.data);
-
       let totalCollection: number = 0;
       let totalRequest: number = 0;
 
@@ -139,7 +177,7 @@
         collectionId: "",
       };
 
-      workspaceObj.id = response.data.data._id;
+      workspaceObj._id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
       workspaceObj.team = response.data.data?.team;
@@ -153,17 +191,25 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
+      if (userId) await _teamViewModel.refreshTeams(userId);
       if (userId) await _viewModel.refreshWorkspaces(userId);
+      await _viewModel.activateWorkspace(response.data.data._id);
+      collectionsMethods.handleCreateTab(workspaceObj);
+      collectionsMethods.handleActiveTab(response.data.data._id);
+      moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      openCreateWorkspaceModal = false;
-      moveNavigation("right");
       navigate("/dashboard/collections");
-      await _viewModel.activateWorkspace(workspaceObj.id);
-      collectionsMethods.handleCreateTab(workspaceObj);
-      collectionsMethods.handleActiveTab(workspaceObj.id);
       activeSideBarTabMethods.updateActiveTab("collections");
+      workspaceUnderCreation = false;
+      handleCreateWorkspaceModal();
+    } else {
+      await _viewModel.removeWorkspace(workspaceObj._id);
+      handleCreateWorkspaceModal();
+      workspaceUnderCreation = false;
+      isWorkspaceLoaded.set(true);
+      notifications.error("Failed to create new Workspace!");
     }
   };
 
@@ -199,7 +245,9 @@
     inputPlaceholder="Enter workspace name"
     inputId="workspace-name-input"
     invalidValue={invalidWorkspacePostInput.name}
-    errorText="Workspace name cannot be empty."
+    errorText={workspaceNameExistsErr
+      ? "Workspace with this name already exists."
+      : "Workspace name cannot be empty."}
     onChange={handleCreateWorkspaceNameChange}
   />
   <SelectInput
@@ -208,10 +256,19 @@
     errorText="Please select a team."
     selectInputPlaceholder="Select team"
     inputId="select-team-input"
-    options={$teams.map((team) => ({
-      id: team._data.teamId,
-      name: team._data.name,
-    }))}
+    options={$teams
+      .filter((team) => {
+        return (
+          team?._data?.admins?.includes(userId) || team?._data?.owner == userId
+        );
+      })
+      .map((team) => ({
+        id: team?._data?.teamId,
+        name: team?._data?.name,
+        logo: base64ToURL(team?._data?.logo),
+        endIconVisible: team?._data?.users?.length > 1,
+      }))}
+    invalidValue={invalidWorkspacePostInput.id}
     handleOnSelect={handleTeamSelect}
   />
 </CustomPopup>
@@ -225,7 +282,7 @@
   {#if currentWorkspace && currentWorkspace?.name}
     <button
       style="font-size: 12px;"
-      class=" rounded border-0 ps-2 py-2 d-flex gap-2 dropdown-btn ellipsis"
+      class=" rounded border-0 ps-2 py-2 d-flex gap-2 dropdown-btn text-white ellipsis"
       on:click={toggleDropdown}
       id="workspace-dropdown"
     >
@@ -267,7 +324,7 @@
     {#if $data}
       {#if isOpen}
         <div transition:slide={{ duration: 500 }} class="gap-2">
-          {#each $data.slice().reverse() as list, index}
+          {#each $data?.slice().reverse() as list, index}
             {#if index < workspaceLimit}
               <div
                 class="d-flex align-items-center justify-content-between pe-1 dropdown-btn rounded"
@@ -284,7 +341,7 @@
                     handleWorkspaceTab(list._id, list.name, list?.description);
                   }}
                 >
-                  <span>{list.name}</span>
+                  <span class="workspace-name">{list.name}</span>
                   <span class="list-team-name d-block" style="font-size: 12px;"
                     >{list.team.teamName ? list.team.teamName : ""}</span
                   >
@@ -296,26 +353,36 @@
               </div>
             {/if}
           {/each}
+          {#if $data && $data.length < workspaceLimit}
+            <p
+              style="font-size: 12px; color: #636566; "
+              class="text-wrap text-center px-2 py-1"
+            >
+              You will see your five most recent workspaces here.
+            </p>
+          {/if}
         </div>
       {/if}
     {/if}
-    <hr class="m-0 p-0 mt-1" />
-    <p
-      style="cursor:pointer"
-      class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
-      on:click={() => {
-        navigate("/dashboard/workspaces");
-        activeSideBarTabMethods.updateActiveTab("workspaces");
-        isOpen = true;
-        setOpenedTeam(
-          currentTeam.id,
-          currentTeam.name,
-          currentTeam.base64String,
-        );
-      }}
-    >
-      View All Workspaces
-    </p>
+    {#if $data && $data.length > 0}
+      <hr class="m-0 p-0 mt-1" />
+      <p
+        style="cursor:pointer"
+        class="drop-btn d-flex align-items-center mb-2 mt-1 p-1 rounded"
+        on:click={() => {
+          navigate("/dashboard/workspaces");
+          activeSideBarTabMethods.updateActiveTab("workspaces");
+          isOpen = true;
+          setOpenedTeam(
+            currentTeam.id,
+            currentTeam.name,
+            currentTeam.base64String,
+          );
+        }}
+      >
+        View All Workspaces
+      </p>
+    {/if}
   </div>
 </div>
 
@@ -355,7 +422,14 @@
   }
 
   .dropdown-btn:hover {
+    background-color: var(--dull-background-color);
+    color: var(--workspace-hover-color);
+  }
+  .dropdown-btn:active {
     background-color: var(--border-color);
+  }
+  .dropdown-btn:active .workspace-name {
+    color: white;
   }
   .dropdown-data {
     background-color: var(--background-dropdown);

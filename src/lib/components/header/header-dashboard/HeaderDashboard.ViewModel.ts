@@ -73,15 +73,8 @@ export class HeaderDashboardViewModel {
     await this.workspaceRepository.addWorkspace(workspace);
   };
 
-  public updateWorkspace = (
-    workspaceId: string,
-    name: string,
-    description?: string,
-  ) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, {
-      name,
-      description,
-    });
+  public updateWorkspace = async (workspaceId: string, data: any) => {
+    await this.workspaceRepository.updateWorkspace(workspaceId, data);
   };
 
   public updateCollectionInWorkspace = (workspaceId: string, collectionObj) => {
@@ -168,7 +161,7 @@ export class HeaderDashboardViewModel {
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const response = await this.workspaceService.fetchWorkspaces(userId);
-    let isAnyWorkspaceActive = false;
+    let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
     if (
       response?.isSuccessful &&
@@ -180,26 +173,27 @@ export class HeaderDashboardViewModel {
           _id,
           name,
           description,
-          owner,
           users,
+          admins,
           team,
           createdAt,
           createdBy,
           collection,
         } = elem;
         const isActiveWorkspace = await this.checkActiveWorkspace(_id);
-        if (isActiveWorkspace) isAnyWorkspaceActive = true;
+        if (isActiveWorkspace) isAnyWorkspaceActive = _id;
         const item = {
           _id,
           name,
           description,
-          owner,
           users,
           collections: collection ? collection : [],
+          admins: admins,
           team: {
             teamId: team.id,
             teamName: team.name,
           },
+
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -209,7 +203,7 @@ export class HeaderDashboardViewModel {
       await this.workspaceRepository.bulkInsertData(data);
       if (!isAnyWorkspaceActive) {
         this.activateInitialWorkspaceWithTeam();
-      }
+      } else this.activateWorkspace(isAnyWorkspaceActive);
       return;
     }
   };
@@ -271,5 +265,9 @@ export class HeaderDashboardViewModel {
 
   public getServerEnvironments = async (workspaceId: string) => {
     return await this.environmentService.fetchAllEnvironments(workspaceId);
+  };
+
+  public removeWorkspace = async (workspaceId: string) => {
+    return await this.workspaceRepository.deleteWorkspace(workspaceId);
   };
 }

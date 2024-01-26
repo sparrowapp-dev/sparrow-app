@@ -4,7 +4,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import { fade, fly } from "svelte/transition";
-  import CoverButton from "../buttons/CoverButton.svelte";
+  import CustomButton from "../buttons/CustomButton.svelte";
   export let collectionId: string;
   export let folderId: string;
   export let workspaceId: string;
@@ -92,10 +92,10 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <CoverButton
+    <CustomButton
       disable={deleteLoader}
       text={"Cancel"}
-      size={14}
+      fontSize={14}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -103,10 +103,10 @@
       }}
     />
 
-    <CoverButton
+    <CustomButton
       disable={deleteLoader}
       text={"Delete"}
-      size={14}
+      fontSize={14}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

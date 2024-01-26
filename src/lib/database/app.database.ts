@@ -121,6 +121,9 @@ export class RxDB {
           6: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          7: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -152,6 +155,15 @@ export class RxDB {
       },
       team: {
         schema: teamSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+        },
       },
       environment: {
         schema: environmentSchema,

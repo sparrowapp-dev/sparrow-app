@@ -25,7 +25,7 @@
   }
 </script>
 
-<div class={"tooltip opacity-100 "}>
+<div class={"tooltip opacity-100 " + classProp}>
   <span
     class="tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 z-1 opacity-0"
     style={`${

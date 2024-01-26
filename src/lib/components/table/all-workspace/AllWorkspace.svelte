@@ -8,20 +8,30 @@
     DoubleRightIcon,
     ShowMoreIcon,
   } from "$lib/assets/app.asset";
-  import { ShowMoreOptions } from "$lib/components";
+  import { ShowMoreOptions, UserProfileList } from "$lib/components";
+  import type { TeamDocument } from "$lib/database/app.database";
+  import { WorkspaceMemberRole } from "$lib/utils/enums";
   import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
+  import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
+
+  export let userId: string;
   export let data: any;
   export let selectedTab: string;
-  export let openedTeam: CurrentTeam,
-    handleWorkspaceSwitch: any,
-    activeSideBarTabMethods: any,
-    handleWorkspaceTab: any;
+  export let openedTeam: CurrentTeam;
+  export let handleWorkspaceSwitch: any;
+  export let activeSideBarTabMethods: any;
+  export let handleWorkspaceTab: any;
+  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+
   let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
+  let containerRef;
+  let pos = { x: 0, y: 0 };
+  let showMenu: boolean = false;
   const handleOpenCollection = (workspace) => {
     handleWorkspaceSwitch(
       workspace._id,
@@ -49,13 +59,17 @@
       },
       displayText: "Open Workspace",
       disabled: false,
+      visible: true,
     },
     {
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Rename Request",
+      displayText: "Add Members",
       disabled: false,
+      visible:
+        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
+        $currOpenedTeamRxDoc?._data?.owner == userId,
     },
     {
       onClick: (e) => {
@@ -63,6 +77,9 @@
       },
       displayText: "Delete",
       disabled: false,
+      visible:
+        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
+        $currOpenedTeamRxDoc?._data?.owner == userId,
     },
   ];
 
@@ -74,8 +91,12 @@
   };
   const rightClickContextMenu = (e, index) => {
     e.preventDefault();
-
     setTimeout(() => {
+      const containerRect = containerRef?.getBoundingClientRect();
+      const mouseX = e.clientX - (containerRect?.left || 0);
+      const mouseY = e.clientY - (containerRect?.top || 0);
+      pos = { x: mouseX, y: mouseY + 20 };
+      showMenu = true;
       isShowMoreVisible = index;
     }, 100);
   };
@@ -126,6 +147,9 @@
             <th data-sortable="true" class="tab-head">Workspace</th>
 
             <th class="tab-head">Collections</th>
+            {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
+              <th class="tab-head">Contributors</th>
+            {/if}
             <th class="tab-head">Last Updated</th>
             <th class="tab-head"></th>
           </tr>
@@ -138,15 +162,17 @@
               .filter((item) => item.name
                     .toLowerCase()
                     .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <ShowMoreOptions
                 showMenu={isShowMoreVisible == index}
                 menuItems={menuItems(list, index)}
-                rightDistance={9}
-                topDistance={index * 8 + 3}
+                leftDistance={pos.x}
+                topDistance={pos.y}
               />
+
               <tr
-                class="workspace-list-item cursor-pointer overflow-hidden ellipsis w-100"
+                class="workspace-list-item cursor-pointer ellipsis w-100"
                 on:contextmenu|preventDefault={(e) =>
                   rightClickContextMenu(e, index)}
                 on:click={(e) => {
@@ -165,6 +191,24 @@
                 <td class="tab-data py-3"
                   >{list?.collections?.length ? list.collections.length : 0}</td
                 >
+                {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
+                  <td class="tab-data py-3">
+                    <div class="d-flex">
+                      <UserProfileList
+                        width={24}
+                        height={25}
+                        borderRadius={24}
+                        users={list?.users?.filter(
+                          (user) =>
+                            user.role === WorkspaceMemberRole.ADMIN ||
+                            user.role === WorkspaceMemberRole.EDITOR,
+                        )}
+                        maxProfiles={3}
+                        classProp="position-absolute"
+                      />
+                    </div>
+                  </td>
+                {/if}
                 <td class="tab-data py-3"
                   >{calculateTimeDifferenceInDays(
                     new Date(),
@@ -173,7 +217,9 @@
                 >
                 <td class="tab-data rounded-end py-3"
                   ><button
-                    class="show-more-btn rounded border-0"
+                    class="{isShowMoreVisible == index
+                      ? 'bg-plusButton'
+                      : ''} show-more-btn rounded border-0"
                     on:click={(e) => {
                       handleShowMore(
                         isShowMoreVisible == index ? undefined : index,
