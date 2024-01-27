@@ -101,8 +101,12 @@ const editorColors = {
   linkColor: "var(--sparrow-blue)",
   constantColor: "var(--editor-bool)",
   keywordColor: "var(--editor-name)",
-  bracketColor: "var(--editor-bracket)",
-  squareBracket: "var(--edior-square-bracket)",
+  bracketColor: "var(--white-color)",
+  squareBracket: "var(--editor-square-bracket)",
+  numberColor: "var(--editor-number)",
+  angleBracket: "var(--editor-angle-bracket)",
+  tabColor: "var(--editor-tag-color)",
+  stringColor: "var(--editor-string-color)",
 };
 
 export const basicHighlightStyle = HighlightStyle.define([
@@ -110,6 +114,22 @@ export const basicHighlightStyle = HighlightStyle.define([
   {
     tag: t.bracket,
     color: editorColors.bracketColor,
+  },
+  {
+    tag: t.string,
+    color: editorColors.stringColor,
+  },
+  {
+    tag: t.number,
+    color: editorColors.numberColor,
+  },
+  {
+    tag: t.angleBracket,
+    color: editorColors.angleBracket,
+  },
+  {
+    tag: t.typeName,
+    color: editorColors.tabColor,
   },
   {
     tag: t.squareBracket,
@@ -133,9 +153,7 @@ export const basicHighlightStyle = HighlightStyle.define([
   },
   {
     tag: [
-      t.typeName,
       t.className,
-      t.number,
       t.annotation,
       t.modifier,
       t.namespace,
@@ -144,16 +162,8 @@ export const basicHighlightStyle = HighlightStyle.define([
     ],
     color: editorColors.infoColor,
   },
-  { tag: t.number, color: editorColors.squareBracket },
   {
-    tag: [
-      t.operator,
-      t.operatorKeyword,
-      t.url,
-      t.regexp,
-      t.link,
-      t.special(t.string),
-    ],
+    tag: [t.operator, t.operatorKeyword, t.url, t.regexp, t.special(t.string)],
     color: editorColors.operatorColor,
   },
   { tag: t.link, textDecoration: "underline", color: editorColors.linkColor },

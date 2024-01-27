@@ -78,7 +78,8 @@
 
 <style>
   #code-editor {
-    width: 99%;
+    width: 100%;
     height: calc(100vh - 360px);
+    margin-left: 1%;
   }
 </style>

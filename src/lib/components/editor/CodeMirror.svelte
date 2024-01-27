@@ -64,7 +64,8 @@
 
 <style>
   #code-editor {
-    width: 99%;
-    height: 250px;
+    width: 100%;
+    height: calc(100vh - 360px);
+    margin-right: 1%;
   }
 </style>
