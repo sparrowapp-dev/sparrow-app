@@ -42,7 +42,7 @@ import {
   handleRefresh,
 } from "codemirror-json-schema";
 import { hoverTooltip } from "@codemirror/view";
-export const baseTheme = EditorView.theme({
+export const basicTheme = EditorView.theme({
   "&": {
     height: "100%",
     width: "100%",
@@ -91,41 +91,46 @@ export const baseTheme = EditorView.theme({
   },
 });
 
-const editorBasicColor = "var(--editor-name)";
-const editorOperatorColor = "var(--editor-name)";
-const editorInvalidColor = "var(--editor-operator)";
-const editorSeparatorColor = "var(--sparrow-blue)";
-const editorInfoColor = "var(--success-color)";
-const editorVariableColor = "var(--editor-variable)";
-const editorLinkColor = "var(--sparrow-blue)";
-const editorConstantColor = "var(--editor-bool)";
-const editorKeywordColor = "var(--editor-name)";
-const editorBracketColor = "var(--editor-bracket)";
-const editorSquareBracket = "var(--edior-square-bracket)";
+const editorColors = {
+  basicColor: "var(--editor-name)",
+  operatorColor: "var(--editor-name)",
+  invalidColor: "var(--editor-operator)",
+  separatorColor: "var(--sparrow-blue)",
+  infoColor: "var(--success-color)",
+  variableColor: "var(--editor-variable)",
+  linkColor: "var(--sparrow-blue)",
+  constantColor: "var(--editor-bool)",
+  keywordColor: "var(--editor-name)",
+  bracketColor: "var(--editor-bracket)",
+  squareBracket: "var(--edior-square-bracket)",
+};
 
-export const baseHighlightStyle = HighlightStyle.define([
-  { tag: t.keyword, color: editorKeywordColor },
+export const basicHighlightStyle = HighlightStyle.define([
+  { tag: t.keyword, color: editorColors.keywordColor },
   {
     tag: t.bracket,
-    color: editorBracketColor,
+    color: editorColors.bracketColor,
   },
   {
     tag: t.squareBracket,
-    color: editorSquareBracket,
+    color: editorColors.squareBracket,
   },
   {
     tag: [t.name, t.deleted, t.character],
-    color: editorBasicColor,
+    color: editorColors.basicColor,
   },
   {
     tag: [t.function(t.variableName), t.labelName],
-    color: editorVariableColor,
+    color: editorColors.variableColor,
   },
   {
     tag: [t.color, t.constant(t.name), t.standard(t.name)],
-    color: editorConstantColor,
+    color: editorColors.constantColor,
   },
-  { tag: [t.definition(t.name), t.separator], color: editorSeparatorColor },
+  {
+    tag: [t.definition(t.name), t.separator],
+    color: editorColors.separatorColor,
+  },
   {
     tag: [
       t.typeName,
@@ -134,10 +139,12 @@ export const baseHighlightStyle = HighlightStyle.define([
       t.annotation,
       t.modifier,
       t.namespace,
+      t.meta,
+      t.comment,
     ],
-    color: editorInfoColor,
+    color: editorColors.infoColor,
   },
-  { tag: t.number, color: editorSquareBracket },
+  { tag: t.number, color: editorColors.squareBracket },
   {
     tag: [
       t.operator,
@@ -147,15 +154,14 @@ export const baseHighlightStyle = HighlightStyle.define([
       t.link,
       t.special(t.string),
     ],
-    color: editorOperatorColor,
+    color: editorColors.operatorColor,
   },
-  { tag: [t.meta, t.comment], color: editorInfoColor },
-  { tag: t.link, textDecoration: "underline", color: editorLinkColor },
+  { tag: t.link, textDecoration: "underline", color: editorColors.linkColor },
   {
     tag: [t.atom, t.bool, t.special(t.variableName)],
-    color: editorConstantColor,
+    color: editorColors.constantColor,
   },
-  { tag: t.invalid, color: editorInvalidColor },
+  { tag: t.invalid, color: editorColors.invalidColor },
 ]);
 
 export const basicSetup: Extension = [
@@ -170,7 +176,7 @@ export const basicSetup: Extension = [
   dropCursor(),
   EditorState.allowMultipleSelections.of(true),
   indentOnInput(),
-  syntaxHighlighting(baseHighlightStyle),
+  syntaxHighlighting(basicHighlightStyle),
   syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
   bracketMatching(),
   autocompletion(),

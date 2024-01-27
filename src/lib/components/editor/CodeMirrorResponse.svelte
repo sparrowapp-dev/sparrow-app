@@ -6,11 +6,9 @@
   } from "$lib/utils/enums/request.enum";
   import { isHorizontal } from "$lib/store/request-response-section";
   import { EditorView } from "codemirror";
-  import { javascript } from "@codemirror/lang-javascript";
-  import { baseTheme, basicSetup, jsonSetup } from "./codeMirrorTheme";
+  import { basicSetup, basicTheme } from "./codeMirrorTheme";
   import { EditorState, Compartment } from "@codemirror/state";
-  import { html } from "@codemirror/lang-html";
-  import { xml } from "@codemirror/lang-xml";
+  import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
   export let currentTabId: string;
   export let rawTab: RequestDataType;
   export let rawValue: string;
@@ -24,7 +22,7 @@
       doc: value,
       extensions: [
         basicSetup,
-        baseTheme,
+        basicTheme,
         languageConf.of([]),
         EditorState.readOnly.of(true),
       ],
@@ -58,35 +56,7 @@
       });
     }
     if (formatter === ResponseFormatter.PRETTY) {
-      if (rawTab === RequestDataType.HTML) {
-        codeMirrorView.dispatch({
-          effects: languageConf.reconfigure(
-            html({
-              matchClosingTags: true,
-              selfClosingTags: true,
-              autoCloseTags: true,
-            }),
-          ),
-        });
-      } else if (rawTab === RequestDataType.JAVASCRIPT) {
-        codeMirrorView.dispatch({
-          effects: languageConf.reconfigure(
-            javascript({ jsx: true, typescript: true }),
-          ),
-        });
-      } else if (rawTab === RequestDataType.JSON) {
-        codeMirrorView.dispatch({
-          effects: languageConf.reconfigure(jsonSetup),
-        });
-      } else if (rawTab === RequestDataType.XML) {
-        codeMirrorView.dispatch({
-          effects: languageConf.reconfigure(xml()),
-        });
-      } else {
-        codeMirrorView.dispatch({
-          effects: languageConf.reconfigure([]),
-        });
-      }
+      CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
     } else {
       codeMirrorView.dispatch({
         effects: languageConf.reconfigure([]),
