@@ -16,4 +16,3 @@
     fill={color}
   />
 </svg>
- 

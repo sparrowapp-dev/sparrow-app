@@ -4,7 +4,7 @@
     import { fade } from "svelte/transition";
     import closeIcon from "$lib/assets/close-icon-normal.svg";
     import closeIconWhite from "$lib/assets/close-icon-white.svg";
-    import type { addUsersInWorkspacePayload,addUsersInWorkspace } from "$lib/utils/dto";
+    import type {addUsersInWorkspace, addUsersInWorkspacePayload } from "$lib/utils/dto";
     import { notifications } from "$lib/utils/notifications";
     import { UserRoles } from "$lib/utils/enums/enums";
     const emailstoBeSentArr: string[] = [];
@@ -57,6 +57,7 @@
     };
     const handleInvite=async()=>{
       showErrors=true;
+      // !check for selectedRole
       const data:addUsersInWorkspacePayload={
         users:emailstoBeSentArr,
         role:selectedRole.role

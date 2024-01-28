@@ -15,6 +15,7 @@ export interface InvalidWorkspacePostBody {
   name: boolean;
   id: boolean;
 }
+
 export interface addUsersInWorkspacePayload {
   users: string[];
   role: UserRoles;
@@ -22,4 +23,7 @@ export interface addUsersInWorkspacePayload {
 export interface addUsersInWorkspace {
   id: string;
   role: UserRoles;
+}
+export interface ChangeRoleBody {
+  role: string;
 }

@@ -57,7 +57,7 @@
 >
   <div on:click={toggleDropdown} id={`${dropdownId}-dropdown-${title}`}>
     <div
-      class="dropdown-btn px-1 d-flex align-items-center justify-content-between"
+      class="dropdown-btn d-flex align-items-center justify-content-between"
       class:dropdown-btn-active={isOpen}
     >
       <p class=" mb-0">

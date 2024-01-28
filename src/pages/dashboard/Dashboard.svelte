@@ -30,7 +30,9 @@
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user } from "$lib/store";
   import { TeamRepository } from "$lib/repositories/team.repository";
+  import { DashboardViewModel } from "./Dashboard.ViewModel";
 
+  const _dashboardViewModel = new DashboardViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -59,6 +61,7 @@
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -139,7 +142,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace.id = workspaceId;
+    sampleWorkspace._id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -147,7 +150,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-    collectionsMethods.handleActiveTab(sampleWorkspace.id);
+    collectionsMethods.handleActiveTab(sampleWorkspace._id);
     moveNavigation("right");
   };
   let collapsExpandToggle = false;

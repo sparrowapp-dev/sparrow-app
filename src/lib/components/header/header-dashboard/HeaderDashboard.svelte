@@ -37,8 +37,9 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
-  export let activeSideBarTabMethods: any;
   export let handleWorkspaceSwitch;
+
+  export let activeSideBarTabMethods: any;
   export let activeWorkspaceRxDoc: Observable<WorkspaceDocument>;
   export let currentTeam: CurrentTeam;
   export let currentWorkspace: CurrentWorkspace;
@@ -96,7 +97,6 @@
         activeWorkspaceRxDocVal = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
-        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
@@ -183,6 +183,7 @@
   const handleDropdown = (id: string, tab: string, team: any) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
+
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };
@@ -244,7 +245,7 @@
       <div class="d-flex mac-container">
         <div on:click={onClose} class="mac-nav"></div>
         <div on:click={onMinimize} class="mac-nav"></div>
-        <div on:click={toggleSize} class="mac-nav"></div>
+        <div on:click={toggleSize} id="resize-button" class="mac-nav"></div>
       </div>
     {/if}
     <div class="d-flex align-items-center justify-content-center gap-2">

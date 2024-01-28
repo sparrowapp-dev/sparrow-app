@@ -138,6 +138,7 @@ const makeHttpRequest = async (
   request: string,
   tabId: string,
 ) => {
+  console.table({ url, method, headers, body, request });
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
 

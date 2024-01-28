@@ -1,11 +1,12 @@
 import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type {
+  ChangeRoleBody,
   WorkspacePostBody,
   WorkspacePutBody,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto";
-import type { UserRoles } from "$lib/utils/enums";
+
 const apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
@@ -92,31 +93,31 @@ export class WorkspaceService {
     );
     return response;
   };
-  public changeUserRoleofUserInWorkspace = async (
+
+  public changeUserRoleAtWorkspace = async (
     workspaceId: string,
     userId: string,
-    role: UserRoles,
+    changeRoleBody: ChangeRoleBody,
   ) => {
     const response = await makeRequest(
       "PUT",
-      // !CHANGE IN API_URL
       `${"http://localhost:9000"}/api/workspace/${workspaceId}/user/${userId}`,
       {
+        body: changeRoleBody,
         headers: getAuthHeaders(),
-        body: { role },
       },
     );
     return response;
   };
 
-  public removeUserInWorkspace = async (
+  public removeUserFromWorkspace = async (
     workspaceId: string,
     userId: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
       // !CHANGE IN API_URL
-      `${"http://localhost:9000"}/api/workspace/${workspaceId}/user/${userId}`,
+      `${`"http://localhost:9000"`}/api/workspace/${workspaceId}/user/${userId}`,
       {
         headers: getAuthHeaders(),
       },
