@@ -22,6 +22,11 @@ import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repo
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
 import { TeamRepository } from "$lib/repositories/team.repository";
+import type {
+  addUsersInWorkspace,
+  addUsersInWorkspacePayload,
+} from "$lib/utils/dto/workspace-dto";
+import type { UserRoles } from "$lib/utils/enums";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -271,5 +276,78 @@ export class HeaderDashboardViewModel {
 
   public getServerEnvironments = async (workspaceId: string) => {
     return await this.environmentService.fetchAllEnvironments(workspaceId);
+  };
+  public addUsersInWorkspace = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspacePayload,
+  ) => {
+    const response = await this.workspaceService.addUsersInWorkspace(
+      workspaceId,
+      addUsersInWorkspaceDto,
+    );
+    return response;
+  };
+  public getUserDetailsOfWorkspace = async (workspaceId: string) => {
+    const userDetails =
+      await this.workspaceService.getUserDetailsOfWorkspace(workspaceId);
+    return userDetails;
+  };
+
+  public updateUserRoleInWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    role: UserRoles,
+  ) => {
+    const response =
+      await this.workspaceService.changeUserRoleofUserInWorkspace(
+        workspaceId,
+        userId,
+        role,
+      );
+    return response;
+  };
+  public updateUserRoleInWorkspaceInRXDB = async (
+    workspaceId: string,
+    userId: string,
+    role: UserRoles,
+  ): Promise<void> => {
+    await this.workspaceRepository.updateUserRoleInWorkspace(
+      workspaceId,
+      userId,
+      role,
+    );
+  };
+
+  public addUsersInWorkspaceInRxDB = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspace[],
+  ): Promise<void> => {
+    await this.workspaceRepository.addUserInWorkspace(
+      workspaceId,
+      addUsersInWorkspaceDto,
+    );
+  };
+
+  public isUserInMultipleWorkspaces = async (
+    userId: string,
+  ): Promise<boolean> => {
+    return await this.workspaceRepository.isUserInMultipleWorkspaces(userId);
+  };
+
+  public removeUserFromWorkspaceRxDB = async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> => {
+    await this.workspaceRepository.removeUserFromWorkspace(workspaceId, userId);
+  };
+
+  public deleteUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ) => {
+    return await this.workspaceService.removeUserInWorkspace(
+      workspaceId,
+      userId,
+    );
   };
 }
