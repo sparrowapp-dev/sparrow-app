@@ -32,6 +32,8 @@
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
+  import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
+  import { relaunch } from "@tauri-apps/api/process";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -65,7 +67,28 @@
     }
   });
 
+  async function checkForUpdate() {
+    try {
+      const { shouldUpdate, manifest } = await checkUpdate();
+      console.log(shouldUpdate);
+      console.log(manifest);
+      if (shouldUpdate) {
+        await installUpdate();
+        await relaunch();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    listen("tauri://update-available", function (res) {
+      console.log("New version available: ", res);
+    });
+    listen("tauri://update-status", function (res) {
+      console.log("New status: ", res);
+    });
+  }
+
   onMount(async () => {
+    await checkForUpdate();
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");
