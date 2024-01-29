@@ -20,7 +20,13 @@ import {
 } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { type Extension, EditorState } from "@codemirror/state";
-import { history, historyKeymap, defaultKeymap } from "@codemirror/commands";
+import {
+  history,
+  historyKeymap,
+  defaultKeymap,
+  indentLess,
+  insertTab,
+} from "@codemirror/commands";
 import {
   closeBrackets,
   closeBracketsKeymap,
@@ -202,6 +208,16 @@ export const basicSetup: Extension = [
     ...foldKeymap,
     ...completionKeymap,
     ...lintKeymap,
+    {
+      key: "Tab",
+      preventDefault: true,
+      run: insertTab,
+    },
+    {
+      key: "Shift-Tab",
+      preventDefault: true,
+      run: indentLess,
+    },
   ]),
   search({
     top: true,
