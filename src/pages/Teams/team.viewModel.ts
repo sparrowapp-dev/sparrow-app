@@ -14,6 +14,8 @@ import type { TeamDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import { UserService } from "$lib/services/user.service";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Team } from "$lib/utils/interfaces";
 
 export class TeamViewModel {
   constructor() {}
@@ -319,8 +321,12 @@ export class TeamViewModel {
     await this.teamRepository.setOpenTeam(teamId);
   };
 
-  public disableNewInviteTag = async (userId: string, teamId: string) => {
-    const response = await this.userService.disableNewInviteTag(userId, teamId);
+  public disableNewInviteTag = async (
+    userId: string,
+    teamId: string,
+  ): Promise<Team> => {
+    const response: MakeRequestResponse =
+      await this.userService.disableNewInviteTag(userId, teamId);
     if (response.isSuccessful === true) {
       return response.data.data;
     }
