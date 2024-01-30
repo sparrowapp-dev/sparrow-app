@@ -5,6 +5,7 @@
   import type {
     CurrentTeam,
     TeamRepositoryMethods,
+    TeamServiceMethods,
   } from "$lib/utils/interfaces/team.interface";
   import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
@@ -13,8 +14,10 @@
   export let handleCreateTeamModal: any;
   export let teams: any;
   export let teamRepositoryMethods: TeamRepositoryMethods;
-  let currOpenedTeam: CurrentTeam;
+  export let teamServiceMethods: TeamServiceMethods;
+  export let userId: string;
 
+  let currOpenedTeam: CurrentTeam;
   const handleOpenTeam = (
     teamId: string,
     teamName: string,
@@ -56,9 +59,19 @@
         class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
           currOpenedTeam.id == team.teamId && "active"
         }`}
-        on:click={() => {
+        on:click={async () => {
           handleOpenTeam(team.teamId, team.name, team.logo);
-          teamRepositoryMethods.setOpenTeam(team.teamId);
+          await teamRepositoryMethods.setOpenTeam(team.teamId);
+          if (team.isNewInvite) {
+            let data = await teamServiceMethods.disableNewInviteTag(
+              userId,
+              team.teamId,
+            );
+            if (data) {
+              data.isNewInvite = false;
+              teamRepositoryMethods.modifyTeam(team.teamId, data);
+            }
+          }
         }}
       >
         <div class="d-flex overflow-hidden">
@@ -74,10 +87,14 @@
           {/if}
           <p class=" ellipsis overflow-hidden my-auto">{team.name}</p>
         </div>
-        <PeopleIcon
-          color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
-          classProp={team.users?.length <= 1 && "d-none"}
-        />
+        {#if team.isNewInvite}
+          <p class="mb-0 new-invite text-labelColor">NEW INVITE</p>
+        {:else}
+          <PeopleIcon
+            color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
+            classProp={team.users?.length <= 1 && "d-none"}
+          />
+        {/if}
       </button>
     {/each}
   </div>
@@ -117,5 +134,8 @@
   }
   .sidebar-teams-list {
     max-height: 30vh;
+  }
+  .new-invite {
+    font-size: 12px !important;
   }
 </style>

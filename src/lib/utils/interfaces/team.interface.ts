@@ -43,4 +43,5 @@ export interface TeamServiceMethods {
     body: ChangeRoleBody,
   ) => unknown;
   removeUserFromWorkspace?: (workspaceId: string, userId: string) => unknown;
+  disableNewInviteTag?: (userId: string, teamId: string) => unknown;
 }
