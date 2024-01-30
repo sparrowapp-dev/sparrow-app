@@ -1,0 +1,51 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.8'
+
+      - name: Install Windows SDK
+        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
+        shell: powershell
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+
+      - name: Install dependencies
+        run: |
+            yarn cache clean
+            npm install -g pnpm
+            # pnpm install
+            yarn install
+            yarn tauri build --debug
+      - name: Fetch Version from package.json
+        id: fetch-version
+        run: echo "::set-output name=version::$(jq -r .version package.json)"
+            
+      - name: Rename .exe file with version
+        run: mv D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_0.0.0_x64-setup.exe "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_${{ steps.fetch-version.outputs.version }}_x64-setup.exe"
+
+      - name: Rename .msi file with version
+        run: mv D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_0.0.0_x64_en-US.msi "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_${{ steps.fetch-version.outputs.version }}_x64_en-US.msi"
+    
+
+      - name: Semantic Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
