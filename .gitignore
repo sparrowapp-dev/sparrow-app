@@ -28,3 +28,6 @@ dist-ssr
 
 #vite
 vite.config.ts.timestamp*
+
+#pnpm lock
+pnpm-lock.yaml
