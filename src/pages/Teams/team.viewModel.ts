@@ -13,6 +13,9 @@ import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
+import { UserService } from "$lib/services/user.service";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Team } from "$lib/utils/interfaces";
 
 export class TeamViewModel {
   constructor() {}
@@ -22,6 +25,7 @@ export class TeamViewModel {
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
   private teamRepository = new TeamRepository();
+  private userService = new UserService();
 
   public debounce = (func, delay) => {
     let timerId;
@@ -142,6 +146,7 @@ export class TeamViewModel {
       createdBy: elem.get("createdBy"),
       updatedAt: elem.get("updatedAt"),
       updatedBy: elem.get("updatedBy"),
+      isNewInvite: elem.get("isNewInvite"),
     };
   };
 
@@ -188,6 +193,7 @@ export class TeamViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -206,6 +212,7 @@ export class TeamViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
       });
       if (openTeamId) {
@@ -312,5 +319,17 @@ export class TeamViewModel {
 
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
+  };
+
+  public disableNewInviteTag = async (
+    userId: string,
+    teamId: string,
+  ): Promise<Team> => {
+    const response: MakeRequestResponse =
+      await this.userService.disableNewInviteTag(userId, teamId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
   };
 }
