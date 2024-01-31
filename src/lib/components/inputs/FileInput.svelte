@@ -31,6 +31,19 @@
   export let type = "image";
   let isDragOver = false;
 
+  const FileSize = {
+    KB: "kB",
+    MB: "MB",
+    GB: "GB",
+    BYTE: "Byte",
+    BYTES: "Bytes",
+  };
+
+  const FileSizeInByte = {
+    KB: 1024,
+    MB: 1048576,
+    GB: 1073741824,
+  };
   const generateAcceptString = (): string => {
     const acceptString = supportedFileTypes.map((type) => `${type}`).join(", ");
     return acceptString;
@@ -46,18 +59,18 @@
 
   const formatSizeUnits = (bytes: number) => {
     let response: string;
-    if (bytes >= 1073741824) {
-      response = (bytes / 1073741824).toFixed(2) + " GB";
-    } else if (bytes >= 1048576) {
-      response = (bytes / 1048576).toFixed(2) + " MB";
-    } else if (bytes >= 1024) {
-      response = (bytes / 1024).toFixed(2) + " KB";
+    if (bytes >= FileSizeInByte.GB) {
+      response = (bytes / FileSizeInByte.GB).toFixed(2) + ` ${FileSize.GB}`;
+    } else if (bytes >= FileSizeInByte.MB) {
+      response = (bytes / FileSizeInByte.MB).toFixed(2) + ` ${FileSize.MB}`;
+    } else if (bytes >= FileSizeInByte.KB) {
+      response = (bytes / FileSizeInByte.KB).toFixed(2) + ` ${FileSize.KB}`;
     } else if (bytes > 1) {
-      response = bytes + " bytes";
+      response = bytes + ` ${FileSize.BYTES}`;
     } else if (bytes == 1) {
-      response = bytes + " byte";
+      response = bytes + ` ${FileSize.BYTE}`;
     } else {
-      response = "0 bytes";
+      response = `0 ${FileSize.BYTES}`;
     }
     return response;
   };
