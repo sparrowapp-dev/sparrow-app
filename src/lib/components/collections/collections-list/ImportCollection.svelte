@@ -79,8 +79,7 @@
     uploadCollection.file.value =
       (e?.target?.files && e?.target?.files[0]) ||
       (e?.dataTransfer?.files && e?.dataTransfer?.files[0]);
-
-    console.log("up", uploadCollection);
+    isDataEmpty = false;
   };
 
   const handleLogoReset = (e: any) => {
@@ -145,7 +144,6 @@
   }
 
   const handleImport = () => {
-    debugger;
     if (importData) {
       handleImportJsonObject();
       return;
@@ -237,7 +235,7 @@
   />
 
   <div
-    class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+    class="container d-flex flex-column mb-0 p-4"
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
@@ -265,7 +263,9 @@
         class="form-control border-0 rounded bg-blackColor"
       />
     </div>
-
+    <div style="font-size: 14px;" class="importData-lightGray">
+      <p class="mb-1">Drag and drop your YAML/JSON file</p>
+    </div>
     <div>
       <FileInput
         value={uploadCollection.file.value}
@@ -304,7 +304,7 @@
       >
 
       <p class="empty-data-error">
-        {#if isDataEmpty}
+        {#if isDataEmpty && !importData}
           Please Paste or Upload your file in order to import the workspace
         {/if}
       </p>
@@ -333,9 +333,9 @@
   textarea {
     width: 100%;
     resize: vertical;
-    height: 80%;
-    max-height: 100%;
+    height: 100px !important;
     background-color: var(--blackColor);
+    margin-bottom: 15px;
   }
   .background-overlay {
     position: fixed;
@@ -346,7 +346,7 @@
     background: var(--background-hover);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    z-index: 14;
+    z-index: 13;
   }
   .empty-data-error {
     color: var(--error--color);
@@ -362,30 +362,15 @@
   .container {
     display: flex;
     position: fixed;
-    height: 90%;
-    width: 50%;
     top: 50%;
     left: 50%;
+    max-width: 488px;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
     z-index: 14;
     border-radius: 10px;
   }
 
-  @media (min-width: 1000px) {
-    .container {
-      display: flex;
-      position: fixed;
-      height: 90%;
-      width: 40%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: var(--background-color);
-      z-index: 14;
-      border-radius: 10px;
-    }
-  }
   .textarea-div {
     height: 25%;
     border: 2px solid red;
@@ -396,11 +381,11 @@
   }
 
   .btn-close1:hover {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
 
   .btn-close1:active {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);

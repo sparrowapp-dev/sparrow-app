@@ -29,7 +29,6 @@
     supportedFileTypes: string[],
   ) => void;
   export let type = "image";
-  console.log(value);
   let isDragOver = false;
 
   const generateAcceptString = (): string => {
@@ -76,7 +75,7 @@
         {/if}
       {/if}
     </div>
-    {#if value.length === 0}
+    {#if value.length === 0 && type === "image"}
       <span class="sparrow-input-label-desc">{labelDescription}</span>
     {/if}
   </div>
@@ -189,10 +188,13 @@
         >
           <!-- . -->
           <div
-            class="bg-backgroundDropdown px-3 py-0 d-flex justify-content-center align-items-center"
+            class="placeholder-file bg-backgroundDropdown px-3 py-0 d-flex justify-content-center align-items-center"
           >
-            {value.name}
-            {formatSizeUnits(value.size)}
+            <span style="max-width:300px;" class="ellipsis">
+              {value.name}
+              {formatSizeUnits(value.size)}
+            </span>
+
             <button
               on:click={resetValue}
               class="ms-2 border-0 p-1 rounded"
