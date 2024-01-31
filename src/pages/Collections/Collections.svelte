@@ -90,44 +90,56 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
   let environmentVariables = [];
+  let environmentId: string;
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
-        const environmentId = activeWorkspaceRxDoc.get("environmentId");
-        if (environments) {
-          const env = $environments;
-          if (env?.length > 0) {
-            const filteredEnv = env.filter((elem) => {
-              if (
-                elem.type === environmentType.GLOBAL ||
-                elem.id === environmentId
-              ) {
-                return true;
-              }
-            });
-            if (filteredEnv?.length > 0) {
-              environmentVariables.length = 0;
-              filteredEnv.forEach((elem) => {
-                const temp = elem.toMutableJSON();
-                temp.variable.forEach((variable) => {
-                  if (variable.key && variable.checked) {
-                    environmentVariables.push({
-                      key: variable.key,
-                      value: variable.value,
-                      type: temp.type === environmentType.GLOBAL ? "G" : "E",
-                      environment: temp.name,
-                    });
-                  }
-                });
-              });
-            }
-          }
-        }
+        environmentId = activeWorkspaceRxDoc.get("environmentId");
       }
     },
   );
 
+  const refreshEnvironment = () => {
+    if ($environments) {
+      if ($environments?.length > 0) {
+        const filteredEnv = $environments.filter((elem) => {
+          if (
+            elem.type === environmentType.GLOBAL ||
+            elem.id === environmentId
+          ) {
+            return true;
+          }
+        });
+        if (filteredEnv?.length > 0) {
+          environmentVariables.length = 0;
+          filteredEnv.forEach((elem) => {
+            const temp = elem.toMutableJSON();
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                environmentVariables.push({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
+              }
+            });
+          });
+        }
+      }
+    }
+  };
+
+  $: {
+    if (environmentId) {
+      refreshEnvironment();
+    }
+    if ($environments) {
+      refreshEnvironment();
+    }
+  }
   const onTabsSwitched = () => {
     _viewModel.syncTabWithStore();
   };
