@@ -30,7 +30,7 @@
       const containerRect = containerRef?.getBoundingClientRect();
       const mouseX = e.clientX - (containerRect?.left || 0);
       const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      pos = { x: mouseX, y: mouseY - 150 };
       showMenu = true;
     }, 100);
   }
