@@ -7,9 +7,7 @@
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
+      name = value?.name;
       if (name) {
         firstLetter = name[0];
       }
