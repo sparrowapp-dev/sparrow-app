@@ -95,11 +95,11 @@
           "assets": [
             {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/*.exe",
-              "label": "Executable"
+              "label": "Sparrow.exe"
             },
             {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/*.msi",
-              "label": "Installer"
+              "label": "Sparrow.msi"
             }
           ]
         }
