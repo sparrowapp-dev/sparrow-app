@@ -454,6 +454,7 @@
     supportedFileTypes={[".png", ".jpg", ".jpeg"]}
     showFileSizeError={newTeam.file.showFileSizeError}
     showFileTypeError={newTeam.file.showFileTypeError}
+    type={"image"}
     fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
     fileSizeError="The size of the file you are trying to upload is more than 100 KB."
   />

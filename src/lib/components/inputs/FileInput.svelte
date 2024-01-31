@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
+  import {
+    DeleteIcon,
+    CrossIcon,
+    EditIcon,
+    UploadIcon,
+  } from "$lib/assets/app.asset";
   import { imageDataToURL } from "$lib/utils/helpers";
 
   export let value: any = [];
@@ -23,7 +28,8 @@
     maxFileSize: number,
     supportedFileTypes: string[],
   ) => void;
-
+  export let type = "image";
+  console.log(value);
   let isDragOver = false;
 
   const generateAcceptString = (): string => {
@@ -38,16 +44,36 @@
   ) => {
     onChange(event, maxFileSize, supportedFileTypes);
   };
+
+  const formatSizeUnits = (bytes: number) => {
+    let response: string;
+    if (bytes >= 1073741824) {
+      response = (bytes / 1073741824).toFixed(2) + " GB";
+    } else if (bytes >= 1048576) {
+      response = (bytes / 1048576).toFixed(2) + " MB";
+    } else if (bytes >= 1024) {
+      response = (bytes / 1024).toFixed(2) + " KB";
+    } else if (bytes > 1) {
+      response = bytes + " bytes";
+    } else if (bytes == 1) {
+      response = bytes + " byte";
+    } else {
+      response = "0 bytes";
+    }
+    return response;
+  };
 </script>
 
 <div class="sparrow-text-input-container mt-3">
   <div class="sparrow-input-label-container mb-1">
     <div class="sparrow-input-label-heading">
-      <label class="sparrow-input-label text-lightGray fw-light" for={inputId}
-        >{labelText}</label
-      >
-      {#if isRequired}
-        <span class="sparrow-input-required">*</span>
+      {#if labelText}
+        <label class="sparrow-input-label text-lightGray fw-light" for={inputId}
+          >{labelText}</label
+        >
+        {#if isRequired}
+          <span class="sparrow-input-required">*</span>
+        {/if}
       {/if}
     </div>
     {#if value.length === 0}
@@ -116,27 +142,69 @@
     </div>
   {/if}
   {#if !Array.isArray(value)}
-    <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
-      <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
-      <div class="align-items-end justify-content-end d-flex gap-2">
-        <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
-          <EditIcon />
-        </button>
-        <button on:click={resetValue} class="del-btn border-0 p-2 rounded">
-          <DeleteIcon />
-        </button>
+    {#if type === "image"}
+      <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
+        <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
+        <div class="align-items-end justify-content-end d-flex gap-2">
+          <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
+            <EditIcon />
+          </button>
+          <button on:click={resetValue} class="del-btn border-0 p-2 rounded">
+            <DeleteIcon />
+          </button>
+        </div>
       </div>
-    </div>
-    <input
-      class="sparrow-choose-file-input d-none overflow-hidden"
-      type="file"
-      id={inputId}
-      placeholder={inputPlaceholder}
-      accept={generateAcceptString()}
-      on:change={(e) => {
-        onChange(e, maxFileSize, supportedFileTypes);
-      }}
-    />
+      <input
+        class="sparrow-choose-file-input d-none overflow-hidden"
+        type="file"
+        id={inputId}
+        placeholder={inputPlaceholder}
+        accept={generateAcceptString()}
+        on:change={(e) => {
+          onChange(e, maxFileSize, supportedFileTypes);
+        }}
+      />
+    {:else if type === "file"}
+      <div
+        style="border: 3px dashed {showFileTypeError || showFileSizeError
+          ? 'var(--dangerColor)'
+          : 'var(--request-arc)'}; border-width: 2px;"
+        class="sparrow-file-input w-100 px-auto {isDragOver &&
+          'opacity-75 bg-lightBackground'}"
+        on:dragover={(e) => {
+          e.preventDefault();
+          isDragOver = true;
+        }}
+        on:dragleave={() => {
+          isDragOver = false;
+        }}
+        on:drop={(e) => {
+          e.preventDefault();
+          isDragOver = false;
+          handleDrop(e, maxFileSize, supportedFileTypes);
+        }}
+      >
+        <div
+          class="sparrow-choose-file-input-button d-flex py-4 justify-content-center my-4"
+        >
+          <!-- . -->
+          <div
+            class="bg-backgroundDropdown px-3 py-0 d-flex justify-content-center align-items-center"
+          >
+            {value.name}
+            {formatSizeUnits(value.size)}
+            <button
+              on:click={resetValue}
+              class="ms-2 border-0 p-1 rounded"
+              style="background-color:transparent;"
+            >
+              <CrossIcon />
+            </button>
+          </div>
+          <!-- . -->
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>
 

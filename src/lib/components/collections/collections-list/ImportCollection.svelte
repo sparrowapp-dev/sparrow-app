@@ -31,19 +31,67 @@
   let isSyntaxError: boolean = false;
   let isResponseLoading: boolean = false;
   let importData: string = "";
-  let importFile: File;
 
-  let fileName = "";
-  function handleFilesSelect(event: CustomEvent) {
-    fileName = event.detail ? event.detail.acceptedFiles[0]?.name : "";
-    importFile = event.detail ? event.detail.acceptedFiles[0] : "";
-  }
   const handleError = () => {
     isSyntaxError = false;
     isDataEmpty = false;
   };
   const handleInputField = (e) => {
     importData = e.target.value;
+  };
+  let uploadCollection = {
+    file: {
+      value: [],
+      invalid: false,
+      showFileSizeError: false,
+      showFileTypeError: false,
+    },
+  };
+  const handleLogoInputChange = (
+    e: any,
+    maxSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    if (
+      (e?.target?.files && e?.target?.files[0].size > maxSize * 1024) ||
+      (e?.dataTransfer?.files &&
+        e?.dataTransfer?.files[0].size > maxSize * 1024)
+    ) {
+      uploadCollection.file.showFileSizeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    const fileType = `.${(
+      (e?.target?.files && e?.target?.files[0]?.name) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]?.name)
+    )
+      .split(".")
+      .pop()
+      .toLowerCase()}`;
+    if (!supportedFileTypes.includes(fileType)) {
+      uploadCollection.file.showFileTypeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    uploadCollection.file.showFileSizeError = false;
+    uploadCollection.file.showFileTypeError = false;
+    uploadCollection.file.invalid = false;
+    uploadCollection.file.value =
+      (e?.target?.files && e?.target?.files[0]) ||
+      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]);
+
+    console.log("up", uploadCollection);
+  };
+
+  const handleLogoReset = (e: any) => {
+    uploadCollection.file.value = [];
+  };
+
+  const handleLogoEdit = (e: any) => {
+    const uploadFileInput = document.getElementById(
+      "upload-collection-file-input",
+    );
+    uploadFileInput.click();
   };
 
   async function handleFileUpload(file: File) {
@@ -97,12 +145,13 @@
   }
 
   const handleImport = () => {
+    debugger;
     if (importData) {
       handleImportJsonObject();
       return;
     }
-    if (importFile) {
-      handleFileUpload(importFile);
+    if (uploadCollection?.file?.value?.length !== 0) {
+      handleFileUpload(uploadCollection?.file?.value);
       return;
     }
     isDataEmpty = true;
@@ -217,24 +266,25 @@
       />
     </div>
 
-    <div style="font-size: 14px;" class="importData-lightGray mt-2">
-      <p>Drag and drop your YAML/JSON file</p>
-    </div>
-
     <div>
-      <Dropzone
-        containerStyles="background-color:#1e1e1e; width:100%;"
-        accept=".yaml"
-        inputElement
-        on:drop={handleFilesSelect}
-        on:change={handleFilesSelect}
-      >
-        <p class="importData-textColor">Drag and Drop or</p>
-        <p>
-          <span><img src={icons.uploadIcon} alt="" />Choose File</span>
-          <span>{fileName}</span>
-        </p>
-      </Dropzone>
+      <FileInput
+        value={uploadCollection.file.value}
+        maxFileSize={100}
+        onChange={handleLogoInputChange}
+        resetValue={handleLogoReset}
+        editValue={handleLogoEdit}
+        labelText=""
+        labelDescription="Drag and drop your YAML/JSON file"
+        inputId="upload-collection-file-input"
+        inputPlaceholder="Drag and Drop or"
+        isRequired={false}
+        supportedFileTypes={[".yaml", ".json"]}
+        showFileSizeError={uploadCollection.file.showFileSizeError}
+        showFileTypeError={uploadCollection.file.showFileTypeError}
+        type={"file"}
+        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+      />
     </div>
 
     <div
