@@ -1,26 +1,47 @@
 <script lang="ts">
   import { SearchIcon } from "$lib/assets/app.asset";
   import WorkspaceUserInfo from "./workspaceUserInfo.svelte";
-  import { UserRoles } from "$lib/utils/enums/enums";
-  import type { CollectionsMethods, userDetails } from "$lib/utils/interfaces";
+  import { TeamRole} from "$lib/utils/enums";
+  import MemberChangeRolePopup from "../Modal/MemberChangeRolePopup.svelte"
+  import type { CollectionsMethods, TeamRepositoryMethods, TeamServiceMethods, userDetails, workspaceInviteMethods } from "$lib/utils/interfaces";
+  import type { TeamDocument, WorkspaceDocument } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
-  export let currentWorkspaceDetails:{id:string,name:string};
+  import { notifications } from "$lib/utils/notifications";
+  import { navigate } from "svelte-navigator";
+  export let currentTeamworkspaces:WorkspaceDocument[];
+  export let currentWorkspaceDetails: { id: string; name: string };
+  export let currentTeamDetails:{id:string,name:string}
   export let loggedInUserEmail: string;
-  export let teamName:string;
-  export let updateRoleInWorkspace:(workspaceId: string,userId:string,role:UserRoles)=>any;
-  export let updateUsersInWorkspaceInRXDB:(workspaceId: string,userId:string,role:UserRoles)=>any;
-  export let checkIfUserIsPartOfMutipleWorkspaces:(userId:string)=>Promise<boolean>;
-  export let deleteUserFromWorkspace:(workspaceId:string,userId:string)=>Promise<any>
-  export let deleteUserFromWorkspaceRxDB:(workspaceId:string,userId:string)=>Promise<void>
+  export let loggedUserRole:TeamRole;
+  export let teamWorkspaceMethods: Pick<TeamServiceMethods,'demoteToMemberAtTeam'|'promoteToAdminAtTeam'|'removeMembersAtTeam'|'refreshWorkspace'> & Pick <TeamRepositoryMethods,'updateUserRoleInTeam'|'removeUserFromTeam'>
+  export let workspaceInvitePermissonMethods:workspaceInviteMethods
+  export let currentActiveTeam:TeamDocument;
+  let isshowDeletePopupOpen:boolean=false;
   export let users: userDetails[] = [];
-  export let hasPermission:boolean;
+  export let hasPermission: boolean;
   export let loggedInUser: userDetails;
   let filterText="";
+  export let  handleInvitePopup:(showPopup: boolean)=>void;
   export let getUserDetailsOfWorkspace: (workspaceId: string) => any;
-  const handleUserOnRemove=(userId:string)=>{
-    users=users.filter((user)=>{
-      return user.id!==userId
-    })
+  const handleUserOnRemove=async(workspaceId:string,userId:string)=>{
+    users = users.filter((userObj) => !(userObj.id !== userId && userObj.workspaceId !== workspaceId))
+  }
+
+  const handleDeletePopup=(showPopup:boolean)=>{
+    isshowDeletePopupOpen=showPopup;
+  }
+
+
+  const handleDeleteWorkspaceFlow=async()=>{
+    const response=await workspaceInvitePermissonMethods.deleteWorkspace(currentWorkspaceDetails.id);
+    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(currentTeamDetails.id,currentWorkspaceDetails.id)
+    if(response && response.data){
+      notifications.success(`${currentWorkspaceDetails.name}is removed from ${currentTeamDetails.name}`);
+      navigate("/dashboard/workspaces");
+    }else{
+      notifications.error(`Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}.Please Try Again`);
+     }
+     handleDeletePopup(false);
   }
   
 
@@ -36,10 +57,10 @@
       {currentWorkspaceDetails.name}
     </p>
     {#if hasPermission}
-    <div class="workspace-setting-buttons">
-      <button class="workspace-setting-button-del"> Delete Workspace </button>
-      <button class="workspace-setting-button-inv"> Invite</button>
-    </div>
+      <div class="workspace-setting-buttons">
+        <button class="workspace-setting-button-del" on:click={()=>{handleDeletePopup(true)}}> Delete Workspace </button>
+        <button class="workspace-setting-button-inv" on:click={()=>{handleInvitePopup(true)}}> Invite</button>
+      </div>
     {/if}
   </div>
 
@@ -58,49 +79,87 @@
     />
   </div>
   <div class="mt-4">
-    {#if loggedInUser?.name.toLocaleLowerCase().startsWith(filterText) || loggedInUser?.email.toLocaleLowerCase().startsWith(filterText)}
-    <WorkspaceUserInfo
-      name={loggedInUser?.name + "(YOU)"}
-      role={loggedInUser?.role}
-      email={loggedInUser?.email}
-      {hasPermission}
-      teamName={teamName}
-      id={loggedInUser?.id}
-      currentWorkspaceDetails={currentWorkspaceDetails}    
-      updateRoleInWorkspace={updateRoleInWorkspace}
-      updateUsersInWorkspaceInRXDB={updateUsersInWorkspaceInRXDB}
-      deleteUserFromWorkspace={deleteUserFromWorkspace}
-      deleteUserFromWorkspaceRxDB={deleteUserFromWorkspaceRxDB}
-      handleUserOnRemove={handleUserOnRemove}
-      checkIfUserIsPartOfMutipleWorkspaces={checkIfUserIsPartOfMutipleWorkspaces}
-    ></WorkspaceUserInfo>
-    <hr style="margin-top:-5px;" />
+    {#if loggedInUser?.name
+      .toLocaleLowerCase()
+      .startsWith(filterText) || loggedInUser?.email
+        .toLocaleLowerCase()
+        .startsWith(filterText)}
+      <WorkspaceUserInfo
+        name={loggedInUser?.name}
+        role={loggedInUser?.role}
+        loggedInUser={true}
+        {currentTeamworkspaces}
+        email={loggedInUser?.email}
+        {hasPermission}
+        {currentTeamDetails}
+        loggedUserRole={loggedUserRole}
+        id={loggedInUser?.id}
+        {currentWorkspaceDetails}
+        {workspaceInvitePermissonMethods}
+        {handleUserOnRemove}
+        {teamWorkspaceMethods}
+        {currentActiveTeam}
+      ></WorkspaceUserInfo>
+      <hr style="margin-top:-5px;" />
     {/if}
   </div>
   <div>
     {#each users as user}
-    {#if user.name.toLocaleLowerCase().startsWith(filterText) || user.email.toLocaleLowerCase().startsWith(filterText)}
-    <WorkspaceUserInfo
-    name={user?.name}
-    role={user?.role}
-    email={user?.email}
-    {hasPermission}
-    id={user?.id}
-    teamName={teamName}
-    handleUserOnRemove={handleUserOnRemove}
-    currentWorkspaceDetails={currentWorkspaceDetails} 
-    updateRoleInWorkspace={updateRoleInWorkspace}
-    updateUsersInWorkspaceInRXDB={updateUsersInWorkspaceInRXDB}
-    deleteUserFromWorkspace={deleteUserFromWorkspace}
-    deleteUserFromWorkspaceRxDB={deleteUserFromWorkspaceRxDB}
-    checkIfUserIsPartOfMutipleWorkspaces={checkIfUserIsPartOfMutipleWorkspaces}
-  ></WorkspaceUserInfo>
-     {/if}
+      {#if user.name.toLocaleLowerCase().startsWith(filterText) || user.email
+          .toLocaleLowerCase()
+          .startsWith(filterText)}
+        <WorkspaceUserInfo
+          name={user?.name}
+          role={user?.role}
+          email={user?.email}
+          {hasPermission}
+          loggedUserRole={loggedUserRole}
+          id={user?.id}
+          {currentTeamDetails}
+          {teamWorkspaceMethods}
+          {currentTeamworkspaces}
+          {handleUserOnRemove}
+          {currentWorkspaceDetails}
+          {workspaceInvitePermissonMethods}
+          {currentActiveTeam}
+        ></WorkspaceUserInfo>
+      {/if}
     {/each}
-    {#if !(users.some((user)=>{return user.name.toLocaleLowerCase().startsWith(filterText) || user.email.toLocaleLowerCase().startsWith(filterText)}))}
-    <span class="not-found-text mx-auto ellipsis">No results found.</span>
+    {#if ![...users, loggedInUser].some((user) => {
+      return user.name.toLocaleLowerCase().startsWith(filterText) || user.email
+          .toLocaleLowerCase()
+          .startsWith(filterText);
+    })}
+      <span class="not-found-text mx-auto ellipsis">No results found.</span>
     {/if}
   </div>
+
+  {#if isshowDeletePopupOpen }
+  <MemberChangeRolePopup
+    title={`Delete Workspace?`}
+    teamName={currentWorkspaceDetails.name}
+    teamLogo={""}
+    isTeam={false}
+    auth={true}
+    description={`
+    <div class="d-flex tile rounded mb-2">
+  <div
+    class="info d-flex align-items-center"
+  >
+  </div>
+  </div>
+    <p style="font-size:12px;" class="text-textColor">
+      Everything in '<span class="text-whiteColor">${currentWorkspaceDetails.name}</span> will be permanently removed, and all contributors will lose access. This action cannot be undone. 
+      </p>
+    `}
+    onSuccess={async()=>{
+      await handleDeleteWorkspaceFlow();
+    }}
+    onCancel={()=>{
+       handleDeletePopup(false)
+    }}
+  />
+{/if}
 </div>
 
 <style>

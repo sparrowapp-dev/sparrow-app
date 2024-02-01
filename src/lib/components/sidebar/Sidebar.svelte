@@ -26,7 +26,18 @@
       isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
     />
-    {#if $workspaces && $workspaces.length > 0}
+    {#if $workspaces && $workspaces.length > 0 && !$workspaces.some((workspace)=>{return workspace.isActiveWorkspace===true})}
+    <Tooltip text="Select A Workspace To Be Active">
+      <Helper
+        {activeSideBarTabMethods}
+        route=""
+        heading="Collections"
+        logo={collectionsFaded}
+        isSelected={"collections" === activeSidebarTabName && false}
+        disabled={true}
+      />
+    </Tooltip>
+    {:else if $workspaces && $workspaces.length > 0}
       <Helper
         {activeSideBarTabMethods}
         route="collections"

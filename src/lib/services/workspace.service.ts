@@ -1,12 +1,12 @@
 import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
 import type {
-  ChangeRoleBody,
   WorkspacePostBody,
   WorkspacePutBody,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto";
-
+import type { WorkspaceRole } from "$lib/utils/enums";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
@@ -47,7 +47,7 @@ export class WorkspaceService {
     return response;
   };
 
-  public deleteWorkspace = async (workspaceId: string) => {
+  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
     const response = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}`,
@@ -73,7 +73,7 @@ export class WorkspaceService {
     // !CHANGE IN API_URL
     const response = await makeRequest(
       "POST",
-      `${"http://localhost:9000"}/api/workspace/${workspaceId}/user`,
+      `${apiUrl}/api/workspace/${workspaceId}/user`,
       {
         body: addUsersInWorkspaceDto,
         headers: getAuthHeaders(),
@@ -86,7 +86,7 @@ export class WorkspaceService {
     const response = await makeRequest(
       "GET",
       // !CHANGE IN API_URL
-      `${"http://localhost:9000"}/api/workspace/${workspaceId}/users`,
+      `${apiUrl}/api/workspace/${workspaceId}/users`,
       {
         headers: getAuthHeaders(),
       },
@@ -97,13 +97,13 @@ export class WorkspaceService {
   public changeUserRoleAtWorkspace = async (
     workspaceId: string,
     userId: string,
-    changeRoleBody: ChangeRoleBody,
+    role: WorkspaceRole,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${"http://localhost:9000"}/api/workspace/${workspaceId}/user/${userId}`,
+      `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
-        body: changeRoleBody,
+        body: { role },
         headers: getAuthHeaders(),
       },
     );
@@ -117,7 +117,7 @@ export class WorkspaceService {
     const response = await makeRequest(
       "DELETE",
       // !CHANGE IN API_URL
-      `${`"http://localhost:9000"`}/api/workspace/${workspaceId}/user/${userId}`,
+      `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
         headers: getAuthHeaders(),
       },

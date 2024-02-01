@@ -24,11 +24,20 @@
   const handleDropdown = (id) => {
     if (id === "remove") {
       isMemberRemovePopup = true;
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.MEMBER) {
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_MEMBER
+    ) {
       isMemberDemotePopup = true;
-    } else if (user.role === TeamRole.MEMBER && id === TeamRole.ADMIN) {
+    } else if (
+      user.role === TeamRole.TEAM_MEMBER &&
+      id === TeamRole.TEAM_ADMIN
+    ) {
       isMemberPromotePopup = true;
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.OWNER) {
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_OWNER
+    ) {
       isMemberOwnershipPopup = true;
     }
   };
@@ -38,21 +47,21 @@
   let isMemberInfoPopup = false;
   let isMemberOwnershipPopup = false;
 
-  const handleMemberPopUpCancel = (flag) => {
+  const handleMemberPopUpCancel = (flag: boolean): void => {
     isMemberRemovePopup = flag;
   };
-  const handleMemberPromotePopUpCancel = (flag) => {
+  const handleMemberPromotePopUpCancel = (flag: boolean): void => {
     isMemberPromotePopup = flag;
   };
 
-  const handleMemberDemotePopUpCancel = (flag) => {
+  const handleMemberDemotePopUpCancel = (flag: boolean): void => {
     isMemberDemotePopup = flag;
   };
-  const handleMemberInfoPopUpCancel = (flag) => {
+  const handleMemberInfoPopUpCancel = (flag: boolean): void => {
     isMemberInfoPopup = flag;
   };
 
-  const handleMemberOwnershipPopUpCancel = (flag) => {
+  const handleMemberOwnershipPopUpCancel = (flag: boolean): void => {
     isMemberOwnershipPopup = flag;
   };
 
@@ -88,7 +97,7 @@
       );
     }
   };
-  const handleMemberPromotePopUpSuccess = async () => {
+  export const handleMemberPromotePopUpSuccess = async () => {
     const response = await teamServiceMethods.promoteToAdminAtTeam(
       openTeam.teamId,
       user.id,
@@ -123,22 +132,23 @@
       );
     }
   };
-  let getPermissionsData = () => {
+  export let getPermissionsData = () => {
     const commonPermissions = [
       {
         name: "Admin",
-        id: TeamRole.ADMIN,
+        id: TeamRole.TEAM_ADMIN,
         color: "whiteColor",
       },
       {
         name: "Member",
-        id: TeamRole.MEMBER,
+        id: TeamRole.TEAM_MEMBER,
         color: "whiteColor",
       },
     ];
     if (
-      (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) ||
-      (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)
+      (userType === TeamRole.TEAM_OWNER &&
+        user.role === TeamRole.TEAM_MEMBER) ||
+      (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)
     ) {
       return [
         ...commonPermissions,
@@ -148,11 +158,14 @@
           color: "dangerColor",
         },
       ];
-    } else if (userType === TeamRole.OWNER && user.role === TeamRole.ADMIN) {
+    } else if (
+      userType === TeamRole.TEAM_OWNER &&
+      user.role === TeamRole.TEAM_ADMIN
+    ) {
       return [
         {
           name: "Owner",
-          id: TeamRole.OWNER,
+          id: TeamRole.TEAM_OWNER,
           color: "whiteColor",
         },
         ...commonPermissions,
@@ -166,7 +179,7 @@
       return [
         {
           name: "Owner",
-          id: TeamRole.OWNER,
+          id: TeamRole.TEAM_OWNER,
           color: "whiteColor",
         },
         ...commonPermissions,
@@ -352,14 +365,14 @@
     </div>
   </div>
   <div class="position">
-    {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
+    {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <MemberDropdown
         id={user.id + uuidv4()}
         data={getPermissionsData()}
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
-    {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
+    {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <MemberDropdown
         id={user.id + uuidv4()}
         data={getPermissionsData()}

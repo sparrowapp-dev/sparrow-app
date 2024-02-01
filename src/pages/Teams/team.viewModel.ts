@@ -13,6 +13,7 @@ import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
+import type { TeamRole, WorkspaceRole } from "$lib/utils/enums";
 
 export class TeamViewModel {
   constructor() {}
@@ -115,6 +116,18 @@ export class TeamViewModel {
     await this.teamRepository.modifyTeam(teamId, team);
   };
 
+  public updateUserRoleInTeam = async (
+    teamId: string,
+    userId: string,
+    role: TeamRole,
+  ) => {
+    await this.teamRepository.updateUserRoleInTeam(teamId, userId, role);
+    return;
+  };
+  public removeUserFromTeam = async (teamId: string, userId: string) => {
+    await this.teamRepository.removeUserFromTeam(teamId, userId);
+    return;
+  };
   public createTeam = async (team) => {
     const response = await this.teamService.createTeam(team);
     return response;
@@ -283,7 +296,7 @@ export class TeamViewModel {
   public changeUserRoleAtWorkspace = async (
     workspaceId: string,
     userId: string,
-    body,
+    body: WorkspaceRole,
   ) => {
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       workspaceId,

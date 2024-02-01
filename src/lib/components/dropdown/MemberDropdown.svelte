@@ -1,39 +1,39 @@
 <script lang="ts">
-    import Dropdown from "$lib/assets/dropdown.svelte";
-    import checkIcon from "$lib/assets/check.svg";
-    import { onDestroy, onMount } from "svelte";
-    export let isWorkspaceMemberDropDown:boolean=false;
-    export let hasNotPermission: boolean=false;
-    let isOpen: boolean = false;
-   
-    export let data: Array<{
-      name: string;
-      id: string;
-      color: string;
-    }>;
-    export let onclick: (tab: string) => void;
-    export let method: string;
-    export let id:string;
-    export let disabled: boolean = false;
-    let isHover: boolean = false;
-    let selectedRequest: {
-      name: string;
-      id: string;
-      color: string;
-    };
-   
-    const toggleDropdown = () => {
-      isOpen = !isOpen;
-    };
-   
-    $: {
-      if (method) {
-        data.forEach((element) => {
-          if (element.id === method) {
-            selectedRequest = element;
-          }
-        });
-      }
+  import Dropdown from "$lib/assets/dropdown.svelte";
+  import checkIcon from "$lib/assets/check.svg";
+  import { onDestroy, onMount } from "svelte";
+  import { fade, fly, slide } from "svelte/transition";
+  import { WorkspaceRole } from "$lib/utils/enums";
+  export let workspaceId:string=null;
+  let isOpen: boolean = false;
+  export let isWorkspaceMemberDropDown:boolean=false;
+  export let data: Array<{
+    name: string;
+    id: string;
+    color: string;
+  }>;
+  export let onclick: (tab: string,workspaceId?:string) => void;
+  export let method: string;
+  export let id;
+  export let disabled: boolean = false;
+  let isHover: boolean = false;
+  let selectedRequest: {
+    name: string;
+    id: string;
+    color: string;
+  };
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+  };
+
+  $: {
+    if (method) {
+      data.forEach((element) => {
+        if (element.id === method) {
+          selectedRequest = element;
+        }
+      });
     }
    
     function handleDropdownClick(event: MouseEvent) {
@@ -42,22 +42,42 @@
         isOpen = false;
       }
     }
-   
-    onDestroy(() => {
-      window.removeEventListener("click", handleDropdownClick);
-    });
-   
-    onMount(() => {
-      window.addEventListener("click", handleDropdownClick);
-    });
-  </script>
-   
-   {#if  method==="admin" && isWorkspaceMemberDropDown}
-   <div class="default-admin-container p-2 rounded z-2">
-     <p  class="m-0 p-0 text-white text-capitalize"
-     style="font-size: 12px;">Admin</p>
-   </div>
-   {:else}
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleDropdownClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleDropdownClick);
+  });
+</script>
+
+<div
+  class="parent-dropdown display-inline-block"
+  style=" position: relative;"
+  on:mouseover={() => {
+    isHover = true;
+  }}
+  on:mouseout={() => {
+    isHover = false;
+  }}
+  on:click={(event) => {
+    if (!disabled) {
+      handleDropdownClick(event);
+    }
+    event.stopPropagation();
+  }}
+  
+
+  >
+  {#if isWorkspaceMemberDropDown && method===WorkspaceRole.WORKSPACE_ADMIN}
+  <p
+  class="me-4 mt-2 m-0 p-0 text"
+  style="font-size: 12px;">
+  Admin</p>
+{:else}
+
   <div
     class="parent-dropdown display-inline-block"
     style=" position: relative;"
@@ -93,19 +113,19 @@
         <p
           class="{disabled
             ? 'disabled-text'
-            : ''} mb-0 text-{selectedRequest?.color}"
-        >
-          {selectedRequest?.name}
-        </p>
-        <span class="d-flex ps-2" class:dropdown-logo-active={isOpen}>
-          <Dropdown
-            height={12}
-            width={12}
-            color={disabled ? "var(--sparrow-text-color)" : "white"}
-          /></span
-        >
-      </div>
+            : ''} mb-0 text-{selectedRequest?.color}">
+        {selectedRequest?.name}
+      </p>
+      <span class="d-flex ps-2" class:dropdown-logo-active={isOpen}>
+        <Dropdown
+          height={12}
+          width={12}
+          color={disabled ? "var(--sparrow-text-color)" : "white"}
+        /></span
+      >
     </div>
+  </div>
+
    
     {#if isOpen && !disabled}
       <div
@@ -199,3 +219,6 @@
     }
   </style>
    
+
+
+

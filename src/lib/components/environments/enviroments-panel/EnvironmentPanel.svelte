@@ -13,11 +13,13 @@
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment;
   export let activeWorkspace;
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
 
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
   let quickHelp: boolean = false;
@@ -144,6 +146,7 @@
       </header>
       <section class={`var-value-container`}>
         <EnvValue
+         loggedUserRoleInWorkspace={loggedUserRoleInWorkspace}
           keyValue={currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
         />

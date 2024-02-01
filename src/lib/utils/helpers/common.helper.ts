@@ -1,3 +1,8 @@
+import { WorkspaceRole } from "../enums";
+import {
+  workspaceLevelPermissions,
+  workspaceLevelRolePermisson,
+} from "../constants/permissions.constant";
 //get path for url
 export function getPathFromUrl(url: string) {
   try {
@@ -17,4 +22,12 @@ export function replaceSlashWithGreaterThanSymbol(str: string) {
   );
 
   return replacedStringwithoutSlash;
+}
+//handle workspace level permissson based on role
+export function hasWorkpaceLevelPermission(
+  userRole: WorkspaceRole,
+  requiredPermission: workspaceLevelPermissions,
+) {
+  const allowedPermissions = workspaceLevelRolePermisson[userRole] || [];
+  return allowedPermissions.includes(requiredPermission);
 }

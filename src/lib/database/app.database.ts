@@ -163,6 +163,9 @@ export class RxDB {
           2: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
+          3: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
         },
       },
       environment: {
@@ -177,11 +180,14 @@ export class RxDB {
           },
         },
       },
-      environmentTab: {
+      environmenttab: {
         schema: environmentTabSchema,
         migrationStrategies: {
           //   // database  migration functions
           1: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },

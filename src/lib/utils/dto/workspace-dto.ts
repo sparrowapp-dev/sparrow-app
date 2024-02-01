@@ -1,4 +1,4 @@
-import type { UserRoles } from "../enums/enums";
+import type { WorkspaceRole } from "../enums/enums";
 
 //------- workspace Interface ------------//
 export interface WorkspacePostBody {
@@ -18,12 +18,9 @@ export interface InvalidWorkspacePostBody {
 
 export interface addUsersInWorkspacePayload {
   users: string[];
-  role: UserRoles;
+  role: WorkspaceRole;
 }
 export interface addUsersInWorkspace {
   id: string;
-  role: UserRoles;
-}
-export interface ChangeRoleBody {
-  role: string;
+  role: WorkspaceRole;
 }

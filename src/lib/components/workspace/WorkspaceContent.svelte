@@ -202,6 +202,7 @@
                   type={`dark`}
                   fontSize={12}
                   onClick={() => {
+                    teamInvitePopup=true;
                     return;
                   }}
                   classProp={`my-auto px-3 pt-1 me-4`}

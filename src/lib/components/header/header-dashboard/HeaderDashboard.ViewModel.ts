@@ -11,7 +11,11 @@ import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
-import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
+import {
+  RxDB,
+  type TeamDocument,
+  type WorkspaceDocument,
+} from "$lib/database/app.database";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
@@ -26,7 +30,7 @@ import type {
   addUsersInWorkspace,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto/workspace-dto";
-import type { UserRoles } from "$lib/utils/enums";
+import type { WorkspaceRole } from "$lib/utils/enums";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -290,7 +294,7 @@ export class HeaderDashboardViewModel {
   public updateUserRoleInWorkspace = async (
     workspaceId: string,
     userId: string,
-    role: UserRoles,
+    role: WorkspaceRole,
   ) => {
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       workspaceId,
@@ -302,7 +306,7 @@ export class HeaderDashboardViewModel {
   public updateUserRoleInWorkspaceInRXDB = async (
     workspaceId: string,
     userId: string,
-    role: UserRoles,
+    role: WorkspaceRole,
   ): Promise<void> => {
     await this.workspaceRepository.updateUserRoleInWorkspace(
       workspaceId,
@@ -346,5 +350,22 @@ export class HeaderDashboardViewModel {
 
   public removeWorkspace = async (workspaceId: string) => {
     return await this.workspaceRepository.deleteWorkspace(workspaceId);
+  };
+
+  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
+    return await this.workspaceService.deleteWorkspace(workspaceId);
+  };
+
+  public handleWorkspaceDeletion = async (
+    teamId: string,
+    workspaceId: string,
+  ): Promise<void> => {
+    await this.removeWorkspace(workspaceId);
+    await this.teamRepository.removeWorkspaceFromTeam(teamId, workspaceId);
+    return;
+  };
+
+  public getActiveteam = (): Observable<TeamDocument> => {
+    return this.teamRepository.getActiveTeam();
   };
 }

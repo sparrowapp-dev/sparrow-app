@@ -1,11 +1,11 @@
 export enum WorkspaceRole {
-  ADMIN = "admin",
-  EDITOR = "editor",
-  VIEWER = "viewer",
+  WORKSPACE_ADMIN = "admin",
+  WORKSPACE_EDITOR = "editor",
+  WORKSPACE_VIEWER = "viewer",
 }
 
 export enum TeamRole {
-  OWNER = "owner",
-  ADMIN = "admin",
-  MEMBER = "member",
+  TEAM_OWNER = "owner",
+  TEAM_ADMIN = "admin",
+  TEAM_MEMBER = "member",
 }

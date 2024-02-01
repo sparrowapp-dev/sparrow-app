@@ -125,8 +125,8 @@
       emailstoBeSentArr?.length > 0
     ) {
       if (
-        selectedRole === WorkspaceRole.EDITOR ||
-        selectedRole === WorkspaceRole.VIEWER
+        selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
+        selectedRole === WorkspaceRole.WORKSPACE_VIEWER
       ) {
         if (countCheckedList(teamSpecificWorkspace)) {
           let data = {
@@ -250,20 +250,20 @@
         },
         {
           name: "Admin",
-          id: TeamRole.ADMIN,
+          id: TeamRole.TEAM_ADMIN,
           description:
             "Add & edit resources within a workspace,add & remove members to workspace",
           color: "whiteColor",
         },
         {
           name: "Editor",
-          id: WorkspaceRole.EDITOR,
+          id: WorkspaceRole.WORKSPACE_EDITOR,
           description: "Add & edit resources within a workspace",
           color: "whiteColor",
         },
         {
           name: "Viewer",
-          id: WorkspaceRole.VIEWER,
+          id: WorkspaceRole.WORKSPACE_VIEWER,
           description: "View Resources within a workspace.",
           color: "whiteColor",
         },
@@ -272,7 +272,7 @@
       onclick={handleDropdown}
     />
   </div>
-  {#if selectedRole === TeamRole.ADMIN}
+  {#if selectedRole === TeamRole.TEAM_ADMIN}
     <p class="invite-subheader text-textColor mt-1 mb-1">
       Admins will get access to all the current workspaces as well as any future
       workspaces in the team.
@@ -282,7 +282,7 @@
     <p class="error-text">Role cannot be empty.</p>
   {/if}
 
-  {#if selectedRole === WorkspaceRole.EDITOR || selectedRole === WorkspaceRole.VIEWER}
+  {#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
     <div class="mt-4">
       <p class="role-title mb-0">
         Specify Workspace<span class="asterik">*</span>

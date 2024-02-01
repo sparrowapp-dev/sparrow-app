@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 import type { addUsersInWorkspace } from "$lib/utils/dto/workspace-dto";
-import type { UserRoles } from "$lib/utils/enums";
+import type { WorkspaceRole } from "$lib/utils/enums";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 
 import type { Observable } from "rxjs";
@@ -209,7 +209,7 @@ export class WorkspaceRepository {
   public updateUserRoleInWorkspace = async (
     workspaceId: string,
     userId: string,
-    role: UserRoles,
+    role: WorkspaceRole,
   ): Promise<void> => {
     const workspace = await RxDB.getInstance()
       .rxdb.workspace.findOne({
