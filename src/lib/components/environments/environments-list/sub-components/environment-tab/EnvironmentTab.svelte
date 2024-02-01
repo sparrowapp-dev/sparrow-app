@@ -32,7 +32,7 @@
       const mouseY = e.clientY;
       const windowHeight = window.innerHeight;
       if (windowHeight < mouseY + 180) {
-        pos = { x: mouseX, y: mouseY - 170 };
+        pos = { x: mouseX, y: mouseY - 160 };
       } else {
         pos = { x: mouseX, y: mouseY };
       }
