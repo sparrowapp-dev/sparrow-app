@@ -52,18 +52,19 @@
     maxSize: number,
     supportedFileTypes: string[],
   ) => {
+    const targetFile = e?.target?.files;
+    const dataTransferFile = e?.dataTransfer?.files;
     if (
-      (e?.target?.files && e?.target?.files[0].size > maxSize * 1024) ||
-      (e?.dataTransfer?.files &&
-        e?.dataTransfer?.files[0].size > maxSize * 1024)
+      (targetFile && targetFile[0].size > maxSize * 1024) ||
+      (dataTransferFile && dataTransferFile[0].size > maxSize * 1024)
     ) {
       uploadCollection.file.showFileSizeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
     const fileType = `.${(
-      (e?.target?.files && e?.target?.files[0]?.name) ||
-      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]?.name)
+      (targetFile && targetFile[0]?.name) ||
+      (dataTransferFile && dataTransferFile[0]?.name)
     )
       .split(".")
       .pop()
@@ -77,8 +78,8 @@
     uploadCollection.file.showFileTypeError = false;
     uploadCollection.file.invalid = false;
     uploadCollection.file.value =
-      (e?.target?.files && e?.target?.files[0]) ||
-      (e?.dataTransfer?.files && e?.dataTransfer?.files[0]);
+      (targetFile && targetFile[0]) ||
+      (dataTransferFile && dataTransferFile[0]);
     isDataEmpty = false;
   };
 
@@ -333,9 +334,9 @@
   textarea {
     width: 100%;
     resize: vertical;
-    height: 100px !important;
+    height: calc(100px) !important;
     background-color: var(--blackColor);
-    margin-bottom: 15px;
+    margin-bottom: 5%;
   }
   .background-overlay {
     position: fixed;
@@ -364,7 +365,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    max-width: 488px;
+    max-width: calc(488px);
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
     z-index: 14;
