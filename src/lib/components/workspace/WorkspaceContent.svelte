@@ -20,6 +20,7 @@
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { CustomButton, IconButton } from "$lib/components";
+  import Settings from "./settings/Settings.svelte";
 
   export let userId: string;
   export let data: any;
@@ -71,6 +72,9 @@
     if (openTeam) {
       findUserType();
     }
+    if (openTeam?.teamId) {
+      selectedTab = "all-workspace";
+    }
   }
 
   onDestroy(() => {
@@ -111,11 +115,11 @@
             class="team-heading d-flex justify-content-between position-relative"
           >
             <h2 class="d-flex ellipsis overflow-visible">
-              {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
+              {#if openTeam?.logo?.bufferString}
                 <img
                   class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
                   style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                  src={base64ToURL(currOpenedTeam.base64String)}
+                  src={base64ToURL(openTeam?.logo)}
                   alt=""
                 />{:else}
                 <p
@@ -325,6 +329,12 @@
         {workspaces}
         {teamRepositoryMethods}
       />
+    {:else if selectedTab === "settings" && userType === "owner"}
+      <Settings
+        openTeam={openTeam?.toMutableJSON()}
+        {teamServiceMethods}
+        {teamRepositoryMethods}
+      ></Settings>
     {/if}
   </div>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon, UploadIcon } from "$lib/assets/app.asset";
-  import { imageDataToURL } from "$lib/utils/helpers";
+  import { base64ToURL, imageDataToURL } from "$lib/utils/helpers";
 
   export let value: any = [];
   export let labelText: string;
@@ -117,7 +117,11 @@
   {/if}
   {#if !Array.isArray(value)}
     <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
-      <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
+      {#if value.bufferString}
+        <img class="rounded p-2" src={base64ToURL(value)} alt="" />
+      {:else}
+        <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
+      {/if}
       <div class="align-items-end justify-content-end d-flex gap-2">
         <button on:click={editValue} class="edit-btn border-0 p-2 rounded">
           <EditIcon />

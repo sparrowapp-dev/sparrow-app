@@ -44,6 +44,7 @@ export interface TeamServiceMethods {
   ) => unknown;
   removeUserFromWorkspace?: (workspaceId: string, userId: string) => unknown;
   disableNewInviteTag?: (userId: string, teamId: string) => Promise<Team>;
+  updateTeam: (teamId: string, team) => Promise<unknown>;
 }
 
 export interface Team {
