@@ -17,9 +17,10 @@
   export let env;
   export let currentEnvironment;
 
+  let rightClickPanelHeight;
+
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
-  let containerRef;
   let isEnvironmentPopup: boolean = false;
   let newEnvironmentName: string = "";
   let isRenaming = false;
@@ -27,10 +28,14 @@
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY - 150 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      const windowHeight = window.innerHeight;
+      if (windowHeight < mouseY + 180) {
+        pos = { x: mouseX, y: mouseY - 170 };
+      } else {
+        pos = { x: mouseX, y: mouseY };
+      }
       showMenu = true;
     }, 100);
   }
@@ -191,18 +196,18 @@
 {/if}
 
 {#if showMenu}
-  <div class="environment-tab">
+  <div class="environment-tab" bind:offsetHeight={rightClickPanelHeight}>
     <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
       <div
-        class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+        class="navbar p-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
         id="navbar"
       >
-        <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
+        <ul class="p-2 w-100">
           {#each menuItems as item}
             <li class="align-items-center">
               <button
                 disabled={item.disabled}
-                class={`align-items-center mb-1 px-3 py-2 ${
+                class={`align-items-center px-3 py-2 ${
                   item.disabled && "text-requestBodyColor"
                 }`}
                 on:click={item.onClick}
