@@ -31,6 +31,7 @@ import type {
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto/workspace-dto";
 import type { WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -341,7 +342,7 @@ export class HeaderDashboardViewModel {
   public deleteUserFromWorkspace = async (
     workspaceId: string,
     userId: string,
-  ) => {
+  ): Promise<MakeRequestResponse> => {
     return await this.workspaceService.removeUserFromWorkspace(
       workspaceId,
       userId,
@@ -352,7 +353,9 @@ export class HeaderDashboardViewModel {
     return await this.workspaceRepository.deleteWorkspace(workspaceId);
   };
 
-  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
+  public deleteWorkspace = async (
+    workspaceId: string,
+  ): Promise<MakeRequestResponse> => {
     return await this.workspaceService.deleteWorkspace(workspaceId);
   };
 

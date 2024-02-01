@@ -48,7 +48,17 @@ $sparrow-key-value-pair: #262626;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-selectedSideBarTab: #11253a;
 $sparrow-recentApiText: #f3e4e4d7;
-$sparrow-errorTextColor: #fe8c98;
+$sparrow-errorTextColor:#fe8c98;
+$sparrow-editor-operator-color: #FE2E2E;
+$sparrow-editor-bool-color: #82DB42;
+$sparrow-editor-name-color: #9CDCFE;
+$sparrow-editor-varible-color: #ECCD43;
+$sparrow-editor-bracket-color: #9217F6;
+$sparrow-editor-square-bracket-color: #FF8000;
+$sparrow-editor-number-color: #8DC599;
+$sparrow-editor-angle-bracket-color: #636566;
+$sparrow-editor-tag-color: #246BB8;
+$sparrow-editor-string-color: #CE9178;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -88,8 +98,18 @@ $sparrow-errorTextColor: #fe8c98;
   --selected-active-sidebar: #{$sparrow-selectedSideBarTab};
   --sparrow-blue: #{$sparrow-blue};
   --sparrow-button-background: #{$sparrow-button-background};
+  --editor-operator:#{$sparrow-editor-operator-color};
+  --editor-bool:#{$sparrow-editor-bool-color};
+  --editor-name:#{$sparrow-editor-name-color};
+  --editor-variable:#{$sparrow-editor-varible-color};
+  --editor-bracket:#{$sparrow-editor-bracket-color};
+  --editor-square-bracket:#{$sparrow-editor-square-bracket-color};
   --error--color: #{$sparrow-errorTextColor};
   --sparrow-text-color:#{$sparrow-text-color};
+  --editor-number:#{$sparrow-editor-number-color};
+  --editor-angle-bracket:#{$sparrow-editor-angle-bracket-color};
+  --editor-tag-color: #{$sparrow-editor-tag-color};
+  --editor-string-color: #{$sparrow-editor-string-color};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);

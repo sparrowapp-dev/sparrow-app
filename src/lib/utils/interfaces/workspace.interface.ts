@@ -1,5 +1,6 @@
 import type { WorkspaceDocument } from "$lib/database/app.database";
 import type { TeamRole, WorkspaceRole } from "../enums";
+import type { MakeRequestResponse } from "./common.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CurrentWorkspace {
   name: string;
@@ -32,17 +33,17 @@ export interface workspaceInviteMethods {
     workspaceId: string,
     userId: string,
     role: WorkspaceRole,
-  ) => any;
+  ) => Promise<MakeRequestResponse>;
   updateUsersInWorkspaceInRXDB: (
     workspaceId: string,
     userId: string,
     role: WorkspaceRole,
-  ) => any;
+  ) => Promise<void>;
   checkIfUserIsPartOfMutipleWorkspaces: (userId: string) => Promise<boolean>;
   deleteUserFromWorkspace: (
     workspaceId: string,
     userId: string,
-  ) => Promise<any>;
+  ) => Promise<MakeRequestResponse>;
   deleteUserFromWorkspaceRxDB: (
     workspaceId: string,
     userId: string,

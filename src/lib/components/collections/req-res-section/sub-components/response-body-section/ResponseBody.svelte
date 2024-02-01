@@ -9,7 +9,6 @@
     ResponseFormatter,
     ResponseStatusCode,
   } from "$lib/utils/enums/request.enum";
-  import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -19,6 +18,7 @@
   import { RequestProperty } from "$lib/utils/enums/request.enum";
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
+  import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
 
   export let response;
   export let apiState;
@@ -250,10 +250,10 @@
     </div>
   </div>
   <div class="w-100 mt-3 backgroundColor">
-    <MonacoEditorResponse
+    <CodeMirrorResponse
+      formatter={apiState.responseFormatter}
       rawTab={apiState.responseRaw}
       rawValue={response.body}
-      formatter={apiState.responseFormatter}
       {currentTabId}
     />
   </div>

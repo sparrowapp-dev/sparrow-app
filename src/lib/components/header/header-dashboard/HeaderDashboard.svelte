@@ -139,11 +139,9 @@
 
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
       userId = value._id;
       email = value?.email;
+      name = value?.name;
       if (name) {
         firstLetter = name[0];
       }
@@ -258,7 +256,6 @@
       hideHeaders
         ? ''
         : ''}"
-      style="height: 36px; width:216px"
     >
       <HeaderDropdown
         {teams}

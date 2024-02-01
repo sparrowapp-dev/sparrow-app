@@ -181,6 +181,8 @@ export class TeamRepository {
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
+      if (typeof data.isNewInvite === "boolean")
+        value.isNewInvite = data.isNewInvite;
       return value;
     });
     return;

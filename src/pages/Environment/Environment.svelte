@@ -58,7 +58,7 @@
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
-  <div class="d-flex" use:motion>
+  <div class="environment" use:motion>
     <EnvironmentList
       {environmentRepositoryMethods}
       {environmentServiceMethods}
@@ -77,3 +77,11 @@
     />
   </div>
 </Motion>
+
+<style>
+  .environment {
+    display: flex;
+    height: calc(100vh - 44px);
+    overflow: hidden;
+  }
+</style>

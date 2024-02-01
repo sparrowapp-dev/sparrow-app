@@ -44,7 +44,6 @@
   let currOpenedTeamRxDoc: Observable<TeamDocument>;
   let isTooltipVisible: boolean = false;
 
-
   const openedTeamSubscribe = openedTeam.subscribe(async (value) => {
     if (value) {
       currOpenedTeam = value;
@@ -202,8 +201,7 @@
                   type={`dark`}
                   fontSize={12}
                   onClick={() => {
-                    teamInvitePopup=true;
-                    return;
+                    teamInvitePopup = true;
                   }}
                   classProp={`my-auto px-3 pt-1 me-4`}
                   styleProp={`height: 30px;`}
@@ -318,7 +316,7 @@
         {activeSideBarTabMethods}
         {currOpenedTeamRxDoc}
       />
-      {:else if selectedTab === "members"}
+    {:else if selectedTab === "members"}
       <Members
         {userId}
         {userType}

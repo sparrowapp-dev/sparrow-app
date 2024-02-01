@@ -13,7 +13,7 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import InvalidSyntaxPopup from "$lib/components/Modal/InvalidSyntaxPopup.svelte";
   import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
-  import Dropzone from "svelte-file-dropzone/Dropzone.svelte";
+  import Dropzone from "svelte-file-dropzone";
   import File from "./File.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";

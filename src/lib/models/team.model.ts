@@ -73,6 +73,10 @@ export const teamSchemaLiteral = {
       type: "boolean",
       default: false,
     },
+    isNewInvite: {
+      type: "boolean",
+      default: false,
+    },
     createdAt: {
       type: "string",
     },

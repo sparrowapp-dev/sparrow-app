@@ -6,6 +6,7 @@ import type {
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto";
 import type { WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 
@@ -47,8 +48,10 @@ export class WorkspaceService {
     return response;
   };
 
-  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
-    const response = await makeRequest(
+  public deleteWorkspace = async (
+    workspaceId: string,
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}`,
       {
@@ -70,7 +73,6 @@ export class WorkspaceService {
     workspaceId: string,
     addUsersInWorkspaceDto: addUsersInWorkspacePayload,
   ) => {
-    // !CHANGE IN API_URL
     const response = await makeRequest(
       "POST",
       `${apiUrl}/api/workspace/${workspaceId}/user`,
@@ -85,7 +87,6 @@ export class WorkspaceService {
   public getUserDetailsOfWorkspace = async (workspaceId: string) => {
     const response = await makeRequest(
       "GET",
-      // !CHANGE IN API_URL
       `${apiUrl}/api/workspace/${workspaceId}/users`,
       {
         headers: getAuthHeaders(),
@@ -98,8 +99,8 @@ export class WorkspaceService {
     workspaceId: string,
     userId: string,
     role: WorkspaceRole,
-  ) => {
-    const response = await makeRequest(
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
       "PUT",
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
@@ -113,10 +114,9 @@ export class WorkspaceService {
   public removeUserFromWorkspace = async (
     workspaceId: string,
     userId: string,
-  ) => {
-    const response = await makeRequest(
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
       "DELETE",
-      // !CHANGE IN API_URL
       `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
         headers: getAuthHeaders(),

@@ -2,25 +2,11 @@
   import icons from "$lib/assets/app.asset";
   export let  noOfCollections:number;
   export let email:String;
-  export let handleWorkspaceTab:(tab)=>void;
+  export let handleWorkspaceTab:(tab:string)=>void;
  </script>
  
- <style>
-   .profile-circle {
-       border-radius: 50%;
-     }
-     .info-setting-hover:hover {
-       background-color: var(--border-color);
-     }
-     .workspace-info {
-       position: fixed;
-       bottom: 0;
-       padding: 15px;
-       display: flex;
-       width: 100%;
-       font-size: 12px;
-     }   
-   </style>
+ 
+
  
  <div
    class="d-flex flex-column align-items-left justify-content-start"
@@ -71,3 +57,54 @@
      </p>
    </div>
  </div>
+
+
+
+
+
+
+<style>
+  .main-container {
+    width: 280px;
+    position: fixed;
+    font-family: Roboto;
+    right: 0;
+    top: 80px;
+    border-left: 1px solid var(--border-color);
+    height: calc(100vh - 80px);
+    z-index: 99;
+  }
+
+  .workspace-info {
+    position: fixed;
+    bottom: 0;
+    padding: 15px;
+    display: flex;
+    width: 100%;
+    color: #45494d;
+    font-size: 12px;
+  }
+  .workspace-info > :first-child {
+    margin-right: 10px;
+  }
+  .api-info {
+    color: #85c2ff;
+    line-height: 18px;
+    font-size: 16px;
+    padding-left: 10px;
+  }
+  .profile-circle {
+       border-radius: 50%;
+     }
+     .info-setting-hover:hover {
+       background-color: var(--border-color);
+     }
+     .workspace-info {
+       position: fixed;
+       bottom: 0;
+       padding: 15px;
+       display: flex;
+       width: 100%;
+       font-size: 12px;
+     } 
+</style>

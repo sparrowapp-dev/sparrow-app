@@ -99,6 +99,7 @@
     refreshWorkspace: _viewModelWorkspace.refreshWorkspaces,
     changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
     removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
+    disableNewInviteTag: _viewModel.disableNewInviteTag,
   };
 
   const userSubscribe = user.subscribe(async (value) => {
@@ -478,6 +479,7 @@
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>
     <WorkspaceList
+      {userId}
       {handleCreateTeamModal}
       teams={allTeams}
       {data}
@@ -487,6 +489,7 @@
       {handleWorkspaceTab}
       {activeSideBarTabMethods}
       {teamRepositoryMethods}
+      {teamServiceMethods}
       {collectionsMethods}
     />
     <WorkspaceContent

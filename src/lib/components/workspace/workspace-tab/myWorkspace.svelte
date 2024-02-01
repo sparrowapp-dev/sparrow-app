@@ -32,7 +32,6 @@
   let currentTeamWorkspacesArr: WorkspaceDocument[] = [];
   let componentData: NewTab;
   let newWorkspaceName: string;
-  let ownerName: string;
   let noOfCollections = 0;
   let isActiveInvitePopup: boolean = false;
   let currentTeamDetails:{id:string,name:string}
@@ -140,9 +139,7 @@
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
+      name = value?.name;
       if (name) {
         firstLetter = name[0];
       }
@@ -168,18 +165,10 @@
     (value: WorkspaceDocument) => {
       if (value) {
         currentWorkspaceDetails.id = value._data._id;
-        ownerName = value._data?.owner?.name;
         currentWorkspaceDetails.name = value._data.name;
         currentTeamDetails={
            name:value._data?.team?.teamName,
             id : value._data?.team.teamId
-        }
-       
-        if (ownerName) {
-          name = ownerName;
-          firstLetter = name[0];
-        } else {
-          name = name;
         }
         getUserDetails();
       }
