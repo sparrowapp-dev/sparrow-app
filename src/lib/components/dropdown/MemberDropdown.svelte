@@ -65,6 +65,7 @@
       if (!disabled) {
         handleDropdownClick(event);
       }
+      event.stopPropagation();
     }}
   >
   {#if  method==="admin" && isWorkspaceMemberDropDown}
