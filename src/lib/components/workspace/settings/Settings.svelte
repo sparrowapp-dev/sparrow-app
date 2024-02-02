@@ -1,6 +1,5 @@
 <script lang="ts">
   import FileInput from "$lib/components/inputs/FileInput.svelte";
-  import { user } from "$lib/store";
   import type {
     Team,
     TeamRepositoryMethods,
@@ -24,6 +23,13 @@
   if (openTeam?.logo) {
     uploadTeamIcon.file.value = openTeam?.logo;
   }
+
+  let ownerDetails;
+  openTeam?.users.forEach((element) => {
+    if (element.id === openTeam.owner) {
+      ownerDetails = element;
+    }
+  });
 
   const handleUpdateTeam = async (property) => {
     let data;
@@ -108,13 +114,17 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-3">
-        <div class="settings-list w-30">
-          <button> Team Profile </button>
+        <div class="settings-list w-30 p-2">
+          <button
+            class="settings-tab p-2 w-100 rounded bg-backgroundLight border-0"
+          >
+            Team Profile
+          </button>
         </div>
       </div>
       <div class="col-9">
         <div class="settings-content w-70">
-          <div class="row">
+          <div class="row pb-3">
             <div class="col-12">
               <div>
                 <FileInput
@@ -137,17 +147,17 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row pb-3">
             <div class="col-2">
-              <p class="team-title">Team Name</p>
+              <p class="team-title fs-12 text-textColor">Team Name</p>
             </div>
             <div class="col-10">
               <input
                 required
                 type="text"
                 id="input-team-name"
-                placeholder="Enter URL or paste text"
-                class="url-input form-control input-outline border-0 p-3 rounded"
+                placeholder=""
+                class="settings-team-name w-100 fs-12 border-0 p-3 rounded"
                 autocomplete="off"
                 spellcheck="false"
                 autocorrect="off"
@@ -163,28 +173,32 @@
               />
             </div>
           </div>
-          <div class="row">
+          <div class="row pb-3">
             <div class="col-2">
-              <p class="team-title">Owner</p>
-            </div>
-            <div class="col-10"><p>{openTeam?.name} | {$user?.email}</p></div>
-          </div>
-          <div class="row">
-            <div class="col-2">
-              <p class="team-title">About</p>
+              <p class="team-title fs-12 text-textColor">Owner</p>
             </div>
             <div class="col-10">
-              <input
+              <p class="ps-3">
+                {ownerDetails.name} <span class="text-textColor px-2">|</span>
+                {ownerDetails.email}
+              </p>
+            </div>
+          </div>
+          <div class="row pb-3">
+            <div class="col-2">
+              <p class="team-title fs-12 text-textColor">About</p>
+            </div>
+            <div class="col-10">
+              <textarea
                 required
                 type="text"
                 id="input-team-description"
-                placeholder="Enter URL or paste text"
-                class="url-input form-control input-outline border-0 p-3 rounded"
+                placeholder="Add teams's description"
+                class="settings-team-description w-100 fs-12 border-0 p-3 rounded"
                 autocomplete="off"
                 spellcheck="false"
                 autocorrect="off"
                 autocapitalize="off"
-                style="height:34px;"
                 bind:value={teamDescription}
                 on:keydown={(e) => {
                   blurInputField(e, "input-team-description");
@@ -204,10 +218,26 @@
 <style>
   .settings-list {
     height: calc(100vh - 250px);
-    border-right: 1px solid white;
+    border-right: 1px solid var(--border-color);
   }
-  .settings-team-name {
+  .settings-tab {
+    text-align: left;
   }
   .settings-team-description {
+    height: calc(150px) !important;
+  }
+  .settings-team-name,
+  .settings-team-description {
+    background-color: transparent !important;
+  }
+  .settings-team-description:hover {
+    outline: 1px solid var(--send-button);
+  }
+  .settings-team-name:focus,
+  .settings-team-description:focus {
+    outline: 1px solid var(--send-button);
+  }
+  .fs-12 {
+    font-size: 12px;
   }
 </style>
