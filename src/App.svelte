@@ -18,7 +18,7 @@
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
@@ -31,13 +31,11 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
-  import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
   import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
   import { relaunch } from "@tauri-apps/api/process";
 
   export let url = "/";
   const tabRepository = new TabRepository();
-  const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let flag: boolean = true;
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
