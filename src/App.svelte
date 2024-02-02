@@ -70,8 +70,6 @@
   async function checkForUpdate() {
     try {
       const { shouldUpdate, manifest } = await checkUpdate();
-      console.log(shouldUpdate);
-      console.log(manifest);
       if (shouldUpdate) {
         await installUpdate();
         await relaunch();
@@ -79,12 +77,6 @@
     } catch (error) {
       console.log(error);
     }
-    listen("tauri://update-available", function (res) {
-      console.log("New version available: ", res);
-    });
-    listen("tauri://update-status", function (res) {
-      console.log("New status: ", res);
-    });
   }
 
   onMount(async () => {
