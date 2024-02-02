@@ -138,7 +138,7 @@
     background-color: #616364;
   }
   .collection-btn {
-    background-color: var(--send-button);
+    background-color: var(--sparrow-blue);
     color: var(--white-color);
     font-family: Roboto;
     font-size: 16px;
@@ -155,10 +155,10 @@
   }
 
   .btn-close1:hover {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
 
   .btn-close1:active {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
 </style>

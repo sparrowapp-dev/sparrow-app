@@ -31,19 +31,67 @@
   let isSyntaxError: boolean = false;
   let isResponseLoading: boolean = false;
   let importData: string = "";
-  let importFile: File;
 
-  let fileName = "";
-  function handleFilesSelect(event: CustomEvent) {
-    fileName = event.detail ? event.detail.acceptedFiles[0]?.name : "";
-    importFile = event.detail ? event.detail.acceptedFiles[0] : "";
-  }
   const handleError = () => {
     isSyntaxError = false;
     isDataEmpty = false;
   };
   const handleInputField = (e) => {
     importData = e.target.value;
+  };
+  let uploadCollection = {
+    file: {
+      value: [],
+      invalid: false,
+      showFileSizeError: false,
+      showFileTypeError: false,
+    },
+  };
+  const handleLogoInputChange = (
+    e: any,
+    maxSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    const targetFile = e?.target?.files;
+    const dataTransferFile = e?.dataTransfer?.files;
+    if (
+      (targetFile && targetFile[0].size > maxSize * 1024) ||
+      (dataTransferFile && dataTransferFile[0].size > maxSize * 1024)
+    ) {
+      uploadCollection.file.showFileSizeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    const fileType = `.${(
+      (targetFile && targetFile[0]?.name) ||
+      (dataTransferFile && dataTransferFile[0]?.name)
+    )
+      .split(".")
+      .pop()
+      .toLowerCase()}`;
+    if (!supportedFileTypes.includes(fileType)) {
+      uploadCollection.file.showFileTypeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    uploadCollection.file.showFileSizeError = false;
+    uploadCollection.file.showFileTypeError = false;
+    uploadCollection.file.invalid = false;
+    uploadCollection.file.value =
+      (targetFile && targetFile[0]) ||
+      (dataTransferFile && dataTransferFile[0]);
+    isDataEmpty = false;
+  };
+
+  const handleLogoReset = (e: any) => {
+    uploadCollection.file.value = [];
+  };
+
+  const handleLogoEdit = (e: any) => {
+    const uploadFileInput = document.getElementById(
+      "upload-collection-file-input",
+    );
+    uploadFileInput.click();
   };
 
   async function handleFileUpload(file: File) {
@@ -101,8 +149,8 @@
       handleImportJsonObject();
       return;
     }
-    if (importFile) {
-      handleFileUpload(importFile);
+    if (uploadCollection?.file?.value?.length !== 0) {
+      handleFileUpload(uploadCollection?.file?.value);
       return;
     }
     isDataEmpty = true;
@@ -188,7 +236,7 @@
   />
 
   <div
-    class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+    class="container d-flex flex-column mb-0 p-4"
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
@@ -216,25 +264,28 @@
         class="form-control border-0 rounded bg-blackColor"
       />
     </div>
-
-    <div style="font-size: 14px;" class="importData-lightGray mt-2">
-      <p>Drag and drop your YAML/JSON file</p>
+    <div style="font-size: 14px;" class="importData-lightGray">
+      <p class="mb-1">Drag and drop your YAML/JSON file</p>
     </div>
-
     <div>
-      <Dropzone
-        containerStyles="background-color:#1e1e1e; width:100%;"
-        accept=".yaml"
-        inputElement
-        on:drop={handleFilesSelect}
-        on:change={handleFilesSelect}
-      >
-        <p class="importData-textColor">Drag and Drop or</p>
-        <p>
-          <span><img src={icons.uploadIcon} alt="" />Choose File</span>
-          <span>{fileName}</span>
-        </p>
-      </Dropzone>
+      <FileInput
+        value={uploadCollection.file.value}
+        maxFileSize={100}
+        onChange={handleLogoInputChange}
+        resetValue={handleLogoReset}
+        editValue={handleLogoEdit}
+        labelText=""
+        labelDescription="Drag and drop your YAML/JSON file"
+        inputId="upload-collection-file-input"
+        inputPlaceholder="Drag and Drop or"
+        isRequired={false}
+        supportedFileTypes={[".yaml", ".json"]}
+        showFileSizeError={uploadCollection.file.showFileSizeError}
+        showFileTypeError={uploadCollection.file.showFileTypeError}
+        type={"file"}
+        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+      />
     </div>
 
     <div
@@ -254,7 +305,7 @@
       >
 
       <p class="empty-data-error">
-        {#if isDataEmpty}
+        {#if isDataEmpty && !importData}
           Please Paste or Upload your file in order to import the workspace
         {/if}
       </p>
@@ -283,9 +334,9 @@
   textarea {
     width: 100%;
     resize: vertical;
-    height: 80%;
-    max-height: 100%;
+    height: calc(100px) !important;
     background-color: var(--blackColor);
+    margin-bottom: 5%;
   }
   .background-overlay {
     position: fixed;
@@ -296,7 +347,7 @@
     background: var(--background-hover);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    z-index: 14;
+    z-index: 13;
   }
   .empty-data-error {
     color: var(--error--color);
@@ -312,30 +363,15 @@
   .container {
     display: flex;
     position: fixed;
-    height: 90%;
-    width: 50%;
     top: 50%;
     left: 50%;
+    max-width: calc(488px);
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
     z-index: 14;
     border-radius: 10px;
   }
 
-  @media (min-width: 1000px) {
-    .container {
-      display: flex;
-      position: fixed;
-      height: 90%;
-      width: 40%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: var(--background-color);
-      z-index: 14;
-      border-radius: 10px;
-    }
-  }
   .textarea-div {
     height: 25%;
     border: 2px solid red;
@@ -346,11 +382,11 @@
   }
 
   .btn-close1:hover {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
 
   .btn-close1:active {
-    background-color: var(--dangerColor);
+    background-color: var(--background-dropdown);
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
