@@ -10,6 +10,8 @@
   export let openTeam: Team;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
+  let teamName: string = openTeam?.name;
+  let teamDescription: string = openTeam.description;
   let uploadTeamIcon = {
     file: {
       value: [],
@@ -18,6 +20,7 @@
       showFileTypeError: false,
     },
   };
+
   if (openTeam?.logo) {
     uploadTeamIcon.file.value = openTeam?.logo;
   }
@@ -28,8 +31,21 @@
       data = {
         image: uploadTeamIcon.file.value,
       };
+    } else if (property === "name") {
+      if (!teamName) {
+        teamName = openTeam?.name;
+      }
+      data = {
+        name: teamName,
+      };
+    } else if (property === "description") {
+      data = {
+        description: teamDescription,
+      };
     }
+
     const response = await teamServiceMethods.updateTeam(openTeam.teamId, data);
+    delete response._id;
     teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
   };
 
@@ -77,8 +93,17 @@
     );
     uploadFileInput.click();
   };
+
+  const blurInputField = (event, inputId) => {
+    console.log(event, inputId);
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(inputId) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
+<svelte:window />
 <section>
   <div class="container-fluid">
     <div class="row">
@@ -116,7 +141,27 @@
             <div class="col-2">
               <p class="team-title">Team Name</p>
             </div>
-            <div class="col-10"><p>{openTeam?.name}</p></div>
+            <div class="col-10">
+              <input
+                required
+                type="text"
+                id="input-team-name"
+                placeholder="Enter URL or paste text"
+                class="url-input form-control input-outline border-0 p-3 rounded"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                style="height:34px;"
+                bind:value={teamName}
+                on:keydown={(e) => {
+                  blurInputField(e, "input-team-name");
+                }}
+                on:blur={() => {
+                  handleUpdateTeam("name");
+                }}
+              />
+            </div>
           </div>
           <div class="row">
             <div class="col-2">
@@ -129,9 +174,25 @@
               <p class="team-title">About</p>
             </div>
             <div class="col-10">
-              <p>
-                {"About will be shown here. Backend Implementation is left."}
-              </p>
+              <input
+                required
+                type="text"
+                id="input-team-description"
+                placeholder="Enter URL or paste text"
+                class="url-input form-control input-outline border-0 p-3 rounded"
+                autocomplete="off"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                style="height:34px;"
+                bind:value={teamDescription}
+                on:keydown={(e) => {
+                  blurInputField(e, "input-team-description");
+                }}
+                on:blur={() => {
+                  handleUpdateTeam("description");
+                }}
+              />
             </div>
           </div>
         </div>
@@ -144,5 +205,9 @@
   .settings-list {
     height: calc(100vh - 250px);
     border-right: 1px solid white;
+  }
+  .settings-team-name {
+  }
+  .settings-team-description {
   }
 </style>

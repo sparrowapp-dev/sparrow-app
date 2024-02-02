@@ -63,6 +63,8 @@
       }
     });
   };
+
+  let previousTeamId: string;
   $: {
     if (userId) {
       findUserType();
@@ -71,9 +73,10 @@
   $: {
     if (openTeam) {
       findUserType();
-    }
-    if (openTeam?.teamId) {
-      selectedTab = "all-workspace";
+      if (previousTeamId !== openTeam?.teamId) {
+        selectedTab = "all-workspace";
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
 
@@ -126,13 +129,11 @@
                   class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                   style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
                 >
-                  {currOpenedTeam.name[0]
-                    ? currOpenedTeam.name[0].toUpperCase()
-                    : ""}
+                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </p>
               {/if}
               <span class="ms-4 my-auto ellipsis overflow-hidden"
-                >{currOpenedTeam.name}
+                >{openTeam?.name}
               </span>
               <div class="mr-4 position-relative my-auto">
                 <IconButton
