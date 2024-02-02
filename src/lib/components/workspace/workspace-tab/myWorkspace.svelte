@@ -8,10 +8,7 @@
   import { user } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import type { Observable } from "rxjs";
-  import type {
-    CollectionDocument,
-    WorkspaceDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument } from "$lib/database/app.database";
   import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
@@ -20,10 +17,7 @@
   let workspaceDescription: string = "";
   let componentData: NewTab;
   let newWorkspaceName: string;
-  let ownerName: string;
   let noOfCollections = 0;
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    _viewModel.activeWorkspace;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
       tabName = event?.name;
@@ -79,9 +73,7 @@
   let firstLetter;
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
+      name = value?.name;
       if (name) {
         firstLetter = name[0];
       }
@@ -89,19 +81,6 @@
     }
   });
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    (value: WorkspaceDocument) => {
-      if (value) {
-        ownerName = value._data?.owner?.name;
-        if (ownerName) {
-          name = ownerName;
-          firstLetter = name[0];
-        } else {
-          name = name;
-        }
-      }
-    },
-  );
   // Not required for now may be used in future if things breaks
   // const userUnsubscribe = user.subscribe(async (value) => {
   //   if (value) {

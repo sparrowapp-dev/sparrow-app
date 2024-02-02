@@ -238,10 +238,10 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    height: 95vh;
     border-right: 1px solid var(--border-color);
     padding: 0px 0px 8px 2px;
-    width: 20vw;
+    width: calc(280px);
+    height: calc(100vh - 44px);
   }
   .curr-workspace {
     max-height: 20vw;

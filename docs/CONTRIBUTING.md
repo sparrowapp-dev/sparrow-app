@@ -57,11 +57,16 @@ git add .
 # feat - New Feature; future planned; non-mainstream changes;
 # bug - Bug Fixes
 # exp - Experimental; random experimental features;
+# Include issue number in encloseing square brackets at the end of commit message
 
-git commit -m "fix: your-commit-message"
+git commit -m "fix: your-commit-message[<issue-issueNumber>]"
+
+# example - "feat: add indent and indent-less[496]" 
 
 # Push changes to your forked repository
 git push origin <type>/<issue-issueNumber>/{<additional-fixes>}
+
+# example - git push origin feat/496/codemirror-shortcuts
 
 ## Creating the PR using GitHub Website
 # Create Pull Request from <type>/<issue-issueNumber>/{<additional-fixes>} branch in your forked repository to the master branch in the upstream repository
