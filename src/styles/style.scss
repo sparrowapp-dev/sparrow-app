@@ -198,3 +198,22 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #888;
 }
+
+.env-highlight {
+  &.env-found {
+    color: #9CDCFE;
+  }
+
+  &.env-not-found {
+    color: #FE8C98;
+  }
+
+  &.hover-found {
+    color: #9CDCFE;
+  }
+
+  &.hover-not-found {
+    color: #FE8C98;
+    background-color: #230408;
+  }
+}

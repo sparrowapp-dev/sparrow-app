@@ -23,6 +23,14 @@
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import CodeMirrorInput from "./CodeMirrorInput.svelte";
+  import type { EditorSelection } from "@codemirror/state";
+  import AddEnvironment from "../add-environment-popup/AddEnvironment.svelte";
+  import type {
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -51,6 +59,14 @@
   let trackCursor: number;
   let environmentAxisY: number;
   let environmentAxisX: number;
+  let envMissing = false;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
+  let currentWorkspaceName: string;
+  let currentWorkspaceId: string;
+  let globalEnvironment;
+  let currentEnvironment;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -236,8 +252,52 @@
       currentTabId,
     );
     trackParanthesis = environmentHelper.balanceParanthesis(urlText);
+    console.log("urlText", urlText);
   };
-  onDestroy(() => {
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      globalEnvironment = await collectionsMethods.getGlobalEnvironment();
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        const env: EnvironmentDocument =
+          await collectionsMethods.currentEnvironment(
+            activeWorkspaceRxDoc.get("environmentId"),
+          );
+        // collectionsMethods.
+        if (env) {
+          currentEnvironment = env.toMutableJSON();
+        } else {
+          currentEnvironment = {
+            name: "None",
+            id: "none",
+          };
+        }
+        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+      }
+    },
+  );
+  let handleFocusValue = () => {
+    handleInputValue();
+    const elem = document.getElementById("input-request-url");
+    environmentAxisY = elem.getBoundingClientRect().top + 40;
+    environmentAxisX = elem.getBoundingClientRect().left;
+  };
+  let handleBlurValue = () => {
+    setTimeout(() => {
+      trackParanthesis = [];
+      trackCursor = undefined;
+      filterData = [];
+    }, 300);
+  };
+  let handleInputChange = (text: string) => {
+    urlText = text;
+  };
+  let handleKeyUpValue = (e: EditorSelection) => {
+    trackCursor = e.main.head;
+    console.log("trackCursor", trackCursor, e);
+  };
+  let handleKeyDownChange = onDestroy(() => {
     isHorizontalUnsubscribe();
     tabSubscribe();
   });
@@ -256,6 +316,7 @@
 
   onDestroy(() => {
     window.removeEventListener("resize", handleResize);
+    // activeWorkspaceSubscribe.unsubscribe();
   });
 
   const handleKeyPress = (event) => {
@@ -267,6 +328,31 @@
     } else if (event.altKey && event.code === "KeyL") {
       inputElement.focus();
     }
+  };
+  const HOPP_ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_]+}})/g;
+
+  const isENVInString = (str: string) => {
+    return HOPP_ENVIRONMENT_REGEX.test(str);
+  };
+
+  const handleMissingEnv = (text: string) => {
+    if (isENVInString(text)) {
+      const envKey = text.slice(2, -2);
+      const className = environmentVariables.find(
+        (k: { key: string }) => k.key === envKey,
+      )
+        ? "found"
+        : "not found";
+
+      console.log(className, envKey);
+      envMissing = true;
+    } else {
+      // envMissing = false;
+    }
+  };
+
+  const handleEnvironmentBox = (change: boolean) => {
+    envMissing = change;
   };
 </script>
 
@@ -309,7 +395,7 @@
         method={method ? method : ""}
         onclick={handleDropdown}
       />
-      <input
+      <!-- <input
         required
         type="text"
         id="input-request-url"
@@ -326,6 +412,7 @@
         on:input={handleInputValue}
         on:keydown={(e) => handleKeyPress(e)}
         on:keyup={(e) => {
+          console.log("e", e);
           trackCursor = e.target.selectionStart;
         }}
         on:blur={() => {
@@ -342,6 +429,21 @@
           environmentAxisX = elem.getBoundingClientRect().left;
         }}
         bind:this={inputElement}
+      /> -->
+      <CodeMirrorInput
+        rawValue={urlText}
+        handleRawChange={handleInputValue}
+        handleFocusChange={handleFocusValue}
+        handleBlurChange={handleBlurValue}
+        {handleInputChange}
+        handleKeyUpChange={handleKeyUpValue}
+        handleKeyDownChange={handleKeyPress}
+        codeMirrorEditorDiv={inputElement}
+        {handleSendRequest}
+        {currentTabId}
+        {handleMissingEnv}
+        filterData={environmentVariables}
+        {handleEnvironmentBox}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
@@ -355,6 +457,17 @@
             urlText = txt;
           }}
           {handleInputValue}
+        />
+      {/if}
+      {#if envMissing}
+        <AddEnvironment
+          {environmentAxisX}
+          {environmentAxisY}
+          updateEnvironment={collectionsMethods.updateEnvironment}
+          {currentWorkspaceId}
+          {currentEnvironment}
+          {globalEnvironment}
+          {handleEnvironmentBox}
         />
       {/if}
 

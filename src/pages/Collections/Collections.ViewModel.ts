@@ -11,12 +11,14 @@ import {
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type { Collection } from "$lib/utils/interfaces/request.interface";
-
+import { EnvironmentService } from "$lib/services-v2/environment.service";
+import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
+  private environmentService = new EnvironmentService();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -309,5 +311,21 @@ export class CollectionsViewModel {
 
   public currentEnvironment = async (id: string) => {
     return await this.environmentRepository.readEnvironment(id);
+  };
+
+  public getGlobalEnvironment = async () => {
+    return await this.environmentRepository.getGlobalEnvironment();
+  };
+
+  public updateEnvironment = async (
+    workspaceId: string,
+    environmentId: string,
+    environment: UpdateEnvironmentPostBody,
+  ) => {
+    return await this.environmentService.updateEnvironment(
+      workspaceId,
+      environmentId,
+      environment,
+    );
   };
 }
