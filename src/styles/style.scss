@@ -59,6 +59,7 @@ $sparrow-editor-number-color: #8DC599;
 $sparrow-editor-angle-bracket-color: #636566;
 $sparrow-editor-tag-color: #246BB8;
 $sparrow-editor-string-color: #CE9178;
+$sparrow-email-invite-bg-color:#1E1E1E;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -150,6 +151,7 @@ $theme-colors: map-merge(
     "keyValuePairColor": $sparrow-key-value-pair,
     "dullBackground": $sparrow-dull-background,
     "sparrowBottomBorder": $sparrow-bottom-border,
+    "emailInviteBackgroundColor":$sparrow-email-invite-bg-color
   )
 );
 

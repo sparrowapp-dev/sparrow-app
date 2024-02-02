@@ -67,10 +67,10 @@
   <button
   disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
     id="dropdown-btn-color"
-    class="dropdown dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
+    class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
       ? 'drop-active'
       : ''}"
-    style="width: 32px; height:32px;border:none"
+    style="width: 32px; height:32px;"
     on:click={() => {
       visibilty = !visibilty;
       changeBtnBackground();

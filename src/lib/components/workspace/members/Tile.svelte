@@ -1,70 +1,84 @@
 <script lang="ts">
   import RemoveConfirmationPopup from "$lib/components/Modal/RemoveConfirmationPopup.svelte";
-
   import MemberChangeRolePopup from "$lib/components/Modal/MemberChangeRolePopup.svelte";
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
+    userDetails,
+    workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  export let user;
-  export let userType;
+  import type { MemberPopType } from "$lib/utils/types/common.type";
+  export let user: userDetails;
+  export let userType: TeamRole;
   export let openTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
-  export let workspaces;
-  export let userId;
+  export let workspaces: workspaceDocumentWithPosition;
+  export let userId: string;
   export let owner: boolean = false;
 
-  const handleDropdown = (id) => {
+  const handleDropdown = (id: TeamRole | "remove") => {
     if (id === "remove") {
-      isMemberRemovePopup = true;
+      memberPopObj.isMemberRemovePopup = true;
     } else if (
       user.role === TeamRole.TEAM_ADMIN &&
       id === TeamRole.TEAM_MEMBER
     ) {
-      isMemberDemotePopup = true;
+      memberPopObj.isMemberDemotePopup = true;
     } else if (
       user.role === TeamRole.TEAM_MEMBER &&
       id === TeamRole.TEAM_ADMIN
     ) {
-      isMemberPromotePopup = true;
+      memberPopObj.isMemberPromotePopup = true;
     } else if (
       user.role === TeamRole.TEAM_ADMIN &&
       id === TeamRole.TEAM_OWNER
     ) {
-      isMemberOwnershipPopup = true;
+      memberPopObj.isMemberOwnershipPopup = true;
     }
   };
-  let isMemberRemovePopup = false;
-  let isMemberPromotePopup = false;
-  let isMemberDemotePopup = false;
-  let isMemberInfoPopup = false;
-  let isMemberOwnershipPopup = false;
+  const memberPopObj={
+    isMemberRemovePopup:false,
+    isMemberPromotePopup:false,
+    isMemberDemotePopup :false,
+     isMemberInfoPopup:false,
+    isMemberOwnershipPopup:false,
+  }
+  // let isMemberRemovePopup = false;
+  // let isMemberPromotePopup = false;
+  // let isMemberDemotePopup = false;
+  // let isMemberInfoPopup = false;
+  // let isMemberOwnershipPopup = false;
 
-  const handleMemberPopUpCancel = (flag: boolean): void => {
-    isMemberRemovePopup = flag;
-  };
-  const handleMemberPromotePopUpCancel = (flag: boolean): void => {
-    isMemberPromotePopup = flag;
-  };
 
-  const handleMemberDemotePopUpCancel = (flag: boolean): void => {
-    isMemberDemotePopup = flag;
+  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+    switch (popType) {
+      case "isMemberRemovePopup":
+        memberPopObj.isMemberRemovePopup = flag;
+        break;
+      case "isMemberPromotePopup":
+        memberPopObj.isMemberPromotePopup = flag;
+        break;
+      case "isMemberDemotePopup":
+        memberPopObj.isMemberDemotePopup = flag;
+        break;
+      case "isMemberInfoPopup":
+        memberPopObj.isMemberInfoPopup = flag;
+        break;
+      case "isMemberOwnershipPopup":
+        memberPopObj.isMemberOwnershipPopup = flag;
+        break;
+      default:
+        break;
+    }
   };
-  const handleMemberInfoPopUpCancel = (flag: boolean): void => {
-    isMemberInfoPopup = flag;
-  };
-
-  const handleMemberOwnershipPopUpCancel = (flag: boolean): void => {
-    isMemberOwnershipPopup = flag;
-  };
-
+  
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
       openTeam.teamId,
@@ -73,7 +87,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberRemovePopup = false;
+      memberPopObj.isMemberRemovePopup = false;
       notifications.success(`${user.name} is removed from ${openTeam.name}`);
     } else {
       notifications.error(
@@ -89,7 +103,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberDemotePopup = false;
+      memberPopObj.isMemberDemotePopup = false;
       notifications.success(`${user.name} is now a member`);
     } else {
       notifications.error(
@@ -105,7 +119,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberPromotePopup = false;
+      memberPopObj.isMemberPromotePopup = false;
       notifications.success(`${user.name} is now an admin`);
     } else {
       notifications.error(
@@ -122,7 +136,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberOwnershipPopup = false;
+      memberPopObj.isMemberOwnershipPopup = false;
       notifications.success(
         `${user.name} is now the new Owner of ${openTeam.name}.`,
       );
@@ -188,7 +202,7 @@
   };
 </script>
 
-{#if isMemberRemovePopup}
+{#if memberPopObj.isMemberRemovePopup}
   <RemoveConfirmationPopup
     title={`Remove user?`}
     description={`<p style="font-size:12px;" class="text-textColor">
@@ -199,11 +213,13 @@
         class="text-whiteColor">"${openTeam?.name}"</span> team.
     </p>`}
     onSuccess={handleMemberPopUpSuccess}
-    onCancel={handleMemberPopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberRemovePopup");
+    }}
   />
 {/if}
 
-{#if isMemberPromotePopup}
+{#if memberPopObj.isMemberPromotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
     teamName={openTeam?.name}
@@ -239,11 +255,13 @@
     </ul>
     `}
     onSuccess={handleMemberPromotePopUpSuccess}
-    onCancel={handleMemberPromotePopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberPromotePopup");
+    }}
   />
 {/if}
 
-{#if isMemberDemotePopup}
+{#if memberPopObj.isMemberDemotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
     teamName={openTeam?.name}
@@ -275,11 +293,13 @@
       
       `}
     onSuccess={handleMemberDemotePopUpSuccess}
-    onCancel={handleMemberDemotePopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberDemotePopup");
+    }}
   />
 {/if}
 
-{#if isMemberOwnershipPopup}
+{#if memberPopObj.isMemberOwnershipPopup}
   <MemberChangeRolePopup
     auth={true}
     title={`Changing Role?`}
@@ -316,11 +336,11 @@
       
       `}
     onSuccess={handleMemberOwnershipPopUpSuccess}
-    onCancel={handleMemberOwnershipPopUpCancel}
+    onCancel={()=>{handlePopup(false,"isMemberOwnershipPopup")}}
   />
 {/if}
 
-{#if isMemberInfoPopup}
+{#if memberPopObj.isMemberInfoPopup}
   <MemberInfoPopup
     {owner}
     title={`Access to ${openTeam.name}`}
@@ -337,11 +357,10 @@
     })}
     {userType}
     {userId}
-    onCancel={handleMemberInfoPopUpCancel}
-    {handleMemberPopUpCancel}
-    {handleMemberPromotePopUpCancel}
-    {handleMemberDemotePopUpCancel}
-    {handleMemberOwnershipPopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberInfoPopup");
+    }}
+    {handlePopup}
     {teamServiceMethods}
     {handleMemberPopUpSuccess}
     {getPermissionsData}
@@ -351,7 +370,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      isMemberInfoPopup = true;
+      memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">

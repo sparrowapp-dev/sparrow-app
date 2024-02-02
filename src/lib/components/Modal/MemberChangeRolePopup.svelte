@@ -4,12 +4,12 @@
   import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
 
-  export let title;
+  export let title:string;
   export let description;
-  export let teamName;
-  export let teamLogo;
+  export let teamName:string;
+  export let teamLogo:string;
   export let onSuccess;
-  export let onCancel;
+  export let onCancel:()=>void;
   export let auth = false;
   export let isTeam=true;
 
@@ -27,9 +27,7 @@
 <div class="environment-delete-popup">
   <div
     class="background-overlay"
-    on:click={() => {
-      onCancel(false);
-    }}
+    on:click={onCancel}
     transition:fade={{ delay: 0, duration: 100 }}
   />
 
@@ -41,13 +39,11 @@
   >
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-        {title}
+        {title} 
       </h5>
       <button
         class="btn-close1 border-0 rounded"
-        on:click={() => {
-          onCancel(false);
-        }}
+        on:click={onCancel}
       >
         <img src={closeIcon} alt="" />
       </button>
@@ -120,9 +116,7 @@
       fontSize={14}
       type={"dark"}
       loader={false}
-      onClick={() => {
-        onCancel(false);
-      }}
+      onClick={onCancel}
     />
 
     <CustomButton
@@ -131,9 +125,7 @@
       fontSize={14}
       type={"danger"}
       loader={deleteLoader}
-      onClick={() => {
-        handleDelete();
-      }}
+      onClick={handleDelete}
       
     />
     </div>

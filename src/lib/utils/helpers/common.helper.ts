@@ -31,3 +31,22 @@ export function hasWorkpaceLevelPermission(
   const allowedPermissions = workspaceLevelRolePermisson[userRole] || [];
   return allowedPermissions.includes(requiredPermission);
 }
+
+interface EventListenersObject {
+  eventType: string;
+  eventHandler: (event: Event) => void;
+}
+export function createDynamicComponents(
+  elementType: string,
+  bootstrapClasses: string,
+  eventListeners?: EventListenersObject[],
+): HTMLElement {
+  const element: HTMLElement = document.createElement(elementType);
+  element.setAttribute("class", bootstrapClasses);
+  if (eventListeners && eventListeners.length > 0) {
+    eventListeners.forEach((listener: EventListenersObject) => {
+      element.addEventListener(listener.eventType, listener.eventHandler);
+    });
+  }
+  return element;
+}

@@ -11,6 +11,7 @@
   } from "$lib/utils/dto";
   import { notifications } from "$lib/utils/notifications";
   import { WorkspaceRole } from "$lib/utils/enums";
+  import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   const emailstoBeSentArr: string[] = [];
 
   export let addUsersInWorkspace: (
@@ -21,45 +22,55 @@
     id: string,
     data: addUsersInWorkspace[],
   ) => Promise<void>;
-  export let currentWorkspaceDetails;
+  export let currentWorkspaceDetails: { id: string; name: string };
   let showErrors = false;
-  
-  let selectedRole = "select";
+  let defaultRole="select";
+  let selectedRole= defaultRole;
   let currentEmailEntered: string;
+
+  function removeElement(event: Event): void {
+    const id = event.target?.id;
+    const removeElement = document.getElementById(id) as HTMLElement;
+    const emailContainer = document.getElementById(
+      "input-email",
+    ) as HTMLElement;
+    emailContainer.removeChild(removeElement);
+  }
+
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
     emailstoBeSentArr.push(email);
-    const emailDiv = document.createElement("div");
-    const emailContentSpan = document.createElement("span");
-    const closeIconBtn = document.createElement("img");
+    const emailDiv: HTMLElement = createDynamicComponents(
+      "div",
+      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+    );
+    const emailContentSpan = createDynamicComponents("span", "");
+    const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
+      { eventType: "click", eventHandler: removeElement },
+      {
+        eventType: "mouseleave",
+        eventHandler: () => {
+          closeIconBtn.src = closeIcon;
+        },
+      },
+      {
+        eventType: "mouseenter",
+        eventHandler: () => {
+          closeIconBtn.src = closeIconWhite;
+        },
+      },
+    ]) as HTMLImageElement;
     emailDiv.id = email;
-    closeIconBtn.classList.add(email);
-    closeIconBtn.addEventListener("click", (event: any) => {
-      const className = event.target?.className;
-      const removeElement = document.getElementById(className);
-      document.getElementById("input-email").removeChild(removeElement);
-    });
-    closeIconBtn.addEventListener("mouseenter", () => {
-      closeIconBtn.src = closeIconWhite;
-    });
-    closeIconBtn.addEventListener("mouseleave", () => {
-      closeIconBtn.src = closeIcon;
-    });
+    closeIconBtn.id = email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
-    emailDiv.style.backgroundColor = "#1E1E1E";
-    emailDiv.style.display = "flex";
-    emailDiv.style.justifyContent = "center";
-    emailDiv.style.alignItems = "center";
-    emailDiv.style.gap = "4px";
-    emailDiv.style.paddingLeft = "4px";
-    emailDiv.style.paddingRight = "4px";
-    emailDiv.style.borderRadius = "4px";
-    closeIconBtn.style.backgroundColor = "transparent";
-    document.getElementById("input-email").appendChild(emailDiv);
+    const emailContainer: HTMLElement = document.getElementById(
+      "input-email",
+    ) as HTMLElement;
+    emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
   };
   const handleInvite = async () => {
@@ -98,7 +109,10 @@
   transition:fade={{ delay: 0, duration: 100 }}
 />
 
-<div class="container">
+<div
+  class="container d-flex flex-column position-fixed top-50 start-50 translate-middle rounded-3 bg-backgroundColor"
+  style="z-index: 12;padding:2%"
+>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <p class="mb-0 header-title">Invite Team Members</p>
     <button
@@ -117,8 +131,8 @@
     <p class="invite-subheader text-textColor mt-0 mb-0">
       use commas to separate emails
     </p>
-    <div class="email-container">
-      <div id="input-email"></div>
+    <div class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary" style="padding:3px 5px 3px 5px;">
+      <div id="input-email" class="d-flex align-items-start flex-wrap gap-2"></div>
       <input
         id="input"
         placeholder="Enter email ID"
@@ -139,12 +153,12 @@
   <div class="mt-4">
     <p class="role-title mb-1">Role<span class="asterik">*</span></p>
     <SelectRoleDropdown
-      isError={showErrors && selectedRole === "select"}
+      isError={showErrors && selectedRole === defaultRole}
       id={"invite-member-workspace"}
       data={[
         {
           name: "Select",
-          id: "select",
+          id: defaultRole,
           description: "Select role",
           color: "whiteColor",
         },
@@ -172,8 +186,8 @@
       onclick={handleDropdown}
     />
     {#if showErrors && selectedRole === "select"}
-    <p class="error-text">Role Cannot Be Empty</p>
-  {/if}
+      <p class="error-text">Role Cannot Be Empty</p>
+    {/if}
   </div>
   <div class="text-textColor mt-2" style="font-size: 12px;">
     You can invite your team members or external collaborators to a this
@@ -213,18 +227,8 @@
     z-index: 12;
   }
   .container {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
     height: 50%;
     width: 60%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--background-color);
-    z-index: 12;
-    padding: 2%;
-    border-radius: 10px;
   }
   .header-title {
     font-size: 20px;
@@ -263,34 +267,12 @@
     color: var(--error--color);
     font-size: 12px;
   }
-  .email-container {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    padding: 3px 5px 3px 5px;
-  }
-  #input-email {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
+
   @media (min-width: 1000px) {
     .container {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
       min-height: 54%;
-      height: auto;
       width: 42%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: var(--background-color);
-      z-index: 12;
-      padding: 2%;
-      border-radius: 10px;
+      height: auto;
     }
   }
 </style>

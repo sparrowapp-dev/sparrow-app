@@ -150,7 +150,7 @@
     const response = await _viewModel.getUserDetailsOfWorkspace(
       currentWorkspaceDetails.id,
     );
-    if(response.data && response.data.data){
+    if(response?.data && response?.data?.data){
     users = response.data.data;
     const indexToRemove = users.findIndex(
       (dataObj: any) => dataObj.email === email,
@@ -164,8 +164,10 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
       if (value) {
-        currentWorkspaceDetails.id = value._data._id;
-        currentWorkspaceDetails.name = value._data.name;
+        currentWorkspaceDetails={
+           id:value._data._id,
+           name:value._data.name
+         },
         currentTeamDetails={
            name:value._data?.team?.teamName,
             id : value._data?.team.teamId

@@ -5,49 +5,52 @@
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import type {
-    TeamRepositoryMethods,
     TeamServiceMethods,
     userDetails,
+    workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
+    import type { MemberPopType } from "$lib/utils/types/common.type";
 
   export let title: string;
   export let user: userDetails;
-  export let teamRole: TeamRole = null;
-  export let workspaces: any[];
+  export let teamRole: TeamRole;
+  export let workspaces: workspaceDocumentWithPosition[];
   export let hasPermission: boolean = false;
   export let onCancel: (flag: boolean) => void;
   export let userType: TeamRole;
-  export let handleMemberPromotePopUpCancel = (flag: boolean) => {};
-  export let handleMemberDemotePopUpCancel = (flag: boolean) => {};
-  export let handleMemberPopUpCancel = (flag: boolean) => {};
-  export let handleMemberOwnershipPopUpCancel = (flag: boolean) => {};
+  export let handlePopup: (flag: boolean, popType: MemberPopType) => void;
   export let owner: boolean = false;
   export let teamServiceMethods: TeamServiceMethods = {};
   export let userId: string;
   export let handleMemberPopUpSuccess = (flag: boolean) => {};
-  export let getPermissionsData;
+  export let getPermissionsData: () => Array<{
+    name: string;
+    id: string;
+    color: string;
+  }>;
   export let isWorkspaceMemberInfo = false;
   export let handleDropDownWorkspaceLevel = (
     currentRole: WorkspaceRole | "remove",
   ) => {};
-  const handleDropdown = (id) => {
+  const handleDropdown = (id:"remove"|TeamRole) => {
+    debugger;
     if (id === "remove") {
-      handleMemberPopUpCancel(true);
+      handlePopup(true,"isMemberRemovePopup");
     } else if (
       user.role === TeamRole.TEAM_ADMIN &&
       id === TeamRole.TEAM_MEMBER
     ) {
-      handleMemberDemotePopUpCancel(true);
+      handlePopup(true,"isMemberDemotePopup");
     } else if (
       user.role === TeamRole.TEAM_MEMBER &&
       id === TeamRole.TEAM_ADMIN
     ) {
-      handleMemberPromotePopUpCancel(true);
+      handlePopup(true,"isMemberPromotePopup");
     } else if (
       user.role === TeamRole.TEAM_ADMIN &&
       id === TeamRole.TEAM_OWNER
     ) {
-      handleMemberOwnershipPopUpCancel(true);
+      handlePopup(true,"isMemberOwnershipPopup")
     }
   };
 
