@@ -33,7 +33,6 @@
     currentRole: WorkspaceRole | "remove",
   ) => {};
   const handleDropdown = (id:"remove"|TeamRole) => {
-    debugger;
     if (id === "remove") {
       handlePopup(true,"isMemberRemovePopup");
     } else if (
