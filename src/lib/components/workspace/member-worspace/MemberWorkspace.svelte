@@ -10,7 +10,6 @@
   export let userId: string;
   export let handleMemberPopUpSuccess;
   export let workspaceCount;
-  console.log(workspaceCount);
 
   const handleDropdown = async (id) => {
     if (id === "remove") {
