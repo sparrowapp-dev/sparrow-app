@@ -99,6 +99,8 @@
             aria-describedby="emailHelp"
             required
             placeholder="Please enter your registered email id"
+            autocorrect="off" 
+            autocapitalize="none"
             bind:value={forgotPasswordCredential.email}
             on:input={validateEmail}
           />
