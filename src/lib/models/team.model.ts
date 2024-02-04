@@ -41,7 +41,7 @@ export const teamSchemaLiteral = {
       items: {
         type: "object",
         properties: {
-          userId: {
+          id: {
             type: "string",
           },
           email: {

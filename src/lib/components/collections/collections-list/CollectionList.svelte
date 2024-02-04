@@ -53,13 +53,15 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { currentWorkspace, setCurrentWorkspace } from "$lib/store";
+  import {setCurrentWorkspace } from "$lib/store";
+  import type {WorkspaceRole } from "$lib/utils/enums";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   let isComponentRenderedFirstTime = false;
   let showDefault = false;
   let isLoading = true;
@@ -477,6 +479,7 @@
     </div>
     <div>
       <RequestDropdown
+       {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {handleCreateCollection}
         {collectionUnderCreation}

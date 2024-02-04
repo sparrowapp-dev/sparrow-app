@@ -205,6 +205,7 @@
       workspaceUnderCreation = false;
       handleCreateWorkspaceModal();
     } else {
+      //only to remove the dummy workspace at fail workspace creation
       await _viewModel.removeWorkspace(workspaceObj._id);
       handleCreateWorkspaceModal();
       workspaceUnderCreation = false;
@@ -334,7 +335,6 @@
                   style="cursor: pointer;overflow:auto"
                   on:click={() => {
                     isOpen = false;
-
                     onclick(list._id, list.name, list.team);
                   }}
                   on:click={() => {

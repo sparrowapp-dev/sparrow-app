@@ -7,7 +7,7 @@
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import { CustomButton } from "$lib/components";
-  import { base64ToURL } from "$lib/utils/helpers";
+  import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
 
@@ -33,41 +33,27 @@
   let roleError: boolean = false;
   let workspaceError: boolean = false;
 
+  function removeElement(event:Event):void{
+      const id=event.target?.id;
+      const removeElement = document.getElementById(id) as HTMLElement;
+      document.getElementById("input-email").removeChild(removeElement);
+  };
+  
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
     emailstoBeSentArr.push(email);
-    const emailDiv = document.createElement("div");
-    const emailContentSpan = document.createElement("span");
-    const closeIconBtn = document.createElement("img");
+    const emailDiv:HTMLElement=createDynamicComponents("div","d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center")
+    const emailContentSpan = createDynamicComponents("span","");
+    const closeIconBtn= createDynamicComponents("img","bg-transparent",[{eventType:"click",eventHandler:removeElement},{eventType:"mouseleave",eventHandler:()=>{closeIconBtn.src = closeIcon}},{eventType:"mouseenter",eventHandler:()=>{closeIconBtn.src = closeIconWhite}}]) as HTMLImageElement;
     emailDiv.id = email;
-    closeIconBtn.classList.add(email);
-    closeIconBtn.addEventListener("click", (event: any) => {
-      const className = event.target?.className;
-      const removeElement = document.getElementById(className);
-      document.getElementById("input-email").removeChild(removeElement);
-    });
-    closeIconBtn.addEventListener("mouseenter", () => {
-      closeIconBtn.src = closeIcon;
-    });
-    closeIconBtn.addEventListener("mouseleave", () => {
-      closeIconBtn.src = closeIcon;
-    });
-
+    closeIconBtn.id=email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
-    emailDiv.style.backgroundColor = "#1E1E1E";
-    emailDiv.style.display = "flex";
-    emailDiv.style.justifyContent = "center";
-    emailDiv.style.alignItems = "center";
-    emailDiv.style.gap = "4px";
-    emailDiv.style.paddingLeft = "4px";
-    emailDiv.style.paddingRight = "4px";
-    emailDiv.style.borderRadius = "4px";
-    closeIconBtn.style.backgroundColor = "transparent";
-    document.getElementById("input-email").appendChild(emailDiv);
+    const emailContainer:HTMLElement=document.getElementById("input-email") as HTMLElement;
+    emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
   };
 
@@ -125,8 +111,8 @@
       emailstoBeSentArr?.length > 0
     ) {
       if (
-        selectedRole === WorkspaceRole.EDITOR ||
-        selectedRole === WorkspaceRole.VIEWER
+        selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
+        selectedRole === WorkspaceRole.WORKSPACE_VIEWER
       ) {
         if (countCheckedList(teamSpecificWorkspace)) {
           let data = {
@@ -250,20 +236,20 @@
         },
         {
           name: "Admin",
-          id: TeamRole.ADMIN,
+          id: TeamRole.TEAM_ADMIN,
           description:
             "Add & edit resources within a workspace,add & remove members to workspace",
           color: "whiteColor",
         },
         {
           name: "Editor",
-          id: WorkspaceRole.EDITOR,
+          id: WorkspaceRole.WORKSPACE_EDITOR,
           description: "Add & edit resources within a workspace",
           color: "whiteColor",
         },
         {
           name: "Viewer",
-          id: WorkspaceRole.VIEWER,
+          id: WorkspaceRole.WORKSPACE_VIEWER,
           description: "View Resources within a workspace.",
           color: "whiteColor",
         },
@@ -272,7 +258,7 @@
       onclick={handleDropdown}
     />
   </div>
-  {#if selectedRole === TeamRole.ADMIN}
+  {#if selectedRole === TeamRole.TEAM_ADMIN}
     <p class="invite-subheader text-textColor mt-1 mb-1">
       Admins will get access to all the current workspaces as well as any future
       workspaces in the team.
@@ -282,7 +268,7 @@
     <p class="error-text">Role cannot be empty.</p>
   {/if}
 
-  {#if selectedRole === WorkspaceRole.EDITOR || selectedRole === WorkspaceRole.VIEWER}
+  {#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
     <div class="mt-4">
       <p class="role-title mb-0">
         Specify Workspace<span class="asterik">*</span>

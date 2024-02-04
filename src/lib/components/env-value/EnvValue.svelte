@@ -2,12 +2,15 @@
   import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
   import Crossicon from "$lib/assets/crossicon.svelte";
   import trashIcon from "$lib/assets/trash-icon.svg";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import Tooltip from "../tooltip/Tooltip.svelte";
   type Mode = "READ" | "WRITE";
-
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   export let keyValue: EnvValuePair[];
   export let callback: (pairs: EnvValuePair[]) => void;
   export let mode: Mode = "WRITE";
@@ -188,7 +191,7 @@
                     placeholder="Enter Variable"
                     class="form-control py-1"
                     style="font-size: 13px;"
-                    disabled
+                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
                     bind:value={readable.key}
                   />
                   <div class="me-2 my-auto edit-icon">
@@ -203,7 +206,7 @@
                     placeholder="Enter Value"
                     class="form-control py-1"
                     style="font-size: 13px;"
-                    disabled
+                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
                     bind:value={readable.value}
                   />
                   <div class="me-2 my-auto edit-icon">

@@ -13,9 +13,13 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   import { notifications } from "$lib/utils/notifications";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
 
   let componentData: NewTab;
   let description: string;
@@ -179,11 +183,13 @@
           <p
             class="description-field text-labelColor"
             on:click={() => {
-              collectionsMethods.updateRequestState(
-                !isSaveDescription,
-                "isSaveDescription",
-              );
-            }}
+              if(hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_API_DESC)){
+                collectionsMethods.updateRequestState(
+                  !isSaveDescription,
+                  "isSaveDescription",
+                  );
+                }}
+              }
           >
             <img src={EditIcon} alt="" />
             Edit

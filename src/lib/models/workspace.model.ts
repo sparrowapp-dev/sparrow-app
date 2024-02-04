@@ -21,9 +21,8 @@ export const workspaceSchemaLiteral = {
       type: "string",
     },
     team: {
-      type: "array",
-      items: {
-        type: "object",
+      type: "object",
+      properties: {
         teamId: {
           type: "string",
         },
@@ -58,7 +57,7 @@ export const workspaceSchemaLiteral = {
             type: "string",
           },
           id: {
-            type: "number",
+            type: "string",
           },
           name: {
             type: "string",

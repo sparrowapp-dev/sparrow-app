@@ -6,7 +6,7 @@
   export let title;
   export let description;
   export let onSuccess;
-  export let onCancel;
+  export let onCancel:()=>void;
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -20,7 +20,7 @@
   <div
     class="background-overlay"
     on:click={() => {
-      onCancel(false);
+      onCancel();
     }}
     transition:fade={{ delay: 0, duration: 100 }}
   />
@@ -37,9 +37,7 @@
       </h5>
       <button
         class="btn-close1 border-0 rounded"
-        on:click={() => {
-          onCancel(false);
-        }}
+        on:click={onCancel}
       >
         <img src={closeIcon} alt="" />
       </button>
@@ -57,9 +55,7 @@
         fontSize={14}
         type={"dark"}
         loader={false}
-        onClick={() => {
-          onCancel(false);
-        }}
+        onClick={onCancel}
       />
 
       <CustomButton

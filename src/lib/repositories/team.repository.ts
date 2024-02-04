@@ -1,4 +1,6 @@
 import { RxDB, type TeamDocument } from "$lib/database/app.database";
+import { TeamRole } from "$lib/utils/enums";
+import type { userDetails } from "$lib/utils/interfaces";
 import type { Observable } from "rxjs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -143,7 +145,7 @@ export class TeamRepository {
   /**
    * get teams data
    */
-  public getTeamData = (): Observable<TeamDocument> => {
+  public getTeamData = (): TeamDocument[] => {
     return RxDB.getInstance().rxdb.team.find().exec();
   };
 
@@ -186,6 +188,51 @@ export class TeamRepository {
     return;
   };
 
+  public updateUserRoleInTeam = async (
+    teamId: string,
+    userId: string,
+    role: TeamRole,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+
+    team._data.users.forEach((user: userDetails) => {
+      if (user.id === userId) {
+        user.role = role;
+        return;
+      }
+    });
+
+    team.incrementalPatch({
+      users: [...team.users],
+    });
+  };
+
+  public removeUserFromTeam = async (
+    teamId: string,
+    userId: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    const filteredUsers = team._data.users.filter((user: any) => {
+      return user.id !== userId;
+    });
+
+    team.incrementalPatch({
+      users: filteredUsers,
+    });
+  };
+
   public removeTeam = async (teamId: string) => {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
@@ -195,5 +242,28 @@ export class TeamRepository {
       })
       .exec();
     return await team.remove();
+  };
+
+  public removeWorkspaceFromTeam = async (
+    teamId: string,
+    workspaceId: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    const filteredWorkspaces = team._data.workspaces.filter(
+      (workspace: { workspaceId: string; name: string }) => {
+        return workspace.workspaceId !== workspaceId;
+      },
+    );
+
+    team.incrementalPatch({
+      workspaces: filteredWorkspaces,
+    });
+    return;
   };
 }

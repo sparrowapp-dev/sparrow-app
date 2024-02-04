@@ -11,7 +11,11 @@ import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
-import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
+import {
+  RxDB,
+  type TeamDocument,
+  type WorkspaceDocument,
+} from "$lib/database/app.database";
 import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
@@ -22,6 +26,12 @@ import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repo
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
 import { TeamRepository } from "$lib/repositories/team.repository";
+import type {
+  addUsersInWorkspace,
+  addUsersInWorkspacePayload,
+} from "$lib/utils/dto/workspace-dto";
+import type { WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -266,8 +276,99 @@ export class HeaderDashboardViewModel {
   public getServerEnvironments = async (workspaceId: string) => {
     return await this.environmentService.fetchAllEnvironments(workspaceId);
   };
+  public addUsersInWorkspace = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspacePayload,
+  ) => {
+    const response = await this.workspaceService.addUsersInWorkspace(
+      workspaceId,
+      addUsersInWorkspaceDto,
+    );
+    return response;
+  };
+  public getUserDetailsOfWorkspace = async (workspaceId: string) => {
+    const userDetails =
+      await this.workspaceService.getUserDetailsOfWorkspace(workspaceId);
+    return userDetails;
+  };
+
+  public updateUserRoleInWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    role: WorkspaceRole,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      workspaceId,
+      userId,
+      role,
+    );
+    return response;
+  };
+  public updateUserRoleInWorkspaceInRXDB = async (
+    workspaceId: string,
+    userId: string,
+    role: WorkspaceRole,
+  ): Promise<void> => {
+    await this.workspaceRepository.updateUserRoleInWorkspace(
+      workspaceId,
+      userId,
+      role,
+    );
+  };
+
+  public addUsersInWorkspaceInRxDB = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspace[],
+  ): Promise<void> => {
+    await this.workspaceRepository.addUserInWorkspace(
+      workspaceId,
+      addUsersInWorkspaceDto,
+    );
+  };
+
+  public isUserInMultipleWorkspaces = async (
+    userId: string,
+  ): Promise<boolean> => {
+    return await this.workspaceRepository.isUserInMultipleWorkspaces(userId);
+  };
+
+  public removeUserFromWorkspaceRxDB = async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> => {
+    await this.workspaceRepository.removeUserFromWorkspace(workspaceId, userId);
+  };
+
+  public deleteUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<MakeRequestResponse> => {
+    return await this.workspaceService.removeUserFromWorkspace(
+      workspaceId,
+      userId,
+    );
+  };
 
   public removeWorkspace = async (workspaceId: string) => {
     return await this.workspaceRepository.deleteWorkspace(workspaceId);
+  };
+
+  public deleteWorkspace = async (
+    workspaceId: string,
+  ): Promise<MakeRequestResponse> => {
+    return await this.workspaceService.deleteWorkspace(workspaceId);
+  };
+
+  public handleWorkspaceDeletion = async (
+    teamId: string,
+    workspaceId: string,
+  ): Promise<void> => {
+    await this.removeWorkspace(workspaceId);
+    await this.teamRepository.removeWorkspaceFromTeam(teamId, workspaceId);
+    return;
+  };
+
+  public getActiveteam = (): Observable<TeamDocument> => {
+    return this.teamRepository.getActiveTeam();
   };
 }
