@@ -247,7 +247,7 @@
   const onUpdateWorkspaceDescription = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-        "updateDescriptionFieldWorkspace",
+        "workspaceDescription",
       ) as HTMLInputElement;
       inputField.blur();
     }
@@ -287,7 +287,7 @@
       <div class="d-flex align-items-start ps-0 h-100">
         <textarea
           value={workspaceDescription}
-          id="updateDescriptionFieldWorkspace"
+          id="workspaceDescription"
           {autofocus}
           class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
           on:input={(event) => {

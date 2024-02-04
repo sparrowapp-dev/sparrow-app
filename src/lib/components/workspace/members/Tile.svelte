@@ -50,13 +50,7 @@
      isMemberInfoPopup:false,
     isMemberOwnershipPopup:false,
   }
-  // let isMemberRemovePopup = false;
-  // let isMemberPromotePopup = false;
-  // let isMemberDemotePopup = false;
-  // let isMemberInfoPopup = false;
-  // let isMemberOwnershipPopup = false;
-
-
+ 
   const handlePopup = (flag: boolean, popType: MemberPopType): void => {
     switch (popType) {
       case "isMemberRemovePopup":
