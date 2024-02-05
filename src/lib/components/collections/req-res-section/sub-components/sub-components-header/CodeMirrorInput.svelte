@@ -13,6 +13,7 @@
     hoverTooltip,
     type Tooltip,
   } from "@codemirror/view";
+  import { environmentHoverHighlightStyle } from "./EnvironmentHighlight";
   export let currentTabId: string;
   export let rawValue: string;
   export let handleRawChange: () => void;
@@ -111,42 +112,6 @@
     aggregateEnvs: AggregateEnvironment[],
   ) => {
     const decorator = getMatchDecorator(aggregateEnvs);
-
-    return ViewPlugin.define(
-      (view) => ({
-        decorations: decorator.createDeco(view),
-        update(u) {
-          this.decorations = decorator.updateDeco(u, this.decorations);
-        },
-      }),
-      {
-        decorations: (v) => v.decorations,
-      },
-    );
-  };
-
-  function checkHoverEnv(env: string, aggregateEnvs: AggregateEnvironment[]) {
-    const className = aggregateEnvs.find(
-      (k: { key: string }) => k.key === env.slice(2, -2),
-    )
-      ? HOVER_FOUND
-      : HOVER_NOT_FOUND;
-
-    return Decoration.mark({
-      class: `${ENV_HIGHLIGHT} ${className}`,
-    });
-  }
-
-  const getHoverMatchDecorator = (aggregateEnvs: AggregateEnvironment[]) =>
-    new MatchDecorator({
-      regexp: ENVIRONMENT_REGEX,
-      decoration: (m) => checkHoverEnv(m[0], aggregateEnvs),
-    });
-
-  export const environmentHoverHighlightStyle = (
-    aggregateEnvs: AggregateEnvironment[],
-  ) => {
-    const decorator = getHoverMatchDecorator(aggregateEnvs);
 
     return ViewPlugin.define(
       (view) => ({
