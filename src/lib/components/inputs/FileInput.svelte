@@ -50,11 +50,11 @@
         <span class="sparrow-input-required">*</span>
       {/if}
     </div>
-    {#if value.length === 0}
+    {#if value.length === 0 || value.size === 0}
       <span class="sparrow-input-label-desc">{labelDescription}</span>
     {/if}
   </div>
-  {#if value.length == 0}
+  {#if value.length == 0 || value.size === 0}
     <div
       style="border: 3px dashed {showFileTypeError || showFileSizeError
         ? 'var(--dangerColor)'
@@ -115,7 +115,7 @@
       {/each}
     </div>
   {/if}
-  {#if !Array.isArray(value)}
+  {#if !Array.isArray(value) && value.size > 0}
     <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
       {#if value.bufferString}
         <img class="rounded p-2" src={base64ToURL(value)} alt="" />

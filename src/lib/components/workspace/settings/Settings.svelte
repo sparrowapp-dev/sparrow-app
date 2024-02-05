@@ -20,7 +20,7 @@
     },
   };
 
-  if (openTeam?.logo) {
+  if (openTeam?.logo?.bufferString) {
     uploadTeamIcon.file.value = openTeam?.logo;
   }
 
@@ -32,10 +32,17 @@
   });
 
   const handleUpdateTeam = async (property) => {
+    const blankFile = new File([""], "blank.jpg", {
+      type: "",
+      lastModified: 1706698162061,
+    });
     let data;
     if (property === "image") {
       data = {
-        image: uploadTeamIcon.file.value,
+        image:
+          uploadTeamIcon.file.value.length === 0
+            ? blankFile
+            : uploadTeamIcon.file.value,
       };
     } else if (property === "name") {
       if (!teamName) {
@@ -92,6 +99,7 @@
   };
   const handleLogoReset = (e: any) => {
     uploadTeamIcon.file.value = [];
+    handleUpdateTeam("image");
   };
   const handleLogoEdit = (e: any) => {
     const uploadFileInput = document.getElementById(
@@ -101,7 +109,6 @@
   };
 
   const blurInputField = (event, inputId) => {
-    console.log(event, inputId);
     if (event.key === "Enter") {
       const inputField = document.getElementById(inputId) as HTMLInputElement;
       inputField.blur();

@@ -117,10 +117,10 @@
           <div
             class="team-heading d-flex justify-content-between position-relative"
           >
-            <h2 class="d-flex ellipsis overflow-visible">
-              {#if openTeam?.logo?.bufferString}
+            <h2 class="d-flex ellipsis overflow-visible team-title">
+              {#if openTeam?.logo?.size}
                 <img
-                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
+                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
                   style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
                   src={base64ToURL(openTeam?.logo)}
                   alt=""
@@ -132,7 +132,7 @@
                   {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </p>
               {/if}
-              <span class="ms-4 my-auto ellipsis overflow-hidden"
+              <span class="ms-4 my-auto ellipsis overflow-hidden heading"
                 >{openTeam?.name}
               </span>
               <div class="mr-4 position-relative my-auto">
@@ -377,5 +377,11 @@
   .view-active {
     filter: invert(65%) sepia(63%) saturate(551%) hue-rotate(185deg)
       brightness(103%) contrast(104%);
+  }
+  .team-title {
+    width: calc(100% - 351px);
+  }
+  .heading {
+    max-width: calc(100% - 150px);
   }
 </style>
