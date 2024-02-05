@@ -28,9 +28,10 @@
   import { TeamViewModel } from "../Teams/team.viewModel";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
-  import { user } from "$lib/store";
+  import { user, userWorkspaceLevelRole } from "$lib/store";
   import { TeamRepository } from "$lib/repositories/team.repository";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
   const _dashboardViewModel = new DashboardViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
@@ -43,7 +44,7 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
-
+  let loggedInUserId:string;
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
   let currentTeam: CurrentTeam;
@@ -54,9 +55,11 @@
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
   let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
+  let loggedUserRoleInWorkspace:WorkspaceRole;
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
+      loggedInUserId=value._id;
       await _viewModelHome.refreshTeams(value._id);
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
@@ -73,6 +76,11 @@
         };
         let currentTeam = value.get("team");
         _viewModelHome.activateTeam(currentTeam.teamId);
+         value._data.users.forEach((user)=>{
+          if(user.id===loggedInUserId){
+            userWorkspaceLevelRole.set(user.role);
+          }
+        })
       }
     },
   );
@@ -199,6 +207,12 @@
 
   const getActiveTab = handleActiveTab();
 
+  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe((value:WorkspaceRole) => {
+    if(value){
+      loggedUserRoleInWorkspace=value;
+    }
+  });
+
   onMount(() => {
     handleResize();
     return () => {
@@ -233,7 +247,7 @@
       />
     {/if}
     <section class="w-100">
-      <Route path="/collections/*"><CollectionsHome /></Route>
+      <Route path="/collections/*"><CollectionsHome {loggedUserRoleInWorkspace} /></Route>
       <Route path="/workspaces/*"
         ><Teams
           {currentTeam}
@@ -245,7 +259,7 @@
         /></Route
       >
       <Route path="/mock/*"><Mock /></Route>
-      <Route path="/environment/*"><Environment /></Route>
+      <Route path="/environment/*"><Environment loggedUserRoleInWorkspace={loggedUserRoleInWorkspace} /></Route>
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#if activeSidebarTabName}

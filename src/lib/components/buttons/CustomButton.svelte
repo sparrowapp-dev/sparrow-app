@@ -9,7 +9,7 @@
   }
 
   export let text = "Submit";
-  export let onClick;
+  export let onClick:()=>void;
   export let type: "primary" | "dark" | "danger" | "transparent" = "primary";
   export let fontSize = 16;
   export let disable = false;

@@ -23,6 +23,7 @@
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -75,7 +76,7 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
   };
-
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const environments = _viewModel.environments;
@@ -164,6 +165,7 @@
         activePath={$activeTab?.path}
         environments={$environments}
         {collectionsMethods}
+        {loggedUserRoleInWorkspace}
       />
     </div>
     <div
@@ -190,6 +192,7 @@
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
             <RequestResponse
               {activeTab}
+              {loggedUserRoleInWorkspace}
               {collectionsMethods}
               environmentVariables={environmentVariables.reverse()}
             />
@@ -204,12 +207,14 @@
               {collectionsMethods}
               {activeTab}
               {_collectionListViewModel}
+              {loggedUserRoleInWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
             <MyCollection
               {collectionsMethods}
               {activeTab}
               {_collectionListViewModel}
+              {loggedUserRoleInWorkspace}
             />
           {/if}
         </div>

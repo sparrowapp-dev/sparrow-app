@@ -18,9 +18,12 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
   import { RequestDataset } from "$lib/utils/enums/request.enum";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   let display: boolean = false;
   window.addEventListener("click", () => {
     display = false;
@@ -247,7 +250,7 @@
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
-            disabled={componentData?.save}
+            disabled={componentData?.save || !hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.SAVE_REQUEST)}
             style="width:140px;"
             class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
@@ -274,7 +277,7 @@
             </p>
           </button>
           <span class="position-relative" style="width:35px;">
-            <button
+            <button disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.SAVE_REQUEST)}
               id="save-dropdown"
               on:click={toggleDropdown}
               class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"

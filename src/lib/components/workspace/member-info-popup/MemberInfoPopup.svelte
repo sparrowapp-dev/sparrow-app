@@ -3,36 +3,53 @@
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { fly, fade } from "svelte/transition";
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
-  import { TeamRole } from "$lib/utils/enums/team.enum";
+  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import type {
-    TeamRepositoryMethods,
     TeamServiceMethods,
+    userDetails,
+    workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
+    import type { MemberPopType } from "$lib/utils/types/common.type";
 
-  export let title;
-  export let user;
-  export let workspaces;
-  export let onCancel;
-  export let userType;
-  export let handleMemberPromotePopUpCancel;
-  export let handleMemberDemotePopUpCancel;
-  export let handleMemberPopUpCancel;
-  export let handleMemberOwnershipPopUpCancel;
+  export let title: string;
+  export let user: userDetails;
+  export let teamRole: TeamRole;
+  export let workspaces: workspaceDocumentWithPosition[];
+  export let hasPermission: boolean = false;
+  export let onCancel: (flag: boolean) => void;
+  export let userType: TeamRole;
+  export let handlePopup: (flag: boolean, popType: MemberPopType) => void;
   export let owner: boolean = false;
-  export let teamServiceMethods: TeamServiceMethods;
+  export let teamServiceMethods: TeamServiceMethods = {};
   export let userId: string;
-  export let handleMemberPopUpSuccess;
-  export let getPermissionsData;
-
-  const handleDropdown = (id) => {
+  export let handleMemberPopUpSuccess = (flag: boolean) => {};
+  export let getPermissionsData: () => Array<{
+    name: string;
+    id: string;
+    color: string;
+  }>;
+  export let isWorkspaceMemberInfo = false;
+  export let handleDropDownWorkspaceLevel = (
+    currentRole: WorkspaceRole | "remove",
+  ) => {};
+  const handleDropdown = (id:"remove"|TeamRole) => {
     if (id === "remove") {
-      handleMemberPopUpCancel(true);
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.MEMBER) {
-      handleMemberDemotePopUpCancel(true);
-    } else if (user.role === TeamRole.MEMBER && id === TeamRole.ADMIN) {
-      handleMemberPromotePopUpCancel(true);
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.OWNER) {
-      handleMemberOwnershipPopUpCancel(true);
+      handlePopup(true,"isMemberRemovePopup");
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_MEMBER
+    ) {
+      handlePopup(true,"isMemberDemotePopup");
+    } else if (
+      user.role === TeamRole.TEAM_MEMBER &&
+      id === TeamRole.TEAM_ADMIN
+    ) {
+      handlePopup(true,"isMemberPromotePopup");
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_OWNER
+    ) {
+      handlePopup(true,"isMemberOwnershipPopup")
     }
   };
 
@@ -52,7 +69,8 @@
 <div class="environment-delete-popup">
   <div
     class="background-overlay"
-    on:click={() => {
+    on:click={(event) => {
+      event.stopPropagation();
       onCancel(false);
     }}
     transition:fade={{ delay: 0, duration: 100 }}
@@ -70,7 +88,8 @@
       </h5>
       <button
         class="btn-close1 border-0 rounded"
-        on:click={() => {
+        on:click={(event) => {
+          event.stopPropagation();
           onCancel(false);
         }}
       >
@@ -93,27 +112,36 @@
           </div>
         </div>
         <div class="position">
-          {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
+          {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)}
             <MemberDropdown
-              id={user.id}
+              workspaceId={user.workspaceId}
+              id={user.id + "owner-team-acess"}
               data={getPermissionsData()}
-              method={user.role ? user.role : ""}
-              onclick={handleDropdown}
+              method={isWorkspaceMemberInfo ? teamRole : user.role}
+              onclick={isWorkspaceMemberInfo
+                ? handleDropDownWorkspaceLevel
+                : handleDropdown}
             />
-          {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
+          {:else if userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_ADMIN : user.role === TeamRole.TEAM_ADMIN)}
             <MemberDropdown
-              id={user.id}
+              workspaceId={user.workspaceId}
+              id={user.id + "admin-team-access"}
               data={getPermissionsData()}
-              method={user.role ? user.role : ""}
-              onclick={handleDropdown}
+              method={isWorkspaceMemberInfo ? teamRole : user.role}
+              onclick={isWorkspaceMemberInfo
+                ? handleDropDownWorkspaceLevel
+                : handleDropdown}
             />
           {:else}
             <MemberDropdown
-              id={user.id}
+              workspaceId={user.workspaceId}
+              id={user.id + "admin-workspace-member-access"}
               disabled={true}
               data={getPermissionsData()}
-              method={user.role ? user.role : ""}
-              onclick={handleDropdown}
+              method={isWorkspaceMemberInfo ? teamRole : user.role}
+              onclick={isWorkspaceMemberInfo
+                ? handleDropDownWorkspaceLevel
+                : handleDropdown}
             />
           {/if}
         </div>
@@ -124,6 +152,7 @@
       {#each workspaces as workspace}
         {#if workspace.position}
           <MemberWorkspace
+            {teamRole}
             {workspace}
             {userType}
             {user}
@@ -131,6 +160,8 @@
             {userId}
             {workspaceCount}
             {handleMemberPopUpSuccess}
+            {isWorkspaceMemberInfo}
+            {handleDropDownWorkspaceLevel}
           />
         {/if}
       {/each}

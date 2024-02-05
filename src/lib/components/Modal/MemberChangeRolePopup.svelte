@@ -4,13 +4,14 @@
   import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
 
-  export let title;
+  export let title:string;
   export let description;
-  export let teamName;
-  export let teamLogo;
+  export let teamName:string;
+  export let teamLogo:string;
   export let onSuccess;
-  export let onCancel;
+  export let onCancel:()=>void;
   export let auth = false;
+  export let isTeam=true;
 
   let confirmationText = "";
   let confirmationError = "";
@@ -26,9 +27,7 @@
 <div class="environment-delete-popup">
   <div
     class="background-overlay"
-    on:click={() => {
-      onCancel(false);
-    }}
+    on:click={onCancel}
     transition:fade={{ delay: 0, duration: 100 }}
   />
 
@@ -40,13 +39,11 @@
   >
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
-        {title}
+        {title} 
       </h5>
       <button
         class="btn-close1 border-0 rounded"
-        on:click={() => {
-          onCancel(false);
-        }}
+        on:click={onCancel}
       >
         <img src={closeIcon} alt="" />
       </button>
@@ -56,7 +53,7 @@
     </div>
     {#if auth}
       <p class="confirm-header mb-0">
-        Enter Team name to confirm<span class="asterik">*</span>
+        Enter {isTeam?"Team":"Workspace"} name to confirm<span class="asterik">*</span>
       </p>
       <input
         id="input"
@@ -71,9 +68,9 @@
         }}
         on:blur={() => {
           if (confirmationText === "") {
-            confirmationError = "Team name cannot be empty.";
+            confirmationError = `${isTeam?"Team":"Workspace"} name cannot be empty.`;
           } else if (confirmationText !== teamName) {
-            confirmationError = "Team name does not match.";
+            confirmationError = `${isTeam?"Team":"Workspace"} name does not match.`;
           } else {
             confirmationError = "";
           }
@@ -97,6 +94,7 @@
         {/if}
         <p style="font-size:16px;" class="mb-0">{teamName}</p>
       </div>
+      {#if isTeam}
       <CustomButton
         disable={deleteLoader || (confirmationText !== teamName && auth)}
         text={"Update Access"}
@@ -107,6 +105,31 @@
           handleDelete();
         }}
       />
+      {:else}
+      <div
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
+      style="font-size: 16px;"
+    >
+      <CustomButton
+      disable={deleteLoader}
+      text={"Cancel"}
+      fontSize={14}
+      type={"dark"}
+      loader={false}
+      onClick={onCancel}
+    />
+
+    <CustomButton
+      disable={deleteLoader}
+      text={"Delete Workspace"}
+      fontSize={14}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={handleDelete}
+      
+    />
+    </div>
+     {/if}
     </div>
   </div>
 </div>
