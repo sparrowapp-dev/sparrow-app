@@ -9,6 +9,13 @@
   export let openTeam: Team;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
+
+  enum TeamProperty {
+    IMAGE = "image",
+    NAME = "name",
+    DESCRIPTION = "description",
+  }
+
   let teamName: string = openTeam?.name;
   let teamDescription: string = openTeam.description;
   let uploadTeamIcon = {
@@ -37,21 +44,21 @@
       lastModified: 1706698162061,
     });
     let data;
-    if (property === "image") {
+    if (property === TeamProperty.IMAGE) {
       data = {
         image:
           uploadTeamIcon.file.value.length === 0
             ? blankFile
             : uploadTeamIcon.file.value,
       };
-    } else if (property === "name") {
+    } else if (property === TeamProperty.NAME) {
       if (!teamName) {
         teamName = openTeam?.name;
       }
       data = {
         name: teamName,
       };
-    } else if (property === "description") {
+    } else if (property === TeamProperty.DESCRIPTION) {
       data = {
         description: teamDescription,
       };
@@ -97,7 +104,7 @@
     uploadTeamIcon.file.value =
       (targetFile && targetFile[0]) ||
       (dataTransferFile && dataTransferFile[0]);
-    handleUpdateTeam("image");
+    handleUpdateTeam(TeamProperty.IMAGE);
   };
   const handleLogoReset = (e: any) => {
     uploadTeamIcon.file = {
@@ -106,7 +113,7 @@
       showFileSizeError: false,
       showFileTypeError: false,
     };
-    handleUpdateTeam("image");
+    handleUpdateTeam(TeamProperty.IMAGE);
   };
   const handleLogoEdit = (e: any) => {
     const uploadFileInput = document.getElementById(

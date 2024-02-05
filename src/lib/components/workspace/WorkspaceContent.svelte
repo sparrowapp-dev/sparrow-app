@@ -188,19 +188,19 @@
               </div>
             </h2>
 
-            {#if userType && userType !== "member"}
-              <div class="d-flex align-items-end justify-content-end">
-                {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
-                  <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
-                    <PeopleIcon
-                      color={"#8A9299"}
-                      classProp="mx-2 my-auto d-flex"
-                    />
-                    <span class="my-auto"
-                      >{$currOpenedTeamRxDoc?._data?.users.length} Members</span
-                    >
-                  </p>
-                {/if}
+            <div class="d-flex align-items-end justify-content-end">
+              {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
+                <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
+                  <PeopleIcon
+                    color={"#8A9299"}
+                    classProp="mx-2 my-auto d-flex"
+                  />
+                  <span class="my-auto"
+                    >{$currOpenedTeamRxDoc?._data?.users.length} Members</span
+                  >
+                </p>
+              {/if}
+              {#if userType && userType !== "member"}
                 <CustomButton
                   text={`Invite`}
                   type={`dark`}
@@ -220,8 +220,8 @@
                   classProp={`my-auto `}
                   styleProp={`height: 30px;`}
                 />
-              </div>
-            {/if}
+              {/if}
+            </div>
           </div>
         </div>
       </div>
