@@ -1,61 +1,78 @@
 <script lang="ts">
   import RemoveConfirmationPopup from "$lib/components/Modal/RemoveConfirmationPopup.svelte";
-
   import MemberChangeRolePopup from "$lib/components/Modal/MemberChangeRolePopup.svelte";
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
+    userDetails,
+    workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
-  export let user;
-  export let userType;
+  import type { MemberPopType } from "$lib/utils/types/common.type";
+  export let user: userDetails;
+  export let userType: TeamRole;
   export let openTeam;
   export let teamServiceMethods: TeamServiceMethods;
   export let teamRepositoryMethods: TeamRepositoryMethods;
-  export let workspaces;
-  export let userId;
+  export let workspaces: workspaceDocumentWithPosition;
+  export let userId: string;
   export let owner: boolean = false;
 
-  const handleDropdown = (id) => {
+  const handleDropdown = (id: TeamRole | "remove") => {
     if (id === "remove") {
-      isMemberRemovePopup = true;
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.MEMBER) {
-      isMemberDemotePopup = true;
-    } else if (user.role === TeamRole.MEMBER && id === TeamRole.ADMIN) {
-      isMemberPromotePopup = true;
-    } else if (user.role === TeamRole.ADMIN && id === TeamRole.OWNER) {
-      isMemberOwnershipPopup = true;
+      memberPopObj.isMemberRemovePopup = true;
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_MEMBER
+    ) {
+      memberPopObj.isMemberDemotePopup = true;
+    } else if (
+      user.role === TeamRole.TEAM_MEMBER &&
+      id === TeamRole.TEAM_ADMIN
+    ) {
+      memberPopObj.isMemberPromotePopup = true;
+    } else if (
+      user.role === TeamRole.TEAM_ADMIN &&
+      id === TeamRole.TEAM_OWNER
+    ) {
+      memberPopObj.isMemberOwnershipPopup = true;
     }
   };
-  let isMemberRemovePopup = false;
-  let isMemberPromotePopup = false;
-  let isMemberDemotePopup = false;
-  let isMemberInfoPopup = false;
-  let isMemberOwnershipPopup = false;
-
-  const handleMemberPopUpCancel = (flag) => {
-    isMemberRemovePopup = flag;
+  const memberPopObj={
+    isMemberRemovePopup:false,
+    isMemberPromotePopup:false,
+    isMemberDemotePopup :false,
+     isMemberInfoPopup:false,
+    isMemberOwnershipPopup:false,
+  }
+ 
+  const handlePopup = (flag: boolean, popType: MemberPopType): void => {
+    switch (popType) {
+      case "isMemberRemovePopup":
+        memberPopObj.isMemberRemovePopup = flag;
+        break;
+      case "isMemberPromotePopup":
+        memberPopObj.isMemberPromotePopup = flag;
+        break;
+      case "isMemberDemotePopup":
+        memberPopObj.isMemberDemotePopup = flag;
+        break;
+      case "isMemberInfoPopup":
+        memberPopObj.isMemberInfoPopup = flag;
+        break;
+      case "isMemberOwnershipPopup":
+        memberPopObj.isMemberOwnershipPopup = flag;
+        break;
+      default:
+        break;
+    }
   };
-  const handleMemberPromotePopUpCancel = (flag) => {
-    isMemberPromotePopup = flag;
-  };
-
-  const handleMemberDemotePopUpCancel = (flag) => {
-    isMemberDemotePopup = flag;
-  };
-  const handleMemberInfoPopUpCancel = (flag) => {
-    isMemberInfoPopup = flag;
-  };
-
-  const handleMemberOwnershipPopUpCancel = (flag) => {
-    isMemberOwnershipPopup = flag;
-  };
-
+  
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
       openTeam.teamId,
@@ -64,7 +81,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberRemovePopup = false;
+      memberPopObj.isMemberRemovePopup = false;
       notifications.success(`${user.name} is removed from ${openTeam.name}`);
     } else {
       notifications.error(
@@ -80,7 +97,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberDemotePopup = false;
+      memberPopObj.isMemberDemotePopup = false;
       notifications.success(`${user.name} is now a member`);
     } else {
       notifications.error(
@@ -88,7 +105,7 @@
       );
     }
   };
-  const handleMemberPromotePopUpSuccess = async () => {
+  export const handleMemberPromotePopUpSuccess = async () => {
     const response = await teamServiceMethods.promoteToAdminAtTeam(
       openTeam.teamId,
       user.id,
@@ -96,7 +113,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberPromotePopup = false;
+      memberPopObj.isMemberPromotePopup = false;
       notifications.success(`${user.name} is now an admin`);
     } else {
       notifications.error(
@@ -113,7 +130,7 @@
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      isMemberOwnershipPopup = false;
+      memberPopObj.isMemberOwnershipPopup = false;
       notifications.success(
         `${user.name} is now the new Owner of ${openTeam.name}.`,
       );
@@ -123,22 +140,23 @@
       );
     }
   };
-  let getPermissionsData = () => {
+  export let getPermissionsData = () => {
     const commonPermissions = [
       {
         name: "Admin",
-        id: TeamRole.ADMIN,
+        id: TeamRole.TEAM_ADMIN,
         color: "whiteColor",
       },
       {
         name: "Member",
-        id: TeamRole.MEMBER,
+        id: TeamRole.TEAM_MEMBER,
         color: "whiteColor",
       },
     ];
     if (
-      (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) ||
-      (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)
+      (userType === TeamRole.TEAM_OWNER &&
+        user.role === TeamRole.TEAM_MEMBER) ||
+      (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)
     ) {
       return [
         ...commonPermissions,
@@ -148,11 +166,14 @@
           color: "dangerColor",
         },
       ];
-    } else if (userType === TeamRole.OWNER && user.role === TeamRole.ADMIN) {
+    } else if (
+      userType === TeamRole.TEAM_OWNER &&
+      user.role === TeamRole.TEAM_ADMIN
+    ) {
       return [
         {
           name: "Owner",
-          id: TeamRole.OWNER,
+          id: TeamRole.TEAM_OWNER,
           color: "whiteColor",
         },
         ...commonPermissions,
@@ -166,7 +187,7 @@
       return [
         {
           name: "Owner",
-          id: TeamRole.OWNER,
+          id: TeamRole.TEAM_OWNER,
           color: "whiteColor",
         },
         ...commonPermissions,
@@ -175,7 +196,7 @@
   };
 </script>
 
-{#if isMemberRemovePopup}
+{#if memberPopObj.isMemberRemovePopup}
   <RemoveConfirmationPopup
     title={`Remove user?`}
     description={`<p style="font-size:12px;" class="text-textColor">
@@ -186,11 +207,13 @@
         class="text-whiteColor">"${openTeam?.name}"</span> team.
     </p>`}
     onSuccess={handleMemberPopUpSuccess}
-    onCancel={handleMemberPopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberRemovePopup");
+    }}
   />
 {/if}
 
-{#if isMemberPromotePopup}
+{#if memberPopObj.isMemberPromotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
     teamName={openTeam?.name}
@@ -226,11 +249,13 @@
     </ul>
     `}
     onSuccess={handleMemberPromotePopUpSuccess}
-    onCancel={handleMemberPromotePopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberPromotePopup");
+    }}
   />
 {/if}
 
-{#if isMemberDemotePopup}
+{#if memberPopObj.isMemberDemotePopup}
   <MemberChangeRolePopup
     title={`Changing Role?`}
     teamName={openTeam?.name}
@@ -262,11 +287,13 @@
       
       `}
     onSuccess={handleMemberDemotePopUpSuccess}
-    onCancel={handleMemberDemotePopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberDemotePopup");
+    }}
   />
 {/if}
 
-{#if isMemberOwnershipPopup}
+{#if memberPopObj.isMemberOwnershipPopup}
   <MemberChangeRolePopup
     auth={true}
     title={`Changing Role?`}
@@ -303,11 +330,11 @@
       
       `}
     onSuccess={handleMemberOwnershipPopUpSuccess}
-    onCancel={handleMemberOwnershipPopUpCancel}
+    onCancel={()=>{handlePopup(false,"isMemberOwnershipPopup")}}
   />
 {/if}
 
-{#if isMemberInfoPopup}
+{#if memberPopObj.isMemberInfoPopup}
   <MemberInfoPopup
     {owner}
     title={`Access to ${openTeam.name}`}
@@ -324,11 +351,10 @@
     })}
     {userType}
     {userId}
-    onCancel={handleMemberInfoPopUpCancel}
-    {handleMemberPopUpCancel}
-    {handleMemberPromotePopUpCancel}
-    {handleMemberDemotePopUpCancel}
-    {handleMemberOwnershipPopUpCancel}
+    onCancel={() => {
+      handlePopup(false, "isMemberInfoPopup");
+    }}
+    {handlePopup}
     {teamServiceMethods}
     {handleMemberPopUpSuccess}
     {getPermissionsData}
@@ -338,7 +364,7 @@
   <div
     class="info d-flex align-items-center"
     on:click={() => {
-      isMemberInfoPopup = true;
+      memberPopObj.isMemberInfoPopup = true;
     }}
   >
     <div class="icon d-flex align-items-center justify-content-center">
@@ -352,14 +378,14 @@
     </div>
   </div>
   <div class="position">
-    {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
+    {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <MemberDropdown
         id={user.id + uuidv4()}
         data={getPermissionsData()}
         method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
-    {:else if userType === TeamRole.OWNER && user.role === TeamRole.ADMIN}
+    {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <MemberDropdown
         id={user.id + uuidv4()}
         data={getPermissionsData()}

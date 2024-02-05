@@ -11,11 +11,15 @@
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
 
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let _collectionListViewModel: CollectionListViewModel;
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
   let isLoading: boolean = false;
@@ -162,6 +166,7 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
+       disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_COLLECTION_DESC)}
         type="text"
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"

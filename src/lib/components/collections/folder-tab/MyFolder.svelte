@@ -13,9 +13,13 @@
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
   export let _collectionListViewModel:CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
@@ -150,7 +154,8 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-        type="textarea"
+       type="textarea"
+       disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_FOLDER_DESC)}
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
