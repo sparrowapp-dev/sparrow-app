@@ -317,7 +317,7 @@
 
   onDestroy(() => {
     window.removeEventListener("resize", handleResize);
-    // activeWorkspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscribe.unsubscribe();
   });
 
   const handleKeyPress = (event) => {
@@ -376,41 +376,6 @@
         method={method ? method : ""}
         onclick={handleDropdown}
       />
-      <!-- <input
-        required
-        type="text"
-        id="input-request-url"
-        placeholder="Enter URL or paste text"
-        class="url-input form-control input-outline border-0 p-3 rounded {isInputEmpty
-          ? 'border-red'
-          : ''}"
-        autocomplete="off"
-        spellcheck="false"
-        autocorrect="off"
-        autocapitalize="off"
-        style="width:{isCollaps ? '100%' : ''}; height:34px;"
-        bind:value={urlText}
-        on:input={handleInputValue}
-        on:keydown={(e) => handleKeyPress(e)}
-        on:keyup={(e) => {
-          console.log("e", e);
-          trackCursor = e.target.selectionStart;
-        }}
-        on:blur={() => {
-          setTimeout(() => {
-            trackParanthesis = [];
-            trackCursor = undefined;
-            filterData = [];
-          }, 300);
-        }}
-        on:focus={(e) => {
-          handleInputValue();
-          const elem = document.getElementById("input-request-url");
-          environmentAxisY = elem.getBoundingClientRect().top + 40;
-          environmentAxisX = elem.getBoundingClientRect().left;
-        }}
-        bind:this={inputElement}
-      /> -->
       <CodeMirrorInput
         rawValue={urlText}
         handleRawChange={handleInputValue}
