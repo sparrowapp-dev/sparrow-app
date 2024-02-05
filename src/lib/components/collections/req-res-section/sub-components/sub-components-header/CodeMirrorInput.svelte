@@ -32,6 +32,7 @@
   const ENV_HIGHLIGHT = "env-highlight";
   const ENV_HIGHLIGHT_FOUND = "env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found";
+  const HOVER_TIME = 3000;
   let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
@@ -71,7 +72,10 @@
     if (boxes.length > 0) {
       for (const box of boxes) {
         box.addEventListener("click", function handleClick(event) {
-          if (!filterData.find((k: { key: string }) => k.key === localEnvKey)) {
+          const envExist = filterData.find(
+            (k: { key: string }) => k.key === localEnvKey,
+          );
+          if (!envExist) {
             handleEnvironmentBox(true, localEnvKey);
           }
         });
@@ -139,7 +143,7 @@
               environmentHighlightStyle(filterData),
             ]),
           });
-        }, 3000);
+        }, HOVER_TIME);
         let start = 0,
           end = 0;
         for (let index = pos; index > from; index--) {
@@ -218,6 +222,5 @@
 <style>
   #input-request-url {
     width: 100%;
-    height: 34px;
   }
 </style>

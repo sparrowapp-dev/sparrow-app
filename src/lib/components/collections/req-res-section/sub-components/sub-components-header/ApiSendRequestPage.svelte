@@ -253,7 +253,6 @@
       currentTabId,
     );
     trackParanthesis = environmentHelper.balanceParanthesis(urlText);
-    console.log("urlText", urlText);
   };
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -264,7 +263,6 @@
           await collectionsMethods.currentEnvironment(
             activeWorkspaceRxDoc.get("environmentId"),
           );
-        // collectionsMethods.
         if (env) {
           currentEnvironment = env.toMutableJSON();
         } else {
@@ -296,7 +294,6 @@
   };
   let handleKeyUpValue = (e: EditorSelection) => {
     trackCursor = e.main.head;
-    console.log("trackCursor", trackCursor, e);
   };
   let handleKeyDownChange = onDestroy(() => {
     isHorizontalUnsubscribe();

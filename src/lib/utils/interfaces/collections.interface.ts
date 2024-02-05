@@ -3,6 +3,7 @@ import type { CollectionDocument } from "$lib/database/app.database";
 import type {
   CreateApiRequestPostBody,
   CreateDirectoryPostBody,
+  EnvironmentResponseDto,
   UpdateEnvironmentPostBody,
 } from "../dto";
 import type { Observable } from "rxjs";
@@ -105,6 +106,6 @@ export interface CollectionsMethods {
     workspaceId: string,
     environmentId: string,
     environment: UpdateEnvironmentPostBody,
-  ) => any;
+  ) => Promise<EnvironmentResponseDto>;
   getGlobalEnvironment: () => any;
 }

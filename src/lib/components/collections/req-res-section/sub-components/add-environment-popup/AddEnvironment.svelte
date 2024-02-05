@@ -3,7 +3,10 @@
   import Cross from "$lib/assets/cross.svg";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { slide } from "svelte/transition";
-  import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
+  import type {
+    EnvironmentResponseDto,
+    UpdateEnvironmentPostBody,
+  } from "$lib/utils/dto";
   import { notifications } from "$lib/utils/notifications";
   export let environmentAxisX;
   export let environmentAxisY;
@@ -11,7 +14,7 @@
     workspaceId: string,
     environmentId: string,
     environment: UpdateEnvironmentPostBody,
-  ) => any;
+  ) => Promise<EnvironmentResponseDto>;
   export let currentWorkspaceId: string;
   export let currentEnvironment;
   export let globalEnvironment;
@@ -61,7 +64,6 @@
         modifiedGlobalEnvironment.id,
         payload,
       );
-      console.log("dataglobal", response);
       if (response.isSuccessful) {
         notifications.success("Environment Variable Added");
       } else {
@@ -84,7 +86,6 @@
         currentEnvironment.id,
         payload,
       );
-      console.log("datalocal", response);
       if (response.isSuccessful) {
         notifications.success("Environment Variable Added");
       } else {
@@ -117,7 +118,7 @@ left:{environmentAxisX}px;
         />
       </div>
     </div>
-    <p class="missing-discription" style="height: 30px;">
+    <p class="missing-discription" style="margin-top: 2%;">
       This variable is missing in your workspace. Try adding it as a global
       variable or under the active environment.
     </p>
@@ -130,7 +131,7 @@ left:{environmentAxisX}px;
         onClick={() => {
           addVariable = true;
         }}
-        styleProp={`align-items: center; justify-content: center; height: 30px; margin-top: 10px;`}
+        styleProp={`align-items: center; justify-content: center; height: 30px;`}
       />
     </div>
   </div>
@@ -278,7 +279,7 @@ left:{environmentAxisX}px;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
-    line-height: 150%; /* 18px */
+    line-height: 150%;
     align-self: stretch;
   }
   .form-check-input {
