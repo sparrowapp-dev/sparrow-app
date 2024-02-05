@@ -130,9 +130,11 @@
     color: var(--workspace-hover-color);
   }
   .teams-outer img {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 8px;
   }
   .sidebar-teams-list {
     max-height: 30vh;

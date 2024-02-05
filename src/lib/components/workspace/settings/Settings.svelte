@@ -74,6 +74,7 @@
       (dataTransferFile && dataTransferFile[0].size > maxSize * 1024)
     ) {
       uploadTeamIcon.file.showFileSizeError = true;
+      uploadTeamIcon.file.showFileTypeError = false;
       uploadTeamIcon.file.invalid = true;
       return;
     }
@@ -86,6 +87,7 @@
       .toLowerCase()}`;
     if (!supportedFileTypes.includes(fileType)) {
       uploadTeamIcon.file.showFileTypeError = true;
+      uploadTeamIcon.file.showFileSizeError = false;
       uploadTeamIcon.file.invalid = true;
       return;
     }
@@ -98,7 +100,12 @@
     handleUpdateTeam("image");
   };
   const handleLogoReset = (e: any) => {
-    uploadTeamIcon.file.value = [];
+    uploadTeamIcon.file = {
+      value: [],
+      invalid: false,
+      showFileSizeError: false,
+      showFileTypeError: false,
+    };
     handleUpdateTeam("image");
   };
   const handleLogoEdit = (e: any) => {
