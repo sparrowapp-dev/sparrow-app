@@ -12,9 +12,11 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
-  import FilePopup from "$lib/components/Modal/FilePopup.svelte";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { setBodyType } from "$lib/utils/helpers/auth.helper";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import { notifications } from "$lib/utils/notifications";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
 
   export let name: string;
   export let id: string;
@@ -215,9 +217,61 @@
       disabled: false,
     },
   ];
+
+  let deleteLoader: boolean = false;
+
+  const handleDelete = async () => {
+    if (folderId && collectionId && currentWorkspaceId) {
+      deleteLoader = true;
+      const response = await collectionService.deleteRequestInCollection(
+        api.id,
+        {
+          collectionId,
+          workspaceId: currentWorkspaceId,
+          folderId,
+        },
+      );
+      if (response.isSuccessful) {
+        collectionsMethods.deleteRequestInFolder(
+          collectionId,
+          folderId,
+          api.id,
+        );
+        notifications.success(`"${api.name}" Request deleted.`);
+        deleteLoader = false;
+        collectionsMethods.handleRemoveTab(api.id);
+        handleFilePopUp(false);
+      } else {
+        notifications.error("Failed to delete the Request.");
+        deleteLoader = false;
+      }
+    } else if (currentWorkspaceId && collectionId) {
+      deleteLoader = true;
+      const response = await collectionService.deleteRequestInCollection(
+        api.id,
+        {
+          collectionId,
+          workspaceId: currentWorkspaceId,
+        },
+      );
+      if (response.isSuccessful) {
+        collectionsMethods.deleteRequestOrFolderInCollection(
+          collectionId,
+          api.id,
+        );
+        notifications.success(`"${api.name}" Request deleted.`);
+        deleteLoader = false;
+        collectionsMethods.handleRemoveTab(api.id);
+        handleFilePopUp(false);
+      } else {
+        notifications.error("Failed to delete the Request.");
+        deleteLoader = false;
+      }
+    }
+  };
 </script>
 
-{#if isFilePopup}
+<!-- {#if isFilePopup}
   <FilePopup
     {collectionsMethods}
     {folderId}
@@ -226,7 +280,51 @@
     request={api}
     closePopup={handleFilePopUp}
   />
-{/if}
+{/if} -->
+
+<ModalWrapperV1
+  title={"Delete Request?"}
+  type={"danger"}
+  isOpen={isFilePopup}
+  handleModalState={handleFilePopUp}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <p>
+      Are you sure you want to delete this Request? <span
+        style="font-weight:700;"
+        class="text-whiteColor">"{api.name} "</span
+      >
+      will be removed.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <CustomButton
+      disable={deleteLoader}
+      text={"Cancel"}
+      fontSize={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handleFilePopUp(false);
+      }}
+    />
+
+    <CustomButton
+      disable={deleteLoader}
+      text={"Delete"}
+      fontSize={14}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        handleDelete();
+      }}
+    />
+  </div></ModalWrapperV1
+>
 
 {#if showMenu}
   <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
