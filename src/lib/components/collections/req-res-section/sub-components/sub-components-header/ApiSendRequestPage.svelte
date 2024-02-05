@@ -67,6 +67,7 @@
   let currentWorkspaceId: string;
   let globalEnvironment;
   let currentEnvironment;
+  let localEnvKey: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -329,30 +330,10 @@
       inputElement.focus();
     }
   };
-  const HOPP_ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_]+}})/g;
 
-  const isENVInString = (str: string) => {
-    return HOPP_ENVIRONMENT_REGEX.test(str);
-  };
-
-  const handleMissingEnv = (text: string) => {
-    if (isENVInString(text)) {
-      const envKey = text.slice(2, -2);
-      const className = environmentVariables.find(
-        (k: { key: string }) => k.key === envKey,
-      )
-        ? "found"
-        : "not found";
-
-      console.log(className, envKey);
-      envMissing = true;
-    } else {
-      // envMissing = false;
-    }
-  };
-
-  const handleEnvironmentBox = (change: boolean) => {
+  const handleEnvironmentBox = (change: boolean, envKey: string) => {
     envMissing = change;
+    localEnvKey = envKey;
   };
 </script>
 
@@ -439,9 +420,7 @@
         handleKeyUpChange={handleKeyUpValue}
         handleKeyDownChange={handleKeyPress}
         codeMirrorEditorDiv={inputElement}
-        {handleSendRequest}
         {currentTabId}
-        {handleMissingEnv}
         filterData={environmentVariables}
         {handleEnvironmentBox}
       />
@@ -468,6 +447,7 @@
           {currentEnvironment}
           {globalEnvironment}
           {handleEnvironmentBox}
+          {localEnvKey}
         />
       {/if}
 
