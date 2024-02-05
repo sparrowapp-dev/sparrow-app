@@ -32,8 +32,6 @@
   const ENV_HIGHLIGHT = "env-highlight";
   const ENV_HIGHLIGHT_FOUND = "env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found";
-  const HOVER_FOUND = "hover-found";
-  const HOVER_NOT_FOUND = "hover-not-found";
   let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
