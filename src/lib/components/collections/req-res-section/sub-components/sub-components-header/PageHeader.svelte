@@ -21,9 +21,10 @@
   import type { WorkspaceRole } from "$lib/utils/enums";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let display: boolean = false;
   window.addEventListener("click", () => {
     display = false;
@@ -250,7 +251,11 @@
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
           <button
-            disabled={componentData?.save || !hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.SAVE_REQUEST)}
+            disabled={componentData?.save ||
+              !hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
             style="width:140px;"
             class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
             on:click={() => {
@@ -277,7 +282,11 @@
             </p>
           </button>
           <span class="position-relative" style="width:35px;">
-            <button disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.SAVE_REQUEST)}
+            <button
+              disabled={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
               id="save-dropdown"
               on:click={toggleDropdown}
               class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
@@ -297,13 +306,20 @@
                 Save As
               </p>
             </div>
-            {#if visibility}
+            <ModalWrapperV1
+              title={"Save Request"}
+              type={"dark"}
+              width={840}
+              zIndex={11}
+              isOpen={visibility}
+              handleModalState={handleBackdrop}
+            >
               <SaveRequest
                 {collectionsMethods}
                 {componentData}
                 onClick={handleBackdrop}
               />
-            {/if}
+            </ModalWrapperV1>
           </span>
         </div>
         <div>

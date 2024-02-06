@@ -17,9 +17,10 @@
   import { notifications } from "$lib/utils/notifications";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let componentData: NewTab;
   let description: string;
@@ -183,13 +184,18 @@
           <p
             class="description-field text-labelColor"
             on:click={() => {
-              if(hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_API_DESC)){
+              if (
+                hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.EDIT_API_DESC,
+                )
+              ) {
                 collectionsMethods.updateRequestState(
                   !isSaveDescription,
                   "isSaveDescription",
-                  );
-                }}
+                );
               }
+            }}
           >
             <img src={EditIcon} alt="" />
             Edit
@@ -268,7 +274,14 @@
   </div>
 </div>
 
-{#if visibility}
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={840}
+  zIndex={11}
+  isOpen={visibility}
+  handleModalState={handleBackdrop}
+>
   <SaveRequest
     {collectionsMethods}
     {componentData}
@@ -281,7 +294,7 @@
     }}
     type="SAVE_DESCRIPTION"
   />
-{/if}
+</ModalWrapperV1>
 
 <style>
   .sidebar-right {

@@ -19,6 +19,7 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;
@@ -172,7 +173,14 @@
   </div>
 </div>
 
-{#if saveAsVisibility}
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={840}
+  zIndex={11}
+  isOpen={saveAsVisibility}
+  handleModalState={handleSaveAsBackdrop}
+>
   <SaveRequest
     {collectionsMethods}
     {_tabId}
@@ -182,8 +190,16 @@
     }}
     onClick={handleSaveAsBackdrop}
   />
-{/if}
-{#if closePopup}
+</ModalWrapperV1>
+
+<ModalWrapperV1
+  title={"Save Changes"}
+  type={"danger"}
+  width={540}
+  zIndex={9}
+  isOpen={closePopup}
+  handleModalState={handleClosePopupBackdrop}
+>
   <ClosePopup
     {collectionsMethods}
     onFinish={(_id) => {
@@ -193,7 +209,7 @@
     {handleSaveAsBackdrop}
     closeCallback={handleClosePopupBackdrop}
   />
-{/if}
+</ModalWrapperV1>
 
 <style>
   .tabbar {
