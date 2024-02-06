@@ -1,7 +1,4 @@
 <script lang="ts">
-  import closeIcon from "$lib/assets/close.svg";
-  import icons from "$lib/assets/app.asset";
-  import { fly, fade } from "svelte/transition";
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
   import { notifications } from "$lib/utils/notifications";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -11,13 +8,12 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import InvalidSyntaxPopup from "$lib/components/Modal/InvalidSyntaxPopup.svelte";
   import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
-  import Dropzone from "svelte-file-dropzone";
   import File from "./File.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import { FileInput } from "$lib/components";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -220,113 +216,126 @@
 {#if isLoading}
   <ProgressBar {onClick} />
 {/if}
-{#if isSyntaxError}
-  <InvalidSyntaxPopup {onClick} {handleError}></InvalidSyntaxPopup>
-{/if}
-{#if isResponseLoading}
-  <FetchDataProgressBar {onClick}></FetchDataProgressBar>
-{/if}
-{#if !isLoading && !isSyntaxError}
-  <div
-    class="background-overlay"
-    on:click={() => {
-      onClick(false);
-    }}
-    transition:fade={{ delay: 0, duration: 100 }}
-  />
 
-  <div
-    class="container d-flex flex-column mb-0 p-4"
-    transition:fly={{ y: 50, delay: 0, duration: 100 }}
-    on:introstart
-    on:outroend
-  >
-    <div class=" d-flex align-items-center justify-content-between mb-3">
-      <h5 class="mb-0 importData-whiteColor" style="font-weight: 500;">
-        New Collection
-      </h5>
-      <button
-        class="btn-close1 border-0 rounded"
-        on:click={() => {
-          onClick(false);
-        }}
-      >
-        <img src={closeIcon} alt="" />
-      </button>
-    </div>
-    <div style="font-size: 14px;" class="importData-lightGray">
-      <p>Paste your YAML/JSON file</p>
-    </div>
-    <div class="textarea-div rounded border-0">
-      <textarea
-        on:input={(e) => handleInputField(e)}
-        bind:value={importData}
-        class="form-control border-0 rounded bg-blackColor"
-      />
-    </div>
-    <div style="font-size: 14px;" class="importData-lightGray">
-      <p class="mb-1">Drag and drop your YAML/JSON file</p>
-    </div>
+<ModalWrapperV1
+  title={"Incorrect File format"}
+  type={"dark"}
+  width={540}
+  zIndex={9}
+  isOpen={isSyntaxError}
+  handleModalState={onClick}
+>
+  <div class="invalid-type-content">
     <div>
-      <FileInput
-        value={uploadCollection.file.value}
-        maxFileSize={100}
-        onChange={handleLogoInputChange}
-        resetValue={handleLogoReset}
-        editValue={handleLogoEdit}
-        labelText=""
-        labelDescription="Drag and drop your YAML/JSON file"
-        inputId="upload-collection-file-input"
-        inputPlaceholder="Drag and Drop or"
-        isRequired={false}
-        supportedFileTypes={[".yaml", ".json"]}
-        showFileSizeError={uploadCollection.file.showFileSizeError}
-        showFileTypeError={uploadCollection.file.showFileTypeError}
-        type={"file"}
-        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
-        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
-      />
+      <p class="format-info">
+        We have identified that text you pasted is not the right file format.
+        Please ensure that you paste the following file formats only.
+      </p>
     </div>
-
-    <div
-      class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
-    >
+    <div class="format-types-container">
+      <p class="format-type">.YAML</p>
+      <p class="format-type">.JSON</p>
+    </div>
+    <div class="format-btns">
       <button
-        class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
-        on:click={() => {
-          handleImport();
-        }}
-      >
-        <span class="me-3">
-          {#if isLoading}
-            <Spinner size={"16px"} />
-          {/if}</span
-        > Import Collection</button
-      >
-
-      <p class="empty-data-error">
-        {#if isDataEmpty && !importData}
-          Please Paste or Upload your file in order to import the workspace
-        {/if}
-      </p>
-      <p
-        class="importData-whiteColor mb-2"
-        style="font-size: 14px;font-weight:300"
-      >
-        OR
-      </p>
-      <button
-        class="btn-primary border-0 w-100 py-2 fs-6 rounded"
+        class="format-btn"
         on:click={() => {
           onClick(false);
-          handleCreateCollection();
-        }}>Create Collection</button
+        }}>Close</button
+      >
+      <button
+        class="format-btn collection-btn"
+        on:click={() => {
+          handleError();
+        }}>+ Collection</button
       >
     </div>
   </div>
+</ModalWrapperV1>
+{#if isResponseLoading}
+  <FetchDataProgressBar {onClick}></FetchDataProgressBar>
 {/if}
 
-<style>
+<ModalWrapperV1
+  title={"New Collection"}
+  type={"dark"}
+  width={540}
+  zIndex={9}
+  isOpen={!isLoading && !isSyntaxError}
+  handleModalState={onClick}
+>
+  <div style="font-size: 14px;" class="importData-lightGray">
+    <p>Paste your YAML/JSON file</p>
+  </div>
+  <div class="textarea-div rounded border-0">
+    <textarea
+      on:input={(e) => handleInputField(e)}
+      bind:value={importData}
+      class="form-control border-0 rounded bg-blackColor"
+    />
+  </div>
+  <div style="font-size: 14px;" class="importData-lightGray">
+    <p class="mb-1">Drag and drop your YAML/JSON file</p>
+  </div>
+  <div>
+    <FileInput
+      value={uploadCollection.file.value}
+      maxFileSize={100}
+      onChange={handleLogoInputChange}
+      resetValue={handleLogoReset}
+      editValue={handleLogoEdit}
+      labelText=""
+      labelDescription="Drag and drop your YAML/JSON file"
+      inputId="upload-collection-file-input"
+      inputPlaceholder="Drag and Drop or"
+      isRequired={false}
+      supportedFileTypes={[".yaml", ".json"]}
+      showFileSizeError={uploadCollection.file.showFileSizeError}
+      showFileTypeError={uploadCollection.file.showFileTypeError}
+      type={"file"}
+      fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+      fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+    />
+  </div>
+
+  <div
+    class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
+  >
+    <button
+      class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
+      on:click={() => {
+        handleImport();
+      }}
+    >
+      <span class="me-3">
+        {#if isLoading}
+          <Spinner size={"16px"} />
+        {/if}</span
+      > Import Collection</button
+    >
+
+    <p class="empty-data-error">
+      {#if isDataEmpty && !importData}
+        Please Paste or Upload your file in order to import the workspace
+      {/if}
+    </p>
+    <p
+      class="importData-whiteColor mb-2"
+      style="font-size: 14px;font-weight:300"
+    >
+      OR
+    </p>
+    <button
+      class="btn-primary border-0 w-100 py-2 fs-6 rounded"
+      on:click={() => {
+        onClick(false);
+        handleCreateCollection();
+      }}>Create Collection</button
+    >
+  </div>
+</ModalWrapperV1>
+
+<style lang="scss">
   #file-input {
     display: none;
   }
@@ -390,5 +399,86 @@
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+  }
+  .invalid-type-content {
+    .format-types-container {
+      display: flex;
+      justify-content: space-between;
+      width: 25%;
+    }
+    .format-header {
+      font-family: Roboto;
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: 0em;
+      text-align: left;
+    }
+
+    .format-info {
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: 0em;
+      text-align: left;
+    }
+    .format-type {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: 0em;
+      text-align: left;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+    }
+    .format-btns {
+      width: 100%;
+      display: flex;
+      justify-content: end;
+      gap: 10px;
+    }
+    .format-btn {
+      background-color: var(--border-color);
+      border: none;
+      width: 20%;
+      border-radius: 4px;
+      padding: 2px;
+      font-family: Roboto;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0em;
+      text-align: center;
+      padding: 4px;
+    }
+    .format-btn:hover {
+      background-color: #616364;
+    }
+    .collection-btn {
+      background-color: var(--sparrow-blue);
+      color: var(--white-color);
+      font-family: Roboto;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0em;
+      text-align: center;
+    }
+    .collection-btn:hover {
+      background-color: var(--send1-hoverbutton);
+    }
+    .btn-close1 {
+      background-color: var(--background-color);
+    }
+
+    .btn-close1:hover {
+      background-color: var(--background-dropdown);
+    }
+
+    .btn-close1:active {
+      background-color: var(--background-dropdown);
+    }
   }
 </style>
