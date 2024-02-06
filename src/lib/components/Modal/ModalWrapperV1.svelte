@@ -12,17 +12,19 @@
 {#if isOpen}
   <div
     class="sparrow-modal-bg-overlay"
+    style={`z-index: ${zIndex}`}
     on:click={handleModalState(false)}
     transition:fade={{ delay: 0, duration: 100 }}
   />
   <div
     class="sparrow-modal-container gap-2 p-4"
+    style={`z-index: ${zIndex + 1}; width: ${width}px`}
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
   >
     <div class="sparrow-modal-header justify-content-between d-flex">
-      <h3 class="sparrow-modal-heading fw-normal">{title}</h3>
+      <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
       <button
         class="sparrow-modal-close-icon-btn border-0"
         on:click={handleModalState(false)}
@@ -45,17 +47,14 @@
     height: 100vh;
     background: var(--background-hover);
     backdrop-filter: blur(3px);
-    z-index: 9;
   }
   .sparrow-modal-container {
     position: fixed;
     height: auto;
-    width: 540px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 10;
     border-radius: 10px;
   }
   .sparrow-modal-heading {

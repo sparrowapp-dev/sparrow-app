@@ -286,6 +286,8 @@
 <ModalWrapperV1
   title={"Delete Folder?"}
   type={"danger"}
+  width={540}
+  zIndex={9}
   isOpen={isFolderPopup}
   handleModalState={handleFolderPopUp}
 >

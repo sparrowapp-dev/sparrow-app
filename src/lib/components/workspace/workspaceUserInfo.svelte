@@ -4,7 +4,11 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums";
-  import type { TeamRepositoryMethods, TeamServiceMethods, workspaceInviteMethods } from "$lib/utils/interfaces";
+  import type {
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+    workspaceInviteMethods,
+  } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
   import MemberDropDown from "../dropdown/MemberDropdown.svelte";
   import RemoveConfirmationPopup from "../Modal/RemoveConfirmationPopup.svelte";
@@ -15,9 +19,16 @@
   export let role: WorkspaceRole | TeamRole;
   export let loggedUserRole: TeamRole;
   export let currentTeamworkspaces: WorkspaceDocument[];
-  export let currentTeamDetails:{id:string,name:string}
-  export let teamWorkspaceMethods: Pick<TeamServiceMethods,'demoteToMemberAtTeam'|'promoteToAdminAtTeam'|'removeMembersAtTeam'|'refreshWorkspace'> & Pick <TeamRepositoryMethods,'updateUserRoleInTeam'|'removeUserFromTeam'>
-  export let workspaceInvitePermissonMethods:workspaceInviteMethods
+  export let currentTeamDetails: { id: string; name: string };
+  export let teamWorkspaceMethods: Pick<
+    TeamServiceMethods,
+    | "demoteToMemberAtTeam"
+    | "promoteToAdminAtTeam"
+    | "removeMembersAtTeam"
+    | "refreshWorkspace"
+  > &
+    Pick<TeamRepositoryMethods, "updateUserRoleInTeam" | "removeUserFromTeam">;
+  export let workspaceInvitePermissonMethods: workspaceInviteMethods;
   export let loggedInUser: boolean = false;
   export let hasPermission: boolean;
   export let currentWorkspaceDetails: { id: string; name: string };
@@ -32,10 +43,17 @@
     userId: string,
   ) => Promise<void>;
   const handleRemove = async (workspaceId: string, userId: string) => {
-    const response = await workspaceInvitePermissonMethods.deleteUserFromWorkspace(workspaceId, userId);
+    const response =
+      await workspaceInvitePermissonMethods.deleteUserFromWorkspace(
+        workspaceId,
+        userId,
+      );
     if (response && response?.data?.data) {
       await handleUserOnRemove(workspaceId, userId);
-      await workspaceInvitePermissonMethods.deleteUserFromWorkspaceRxDB(workspaceId, userId);
+      await workspaceInvitePermissonMethods.deleteUserFromWorkspaceRxDB(
+        workspaceId,
+        userId,
+      );
       notifications.success(
         `${name} removed from ${currentWorkspaceDetails.name}`,
       );
@@ -50,7 +68,7 @@
   const handleDropdown = async (
     currentRole: TeamRole | WorkspaceRole | "remove" | "teamRemove",
     workspaceId?: string,
-  ) => {   
+  ) => {
     activeWorkspaceOpertionId = workspaceId
       ? workspaceId
       : currentWorkspaceDetails.id;
@@ -62,7 +80,11 @@
       if (response) {
         role = currentRole;
         teamRole = currentRole;
-        teamWorkspaceMethods.updateUserRoleInTeam(currentTeamDetails.id, id, teamRole);
+        teamWorkspaceMethods.updateUserRoleInTeam(
+          currentTeamDetails.id,
+          id,
+          teamRole,
+        );
         response.workspaces.map(
           async (workspace: { id: string; name: string }) => {
             await workspaceInvitePermissonMethods.updateUsersInWorkspaceInRXDB(
@@ -87,7 +109,11 @@
       if (response) {
         teamRole = currentRole;
         role = currentRole;
-        teamWorkspaceMethods.updateUserRoleInTeam(currentTeamDetails.id, id, teamRole);
+        teamWorkspaceMethods.updateUserRoleInTeam(
+          currentTeamDetails.id,
+          id,
+          teamRole,
+        );
         response.workspaces.map(
           async (workspace: { id: string; name: string }) => {
             await workspaceInvitePermissonMethods.updateUsersInWorkspaceInRXDB(
@@ -111,17 +137,24 @@
       (hasPermission && currentRole === WorkspaceRole.WORKSPACE_VIEWER) ||
       currentRole === WorkspaceRole.WORKSPACE_EDITOR
     ) {
-      const response = await workspaceInvitePermissonMethods.updateRoleInWorkspace(
-        activeWorkspaceOpertionId,
-        id,
-        currentRole,
-      );
+      const response =
+        await workspaceInvitePermissonMethods.updateRoleInWorkspace(
+          activeWorkspaceOpertionId,
+          id,
+          currentRole,
+        );
       if (response && response.data.data) {
-        await workspaceInvitePermissonMethods.updateUsersInWorkspaceInRXDB( activeWorkspaceOpertionId, id, currentRole);
+        await workspaceInvitePermissonMethods.updateUsersInWorkspaceInRXDB(
+          activeWorkspaceOpertionId,
+          id,
+          currentRole,
+        );
         handleNotification(true, `${name} is now an ${currentRole}`);
-      }else{
-        handleNotification(false, `Failed to change role for ${name}. Please try again.`);
-
+      } else {
+        handleNotification(
+          false,
+          `Failed to change role for ${name}. Please try again.`,
+        );
       }
     }
     if (hasPermission && currentRole === "remove") {
@@ -144,7 +177,9 @@
   };
   const checkIfUserExistInMultipleWorkspace = async (userId: string) => {
     isPartOfOnlythisWorkspace =
-      await workspaceInvitePermissonMethods.checkIfUserIsPartOfMutipleWorkspaces(userId);
+      await workspaceInvitePermissonMethods.checkIfUserIsPartOfMutipleWorkspaces(
+        userId,
+      );
   };
   let teamRole: TeamRole;
   currentActiveTeam._data.users.forEach((user) => {
@@ -161,7 +196,7 @@
     isMemberInfoPopup = showPopup;
   };
 
-  let getPermissionsData = () => {;
+  let getPermissionsData = () => {
     const commonPermissions = [
       {
         name: "Admin",
@@ -211,19 +246,28 @@
       ];
     }
   };
-  const handleRemoveUserFromTeam = async() => {
-    const response =await  teamWorkspaceMethods.removeMembersAtTeam(currentTeamDetails.id, id);
+  const handleRemoveUserFromTeam = async () => {
+    const response = await teamWorkspaceMethods.removeMembersAtTeam(
+      currentTeamDetails.id,
+      id,
+    );
     if (response) {
       teamWorkspaceMethods.removeUserFromTeam(currentTeamDetails.id, id);
       response.workspaces.map(
-          async (workspace: { id: string; name: string }) => {
-            await handleRemove(workspace.id,id);
-          },
-        );
-      
-      handleNotification(true, `${name} is removed from ${currentTeamDetails.name}`);
+        async (workspace: { id: string; name: string }) => {
+          await handleRemove(workspace.id, id);
+        },
+      );
+
+      handleNotification(
+        true,
+        `${name} is removed from ${currentTeamDetails.name}`,
+      );
     } else {
-      handleNotification(false, `$Failed to remove ${name}  from ${currentWorkspaceDetails.name}`);
+      handleNotification(
+        false,
+        `$Failed to remove ${name}  from ${currentWorkspaceDetails.name}`,
+      );
     }
   };
 </script>
@@ -331,7 +375,7 @@
 </div>
 
 {#if isMemberInfoPopup}
-  <MemberInfoPopup
+  <!-- <MemberInfoPopup
     owner={loggedInUser}
     {teamRole}
     title={`Access to ${currentTeamDetails.name}`}
@@ -360,7 +404,7 @@
     }}
     handleDropDownWorkspaceLevel={handleDropdown}
     isWorkspaceMemberInfo={true}
-  />
+  /> -->
 {/if}
 
 <style>

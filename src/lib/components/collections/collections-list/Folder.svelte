@@ -336,19 +336,11 @@
   };
 </script>
 
-<!-- {#if isCollectionPopup}
-  <CollectionPopup
-    {collectionsMethods}
-    {collection}
-    {collectionId}
-    workspaceId={currentWorkspaceId}
-    closePopup={handleCollectionPopUp}
-  />
-{/if} -->
-
 <ModalWrapperV1
   title={"Delete Collection?"}
   type={"danger"}
+  width={540}
+  zIndex={9}
   isOpen={isCollectionPopup}
   handleModalState={handleCollectionPopUp}
 >

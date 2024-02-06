@@ -271,20 +271,11 @@
   };
 </script>
 
-<!-- {#if isFilePopup}
-  <FilePopup
-    {collectionsMethods}
-    {folderId}
-    {collectionId}
-    workspaceId={currentWorkspaceId}
-    request={api}
-    closePopup={handleFilePopUp}
-  />
-{/if} -->
-
 <ModalWrapperV1
   title={"Delete Request?"}
   type={"danger"}
+  width={540}
+  zIndex={9}
   isOpen={isFilePopup}
   handleModalState={handleFilePopUp}
 >
