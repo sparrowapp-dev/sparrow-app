@@ -1,1 +1,1 @@
-export { default as CustomPopup } from "./CustomPopup.svelte";
+export { default as ModalWrapperV1 } from "./ModalWrapperV1.svelte";

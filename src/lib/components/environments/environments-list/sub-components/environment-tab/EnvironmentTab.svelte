@@ -218,7 +218,6 @@
       type={"danger"}
       loader={deleteEnvironmentLoader}
       onClick={async () => {
-        debugger;
         deleteEnvironmentLoader = true;
         await handleEnvironmentPopUpSuccess();
         deleteEnvironmentLoader = false;

@@ -481,36 +481,9 @@
     />
   </div>
 </ModalWrapperV1>
-<!-- ////////////////////////// -->
-<!-- {#if memberPopObj.isMemberInfoPopup}
-  <MemberInfoPopup
-    {owner}
-    title={`Access to ${openTeam.name}`}
-    {user}
-    workspaces={workspaces.map((elem) => {
-      let element = elem.toMutableJSON();
-      for (let i = 0; i < element.users.length; i++) {
-        if (element.users[i].id === user.id) {
-          element.position = elem.users[i].role;
-          break;
-        }
-      }
-      return element;
-    })}
-    {userType}
-    {userId}
-    onCancel={() => {
-      handlePopup(false, "isMemberInfoPopup");
-    }}
-    {handlePopup}
-    {teamServiceMethods}
-    {handleMemberPopUpSuccess}
-    {getPermissionsData}
-  />
-{/if} -->
 
 <ModalWrapperV1
-  title={`Access to ${openTeam.name}`}
+  title={`Access to ${openTeam?.name}`}
   type={"danger"}
   width={540}
   zIndex={7}
