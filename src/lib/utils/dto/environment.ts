@@ -22,3 +22,17 @@ export interface EnvironmentDto {
   updatedAt: string;
   variable: EnvValuePair[];
 }
+
+export interface EnvironmentResponseDto {
+  isSuccessful: boolean;
+  messagee: string;
+  status: string;
+  tabId: string;
+  data: UpdateEnvironmentResponseDto;
+}
+
+export interface UpdateEnvironmentResponseDto {
+  data: EnvironmentDto;
+  httpStatusCode: number;
+  message: string;
+}

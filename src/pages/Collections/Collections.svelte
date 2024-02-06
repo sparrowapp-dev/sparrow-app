@@ -73,6 +73,8 @@
     initActiveEnvironmentToWorkspace:
       _viewModel.initActiveEnvironmentToWorkspace,
     currentEnvironment: _viewModel.currentEnvironment,
+    updateEnvironment: _viewModel.updateEnvironment,
+    getGlobalEnvironment: _viewModel.getGlobalEnvironment,
   };
   export let loggedUserRoleInWorkspace:WorkspaceRole;
   const activeTab = _viewModel.activeTab;
