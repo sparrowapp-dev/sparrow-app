@@ -51,7 +51,6 @@
         title={"Cancel"}
         textStyleProp={"font-size: 14px"}
         type={"dark"}
-        loader={false}
         onClick={onCancel}
       />
 
