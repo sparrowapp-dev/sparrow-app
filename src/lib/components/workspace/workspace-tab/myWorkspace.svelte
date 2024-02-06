@@ -6,7 +6,7 @@
   import { user, userWorkspaceLevelRole } from "$lib/store/auth.store";
   import { isWorkspaceCreatedFirstTime } from "$lib/store/workspace.store";
   import type { Observable } from "rxjs";
-  import InviteToWorkspacePopup from "$lib/components/Modal/InviteToWorkspace.svelte";
+  import InviteToWorkspace from "$lib/components/workspace/invite-to-workspace/InviteToWorkspace.svelte";
   import type {
     CollectionDocument,
     TeamDocument,
@@ -15,16 +15,22 @@
   import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import WorkspaceSetting from "../workspaceSetting.svelte";
   import WorkspaceSidebar from "../workspaceSidebar.svelte";
-  import type { TeamRepositoryMethods, TeamServiceMethods, userDetails, workspaceInviteMethods } from "$lib/utils/interfaces";
+  import type {
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+    userDetails,
+    workspaceInviteMethods,
+  } from "$lib/utils/interfaces";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
   const _viewModel = new HeaderDashboardViewModel();
-  const _teamViewModel=new TeamViewModel()
+  const _teamViewModel = new TeamViewModel();
   const currentTeamworkspaces: Observable<WorkspaceDocument[]> =
     _viewModel.workspaces;
   let tabName: string = "";
@@ -34,7 +40,7 @@
   let newWorkspaceName: string;
   let noOfCollections = 0;
   let isActiveInvitePopup: boolean = false;
-  let currentTeamDetails:{id:string,name:string}
+  let currentTeamDetails: { id: string; name: string };
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
@@ -44,8 +50,8 @@
       componentData = event;
     }
   });
- 
- const activeTeam: Observable<TeamDocument> = _viewModel.getActiveteam();
+
+  const activeTeam: Observable<TeamDocument> = _viewModel.getActiveteam();
   let currentActiveTeam: TeamDocument;
   let currentWorkspaceDetails = {
     id: "",
@@ -54,7 +60,7 @@
   type currentTabType = "ABOUT" | "SETTING";
   let currentTab: currentTabType = "ABOUT";
   let users: userDetails[] = [];
-  let hasPermission: boolean=false;
+  let hasPermission: boolean = false;
   let loggedInUser: userDetails;
   let loggedUserRole: TeamRole;
   export let _collectionListViewModel: CollectionListViewModel;
@@ -66,11 +72,16 @@
     collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
   };
 
-  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe((value:WorkspaceRole) => {
-    if(value){
-        hasPermission = hasWorkpaceLevelPermission(value,workspaceLevelPermissions.SEND_INVITE);
-    }
-  });
+  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe(
+    (value: WorkspaceRole) => {
+      if (value) {
+        hasPermission = hasWorkpaceLevelPermission(
+          value,
+          workspaceLevelPermissions.SEND_INVITE,
+        );
+      }
+    },
+  );
 
   const handleWorkspaceDescription = (event) => {
     workspaceDescription = event.target.value;
@@ -113,26 +124,33 @@
       }
     },
   );
-  
-  const teamWorkspaceMethods: Pick<TeamServiceMethods,'demoteToMemberAtTeam'|'promoteToAdminAtTeam'|'removeMembersAtTeam'|'refreshWorkspace'> & Pick <TeamRepositoryMethods,'updateUserRoleInTeam'|'removeUserFromTeam'> = {
-    demoteToMemberAtTeam:_teamViewModel.demoteToMemberAtTeam,
-    promoteToAdminAtTeam:_teamViewModel.promoteToAdminAtTeam,
-    updateUserRoleInTeam:_teamViewModel.updateUserRoleInTeam,
-    removeUserFromTeam:_teamViewModel.removeUserFromTeam,
-    refreshWorkspace:_viewModel.refreshWorkspaces,
-    removeMembersAtTeam:_teamViewModel.removeMembersAtTeam
+
+  const teamWorkspaceMethods: Pick<
+    TeamServiceMethods,
+    | "demoteToMemberAtTeam"
+    | "promoteToAdminAtTeam"
+    | "removeMembersAtTeam"
+    | "refreshWorkspace"
+  > &
+    Pick<TeamRepositoryMethods, "updateUserRoleInTeam" | "removeUserFromTeam"> =
+    {
+      demoteToMemberAtTeam: _teamViewModel.demoteToMemberAtTeam,
+      promoteToAdminAtTeam: _teamViewModel.promoteToAdminAtTeam,
+      updateUserRoleInTeam: _teamViewModel.updateUserRoleInTeam,
+      removeUserFromTeam: _teamViewModel.removeUserFromTeam,
+      refreshWorkspace: _viewModel.refreshWorkspaces,
+      removeMembersAtTeam: _teamViewModel.removeMembersAtTeam,
+    };
+  const workspaceInvitePermissonMethods: workspaceInviteMethods = {
+    deleteWorkspace: _viewModel.deleteWorkspace,
+    updateRoleInWorkspace: _viewModel.updateUserRoleInWorkspace,
+    updateUsersInWorkspaceInRXDB: _viewModel.updateUserRoleInWorkspaceInRXDB,
+    checkIfUserIsPartOfMutipleWorkspaces: _viewModel.isUserInMultipleWorkspaces,
+    deleteUserFromWorkspace: _viewModel.deleteUserFromWorkspace,
+    deleteUserFromWorkspaceRxDB: _viewModel.removeUserFromWorkspaceRxDB,
+    activateWorkspace: _viewModel.activateWorkspace,
+    handleWorkspaceDeletion: _viewModel.handleWorkspaceDeletion,
   };
-  const workspaceInvitePermissonMethods:workspaceInviteMethods={
-    deleteWorkspace:_viewModel.deleteWorkspace,
-    updateRoleInWorkspace:_viewModel.updateUserRoleInWorkspace,
-    updateUsersInWorkspaceInRXDB:_viewModel.updateUserRoleInWorkspaceInRXDB,
-    checkIfUserIsPartOfMutipleWorkspaces:_viewModel.isUserInMultipleWorkspaces,
-    deleteUserFromWorkspace:_viewModel.deleteUserFromWorkspace,
-    deleteUserFromWorkspaceRxDB:_viewModel.removeUserFromWorkspaceRxDB,
-    activateWorkspace:_viewModel.activateWorkspace,
-    handleWorkspaceDeletion:_viewModel.handleWorkspaceDeletion
-  }
-  
 
   let name: string = "";
   let email: string = "";
@@ -150,34 +168,33 @@
     const response = await _viewModel.getUserDetailsOfWorkspace(
       currentWorkspaceDetails.id,
     );
-    if(response?.data && response?.data?.data){
-    users = response.data.data;
-    const indexToRemove = users.findIndex(
-      (dataObj: any) => dataObj.email === email,
-    );
-    loggedInUser = users.splice(indexToRemove, 1)[0];
-    users.sort((a, b) => a.role.localeCompare(b.role));
-    return users;
-  }
+    if (response?.data && response?.data?.data) {
+      users = response.data.data;
+      const indexToRemove = users.findIndex(
+        (dataObj: any) => dataObj.email === email,
+      );
+      loggedInUser = users.splice(indexToRemove, 1)[0];
+      users.sort((a, b) => a.role.localeCompare(b.role));
+      return users;
+    }
   };
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     (value: WorkspaceDocument) => {
       if (value) {
-        currentWorkspaceDetails={
-           id:value._data._id,
-           name:value._data.name
-         },
-        currentTeamDetails={
-           name:value._data?.team?.teamName,
-            id : value._data?.team.teamId
-        }
+        (currentWorkspaceDetails = {
+          id: value._data._id,
+          name: value._data.name,
+        }),
+          (currentTeamDetails = {
+            name: value._data?.team?.teamName,
+            id: value._data?.team.teamId,
+          });
         getUserDetails();
       }
     },
   );
 
- 
   const activeTeamsSubscribe = activeTeam.subscribe(
     async (team: TeamDocument) => {
       if (team) {
@@ -307,31 +324,37 @@
       {hasPermission}
       {loggedUserRole}
       {loggedInUser}
-      handleInvitePopup={handleInvitePopup}
+      {handleInvitePopup}
       currentTeamworkspaces={currentTeamWorkspacesArr}
-      currentTeamDetails={currentTeamDetails}
+      {currentTeamDetails}
       getUserDetailsOfWorkspace={_viewModel.getUserDetailsOfWorkspace}
       loggedInUserEmail={email}
       {currentWorkspaceDetails}
       {workspaceInvitePermissonMethods}
-      teamWorkspaceMethods={teamWorkspaceMethods}
+      {teamWorkspaceMethods}
       {collectionsMethods}
       {currentActiveTeam}
     ></WorkspaceSetting>
-    
   {/if}
   <WorkspaceSidebar {handleWorkspaceTab} {noOfCollections} {email}
   ></WorkspaceSidebar>
-  
-  {#if isActiveInvitePopup}
-  <InviteToWorkspacePopup
-    {handleInvitePopup}
-    {currentWorkspaceDetails}
-    teamName={currentTeamDetails.name}
-    addUsersInWorkspace={_viewModel.addUsersInWorkspace}
-    addUsersInWorkspaceInRxDB={_viewModel.addUsersInWorkspaceInRxDB}
-  ></InviteToWorkspacePopup>
-{/if}
+
+  <ModalWrapperV1
+    title={"Invite Team Members"}
+    type={"dark"}
+    width={540}
+    zIndex={9}
+    isOpen={isActiveInvitePopup}
+    handleModalState={handleInvitePopup}
+  >
+    <InviteToWorkspace
+      {handleInvitePopup}
+      {currentWorkspaceDetails}
+      teamName={currentTeamDetails.name}
+      addUsersInWorkspace={_viewModel.addUsersInWorkspace}
+      addUsersInWorkspaceInRxDB={_viewModel.addUsersInWorkspaceInRxDB}
+    />
+  </ModalWrapperV1>
 </div>
 
 <style>
