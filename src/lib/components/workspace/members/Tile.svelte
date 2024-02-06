@@ -1,6 +1,4 @@
 <script lang="ts">
-  import RemoveConfirmationPopup from "$lib/components/Modal/RemoveConfirmationPopup.svelte";
-  import MemberChangeRolePopup from "$lib/components/Modal/MemberChangeRolePopup.svelte";
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type {

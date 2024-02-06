@@ -7,9 +7,11 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import DeleteConfirmationPopup from "$lib/components/Modal/DeleteConfirmationPopup.svelte";
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
   import { notifications } from "$lib/utils/notifications";
+  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
+  import { boolean } from "yup";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -173,27 +175,57 @@
       ];
     }
   }
+  let deleteEnvironmentLoader: boolean = false;
 </script>
 
-{#if isEnvironmentPopup}
-  <DeleteConfirmationPopup
-    {env}
-    {currentWorkspace}
-    title={`Delete Environment?`}
-    description={`<p>
+<ModalWrapperV1
+  title={"Delete Environment?"}
+  type={"danger"}
+  width={540}
+  zIndex={9}
+  isOpen={isEnvironmentPopup}
+  handleModalState={handleEnvironmentPopUpCancel}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
-        class="text-whiteColor">"${env.name}"</span
+        class="text-whiteColor">"{env.name}"</span
       >
       and all its variables will be removed and cannot be restored. It will also
       impact all the API requests that use the variables in this environment.
-    </p>`}
-    onSuccess={handleEnvironmentPopUpSuccess}
-    onCancel={handleEnvironmentPopUpCancel}
-    {environmentRepositoryMethods}
-    {environmentServiceMethods}
-  />
-{/if}
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <CustomButton
+      disable={deleteEnvironmentLoader}
+      text={"Cancel"}
+      fontSize={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handleEnvironmentPopUpCancel(false);
+      }}
+    />
+
+    <CustomButton
+      disable={deleteEnvironmentLoader}
+      text={"Delete"}
+      fontSize={14}
+      type={"danger"}
+      loader={deleteEnvironmentLoader}
+      onClick={async () => {
+        debugger;
+        deleteEnvironmentLoader = true;
+        await handleEnvironmentPopUpSuccess();
+        deleteEnvironmentLoader = false;
+      }}
+    />
+  </div></ModalWrapperV1
+>
 
 {#if showMenu}
   <div class="environment-tab" bind:offsetHeight={rightClickPanelHeight}>
