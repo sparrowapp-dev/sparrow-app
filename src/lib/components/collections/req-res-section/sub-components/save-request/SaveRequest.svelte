@@ -35,6 +35,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import TextButton from "$lib/components/buttons/TextButton.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -945,18 +946,22 @@
     <div class="controllers mt-3 d-flex justify-content-between">
       <div>
         {#if path.length === 0}
-          <TextButton
-            text={"+ Collection"}
+          <Button
             onClick={() => {
               createCollectionNameVisibility = true;
             }}
+            title={"+ Collection"}
+            buttonClassProp={"btn"}
+            buttonStyleProp={"color: var(--send-button); font-size: 12px; margin-bottom: 4px; border: 1px solid var(--send-button);"}
           />
         {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-          <TextButton
-            text={"+ Folder"}
+          <Button
             onClick={() => {
               createFolderNameVisibility = true;
             }}
+            title={"+ Folder"}
+            buttonClassProp={"btn"}
+            buttonStyleProp={"color: var(--send-button); font-size: 12px; margin-bottom: 4px; border: 1px solid var(--send-button);"}
           />
         {/if}
       </div>

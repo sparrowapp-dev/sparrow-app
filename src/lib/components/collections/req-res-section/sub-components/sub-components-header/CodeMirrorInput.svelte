@@ -200,7 +200,7 @@
       selectedTabId = currentTabId;
       handleEnvironmentBox(false, localEnvKey);
     }
-    if (rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,

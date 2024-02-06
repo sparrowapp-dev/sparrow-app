@@ -11,6 +11,7 @@
   } from "$lib/utils/interfaces/request.interface";
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+  import Button from "$lib/components/buttons/Button.svelte";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
@@ -128,9 +129,9 @@
     </div>
     <div class="d-flex justify-content-between">
       <div>
-        <CustomButton
-          text={"Cancel"}
-          fontSize={16}
+        <Button
+          title={"Cancel"}
+          textStyleProp={"font-size: 16px"}
           type={"dark"}
           onClick={() => {
             closeCallback(false);
@@ -139,9 +140,9 @@
       </div>
       <div class="d-flex">
         <span style="margin-right: 15px;">
-          <CustomButton
-            text={"Discard Changes"}
-            fontSize={16}
+          <Button
+            title={"Discard Changes"}
+            textStyleProp={"font-size: 16px"}
             type={"dark"}
             onClick={() => {
               collectionsMethods.handleRemoveTab(componentData.id);
@@ -149,9 +150,9 @@
             }}
           />
         </span>
-        <CustomButton
-          text={"Save Changes"}
-          fontSize={16}
+        <Button
+          title={"Save Changes"}
+          textStyleProp={"font-size: 16px"}
           type={"primary"}
           {loader}
           onClick={() => {

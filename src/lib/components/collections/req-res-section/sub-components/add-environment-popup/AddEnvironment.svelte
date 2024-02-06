@@ -8,6 +8,7 @@
     UpdateEnvironmentPostBody,
   } from "$lib/utils/dto";
   import { notifications } from "$lib/utils/notifications";
+  import Button from "$lib/components/buttons/Button.svelte";
   export let environmentAxisX;
   export let environmentAxisY;
   export let updateEnvironment: (
@@ -123,15 +124,16 @@ left:{environmentAxisX}px;
       variable or under the active environment.
     </p>
     <div class="w-100">
-      <CustomButton
-        text={"Add Variable"}
+      <Button
+        title={"Add Variable"}
         fontSize={12}
         type={"dark"}
-        classProp={`w-100`}
+        buttonClassProp={`w-100`}
         onClick={() => {
           addVariable = true;
         }}
-        styleProp={`align-items: center; justify-content: center; height: 30px;`}
+        buttonStyleProp={`align-items: center; justify-content: center; height: 30px;`}
+        textStyleProp={"font-size: 12px"}
       />
     </div>
   </div>
@@ -189,16 +191,16 @@ left:{environmentAxisX}px;
       </div>
     {/if}
     <div class="w-100">
-      <CustomButton
-        text={"Add & Apply"}
-        fontSize={12}
+      <Button
+        title={"Add & Apply"}
         type={"primary"}
-        classProp={`w-100`}
+        buttonClassProp={`w-100`}
         disable={isAddDisable}
         onClick={() => applyVariable()}
-        styleProp={isAddDisable
+        buttonStyleProp={isAddDisable
           ? `align-items: center; justify-content: center; height: 30px; margin-top: 10px; opacity: 35%;`
           : `align-items: center; justify-content: center; height: 30px; margin-top: 10px;`}
+        textStyleProp={"font-size: 12px"}
       />
     </div>
   </div>

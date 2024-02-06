@@ -20,6 +20,7 @@
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { CustomButton, IconButton } from "$lib/components";
+  import Button from "../buttons/Button.svelte";
 
   export let userId: string;
   export let data: any;
@@ -138,6 +139,16 @@
                   onClick={handleOnShowMoreClick}
                   ><ShowMoreIcon classProp="" /></IconButton
                 >
+                <!-- <Button
+                  onClick={handleOnShowMoreClick}
+                  allowChild={true}
+                  buttonClassProp={`rounded mx-2 my-auto p-0 d-flex ${
+                    isShowMoreVisible ? "transparent" : "bg-plusButton"
+                  } `}
+                  buttonStyleProp={"width: auto; height: auto; background-color: transparent; border: 0px;"}
+                >
+                  <ShowMoreIcon classProp="" />
+                </Button> -->
                 {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                   <button
                     on:click={(e) => {
@@ -366,5 +377,12 @@
   .view-active {
     filter: invert(65%) sepia(63%) saturate(551%) hue-rotate(185deg)
       brightness(103%) contrast(104%);
+  }
+  .sparrow-icon-btn {
+    background-color: transparent;
+    border: 0px;
+  }
+  .sparrow-icon-btn:hover {
+    background-color: var(--blackColor);
   }
 </style>
