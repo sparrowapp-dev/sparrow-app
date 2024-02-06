@@ -7,7 +7,7 @@
     userDetails,
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
-  import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
+  import MemberInfoPopup from "../member-info/MemberInfo.svelte";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
@@ -207,7 +207,7 @@
   title={"Remove user?"}
   type={"danger"}
   width={540}
-  zIndex={9}
+  zIndex={11}
   isOpen={memberPopObj.isMemberRemovePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberRemovePopup");
@@ -256,7 +256,7 @@
   title={"Changing Role?"}
   type={"danger"}
   width={540}
-  zIndex={9}
+  zIndex={11}
   isOpen={memberPopObj.isMemberPromotePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberPromotePopup");
@@ -326,7 +326,7 @@
   title={"Changing Role?"}
   type={"danger"}
   width={540}
-  zIndex={9}
+  zIndex={11}
   isOpen={memberPopObj.isMemberDemotePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberDemotePopup");
@@ -388,9 +388,9 @@
 
 <ModalWrapperV1
   title={"Changing Role?"}
-  type={"danger"}
+  type={"dark"}
   width={540}
-  zIndex={9}
+  zIndex={11}
   isOpen={memberPopObj.isMemberOwnershipPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberOwnershipPopup");
@@ -484,9 +484,9 @@
 
 <ModalWrapperV1
   title={`Access to ${openTeam?.name}`}
-  type={"danger"}
+  type={"dark"}
   width={540}
-  zIndex={7}
+  zIndex={9}
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberInfoPopup");

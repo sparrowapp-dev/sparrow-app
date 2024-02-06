@@ -13,7 +13,7 @@
   import CustomButton from "../buttons/CustomButton.svelte";
   import MemberDropDown from "../dropdown/MemberDropdown.svelte";
   import ModalWrapperV1 from "../Modal/ModalWrapperV1.svelte";
-  import MemberInfoPopup from "../workspace/member-info-popup/MemberInfoPopup.svelte";
+  import MemberInfoPopup from "./member-info/MemberInfo.svelte";
   export let id: string;
   export let name: string;
   export let email: string;
@@ -330,7 +330,7 @@
       title={"Remove user?"}
       type={"danger"}
       width={540}
-      zIndex={9}
+      zIndex={11}
       isOpen={isRemoveMemberPopup}
       handleModalState={showRemoveMemberPopup}
     >
@@ -388,7 +388,7 @@
       title={"Remove user?"}
       type={"danger"}
       width={540}
-      zIndex={9}
+      zIndex={11}
       isOpen={isRemoveTeamPopup}
       handleModalState={showRemoveTeamPopup}
     >
@@ -439,7 +439,7 @@
   title={`Access to ${currentTeamDetails.name}`}
   type={"dark"}
   width={540}
-  zIndex={7}
+  zIndex={9}
   isOpen={isMemberInfoPopup}
   handleModalState={handleMemberPopup}
 >
