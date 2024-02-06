@@ -29,18 +29,18 @@ extern crate objc;
 // Commands
 #[tauri::command]
 fn zoom_window(window: tauri::Window, scale_factor: f64) {
-    let _ = window.with_webview(move |webview| {
-        #[cfg(windows)]
-        unsafe {
-            // see https://docs.rs/webview2-com/0.19.1/webview2_com/Microsoft/Web/WebView2/Win32/struct.ICoreWebView2Controller.html
-            webview.controller().SetZoomFactor(scale_factor).unwrap();
-        }
+    // let _ = window.with_webview(move |webview| {
+    //     #[cfg(windows)]
+    //     unsafe {
+    //         // see https://docs.rs/webview2-com/0.19.1/webview2_com/Microsoft/Web/WebView2/Win32/struct.ICoreWebView2Controller.html
+    //         webview.controller().SetZoomFactor(scale_factor).unwrap();
+    //     }
 
-        #[cfg(target_os = "macos")]
-        unsafe {
-            let () = msg_send![webview.inner(), setPageZoom: scale_factor];
-        }
-    });
+    //     #[cfg(target_os = "macos")]
+    //     unsafe {
+    //         let () = msg_send![webview.inner(), setPageZoom: scale_factor];
+    //     }
+    // });
 }
 
 #[tauri::command]
@@ -75,12 +75,12 @@ fn fetch_file_command() -> String {
 
 #[tauri::command]
 async fn open_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth");
+    let oauth_window = handle.get_webview_window("oauth");
     if oauth_window == None {
-        tauri::WindowBuilder::new(
+        tauri::WebviewWindowBuilder::new(
             &handle,
-            "oauth", /* the unique window label */
-            tauri::WindowUrl::External(
+            "oauth",
+            tauri::WebviewUrl::External(
                 "https://dev-api.sparrow.techdomeaks.com/api/auth/google"
                     .parse()
                     .unwrap(),
@@ -90,7 +90,7 @@ async fn open_oauth_window(handle: tauri::AppHandle) {
         .build()
         .unwrap();
     } else {
-        let oauth_window = handle.get_window("oauth").unwrap();
+        let oauth_window = handle.get_webview_window("oauth").unwrap();
         let _ = oauth_window.eval(&format!(
             "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
         ));
@@ -100,7 +100,7 @@ async fn open_oauth_window(handle: tauri::AppHandle) {
         let _ = oauth_window.center();
         let _ = oauth_window.show();
     }
-    let oauth_window = handle.get_window("oauth").unwrap();
+    let oauth_window = handle.get_webview_window("oauth").unwrap();
     oauth_window
         .emit(
             "onclose",
@@ -113,7 +113,7 @@ async fn open_oauth_window(handle: tauri::AppHandle) {
 
 #[tauri::command]
 async fn close_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth").unwrap();
+    let oauth_window = handle.get_webview_window("oauth").unwrap();
     let _ = oauth_window.eval(&format!(
         "window.location.replace('https://accounts.google.com/logout')"
     ));
@@ -244,6 +244,7 @@ struct MyResponse {
 fn main() {
     // Initiate Tauri Runtime
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
             fetch_file_command,
@@ -253,22 +254,23 @@ fn main() {
             zoom_window
         ])
         .setup(|app| {
-            let window = app.get_window("main").unwrap();
+            let window = app.get_webview_window("main").unwrap();
             set_shadow(&window, true).expect("Unsupported platform!");
             Ok(())
         })
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
                 wry_window
-                    .emit_all(
+                    .emit(
                         "receive-login",
                         Payload {
-                            url: _payload.url().into(),
+                            url: _payload.url().to_string(),
                         },
                     )
                     .unwrap();
             }
         })
+        .plugin(tauri_plugin_os::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

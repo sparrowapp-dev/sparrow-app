@@ -22,12 +22,12 @@
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
-  import { appWindow } from "@tauri-apps/api/window";
+  import { Window } from "@tauri-apps/plugin-window";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import constants from "$lib/utils/constants";
   import { notifications } from "$lib/utils/notifications";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { invoke } from "@tauri-apps/api";
+  import { invoke } from "@tauri-apps/api/core";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
@@ -70,7 +70,7 @@
       const refreshToken = params.get("refreshToken");
       if (accessToken && refreshToken) {
         await invoke("close_oauth_window");
-        await appWindow.setFocus();
+        await Window.getByLabel("main")!.setFocus();
         setAuthJwt(constants.AUTH_TOKEN, accessToken);
         setAuthJwt(constants.REF_TOKEN, refreshToken);
         setUser(jwtDecode(accessToken));

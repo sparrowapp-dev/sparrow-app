@@ -1,5 +1,5 @@
 import { WindowSettingReposistory } from "$lib/repositories/window-settings.repository";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 const windowSettingRepository = new WindowSettingReposistory();
 

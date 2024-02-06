@@ -10,7 +10,7 @@ import {
   resizeWindowOnLogOut,
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";

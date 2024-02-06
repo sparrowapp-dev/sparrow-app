@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { appWindow } from "@tauri-apps/api/window";
+  import { getCurrent } from "@tauri-apps/api/window";
   import { Observable } from "rxjs";
   import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
   import icons, {
@@ -149,15 +149,15 @@
   });
 
   const onMinimize = () => {
-    appWindow.minimize();
+    getCurrent().minimize();
   };
 
   const onClose = () => {
-    appWindow.close();
+    getCurrent().close();
   };
 
   const toggleSize = () => {
-    appWindow.toggleMaximize();
+    getCurrent().toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
 
