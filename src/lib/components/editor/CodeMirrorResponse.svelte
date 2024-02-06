@@ -46,7 +46,7 @@
       });
       selectedTabId = currentTabId;
     }
-    if (rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+    if (rawValue && rawValue.toString() !== codeMirrorView.state.doc.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,

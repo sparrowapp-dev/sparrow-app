@@ -19,8 +19,8 @@
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
-  export let _collectionListViewModel:CollectionListViewModel;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let _collectionListViewModel: CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
   let isLoading: boolean = false;
@@ -29,16 +29,16 @@
   let componentData: NewTab;
   let totalRequest: number = 0;
   let newFolderName: string = "";
-  let collectionId:string;
-  let folderId:string;
+  let collectionId: string;
+  let folderId: string;
   const _myFolderViewModel = new MyFolderViewModel();
 
-  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
-      collectionId=event.path?.collectionId;
-      folderId=event.path?.folderId;
+      collectionId = event.path?.collectionId;
+      folderId = event.path?.folderId;
     }
   });
 
@@ -47,11 +47,14 @@
       if (collectionArr) {
         collectionArr.forEach(async (collection) => {
           if (collection._data.id === collectionId) {
-            const collectionData = await collectionsMethods.getNoOfApisandFolders(
-             collection,
-             folderId
-            );
-            totalRequest = collectionData.requestCount;
+            const collectionData =
+              await collectionsMethods.getNoOfApisandFolders(
+                collection,
+                folderId,
+              );
+            if (collectionData) {
+              totalRequest = collectionData.requestCount;
+            }
           }
         });
       }
@@ -154,8 +157,11 @@
     </div>
     <div class="d-flex align-items-start ps-0 h-100">
       <textarea
-       type="textarea"
-       disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_FOLDER_DESC)}
+        type="textarea"
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.EDIT_FOLDER_DESC,
+        )}
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."

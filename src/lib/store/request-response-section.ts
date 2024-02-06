@@ -145,7 +145,7 @@ const setRequestProperty = async (
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.id === id) {
+      if (elem.id === id && elem.property.request) {
         elem.property.request[route] = data;
         elem.property.request.save.api = false;
         if (elem.isActive) {
@@ -166,7 +166,7 @@ const updateRequestPropertyResponseBody = async (
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.id === id) {
+      if (elem.id === id && elem.property.request) {
         elem.property.request[route].body = data;
         elem.save = false;
         if (elem.isActive) {

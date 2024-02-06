@@ -37,6 +37,7 @@
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
+    debugger;
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
     handleRawChange();
@@ -200,7 +201,7 @@
       selectedTabId = currentTabId;
       handleEnvironmentBox(false, localEnvKey);
     }
-    if (rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+    if (rawValue && rawValue.toString() !== codeMirrorView.state.doc.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,
