@@ -194,7 +194,7 @@
 
 <ModalWrapperV1
   title={"Save Changes"}
-  type={"danger"}
+  type={"dark"}
   width={540}
   zIndex={9}
   isOpen={closePopup}

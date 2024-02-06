@@ -254,7 +254,7 @@
 
 <ModalWrapperV1
   title={"Changing Role?"}
-  type={"danger"}
+  type={"dark"}
   width={540}
   zIndex={11}
   isOpen={memberPopObj.isMemberPromotePopup}
@@ -324,7 +324,7 @@
 
 <ModalWrapperV1
   title={"Changing Role?"}
-  type={"danger"}
+  type={"dark"}
   width={540}
   zIndex={11}
   isOpen={memberPopObj.isMemberDemotePopup}

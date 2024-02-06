@@ -403,7 +403,7 @@
 
 <ModalWrapperV1
   title={"New Team"}
-  type={"danger"}
+  type={"dark"}
   width={540}
   zIndex={9}
   isOpen={isCreateTeamModalOpen}
