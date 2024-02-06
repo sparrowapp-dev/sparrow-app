@@ -1,6 +1,5 @@
 <script lang="ts">
   import crossAsset from "$lib/assets/close.svg";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { fade, fly } from "svelte/transition";
@@ -154,6 +153,7 @@
           title={"Save Changes"}
           textStyleProp={"font-size: 16px"}
           type={"primary"}
+          loaderSize={18}
           {loader}
           onClick={() => {
             if (

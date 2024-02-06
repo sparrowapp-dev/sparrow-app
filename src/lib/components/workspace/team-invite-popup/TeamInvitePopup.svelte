@@ -6,10 +6,10 @@
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
-  import { CustomButton } from "$lib/components";
   import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let onSubmit;
   export let updateRepo;
@@ -33,26 +33,45 @@
   let roleError: boolean = false;
   let workspaceError: boolean = false;
 
-  function removeElement(event:Event):void{
-      const id=event.target?.id;
-      const removeElement = document.getElementById(id) as HTMLElement;
-      document.getElementById("input-email").removeChild(removeElement);
-  };
-  
+  function removeElement(event: Event): void {
+    const id = event.target?.id;
+    const removeElement = document.getElementById(id) as HTMLElement;
+    document.getElementById("input-email").removeChild(removeElement);
+  }
+
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
     emailstoBeSentArr.push(email);
-    const emailDiv:HTMLElement=createDynamicComponents("div","d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center")
-    const emailContentSpan = createDynamicComponents("span","");
-    const closeIconBtn= createDynamicComponents("img","bg-transparent",[{eventType:"click",eventHandler:removeElement},{eventType:"mouseleave",eventHandler:()=>{closeIconBtn.src = closeIcon}},{eventType:"mouseenter",eventHandler:()=>{closeIconBtn.src = closeIconWhite}}]) as HTMLImageElement;
+    const emailDiv: HTMLElement = createDynamicComponents(
+      "div",
+      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+    );
+    const emailContentSpan = createDynamicComponents("span", "");
+    const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
+      { eventType: "click", eventHandler: removeElement },
+      {
+        eventType: "mouseleave",
+        eventHandler: () => {
+          closeIconBtn.src = closeIcon;
+        },
+      },
+      {
+        eventType: "mouseenter",
+        eventHandler: () => {
+          closeIconBtn.src = closeIconWhite;
+        },
+      },
+    ]) as HTMLImageElement;
     emailDiv.id = email;
-    closeIconBtn.id=email;
+    closeIconBtn.id = email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
-    const emailContainer:HTMLElement=document.getElementById("input-email") as HTMLElement;
+    const emailContainer: HTMLElement = document.getElementById(
+      "input-email",
+    ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
   };
@@ -300,10 +319,11 @@
       </div>
     </div>
     <div>
-      <CustomButton
+      <Button
         disable={loader}
-        text={"Send Invite"}
-        fontSize={14}
+        title={"Send Invite"}
+        loaderSize={19}
+        textStyleProp={"font-size: 14px"}
         type={"primary"}
         {loader}
         onClick={() => {

@@ -4,7 +4,7 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import CustomButton from "../buttons/CustomButton.svelte";
+  import Button from "../buttons/Button.svelte";
   import { fly, fade } from "svelte/transition";
 
   export let title;
@@ -55,10 +55,10 @@
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
       style="font-size: 16px;"
     >
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Cancel"}
-        fontSize={14}
+        title={"Cancel"}
+        textStyleProp={"font-size: 14px"}
         type={"dark"}
         loader={false}
         onClick={() => {
@@ -66,15 +66,16 @@
         }}
       />
 
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Delete"}
-        fontSize={14}
+        title={"Delete"}
+        textStyleProp={"font-size: 14px"}
         type={"danger"}
         loader={deleteLoader}
         onClick={() => {
           handleDelete();
         }}
+        loaderSize={19}
       />
     </div>
   </div>

@@ -10,7 +10,6 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import crossAsset from "$lib/assets/close.svg";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import {
     insertCollection,
     insertCollectionDirectory,
@@ -34,7 +33,6 @@
   import questionIcon from "$lib/assets/question.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import TextButton from "$lib/components/buttons/TextButton.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
 
   export let collectionsMethods: CollectionsMethods;
@@ -789,9 +787,9 @@
                     Collection to easily organize and use your API requests.
                   </p>
                   <div class="w-100 d-flex justify-content-center">
-                    <CustomButton
-                      text={"+ Collection"}
-                      fontSize={14}
+                    <Button
+                      title={"+ Collection"}
+                      textStyleProp={"font-size: 14px"}
                       type={"primary"}
                       onClick={() => {
                         createCollectionNameVisibility = true;
@@ -967,24 +965,25 @@
       </div>
       <div class="d-flex">
         <span class="mx-2">
-          <CustomButton
-            text={"Cancel"}
-            fontSize={16}
+          <Button
+            title={"Cancel"}
+            textStyleProp={"font-size: 16px"}
             type={"dark"}
             onClick={() => {
               onClick(false);
             }}
           />
         </span>
-        <CustomButton
+        <Button
           disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
-          text={"Save"}
-          fontSize={16}
+          title={"Save"}
+          textStyleProp={"font-size: 16px"}
           type={"primary"}
           loader={isLoading}
           onClick={() => {
             handleSaveAsRequest();
           }}
+          loaderSize={18}
         />
       </div>
     </div>

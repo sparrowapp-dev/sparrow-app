@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
   import { fade, fly } from "svelte/transition";
-  import { CustomButton } from "..";
+  import Button from "../buttons/Button.svelte";
 
   export let isOpen = false;
   export let title: string;
@@ -37,19 +37,19 @@
       <slot />
     </div>
     <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
-      <CustomButton
-        text={`Cancel`}
+      <Button
+        title={`Cancel`}
         type="dark"
         disable={false}
-        classProp={`me-2`}
+        buttonClassProp={`me-2`}
         onClick={handleOpen}
       />
-      <CustomButton
-        text={btnText}
+      <Button
+        title={btnText}
         type="primary"
         disable={underSubmission}
         loader={underSubmission}
-        classProp={`me-1`}
+        buttonClassProp={`me-1`}
         onClick={() => handleSubmit()}
       />
     </div>

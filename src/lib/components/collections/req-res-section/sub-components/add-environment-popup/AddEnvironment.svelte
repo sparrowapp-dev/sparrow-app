@@ -1,7 +1,6 @@
 <script lang="ts">
   import Warning from "$lib/assets/warning.svg";
   import Cross from "$lib/assets/cross.svg";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { slide } from "svelte/transition";
   import type {
     EnvironmentResponseDto,
@@ -126,7 +125,6 @@ left:{environmentAxisX}px;
     <div class="w-100">
       <Button
         title={"Add Variable"}
-        fontSize={12}
         type={"dark"}
         buttonClassProp={`w-100`}
         onClick={() => {

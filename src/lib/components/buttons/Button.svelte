@@ -3,22 +3,28 @@
 
   export let title = "Submit";
   export let onClick: (e) => void;
-  export let fontSize = 16;
+  export let loaderSize = 16;
   export let disable = false;
   export let loader = false;
   export let buttonStyleProp = "";
   export let buttonClassProp = "";
   export let textClassProp = "";
   export let textStyleProp = "";
-  // export let allowChild = false;
-  export let type: "primary" | "dark" | "danger" | "transparent" | "other" =
-    "other";
+  export let allowChild = false;
+  export let type:
+    | "primary"
+    | "dark"
+    | "danger"
+    | "transparent"
+    | "other"
+    | "icon" = "other";
   enum BtnType {
     PRIMARY = "primary",
     DARK = "dark",
     DANGER = "danger",
     TRANSPARENT = "transparent",
     OTHER = "other",
+    ICON = "icon",
   }
   let btnClass = "";
   if (type === BtnType.PRIMARY) {
@@ -29,33 +35,37 @@
     btnClass = "custom-btn-danger";
   } else if (type === BtnType.TRANSPARENT) {
     btnClass = "custom-btn-transparent";
+  } else if (type === BtnType.ICON) {
+    btnClass = "sparrow-icon-btn";
   }
 </script>
 
 <button
   disabled={disable}
   style={`${buttonStyleProp} ${
-    type !== "other"
+    type !== "other" && type !== "icon"
       ? "margin-bottom: 4px; border-radius: 4px; padding: 6px 12px;"
       : ""
   } `}
   class={`${buttonClassProp} ${
-    type !== "other" ? "py-1 px-3 border-0 d-flex align-items-center" : ""
+    type !== "other" && type !== "icon"
+      ? "py-1 px-3 border-0 d-flex align-items-center"
+      : ""
   } ${btnClass}`}
   on:click={(e) => {
     onClick(e);
   }}
 >
-  {#if loader}
+  {#if loader && !allowChild}
     <span class="mx-2">
-      <Spinner size={`${fontSize}px`} />
+      <Spinner size={`${loaderSize}px`} />
     </span>
-  {:else if !loader}
+  {:else if !loader && !allowChild}
     <span class={textClassProp} style={textStyleProp}>
       {title}
     </span>
-    <!-- {:else if allowChild}
-    <slot /> -->
+  {:else if allowChild}
+    <slot />
   {/if}
 </button>
 

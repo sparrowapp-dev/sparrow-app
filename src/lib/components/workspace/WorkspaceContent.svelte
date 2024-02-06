@@ -19,7 +19,6 @@
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
-  import { CustomButton, IconButton } from "$lib/components";
   import Button from "../buttons/Button.svelte";
 
   export let userId: string;
@@ -132,23 +131,16 @@
                 >{currOpenedTeam.name}
               </span>
               <div class="mr-4 position-relative my-auto">
-                <IconButton
-                  classProp="rounded mx-2 my-auto p-0 d-flex {isShowMoreVisible
-                    ? 'transparent'
-                    : 'bg-plusButton'}"
-                  onClick={handleOnShowMoreClick}
-                  ><ShowMoreIcon classProp="" /></IconButton
-                >
-                <!-- <Button
+                <Button
                   onClick={handleOnShowMoreClick}
                   allowChild={true}
                   buttonClassProp={`rounded mx-2 my-auto p-0 d-flex ${
                     isShowMoreVisible ? "transparent" : "bg-plusButton"
                   } `}
-                  buttonStyleProp={"width: auto; height: auto; background-color: transparent; border: 0px;"}
+                  type={`icon`}
                 >
                   <ShowMoreIcon classProp="" />
-                </Button> -->
+                </Button>
                 {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                   <button
                     on:click={(e) => {
@@ -207,24 +199,25 @@
                     >
                   </p>
                 {/if}
-                <CustomButton
-                  text={`Invite`}
+                <Button
+                  title={`Invite`}
                   type={`dark`}
-                  fontSize={12}
+                  textStyleProp={"font-size: 12px"}
                   onClick={() => {
                     teamInvitePopup = true;
                   }}
-                  classProp={`my-auto px-3 pt-1 me-4`}
-                  styleProp={`height: 30px;`}
+                  buttonClassProp={`my-auto px-3 pt-1 me-4`}
+                  buttonStyleProp={`height: 30px;`}
                 />
-                <CustomButton
-                  text={`New Workspace`}
+                <Button
+                  title={`New Workspace`}
                   type={`primary`}
                   loader={isLoading}
-                  fontSize={12}
+                  loaderSize={17}
+                  textStyleProp={"font-size: 12px"}
                   onClick={handleCreateWorkspace}
-                  classProp={`my-auto `}
-                  styleProp={`height: 30px;`}
+                  buttonClassProp={`my-auto`}
+                  buttonStyleProp={`height: 30px;`}
                 />
               </div>
             {/if}
@@ -377,12 +370,5 @@
   .view-active {
     filter: invert(65%) sepia(63%) saturate(551%) hue-rotate(185deg)
       brightness(103%) contrast(104%);
-  }
-  .sparrow-icon-btn {
-    background-color: transparent;
-    border: 0px;
-  }
-  .sparrow-icon-btn:hover {
-    background-color: var(--blackColor);
   }
 </style>
