@@ -20,11 +20,7 @@
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import {
-    CustomPopup,
-    TextInput,
-    SelectInput,
-  } from "$lib/components";
+  import { TextInput, SelectInput } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -34,6 +30,8 @@
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import { setOpenedTeam } from "$lib/store";
   import { v4 as uuidv4 } from "uuid";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
+  import Button from "../buttons/Button.svelte";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -231,13 +229,15 @@
 </script>
 
 <!-- Create New Workspace POP UP -->
-<CustomPopup
-  title="New Workspace"
+<ModalWrapperV1
+  title={"New Workspace"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
   isOpen={openCreateWorkspaceModal}
-  btnText="Create"
-  underSubmission={workspaceUnderCreation}
-  handleOpen={handleCreateWorkspaceModal}
-  handleSubmit={handleCreateWorkSpace}
+  handleModalState={(flag) => {
+    handleCreateWorkspaceModal();
+  }}
 >
   <TextInput
     value={workspacePostInput?.name}
@@ -272,7 +272,26 @@
     invalidValue={invalidWorkspacePostInput.id}
     handleOnSelect={handleTeamSelect}
   />
-</CustomPopup>
+  <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+    <Button
+      disable={workspaceUnderCreation}
+      title={`Cancel`}
+      type="dark"
+      buttonClassProp={`me-2`}
+      onClick={handleCreateWorkspaceModal}
+    />
+    <Button
+      title={"Create"}
+      type="primary"
+      disable={workspaceUnderCreation}
+      loader={workspaceUnderCreation}
+      buttonClassProp={`me-1`}
+      onClick={() => {
+        handleCreateWorkSpace();
+      }}
+    />
+  </div>
+</ModalWrapperV1>
 
 <div
   class="rounded z-2"

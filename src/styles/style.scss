@@ -60,6 +60,8 @@ $sparrow-editor-angle-bracket-color: #636566;
 $sparrow-editor-tag-color: #246BB8;
 $sparrow-editor-string-color: #CE9178;
 $sparrow-email-invite-bg-color:#1E1E1E;
+$sparrow-small-text-size: 0.75rem;
+$sparrow-base-text-size: 0.875rem;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -111,6 +113,8 @@ $sparrow-email-invite-bg-color:#1E1E1E;
   --editor-angle-bracket:#{$sparrow-editor-angle-bracket-color};
   --editor-tag-color: #{$sparrow-editor-tag-color};
   --editor-string-color: #{$sparrow-editor-string-color};
+  --base-text: #{$sparrow-base-text-size};
+  --small-text: #{$sparrow-small-text-size};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -163,6 +167,14 @@ $theme-colors: map-merge(
 body {
   background-color: var(--background-color);
 }
+
+.sparrow-fs-12{
+  font-size: 0.75rem;
+}
+.sparrow-fs-14{
+  font-size: 0.875rem;
+}
+
 .border-error {
   border-color: $sparrow-error;
   border-width: 3px;
@@ -199,4 +211,24 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: #888;
+}
+
+.env-highlight {
+  &.env-found {
+    color: #9CDCFE;
+  }
+
+  &.env-not-found {
+    color: #FE8C98;
+    cursor: pointer;
+  }
+
+  &.hover-found {
+    color: #9CDCFE;
+  }
+
+  &.hover-not-found {
+    color: #FE8C98;
+    background-color: #230408;
+  }
 }

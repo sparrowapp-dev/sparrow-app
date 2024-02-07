@@ -30,13 +30,10 @@
   import { navigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import {
-    ParaInput,
-    FileInput,
-    TextInput,
-    CustomPopup,
-  } from "$lib/components";
+  import { ParaInput, FileInput, TextInput } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -50,7 +47,6 @@
   let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
-  let teamUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
   let isShowMoreVisible: boolean = false;
   let openLeaveTeamModal: boolean = false;
@@ -232,7 +228,6 @@
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
 
-    teamUnderCreation = true;
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
 
@@ -249,10 +244,8 @@
       );
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
-      teamUnderCreation = false;
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
-      teamUnderCreation = false;
       handleCreateTeamModal();
       notifications.error("Failed to create a new team.");
     }
@@ -396,6 +389,7 @@
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
+  let teamUnderSubmission: boolean = false;
 </script>
 
 <svelte:window
@@ -407,18 +401,16 @@
   }}
 />
 <!-- Create New Team POP UP -->
-<CustomPopup
-  isOpen={isCreateTeamModalOpen}
+
+<ModalWrapperV1
   title={"New Team"}
-  underSubmission={teamUnderCreation}
-  btnText={"Create Team"}
-  handleOpen={handleCreateTeamModal}
-  handleSubmit={() =>
-    handleCreateTeam(
-      newTeam.name.value,
-      newTeam.description.value,
-      newTeam.file.value,
-    )}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    handleCreateTeamModal();
+  }}
 >
   <TextInput
     value={newTeam.name.value}
@@ -459,24 +451,70 @@
     fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
     fileSizeError="The size of the file you are trying to upload is more than 100 KB."
   />
-</CustomPopup>
+  <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+    <Button
+      disable={teamUnderSubmission}
+      title={`Cancel`}
+      type="dark"
+      buttonClassProp={`me-2`}
+      onClick={handleCreateTeamModal}
+    />
+    <Button
+      title={"Create Team"}
+      type="primary"
+      disable={teamUnderSubmission}
+      loader={teamUnderSubmission}
+      buttonClassProp={`me-1`}
+      onClick={async () => {
+        teamUnderSubmission = true;
+        await handleCreateTeam(
+          newTeam.name.value,
+          newTeam.description.value,
+          newTeam.file.value,
+        );
+        teamUnderSubmission = false;
+      }}
+    />
+  </div>
+</ModalWrapperV1>
 
 <!-- Leave Team POP UP -->
-<CustomPopup
+
+<ModalWrapperV1
+  title={"Leave Team?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
   isOpen={openLeaveTeamModal}
-  title="Leave Team?"
-  underSubmission={isLeavingTeam}
-  isDanger={true}
-  btnText="Leave"
-  handleOpen={handleLeaveTeamModal}
-  handleSubmit={handleLeaveTeam}
+  handleModalState={(flag) => {
+    handleLeaveTeamModal();
+  }}
 >
   <p class="warning-text text-lightGray mt-3">
     Are you sure you want to leave team <span class="fw-semibold"
       >"{currOpenedTeam?.name}"</span
     >? You will lose access to all the resources in this team.
   </p>
-</CustomPopup>
+  <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+    <Button
+      disable={isLeavingTeam}
+      title={`Cancel`}
+      type="dark"
+      buttonClassProp={`me-2`}
+      onClick={handleLeaveTeamModal}
+    />
+    <Button
+      title={"Leave"}
+      type="danger"
+      disable={isLeavingTeam}
+      loader={isLeavingTeam}
+      buttonClassProp={`me-1`}
+      onClick={async () => {
+        handleLeaveTeam();
+      }}
+    />
+  </div>
+</ModalWrapperV1>
 
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>

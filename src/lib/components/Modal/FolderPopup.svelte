@@ -1,10 +1,14 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
+   * **/
   import closeIcon from "$lib/assets/close.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
   import { fade, fly } from "svelte/transition";
-  import CustomButton from "../buttons/CustomButton.svelte";
+  import Button from "../buttons/Button.svelte";
   export let collectionId: string;
   export let folderId: string;
   export let workspaceId: string;
@@ -92,21 +96,21 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
-      loader={false}
       onClick={() => {
         closePopup(false);
       }}
     />
 
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Delete"}
-      fontSize={14}
+      title={"Delete"}
+      loaderSize={19}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

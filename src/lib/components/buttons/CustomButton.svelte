@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated This component is deprecated and will be removed in future releases.
+   * Please use Button Component instead.
+   */
   import Spinner from "../Transition/Spinner.svelte";
 
   enum BtnType {
@@ -9,7 +13,7 @@
   }
 
   export let text = "Submit";
-  export let onClick:()=>void;
+  export let onClick: () => void;
   export let type: "primary" | "dark" | "danger" | "transparent" = "primary";
   export let fontSize = 16;
   export let disable = false;
