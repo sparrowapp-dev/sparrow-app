@@ -583,32 +583,6 @@
     padding: 8px;
   }
 
-  .btn-close1 {
-    background-color: var(--background-color);
-  }
-  .btn-close1:hover {
-    background-color: var(--background-dropdown);
-  }
-  .btn-close1:active {
-    background-color: var(--background-dropdown);
-  }
-  .btn-primary {
-    background-color: var(--border-color);
-  }
-  .btn-primary:hover {
-    color: var(--blackColor);
-    background-color: var(--workspace-hover-color);
-  }
-  .btn-primary:active {
-    color: var(--blackColor);
-    background-color: var(--button-pressed);
-  }
-  .btn-secondary {
-    background-color: var(--dangerColor);
-  }
-  .btn-secondary:hover {
-    background-color: var(--delete-hover);
-  }
   .team-icon {
     height: 24px;
     width: 24px;
