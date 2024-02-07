@@ -31,6 +31,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
+  import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -64,6 +65,9 @@
   });
 
   onMount(async () => {
+    await onOpenUrl((urls) => {
+      console.log("deep link:", urls);
+    });
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");
