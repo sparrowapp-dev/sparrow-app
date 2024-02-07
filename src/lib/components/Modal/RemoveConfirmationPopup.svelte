@@ -1,6 +1,7 @@
 <script lang="ts">
   /**
    * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\ModalWrapperV1.svelte
    * **/
   import closeIcon from "$lib/assets/close.svg";
   import { CustomButton } from "$lib/components";

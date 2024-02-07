@@ -4,8 +4,17 @@
   export let isOpen = false;
   export let title: string;
   export let type: "primary" | "dark" | "danger" = "primary";
-  export let zIndex = 34;
-  export let width = 488;
+  /**
+   * Takes x-index, recommended values => 1, 100, 1000, 10000, 100000.
+   */
+  export let zIndex = 1000;
+  /**
+   * Takes max width of the modal in percentage %.
+   */
+  export let width = 35;
+  /**
+   * Callback function to close the modal.
+   */
   export let handleModalState: (flag: boolean) => void;
 </script>
 
