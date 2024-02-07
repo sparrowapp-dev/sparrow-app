@@ -294,8 +294,7 @@
   <div class="text-lightGray mb-1 sparrow-fs-14">
     <p>
       Are you sure you want to delete this Folder? Everything in <span
-        style="font-weight:700;"
-        class="text-whiteColor">"{explorer.name}"</span
+        class="text-whiteColor fw-bold">"{explorer.name}"</span
       >
       will be removed.
     </p>
