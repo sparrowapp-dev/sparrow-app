@@ -898,59 +898,55 @@
           {/if}
         </p>
       </div>
-    </div>
-    <div class="controllers mt-3 d-flex justify-content-between">
-      <div>
-        {#if path.length === 0}
-          <Button
-            onClick={() => {
-              createCollectionNameVisibility = true;
-            }}
-            title={"+ Collection"}
-            buttonClassProp={"btn mb-2"}
-            buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
-          />
-        {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-          <Button
-            onClick={() => {
-              createFolderNameVisibility = true;
-            }}
-            title={"+ Folder"}
-            buttonClassProp={"btn mb-2"}
-            buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
-          />
-        {/if}
-      </div>
-      <div class="d-flex">
-        <span class="mx-1">
-          <Button
-            title={"Cancel"}
-            textClassProp={"fs-6 px-2"}
-            type={"dark"}
-            onClick={() => {
-              onClick(false);
-            }}
-          />
-        </span>
-        <span class="mx-2">
-          <Button
-            disable={path.length > 0
-              ? tabName.length > 0
-                ? false
-                : true
-              : true}
-            title={"Save"}
-            textClassProp={"fs-6"}
-            type={"primary"}
-            loader={isLoading}
-            onClick={() => {
-              handleSaveAsRequest();
-            }}
-            loaderSize={18}
-          />
-        </span>
-      </div>
-    </div>
+    {/if}
+  </div>
+</div>
+<div class="controllers mt-3 d-flex justify-content-between">
+  <div>
+    {#if path.length === 0}
+      <Button
+        onClick={() => {
+          createCollectionNameVisibility = true;
+        }}
+        title={"+ Collection"}
+        buttonClassProp={"btn mb-2"}
+        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+      />
+    {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
+      <Button
+        onClick={() => {
+          createFolderNameVisibility = true;
+        }}
+        title={"+ Folder"}
+        buttonClassProp={"btn mb-2"}
+        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+      />
+    {/if}
+  </div>
+  <div class="d-flex">
+    <span class="mx-1">
+      <Button
+        title={"Cancel"}
+        textClassProp={"fs-6 px-2"}
+        type={"dark"}
+        onClick={() => {
+          onClick(false);
+        }}
+      />
+    </span>
+    <span class="mx-1">
+      <Button
+        disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
+        title={"Save"}
+        textClassProp={"fs-6"}
+        type={"primary"}
+        loader={isLoading}
+        onClick={() => {
+          handleSaveAsRequest();
+        }}
+        loaderSize={18}
+      />
+    </span>
   </div>
 </div>
 

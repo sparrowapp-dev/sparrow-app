@@ -26,8 +26,8 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { notifications } from "$lib/utils/notifications";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   let expand: boolean = false;
   export let explorer;
@@ -308,10 +308,10 @@
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
   >
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -319,10 +319,11 @@
       }}
     />
 
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Delete"}
-      fontSize={14}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

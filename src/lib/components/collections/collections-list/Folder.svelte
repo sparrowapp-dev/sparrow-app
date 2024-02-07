@@ -26,7 +26,7 @@
   import requestIcon from "$lib/assets/create_request.svg";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let title: string;
   export let collection: any;
@@ -364,10 +364,10 @@
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
   >
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -375,10 +375,11 @@
       }}
     />
 
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Delete"}
-      fontSize={14}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

@@ -10,8 +10,8 @@
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
   import { notifications } from "$lib/utils/notifications";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { boolean } from "yup";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -200,10 +200,10 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <CustomButton
+    <Button
       disable={deleteEnvironmentLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -211,10 +211,11 @@
       }}
     />
 
-    <CustomButton
+    <Button
       disable={deleteEnvironmentLoader}
-      text={"Delete"}
-      fontSize={14}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"danger"}
       loader={deleteEnvironmentLoader}
       onClick={async () => {
