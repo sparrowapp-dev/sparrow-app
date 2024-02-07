@@ -430,7 +430,7 @@
   </div>
 
   <p class="confirm-header mb-0 sparrow-fs-14">
-    Enter Team name to confirm<span class="asterik">*</span>
+    Enter Team name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
@@ -452,7 +452,7 @@
         confirmationError = "";
       }
     }}
-    class="input-container w-100 mt-2 mb-1 {confirmationError
+    class="input-container rounded w-100 p-2 mt-2 mb-1 {confirmationError
       ? 'error-border'
       : ''}"
   />
@@ -589,12 +589,9 @@
   }
   .asterik {
     color: var(--dangerColor);
-    margin-left: 4px;
   }
   .input-container {
     background-color: var(--background-dropdown);
-    padding: 8px;
-    border-radius: 4px;
     border: 1px solid var(--border-color) !important;
   }
   .error-text {
