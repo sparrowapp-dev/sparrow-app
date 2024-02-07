@@ -192,7 +192,7 @@
               {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
                 <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
                   <PeopleIcon
-                    color={"#8A9299"}
+                    color={"var(--sparrow-text-color)"}
                     classProp="mx-2 my-auto d-flex"
                   />
                   <span class="my-auto"

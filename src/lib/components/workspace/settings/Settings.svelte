@@ -65,7 +65,7 @@
     }
 
     const response = await teamServiceMethods.updateTeam(openTeam.teamId, data);
-    delete response._id;
+    delete response?._id;
     teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
   };
 
@@ -183,7 +183,6 @@
                 spellcheck="false"
                 autocorrect="off"
                 autocapitalize="off"
-                style="height:34px;"
                 bind:value={teamName}
                 on:keydown={(e) => {
                   blurInputField(e, "input-team-name");
