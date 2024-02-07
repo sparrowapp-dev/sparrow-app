@@ -49,7 +49,7 @@
       <Button
         disable={deleteLoader}
         title={"Cancel"}
-        textStyleProp={"font-size: 14px"}
+        textStyleProp={"font-size: var(--base-size)"}
         type={"dark"}
         onClick={onCancel}
       />
@@ -63,7 +63,7 @@
         onClick={() => {
           handleDelete();
         }}
-        textStyleProp={"font-size: 14px"}
+        textStyleProp={"font-size: var(--base-size)"}
       />
     </div>
   </div>

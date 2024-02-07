@@ -130,7 +130,7 @@
       <div>
         <Button
           title={"Cancel"}
-          textStyleProp={"font-size: 16px"}
+          textClassProp={"fs-6"}
           type={"dark"}
           onClick={() => {
             closeCallback(false);
@@ -141,7 +141,7 @@
         <span style="margin-right: 15px;">
           <Button
             title={"Discard Changes"}
-            textStyleProp={"font-size: 16px"}
+            textClassProp={"fs-6"}
             type={"dark"}
             onClick={() => {
               collectionsMethods.handleRemoveTab(componentData.id);
@@ -151,7 +151,7 @@
         </span>
         <Button
           title={"Save Changes"}
-          textStyleProp={"font-size: 16px"}
+          textClassProp={"fs-6"}
           type={"primary"}
           loaderSize={18}
           {loader}

@@ -109,7 +109,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: 14px"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
       onClick={() => {
         closePopup(false);
@@ -119,7 +119,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: 14px"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

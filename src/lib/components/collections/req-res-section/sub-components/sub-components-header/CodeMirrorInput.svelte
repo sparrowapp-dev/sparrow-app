@@ -39,7 +39,9 @@
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
-    handleRawChange();
+    if (rawValue?.length > 0) {
+      handleRawChange();
+    }
     handleHighlightClass();
   });
   const keyBinding = keymap.of([

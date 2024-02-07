@@ -202,7 +202,7 @@
                 <Button
                   title={`Invite`}
                   type={`dark`}
-                  textStyleProp={"font-size: 12px"}
+                  textStyleProp={"font-size: var(--small-text)"}
                   onClick={() => {
                     teamInvitePopup = true;
                   }}
@@ -214,7 +214,7 @@
                   type={`primary`}
                   loader={isLoading}
                   loaderSize={17}
-                  textStyleProp={"font-size: 12px"}
+                  textStyleProp={"font-size: var(--small-text)"}
                   onClick={handleCreateWorkspace}
                   buttonClassProp={`my-auto`}
                   buttonStyleProp={`height: 30px;`}

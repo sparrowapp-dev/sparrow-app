@@ -789,7 +789,7 @@
                   <div class="w-100 d-flex justify-content-center">
                     <Button
                       title={"+ Collection"}
-                      textStyleProp={"font-size: 14px"}
+                      textStyleProp={"font-size: var(--base-text)"}
                       type={"primary"}
                       onClick={() => {
                         createCollectionNameVisibility = true;
@@ -949,8 +949,8 @@
               createCollectionNameVisibility = true;
             }}
             title={"+ Collection"}
-            buttonClassProp={"btn"}
-            buttonStyleProp={"color: var(--send-button); font-size: 12px; margin-bottom: 4px; border: 1px solid var(--send-button);"}
+            buttonClassProp={"btn mb-2"}
+            buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
           />
         {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
           <Button
@@ -958,33 +958,39 @@
               createFolderNameVisibility = true;
             }}
             title={"+ Folder"}
-            buttonClassProp={"btn"}
-            buttonStyleProp={"color: var(--send-button); font-size: 12px; margin-bottom: 4px; border: 1px solid var(--send-button);"}
+            buttonClassProp={"btn mb-2"}
+            buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
           />
         {/if}
       </div>
       <div class="d-flex">
-        <span class="mx-2">
+        <span class="mx-1">
           <Button
             title={"Cancel"}
-            textStyleProp={"font-size: 16px"}
+            textClassProp={"fs-6 px-2"}
             type={"dark"}
             onClick={() => {
               onClick(false);
             }}
           />
         </span>
-        <Button
-          disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
-          title={"Save"}
-          textStyleProp={"font-size: 16px"}
-          type={"primary"}
-          loader={isLoading}
-          onClick={() => {
-            handleSaveAsRequest();
-          }}
-          loaderSize={18}
-        />
+        <span class="mx-2">
+          <Button
+            disable={path.length > 0
+              ? tabName.length > 0
+                ? false
+                : true
+              : true}
+            title={"Save"}
+            textClassProp={"fs-6"}
+            type={"primary"}
+            loader={isLoading}
+            onClick={() => {
+              handleSaveAsRequest();
+            }}
+            loaderSize={18}
+          />
+        </span>
       </div>
     </div>
   </div>

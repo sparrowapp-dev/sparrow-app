@@ -131,7 +131,7 @@ left:{environmentAxisX}px;
           addVariable = true;
         }}
         buttonStyleProp={`align-items: center; justify-content: center; height: 30px;`}
-        textStyleProp={"font-size: 12px"}
+        textStyleProp={"font-size: var(--small-text)"}
       />
     </div>
   </div>
@@ -192,13 +192,13 @@ left:{environmentAxisX}px;
       <Button
         title={"Add & Apply"}
         type={"primary"}
-        buttonClassProp={`w-100`}
+        buttonClassProp={`w-100 mt-1`}
         disable={isAddDisable}
         onClick={() => applyVariable()}
         buttonStyleProp={isAddDisable
-          ? `align-items: center; justify-content: center; height: 30px; margin-top: 10px; opacity: 35%;`
-          : `align-items: center; justify-content: center; height: 30px; margin-top: 10px;`}
-        textStyleProp={"font-size: 12px"}
+          ? `align-items: center; justify-content: center; height: 30px; opacity: 35%;`
+          : `align-items: center; justify-content: center; height: 30px;`}
+        textStyleProp={"font-size: var(--small-text)"}
       />
     </div>
   </div>

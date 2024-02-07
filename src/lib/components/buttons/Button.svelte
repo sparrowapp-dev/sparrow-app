@@ -27,16 +27,25 @@
     ICON = "icon",
   }
   let btnClass = "";
-  if (type === BtnType.PRIMARY) {
-    btnClass = "custom-btn-primary";
-  } else if (type === BtnType.DARK) {
-    btnClass = "custom-btn-dark";
-  } else if (type === BtnType.DANGER) {
-    btnClass = "custom-btn-danger";
-  } else if (type === BtnType.TRANSPARENT) {
-    btnClass = "custom-btn-transparent";
-  } else if (type === BtnType.ICON) {
-    btnClass = "sparrow-icon-btn";
+  switch (type) {
+    case BtnType.PRIMARY:
+      btnClass = "custom-btn-primary";
+      break;
+    case BtnType.DARK:
+      btnClass = "custom-btn-dark";
+      break;
+    case BtnType.DANGER:
+      btnClass = "custom-btn-danger";
+      break;
+    case BtnType.TRANSPARENT:
+      btnClass = "custom-btn-transparent";
+      break;
+    case BtnType.ICON:
+      btnClass = "sparrow-icon-btn";
+      break;
+    default:
+      btnClass = "";
+      break;
   }
 </script>
 

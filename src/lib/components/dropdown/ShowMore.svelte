@@ -25,7 +25,7 @@
                   disable={item.disabled}
                   title={item.displayText}
                   type={"transparent"}
-                  textStyleProp={"font-size: 12px"}
+                  textStyleProp={"font-size: var(--small-text)"}
                   buttonClassProp={`${
                     item.disabled && "text-requestBodyColor"
                   }`}

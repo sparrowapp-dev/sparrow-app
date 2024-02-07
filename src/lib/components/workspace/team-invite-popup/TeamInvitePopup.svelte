@@ -323,7 +323,7 @@
         disable={loader}
         title={"Send Invite"}
         loaderSize={19}
-        textStyleProp={"font-size: 14px"}
+        textStyleProp={"font-size: var(--base-text)"}
         type={"primary"}
         {loader}
         onClick={() => {
