@@ -404,8 +404,8 @@
 <ModalWrapperV1
   title={"New Team"}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={isCreateTeamModalOpen}
   handleModalState={(flag) => {
     handleCreateTeamModal();
@@ -482,8 +482,8 @@
 <ModalWrapperV1
   title={"Leave Team?"}
   type={"danger"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={openLeaveTeamModal}
   handleModalState={(flag) => {
     handleLeaveTeamModal();

@@ -220,8 +220,8 @@
 <ModalWrapperV1
   title={"Incorrect File format"}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={isSyntaxError}
   handleModalState={onClick}
 >
@@ -259,8 +259,8 @@
 <ModalWrapperV1
   title={"New Collection"}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={!isLoading && !isSyntaxError}
   handleModalState={onClick}
 >

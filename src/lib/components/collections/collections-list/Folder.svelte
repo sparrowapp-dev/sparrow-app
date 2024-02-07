@@ -339,8 +339,8 @@
 <ModalWrapperV1
   title={"Delete Collection?"}
   type={"danger"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={isCollectionPopup}
   handleModalState={handleCollectionPopUp}
 >

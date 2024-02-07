@@ -232,8 +232,8 @@
 <ModalWrapperV1
   title={"New Workspace"}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={openCreateWorkspaceModal}
   handleModalState={(flag) => {
     handleCreateWorkspaceModal();

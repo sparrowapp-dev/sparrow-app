@@ -176,8 +176,8 @@
 <ModalWrapperV1
   title={"Save Request"}
   type={"dark"}
-  width={840}
-  zIndex={11}
+  width={55}
+  zIndex={10000}
   isOpen={saveAsVisibility}
   handleModalState={handleSaveAsBackdrop}
 >
@@ -195,8 +195,8 @@
 <ModalWrapperV1
   title={"Save Changes"}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={closePopup}
   handleModalState={handleClosePopupBackdrop}
 >

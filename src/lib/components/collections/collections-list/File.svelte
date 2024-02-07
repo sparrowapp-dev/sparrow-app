@@ -274,8 +274,8 @@
 <ModalWrapperV1
   title={"Delete Request?"}
   type={"danger"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={isFilePopup}
   handleModalState={handleFilePopUp}
 >

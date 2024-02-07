@@ -206,8 +206,8 @@
 <ModalWrapperV1
   title={"Remove user?"}
   type={"danger"}
-  width={540}
-  zIndex={11}
+  width={35}
+  zIndex={10000}
   isOpen={memberPopObj.isMemberRemovePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberRemovePopup");
@@ -255,8 +255,8 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={540}
-  zIndex={11}
+  width={35}
+  zIndex={10000}
   isOpen={memberPopObj.isMemberPromotePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberPromotePopup");
@@ -325,8 +325,8 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={540}
-  zIndex={11}
+  width={35}
+  zIndex={10000}
   isOpen={memberPopObj.isMemberDemotePopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberDemotePopup");
@@ -389,8 +389,8 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={540}
-  zIndex={11}
+  width={35}
+  zIndex={10000}
   isOpen={memberPopObj.isMemberOwnershipPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberOwnershipPopup");
@@ -485,8 +485,8 @@
 <ModalWrapperV1
   title={`Access to ${openTeam?.name}`}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {
     handlePopup(flag, "isMemberInfoPopup");

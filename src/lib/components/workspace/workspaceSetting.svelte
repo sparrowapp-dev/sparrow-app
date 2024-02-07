@@ -179,8 +179,8 @@
   <ModalWrapperV1
     title={"Delete Workspace?"}
     type={"danger"}
-    width={540}
-    zIndex={9}
+    width={35}
+    zIndex={1000}
     isOpen={isshowDeletePopupOpen}
     handleModalState={handleDeletePopup}
   >

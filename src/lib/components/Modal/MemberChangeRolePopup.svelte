@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * @deprecated please so not use this file
+   * @deprecated please do not use this file
    * **/
   import closeIcon from "$lib/assets/close.svg";
   import { base64ToURL } from "$lib/utils/helpers";

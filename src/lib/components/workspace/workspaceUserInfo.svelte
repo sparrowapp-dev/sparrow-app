@@ -329,8 +329,8 @@
     <ModalWrapperV1
       title={"Remove user?"}
       type={"danger"}
-      width={540}
-      zIndex={11}
+      width={35}
+      zIndex={10000}
       isOpen={isRemoveMemberPopup}
       handleModalState={showRemoveMemberPopup}
     >
@@ -387,8 +387,8 @@
     <ModalWrapperV1
       title={"Remove user?"}
       type={"danger"}
-      width={540}
-      zIndex={11}
+      width={35}
+      zIndex={10000}
       isOpen={isRemoveTeamPopup}
       handleModalState={showRemoveTeamPopup}
     >
@@ -438,8 +438,8 @@
 <ModalWrapperV1
   title={`Access to ${currentTeamDetails.name}`}
   type={"dark"}
-  width={540}
-  zIndex={9}
+  width={35}
+  zIndex={1000}
   isOpen={isMemberInfoPopup}
   handleModalState={handleMemberPopup}
 >

@@ -342,8 +342,8 @@
   <ModalWrapperV1
     title={"Invite Team Members"}
     type={"dark"}
-    width={540}
-    zIndex={9}
+    width={35}
+    zIndex={1000}
     isOpen={isActiveInvitePopup}
     handleModalState={handleInvitePopup}
   >

@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * @deprecated please so not use this file
+   * @deprecated please do not use this file
    * **/
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string;

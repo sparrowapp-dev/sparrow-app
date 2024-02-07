@@ -277,8 +277,8 @@
 <ModalWrapperV1
   title={"Save Request"}
   type={"dark"}
-  width={840}
-  zIndex={11}
+  width={55}
+  zIndex={10000}
   isOpen={visibility}
   handleModalState={handleBackdrop}
 >

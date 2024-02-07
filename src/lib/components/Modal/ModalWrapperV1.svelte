@@ -18,7 +18,7 @@
   />
   <div
     class="sparrow-modal-container gap-2 p-4"
-    style={`z-index: ${zIndex + 1}; width: ${width}px`}
+    style={`z-index: ${zIndex + 1}; width: ${width}%`}
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
