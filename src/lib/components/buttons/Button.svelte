@@ -53,12 +53,12 @@
   disabled={disable}
   style={`${buttonStyleProp} ${
     type !== "other" && type !== "icon"
-      ? "margin-bottom: 4px; border-radius: 4px; padding: 6px 12px;"
+      ? "border-radius: 4px; padding: 6px 12px;"
       : ""
   } `}
   class={`${buttonClassProp} ${
     type !== "other" && type !== "icon"
-      ? "py-1 px-3 border-0 d-flex align-items-center"
+      ? "py-1 px-3 border-0 d-flex align-items-center mb-2"
       : ""
   } ${btnClass}`}
   on:click={(e) => {
