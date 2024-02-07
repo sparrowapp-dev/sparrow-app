@@ -240,7 +240,7 @@ class ApiSendRequestViewModel {
   ): string => {
     let response = text;
     environmentVariables.forEach((element) => {
-      const regex = new RegExp(`{{${element.key}}}`, "g");
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
       response = response.replace(regex, element.value);
     });
     return response;

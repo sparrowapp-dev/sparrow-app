@@ -14,7 +14,6 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
-  import CollectionPopup from "$lib/components/Modal/CollectionPopup.svelte";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
@@ -25,6 +24,9 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { notifications } from "$lib/utils/notifications";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
 
   export let title: string;
   export let collection: any;
@@ -276,24 +278,115 @@
       disabled: false,
     },
   ];
+  let requestCount: number = 0;
+  let folderCount: number = 0;
+  let deletedIds: string[] = [];
   $: {
     if (activePath) {
       if (activePath.collectionId === collection.id) {
         visibility = true;
       }
     }
+    if (collection) {
+      deletedIds.length = [];
+      requestCount = 0;
+      folderCount = 0;
+      collection.items.forEach((item) => {
+        if (item.type === ItemType.FOLDER) {
+          deletedIds.push(item.id);
+          folderCount++;
+          requestCount += item.items.length;
+          for (let i = 0; i < item.items.length; i++) {
+            deletedIds.push(item.items[i].id);
+          }
+        } else if (item.type === ItemType.REQUEST) {
+          requestCount++;
+          deletedIds.push(item.id);
+        }
+      });
+      deletedIds.push(collectionId);
+    }
   }
+
+  // delete collection
+
+  let deleteLoader: boolean = false;
+  const handleDelete = async () => {
+    deleteLoader = true;
+    const response = await collectionService.deleteCollection(
+      currentWorkspaceId,
+      collectionId,
+    );
+
+    if (response.isSuccessful) {
+      collectionsMethods.deleteCollection(collectionId);
+      collectionsMethods.deleteCollectioninWorkspace(
+        currentWorkspaceId,
+        collectionId,
+      );
+      handleCollectionPopUp(false);
+      notifications.success(`"${collection.name}" Collection deleted.`);
+      collectionsMethods.removeMultipleTabs(deletedIds);
+      deleteLoader = false;
+    } else {
+      notifications.error("Failed to delete the Collection.");
+      deleteLoader = false;
+    }
+  };
 </script>
 
-{#if isCollectionPopup}
-  <CollectionPopup
-    {collectionsMethods}
-    {collection}
-    {collectionId}
-    workspaceId={currentWorkspaceId}
-    closePopup={handleCollectionPopUp}
-  />
-{/if}
+<ModalWrapperV1
+  title={"Delete Collection?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCollectionPopup}
+  handleModalState={handleCollectionPopUp}
+>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
+      Are you sure you want to delete this Collection? Everything in <span
+        class="text-whiteColor fw-bold">"{collection.name}"</span
+      >
+      will be removed.
+    </p>
+  </div>
+  <div class="d-flex gap-3 sparrow-fs-12">
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{requestCount}</span>
+      <p>API Requests</p>
+    </div>
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{folderCount}</span>
+      <p>Folder</p>
+    </div>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <CustomButton
+      disable={deleteLoader}
+      text={"Cancel"}
+      fontSize={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handleCollectionPopUp(false);
+      }}
+    />
+
+    <CustomButton
+      disable={deleteLoader}
+      text={"Delete"}
+      fontSize={14}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        handleDelete();
+      }}
+    />
+  </div></ModalWrapperV1
+>
 
 {#if showMenu}
   <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">

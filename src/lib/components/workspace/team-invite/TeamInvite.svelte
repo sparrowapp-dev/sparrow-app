@@ -2,7 +2,6 @@
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string = "";
   export let teamId: string = "";
-  import { fly, fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
@@ -33,26 +32,45 @@
   let roleError: boolean = false;
   let workspaceError: boolean = false;
 
-  function removeElement(event:Event):void{
-      const id=event.target?.id;
-      const removeElement = document.getElementById(id) as HTMLElement;
-      document.getElementById("input-email").removeChild(removeElement);
-  };
-  
+  function removeElement(event: Event): void {
+    const id = event.target?.id;
+    const removeElement = document.getElementById(id) as HTMLElement;
+    document.getElementById("input-email").removeChild(removeElement);
+  }
+
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
     emailstoBeSentArr.push(email);
-    const emailDiv:HTMLElement=createDynamicComponents("div","d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center")
-    const emailContentSpan = createDynamicComponents("span","");
-    const closeIconBtn= createDynamicComponents("img","bg-transparent",[{eventType:"click",eventHandler:removeElement},{eventType:"mouseleave",eventHandler:()=>{closeIconBtn.src = closeIcon}},{eventType:"mouseenter",eventHandler:()=>{closeIconBtn.src = closeIconWhite}}]) as HTMLImageElement;
+    const emailDiv: HTMLElement = createDynamicComponents(
+      "div",
+      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+    );
+    const emailContentSpan = createDynamicComponents("span", "");
+    const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
+      { eventType: "click", eventHandler: removeElement },
+      {
+        eventType: "mouseleave",
+        eventHandler: () => {
+          closeIconBtn.src = closeIcon;
+        },
+      },
+      {
+        eventType: "mouseenter",
+        eventHandler: () => {
+          closeIconBtn.src = closeIconWhite;
+        },
+      },
+    ]) as HTMLImageElement;
     emailDiv.id = email;
-    closeIconBtn.id=email;
+    closeIconBtn.id = email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
-    const emailContainer:HTMLElement=document.getElementById("input-email") as HTMLElement;
+    const emailContainer: HTMLElement = document.getElementById(
+      "input-email",
+    ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
   };
@@ -163,154 +181,127 @@
   };
 </script>
 
-<div
-  class="background-overlay"
-  on:click={() => {
-    handleInvitePopup(false);
-  }}
-  transition:fade={{ delay: 0, duration: 100 }}
-/>
-
-<div
-  class="container"
-  transition:fly={{ y: 50, delay: 0, duration: 100 }}
-  on:introstart
-  on:outroend
->
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <p class="mb-0 header-title">Invite Team Members</p>
-    <button
-      class="btn-close1 border-0 rounded"
-      on:click={() => {
-        handleInvitePopup(false);
+<div class="d-flex flex-column">
+  <p class="invite-header mb-0">
+    Invite By Email<span class="asterik">*</span>
+  </p>
+  <p class="invite-subheader text-textColor mt-0 mb-1">
+    use commas to separate emails
+  </p>
+  <div
+    class="email-container rounded {emailError && emailstoBeSentArr.length === 0
+      ? 'isError'
+      : ''}"
+  >
+    <div id="input-email"></div>
+    <input
+      id="input"
+      placeholder="Enter email ID"
+      autocomplete="off"
+      autocapitalize="none"
+      style="outline:none;border:none;flex-grow:1; background:transparent;"
+      bind:value={currentEmailEntered}
+      class="input-container mt-2"
+      on:keyup={(event) => {
+        if (event.key === "," || event.key === "Enter") {
+          handleEmailOnAdd(currentEmailEntered);
+        }
       }}
-    >
-      <img src={closeIcon} alt="x" />
-    </button>
-  </div>
-  <div class="d-flex flex-column">
-    <p class="invite-header mb-0">
-      Invite By Email<span class="asterik">*</span>
-    </p>
-    <p class="invite-subheader text-textColor mt-0 mb-1">
-      use commas to separate emails
-    </p>
-    <div
-      class="email-container rounded {emailError &&
-      emailstoBeSentArr.length === 0
-        ? 'isError'
-        : ''}"
-    >
-      <div id="input-email"></div>
-      <input
-        id="input"
-        placeholder="Enter email ID"
-        autocomplete="off"
-        autocapitalize="none"
-        style="outline:none;border:none;flex-grow:1; background:transparent;"
-        bind:value={currentEmailEntered}
-        class="input-container mt-2"
-        on:keyup={(event) => {
-          if (event.key === "," || event.key === "Enter") {
-            handleEmailOnAdd(currentEmailEntered);
-          }
-        }}
-      />
-    </div>
-    {#if emailError && emailstoBeSentArr.length === 0}
-      <p class="error-text">Email ID cannot be Empty.</p>
-    {/if}
-  </div>
-
-  <div class="mt-4">
-    <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-    <SelectRoleDropdown
-      isError={roleError && selectedRole === "select"}
-      id={"invite-member-workspace"}
-      data={[
-        {
-          name: "Select",
-          id: "select",
-          description: "Select role",
-          color: "whiteColor",
-        },
-        {
-          name: "Admin",
-          id: TeamRole.TEAM_ADMIN,
-          description:
-            "Add & edit resources within a workspace,add & remove members to workspace",
-          color: "whiteColor",
-        },
-        {
-          name: "Editor",
-          id: WorkspaceRole.WORKSPACE_EDITOR,
-          description: "Add & edit resources within a workspace",
-          color: "whiteColor",
-        },
-        {
-          name: "Viewer",
-          id: WorkspaceRole.WORKSPACE_VIEWER,
-          description: "View Resources within a workspace.",
-          color: "whiteColor",
-        },
-      ]}
-      method={selectedRole ? selectedRole : ""}
-      onclick={handleDropdown}
     />
   </div>
-  {#if selectedRole === TeamRole.TEAM_ADMIN}
-    <p class="invite-subheader text-textColor mt-1 mb-1">
-      Admins will get access to all the current workspaces as well as any future
-      workspaces in the team.
+  {#if emailError && emailstoBeSentArr.length === 0}
+    <p class="error-text">Email ID cannot be Empty.</p>
+  {/if}
+</div>
+
+<div class="mt-4">
+  <p class="role-title mb-1">Role<span class="asterik">*</span></p>
+  <SelectRoleDropdown
+    isError={roleError && selectedRole === "select"}
+    id={"invite-member-workspace"}
+    data={[
+      {
+        name: "Select",
+        id: "select",
+        description: "Select role",
+        color: "whiteColor",
+      },
+      {
+        name: "Admin",
+        id: TeamRole.TEAM_ADMIN,
+        description:
+          "Add & edit resources within a workspace,add & remove members to workspace",
+        color: "whiteColor",
+      },
+      {
+        name: "Editor",
+        id: WorkspaceRole.WORKSPACE_EDITOR,
+        description: "Add & edit resources within a workspace",
+        color: "whiteColor",
+      },
+      {
+        name: "Viewer",
+        id: WorkspaceRole.WORKSPACE_VIEWER,
+        description: "View Resources within a workspace.",
+        color: "whiteColor",
+      },
+    ]}
+    method={selectedRole ? selectedRole : ""}
+    onclick={handleDropdown}
+  />
+</div>
+{#if selectedRole === TeamRole.TEAM_ADMIN}
+  <p class="invite-subheader text-textColor mt-1 mb-1">
+    Admins will get access to all the current workspaces as well as any future
+    workspaces in the team.
+  </p>
+{/if}
+{#if roleError && selectedRole === "select"}
+  <p class="error-text">Role cannot be empty.</p>
+{/if}
+
+{#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
+  <div class="mt-4">
+    <p class="role-title mb-0">
+      Specify Workspace<span class="asterik">*</span>
+    </p>
+    <p class="invite-subheader text-textColor mt-0 mb-1">
+      Select workspaces you would want to give access to.
+    </p>
+    <CheckSelectDropdown
+      isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}
+      id={"check-select-workspace"}
+      list={teamSpecificWorkspace}
+      onclick={handleCheckSelectDropdown}
+    />
+  </div>
+  {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
+    <p class="error-text">
+      You need to select at least one workspace. If you wish to give access to
+      all workspaces, plese click on select all.
     </p>
   {/if}
-  {#if roleError && selectedRole === "select"}
-    <p class="error-text">Role cannot be empty.</p>
-  {/if}
-
-  {#if selectedRole === WorkspaceRole.WORKSPACE_EDITOR || selectedRole === WorkspaceRole.WORKSPACE_VIEWER}
-    <div class="mt-4">
-      <p class="role-title mb-0">
-        Specify Workspace<span class="asterik">*</span>
-      </p>
-      <p class="invite-subheader text-textColor mt-0 mb-1">
-        Select Workspaces you would want to give access to.
-      </p>
-      <CheckSelectDropdown
-        isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}
-        id={"check-select-workspace"}
-        list={teamSpecificWorkspace}
-        onclick={handleCheckSelectDropdown}
-      />
+{/if}
+<div class="d-flex align-items-center justify-content-between mt-4">
+  <div class="description">
+    <div class="d-flex align-items-center">
+      {#if teamLogo}
+        <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
+      {/if}
+      <p style="font-size:16px;" class="mb-0">{teamName}</p>
     </div>
-    {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
-      <p class="error-text">
-        You need to select at least one workspace. If you wish to give access to
-        all workspaces, plese click on select all.
-      </p>
-    {/if}
-  {/if}
-  <div class="d-flex align-items-center justify-content-between mt-4">
-    <div class="description">
-      <div class="d-flex align-items-center">
-        {#if teamLogo}
-          <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
-        {/if}
-        <p style="font-size:16px;" class="mb-0">{teamName}</p>
-      </div>
-    </div>
-    <div>
-      <CustomButton
-        disable={loader}
-        text={"Send Invite"}
-        fontSize={14}
-        type={"primary"}
-        {loader}
-        onClick={() => {
-          handleInvite();
-        }}
-      />
-    </div>
+  </div>
+  <div>
+    <CustomButton
+      disable={loader}
+      text={"Send Invite"}
+      fontSize={14}
+      type={"primary"}
+      {loader}
+      onClick={() => {
+        handleInvite();
+      }}
+    />
   </div>
 </div>
 

@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
+   * **/
   import closeIcon from "$lib/assets/close.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -10,12 +14,9 @@
   export let workspaceId: string;
   export let request;
   export let closePopup: (flag: boolean) => void;
-
   export let collectionsMethods: CollectionsMethods;
   const collectionService = new CollectionService();
-
   let deleteLoader: boolean = false;
-
   const handleDelete = async () => {
     if (folderId && collectionId && workspaceId) {
       deleteLoader = true;
@@ -144,7 +145,6 @@
     backdrop-filter: blur(3px);
     z-index: 9;
   }
-
   .container {
     position: fixed;
     height: 204px;
@@ -156,36 +156,29 @@
     z-index: 10;
     border-radius: 10px;
   }
-
   .btn-close1 {
     background-color: var(--background-color);
   }
-
   .btn-close1:hover {
     background-color: var(--dangerColor);
   }
-
   .btn-close1:active {
     background-color: var(--dangerColor);
   }
   .btn-primary {
     background-color: var(--border-color);
   }
-
   .btn-primary:hover {
     color: var(--blackColor);
     background-color: var(--workspace-hover-color);
   }
-
   .btn-primary:active {
     color: var(--blackColor);
     background-color: var(--button-pressed);
   }
-
   .btn-secondary {
     background-color: var(--dangerColor);
   }
-
   .btn-secondary:hover {
     background-color: var(--delete-hover);
   }

@@ -11,8 +11,9 @@
   } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
   import Dropdown from "../dropdown/Dropdown.svelte";
-  import RemoveConfirmationPopup from "../Modal/RemoveConfirmationPopup.svelte";
   import MemberInfoPopup from "../workspace/member-info-popup/MemberInfoPopup.svelte";
+  import CustomButton from "../buttons/CustomButton.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
   export let id: string;
   export let name: string;
   export let email: string;
@@ -271,6 +272,8 @@
       );
     }
   };
+  let memberRemoveLoader: boolean = false;
+  let teamMemberRemoveLoader: boolean = false;
 </script>
 
 <div
@@ -324,62 +327,123 @@
         </p>
       </div>
     {/if}
-    {#if isRemoveMemberPopup}
-      <RemoveConfirmationPopup
-        title={`Remove user?`}
-        description={`<p class="text-lightGray">
-      Are you sure you want to remove <span style="font-weight:700;"
-      class="text-whiteColor">${name}</span
-      >? They will lose access to the
-      <span  style="font-weight:700;"
-      class="text-whiteColor">${currentWorkspaceDetails.name}</span> workspace.
-      ${
-        isPartOfOnlythisWorkspace
-          ? `
-      <span>
-        They will still have access to other workspaces that they are part of.
-      </span>
-    `
-          : `
-      <span>
-        Since they are not part of any other workspace, they will lose access to ${currentTeamDetails.name} team as well.
-      </span>`
-      }
-    </p>`}
-        onSuccess={async () => {
-          await handleRemove(activeWorkspaceOpertionId, id);
-        }}
-        onCancel={() => {
-          showRemoveMemberPopup(false);
-        }}
-      />
-    {/if}
-    {#if isRemoveTeamPopup}
-      <RemoveConfirmationPopup
-        title={`Remove user?`}
-        description={`<p class="text-lightGray">
-    Are you sure you want to remove <span style="font-weight:700;"
-    class="text-whiteColor">${name}</span
-    >? They will lose access to the
-    <span  style="font-weight:700;"
-    class="text-whiteColor">${currentTeamDetails.name}</span> Team.
-    </p>`}
-        onSuccess={async () => {
-          await handleRemoveUserFromTeam();
-        }}
-        onCancel={() => {
-          showRemoveTeamPopup(false);
-        }}
-      />
-    {/if}
+    <ModalWrapperV1
+      title={"Remove user?"}
+      type={"danger"}
+      width={"35%"}
+      zIndex={10000}
+      isOpen={isRemoveMemberPopup}
+      handleModalState={showRemoveMemberPopup}
+    >
+      <div class="text-lightGray mb-1 sparrow-fs-14">
+        <p class="text-lightGray">
+          Are you sure you want to remove <span class="text-whiteColor fw-bold"
+            >{name}</span
+          >? They will lose access to the
+          <span class="text-whiteColor fw-bold"
+            >{currentWorkspaceDetails.name}</span
+          >
+          workspace.
+
+          {isPartOfOnlythisWorkspace
+            ? `
+            They will still have access to other workspaces that they are part of.
+        `
+            : `
+            Since they are not part of any other workspace, they will lose access to ${currentTeamDetails.name} team as well.
+          `}
+        </p>
+      </div>
+      <div
+        class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
+        style="font-size: 16px;"
+      >
+        <CustomButton
+          disable={memberRemoveLoader}
+          text={"Cancel"}
+          fontSize={14}
+          type={"dark"}
+          loader={false}
+          onClick={() => {
+            showRemoveMemberPopup(false);
+          }}
+        />
+
+        <CustomButton
+          disable={memberRemoveLoader}
+          text={"Remove"}
+          fontSize={14}
+          type={"danger"}
+          loader={memberRemoveLoader}
+          onClick={async () => {
+            memberRemoveLoader = true;
+            await handleRemove(activeWorkspaceOpertionId, id);
+            memberRemoveLoader = false;
+          }}
+        />
+      </div>
+    </ModalWrapperV1>
+
+    <ModalWrapperV1
+      title={"Remove user?"}
+      type={"danger"}
+      width={"35%"}
+      zIndex={10000}
+      isOpen={isRemoveTeamPopup}
+      handleModalState={showRemoveTeamPopup}
+    >
+      <div class="text-lightGray mb-1 sparrow-fs-14">
+        <p class="text-lightGray">
+          Are you sure you want to remove <span class="text-whiteColor fw-bold"
+            >{name}</span
+          >? They will lose access to the
+          <span class="text-whiteColor fw-bold">{currentTeamDetails.name}</span>
+          Team.
+        </p>
+      </div>
+      <div
+        class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
+        style="font-size: 16px;"
+      >
+        <CustomButton
+          disable={teamMemberRemoveLoader}
+          text={"Cancel"}
+          fontSize={14}
+          type={"dark"}
+          loader={false}
+          onClick={() => {
+            showRemoveTeamPopup(false);
+          }}
+        />
+
+        <CustomButton
+          disable={teamMemberRemoveLoader}
+          text={"Remove"}
+          fontSize={14}
+          type={"danger"}
+          loader={teamMemberRemoveLoader}
+          onClick={async () => {
+            teamMemberRemoveLoader = true;
+            await handleRemoveUserFromTeam();
+            teamMemberRemoveLoader = false;
+          }}
+        />
+      </div>
+    </ModalWrapperV1>
   </div>
 </div>
 
-{#if isMemberInfoPopup}
+<ModalWrapperV1
+  title={`Access to ${currentTeamDetails.name}`}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isMemberInfoPopup}
+  handleModalState={handleMemberPopup}
+>
   <MemberInfoPopup
     owner={loggedInUser}
     {teamRole}
-    title={`Access to ${currentTeamDetails.name}`}
     user={{
       id,
       name,
@@ -399,14 +463,13 @@
     })}
     userType={loggedUserRole}
     userId={id}
-    onCancel={handleMemberPopup}
     getPermissionsData={() => {
       return getPermissionsData();
     }}
     handleDropDownWorkspaceLevel={handleDropdown}
     isWorkspaceMemberInfo={true}
   />
-{/if}
+</ModalWrapperV1>
 
 <style>
   .user:hover {
