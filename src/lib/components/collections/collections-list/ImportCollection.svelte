@@ -13,7 +13,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import { FileInput } from "$lib/components";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -220,21 +220,21 @@
 <ModalWrapperV1
   title={"Incorrect File format"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isSyntaxError}
   handleModalState={onClick}
 >
   <div class="invalid-type-content">
     <div>
-      <p class="format-info">
+      <p class="format-info sparrow-fs-12">
         We have identified that text you pasted is not the right file format.
         Please ensure that you paste the following file formats only.
       </p>
     </div>
     <div class="format-types-container">
-      <p class="format-type">.YAML</p>
-      <p class="format-type">.JSON</p>
+      <p class="format-type sparrow-fs-12">.YAML</p>
+      <p class="format-type sparrow-fs-12">.JSON</p>
     </div>
     <div class="format-btns">
       <button
@@ -259,12 +259,12 @@
 <ModalWrapperV1
   title={"New Collection"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={!isLoading && !isSyntaxError}
   handleModalState={onClick}
 >
-  <div style="font-size: 14px;" class="importData-lightGray">
+  <div class="importData-lightGray sparrow-fs-14">
     <p>Paste your YAML/JSON file</p>
   </div>
   <div class="textarea-div rounded border-0">
@@ -274,7 +274,7 @@
       class="form-control border-0 rounded bg-blackColor"
     />
   </div>
-  <div style="font-size: 14px;" class="importData-lightGray">
+  <div class="importData-lightGray sparrow-fs-14">
     <p class="mb-1">Drag and drop your YAML/JSON file</p>
   </div>
   <div>
@@ -314,17 +314,12 @@
       > Import Collection</button
     >
 
-    <p class="empty-data-error">
+    <p class="empty-data-error sparrow-fs-12">
       {#if isDataEmpty && !importData}
         Please Paste or Upload your file in order to import the workspace
       {/if}
     </p>
-    <p
-      class="importData-whiteColor mb-2"
-      style="font-size: 14px;font-weight:300"
-    >
-      OR
-    </p>
+    <p class="importData-whiteColor mb-2 sparrow-fs-14 fw-bold">OR</p>
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
@@ -361,7 +356,6 @@
   .empty-data-error {
     color: var(--error--color);
     font-family: Roboto;
-    font-size: 12px;
     font-weight: 400;
     line-height: 18px;
     letter-spacing: 0em;
@@ -417,14 +411,12 @@
 
     .format-info {
       font-family: Roboto;
-      font-size: 12px;
       font-weight: 400;
       line-height: 18px;
       letter-spacing: 0em;
       text-align: left;
     }
     .format-type {
-      font-size: 12px;
       font-weight: 400;
       line-height: 18px;
       letter-spacing: 0em;

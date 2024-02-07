@@ -8,10 +8,7 @@
    * Takes x-index, recommended values => 1, 100, 1000, 10000, 100000.
    */
   export let zIndex = 1000;
-  /**
-   * Takes max width of the modal in percentage %.
-   */
-  export let width = 35;
+  export let width = "35%";
   /**
    * Callback function to close the modal.
    */
@@ -27,7 +24,7 @@
   />
   <div
     class="sparrow-modal-container gap-2 p-4"
-    style={`z-index: ${zIndex + 1}; width: ${width}%`}
+    style={`z-index: ${zIndex + 1}; width: ${width}`}
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend

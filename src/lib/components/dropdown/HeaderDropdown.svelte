@@ -30,7 +30,7 @@
   import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import { setOpenedTeam } from "$lib/store";
   import { v4 as uuidv4 } from "uuid";
-  import ModalWrapperV1 from "../Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
   import CustomButton from "../buttons/CustomButton.svelte";
 
   export let userId: string | undefined;
@@ -232,7 +232,7 @@
 <ModalWrapperV1
   title={"New Workspace"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={openCreateWorkspaceModal}
   handleModalState={(flag) => {

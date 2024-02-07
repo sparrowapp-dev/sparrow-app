@@ -17,7 +17,7 @@
   export let collectionsMethods: CollectionsMethods;
   import { notifications } from "$lib/utils/notifications";
   import { navigate } from "svelte-navigator";
-  import ModalWrapperV1 from "../Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };
@@ -66,7 +66,7 @@
       navigate("/dashboard/workspaces");
     } else {
       notifications.error(
-        `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}.Please Try Again`,
+        `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,
       );
     }
     handleDeletePopup(false);
@@ -179,14 +179,14 @@
   <ModalWrapperV1
     title={"Delete Workspace?"}
     type={"danger"}
-    width={35}
+    width={"35%"}
     zIndex={1000}
     isOpen={isshowDeletePopupOpen}
     handleModalState={handleDeletePopup}
   >
     <div class="workspace-delete-confirmation">
-      <div style="font-size: 14px;" class="text-lightGray mb-1">
-        <p style="font-size:12px;" class="text-textColor">
+      <div class="text-lightGray mb-1 sparrow-fs-14">
+        <p class="text-textColor sparrow-fs-12">
           Everything in '<span class="text-whiteColor"
             >{currentWorkspaceDetails.name}</span
           > will be permanently removed, and all contributors will lose access. This
@@ -194,8 +194,8 @@
         </p>
       </div>
 
-      <p class="confirm-header mb-0">
-        Enter Workspace name to confirm<span class="asterik">*</span>
+      <p class="confirm-header mb-0 sparrow-fs-14">
+        Enter workspace name to confirm<span class="asterik">*</span>
       </p>
       <input
         id={`workspace-confirmation-input`}
@@ -222,7 +222,7 @@
           : ''}"
       />
       {#if confirmationError}
-        <p class="error-text">{confirmationError}</p>
+        <p class="error-text sparrow-fs-12">{confirmationError}</p>
       {/if}
       <br />
 
@@ -348,9 +348,6 @@
       color: var(--dangerColor);
       margin-left: 4px;
     }
-    .confirm-header {
-      font-size: 14px;
-    }
     .input-container {
       background-color: var(--background-dropdown);
       padding: 8px;
@@ -362,7 +359,6 @@
       margin-top: 2px;
       margin-bottom: 0 !important;
       color: var(--error--color);
-      font-size: 12px;
     }
     .error-border {
       border: 1px solid var(--error--color) !important;

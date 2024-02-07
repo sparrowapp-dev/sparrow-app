@@ -25,7 +25,7 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { notifications } from "$lib/utils/notifications";
 
@@ -286,12 +286,12 @@
 <ModalWrapperV1
   title={"Delete Folder?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isFolderPopup}
   handleModalState={handleFolderPopUp}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 sparrow-fs-14">
     <p>
       Are you sure you want to delete this Folder? Everything in <span
         style="font-weight:700;"
@@ -300,7 +300,7 @@
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3" style="font-size:12px">
+  <div class="d-flex gap-3 sparrow-fs-12">
     <div class="d-flex gap-1">
       <span class="text-plusButton">{requestCount}</span>
       <p>API Requests</p>
@@ -308,7 +308,6 @@
   </div>
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-    style="font-size: 16px;"
   >
     <CustomButton
       disable={deleteLoader}

@@ -32,7 +32,7 @@
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { ParaInput, FileInput, TextInput } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
 
   export let data: any;
@@ -404,7 +404,7 @@
 <ModalWrapperV1
   title={"New Team"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isCreateTeamModalOpen}
   handleModalState={(flag) => {
@@ -482,7 +482,7 @@
 <ModalWrapperV1
   title={"Leave Team?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={openLeaveTeamModal}
   handleModalState={(flag) => {

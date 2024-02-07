@@ -14,7 +14,7 @@
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { setBodyType } from "$lib/utils/helpers/auth.helper";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
 
@@ -274,16 +274,15 @@
 <ModalWrapperV1
   title={"Delete Request?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isFilePopup}
   handleModalState={handleFilePopUp}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 sparrow-fs-12">
     <p>
       Are you sure you want to delete this Request? <span
-        style="font-weight:700;"
-        class="text-whiteColor">"{api.name} "</span
+        class="text-whiteColor fw-bold">"{api.name}"</span
       >
       will be removed.
     </p>
@@ -374,8 +373,7 @@
 
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldFile"
-        style="font-size: 12px;"
+        class="form-control py-0 renameInputFieldFile sparrow-fs-12"
         id="renameInputFieldFile"
         type="text"
         autofocus

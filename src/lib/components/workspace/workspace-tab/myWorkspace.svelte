@@ -25,7 +25,7 @@
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
@@ -342,7 +342,7 @@
   <ModalWrapperV1
     title={"Invite Team Members"}
     type={"dark"}
-    width={35}
+    width={"35%"}
     zIndex={1000}
     isOpen={isActiveInvitePopup}
     handleModalState={handleInvitePopup}

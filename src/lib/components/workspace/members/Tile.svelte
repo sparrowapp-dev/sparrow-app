@@ -13,7 +13,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
@@ -206,7 +206,7 @@
 <ModalWrapperV1
   title={"Remove user?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberRemovePopup}
   handleModalState={(flag) => {
@@ -255,7 +255,7 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberPromotePopup}
   handleModalState={(flag) => {
@@ -325,7 +325,7 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberDemotePopup}
   handleModalState={(flag) => {
@@ -389,7 +389,7 @@
 <ModalWrapperV1
   title={"Changing Role?"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberOwnershipPopup}
   handleModalState={(flag) => {
@@ -485,7 +485,7 @@
 <ModalWrapperV1
   title={`Access to ${openTeam?.name}`}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={memberPopObj.isMemberInfoPopup}
   handleModalState={(flag) => {

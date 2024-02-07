@@ -1,6 +1,7 @@
 <script lang="ts">
   /**
    * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string;

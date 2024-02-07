@@ -17,7 +17,7 @@
   import { notifications } from "$lib/utils/notifications";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -277,7 +277,7 @@
 <ModalWrapperV1
   title={"Save Request"}
   type={"dark"}
-  width={55}
+  width={"55%"}
   zIndex={10000}
   isOpen={visibility}
   handleModalState={handleBackdrop}

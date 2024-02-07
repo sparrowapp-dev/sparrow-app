@@ -266,7 +266,7 @@
       Specify Workspace<span class="asterik">*</span>
     </p>
     <p class="invite-subheader text-textColor mt-0 mb-1">
-      Select Workspaces you would want to give access to.
+      Select workspaces you would want to give access to.
     </p>
     <CheckSelectDropdown
       isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}

@@ -91,7 +91,7 @@
           `Invite Sent to ${emailstoBeSentArr.length} for ${currentWorkspaceDetails.name}`,
         );
       } else {
-        notifications.error(`Failed To sent invites,please try again`);
+        notifications.error(`Failed to sent invites, please try again`);
       }
       handleInvitePopup(false);
     }
@@ -102,10 +102,10 @@
 </script>
 
 <div class="d-flex flex-column">
-  <p class="invite-header mb-0">
+  <p class="invite-header mb-0 sparrow-fs-14">
     Invite By Email<span class="asterik">*</span>
   </p>
-  <p class="invite-subheader text-textColor mt-0 mb-0">
+  <p class="invite-subheader text-textColor mt-0 mb-0 sparrow-fs-12">
     use commas to separate emails
   </p>
   <div
@@ -130,7 +130,7 @@
     />
   </div>
   {#if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text">Email ID cannot be Empty</p>
+    <p class="error-text sparrow-fs-12">Email ID cannot be Empty</p>
   {/if}
 </div>
 <div class="mt-4">
@@ -169,17 +169,17 @@
     onclick={handleDropdown}
   />
   {#if showErrors && selectedRole === "select"}
-    <p class="error-text">Role Cannot Be Empty</p>
+    <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>
   {/if}
 </div>
-<div class="text-textColor mt-2" style="font-size: 12px;">
+<div class="text-textColor mt-2 sparrow-fs-12">
   You can invite your team members or external collaborators to a this
   workspace. Invited people will have access to only the <span
     style="color:white">{currentWorkspaceDetails.name}</span
   > workspace.
 </div>
 <div class="d-flex align-items-center justify-content-between">
-  <div class="description mt-4">
+  <div class="description mt-4 sparrow-fs-12">
     <p class="mb-0 text-textColor">
       Workspace<span style="color:white">: {currentWorkspaceDetails.name}</span>
     </p>
@@ -195,15 +195,6 @@
 </div>
 
 <style>
-  .invite-header {
-    font-size: 14px;
-  }
-  .invite-subheader {
-    font-size: 12px;
-  }
-  .description {
-    font-size: 12px;
-  }
   .asterik {
     color: var(--dangerColor);
     margin-left: 4px;
@@ -218,6 +209,5 @@
   .error-text {
     margin-top: 4px;
     color: var(--error--color);
-    font-size: 12px;
   }
 </style>

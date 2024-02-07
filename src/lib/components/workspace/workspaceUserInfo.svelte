@@ -12,7 +12,7 @@
   import { notifications } from "$lib/utils/notifications";
   import CustomButton from "../buttons/CustomButton.svelte";
   import MemberDropDown from "../dropdown/MemberDropdown.svelte";
-  import ModalWrapperV1 from "../Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
   import MemberInfoPopup from "./member-info/MemberInfo.svelte";
   export let id: string;
   export let name: string;
@@ -329,12 +329,12 @@
     <ModalWrapperV1
       title={"Remove user?"}
       type={"danger"}
-      width={35}
+      width={"35%"}
       zIndex={10000}
       isOpen={isRemoveMemberPopup}
       handleModalState={showRemoveMemberPopup}
     >
-      <div style="font-size: 14px;" class="text-lightGray mb-1">
+      <div class="text-lightGray mb-1 sparrow-fs-14">
         <p class="text-lightGray">
           Are you sure you want to remove <span
             style="font-weight:700;"
@@ -387,12 +387,12 @@
     <ModalWrapperV1
       title={"Remove user?"}
       type={"danger"}
-      width={35}
+      width={"35%"}
       zIndex={10000}
       isOpen={isRemoveTeamPopup}
       handleModalState={showRemoveTeamPopup}
     >
-      <div style="font-size: 14px;" class="text-lightGray mb-1">
+      <div class="text-lightGray mb-1 sparrow-fs-14">
         <p class="text-lightGray">
           Are you sure you want to remove <span
             style="font-weight:700;"
@@ -438,7 +438,7 @@
 <ModalWrapperV1
   title={`Access to ${currentTeamDetails.name}`}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isMemberInfoPopup}
   handleModalState={handleMemberPopup}

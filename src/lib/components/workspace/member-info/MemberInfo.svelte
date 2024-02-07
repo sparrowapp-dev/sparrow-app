@@ -1,7 +1,11 @@
 <script lang="ts">
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
-  import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import {
+    TeamAccess,
+    TeamRole,
+    WorkspaceRole,
+  } from "$lib/utils/enums/team.enum";
   import type {
     TeamServiceMethods,
     userDetails,
@@ -12,10 +16,10 @@
   export let user: userDetails;
   export let teamRole: TeamRole;
   export let workspaces: workspaceDocumentWithPosition[];
-  export let hasPermission: boolean = false;
+  export let hasPermission = false;
   export let userType: TeamRole;
-  export let handlePopup: (flag: boolean, popType: MemberPopType) => void;
-  export let owner: boolean = false;
+  export let handlePopup: (flag, popType: MemberPopType) => void;
+  export let owner = false;
   export let teamServiceMethods: TeamServiceMethods = {};
   export let userId: string;
   export let handleMemberPopUpSuccess = (flag: boolean) => {};
@@ -69,17 +73,17 @@
         <span>{user.name[0].toUpperCase()}</span>
       </div>
       <div class="name px-2">
-        <span style="font-size:12px;" class="text-whiteColor"
+        <span class="text-whiteColor sparrow-fs-12"
           >{user.name} {owner ? "(You)" : ""}</span
         ><br />
-        <span style="font-size:12px;" class="text-textColor">{user.email}</span>
+        <span class="text-textColor sparrow-fs-12">{user.email}</span>
       </div>
     </div>
     <div class="position">
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)}
         <MemberDropdown
           workspaceId={user.workspaceId}
-          id={user.id + "owner-team-acess"}
+          id={user.id + TeamAccess.OWNER_TEAM_ACCES}
           data={getPermissionsData()}
           method={isWorkspaceMemberInfo ? teamRole : user.role}
           onclick={isWorkspaceMemberInfo
@@ -89,7 +93,7 @@
       {:else if userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_ADMIN : user.role === TeamRole.TEAM_ADMIN)}
         <MemberDropdown
           workspaceId={user.workspaceId}
-          id={user.id + "admin-team-access"}
+          id={user.id + TeamAccess.ADMIN_TEAM_ACCESS}
           data={getPermissionsData()}
           method={isWorkspaceMemberInfo ? teamRole : user.role}
           onclick={isWorkspaceMemberInfo
@@ -99,7 +103,7 @@
       {:else}
         <MemberDropdown
           workspaceId={user.workspaceId}
-          id={user.id + "admin-workspace-member-access"}
+          id={user.id + TeamAccess.ADMIN_WORKSPACE_MEMBER_ACCESS}
           disabled={true}
           data={getPermissionsData()}
           method={isWorkspaceMemberInfo ? teamRole : user.role}
@@ -112,7 +116,7 @@
   </div>
 </div>
 <hr />
-<div style="font-size: 14px;" class="team-workspace mb-1">
+<div class="team-workspace mb-1 sparrow-fs-14">
   {#each workspaces as workspace}
     {#if workspace.position}
       <MemberWorkspace

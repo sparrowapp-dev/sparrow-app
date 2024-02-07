@@ -9,7 +9,7 @@
   } from "$lib/utils/interfaces/environment.interface";
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
   import { notifications } from "$lib/utils/notifications";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { boolean } from "yup";
 
@@ -181,12 +181,12 @@
 <ModalWrapperV1
   title={"Delete Environment?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isEnvironmentPopup}
   handleModalState={handleEnvironmentPopUpCancel}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 sparrow-fs-14">
     <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"

@@ -445,8 +445,9 @@
     {#if workspace}
       <span
         on:click={navigateToWorkspace}
-        class="{path.length === 0 ? 'text-whiteColor' : ''} cursor-pointer px-1"
-        style="font-size: 12px;"
+        class="sparrow-fs-12 {path.length === 0
+          ? 'text-whiteColor'
+          : ''} cursor-pointer px-1"
       >
         <img
           style="height:10.67px; width: 10.67px;"
@@ -465,8 +466,7 @@
           }}
           class="{path.length - 1 === index
             ? 'text-whiteColor'
-            : ''} cursor-pointer px-1"
-          style="font-size: 12px;"
+            : ''} cursor-pointer px-1 sparrow-fs-12"
         >
           {#if elem.type === ItemType.COLLECTION}
             <img
@@ -500,7 +500,7 @@
           <small class="save-text-clr">Collection: </small>
           <small class="text-whiteColor"> {path[path.length - 1].name}</small>
         </p>
-        <small class="save-text-clr" style="font-size: 12px;"
+        <small class="save-text-clr sparrow-fs-12"
           >Save your request in this collection or any of its folders.</small
         >
       {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
@@ -746,10 +746,7 @@
             <p class="save-text-clr text-center">This Collection is empty</p>
           {:else if path.length === 0}
             <div>
-              <p
-                style="font-size: 12px;"
-                class="w-100 save-text-clr text-center"
-              >
+              <p class="w-100 save-text-clr text-center sparrow-fs-12">
                 You have no collections in this workspace. Create a Collection
                 to easily organize and use your API requests.
               </p>
@@ -772,7 +769,7 @@
   <div class="col-6">
     <!-- Right panel  -->
     <div class="d-flex justify-content-between" on:click={handleDropdownClick}>
-      <p class="save-text-clr mb-1" style="font-size:12px">
+      <p class="save-text-clr mb-1 sparrow-fs-12">
         Request Name <span class="text-dangerColor">*</span>
       </p>
       <span
@@ -827,11 +824,11 @@
     <div class="pb-2">
       <input
         type="text"
-        style="width: 100%; font-size: 12px; {tabName?.length === 0
+        style="width: 100%; {tabName?.length === 0
           ? `outline: 1px solid #FE8C98`
           : ``}"
         placeholder="Enter request name."
-        class="p-1 bg-black outline-0 rounded border-0"
+        class="p-1 bg-black outline-0 rounded border-0 sparrow-fs-12"
         bind:value={tabName}
         autofocus
       />
@@ -845,20 +842,20 @@
       <MethodButton method={componentData?.property.request.method} />
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
-    <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
+    <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
     <div class="pb-1">
       <textarea
-        style="width: 100%; font-size: 12px; resize:none;"
-        class="p-1 bg-black rounded border-0"
+        style="width: 100%; resize:none;"
+        class="p-1 bg-black rounded border-0 sparrow-fs-12"
         rows="5"
         maxlength="1024"
         placeholder="Give a description to help people know about this request."
         bind:value={description}
       />
     </div>
-    <p class="save-text-clr mb-1" style="font-size:12px">Saving to</p>
+    <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
-      <p style="font-size: 12px;" class="save-text-clr text-dangerColor">
+      <p class="save-text-clr text-dangerColor sparrow-fs-12">
         Select a Collection or Folder.
       </p>
     {:else}
@@ -870,7 +867,7 @@
       <div class="url d-flex align-items-center pb-3">
         <p class="ellipsis mb-0">
           {#if workspace}
-            <span class="px-1" style="font-size: 12px;">
+            <span class="px-1 sparrow-fs-12">
               <img
                 style="height:10.67px; width: 10.67px;"
                 src={workspaceAsset}
@@ -882,7 +879,7 @@
           {#if path.length > 0}
             {#each path as elem}
               <span>/</span>
-              <span class="px-1" style="font-size: 12px;">
+              <span class="px-1 sparrow-fs-12">
                 {#if elem.type === ItemType.COLLECTION}
                   <img
                     src={collectionAsset}

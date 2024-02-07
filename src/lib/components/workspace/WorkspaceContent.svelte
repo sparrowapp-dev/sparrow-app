@@ -18,7 +18,7 @@
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { CustomButton, IconButton } from "$lib/components";
-  import ModalWrapperV1 from "../Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
 
   export let userId: string;
   export let data: any;
@@ -82,7 +82,7 @@
 <ModalWrapperV1
   title={"Invite Team Members"}
   type={"dark"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={teamInvitePopup}
   handleModalState={(flag) => {

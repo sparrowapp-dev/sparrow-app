@@ -24,7 +24,7 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import ModalWrapperV1 from "$lib/components/Modal/ModalWrapperV1.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
 
@@ -280,7 +280,7 @@
   ];
   let requestCount: number = 0;
   let folderCount: number = 0;
-  let deleteIds: string[] = [];
+  let deletedIds: string[] = [];
   $: {
     if (activePath) {
       if (activePath.collectionId === collection.id) {
@@ -288,24 +288,23 @@
       }
     }
     if (collection) {
-      deleteIds.length = 0;
+      deletedIds.length = [];
       requestCount = 0;
       folderCount = 0;
       collection.items.forEach((item) => {
         if (item.type === ItemType.FOLDER) {
-          deleteIds.push(item.id);
+          deletedIds.push(item.id);
           folderCount++;
           requestCount += item.items.length;
           for (let i = 0; i < item.items.length; i++) {
-            deleteIds.push(item.items[i].id);
+            deletedIds.push(item.items[i].id);
           }
-        }
-        if (item.type === ItemType.REQUEST) {
+        } else if (item.type === ItemType.REQUEST) {
           requestCount++;
-          deleteIds.push(item.id);
+          deletedIds.push(item.id);
         }
       });
-      deleteIds.push(collectionId);
+      deletedIds.push(collectionId);
     }
   }
 
@@ -327,7 +326,7 @@
       );
       handleCollectionPopUp(false);
       notifications.success(`"${collection.name}" Collection deleted.`);
-      collectionsMethods.removeMultipleTabs(deleteIds);
+      collectionsMethods.removeMultipleTabs(deletedIds);
       deleteLoader = false;
     } else {
       notifications.error("Failed to delete the Collection.");
@@ -339,21 +338,20 @@
 <ModalWrapperV1
   title={"Delete Collection?"}
   type={"danger"}
-  width={35}
+  width={"35%"}
   zIndex={1000}
   isOpen={isCollectionPopup}
   handleModalState={handleCollectionPopUp}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 sparrow-fs-14">
     <p>
       Are you sure you want to delete this Collection? Everything in <span
-        style="font-weight:700;"
-        class="text-whiteColor">"{collection.name}"</span
+        class="text-whiteColor fw-bold">"{collection.name}"</span
       >
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3" style="font-size:12px">
+  <div class="d-flex gap-3 sparrow-fs-12">
     <div class="d-flex gap-1">
       <span class="text-plusButton">{requestCount}</span>
       <p>API Requests</p>
@@ -365,7 +363,6 @@
   </div>
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-    style="font-size: 16px;"
   >
     <CustomButton
       disable={deleteLoader}
