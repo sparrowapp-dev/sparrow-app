@@ -271,6 +271,13 @@ fn main() {
             }
         })
         .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
+            app.listen("deep-link://new-url", |url| {
+                dbg!(url);
+            });
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

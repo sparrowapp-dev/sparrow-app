@@ -35,8 +35,23 @@
     ],
     "targets": "all"
   },
-  "identifier": "com.tauri.app",
-  "plugins": {},
+  "identifier": "com.sparrow.app",
+  "plugins": {
+    "deep-link": {
+      "domains": [
+        {
+          "host": "sparrowapp.dev",
+          "pathPrefix": ["/auth"]
+        },
+        {
+          "host": "sparrowapp.dev"
+        },
+        {
+          "host": "tauri.app"
+        }
+      ]
+    }
+  },
   "productName": "sparrow-app",
   "version": "0.0.0"
 }

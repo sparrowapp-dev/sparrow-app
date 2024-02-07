@@ -11,6 +11,7 @@
     "resources:default",
     "menu:default",
     "tray:default",
+    "deep-link:default",
     "window:allow-center",
     "window:allow-maximize",
     "window:allow-toggle-maximize",
@@ -24,7 +25,8 @@
     "window:allow-set-fullscreen",
     "window:allow-set-focus",
     "window:allow-start-dragging",
-    "os:allow-platform"
+    "os:allow-platform",
+    "deep-link:allow-get-current"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }
