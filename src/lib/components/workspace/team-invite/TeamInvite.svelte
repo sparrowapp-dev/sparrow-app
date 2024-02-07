@@ -3,12 +3,12 @@
   export let teamName: string = "";
   export let teamId: string = "";
   import closeIcon from "$lib/assets/close.svg";
-  import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import { CustomButton } from "$lib/components";
   import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+    import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export let onSubmit;
   export let updateRepo;
@@ -216,39 +216,45 @@
 
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <SelectRoleDropdown
-    isError={roleError && selectedRole === "select"}
-    id={"invite-member-workspace"}
-    data={[
+  <Dropdown
+    title={selectedRole ? selectedRole : ""}
+    dropdownId="invite-team"
+     data={[
       {
         name: "Select",
         id: "select",
         description: "Select role",
-        color: "whiteColor",
+        textColor: "whiteColor",
+        hide: true,
       },
       {
         name: "Admin",
-        id: TeamRole.TEAM_ADMIN,
+        id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        color: "whiteColor",
+        textColor: "whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        color: "whiteColor",
+        textColor: "whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        color: "whiteColor",
+        textColor: "whiteColor",
       },
     ]}
-    method={selectedRole ? selectedRole : ""}
     onclick={handleDropdown}
-  />
+    staticClasses={[
+      {
+        id: `invite-team-dropdown-${selectedRole}`,
+        classToAdd: ["border", "rounded", "py-1"],
+      },
+    ]}
+    ></Dropdown>
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">

@@ -7,8 +7,8 @@
     name: string;
     id: string;
     textColor: string;
-    hide?:boolean;
-    description?:string;
+    hide?: boolean;
+    description?: string;
     dynamicClasses?:
       | {
           id: string;
@@ -27,7 +27,7 @@
     name: string;
     id: string;
     textColor: string;
-    description?:string;
+    description?: string;
     dynamicClasses?:
       | {
           id: string;
@@ -105,7 +105,7 @@
             );
           });
       });
-    
+
     staticClasses.length > 0 &&
       staticClasses.forEach((classes) => {
         const element = document.getElementById(classes.id);
@@ -123,6 +123,7 @@
           dynamicObj.classToRemove,
         );
       });
+  
   });
 </script>
 
@@ -131,14 +132,16 @@
   style=" position: relative;"
   on:click={handleDropdownClick}
 >
-  <div
+  <div 
     on:click={(event) => {
       event.stopPropagation();
       if (!disabled) {
         toggleDropdown();
       }
     }}
+    
     id={`${dropdownId}-dropdown-${title}`}
+    
   >
     <div
       id="dropdown-btn-div"
@@ -164,15 +167,16 @@
   <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
     {#each data as list}
       <div
-        class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===true?
-          'd-none'
-            : ''}"
+        class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===
+        true
+          ? 'd-none'
+          : ''}"
         on:click={(event) => {
           event.stopPropagation();
           isOpen = false;
           onclick(list.id);
         }}
-         >
+      >
         <p
           class="m-0 p-0 {list?.textColor}"
           style="font-size: 12px;"
@@ -181,8 +185,8 @@
         >
           {list.name}
           {#if list.description}
-           <br>
-          <small class="text-textColor">{list.description}</small>
+            <br />
+            <small class="text-textColor">{list.description}</small>
           {/if}
         </p>
         {#if selectedTitle?.id === list.id}
@@ -214,6 +218,7 @@
     background-color: var(--border-color);
   }
   .dropdown-data {
+    /* !HANDLE Background color */
     /* background-color: var(--background-dropdown); */
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
@@ -221,7 +226,8 @@
     top: 32px;
     left: 0;
     right: 0;
-    
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     /* !HANDLE MIN WIDTH */
     /* min-width: 136px; */
     z-index: 2;

@@ -11,7 +11,7 @@
   } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
   import Dropdown from "../dropdown/Dropdown.svelte";
-  import MemberInfoPopup from "../workspace/member-info-popup/MemberInfoPopup.svelte";
+  import MemberInfoPopup from "../workspace/member-info/MemberInfo.svelte";
   import CustomButton from "../buttons/CustomButton.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   export let id: string;

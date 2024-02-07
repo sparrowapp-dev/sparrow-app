@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type {
     TeamRepositoryMethods,
@@ -15,6 +14,7 @@
   import type { MemberPopType } from "$lib/utils/types/common.type";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import CustomButton from "$lib/components/buttons/CustomButton.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -146,12 +146,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "whiteColor",
+        textColor: "whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "whiteColor",
+        textColor: "text-whiteColor",
       },
     ];
     if (
@@ -164,7 +164,7 @@
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+          textColor: "text-dangerColor",
         },
       ];
     } else if (
@@ -175,13 +175,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+          textColor: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+          textColor: "text-dangerColor",
         },
       ];
     } else {
@@ -189,7 +189,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+          textColor: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -532,27 +532,24 @@
   </div>
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        title={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        title={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {:else}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+        <Dropdown
         disabled={true}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        title={user.role ? user.role : ""}
         onclick={handleDropdown}
-      />
+     /> 
     {/if}
   </div>
 </div>
