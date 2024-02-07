@@ -429,7 +429,7 @@
     </p>
   </div>
 
-  <p class="confirm-header mb-0">
+  <p class="confirm-header mb-0 sparrow-fs-14">
     Enter Team name to confirm<span class="asterik">*</span>
   </p>
   <input
@@ -452,10 +452,12 @@
         confirmationError = "";
       }
     }}
-    class="input-container mt-2 mb-1 {confirmationError ? 'error-border' : ''}"
+    class="input-container w-100 mt-2 mb-1 {confirmationError
+      ? 'error-border'
+      : ''}"
   />
   {#if confirmationError}
-    <p class="error-text">{confirmationError}</p>
+    <p class="error-text sparrow-fs-12">{confirmationError}</p>
   {/if}
   <br />
 
@@ -561,7 +563,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .tile:hover {
     background-color: var(--background-light) !important;
   }
@@ -579,5 +581,54 @@
   .position {
     width: 120px;
     padding: 8px;
+  }
+
+  .btn-close1 {
+    background-color: var(--background-color);
+  }
+  .btn-close1:hover {
+    background-color: var(--background-dropdown);
+  }
+  .btn-close1:active {
+    background-color: var(--background-dropdown);
+  }
+  .btn-primary {
+    background-color: var(--border-color);
+  }
+  .btn-primary:hover {
+    color: var(--blackColor);
+    background-color: var(--workspace-hover-color);
+  }
+  .btn-primary:active {
+    color: var(--blackColor);
+    background-color: var(--button-pressed);
+  }
+  .btn-secondary {
+    background-color: var(--dangerColor);
+  }
+  .btn-secondary:hover {
+    background-color: var(--delete-hover);
+  }
+  .team-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .asterik {
+    color: var(--dangerColor);
+    margin-left: 4px;
+  }
+  .input-container {
+    background-color: var(--background-dropdown);
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color) !important;
+  }
+  .error-text {
+    margin-top: 2px;
+    margin-bottom: 0 !important;
+    color: var(--error--color);
+  }
+  .error-border {
+    border: 1px solid var(--error--color) !important;
   }
 </style>
