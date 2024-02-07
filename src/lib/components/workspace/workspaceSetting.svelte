@@ -1,51 +1,79 @@
 <script lang="ts">
   import { SearchIcon } from "$lib/assets/app.asset";
   import WorkspaceUserInfo from "./workspaceUserInfo.svelte";
-  import { TeamRole} from "$lib/utils/enums";
-  import MemberChangeRolePopup from "../Modal/MemberChangeRolePopup.svelte"
-  import type { CollectionsMethods, TeamRepositoryMethods, TeamServiceMethods, userDetails, workspaceInviteMethods } from "$lib/utils/interfaces";
-  import type { TeamDocument, WorkspaceDocument } from "$lib/database/app.database";
+  import { TeamRole } from "$lib/utils/enums";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
+  import type {
+    CollectionsMethods,
+    TeamRepositoryMethods,
+    TeamServiceMethods,
+    userDetails,
+    workspaceInviteMethods,
+  } from "$lib/utils/interfaces";
+  import type {
+    TeamDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
   import { notifications } from "$lib/utils/notifications";
   import { navigate } from "svelte-navigator";
-  export let currentTeamworkspaces:WorkspaceDocument[];
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
+  export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
-  export let currentTeamDetails:{id:string,name:string}
+  export let currentTeamDetails: { id: string; name: string };
   export let loggedInUserEmail: string;
-  export let loggedUserRole:TeamRole;
-  export let teamWorkspaceMethods: Pick<TeamServiceMethods,'demoteToMemberAtTeam'|'promoteToAdminAtTeam'|'removeMembersAtTeam'|'refreshWorkspace'> & Pick <TeamRepositoryMethods,'updateUserRoleInTeam'|'removeUserFromTeam'>
-  export let workspaceInvitePermissonMethods:workspaceInviteMethods
-  export let currentActiveTeam:TeamDocument;
-  let isshowDeletePopupOpen:boolean=false;
+  export let loggedUserRole: TeamRole;
+  export let teamWorkspaceMethods: Pick<
+    TeamServiceMethods,
+    | "demoteToMemberAtTeam"
+    | "promoteToAdminAtTeam"
+    | "removeMembersAtTeam"
+    | "refreshWorkspace"
+  > &
+    Pick<TeamRepositoryMethods, "updateUserRoleInTeam" | "removeUserFromTeam">;
+  export let workspaceInvitePermissonMethods: workspaceInviteMethods;
+  export let currentActiveTeam: TeamDocument;
+  let isshowDeletePopupOpen: boolean = false;
   export let users: userDetails[] = [];
   export let hasPermission: boolean;
   export let loggedInUser: userDetails;
-  let filterText="";
-  export let  handleInvitePopup:(showPopup: boolean)=>void;
+  let filterText = "";
+  export let handleInvitePopup: (showPopup: boolean) => void;
   export let getUserDetailsOfWorkspace: (workspaceId: string) => any;
-  const handleUserOnRemove=async(workspaceId:string,userId:string)=>{
-    users = users.filter((userObj) => !(userObj.id !== userId && userObj.workspaceId !== workspaceId))
-  }
+  const handleUserOnRemove = async (workspaceId: string, userId: string) => {
+    users = users.filter(
+      (userObj) =>
+        !(userObj.id !== userId && userObj.workspaceId !== workspaceId),
+    );
+  };
 
-  const handleDeletePopup=(showPopup:boolean)=>{
-    isshowDeletePopupOpen=showPopup;
-  }
+  const handleDeletePopup = (showPopup: boolean) => {
+    isshowDeletePopupOpen = showPopup;
+  };
 
-
-  const handleDeleteWorkspaceFlow=async()=>{
-    const response=await workspaceInvitePermissonMethods.deleteWorkspace(currentWorkspaceDetails.id);
-    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(currentTeamDetails.id,currentWorkspaceDetails.id)
-    if(response && response.data){
-      notifications.success(`${currentWorkspaceDetails.name}is removed from ${currentTeamDetails.name}`);
+  const handleDeleteWorkspaceFlow = async () => {
+    const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+      currentWorkspaceDetails.id,
+    );
+    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+      currentTeamDetails.id,
+      currentWorkspaceDetails.id,
+    );
+    if (response && response.data) {
+      notifications.success(
+        `${currentWorkspaceDetails.name}is removed from ${currentTeamDetails.name}`,
+      );
       navigate("/dashboard/workspaces");
-    }else{
-      notifications.error(`Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}.Please Try Again`);
-     }
-     handleDeletePopup(false);
-  }
-  
-
-
+    } else {
+      notifications.error(
+        `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,
+      );
+    }
+    handleDeletePopup(false);
+  };
+  let confirmationText: string = "";
+  let confirmationError: string = "";
+  let workspaceDeletePopupLoader: boolean = false;
 </script>
 
 <div
@@ -58,8 +86,22 @@
     </p>
     {#if hasPermission}
       <div class="workspace-setting-buttons">
-        <button class="workspace-setting-button-del" on:click={()=>{handleDeletePopup(true)}}> Delete Workspace </button>
-        <button class="workspace-setting-button-inv" on:click={()=>{handleInvitePopup(true)}}> Invite</button>
+        <button
+          class="workspace-setting-button-del"
+          on:click={() => {
+            handleDeletePopup(true);
+          }}
+        >
+          Delete Workspace
+        </button>
+        <button
+          class="workspace-setting-button-inv"
+          on:click={() => {
+            handleInvitePopup(true);
+          }}
+        >
+          Invite</button
+        >
       </div>
     {/if}
   </div>
@@ -74,7 +116,7 @@
       class="border-0 w-100 h-100"
       placeholder="Search People in {currentWorkspaceDetails.name || ''}"
       on:input={(event) => {
-         filterText=event.target.value;
+        filterText = event.target.value;
       }}
     />
   </div>
@@ -92,7 +134,7 @@
         email={loggedInUser?.email}
         {hasPermission}
         {currentTeamDetails}
-        loggedUserRole={loggedUserRole}
+        {loggedUserRole}
         id={loggedInUser?.id}
         {currentWorkspaceDetails}
         {workspaceInvitePermissonMethods}
@@ -113,7 +155,7 @@
           role={user?.role}
           email={user?.email}
           {hasPermission}
-          loggedUserRole={loggedUserRole}
+          {loggedUserRole}
           id={user?.id}
           {currentTeamDetails}
           {teamWorkspaceMethods}
@@ -134,35 +176,84 @@
     {/if}
   </div>
 
-  {#if isshowDeletePopupOpen }
-  <MemberChangeRolePopup
-    title={`Delete Workspace?`}
-    teamName={currentWorkspaceDetails.name}
-    teamLogo={""}
-    isTeam={false}
-    auth={true}
-    description={`
-    <div class="d-flex tile rounded mb-2">
-  <div
-    class="info d-flex align-items-center"
+  <ModalWrapperV1
+    title={"Delete Workspace?"}
+    type={"danger"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={isshowDeletePopupOpen}
+    handleModalState={handleDeletePopup}
   >
-  </div>
-  </div>
-    <p style="font-size:12px;" class="text-textColor">
-      Everything in '<span class="text-whiteColor">${currentWorkspaceDetails.name}</span> will be permanently removed, and all contributors will lose access. This action cannot be undone. 
+    <div class="workspace-delete-confirmation">
+      <div class="text-lightGray mb-1 sparrow-fs-14">
+        <p class="text-textColor sparrow-fs-12">
+          Everything in '<span class="text-whiteColor"
+            >{currentWorkspaceDetails.name}</span
+          > will be permanently removed, and all contributors will lose access. This
+          action cannot be undone.
+        </p>
+      </div>
+
+      <p class="confirm-header mb-0 sparrow-fs-14">
+        Enter workspace name to confirm<span class="asterik">*</span>
       </p>
-    `}
-    onSuccess={async()=>{
-      await handleDeleteWorkspaceFlow();
-    }}
-    onCancel={()=>{
-       handleDeletePopup(false)
-    }}
-  />
-{/if}
+      <input
+        id={`workspace-confirmation-input`}
+        placeholder=""
+        autocomplete="off"
+        autocapitalize="none"
+        autofocus
+        style="outline:none;border:none;flex-grow:1;"
+        bind:value={confirmationText}
+        on:input={() => {
+          confirmationError = "";
+        }}
+        on:blur={() => {
+          if (confirmationText === "") {
+            confirmationError = `Workspace name cannot be empty.`;
+          } else if (confirmationText !== currentWorkspaceDetails.name) {
+            confirmationError = `Workspace name does not match.`;
+          } else {
+            confirmationError = "";
+          }
+        }}
+        class="input-container mt-2 mb-1 {confirmationError
+          ? 'error-border'
+          : ''}"
+      />
+      {#if confirmationError}
+        <p class="error-text sparrow-fs-12">{confirmationError}</p>
+      {/if}
+      <br />
+
+      <div
+        class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+        style="font-size: 16px;"
+      >
+        <div class="d-flex align-items-center">
+          <p style="font-size:16px;" class="mb-0">
+            {currentWorkspaceDetails.name}
+          </p>
+        </div>
+        <CustomButton
+          disable={workspaceDeletePopupLoader ||
+            confirmationText !== currentWorkspaceDetails.name}
+          text={"Delete Workspace"}
+          fontSize={14}
+          type={"danger"}
+          loader={workspaceDeletePopupLoader}
+          onClick={async () => {
+            workspaceDeletePopupLoader = true;
+            await handleDeleteWorkspaceFlow();
+            workspaceDeletePopupLoader = false;
+          }}
+        />
+      </div>
+    </div>
+  </ModalWrapperV1>
 </div>
 
-<style>
+<style lang="scss">
   .workspace-setting-header {
     width: 100%;
     display: flex;
@@ -214,6 +305,63 @@
     .search-bar {
       margin-top: 15px;
       width: 80%;
+    }
+  }
+  .workspace-delete-confirmation {
+    .btn-close1 {
+      background-color: var(--background-color);
+    }
+
+    .btn-close1:hover {
+      background-color: var(--background-dropdown);
+    }
+
+    .btn-close1:active {
+      background-color: var(--background-dropdown);
+    }
+    .btn-primary {
+      background-color: var(--border-color);
+    }
+
+    .btn-primary:hover {
+      color: var(--blackColor);
+      background-color: var(--workspace-hover-color);
+    }
+
+    .btn-primary:active {
+      color: var(--blackColor);
+      background-color: var(--button-pressed);
+    }
+
+    .btn-secondary {
+      background-color: var(--dangerColor);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--delete-hover);
+    }
+    .team-icon {
+      height: 24px;
+      width: 24px;
+    }
+    .asterik {
+      color: var(--dangerColor);
+      margin-left: 4px;
+    }
+    .input-container {
+      background-color: var(--background-dropdown);
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color) !important;
+      width: 100%;
+    }
+    .error-text {
+      margin-top: 2px;
+      margin-bottom: 0 !important;
+      color: var(--error--color);
+    }
+    .error-border {
+      border: 1px solid var(--error--color) !important;
     }
   }
 </style>

@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
+   * **/
   import closeIcon from "$lib/assets/close.svg";
   import { fade, fly } from "svelte/transition";
   export let onClick: (flag: boolean) => void;
@@ -70,7 +74,6 @@
     backdrop-filter: blur(3px);
     z-index: 14;
   }
-
   .format-header {
     font-family: Roboto;
     font-size: 20px;
@@ -79,7 +82,6 @@
     letter-spacing: 0em;
     text-align: left;
   }
-
   .format-info {
     font-family: Roboto;
     font-size: 12px;
@@ -153,11 +155,9 @@
   .btn-close1 {
     background-color: var(--background-color);
   }
-
   .btn-close1:hover {
     background-color: var(--background-dropdown);
   }
-
   .btn-close1:active {
     background-color: var(--background-dropdown);
   }

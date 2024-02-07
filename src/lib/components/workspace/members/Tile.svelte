@@ -1,19 +1,20 @@
 <script lang="ts">
-  import RemoveConfirmationPopup from "$lib/components/Modal/RemoveConfirmationPopup.svelte";
-  import MemberChangeRolePopup from "$lib/components/Modal/MemberChangeRolePopup.svelte";
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
+  import { base64ToURL } from "$lib/utils/helpers";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
     userDetails,
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
-  import MemberInfoPopup from "../member-info-popup/MemberInfoPopup.svelte";
+  import MemberInfoPopup from "../member-info/MemberInfo.svelte";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -43,14 +44,14 @@
       memberPopObj.isMemberOwnershipPopup = true;
     }
   };
-  const memberPopObj={
-    isMemberRemovePopup:false,
-    isMemberPromotePopup:false,
-    isMemberDemotePopup :false,
-     isMemberInfoPopup:false,
-    isMemberOwnershipPopup:false,
-  }
- 
+  const memberPopObj = {
+    isMemberRemovePopup: false,
+    isMemberPromotePopup: false,
+    isMemberDemotePopup: false,
+    isMemberInfoPopup: false,
+    isMemberOwnershipPopup: false,
+  };
+
   const handlePopup = (flag: boolean, popType: MemberPopType): void => {
     switch (popType) {
       case "isMemberRemovePopup":
@@ -72,7 +73,7 @@
         break;
     }
   };
-  
+
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
       openTeam.teamId,
@@ -194,150 +195,305 @@
       ];
     }
   };
+  let memberRemovePopupLoader: boolean = false;
+  let memberPromotePopupLoader: boolean = false;
+  let memberDemotePopupLoader: boolean = false;
+  let memberOwnershipPopupLoader: boolean = false;
+  let confirmationText: string = "";
+  let confirmationError: string = "";
 </script>
 
-{#if memberPopObj.isMemberRemovePopup}
-  <RemoveConfirmationPopup
-    title={`Remove user?`}
-    description={`<p style="font-size:12px;" class="text-textColor">
-      Are you sure you want to remove <span
-        class="text-whiteColor">"${user.name}"</span
-      >
-      ? They will lose access to the <span
-        class="text-whiteColor">"${openTeam?.name}"</span> team.
-    </p>`}
-    onSuccess={handleMemberPopUpSuccess}
-    onCancel={() => {
-      handlePopup(false, "isMemberRemovePopup");
-    }}
-  />
-{/if}
-
-{#if memberPopObj.isMemberPromotePopup}
-  <MemberChangeRolePopup
-    title={`Changing Role?`}
-    teamName={openTeam?.name}
-    teamLogo={openTeam?.logo}
-    description={`
-    <div class="d-flex tile rounded mb-3">
-  <div
-    class="info d-flex align-items-center"
-  >
-    <div class="d-flex align-items-center justify-content-center" style="width: 36px;
-    border: 1px solid var(--border-color);
-    height: 36px;
-    border-radius: 50%;">
-      <span>${user.name[0].toUpperCase()}</span>
-    </div>
-    <div class="name px-2">
-      <span style="font-size:12px;" class="text-whiteColor">${
-        user.name
-      }</span><br />
-      <span style="font-size:12px;" class="text-textColor">${user.email}</span>
-    </div>
-  </div>
-</div>
-    
+<ModalWrapperV1
+  title={"Remove user?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={10000}
+  isOpen={memberPopObj.isMemberRemovePopup}
+  handleModalState={(flag) => {
+    handlePopup(flag, "isMemberRemovePopup");
+  }}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
     <p style="font-size:12px;" class="text-textColor">
-    You are assigning the role of an '<span class="text-whiteColor">Admin</span>' to ${
-      user.name
-    }. Following access will be provided to ${user.name}:</p>
+      Are you sure you want to remove <span class="text-whiteColor"
+        >"{user.name}"</span
+      >
+      ? They will lose access to the
+      <span class="text-whiteColor">"{openTeam?.name}"</span> team.
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
+    style="font-size: 16px;"
+  >
+    <CustomButton
+      disable={memberRemovePopupLoader}
+      text={"Cancel"}
+      fontSize={14}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handlePopup(false, "isMemberRemovePopup");
+      }}
+    />
+
+    <CustomButton
+      disable={memberRemovePopupLoader}
+      text={"Remove"}
+      fontSize={14}
+      type={"danger"}
+      loader={memberRemovePopupLoader}
+      onClick={() => {
+        memberRemovePopupLoader = true;
+        handleMemberPopUpSuccess();
+        memberRemovePopupLoader = false;
+      }}
+    />
+  </div>
+</ModalWrapperV1>
+
+<ModalWrapperV1
+  title={"Changing Role?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={10000}
+  isOpen={memberPopObj.isMemberPromotePopup}
+  handleModalState={(flag) => {
+    handlePopup(flag, "isMemberPromotePopup");
+  }}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <div class="d-flex tile rounded mb-3">
+      <div class="info d-flex align-items-center">
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="width: 36px;
+        border: 1px solid var(--border-color);
+        height: 36px;
+        border-radius: 50%;"
+        >
+          <span>{user.name[0].toUpperCase()}</span>
+        </div>
+        <div class="name px-2">
+          <span style="font-size:12px;" class="text-whiteColor"
+            >{user.name}</span
+          ><br />
+          <span style="font-size:12px;" class="text-textColor"
+            >{user.email}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;" class="text-textColor">
+      You are assigning the role of an '<span class="text-whiteColor"
+        >Admin</span
+      >' to ${user.name}. Following access will be provided to ${user.name}:
+    </p>
     <ul class="ps-4 text-textColor" style="font-size:12px;">
-      ${AdminLevelPermission.map((element) => {
-        return `<li>${element}</li>`;
-      }).join("")}
+      {#each AdminLevelPermission as permission}
+        <li>{permission}</li>
+      {/each}
     </ul>
-    `}
-    onSuccess={handleMemberPromotePopUpSuccess}
-    onCancel={() => {
-      handlePopup(false, "isMemberPromotePopup");
-    }}
-  />
-{/if}
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <div class="d-flex align-items-center">
+      {#if openTeam?.logo}
+        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      {/if}
+      <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
+    </div>
 
-{#if memberPopObj.isMemberDemotePopup}
-  <MemberChangeRolePopup
-    title={`Changing Role?`}
-    teamName={openTeam?.name}
-    teamLogo={openTeam?.logo}
-    description={`
-      <div class="d-flex tile rounded mb-3">
-    <div
-      class="info d-flex align-items-center"
-    >
-      <div class="d-flex align-items-center justify-content-center" style="width: 36px;
-      border: 1px solid var(--border-color);
-      height: 36px;
-      border-radius: 50%;">
-        <span>${user.name[0].toUpperCase()}</span>
-      </div>
-      <div class="name px-2">
-        <span style="font-size:12px;" class="text-whiteColor">${
-          user.name
-        }</span><br />
-        <span style="font-size:12px;" class="text-textColor">${
-          user.email
-        }</span>
+    <CustomButton
+      disable={memberPromotePopupLoader}
+      text={"Update Access"}
+      fontSize={14}
+      type={"primary"}
+      loader={memberPromotePopupLoader}
+      onClick={() => {
+        memberPromotePopupLoader = true;
+        handleMemberPromotePopUpSuccess();
+        memberPromotePopupLoader = false;
+      }}
+    />
+  </div></ModalWrapperV1
+>
+
+<ModalWrapperV1
+  title={"Changing Role?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={10000}
+  isOpen={memberPopObj.isMemberDemotePopup}
+  handleModalState={(flag) => {
+    handlePopup(flag, "isMemberDemotePopup");
+  }}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <div class="d-flex tile rounded mb-3">
+      <div class="info d-flex align-items-center">
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="width: 36px;
+        border: 1px solid var(--border-color);
+        height: 36px;
+        border-radius: 50%;"
+        >
+          <span>{user.name[0].toUpperCase()}</span>
+        </div>
+        <div class="name px-2">
+          <span style="font-size:12px;" class="text-whiteColor"
+            >{user.name}</span
+          ><br />
+          <span style="font-size:12px;" class="text-textColor"
+            >{user.email}</span
+          >
+        </div>
       </div>
     </div>
-  </div>
-      
-      <p style="font-size:12px;" class="text-textColor">
-        Upon transitioning an Admin to a Member, 'Edit' access will be automatically provided for all assigned workspaces.</p>
-      
-      `}
-    onSuccess={handleMemberDemotePopUpSuccess}
-    onCancel={() => {
-      handlePopup(false, "isMemberDemotePopup");
-    }}
-  />
-{/if}
 
-{#if memberPopObj.isMemberOwnershipPopup}
-  <MemberChangeRolePopup
-    auth={true}
-    title={`Changing Role?`}
-    teamName={openTeam?.name}
-    teamLogo={openTeam?.logo}
-    description={`
-      <div class="d-flex tile rounded mb-3">
-    <div
-      class="info d-flex align-items-center"
-    >
-      <div class="d-flex align-items-center justify-content-center" style="width: 36px;
-      border: 1px solid var(--border-color);
-      height: 36px;
-      border-radius: 50%;">
-        <span>${user.name[0].toUpperCase()}</span>
-      </div>
-      <div class="name px-2">
-        <span style="font-size:12px;" class="text-whiteColor">${
-          user.name
-        }</span><br />
-        <span style="font-size:12px;" class="text-textColor">${
-          user.email
-        }</span>
+    <p style="font-size:12px;" class="text-textColor">
+      Upon transitioning an Admin to a Member, 'Edit' access will be
+      automatically provided for all assigned workspaces.
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <div class="d-flex align-items-center">
+      {#if openTeam?.logo}
+        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      {/if}
+      <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
+    </div>
+
+    <CustomButton
+      disable={memberDemotePopupLoader}
+      text={"Update Access"}
+      fontSize={14}
+      type={"primary"}
+      loader={memberDemotePopupLoader}
+      onClick={() => {
+        memberDemotePopupLoader = true;
+        handleMemberDemotePopUpSuccess();
+        memberDemotePopupLoader = false;
+      }}
+    />
+  </div></ModalWrapperV1
+>
+
+<ModalWrapperV1
+  title={"Changing Role?"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={10000}
+  isOpen={memberPopObj.isMemberOwnershipPopup}
+  handleModalState={(flag) => {
+    handlePopup(flag, "isMemberOwnershipPopup");
+  }}
+>
+  <div style="font-size: 14px;" class="text-lightGray mb-1">
+    <div class="d-flex tile rounded mb-3">
+      <div class="info d-flex align-items-center">
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="width: 36px;
+        border: 1px solid var(--border-color);
+        height: 36px;
+        border-radius: 50%;"
+        >
+          <span>{user.name[0].toUpperCase()}</span>
+        </div>
+        <div class="name px-2">
+          <span style="font-size:12px;" class="text-whiteColor"
+            >{user.name}</span
+          ><br />
+          <span style="font-size:12px;" class="text-textColor"
+            >{user.email}</span
+          >
+        </div>
       </div>
     </div>
-  </div>
-      
-      <p style="font-size:12px;" class="text-textColor">
-        You are assigning the role of <span class="text-whiteColor">‘Owner’</span> to ${
-          user.name
-        }. All the Owner’s access will be transferred to ${
-          user.name
-        } and you will be demoted to Admin. This action cannot be undone.  </p>
-      
-      `}
-    onSuccess={handleMemberOwnershipPopUpSuccess}
-    onCancel={()=>{handlePopup(false,"isMemberOwnershipPopup")}}
-  />
-{/if}
 
-{#if memberPopObj.isMemberInfoPopup}
+    <p style="font-size:12px;" class="text-textColor">
+      You are assigning the role of <span class="text-whiteColor">‘Owner’</span>
+      to {user.name}. All the Owner’s access will be transferred to {user.name}
+      and you will be demoted to Admin. This action cannot be undone.
+    </p>
+  </div>
+
+  <p class="confirm-header mb-0">
+    Enter Team name to confirm<span class="asterik">*</span>
+  </p>
+  <input
+    id={`input-${user.id}`}
+    placeholder=""
+    autocomplete="off"
+    autocapitalize="none"
+    autofocus
+    style="outline:none;border:none;flex-grow:1;"
+    bind:value={confirmationText}
+    on:input={() => {
+      confirmationError = "";
+    }}
+    on:blur={() => {
+      if (confirmationText === "") {
+        confirmationError = `Team name cannot be empty.`;
+      } else if (confirmationText !== openTeam?.name) {
+        confirmationError = `Team name does not match.`;
+      } else {
+        confirmationError = "";
+      }
+    }}
+    class="input-container mt-2 mb-1 {confirmationError ? 'error-border' : ''}"
+  />
+  {#if confirmationError}
+    <p class="error-text">{confirmationError}</p>
+  {/if}
+  <br />
+
+  <div
+    class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <div class="d-flex align-items-center">
+      {#if openTeam?.logo}
+        <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
+      {/if}
+      <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
+    </div>
+    <CustomButton
+      disable={memberOwnershipPopupLoader ||
+        confirmationText !== openTeam?.name}
+      text={"Update Access"}
+      fontSize={14}
+      type={"primary"}
+      loader={memberOwnershipPopupLoader}
+      onClick={() => {
+        memberOwnershipPopupLoader = true;
+        handleMemberOwnershipPopUpSuccess();
+        memberOwnershipPopupLoader = false;
+      }}
+    />
+  </div>
+</ModalWrapperV1>
+
+<ModalWrapperV1
+  title={`Access to ${openTeam?.name}`}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={memberPopObj.isMemberInfoPopup}
+  handleModalState={(flag) => {
+    handlePopup(flag, "isMemberInfoPopup");
+  }}
+>
   <MemberInfoPopup
     {owner}
-    title={`Access to ${openTeam.name}`}
     {user}
     workspaces={workspaces.map((elem) => {
       let element = elem.toMutableJSON();
@@ -351,15 +507,12 @@
     })}
     {userType}
     {userId}
-    onCancel={() => {
-      handlePopup(false, "isMemberInfoPopup");
-    }}
     {handlePopup}
     {teamServiceMethods}
     {handleMemberPopUpSuccess}
     {getPermissionsData}
   />
-{/if}
+</ModalWrapperV1>
 <div class="d-flex tile rounded align-items-center">
   <div
     class="info d-flex align-items-center"

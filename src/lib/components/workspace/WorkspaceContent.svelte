@@ -6,20 +6,19 @@
   import { workspaceView, openedTeam } from "$lib/store";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import Members from "$lib/components/workspace/members/Members.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type {
     CurrentTeam,
     TeamRepositoryMethods,
     TeamServiceMethods,
-    WorkspaceMethods,
   } from "$lib/utils/interfaces";
-  import TeamInvitePopup from "./team-invite-popup/TeamInvitePopup.svelte";
+  import TeamInvite from "./team-invite/TeamInvite.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type { TeamDocument } from "$lib/database/app.database";
-  import { TeamViewModel } from "../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import { CustomButton, IconButton } from "$lib/components";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
 
   export let userId: string;
   export let data: any;
@@ -80,8 +79,17 @@
   let teamInvitePopup = false;
 </script>
 
-{#if teamInvitePopup}
-  <TeamInvitePopup
+<ModalWrapperV1
+  title={"Invite Team Members"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={teamInvitePopup}
+  handleModalState={(flag) => {
+    teamInvitePopup = flag;
+  }}
+>
+  <TeamInvite
     {userId}
     teamLogo={openTeam?.logo}
     onSubmit={teamServiceMethods.inviteMembersAtTeam}
@@ -95,8 +103,9 @@
     handleInvitePopup={(flag) => {
       teamInvitePopup = flag;
     }}
-  />
-{/if}
+  /></ModalWrapperV1
+>
+
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
     <div

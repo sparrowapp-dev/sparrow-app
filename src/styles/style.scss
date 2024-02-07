@@ -163,6 +163,14 @@ $theme-colors: map-merge(
 body {
   background-color: var(--background-color);
 }
+
+.sparrow-fs-12{
+  font-size: 0.75rem;
+}
+.sparrow-fs-14{
+  font-size: 0.875rem;
+}
+
 .border-error {
   border-color: $sparrow-error;
   border-width: 3px;
