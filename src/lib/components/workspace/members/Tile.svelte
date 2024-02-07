@@ -430,7 +430,7 @@
   </div>
 
   <p class="confirm-header mb-0 sparrow-fs-14">
-    Enter Team name to confirm<span class="asterik ms-1">*</span>
+    Enter team name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
