@@ -5,10 +5,10 @@
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
-  import { CustomButton } from "$lib/components";
   import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let onSubmit;
   export let updateRepo;
@@ -292,10 +292,11 @@
     </div>
   </div>
   <div>
-    <CustomButton
+    <Button
       disable={loader}
-      text={"Send Invite"}
-      fontSize={14}
+      title={"Send Invite"}
+      loaderSize={19}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"primary"}
       {loader}
       onClick={() => {

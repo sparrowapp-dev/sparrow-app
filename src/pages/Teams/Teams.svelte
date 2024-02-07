@@ -33,7 +33,7 @@
   import { ParaInput, FileInput, TextInput } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -451,19 +451,19 @@
     fileSizeError="The size of the file you are trying to upload is more than 100 KB."
   />
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
-    <CustomButton
+    <Button
       disable={teamUnderSubmission}
-      text={`Cancel`}
+      title={`Cancel`}
       type="dark"
-      classProp={`me-2`}
+      buttonClassProp={`me-2`}
       onClick={handleCreateTeamModal}
     />
-    <CustomButton
-      text={"Create Team"}
+    <Button
+      title={"Create Team"}
       type="primary"
       disable={teamUnderSubmission}
       loader={teamUnderSubmission}
-      classProp={`me-1`}
+      buttonClassProp={`me-1`}
       onClick={async () => {
         teamUnderSubmission = true;
         await handleCreateTeam(
@@ -495,19 +495,19 @@
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
-    <CustomButton
+    <Button
       disable={isLeavingTeam}
-      text={`Cancel`}
+      title={`Cancel`}
       type="dark"
-      classProp={`me-2`}
+      buttonClassProp={`me-2`}
       onClick={handleLeaveTeamModal}
     />
-    <CustomButton
-      text={"Leave"}
+    <Button
+      title={"Leave"}
       type="danger"
       disable={isLeavingTeam}
       loader={isLeavingTeam}
-      classProp={`me-1`}
+      buttonClassProp={`me-1`}
       onClick={async () => {
         handleLeaveTeam();
       }}

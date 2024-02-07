@@ -31,7 +31,7 @@
   import { setOpenedTeam } from "$lib/store";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
-  import CustomButton from "../buttons/CustomButton.svelte";
+  import Button from "../buttons/Button.svelte";
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -273,19 +273,19 @@
     handleOnSelect={handleTeamSelect}
   />
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
-    <CustomButton
+    <Button
       disable={workspaceUnderCreation}
-      text={`Cancel`}
+      title={`Cancel`}
       type="dark"
-      classProp={`me-2`}
+      buttonClassProp={`me-2`}
       onClick={handleCreateWorkspaceModal}
     />
-    <CustomButton
-      text={"Create"}
+    <Button
+      title={"Create"}
       type="primary"
       disable={workspaceUnderCreation}
       loader={workspaceUnderCreation}
-      classProp={`me-1`}
+      buttonClassProp={`me-1`}
       onClick={() => {
         handleCreateWorkSpace();
       }}

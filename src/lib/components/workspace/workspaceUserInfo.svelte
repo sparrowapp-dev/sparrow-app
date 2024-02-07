@@ -10,7 +10,7 @@
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
-  import CustomButton from "../buttons/CustomButton.svelte";
+  import Button from "../buttons/Button.svelte";
   import MemberDropDown from "../dropdown/MemberDropdown.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   import MemberInfoPopup from "./member-info/MemberInfo.svelte";
@@ -357,10 +357,10 @@
         class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
         style="font-size: 16px;"
       >
-        <CustomButton
+        <Button
           disable={memberRemoveLoader}
-          text={"Cancel"}
-          fontSize={14}
+          title={"Cancel"}
+          textStyleProp={"font-size: var(--base-size)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -368,10 +368,11 @@
           }}
         />
 
-        <CustomButton
+        <Button
           disable={memberRemoveLoader}
-          text={"Remove"}
-          fontSize={14}
+          title={"Remove"}
+          textStyleProp={"font-size: var(--base-size)"}
+          loaderSize={18}
           type={"danger"}
           loader={memberRemoveLoader}
           onClick={async () => {
@@ -404,10 +405,10 @@
         class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
         style="font-size: 16px;"
       >
-        <CustomButton
+        <Button
           disable={teamMemberRemoveLoader}
-          text={"Cancel"}
-          fontSize={14}
+          title={"Cancel"}
+          textStyleProp={"font-size: var(--base-size)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -415,10 +416,11 @@
           }}
         />
 
-        <CustomButton
+        <Button
           disable={teamMemberRemoveLoader}
-          text={"Remove"}
-          fontSize={14}
+          title={"Remove"}
+          textStyleProp={"font-size: var(--base-size)"}
+          loaderSize={18}
           type={"danger"}
           loader={teamMemberRemoveLoader}
           onClick={async () => {
