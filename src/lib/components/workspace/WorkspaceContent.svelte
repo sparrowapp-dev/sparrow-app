@@ -17,14 +17,10 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
-<<<<<<< HEAD
-  import { CustomButton, IconButton } from "$lib/components";
   import Settings from "./settings/Settings.svelte";
 
-=======
   import Button from "../buttons/Button.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
->>>>>>> 81ebb104263dabdd9bcc1570871f89bc0b97b398
   export let userId: string;
   export let data: any;
   export let loaderColor = "default";
@@ -217,8 +213,8 @@
                 </p>
               {/if}
               {#if userType && userType !== "member"}
-                <CustomButton
-                  text={`Invite`}
+                <Button
+                  title={`Invite`}
                   type={`dark`}
                   textStyleProp={"font-size: var(--small-text)"}
                   onClick={() => {
