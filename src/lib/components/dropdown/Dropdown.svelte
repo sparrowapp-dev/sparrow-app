@@ -1,19 +1,40 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
-  import { onDestroy, onMount } from "svelte";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
 
   export let data: Array<{
     name: string;
     id: string;
+    textColor: string;
+    hide?:boolean;
+    description?:string;
+    dynamicClasses?:
+      | {
+          id: string;
+          classToAdd: string[];
+          classToRemove: string;
+        }[]
+      | null;
   }>;
+  export let staticClasses: { id: string; classToAdd: string[] }[] = [];
   export let onclick: (tab: string) => void;
   export let title: string;
   export let dropdownId: string = "";
+  export let disabled: boolean = false;
 
   let selectedTitle: {
     name: string;
     id: string;
+    textColor: string;
+    description?:string;
+    dynamicClasses?:
+      | {
+          id: string;
+          classToAdd: string[];
+          classToRemove: string;
+        }[]
+      | null;
   };
 
   let isOpen: boolean = false;
@@ -29,10 +50,14 @@
           selectedTitle = element;
         }
       });
+      if (!selectedTitle) {
+        selectedTitle = data[0];
+      }
     }
   }
 
   function handleDropdownClick(event: MouseEvent) {
+    debugger;
     const dropdownElement = document.getElementById(
       `${dropdownId}-dropdown-${title}`,
     );
@@ -45,22 +70,86 @@
     window.removeEventListener("click", handleDropdownClick);
   });
 
+  function handleDynamicClasses(
+    id: string,
+    classes: string[],
+    toRemoveClassName: string,
+  ) {
+    const doc = document.getElementById(id) as HTMLElement;
+    doc &&
+      doc?.classList?.length > 0 &&
+      doc?.classList.forEach((className) => {
+        if (className.startsWith(toRemoveClassName)) {
+          doc?.classList.remove(className);
+        }
+      });
+
+    doc &&
+      classes.length > 0 &&
+      classes.map((classObj) => {
+        doc.classList.add(classObj);
+      });
+  }
+
   onMount(() => {
+    debugger;
+    data.length > 0 &&
+      data.forEach((dataObj) => {
+        dataObj.dynamicClasses &&
+          dataObj.dynamicClasses.length > 0 &&
+          dataObj.dynamicClasses.forEach((dynamicObj) => {
+            handleDynamicClasses(
+              dynamicObj.id,
+              dynamicObj.classToAdd,
+              dynamicObj.classToRemove,
+            );
+          });
+      });
+    
+    staticClasses.length > 0 &&
+      staticClasses.forEach((classes) => {
+        const element = document.getElementById(classes.id);
+        element?.classList.add(...classes.classToAdd);
+      });
     window.addEventListener("click", handleDropdownClick);
+  });
+  afterUpdate(() => {
+    selectedTitle.dynamicClasses &&
+      selectedTitle.dynamicClasses.length > 0 &&
+      selectedTitle.dynamicClasses.forEach((dynamicObj) => {
+        handleDynamicClasses(
+          dynamicObj.id,
+          dynamicObj.classToAdd,
+          dynamicObj.classToRemove,
+        );
+      });
   });
 </script>
 
 <div
-  class="parent-dropdown display-inline-block z-2"
+  class="parent-dropdown display-inline-block"
   style=" position: relative;"
   on:click={handleDropdownClick}
 >
-  <div on:click={toggleDropdown} id={`${dropdownId}-dropdown-${title}`}>
+  <div
+    on:click={(event) => {
+      event.stopPropagation();
+      if (!disabled) {
+        toggleDropdown();
+      }
+    }}
+    id={`${dropdownId}-dropdown-${title}`}
+  >
     <div
+      id="dropdown-btn-div"
       class="dropdown-btn d-flex align-items-center justify-content-between"
       class:dropdown-btn-active={isOpen}
     >
-      <p class=" mb-0">
+      <p
+        class="{disabled
+          ? 'disabled-text'
+          : ''} mb-0 {selectedTitle?.textColor}"
+      >
         {selectedTitle?.name}
       </p>
       <span class:dropdown-logo-active={isOpen}
@@ -75,18 +164,26 @@
   <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
     {#each data as list}
       <div
-        class="d-flex px-2 py-1 justify-content-between highlight"
-        on:click={() => {
+        class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===true?
+          'd-none'
+            : ''}"
+        on:click={(event) => {
+          event.stopPropagation();
           isOpen = false;
           onclick(list.id);
         }}
-      >
+         >
         <p
-          class="m-0 p-0"
+          class="m-0 p-0 {list?.textColor}"
           style="font-size: 12px;"
+          id="option-name-p-{list.id}"
           class:selected-request={list.id === selectedTitle?.id}
         >
           {list.name}
+          {#if list.description}
+           <br>
+          <small class="text-textColor">{list.description}</small>
+          {/if}
         </p>
         {#if selectedTitle?.id === list.id}
           <img src={checkIcon} alt="" />
@@ -102,17 +199,32 @@
     outline: none;
     border: none;
     height: 26px;
+    width: auto;
+    padding: 0 10px;
   }
-  .dropdown-btn:hover {
+  /* ! PASS AS PROP */
+  /* .dropdown-btn-hover {
+      background-color: var(--border-color);
+  } */
+
+  /* .dropdown-btn:hover {
     border-bottom: 1px solid var(--send-button);
+  } */
+  .dropdown-btn:hover {
+    background-color: var(--border-color);
   }
   .dropdown-data {
-    background-color: var(--background-dropdown);
+    /* background-color: var(--background-dropdown); */
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     position: absolute;
     top: 32px;
     left: 0;
-    min-width: 136px;
+    right: 0;
+    
+    /* !HANDLE MIN WIDTH */
+    /* min-width: 136px; */
+    z-index: 2;
     border: 1px solid rgb(44, 44, 44);
   }
   .dropdown-btn p,
@@ -136,8 +248,13 @@
   .dropdown-btn {
     cursor: pointer;
   }
+
   .dropdown-btn-active {
     background-color: var(--border-color);
-    border-bottom: 1px solid var(--send-button);
+    /* !PASS AS PROP */
+    /* border-bottom: 1px solid var(--send-button); */
+  }
+  .disabled-text {
+    color: var(--sparrow-text-color) !important;
   }
 </style>

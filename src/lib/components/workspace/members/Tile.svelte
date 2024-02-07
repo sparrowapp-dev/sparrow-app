@@ -1,7 +1,6 @@
 <script lang="ts">
   import RemoveConfirmationPopup from "$lib/components/Modal/RemoveConfirmationPopup.svelte";
   import MemberChangeRolePopup from "$lib/components/Modal/MemberChangeRolePopup.svelte";
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import type {
     TeamRepositoryMethods,
     TeamServiceMethods,
@@ -14,6 +13,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -50,7 +50,6 @@
      isMemberInfoPopup:false,
     isMemberOwnershipPopup:false,
   }
- 
   const handlePopup = (flag: boolean, popType: MemberPopType): void => {
     switch (popType) {
       case "isMemberRemovePopup":
@@ -72,7 +71,7 @@
         break;
     }
   };
-  
+
   const handleMemberPopUpSuccess = async () => {
     const response = await teamServiceMethods.removeMembersAtTeam(
       openTeam.teamId,
@@ -145,12 +144,26 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "whiteColor",
+        textColor: "whiteColor",
+        dynamicClasses: [
+          {
+            id: "dropdown-btn-div",
+            classToAdd: ["px-2", "py-3"],
+            classToRemove: " ",
+          },
+        ],
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "whiteColor",
+        textColor: "whiteColor",
+        dynamicClasses: [
+          {
+            id: "dropdown-btn-div",
+            classToAdd: ["px-2", "py-3"],
+            classToRemove: " ",
+          },
+        ],
       },
     ];
     if (
@@ -163,7 +176,7 @@
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+          textColor: "text-dangerColor",
         },
       ];
     } else if (
@@ -174,13 +187,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+          textColor: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+          textColor: "text-dangerColor",
         },
       ];
     } else {
@@ -188,7 +201,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+          textColor: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -330,7 +343,9 @@
       
       `}
     onSuccess={handleMemberOwnershipPopUpSuccess}
-    onCancel={()=>{handlePopup(false,"isMemberOwnershipPopup")}}
+    onCancel={() => {
+      handlePopup(false, "isMemberOwnershipPopup");
+    }}
   />
 {/if}
 
@@ -379,25 +394,25 @@
   </div>
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
+        dropdownId={user.id + uuidv4()}
+        title={user.role ? user.role : ""}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
+        dropdownId={user.id + uuidv4()}
+        title={user.role ? user.role : ""}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {:else}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         disabled={true}
+        dropdownId={user.id + uuidv4()}
+        title={user.role ? user.role : ""}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
         onclick={handleDropdown}
       />
     {/if}

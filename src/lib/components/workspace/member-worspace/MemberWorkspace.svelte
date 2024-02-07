@@ -1,10 +1,13 @@
 <script lang="ts">
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
-    import type { WorkspaceDocument } from "$lib/database/app.database";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import type { TeamServiceMethods, workspaceDocumentWithPosition } from "$lib/utils/interfaces";
+  import type {
+    TeamServiceMethods,
+    workspaceDocumentWithPosition,
+  } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
-  export let workspace:workspaceDocumentWithPosition;
+  export let workspace: workspaceDocumentWithPosition;
   export let user;
   export let isWorkspaceMemberInfo = false;
   export let teamRole: TeamRole = null;
@@ -87,64 +90,70 @@
     <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
+      
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER))}
-        <MemberDropdown
-          workspaceId={workspace._id}
-          id={workspace._id + "member-workspace"}
+        <Dropdown
+          dropdownId={workspace._id}
+          title={workspace.position ? workspace.position : ""}
           data={[
             {
               name: "Editor",
               id: WorkspaceRole.WORKSPACE_EDITOR,
-              color: "whiteColor",
+              textColor: "text-whiteColor",
             },
             {
               name: "Viewer",
               id: WorkspaceRole.WORKSPACE_VIEWER,
-              color: "whiteColor",
+              textColor: "text-whiteColor",
             },
             {
               name: "Remove",
               id: "remove",
-              color: "dangerColor",
+              textColor: "text-dangerColor",
             },
           ]}
-          method={workspace.position ? workspace.position : ""}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
         />
       {:else}
-        <MemberDropdown
-          id={workspace._id + "member-workspace"}
+        
+        <Dropdown
+          dropdownId={workspace._id + "member-workspace"}
+          title={workspace.position ? workspace.position : ""}
           disabled={true}
-          workspaceId={workspace._id}
-          data={[
-            {
-              name: "Editor",
-              id: WorkspaceRole.WORKSPACE_EDITOR,
-              color: "whiteColor",
-            },
-            {
-              name: "Viewer",
-              id: WorkspaceRole.WORKSPACE_VIEWER,
-              color: "whiteColor",
-            },
-            {
-              name: "Admin",
-              id: TeamRole.TEAM_ADMIN,
-              color: "whiteColor",
-            },
-            {
-              name: "Owner",
-              id: TeamRole.TEAM_OWNER,
-              color: "whiteColor",
-            },
-          ]}
           method={user.role || teamRole === TeamRole.TEAM_OWNER
             ? TeamRole.TEAM_ADMIN
             : workspace.position
             ? workspace.position
             : ""}
+          data={[
+            {
+              name: "Editor",
+              id: WorkspaceRole.WORKSPACE_EDITOR,
+              textColor: "text-whiteColor",
+            },
+            {
+              name: "Viewer",
+              id: WorkspaceRole.WORKSPACE_VIEWER,
+              textColor: "text-whiteColor",
+            },
+            {
+              name: "Admins",
+              id: TeamRole.TEAM_ADMIN,
+              textColor: "text-whiteColor",
+            },
+            {
+              name: "Owner",
+              id: TeamRole.TEAM_OWNER,
+              textColor: "text-whiteColor",
+            },
+            {
+              name: "Removes",
+              id: "remove",
+              textColor: "text-dangerColor",
+            },
+          ]}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}

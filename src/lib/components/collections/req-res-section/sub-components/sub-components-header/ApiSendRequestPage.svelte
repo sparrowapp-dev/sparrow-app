@@ -8,7 +8,6 @@
     leftPanelWidth,
     rightPanelWidth,
   } from "$lib/store/request-response-section";
-  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
@@ -31,6 +30,7 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -232,9 +232,9 @@
     isHorizontalMode = value;
   });
 
-  const handleDropdown = (tab: RequestMethodType) => {
+  const handleDropdown = (tab: string) => {
     collectionsMethods.updateRequestProperty(
-      tab,
+      tab as RequestMethodType,
       RequestProperty.METHOD,
       currentTabId,
     );
@@ -342,37 +342,58 @@
     style="width:calc(100%-312px);"
   >
     <div class="d-flex gap-2 w-100 position-relative">
-      <ColorDropdown
+      <Dropdown
+        title={method ? method : ""}
+        staticClasses={[
+          {
+           id: "dropdown-btn-div",
+          classToAdd: ["px-2", "py-3", "border", "rounded"],
+          }
+        ]}
         data={[
           {
             name: "GET",
             id: RequestMethod.GET,
-            color: "getColor",
+            textColor: "text-getColor",
           },
           {
             name: "POST",
             id: RequestMethod.POST,
-            color: "postColor",
+            textColor: "text-postColor",
           },
           {
             name: "PUT",
             id: RequestMethod.PUT,
-            color: "putColor",
+            textColor: "text-putColor",
           },
           {
             name: "DELETE",
             id: RequestMethod.DELETE,
-            color: "deleteColor",
+            textColor: "text-deleteColor",
+            dynamicClasses: [
+              {
+                id: "dropdown-btn-div",
+                classToAdd: ["px-2","py-3","border","rounded"],
+                classToRemove: " ",
+              },
+            ],
           },
           {
             name: "PATCH",
             id: RequestMethod.PATCH,
-            color: "patchColor",
+            textColor: "text-patchColor",
+            dynamicClasses: [
+              // {
+              //   id: "dropdown-btn-div",
+              //   classToAdd: ["px-2","py-3","border","rounded"],
+              //   classToRemove: " ",
+              // },
+            ],
           },
         ]}
-        method={method ? method : ""}
         onclick={handleDropdown}
-      />
+      ></Dropdown>
+
       <CodeMirrorInput
         rawValue={urlText}
         handleRawChange={handleInputValue}

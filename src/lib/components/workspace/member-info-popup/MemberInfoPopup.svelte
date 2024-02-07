@@ -1,6 +1,5 @@
 <script lang="ts">
   import closeIcon from "$lib/assets/close.svg";
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { fly, fade } from "svelte/transition";
   import MemberWorkspace from "../member-worspace/MemberWorkspace.svelte";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
@@ -10,6 +9,7 @@
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
     import type { MemberPopType } from "$lib/utils/types/common.type";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export let title: string;
   export let user: userDetails;
@@ -113,36 +113,34 @@
         </div>
         <div class="position">
           {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)}
-            <MemberDropdown
-              workspaceId={user.workspaceId}
-              id={user.id + "owner-team-acess"}
-              data={getPermissionsData()}
-              method={isWorkspaceMemberInfo ? teamRole : user.role}
-              onclick={isWorkspaceMemberInfo
-                ? handleDropDownWorkspaceLevel
-                : handleDropdown}
-            />
+         
+            <Dropdown
+          dropdownId={user.workspaceId}
+          title={isWorkspaceMemberInfo ? teamRole : user.role}
+          data={ getPermissionsData()}
+           onclick={isWorkspaceMemberInfo
+            ? handleDropDownWorkspaceLevel
+            : handleDropdown}
+        />
           {:else if userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_ADMIN : user.role === TeamRole.TEAM_ADMIN)}
-            <MemberDropdown
-              workspaceId={user.workspaceId}
-              id={user.id + "admin-team-access"}
-              data={getPermissionsData()}
-              method={isWorkspaceMemberInfo ? teamRole : user.role}
-              onclick={isWorkspaceMemberInfo
-                ? handleDropDownWorkspaceLevel
-                : handleDropdown}
-            />
+            <Dropdown
+            dropdownId={user.workspaceId}
+            title={isWorkspaceMemberInfo ? teamRole : user.role}
+            data={ getPermissionsData()}
+             onclick={isWorkspaceMemberInfo
+              ? handleDropDownWorkspaceLevel
+              : handleDropdown}
+          />
           {:else}
-            <MemberDropdown
-              workspaceId={user.workspaceId}
-              id={user.id + "admin-workspace-member-access"}
-              disabled={true}
-              data={getPermissionsData()}
-              method={isWorkspaceMemberInfo ? teamRole : user.role}
-              onclick={isWorkspaceMemberInfo
-                ? handleDropDownWorkspaceLevel
-                : handleDropdown}
-            />
+            <Dropdown
+            dropdownId={user.workspaceId}
+            disabled={true}
+            title={isWorkspaceMemberInfo ? teamRole : user.role}
+            data={ getPermissionsData()}
+             onclick={isWorkspaceMemberInfo
+              ? handleDropDownWorkspaceLevel
+              : handleDropdown}
+          />
           {/if}
         </div>
       </div>
