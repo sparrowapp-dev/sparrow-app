@@ -20,7 +20,7 @@
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
-  import GlobalSearchBarPopup from "$lib/components/Modal/GlobalSearchBarPopup.svelte";
+  import GlobalSearchBarPopup from "$lib/components/header/global-search-bar/GlobalSearchBar.svelte";
   import { useTree } from "$lib/components/collections/collections-list/collectionList";
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";

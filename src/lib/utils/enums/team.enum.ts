@@ -9,3 +9,9 @@ export enum TeamRole {
   TEAM_ADMIN = "admin",
   TEAM_MEMBER = "member",
 }
+
+export enum TeamAccess {
+  OWNER_TEAM_ACCES = "owner-team-acess",
+  ADMIN_TEAM_ACCESS = "admin-team-access",
+  ADMIN_WORKSPACE_MEMBER_ACCESS = "admin-workspace-member-access",
+}
