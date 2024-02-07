@@ -96,6 +96,7 @@
     changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
     removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
     disableNewInviteTag: _viewModel.disableNewInviteTag,
+    updateTeam: _viewModel.updateTeam,
   };
 
   const userSubscribe = user.subscribe(async (value) => {
