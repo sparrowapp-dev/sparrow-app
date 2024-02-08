@@ -35,21 +35,10 @@
     ],
     "targets": "all"
   },
-  "identifier": "com.sparrow.app",
+  "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "deep-link": {
-      "domains": [
-        {
-          "host": "sparrowapp.dev",
-          "pathPrefix": ["/auth"]
-        },
-        {
-          "host": "sparrowapp.dev"
-        },
-        {
-          "host": "tauri.app"
-        }
-      ]
+      "domains": []
     }
   },
   "productName": "sparrow-app",

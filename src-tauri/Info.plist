@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-    <dict>
-        <key>CFBundleURLTypes</key>
-        <array>
-            <dict>
-                <key>CFBundleURLName</key>
-                <!-- Obviously needs to be replaced with your app's bundle identifier -->
-                <string>com.sparrow.app</string>
-                <key>CFBundleURLSchemes</key>
-                <array>
-                    <string>sparrow</string>
-                    <string>sparrowapp</string>
-                </array>
-            </dict>
-        </array>
-    </dict>
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>sparrow-app</string>
+	<key>CFBundleExecutable</key>
+	<string>sparrow-app</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.sparrow.app</string>
+	<key>CFBundleName</key>
+	<string>sparrow-app</string>
+	<key>CFBundleSpokenName</key>
+	<string>sparrow-app</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.sparrow.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sparrow</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSPrefPaneIconFile</key>
+	<string>icon.icns</string>
+	<key>NSPrefPaneIconLabel</key>
+	<string>sparrow-app</string>
+</dict>
 </plist>
