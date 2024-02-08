@@ -74,10 +74,10 @@
           }
         }}
       >
-        <div class="d-flex overflow-hidden">
+        <div class="d-flex w-100 overflow-hidden">
           {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
             <p
-              class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor `}
+              class={`m-0 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
               style={`font-size: 15px; padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
             >
               {team.name[0] ? team.name[0].toUpperCase() : ""}
@@ -85,7 +85,9 @@
           {:else}
             <img src={base64ToURL(team.logo)} alt="" />
           {/if}
-          <p class=" ellipsis overflow-hidden my-auto">{team.name}</p>
+          <p class="ellipsis text-left teams-title overflow-hidden my-auto">
+            {team.name}
+          </p>
         </div>
         {#if team.isNewInvite}
           <p class="mb-0 new-invite text-labelColor">NEW INVITE</p>
@@ -128,14 +130,20 @@
     color: var(--workspace-hover-color);
   }
   .teams-outer img {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-right: 8px;
   }
   .sidebar-teams-list {
     max-height: 30vh;
   }
   .new-invite {
     font-size: 12px !important;
+  }
+  .teams-title {
+    width: calc(100% - 40px);
+    text-align: left;
   }
 </style>
