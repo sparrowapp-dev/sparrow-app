@@ -30,7 +30,6 @@
         ? collection
         : null}
       alt=""
-      style="height:16px; width:16px;"
     />
     <span class="ellipsis sparrow-fs-12 fw-normal ps-2" style="cursor:pointer;"
       >{name}</span
