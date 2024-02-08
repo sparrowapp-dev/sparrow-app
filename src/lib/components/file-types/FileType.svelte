@@ -3,13 +3,13 @@
   import folder from "$lib/assets/folder.svg";
   import collection from "$lib/assets/collection.svg";
   import { ItemType, RequestMethod } from "$lib/utils/enums";
-  export let type: ItemType = ItemType.REQUEST;
+  export let type = ItemType.REQUEST;
   export let name = "";
-  export let method: RequestMethod = RequestMethod.GET;
+  export let method = RequestMethod.GET;
 </script>
 
 {#if type === ItemType.REQUEST}
-  <div class="d-flex align-items-center" style="height:32px;">
+  <div class="d-flex align-items-center" style="height:calc(32px);">
     <div
       class="api-method text-start sparrow-fs-12 fw-normal me-2 text-{getMethodStyle(
         method,
