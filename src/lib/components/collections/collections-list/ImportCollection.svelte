@@ -12,8 +12,8 @@
   import File from "./File.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { FileInput } from "$lib/components";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -278,7 +278,7 @@
     <p class="mb-1">Drag and drop your YAML/JSON file</p>
   </div>
   <div>
-    <FileInput
+    <DragDrop
       value={uploadCollection.file.value}
       maxFileSize={100}
       onChange={handleLogoInputChange}

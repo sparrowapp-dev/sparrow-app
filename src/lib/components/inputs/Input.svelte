@@ -2,42 +2,80 @@
   export let value: string = "";
   export let labelText: string = "";
   export let labelDescription: string = "";
-  export let inputId: string;
-  export let inputPlaceholder: string;
+  export let inputId: string = "";
+  export let inputPlaceholder: string = "";
   export let isRequired: boolean = false;
   export let invalidValue: boolean = false;
   export let errorText: string = "Invalid Value";
   export let onChange: (e: any) => void;
+  export let type: "input" | "textarea" = "input";
+  export let maxCharacter = 100;
+  export let inputStyleProp = "";
+  export let inputClassProp = "";
+  export let labelDescriptionClassProp = "";
+  export let labelDescriptionStyleProp = "";
+  export let labelTextClassProp = "";
+  export let labelTextStyleProp = "";
+
+  enum InputType {
+    INPUT = "input",
+    TEXTAREA = "textarea",
+  }
 </script>
 
-<div class="sparrow-text-input-container mt-3">
-  <div class="sparrow-input-label-container mb-1">
-    <div class="sparrow-input-label-heading">
-      <label class="sparrow-input-label text-lightGray fw-light" for={inputId}
-        >{labelText}</label
+<div class="sparrow-input-label-container">
+  {#if labelText.length > 0}
+    <div class="sparrow-input-label-heading mb-1">
+      <label
+        class={`sparrow-input-label text-lightGray fw-light ${labelTextClassProp}`}
+        style={`${labelTextStyleProp}`}
+        for={inputId}>{labelText}</label
       >
       {#if isRequired}
         <span class="sparrow-input-required">*</span>
       {/if}
     </div>
-    <span class="sparrow-input-label-desc">{labelDescription}</span>
-  </div>
+  {/if}
+  {#if labelDescription.length > 0}
+    <span
+      class={`sparrow-input-label-desc ${labelDescriptionClassProp}`}
+      style={`${labelDescriptionStyleProp}`}>{labelDescription}</span
+    >
+  {/if}
+</div>
+{#if type === InputType.INPUT}
   <input
     bind:value
-    class={`${invalidValue && "invalid"} sparrow-text-input py-2 px-3 w-100 `}
+    class={`${
+      invalidValue && "invalid"
+    } sparrow-text-input w-100 ${inputClassProp}`}
     type="text"
     id={inputId}
     placeholder={inputPlaceholder}
     on:input={(e) => onChange(e)}
+    style={`${inputStyleProp}`}
+    maxlength={maxCharacter}
   />
-  {#if invalidValue}
-    <span class="sparrow-input-error-text">{errorText}</span>
-  {/if}
-</div>
+{:else}
+  <textarea
+    class={`${
+      invalidValue && "invalid"
+    } sparrow-text-input w-100 ${inputClassProp}`}
+    {value}
+    id={inputId}
+    placeholder={inputPlaceholder}
+    maxlength={maxCharacter}
+    on:input={(e) => onChange(e)}
+    style={`${inputStyleProp}`}
+  />
+{/if}
+{#if invalidValue}
+  <span class="sparrow-input-error-text">{errorText}</span>
+{/if}
 
 <style lang="scss">
   .sparrow-input-label {
-    font-size: 14px;
+    font-size: var(--base-text);
   }
   .sparrow-input-required {
     color: var(--dangerColor);
@@ -46,8 +84,7 @@
     background-color: var(--blackColor);
     outline: none;
     border-radius: 4px;
-    font-size: 14px;
-    border: 1px solid var(--border-color);
+    font-size: var(--base-text);
   }
   .sparrow-text-input.invalid {
     border: 1px solid var(--dangerColor);
@@ -56,7 +93,7 @@
     color: var(--request-arc);
   }
   .sparrow-input-error-text {
-    font-size: 12px;
+    font-size: var(--small-text);
     color: var(--dangerColor);
   }
 </style>

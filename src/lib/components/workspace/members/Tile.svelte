@@ -229,7 +229,7 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -240,7 +240,7 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Remove"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
@@ -311,7 +311,7 @@
     <Button
       disable={memberPromotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
@@ -376,7 +376,7 @@
     <Button
       disable={memberDemotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberDemotePopupLoader}
@@ -473,7 +473,7 @@
       disable={memberOwnershipPopupLoader ||
         confirmationText !== openTeam?.name}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}

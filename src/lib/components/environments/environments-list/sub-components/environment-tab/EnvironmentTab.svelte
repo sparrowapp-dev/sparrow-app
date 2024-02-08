@@ -203,7 +203,7 @@
     <Button
       disable={deleteEnvironmentLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -214,7 +214,7 @@
     <Button
       disable={deleteEnvironmentLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteEnvironmentLoader}

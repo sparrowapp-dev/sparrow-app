@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated This component is deprecated and will be removed in future releases.
+   * Please use Input Component instead.
+   */
   export let value: string = "";
   export let maxCharacter: number = 100;
   export let labelText: string;

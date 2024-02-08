@@ -239,7 +239,7 @@
           disable={workspaceDeletePopupLoader ||
             confirmationText !== currentWorkspaceDetails.name}
           title={"Delete Workspace"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={workspaceDeletePopupLoader}
