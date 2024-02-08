@@ -5,8 +5,9 @@
    * **/
   import closeIcon from "$lib/assets/close.svg";
   import { base64ToURL } from "$lib/utils/helpers";
-  import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
+  import Button from "../buttons/Button.svelte";
+
   export let title: string;
   export let description;
   export let teamName: string;
@@ -99,37 +100,38 @@
         <p style="font-size:16px;" class="mb-0">{teamName}</p>
       </div>
       {#if isTeam}
-        <CustomButton
+        <Button
           disable={deleteLoader || (confirmationText !== teamName && auth)}
-          text={"Update Access"}
-          fontSize={14}
+          title={"Update Access"}
+          loaderSize={19}
           type={"primary"}
           loader={deleteLoader}
           onClick={() => {
             handleDelete();
           }}
+          textStyleProp={"font-size: var(--base-size)"}
         />
       {:else}
         <div
           class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
           style="font-size: 16px;"
         >
-          <CustomButton
+          <Button
             disable={deleteLoader}
-            text={"Cancel"}
-            fontSize={14}
+            title={"Cancel"}
+            textStyleProp={"font-size: var(--base-size)"}
             type={"dark"}
-            loader={false}
             onClick={onCancel}
           />
 
-          <CustomButton
+          <Button
             disable={deleteLoader}
-            text={"Delete Workspace"}
-            fontSize={14}
+            title={"Delete Workspace"}
+            loaderSize={19}
             type={"danger"}
             loader={deleteLoader}
             onClick={handleDelete}
+            textStyleProp={"font-size: var(--base-size)"}
           />
         </div>
       {/if}

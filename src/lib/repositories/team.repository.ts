@@ -170,8 +170,9 @@ export class TeamRepository {
       })
       .exec();
     await team.incrementalModify((value) => {
-      if (data.name) value.name = data.name;
-      if (data.description) value.description = data.description;
+      if (data.name || data.name === "") value.name = data.name;
+      if (data.description || data.description === "")
+        value.description = data.description;
       if (data.workspaces) value.workspaces = data.workspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;

@@ -4,8 +4,9 @@
    * Instead of this we can use src\lib\components\Modal\Modal.svelte
    * **/
   import closeIcon from "$lib/assets/close.svg";
-  import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
+  import Button from "../buttons/Button.svelte";
+
   export let title;
   export let description;
   export let onSuccess;
@@ -48,24 +49,24 @@
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
       style="font-size: 16px;"
     >
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Cancel"}
-        fontSize={14}
+        title={"Cancel"}
+        textStyleProp={"font-size: var(--base-size)"}
         type={"dark"}
-        loader={false}
         onClick={onCancel}
       />
 
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Remove"}
-        fontSize={14}
+        title={"Remove"}
+        loaderSize={19}
         type={"danger"}
         loader={deleteLoader}
         onClick={() => {
           handleDelete();
         }}
+        textStyleProp={"font-size: var(--base-size)"}
       />
     </div>
   </div>

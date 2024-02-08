@@ -17,9 +17,10 @@
   import type { TeamDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
-  import { CustomButton, IconButton } from "$lib/components";
-  import ModalWrapperV1 from "../Modal/Modal.svelte";
+  import Settings from "./settings/Settings.svelte";
 
+  import Button from "../buttons/Button.svelte";
+  import ModalWrapperV1 from "../Modal/Modal.svelte";
   export let userId: string;
   export let data: any;
   export let loaderColor = "default";
@@ -61,6 +62,8 @@
       }
     });
   };
+
+  let previousTeamId: string;
   $: {
     if (userId) {
       findUserType();
@@ -69,6 +72,10 @@
   $: {
     if (openTeam) {
       findUserType();
+      if (previousTeamId !== openTeam?.teamId) {
+        selectedTab = "all-workspace";
+      }
+      previousTeamId = openTeam?.teamId;
     }
   }
 
@@ -119,34 +126,35 @@
           <div
             class="team-heading d-flex justify-content-between position-relative"
           >
-            <h2 class="d-flex ellipsis overflow-visible">
-              {#if base64ToURL(currOpenedTeam.base64String) && base64ToURL(currOpenedTeam.base64String) !== ""}
+            <h2 class="d-flex ellipsis overflow-visible team-title">
+              {#if openTeam?.logo?.size}
                 <img
-                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground mb-3"
+                  class="text-center w-25 align-items-center justify-content-center profile-circle bg-dullBackground"
                   style="width: 60px !important; height: 60px !important; padding-top: 2px; display: flex; border-radius: 50%;"
-                  src={base64ToURL(currOpenedTeam.base64String)}
+                  src={base64ToURL(openTeam?.logo)}
                   alt=""
                 />{:else}
                 <p
                   class={`text-defaultColor w-25 text-center my-auto align-items-center justify-content-center profile-circle bg-dullBackground border-defaultColor border-2`}
                   style={`font-size: 40px; padding-top: 2px; width: 60px !important; height: 60px !important; display: flex; border: 2px solid #45494D;border-radius: 50%;`}
                 >
-                  {currOpenedTeam.name[0]
-                    ? currOpenedTeam.name[0].toUpperCase()
-                    : ""}
+                  {openTeam?.name[0] ? openTeam?.name[0].toUpperCase() : ""}
                 </p>
               {/if}
-              <span class="ms-4 my-auto ellipsis overflow-hidden"
-                >{currOpenedTeam.name}
+              <span class="ms-4 my-auto ellipsis overflow-hidden heading"
+                >{openTeam?.name}
               </span>
               <div class="mr-4 position-relative my-auto">
-                <IconButton
-                  classProp="rounded mx-2 my-auto p-0 d-flex {isShowMoreVisible
-                    ? 'transparent'
-                    : 'bg-plusButton'}"
+                <Button
                   onClick={handleOnShowMoreClick}
-                  ><ShowMoreIcon classProp="" /></IconButton
+                  allowChild={true}
+                  buttonClassProp={`rounded mx-2 my-auto p-0 d-flex ${
+                    isShowMoreVisible ? "transparent" : "bg-plusButton"
+                  } `}
+                  type={`icon`}
                 >
+                  <ShowMoreIcon classProp="" />
+                </Button>
                 {#if $currOpenedTeamRxDoc?._data?.owner == userId}
                   <button
                     on:click={(e) => {
@@ -192,40 +200,41 @@
               </div>
             </h2>
 
-            {#if userType && userType !== "member"}
-              <div class="d-flex align-items-end justify-content-end">
-                {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
-                  <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
-                    <PeopleIcon
-                      color={"#8A9299"}
-                      classProp="mx-2 my-auto d-flex"
-                    />
-                    <span class="my-auto"
-                      >{$currOpenedTeamRxDoc?._data?.users.length} Members</span
-                    >
-                  </p>
-                {/if}
-                <CustomButton
-                  text={`Invite`}
+            <div class="d-flex align-items-end justify-content-end">
+              {#if $currOpenedTeamRxDoc?._data?.users.length > 1}
+                <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
+                  <PeopleIcon
+                    color={"var(--sparrow-text-color)"}
+                    classProp="mx-2 my-auto d-flex"
+                  />
+                  <span class="my-auto"
+                    >{$currOpenedTeamRxDoc?._data?.users.length} Members</span
+                  >
+                </p>
+              {/if}
+              {#if userType && userType !== "member"}
+                <Button
+                  title={`Invite`}
                   type={`dark`}
-                  fontSize={12}
+                  textStyleProp={"font-size: var(--small-text)"}
                   onClick={() => {
                     teamInvitePopup = true;
                   }}
-                  classProp={`my-auto px-3 pt-1 me-4`}
-                  styleProp={`height: 30px;`}
+                  buttonClassProp={`my-auto px-3 pt-1 me-4`}
+                  buttonStyleProp={`height: 30px;`}
                 />
-                <CustomButton
-                  text={`New Workspace`}
+                <Button
+                  title={`New Workspace`}
                   type={`primary`}
                   loader={isLoading}
-                  fontSize={12}
+                  loaderSize={17}
+                  textStyleProp={"font-size: var(--small-text)"}
                   onClick={handleCreateWorkspace}
-                  classProp={`my-auto `}
-                  styleProp={`height: 30px;`}
+                  buttonClassProp={`my-auto`}
+                  buttonStyleProp={`height: 30px;`}
                 />
-              </div>
-            {/if}
+              {/if}
+            </div>
           </div>
         </div>
       </div>
@@ -334,6 +343,12 @@
         {workspaces}
         {teamRepositoryMethods}
       />
+    {:else if selectedTab === "settings" && userType === "owner"}
+      <Settings
+        openTeam={openTeam?.toMutableJSON()}
+        {teamServiceMethods}
+        {teamRepositoryMethods}
+      ></Settings>
     {/if}
   </div>
 </div>
@@ -375,5 +390,11 @@
   .view-active {
     filter: invert(65%) sepia(63%) saturate(551%) hue-rotate(185deg)
       brightness(103%) contrast(104%);
+  }
+  .team-title {
+    width: calc(100% - 351px);
+  }
+  .heading {
+    max-width: calc(100% - 150px);
   }
 </style>

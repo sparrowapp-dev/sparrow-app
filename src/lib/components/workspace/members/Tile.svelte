@@ -13,8 +13,8 @@
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -226,10 +226,10 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
     style="font-size: 16px;"
   >
-    <CustomButton
+    <Button
       disable={memberRemovePopupLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -237,10 +237,11 @@
       }}
     />
 
-    <CustomButton
+    <Button
       disable={memberRemovePopupLoader}
-      text={"Remove"}
-      fontSize={14}
+      title={"Remove"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
       onClick={() => {
@@ -307,10 +308,11 @@
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
 
-    <CustomButton
+    <Button
       disable={memberPromotePopupLoader}
-      text={"Update Access"}
-      fontSize={14}
+      title={"Update Access"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
       onClick={() => {
@@ -371,10 +373,11 @@
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
 
-    <CustomButton
+    <Button
       disable={memberDemotePopupLoader}
-      text={"Update Access"}
-      fontSize={14}
+      title={"Update Access"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"primary"}
       loader={memberDemotePopupLoader}
       onClick={() => {
@@ -466,11 +469,12 @@
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
-    <CustomButton
+    <Button
       disable={memberOwnershipPopupLoader ||
         confirmationText !== openTeam?.name}
-      text={"Update Access"}
-      fontSize={14}
+      title={"Update Access"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}
       onClick={() => {

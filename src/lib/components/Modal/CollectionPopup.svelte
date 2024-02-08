@@ -8,16 +8,19 @@
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { notifications } from "$lib/utils/notifications";
-  import CustomButton from "../buttons/CustomButton.svelte";
+  import Button from "../buttons/Button.svelte";
   import { fly, fade } from "svelte/transition";
   export let collectionId: string;
   export let workspaceId: string;
   export let collection;
   export let closePopup: (flag: boolean) => void;
   export let collectionsMethods: CollectionsMethods;
+
   const collectionService = new CollectionService();
+
   let requestCount: number = 0;
   let folderCount: number = 0;
+
   let deleteIds: string[] = [];
   collection.items.forEach((item) => {
     if (item.type === ItemType.FOLDER) {
@@ -34,6 +37,7 @@
     }
   });
   deleteIds.push(collectionId);
+
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
     deleteLoader = true;
@@ -41,6 +45,7 @@
       workspaceId,
       collectionId,
     );
+
     if (response.isSuccessful) {
       collectionsMethods.deleteCollection(collectionId);
       collectionsMethods.deleteCollectioninWorkspace(workspaceId, collectionId);
@@ -105,26 +110,26 @@
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Cancel"}
-      fontSize={14}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"dark"}
-      loader={false}
       onClick={() => {
         closePopup(false);
       }}
     />
 
-    <CustomButton
+    <Button
       disable={deleteLoader}
-      text={"Delete"}
-      fontSize={14}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-size)"}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
         handleDelete();
       }}
+      loaderSize={18}
     />
   </div>
 </div>
@@ -141,6 +146,7 @@
     backdrop-filter: blur(3px);
     z-index: 9;
   }
+
   .container {
     position: fixed;
     height: 244px;
@@ -152,29 +158,36 @@
     z-index: 10;
     border-radius: 10px;
   }
+
   .btn-close1 {
     background-color: var(--background-color);
   }
+
   .btn-close1:hover {
     background-color: var(--dangerColor);
   }
+
   .btn-close1:active {
     background-color: var(--dangerColor);
   }
   .btn-primary {
     background-color: var(--border-color);
   }
+
   .btn-primary:hover {
     color: var(--blackColor);
     background-color: var(--workspace-hover-color);
   }
+
   .btn-primary:active {
     color: var(--blackColor);
     background-color: var(--button-pressed);
   }
+
   .btn-secondary {
     background-color: var(--dangerColor);
   }
+
   .btn-secondary:hover {
     background-color: var(--delete-hover);
   }

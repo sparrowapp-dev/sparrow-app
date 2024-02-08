@@ -1,13 +1,13 @@
 <script lang="ts">
   import Warning from "$lib/assets/warning.svg";
   import Cross from "$lib/assets/cross.svg";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import { slide } from "svelte/transition";
   import type {
     EnvironmentResponseDto,
     UpdateEnvironmentPostBody,
   } from "$lib/utils/dto";
   import { notifications } from "$lib/utils/notifications";
+  import Button from "$lib/components/buttons/Button.svelte";
   export let environmentAxisX;
   export let environmentAxisY;
   export let updateEnvironment: (
@@ -123,15 +123,15 @@ left:{environmentAxisX}px;
       variable or under the active environment.
     </p>
     <div class="w-100">
-      <CustomButton
-        text={"Add Variable"}
-        fontSize={12}
+      <Button
+        title={"Add Variable"}
         type={"dark"}
-        classProp={`w-100`}
+        buttonClassProp={`w-100`}
         onClick={() => {
           addVariable = true;
         }}
-        styleProp={`align-items: center; justify-content: center; height: 30px;`}
+        buttonStyleProp={`align-items: center; justify-content: center; height: 30px;`}
+        textStyleProp={"font-size: var(--small-text)"}
       />
     </div>
   </div>
@@ -189,16 +189,16 @@ left:{environmentAxisX}px;
       </div>
     {/if}
     <div class="w-100">
-      <CustomButton
-        text={"Add & Apply"}
-        fontSize={12}
+      <Button
+        title={"Add & Apply"}
         type={"primary"}
-        classProp={`w-100`}
+        buttonClassProp={`w-100 mt-1`}
         disable={isAddDisable}
         onClick={() => applyVariable()}
-        styleProp={isAddDisable
-          ? `align-items: center; justify-content: center; height: 30px; margin-top: 10px; opacity: 35%;`
-          : `align-items: center; justify-content: center; height: 30px; margin-top: 10px;`}
+        buttonStyleProp={isAddDisable
+          ? `align-items: center; justify-content: center; height: 30px; opacity: 35%;`
+          : `align-items: center; justify-content: center; height: 30px;`}
+        textStyleProp={"font-size: var(--small-text)"}
       />
     </div>
   </div>

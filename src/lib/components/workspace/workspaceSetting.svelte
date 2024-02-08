@@ -2,7 +2,6 @@
   import { SearchIcon } from "$lib/assets/app.asset";
   import WorkspaceUserInfo from "./workspaceUserInfo.svelte";
   import { TeamRole } from "$lib/utils/enums";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import type {
     CollectionsMethods,
     TeamRepositoryMethods,
@@ -18,6 +17,7 @@
   import { notifications } from "$lib/utils/notifications";
   import { navigate } from "svelte-navigator";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
+  import Button from "../buttons/Button.svelte";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };
@@ -235,11 +235,12 @@
             {currentWorkspaceDetails.name}
           </p>
         </div>
-        <CustomButton
+        <Button
           disable={workspaceDeletePopupLoader ||
             confirmationText !== currentWorkspaceDetails.name}
-          text={"Delete Workspace"}
-          fontSize={14}
+          title={"Delete Workspace"}
+          textStyleProp={"font-size: var(--base-size)"}
+          loaderSize={18}
           type={"danger"}
           loader={workspaceDeletePopupLoader}
           onClick={async () => {
