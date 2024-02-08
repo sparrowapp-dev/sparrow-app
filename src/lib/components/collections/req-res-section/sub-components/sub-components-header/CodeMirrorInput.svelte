@@ -40,7 +40,9 @@
     debugger;
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
-    handleRawChange();
+    if (rawValue?.length > 0) {
+      handleRawChange();
+    }
     handleHighlightClass();
   });
   const keyBinding = keymap.of([
@@ -201,7 +203,7 @@
       selectedTabId = currentTabId;
       handleEnvironmentBox(false, localEnvKey);
     }
-    if (rawValue && rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,

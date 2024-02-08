@@ -15,7 +15,6 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
-  import FolderPopup from "$lib/components/Modal/FolderPopup.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
@@ -26,6 +25,9 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { notifications } from "$lib/utils/notifications";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   let expand: boolean = false;
   export let explorer;
@@ -232,25 +234,105 @@
 
   let workspaceId = currentWorkspaceId;
 
+  let requestCount: number;
+  let requestIds = [];
   $: {
     if (activePath) {
       if (activePath.folderId === explorer.id) {
         expand = true;
       }
     }
+    if (explorer) {
+      requestIds.length = 0;
+      requestCount = 0;
+      requestCount = explorer?.items?.length;
+      if (explorer?.items) {
+        requestIds = explorer?.items?.map((element) => {
+          return element.id;
+        });
+      }
+      requestIds.push(explorer?.id);
+    }
   }
+
+  // Delete folder functions
+  let deleteLoader: boolean = false;
+
+  const handleDelete = async () => {
+    deleteLoader = true;
+    const response = await collectionService.deleteFolderInCollection(
+      workspaceId,
+      collectionId,
+      explorer.id,
+    );
+
+    if (response.isSuccessful) {
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        explorer.id,
+      );
+
+      notifications.success(`"${explorer.name}" Folder deleted.`);
+      deleteLoader = false;
+      collectionsMethods.removeMultipleTabs(requestIds);
+      handleFolderPopUp(false);
+    } else {
+      notifications.error("Failed to delete the Folder.");
+      deleteLoader = false;
+    }
+  };
 </script>
 
-{#if isFolderPopup}
-  <FolderPopup
-    {collectionsMethods}
-    {collectionId}
-    folderId={explorer.id}
-    {workspaceId}
-    folder={explorer}
-    closePopup={handleFolderPopUp}
-  />
-{/if}
+<ModalWrapperV1
+  title={"Delete Folder?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isFolderPopup}
+  handleModalState={handleFolderPopUp}
+>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
+      Are you sure you want to delete this Folder? Everything in <span
+        class="text-whiteColor fw-bold">"{explorer.name}"</span
+      >
+      will be removed.
+    </p>
+  </div>
+  <div class="d-flex gap-3 sparrow-fs-12">
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{requestCount}</span>
+      <p>API Requests</p>
+    </div>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      disable={deleteLoader}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-size)"}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handleFolderPopUp(false);
+      }}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-size)"}
+      loaderSize={18}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        handleDelete();
+      }}
+    />
+  </div></ModalWrapperV1
+>
+<!-- {/if} -->
 
 <svelte:window
   on:click={closeRightClickContextMenu}

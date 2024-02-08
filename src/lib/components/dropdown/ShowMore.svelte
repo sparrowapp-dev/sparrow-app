@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CustomButton } from "..";
+  import Button from "../buttons/Button.svelte";
 
   export let showMenu: boolean = false;
   export let menuItems = [];
@@ -21,13 +21,15 @@
           {#each menuItems as item}
             {#if item.visible}
               <li class="align-items-center sparrow-menu-item list-unstyled">
-                <CustomButton
+                <Button
                   disable={item.disabled}
-                  text={item.displayText}
+                  title={item.displayText}
                   type={"transparent"}
-                  fontSize={12}
-                  classProp={`${item.disabled && "text-requestBodyColor"}`}
-                  styleProp={`${
+                  textStyleProp={"font-size: var(--small-text)"}
+                  buttonClassProp={`${
+                    item.disabled && "text-requestBodyColor"
+                  }`}
+                  buttonStyleProp={`${
                     item.disabled
                       ? "color: var(--request-arc);"
                       : item.displayText === "Delete" ||

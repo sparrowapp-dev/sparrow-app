@@ -10,7 +10,6 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import crossAsset from "$lib/assets/close.svg";
-  import CustomButton from "$lib/components/buttons/CustomButton.svelte";
   import {
     insertCollection,
     insertCollectionDirectory,
@@ -34,7 +33,7 @@
   import questionIcon from "$lib/assets/question.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import TextButton from "$lib/components/buttons/TextButton.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -433,584 +432,525 @@
   });
 </script>
 
-<div
-  class="save-request-backdrop d-block"
-  on:click={() => {
-    onClick(false);
-  }}
-  transition:fade={{ delay: 0, duration: 100 }}
-/>
-<div
-  class="save-request d-block"
-  transition:fly={{ y: 50, delay: 0, duration: 100 }}
-  on:introstart
-  on:outroend
->
-  <div class="contain">
-    <div class="d-flex justify-content-between">
-      <div class="pb-2">
-        <h4>Save Request</h4>
-      </div>
-      <button
-        class="btn pe-0 pt-0 border-0"
-        on:click={() => {
-          onClick(false);
-        }}><img src={crossAsset} alt="" /></button
+<div class="url d-flex align-items-center pb-3">
+  <p class="ellipsis mb-0">
+    {#if path.length > 0}
+      <span
+        class="cursor-pointer"
+        style="height:24px; width:24px;"
+        on:click={navigateToLastRoute}><img src={leftArrowAsset} alt="" /></span
       >
-    </div>
-    <div class="url d-flex align-items-center pb-3">
-      <p class="ellipsis mb-0">
-        {#if path.length > 0}
-          <span
-            class="cursor-pointer"
-            style="height:24px; width:24px;"
-            on:click={navigateToLastRoute}
-            ><img src={leftArrowAsset} alt="" /></span
-          >
-        {/if}
-        {#if workspace}
-          <span
-            on:click={navigateToWorkspace}
-            class="{path.length === 0
-              ? 'text-whiteColor'
-              : ''} cursor-pointer px-1"
-            style="font-size: 12px;"
-          >
+    {/if}
+    {#if workspace}
+      <span
+        on:click={navigateToWorkspace}
+        class="sparrow-fs-12 {path.length === 0
+          ? 'text-whiteColor'
+          : ''} cursor-pointer px-1"
+      >
+        <img
+          style="height:10.67px; width: 10.67px;"
+          src={workspaceAsset}
+          alt=""
+        />
+        {workspace.name}</span
+      >
+    {/if}
+    {#if path.length > 0}
+      {#each path as elem, index}
+        <span>/</span>
+        <span
+          on:click={() => {
+            navigateToDirectory(elem);
+          }}
+          class="{path.length - 1 === index
+            ? 'text-whiteColor'
+            : ''} cursor-pointer px-1 sparrow-fs-12"
+        >
+          {#if elem.type === ItemType.COLLECTION}
             <img
+              src={collectionAsset}
               style="height:10.67px; width: 10.67px;"
-              src={workspaceAsset}
               alt=""
             />
-            {workspace.name}</span
-          >
-        {/if}
-        {#if path.length > 0}
-          {#each path as elem, index}
-            <span>/</span>
-            <span
-              on:click={() => {
-                navigateToDirectory(elem);
-              }}
-              class="{path.length - 1 === index
-                ? 'text-whiteColor'
-                : ''} cursor-pointer px-1"
-              style="font-size: 12px;"
-            >
-              {#if elem.type === ItemType.COLLECTION}
-                <img
-                  src={collectionAsset}
-                  style="height:10.67px; width: 10.67px;"
-                  alt=""
-                />
-              {:else if elem.type === ItemType.FOLDER}
-                <img
-                  src={folderAsset}
-                  style="height:10.67px; width: 10.67px;"
-                  alt=""
-                />
-              {/if}
-              {elem.name}</span
-            >
-          {/each}
-        {/if}
-      </p>
-    </div>
-    <div class="row">
-      <div class="col-6" style="border-right: 1px solid var(--border-color);">
-        <div style="height: 460px; overflow:auto;">
-          <!-- 
+          {:else if elem.type === ItemType.FOLDER}
+            <img
+              src={folderAsset}
+              style="height:10.67px; width: 10.67px;"
+              alt=""
+            />
+          {/if}
+          {elem.name}</span
+        >
+      {/each}
+    {/if}
+  </p>
+</div>
+<div class="row">
+  <div class="col-6" style="border-right: 1px solid var(--border-color);">
+    <div style="height: 460px; overflow:auto;">
+      <!-- 
             --
             shows current directory 
           --
           -->
-          {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-            <p class="mb-0 ellipsis">
-              <small class="save-text-clr">Collection: </small>
-              <small class="text-whiteColor">
-                {path[path.length - 1].name}</small
-              >
-            </p>
-            <small class="save-text-clr" style="font-size: 12px;"
-              >Save your request in this collection or any of its folders.</small
-            >
-          {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
-            <p class="mb-0 ellipsis">
-              <small class="save-text-clr">Folder: </small>
-              <small class="text-whiteColor">
-                {path[path.length - 1].name}</small
-              >
-            </p>
-          {:else}
-            <p class="mb-0 ellipsis">
-              <small class="save-text-clr">Workspace: </small>
-              {#if workspace}
-                <small class="text-whiteColor">
-                  {workspace.name}
-                </small>
-              {/if}
-            </p>
-
-            <small class="save-text-clr" style="font-size: 12px;"
-              >Save your request inside a collection or a folder.</small
-            >
+      {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
+        <p class="mb-0 ellipsis">
+          <small class="save-text-clr">Collection: </small>
+          <small class="text-whiteColor"> {path[path.length - 1].name}</small>
+        </p>
+        <small class="save-text-clr sparrow-fs-12"
+          >Save your request in this collection or any of its folders.</small
+        >
+      {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
+        <p class="mb-0 ellipsis">
+          <small class="save-text-clr">Folder: </small>
+          <small class="text-whiteColor"> {path[path.length - 1].name}</small>
+        </p>
+      {:else}
+        <p class="mb-0 ellipsis">
+          <small class="save-text-clr">Workspace: </small>
+          {#if workspace}
+            <small class="text-whiteColor">
+              {workspace.name}
+            </small>
           {/if}
-          <p />
-          {#if directory.length > 0}
-            <!-- 
+        </p>
+
+        <small class="save-text-clr" style="font-size: 12px;"
+          >Save your request inside a collection or a folder.</small
+        >
+      {/if}
+      <p />
+      {#if directory.length > 0}
+        <!-- 
             --
             create collection 
           --
           -->
-            {#if path.length === 0 && createCollectionNameVisibility}
-              <div class="d-flex justify-content-between">
-                <div class="w-100 pe-3">
-                  <input
-                    class="form-input save-input"
-                    type="text"
-                    placeholder="Name your collection"
-                    bind:value={createCollectionName}
-                    autofocus
-                  />
-                </div>
-                <div class="d-flex">
-                  {#if !createDirectoryLoader}
-                    <button
-                      class="icon-btn {createCollectionName.length > 0
-                        ? ''
-                        : 'unclickable'}"
-                      on:click={() => {
-                        handleCreateCollection(createCollectionName);
-                      }}
-                    >
-                      <img src={tickIcon} alt="" />
-                    </button>
+        {#if path.length === 0 && createCollectionNameVisibility}
+          <div class="d-flex justify-content-between">
+            <div class="w-100 pe-3">
+              <input
+                class="form-input save-input"
+                type="text"
+                placeholder="Name your collection"
+                bind:value={createCollectionName}
+                autofocus
+              />
+            </div>
+            <div class="d-flex">
+              {#if !createDirectoryLoader}
+                <button
+                  class="icon-btn {createCollectionName.length > 0
+                    ? ''
+                    : 'unclickable'}"
+                  on:click={() => {
+                    handleCreateCollection(createCollectionName);
+                  }}
+                >
+                  <img src={tickIcon} alt="" />
+                </button>
 
-                    <button
-                      class="icon-btn"
-                      on:click={() => {
-                        createCollectionNameVisibility = false;
-                        createCollectionName = constant.newCollection;
-                      }}
-                    >
-                      <img src={crossIcon} alt="" />
-                    </button>
-                  {:else}
-                    <button
-                      class="d-flex justify-content-center border-0"
-                      style="width:50px; background-color: transparent;"
-                    >
-                      <Spinner size={"16px"} />
-                    </button>
-                  {/if}
-                </div>
-              </div>
-              <!-- 
+                <button
+                  class="icon-btn"
+                  on:click={() => {
+                    createCollectionNameVisibility = false;
+                    createCollectionName = constant.newCollection;
+                  }}
+                >
+                  <img src={crossIcon} alt="" />
+                </button>
+              {:else}
+                <button
+                  class="d-flex justify-content-center border-0"
+                  style="width:50px; background-color: transparent;"
+                >
+                  <Spinner size={"16px"} />
+                </button>
+              {/if}
+            </div>
+          </div>
+          <!-- 
             --
             create folder 
           --
           -->
-            {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
-              <div class="d-flex justify-content-between">
-                <div class="w-100 pe-3">
-                  <input
-                    class="form-input save-input"
-                    type="text"
-                    placeholder="Name your folder"
-                    bind:value={createFolderName}
-                    autofocus
-                  />
-                </div>
-                <div class="d-flex">
-                  {#if !createDirectoryLoader}
-                    <button
-                      class="icon-btn {createFolderName.length > 0
-                        ? ''
-                        : 'unclickable'}"
-                      on:click={() => {
-                        handleFolderClick(createFolderName);
-                      }}
-                    >
-                      <img src={tickIcon} alt="" />
-                    </button>
+        {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+          <div class="d-flex justify-content-between">
+            <div class="w-100 pe-3">
+              <input
+                class="form-input save-input"
+                type="text"
+                placeholder="Name your folder"
+                bind:value={createFolderName}
+                autofocus
+              />
+            </div>
+            <div class="d-flex">
+              {#if !createDirectoryLoader}
+                <button
+                  class="icon-btn {createFolderName.length > 0
+                    ? ''
+                    : 'unclickable'}"
+                  on:click={() => {
+                    handleFolderClick(createFolderName);
+                  }}
+                >
+                  <img src={tickIcon} alt="" />
+                </button>
 
-                    <button
-                      class="icon-btn"
-                      on:click={() => {
-                        createFolderNameVisibility = false;
-                        createFolderName = constant.newFolder;
-                      }}
-                    >
-                      <img src={crossIcon} alt="" />
-                    </button>
-                  {:else}
-                    <button
-                      class="d-flex justify-content-center border-0"
-                      style="width:50px; background-color: transparent;"
-                    >
-                      <Spinner size={"16px"} />
-                    </button>
-                  {/if}
-                </div>
-              </div>
-            {/if}
-            {#each directory as col}
-              <!-- 
+                <button
+                  class="icon-btn"
+                  on:click={() => {
+                    createFolderNameVisibility = false;
+                    createFolderName = constant.newFolder;
+                  }}
+                >
+                  <img src={crossIcon} alt="" />
+                </button>
+              {:else}
+                <button
+                  class="d-flex justify-content-center border-0"
+                  style="width:50px; background-color: transparent;"
+                >
+                  <Spinner size={"16px"} />
+                </button>
+              {/if}
+            </div>
+          </div>
+        {/if}
+        {#each directory as col}
+          <!-- 
             --
             render collection, folder and requests 
           --
           -->
-              {#if col.type === ItemType.FOLDER}
-                <div
-                  on:click={() => {
-                    navigateToDirectory(col);
-                  }}
-                >
-                  <Folder name={col.name} />
-                </div>
-              {:else if col.type === ItemType.REQUEST}
-                <Request name={col.name} method={col.request.method} />
-              {:else}
-                <div
-                  on:click={() => {
-                    navigateToDirectory(col);
-                  }}
-                >
-                  <Collection name={col.name} />
-                </div>
-              {/if}
-            {/each}
-          {:else}
-            <div>
-              {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
-                <div class="d-flex justify-content-between">
-                  <div class="w-100 pe-3">
-                    <input
-                      class="form-input save-input"
-                      type="text"
-                      placeholder="Name your folder"
-                      bind:value={createFolderName}
-                      autofocus
-                    />
-                  </div>
-                  <div class="d-flex">
-                    {#if !createDirectoryLoader}
-                      <button
-                        class="icon-btn {createFolderName.length > 0
-                          ? ''
-                          : 'unclickable'}"
-                        on:click={() => {
-                          handleFolderClick(createFolderName);
-                        }}
-                      >
-                        <img src={tickIcon} alt="" />
-                      </button>
-
-                      <button
-                        class="icon-btn"
-                        on:click={() => {
-                          createFolderNameVisibility = false;
-                          createFolderName = constant.newFolder;
-                        }}
-                      >
-                        <img src={crossIcon} alt="" />
-                      </button>
-                    {:else}
-                      <button
-                        class="d-flex justify-content-center border-0"
-                        style="width:50px; background-color: transparent;"
-                      >
-                        <Spinner size={"16px"} />
-                      </button>
-                    {/if}
-                  </div>
-                </div>
-              {:else if path.length === 0 && createCollectionNameVisibility}
-                <div class="d-flex justify-content-between">
-                  <div class="w-100 pe-3">
-                    <input
-                      class="form-input save-input"
-                      type="text"
-                      placeholder="Name your collection"
-                      bind:value={createCollectionName}
-                      autofocus
-                    />
-                  </div>
-                  <div class="d-flex">
-                    {#if !createDirectoryLoader}
-                      <button
-                        class="icon-btn {createCollectionName.length > 0
-                          ? ''
-                          : 'unclickable'}"
-                        on:click={() => {
-                          handleCreateCollection(createCollectionName);
-                        }}
-                      >
-                        <img src={tickIcon} alt="" />
-                      </button>
-                      <button
-                        class="icon-btn"
-                        on:click={() => {
-                          createCollectionNameVisibility = false;
-                          createCollectionName = constant.newCollection;
-                        }}
-                      >
-                        <img src={crossIcon} alt="" />
-                      </button>
-                    {:else}
-                      <button
-                        class="d-flex justify-content-center border-0"
-                        style="width:50px; background-color: transparent;"
-                      >
-                        <Spinner size={"16px"} />
-                      </button>
-                    {/if}
-                  </div>
-                </div>
-              {/if}
-            </div>
+          {#if col.type === ItemType.FOLDER}
             <div
-              class="d-flex align-items-center justify-content-center"
-              style="height: 300px;"
+              on:click={() => {
+                navigateToDirectory(col);
+              }}
             >
-              {#if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
-                <p class="save-text-clr text-center">This Folder is empty</p>
-              {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-                <p class="save-text-clr text-center">
-                  This Collection is empty
-                </p>
-              {:else if path.length === 0}
-                <div>
-                  <p
-                    style="font-size: 12px;"
-                    class="w-100 save-text-clr text-center"
+              <Folder name={col.name} />
+            </div>
+          {:else if col.type === ItemType.REQUEST}
+            <Request name={col.name} method={col.request.method} />
+          {:else}
+            <div
+              on:click={() => {
+                navigateToDirectory(col);
+              }}
+            >
+              <Collection name={col.name} />
+            </div>
+          {/if}
+        {/each}
+      {:else}
+        <div>
+          {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION && createFolderNameVisibility}
+            <div class="d-flex justify-content-between">
+              <div class="w-100 pe-3">
+                <input
+                  class="form-input save-input"
+                  type="text"
+                  placeholder="Name your folder"
+                  bind:value={createFolderName}
+                  autofocus
+                />
+              </div>
+              <div class="d-flex">
+                {#if !createDirectoryLoader}
+                  <button
+                    class="icon-btn {createFolderName.length > 0
+                      ? ''
+                      : 'unclickable'}"
+                    on:click={() => {
+                      handleFolderClick(createFolderName);
+                    }}
                   >
-                    You have no collections in this workspace. Create a
-                    Collection to easily organize and use your API requests.
-                  </p>
-                  <div class="w-100 d-flex justify-content-center">
-                    <CustomButton
-                      text={"+ Collection"}
-                      fontSize={14}
-                      type={"primary"}
-                      onClick={() => {
-                        createCollectionNameVisibility = true;
-                      }}
-                    />
-                  </div>
-                </div>
-              {/if}
+                    <img src={tickIcon} alt="" />
+                  </button>
+
+                  <button
+                    class="icon-btn"
+                    on:click={() => {
+                      createFolderNameVisibility = false;
+                      createFolderName = constant.newFolder;
+                    }}
+                  >
+                    <img src={crossIcon} alt="" />
+                  </button>
+                {:else}
+                  <button
+                    class="d-flex justify-content-center border-0"
+                    style="width:50px; background-color: transparent;"
+                  >
+                    <Spinner size={"16px"} />
+                  </button>
+                {/if}
+              </div>
+            </div>
+          {:else if path.length === 0 && createCollectionNameVisibility}
+            <div class="d-flex justify-content-between">
+              <div class="w-100 pe-3">
+                <input
+                  class="form-input save-input"
+                  type="text"
+                  placeholder="Name your collection"
+                  bind:value={createCollectionName}
+                  autofocus
+                />
+              </div>
+              <div class="d-flex">
+                {#if !createDirectoryLoader}
+                  <button
+                    class="icon-btn {createCollectionName.length > 0
+                      ? ''
+                      : 'unclickable'}"
+                    on:click={() => {
+                      handleCreateCollection(createCollectionName);
+                    }}
+                  >
+                    <img src={tickIcon} alt="" />
+                  </button>
+                  <button
+                    class="icon-btn"
+                    on:click={() => {
+                      createCollectionNameVisibility = false;
+                      createCollectionName = constant.newCollection;
+                    }}
+                  >
+                    <img src={crossIcon} alt="" />
+                  </button>
+                {:else}
+                  <button
+                    class="d-flex justify-content-center border-0"
+                    style="width:50px; background-color: transparent;"
+                  >
+                    <Spinner size={"16px"} />
+                  </button>
+                {/if}
+              </div>
             </div>
           {/if}
         </div>
-      </div>
-      <div class="col-6">
-        <!-- Right panel  -->
         <div
-          class="d-flex justify-content-between"
-          on:click={handleDropdownClick}
+          class="d-flex align-items-center justify-content-center"
+          style="height: 300px;"
         >
-          <p class="save-text-clr mb-1" style="font-size:12px">
-            Request Name <span class="text-dangerColor">*</span>
-          </p>
-          <span
-            id="3456-dropdown900"
-            class="instruction-btn {instructionEnabled
-              ? 'bg-sparrowBottomBorder'
-              : ''} rounded d-flex align-items-center justify-content-center position-relative"
-          >
-            <img
-              on:click={() => {
-                instructionEnabled = !instructionEnabled;
-              }}
-              src={questionIcon}
-              alt="question"
-            />
-            {#if instructionEnabled}
-              <div class="bg-blackColor api-name-usage p-2">
-                <p class="text-whiteColor">Best Practices</p>
-                <p class="save-as-instructions">
-                  When naming your requests, remember that resources are at the
-                  core of REST. Use nouns to represent your resources, such as
-                  'user accounts' or 'managed devices.' Keep your URIs clear and
-                  consistent by using forward slashes to indicate hierarchy,
-                  avoid file extensions.
-                </p>
-                <div class="d-flex">
-                  <div class="w-50">
-                    <p class="save-as-instructions">Do's:</p>
-                    <ul class="save-as-instructions">
-                      <li>Use nouns to represent resources</li>
-                      <li>Use forward slashes for hierarchy</li>
-                      <li>Use hyphens for readability</li>
-                      <li>Use lowercase letters in URIs</li>
-                      <li>Use HTTP methods for CRUD actions</li>
-                    </ul>
-                  </div>
-                  <div class="w-50">
-                    <p class="save-as-instructions">Don'ts:</p>
-                    <ul class="save-as-instructions">
-                      <li>Don't use file extensions.</li>
-                      <li>Don't use underscores in URIs.</li>
-                      <li>Don't use verbs in the URIs.</li>
-                      <li>Don't put CRUD function names in URIs.</li>
-                      <li>Don't use capital letters in URIs.</li>
-                    </ul>
-                  </div>
-                </div>
+          {#if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
+            <p class="save-text-clr text-center">This Folder is empty</p>
+          {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
+            <p class="save-text-clr text-center">This Collection is empty</p>
+          {:else if path.length === 0}
+            <div>
+              <p class="w-100 save-text-clr text-center sparrow-fs-12">
+                You have no collections in this workspace. Create a Collection
+                to easily organize and use your API requests.
+              </p>
+              <div class="w-100 d-flex justify-content-center">
+                <Button
+                  title={"+ Collection"}
+                  buttonClassProp={"fs-6"}
+                  type={"primary"}
+                  onClick={() => {
+                    createCollectionNameVisibility = true;
+                  }}
+                />
               </div>
-            {/if}
-          </span>
+            </div>
+          {/if}
         </div>
-        <div class="pb-2">
-          <input
-            type="text"
-            style="width: 100%; font-size: 12px; {tabName?.length === 0
-              ? `outline: 1px solid #FE8C98`
-              : ``}"
-            placeholder="Enter request name."
-            class="p-1 bg-black outline-0 rounded border-0"
-            bind:value={tabName}
-            autofocus
-          />
-        </div>
-        {#if tabName?.length === 0}
-          <p class="tabname-error-text text-dangerColor">
-            Please add the Request Name to save the request.
-          </p>
+      {/if}
+    </div>
+  </div>
+  <div class="col-6">
+    <!-- Right panel  -->
+    <div class="d-flex justify-content-between" on:click={handleDropdownClick}>
+      <p class="save-text-clr mb-1 sparrow-fs-12">
+        Request Name <span class="text-dangerColor">*</span>
+      </p>
+      <span
+        id="3456-dropdown900"
+        class="instruction-btn {instructionEnabled
+          ? 'bg-sparrowBottomBorder'
+          : ''} rounded d-flex align-items-center justify-content-center position-relative"
+      >
+        <img
+          on:click={() => {
+            instructionEnabled = !instructionEnabled;
+          }}
+          src={questionIcon}
+          alt="question"
+        />
+        {#if instructionEnabled}
+          <div class="bg-blackColor api-name-usage p-2">
+            <p class="text-whiteColor">Best Practices</p>
+            <p class="save-as-instructions">
+              When naming your requests, remember that resources are at the core
+              of REST. Use nouns to represent your resources, such as 'user
+              accounts' or 'managed devices.' Keep your URIs clear and
+              consistent by using forward slashes to indicate hierarchy, avoid
+              file extensions.
+            </p>
+            <div class="d-flex">
+              <div class="w-50">
+                <p class="save-as-instructions">Do's:</p>
+                <ul class="save-as-instructions">
+                  <li>Use nouns to represent resources</li>
+                  <li>Use forward slashes for hierarchy</li>
+                  <li>Use hyphens for readability</li>
+                  <li>Use lowercase letters in URIs</li>
+                  <li>Use HTTP methods for CRUD actions</li>
+                </ul>
+              </div>
+              <div class="w-50">
+                <p class="save-as-instructions">Don'ts:</p>
+                <ul class="save-as-instructions">
+                  <li>Don't use file extensions.</li>
+                  <li>Don't use underscores in URIs.</li>
+                  <li>Don't use verbs in the URIs.</li>
+                  <li>Don't put CRUD function names in URIs.</li>
+                  <li>Don't use capital letters in URIs.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         {/if}
-        <div class="d-flex">
-          <MethodButton method={componentData?.property.request.method} />
-          <p class="api-url">{componentData?.property.request.url}</p>
-        </div>
-        <p class="save-text-clr mb-1" style="font-size:12px">Description</p>
-        <div class="pb-1">
-          <textarea
-            style="width: 100%; font-size: 12px; resize:none;"
-            class="p-1 bg-black rounded border-0"
-            rows="5"
-            maxlength="1024"
-            placeholder="Give a description to help people know about this request."
-            bind:value={description}
-          />
-        </div>
-        <p class="save-text-clr mb-1" style="font-size:12px">Saving to</p>
-        {#if path.length === 0}
-          <p style="font-size: 12px;" class="save-text-clr text-dangerColor">
-            Select a Collection or Folder.
-          </p>
-        {:else}
-          <!-- 
+      </span>
+    </div>
+    <div class="pb-2">
+      <input
+        type="text"
+        style="width: 100%; {tabName?.length === 0
+          ? `outline: 1px solid #FE8C98`
+          : ``}"
+        placeholder="Enter request name."
+        class="p-1 bg-black outline-0 rounded border-0 sparrow-fs-12"
+        bind:value={tabName}
+        autofocus
+      />
+    </div>
+    {#if tabName?.length === 0}
+      <p class="tabname-error-text text-dangerColor">
+        Please add the Request Name to save the request.
+      </p>
+    {/if}
+    <div class="d-flex">
+      <MethodButton method={componentData?.property.request.method} />
+      <p class="api-url">{componentData?.property.request.url}</p>
+    </div>
+    <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
+    <div class="pb-1">
+      <textarea
+        style="width: 100%; resize:none;"
+        class="p-1 bg-black rounded border-0 sparrow-fs-12"
+        rows="5"
+        maxlength="1024"
+        placeholder="Give a description to help people know about this request."
+        bind:value={description}
+      />
+    </div>
+    <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
+    {#if path.length === 0}
+      <p class="save-text-clr text-dangerColor sparrow-fs-12">
+        Select a Collection or Folder.
+      </p>
+    {:else}
+      <!-- 
             --
             current directory path 
           --
           -->
-          <div class="url d-flex align-items-center pb-3">
-            <p class="ellipsis mb-0">
-              {#if workspace}
-                <span class="px-1" style="font-size: 12px;">
+      <div class="url d-flex align-items-center pb-3">
+        <p class="ellipsis mb-0">
+          {#if workspace}
+            <span class="px-1 sparrow-fs-12">
+              <img
+                style="height:10.67px; width: 10.67px;"
+                src={workspaceAsset}
+                alt=""
+              />
+              {workspace.name}</span
+            >
+          {/if}
+          {#if path.length > 0}
+            {#each path as elem}
+              <span>/</span>
+              <span class="px-1 sparrow-fs-12">
+                {#if elem.type === ItemType.COLLECTION}
                   <img
+                    src={collectionAsset}
                     style="height:10.67px; width: 10.67px;"
-                    src={workspaceAsset}
                     alt=""
                   />
-                  {workspace.name}</span
-                >
-              {/if}
-              {#if path.length > 0}
-                {#each path as elem}
-                  <span>/</span>
-                  <span class="px-1" style="font-size: 12px;">
-                    {#if elem.type === ItemType.COLLECTION}
-                      <img
-                        src={collectionAsset}
-                        style="height:10.67px; width: 10.67px;"
-                        alt=""
-                      />
-                    {:else if elem.type === ItemType.FOLDER}
-                      <img
-                        src={folderAsset}
-                        style="height:10.67px; width: 10.67px;"
-                        alt=""
-                      />
-                    {/if}
-                    {elem.name}</span
-                  >
-                {/each}
-              {/if}
-            </p>
-          </div>
-        {/if}
+                {:else if elem.type === ItemType.FOLDER}
+                  <img
+                    src={folderAsset}
+                    style="height:10.67px; width: 10.67px;"
+                    alt=""
+                  />
+                {/if}
+                {elem.name}</span
+              >
+            {/each}
+          {/if}
+        </p>
       </div>
-    </div>
-    <div class="controllers mt-3 d-flex justify-content-between">
-      <div>
-        {#if path.length === 0}
-          <TextButton
-            text={"+ Collection"}
-            onClick={() => {
-              createCollectionNameVisibility = true;
-            }}
-          />
-        {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-          <TextButton
-            text={"+ Folder"}
-            onClick={() => {
-              createFolderNameVisibility = true;
-            }}
-          />
-        {/if}
-      </div>
-      <div class="d-flex">
-        <span class="mx-2">
-          <CustomButton
-            text={"Cancel"}
-            fontSize={16}
-            type={"dark"}
-            onClick={() => {
-              onClick(false);
-            }}
-          />
-        </span>
-        <CustomButton
-          disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
-          text={"Save"}
-          fontSize={16}
-          type={"primary"}
-          loader={isLoading}
-          onClick={() => {
-            handleSaveAsRequest();
-          }}
-        />
-      </div>
-    </div>
+    {/if}
+  </div>
+</div>
+<div class="controllers mt-3 d-flex justify-content-between">
+  <div>
+    {#if path.length === 0}
+      <Button
+        onClick={() => {
+          createCollectionNameVisibility = true;
+        }}
+        title={"+ Collection"}
+        buttonClassProp={"btn mb-2"}
+        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+      />
+    {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
+      <Button
+        onClick={() => {
+          createFolderNameVisibility = true;
+        }}
+        title={"+ Folder"}
+        buttonClassProp={"btn mb-2"}
+        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+      />
+    {/if}
+  </div>
+  <div class="d-flex">
+    <span class="mx-1">
+      <Button
+        title={"Cancel"}
+        textClassProp={"fs-6 px-2"}
+        type={"dark"}
+        onClick={() => {
+          onClick(false);
+        }}
+      />
+    </span>
+    <span class="mx-1">
+      <Button
+        disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
+        title={"Save"}
+        textClassProp={"fs-6"}
+        type={"primary"}
+        loader={isLoading}
+        onClick={() => {
+          handleSaveAsRequest();
+        }}
+        loaderSize={18}
+      />
+    </span>
   </div>
 </div>
 
 <style>
-  .save-request-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-  }
-  .save-request {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    padding: 24px;
-    background-color: var(--background-color);
-    width: 100%;
-    max-width: 960px;
-    height: 640px;
-    z-index: 10;
-    border-radius: 8px;
-  }
   .cursor-pointer {
     cursor: pointer;
   }
@@ -1021,8 +961,8 @@
     font-family: monospace;
     align-self: center;
   }
-  .save-request input:focus,
-  .save-request textarea:focus {
+  input:focus,
+  textarea:focus {
     outline: none;
     padding: 6px 12px;
   }
@@ -1033,7 +973,7 @@
   .unclickable {
     pointer-events: none;
   }
-  .save-request .icon-btn {
+  .icon-btn {
     width: 25px;
     height: 25px;
     background-color: transparent;

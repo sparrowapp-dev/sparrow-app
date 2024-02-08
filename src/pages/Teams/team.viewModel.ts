@@ -344,4 +344,12 @@ export class TeamViewModel {
     }
     return;
   };
+
+  public updateTeam = async (teamId: string, team): Promise<Team | void> => {
+    const response = await this.teamService.updateTeam(teamId, team);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
 }

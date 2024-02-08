@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
+   * **/
   export let handleInvitePopup: (flag: boolean) => void;
   export let teamName: string;
   import { fade } from "svelte/transition";
@@ -13,7 +17,6 @@
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   const emailstoBeSentArr: string[] = [];
-
   export let addUsersInWorkspace: (
     id: string,
     data: addUsersInWorkspacePayload,
@@ -24,10 +27,9 @@
   ) => Promise<void>;
   export let currentWorkspaceDetails: { id: string; name: string };
   let showErrors = false;
-  let defaultRole="select";
-  let selectedRole= defaultRole;
+  let defaultRole = "select";
+  let selectedRole = defaultRole;
   let currentEmailEntered: string;
-
   function removeElement(event: Event): void {
     const id = event.target?.id;
     const removeElement = document.getElementById(id) as HTMLElement;
@@ -36,7 +38,6 @@
     ) as HTMLElement;
     emailContainer.removeChild(removeElement);
   }
-
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
@@ -74,10 +75,10 @@
     currentEmailEntered = "";
   };
   const handleInvite = async () => {
-    showErrors=true;
-    const data:addUsersInWorkspacePayload = {
-      users:emailstoBeSentArr,
-      role:selectedRole,
+    showErrors = true;
+    const data: addUsersInWorkspacePayload = {
+      users: emailstoBeSentArr,
+      role: selectedRole,
     };
     if (emailstoBeSentArr && emailstoBeSentArr.length > 0 && selectedRole) {
       const response = await addUsersInWorkspace(
@@ -93,10 +94,10 @@
       } else {
         notifications.error(`Failed To sent invites,please try again`);
       }
-       handleInvitePopup(false);
+      handleInvitePopup(false);
     }
   };
-  const handleDropdown = (role:WorkspaceRole) => {
+  const handleDropdown = (role: WorkspaceRole) => {
     selectedRole = role;
   };
 </script>
@@ -131,8 +132,14 @@
     <p class="invite-subheader text-textColor mt-0 mb-0">
       use commas to separate emails
     </p>
-    <div class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary" style="padding:3px 5px 3px 5px;">
-      <div id="input-email" class="d-flex align-items-start flex-wrap gap-2"></div>
+    <div
+      class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary"
+      style="padding:3px 5px 3px 5px;"
+    >
+      <div
+        id="input-email"
+        class="d-flex align-items-start flex-wrap gap-2"
+      ></div>
       <input
         id="input"
         placeholder="Enter email ID"
@@ -267,7 +274,6 @@
     color: var(--error--color);
     font-size: 12px;
   }
-
   @media (min-width: 1000px) {
     .container {
       min-height: 54%;

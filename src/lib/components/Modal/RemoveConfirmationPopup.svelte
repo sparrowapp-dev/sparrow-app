@@ -1,13 +1,16 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Modal\Modal.svelte
+   * **/
   import closeIcon from "$lib/assets/close.svg";
-  import { CustomButton } from "$lib/components";
   import { fly, fade } from "svelte/transition";
+  import Button from "../buttons/Button.svelte";
 
   export let title;
   export let description;
   export let onSuccess;
-  export let onCancel:()=>void;
-
+  export let onCancel: () => void;
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
     deleteLoader = true;
@@ -35,10 +38,7 @@
       <h5 class="mb-0 text-whiteColor" style="font-weight: 500;">
         {title}
       </h5>
-      <button
-        class="btn-close1 border-0 rounded"
-        on:click={onCancel}
-      >
+      <button class="btn-close1 border-0 rounded" on:click={onCancel}>
         <img src={closeIcon} alt="" />
       </button>
     </div>
@@ -49,24 +49,24 @@
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 pb-3 rounded"
       style="font-size: 16px;"
     >
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Cancel"}
-        fontSize={14}
+        title={"Cancel"}
+        textStyleProp={"font-size: var(--base-size)"}
         type={"dark"}
-        loader={false}
         onClick={onCancel}
       />
 
-      <CustomButton
+      <Button
         disable={deleteLoader}
-        text={"Remove"}
-        fontSize={14}
+        title={"Remove"}
+        loaderSize={19}
         type={"danger"}
         loader={deleteLoader}
         onClick={() => {
           handleDelete();
         }}
+        textStyleProp={"font-size: var(--base-size)"}
       />
     </div>
   </div>
@@ -85,7 +85,6 @@
       backdrop-filter: blur(3px);
       z-index: 11;
     }
-
     .container {
       display: flex;
       flex-direction: column;
@@ -99,36 +98,29 @@
       padding: 2%;
       border-radius: 10px;
     }
-
     .btn-close1 {
       background-color: var(--background-color);
     }
-
     .btn-close1:hover {
       background-color: var(--background-dropdown);
     }
-
     .btn-close1:active {
       background-color: var(--background-dropdown);
     }
     .btn-primary {
       background-color: var(--border-color);
     }
-
     .btn-primary:hover {
       color: var(--blackColor);
       background-color: var(--workspace-hover-color);
     }
-
     .btn-primary:active {
       color: var(--blackColor);
       background-color: var(--button-pressed);
     }
-
     .btn-secondary {
       background-color: var(--dangerColor);
     }
-
     .btn-secondary:hover {
       background-color: var(--delete-hover);
     }
