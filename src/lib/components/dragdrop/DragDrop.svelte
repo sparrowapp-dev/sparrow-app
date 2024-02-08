@@ -225,7 +225,7 @@
 
 <style lang="scss">
   .sparrow-input-label {
-    font-size: 14px;
+    font-size: var(--base-text);
   }
   .sparrow-input-required {
     color: var(--dangerColor);
@@ -233,21 +233,21 @@
   .sparrow-file-input {
     outline: none;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: var(--base-text);
   }
   .sparrow-input-label-desc {
     color: var(--request-arc);
-    font-size: 12px;
+    font-size: var(--small-text);
   }
   .sparrow-file-input-placeholder {
     color: var(--request-arc);
-    font-size: 14px;
+    font-size: var(--base-text);
   }
   .sparrow-choose-file-input::file-selector-button {
     background-color: transparent;
     color: var(--primary-btn-color);
     border: 0;
-    font-size: 12px;
+    font-size: var(--small-text);
   }
 
   .sparrow-choose-file-label {
@@ -271,7 +271,7 @@
   }
   .sparrow-file-input-error-text {
     color: var(--dangerColor);
-    font-size: 12px;
+    font-size: var(--small-text);
   }
 
   .sparrow-input-file-type {
