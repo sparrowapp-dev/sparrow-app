@@ -37,7 +37,7 @@
     font-size: var(--small-text);
     font-weight: 500;
     line-height: var(--medium-text);
-    color: #8a9299;
+    color: var(--sparrow-text-color);
     background-color: transparent;
   }
 </style>
