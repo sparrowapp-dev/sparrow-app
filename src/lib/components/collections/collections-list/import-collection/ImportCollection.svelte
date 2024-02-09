@@ -9,10 +9,10 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
-  import File from "../request/Request.svelte";
+  import Request from "../request/Request.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { FileInput } from "$lib/components";
+  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
 
   export let handleCreateCollection;
@@ -90,7 +90,7 @@
     uploadFileInput.click();
   };
 
-  async function handleFileUpload(file: File) {
+  async function handleFileUpload(file: Request) {
     if (file) {
       const response = await _viewImportCollection.importCollectionFromFile(
         currentWorkspaceId,
@@ -278,7 +278,7 @@
     <p class="mb-1">Drag and drop your YAML/JSON file</p>
   </div>
   <div>
-    <FileInput
+    <DragDrop
       value={uploadCollection.file.value}
       maxFileSize={100}
       onChange={handleLogoInputChange}

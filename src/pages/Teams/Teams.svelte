@@ -30,10 +30,11 @@
   import { navigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import { ParaInput, FileInput, TextInput } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
+  import Input from "$lib/components/inputs/Input.svelte";
+  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -412,17 +413,21 @@
     handleCreateTeamModal();
   }}
 >
-  <TextInput
+  <Input
     value={newTeam.name.value}
-    labelText="Team or Organization name"
     inputId="team-name-input"
+    labelText="Team or Organization name"
     inputPlaceholder="Please enter your team name"
     isRequired={true}
     onChange={handleTeamNameChange}
     invalidValue={newTeam.name.invalid}
     errorText={"Team name cannot be empty."}
+    type={"input"}
+    inputStyleProp={"border: 1px solid var(--border-color);"}
+    inputClassProp={`py-2 px-3 mb-3`}
+    labelTextClassProp={`mt-3`}
   />
-  <ParaInput
+  <Input
     maxCharacter={500}
     value={newTeam.description.value}
     labelText="About"
@@ -432,8 +437,10 @@
     inputId="team-desc-input"
     inputPlaceholder="Write a little about your team"
     onChange={handleTeamDescChange}
+    type={"textarea"}
+    inputClassProp={`py-2 px-3 border-0`}
   />
-  <FileInput
+  <DragDrop
     value={newTeam.file.value}
     maxFileSize={100}
     onChange={handleLogoInputChange}
