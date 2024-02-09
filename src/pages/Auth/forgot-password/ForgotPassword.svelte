@@ -6,7 +6,7 @@
   import { handleForgotPasswordValidation } from "./forgot-password";
   import { isLoading, username } from "$lib/store/auth.store";
   import { Link } from "svelte-navigator";
-  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
 
   let validationErrors: any = {};
 
@@ -48,7 +48,7 @@
 >
   <Header />
   {#if isLoadingPage}
-    <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
+    <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"

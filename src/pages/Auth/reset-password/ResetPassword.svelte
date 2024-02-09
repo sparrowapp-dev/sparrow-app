@@ -11,7 +11,7 @@
   import angleLeft from "$lib/assets/angleLeft.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
-  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
 
   let passwordText: string = "";
 
@@ -135,7 +135,7 @@
     </p>
 
     {#if isLoading}
-      <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
+      <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
     {:else}
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"

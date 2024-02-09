@@ -32,7 +32,7 @@
     height: 100%;
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    z-index: 999;
+    z-index: 1000;
   }
   .load-spin {
     animation: loader-animation 1s linear infinite;

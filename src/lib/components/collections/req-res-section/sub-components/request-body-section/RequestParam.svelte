@@ -5,7 +5,6 @@
   import Authorization from "../request-authorization-section/Authorization.svelte";
 
   import Parameters from "../request-parameter-section/Parameters.svelte";
-  import Loader from "$lib/components/Transition/Loader.svelte";
 
   import {
     bottomPanelHeight,
@@ -29,7 +28,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -361,7 +360,7 @@
           bottom: 0;
           z-index:3;"
         >
-          <LoaderV2 loaderSize={"80px"} />
+          <Loader loaderSize={"80px"} />
         </div>
       {/if}
     </div>

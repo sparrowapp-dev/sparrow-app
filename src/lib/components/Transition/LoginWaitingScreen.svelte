@@ -2,7 +2,7 @@
   import icons from "$lib/assets/app.asset";
 
   import { fly, fade } from "svelte/transition";
-  import LoaderV2 from "./loader/LoaderV2.svelte";
+  import Loader from "./loader/Loader.svelte";
   export let onClick: (flag: boolean) => void;
   export let isLoadingPage;
 </script>
@@ -28,7 +28,7 @@
     </h5>
   </div>
 
-  <LoaderV2
+  <Loader
     loaderSize={"60px"}
     loaderMessage="Please wait while we sign you in...."
     messageStyleProp={"font-size: var(--base-text)"}

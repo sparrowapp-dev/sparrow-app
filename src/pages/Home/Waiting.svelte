@@ -1,5 +1,5 @@
 <script>
-  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
   import { setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
@@ -28,6 +28,6 @@
 
 <div class="d-flex align-items-center justify-content-center m-auto pt-5">
   <div>
-    <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
+    <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   </div>
 </div>
