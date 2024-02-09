@@ -27,6 +27,7 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
+  import RightOption from "$lib/components/right-option/RightOption.svelte";
 
   export let title: string;
   export let collection: any;
@@ -161,14 +162,17 @@
 
   let showMenu: boolean = false;
 
-  let containerRef;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      const windowHeight = window.innerHeight;
+      if (windowHeight < mouseY + 200) {
+        pos = { x: mouseX, y: mouseY - 180 };
+      } else {
+        pos = { x: mouseX, y: mouseY };
+      }
       showMenu = true;
     }, 100);
   }
@@ -390,28 +394,7 @@
 >
 
 {#if showMenu}
-  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-    <div
-      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-      id="navbar"
-    >
-      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
-        {#each menuItems as item}
-          <li class="align-items-center">
-            <button
-              disabled={item.disabled}
-              class={`align-items-center mb-1 px-3 py-2 ${
-                item.disabled && "text-requestBodyColor"
-              }`}
-              on:click={item.onClick}
-              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-              >{item.displayText}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </nav>
+  <RightOption xAxis={pos.x} yAxis={pos.y} {menuItems} />
 {/if}
 
 <svelte:window
@@ -563,31 +546,6 @@
   .btn-primary:hover {
     background-color: var(--border-color);
     color: var(--white-color);
-  }
-
-  .navbar {
-    width: 180px;
-    height: auto;
-    overflow: hidden;
-  }
-
-  ul li {
-    display: block;
-  }
-
-  ul li button {
-    font-size: 12px;
-    display: flex;
-    width: 100%;
-    border: 0px;
-    background-color: var(--blackColor);
-  }
-
-  ul li button:hover {
-    width: 100%;
-    color: var(--white-color);
-    border-radius: 8px;
-    background-color: #232527;
   }
 
   .renameInputFieldCollection {
