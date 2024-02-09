@@ -29,7 +29,7 @@
   </div>
 
   <LoaderV2
-    loaderStyleProp={"height: 45%; weight: 45%"}
+    loaderSize={"60px"}
     loaderMessage="Please wait while we sign you in...."
     messageStyleProp={"font-size: var(--base-text)"}
     messageClassProp={"text-lightGray mt-2"}

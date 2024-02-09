@@ -146,10 +146,7 @@
 >
   <Header />
   {#if isLoadingPage}
-    <LoaderV2
-      loaderStyleProp={"width: 20%; height: 20%;"}
-      loaderMessage="Please Wait..."
-    />
+    <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"

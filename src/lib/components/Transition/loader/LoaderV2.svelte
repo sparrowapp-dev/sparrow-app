@@ -1,24 +1,18 @@
 <script>
-  import spin from "$lib/assets/spin.svg";
+  import Spinner from "../Spinner.svelte";
   export let loaderMessage = "";
   export let messageClassProp = "";
   export let messageStyleProp = "";
   export let loaderContainerClassProp = "";
   export let loaderContainerStyleProp = "";
-  export let loaderClassProp = "";
-  export let loaderStyleProp = "";
+  export let loaderSize = "";
 </script>
 
 <div
   class={`d-flex flex-column loading-spinner spinner-item ${loaderContainerClassProp}`}
   style={`${loaderContainerStyleProp}`}
 >
-  <img
-    class={`load-spin ${loaderClassProp} `}
-    src={spin}
-    style={`${loaderStyleProp}`}
-    alt=""
-  />
+  <Spinner size={loaderSize} />
   {#if loaderMessage.length > 0}
     <p class={`mt-2 ${messageClassProp}`} style={`${messageStyleProp}`}>
       {loaderMessage}

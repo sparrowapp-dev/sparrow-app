@@ -135,10 +135,7 @@
     </p>
 
     {#if isLoading}
-      <LoaderV2
-        loaderStyleProp={"width: 20%; height: 20%;"}
-        loaderMessage="Please Wait..."
-      />
+      <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
     {:else}
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"

@@ -28,9 +28,6 @@
 
 <div class="d-flex align-items-center justify-content-center m-auto pt-5">
   <div>
-    <LoaderV2
-      loaderStyleProp={"width: 20%; height: 20%;"}
-      loaderMessage="Please Wait..."
-    />
+    <LoaderV2 loaderSize={"80px"} loaderMessage="Please Wait..." />
   </div>
 </div>

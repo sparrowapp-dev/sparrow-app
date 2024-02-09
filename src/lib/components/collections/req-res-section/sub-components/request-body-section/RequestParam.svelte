@@ -361,7 +361,7 @@
           bottom: 0;
           z-index:3;"
         >
-          <LoaderV2 loaderStyleProp={"width: 13%; height: 13%"} />
+          <LoaderV2 loaderSize={"80px"} />
         </div>
       {/if}
     </div>
