@@ -9,7 +9,7 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { slide } from "svelte/transition";
   import Spinner from "../Transition/Spinner.svelte";
-  import ImportCollection from "../collections/collections-list/ImportCollection.svelte";
+  import ImportCollection from "../collections/collections-list/import-collection/ImportCollection.svelte";
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -21,7 +21,7 @@
   export let currentWorkspaceId;
   export let collectionUnderCreation: boolean = false;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let isImportCollectionPopup: boolean = false;
   const handleImportCollectionPopup = (flag) => {
     createCollectionSource.set("AddIcon");
@@ -65,7 +65,10 @@
   bind:this={container}
 >
   <button
-  disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
+    disabled={!hasWorkpaceLevelPermission(
+      loggedUserRoleInWorkspace,
+      workspaceLevelPermissions.ADD_COLLECTIONS,
+    )}
     id="dropdown-btn-color"
     class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
       ? 'drop-active'

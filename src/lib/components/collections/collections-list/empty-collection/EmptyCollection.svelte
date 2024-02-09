@@ -5,7 +5,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  import ImportCollection from "./ImportCollection.svelte";
+  import ImportCollection from "../import-collection/ImportCollection.svelte";
   import { createCollectionSource } from "$lib/store/event-source.store";
   export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;

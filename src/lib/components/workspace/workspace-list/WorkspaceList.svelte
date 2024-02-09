@@ -22,7 +22,7 @@
 
 <div
   style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
-  class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor p-sm-1 p-md-2 p-lg-3 p-3 pe-3"
+  class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor"
 >
   <TeamsList
     {userId}
@@ -38,7 +38,7 @@
     {collectionsMethods}
     {activeSideBarTabMethods}
   />
-  <hr />
+  <hr class="mb-0 pb-0" />
   <RecentWorkspace
     {data}
     {handleWorkspaceSwitch}
