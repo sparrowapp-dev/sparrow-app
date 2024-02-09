@@ -1,15 +1,10 @@
 <script lang="ts">
-  import Collection from "$lib/components/file-types/collection/Collection.svelte";
-  import Folder from "$lib/components/file-types/folder/Folder.svelte";
-  import Request from "$lib/components/file-types/request/Request.svelte";
-  import { fade, fly } from "svelte/transition";
   import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
   import workspaceAsset from "$lib/assets/workspace.svg";
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
-  import crossAsset from "$lib/assets/close.svg";
   import {
     insertCollection,
     insertCollectionDirectory,
@@ -34,6 +29,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "$lib/components/buttons/Button.svelte";
+  import FileType from "$lib/components/file-types/FileType.svelte";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -632,17 +628,21 @@
                 navigateToDirectory(col);
               }}
             >
-              <Folder name={col.name} />
+              <FileType name={col.name} type={ItemType.FOLDER} />
             </div>
           {:else if col.type === ItemType.REQUEST}
-            <Request name={col.name} method={col.request.method} />
+            <FileType
+              name={col.name}
+              method={col.request.method}
+              type={ItemType.REQUEST}
+            />
           {:else}
             <div
               on:click={() => {
                 navigateToDirectory(col);
               }}
             >
-              <Collection name={col.name} />
+              <FileType name={col.name} type={ItemType.COLLECTION} />
             </div>
           {/if}
         {/each}
