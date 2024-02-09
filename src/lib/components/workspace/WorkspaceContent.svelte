@@ -2,7 +2,7 @@
   import { Link } from "svelte-navigator";
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
-  import AllWorkspace from "$lib/components/table/all-workspace/AllWorkspace.svelte";
+  import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
   import { workspaceView, openedTeam } from "$lib/store";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import Members from "$lib/components/workspace/members/Members.svelte";
