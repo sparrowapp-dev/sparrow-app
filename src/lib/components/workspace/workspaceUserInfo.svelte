@@ -299,7 +299,7 @@
     {#if hasPermission && role !== "admin"}
       <Dropdown
         dropdownId={id}
-        title={role ? role : ""}
+        dropDownType={{type:"text",title:role ? role : ""}}            
         data={[
           {
             name: "Editor",

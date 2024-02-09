@@ -36,23 +36,30 @@
       <button class="d-flex bg-backgroundColor border-0">
         <p>
           <Dropdown
-            title={currentTab}
+           dropDownType={{type:"text",title:currentTab}}            
             data={[
               {
                 name: "No Auth",
                 id: AuthType.NO_AUTH,
+                textColor:"text-whiteColor"
+
               },
               {
                 name: "API Key",
                 id: AuthType.API_KEY,
+                textColor:"text-whiteColor"
+
               },
               {
                 name: "Bearer Token",
                 id: AuthType.BEARER_TOKEN,
+                textColor:"text-whiteColor"
+
               },
               {
                 name: "Basic Auth",
                 id: AuthType.BASIC_AUTH,
+                textColor:"text-whiteColor"
               },
             ]}
             onclick={handleDropdown}

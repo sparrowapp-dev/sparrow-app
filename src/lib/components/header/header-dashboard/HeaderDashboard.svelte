@@ -36,6 +36,8 @@
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+   
 
   export let handleWorkspaceSwitch;
 

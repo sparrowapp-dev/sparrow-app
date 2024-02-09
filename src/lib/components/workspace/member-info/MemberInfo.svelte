@@ -85,9 +85,8 @@
     <div class="position">
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)}
         <Dropdown
-          
+         dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
           data={getPermissionsData()}
-          title={isWorkspaceMemberInfo ? teamRole : user.role}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
@@ -96,7 +95,7 @@
       {:else if userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_ADMIN : user.role === TeamRole.TEAM_ADMIN)}
         <Dropdown
           data={getPermissionsData()}
-          title={isWorkspaceMemberInfo ? teamRole : user.role}
+          dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
@@ -105,7 +104,7 @@
         <Dropdown
           disabled={true}
           data={getPermissionsData()}
-          title={isWorkspaceMemberInfo ? teamRole : user.role}
+          dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}

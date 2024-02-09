@@ -217,7 +217,7 @@
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
   <Dropdown
-    title={selectedRole ? selectedRole : ""}
+    dropDownType={{type:"text",title:selectedRole ? selectedRole : ""}} 
     dropdownId="invite-team"
      data={[
       {
@@ -252,6 +252,10 @@
       {
         id: `invite-team-dropdown-${selectedRole}`,
         classToAdd: ["border", "rounded", "py-1"],
+      },
+      {
+          id: "invite-team-options-container",
+          classToAdd: ["end-0","start-0"],
       },
     ]}
     ></Dropdown>

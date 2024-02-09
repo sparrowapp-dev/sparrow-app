@@ -1,4 +1,8 @@
 <script lang="ts">
+     /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\dropdown\Dropdown
+   * **/
   let visibilty = false;
   import plusIcon from "$lib/assets/plus.svg";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -65,7 +69,10 @@
   bind:this={container}
 >
   <button
-  disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
+    disabled={!hasWorkpaceLevelPermission(
+      loggedUserRoleInWorkspace,
+      workspaceLevelPermissions.ADD_COLLECTIONS,
+    )}
     id="dropdown-btn-color"
     class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
       ? 'drop-active'

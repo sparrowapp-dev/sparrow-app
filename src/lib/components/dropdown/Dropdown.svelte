@@ -1,65 +1,67 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import {onDestroy, onMount } from "svelte";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
+  type dropdownType = "text" | "img";
+  type dropdownHoverType="add"|"remove"
   export let data: Array<{
     name: string;
     id: string;
     textColor: string;
     hide?: boolean;
     description?: string;
-    dynamicClasses?:
-      | {
-          id: string;
-          classToAdd: string[];
-          classToRemove: string;
-        }[]
-      | null;
+    selectedOptionClasses?: string;
   }>;
+
   export let staticClasses: { id: string; classToAdd: string[] }[] = [];
+  export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
+
   export let onclick: (tab: string) => void;
-  export let title: string;
+
+  export let dropDownType: {
+    type: dropdownType;
+    title: string;
+  };
   export let dropdownId: string = "";
   export let disabled: boolean = false;
+  export let mixpanelEvent: Events = Events.NO_EVENT;
 
-  let selectedTitle: {
+  let selectedOption: {
     name: string;
     id: string;
     textColor: string;
     description?: string;
-    dynamicClasses?:
-      | {
-          id: string;
-          classToAdd: string[];
-          classToRemove: string;
-        }[]
-      | null;
+    selectedOptionClasses?: string;
   };
 
   let isOpen: boolean = false;
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
+    if (mixpanelEvent && mixpanelEvent !== Events.NO_EVENT) {
+      MixpanelEvent(mixpanelEvent);
+    }
   };
 
   $: {
-    if (title) {
+    if (dropDownType.title) {
       data.forEach((element) => {
-        if (element.id === title) {
-          selectedTitle = element;
+        if (element.id === dropDownType.title) {
+          selectedOption = element;
         }
       });
-      if (!selectedTitle) {
-        selectedTitle = data[0];
+      if (!selectedOption) {
+        selectedOption = data[0];
       }
     }
   }
 
   function handleDropdownClick(event: MouseEvent) {
-    debugger;
     const dropdownElement = document.getElementById(
-      `${dropdownId}-dropdown-${title}`,
+      `${dropdownId}-dropdown-${dropDownType.title}`,
     );
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
@@ -70,42 +72,27 @@
     window.removeEventListener("click", handleDropdownClick);
   });
 
-  function handleDynamicClasses(
-    id: string,
-    classes: string[],
-    toRemoveClassName: string,
-  ) {
-    const doc = document.getElementById(id) as HTMLElement;
-    doc &&
-      doc?.classList?.length > 0 &&
-      doc?.classList.forEach((className) => {
-        if (className.startsWith(toRemoveClassName)) {
-          doc?.classList.remove(className);
-        }
-      });
+  
 
-    doc &&
-      classes.length > 0 &&
-      classes.map((classObj) => {
-        doc.classList.add(classObj);
-      });
+  function handleHover(elementId: string, handleType:dropdownHoverType) {
+    if (hoverClasses && hoverClasses.length > 0) {
+      let selectedHoverClasses = hoverClasses.filter((cls) => {
+        return cls.id === elementId;
+      })[0];
+      if (selectedHoverClasses) {
+        const elementDiv = document.getElementById(elementId) as HTMLElement;
+        if (handleType === "add") {
+          elementDiv.classList.add(...selectedHoverClasses.classToAdd);
+        } else {
+          selectedHoverClasses.classToAdd.forEach((cls) => {
+            elementDiv.classList.remove(cls);
+          });
+        }
+      }
+    }
   }
 
   onMount(() => {
-    debugger;
-    data.length > 0 &&
-      data.forEach((dataObj) => {
-        dataObj.dynamicClasses &&
-          dataObj.dynamicClasses.length > 0 &&
-          dataObj.dynamicClasses.forEach((dynamicObj) => {
-            handleDynamicClasses(
-              dynamicObj.id,
-              dynamicObj.classToAdd,
-              dynamicObj.classToRemove,
-            );
-          });
-      });
-
     staticClasses.length > 0 &&
       staticClasses.forEach((classes) => {
         const element = document.getElementById(classes.id);
@@ -113,18 +100,7 @@
       });
     window.addEventListener("click", handleDropdownClick);
   });
-  afterUpdate(() => {
-    selectedTitle.dynamicClasses &&
-      selectedTitle.dynamicClasses.length > 0 &&
-      selectedTitle.dynamicClasses.forEach((dynamicObj) => {
-        handleDynamicClasses(
-          dynamicObj.id,
-          dynamicObj.classToAdd,
-          dynamicObj.classToRemove,
-        );
-      });
-  
-  });
+ 
 </script>
 
 <div
@@ -132,41 +108,58 @@
   style=" position: relative;"
   on:click={handleDropdownClick}
 >
-  <div 
+  <div
     on:click={(event) => {
       event.stopPropagation();
       if (!disabled) {
         toggleDropdown();
       }
     }}
-    
-    id={`${dropdownId}-dropdown-${title}`}
-    
+    id={`${dropdownId}-dropdown-${dropDownType.title}`}
   >
-    <div
-      id="dropdown-btn-div"
-      class="dropdown-btn d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={isOpen}
-    >
-      <p
-        class="{disabled
-          ? 'disabled-text'
-          : ''} mb-0 {selectedTitle?.textColor}"
+    {#if dropDownType.type === "text"}
+      <div
+        id={`${dropdownId}-btn-div`}
+        class="dropdown-btn d-flex align-items-center justify-content-between"
+        class:dropdown-btn-active={isOpen}
+        on:mouseenter={() => {
+          handleHover(`${dropdownId}-btn-div`, "add");
+        }}
+        on:mouseleave={() => {
+          handleHover(`${dropdownId}-btn-div`, "remove");
+        }}
       >
-        {selectedTitle?.name}
-      </p>
-      <span class:dropdown-logo-active={isOpen}
-        ><img
-          style="margin-left:10px; height:12px; width:12px;"
-          src={dropdown}
-          alt=""
-        /></span
-      >
-    </div>
+        <p
+          class="{disabled
+            ? 'disabled-text'
+            : ''} mb-0 {selectedOption?.textColor} {selectedOption?.selectedOptionClasses
+            ? selectedOption.selectedOptionClasses
+            : ''}"
+        >
+          {selectedOption?.name}
+        </p>
+        <span class:dropdown-logo-active={isOpen}
+          ><img
+            style="margin-left:10px; height:12px; width:12px;"
+            src={dropdown}
+            alt=""
+          /></span
+        >
+      </div>
+    {:else}
+      <div id={`${dropdownId}-img`}>
+        <img src={dropDownType.title} alt="+" />
+      </div>
+    {/if}
   </div>
-  <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
+  <div
+    class="d-none dropdown-data rounded"
+    class:dropdown-active={isOpen}
+    id="{dropdownId}-options-container"
+  >
     {#each data as list}
       <div
+        id="{dropdownId}-options-div"
         class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===
         true
           ? 'd-none'
@@ -178,10 +171,10 @@
         }}
       >
         <p
-          class="m-0 p-0 {list?.textColor}"
+          class="m-0 p-1 {list?.textColor}"
           style="font-size: 12px;"
-          id="option-name-p-{list.id}"
-          class:selected-request={list.id === selectedTitle?.id}
+          id="{dropdownId}-options-name"
+          class:selected-request={list.id === selectedOption?.id}
         >
           {list.name}
           {#if list.description}
@@ -189,7 +182,7 @@
             <small class="text-textColor">{list.description}</small>
           {/if}
         </p>
-        {#if selectedTitle?.id === list.id}
+        {#if selectedOption?.id === list.id && dropDownType.type === "text"}
           <img src={checkIcon} alt="" />
         {/if}
       </div>
@@ -206,33 +199,19 @@
     width: auto;
     padding: 0 10px;
   }
-  /* ! PASS AS PROP */
-  /* .dropdown-btn-hover {
-      background-color: var(--border-color);
-  } */
-
-  /* .dropdown-btn:hover {
-    border-bottom: 1px solid var(--send-button);
-  } */
-  .dropdown-btn:hover {
-    background-color: var(--border-color);
-  }
+ 
   .dropdown-data {
-    /* !HANDLE Background color */
-    /* background-color: var(--background-dropdown); */
-    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     position: absolute;
-    top: 32px;
-    left: 0;
-    right: 0;
+    border: 1px solid rgb(44, 44, 44);
+    z-index: 2;
+    background-color: var(--blackColor);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     /* !HANDLE MIN WIDTH */
-    /* min-width: 136px; */
-    z-index: 2;
-    border: 1px solid rgb(44, 44, 44);
+    min-width: 180px;
   }
+
   .dropdown-btn p,
   .dropdown-data p {
     font-size: 12px;
@@ -257,8 +236,6 @@
 
   .dropdown-btn-active {
     background-color: var(--border-color);
-    /* !PASS AS PROP */
-    /* border-bottom: 1px solid var(--send-button); */
   }
   .disabled-text {
     color: var(--sparrow-text-color) !important;

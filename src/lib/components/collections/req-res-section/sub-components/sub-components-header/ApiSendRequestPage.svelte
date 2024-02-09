@@ -11,6 +11,7 @@
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
+  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import {
     RequestMethod,
     RequestProperty,
@@ -343,12 +344,17 @@
   >
     <div class="d-flex gap-2 w-100 position-relative">
       <Dropdown
-        title={method ? method : ""}
+        dropdownId="api-request"
+        dropDownType={{ type: "text", title: method ? method : "" }}
         staticClasses={[
           {
-           id: "dropdown-btn-div",
-          classToAdd: ["px-2", "py-3", "border", "rounded"],
-          }
+            id: "api-request-btn-div",
+            classToAdd: ["px-2", "py-3", "border", "rounded"],
+          },
+          {
+            id: "requestDropdown-options-container",
+            classToAdd: ["start-0", "end-2"],
+          },
         ]}
         data={[
           {
@@ -370,29 +376,46 @@
             name: "DELETE",
             id: RequestMethod.DELETE,
             textColor: "text-deleteColor",
-            dynamicClasses: [
-              {
-                id: "dropdown-btn-div",
-                classToAdd: ["px-2","py-3","border","rounded"],
-                classToRemove: " ",
-              },
-            ],
           },
           {
             name: "PATCH",
             id: RequestMethod.PATCH,
             textColor: "text-patchColor",
-            dynamicClasses: [
-              // {
-              //   id: "dropdown-btn-div",
-              //   classToAdd: ["px-2","py-3","border","rounded"],
-              //   classToRemove: " ",
-              // },
-            ],
           },
         ]}
         onclick={handleDropdown}
       ></Dropdown>
+      <!-- <ColorDropdown
+        data={[
+          {
+            name: "GET",
+            id: RequestMethod.GET,
+            color: "getColor",
+          },
+          {
+            name: "POST",
+            id: RequestMethod.POST,
+            color: "postColor",
+          },
+          {
+            name: "PUT",
+            id: RequestMethod.PUT,
+            color: "putColor",
+          },
+          {
+            name: "DELETE",
+            id: RequestMethod.DELETE,
+            color: "deleteColor",
+          },
+          {
+            name: "PATCH",
+            id: RequestMethod.PATCH,
+            color: "patchColor",
+          },
+        ]}
+        method={method ? method : ""}
+        onclick={handleDropdown}
+      /> -->
 
       <CodeMirrorInput
         rawValue={urlText}

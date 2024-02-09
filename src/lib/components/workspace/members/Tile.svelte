@@ -538,20 +538,20 @@
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <Dropdown
         data={getPermissionsData()}
-        title={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <Dropdown
         data={getPermissionsData()}
-        title={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else}
         <Dropdown
         disabled={true}
         data={getPermissionsData()}
-        title={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
      /> 
     {/if}

@@ -94,7 +94,7 @@
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER))}
         <Dropdown
           dropdownId={workspace._id}
-          title={workspace.position ? workspace.position : ""}
+          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
           data={[
             {
               name: "Editor",
@@ -120,7 +120,7 @@
         
         <Dropdown
           dropdownId={workspace._id + "member-workspace"}
-          title={workspace.position ? workspace.position : ""}
+          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
           disabled={true}
           method={user.role || teamRole === TeamRole.TEAM_OWNER
             ? TeamRole.TEAM_ADMIN
