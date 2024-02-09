@@ -227,24 +227,24 @@
 >
   <div class="invalid-type-content">
     <div>
-      <p class="format-info sparrow-fs-12">
+      <p class="format-info fw-normal text-start sparrow-fs-12">
         We have identified that text you pasted is not the right file format.
         Please ensure that you paste the following file formats only.
       </p>
     </div>
     <div class="format-types-container">
-      <p class="format-type sparrow-fs-12">.YAML</p>
-      <p class="format-type sparrow-fs-12">.JSON</p>
+      <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.YAML</p>
+      <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.JSON</p>
     </div>
     <div class="format-btns">
       <button
-        class="format-btn"
+        class="format-btn fw-normal sparrow-fs-16 p-1 text-start"
         on:click={() => {
           onClick(false);
         }}>Close</button
       >
       <button
-        class="format-btn collection-btn"
+        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-start"
         on:click={() => {
           handleError();
         }}>+ Collection</button
@@ -314,7 +314,7 @@
       > Import Collection</button
     >
 
-    <p class="empty-data-error sparrow-fs-12">
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       {#if isDataEmpty && !importData}
         Please Paste or Upload your file in order to import the workspace
       {/if}
@@ -355,12 +355,8 @@
   }
   .empty-data-error {
     color: var(--error--color);
-    font-family: Roboto;
-    font-weight: 400;
     line-height: 18px;
     letter-spacing: 0em;
-    width: 100%;
-    text-align: left;
     padding: 2px;
   }
   .container {
@@ -401,27 +397,17 @@
       width: 25%;
     }
     .format-header {
-      font-family: Roboto;
-      font-size: 20px;
-      font-weight: 400;
       line-height: 18px;
       letter-spacing: 0em;
-      text-align: left;
     }
 
     .format-info {
-      font-family: Roboto;
-      font-weight: 400;
       line-height: 18px;
       letter-spacing: 0em;
-      text-align: left;
     }
     .format-type {
-      font-weight: 400;
       line-height: 18px;
       letter-spacing: 0em;
-      text-align: left;
-      padding: 8px;
       border: 1px solid var(--border-color);
       border-radius: 10px;
     }
@@ -436,14 +422,9 @@
       border: none;
       width: 20%;
       border-radius: 4px;
-      padding: 2px;
       font-family: Roboto;
-      font-size: 16px;
-      font-weight: 400;
       line-height: 24px;
       letter-spacing: 0em;
-      text-align: center;
-      padding: 4px;
     }
     .format-btn:hover {
       background-color: #616364;
@@ -451,9 +432,6 @@
     .collection-btn {
       background-color: var(--sparrow-blue);
       color: var(--white-color);
-      font-family: Roboto;
-      font-size: 16px;
-      font-weight: 400;
       line-height: 24px;
       letter-spacing: 0em;
       text-align: center;

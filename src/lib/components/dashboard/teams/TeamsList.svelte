@@ -79,8 +79,8 @@
           <div class="d-flex w-100 overflow-hidden">
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
               <p
-                class={`m-0 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-                style={`font-size: 15px; padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+                class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
+                style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
               >
                 {team.name[0] ? team.name[0].toUpperCase() : ""}
               </p>
