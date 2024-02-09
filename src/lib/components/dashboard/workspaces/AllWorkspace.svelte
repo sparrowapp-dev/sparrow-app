@@ -15,6 +15,7 @@
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
+  import Table from "../../table/Table.svelte";
 
   export let userId: string;
   export let data: any;
@@ -32,6 +33,13 @@
   let containerRef;
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
+  const tableHeaderContent = [
+    "Workspace",
+    "Collections",
+    "Contributors",
+    "Last Updated",
+    "",
+  ];
   const handleOpenCollection = (workspace) => {
     handleWorkspaceSwitch(
       workspace._id,
@@ -135,25 +143,15 @@
       class="table-container sparrow-thin-scrollbar overflow-y-auto"
       style="max-height: 60vh; height: auto;"
     >
-      <table
-        class="table p-0 table-responsive bg-backgroundColor w-100"
-        style="max-height: 100%;"
-        data-search="true"
+      <Table
+        tableClassProps="table p-0 table-responsive bg-backgroundColor w-100"
+        tableStyleProp="max-height: 100%;"
+        dataSearch="true"
+        tableHeaderClassProp="position-sticky bg-backgroundColor top-0 z-2"
+        tableHeaderStyleProp={"background-color: var(--background-color) !important;"}
+        contributorsCount={$currOpenedTeamRxDoc?._data?.users?.length}
+        headerObject={tableHeaderContent}
       >
-        <thead
-          class="position-sticky workspace-table-heading bg-backgroundColor top-0 z-2"
-        >
-          <tr class="">
-            <th data-sortable="true" class="tab-head">Workspace</th>
-
-            <th class="tab-head">Collections</th>
-            {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
-              <th class="tab-head">Contributors</th>
-            {/if}
-            <th class="tab-head">Last Updated</th>
-            <th class="tab-head"></th>
-          </tr>
-        </thead>
         <tbody class="overflow-y-auto position-relative">
           {#if $data}
             {#each $data
@@ -341,7 +339,7 @@
             </tr>
           </tfoot>
         {/if}
-      </table>
+      </Table>
       {#if $data && $data
           .slice()
           .filter((item) => item.team.teamId == openedTeam.id).length == 0}
