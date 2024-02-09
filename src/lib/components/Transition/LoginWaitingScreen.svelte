@@ -16,16 +16,14 @@
 />
 
 <div
-  class="container d-flex flex-column mb-0 px-4 pb-0 pt-4"
+  class="container d-flex flex-column mb-0 pb-0 pt-4 rounded-3"
   transition:fly={{ y: 50, delay: 0, duration: 100 }}
   on:introstart
   on:outroend
 >
   <div class="d-flex align-items-center justify-content-center mb-3 gap-2">
     <img src={icons.logoSparrow} alt="" />
-    <h5 class="mb-0 text-whiteColor" style="font-weight: 500;font-size:36px;">
-      Sparrow
-    </h5>
+    <span class="mb-0 text-whiteColor sparrow-fs-36 fw-medium">Sparrow</span>
   </div>
 
   <Loader
@@ -51,13 +49,11 @@
 
   .container {
     position: fixed;
-    height: 200px;
     width: 500px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
-    z-index: 1;
-    border-radius: 10px;
+    z-index: 10;
   }
 </style>
