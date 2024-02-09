@@ -80,7 +80,7 @@
             {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
               <p
                 class={`m-0 sparrow-fs-15 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-                style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+                style={`padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid var(--defaultcolor); border-radius: 50%;`}
               >
                 {team.name[0] ? team.name[0].toUpperCase() : ""}
               </p>
@@ -95,7 +95,9 @@
             <p class="mb-0 new-invite text-labelColor w-50">NEW INVITE</p>
           {:else}
             <PeopleIcon
-              color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
+              color={currOpenedTeam.id == team.teamId
+                ? "var(--sparrow-text-color)"
+                : "var(--defaultcolor)"}
               classProp={team.users?.length <= 1 && "d-none"}
             />
           {/if}

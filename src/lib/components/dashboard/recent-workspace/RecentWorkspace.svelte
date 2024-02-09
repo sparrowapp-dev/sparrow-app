@@ -50,8 +50,8 @@
               </div>
               <PeopleIcon
                 color={currOpenedTeam.id == list.team.teamId
-                  ? "#8A9299"
-                  : "#45494D"}
+                  ? "var(--sparrow-text-color)"
+                  : "var(--defaultcolor)"}
                 classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}
               />
             </div>
