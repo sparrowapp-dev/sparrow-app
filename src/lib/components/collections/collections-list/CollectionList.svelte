@@ -502,7 +502,7 @@
           <FilterDropDown {handleSearch} />
         {/if}
         {#if searchData.length > 0}
-          <List height={"calc(100vh - 180px)"}>
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#if filteredFile.length > 0}
               {#each filteredFile as exp}
                 <SearchTree
@@ -540,7 +540,7 @@
             {/if}
           </List>
         {:else if selectedApiMethods.length > 0}
-          <List height={"calc(100vh - 180px)"}>
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#each filteredSelectedMethodsCollection as col}
               <Collection
                 collectionList={collection}
@@ -555,7 +555,7 @@
             {/each}
           </List>
         {:else if collection && collection.length > 0}
-          <List height={"calc(100vh - 180px)"}>
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#each collection as col}
               <Collection
                 collectionList={collection}

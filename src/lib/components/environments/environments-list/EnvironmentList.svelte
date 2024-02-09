@@ -200,7 +200,7 @@
   {/if}
   <ul class={`env-side-tab-list p-0`}>
     {#if localEnvironment && localEnvironment.length > 0}
-      <List height={"calc(100vh - 180px)"}>
+      <List height={"calc(100vh - 180px)"} classProps={"p-2"}>
         {#each localEnvironment as env}
           <EnvironmentTab
             {env}

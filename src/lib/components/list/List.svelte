@@ -6,7 +6,7 @@
 </script>
 
 <div
-  class={`list-container gap-2 p-3 sparrow-thin-scrollbar ${classProps}`}
+  class={`list-container gap-2 sparrow-thin-scrollbar ${classProps}`}
   style={`max-height: ${height}; overflow-y=${overflowY}; overflow-x: ${overflowX}`}
 >
   <div class="list-body">
