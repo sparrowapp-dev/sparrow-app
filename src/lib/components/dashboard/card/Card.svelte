@@ -22,6 +22,6 @@
     z-index: 0 !important;
   }
   .workspace-card:hover {
-    background-color: #313233 !important;
+    background-color: var(--border-color) !important;
   }
 </style>

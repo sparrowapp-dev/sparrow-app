@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WorkspaceGrid from "../workspace-card/WorkspaceGrid.svelte";
+  import WorkspaceGrid from "../workspace-grid/WorkspaceGrid.svelte";
   import {
     CrossIcon,
     DoubleLeftIcon,
