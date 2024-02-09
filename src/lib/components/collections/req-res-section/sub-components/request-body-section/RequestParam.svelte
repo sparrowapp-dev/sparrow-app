@@ -29,6 +29,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { Pane, Splitpanes } from "svelte-splitpanes";
+  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
 
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -360,7 +361,7 @@
           bottom: 0;
           z-index:3;"
         >
-          <Loader />
+          <LoaderV2 loaderStyleProp={"width: 13%; height: 13%"} />
         </div>
       {/if}
     </div>

@@ -5,8 +5,8 @@
 
   import { handleForgotPasswordValidation } from "./forgot-password";
   import { isLoading, username } from "$lib/store/auth.store";
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import { Link } from "svelte-navigator";
+  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
 
   let validationErrors: any = {};
 
@@ -28,7 +28,7 @@
       validationErrors.email = "Please enter a valid email ID.";
     } else if (isEmailTouched) {
       validationErrors.email = "";
-    } 
+    }
 
     if (forgotPasswordCredential.email === "") {
       validationErrors.email =
@@ -48,7 +48,10 @@
 >
   <Header />
   {#if isLoadingPage}
-    <PageLoader />
+    <LoaderV2
+      loaderStyleProp={"width: 20%; height: 20%;"}
+      loaderMessage="Please Wait..."
+    />
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"
@@ -99,7 +102,7 @@
             aria-describedby="emailHelp"
             required
             placeholder="Please enter your registered email id"
-            autocorrect="off" 
+            autocorrect="off"
             autocapitalize="none"
             bind:value={forgotPasswordCredential.email}
             on:input={validateEmail}

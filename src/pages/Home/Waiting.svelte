@@ -1,5 +1,5 @@
 <script>
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
   import { setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
@@ -28,6 +28,9 @@
 
 <div class="d-flex align-items-center justify-content-center m-auto pt-5">
   <div>
-    <PageLoader />
+    <LoaderV2
+      loaderStyleProp={"width: 20%; height: 20%;"}
+      loaderMessage="Please Wait..."
+    />
   </div>
 </div>

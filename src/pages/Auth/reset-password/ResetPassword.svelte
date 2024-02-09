@@ -9,9 +9,9 @@
   import { username } from "$lib/store/auth.store";
 
   import angleLeft from "$lib/assets/angleLeft.svg";
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
+  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
 
   let passwordText: string = "";
 
@@ -21,7 +21,7 @@
   };
 
   username.subscribe((value) => {
-    if(value){
+    if (value) {
       resetPasswordCredential.email = value;
     }
   });
@@ -135,7 +135,10 @@
     </p>
 
     {#if isLoading}
-      <PageLoader />
+      <LoaderV2
+        loaderStyleProp={"width: 20%; height: 20%;"}
+        loaderMessage="Please Wait..."
+      />
     {:else}
       <form
         class="register-form text-whiteColor ps-1 pe-1 gap-16"

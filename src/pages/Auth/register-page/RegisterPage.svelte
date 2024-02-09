@@ -5,11 +5,11 @@
   import vector3 from "$lib/assets/Vector3.svg";
   import { handleRegisterValidation } from "./register-page";
   import { isLoading } from "$lib/store/auth.store";
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import starIcon from "$lib/assets/starIcon.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
   import { Link } from "svelte-navigator";
+  import LoaderV2 from "$lib/components/Transition/loader/LoaderV2.svelte";
 
   let userData = {
     email: "",
@@ -146,7 +146,10 @@
 >
   <Header />
   {#if isLoadingPage}
-    <PageLoader />
+    <LoaderV2
+      loaderStyleProp={"width: 20%; height: 20%;"}
+      loaderMessage="Please Wait..."
+    />
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"
