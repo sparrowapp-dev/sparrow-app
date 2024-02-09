@@ -5,6 +5,7 @@
   import { formatDateInString } from "$lib/utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
   import { navigate } from "svelte-navigator";
+  import Card from "../card/Card.svelte";
 
   export let workspace: any;
   export let handleWorkspaceSwitch: any;
@@ -86,10 +87,10 @@
   on:click={closeShowMore}
   on:contextmenu|preventDefault={closeShowMore}
 />
-<div
-  class="flex-grow-1 col-lg-5 col-md-10 pb-4 workspace-card-container"
-  on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-  style="max-width: 47.5%; max-height: 32%; "
+<Card
+  cardClassProp={"flex-grow-1 col-lg-5 col-md-10 pb-4"}
+  cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
+  onContextMenu={(e) => rightClickContextMenu(e)}
 >
   <div
     class="bg-black workspace-card rounded p-4 {isShowMoreVisible &&
@@ -129,7 +130,7 @@
       Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
     </p>
   </div>
-</div>
+</Card>
 
 <style>
   @media only screen and (max-width: 1000px) {

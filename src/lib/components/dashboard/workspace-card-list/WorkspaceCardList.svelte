@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WorkspaceCard from "../workspace-card/WorkspaceCard.svelte";
+  import WorkspaceGrid from "../workspace-grid/WorkspaceGrid.svelte";
   import {
     CrossIcon,
     DoubleLeftIcon,
@@ -88,7 +88,7 @@
               .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
-        <WorkspaceCard
+        <WorkspaceGrid
           isAdminOrOwner={$currOpenedTeamRxDoc?._data?.admins?.includes(
             userId,
           ) || $currOpenedTeamRxDoc?._data?.owner == userId}
