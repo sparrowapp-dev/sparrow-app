@@ -92,7 +92,7 @@
             </p>
           </div>
           {#if team.isNewInvite}
-            <p class="mb-0 new-invite text-labelColor">NEW INVITE</p>
+            <p class="mb-0 new-invite text-labelColor w-50">NEW INVITE</p>
           {:else}
             <PeopleIcon
               color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
