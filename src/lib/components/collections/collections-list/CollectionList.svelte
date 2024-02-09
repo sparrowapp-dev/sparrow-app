@@ -3,7 +3,7 @@
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
-  import Folder from "./Folder.svelte";
+  import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import {
@@ -19,7 +19,7 @@
     selectedMethodsCollectionStore,
   } from "$lib/store/methods";
 
-  import DefaultCollection from "./DefaultCollection.svelte";
+  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
   import {
     type CollectionDocument,
     type EnvironmentDocument,
@@ -53,15 +53,16 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import {setCurrentWorkspace } from "$lib/store";
-  import type {WorkspaceRole } from "$lib/utils/enums";
+  import { setCurrentWorkspace } from "$lib/store";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import List from "$lib/components/list/List.svelte";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let isComponentRenderedFirstTime = false;
   let showDefault = false;
   let isLoading = true;
@@ -479,7 +480,7 @@
     </div>
     <div>
       <RequestDropdown
-       {loggedUserRoleInWorkspace}
+        {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {handleCreateCollection}
         {collectionUnderCreation}
@@ -488,8 +489,8 @@
     </div>
   </div>
   <div
-    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list sparrow-thin-scrollbar pb-4"
-    style="overflow:auto;margin-top:5px;"
+    class="d-flex flex-column collections-list"
+    style="overflow:hidden; margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
       {#if isLoading}
@@ -501,7 +502,7 @@
           <FilterDropDown {handleSearch} />
         {/if}
         {#if searchData.length > 0}
-          <div class="p-4 pt-0">
+          <List height={"calc(100vh - 180px)"}>
             {#if filteredFile.length > 0}
               {#each filteredFile as exp}
                 <SearchTree
@@ -537,35 +538,39 @@
                 />
               {/each}
             {/if}
-          </div>
+          </List>
         {:else if selectedApiMethods.length > 0}
-          {#each filteredSelectedMethodsCollection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-              {activeTabId}
-              {activePath}
-            />
-          {/each}
+          <List height={"calc(100vh - 180px)"}>
+            {#each filteredSelectedMethodsCollection as col}
+              <Collection
+                collectionList={collection}
+                collectionId={col.id}
+                {currentWorkspaceId}
+                collection={col}
+                title={col.name}
+                {collectionsMethods}
+                {activeTabId}
+                {activePath}
+              />
+            {/each}
+          </List>
         {:else if collection && collection.length > 0}
-          {#each collection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-              {activeTabId}
-              {activePath}
-            />
-          {/each}
+          <List height={"calc(100vh - 180px)"}>
+            {#each collection as col}
+              <Collection
+                collectionList={collection}
+                collectionId={col.id}
+                {currentWorkspaceId}
+                collection={col}
+                title={col.name}
+                {collectionsMethods}
+                {activeTabId}
+                {activePath}
+              />
+            {/each}
+          </List>
         {/if}
-        <DefaultCollection
+        <EmptyCollection
           {handleCreateCollection}
           {collectionsMethods}
           {showDefault}

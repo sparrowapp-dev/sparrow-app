@@ -11,6 +11,7 @@
   import { PeopleIcon } from "$lib/assets/app.asset";
   import { base64ToURL } from "$lib/utils/helpers";
   import { TeamRepository } from "$lib/repositories/team.repository";
+  import List from "$lib/components/list/List.svelte";
   export let handleCreateTeamModal: any;
   export let teams: any;
   export let teamRepositoryMethods: TeamRepositoryMethods;
@@ -39,8 +40,8 @@
   });
 </script>
 
-<section class="pb-4">
-  <div class="sidebar-teams-header d-flex justify-content-between">
+<section>
+  <div class="sidebar-teams-header d-flex justify-content-between p-3 pb-0">
     <h6 class="teams-heading">Teams</h6>
     <div>
       <Tooltip text="New Team">
@@ -53,52 +54,54 @@
       </Tooltip>
     </div>
   </div>
-  <div class="sidebar-teams-list sparrow-thin-scrollbar overflow-y-auto">
-    {#each teams as team, index}
-      <button
-        class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
-          currOpenedTeam.id == team.teamId && "active"
-        }`}
-        on:click={async () => {
-          handleOpenTeam(team.teamId, team.name, team.logo);
-          await teamRepositoryMethods.setOpenTeam(team.teamId);
-          if (team.isNewInvite) {
-            let data = await teamServiceMethods.disableNewInviteTag(
-              userId,
-              team.teamId,
-            );
-            if (data) {
-              data.isNewInvite = false;
-              teamRepositoryMethods.modifyTeam(team.teamId, data);
+  <div class="sidebar-teams-list">
+    <List height={"calc((100vh - 230px) / 3)"} classProps={"px-3 py-0"}>
+      {#each teams as team, index}
+        <button
+          class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
+            currOpenedTeam.id == team.teamId && "active"
+          }`}
+          on:click={async () => {
+            handleOpenTeam(team.teamId, team.name, team.logo);
+            await teamRepositoryMethods.setOpenTeam(team.teamId);
+            if (team.isNewInvite) {
+              let data = await teamServiceMethods.disableNewInviteTag(
+                userId,
+                team.teamId,
+              );
+              if (data) {
+                data.isNewInvite = false;
+                teamRepositoryMethods.modifyTeam(team.teamId, data);
+              }
             }
-          }
-        }}
-      >
-        <div class="d-flex w-100 overflow-hidden">
-          {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-            <p
-              class={`m-0 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
-              style={`font-size: 15px; padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
-            >
-              {team.name[0] ? team.name[0].toUpperCase() : ""}
+          }}
+        >
+          <div class="d-flex w-100 overflow-hidden">
+            {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
+              <p
+                class={`m-0 text-defaultColor me-2 align-items-center justify-content-center bg-transparent border-defaultColor `}
+                style={`font-size: 15px; padding-top: 2px; width: 25px !important; height: 25px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+              >
+                {team.name[0] ? team.name[0].toUpperCase() : ""}
+              </p>
+            {:else}
+              <img src={base64ToURL(team.logo)} alt="" />
+            {/if}
+            <p class="ellipsis text-left teams-title overflow-hidden my-auto">
+              {team.name}
             </p>
+          </div>
+          {#if team.isNewInvite}
+            <p class="mb-0 new-invite text-labelColor">NEW INVITE</p>
           {:else}
-            <img src={base64ToURL(team.logo)} alt="" />
+            <PeopleIcon
+              color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
+              classProp={team.users?.length <= 1 && "d-none"}
+            />
           {/if}
-          <p class="ellipsis text-left teams-title overflow-hidden my-auto">
-            {team.name}
-          </p>
-        </div>
-        {#if team.isNewInvite}
-          <p class="mb-0 new-invite text-labelColor">NEW INVITE</p>
-        {:else}
-          <PeopleIcon
-            color={currOpenedTeam.id == team.teamId ? "#8A9299" : "#45494D"}
-            classProp={team.users?.length <= 1 && "d-none"}
-          />
-        {/if}
-      </button>
-    {/each}
+        </button>
+      {/each}
+    </List>
   </div>
 </section>
 

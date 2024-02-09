@@ -17,6 +17,7 @@
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import List from "$lib/components/list/List.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -180,7 +181,7 @@
       {globalEnvironment[0]?.name}
     </p>
   {/if}
-  <hr />
+  <hr class="mb-0" />
 
   {#if localEnvironment && localEnvironment.length === 0}
     <div class={`add-env-container `}>
@@ -197,17 +198,19 @@
       </button>
     </div>
   {/if}
-  <ul class={`env-side-tab-list sparrow-thin-scrollbar overflow-y-scroll px-2`}>
+  <ul class={`env-side-tab-list p-0`}>
     {#if localEnvironment && localEnvironment.length > 0}
-      {#each localEnvironment as env}
-        <EnvironmentTab
-          {env}
-          {environmentServiceMethods}
-          {environmentRepositoryMethods}
-          {currentWorkspace}
-          {currentEnvironment}
-        />
-      {/each}
+      <List height={"calc(100vh - 180px)"}>
+        {#each localEnvironment as env}
+          <EnvironmentTab
+            {env}
+            {environmentServiceMethods}
+            {environmentRepositoryMethods}
+            {currentWorkspace}
+            {currentEnvironment}
+          />
+        {/each}
+      </List>
     {/if}
   </ul>
 </div>
@@ -282,9 +285,7 @@
   }
   .env-side-tab-list {
     list-style: none;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    height: 78vh;
+    overflow: none;
   }
 
   .show-more-btn {

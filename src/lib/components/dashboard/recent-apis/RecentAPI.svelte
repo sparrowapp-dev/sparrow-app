@@ -1,4 +1,5 @@
 <script lang="ts">
+  import List from "$lib/components/list/List.svelte";
   import constants from "$lib/utils/constants";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import Helper from "./Helper.svelte";
@@ -17,23 +18,25 @@
 </script>
 
 <section>
-  <h6 class="teams-heading">Recent APIs</h6>
-  {#if tabList}
-    {#each tabList.slice().reverse() as api, index}
-      {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
-        <Helper
-          {api}
-          {data}
-          {collectionList}
-          {collectionsMethods}
-          {activeSideBarTabMethods}
-        />
-      {/if}
-    {/each}
+  <h6 class="teams-heading p-3 mb-0">Recent APIs</h6>
+  {#if tabList?.slice()?.reverse()?.length}
+    <List height={"calc((100vh - 230px) / 3)"} classProps={"px-3 py-0"}>
+      {#each tabList.slice().reverse() as api, index}
+        {#if api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED") && index < constants.API_LIMIT}
+          <Helper
+            {api}
+            {data}
+            {collectionList}
+            {collectionsMethods}
+            {activeSideBarTabMethods}
+          />
+        {/if}
+      {/each}
+    </List>
   {/if}
 
   {#if !tabList.find((api) => api.type === ItemType.REQUEST && !api.id.startsWith("UNTRACKED"))}
-    <p class="not-found-text pt-1">Recently opened APIs show up here.</p>
+    <p class="not-found-text px-3 pt-1">Recently opened APIs show up here.</p>
   {/if}
 </section>
 
