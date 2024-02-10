@@ -555,7 +555,7 @@
         {currentWorkspaceId}
       /> -->
       <Dropdown
-        dropdownId={"requestDropdown"}
+        dropdownId={"collectionDropdown"}
         disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
         dropDownType={{ type: "img", title: plusIcon }}
         data={[
@@ -573,15 +573,15 @@
         onclick={handleRequestClick}
         staticClasses={[
           {
-            id: "requestDropdown-img",
+            id: "collectionDropdown-img",
             classToAdd: ["bg-backgroundDark", "p-1", "rounded"],
           },
           {
-            id: "requestDropdown-options-div",
+            id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
           {
-            id: "requestDropdown-options-container",
+            id: "collectionDropdown-options-container",
             classToAdd: ["end-0"],
           },
         ]}
