@@ -11,6 +11,7 @@
   import type { CurrentTeam } from "$lib/utils/interfaces";
   import type { TeamDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let userId: string;
   export let openedTeam: CurrentTeam;
@@ -21,6 +22,7 @@
   export let workspaces: any;
   export let handleWorkspaceSwitch: any;
   export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+  export let workspaceUnderCreation = false;
 
   let filterText: string = "";
   let workspacePerPage: number = 5;
@@ -73,12 +75,14 @@
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
       {#if currPage === 1 && filterText === "" && ($currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId)}
-        <button
-          on:click={handleCreateWorkspace}
-          class="col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
-        >
-          + Add New Workspace
-        </button>
+        <Button
+          disable={workspaceUnderCreation}
+          loader={workspaceUnderCreation}
+          title={`+ Add New Workspace`}
+          type="other"
+          buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
+          onClick={handleCreateWorkspace}
+        />
       {/if}
       {#each $workspaces
         .slice()
@@ -266,9 +270,7 @@
     border: 1px solid var(--workspace-hover-color);
   }
 
-  .add-new-workspace {
-    border-radius: 8px;
-    background: transparent;
+  :global(.add-new-workspace) {
     border: 2px dashed var(--gradiant-2, #6147ff);
     background: var(
       --gradiant-2,
@@ -277,16 +279,15 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 16px;
     max-width: 47.5%;
     max-height: 32%;
-    min-height: 18vh;
+    min-height: 15vh;
   }
 
-  .add-new-workspace.empty {
+  :global(.add-new-workspace.empty) {
     max-width: 80%;
   }
-  .add-new-workspace:hover {
+  :global(.add-new-workspace:hover) {
     border: 2px dashed var(--workspace-hover-color);
     background: var(--dull-background-color);
     color: var(--workspace-hover-color);

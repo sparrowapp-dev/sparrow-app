@@ -158,16 +158,13 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      let totalCollection: number = 0;
-      let totalRequest: number = 0;
+      let totalRequest = 0;
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data._id) {
-            totalCollection = 0;
-          } else {
+          if (item._data._id != response.data.data._id) {
             totalRequest = 0;
-          }
+          } 
         }
       });
 
@@ -177,15 +174,15 @@
       };
 
       workspaceObj._id = response.data.data._id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
       workspaceObj.description = response.data.data?.description;
       workspaceObj.team = response.data.data?.team;
-      workspaceObj.owner = response.data.data?.owner;
       workspaceObj.users = response.data.data?.users;
       workspaceObj.createdAt = response.data.data?.createdAt;
       workspaceObj.createdBy = response.data.data?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.environments = response.data.data?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;

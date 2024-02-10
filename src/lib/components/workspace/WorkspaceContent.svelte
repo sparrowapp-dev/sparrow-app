@@ -36,6 +36,7 @@
   export let handleLeaveTeamModal: () => void;
   export let handleOnShowMoreClick: (e) => void;
   export let isShowMoreVisible: boolean = false;
+  export let workspaceUnderCreation = false
 
   let currOpenedTeam: CurrentTeam;
   let isLoading: boolean = false;
@@ -333,6 +334,7 @@
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
         {currOpenedTeamRxDoc}
+        {workspaceUnderCreation}
       />
     {:else if selectedTab === "members"}
       <Members
