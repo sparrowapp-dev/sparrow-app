@@ -143,7 +143,7 @@
         name: "Select",
         id: defaultRole,
         description: "Select role",
-        textColor: "whiteColor",
+        dynamicClasses: "whiteColor",
         hide: true,
       },
       {
@@ -151,19 +151,19 @@
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        textColor: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        textColor: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        textColor: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
     ]}
     onclick={handleDropdown}

@@ -16,7 +16,7 @@
   export let workspaces;
   export let teamLogo;
   export let userId;
-  let isAllSelectedCheck=false
+  let isAllSelectedCheck=false;
   const emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
@@ -179,7 +179,7 @@
   };
   const handleCheckSelectDropdown = (id: string) => {
     if (id === "select-all") {
-      isAllSelectedCheck=!isAllSelectedCheck;
+      isAllSelectedCheck =!isAllSelectedCheck;
       teamSpecificWorkspace.forEach((elem: any) => {
           elem.checked = isAllSelectedCheck;
       });
@@ -191,9 +191,8 @@
         return elem;
       });
       isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
-        return  item.checked;
+        return item.checked;
       });
-      
     }
   };
 </script>
@@ -234,14 +233,14 @@
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
   <Dropdown
-    dropDownType={{type:"text",title: selectedRole ? selectedRole : "" }}
+    dropDownType={{ type: "text", title:selectedRole ?selectedRole : "" }}
     dropdownId="invite-team"
     data={[
       {
         name: "Select",
         id: "select",
         description: "Select role",
-        textColor: "whiteColor",
+       dynamicClasses: "text-whiteColor",
         hide: true,
       },
       {
@@ -249,19 +248,19 @@
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        textColor: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        textColor: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        textColor: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
     ]}
     onclick={handleDropdown}
@@ -304,20 +303,19 @@
     <Dropdown
       dropDownType={{ type: "checkbox", title: "select" }}
       dropdownId="check-select-workspace"
-      data={
-      [
+      data={[
         {
           name: "Select",
           id: "select",
-          textColor: "whiteColor",
+          dynamicClasses: "text-whiteColor",
           hide: true,
         },
         {
           name: "Select ALL",
           id: "select-all",
-          textColor: "whiteColor",
+          dynamicClasses: "text-whiteColor",
           isInvalidOption: true,
-          checked:isAllSelectedCheck
+          checked: isAllSelectedCheck,
         },
         ...teamSpecificWorkspace,
       ]}

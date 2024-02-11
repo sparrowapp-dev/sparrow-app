@@ -29,7 +29,7 @@
   export let getPermissionsData: () => Array<{
     name: string;
     id: string;
-    textColor: string;
+    dynamicClasses: string;
   }>;
   export let isWorkspaceMemberInfo = false;
   export let handleDropDownWorkspaceLevel = (

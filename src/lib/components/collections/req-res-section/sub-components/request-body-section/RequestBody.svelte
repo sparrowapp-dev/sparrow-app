@@ -152,25 +152,25 @@
         {
           name: "Raw",
           id: RequestDataset.RAW,
-          textColor:"text-whiteColor"
+         dynamicClasses:"text-whiteColor"
 
         },
         {
           name: "Form data",
           id: RequestDataset.FORMDATA,
-          textColor:"text-whiteColor"
+          dynamicClasses:"text-whiteColor"
 
         },
         {
           name: "Encoded URL",
           id: RequestDataset.URLENCODED,
-          textColor:"text-whiteColor"
+          dynamicClasses:"text-whiteColor"
 
         },
         {
           name: "None",
           id: RequestDataset.NONE,
-          textColor:"text-whiteColor"
+          dynamicClasses:"text-whiteColor"
 
         },
       ]}
@@ -185,31 +185,31 @@
           {
             name: "HTML",
             id: RequestDataType.HTML,
-            textColor:"text-whiteColor"
+             dynamicClasses:"text-whiteColor"
 
           },
           {
             name: "JSON",
             id: RequestDataType.JSON,
-            textColor:"text-whiteColor"
+             dynamicClasses:"text-whiteColor"
 
           },
           {
             name: "JavaScript",
             id: RequestDataType.JAVASCRIPT,
-            textColor:"text-whiteColor"
+             dynamicClasses:"text-whiteColor"
 
           },
           {
             name: "Text",
             id: RequestDataType.TEXT,
-            textColor:"text-whiteColor"
+             dynamicClasses:"text-whiteColor"
 
           },
           {
             name: "XML",
             id: RequestDataType.XML,
-            textColor:"text-whiteColor"
+             dynamicClasses:"text-whiteColor"
 
           },
         ]}

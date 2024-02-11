@@ -41,25 +41,25 @@
               {
                 name: "No Auth",
                 id: AuthType.NO_AUTH,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
 
               },
               {
                 name: "API Key",
                 id: AuthType.API_KEY,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
 
               },
               {
                 name: "Bearer Token",
                 id: AuthType.BEARER_TOKEN,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
 
               },
               {
                 name: "Basic Auth",
                 id: AuthType.BASIC_AUTH,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
               },
             ]}
             onclick={handleDropdown}

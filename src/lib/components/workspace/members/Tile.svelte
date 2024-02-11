@@ -146,12 +146,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        textColor: "whiteColor",
+         dynamicClasses: "whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        textColor: "text-whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -164,7 +164,7 @@
         {
           name: "Remove",
           id: "remove",
-          textColor: "text-dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -175,13 +175,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          textColor: "text-whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-          textColor: "text-dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -189,7 +189,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          textColor: "text-whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];

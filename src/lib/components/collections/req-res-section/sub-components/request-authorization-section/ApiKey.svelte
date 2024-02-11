@@ -184,12 +184,12 @@
               {
                 name: "Header",
                 id: AuthSection.HEADER,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
               },
               {
                 name: "Query Parameter",
                 id: AuthSection.QUERY_PARAMETER,
-                textColor:"text-whiteColor"
+                dynamicClasses:"text-whiteColor"
               },
             ]}
             onclick={handleDropdown}

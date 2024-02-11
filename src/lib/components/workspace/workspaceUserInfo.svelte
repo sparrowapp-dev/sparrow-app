@@ -202,13 +202,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        // color: "whiteColor",
-        textColor: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        textColor: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -222,7 +221,7 @@
         {
           name: "Remove",
           id: "teamRemove",
-          textColor: "text-dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -234,7 +233,7 @@
         {
           name: "Remove",
           id: "teamRemove",
-          textColor: "text-dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -242,7 +241,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          textColor: "text-whiteColor",
+          dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -304,17 +303,17 @@
           {
             name: "Editor",
             id: "editor",
-            textColor: "text-whiteColor",
+            dynamicClasses: "text-whiteColor",
           },
           {
             name: "Viewer",
             id: "viewer",
-            textColor: "text-whiteColor",
+            dynamicClasses: "text-whiteColor",
           },
           {
             name: "Remove",
             id: "remove",
-            textColor: "text-dangerColor",
+            dynamicClasses: "text-dangerColor",
 
           },
         ]}

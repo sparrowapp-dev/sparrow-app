@@ -61,8 +61,8 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
   import ImportCollection from "./ImportCollection.svelte";
-    import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-    import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -453,21 +453,6 @@
     </button>
   </div>
   <div class="px-3 pt-2">
-    <!-- <EnvironmentDropdown
-      dropdownId={"hash129"}
-      title={currentEnvironment?.id}
-      data={[
-        {
-          name: "None",
-          id: "none",
-          type: environmentType.LOCAL,
-        },
-        ...environments,
-      ].filter((elem) => {
-        return elem.type === environmentType.LOCAL;
-      })}
-      onclick={handleDropdown}
-    /> -->
     <Dropdown
       mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
@@ -481,13 +466,13 @@
         },
         {
           name: "None",
-          id: " ",
+          id: "",
           type: environmentType.LOCAL,
         },
 
         ...environments,
       ].filter((elem) => {
-        elem["textColor"] = "text-whiteColor";
+        elem["dynamicClasses"] = "text-whiteColor";
         return elem.type === environmentType.LOCAL;
       })}
       onclick={handleDropdown}
@@ -495,18 +480,15 @@
       staticClasses={[
         {
           id: "hash129-options-container",
-          classToAdd: ["start-0", "end-0"],
+          classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
         },
       ]}
-      hoverClasses={
-        [
-          {
-            id:"hash129-btn-div",
-            classToAdd: ["border-bottom","border-labelColor"],
-          }
-        ]
-      }
-      
+      hoverClasses={[
+        {
+          id: "hash129-btn-div",
+          classToAdd: ["border-bottom","border-labelColor"],
+        },
+      ]}
     ></Dropdown>
   </div>
   <div
@@ -556,18 +538,24 @@
       /> -->
       <Dropdown
         dropdownId={"collectionDropdown"}
-        disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_COLLECTIONS,
+        )}
         dropDownType={{ type: "img", title: plusIcon }}
+        staticCustomStyles={[
+          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+        ]}
         data={[
           {
             name: "Collection",
             id: "collection",
-            textColor: "text-whiteColor",
+            dynamicClasses: "text-whiteColor",
           },
           {
             name: "API Request",
             id: "apiRequest",
-            textColor: "text-whiteColor",
+            dynamicClasses: "text-whiteColor mt-1",
           },
         ]}
         onclick={handleRequestClick}
@@ -580,9 +568,10 @@
             id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
+          
           {
             id: "collectionDropdown-options-container",
-            classToAdd: ["end-0"],
+            classToAdd: ["end-0","mt-1"],
           },
         ]}
       ></Dropdown>

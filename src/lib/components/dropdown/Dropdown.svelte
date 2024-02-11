@@ -1,29 +1,36 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
-  import { onDestroy, onMount } from "svelte";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import closeIcon from "$lib/assets/close.svg";
-
   type dropdownType = "text" | "img" | "checkbox";
-  type dropdownHoverType = "add"| "remove";
+  type dropdownHoverType = "add" | "remove";
   export let data: Array<{
     name: string;
     id: string;
-    textColor: string;
+    dynamicClasses:string;
     hide?: boolean;
     description?: string;
     selectedOptionClasses?: string;
     checked?: boolean;
     isInvalidOption?: boolean;
+    img?: string;
+    hasDivider?: boolean;
   }>;
 
   export let staticClasses: { id: string; classToAdd: string[] }[] = [];
+  export let staticCustomStyles: {
+    id: string;
+    styleKey: string;
+    styleValue: string;
+  }[] = [];
   export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
+  export let activeClasses: string = "";
+  export let additonalSelectedOptionText: string = "";
 
   export let onclick: (tab: string) => void;
-
   export let dropDownType: {
     type: dropdownType;
     title: string;
@@ -35,11 +42,13 @@
   let selectedOption: {
     name: string;
     id: string;
-    textColor: string;
+    dynamicClasses: string;
     description?: string;
     selectedOptionClasses?: string;
     checked?: boolean;
     isInvalidOption?: boolean;
+    img?: string;
+    hasDivider?: boolean;
   };
 
   let isOpen: boolean = false;
@@ -67,7 +76,8 @@
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(
       `${dropdownId}-dropdown-${dropDownType.title}`,
-    );
+    ) as HTMLElement;
+
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
     }
@@ -94,6 +104,21 @@
       }
     }
   }
+  function handleStaticClasses() {
+    staticClasses.length > 0 &&
+      staticClasses.forEach((classes) => {
+        const element = document.getElementById(classes.id);
+        element?.classList.add(...classes.classToAdd);
+      });
+    staticCustomStyles?.length > 0 &&
+      staticCustomStyles.forEach((stylesObj) => {
+        const element = document.getElementById(stylesObj.id);
+        if (element) {
+          element.style[stylesObj.styleKey] = stylesObj.styleValue;
+        }
+      });
+
+  }
   const countCheckedList = (list: any[]) => {
     let count = 0;
     list.forEach((element) => {
@@ -105,12 +130,11 @@
   };
 
   onMount(() => {
-    staticClasses.length > 0 &&
-      staticClasses.forEach((classes) => {
-        const element = document.getElementById(classes.id);
-        element?.classList.add(...classes.classToAdd);
-      });
+    handleStaticClasses();
     window.addEventListener("click", handleDropdownClick);
+  });
+  afterUpdate(() => {
+    handleStaticClasses();
   });
 </script>
 
@@ -131,8 +155,9 @@
     {#if dropDownType.type === "text" || dropDownType.type === "checkbox"}
       <div
         id={`${dropdownId}-btn-div`}
-        class="dropdown-btn d-flex align-items-center justify-content-between"
-        class:dropdown-btn-active={isOpen}
+        class="dropdown-btn d-flex align-items-center justify-content-between {isOpen
+          ? activeClasses
+          : ''}"
         on:mouseenter={() => {
           handleHover(`${dropdownId}-btn-div`, "add");
         }}
@@ -145,11 +170,14 @@
             <p
               class="{disabled
                 ? 'disabled-text'
-                : ''} mb-0 {selectedOption?.textColor} {selectedOption?.selectedOptionClasses
+                : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
                 ? selectedOption.selectedOptionClasses
                 : ''}"
             >
               {selectedOption?.name}
+              <span id={`${dropdownId}-additional-option`}
+                >{additonalSelectedOptionText}</span
+              >
             </p>
           {:else}
             <div class="me-4 navigator">
@@ -160,7 +188,7 @@
                     <img
                       src={closeIcon}
                       on:click={() => {
-                        onclick(element.id)
+                        onclick(element.id);
                       }}
                     /></span
                   >
@@ -172,12 +200,15 @@
           <p
             class="{disabled
               ? 'disabled-text'
-              : ''} mb-0 {selectedOption?.textColor} {selectedOption?.selectedOptionClasses
+              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
               ? selectedOption.selectedOptionClasses
               : ''}"
           >
             {selectedOption?.name}
           </p>
+          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
+            >{additonalSelectedOptionText}</span
+          >
         {/if}
         <span class:dropdown-logo-active={isOpen}
           ><img
@@ -199,26 +230,24 @@
     id="{dropdownId}-options-container"
   >
     {#each data as list}
-      <div 
+      <div
         id="{dropdownId}-options-div"
         class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===
         true
           ? 'd-none'
           : ''}"
         on:click={(event) => {
-        event.stopPropagation();
+          event.stopPropagation();
           if (dropDownType.type === "checkbox") {
             onclick(list.id);
-          }
-           else {
+          } else {
             isOpen = false;
             onclick(list.id);
           }
-          
         }}
       >
         <p
-          class="m-0 p-1 {list?.textColor}"
+          class="m-0 {list?.dynamicClasses}"
           style="font-size: 12px;"
           id="{dropdownId}-options-name"
           class:selected-request={list.id === selectedOption?.id}
@@ -229,14 +258,20 @@
             <small class="text-textColor">{list.description}</small>
           {/if}
         </p>
+
         {#if selectedOption?.id === list.id && dropDownType.type === "text"}
           <img src={checkIcon} alt="" />
         {:else if dropDownType.type === "checkbox"}
           <label>
             <input type="checkbox" bind:checked={list.checked} />
           </label>
+        {:else if list?.img}
+          <img src={list.img} />
         {/if}
       </div>
+      {#if list?.hasDivider}
+        <div style="margin-top:-10px"><hr class="dropdown-divider" /></div>
+      {/if}
     {/each}
   </div>
 </div>
@@ -259,8 +294,6 @@
     background-color: var(--blackColor);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    /* !HANDLE MIN WIDTH */
-    min-width: 180px;
   }
 
   .dropdown-btn p,
@@ -285,9 +318,6 @@
     cursor: pointer;
   }
 
-  .dropdown-btn-active {
-    background-color: var(--border-color);
-  }
   .disabled-text {
     color: var(--sparrow-text-color) !important;
   }

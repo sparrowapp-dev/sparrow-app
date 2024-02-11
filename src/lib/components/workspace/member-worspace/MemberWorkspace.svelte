@@ -99,17 +99,17 @@
             {
               name: "Editor",
               id: WorkspaceRole.WORKSPACE_EDITOR,
-              textColor: "text-whiteColor",
+               dynamicClasses: "text-whiteColor",
             },
             {
               name: "Viewer",
               id: WorkspaceRole.WORKSPACE_VIEWER,
-              textColor: "text-whiteColor",
+               dynamicClasses: "text-whiteColor",
             },
             {
               name: "Remove",
               id: "remove",
-              textColor: "text-dangerColor",
+               dynamicClasses: "text-dangerColor",
             },
           ]}
           onclick={isWorkspaceMemberInfo
@@ -131,27 +131,27 @@
             {
               name: "Editor",
               id: WorkspaceRole.WORKSPACE_EDITOR,
-              textColor: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Viewer",
               id: WorkspaceRole.WORKSPACE_VIEWER,
-              textColor: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Admins",
               id: TeamRole.TEAM_ADMIN,
-              textColor: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Owner",
               id: TeamRole.TEAM_OWNER,
-              textColor: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Removes",
               id: "remove",
-              textColor: "text-dangerColor",
+              dynamicClasses: "text-dangerColor",
             },
           ]}
           onclick={isWorkspaceMemberInfo

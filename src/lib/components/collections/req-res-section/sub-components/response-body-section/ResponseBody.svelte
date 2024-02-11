@@ -123,37 +123,32 @@
         >
           <Dropdown
             dropdownId={"hash565"}
-           dropDownType={{type:"text",title:apiState.responseRaw}}            
+            dropDownType={{ type: "text", title: apiState.responseRaw }}
             data={[
               {
                 name: "JSON",
                 id: RequestDataType.JSON,
-                textColor:"text-whiteColor"
-
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "XML",
                 id: RequestDataType.XML,
-                textColor:"text-whiteColor"
-
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "HTML",
                 id: RequestDataType.HTML,
-                textColor:"text-whiteColor"
-
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Javascript",
                 id: RequestDataType.JAVASCRIPT,
-                textColor:"text-whiteColor"
-
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Text",
                 id: RequestDataType.TEXT,
-                textColor:"text-whiteColor"
-
+                dynamicClasses: "text-whiteColor",
               },
             ]}
             onclick={handleTypeDropdown}

@@ -335,52 +335,55 @@
   };
 </script>
 
-<div class="d-flex flex-column w-100">
+<div class="d-flex flex-column">
   <div
     class="d-flex align-items-center justify-content-between {isCollaps
       ? 'ps-5 pt-3 pe-3'
       : 'pt-3 px-3'}"
-    style="width:calc(100%-312px);"
+    style="width:calc(100%-302px);"
   >
     <div class="d-flex gap-2 w-100 position-relative">
       <Dropdown
         dropdownId="api-request"
         dropDownType={{ type: "text", title: method ? method : "" }}
+        staticCustomStyles={[
+          { id: "api-request-options-container", styleKey: "minWidth", styleValue: "120px" },
+        ]}
         staticClasses={[
           {
             id: "api-request-btn-div",
             classToAdd: ["px-2", "py-3", "border", "rounded"],
           },
           {
-            id: "requestDropdown-options-container",
-            classToAdd: ["start-0", "end-2"],
+            id: "api-request-options-container",
+            classToAdd: ["start-0","bg-backgroundDropdown"],
           },
         ]}
         data={[
           {
             name: "GET",
             id: RequestMethod.GET,
-            textColor: "text-getColor",
+            dynamicClasses: "text-getColor",
           },
           {
             name: "POST",
             id: RequestMethod.POST,
-            textColor: "text-postColor",
+            dynamicClasses: "text-postColor",
           },
           {
             name: "PUT",
             id: RequestMethod.PUT,
-            textColor: "text-putColor",
+            dynamicClasses: "text-putColor",
           },
           {
             name: "DELETE",
             id: RequestMethod.DELETE,
-            textColor: "text-deleteColor",
+            dynamicClasses: "text-deleteColor",
           },
           {
             name: "PATCH",
             id: RequestMethod.PATCH,
-            textColor: "text-patchColor",
+            dynamicClasses: "text-patchColor",
           },
         ]}
         onclick={handleDropdown}
