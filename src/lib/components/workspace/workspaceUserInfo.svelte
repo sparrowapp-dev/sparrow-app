@@ -360,7 +360,7 @@
         <Button
           disable={memberRemoveLoader}
           title={"Cancel"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -371,7 +371,7 @@
         <Button
           disable={memberRemoveLoader}
           title={"Remove"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={memberRemoveLoader}
@@ -408,7 +408,7 @@
         <Button
           disable={teamMemberRemoveLoader}
           title={"Cancel"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -419,7 +419,7 @@
         <Button
           disable={teamMemberRemoveLoader}
           title={"Remove"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={teamMemberRemoveLoader}

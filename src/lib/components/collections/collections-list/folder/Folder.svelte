@@ -4,12 +4,12 @@
 
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
 
-  import File from "./File.svelte";
+  import Request from "../request/Request.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import { CollectionListViewModel } from "../CollectionList.ViewModel";
   import type { CreateApiRequestPostBody } from "$lib/utils/dto";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -311,7 +311,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -322,7 +322,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -487,7 +487,7 @@
   </div>
 {:else}
   <div style="cursor:pointer;">
-    <File
+    <Request
       api={explorer}
       {folderId}
       {folderName}

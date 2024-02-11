@@ -18,12 +18,7 @@
     CurrentWorkspace,
     CollectionsMethods,
   } from "$lib/utils/interfaces";
-  import {
-    TextInput,
-    SelectInput,
-    ModalWrapperV1,
-    Button,
-  } from "$lib/components";
+  import { Button, Input, ModalWrapperV1, SelectInput } from "$lib/components";
   import type {
     InvalidWorkspacePostBody,
     WorkspacePostBody,
@@ -34,6 +29,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import Dropdown from "../../dropdown/Dropdown.svelte";
+
 
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
@@ -251,7 +247,7 @@
     handleCreateWorkspaceModal();
   }}
 >
-  <TextInput
+  <Input
     value={workspacePostInput?.name}
     labelText="Workspace Name"
     isRequired={true}
@@ -262,6 +258,9 @@
       ? "Workspace with this name already exists."
       : "Workspace name cannot be empty."}
     onChange={handleCreateWorkspaceNameChange}
+    type={"input"}
+    inputStyleProp={"border: 1px solid var(--border-color);"}
+    inputClassProp={`py-2 px-3`}
   />
   <SelectInput
     labelText="Team"

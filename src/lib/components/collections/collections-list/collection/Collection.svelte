@@ -1,9 +1,9 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import FileExplorer from "./FileExplorer.svelte";
-  import { getNextName } from "./collectionList";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import Folder from "../folder/Folder.svelte";
+  import { getNextName } from "../collectionList";
+  import { CollectionListViewModel } from "../CollectionList.ViewModel";
 
   import { CollectionService } from "$lib/services/collection.service";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -367,7 +367,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -378,7 +378,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -497,7 +497,7 @@
 >
   <div class="sub-folders ps-3">
     {#each collection.items as exp}
-      <FileExplorer
+      <Folder
         {collectionsMethods}
         {collectionList}
         {collectionId}
