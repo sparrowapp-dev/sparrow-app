@@ -14,13 +14,17 @@
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import type { WorkspaceRole } from "$lib/utils/enums";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
-  export let _collectionListViewModel:CollectionListViewModel;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let _collectionListViewModel: CollectionListViewModel;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
   let isLoading: boolean = false;
@@ -29,16 +33,16 @@
   let componentData: NewTab;
   let totalRequest: number = 0;
   let newFolderName: string = "";
-  let collectionId:string;
-  let folderId:string;
+  let collectionId: string;
+  let folderId: string;
   const _myFolderViewModel = new MyFolderViewModel();
 
-  const tabSubscribe = activeTab.subscribe(async(event: NewTab) => {
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
-      collectionId=event.path?.collectionId;
-      folderId=event.path?.folderId;
+      collectionId = event.path?.collectionId;
+      folderId = event.path?.folderId;
     }
   });
 
@@ -47,10 +51,11 @@
       if (collectionArr) {
         collectionArr.forEach(async (collection) => {
           if (collection._data.id === collectionId) {
-            const collectionData = await collectionsMethods.getNoOfApisandFolders(
-             collection,
-             folderId
-            );
+            const collectionData =
+              await collectionsMethods.getNoOfApisandFolders(
+                collection,
+                folderId,
+              );
             totalRequest = collectionData.requestCount;
           }
         });
@@ -123,28 +128,40 @@
     class="my-collection d-flex flex-column"
     style="width:calc(100% - 280px); margin-top: 15px;"
   >
-    <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
-      <input
-        type="text"
-        required
-        {autofocus}
-        id="renameInputFieldFolder"
-        value={tabName}
-        class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
-        on:input={(event) => {
-          handleFolderInput(event);
-        }}
-        maxlength={100}
-        on:blur={onRenameBlur}
-        on:keydown={onRenameInputKeyPress}
-        bind:this={inputElement}
-      />
+    <Tooltip
+      text={PERMISSION_NOT_FOUND_TEXT}
+      show={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )}
+    >
+      <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
+        <input
+          type="text"
+          required
+          {autofocus}
+          id="renameInputFieldFolder"
+          value={tabName}
+          class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
+          on:input={(event) => {
+            handleFolderInput(event);
+          }}
+          maxlength={100}
+          on:blur={onRenameBlur}
+          on:keydown={onRenameInputKeyPress}
+          bind:this={inputElement}
+        />
 
-      <button
-        class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
-        on:click={handleApiRequest}>New Request</button
-      >
-    </div>
+        <button
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )}
+          class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
+          on:click={handleApiRequest}>New Request</button
+        >
+      </div>
+    </Tooltip>
 
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">
@@ -152,15 +169,25 @@
         <p style="font-size: 12px;" class="mb-0">API Requests</p>
       </div>
     </div>
-    <div class="d-flex align-items-start ps-0 h-100">
-      <textarea
-       type="textarea"
-       disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_FOLDER_DESC)}
-        style="font-size: 12px; "
-        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
-      />
-    </div>
+    <Tooltip
+      text={PERMISSION_NOT_FOUND_TEXT}
+      show={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.EDIT_FOLDER_DESC,
+      )}
+    >
+      <div class="d-flex align-items-start ps-0 h-100">
+        <textarea
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.EDIT_FOLDER_DESC,
+          )}
+          style="font-size: 12px; "
+          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+          placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
+        />
+      </div>
+    </Tooltip>
   </div>
   <div
     class="d-flex flex-column align-items-left justify-content-start"

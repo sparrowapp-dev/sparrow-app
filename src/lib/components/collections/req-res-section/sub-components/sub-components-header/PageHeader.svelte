@@ -20,7 +20,10 @@
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -250,37 +253,50 @@
     <div class="d-flex gap-3">
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
-          <button
-            disabled={componentData?.save ||
-              !hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-            style="width:140px;"
-            class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
-            on:click={() => {
-              if (
-                componentData?.path.collectionId &&
-                componentData?.path.workspaceId
-              ) {
-                handleSaveRequest();
-              } else {
-                visibility = true;
-              }
-            }}
+          <Tooltip
+            text={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
           >
-            {#if componentData.saveInProgress}
-              <Spinner size={"14px"} />
-            {:else}
-              <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
-            {/if}
-            <p
-              class="mb-0 text-whiteColor"
-              style="font-size: 14px; font-weight:400;"
+            <button
+              disabled={componentData?.save ||
+                !hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+              style="width:140px;"
+              class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+              on:click={() => {
+                if (
+                  componentData?.path.collectionId &&
+                  componentData?.path.workspaceId
+                ) {
+                  handleSaveRequest();
+                } else {
+                  visibility = true;
+                }
+              }}
             >
-              Save Request
-            </p>
-          </button>
+              {#if componentData.saveInProgress}
+                <Spinner size={"14px"} />
+              {:else}
+                <img
+                  src={floppyDisk}
+                  alt=""
+                  style="height: 20px; width:20px;"
+                />
+              {/if}
+              <p
+                class="mb-0 text-whiteColor"
+                style="font-size: 14px; font-weight:400;"
+              >
+                Save Request
+              </p>
+            </button>
+          </Tooltip>
+
           <span class="position-relative" style="width:35px;">
             <button
               disabled={!hasWorkpaceLevelPermission(
@@ -306,6 +322,7 @@
                 Save As
               </p>
             </div>
+
             <ModalWrapperV1
               title={"Save Request"}
               type={"dark"}

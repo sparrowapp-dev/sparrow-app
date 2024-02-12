@@ -30,7 +30,7 @@ import type {
   addUsersInWorkspace,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto/workspace-dto";
-import type { WorkspaceRole } from "$lib/utils/enums";
+import { WorkspaceMemberRole, type WorkspaceRole } from "$lib/utils/enums";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 
 export class HeaderDashboardViewModel {

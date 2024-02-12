@@ -27,11 +27,15 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
@@ -44,6 +48,14 @@
   let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_FOLDER,
+      )
+    ) {
+      return;
+    }
     isFolderCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -98,6 +110,14 @@
   };
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -498,6 +518,7 @@
   <div class="sub-folders ps-3">
     {#each collection.items as exp}
       <Folder
+        {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {collectionList}
         {collectionId}

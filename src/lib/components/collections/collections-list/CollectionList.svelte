@@ -543,6 +543,7 @@
           <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#each filteredSelectedMethodsCollection as col}
               <Collection
+                {loggedUserRoleInWorkspace}
                 collectionList={collection}
                 collectionId={col.id}
                 {currentWorkspaceId}
@@ -558,6 +559,7 @@
           <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#each collection as col}
               <Collection
+                {loggedUserRoleInWorkspace}
                 collectionList={collection}
                 collectionId={col.id}
                 {currentWorkspaceId}
@@ -571,9 +573,11 @@
           </List>
         {/if}
         <EmptyCollection
+          {loggedUserRoleInWorkspace}
           {handleCreateCollection}
           {collectionsMethods}
           {showDefault}
+          {currentWorkspaceId}
         />
       {/if}
     </div>

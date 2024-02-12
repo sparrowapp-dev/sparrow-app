@@ -2,7 +2,10 @@
   import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
   import Crossicon from "$lib/assets/crossicon.svelte";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -10,7 +13,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import Tooltip from "../tooltip/Tooltip.svelte";
   type Mode = "READ" | "WRITE";
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   export let keyValue: EnvValuePair[];
   export let callback: (pairs: EnvValuePair[]) => void;
   export let mode: Mode = "WRITE";
@@ -186,14 +189,25 @@
             <div class="w-100 d-flex gap-2">
               <div class="flex-grow-1 w-100">
                 <div class="bg-keyValuePairColor d-flex rounded">
-                  <input
-                    type="text"
-                    placeholder="Enter Variable"
-                    class="form-control py-1"
-                    style="font-size: 13px;"
-                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
-                    bind:value={readable.key}
-                  />
+                  <Tooltip
+                    text={PERMISSION_NOT_FOUND_TEXT}
+                    show={!hasWorkpaceLevelPermission(
+                      loggedUserRoleInWorkspace,
+                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                    )}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter Variable"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={!hasWorkpaceLevelPermission(
+                        loggedUserRoleInWorkspace,
+                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                      )}
+                      bind:value={readable.key}
+                    />
+                  </Tooltip>
                   <div class="me-2 my-auto edit-icon">
                     <EditIcon />
                   </div>
@@ -201,14 +215,25 @@
               </div>
               <div class="flex-grow-1 w-100">
                 <div class="bg-keyValuePairColor d-flex rounded">
-                  <input
-                    type="text"
-                    placeholder="Enter Value"
-                    class="form-control py-1"
-                    style="font-size: 13px;"
-                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
-                    bind:value={readable.value}
-                  />
+                  <Tooltip
+                    text={PERMISSION_NOT_FOUND_TEXT}
+                    show={!hasWorkpaceLevelPermission(
+                      loggedUserRoleInWorkspace,
+                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                    )}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter Value"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={!hasWorkpaceLevelPermission(
+                        loggedUserRoleInWorkspace,
+                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                      )}
+                      bind:value={readable.value}
+                    />
+                  </Tooltip>
                   <div class="me-2 my-auto edit-icon">
                     <EditIcon />
                   </div>

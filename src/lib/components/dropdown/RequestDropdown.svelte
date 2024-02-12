@@ -14,8 +14,12 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import type { WorkspaceRole } from "$lib/utils/enums";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import Tooltip from "../tooltip/Tooltip.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -64,39 +68,47 @@
   class="d-flex align-items-center justify-content-center"
   bind:this={container}
 >
-  <button
-    disabled={!hasWorkpaceLevelPermission(
+  <Tooltip
+    text={PERMISSION_NOT_FOUND_TEXT}
+    show={!hasWorkpaceLevelPermission(
       loggedUserRoleInWorkspace,
       workspaceLevelPermissions.ADD_COLLECTIONS,
     )}
-    id="dropdown-btn-color"
-    class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
-      ? 'drop-active'
-      : ''}"
-    style="width: 32px; height:32px;"
-    on:click={() => {
-      visibilty = !visibilty;
-      changeBtnBackground();
-    }}
   >
-    {#if collectionUnderCreation}
-      <Spinner size={"15px"} />
-    {/if}
-    {#if !collectionUnderCreation}
-      <img src={plusIcon} alt="plus" />
-    {/if}
+    <button
+      disabled={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_COLLECTIONS,
+      )}
+      id="dropdown-btn-color"
+      class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
+        ? 'drop-active'
+        : ''}"
+      style="width: 32px; height:32px;"
+      on:click={() => {
+        visibilty = !visibilty;
+        changeBtnBackground();
+      }}
+    >
+      {#if collectionUnderCreation}
+        <Spinner size={"15px"} />
+      {/if}
+      {#if !collectionUnderCreation}
+        <img src={plusIcon} alt="plus" />
+      {/if}
 
-    {#if visibilty}
-      <div class="dropdown-content" transition:slide={{ duration: 100 }}>
-        <button
-          on:click={() => {
-            handleImportCollectionPopup(true);
-          }}>Collection</button
-        >
-        <button on:click={addApiRequest}>API Request</button>
-      </div>
-    {/if}
-  </button>
+      {#if visibilty}
+        <div class="dropdown-content" transition:slide={{ duration: 100 }}>
+          <button
+            on:click={() => {
+              handleImportCollectionPopup(true);
+            }}>Collection</button
+          >
+          <button on:click={addApiRequest}>API Request</button>
+        </div>
+      {/if}
+    </button>
+  </Tooltip>
 </div>
 
 <style>

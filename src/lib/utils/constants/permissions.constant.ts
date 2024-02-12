@@ -1,5 +1,8 @@
 import { WorkspaceRole } from "../enums";
 
+export const PERMISSION_NOT_FOUND_TEXT =
+  "You are not allowed to perform this action!";
+
 export const AdminLevelPermission = [
   "Create New Workspaces.",
   "Send Invites.",
@@ -14,11 +17,13 @@ export enum workspaceLevelPermissions {
   SEND_INVITE = "send invite",
   REST_API_TOOL_ACCESS = "rest api tool access",
   SAVE_REQUEST = "save request",
+  ADD_FOLDER = "add folder",
   ADD_COLLECTIONS = "add collection",
   EDIT_API_DESC = "edit api description",
   EDIT_FOLDER_DESC = "edit folder description",
   EDIT_COLLECTION_DESC = "edit collection description",
   ACTIVE_SYNC = "active sync",
+  ADD_ENVIRONMENT = "add environment",
   EDIT_ENVIRONMENT = "edit environment",
   SWITCH_ENVIRONMENT = "switch environment",
   USE_ENV_VARIABLE = "use env variables",
@@ -31,10 +36,12 @@ export const workspaceLevelRolePermisson = {
     workspaceLevelPermissions.REST_API_TOOL_ACCESS,
     workspaceLevelPermissions.SAVE_REQUEST,
     workspaceLevelPermissions.ADD_COLLECTIONS,
+    workspaceLevelPermissions.ADD_FOLDER,
     workspaceLevelPermissions.EDIT_API_DESC,
     workspaceLevelPermissions.EDIT_FOLDER_DESC,
     workspaceLevelPermissions.EDIT_COLLECTION_DESC,
     workspaceLevelPermissions.ACTIVE_SYNC,
+    workspaceLevelPermissions.ADD_ENVIRONMENT,
     workspaceLevelPermissions.EDIT_ENVIRONMENT,
     workspaceLevelPermissions.SWITCH_ENVIRONMENT,
     workspaceLevelPermissions.USE_ENV_VARIABLE,
@@ -44,10 +51,12 @@ export const workspaceLevelRolePermisson = {
     workspaceLevelPermissions.REST_API_TOOL_ACCESS,
     workspaceLevelPermissions.SAVE_REQUEST,
     workspaceLevelPermissions.ADD_COLLECTIONS,
+    workspaceLevelPermissions.ADD_FOLDER,
     workspaceLevelPermissions.EDIT_API_DESC,
     workspaceLevelPermissions.EDIT_FOLDER_DESC,
     workspaceLevelPermissions.EDIT_COLLECTION_DESC,
     workspaceLevelPermissions.ACTIVE_SYNC,
+    workspaceLevelPermissions.ADD_ENVIRONMENT,
     workspaceLevelPermissions.EDIT_ENVIRONMENT,
     workspaceLevelPermissions.SWITCH_ENVIRONMENT,
     workspaceLevelPermissions.USE_ENV_VARIABLE,

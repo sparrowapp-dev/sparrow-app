@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
 
   export let text = "Coming Soon!",
-    classProp = "";
+    classProp = "",
+    show = true;
   let mouseX = 0,
     mouseY = 0,
     displayLeft = true,
@@ -26,26 +27,29 @@
 </script>
 
 <div class={"tooltip opacity-100 " + classProp}>
-  <span
-    class="tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 z-1 opacity-0"
-    style={`${
-      displayLeft
-        ? `left: ${mouseX}px; `
-        : `right: ${window.innerWidth - mouseX}px; `
-    }` +
-      `${
-        displayBottom
-          ? `bottom: ${window.innerHeight - mouseY}px; `
-          : `top: ${mouseY}px; `
-      }`}
-    >{text}
-  </span>
+  {#if show}
+    <span
+      class="tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 z-1 opacity-0"
+      style={`${
+        displayLeft
+          ? `left: ${mouseX}px; `
+          : `right: ${window.innerWidth - mouseX}px; `
+      }` +
+        `${
+          displayBottom
+            ? `bottom: ${window.innerHeight - mouseY}px; `
+            : `top: ${mouseY}px; `
+        }`}
+      >{text}
+    </span>
+  {/if}
+
   <slot />
 </div>
 
 <style>
   .tooltip {
-    z-index: 2 !important;
+    z-index: 1 !important;
   }
   .tooltip-text {
     font-family: Roboto;

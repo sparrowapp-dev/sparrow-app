@@ -18,7 +18,6 @@
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
@@ -28,6 +27,9 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "$lib/utils/enums";
 
   let expand: boolean = false;
   export let explorer;
@@ -44,10 +46,19 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
