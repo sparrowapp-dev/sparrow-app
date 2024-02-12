@@ -32,7 +32,8 @@
   let tabName: string = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
-  let newFolderName: string = "";
+  let newFolderName = "";
+  let newFolderDesc = "";
   let collectionId: string;
   let folderId: string;
   const _myFolderViewModel = new MyFolderViewModel();
@@ -68,12 +69,17 @@
     collectionsMethods.updateTab(false, "save", componentData.path.folderId);
   };
 
-  const onRenameBlur = async () => {
+  const handleFolderDesc = (event) => {
+    newFolderDesc = event.target.value;
+  };
+
+  const onUpdate = async (property: string) => {
+    const value = property === "name" ? newFolderName : newFolderDesc;
     await _myFolderViewModel.modifyFolder(
       componentData,
-      newFolderName,
+      property,
+      value,
       collectionsMethods,
-      tabName,
     );
   };
 
@@ -121,6 +127,15 @@
       inputField.blur();
     }
   };
+
+  const onDescInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "updateFolderDescField",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -147,7 +162,7 @@
             handleFolderInput(event);
           }}
           maxlength={100}
-          on:blur={onRenameBlur}
+          on:blur={() => onUpdate("name")}
           on:keydown={onRenameInputKeyPress}
           bind:this={inputElement}
         />
@@ -182,9 +197,16 @@
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.EDIT_FOLDER_DESC,
           )}
+          id="updateFolderDescField"
           style="font-size: 12px; "
           class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
           placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
+          on:input={(event) => {
+            handleFolderDesc(event);
+          }}
+          on:blur={() => onUpdate("description")}
+          on:keydown={onDescInputKeyPress}
+          bind:this={inputElement}
         />
       </div>
     </Tooltip>

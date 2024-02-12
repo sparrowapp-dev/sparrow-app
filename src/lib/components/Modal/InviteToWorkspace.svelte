@@ -147,7 +147,7 @@
         bind:value={currentEmailEntered}
         class="input-container mt-2"
         on:keyup={(event) => {
-          if (event.key === "," || event.key === "Enter") {
+          if (event.key === "," || event.key === "Enter" || event.key === "Spacebar") {
             handleEmailOnAdd(currentEmailEntered);
           }
         }}

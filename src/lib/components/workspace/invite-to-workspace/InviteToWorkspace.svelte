@@ -12,7 +12,8 @@
   import { notifications } from "$lib/utils/notifications";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  const emailstoBeSentArr: string[] = [];
+  import { validateEmail } from "$lib/utils/helpers";
+  let emailstoBeSentArr: string[] = [];
 
   export let addUsersInWorkspace: (
     id: string,
@@ -27,23 +28,36 @@
   let defaultRole = "select";
   let selectedRole = defaultRole;
   let currentEmailEntered: string;
+  let invalidEmails: string[] = [];
 
   function removeElement(event: Event): void {
-    const id = event.target?.id;
-    const removeElement = document.getElementById(id) as HTMLElement;
+    const email = event.target?.id;
+    const removeElement = document.getElementById(email) as HTMLElement;
     const emailContainer = document.getElementById(
       "input-email",
     ) as HTMLElement;
     emailContainer.removeChild(removeElement);
+    emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
+    invalidEmails = invalidEmails.filter((e) => e != email);
+    console.log(emailstoBeSentArr);
+    console.log(invalidEmails);
   }
 
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    emailstoBeSentArr.push(email);
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      invalidEmails.push(email);
+    } else {
+      emailstoBeSentArr.push(email);
+    }
+
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
+        !isValidEmail ? "border border-danger" : ""
+      }`,
     );
     const emailContentSpan = createDynamicComponents("span", "");
     const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
@@ -79,7 +93,13 @@
       users: emailstoBeSentArr,
       role: selectedRole,
     };
-    if (emailstoBeSentArr && emailstoBeSentArr.length > 0 && selectedRole) {
+    if (
+      emailstoBeSentArr &&
+      emailstoBeSentArr.length > 0 &&
+      !invalidEmails.length &&
+      selectedRole &&
+      selectedRole != "select"
+    ) {
       const response = await addUsersInWorkspace(
         currentWorkspaceDetails.id,
         data,
@@ -118,12 +138,12 @@
     ></div>
     <input
       id="input"
-      placeholder="Enter email ID"
+      placeholder="Enter email IDs"
       style="outline:none;border:none;flex-grow:1; background:transparent;"
       bind:value={currentEmailEntered}
       class="input-container mt-2"
       on:keyup={(event) => {
-        if (event.key === "," || event.key === "Enter") {
+        if (event.key === "," || event.key === "Enter" || event.key === " ") {
           handleEmailOnAdd(currentEmailEntered);
         }
       }}
@@ -131,6 +151,9 @@
   </div>
   {#if showErrors && emailstoBeSentArr.length === 0}
     <p class="error-text sparrow-fs-12">Email ID cannot be Empty</p>
+  {/if}
+  {#if showErrors && invalidEmails.length}
+    <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
   {/if}
 </div>
 <div class="mt-4">
