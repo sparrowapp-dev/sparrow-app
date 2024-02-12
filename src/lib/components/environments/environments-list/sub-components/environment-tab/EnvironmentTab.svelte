@@ -12,7 +12,7 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { boolean } from "yup";
   import Button from "$lib/components/buttons/Button.svelte";
-  import RightOption from "$lib/components/right-option/RightOption.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;

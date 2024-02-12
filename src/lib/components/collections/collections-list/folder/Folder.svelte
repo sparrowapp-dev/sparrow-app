@@ -1,5 +1,5 @@
 <script lang="ts">
-  import RightOption from "$lib/components/right-option/RightOption.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import folder from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
 

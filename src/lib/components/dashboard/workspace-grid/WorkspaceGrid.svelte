@@ -5,7 +5,7 @@
   import { onDestroy } from "svelte";
   import { navigate } from "svelte-navigator";
   import Card from "../card/Card.svelte";
-  import RightOption from "$lib/components/right-option/RightOption.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let workspace: any;
   export let handleWorkspaceSwitch: any;
