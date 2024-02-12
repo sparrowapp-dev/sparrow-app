@@ -6,11 +6,55 @@
     displayText: string;
     disabled: boolean;
   }> = [];
+  export let noOfRows = 0;
+  export let noOfColumns = 0;
+  let mouseX = 0;
+  let mouseY = 0;
+
+  const calculateRightOptionHeight = () => {
+    if (noOfRows === 5) {
+      return [200, 180];
+    } else if (noOfRows === 4) {
+      return [160, 150];
+    } else if (noOfRows === 3) {
+      return [140, 120];
+    }
+  };
+  const calculateRightOptionWidth = () => {
+    if (noOfColumns === 180) {
+      return [200, 180];
+    }
+  };
+
+  const calculateAdjustedAxis = () => {
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    mouseX = xAxis;
+    mouseY = yAxis;
+    const [yHeight, yTranslate] = calculateRightOptionHeight();
+    const [xWidth, xTranslate] = calculateRightOptionWidth();
+    if (windowHeight < yAxis + yHeight) {
+      mouseY = yAxis - yTranslate;
+    }
+    if (windowWidth < xAxis + xWidth) {
+      mouseX = xAxis - xTranslate;
+    }
+  };
+
+  $: {
+    if (xAxis) {
+      calculateAdjustedAxis();
+    }
+    if (yAxis) {
+      calculateAdjustedAxis();
+    }
+  }
 </script>
 
-<nav style="position: fixed; top:{yAxis}px; left:{xAxis}px; z-index:4;">
+<nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
   <div
-    class="navbar pb-0 pt-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+    style={`width: ${noOfColumns}px`}
+    class=" navbar pb-0 pt-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
   >
     <ul class="p-2 w-100 mb-0">
       {#each menuItems as item}
@@ -32,7 +76,6 @@
 
 <style>
   .navbar {
-    width: 180px;
     height: auto;
     overflow: hidden;
   }

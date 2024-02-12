@@ -37,20 +37,14 @@
   onDestroy(() => {
     window.removeEventListener("click", handleWindowClick);
   });
+  let noOfColumns = 180;
+  let noOfRows = 3;
   const rightClickContextMenu = (e) => {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
-      const windowHeight = window.innerHeight;
-      const windowWidth = window.innerWidth;
       pos = { x: mouseX, y: mouseY };
-      if (windowHeight < mouseY + 140) {
-        pos = { x: pos.x, y: mouseY - 120 };
-      }
-      if (windowWidth < mouseX + 200) {
-        pos = { x: mouseX - 180, y: pos.y };
-      }
       showMenu = true;
     }, 100);
   };
@@ -101,7 +95,13 @@
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 {#if showMenu}
-  <RightOption xAxis={pos.x} yAxis={pos.y} {menuItems} />
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {noOfRows}
+    {noOfColumns}
+    {menuItems}
+  />
 {/if}
 
 <Card

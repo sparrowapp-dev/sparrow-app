@@ -106,17 +106,14 @@
 
   let showMenu: boolean = false;
 
+  let noOfColumns = 180;
+  let noOfRows = 3;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
-      const windowHeight = window.innerHeight;
-      if (windowHeight < mouseY + 140) {
-        pos = { x: mouseX, y: mouseY - 120 };
-      } else {
-        pos = { x: mouseX, y: mouseY };
-      }
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -321,7 +318,13 @@
 >
 
 {#if showMenu}
-  <RightOption xAxis={pos.x} yAxis={pos.y} {menuItems} />
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window

@@ -28,17 +28,14 @@
   let newEnvironmentName: string = "";
   let isRenaming = false;
 
+  let noOfColumns = 180;
+  let noOfRows = 4;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
-      const windowHeight = window.innerHeight;
-      if (windowHeight < mouseY + 160) {
-        pos = { x: mouseX, y: mouseY - 150 };
-      } else {
-        pos = { x: mouseX, y: mouseY };
-      }
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -229,7 +226,13 @@
 >
 
 {#if showMenu}
-  <RightOption xAxis={pos.x} yAxis={pos.y} {menuItems} />
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window
