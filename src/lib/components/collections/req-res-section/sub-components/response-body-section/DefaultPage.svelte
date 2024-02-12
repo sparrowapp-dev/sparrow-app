@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ComboText from "$lib/components/text/ComboText.svelte";
   import { isHorizontal } from "$lib/store/request-response-section";
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));
@@ -32,73 +33,78 @@
         ? "d-flex flex-column align-items-start justify-content-between"
         : ""}
     >
-      <div
-        class="d-flex align-items-center text-left justify-content-between gap-5 mb-2 mt-2"
-      >
-        <p class="mb-0 shortcut-text">Send Request</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          ctrl + Enter
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-between gap-5 mb-2">
-        <p class="mb-0 shortcut-text">Save Request</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          ctrl + S
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-between gap-5 mb-2">
-        <p class="mb-0 shortcut-text">New Request</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          ctrl + N
-        </button>
-      </div>
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center text-left justify-content-between gap-5 mb-2 mt-2"}
+        key={"Send Request"}
+        value={"ctrl + Enter"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"Save Request"}
+        value={"ctrl + S"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"New Request"}
+        value={"ctrl + N"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
     </div>
     <div class={isHorizontalMode ? "d-flex flex-column" : "d-flex flex-column"}>
-      <div class="d-flex align-items-center justify-content-between gap-5 mb-2">
-        <p class="mb-0 shortcut-text">Edit link</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          alt + L
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-between gap-5 mb-2">
-        <p class="mb-0 shortcut-text">Add Parameter</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          alt + P
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-center gap-5 mb-2">
-        <p class="mb-0 shortcut-text">Add Header</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          alt + H
-        </button>
-      </div>
-      <div class="d-flex align-items-center justify-content-center gap-5 mb-2">
-        <p class="mb-0 shortcut-text">Edit Body</p>
-        <button
-          disabled
-          class="bg-buttonBackColor rounded shortcut-btn-api text-buttonColor border-0 py-1 px-4"
-        >
-          alt + B
-        </button>
-      </div>
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"Edit link"}
+        value={"alt + L"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"Add Parameter"}
+        value={"alt + P"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"Add Header"}
+        value={"alt + H"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
+      <ComboText
+        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+        key={"Edit Body"}
+        value={"alt + B"}
+        keyClassProp={"mb-0"}
+        keyStyleProp={"min-width: 80px; width: auto;"}
+        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
+        valueStyleProp={"width: 120px;"}
+        type="combo"
+      />
     </div>
   </div>
 </div>
