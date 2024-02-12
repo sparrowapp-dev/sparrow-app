@@ -37,30 +37,18 @@
         comboContainerClassProp={"d-flex align-items-center text-left justify-content-between gap-5 mb-2 mt-2"}
         key={"Send Request"}
         value={"ctrl + Enter"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
       <ComboText
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"Save Request"}
         value={"ctrl + S"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
       <ComboText
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"New Request"}
         value={"ctrl + N"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
     </div>
@@ -69,52 +57,26 @@
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"Edit link"}
         value={"alt + L"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
       <ComboText
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"Add Parameter"}
         value={"alt + P"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
       <ComboText
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"Add Header"}
         value={"alt + H"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
       <ComboText
         comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
         key={"Edit Body"}
         value={"alt + B"}
-        keyClassProp={"mb-0"}
-        keyStyleProp={"min-width: 80px; width: auto;"}
-        valueClassProp={"bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4"}
-        valueStyleProp={"width: 120px;"}
         type="combo"
       />
     </div>
   </div>
 </div>
-
-<style>
-  .shortcut-btn-api {
-    width: 120px;
-  }
-  .shortcut-text {
-    min-width: 80px;
-    width: auto;
-  }
-</style>

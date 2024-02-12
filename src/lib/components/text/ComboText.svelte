@@ -19,8 +19,14 @@
 
 <div class={`${comboContainerClassProp}`} style={`${comboContainerStyleProp}`}>
   {#if type === TextType.COMBO}
-    <p class={`${keyClassProp}`} style={`${keyStyleProp}`}>{key}</p>
-    <button disabled class={`${valueClassProp}`} style={`${valueStyleProp}`}>
+    <p class={`${keyClassProp} shortcut-text mb-0`} style={`${keyStyleProp}`}>
+      {key}
+    </p>
+    <button
+      disabled
+      class={`${valueClassProp} bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4 shortcut-btn-api`}
+      style={`${valueStyleProp}`}
+    >
       {value}
     </button>
   {:else}
@@ -44,5 +50,12 @@
   }
   .api-type span {
     font-weight: 500;
+  }
+  .shortcut-btn-api {
+    width: 120px;
+  }
+  .shortcut-text {
+    min-width: 80px;
+    width: auto;
   }
 </style>
