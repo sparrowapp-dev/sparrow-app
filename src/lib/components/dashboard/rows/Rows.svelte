@@ -2,6 +2,7 @@
   import { ThreeDotIcon } from "$lib/assets/app.asset";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import { TeamRole } from "$lib/utils/enums";
 
   export let list;
   export let currOpenedTeamRxDoc;
@@ -26,7 +27,7 @@
     }, 100);
   };
   $: {
-    if (userType === "owner" || userType === "admin") {
+    if (userType === TeamRole.TEAM_OWNER || userType === TeamRole.TEAM_ADMIN) {
       menuItems = [
         {
           onClick: () => {
