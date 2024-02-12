@@ -54,14 +54,14 @@
 <nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
   <div
     style={`width: ${noOfColumns}px`}
-    class=" navbar pb-0 pt-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
   >
     <ul class="p-2 w-100 mb-0">
       {#each menuItems as item}
-        <li class="align-items-center">
+        <li class="align-items-center d-block">
           <button
             disabled={item.disabled}
-            class={`align-items-center px-2 py-2 ${
+            class={`w-100 d-flex sparrow-fs-12 border-0 align-items-center px-2 py-2 ${
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
@@ -78,23 +78,13 @@
 <style>
   .navbar {
     height: auto;
-    overflow: hidden;
-  }
-
-  ul li {
-    display: block;
   }
 
   ul li button {
-    font-size: 12px;
-    display: flex;
-    width: 100%;
-    border: 0px;
     background-color: var(--blackColor);
   }
 
   ul li button:hover {
-    width: 100%;
     color: var(--white-color);
     border-radius: 8px;
     background-color: var(--right-click-menu);

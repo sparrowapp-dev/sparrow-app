@@ -129,7 +129,7 @@
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
       <div class="d-flex overflow-hidden justify-content-between">
-        <h4 class="ellipsis overflow-hidden">{workspace.name}</h4>
+        <h4 class="ellipsis overflow-hidden me-4">{workspace.name}</h4>
       </div>
       <p
         class="teams-workspace__para mb-1"
