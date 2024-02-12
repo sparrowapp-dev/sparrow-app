@@ -1,6 +1,5 @@
 <script lang="ts">
   import { ThreeDotIcon } from "$lib/assets/app.asset";
-  import { ShowMoreOptions } from "$lib/components";
   import type { CurrentTeam } from "$lib/utils/interfaces";
   import { formatDateInString } from "$lib/utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
@@ -104,40 +103,52 @@
   />
 {/if}
 
-<Card
-  cardClassProp={"flex-grow-1 col-lg-5 col-md-10 pb-4 position-relative"}
-  cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
->
-  <button
-    class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-      ? 'threedot-active'
-      : ''}"
-    style="top:15px;
-    right:15px;"
-    on:click={(e) => rightClickContextMenu(e)}
+<div class="workspace-card-outer w-100">
+  <Card
+    cardClassProp={"flex-grow-1 col-lg-5 col-md-10 pb-4 position-relative"}
+    cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
   >
-    <ThreeDotIcon />
-  </button>
-  <div
-    class="bg-black workspace-card rounded p-4"
-    on:click={() => {
-      handleOpenWorkspace();
-    }}
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-  >
-    <div class="d-flex overflow-hidden justify-content-between">
-      <h4 class="ellipsis overflow-hidden">{workspace.name}</h4>
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+        ? 'threedot-active'
+        : ''}"
+      style="top:15px;
+      right:15px;"
+      on:click={(e) => rightClickContextMenu(e)}
+    >
+      <ThreeDotIcon />
+    </button>
+    <div
+      class="bg-black workspace-card rounded p-4"
+      on:click={() => {
+        handleOpenWorkspace();
+      }}
+      style={`${showMenu ? "background-color: #313233 !important;" : null}`}
+      on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    >
+      <div class="d-flex overflow-hidden justify-content-between">
+        <h4 class="ellipsis overflow-hidden">{workspace.name}</h4>
+      </div>
+      <p
+        class="teams-workspace__para mb-1"
+        style={`${showMenu ? "color: #999 !important;" : null}`}
+      >
+        <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS
+      </p>
+      <p
+        class="teams-workspace__date mb-0"
+        style={`${showMenu ? "color: #999 !important;" : null}`}
+      >
+        Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
+      </p>
     </div>
-    <p class="teams-workspace__para mb-1">
-      <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS
-    </p>
-    <p class="teams-workspace__date mb-0">
-      Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
-    </p>
-  </div>
-</Card>
+  </Card>
+</div>
 
 <style>
+  .workspace-card-outer {
+    display: contents;
+  }
   .workspace-card {
     z-index: 0 !important;
   }
@@ -164,6 +175,14 @@
     font-size: 14px;
     color: white;
   }
+  .threedot-icon-container {
+    visibility: hidden;
+    background-color: transparent;
+  }
+  .workspace-card-outer:hover .threedot-icon-container {
+    visibility: visible;
+  }
+
   .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
