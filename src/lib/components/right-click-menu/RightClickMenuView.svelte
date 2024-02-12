@@ -12,18 +12,18 @@
   let mouseY = 0;
 
   const calculateRightOptionHeight = () => {
-    if (noOfRows === 5) {
-      return [200, 180];
-    } else if (noOfRows === 4) {
-      return [160, 150];
-    } else if (noOfRows === 3) {
-      return [140, 120];
-    }
+    const baseHeight = 80; // Base height for each row
+    const extraHeight = 30; // Extra height for additional rows
+
+    const firstOptionHeight = baseHeight + (noOfRows - 1) * extraHeight;
+    const secondOptionHeight = firstOptionHeight - 20;
+
+    return [firstOptionHeight, secondOptionHeight];
   };
   const calculateRightOptionWidth = () => {
-    if (noOfColumns === 180) {
-      return [200, 180];
-    }
+    const firstOptionWidth = noOfColumns + 20;
+    const secondOptionWidth = noOfColumns;
+    return [firstOptionWidth, secondOptionWidth];
   };
 
   const calculateAdjustedAxis = () => {

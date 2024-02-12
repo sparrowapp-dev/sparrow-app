@@ -133,13 +133,17 @@
       </div>
       <p
         class="teams-workspace__para mb-1"
-        style={`${showMenu ? "color: var(--border-color) !important;" : null}`}
+        style={`${
+          showMenu ? "color: var(--sparrow-text-color) !important;" : null
+        }`}
       >
         <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS
       </p>
       <p
         class="teams-workspace__date mb-0"
-        style={`${showMenu ? "color: var(--border-color) !important;" : null}`}
+        style={`${
+          showMenu ? "color: var(--sparrow-text-color) !important;" : null
+        }`}
       >
         Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
       </p>
@@ -159,7 +163,7 @@
   }
   .workspace-card:hover .teams-workspace__para,
   .workspace-card:hover .teams-workspace__date {
-    color: #999 !important;
+    color: var(--sparrow-text-color) !important;
   }
   .teams-workspace__para {
     font-size: 12px;
