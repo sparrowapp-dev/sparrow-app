@@ -60,6 +60,7 @@ $sparrow-editor-angle-bracket-color: #636566;
 $sparrow-editor-tag-color: #246BB8;
 $sparrow-editor-string-color: #CE9178;
 $sparrow-email-invite-bg-color:#1E1E1E;
+$sparrow-dropdown-border-color:rgb(44, 44, 44);
 $sparrow-small-text-size: 0.75rem;
 $sparrow-base-text-size: 0.875rem;
 $sparrow-medium-text-size: 1.125rem;
@@ -158,6 +159,7 @@ $theme-colors: map-merge(
     "dullBackground": $sparrow-dull-background,
     "sparrowBottomBorder": $sparrow-bottom-border,
     "emailInviteBackgroundColor":$sparrow-email-invite-bg-color
+    "dropdownBorderColor":$sparrow-dropdown-border-color
   )
 );
 

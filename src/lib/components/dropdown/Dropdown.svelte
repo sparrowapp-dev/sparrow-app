@@ -117,7 +117,6 @@
           element.style[stylesObj.styleKey] = stylesObj.styleValue;
         }
       });
-
   }
   const countCheckedList = (list: any[]) => {
     let count = 0;
@@ -225,7 +224,7 @@
     {/if}
   </div>
   <div
-    class="d-none dropdown-data rounded dropdown-menu"
+    class="d-none dropdown-data border-1 border-dropdownBorderColor rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
   >
@@ -280,7 +279,6 @@
   .dropdown-btn {
     background: none;
     outline: none;
-    border: none;
     height: 26px;
     width: auto;
     padding: 0 10px;
@@ -289,7 +287,6 @@
   .dropdown-data {
     color: white;
     position: absolute;
-    border: 1px solid rgb(44, 44, 44);
     z-index: 2;
     background-color: var(--blackColor);
     -webkit-backdrop-filter: blur(10px);
