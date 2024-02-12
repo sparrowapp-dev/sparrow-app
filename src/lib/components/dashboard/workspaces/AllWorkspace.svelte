@@ -16,6 +16,7 @@
   import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
   import Table from "../../table/Table.svelte";
+  import Rows from "../rows/Rows.svelte";
 
   export let userId: string;
   export let data: any;
@@ -25,6 +26,7 @@
   export let activeSideBarTabMethods: any;
   export let handleWorkspaceTab: any;
   export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+  export let userType;
 
   let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
@@ -141,7 +143,7 @@
     {/if}
     <div
       class="table-container sparrow-thin-scrollbar overflow-y-auto"
-      style="max-height: 60vh; height: auto;"
+      style="max-height: calc(100vh - 355px); height: auto;"
     >
       <Table
         tableClassProps="table p-0 table-responsive bg-backgroundColor w-100"
@@ -152,7 +154,7 @@
         contributorsCount={$currOpenedTeamRxDoc?._data?.users?.length}
         headerObject={tableHeaderContent}
       >
-        <tbody class="overflow-y-auto position-relative">
+        <tbody class="overflow-y-auto position-relative z-0">
           {#if $data}
             {#each $data
               .slice()
@@ -162,184 +164,19 @@
                     .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
-              <ShowMoreOptions
-                showMenu={isShowMoreVisible == index}
-                menuItems={menuItems(list, index)}
-                leftDistance={pos.x}
-                topDistance={pos.y}
+              <Rows
+                {list}
+                {currOpenedTeamRxDoc}
+                {handleOpenCollection}
+                {calculateTimeDifferenceInDays}
+                {WorkspaceMemberRole}
+                {userType}
               />
-
-              <tr
-                class="workspace-list-item cursor-pointer ellipsis w-100"
-                on:contextmenu|preventDefault={(e) =>
-                  rightClickContextMenu(e, index)}
-                on:click={(e) => {
-                  e.stopPropagation();
-                  !isShowMoreVisible
-                    ? handleOpenCollection(list)
-                    : isShowMoreVisible && handleShowMore(index);
-                }}
-              >
-                <td
-                  style="max-width: 15vw; padding-right: 10px;"
-                  class="tab-data rounded-start py-3 overflow-hidden ellipsis"
-                  >{list?.name}</td
-                >
-
-                <td class="tab-data py-3"
-                  >{list?.collections?.length ? list.collections.length : 0}</td
-                >
-                {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
-                  <td class="tab-data py-3">
-                    <div class="d-flex">
-                      <UserProfileList
-                        width={24}
-                        height={25}
-                        borderRadius={24}
-                        users={list?.users?.filter(
-                          (user) =>
-                            user.role === WorkspaceMemberRole.ADMIN ||
-                            user.role === WorkspaceMemberRole.EDITOR,
-                        )}
-                        maxProfiles={3}
-                        classProp="position-absolute"
-                      />
-                    </div>
-                  </td>
-                {/if}
-                <td class="tab-data py-3"
-                  >{calculateTimeDifferenceInDays(
-                    new Date(),
-                    new Date(list?.createdAt),
-                  )}</td
-                >
-                <td class="tab-data rounded-end py-3"
-                  ><button
-                    class="{isShowMoreVisible == index
-                      ? 'bg-plusButton'
-                      : ''} show-more-btn rounded border-0"
-                    on:click={(e) => {
-                      handleShowMore(
-                        isShowMoreVisible == index ? undefined : index,
-                      );
-                      e.stopPropagation();
-                    }}><ShowMoreIcon /></button
-                  ></td
-                >
-              </tr>
             {/each}
           {/if}
         </tbody>
-        {#if $data
-          .slice()
-          .reverse()
-          .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
-          .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
-          <tfoot class="position-sticky bottom-0">
-            <tr>
-              <th class="tab-head"
-                >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
-                  currPage * workspacePerPage,
-                  $data?.filter(
-                    (item) =>
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
-                  ).length,
-                )} of {$data?.filter(
-                  (item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()) &&
-                    item.team.teamId == openedTeam.id,
-                ).length}
-              </th>
-              <th class="tab-head gap-2">
-                <button
-                  on:click={() => (currPage = 1)}
-                  class="bg-transparent border-0"
-                  ><DoubleLeftIcon
-                    color={currPage === 1 ? "#313233" : "white"}
-                  /></button
-                >
-                <button
-                  on:click={() => {
-                    if (currPage > 1) currPage -= 1;
-                  }}
-                  class="bg-transparent border-0"
-                  ><LeftIcon
-                    color={currPage === 1 ? "#313233" : "white"}
-                  /></button
-                >
-                <button
-                  on:click={() => {
-                    if (
-                      currPage <
-                      Math.ceil(
-                        $data?.filter(
-                          (item) =>
-                            item.name
-                              .toLowerCase()
-                              .startsWith(filterText.toLowerCase()) &&
-                            item.team.teamId == openedTeam.id,
-                        ).length / workspacePerPage,
-                      )
-                    )
-                      currPage += 1;
-                  }}
-                  class="bg-transparent border-0"
-                  ><RightIcon
-                    color={currPage ===
-                    Math.ceil(
-                      $data?.filter(
-                        (item) =>
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
-                      ).length / workspacePerPage,
-                    )
-                      ? "#313233"
-                      : "white"}
-                  /></button
-                >
-                <button
-                  on:click={() =>
-                    (currPage = Math.ceil(
-                      $data?.filter(
-                        (item) =>
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
-                      ).length / workspacePerPage,
-                    ))}
-                  class="bg-transparent border-0"
-                  ><DoubleRightIcon
-                    color={currPage ===
-                    Math.ceil(
-                      $data?.filter(
-                        (item) =>
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
-                      ).length / workspacePerPage,
-                    )
-                      ? "#313233"
-                      : "white"}
-                  /></button
-                >
-              </th>
-              <th class="tab-head"></th>
-              <th class="tab-head"></th>
-            </tr>
-          </tfoot>
-        {/if}
       </Table>
+
       {#if $data && $data
           .slice()
           .filter((item) => item.team.teamId == openedTeam.id).length == 0}
@@ -354,6 +191,117 @@
         <p class="not-found-text mt-3">No results found.</p>
       {/if}
     </div>
+
+    {#if $data
+      .slice()
+      .reverse()
+      .filter((item) => item.name
+            .toLowerCase()
+            .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+      .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
+      <table class="w-100">
+        <tfoot class="bottom-0">
+          <tr class="d-flex justify-content-between">
+            <th class="tab-head"
+              >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
+                currPage * workspacePerPage,
+                $data?.filter(
+                  (item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()) &&
+                    item.team.teamId == openedTeam.id,
+                ).length,
+              )} of {$data?.filter(
+                (item) =>
+                  item.name
+                    .toLowerCase()
+                    .startsWith(filterText.toLowerCase()) &&
+                  item.team.teamId == openedTeam.id,
+              ).length}
+            </th>
+            <th class="tab-head" style="">
+              <button
+                on:click={() => (currPage = 1)}
+                class="bg-transparent border-0"
+                ><DoubleLeftIcon
+                  color={currPage === 1 ? "#313233" : "white"}
+                /></button
+              >
+              <button
+                on:click={() => {
+                  if (currPage > 1) currPage -= 1;
+                }}
+                class="bg-transparent border-0"
+                ><LeftIcon
+                  color={currPage === 1 ? "#313233" : "white"}
+                /></button
+              >
+              <button
+                on:click={() => {
+                  if (
+                    currPage <
+                    Math.ceil(
+                      $data?.filter(
+                        (item) =>
+                          item.name
+                            .toLowerCase()
+                            .startsWith(filterText.toLowerCase()) &&
+                          item.team.teamId == openedTeam.id,
+                      ).length / workspacePerPage,
+                    )
+                  )
+                    currPage += 1;
+                }}
+                class="bg-transparent border-0"
+                ><RightIcon
+                  color={currPage ===
+                  Math.ceil(
+                    $data?.filter(
+                      (item) =>
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()) &&
+                        item.team.teamId == openedTeam.id,
+                    ).length / workspacePerPage,
+                  )
+                    ? "#313233"
+                    : "white"}
+                /></button
+              >
+              <button
+                on:click={() =>
+                  (currPage = Math.ceil(
+                    $data?.filter(
+                      (item) =>
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()) &&
+                        item.team.teamId == openedTeam.id,
+                    ).length / workspacePerPage,
+                  ))}
+                class="bg-transparent border-0"
+                ><DoubleRightIcon
+                  color={currPage ===
+                  Math.ceil(
+                    $data?.filter(
+                      (item) =>
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()) &&
+                        item.team.teamId == openedTeam.id,
+                    ).length / workspacePerPage,
+                  )
+                    ? "#313233"
+                    : "white"}
+                /></button
+              >
+            </th>
+            <th class="tab-head px-5 ms-5"></th>
+          </tr>
+        </tfoot>
+      </table>
+    {/if}
   </div>
 {/if}
 
@@ -425,5 +373,8 @@
   .workspace-list-item:hover {
     cursor: pointer !important;
     background-color: var(--border-color);
+  }
+  table {
+    background-color: transparent;
   }
 </style>
