@@ -225,7 +225,7 @@
                 on:click={() => (currPage = 1)}
                 class="bg-transparent border-0"
                 ><DoubleLeftIcon
-                  color={currPage === 1 ? "#313233" : "white"}
+                  color={currPage === 1 ? "var(--border-color)" : "white"}
                 /></button
               >
               <button
@@ -234,7 +234,7 @@
                 }}
                 class="bg-transparent border-0"
                 ><LeftIcon
-                  color={currPage === 1 ? "#313233" : "white"}
+                  color={currPage === 1 ? "var(--border-color)" : "white"}
                 /></button
               >
               <button
@@ -265,7 +265,7 @@
                         item.team.teamId == openedTeam.id,
                     ).length / workspacePerPage,
                   )
-                    ? "#313233"
+                    ? "var(--border-color)"
                     : "white"}
                 /></button
               >
@@ -292,7 +292,7 @@
                         item.team.teamId == openedTeam.id,
                     ).length / workspacePerPage,
                   )
-                    ? "#313233"
+                    ? "var(--border-color)"
                     : "white"}
                 /></button
               >

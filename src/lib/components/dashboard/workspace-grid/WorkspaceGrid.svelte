@@ -123,7 +123,9 @@
       on:click={() => {
         handleOpenWorkspace();
       }}
-      style={`${showMenu ? "background-color: #313233 !important;" : null}`}
+      style={`${
+        showMenu ? "background-color: var(--border-color) !important;" : null
+      }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
       <div class="d-flex overflow-hidden justify-content-between">
@@ -131,13 +133,13 @@
       </div>
       <p
         class="teams-workspace__para mb-1"
-        style={`${showMenu ? "color: #999 !important;" : null}`}
+        style={`${showMenu ? "color: var(--border-color) !important;" : null}`}
       >
         <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS
       </p>
       <p
         class="teams-workspace__date mb-0"
-        style={`${showMenu ? "color: #999 !important;" : null}`}
+        style={`${showMenu ? "color: var(--border-color) !important;" : null}`}
       >
         Last updated on <span>{formatDateInString(workspace?.createdAt)}</span>
       </p>
@@ -153,7 +155,7 @@
     z-index: 0 !important;
   }
   .workspace-card:hover {
-    background-color: #313233 !important;
+    background-color: var(--border-color) !important;
   }
   .workspace-card:hover .teams-workspace__para,
   .workspace-card:hover .teams-workspace__date {

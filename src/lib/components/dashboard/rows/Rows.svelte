@@ -139,11 +139,9 @@
   >
   <td class="tab-data rounded-end py-3">
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
         ? 'threedot-active'
         : ''}"
-      style="top:10px;
-          right:60px;"
       on:click={(e) => {
         rightClickContextMenu(e);
       }}
@@ -154,6 +152,9 @@
 </tr>
 
 <style>
+  tr:hover {
+    background-color: var(--background-light);
+  }
   .workspace-list-item td {
     background-color: transparent;
   }

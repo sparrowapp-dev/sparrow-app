@@ -65,8 +65,9 @@
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
-            style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-            >{item.displayText}</button
+            style={item.displayText === "Delete"
+              ? "color: var(--request-delete)"
+              : ""}>{item.displayText}</button
           >
         </li>
       {/each}
@@ -96,6 +97,6 @@
     width: 100%;
     color: var(--white-color);
     border-radius: 8px;
-    background-color: #232527;
+    background-color: var(--right-click-menu);
   }
 </style>
