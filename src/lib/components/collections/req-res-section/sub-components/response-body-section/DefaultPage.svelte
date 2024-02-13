@@ -3,6 +3,17 @@
   import { isHorizontal } from "$lib/store/request-response-section";
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));
+  const ctrlCommands = {
+    "Send Request": "ctrl + Enter",
+    "Save Request": "ctrl + S",
+    "New Request": "ctrl + N",
+  };
+  const altCommands = {
+    "Edit link": "alt + L",
+    "Add Parameter": "alt + P",
+    "Add Header": "alt + H",
+    "Edit Body": "alt + B",
+  };
 </script>
 
 <div
@@ -33,50 +44,24 @@
         ? "d-flex flex-column align-items-start justify-content-between"
         : ""}
     >
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center text-left justify-content-between gap-5 mb-2 mt-2"}
-        key={"Send Request"}
-        value={"ctrl + Enter"}
-        type="combo"
-      />
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"Save Request"}
-        value={"ctrl + S"}
-        type="combo"
-      />
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"New Request"}
-        value={"ctrl + N"}
-        type="combo"
-      />
+      {#each Object.entries(ctrlCommands) as [key, value]}
+        <ComboText
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          {key}
+          {value}
+          type="combo"
+        />
+      {/each}
     </div>
     <div class={isHorizontalMode ? "d-flex flex-column" : "d-flex flex-column"}>
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"Edit link"}
-        value={"alt + L"}
-        type="combo"
-      />
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"Add Parameter"}
-        value={"alt + P"}
-        type="combo"
-      />
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"Add Header"}
-        value={"alt + H"}
-        type="combo"
-      />
-      <ComboText
-        comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
-        key={"Edit Body"}
-        value={"alt + B"}
-        type="combo"
-      />
+      {#each Object.entries(altCommands) as [key, value]}
+        <ComboText
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          {key}
+          {value}
+          type="combo"
+        />
+      {/each}
     </div>
   </div>
 </div>

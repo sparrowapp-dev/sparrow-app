@@ -31,7 +31,7 @@
     </button>
   {:else}
     <div
-      class={`${singleTextClassProp} api-type sparrow-fs-12`}
+      class={`${singleTextClassProp} api-type sparrow-fs-12 border border-1 fw-medium me-1`}
       style={`${singleTextStyleProp}`}
     >
       <span class={`${valueClassProp}`} style={`${valueStyleProp}`}
@@ -45,11 +45,7 @@
   .api-type {
     height: 34px;
     width: 56px;
-    border: 1px solid #313233;
-    margin-right: 5px;
-  }
-  .api-type span {
-    font-weight: 500;
+    border-color: var(--border-color) !important;
   }
   .shortcut-btn-api {
     width: 120px;
