@@ -4,3 +4,5 @@ export * from "./environment.enum";
 export * from "./item-type.enum";
 export * from "./mixpanel-events.enum";
 export * from "./request.enum";
+export * from "./team.enum";
+export * from "./workspace.enum";

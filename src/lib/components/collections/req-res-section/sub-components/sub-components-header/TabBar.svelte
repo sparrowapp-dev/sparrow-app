@@ -19,11 +19,14 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;
   export let tabList: TabDocument[];
   export let _tabId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab;
   let movedTabStartIndex: number;
   let movedTabEndIndex: number;
@@ -172,7 +175,14 @@
   </div>
 </div>
 
-{#if saveAsVisibility}
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={saveAsVisibility}
+  handleModalState={handleSaveAsBackdrop}
+>
   <SaveRequest
     {collectionsMethods}
     {_tabId}
@@ -182,8 +192,16 @@
     }}
     onClick={handleSaveAsBackdrop}
   />
-{/if}
-{#if closePopup}
+</ModalWrapperV1>
+
+<ModalWrapperV1
+  title={"Save Changes"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={closePopup}
+  handleModalState={handleClosePopupBackdrop}
+>
   <ClosePopup
     {collectionsMethods}
     onFinish={(_id) => {
@@ -192,8 +210,9 @@
     componentData={removeTab}
     {handleSaveAsBackdrop}
     closeCallback={handleClosePopupBackdrop}
+    {loggedUserRoleInWorkspace}
   />
-{/if}
+</ModalWrapperV1>
 
 <style>
   .tabbar {

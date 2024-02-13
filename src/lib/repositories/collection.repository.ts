@@ -174,12 +174,12 @@ export class CollectionRepository {
       })
       .exec();
     const updatedItems = collection.toJSON().items.map((element) => {
-      if (element.id === uuid) {
+      if (element.id.toString() === uuid) {
         element = items;
       }
       return element;
     });
-    collection.incrementalModify((value) => {
+    await collection.incrementalModify((value) => {
       value.items = [...updatedItems];
       return value;
     });

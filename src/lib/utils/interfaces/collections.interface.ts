@@ -1,6 +1,11 @@
 import type { CollectionDocument } from "$lib/database/app.database";
 
-import type { CreateApiRequestPostBody, CreateDirectoryPostBody } from "../dto";
+import type {
+  CreateApiRequestPostBody,
+  CreateDirectoryPostBody,
+  EnvironmentResponseDto,
+  UpdateEnvironmentPostBody,
+} from "../dto";
 import type { Observable } from "rxjs";
 import type { Collection } from "./request.interface";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -97,4 +102,10 @@ export interface CollectionsMethods {
     environmentId: string,
   ) => void;
   currentEnvironment: (environmentId: string) => any;
+  updateEnvironment: (
+    workspaceId: string,
+    environmentId: string,
+    environment: UpdateEnvironmentPostBody,
+  ) => Promise<EnvironmentResponseDto>;
+  getGlobalEnvironment: () => any;
 }

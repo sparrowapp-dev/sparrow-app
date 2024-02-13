@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
+import type { addUsersInWorkspace } from "$lib/utils/dto/workspace-dto";
+import type { WorkspaceRole } from "$lib/utils/enums";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 
 import type { Observable } from "rxjs";
@@ -177,12 +179,15 @@ export class WorkspaceRepository {
       })
       .exec();
     workspace.incrementalModify((value) => {
+      if (data._id) value._id = data._id;
       if (data.name) value.name = data.name;
+      if (data.description) value.description = data.description;
+      if (data.team) value.team = data.team;
       if (data.environmentId) value.environmentId = data.environmentId;
+      if (data.users) value.users = data.users;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
-      if (data.description) value.description = data.description;
       return value;
     });
   };
@@ -196,7 +201,101 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
+    await this.clearWorkspaces();
     await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
+  };
+
+  public updateUserRoleInWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    role: WorkspaceRole,
+  ): Promise<void> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    workspace._data.users.forEach((user) => {
+      if (user.id === userId) {
+        user.role = role;
+        return;
+      }
+    });
+
+    workspace.incrementalPatch({
+      users: [...workspace.users],
+    });
+  };
+  public deleteWorkspace = async (workspaceId: string): Promise<any> => {
+    const workspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    return await workspace.remove();
+  };
+  public addUserInWorkspace = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspace[],
+  ): Promise<void> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+
+    workspace.incrementalPatch({
+      users: addUsersInWorkspaceDto,
+    });
+  };
+
+  public isUserInMultipleWorkspaces = async (
+    userId: string,
+  ): Promise<boolean> => {
+    const workspaces: WorkspaceDocument[] = await RxDB.getInstance()
+      .rxdb.workspace.find()
+      .exec();
+    let userExistinWorkspacesCount = 0;
+    let isUserExistsinMutlpleWorkspaces = false;
+    workspaces.forEach((workspace) => {
+      workspace._data.users.forEach((user) => {
+        if (user.id === userId) {
+          userExistinWorkspacesCount += 1;
+          return;
+        }
+      });
+      if (userExistinWorkspacesCount === 2) {
+        isUserExistsinMutlpleWorkspaces = true;
+        return;
+      }
+    });
+    return isUserExistsinMutlpleWorkspaces;
+  };
+
+  public removeUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<void> => {
+    const workspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    const filteredUsers = workspace._data.users.filter((user: any) => {
+      return user.id !== userId;
+    });
+
+    workspace.incrementalPatch({
+      users: filteredUsers,
+    });
   };
 }

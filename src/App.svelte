@@ -6,7 +6,7 @@
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
-  import Dashboard from "./pages/Dashboard/Dashboard.svelte";
+  import Dashboard from "./pages/dashboard/Dashboard.svelte";
   import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
   import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
   import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
@@ -18,7 +18,7 @@
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
 
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
 
   import { setUser, user } from "$lib/store/auth.store";
   import { listen } from "@tauri-apps/api/event";
@@ -31,11 +31,9 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
-  import ActiveSideBarTabViewModel from "./pages/Dashboard/ActiveSideBarTab.ViewModel";
 
   export let url = "/";
   const tabRepository = new TabRepository();
-  const _activeSidebarViewModel = new ActiveSideBarTabViewModel();
   let flag: boolean = true;
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());

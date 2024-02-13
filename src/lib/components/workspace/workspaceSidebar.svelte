@@ -1,55 +1,67 @@
 <script lang="ts">
-  import { user } from "$lib/store/auth.store";
-  import { onDestroy } from "svelte";
   import icons from "$lib/assets/app.asset";
+  export let  noOfCollections:number;
+  export let email:String;
+  export let handleWorkspaceTab:(tab:string)=>void;
+ </script>
+ 
+ 
 
-  let name: string = "";
-  let firstLetter;
-  const unsubscribeUser = user.subscribe((value) => {
-    if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
-      if (name) {
-        firstLetter = name[0];
-      }
-    }
-  });
+ 
+ <div
+   class="d-flex flex-column align-items-left justify-content-start"
+   style="width: 280px;border-left:2px solid #313233"
+ >
+   <div
+     class="d-flex flex-column text-whiteColor mt-4 ps-3 gap-1"
+     style="font-size: 12px;"
+   >
+     <button id="btn" on:click={()=>{handleWorkspaceTab("ABOUT")}}
+       class='d-flex align-items-center gap-2 mt-2 info-setting-hover rounded py-2 cursor-pointer'
+      style='background:transparent;border:none'>
+       <img src={icons.info} alt="info" class="ps-2" />
+       <p class="mb-0">About</p>
+     </button>
+     <button id="btn2" style="background:transparent;border:none" on:click={()=>{handleWorkspaceTab("SETTING")}}
+       class="d-flex align-items-center gap-2 info-setting-hover rounded py-2"
+     >
+       <img src={icons.setting} alt="settings" class="ps-2" />
+       <p class="mb-0">Workspace Settings</p>
+     </button>
+     <div class="mb-3 mt-2">
+       <img src={icons.line} alt="lineicon" />
+     </div>
+     <div class="d-flex flex-column">
+       <p class="fw-bold fs-6 text-textColor ps-3">Last Activity by</p>
+       <div class="d-flex align-items-center ps-3 gap-2">
+         <button
+           class="bg-backgroundColor border-0"
+           id="profile-dropdown"
+           style="width: 24px; height:24px;border-radius:50%"
+         >
+           <p
+             class="mb-0 profile-circle bg-plusButton text-black m-auto text-center d-flex align-items-center justify-content-center"
+             style="width: 100%; height: 100%; margin: 0;"
+           >
+            {email[0].toUpperCase()}
+           </p>
+         </button>
+         <p class="mb-0">{email}</p>
+       </div>
+     </div>
+   </div>
+   <div class="workspace-info gap-3 text-defaultColor">
+     <p>
+       <span class="me-1 fs-6 text-plusButton">{noOfCollections}</span
+       >COLLECTION
+     </p>
+   </div>
+ </div>
 
-  onDestroy(() => {
-    unsubscribeUser();
-  });
-</script>
 
-<div class="main-container">
-  <div class="sidebar w-100 p-4">
-    <div
-      class="d-flex align-items-center gap-2 mt-2 info-setting-hover rounded py-2 cursor-pointer"
-    >
-      <img src={icons.info} alt="info" class="ps-2" />
-      <p class="mb-0">About</p>
-    </div>
-    <div
-      class="d-flex align-items-center gap-2 info-setting-hover rounded py-2"
-    >
-      <img src={icons.setting} alt="settings" class="ps-2" />
-      <p class="mb-0">Workspace Settings</p>
-    </div>
-    <div class="border my-3 border-bottom border-dark" />
-    <div class="fs-6 p-2 pt-1">
-      <p class="text-secondary font-family-roboto fs-6 fw-bold">
-        Last Activity by
-      </p>
-      <p style="margin-top: -10px;">{name}</p>
-    </div>
-  </div>
-  <div class="workspace-info">
-    <p class="gap-2"><span class="api-info">{0}</span>API REQUESTS</p>
-    <p class="gap-2">
-      <span class="api-info">{0}</span>COLLECTION
-    </p>
-  </div>
-</div>
+
+
+
 
 <style>
   .main-container {
@@ -81,4 +93,18 @@
     font-size: 16px;
     padding-left: 10px;
   }
+  .profile-circle {
+       border-radius: 50%;
+     }
+     .info-setting-hover:hover {
+       background-color: var(--border-color);
+     }
+     .workspace-info {
+       position: fixed;
+       bottom: 0;
+       padding: 15px;
+       display: flex;
+       width: 100%;
+       font-size: 12px;
+     } 
 </style>

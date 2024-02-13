@@ -26,7 +26,20 @@
       isSelected={"workspaces" === activeSidebarTabName ? true : false}
       disabled={false}
     />
-    {#if $workspaces && $workspaces.length > 0}
+    {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
+          return workspace.isActiveWorkspace === true;
+        }, )}
+      <Tooltip title="Select A Workspace To Be Active" placement={"right"}>
+        <Helper
+          {activeSideBarTabMethods}
+          route=""
+          heading="Collections"
+          logo={collectionsFaded}
+          isSelected={"collections" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {:else if $workspaces && $workspaces.length > 0}
       <Helper
         {activeSideBarTabMethods}
         route="collections"
@@ -36,7 +49,7 @@
         disabled={false}
       />
     {:else}
-      <Tooltip text="Add New Workspace">
+      <Tooltip title="Add New Workspace" placement={"right"}>
         <Helper
           {activeSideBarTabMethods}
           route=""
@@ -57,7 +70,7 @@
         disabled={false}
       />
     {:else}
-      <Tooltip text="Add New Workspace">
+      <Tooltip title="Add New Workspace" placement={"right"}>
         <Helper
           {activeSideBarTabMethods}
           route={""}
@@ -78,7 +91,7 @@
     />
   </div>
   <div class="sidebar__secondary">
-    <Tooltip>
+    <Tooltip placement={"right"} title={"Coming Soon!"}>
       <div class="sidebar__container sidebar__container_background2">
         <div class="sidebar__container--icon pt-2">
           <HelpIcon />
@@ -88,7 +101,7 @@
         </div>
       </div>
     </Tooltip>
-    <Tooltip>
+    <Tooltip placement={"right"} title={"Coming Soon!"}>
       <div class="sidebar__container sidebar__container_background2">
         <div class="sidebar__container--icon pt-2">
           <SettingsIcon color={"#8A9299"} />
@@ -126,6 +139,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 45px;
   }
   .sidebar__container--text {
     font-family: Roboto;
