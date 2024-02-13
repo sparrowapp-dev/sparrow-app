@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\dropdown\Dropdown
+   * **/
   let visibilty = false;
   import plusIcon from "$lib/assets/plus.svg";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -69,7 +73,7 @@
   bind:this={container}
 >
   <Tooltip
-    text={PERMISSION_NOT_FOUND_TEXT}
+    title={PERMISSION_NOT_FOUND_TEXT}
     show={!hasWorkpaceLevelPermission(
       loggedUserRoleInWorkspace,
       workspaceLevelPermissions.ADD_COLLECTIONS,

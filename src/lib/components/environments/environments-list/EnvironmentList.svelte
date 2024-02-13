@@ -165,7 +165,7 @@
       {currentWorkspace?.name || ""}
     </h1>
     <Tooltip
-      text={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
+      title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
     >
       <button
         disabled={!hasWorkpaceLevelPermission(
@@ -207,7 +207,7 @@
         set of resources and constraints.
       </p>
       <Tooltip
-        text={PERMISSION_NOT_FOUND_TEXT}
+        title={PERMISSION_NOT_FOUND_TEXT}
         show={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_COLLECTIONS,

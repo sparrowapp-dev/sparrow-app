@@ -1,46 +1,18 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
-  export let text = "Coming Soon!",
-    classProp = "",
-    show = true;
-  let mouseX = 0,
-    mouseY = 0,
-    displayLeft = true,
-    displayBottom = true;
-  onMount(() => {
-    document.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
-  });
-
-  function handleMouseMove(event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    if (window.innerWidth / 2 < mouseX) displayLeft = false;
-    else displayLeft = true;
-    if (window.innerHeight / 2 < mouseY) displayBottom = true;
-    else displayBottom = false;
-  }
+  export let title = "Tooltip";
+  export let classProp = "";
+  export let styleProp = "";
+  export let show = true;
+  export let placement: "left" | "right" | "top" | "bottom" = "bottom";
 </script>
 
-<div class={"tooltip opacity-100 " + classProp}>
+<div class={"tooltip position-relative opacity-100 z-2"}>
   {#if show}
     <span
-      class="tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 z-1 opacity-0"
-      style={`${
-        displayLeft
-          ? `left: ${mouseX}px; `
-          : `right: ${window.innerWidth - mouseX}px; `
-      }` +
-        `${
-          displayBottom
-            ? `bottom: ${window.innerHeight - mouseY}px; `
-            : `top: ${mouseY}px; `
-        }`}
-      >{text}
+      class={`tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 opacity-0 z-1
+    ${placement.toString()} ${classProp}  `}
+      style={styleProp}
+      >{title}
     </span>
   {/if}
 
@@ -51,9 +23,30 @@
   .tooltip {
     z-index: 1 !important;
   }
+  .top {
+    top: -5px;
+    left: 50%;
+    transform: translateY(-100%) translateX(-50%);
+  }
+  .left {
+    left: -5px;
+    top: 50%;
+    transform: translateX(-100%) translateY(-50%);
+  }
+  .right {
+    right: -5px;
+    top: 50%;
+    transform: translateX(100%) translateY(-50%);
+  }
+  .bottom {
+    bottom: -5px;
+    left: 50%;
+    transform: translateY(100%) translateX(-50%);
+  }
   .tooltip-text {
     font-family: Roboto;
     transition: opacity 0.3s;
+    width: max-content;
   }
 
   .tooltip:hover .tooltip-text {

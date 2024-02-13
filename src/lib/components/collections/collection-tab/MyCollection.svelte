@@ -135,7 +135,7 @@
     style="width:calc(100% - 280px); margin-top: 15px;"
   >
     <Tooltip
-      text={PERMISSION_NOT_FOUND_TEXT}
+      title={PERMISSION_NOT_FOUND_TEXT}
       show={!hasWorkpaceLevelPermission(
         loggedUserRoleInWorkspace,
         workspaceLevelPermissions.SAVE_REQUEST,
@@ -150,6 +150,10 @@
           id="renameInputFieldCollection"
           value={tabName}
           class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )}
           on:input={(event) => {
             handleCollectionInput(event);
           }}
@@ -180,7 +184,7 @@
       </div>
     </div>
     <Tooltip
-      text={PERMISSION_NOT_FOUND_TEXT}
+      title={PERMISSION_NOT_FOUND_TEXT}
       show={!hasWorkpaceLevelPermission(
         loggedUserRoleInWorkspace,
         workspaceLevelPermissions.EDIT_COLLECTION_DESC,

@@ -522,7 +522,7 @@
     {#if showFolderAPIButtons}
       <Tooltip
         classProp="mt-2 mb-2"
-        text={PERMISSION_NOT_FOUND_TEXT}
+        title={PERMISSION_NOT_FOUND_TEXT}
         show={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.SAVE_REQUEST,

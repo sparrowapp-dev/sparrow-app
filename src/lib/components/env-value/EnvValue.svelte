@@ -147,14 +147,12 @@
       class="form-check-input-container"
       style="width:27.5px; margin-top: -3px;"
     >
-      <Tooltip text={`${controller ? "Unselect" : "Select"}`}>
-        <input
-          class="form-check-input"
-          type="checkbox"
-          on:input={handleCheckAll}
-          bind:checked={controller}
-        />
-      </Tooltip>
+      <input
+        class="form-check-input"
+        type="checkbox"
+        on:input={handleCheckAll}
+        bind:checked={controller}
+      />
     </div>
     <div
       class="d-flex pe-5 text-requestBodyColor align-items-center w-100"
@@ -185,20 +183,20 @@
             <div class="form-check-input-container" style="width:30px;">
               <input class="form-check-input" type="checkbox" disabled />
             </div>
-
-            <div class="w-100 d-flex gap-2">
-              <div class="flex-grow-1 w-100">
-                <div class="bg-keyValuePairColor d-flex rounded">
-                  <Tooltip
-                    text={PERMISSION_NOT_FOUND_TEXT}
-                    show={!hasWorkpaceLevelPermission(
-                      loggedUserRoleInWorkspace,
-                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                    )}
-                  >
+            <Tooltip
+              classProp="w-100 d-flex gap-2"
+              title={PERMISSION_NOT_FOUND_TEXT}
+              show={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.EDIT_ENVIRONMENT,
+              )}
+            >
+              <div class="w-100 d-flex gap-2">
+                <div class="flex-grow-1 w-100">
+                  <div class="bg-keyValuePairColor d-flex rounded">
                     <input
                       type="text"
-                      placeholder="Enter Variable2"
+                      placeholder="Enter Variable"
                       class="form-control py-1"
                       style="font-size: 13px;"
                       disabled={!hasWorkpaceLevelPermission(
@@ -207,39 +205,39 @@
                       )}
                       bind:value={readable.key}
                     />
-                  </Tooltip>
-                  <div class="me-2 my-auto edit-icon">
-                    <EditIcon />
+                    <div class="me-2 my-auto edit-icon">
+                      <EditIcon />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="flex-grow-1 w-100">
-                <div class="bg-keyValuePairColor d-flex rounded">
-                  <Tooltip
-                    text={PERMISSION_NOT_FOUND_TEXT}
-                    show={!hasWorkpaceLevelPermission(
-                      loggedUserRoleInWorkspace,
-                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                    )}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Enter Value"
-                      class="form-control py-1"
-                      style="font-size: 13px;"
-                      disabled={!hasWorkpaceLevelPermission(
+                <div class="flex-grow-1 w-100">
+                  <div class="bg-keyValuePairColor d-flex rounded">
+                    <Tooltip
+                      title={PERMISSION_NOT_FOUND_TEXT}
+                      show={!hasWorkpaceLevelPermission(
                         loggedUserRoleInWorkspace,
                         workspaceLevelPermissions.EDIT_ENVIRONMENT,
                       )}
-                      bind:value={readable.value}
-                    />
-                  </Tooltip>
-                  <div class="me-2 my-auto edit-icon">
-                    <EditIcon />
+                    >
+                      <input
+                        type="text"
+                        placeholder="Enter Value"
+                        class="form-control py-1"
+                        style="font-size: 13px;"
+                        disabled={!hasWorkpaceLevelPermission(
+                          loggedUserRoleInWorkspace,
+                          workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                        )}
+                        bind:value={readable.value}
+                      />
+                    </Tooltip>
+                    <div class="me-2 my-auto edit-icon">
+                      <EditIcon />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Tooltip>
             <div class="h-75 pe-1">
               <button class="bg-backgroundColor border-0" style="width:40px;" />
             </div>
@@ -277,62 +275,52 @@
                   />
                 {/if}
               </div>
-              <Tooltip
-                classProp="w-100 d-flex gap-2"
-                text={PERMISSION_NOT_FOUND_TEXT}
-                show={!hasWorkpaceLevelPermission(
-                  loggedUserRoleInWorkspace,
-                  workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                )}
-              >
-                <div class="w-100 d-flex gap-2">
-                  <div class="flex-grow-1 w-100">
-                    <div
-                      class="bg-keyValuePairColor input-container d-flex rounded"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Enter Variable2"
-                        class="form-control py-1"
-                        style="font-size: 13px;"
-                        disabled={!hasWorkpaceLevelPermission(
-                          loggedUserRoleInWorkspace,
-                          workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                        )}
-                        bind:value={element.key}
-                        on:input={(e) => {
-                          updateParam(index);
-                        }}
-                      />
-                      <div class="me-2 my-auto edit-icon">
-                        <EditIcon />
-                      </div>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 w-100">
-                    <div class="bg-keyValuePairColor d-flex rounded">
-                      <input
-                        type="text"
-                        placeholder="Enter Value2"
-                        class="form-control py-1"
-                        style="font-size: 13px;"
-                        disabled={!hasWorkpaceLevelPermission(
-                          loggedUserRoleInWorkspace,
-                          workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                        )}
-                        bind:value={element.value}
-                        on:input={() => {
-                          updateParam(index);
-                        }}
-                      />
-                      <div class="me-2 my-auto edit-icon">
-                        <EditIcon />
-                      </div>
+              <div class="w-100 d-flex gap-2">
+                <div class="flex-grow-1 w-100">
+                  <div
+                    class="bg-keyValuePairColor input-container d-flex rounded"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter Variable"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={!hasWorkpaceLevelPermission(
+                        loggedUserRoleInWorkspace,
+                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                      )}
+                      bind:value={element.key}
+                      on:input={(e) => {
+                        updateParam(index);
+                      }}
+                    />
+                    <div class="me-2 my-auto edit-icon">
+                      <EditIcon />
                     </div>
                   </div>
                 </div>
-              </Tooltip>
-
+                <div class="flex-grow-1 w-100">
+                  <div class="bg-keyValuePairColor d-flex rounded">
+                    <input
+                      type="text"
+                      placeholder="Enter Value"
+                      class="form-control py-1"
+                      style="font-size: 13px;"
+                      disabled={!hasWorkpaceLevelPermission(
+                        loggedUserRoleInWorkspace,
+                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                      )}
+                      bind:value={element.value}
+                      on:input={() => {
+                        updateParam(index);
+                      }}
+                    />
+                    <div class="me-2 my-auto edit-icon">
+                      <EditIcon />
+                    </div>
+                  </div>
+                </div>
+              </div>
               {#if filteredKeyValuePairs.length - 1 != index}
                 <div class="h-75 pe-1 d-flex">
                   <button

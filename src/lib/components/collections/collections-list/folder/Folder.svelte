@@ -29,8 +29,12 @@
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    workspaceLevelPermissions,
+    PERMISSION_NOT_FOUND_TEXT,
+  } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   let expand: boolean = false;
   export let explorer;
@@ -465,17 +469,26 @@
       {/each}
       {#if showFolderAPIButtons}
         <div class="mt-2 mb-2 ms-0">
-          <img
-            class="list-icons"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={() => {
-              handleAPIClick();
-              MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                source: "Side Panel Collection List",
-              });
-            }}
-          />
+          <Tooltip
+            classProp="mt-2 mb-2 ms-0"
+            title={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
+          >
+            <img
+              class="list-icons"
+              src={requestIcon}
+              alt="+ API Request"
+              on:click={() => {
+                handleAPIClick();
+                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                  source: "Side Panel Collection List",
+                });
+              }}
+            />
+          </Tooltip>
         </div>
       {/if}
     </div>

@@ -179,15 +179,17 @@
       <button class="bg-backgroundColor border-0">
         <p class="">
           <Dropdown
-            title={apiData.addTo}
+           dropDownType={{type:"text",title:apiData.addTo}}
             data={[
               {
                 name: "Header",
                 id: AuthSection.HEADER,
+                dynamicClasses:"text-whiteColor"
               },
               {
                 name: "Query Parameter",
                 id: AuthSection.QUERY_PARAMETER,
+                dynamicClasses:"text-whiteColor"
               },
             ]}
             onclick={handleDropdown}

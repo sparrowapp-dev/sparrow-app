@@ -126,7 +126,7 @@
             >
           </button>
           <Tooltip
-            text={PERMISSION_NOT_FOUND_TEXT}
+            title={PERMISSION_NOT_FOUND_TEXT}
             show={!hasWorkpaceLevelPermission(
               loggedUserRoleInWorkspace,
               workspaceLevelPermissions.ADD_ENVIRONMENT,

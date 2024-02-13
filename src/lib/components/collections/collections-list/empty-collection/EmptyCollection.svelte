@@ -59,7 +59,7 @@ font-weight: 300;"
     </p>
     <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
       <Tooltip
-        text={PERMISSION_NOT_FOUND_TEXT}
+        title={PERMISSION_NOT_FOUND_TEXT}
         show={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,

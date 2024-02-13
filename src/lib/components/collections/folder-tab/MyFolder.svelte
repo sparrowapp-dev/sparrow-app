@@ -137,7 +137,7 @@
     style="width:calc(100% - 280px); margin-top: 15px;"
   >
     <Tooltip
-      text={PERMISSION_NOT_FOUND_TEXT}
+      title={PERMISSION_NOT_FOUND_TEXT}
       show={!hasWorkpaceLevelPermission(
         loggedUserRoleInWorkspace,
         workspaceLevelPermissions.SAVE_REQUEST,
@@ -175,7 +175,7 @@
       </div>
     </div>
     <Tooltip
-      text={PERMISSION_NOT_FOUND_TEXT}
+      title={PERMISSION_NOT_FOUND_TEXT}
       show={!hasWorkpaceLevelPermission(
         loggedUserRoleInWorkspace,
         workspaceLevelPermissions.EDIT_FOLDER_DESC,
