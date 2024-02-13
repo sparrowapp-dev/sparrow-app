@@ -39,8 +39,6 @@
     emailContainer.removeChild(removeElement);
     emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
     invalidEmails = invalidEmails.filter((e) => e != email);
-    console.log(emailstoBeSentArr);
-    console.log(invalidEmails);
   }
 
   const handleEmailOnAdd = (email: string) => {

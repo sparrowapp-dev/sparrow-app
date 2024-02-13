@@ -7,7 +7,6 @@
     isApiCreatedFirstTime,
   } from "$lib/store/request-response-section";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { MyFolderViewModel } from "./MyFolder.viewModel";
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
@@ -30,12 +29,15 @@
   let isLoading: boolean = false;
   let collapsExpandToggle: boolean = false;
   let tabName: string = "";
+  let collectionDescription = "";
+  let folderDescription = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
   let newFolderName = "";
   let newFolderDesc = "";
   let collectionId: string;
   let folderId: string;
+  let collectionArray = []
   const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
@@ -46,10 +48,10 @@
       folderId = event.path?.folderId;
     }
   });
-
   const collectionSubscribe = collections.subscribe(
     (collectionArr: CollectionDocument[]) => {
       if (collectionArr) {
+        collectionArray = collectionArr;
         collectionArr.forEach(async (collection) => {
           if (collection._data.id === collectionId) {
             const collectionData =
@@ -206,7 +208,6 @@
           }}
           on:blur={() => onUpdate("description")}
           on:keydown={onDescInputKeyPress}
-          bind:this={inputElement}
         />
       </div>
     </Tooltip>
