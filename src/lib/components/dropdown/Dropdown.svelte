@@ -10,7 +10,7 @@
   export let data: Array<{
     name: string;
     id: string;
-    dynamicClasses:string;
+    dynamicClasses: string;
     hide?: boolean;
     description?: string;
     selectedOptionClasses?: string;
