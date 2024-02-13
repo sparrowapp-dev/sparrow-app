@@ -28,21 +28,21 @@
     _collectionListViewModel.collection;
   let isLoading: boolean = false;
   let collapsExpandToggle: boolean = false;
-  let tabName: string = "";
+  let tabName = "";
+  let tabDescription = "";
   let collectionDescription = "";
   let folderDescription = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
-  let newFolderName = "";
-  let newFolderDesc = "";
   let collectionId: string;
   let folderId: string;
-  let collectionArray = []
+  let collectionArray = [];
   const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
+      tabDescription = event?.description;
       componentData = event;
       collectionId = event.path?.collectionId;
       folderId = event.path?.folderId;
@@ -66,17 +66,8 @@
     },
   );
 
-  const handleFolderInput = (event) => {
-    newFolderName = event.target.value;
-    collectionsMethods.updateTab(false, "save", componentData.path.folderId);
-  };
-
-  const handleFolderDesc = (event) => {
-    newFolderDesc = event.target.value;
-  };
-
-  const onUpdate = async (property: string) => {
-    const value = property === "name" ? newFolderName : newFolderDesc;
+  const onUpdate = async (property: string, event) => {
+    const value = event.target.value;
     await _myFolderViewModel.modifyFolder(
       componentData,
       property,
@@ -160,11 +151,8 @@
           id="renameInputFieldFolder"
           value={tabName}
           class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
-          on:input={(event) => {
-            handleFolderInput(event);
-          }}
           maxlength={100}
-          on:blur={() => onUpdate("name")}
+          on:blur={(event) => onUpdate("name", event)}
           on:keydown={onRenameInputKeyPress}
           bind:this={inputElement}
         />
@@ -202,11 +190,9 @@
           id="updateFolderDescField"
           style="font-size: 12px; "
           class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+          value={tabDescription}
           placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
-          on:input={(event) => {
-            handleFolderDesc(event);
-          }}
-          on:blur={() => onUpdate("description")}
+          on:blur={(event) => onUpdate("description", event)}
           on:keydown={onDescInputKeyPress}
         />
       </div>

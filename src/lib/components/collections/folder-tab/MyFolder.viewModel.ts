@@ -61,10 +61,8 @@ export class MyFolderViewModel {
       updateFolderElement.data.data,
     );
 
-    if (property === "name") {
-      collectionsMethods.updateTab(value, "name", componentData.path.folderId);
-      collectionsMethods.updateTab(true, "save", componentData.path.folderId);
-    }
+    collectionsMethods.updateTab(value, property, componentData.path.folderId);
+    collectionsMethods.updateTab(true, "save", componentData.path.folderId);
     Promise.resolve().then(() => {
       moveNavigation("right");
     });
