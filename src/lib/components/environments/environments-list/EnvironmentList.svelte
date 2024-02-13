@@ -153,7 +153,7 @@
     >
       {currentWorkspace?.name || ""}
     </h1>
-    <Tooltip text={`Add Environment`}>
+    <Tooltip title={`Add Environment`} placement={"bottom"}>
       <button
         class={`border-0 mx-3 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"

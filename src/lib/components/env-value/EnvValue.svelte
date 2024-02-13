@@ -10,7 +10,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import Tooltip from "../tooltip/Tooltip.svelte";
   type Mode = "READ" | "WRITE";
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   export let keyValue: EnvValuePair[];
   export let callback: (pairs: EnvValuePair[]) => void;
   export let mode: Mode = "WRITE";
@@ -144,14 +144,12 @@
       class="form-check-input-container"
       style="width:27.5px; margin-top: -3px;"
     >
-      <Tooltip text={`${controller ? "Unselect" : "Select"}`}>
-        <input
-          class="form-check-input"
-          type="checkbox"
-          on:input={handleCheckAll}
-          bind:checked={controller}
-        />
-      </Tooltip>
+      <input
+        class="form-check-input"
+        type="checkbox"
+        on:input={handleCheckAll}
+        bind:checked={controller}
+      />
     </div>
     <div
       class="d-flex pe-5 text-requestBodyColor align-items-center w-100"
@@ -191,7 +189,10 @@
                     placeholder="Enter Variable"
                     class="form-control py-1"
                     style="font-size: 13px;"
-                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
+                    disabled={!hasWorkpaceLevelPermission(
+                      loggedUserRoleInWorkspace,
+                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                    )}
                     bind:value={readable.key}
                   />
                   <div class="me-2 my-auto edit-icon">
@@ -206,7 +207,10 @@
                     placeholder="Enter Value"
                     class="form-control py-1"
                     style="font-size: 13px;"
-                    disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_ENVIRONMENT)}
+                    disabled={!hasWorkpaceLevelPermission(
+                      loggedUserRoleInWorkspace,
+                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                    )}
                     bind:value={readable.value}
                   />
                   <div class="me-2 my-auto edit-icon">

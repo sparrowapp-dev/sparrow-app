@@ -323,7 +323,7 @@
           </span>
         </div>
         <div>
-          <Tooltip>
+          <Tooltip placement={"bottom"} title={"Coming Soon!"}>
             <button
               disabled
               class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
