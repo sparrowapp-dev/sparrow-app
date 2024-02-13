@@ -64,6 +64,7 @@ $sparrow-dropdown-border-color:rgb(44, 44, 44);
 $sparrow-small-text-size: 0.75rem;
 $sparrow-base-text-size: 0.875rem;
 $sparrow-medium-text-size: 1.125rem;
+$sparrow-right-click-menu:#232527;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -118,6 +119,7 @@ $sparrow-medium-text-size: 1.125rem;
   --base-text: #{$sparrow-base-text-size};
   --small-text: #{$sparrow-small-text-size};
   --medium-text: #{$sparrow-medium-text-size};
+  --right-click-menu : #{$sparrow-right-click-menu};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -178,7 +180,8 @@ $font-sizes: (
   17: 1.0625rem, // 17px in rem
   18: 1.125rem, // 18px in rem
   19: 1.1875rem, // 19px in rem
-  20: 1.25rem // 20px in rem
+  20: 1.25rem, // 20px in rem
+  36: 2.25rem // 36px in rem
 );
 
 // Generate utility classes for font sizes
