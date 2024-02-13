@@ -30,7 +30,6 @@
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import Dropdown from "../../dropdown/Dropdown.svelte";
 
-
   export let userId: string | undefined;
   export let activeWorkspaceId: string;
   export let activeSideBarTabMethods: any;
@@ -347,7 +346,7 @@
           id: workspace.name,
           name: workspace.name,
           dynamicClasses: "text-whiteColor",
-          description: currentTeam.name,
+          description: currentTeam?.name,
           selectedOptionClasses: "ellipsis mw-25",
         };
         return workspaceObj;
@@ -361,7 +360,8 @@
     {
       id: "view-all",
       name: "View All Workspaces",
-      dynamicClasses: "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
+      dynamicClasses:
+        "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
     },
   ]}
   onclick={handleDropdown}
