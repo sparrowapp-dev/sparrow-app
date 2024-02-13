@@ -29,40 +29,48 @@ export class MyCollectionViewModel {
 
   public modifyCollection = async (
     componentData,
-    newCollectionName: string,
+    property: string,
+    value: string,
     collectionsMethods: CollectionsMethods,
-    tabName: string,
   ) => {
-    if (newCollectionName) {
-      const updateCollectionElement =
-        await this.collectionService.updateCollectionData(
-          componentData.path.collectionId,
-          componentData.path.workspaceId,
-          { name: newCollectionName },
-        );
+    const updateObj = {};
 
-      tabName = updateCollectionElement.data.data.name;
-
-      collectionsMethods.updateCollection(
-        componentData.path.collectionId,
-        updateCollectionElement.data.data,
-      );
-
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.collectionId,
-      );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.collectionId,
-      );
-
-      Promise.resolve().then(() => {
-        moveNavigation("right");
-      });
+    switch (property) {
+      case "name": {
+        updateObj.name = value;
+        break;
+      }
+      case "description": {
+        updateObj.description = value;
+        break;
+      }
+      default: {
+        break;
+      }
     }
+    const updateCollectionElement =
+      await this.collectionService.updateCollectionData(
+        componentData.path.collectionId,
+        componentData.path.workspaceId,
+        updateObj,
+      );
+
+    collectionsMethods.updateCollection(
+      componentData.path.collectionId,
+      updateCollectionElement.data.data,
+    );
+
+    collectionsMethods.updateTab(
+      value,
+      property,
+      componentData.path.collectionId,
+    );
+
+    collectionsMethods.updateTab(true, "save", componentData.path.collectionId);
+
+    Promise.resolve().then(() => {
+      moveNavigation("right");
+    });
   };
 
   public createApiRequest = async (
