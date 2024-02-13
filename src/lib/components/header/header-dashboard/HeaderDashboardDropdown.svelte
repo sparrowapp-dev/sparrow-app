@@ -223,7 +223,11 @@
       navigate("/dashboard/workspaces");
       activeSideBarTabMethods.updateActiveTab("workspaces");
       isOpen = true;
-      setOpenedTeam(currentTeam.id, currentTeam.name, currentTeam.base64String);
+      setOpenedTeam(
+        currentTeam?.id,
+        currentTeam?.name,
+        currentTeam?.base64String,
+      );
     } else {
       allworkspaces.forEach((workspace) => {
         if (id === workspace.name) {
