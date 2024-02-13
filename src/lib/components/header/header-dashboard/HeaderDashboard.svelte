@@ -399,8 +399,8 @@
       <div
         class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
-        <Tooltip>
-          <button class="bg-backgroundColor border-0">
+        <Tooltip placement={"bottom"} title={"Coming Soon!"}>
+          <button class="bg-backgroundColor border-0" style="height:40px;">
             <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
@@ -408,8 +408,8 @@
       <div
         class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
-        <Tooltip>
-          <button class="bg-backgroundColor border-0">
+        <Tooltip placement={"bottom"} title={"Coming Soon!"}>
+          <button class="bg-backgroundColor border-0" style="height:40px;">
             <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>

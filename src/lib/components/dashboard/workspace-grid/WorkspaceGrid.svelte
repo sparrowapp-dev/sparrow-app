@@ -105,7 +105,7 @@
 
 <div class="workspace-card-outer w-100">
   <Card
-    cardClassProp={"flex-grow-1 col-lg-5 col-md-10 pb-4 position-relative"}
+    cardClassProp={"flex-grow-1 col-lg-5 col-md-10 mb-4 position-relative"}
     cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
   >
     <button
@@ -155,14 +155,14 @@
   .workspace-card-outer {
     display: contents;
   }
+  .workspace-card-outer:hover .workspace-card {
+    background-color: var(--border-color) !important;
+  }
   .workspace-card {
     z-index: 0 !important;
   }
-  .workspace-card:hover {
-    background-color: var(--border-color) !important;
-  }
-  .workspace-card:hover .teams-workspace__para,
-  .workspace-card:hover .teams-workspace__date {
+  .workspace-card-outer:hover .workspace-card .teams-workspace__para,
+  .workspace-card-outer:hover .workspace-card .teams-workspace__date {
     color: var(--sparrow-text-color) !important;
   }
   .teams-workspace__para {
