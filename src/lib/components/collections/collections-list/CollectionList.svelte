@@ -573,6 +573,7 @@
         <EmptyCollection
           {handleCreateCollection}
           {collectionsMethods}
+          {currentWorkspaceId}
           {showDefault}
         />
       {/if}
