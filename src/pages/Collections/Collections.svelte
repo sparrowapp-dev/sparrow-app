@@ -76,7 +76,7 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
   };
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const environments = _viewModel.environments;
@@ -183,6 +183,7 @@
           _tabId={$activeTab?.id}
           {collectionsMethods}
           {onTabsSwitched}
+          {loggedUserRoleInWorkspace}
         />
       </div>
       <div class="tab__content d-flex">

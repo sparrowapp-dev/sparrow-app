@@ -19,7 +19,6 @@
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
@@ -29,6 +28,13 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    workspaceLevelPermissions,
+    PERMISSION_NOT_FOUND_TEXT,
+  } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "$lib/utils/enums";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   let expand: boolean = false;
   export let explorer;
@@ -45,10 +51,19 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -454,17 +469,26 @@
       {/each}
       {#if showFolderAPIButtons}
         <div class="mt-2 mb-2 ms-0">
-          <img
-            class="list-icons"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={() => {
-              handleAPIClick();
-              MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                source: "Side Panel Collection List",
-              });
-            }}
-          />
+          <Tooltip
+            classProp="mt-2 mb-2 ms-0"
+            title={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
+          >
+            <img
+              class="list-icons"
+              src={requestIcon}
+              alt="+ API Request"
+              on:click={() => {
+                handleAPIClick();
+                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                  source: "Side Panel Collection List",
+                });
+              }}
+            />
+          </Tooltip>
         </div>
       {/if}
     </div>

@@ -12,7 +12,8 @@ const generateSampleWorkspace = (
   const defaultWorkspaceName = generateUniqueWorkspaceName(teamId);
   return {
     _id: id,
-    name: name ? name : defaultWorkspaceName,
+    id: id,
+    name: name ?? defaultWorkspaceName,
     type: ItemType.WORKSPACE,
     description: "",
     property: {
@@ -25,7 +26,6 @@ const generateSampleWorkspace = (
       teamId: "",
       teamName: "",
     },
-    owner: "",
     users: [],
     isActiveWorkspace: true,
     environmentId: "",
@@ -39,8 +39,8 @@ const generateSampleWorkspace = (
   };
 };
 
-function generateUniqueWorkspaceName(teamId: string) {
-  const existingWorkspaces = [];
+function generateUniqueWorkspaceName(teamId?: string) {
+  const existingWorkspaces: string[] = [];
   const workspacesObservable = _workspaceViewModel.workspaces;
   workspacesObservable.subscribe((workspaces) => {
     workspaces

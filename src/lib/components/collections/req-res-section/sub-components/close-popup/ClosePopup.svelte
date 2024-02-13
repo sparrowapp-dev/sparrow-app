@@ -11,11 +11,18 @@
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let loader: boolean = false;
 
@@ -124,6 +131,10 @@
       />
     </span>
     <Button
+      disable={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )}
       title={"Save Changes"}
       textClassProp={"fs-6"}
       type={"primary"}

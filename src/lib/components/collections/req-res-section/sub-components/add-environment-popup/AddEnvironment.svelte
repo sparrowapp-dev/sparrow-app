@@ -149,15 +149,16 @@ left:{environmentAxisX}px;
     </div>
     <div class="input-class">
       <input
+        disabled
         type="text"
-        placeholder="Enter Variable"
+        placeholder="Enter Variable1"
         class="variable-name"
         bind:value={variableData}
         on:input={checkDataInput}
       />
       <input
         type="text"
-        placeholder="Enter Value"
+        placeholder="Enter Value1"
         class="variable-name"
         bind:value={valueData}
         on:input={checkDataInput}
