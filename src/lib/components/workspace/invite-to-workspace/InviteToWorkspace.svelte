@@ -3,7 +3,6 @@
   export let teamName: string;
   import { fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close-icon-normal.svg";
-  import SelectRoleDropdown from "$lib/components/dropdown/SelectRoleDropdown.svelte";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import type {
     addUsersInWorkspace,
@@ -12,6 +11,7 @@
   import { notifications } from "$lib/utils/notifications";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   const emailstoBeSentArr: string[] = [];
 
   export let addUsersInWorkspace: (
@@ -96,8 +96,8 @@
       handleInvitePopup(false);
     }
   };
-  const handleDropdown = (role: WorkspaceRole) => {
-    selectedRole = role;
+  const handleDropdown = (role: string) => {
+    selectedRole = role as WorkspaceRole;
   };
 </script>
 
@@ -135,38 +135,48 @@
 </div>
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <SelectRoleDropdown
-    isError={showErrors && selectedRole === defaultRole}
-    id={"invite-member-workspace"}
+  <Dropdown
+    dropDownType={{type:"text",title:selectedRole ? selectedRole : ""}}            
+    dropdownId="workspaceInvite"
     data={[
       {
         name: "Select",
         id: defaultRole,
         description: "Select role",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
+        hide: true,
       },
       {
         name: "Admin",
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
     ]}
-    method={selectedRole ? selectedRole : ""}
     onclick={handleDropdown}
+    staticClasses={[
+      {
+        id: `workspaceInvite-dropdown-${selectedRole}`,
+        classToAdd: ["border", "rounded", "py-1"],
+      },
+      {
+          id: "workspaceInvite-options-container",
+          classToAdd: ["end-0","start-0"],
+      },
+    ]}
   />
   {#if showErrors && selectedRole === "select"}
     <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>

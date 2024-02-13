@@ -22,6 +22,7 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -281,8 +282,8 @@
               Save Request
             </p>
           </button>
-          <span class="position-relative" style="width:35px;">
-            <button
+          <!-- <span class="position-relative" style="width:35px;"> -->
+          <!-- <button
               disabled={!hasWorkpaceLevelPermission(
                 loggedUserRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
@@ -292,8 +293,9 @@
               class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
             >
               <img src={angleDown} alt="" class="w-100 h-100" />
-            </button>
-            <div
+            </button> -->
+
+          <!-- <div
               class="rounded z-2 save-options {isOpen ? 'd-block' : 'd-none'}"
             >
               <p
@@ -305,22 +307,58 @@
               >
                 Save As
               </p>
-            </div>
-            <ModalWrapperV1
-              title={"Save Request"}
-              type={"dark"}
-              width={"55%"}
-              zIndex={10000}
-              isOpen={visibility}
-              handleModalState={handleBackdrop}
-            >
-              <SaveRequest
-                {collectionsMethods}
-                {componentData}
-                onClick={handleBackdrop}
-              />
-            </ModalWrapperV1>
-          </span>
+            </div> -->
+            <!-- </span> -->
+          <Dropdown
+            dropdownId={"saveAsDropdown"}
+            dropDownType={{ type: "img", title: angleDown }}
+            data={[
+              {
+                name: "Save As",
+                id: "collection",
+                dynamicClasses: "text-whiteColor",
+              },
+            ]}
+            onclick={() => {
+              isOpen = false;
+              visibility = true;
+            }}
+            staticCustomStyles={[
+              {
+                id: "saveAsDropdown-options-container",
+                styleKey: "minWidth",
+                styleValue: "180px",
+              },
+            ]}
+            staticClasses={[
+              {
+                id: "saveAsDropdown-img",
+                classToAdd: ["bg-dullBackground", "px-2", "py-1"],
+              },
+              {
+                id: "saveAsDropdown-options-name",
+                classToAdd: ["fs-6"],
+              },
+              {
+                id: "saveAsDropdown-options-container",
+                classToAdd: ["end-0", "mt-1", "rounded"],
+              },
+            ]}
+          ></Dropdown>
+          <ModalWrapperV1
+            title={"Save Request"}
+            type={"dark"}
+            width={"55%"}
+            zIndex={10000}
+            isOpen={visibility}
+            handleModalState={handleBackdrop}
+          >
+            <SaveRequest
+              {collectionsMethods}
+              {componentData}
+              onClick={handleBackdrop}
+            />
+          </ModalWrapperV1>
         </div>
         <div>
           <Tooltip>

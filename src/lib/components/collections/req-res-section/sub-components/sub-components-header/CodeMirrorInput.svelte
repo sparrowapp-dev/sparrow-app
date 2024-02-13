@@ -39,7 +39,7 @@
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
-    if (rawValue?.length > 0) {
+    if(rawValue?.length>0){
       handleRawChange();
     }
     handleHighlightClass();

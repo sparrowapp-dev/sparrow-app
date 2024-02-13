@@ -1,7 +1,7 @@
 <script lang="ts">
   import { appWindow } from "@tauri-apps/api/window";
   import { Observable } from "rxjs";
-  import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
+  import HeaderDropdown from "./HeaderDashboardDropdown.svelte"
   import icons, {
     NotifyIcon,
     SearchIcon,
@@ -45,7 +45,6 @@
   export let currentWorkspace: CurrentWorkspace;
   export let currWorkspace: CurrentWorkspace;
   export let teams: Observable<TeamDocument[]>;
-
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
   const _workspaceViewModel = new TeamViewModel();
@@ -178,13 +177,14 @@
     profile = false;
   });
 
-  const handleDropdown = (id: string, tab: string, team: any) => {
+  const handleDropdown = (id: string) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
 
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };
+
 
   onDestroy(() => {
     workspaceSubscribe.unsubscribe();
@@ -263,11 +263,12 @@
         {currentTeam}
         {currentWorkspace}
         data={workspaces}
-        onclick={handleDropdown}
+        handleWorkspaceSwitch={handleDropdown}
         {collectionsMethods}
         {activeSideBarTabMethods}
         {activeWorkspaceId}
-      />
+        allworkspaces={allworkspaces}
+      /> 
     </div>
   </div>
 

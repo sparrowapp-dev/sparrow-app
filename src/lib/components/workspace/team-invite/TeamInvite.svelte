@@ -3,11 +3,11 @@
   export let teamName: string = "";
   export let teamId: string = "";
   import closeIcon from "$lib/assets/close.svg";
-  import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
 
   export let onSubmit;
@@ -16,12 +16,13 @@
   export let workspaces;
   export let teamLogo;
   export let userId;
-
+  let isAllSelectedCheck=false;
   const emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
       name: elem.name,
+      textColor: "whiteColor",
       checked: false,
     };
   });
@@ -176,8 +177,23 @@
   const handleDropdown = (id) => {
     selectedRole = id;
   };
-  const handleCheckSelectDropdown = (data) => {
-    teamSpecificWorkspace = data;
+  const handleCheckSelectDropdown = (id: string) => {
+    if (id === "select-all") {
+      isAllSelectedCheck =!isAllSelectedCheck;
+      teamSpecificWorkspace.forEach((elem: any) => {
+          elem.checked = isAllSelectedCheck;
+      });
+    } else {
+      teamSpecificWorkspace=teamSpecificWorkspace.map((elem) => {
+        if (elem?.id === id) {
+          elem.checked = !elem.checked;
+        }
+        return elem;
+      });
+      isAllSelectedCheck = teamSpecificWorkspace.every((item) => {
+        return item.checked;
+      });
+    }
   };
 </script>
 
@@ -216,39 +232,49 @@
 
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <SelectRoleDropdown
-    isError={roleError && selectedRole === "select"}
-    id={"invite-member-workspace"}
+  <Dropdown
+    dropDownType={{ type: "text", title:selectedRole ?selectedRole : "" }}
+    dropdownId="invite-team"
     data={[
       {
         name: "Select",
         id: "select",
         description: "Select role",
-        color: "whiteColor",
+       dynamicClasses: "text-whiteColor",
+        hide: true,
       },
       {
         name: "Admin",
-        id: TeamRole.TEAM_ADMIN,
+        id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        color: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        color: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        color: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
     ]}
-    method={selectedRole ? selectedRole : ""}
     onclick={handleDropdown}
-  />
+    staticClasses={[
+      {
+        id: `invite-team-dropdown-${selectedRole}`,
+        classToAdd: ["border", "rounded", "py-1"],
+      },
+      {
+        id: "invite-team-options-container",
+        classToAdd: ["end-0", "start-0"],
+      },
+    ]}
+  ></Dropdown>
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">
@@ -268,12 +294,43 @@
     <p class="invite-subheader text-textColor mt-0 mb-1">
       Select workspaces you would want to give access to.
     </p>
-    <CheckSelectDropdown
+    <!-- <CheckSelectDropdown
       isError={workspaceError && !countCheckedList(teamSpecificWorkspace)}
       id={"check-select-workspace"}
       list={teamSpecificWorkspace}
       onclick={handleCheckSelectDropdown}
-    />
+    /> -->
+    <Dropdown
+      dropDownType={{ type: "checkbox", title: "select" }}
+      dropdownId="check-select-workspace"
+      data={[
+        {
+          name: "Select",
+          id: "select",
+          dynamicClasses: "text-whiteColor",
+          hide: true,
+        },
+        {
+          name: "Select ALL",
+          id: "select-all",
+          dynamicClasses: "text-whiteColor",
+          isInvalidOption: true,
+          checked: isAllSelectedCheck,
+        },
+        ...teamSpecificWorkspace,
+      ]}
+      onclick={handleCheckSelectDropdown}
+      staticClasses={[
+        {
+          id: `check-select-workspace-dropdown-select`,
+          classToAdd: ["border", "rounded", "py-1"],
+        },
+        {
+          id: "check-select-workspace-options-container",
+          classToAdd: ["end-0", "start-0"],
+        },
+      ]}
+    ></Dropdown>
   </div>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
