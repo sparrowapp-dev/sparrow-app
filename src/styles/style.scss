@@ -63,6 +63,7 @@ $sparrow-email-invite-bg-color:#1E1E1E;
 $sparrow-small-text-size: 0.75rem;
 $sparrow-base-text-size: 0.875rem;
 $sparrow-medium-text-size: 1.125rem;
+$sparrow-right-click-menu:#232527;
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -117,6 +118,7 @@ $sparrow-medium-text-size: 1.125rem;
   --base-text: #{$sparrow-base-text-size};
   --small-text: #{$sparrow-small-text-size};
   --medium-text: #{$sparrow-medium-text-size};
+  --right-click-menu : #{$sparrow-right-click-menu};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
