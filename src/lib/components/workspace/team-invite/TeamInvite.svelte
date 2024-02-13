@@ -5,7 +5,11 @@
   import closeIcon from "$lib/assets/close.svg";
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
-  import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
+  import {
+    base64ToURL,
+    createDynamicComponents,
+    validateEmail,
+  } from "$lib/utils/helpers";
   import { notifications } from "$lib/utils/notifications";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import Button from "$lib/components/buttons/Button.svelte";
@@ -17,7 +21,9 @@
   export let teamLogo;
   export let userId;
 
-  const emailstoBeSentArr: string[] = [];
+  import closeIconWhite from "$lib/assets/close-icon-white.svg";
+
+  let emailstoBeSentArr: string[] = [];
   let teamSpecificWorkspace = workspaces.map((elem) => {
     return {
       id: elem._id,
@@ -31,20 +37,34 @@
   let emailError: boolean = false;
   let roleError: boolean = false;
   let workspaceError: boolean = false;
+  let invalidEmails: string[] = [];
 
   function removeElement(event: Event): void {
-    const id = event.target?.id;
-    const removeElement = document.getElementById(id) as HTMLElement;
-    document.getElementById("input-email").removeChild(removeElement);
+    const email = event.target?.id;
+    const removeElement = document.getElementById(email) as HTMLElement;
+    const emailContainer = document.getElementById(
+      "input-email",
+    ) as HTMLElement;
+    emailContainer.removeChild(removeElement);
+    emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
+    invalidEmails = invalidEmails.filter((e) => e != email);
   }
 
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    emailstoBeSentArr.push(email);
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      invalidEmails.push(email);
+    } else {
+      emailstoBeSentArr.push(email);
+    }
+
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
+        !isValidEmail ? "border border-danger" : ""
+      }`,
     );
     const emailContentSpan = createDynamicComponents("span", "");
     const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
@@ -73,6 +93,11 @@
     ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
+    if (emailstoBeSentArr.length && !invalidEmails.length) {
+      emailError = false;
+    } else {
+      emailError = true;
+    }
   };
 
   const countCheckedList = (ls) => {
@@ -124,9 +149,11 @@
     checkInviteValidation();
     loader = true;
     if (
+      emailstoBeSentArr &&
+      emailstoBeSentArr.length > 0 &&
+      !invalidEmails.length &&
       selectedRole &&
-      selectedRole !== "select" &&
-      emailstoBeSentArr?.length > 0
+      selectedRole != "select"
     ) {
       if (
         selectedRole === WorkspaceRole.WORKSPACE_EDITOR ||
@@ -203,13 +230,29 @@
       bind:value={currentEmailEntered}
       class="input-container mt-2"
       on:keyup={(event) => {
-        if (event.key === "," || event.key === "Enter") {
+        if (
+          (event.key === "," || event.key === "Enter" || event.key === " ") &&
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
+          handleEmailOnAdd(currentEmailEntered);
+        }
+      }}
+      on:blur={() => {
+        if (
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
           handleEmailOnAdd(currentEmailEntered);
         }
       }}
     />
   </div>
-  {#if emailError && emailstoBeSentArr.length === 0}
+  {#if emailError && invalidEmails.length}
+    <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
+  {:else if emailError && emailstoBeSentArr.length === 0}
     <p class="error-text">Email ID cannot be Empty.</p>
   {/if}
 </div>

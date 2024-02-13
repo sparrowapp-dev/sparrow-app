@@ -198,7 +198,7 @@
                   >
                     <input
                       type="text"
-                      placeholder="Enter Variable"
+                      placeholder="Enter Variable2"
                       class="form-control py-1"
                       style="font-size: 13px;"
                       disabled={!hasWorkpaceLevelPermission(
@@ -277,47 +277,62 @@
                   />
                 {/if}
               </div>
-              <div class="w-100 d-flex gap-2">
-                <div class="flex-grow-1 w-100">
-                  <div
-                    class="bg-keyValuePairColor input-container d-flex rounded"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Enter Variable"
-                      class="form-control py-1"
-                      style="font-size: 13px;"
-                      disabled={mode == "READ" ? true : false}
-                      bind:value={element.key}
-                      on:input={(e) => {
-                        updateParam(index);
-                      }}
-                    />
-                    <div class="me-2 my-auto edit-icon">
-                      <EditIcon />
+              <Tooltip
+                classProp="w-100 d-flex gap-2"
+                text={PERMISSION_NOT_FOUND_TEXT}
+                show={!hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                )}
+              >
+                <div class="w-100 d-flex gap-2">
+                  <div class="flex-grow-1 w-100">
+                    <div
+                      class="bg-keyValuePairColor input-container d-flex rounded"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Enter Variable2"
+                        class="form-control py-1"
+                        style="font-size: 13px;"
+                        disabled={!hasWorkpaceLevelPermission(
+                          loggedUserRoleInWorkspace,
+                          workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                        )}
+                        bind:value={element.key}
+                        on:input={(e) => {
+                          updateParam(index);
+                        }}
+                      />
+                      <div class="me-2 my-auto edit-icon">
+                        <EditIcon />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1 w-100">
+                    <div class="bg-keyValuePairColor d-flex rounded">
+                      <input
+                        type="text"
+                        placeholder="Enter Value2"
+                        class="form-control py-1"
+                        style="font-size: 13px;"
+                        disabled={!hasWorkpaceLevelPermission(
+                          loggedUserRoleInWorkspace,
+                          workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                        )}
+                        bind:value={element.value}
+                        on:input={() => {
+                          updateParam(index);
+                        }}
+                      />
+                      <div class="me-2 my-auto edit-icon">
+                        <EditIcon />
+                      </div>
                     </div>
                   </div>
                 </div>
+              </Tooltip>
 
-                <div class="flex-grow-1 w-100">
-                  <div class="bg-keyValuePairColor d-flex rounded">
-                    <input
-                      type="text"
-                      placeholder="Enter Value"
-                      class="form-control py-1"
-                      style="font-size: 13px;"
-                      disabled={mode == "READ" ? true : false}
-                      bind:value={element.value}
-                      on:input={() => {
-                        updateParam(index);
-                      }}
-                    />
-                    <div class="me-2 my-auto edit-icon">
-                      <EditIcon />
-                    </div>
-                  </div>
-                </div>
-              </div>
               {#if filteredKeyValuePairs.length - 1 != index}
                 <div class="h-75 pe-1 d-flex">
                   <button

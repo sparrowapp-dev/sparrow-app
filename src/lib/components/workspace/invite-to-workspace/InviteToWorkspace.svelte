@@ -84,6 +84,11 @@
     ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
+    if (emailstoBeSentArr.length && !invalidEmails.length) {
+      showErrors = false;
+    } else {
+      showErrors = true;
+    }
   };
   const handleInvite = async () => {
     showErrors = true;
@@ -141,17 +146,30 @@
       bind:value={currentEmailEntered}
       class="input-container mt-2"
       on:keyup={(event) => {
-        if (event.key === "," || event.key === "Enter" || event.key === " ") {
+        if (
+          (event.key === "," || event.key === "Enter" || event.key === " ") &&
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
+          handleEmailOnAdd(currentEmailEntered);
+        }
+      }}
+      on:blur={() => {
+        if (
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
           handleEmailOnAdd(currentEmailEntered);
         }
       }}
     />
   </div>
-  {#if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text sparrow-fs-12">Email ID cannot be Empty</p>
-  {/if}
   {#if showErrors && invalidEmails.length}
     <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
+  {:else if showErrors && emailstoBeSentArr.length === 0}
+    <p class="error-text">Email ID cannot be Empty.</p>
   {/if}
 </div>
 <div class="mt-4">

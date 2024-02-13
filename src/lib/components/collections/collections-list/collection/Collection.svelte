@@ -28,9 +28,13 @@
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let title: string;
   export let collection: any;
@@ -516,20 +520,29 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2">
-        <img
-          class="list-icons"
-          src={folderIcon}
-          alt="+ Folder"
-          on:click={handleFolderClick}
-        />
-        <img
-          class="list-icons"
-          src={requestIcon}
-          alt="+ API Request"
-          on:click={handleAPIClick}
-        />
-      </div>
+      <Tooltip
+        classProp="mt-2 mb-2"
+        text={PERMISSION_NOT_FOUND_TEXT}
+        show={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.SAVE_REQUEST,
+        )}
+      >
+        <div class="mt-2 mb-2">
+          <img
+            class="list-icons"
+            src={folderIcon}
+            alt="+ Folder"
+            on:click={handleFolderClick}
+          />
+          <img
+            class="list-icons"
+            src={requestIcon}
+            alt="+ API Request"
+            on:click={handleAPIClick}
+          />
+        </div>
+      </Tooltip>
     {/if}
   </div>
 </div>
