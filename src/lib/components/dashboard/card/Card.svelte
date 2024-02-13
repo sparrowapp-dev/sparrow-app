@@ -1,13 +1,11 @@
 <script lang="ts">
   export let cardClassProp = "";
   export let cardStyleProp = "";
-  export let onContextMenu: (e) => void;
 </script>
 
 <div
   class={`${cardClassProp} workspace-card-container`}
   style={`${cardStyleProp} workspace-card`}
-  on:contextmenu|preventDefault={onContextMenu}
 >
   <slot />
 </div>
