@@ -14,7 +14,7 @@
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
   import { WebviewWindow } from "@tauri-apps/api/window";
-  import LoginLoader from "$lib/components/Transition/LoginLoader.svelte";
+  import LoginWaitingScreen from "$lib/components/Transition/LoginWaitingScreen.svelte";
 
   let isEmailTouched = false;
 
@@ -102,14 +102,14 @@
 
   let isSignInPopup: boolean = false;
   const handleSignInPopup = (flag: boolean) => {
-    if(validationErrors.isSuccessful){
+    if (validationErrors.isSuccessful) {
       isSignInPopup = flag;
-      }
+    }
   };
 </script>
 
 {#if isSignInPopup}
-  <LoginLoader onClick={handleSignInPopup} {isLoadingPage} />
+  <LoginWaitingScreen onClick={handleSignInPopup} {isLoadingPage} />
 {/if}
 
 <div
