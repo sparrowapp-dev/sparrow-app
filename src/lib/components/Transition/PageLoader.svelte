@@ -1,5 +1,9 @@
 <script>
   import spin from "$lib/assets/spin.svg";
+  /**
+   * @deprecated This component is deprecated and will be removed in future releases.
+   * Please use Loader Component instead.
+   */
 </script>
 
 <div class="d-flex flex-column loading-spinner spinner-item">

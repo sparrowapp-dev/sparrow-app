@@ -12,6 +12,7 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { boolean } from "yup";
   import Button from "$lib/components/buttons/Button.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -27,17 +28,14 @@
   let newEnvironmentName: string = "";
   let isRenaming = false;
 
+  let noOfColumns = 180;
+  let noOfRows = 4;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = e.clientX;
       const mouseY = e.clientY;
-      const windowHeight = window.innerHeight;
-      if (windowHeight < mouseY + 180) {
-        pos = { x: mouseX, y: mouseY - 160 };
-      } else {
-        pos = { x: mouseX, y: mouseY };
-      }
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -228,30 +226,13 @@
 >
 
 {#if showMenu}
-  <div class="environment-tab" bind:offsetHeight={rightClickPanelHeight}>
-    <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-      <div
-        class="navbar p-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-        id="navbar"
-      >
-        <ul class="p-2 w-100">
-          {#each menuItems as item}
-            <li class="align-items-center">
-              <button
-                disabled={item.disabled}
-                class={`align-items-center px-3 py-2 ${
-                  item.disabled && "text-requestBodyColor"
-                }`}
-                on:click={item.onClick}
-                style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-                >{item.displayText}</button
-              >
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </nav>
-  </div>
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window

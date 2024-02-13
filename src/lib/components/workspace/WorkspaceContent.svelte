@@ -321,6 +321,7 @@
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
         {currOpenedTeamRxDoc}
+        {userType}
       />
     {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
       <WorkspaceCardList

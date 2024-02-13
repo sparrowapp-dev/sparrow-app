@@ -39,5 +39,6 @@
     line-height: var(--medium-text);
     color: var(--sparrow-text-color);
     background-color: transparent;
+    z-index: 999 !important;
   }
 </style>
