@@ -125,12 +125,6 @@
     }
   });
 
-  const isWorkspaceLoadedSubscribe = isWorkspaceLoaded.subscribe(
-    (value: boolean) => {
-      workspaceUnderCreation = value;
-    },
-  );
-
   const teamSubscribe = teams.subscribe((value: TeamDocument[]) => {
     if (value && value.length > 0) {
       const teamArr = value.map((teamDocument: TeamDocument) => {
@@ -142,6 +136,7 @@
   });
 
   const handleCreateWorkspace = async () => {
+    workspaceUnderCreation = true;  
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -162,15 +157,11 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      let totalCollection: number = 0;
       let totalRequest: number = 0;
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data._id) {
-            // totalCollection = item?._data?.collections?.length;
-            totalCollection = 0;
-          } else {
+          if (item._data._id !== response.data.data._id) {
             totalRequest = 0;
           }
         }
@@ -182,23 +173,22 @@
       };
 
       workspaceObj._id = response.data.data._id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
-      workspaceObj.description = response.data.data?.description;
+      workspaceObj.description = response.data.data?.description ?? workspaceObj.description;
       workspaceObj.team = {
         teamId: response.data.data?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
       };
-      workspaceObj.owner = response.data.data?.owner;
       workspaceObj.users = response.data.data?.users;
       workspaceObj.createdAt = response.data.data?.createdAt;
       workspaceObj.createdBy = response.data.data?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.environments = response.data.data?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      // await _viewModelWorkspace.addWorkspace(workspaceObj);
       if (userId) await _viewModel.refreshTeams(userId);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
@@ -386,7 +376,6 @@
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
-    isWorkspaceLoadedSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
@@ -550,6 +539,7 @@
       {isShowMoreVisible}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
+      {workspaceUnderCreation}
       openTeam={$openTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}

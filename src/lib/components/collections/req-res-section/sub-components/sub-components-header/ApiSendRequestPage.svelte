@@ -8,10 +8,10 @@
     leftPanelWidth,
     rightPanelWidth,
   } from "$lib/store/request-response-section";
-  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
+  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import {
     RequestMethod,
     RequestProperty,
@@ -31,6 +31,7 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -232,9 +233,9 @@
     isHorizontalMode = value;
   });
 
-  const handleDropdown = (tab: RequestMethodType) => {
+  const handleDropdown = (tab: string) => {
     collectionsMethods.updateRequestProperty(
-      tab,
+      tab as RequestMethodType,
       RequestProperty.METHOD,
       currentTabId,
     );
@@ -334,15 +335,60 @@
   };
 </script>
 
-<div class="d-flex flex-column w-100">
+<div class="d-flex flex-column">
   <div
     class="d-flex align-items-center justify-content-between {isCollaps
       ? 'ps-5 pt-3 pe-3'
       : 'pt-3 px-3'}"
-    style="width:calc(100%-312px);"
+    style="width:calc(100%-302px);"
   >
     <div class="d-flex gap-2 w-100 position-relative">
-      <ColorDropdown
+      <Dropdown
+        dropdownId="api-request"
+        dropDownType={{ type: "text", title: method ? method : "" }}
+        staticCustomStyles={[
+          { id: "api-request-options-container", styleKey: "minWidth", styleValue: "120px" },
+        ]}
+        staticClasses={[
+          {
+            id: "api-request-btn-div",
+            classToAdd: ["px-2", "py-3", "border", "rounded"],
+          },
+          {
+            id: "api-request-options-container",
+            classToAdd: ["start-0","bg-backgroundDropdown"],
+          },
+        ]}
+        data={[
+          {
+            name: "GET",
+            id: RequestMethod.GET,
+            dynamicClasses: "text-getColor",
+          },
+          {
+            name: "POST",
+            id: RequestMethod.POST,
+            dynamicClasses: "text-postColor",
+          },
+          {
+            name: "PUT",
+            id: RequestMethod.PUT,
+            dynamicClasses: "text-putColor",
+          },
+          {
+            name: "DELETE",
+            id: RequestMethod.DELETE,
+            dynamicClasses: "text-deleteColor",
+          },
+          {
+            name: "PATCH",
+            id: RequestMethod.PATCH,
+            dynamicClasses: "text-patchColor",
+          },
+        ]}
+        onclick={handleDropdown}
+      ></Dropdown>
+      <!-- <ColorDropdown
         data={[
           {
             name: "GET",
@@ -372,7 +418,8 @@
         ]}
         method={method ? method : ""}
         onclick={handleDropdown}
-      />
+      /> -->
+
       <CodeMirrorInput
         rawValue={urlText}
         handleRawChange={handleInputValue}

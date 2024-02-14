@@ -36,9 +36,9 @@
   export let handleLeaveTeamModal: () => void;
   export let handleOnShowMoreClick: (e) => void;
   export let isShowMoreVisible: boolean = false;
+  export let workspaceUnderCreation = false
 
   let currOpenedTeam: CurrentTeam;
-  let isLoading: boolean = false;
   let selectedTab = "all-workspace";
   let selectedView: string;
   let currOpenedTeamRxDoc: Observable<TeamDocument>;
@@ -226,7 +226,7 @@
                 <Button
                   title={`New Workspace`}
                   type={`primary`}
-                  loader={isLoading}
+                  loader={workspaceUnderCreation}
                   loaderSize={17}
                   textStyleProp={"font-size: var(--small-text)"}
                   onClick={handleCreateWorkspace}
@@ -334,6 +334,7 @@
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
         {currOpenedTeamRxDoc}
+        {workspaceUnderCreation}
       />
     {:else if selectedTab === "members"}
       <Members
