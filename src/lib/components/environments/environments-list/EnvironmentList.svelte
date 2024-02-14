@@ -18,18 +18,25 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import List from "$lib/components/list/List.svelte";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentWorkspace;
   export let environments;
   export let currentEnvironment;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let localEnvironment;
   let globalEnvironment;
   let isLoading: boolean = false;
   let environmentUnderCreation: boolean = false;
-
+  let addEnvDisabled = false;
   $: {
     if (environments) {
       localEnvironment = [];
@@ -43,6 +50,10 @@
         }
       });
     }
+    addEnvDisabled = !hasWorkpaceLevelPermission(
+      loggedUserRoleInWorkspace,
+      workspaceLevelPermissions.ADD_ENVIRONMENT,
+    );
   }
 
   const handleOpenEnvironment = (id: string) => {
@@ -153,8 +164,14 @@
     >
       {currentWorkspace?.name || ""}
     </h1>
-    <Tooltip title={`Add Environment`} placement={"bottom"}>
+    <Tooltip
+      title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
+    >
       <button
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_ENVIRONMENT,
+        )}
         class={`border-0 mx-3 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
@@ -189,13 +206,25 @@
         Add Environments to your Workspace to test your APIs with the relevant
         set of resources and constraints.
       </p>
-      <button
-        class={`add-env-btn d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
-        on:click={handleCreateEnvironment}
+      <Tooltip
+        title={PERMISSION_NOT_FOUND_TEXT}
+        show={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_COLLECTIONS,
+        )}
       >
-        <PlusIcon classProp={`my-auto me-2`} />
-        <span class={`my-auto ps-2`}>Environment</span>
-      </button>
+        <button
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.ADD_COLLECTIONS,
+          )}
+          class={`add-env-btn d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
+          on:click={handleCreateEnvironment}
+        >
+          <PlusIcon classProp={`my-auto me-2`} />
+          <span class={`my-auto ps-2`}>Environment</span>
+        </button>
+      </Tooltip>
     </div>
   {/if}
   <ul class={`env-side-tab-list p-0`}>

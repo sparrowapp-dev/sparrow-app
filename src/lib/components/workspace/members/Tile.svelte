@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type {
     TeamRepositoryMethods,
@@ -14,6 +13,7 @@
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
@@ -146,12 +146,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "whiteColor",
+         dynamicClasses: "whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -164,7 +164,7 @@
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -175,13 +175,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -189,7 +189,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -538,27 +538,24 @@
   </div>
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+        <Dropdown
         disabled={true}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
-      />
+     /> 
     {/if}
   </div>
 </div>
@@ -582,7 +579,6 @@
     width: 120px;
     padding: 8px;
   }
-
   .team-icon {
     height: 24px;
     width: 24px;

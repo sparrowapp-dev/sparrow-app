@@ -21,7 +21,6 @@
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -30,6 +29,8 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "$lib/components/buttons/Button.svelte";
   import FileType from "$lib/components/file-types/FileType.svelte";
+  import ComboText from "$lib/components/text/ComboText.svelte";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -838,7 +839,14 @@
       </p>
     {/if}
     <div class="d-flex">
-      <MethodButton method={componentData?.property.request.method} />
+      <ComboText
+        value={componentData?.property.request.method}
+        comboContainerClassProp={"d-flex flex-start pb-2"}
+        singleTextClassProp={"rounded d-flex align-items-center justify-content-center"}
+        valueClassProp={`text-${getMethodStyle(
+          componentData?.property.request.method,
+        )}`}
+      />
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>

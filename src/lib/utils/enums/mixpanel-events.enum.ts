@@ -1,4 +1,5 @@
 export enum Events {
+  NO_EVENT = "No_Event",
   USER_LOGIN = "User_Login",
   USER_SIGNUP = "User_Signup",
   CREATE_COLLECTION = "Create_Collection",

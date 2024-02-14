@@ -20,8 +20,12 @@
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -250,62 +254,86 @@
     <div class="d-flex gap-3">
       <div class="d-flex gap-3">
         <div class="d-flex gap-1">
-          <button
-            disabled={componentData?.save ||
-              !hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-            style="width:140px;"
-            class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
-            on:click={() => {
-              if (
-                componentData?.path.collectionId &&
-                componentData?.path.workspaceId
-              ) {
-                handleSaveRequest();
-              } else {
-                visibility = true;
-              }
-            }}
+          <Tooltip
+            title={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
           >
-            {#if componentData.saveInProgress}
-              <Spinner size={"14px"} />
-            {:else}
-              <img src={floppyDisk} alt="" style="height: 20px; width:20px;" />
-            {/if}
-            <p
-              class="mb-0 text-whiteColor"
-              style="font-size: 14px; font-weight:400;"
-            >
-              Save Request
-            </p>
-          </button>
-          <span class="position-relative" style="width:35px;">
             <button
-              disabled={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-              id="save-dropdown"
-              on:click={toggleDropdown}
-              class="save-request-dropdown-btn px-2 py-2 btn btn-primary d-flex align-items-center justify-content-center rounded border-0"
-            >
-              <img src={angleDown} alt="" class="w-100 h-100" />
-            </button>
-            <div
-              class="rounded z-2 save-options {isOpen ? 'd-block' : 'd-none'}"
-            >
-              <p
-                class="m-1 saveas-text m-0 py-1 px-3 cursor-pointer rounded fs-6"
-                on:click={() => {
-                  isOpen = false;
+              disabled={componentData?.save ||
+                !hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+              style="width:140px;"
+              class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+              on:click={() => {
+                if (
+                  componentData?.path.collectionId &&
+                  componentData?.path.workspaceId
+                ) {
+                  handleSaveRequest();
+                } else {
                   visibility = true;
-                }}
+                }
+              }}
+            >
+              {#if componentData.saveInProgress}
+                <Spinner size={"14px"} />
+              {:else}
+                <img
+                  src={floppyDisk}
+                  alt=""
+                  style="height: 20px; width:20px;"
+                />
+              {/if}
+              <p
+                class="mb-0 text-whiteColor"
+                style="font-size: 14px; font-weight:400;"
               >
-                Save As
+                Save Request
               </p>
-            </div>
+            </button>
+          </Tooltip>
+          <span class="position-relative" style="width:35px;">
+            <Dropdown
+              dropdownId={"saveAsDropdown"}
+              dropDownType={{ type: "img", title: angleDown }}
+              data={[
+                {
+                  name: "Save As",
+                  id: "collection",
+                  dynamicClasses: "text-whiteColor",
+                },
+              ]}
+              onclick={() => {
+                isOpen = false;
+                visibility = true;
+              }}
+              staticCustomStyles={[
+                {
+                  id: "saveAsDropdown-options-container",
+                  styleKey: "minWidth",
+                  styleValue: "180px",
+                },
+              ]}
+              staticClasses={[
+                {
+                  id: "saveAsDropdown-img",
+                  classToAdd: ["bg-dullBackground", "px-2", "py-1"],
+                },
+                {
+                  id: "saveAsDropdown-options-name",
+                  classToAdd: ["fs-6"],
+                },
+                {
+                  id: "saveAsDropdown-options-container",
+                  classToAdd: ["end-0", "mt-1", "rounded"],
+                },
+              ]}
+            ></Dropdown>
             <ModalWrapperV1
               title={"Save Request"}
               type={"dark"}

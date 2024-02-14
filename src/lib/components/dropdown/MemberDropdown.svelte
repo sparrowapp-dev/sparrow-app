@@ -1,4 +1,8 @@
 <script lang="ts">
+   /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\dropdown\Dropdown
+   * **/
     import Dropdown from "$lib/assets/dropdown.svelte";
     import checkIcon from "$lib/assets/check.svg";
     import { onDestroy, onMount } from "svelte";

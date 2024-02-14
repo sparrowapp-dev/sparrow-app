@@ -20,11 +20,13 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;
   export let tabList: TabDocument[];
   export let _tabId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab;
   let movedTabStartIndex: number;
   let movedTabEndIndex: number;
@@ -208,6 +210,7 @@
     componentData={removeTab}
     {handleSaveAsBackdrop}
     closeCallback={handleClosePopupBackdrop}
+    {loggedUserRoleInWorkspace}
   />
 </ModalWrapperV1>
 

@@ -14,7 +14,7 @@
   import { onDestroy } from "svelte";
   import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
   const _viewModel = new EnvironmentViewModel();
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const environments = _viewModel.environments;
   let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
 
@@ -60,6 +60,7 @@
 <Motion {...scaleMotionProps} let:motion>
   <div class="environment" use:motion>
     <EnvironmentList
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentWorkspace={$activeWorkspace}
@@ -67,7 +68,7 @@
       currentEnvironment={$activeEnvironment}
     />
     <EnvironmentPanel
-    {loggedUserRoleInWorkspace}
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentEnvironment={$activeEnvironment
