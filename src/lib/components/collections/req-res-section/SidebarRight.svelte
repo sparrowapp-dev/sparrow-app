@@ -12,8 +12,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+
+  import { Events, type WorkspaceRole } from "$lib/utils/enums";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import {
     getMethodStyle,
@@ -21,6 +23,7 @@
   } from "$lib/utils/helpers";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -141,6 +144,7 @@
       } else {
       }
     }
+    MixpanelEvent(Events.SAVE_API_DOCUMENTATION);
   };
 
   onDestroy(() => {

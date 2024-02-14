@@ -1,5 +1,4 @@
 <script lang="ts">
-
   /**
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\dropdown\Dropdown
@@ -8,8 +7,6 @@
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   export let data: Array<{
     name: string;
@@ -28,7 +25,6 @@
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
-    MixpanelEvent(Events.ENVIRONMENT_SIDE_PANEL);
   };
 
   $: {

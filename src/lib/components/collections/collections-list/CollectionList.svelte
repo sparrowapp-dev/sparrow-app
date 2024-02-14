@@ -455,7 +455,6 @@
   </div>
   <div class="px-3 pt-2">
     <Dropdown
-      mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
       data={[
         {
