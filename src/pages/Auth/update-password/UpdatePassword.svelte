@@ -9,7 +9,7 @@
   import { writable } from "svelte/store";
   import { onDestroy } from "svelte";
   import { Link, navigate } from "svelte-navigator";
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
 
   const seconds = writable(59);
   const verifyString = writable("");
@@ -89,7 +89,7 @@
 >
   <Header />
   {#if isLoadingPage}
-    <PageLoader />
+    <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   {:else}
     <div
       class="d-flex mb-5 flex-column align-items-center justify-content-center"

@@ -2,7 +2,7 @@ import type { ContentTypeEnum } from "../enums/request.enum";
 import type { KeyValuePair } from "../interfaces/request.interface";
 
 export interface CreateDirectoryPostBody {
-  name: string;
+  name?: string;
   description?: string;
 }
 

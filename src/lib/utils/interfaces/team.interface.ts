@@ -3,7 +3,7 @@
 import type { TeamDocument } from "$lib/database/app.database";
 import type { Observable } from "rxjs";
 import type { InviteBody, TeamPostBody } from "../dto/team-dto";
-import type { ChangeRoleBody } from "../dto";
+import type { TeamRole, WorkspaceRole } from "../enums";
 
 export interface CurrentTeam {
   name: string;
@@ -24,26 +24,31 @@ export interface TeamRepositoryMethods {
   createTeam?: (team: any) => Promise<void>;
   modifyTeam?: (teamId: string, data) => any;
   setOpenTeam?: (teamId: string) => any;
+  updateUserRoleInTeam: (
+    teamId: string,
+    userId: string,
+    role: TeamRole,
+  ) => Promise<void>;
+  removeUserFromTeam: (teamId: string, userId: string) => Promise<void>;
 }
 
 export interface TeamServiceMethods {
   fetchTeams?: (userId: string) => any;
   createTeam?: (team: TeamPostBody) => any;
-
   inviteMembersAtTeam?: (teamId: string, inviteBody: InviteBody) => unknown;
-  removeMembersAtTeam?: (teamId: string, userId: string) => unknown;
-  promoteToAdminAtTeam?: (teamId: string, userId: string) => unknown;
-  demoteToMemberAtTeam?: (teamId: string, userId: string) => unknown;
+  removeMembersAtTeam?: (teamId: string, userId: string) => any;
+  promoteToAdminAtTeam?: (teamId: string, userId: string) => any;
+  demoteToMemberAtTeam?: (teamId: string, userId: string) => any;
   promoteToOwnerAtTeam?: (teamId: string, userId: string) => unknown;
   refreshWorkspace?: (userId: string) => void;
-
   changeUserRoleAtWorkspace?: (
     workspaceId: string,
     userId: string,
-    body: ChangeRoleBody,
+    body: WorkspaceRole,
   ) => unknown;
   removeUserFromWorkspace?: (workspaceId: string, userId: string) => unknown;
   disableNewInviteTag?: (userId: string, teamId: string) => Promise<Team>;
+  updateTeam: (teamId: string, team) => Promise<Team>;
 }
 
 export interface Team {

@@ -3,7 +3,7 @@
   export let width: number = 12;
   export let color: string = "grey";
 </script>
-
+ 
 <svg
   {width}
   {height}

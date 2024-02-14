@@ -43,7 +43,8 @@
   {#if generateUsersList(users).length > maxProfiles}
     <UserProfileSM
       classProp={classProp + `position-absolute bg-backgroundColor`}
-      stypeProp={stypeProp + `margin-left: -${4 * maxProfiles}px; z-index: ${maxProfiles};`}
+      stypeProp={stypeProp +
+        `margin-left: -${4 * maxProfiles}px; z-index: ${maxProfiles};`}
       {width}
       {height}
       {borderRadius}

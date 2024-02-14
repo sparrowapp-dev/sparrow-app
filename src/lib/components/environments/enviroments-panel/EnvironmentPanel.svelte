@@ -13,11 +13,19 @@
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment;
   export let activeWorkspace;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   const _environmentPanelViewModel = new EnvironmentPanelViewModel();
   let quickHelp: boolean = false;
@@ -117,33 +125,47 @@
               }}>How to use variables</span
             >
           </button>
-          <button
-            disabled={currentEnvironment.isSaveInProgress}
-            class="d-flex border-0 rounded env-save-btn env-save-btn-enabled d-flex align-items-center"
-            on:click={handleSaveEnvironment}
+          <Tooltip
+            title={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_ENVIRONMENT,
+            )}
           >
-            <div class="badge"></div>
-
-            {#if currentEnvironment.isSaveInProgress}
-              <span style="padding-right: 10px;">
-                <Spinner size={`${12}px`} />
-              </span>
-            {:else}
-              <SaveIcon
-                width={16}
-                height={16}
-                classProp={`me-2 my-auto rounded `}
-              />
-            {/if}
-
-            <span>Save</span>
-            <span class={`${!currentEnvironment.isSave && "badge"}`}>{" "}</span
+            <button
+              disabled={currentEnvironment.isSaveInProgress ||
+                !hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.ADD_ENVIRONMENT,
+                )}
+              class="d-flex border-0 rounded env-save-btn env-save-btn-enabled d-flex align-items-center"
+              on:click={handleSaveEnvironment}
             >
-          </button>
+              <div class="badge"></div>
+
+              {#if currentEnvironment.isSaveInProgress}
+                <span style="padding-right: 10px;">
+                  <Spinner size={`${12}px`} />
+                </span>
+              {:else}
+                <SaveIcon
+                  width={16}
+                  height={16}
+                  classProp={`me-2 my-auto rounded `}
+                />
+              {/if}
+
+              <span>Save</span>
+              <span class={`${!currentEnvironment.isSave && "badge"}`}
+                >{" "}</span
+              >
+            </button>
+          </Tooltip>
         </div>
       </header>
       <section class={`var-value-container`}>
         <EnvValue
+          {loggedUserRoleInWorkspace}
           keyValue={currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
         />

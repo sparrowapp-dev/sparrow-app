@@ -1,16 +1,24 @@
 <script lang="ts">
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import type { TeamServiceMethods } from "$lib/utils/interfaces";
+  import type {
+    TeamServiceMethods,
+    workspaceDocumentWithPosition,
+  } from "$lib/utils/interfaces";
   import { notifications } from "$lib/utils/notifications";
-  export let workspace;
+  export let workspace: workspaceDocumentWithPosition;
   export let user;
+  export let isWorkspaceMemberInfo = false;
+  export let teamRole: TeamRole = null;
   export let userType;
   export let teamServiceMethods: TeamServiceMethods;
   export let userId: string;
   export let handleMemberPopUpSuccess;
   export let workspaceCount;
-  console.log(workspaceCount);
+  export let handleDropDownWorkspaceLevel = (
+    currentRole: WorkspaceRole | "remove",
+  ) => {};
 
   const handleDropdown = async (id) => {
     if (id === "remove") {
@@ -34,16 +42,14 @@
         }
       }
     } else if (
-      workspace.position === WorkspaceRole.EDITOR &&
-      id === WorkspaceRole.VIEWER
+      workspace.position === WorkspaceRole.WORKSPACE_EDITOR &&
+      id === WorkspaceRole.WORKSPACE_VIEWER
     ) {
       // demote editor to viewer
       const response = await teamServiceMethods.changeUserRoleAtWorkspace(
         workspace._id,
         user.id,
-        {
-          role: WorkspaceRole.VIEWER,
-        },
+        WorkspaceRole.WORKSPACE_VIEWER,
       );
       if (response) {
         await teamServiceMethods.refreshWorkspace(userId);
@@ -56,16 +62,14 @@
         );
       }
     } else if (
-      workspace.position === WorkspaceRole.VIEWER &&
-      id === WorkspaceRole.EDITOR
+      workspace.position === WorkspaceRole.WORKSPACE_VIEWER &&
+      id === WorkspaceRole.WORKSPACE_EDITOR
     ) {
       // promote viewer to editor
       const response = await teamServiceMethods.changeUserRoleAtWorkspace(
         workspace._id,
         user.id,
-        {
-          role: WorkspaceRole.EDITOR,
-        },
+        WorkspaceRole.WORKSPACE_EDITOR,
       );
       if (response) {
         await teamServiceMethods.refreshWorkspace(userId);
@@ -86,61 +90,73 @@
     <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
-      {#if (userType === TeamRole.OWNER && user.role === TeamRole.MEMBER) || (userType === TeamRole.ADMIN && user.role === TeamRole.MEMBER)}
-        <MemberDropdown
-          id={workspace._id + "member-workspace"}
+      
+      {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER))}
+        <Dropdown
+          dropdownId={workspace._id}
+          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
           data={[
             {
               name: "Editor",
-              id: WorkspaceRole.EDITOR,
-              color: "whiteColor",
+              id: WorkspaceRole.WORKSPACE_EDITOR,
+               dynamicClasses: "text-whiteColor",
             },
             {
               name: "Viewer",
-              id: WorkspaceRole.VIEWER,
-              color: "whiteColor",
+              id: WorkspaceRole.WORKSPACE_VIEWER,
+               dynamicClasses: "text-whiteColor",
             },
             {
               name: "Remove",
               id: "remove",
-              color: "dangerColor",
+               dynamicClasses: "text-dangerColor",
             },
           ]}
-          method={workspace.position ? workspace.position : ""}
-          onclick={handleDropdown}
+          onclick={isWorkspaceMemberInfo
+            ? handleDropDownWorkspaceLevel
+            : handleDropdown}
         />
       {:else}
-        <MemberDropdown
-          id={workspace._id + "member-workspace"}
+        
+        <Dropdown
+          dropdownId={workspace._id + "member-workspace"}
+          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
           disabled={true}
-          data={[
-            {
-              name: "Editor",
-              id: WorkspaceRole.EDITOR,
-              color: "whiteColor",
-            },
-            {
-              name: "Viewer",
-              id: WorkspaceRole.VIEWER,
-              color: "whiteColor",
-            },
-            {
-              name: "Admin",
-              id: TeamRole.ADMIN,
-              color: "whiteColor",
-            },
-            {
-              name: "Owner",
-              id: TeamRole.OWNER,
-              color: "whiteColor",
-            },
-          ]}
-          method={user.role === TeamRole.OWNER
-            ? TeamRole.OWNER
+          method={user.role || teamRole === TeamRole.TEAM_OWNER
+            ? TeamRole.TEAM_ADMIN
             : workspace.position
             ? workspace.position
             : ""}
-          onclick={handleDropdown}
+          data={[
+            {
+              name: "Editor",
+              id: WorkspaceRole.WORKSPACE_EDITOR,
+              dynamicClasses: "text-whiteColor",
+            },
+            {
+              name: "Viewer",
+              id: WorkspaceRole.WORKSPACE_VIEWER,
+              dynamicClasses: "text-whiteColor",
+            },
+            {
+              name: "Admins",
+              id: TeamRole.TEAM_ADMIN,
+              dynamicClasses: "text-whiteColor",
+            },
+            {
+              name: "Owner",
+              id: TeamRole.TEAM_OWNER,
+              dynamicClasses: "text-whiteColor",
+            },
+            {
+              name: "Removes",
+              id: "remove",
+              dynamicClasses: "text-dangerColor",
+            },
+          ]}
+          onclick={isWorkspaceMemberInfo
+            ? handleDropDownWorkspaceLevel
+            : handleDropdown}
         />
       {/if}
     </div>

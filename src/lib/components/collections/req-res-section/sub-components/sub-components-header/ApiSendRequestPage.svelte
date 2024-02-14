@@ -8,10 +8,10 @@
     leftPanelWidth,
     rightPanelWidth,
   } from "$lib/store/request-response-section";
-  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import { onDestroy } from "svelte";
   import { ApiSendRequestViewModel } from "./ApiSendRequestPage.ViewModel";
   import { createApiRequest } from "$lib/services/rest-api.service";
+  import ColorDropdown from "$lib/components/dropdown/ColourDropdown.svelte";
   import {
     RequestMethod,
     RequestProperty,
@@ -23,6 +23,15 @@
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import CodeMirrorInput from "./CodeMirrorInput.svelte";
+  import type { EditorSelection } from "@codemirror/state";
+  import AddEnvironment from "../add-environment-popup/AddEnvironment.svelte";
+  import type {
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -51,6 +60,15 @@
   let trackCursor: number;
   let environmentAxisY: number;
   let environmentAxisX: number;
+  let envMissing = false;
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let activeWorkspaceRxDoc: WorkspaceDocument;
+  let currentWorkspaceName: string;
+  let currentWorkspaceId: string;
+  let globalEnvironment;
+  let currentEnvironment;
+  let localEnvKey: string;
 
   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
     if (event) {
@@ -215,9 +233,9 @@
     isHorizontalMode = value;
   });
 
-  const handleDropdown = (tab: RequestMethodType) => {
+  const handleDropdown = (tab: string) => {
     collectionsMethods.updateRequestProperty(
-      tab,
+      tab as RequestMethodType,
       RequestProperty.METHOD,
       currentTabId,
     );
@@ -237,7 +255,48 @@
     );
     trackParanthesis = environmentHelper.balanceParanthesis(urlText);
   };
-  onDestroy(() => {
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      globalEnvironment = await collectionsMethods.getGlobalEnvironment();
+      activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        const env: EnvironmentDocument =
+          await collectionsMethods.currentEnvironment(
+            activeWorkspaceRxDoc.get("environmentId"),
+          );
+        if (env) {
+          currentEnvironment = env.toMutableJSON();
+        } else {
+          currentEnvironment = {
+            name: "None",
+            id: "none",
+          };
+        }
+        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+      }
+    },
+  );
+  let handleFocusValue = () => {
+    handleInputValue();
+    const elem = document.getElementById("input-request-url");
+    environmentAxisY = elem.getBoundingClientRect().top + 40;
+    environmentAxisX = elem.getBoundingClientRect().left;
+  };
+  let handleBlurValue = () => {
+    setTimeout(() => {
+      trackParanthesis = [];
+      trackCursor = undefined;
+      filterData = [];
+    }, 300);
+  };
+  let handleInputChange = (text: string) => {
+    urlText = text;
+  };
+  let handleKeyUpValue = (e: EditorSelection) => {
+    trackCursor = e.main.head;
+  };
+  let handleKeyDownChange = onDestroy(() => {
     isHorizontalUnsubscribe();
     tabSubscribe();
   });
@@ -256,6 +315,7 @@
 
   onDestroy(() => {
     window.removeEventListener("resize", handleResize);
+    activeWorkspaceSubscribe.unsubscribe();
   });
 
   const handleKeyPress = (event) => {
@@ -268,17 +328,67 @@
       inputElement.focus();
     }
   };
+
+  const handleEnvironmentBox = (change: boolean, envKey: string) => {
+    envMissing = change;
+    localEnvKey = envKey;
+  };
 </script>
 
-<div class="d-flex flex-column w-100">
+<div class="d-flex flex-column">
   <div
     class="d-flex align-items-center justify-content-between {isCollaps
       ? 'ps-5 pt-3 pe-3'
       : 'pt-3 px-3'}"
-    style="width:calc(100%-312px);"
+    style="width:calc(100%-302px);"
   >
     <div class="d-flex gap-2 w-100 position-relative">
-      <ColorDropdown
+      <Dropdown
+        dropdownId="api-request"
+        dropDownType={{ type: "text", title: method ? method : "" }}
+        staticCustomStyles={[
+          { id: "api-request-options-container", styleKey: "minWidth", styleValue: "120px" },
+        ]}
+        staticClasses={[
+          {
+            id: "api-request-btn-div",
+            classToAdd: ["px-2", "py-3", "border", "rounded"],
+          },
+          {
+            id: "api-request-options-container",
+            classToAdd: ["start-0","bg-backgroundDropdown"],
+          },
+        ]}
+        data={[
+          {
+            name: "GET",
+            id: RequestMethod.GET,
+            dynamicClasses: "text-getColor",
+          },
+          {
+            name: "POST",
+            id: RequestMethod.POST,
+            dynamicClasses: "text-postColor",
+          },
+          {
+            name: "PUT",
+            id: RequestMethod.PUT,
+            dynamicClasses: "text-putColor",
+          },
+          {
+            name: "DELETE",
+            id: RequestMethod.DELETE,
+            dynamicClasses: "text-deleteColor",
+          },
+          {
+            name: "PATCH",
+            id: RequestMethod.PATCH,
+            dynamicClasses: "text-patchColor",
+          },
+        ]}
+        onclick={handleDropdown}
+      ></Dropdown>
+      <!-- <ColorDropdown
         data={[
           {
             name: "GET",
@@ -308,40 +418,20 @@
         ]}
         method={method ? method : ""}
         onclick={handleDropdown}
-      />
-      <input
-        required
-        type="text"
-        id="input-request-url"
-        placeholder="Enter URL or paste text"
-        class="url-input form-control input-outline border-0 p-3 rounded {isInputEmpty
-          ? 'border-red'
-          : ''}"
-        autocomplete="off"
-        spellcheck="false"
-        autocorrect="off"
-        autocapitalize="off"
-        style="width:{isCollaps ? '100%' : ''}; height:34px;"
-        bind:value={urlText}
-        on:input={handleInputValue}
-        on:keydown={(e) => handleKeyPress(e)}
-        on:keyup={(e) => {
-          trackCursor = e.target.selectionStart;
-        }}
-        on:blur={() => {
-          setTimeout(() => {
-            trackParanthesis = [];
-            trackCursor = undefined;
-            filterData = [];
-          }, 300);
-        }}
-        on:focus={(e) => {
-          handleInputValue();
-          const elem = document.getElementById("input-request-url");
-          environmentAxisY = elem.getBoundingClientRect().top + 40;
-          environmentAxisX = elem.getBoundingClientRect().left;
-        }}
-        bind:this={inputElement}
+      /> -->
+
+      <CodeMirrorInput
+        rawValue={urlText}
+        handleRawChange={handleInputValue}
+        handleFocusChange={handleFocusValue}
+        handleBlurChange={handleBlurValue}
+        {handleInputChange}
+        handleKeyUpChange={handleKeyUpValue}
+        handleKeyDownChange={handleKeyPress}
+        codeMirrorEditorDiv={inputElement}
+        {currentTabId}
+        filterData={environmentVariables}
+        {handleEnvironmentBox}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
         <EnvironmentPicker
@@ -355,6 +445,18 @@
             urlText = txt;
           }}
           {handleInputValue}
+        />
+      {/if}
+      {#if envMissing}
+        <AddEnvironment
+          {environmentAxisX}
+          {environmentAxisY}
+          updateEnvironment={collectionsMethods.updateEnvironment}
+          {currentWorkspaceId}
+          {currentEnvironment}
+          {globalEnvironment}
+          {handleEnvironmentBox}
+          {localEnvKey}
         />
       {/if}
 
