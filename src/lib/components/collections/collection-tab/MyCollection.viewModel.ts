@@ -35,19 +35,7 @@ export class MyCollectionViewModel {
   ) => {
     const updateObj = {};
 
-    switch (property) {
-      case "name": {
-        updateObj.name = value;
-        break;
-      }
-      case "description": {
-        updateObj.description = value;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    updateObj[property] = value;
     const updateCollectionElement =
       await this.collectionService.updateCollectionData(
         componentData.path.collectionId,
