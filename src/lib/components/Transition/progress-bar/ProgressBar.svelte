@@ -17,15 +17,15 @@
 </script>
 
 <div
-  class="sparrow-progress-bg-overlay"
+  class="sparrow-progress-bg-overlay position-fixed"
   style={`z-index: ${zIndex}`}
   on:click={onClick(false)}
   transition:fade={{ delay: 0, duration: 100 }}
 />
 
-<div class="progress" style={`z-index: ${zIndex + 1};`}>
-  <div class="container d-flex justify-content-center">
-    <h1 class="syntax-highlighting sparrow-fs-12 fw-normal text-center">
+<div class="progress position-fixed" style={`z-index: ${zIndex + 1};`}>
+  <div class="container d-flex flex-column justify-content-center">
+    <h1 class="syntax-highlighting lh-1 sparrow-fs-12 fw-normal text-center">
       {title}
     </h1>
     <div class="progresser w-100 overflow-hidden rounded">
@@ -46,7 +46,6 @@
 
 <style>
   .sparrow-progress-bg-overlay {
-    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
@@ -55,7 +54,6 @@
     backdrop-filter: blur(3px);
   }
   .progress {
-    position: fixed;
     width: 30%;
     height: 10%;
     top: 50%;
@@ -69,12 +67,10 @@
   }
 
   .container {
-    flex-direction: column;
     background-color: transparent !important;
   }
 
   .syntax-highlighting {
-    line-height: 18px;
     letter-spacing: 0em;
   }
 
