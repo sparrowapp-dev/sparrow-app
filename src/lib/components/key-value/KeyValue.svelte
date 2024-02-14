@@ -2,12 +2,16 @@
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
-  import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+  import type {
+    KeyValuePair,
+    KeyValuePairWithBase,
+  } from "$lib/utils/interfaces/request.interface";
+  import { invoke } from "@tauri-apps/api";
   import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
-
+  import close from "$lib/assets/close.svg";
   type Mode = "READ" | "WRITE";
 
-  export let keyValue: KeyValuePair[];
+  export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
   export let callback: (pairs: KeyValuePair[]) => void;
   export let mode: Mode = "WRITE";
   export let readable: { key: string; value: string } = {
@@ -15,8 +19,9 @@
     value: "",
   };
   export let environmentVariables;
+  export let type: "file" | "text" = "text";
   const environmentHelper = new EnvironmentHeper();
-  let pairs: KeyValuePair[] = keyValue;
+  let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
 
   let trackParanthesis: unknown[] = [];
@@ -104,6 +109,42 @@
       return elem;
     });
     pairs = filteredKeyValue;
+    callback(pairs);
+  };
+
+  const extractFileName = (url) => {
+    const parts = url.split("\\");
+    const fileName = parts[parts.length - 1];
+    return fileName;
+  };
+
+  const uploadFormFile = async (index) => {
+    const filePathResponse = await invoke("fetch_file_command");
+    if (filePathResponse !== "Canceled") {
+      const filename = extractFileName(filePathResponse);
+      const updatedFilePath = "#@#" + filePathResponse;
+      let filteredPair = pairs.map((elem, i) => {
+        if (i == index) {
+          elem.value = filename;
+          elem.base = updatedFilePath;
+        }
+        return elem;
+      });
+      pairs = filteredPair;
+      callback(pairs);
+      updateParam(index);
+    }
+  };
+
+  const removeFormFile = (index) => {
+    let filteredPair = pairs.map((elem, i) => {
+      if (i == index) {
+        elem.value = "";
+        elem.base = "";
+      }
+      return elem;
+    });
+    pairs = filteredPair;
     callback(pairs);
   };
 
@@ -301,61 +342,137 @@
                   />
                 {/if}
               </div>
-              <div class="flex-grow-1 w-100 position-relative">
-                <input
-                  type="text"
-                  placeholder="Enter Value"
-                  class="form-control keyValuePair py-1"
-                  style="font-size: 13px;"
-                  id={"pair-value" + index}
-                  disabled={mode == "READ" ? true : false}
-                  bind:value={element.value}
-                  on:input={() => {
-                    updateParam(index);
-                    tempText = element.value;
-                    handleInputValue();
-                  }}
-                  on:keyup={(e) => {
-                    trackCursor = e.target.selectionStart;
-                  }}
-                  on:blur={() => {
-                    setTimeout(() => {
-                      tempText = "";
-                      trackParanthesis = [];
-                      trackCursor = undefined;
-                      filterData = [];
-                    }, 300);
-                  }}
-                  on:focus={(e) => {
-                    tempText = element.value;
-                    focusedInput = index;
-                    focusedElement = "value";
-                    handleInputValue();
-                    const elem = document.getElementById("pair-value" + index);
-                    environmentAxisY = elem.getBoundingClientRect().top + 30;
-                    environmentAxisX = elem.getBoundingClientRect().left;
-                  }}
-                />
-                {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
-                  <EnvironmentPicker
-                    {environmentAxisX}
-                    {environmentAxisY}
-                    {filterData}
-                    inputText={element.value}
-                    {trackCursor}
-                    {trackParanthesis}
-                    updateText={(url) => {
-                      element.value = url;
-                    }}
-                    handleInputValue={() => {
+              {#if type === "file"}
+                <div class="flex-grow-1 w-100">
+                  <div
+                    class="position-relative rounded p-1 d-flex backgroundColor"
+                    style="height: 27px;"
+                  >
+                    {#if element.value === ""}
+                      <input
+                        type="text"
+                        class="form-control keyValuePair py-1"
+                        readonly
+                        style="z-index:4; font-size:13px;
+                    position: absolute;
+                      top:0;
+                      left:0;
+                      right:0;
+                      bottom:-1;"
+                        placeholder="Choose File"
+                      />
+                      <input
+                        class="form-input"
+                        type="text"
+                        id="formdata-file"
+                        on:click={() => {
+                          uploadFormFile(index);
+                        }}
+                        style="opacity: 0;
+                      position: absolute;
+                      top:0;
+                      left:0;
+                      right:0;
+                      bottom:0;
+                      z-index:10;
+                      "
+                      />
+                    {:else}
+                      <input
+                        type="text"
+                        class="form-control keyValuePair py-1"
+                        readonly
+                        style="z-index:4; font-size:13px;
+                    position: absolute;
+                      top:0;
+                      left:0;
+                      right:0;
+                      bottom:-1;"
+                        placeholder=""
+                      />
+                      <div
+                        class=""
+                        style="height:18px;
+                      z-index:4; 
+                      font-size:13px;
+                    position: absolute;
+                      top:0;
+                      left:10px;"
+                      >
+                        <span style="font-size:10px; margin:4px;"
+                          >{element.value}</span
+                        >
+                        <img
+                          src={close}
+                          alt=""
+                          style="cursor:pointer;"
+                          on:click={() => {
+                            removeFormFile(index);
+                          }}
+                        />
+                      </div>
+                    {/if}
+                  </div>
+                </div>
+              {:else}
+                <div class="flex-grow-1 w-100 position-relative">
+                  <input
+                    type="text"
+                    placeholder="Enter Value"
+                    class="form-control keyValuePair py-1"
+                    style="font-size: 13px;"
+                    id={"pair-value" + index}
+                    disabled={mode == "READ" ? true : false}
+                    bind:value={element.value}
+                    on:input={() => {
                       updateParam(index);
-                      trackParanthesis = [];
-                      trackCursor = undefined;
-                      filterData = [];
+                      tempText = element.value;
+                      handleInputValue();
+                    }}
+                    on:keyup={(e) => {
+                      trackCursor = e.target.selectionStart;
+                    }}
+                    on:blur={() => {
+                      setTimeout(() => {
+                        tempText = "";
+                        trackParanthesis = [];
+                        trackCursor = undefined;
+                        filterData = [];
+                      }, 300);
+                    }}
+                    on:focus={(e) => {
+                      tempText = element.value;
+                      focusedInput = index;
+                      focusedElement = "value";
+                      handleInputValue();
+                      const elem = document.getElementById(
+                        "pair-value" + index,
+                      );
+                      environmentAxisY = elem.getBoundingClientRect().top + 30;
+                      environmentAxisX = elem.getBoundingClientRect().left;
                     }}
                   />
-                {/if}
-              </div>
+                  {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
+                    <EnvironmentPicker
+                      {environmentAxisX}
+                      {environmentAxisY}
+                      {filterData}
+                      inputText={element.value}
+                      {trackCursor}
+                      {trackParanthesis}
+                      updateText={(url) => {
+                        element.value = url;
+                      }}
+                      handleInputValue={() => {
+                        updateParam(index);
+                        trackParanthesis = [];
+                        trackCursor = undefined;
+                        filterData = [];
+                      }}
+                    />
+                  {/if}
+                </div>
+              {/if}
             </div>
             {#if pairs.length - 1 != index}
               <div class="h-75 pe-1">

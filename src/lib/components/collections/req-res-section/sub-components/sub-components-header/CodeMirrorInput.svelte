@@ -224,5 +224,7 @@
 <style>
   #input-request-url {
     width: 100%;
+    max-width: calc(100vw - 630px);
+    min-width: 60%;
   }
 </style>
