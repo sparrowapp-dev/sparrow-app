@@ -34,7 +34,6 @@ export class MyFolderViewModel {
     collectionsMethods: CollectionsMethods,
   ) => {
     const updateObj = {};
-
     updateObj[property] = value;
     const updateFolderElement =
       await this.collectionService.updateFolderInCollection(

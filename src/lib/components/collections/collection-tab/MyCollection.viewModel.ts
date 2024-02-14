@@ -34,7 +34,6 @@ export class MyCollectionViewModel {
     collectionsMethods: CollectionsMethods,
   ) => {
     const updateObj = {};
-
     updateObj[property] = value;
     const updateCollectionElement =
       await this.collectionService.updateCollectionData(
