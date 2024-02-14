@@ -667,6 +667,7 @@
           {loggedUserRoleInWorkspace}
           {handleCreateCollection}
           {collectionsMethods}
+          {currentWorkspaceId}
           {showDefault}
           {currentWorkspaceId}
         />
