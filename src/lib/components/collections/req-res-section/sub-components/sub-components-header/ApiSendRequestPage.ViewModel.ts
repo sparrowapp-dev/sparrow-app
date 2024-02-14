@@ -248,9 +248,9 @@ class ApiSendRequestViewModel {
 
   public decodeRestApiData(request: any, environmentVariables): string[] {
     return [
-      this.setEnvironmentVariables(
-        this.extractURl(request.url, request),
-        environmentVariables,
+      this.extractURl(
+        this.setEnvironmentVariables(request.url, environmentVariables),
+        request,
       ),
       this.extractMethod(request.method),
       this.setEnvironmentVariables(
