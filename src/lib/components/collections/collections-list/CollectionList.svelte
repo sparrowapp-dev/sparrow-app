@@ -487,7 +487,7 @@
       hoverClasses={[
         {
           id: "hash129-btn-div",
-          classToAdd: ["border-bottom","border-labelColor"],
+          classToAdd: ["border-bottom", "border-labelColor"],
         },
       ]}
     ></Dropdown>
@@ -546,7 +546,11 @@
         )}
         dropDownType={{ type: "img", title: plusIcon }}
         staticCustomStyles={[
-          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+          {
+            id: "collectionDropdown-options-container",
+            styleKey: "minWidth",
+            styleValue: "160px",
+          },
         ]}
         data={[
           {
@@ -570,10 +574,10 @@
             id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
-          
+
           {
             id: "collectionDropdown-options-container",
-            classToAdd: ["end-0","mt-1"],
+            classToAdd: ["end-0", "mt-1"],
           },
         ]}
       ></Dropdown>
@@ -669,7 +673,6 @@
           {collectionsMethods}
           {currentWorkspaceId}
           {showDefault}
-          {currentWorkspaceId}
         />
       {/if}
     </div>
