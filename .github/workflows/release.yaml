@@ -44,11 +44,11 @@ jobs:
            TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
            GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      # - name: Print file content
-      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64_en-US.msi.zip.sig
+      - name: Print file content
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.1.0_x64_en-US.msi.zip.sig
 
-      # - name: Print file content
-      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.0.0_x64-setup.nsis.zip.sig
+      - name: Print file content
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.1.0_x64-setup.nsis.zip.sig
 
 
       - name: Fetch Version from package.json
