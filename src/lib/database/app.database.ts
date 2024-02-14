@@ -180,11 +180,14 @@ export class RxDB {
           },
         },
       },
-      environmentTab: {
+      environmenttab: {
         schema: environmentTabSchema,
         migrationStrategies: {
           //   // database  migration functions
           1: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },

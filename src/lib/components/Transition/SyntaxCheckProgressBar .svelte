@@ -1,4 +1,8 @@
 <script>
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\Transition\progress-bar\ProgressBar.svelte
+   * **/
   export let onClick;
 </script>
 
@@ -12,12 +16,17 @@
   <div class="container">
     <h1 class="syntax-highlighting">Identifying Syntax</h1>
     <div class="progress">
-      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+      <div
+        class="progress-bar progress-bar-striped progress-bar-animated"
+        role="progressbar"
+        aria-valuenow="100"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        style="width: 100%"
+      ></div>
     </div>
-
   </div>
-  </div>
-
+</div>
 
 <style>
   .background-overlay {

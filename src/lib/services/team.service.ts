@@ -28,6 +28,14 @@ export class TeamService {
     return response;
   };
 
+  public updateTeam = async (teamId: string, team: TeamPostBody) => {
+    const response = await makeRequest("PUT", `${apiUrl}/api/team/${teamId}`, {
+      body: team,
+      headers: getMultipartAuthHeaders(),
+    });
+    return response;
+  };
+
   public leaveTeam = async (teamId: string) => {
     const response = await makeRequest(
       "PUT",

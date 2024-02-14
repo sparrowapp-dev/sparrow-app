@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated This component is deprecated and will be removed in future releases.
+   * Please use Button Component instead.
+   */
   export let classProp = "";
   export let onClick: (e) => void;
   export let disabled = false;

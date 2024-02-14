@@ -3,12 +3,14 @@
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
-  import Folder from "./Folder.svelte";
+  import plusIcon from "$lib/assets/plus.svg";
+  import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import {
     collapseAnimationAppliedStore,
     collapsibleState,
+    isApiCreatedFirstTime,
   } from "$lib/store/request-response-section";
   import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
   import { useTree } from "./collectionList";
@@ -19,7 +21,7 @@
     selectedMethodsCollectionStore,
   } from "$lib/store/methods";
 
-  import DefaultCollection from "./DefaultCollection.svelte";
+  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
   import {
     type CollectionDocument,
     type EnvironmentDocument,
@@ -40,6 +42,7 @@
   export let activePath;
   export let environments = [];
   export let runAnimation: boolean = false;
+  let isImportCollectionPopup = false;
   export let changeAnimation: () => void;
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
@@ -53,13 +56,21 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { currentWorkspace, setCurrentWorkspace } from "$lib/store";
+  import { setCurrentWorkspace } from "$lib/store";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { generateSampleRequest } from "$lib/utils/sample";
+  import ImportCollection from "../../collections/collections-list/import-collection/ImportCollection.svelte";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import List from "$lib/components/list/List.svelte";
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
   let showfilterDropdown = false;
   let searchData: string = "";
   let userName: string = "";
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let isComponentRenderedFirstTime = false;
   let showDefault = false;
   let isLoading = true;
@@ -192,6 +203,11 @@
       }
     },
   );
+
+  const handleImportCollectionPopup = (flag: boolean) => {
+    createCollectionSource.set("AddIcon");
+    isImportCollectionPopup = flag;
+  };
   let collectionSource = "";
   createCollectionSource.subscribe((value) => {
     collectionSource = value;
@@ -303,6 +319,14 @@
     }
   };
 
+  const addApiRequest = () => {
+    isApiCreatedFirstTime.set(true);
+    collectionsMethods.handleCreateTab(
+      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+    );
+    moveNavigation("right");
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "Side Panel TopBar" });
+  };
   let filteredCollection = [];
   let filteredFolder = [];
   let filteredFile = [];
@@ -356,6 +380,14 @@
     activeWorkspaceSubscribe.unsubscribe();
     usernameUnsubscribe();
   });
+
+  const handleRequestClick = (id: string) => {
+    if (id === "apiRequest") {
+      addApiRequest();
+    } else {
+      isImportCollectionPopup = true;
+    }
+  };
 
   let selectedView: string = "grid";
 </script>
@@ -422,21 +454,43 @@
     </button>
   </div>
   <div class="px-3 pt-2">
-    <EnvironmentDropdown
+    <Dropdown
+      mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
-      title={currentEnvironment?.id}
       data={[
         {
-          name: "None",
+          name: "Select Environment",
           id: "none",
           type: environmentType.LOCAL,
+          hide: true,
+          selectedOptionClasses: "mb-0 ellipsis text-textColor",
         },
+        {
+          name: "None",
+          id: "",
+          type: environmentType.LOCAL,
+        },
+
         ...environments,
       ].filter((elem) => {
+        elem["dynamicClasses"] = "text-whiteColor";
         return elem.type === environmentType.LOCAL;
       })}
       onclick={handleDropdown}
-    />
+      dropDownType={{ type: "text", title: currentEnvironment?.id }}
+      staticClasses={[
+        {
+          id: "hash129-options-container",
+          classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
+        },
+      ]}
+      hoverClasses={[
+        {
+          id: "hash129-btn-div",
+          classToAdd: ["border-bottom","border-labelColor"],
+        },
+      ]}
+    ></Dropdown>
   </div>
   <div
     class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
@@ -476,17 +530,58 @@
       </button>
     </div>
     <div>
+      <!-- <RequestDropdown
       <RequestDropdown
+        {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {handleCreateCollection}
         {collectionUnderCreation}
         {currentWorkspaceId}
-      />
+      /> -->
+      <Dropdown
+        dropdownId={"collectionDropdown"}
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_COLLECTIONS,
+        )}
+        dropDownType={{ type: "img", title: plusIcon }}
+        staticCustomStyles={[
+          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+        ]}
+        data={[
+          {
+            name: "Collection",
+            id: "collection",
+            dynamicClasses: "text-whiteColor",
+          },
+          {
+            name: "API Request",
+            id: "apiRequest",
+            dynamicClasses: "text-whiteColor mt-1",
+          },
+        ]}
+        onclick={handleRequestClick}
+        staticClasses={[
+          {
+            id: "collectionDropdown-img",
+            classToAdd: ["bg-backgroundDark", "p-1", "rounded"],
+          },
+          {
+            id: "collectionDropdown-options-div",
+            classToAdd: ["border-bottom"],
+          },
+          
+          {
+            id: "collectionDropdown-options-container",
+            classToAdd: ["end-0","mt-1"],
+          },
+        ]}
+      ></Dropdown>
     </div>
   </div>
   <div
-    class="d-flex flex-column pt-3 ps-3 pe-3 collections-list sparrow-thin-scrollbar pb-4"
-    style="overflow:auto;margin-top:5px;"
+    class="d-flex flex-column collections-list"
+    style="overflow:hidden; margin-top:5px;"
   >
     <div class="d-flex flex-column justify-content-center">
       {#if isLoading}
@@ -498,7 +593,7 @@
           <FilterDropDown {handleSearch} />
         {/if}
         {#if searchData.length > 0}
-          <div class="p-4 pt-0">
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
             {#if filteredFile.length > 0}
               {#each filteredFile as exp}
                 <SearchTree
@@ -534,43 +629,60 @@
                 />
               {/each}
             {/if}
-          </div>
+          </List>
         {:else if selectedApiMethods.length > 0}
-          {#each filteredSelectedMethodsCollection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-              {activeTabId}
-              {activePath}
-            />
-          {/each}
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            {#each filteredSelectedMethodsCollection as col}
+              <Collection
+                {loggedUserRoleInWorkspace}
+                collectionList={collection}
+                collectionId={col.id}
+                {currentWorkspaceId}
+                collection={col}
+                title={col.name}
+                {collectionsMethods}
+                {activeTabId}
+                {activePath}
+              />
+            {/each}
+          </List>
         {:else if collection && collection.length > 0}
-          {#each collection as col}
-            <Folder
-              collectionList={collection}
-              collectionId={col.id}
-              {currentWorkspaceId}
-              collection={col}
-              title={col.name}
-              {collectionsMethods}
-              {activeTabId}
-              {activePath}
-            />
-          {/each}
+          <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            {#each collection as col}
+              <Collection
+                {loggedUserRoleInWorkspace}
+                collectionList={collection}
+                collectionId={col.id}
+                {currentWorkspaceId}
+                collection={col}
+                title={col.name}
+                {collectionsMethods}
+                {activeTabId}
+                {activePath}
+              />
+            {/each}
+          </List>
         {/if}
-        <DefaultCollection
+        <EmptyCollection
+          {loggedUserRoleInWorkspace}
           {handleCreateCollection}
           {collectionsMethods}
+          {currentWorkspaceId}
           {showDefault}
+          {currentWorkspaceId}
         />
       {/if}
     </div>
   </div>
 </div>
+{#if isImportCollectionPopup}
+  <ImportCollection
+    onClick={handleImportCollectionPopup}
+    {handleCreateCollection}
+    {currentWorkspaceId}
+    {collectionsMethods}
+  />
+{/if}
 
 <style>
   .view-active {

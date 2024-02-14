@@ -30,13 +30,11 @@
   import { navigate } from "svelte-navigator";
   import { notifications } from "$lib/utils/notifications";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import {
-    ParaInput,
-    FileInput,
-    TextInput,
-    CustomPopup,
-  } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import Input from "$lib/components/inputs/Input.svelte";
+  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -50,7 +48,6 @@
   let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
-  let teamUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
   let isShowMoreVisible: boolean = false;
   let openLeaveTeamModal: boolean = false;
@@ -100,6 +97,7 @@
     changeUserRoleAtWorkspace: _viewModel.changeUserRoleAtWorkspace,
     removeUserFromWorkspace: _viewModel.removeUserFromWorkspace,
     disableNewInviteTag: _viewModel.disableNewInviteTag,
+    updateTeam: _viewModel.updateTeam,
   };
 
   const userSubscribe = user.subscribe(async (value) => {
@@ -127,12 +125,6 @@
     }
   });
 
-  const isWorkspaceLoadedSubscribe = isWorkspaceLoaded.subscribe(
-    (value: boolean) => {
-      workspaceUnderCreation = value;
-    },
-  );
-
   const teamSubscribe = teams.subscribe((value: TeamDocument[]) => {
     if (value && value.length > 0) {
       const teamArr = value.map((teamDocument: TeamDocument) => {
@@ -144,6 +136,7 @@
   });
 
   const handleCreateWorkspace = async () => {
+    workspaceUnderCreation = true;  
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -164,15 +157,11 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      let totalCollection: number = 0;
       let totalRequest: number = 0;
 
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data._id) {
-            // totalCollection = item?._data?.collections?.length;
-            totalCollection = 0;
-          } else {
+          if (item._data._id !== response.data.data._id) {
             totalRequest = 0;
           }
         }
@@ -184,23 +173,22 @@
       };
 
       workspaceObj._id = response.data.data._id;
+      workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
-      workspaceObj.description = response.data.data?.description;
+      workspaceObj.description = response.data.data?.description ?? workspaceObj.description;
       workspaceObj.team = {
         teamId: response.data.data?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
       };
-      workspaceObj.owner = response.data.data?.owner;
       workspaceObj.users = response.data.data?.users;
       workspaceObj.createdAt = response.data.data?.createdAt;
       workspaceObj.createdBy = response.data.data?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.environments = response.data.data?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      // await _viewModelWorkspace.addWorkspace(workspaceObj);
       if (userId) await _viewModel.refreshTeams(userId);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
@@ -231,7 +219,6 @@
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
 
-    teamUnderCreation = true;
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
 
@@ -248,10 +235,8 @@
       );
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
-      teamUnderCreation = false;
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
-      teamUnderCreation = false;
       handleCreateTeamModal();
       notifications.error("Failed to create a new team.");
     }
@@ -391,10 +376,10 @@
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
-    isWorkspaceLoadedSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
+  let teamUnderSubmission: boolean = false;
 </script>
 
 <svelte:window
@@ -406,30 +391,32 @@
   }}
 />
 <!-- Create New Team POP UP -->
-<CustomPopup
-  isOpen={isCreateTeamModalOpen}
+
+<ModalWrapperV1
   title={"New Team"}
-  underSubmission={teamUnderCreation}
-  btnText={"Create Team"}
-  handleOpen={handleCreateTeamModal}
-  handleSubmit={() =>
-    handleCreateTeam(
-      newTeam.name.value,
-      newTeam.description.value,
-      newTeam.file.value,
-    )}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    handleCreateTeamModal();
+  }}
 >
-  <TextInput
+  <Input
     value={newTeam.name.value}
-    labelText="Team or Organization name"
     inputId="team-name-input"
+    labelText="Team or Organization name"
     inputPlaceholder="Please enter your team name"
     isRequired={true}
     onChange={handleTeamNameChange}
     invalidValue={newTeam.name.invalid}
     errorText={"Team name cannot be empty."}
+    type={"input"}
+    inputStyleProp={"border: 1px solid var(--border-color);"}
+    inputClassProp={`py-2 px-3 mb-3`}
+    labelTextClassProp={`mt-3`}
   />
-  <ParaInput
+  <Input
     maxCharacter={500}
     value={newTeam.description.value}
     labelText="About"
@@ -439,8 +426,10 @@
     inputId="team-desc-input"
     inputPlaceholder="Write a little about your team"
     onChange={handleTeamDescChange}
+    type={"textarea"}
+    inputClassProp={`py-2 px-3 border-0`}
   />
-  <FileInput
+  <DragDrop
     value={newTeam.file.value}
     maxFileSize={100}
     onChange={handleLogoInputChange}
@@ -458,24 +447,70 @@
     fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
     fileSizeError="The size of the file you are trying to upload is more than 100 KB."
   />
-</CustomPopup>
+  <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+    <Button
+      disable={teamUnderSubmission}
+      title={`Cancel`}
+      type="dark"
+      buttonClassProp={`me-2`}
+      onClick={handleCreateTeamModal}
+    />
+    <Button
+      title={"Create Team"}
+      type="primary"
+      disable={teamUnderSubmission}
+      loader={teamUnderSubmission}
+      buttonClassProp={`me-1`}
+      onClick={async () => {
+        teamUnderSubmission = true;
+        await handleCreateTeam(
+          newTeam.name.value,
+          newTeam.description.value,
+          newTeam.file.value,
+        );
+        teamUnderSubmission = false;
+      }}
+    />
+  </div>
+</ModalWrapperV1>
 
 <!-- Leave Team POP UP -->
-<CustomPopup
+
+<ModalWrapperV1
+  title={"Leave Team?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
   isOpen={openLeaveTeamModal}
-  title="Leave Team?"
-  underSubmission={isLeavingTeam}
-  isDanger={true}
-  btnText="Leave"
-  handleOpen={handleLeaveTeamModal}
-  handleSubmit={handleLeaveTeam}
+  handleModalState={(flag) => {
+    handleLeaveTeamModal();
+  }}
 >
   <p class="warning-text text-lightGray mt-3">
     Are you sure you want to leave team <span class="fw-semibold"
       >"{currOpenedTeam?.name}"</span
     >? You will lose access to all the resources in this team.
   </p>
-</CustomPopup>
+  <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+    <Button
+      disable={isLeavingTeam}
+      title={`Cancel`}
+      type="dark"
+      buttonClassProp={`me-2`}
+      onClick={handleLeaveTeamModal}
+    />
+    <Button
+      title={"Leave"}
+      type="danger"
+      disable={isLeavingTeam}
+      loader={isLeavingTeam}
+      buttonClassProp={`me-1`}
+      onClick={async () => {
+        handleLeaveTeam();
+      }}
+    />
+  </div>
+</ModalWrapperV1>
 
 <Motion {...scaleMotionProps} let:motion>
   <div class="workspace bg -backgroundColor" use:motion>
@@ -504,6 +539,7 @@
       {isShowMoreVisible}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
+      {workspaceUnderCreation}
       openTeam={$openTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}
