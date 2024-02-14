@@ -29,40 +29,36 @@ export class MyCollectionViewModel {
 
   public modifyCollection = async (
     componentData,
-    newCollectionName: string,
+    property: string,
+    value: string,
     collectionsMethods: CollectionsMethods,
-    tabName: string,
   ) => {
-    if (newCollectionName) {
-      const updateCollectionElement =
-        await this.collectionService.updateCollectionData(
-          componentData.path.collectionId,
-          componentData.path.workspaceId,
-          { name: newCollectionName },
-        );
+    const updateObj = {};
 
-      tabName = updateCollectionElement.data.data.name;
-
-      collectionsMethods.updateCollection(
+    updateObj[property] = value;
+    const updateCollectionElement =
+      await this.collectionService.updateCollectionData(
         componentData.path.collectionId,
-        updateCollectionElement.data.data,
+        componentData.path.workspaceId,
+        updateObj,
       );
 
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.collectionId,
-      );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.collectionId,
-      );
+    collectionsMethods.updateCollection(
+      componentData.path.collectionId,
+      updateCollectionElement.data.data,
+    );
 
-      Promise.resolve().then(() => {
-        moveNavigation("right");
-      });
-    }
+    collectionsMethods.updateTab(
+      value,
+      property,
+      componentData.path.collectionId,
+    );
+
+    collectionsMethods.updateTab(true, "save", componentData.path.collectionId);
+
+    Promise.resolve().then(() => {
+      moveNavigation("right");
+    });
   };
 
   public createApiRequest = async (
