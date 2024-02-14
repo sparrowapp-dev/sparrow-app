@@ -34,20 +34,7 @@ export class MyFolderViewModel {
     collectionsMethods: CollectionsMethods,
   ) => {
     const updateObj = {};
-
-    switch (property) {
-      case "name": {
-        updateObj.name = value;
-        break;
-      }
-      case "description": {
-        updateObj.description = value;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    updateObj[property] = value;
     const updateFolderElement =
       await this.collectionService.updateFolderInCollection(
         componentData.path.workspaceId,
