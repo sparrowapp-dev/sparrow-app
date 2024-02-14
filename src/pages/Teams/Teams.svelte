@@ -158,34 +158,34 @@
 
     if (response.isSuccessful) {
       let totalRequest: number = 0;
-
+      const responseData = response.data?.data;
       $data.map((item) => {
         if (item) {
-          if (item._data._id !== response.data.data._id) {
+          if (item._data._id !== responseData._id) {
             totalRequest = 0;
           }
         }
       });
 
       let path: Path = {
-        workspaceId: response.data.data._id,
+        workspaceId: responseData._id,
         collectionId: "",
       };
 
-      workspaceObj._id = response.data.data._id;
-      workspaceObj.id = response.data.data._id;
-      workspaceObj.name = response.data.data.name;
+      workspaceObj._id = responseData._id;
+      workspaceObj.id = responseData._id;
+      workspaceObj.name = responseData.name;
       workspaceObj.description =
-        response.data.data?.description ?? workspaceObj.description;
+        responseData?.description ?? workspaceObj.description;
       workspaceObj.team = {
-        teamId: response.data.data?.team?.id,
+        teamId: responseData?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
       };
-      workspaceObj.users = response.data.data?.users;
-      workspaceObj.createdAt = response.data.data?.createdAt;
-      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.users = responseData?.users;
+      workspaceObj.createdAt = responseData?.createdAt;
+      workspaceObj.createdBy = responseData?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environments;
+      workspaceObj.environments = responseData?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
