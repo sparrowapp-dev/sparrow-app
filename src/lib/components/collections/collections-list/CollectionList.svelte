@@ -669,7 +669,6 @@
           {collectionsMethods}
           {currentWorkspaceId}
           {showDefault}
-          {currentWorkspaceId}
         />
       {/if}
     </div>
