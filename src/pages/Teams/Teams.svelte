@@ -260,6 +260,7 @@
         //@ts-ignore
         activeTeamRxDoc?._data?.logo,
       );
+      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();
