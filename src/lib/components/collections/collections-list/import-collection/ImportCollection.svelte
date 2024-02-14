@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";

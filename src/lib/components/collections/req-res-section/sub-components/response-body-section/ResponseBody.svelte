@@ -3,7 +3,7 @@
   import copyIcon from "$lib/assets/copy.svg";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import {
     RequestDataType,
     ResponseFormatter,

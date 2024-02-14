@@ -8,7 +8,7 @@
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info/MemberInfo.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";

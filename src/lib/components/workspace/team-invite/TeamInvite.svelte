@@ -6,7 +6,7 @@
   import SelectRoleDropdown from "../../dropdown/SelectRoleDropdown.svelte";
   import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import { base64ToURL, createDynamicComponents } from "$lib/utils/helpers";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import Button from "$lib/components/buttons/Button.svelte";
 

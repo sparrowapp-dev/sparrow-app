@@ -1,10 +1,13 @@
 <script lang="ts">
   import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
-    import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
-  import type { TeamServiceMethods, workspaceDocumentWithPosition } from "$lib/utils/interfaces";
-  import { notifications } from "$lib/utils/notifications";
-  export let workspace:workspaceDocumentWithPosition;
+  import type {
+    TeamServiceMethods,
+    workspaceDocumentWithPosition,
+  } from "$lib/utils/interfaces";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  export let workspace: workspaceDocumentWithPosition;
   export let user;
   export let isWorkspaceMemberInfo = false;
   export let teamRole: TeamRole = null;

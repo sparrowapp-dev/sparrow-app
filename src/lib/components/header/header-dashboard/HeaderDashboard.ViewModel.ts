@@ -5,7 +5,7 @@ import { WorkspaceService } from "$lib/services/workspace.service";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
 
 import { clearAuthJwt } from "$lib/utils/jwt";
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";

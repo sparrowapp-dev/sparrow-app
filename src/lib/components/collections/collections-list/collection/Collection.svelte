@@ -25,7 +25,7 @@
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 

@@ -9,7 +9,7 @@
     TeamServiceMethods,
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "../buttons/Button.svelte";
   import MemberDropDown from "../dropdown/MemberDropdown.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
