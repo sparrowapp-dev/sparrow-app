@@ -36,7 +36,7 @@
   export let handleLeaveTeamModal: () => void;
   export let handleOnShowMoreClick: (e) => void;
   export let isShowMoreVisible: boolean = false;
-  export let workspaceUnderCreation = false
+  export let workspaceUnderCreation = false;
 
   let currOpenedTeam: CurrentTeam;
   let selectedTab = "all-workspace";

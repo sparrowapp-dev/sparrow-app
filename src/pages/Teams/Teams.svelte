@@ -136,7 +136,7 @@
   });
 
   const handleCreateWorkspace = async () => {
-    workspaceUnderCreation = true;  
+    workspaceUnderCreation = true;
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -175,7 +175,8 @@
       workspaceObj._id = response.data.data._id;
       workspaceObj.id = response.data.data._id;
       workspaceObj.name = response.data.data.name;
-      workspaceObj.description = response.data.data?.description ?? workspaceObj.description;
+      workspaceObj.description =
+        response.data.data?.description ?? workspaceObj.description;
       workspaceObj.team = {
         teamId: response.data.data?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
@@ -221,13 +222,13 @@
 
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
-
     await _viewModel.addTeam(teamObj);
     const response = await _viewModel.createTeam(teamObj);
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
+      await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
       setOpenedTeam(
         response.data.data?._id,
         response?.data?.data?.name,
@@ -238,7 +239,10 @@
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
       handleCreateTeamModal();
-      notifications.error("Failed to create a new team.");
+      notifications.error(
+        "Failed to create a new team. " + response.message ??
+          "Failed to create a new team.",
+      );
     }
   };
 
