@@ -393,7 +393,9 @@
                       <div
                         class="position-absolute"
                         style="height:18px;
+                      
                       font-size:13px;
+                    
                       top:0;
                       left:10px;"
                       >
