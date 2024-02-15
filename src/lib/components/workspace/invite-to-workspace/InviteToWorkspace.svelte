@@ -3,7 +3,6 @@
   export let teamName: string;
   import { fade } from "svelte/transition";
   import closeIcon from "$lib/assets/close-icon-normal.svg";
-  import SelectRoleDropdown from "$lib/components/dropdown/SelectRoleDropdown.svelte";
   import closeIconWhite from "$lib/assets/close-icon-white.svg";
   import type {
     addUsersInWorkspace,
@@ -12,7 +11,9 @@
   import { notifications } from "$lib/utils/notifications";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  const emailstoBeSentArr: string[] = [];
+  import { validateEmail } from "$lib/utils/helpers";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  let emailstoBeSentArr: string[] = [];
 
   export let addUsersInWorkspace: (
     id: string,
@@ -27,23 +28,34 @@
   let defaultRole = "select";
   let selectedRole = defaultRole;
   let currentEmailEntered: string;
+  let invalidEmails: string[] = [];
 
   function removeElement(event: Event): void {
-    const id = event.target?.id;
-    const removeElement = document.getElementById(id) as HTMLElement;
+    const email = event.target?.id;
+    const removeElement = document.getElementById(email) as HTMLElement;
     const emailContainer = document.getElementById(
       "input-email",
     ) as HTMLElement;
     emailContainer.removeChild(removeElement);
+    emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
+    invalidEmails = invalidEmails.filter((e) => e != email);
   }
 
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    emailstoBeSentArr.push(email);
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      invalidEmails.push(email);
+    } else {
+      emailstoBeSentArr.push(email);
+    }
+
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
+        !isValidEmail ? "border border-danger" : ""
+      }`,
     );
     const emailContentSpan = createDynamicComponents("span", "");
     const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
@@ -72,6 +84,11 @@
     ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
+    if (emailstoBeSentArr.length && !invalidEmails.length) {
+      showErrors = false;
+    } else {
+      showErrors = true;
+    }
   };
   const handleInvite = async () => {
     showErrors = true;
@@ -79,7 +96,13 @@
       users: emailstoBeSentArr,
       role: selectedRole,
     };
-    if (emailstoBeSentArr && emailstoBeSentArr.length > 0 && selectedRole) {
+    if (
+      emailstoBeSentArr &&
+      emailstoBeSentArr.length > 0 &&
+      !invalidEmails.length &&
+      selectedRole &&
+      selectedRole != "select"
+    ) {
       const response = await addUsersInWorkspace(
         currentWorkspaceDetails.id,
         data,
@@ -96,8 +119,8 @@
       handleInvitePopup(false);
     }
   };
-  const handleDropdown = (role: WorkspaceRole) => {
-    selectedRole = role;
+  const handleDropdown = (role: string) => {
+    selectedRole = role as WorkspaceRole;
   };
 </script>
 
@@ -118,55 +141,81 @@
     ></div>
     <input
       id="input"
-      placeholder="Enter email ID"
+      placeholder="Enter email IDs"
       style="outline:none;border:none;flex-grow:1; background:transparent;"
       bind:value={currentEmailEntered}
       class="input-container mt-2"
       on:keyup={(event) => {
-        if (event.key === "," || event.key === "Enter") {
+        if (
+          (event.key === "," || event.key === "Enter" || event.key === " ") &&
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
+          handleEmailOnAdd(currentEmailEntered);
+        }
+      }}
+      on:blur={() => {
+        if (
+          currentEmailEntered &&
+          currentEmailEntered.trim() != "" &&
+          currentEmailEntered.trim() != ","
+        ) {
           handleEmailOnAdd(currentEmailEntered);
         }
       }}
     />
   </div>
-  {#if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text sparrow-fs-12">Email ID cannot be Empty</p>
+  {#if showErrors && invalidEmails.length}
+    <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
+  {:else if showErrors && emailstoBeSentArr.length === 0}
+    <p class="error-text">Email ID cannot be Empty.</p>
   {/if}
 </div>
 <div class="mt-4">
   <p class="role-title mb-1">Role<span class="asterik">*</span></p>
-  <SelectRoleDropdown
-    isError={showErrors && selectedRole === defaultRole}
-    id={"invite-member-workspace"}
+  <Dropdown
+    dropDownType={{ type: "text", title: selectedRole ? selectedRole : "" }}
+    dropdownId="workspaceInvite"
     data={[
       {
         name: "Select",
         id: defaultRole,
         description: "Select role",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
+        hide: true,
       },
       {
         name: "Admin",
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
           "Add & edit resources within a workspace,add & remove members to workspace",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
         description: "Add & edit resources within a workspace",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
         description: "View Resources within a workspace.",
-        color: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
     ]}
-    method={selectedRole ? selectedRole : ""}
     onclick={handleDropdown}
+    staticClasses={[
+      {
+        id: `workspaceInvite-dropdown-${selectedRole}`,
+        classToAdd: ["border", "rounded", "py-1"],
+      },
+      {
+        id: "workspaceInvite-options-container",
+        classToAdd: ["end-0", "start-0"],
+      },
+    ]}
   />
   {#if showErrors && selectedRole === "select"}
     <p class="error-text sparrow-fs-12">Role Cannot Be Empty</p>

@@ -36,6 +36,7 @@
   export let handleLeaveTeamModal: () => void;
   export let handleOnShowMoreClick: (e) => void;
   export let isShowMoreVisible: boolean = false;
+  export let workspaceUnderCreation = false;
 
   let isLoading: boolean = false;
   let selectedTab = "all-workspace";
@@ -190,7 +191,7 @@
                 <Button
                   title={`New Workspace`}
                   type={`primary`}
-                  loader={isLoading}
+                  loader={workspaceUnderCreation}
                   loaderSize={17}
                   textStyleProp={"font-size: var(--small-text)"}
                   onClick={handleCreateWorkspace}
@@ -293,6 +294,7 @@
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
         {activeSideBarTabMethods}
+        {workspaceUnderCreation}
       />
     {:else if selectedTab === "members"}
       <Members

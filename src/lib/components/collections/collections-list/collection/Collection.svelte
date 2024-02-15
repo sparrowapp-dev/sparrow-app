@@ -27,12 +27,20 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/utils/notifications";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
@@ -45,6 +53,14 @@
   let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_FOLDER,
+      )
+    ) {
+      return;
+    }
     isFolderCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -99,6 +115,14 @@
   };
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -484,6 +508,7 @@
   <div class="sub-folders ps-3">
     {#each collection.items as exp}
       <Folder
+        {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {collectionList}
         {collectionId}
@@ -495,20 +520,29 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2">
-        <img
-          class="list-icons"
-          src={folderIcon}
-          alt="+ Folder"
-          on:click={handleFolderClick}
-        />
-        <img
-          class="list-icons"
-          src={requestIcon}
-          alt="+ API Request"
-          on:click={handleAPIClick}
-        />
-      </div>
+      <Tooltip
+        classProp="mt-2 mb-2"
+        title={PERMISSION_NOT_FOUND_TEXT}
+        show={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.SAVE_REQUEST,
+        )}
+      >
+        <div class="mt-2 mb-2">
+          <img
+            class="list-icons"
+            src={folderIcon}
+            alt="+ Folder"
+            on:click={handleFolderClick}
+          />
+          <img
+            class="list-icons"
+            src={requestIcon}
+            alt="+ API Request"
+            on:click={handleAPIClick}
+          />
+        </div>
+      </Tooltip>
     {/if}
   </div>
 </div>

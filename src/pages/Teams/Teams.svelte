@@ -125,12 +125,6 @@
     }
   });
 
-  const isWorkspaceLoadedSubscribe = isWorkspaceLoaded.subscribe(
-    (value: boolean) => {
-      workspaceUnderCreation = value;
-    },
-  );
-
   const teamSubscribe = teams.subscribe((value: TeamDocument[]) => {
     if (value && value.length > 0) {
       const teamArr = value.map((teamDocument: TeamDocument) => {
@@ -142,6 +136,7 @@
   });
 
   const handleCreateWorkspace = async () => {
+    workspaceUnderCreation = true;
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
@@ -162,43 +157,39 @@
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
-      let totalCollection: number = 0;
       let totalRequest: number = 0;
-
+      const responseData = response.data?.data;
       $data.map((item) => {
         if (item) {
-          if (item._data._id === response.data.data._id) {
-            // totalCollection = item?._data?.collections?.length;
-            totalCollection = 0;
-          } else {
+          if (item._data._id !== responseData._id) {
             totalRequest = 0;
           }
         }
       });
 
       let path: Path = {
-        workspaceId: response.data.data._id,
+        workspaceId: responseData._id,
         collectionId: "",
       };
 
-      workspaceObj._id = response.data.data._id;
-      workspaceObj.name = response.data.data.name;
-      workspaceObj.description = response.data.data?.description;
+      workspaceObj._id = responseData._id;
+      workspaceObj.id = responseData._id;
+      workspaceObj.name = responseData.name;
+      workspaceObj.description =
+        responseData?.description ?? workspaceObj.description;
       workspaceObj.team = {
-        teamId: response.data.data?.team?.id,
+        teamId: responseData?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
       };
-      workspaceObj.owner = response.data.data?.owner;
-      workspaceObj.users = response.data.data?.users;
-      workspaceObj.createdAt = response.data.data?.createdAt;
-      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.users = responseData?.users;
+      workspaceObj.createdAt = responseData?.createdAt;
+      workspaceObj.createdBy = responseData?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environemnts;
+      workspaceObj.environments = responseData?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      // await _viewModelWorkspace.addWorkspace(workspaceObj);
       if (userId) await _viewModel.refreshTeams(userId);
       if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
       await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
@@ -231,13 +222,13 @@
 
     isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
-
     await _viewModel.addTeam(teamObj);
     const response = await _viewModel.createTeam(teamObj);
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
+      await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
       setOpenedTeam(
         response.data.data?._id,
         response?.data?.data?.name,
@@ -249,7 +240,10 @@
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
       handleCreateTeamModal();
-      notifications.error("Failed to create a new team.");
+      notifications.error(
+        "Failed to create a new team. " + response.message ??
+          "Failed to create a new team.",
+      );
     }
   };
 
@@ -267,6 +261,7 @@
         //@ts-ignore
         activeTeamRxDoc?._data?.logo,
       );
+      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();
@@ -387,7 +382,6 @@
   onDestroy(() => {
     userSubscribe();
     openedTeamSubscribe();
-    isWorkspaceLoadedSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
@@ -552,6 +546,7 @@
       {isShowMoreVisible}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
+      {workspaceUnderCreation}
       openTeam={$openTeam}
       {teamServiceMethods}
       {teamRepositoryMethods}

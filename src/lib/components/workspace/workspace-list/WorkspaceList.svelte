@@ -22,7 +22,7 @@
 </script>
 
 <div
-  style="border-right: 1px solid #313233; overflow-y: auto; overflow-x: hidden;"
+  style="border-right: 1px solid var(--border-color);"
   class="sidebar sparrow-thin-scrollbar d-flex flex-column bg-backgroundColor"
 >
   <TeamsList

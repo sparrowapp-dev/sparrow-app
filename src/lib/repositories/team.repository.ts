@@ -34,7 +34,7 @@ export class TeamRepository {
   };
 
   /**
-   * get all teams
+   * Check whether the team is active
    */
   public checkActiveTeam = async (teamId: string): Promise<boolean> => {
     const team = await RxDB.getInstance()

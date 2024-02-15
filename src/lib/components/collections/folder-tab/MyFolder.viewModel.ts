@@ -29,38 +29,30 @@ export class MyFolderViewModel {
 
   public modifyFolder = async (
     componentData,
-    newFolderName: string,
+    property: string,
+    value: string,
     collectionsMethods: CollectionsMethods,
-    tabName: string,
   ) => {
-    if (newFolderName) {
-      const updateFolderElement =
-        await this.collectionService.updateFolderInCollection(
-          componentData.path.workspaceId,
-          componentData.path.collectionId,
-          componentData.path.folderId,
-          { name: newFolderName, description: "" },
-        );
-
-      tabName = updateFolderElement.data.data.name;
-
-      collectionsMethods.updateRequestOrFolderInCollection(
+    const updateObj = {};
+    updateObj[property] = value;
+    const updateFolderElement =
+      await this.collectionService.updateFolderInCollection(
+        componentData.path.workspaceId,
         componentData.path.collectionId,
         componentData.path.folderId,
-        updateFolderElement.data.data,
+        updateObj,
       );
+    await collectionsMethods.updateRequestOrFolderInCollection(
+      componentData.path.collectionId,
+      componentData.path.folderId,
+      updateFolderElement.data.data,
+    );
 
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.folderId,
-      );
-      collectionsMethods.updateTab(true, "save", componentData.path.folderId);
-
-      Promise.resolve().then(() => {
-        moveNavigation("right");
-      });
-    }
+    collectionsMethods.updateTab(value, property, componentData.path.folderId);
+    collectionsMethods.updateTab(true, "save", componentData.path.folderId);
+    Promise.resolve().then(() => {
+      moveNavigation("right");
+    });
   };
 
   public createApiRequest = async (
