@@ -103,12 +103,16 @@
         {
           "assets": [
             {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64.dmg",
+              "label": "sparrow.dmg"
+            },
+            {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/*.exe",
-              "label": "Sparrow.exe"
+              "label": "sparrow.exe"
             },
             {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/*.msi",
-              "label": "Sparrow.msi"
+              "label": "sparrow.msi"
             }
           ]
         }
