@@ -391,15 +391,13 @@
                         placeholder=""
                       />
                       <div
-                        class=""
+                        class="position-absolute"
                         style="height:18px;
-                      z-index:4; 
                       font-size:13px;
-                    position: absolute;
                       top:0;
                       left:10px;"
                       >
-                        <span style="font-size:10px; margin:4px;"
+                        <span style="font-size:10px;" class="m-1"
                           >{element.value}</span
                         >
                         <img
