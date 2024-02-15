@@ -1,4 +1,6 @@
 import { RxDB, type TeamDocument } from "$lib/database/app.database";
+import { TeamRole } from "$lib/utils/enums";
+import type { userDetails } from "$lib/utils/interfaces";
 import type { Observable } from "rxjs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -9,6 +11,19 @@ export class TeamRepository {
    */
   public getDocument = (elem: TeamDocument) => {
     return elem.toMutableJSON();
+  };
+
+  /**
+   * Get teams RxDoc
+   */
+  public getTeam = async (
+    teamId: string,
+  ): Promise<Observable<TeamDocument>> => {
+    return RxDB.getInstance().rxdb.team.findOne({
+      selector: {
+        teamId: teamId,
+      },
+    }).$;
   };
 
   /**
@@ -25,18 +40,17 @@ export class TeamRepository {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {
-          teamId: teamId,
           isActiveTeam: true,
         },
       })
       .exec();
-    return team ? true : false;
+    return team.teamId == teamId ? true : false;
   };
   /**
    * clear teams data
    */
   public clearTeams = async (): Promise<any> => {
-    return RxDB.getInstance().rxdb.team.find().remove();
+    return await RxDB.getInstance().rxdb.team.find().remove();
   };
 
   /**
@@ -51,6 +65,24 @@ export class TeamRepository {
 
       if (res.teamId == teamId) res.isActiveTeam = true;
       else res.isActiveTeam = false;
+      return res;
+    });
+    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+    return;
+  };
+
+  /**
+   * Sets a team as opened
+   */
+  public setOpenTeam = async (teamId: string): Promise<void> => {
+    const teams: TeamDocument[] = await RxDB.getInstance()
+      .rxdb.team.find()
+      .exec();
+    const data = teams.map((elem: TeamDocument) => {
+      const res = this.getDocument(elem);
+
+      if (res.teamId === teamId) res.isOpen = true;
+      else res.isOpen = false;
       return res;
     });
     await RxDB.getInstance().rxdb.team.bulkUpsert(data);
@@ -100,6 +132,24 @@ export class TeamRepository {
   };
 
   /**
+   * get open team
+   */
+  public getOpenTeam = (): Observable<TeamDocument> => {
+    return RxDB.getInstance().rxdb.team.findOne({
+      selector: {
+        isOpen: true,
+      },
+    }).$;
+  };
+
+  /**
+   * get teams data
+   */
+  public getTeamData = (): TeamDocument[] => {
+    return RxDB.getInstance().rxdb.team.find().exec();
+  };
+
+  /**
    * Create a new team
    */
   public createTeam = async (team: any): Promise<void> => {
@@ -120,8 +170,9 @@ export class TeamRepository {
       })
       .exec();
     await team.incrementalModify((value) => {
-      if (data.name) value.name = data.name;
-      if (data.description) value.description = data.description;
+      if (data.name || data.name === "") value.name = data.name;
+      if (data.description || data.description === "")
+        value.description = data.description;
       if (data.workspaces) value.workspaces = data.workspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;
@@ -131,7 +182,88 @@ export class TeamRepository {
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.createdBy) value.createdBy = data.createdBy;
+      if (typeof data.isNewInvite === "boolean")
+        value.isNewInvite = data.isNewInvite;
       return value;
+    });
+    return;
+  };
+
+  public updateUserRoleInTeam = async (
+    teamId: string,
+    userId: string,
+    role: TeamRole,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+
+    team._data.users.forEach((user: userDetails) => {
+      if (user.id === userId) {
+        user.role = role;
+        return;
+      }
+    });
+
+    team.incrementalPatch({
+      users: [...team.users],
+    });
+  };
+
+  public removeUserFromTeam = async (
+    teamId: string,
+    userId: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    const filteredUsers = team._data.users.filter((user: any) => {
+      return user.id !== userId;
+    });
+
+    team.incrementalPatch({
+      users: filteredUsers,
+    });
+  };
+
+  public removeTeam = async (teamId: string) => {
+    const team = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId: teamId,
+        },
+      })
+      .exec();
+    return await team.remove();
+  };
+
+  public removeWorkspaceFromTeam = async (
+    teamId: string,
+    workspaceId: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    const filteredWorkspaces = team._data.workspaces.filter(
+      (workspace: { workspaceId: string; name: string }) => {
+        return workspace.workspaceId !== workspaceId;
+      },
+    );
+
+    team.incrementalPatch({
+      workspaces: filteredWorkspaces,
     });
     return;
   };

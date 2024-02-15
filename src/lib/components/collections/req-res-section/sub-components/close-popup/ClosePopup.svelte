@@ -1,6 +1,5 @@
 <script lang="ts">
   import crossAsset from "$lib/assets/close.svg";
-  import CoverButton from "$lib/components/buttons/CoverButton.svelte";
   import { updateCollectionRequest } from "$lib/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { fade, fly } from "svelte/transition";
@@ -11,11 +10,19 @@
   } from "$lib/utils/interfaces/request.interface";
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let loader: boolean = false;
 
@@ -95,109 +102,55 @@
   };
 </script>
 
-<div
-  class="close-request-backdrop d-block"
-  on:click={() => {
-    closeCallback(false);
-  }}
-  transition:fade={{ delay: 0, duration: 100 }}
-/>
-<div
-  class="close-request d-block"
-  transition:fly={{ y: 50, delay: 0, duration: 100 }}
-  on:introstart
-  on:outroend
->
-  <div class="contain">
-    <div class="d-flex justify-content-between">
-      <div class="pb-2">
-        <h4 class="close-request__title">Save Changes?</h4>
-      </div>
-      <button
-        class="btn pt-0 p-0 pe-0"
-        on:click={() => {
+<div class="pb-3">
+  <small class="">
+    You have unsaved changes. Do you want to save them before closing the file?
+  </small>
+</div>
+<div class="d-flex justify-content-between">
+  <div>
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      type={"dark"}
+      onClick={() => {
+        closeCallback(false);
+      }}
+    />
+  </div>
+  <div class="d-flex">
+    <span style="margin-right: 15px;">
+      <Button
+        title={"Discard Changes"}
+        textClassProp={"fs-6"}
+        type={"dark"}
+        onClick={() => {
+          collectionsMethods.handleRemoveTab(componentData.id);
           closeCallback(false);
-        }}><img src={crossAsset} alt="" /></button
-      >
-    </div>
-    <div class="pb-3">
-      <small class="">
-        You have unsaved changes. Do you want to save them before closing the
-        file?
-      </small>
-    </div>
-    <div class="d-flex justify-content-between">
-      <div>
-        <CoverButton
-          text={"Cancel"}
-          size={16}
-          type={"dark"}
-          onClick={() => {
-            closeCallback(false);
-          }}
-        />
-      </div>
-      <div class="d-flex">
-        <span style="margin-right: 15px;">
-          <CoverButton
-            text={"Discard Changes"}
-            size={16}
-            type={"dark"}
-            onClick={() => {
-              collectionsMethods.handleRemoveTab(componentData.id);
-              closeCallback(false);
-            }}
-          />
-        </span>
-        <CoverButton
-          text={"Save Changes"}
-          size={16}
-          type={"primary"}
-          {loader}
-          onClick={() => {
-            if (
-              componentData?.path.collectionId &&
-              componentData?.path.workspaceId
-            ) {
-              handleSaveRequest();
-            } else {
-              closeCallback(false);
-              handleSaveAsBackdrop(true);
-            }
-          }}
-        />
-      </div>
-    </div>
+        }}
+      />
+    </span>
+    <Button
+      disable={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )}
+      title={"Save Changes"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      loaderSize={18}
+      {loader}
+      onClick={() => {
+        if (
+          componentData?.path.collectionId &&
+          componentData?.path.workspaceId
+        ) {
+          handleSaveRequest();
+        } else {
+          closeCallback(false);
+          handleSaveAsBackdrop(true);
+        }
+      }}
+    />
   </div>
 </div>
-
-<style>
-  .close-request-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-  }
-  .close-request {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    padding: 24px;
-    background-color: var(--background-color);
-    width: 540px;
-    height: 183px;
-    z-index: 10;
-  }
-  .cursor-pointer {
-    cursor: pointer;
-  }
-  .close-request__title {
-    font-size: 20px;
-  }
-</style>

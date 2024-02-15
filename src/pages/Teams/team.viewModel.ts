@@ -1,4 +1,5 @@
 import { WorkspaceService } from "$lib/services/workspace.service";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
@@ -10,6 +11,12 @@ import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TeamService } from "$lib/services/team.service";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type { TeamDocument } from "$lib/database/app.database";
+import type { Observable } from "rxjs";
+import type { InviteBody } from "$lib/utils/dto/team-dto";
+import type { TeamRole, WorkspaceRole } from "$lib/utils/enums";
+import { UserService } from "$lib/services/user.service";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Team } from "$lib/utils/interfaces";
 
 export class TeamViewModel {
   constructor() {}
@@ -19,6 +26,7 @@ export class TeamViewModel {
   private workspaceService = new WorkspaceService();
   private teamService = new TeamService();
   private teamRepository = new TeamRepository();
+  private userService = new UserService();
 
   public debounce = (func, delay) => {
     let timerId;
@@ -60,9 +68,41 @@ export class TeamViewModel {
     return this.teamRepository.getActiveTeam();
   }
 
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
+  }
+
   public get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
   }
+
+  /**
+   * Get team By it's ID
+   * @param teamId
+   * @returns RxDoc (Observable) of the team with that ID
+   */
+  public getTeam = async (
+    teamId: string,
+  ): Promise<Observable<TeamDocument>> => {
+    return await this.teamRepository.getTeam(teamId);
+  };
+
+  /**
+   * Leave team from RxDB
+   * @param teamId
+   * @returns Left Team Success or Failure
+   */
+  public leaveTeam = async (teamId: string): Promise<any> => {
+    const rxDBResponse = await this.teamRepository.removeTeam(teamId);
+    if ((await this.teamRepository.checkActiveTeam(teamId)) && rxDBResponse) {
+      const teamIdToActivate =
+        await this.workspaceRepository.activateInitialWorkspace();
+      if (teamIdToActivate)
+        await this.teamRepository.setActiveTeam(teamIdToActivate);
+    }
+    const resp = await this.teamService.leaveTeam(teamId);
+    return resp;
+  };
 
   public checkActiveTeam = async (teamId: string): Promise<boolean> => {
     return await this.teamRepository.checkActiveTeam(teamId);
@@ -80,6 +120,18 @@ export class TeamViewModel {
     await this.teamRepository.modifyTeam(teamId, team);
   };
 
+  public updateUserRoleInTeam = async (
+    teamId: string,
+    userId: string,
+    role: TeamRole,
+  ) => {
+    await this.teamRepository.updateUserRoleInTeam(teamId, userId, role);
+    return;
+  };
+  public removeUserFromTeam = async (teamId: string, userId: string) => {
+    await this.teamRepository.removeUserFromTeam(teamId, userId);
+    return;
+  };
   public createTeam = async (team) => {
     const response = await this.teamService.createTeam(team);
     return response;
@@ -107,6 +159,7 @@ export class TeamViewModel {
       createdBy: elem.get("createdBy"),
       updatedAt: elem.get("updatedAt"),
       updatedBy: elem.get("updatedBy"),
+      isNewInvite: elem.get("isNewInvite"),
     };
   };
 
@@ -127,9 +180,17 @@ export class TeamViewModel {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
   };
-
+  public getTeamData = async () => {
+    return await this.teamRepository.getTeamData();
+  };
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
+    let openTeamId: string = "";
+    const teamsData = await this.getTeamData();
+    teamsData.forEach((element) => {
+      const elem = element.toMutableJSON();
+      if (elem.isOpen) openTeamId = elem.teamId;
+    });
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
@@ -145,6 +206,7 @@ export class TeamViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -163,10 +225,131 @@ export class TeamViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          isNewInvite,
         };
       });
+      if (openTeamId) {
+        data.forEach((elem) => {
+          if (elem.teamId === openTeamId) {
+            elem.isOpen = true;
+          } else {
+            elem.isOpen = false;
+          }
+        });
+      } else {
+        data[0].isOpen = true;
+      }
+
       await this.teamRepository.bulkInsertData(data);
-      return;
     }
+  };
+
+  // service
+  public inviteMembersAtTeam = async (
+    teamId: string,
+    inviteBody: InviteBody,
+  ) => {
+    const response = await this.teamService.inviteMembersAtTeam(
+      teamId,
+      inviteBody,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public removeMembersAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.removeMembersAtTeam(teamId, userId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToAdminAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.demoteToMemberAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
+    const response = await this.teamService.promoteToOwnerAtTeam(
+      teamId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public changeUserRoleAtWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    body: WorkspaceRole,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      workspaceId,
+      userId,
+      body,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public removeUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      workspaceId,
+      userId,
+    );
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+  };
+
+  public setOpenTeam = async (teamId) => {
+    await this.teamRepository.setOpenTeam(teamId);
+  };
+
+  public disableNewInviteTag = async (
+    userId: string,
+    teamId: string,
+  ): Promise<Team> => {
+    const response: MakeRequestResponse =
+      await this.userService.disableNewInviteTag(userId, teamId);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
+  };
+
+  public updateTeam = async (teamId: string, team): Promise<Team | void> => {
+    const response = await this.teamService.updateTeam(teamId, team);
+    if (response.isSuccessful === true) {
+      return response.data.data;
+    }
+    return;
   };
 }

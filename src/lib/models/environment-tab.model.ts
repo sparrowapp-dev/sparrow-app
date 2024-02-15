@@ -15,7 +15,7 @@ export const environmentTabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 1,
+  version: 2,
   properties: {
     id: {
       type: "string",

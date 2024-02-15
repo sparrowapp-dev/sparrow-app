@@ -12,7 +12,9 @@
 
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { onDestroy } from "svelte";
+  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
   const _viewModel = new EnvironmentViewModel();
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const environments = _viewModel.environments;
   let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
 
@@ -56,8 +58,9 @@
 </script>
 
 <Motion {...scaleMotionProps} let:motion>
-  <div class="d-flex" use:motion>
+  <div class="environment" use:motion>
     <EnvironmentList
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentWorkspace={$activeWorkspace}
@@ -65,6 +68,7 @@
       currentEnvironment={$activeEnvironment}
     />
     <EnvironmentPanel
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentEnvironment={$activeEnvironment
@@ -74,3 +78,11 @@
     />
   </div>
 </Motion>
+
+<style>
+  .environment {
+    display: flex;
+    height: calc(100vh - 44px);
+    overflow: hidden;
+  }
+</style>

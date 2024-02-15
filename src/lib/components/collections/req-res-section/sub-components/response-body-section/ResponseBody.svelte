@@ -7,8 +7,8 @@
   import {
     RequestDataType,
     ResponseFormatter,
+    ResponseStatusCode,
   } from "$lib/utils/enums/request.enum";
-  import MonacoEditorResponse from "$lib/components/monaco-editor/MonacoEditorResponse.svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -18,6 +18,7 @@
   import { RequestProperty } from "$lib/utils/enums/request.enum";
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
+  import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
 
   export let response;
   export let apiState;
@@ -122,27 +123,32 @@
         >
           <Dropdown
             dropdownId={"hash565"}
-            title={apiState.responseRaw}
+            dropDownType={{ type: "text", title: apiState.responseRaw }}
             data={[
               {
                 name: "JSON",
                 id: RequestDataType.JSON,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "XML",
                 id: RequestDataType.XML,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "HTML",
                 id: RequestDataType.HTML,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Javascript",
                 id: RequestDataType.JAVASCRIPT,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Text",
                 id: RequestDataType.TEXT,
+                dynamicClasses: "text-whiteColor",
               },
             ]}
             onclick={handleTypeDropdown}
@@ -155,7 +161,7 @@
       <div class="d-flex gap-2">
         <button
           class="statuscode position-relative cursor-pointer ps-1 pe-1 border-0 rounded d-flex align-items-center justify-content-center text-backgroundColor gap-1 {statusCode ===
-          '200 OK'
+            '200 OK' || statusCode === '201 Created'
             ? 'status-primary1'
             : 'status-danger'} "
           style="font-size: 10px;"
@@ -164,7 +170,7 @@
             <div class="position-absolute tooltip-statuscode">
               <span class="ellipsis">
                 <span class="me-1">
-                  {#if statusCode === "200 OK"}
+                  {#if statusCode === ResponseStatusCode.OK || statusCode === ResponseStatusCode.CREATED}
                     <StatusSuccess
                       height={8}
                       width={8}
@@ -186,7 +192,7 @@
           {/if}
           <span class="ellipsis">
             <span class="me-1">
-              {#if statusCode === "200 OK"}
+              {#if statusCode === ResponseStatusCode.OK || statusCode === ResponseStatusCode.CREATED}
                 <StatusSuccess
                   height={8}
                   width={8}
@@ -249,10 +255,10 @@
     </div>
   </div>
   <div class="w-100 mt-3 backgroundColor">
-    <MonacoEditorResponse
+    <CodeMirrorResponse
+      formatter={apiState.responseFormatter}
       rawTab={apiState.responseRaw}
       rawValue={response.body}
-      formatter={apiState.responseFormatter}
       {currentTabId}
     />
   </div>

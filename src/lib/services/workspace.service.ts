@@ -1,6 +1,13 @@
 import constants from "$lib/utils/constants";
 import { makeRequest, getAuthHeaders } from "$lib/api/api.common";
-import type { WorkspacePostBody, WorkspacePutBody } from "$lib/utils/dto";
+import type {
+  WorkspacePostBody,
+  WorkspacePutBody,
+  addUsersInWorkspacePayload,
+} from "$lib/utils/dto";
+import type { WorkspaceRole } from "$lib/utils/enums";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
@@ -41,8 +48,10 @@ export class WorkspaceService {
     return response;
   };
 
-  public deleteWorkspace = async (workspaceId: string) => {
-    const response = await makeRequest(
+  public deleteWorkspace = async (
+    workspaceId: string,
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
       "DELETE",
       `${apiUrl}/api/workspace/${workspaceId}`,
       {
@@ -57,6 +66,62 @@ export class WorkspaceService {
       body: workspace,
       headers: getAuthHeaders(),
     });
+    return response;
+  };
+
+  public addUsersInWorkspace = async (
+    workspaceId: string,
+    addUsersInWorkspaceDto: addUsersInWorkspacePayload,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/workspace/${workspaceId}/user`,
+      {
+        body: addUsersInWorkspaceDto,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public getUserDetailsOfWorkspace = async (workspaceId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/${workspaceId}/users`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public changeUserRoleAtWorkspace = async (
+    workspaceId: string,
+    userId: string,
+    role: WorkspaceRole,
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
+      "PUT",
+      `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
+      {
+        body: { role },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public removeUserFromWorkspace = async (
+    workspaceId: string,
+    userId: string,
+  ): Promise<MakeRequestResponse> => {
+    const response: MakeRequestResponse = await makeRequest(
+      "DELETE",
+      `${apiUrl}/api/workspace/${workspaceId}/user/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
     return response;
   };
 }
