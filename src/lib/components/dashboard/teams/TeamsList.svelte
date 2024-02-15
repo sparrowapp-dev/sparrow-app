@@ -1,7 +1,10 @@
 <script lang="ts">
   import plus from "$lib/assets/plus.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { openedTeam } from "$lib/store/team.store";
+  /**
+   * @deprecated referes to teams store
+   * import { openedTeam } from "$lib/store/team.store";
+   **/
   import type {
     CurrentTeam,
     Team,
@@ -20,17 +23,20 @@
   export let userId: string;
   export let openTeam: Team;
 
-  const handleOpenTeam = (
-    teamId: string,
-    teamName: string,
-    teamBase64String: object,
-  ) => {
-    openedTeam.set({
-      id: teamId,
-      name: teamName,
-      base64String: teamBase64String,
-    });
-  };
+  /**
+   * @deprecated referes to teams store
+   * const handleOpenTeam = (
+   *   teamId: string,
+   *   teamName: string,
+   *   teamBase64String: object,
+   * ) => {
+   *   openedTeam.set({
+   *     id: teamId,
+   *     name: teamName,
+   *     base64String: teamBase64String,
+   *   });
+   * };
+   **/
 </script>
 
 <section>
@@ -55,7 +61,10 @@
             openTeam?.teamId == team.teamId && "active"
           }`}
           on:click={async () => {
-            handleOpenTeam(team.teamId, team.name, team.logo);
+            /**
+             * @deprecated referes to teams store
+             * handleOpenTeam(team.teamId, team.name, team.logo);
+             **/
             await teamRepositoryMethods.setOpenTeam(team.teamId);
             if (team.isNewInvite) {
               let data = await teamServiceMethods.disableNewInviteTag(

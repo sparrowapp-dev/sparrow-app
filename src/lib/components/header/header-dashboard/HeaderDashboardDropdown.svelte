@@ -25,7 +25,11 @@
   } from "$lib/utils/dto";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import { setOpenedTeam } from "$lib/store";
+  /**
+   * @deprecated referes to teams store
+   * import { setOpenedTeam } from "$lib/store";
+   **/
+
   import { v4 as uuidv4 } from "uuid";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import Dropdown from "../../dropdown/Dropdown.svelte";
@@ -166,7 +170,7 @@
         if (item) {
           if (item._data._id != response.data.data._id) {
             totalRequest = 0;
-          } 
+          }
         }
       });
 
@@ -220,11 +224,14 @@
       navigate("/dashboard/workspaces");
       activeSideBarTabMethods.updateActiveTab("workspaces");
       isOpen = true;
-      setOpenedTeam(
-        currentTeam?.id,
-        currentTeam?.name,
-        currentTeam?.base64String,
-      );
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   currentTeam?.id,
+       *   currentTeam?.name,
+       *   currentTeam?.base64String,
+       * );
+       **/
     } else {
       allworkspaces.forEach((workspace) => {
         if (id === workspace.name) {
