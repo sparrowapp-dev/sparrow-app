@@ -9,6 +9,7 @@
   import { onDestroy } from "svelte";
   import type {
     CurrentTeam,
+    Team,
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces";
@@ -27,7 +28,7 @@
   export let handleWorkspaceSwitch: any;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
-  export let openTeam;
+  export let openTeam: Team;
   export let currentTeam: CurrentTeam;
   export let handleCreateWorkspace: any,
     teamServiceMethods: TeamServiceMethods,
@@ -212,7 +213,7 @@
               <span
                 style="padding: 8px 8px;"
                 on:click={() => (selectedTab = "all-workspace")}
-                class="team-menu__link"
+                class="team-menu__link cursor-pointer"
                 class:tab-active={selectedTab === "all-workspace"}
                 >Workspaces {`(${
                   workspaces?.filter((elem) => {
@@ -223,20 +224,18 @@
               <span
                 style="padding: 8px 8px;"
                 on:click={() => (selectedTab = "members")}
-                class="team-menu__link"
+                class="team-menu__link cursor-pointer"
                 class:tab-active={selectedTab === "members"}
                 >Members {openTeam?.users?.length
                   ? `(${openTeam.users.length})`
                   : ""}</span
               >
               {#if openTeam?.owner === userId}
-                <Link style="text-decoration:none;" to="personal-workspaces"
-                  ><span
-                    style="padding: 8px 8px;"
-                    on:click={() => (selectedTab = "settings")}
-                    class="team-menu__link"
-                    class:tab-active={selectedTab === "settings"}>Settings</span
-                  ></Link
+                <span
+                  style="padding: 8px 8px;"
+                  on:click={() => (selectedTab = "settings")}
+                  class="team-menu__link cursor-pointer"
+                  class:tab-active={selectedTab === "settings"}>Settings</span
                 >
               {/if}
             </div>
@@ -358,5 +357,8 @@
   }
   .heading {
     max-width: calc(100% - 150px);
+  }
+  .cursor-pointer {
+    cursor: pointer;
   }
 </style>
