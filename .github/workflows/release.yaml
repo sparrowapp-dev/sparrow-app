@@ -87,7 +87,7 @@ jobs:
       - name: Print file content
         run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.0.0_x64-setup.nsis.zip.sig
 
-      - name: Download mac-build from Azure Blob Storage
+      - name: Download mac-build from Azure-Blob-Storage
         run: |
            az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app_1.0.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64.dmg
         env:
