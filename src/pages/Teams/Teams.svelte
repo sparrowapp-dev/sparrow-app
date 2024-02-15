@@ -109,9 +109,28 @@
     }
   });
 
+  /**
+   * @deprecated referes to teams store
+   *   const openedTeamSubscribe = openedTeam.subscribe((value) => {
+   *   if (value) {
+   *    currOpenedTeam = value;
+   *    }
+   *  });
+   **/
+
   const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
     if (value) {
       activeTeamRxDoc = value;
+      /**
+       * @deprecated referes to teams store
+       *  setOpenedTeam(
+       *    currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
+       *    currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
+       *    currOpenedTeam.base64String
+       *      ? currOpenedTeam.base64String
+       *      : value.get("logo"),
+       *  );
+       **/
     }
   });
 

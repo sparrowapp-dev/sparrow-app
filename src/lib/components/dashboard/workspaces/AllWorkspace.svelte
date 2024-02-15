@@ -47,7 +47,7 @@
       workspace.name,
       openTeam?.teamId,
       openTeam?.name,
-      openTeam.logo,
+      openTeam?.logo,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");

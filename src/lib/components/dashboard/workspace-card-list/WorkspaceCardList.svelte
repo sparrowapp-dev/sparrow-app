@@ -9,7 +9,10 @@
     SearchIcon,
   } from "$lib/assets/app.asset";
   import type { CurrentTeam, Team } from "$lib/utils/interfaces";
-  import type { TeamDocument } from "$lib/database/app.database";
+  import type {
+    TeamDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
 
@@ -18,7 +21,7 @@
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
   export let handleCreateWorkspace: any;
-  export let workspaces: any = [];
+  export let workspaces: WorkspaceDocument[] = [];
   export let handleWorkspaceSwitch: any;
   export let openTeam: Team;
   export let workspaceUnderCreation = false;
