@@ -8,19 +8,18 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  import type { CurrentTeam } from "$lib/utils/interfaces";
+  import type { CurrentTeam, Team } from "$lib/utils/interfaces";
   import type { TeamDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
 
   export let userId: string;
-  export let openedTeam: CurrentTeam;
   export let currActiveTeam: CurrentTeam;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
   export let handleCreateWorkspace: any;
   export let workspaces: any = [];
   export let handleWorkspaceSwitch: any;
-  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+  export let openTeam: Team;
 
   let filterText: string = "";
   let workspacePerPage: number = 5;
@@ -42,7 +41,7 @@
         type="text"
         id="search-input"
         class={`bg-transparent w-100 border-0 my-auto`}
-        placeholder="Search workspaces in {openedTeam.name}"
+        placeholder="Search workspaces in {openTeam?.name}"
         bind:value={filterText}
         on:input={(e) => handleFilterTextChange(e)}
       />
@@ -69,7 +68,7 @@
               .startsWith(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
-      {#if currPage === 1 && filterText === "" && ($currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId)}
+      {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
         <button
           on:click={handleCreateWorkspace}
           class="col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
@@ -86,13 +85,12 @@
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
-          isAdminOrOwner={$currOpenedTeamRxDoc?._data?.admins?.includes(
-            userId,
-          ) || $currOpenedTeamRxDoc?._data?.owner == userId}
+          isAdminOrOwner={openTeam?.admins?.includes(userId) ||
+            openTeam?.owner == userId}
           {workspace}
           {handleWorkspaceSwitch}
           {currActiveTeam}
-          {openedTeam}
+          {openTeam}
           {handleWorkspaceTab}
           {activeSideBarTabMethods}
         />

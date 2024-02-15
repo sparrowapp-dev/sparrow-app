@@ -243,6 +243,7 @@
         response?.data?.data?.name,
         response?.data?.data?.logo,
       );
+      await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {

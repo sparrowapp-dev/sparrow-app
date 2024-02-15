@@ -44,7 +44,7 @@ export class TeamRepository {
         },
       })
       .exec();
-    return team.teamId == teamId ? true : false;
+    return team?.teamId == teamId ? true : false;
   };
   /**
    * clear teams data

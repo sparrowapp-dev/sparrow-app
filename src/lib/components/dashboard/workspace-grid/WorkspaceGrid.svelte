@@ -11,7 +11,7 @@
   export let handleWorkspaceSwitch: any;
   export let handleWorkspaceTab: any;
   export let currActiveTeam: CurrentTeam;
-  export let openedTeam: CurrentTeam;
+  export let openTeam: CurrentTeam;
   export let activeSideBarTabMethods: any;
   export let isAdminOrOwner: boolean;
   let pos = { x: 0, y: 0 };
@@ -22,8 +22,8 @@
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
-      openedTeam.id,
-      openedTeam.name,
+      openTeam?.teamId,
+      openTeam?.name,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
