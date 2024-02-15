@@ -1,14 +1,58 @@
-name: Semantic Release
+name: Release
 
 on:
   push:
     branches:
       - main
 
-jobs:
-  release:
-    runs-on: windows-latest
+env: 
+  VITE_API_URL: ${{secrets.VITE_API_URL}}
+  VITE_MIX_PANEL_TOKEN: ${{secrets.VITE_MIX_PANEL_TOKEN}}
+  VITE_ENABLE_MIX_PANEL: ${{secrets.VITE_ENABLE_MIX_PANEL}}
+  VITE_API_TIMEOUT: ${{secrets.VITE_API_TIMEOUT}}
 
+jobs:
+  build_and_release_macos:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.8'
+
+      - name: Build Tauri App
+        run: |
+          TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
+          APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
+          yarn install
+          yarn tauri build --debug
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          
+
+      - name: Upload mac-build to Azure Blob Storage
+        run: |
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_1.0.0_x64.dmg --name sparrow-app_1.0.0_x64.dmg
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+
+  build_and_release_windows:
+    runs-on: windows-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -27,34 +71,32 @@ jobs:
         with:
           dotnet-version: 3.1
 
-      - name: Install dependencies
-        run: |
-            yarn cache clean
-            npm install -g pnpm
-            # pnpm install
-            yarn install
-            # yarn tauri build --debug
       - name: Build Tauri App
         run: |
-            $TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
-            $TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
-            yarn tauri build --debug
+          $TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          $TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn tauri build --debug
         env:
-           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Print file content
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.1.0_x64_en-US.msi.zip.sig
+      - name: Download mac-build from Azure Blob Storage
+        run: |
+           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app_1.0.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64.dmg
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
 
-      - name: Print file content
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.1.0_x64-setup.nsis.zip.sig
 
-
+          
       - name: Fetch Version from package.json
         id: fetch-version
         run: echo "::set-output name=version::$(jq -r .version package.json)"
-        
 
       - name: Semantic Release
         run: npx semantic-release
