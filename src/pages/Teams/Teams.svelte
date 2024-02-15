@@ -528,6 +528,7 @@
     <WorkspaceList
       {userId}
       {handleCreateTeamModal}
+      openTeam={$openTeam}
       teams={allTeams}
       {data}
       tabList={$tabList}

@@ -118,9 +118,7 @@
 />
 {#if selectedTab == "all-workspace"}
   <div class="ps-3">
-    {#if $data && $data
-        .slice()
-        .filter((item) => item.team.teamId == openedTeam.id).length > 0}
+    {#if data && data.slice().length > 0}
       <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
         <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
         <input
@@ -155,13 +153,13 @@
         headerObject={tableHeaderContent}
       >
         <tbody class="overflow-y-auto position-relative z-0">
-          {#if $data}
-            {#each $data
+          {#if data}
+            {#each data
               .slice()
               .reverse()
               .filter((item) => item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+                  .toLowerCase()
+                  .startsWith(filterText.toLowerCase()))
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <Rows
@@ -177,27 +175,25 @@
         </tbody>
       </Table>
 
-      {#if $data && $data
-          .slice()
-          .filter((item) => item.team.teamId == openedTeam.id).length == 0}
+      {#if data && data.slice().filter.length == 0}
         <p class="not-found-text mt-3">Add Workspaces to this team</p>
-      {:else if filterText !== "" && $data
+      {:else if filterText !== "" && data
           .slice()
           .reverse()
           .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase()))
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
         <p class="not-found-text mt-3">No results found.</p>
       {/if}
     </div>
 
-    {#if $data
+    {#if data
       .slice()
       .reverse()
       .filter((item) => item.name
-            .toLowerCase()
-            .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+          .toLowerCase()
+          .startsWith(filterText.toLowerCase()))
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
       <table class="w-100">
         <tfoot class="bottom-0">
@@ -205,19 +201,11 @@
             <th class="tab-head"
               >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
                 currPage * workspacePerPage,
-                $data?.filter(
-                  (item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()) &&
-                    item.team.teamId == openedTeam.id,
+                data?.filter((item) =>
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
                 ).length,
-              )} of {$data?.filter(
-                (item) =>
-                  item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) &&
-                  item.team.teamId == openedTeam.id,
+              )} of {data?.filter((item) =>
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length}
             </th>
             <th class="tab-head" style="">
@@ -242,12 +230,10 @@
                   if (
                     currPage <
                     Math.ceil(
-                      $data?.filter(
-                        (item) =>
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
+                      data?.filter((item) =>
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
                       ).length / workspacePerPage,
                     )
                   )
@@ -257,12 +243,10 @@
                 ><RightIcon
                   color={currPage ===
                   Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                     ? "var(--border-color)"
@@ -272,24 +256,20 @@
               <button
                 on:click={() =>
                   (currPage = Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   ))}
                 class="bg-transparent border-0"
                 ><DoubleRightIcon
                   color={currPage ===
                   Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                     ? "var(--border-color)"

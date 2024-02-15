@@ -4,6 +4,7 @@
   import { openedTeam } from "$lib/store/team.store";
   import type {
     CurrentTeam,
+    Team,
     TeamRepositoryMethods,
     TeamServiceMethods,
   } from "$lib/utils/interfaces/team.interface";
@@ -17,8 +18,8 @@
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let teamServiceMethods: TeamServiceMethods;
   export let userId: string;
+  export let openTeam: Team;
 
-  let currOpenedTeam: CurrentTeam;
   const handleOpenTeam = (
     teamId: string,
     teamName: string,
@@ -30,14 +31,6 @@
       base64String: teamBase64String,
     });
   };
-
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
-  });
-
-  onDestroy(() => {
-    openedTeamSubscribe();
-  });
 </script>
 
 <section>
@@ -59,7 +52,7 @@
       {#each teams as team, index}
         <button
           class={`d-flex w-100 align-items-center justify-content-between rounded teams-outer border-0 ${
-            currOpenedTeam.id == team.teamId && "active"
+            openTeam?.teamId == team.teamId && "active"
           }`}
           on:click={async () => {
             handleOpenTeam(team.teamId, team.name, team.logo);
@@ -95,7 +88,7 @@
             <p class="mb-0 new-invite text-labelColor w-50">NEW INVITE</p>
           {:else}
             <PeopleIcon
-              color={currOpenedTeam.id == team.teamId
+              color={openTeam?.teamId == team.teamId
                 ? "var(--sparrow-text-color)"
                 : "var(--defaultcolor)"}
               classProp={team.users?.length <= 1 && "d-none"}

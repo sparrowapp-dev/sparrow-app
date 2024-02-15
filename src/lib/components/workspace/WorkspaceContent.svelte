@@ -249,18 +249,11 @@
                 on:click={() => (selectedTab = "all-workspace")}
                 class="team-menu__link"
                 class:tab-active={selectedTab === "all-workspace"}
-                >Workspaces {$data &&
-                $data
-                  .slice()
-                  .filter((item) => item.team.teamId == currOpenedTeam.id)
-                  .length > 0
-                  ? `(${
-                      $data
-                        ?.slice()
-                        .filter((item) => item.team.teamId == currOpenedTeam.id)
-                        .length
-                    })`
-                  : ""}</span
+                >Workspaces {`(${
+                  workspaces?.filter((elem) => {
+                    return elem?.team?.teamId === openTeam?.teamId;
+                  }).length || 0
+                })`}</span
               >
               <span
                 style="padding: 8px 8px;"
@@ -315,7 +308,9 @@
       <AllWorkspace
         {userId}
         openedTeam={currOpenedTeam}
-        {data}
+        data={workspaces?.filter((elem) => {
+          return elem?.team?.teamId === openTeam?.teamId;
+        }) || []}
         {selectedTab}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
@@ -323,13 +318,15 @@
         {currOpenedTeamRxDoc}
         {userType}
       />
-    {:else if selectedView == "GRID" && selectedTab == "all-workspace" && $data}
+    {:else if selectedView == "GRID" && selectedTab == "all-workspace"}
       <WorkspaceCardList
         {userId}
         {handleCreateWorkspace}
         openedTeam={currOpenedTeam}
         currActiveTeam={currentTeam}
-        workspaces={data}
+        workspaces={workspaces?.filter((elem) => {
+          return elem?.team?.teamId === openTeam?.teamId;
+        }) || []}
         {handleWorkspaceSwitch}
         {handleWorkspaceTab}
         {activeSideBarTabMethods}

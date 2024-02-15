@@ -18,7 +18,7 @@
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
   export let handleCreateWorkspace: any;
-  export let workspaces: any;
+  export let workspaces: any = [];
   export let handleWorkspaceSwitch: any;
   export let currOpenedTeamRxDoc: Observable<TeamDocument>;
 
@@ -35,10 +35,7 @@
 </script>
 
 <div class="p-2">
-  {#if $workspaces && $workspaces
-      .slice()
-      .reverse()
-      .filter((item) => item.team.teamId == openedTeam.id).length > 0}
+  {#if workspaces && workspaces.slice().reverse().length > 0}
     <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
       <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
       <input
@@ -64,12 +61,12 @@
       class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
       style="max-height: 59vh; height: auto;"
     >
-      {#if filterText !== "" && $workspaces
+      {#if filterText !== "" && workspaces
           .slice()
           .reverse()
           .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
       {#if currPage === 1 && filterText === "" && ($currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId)}
@@ -80,12 +77,12 @@
           + Add New Workspace
         </button>
       {/if}
-      {#each $workspaces
+      {#each workspaces
         .slice()
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .startsWith(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
@@ -101,12 +98,12 @@
         />
       {/each}
     </div>
-    {#if !$workspaces || $workspaces
+    {#if !workspaces || workspaces
         .slice()
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length > 0}
+              .startsWith(filterText.toLowerCase())).length > 0}
       <div
         class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
       >
@@ -114,25 +111,21 @@
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
           {Math.min(
             currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
-            $workspaces
+            workspaces
               .slice()
               .reverse()
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) &&
-                  item.team.teamId == openedTeam.id,
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length,
-          )} of {$workspaces
+          )} of {workspaces
             .slice()
             .reverse()
             ?.filter(
               (item) =>
                 typeof item.name === "string" &&
-                item.name?.toLowerCase().startsWith(filterText.toLowerCase()) &&
-                item.team.teamId == openedTeam.id,
+                item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
         </div>
         <div class="tab-head tab-change">
@@ -158,7 +151,7 @@
               if (
                 currPage <
                 Math.ceil(
-                  $workspaces
+                  workspaces
                     .slice()
                     .reverse()
                     ?.filter(
@@ -166,8 +159,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                          .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               )
@@ -178,7 +170,7 @@
             ><RightIcon
               color={currPage ===
               Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -186,8 +178,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "#313233"
@@ -197,7 +188,7 @@
           <button
             on:click={() => (
               (currPage = Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -205,8 +196,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )),
               (workspacePerPage = currPage > 1 ? 6 : 5)
@@ -215,7 +205,7 @@
             ><DoubleRightIcon
               color={currPage ===
               Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -223,8 +213,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "#313233"
