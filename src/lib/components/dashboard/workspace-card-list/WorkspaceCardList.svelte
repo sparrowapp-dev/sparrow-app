@@ -158,6 +158,35 @@
             ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
           >
           <button
+            disabled={$workspaces
+              .slice()
+              .reverse()
+              ?.filter(
+                (item) =>
+                  typeof item.name === "string" &&
+                  item.name
+                    ?.toLowerCase()
+                    .startsWith(filterText.toLowerCase()) &&
+                  item.team.teamId == openedTeam.id,
+              ).length %
+              6 ===
+              0 &&
+            currPage ===
+              Math.ceil(
+                $workspaces
+                  .slice()
+                  .reverse()
+                  ?.filter(
+                    (item) =>
+                      typeof item.name === "string" &&
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()) &&
+                      item.team.teamId == openedTeam.id,
+                  ).length / workspacePerPage,
+              )
+              ? true
+              : false}
             on:click={() => {
               if (
                 currPage <
@@ -199,8 +228,8 @@
             /></button
           >
           <button
-            on:click={() => (
-              (currPage = Math.ceil(
+            on:click={() => {
+              currPage = Math.ceil(
                 $workspaces
                   .slice()
                   .reverse()
@@ -212,9 +241,43 @@
                         .startsWith(filterText.toLowerCase()) &&
                       item.team.teamId == openedTeam.id,
                   ).length / workspacePerPage,
-              )),
-              (workspacePerPage = currPage > 1 ? 6 : 5)
-            )}
+              );
+              if (
+                $workspaces
+                  .slice()
+                  .reverse()
+                  ?.filter(
+                    (item) =>
+                      typeof item.name === "string" &&
+                      item.name
+                        ?.toLowerCase()
+                        .startsWith(filterText.toLowerCase()) &&
+                      item.team.teamId == openedTeam.id,
+                  ).length %
+                  6 !==
+                0
+              ) {
+                workspacePerPage = currPage > 1 ? 6 : 5;
+              }
+              if (
+                currPage - 1 ===
+                Math.ceil(
+                  $workspaces
+                    .slice()
+                    .reverse()
+                    ?.filter(
+                      (item) =>
+                        typeof item.name === "string" &&
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()) &&
+                        item.team.teamId == openedTeam.id,
+                    ).length / workspacePerPage,
+                )
+              ) {
+                currPage -= 1;
+              }
+            }}
             class="bg-transparent border-0"
             ><DoubleRightIcon
               color={currPage ===

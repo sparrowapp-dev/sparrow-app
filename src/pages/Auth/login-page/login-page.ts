@@ -49,8 +49,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
       Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
-    navigate("/dashboard/collections");
-    _activeSidebarTabViewModel.addActiveTab("collections");
+    navigate("/dashboard/workspaces");
+    _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
   } else {
     navigate("/");
