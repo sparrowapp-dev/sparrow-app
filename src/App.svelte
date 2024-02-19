@@ -31,11 +31,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
-  import {
-    checkUpdate,
-    installUpdate,
-    onUpdaterEvent,
-  } from "@tauri-apps/api/updater";
+  import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
   import { relaunch } from "@tauri-apps/api/process";
   import { ModalWrapperV1 } from "$lib/components";
@@ -76,13 +72,6 @@
   });
 
   onMount(async () => {
-    await onUpdaterEvent(({ error, status }) => {
-      if (status === "PENDING") {
-        showProgressBar = true;
-      } else if (status === "DONE") {
-        showProgressBar = false;
-      }
-    });
     try {
       const { shouldUpdate, manifest } = await checkUpdate();
       if (shouldUpdate) {
@@ -167,6 +156,9 @@
           showProgressBar = false;
           notifications.success("Update Completed. App will relaunch now!");
           relaunch();
+        }).catch(()=>{
+          showProgressBar = false;
+          notifications.error("Update Failed!");
         });
       }}
     />
