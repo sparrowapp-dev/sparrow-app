@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",
@@ -50,6 +51,10 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/release-notes-generator": "^12.1.0",
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "@tsconfig/svelte": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
@@ -60,6 +65,7 @@
     "node-sass": "^9.0.0",
     "prettier": "3.0.2",
     "sass": "^1.66.0",
+    "semantic-release": "^23.0.0",
     "svelte": "^4.0.5",
     "svelte-check": "^3.4.6",
     "svelte-loading-spinners": "^0.3.4",
