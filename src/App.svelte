@@ -38,13 +38,15 @@
   } from "@tauri-apps/api/updater";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
   import { relaunch } from "@tauri-apps/api/process";
-  import Modal from "$lib/components/Modal/Modal.svelte";
   import { ModalWrapperV1 } from "$lib/components";
   import Button from "$lib/components/buttons/Button.svelte";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
+  let showProgressBar = false;
+  let updateAvailable = false;
+  let newAppVersion: string | undefined = "";
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -73,13 +75,8 @@
     }
   });
 
-  var showProgressBar = false;
-  var updateAvailable = false;
   onMount(async () => {
-    const unlisten = await onUpdaterEvent(({ error, status }) => {
-      console.log("STATUS ===> ", status);
-      console.log("error ===> ", error);
-      // This will log all updater events, including status updates and errors.
+    await onUpdaterEvent(({ error, status }) => {
       if (status === "PENDING") {
         showProgressBar = true;
       } else if (status === "DONE") {
@@ -90,6 +87,7 @@
       const { shouldUpdate, manifest } = await checkUpdate();
       if (shouldUpdate) {
         notifications.info("Update Available");
+        newAppVersion = manifest?.version;
         updateAvailable = true;
       }
     } catch (error) {
@@ -129,10 +127,10 @@
   };
 </script>
 
-{#if updateAvailable === true}
+{#if showProgressBar === true}
   <ProgressBar onClick="" title="Update in progress" />{/if}
 <ModalWrapperV1
-  title={"New Update Available!!!"}
+  title={`New Update Available - v${newAppVersion}`}
   type={"primary"}
   width={"50%"}
   zIndex={1000}
@@ -140,7 +138,7 @@
   handleModalState={handleUpdatePopUp}
 >
   <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>Are you sure you want to update?</p>
+    <p>Update for new features and improvements</p>
   </div>
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
@@ -174,8 +172,6 @@
     />
   </div></ModalWrapperV1
 >
-{#if showProgressBar === true}
-  <ProgressBar onClick="" title="Update in progress" />{/if}
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
