@@ -18,6 +18,7 @@
   export let teamRepositoryMethods: TeamRepositoryMethods;
   export let teamServiceMethods: TeamServiceMethods;
   export let userId;
+  export let openTeam;
 </script>
 
 <div
@@ -30,6 +31,7 @@
     {teams}
     {teamRepositoryMethods}
     {teamServiceMethods}
+    {openTeam}
   />
   <RecentApi
     {tabList}
@@ -41,6 +43,7 @@
   <hr class="mb-0 pb-0" />
   <RecentWorkspace
     {data}
+    {openTeam}
     {handleWorkspaceSwitch}
     {handleWorkspaceTab}
     {activeSideBarTabMethods}

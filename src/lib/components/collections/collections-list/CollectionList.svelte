@@ -665,14 +665,15 @@
               />
             {/each}
           </List>
+        {:else}
+          <EmptyCollection
+            {loggedUserRoleInWorkspace}
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+            {showDefault}
+          />
         {/if}
-        <EmptyCollection
-          {loggedUserRoleInWorkspace}
-          {handleCreateCollection}
-          {collectionsMethods}
-          {currentWorkspaceId}
-          {showDefault}
-        />
       {/if}
     </div>
   </div>
