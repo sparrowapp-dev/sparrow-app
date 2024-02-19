@@ -8,7 +8,7 @@
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { boolean } from "yup";
   import Button from "$lib/components/buttons/Button.svelte";

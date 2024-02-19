@@ -12,7 +12,6 @@
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
-  import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
@@ -238,10 +237,11 @@
       {environmentVariables}
     />
     <p>File</p>
-    <KeyValueFile
+    <KeyValue
       keyValue={formDataFile}
       callback={handleFormDataFileChange}
       {environmentVariables}
+      type="file"
     />
   {/if}
 </div>

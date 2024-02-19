@@ -7,7 +7,7 @@
   } from "$lib/utils/interfaces/environment.interface";
   import { EnvironmentPanelViewModel } from "./EnvironmentPanel.ViewModel";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import QuickHelp from "./sub-components/quick-help/QuickHelp.svelte";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";

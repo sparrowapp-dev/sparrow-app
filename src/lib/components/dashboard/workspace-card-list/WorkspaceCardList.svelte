@@ -8,20 +8,22 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  import type { CurrentTeam } from "$lib/utils/interfaces";
-  import type { TeamDocument } from "$lib/database/app.database";
+  import type { CurrentTeam, Team } from "$lib/utils/interfaces";
+  import type {
+    TeamDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
 
   export let userId: string;
-  export let openedTeam: CurrentTeam;
   export let currActiveTeam: CurrentTeam;
   export let handleWorkspaceTab: any;
   export let activeSideBarTabMethods: any;
   export let handleCreateWorkspace: any;
-  export let workspaces: any;
+  export let workspaces: WorkspaceDocument[] = [];
   export let handleWorkspaceSwitch: any;
-  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
+  export let openTeam: Team;
   export let workspaceUnderCreation = false;
 
   let filterText: string = "";
@@ -37,17 +39,14 @@
 </script>
 
 <div class="p-2">
-  {#if $workspaces && $workspaces
-      .slice()
-      .reverse()
-      .filter((item) => item.team.teamId == openedTeam.id).length > 0}
+  {#if workspaces && workspaces.slice().reverse().length > 0}
     <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
       <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
       <input
         type="text"
         id="search-input"
         class={`bg-transparent w-100 border-0 my-auto`}
-        placeholder="Search workspaces in {openedTeam.name}"
+        placeholder="Search workspaces in {openTeam?.name}"
         bind:value={filterText}
         on:input={(e) => handleFilterTextChange(e)}
       />
@@ -66,15 +65,15 @@
       class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
       style="max-height: 59vh; height: auto;"
     >
-      {#if filterText !== "" && $workspaces
+      {#if filterText !== "" && workspaces
           .slice()
           .reverse()
           .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length == 0}
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
-      {#if currPage === 1 && filterText === "" && ($currOpenedTeamRxDoc?._data?.admins?.includes(userId) || $currOpenedTeamRxDoc?._data?.owner == userId)}
+      {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
         <Button
           disable={workspaceUnderCreation}
           loader={workspaceUnderCreation}
@@ -84,33 +83,32 @@
           onClick={handleCreateWorkspace}
         />
       {/if}
-      {#each $workspaces
+      {#each workspaces
         .slice()
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .startsWith(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
-          isAdminOrOwner={$currOpenedTeamRxDoc?._data?.admins?.includes(
-            userId,
-          ) || $currOpenedTeamRxDoc?._data?.owner == userId}
+          isAdminOrOwner={openTeam?.admins?.includes(userId) ||
+            openTeam?.owner == userId}
           {workspace}
           {handleWorkspaceSwitch}
           {currActiveTeam}
-          {openedTeam}
+          {openTeam}
           {handleWorkspaceTab}
           {activeSideBarTabMethods}
         />
       {/each}
     </div>
-    {#if !$workspaces || $workspaces
+    {#if !workspaces || workspaces
         .slice()
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id).length > 0}
+              .startsWith(filterText.toLowerCase())).length > 0}
       <div
         class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
       >
@@ -118,25 +116,21 @@
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
           {Math.min(
             currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
-            $workspaces
+            workspaces
               .slice()
               .reverse()
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) &&
-                  item.team.teamId == openedTeam.id,
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length,
-          )} of {$workspaces
+          )} of {workspaces
             .slice()
             .reverse()
             ?.filter(
               (item) =>
                 typeof item.name === "string" &&
-                item.name?.toLowerCase().startsWith(filterText.toLowerCase()) &&
-                item.team.teamId == openedTeam.id,
+                item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
         </div>
         <div class="tab-head tab-change">
@@ -158,22 +152,19 @@
             ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
           >
           <button
-            disabled={$workspaces
+            disabled={workspaces
               .slice()
               .reverse()
               ?.filter(
                 (item) =>
                   typeof item.name === "string" &&
-                  item.name
-                    ?.toLowerCase()
-                    .startsWith(filterText.toLowerCase()) &&
-                  item.team.teamId == openedTeam.id,
+                  item.name?.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length %
               6 ===
               0 &&
             currPage ===
               Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -181,8 +172,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
               ? true
@@ -191,7 +181,7 @@
               if (
                 currPage <
                 Math.ceil(
-                  $workspaces
+                  workspaces
                     .slice()
                     .reverse()
                     ?.filter(
@@ -199,8 +189,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                          .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               )
@@ -211,7 +200,7 @@
             ><RightIcon
               color={currPage ===
               Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -219,8 +208,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "#313233"
@@ -230,7 +218,7 @@
           <button
             on:click={() => {
               currPage = Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -238,12 +226,11 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               );
               if (
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -251,8 +238,7 @@
                       typeof item.name === "string" &&
                       item.name
                         ?.toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length %
                   6 !==
                 0
@@ -262,7 +248,7 @@
               if (
                 currPage - 1 ===
                 Math.ceil(
-                  $workspaces
+                  workspaces
                     .slice()
                     .reverse()
                     ?.filter(
@@ -270,8 +256,7 @@
                         typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                          .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                 )
               ) {
@@ -282,7 +267,7 @@
             ><DoubleRightIcon
               color={currPage ===
               Math.ceil(
-                $workspaces
+                workspaces
                   .slice()
                   .reverse()
                   ?.filter(
@@ -290,8 +275,7 @@
                       typeof item.name === "string" &&
                       item.name
                         .toLowerCase()
-                        .startsWith(filterText.toLowerCase()) &&
-                      item.team.teamId == openedTeam.id,
+                        .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
                 ? "#313233"

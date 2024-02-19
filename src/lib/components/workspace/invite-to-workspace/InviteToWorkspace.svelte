@@ -8,7 +8,7 @@
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { validateEmail } from "$lib/utils/helpers";

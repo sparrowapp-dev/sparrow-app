@@ -57,6 +57,9 @@ export const InputTheme = EditorView.theme({
     border: "2px solid var(--sparrow-blue)",
     borderRadius: "6px",
   },
+  ".cm-scroller::-webkit-scrollbar": {
+    display: "none",
+  },
 });
 
 export type AggregateEnvironment = {
