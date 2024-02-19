@@ -13,8 +13,9 @@
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { validateEmail } from "$lib/utils/helpers";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import InputSelect from "$lib/components/inputs/InputSelect.svelte";
   let emailstoBeSentArr: string[] = [];
-
+  export let users;
   export let addUsersInWorkspace: (
     id: string,
     data: addUsersInWorkspacePayload,
@@ -27,69 +28,8 @@
   let showErrors = false;
   let defaultRole = "select";
   let selectedRole = defaultRole;
-  let currentEmailEntered: string;
   let invalidEmails: string[] = [];
 
-  function removeElement(event: Event): void {
-    const email = event.target?.id;
-    const removeElement = document.getElementById(email) as HTMLElement;
-    const emailContainer = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
-    emailContainer.removeChild(removeElement);
-    emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
-    invalidEmails = invalidEmails.filter((e) => e != email);
-  }
-
-  const handleEmailOnAdd = (email: string) => {
-    email = email.replace(",", "");
-    email = email.trim();
-    const isValidEmail = validateEmail(email);
-    if (!isValidEmail) {
-      invalidEmails.push(email);
-    } else {
-      emailstoBeSentArr.push(email);
-    }
-
-    const emailDiv: HTMLElement = createDynamicComponents(
-      "div",
-      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
-        !isValidEmail ? "border border-danger" : ""
-      }`,
-    );
-    const emailContentSpan = createDynamicComponents("span", "");
-    const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
-      { eventType: "click", eventHandler: removeElement },
-      {
-        eventType: "mouseleave",
-        eventHandler: () => {
-          closeIconBtn.src = closeIcon;
-        },
-      },
-      {
-        eventType: "mouseenter",
-        eventHandler: () => {
-          closeIconBtn.src = closeIconWhite;
-        },
-      },
-    ]) as HTMLImageElement;
-    emailDiv.id = email;
-    closeIconBtn.id = email;
-    closeIconBtn.src = closeIcon;
-    emailContentSpan.innerHTML = email;
-    emailDiv.appendChild(emailContentSpan);
-    emailDiv.appendChild(closeIconBtn);
-    const emailContainer: HTMLElement = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
-    emailContainer.appendChild(emailDiv);
-    currentEmailEntered = "";
-    if (emailstoBeSentArr.length && !invalidEmails.length) {
-      showErrors = false;
-    } else {
-      showErrors = true;
-    }
-  };
   const handleInvite = async () => {
     showErrors = true;
     const data: addUsersInWorkspacePayload = {
@@ -125,51 +65,30 @@
 </script>
 
 <div class="d-flex flex-column">
-  <p class="invite-header mb-0 sparrow-fs-14">
+  <p class="invite-header mb-2 sparrow-fs-14">
     Invite By Email<span class="asterik">*</span>
   </p>
-  <p class="invite-subheader text-textColor mt-0 mb-0 sparrow-fs-12">
-    use commas to separate emails
-  </p>
-  <div
-    class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary"
-    style="padding:3px 5px 3px 5px;"
-  >
-    <div
-      id="input-email"
-      class="d-flex align-items-start flex-wrap gap-2"
-    ></div>
-    <input
-      id="input"
-      placeholder="Enter email IDs"
-      style="outline:none;border:none;flex-grow:1; background:transparent;"
-      bind:value={currentEmailEntered}
-      class="input-container mt-2"
-      on:keyup={(event) => {
-        if (
-          (event.key === "," || event.key === "Enter" || event.key === " ") &&
-          currentEmailEntered &&
-          currentEmailEntered.trim() != "" &&
-          currentEmailEntered.trim() != ","
-        ) {
-          handleEmailOnAdd(currentEmailEntered);
-        }
-      }}
-      on:blur={() => {
-        if (
-          currentEmailEntered &&
-          currentEmailEntered.trim() != "" &&
-          currentEmailEntered.trim() != ","
-        ) {
-          handleEmailOnAdd(currentEmailEntered);
-        }
-      }}
-    />
-  </div>
-  {#if showErrors && invalidEmails.length}
-    <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
-  {:else if showErrors && emailstoBeSentArr.length === 0}
-    <p class="error-text">Email ID cannot be Empty.</p>
+  <InputSelect
+    list={users.filter((element) => {
+      if (
+        currentWorkspaceDetails.users
+          .map((element) => {
+            return element.email;
+          })
+          .includes(element.email)
+      ) {
+        return false;
+      }
+      return true;
+    })}
+    {showErrors}
+    id={"input-select2"}
+    onChange={(items) => {
+      emailstoBeSentArr = items;
+    }}
+  />
+  {#if showErrors && emailstoBeSentArr.length === 0}
+    <p class="error-text sparrow-fs-12">Email ID cannot be Empty.</p>
   {/if}
 </div>
 <div class="mt-4">
