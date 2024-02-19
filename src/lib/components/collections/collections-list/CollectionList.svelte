@@ -455,7 +455,6 @@
   </div>
   <div class="px-3 pt-2">
     <Dropdown
-      mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
       data={[
         {
@@ -487,7 +486,7 @@
       hoverClasses={[
         {
           id: "hash129-btn-div",
-          classToAdd: ["border-bottom","border-labelColor"],
+          classToAdd: ["border-bottom", "border-labelColor"],
         },
       ]}
     ></Dropdown>
@@ -546,7 +545,11 @@
         )}
         dropDownType={{ type: "img", title: plusIcon }}
         staticCustomStyles={[
-          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+          {
+            id: "collectionDropdown-options-container",
+            styleKey: "minWidth",
+            styleValue: "160px",
+          },
         ]}
         data={[
           {
@@ -570,10 +573,10 @@
             id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
-          
+
           {
             id: "collectionDropdown-options-container",
-            classToAdd: ["end-0","mt-1"],
+            classToAdd: ["end-0", "mt-1"],
           },
         ]}
       ></Dropdown>

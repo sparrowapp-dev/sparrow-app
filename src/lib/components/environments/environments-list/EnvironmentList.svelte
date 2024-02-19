@@ -120,6 +120,7 @@
         workspaceId: currentWorkspace._id,
       });
       notifications.success("New Environment Created!");
+      MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
       notifications.error("Failed to create environment. Please try again.");

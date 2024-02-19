@@ -12,7 +12,8 @@ export interface CreateCollectionPostBody {
 }
 
 export interface UpdateCollectionName {
-  name: string;
+  name?: string;
+  description?: string;
 }
 
 export interface UpdateFolderName {
