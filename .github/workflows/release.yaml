@@ -41,17 +41,19 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Print file content
+      - name: dmg sig
         run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/sparrow-app.app.tar.gz.sig
           
 
       - name: Upload mac-build to Azure Blob Storage
         run: |
           az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_1.0.0_x64.dmg --name sparrow-app_1.0.0_x64.dmg
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/sparrow-app.app.tar.gz --name sparrow-app.app.tar.gz
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
           AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+
 
   build_and_release_windows:
     runs-on: windows-latest
@@ -87,15 +89,17 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Print file content
+      - name: msi sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64_en-US.msi.zip.sig
+  
+      - name: nsis sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.0.0_x64-setup.nsis.zip.sig
 
-      # - name: Print file content
-      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.0.0_x64-setup.nsis.zip.sig
 
-      - name: Download mac-build from Azure-Blob-Storage
+      - name: Download dmg file from Azure Blob Storage
         run: |
            az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app_1.0.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64.dmg
+           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app.app.tar.gz --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app.app.tar.gz
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
@@ -111,4 +115,5 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          
           
