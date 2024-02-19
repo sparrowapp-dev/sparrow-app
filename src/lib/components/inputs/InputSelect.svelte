@@ -38,7 +38,9 @@
       .filter((element) => {
         if (
           element.email.includes(currentEmailEntered) ||
-          element.name.includes(currentEmailEntered)
+          element.name
+            ?.toLowerCase()
+            .includes(currentEmailEntered?.toLowerCase())
         ) {
           return true;
         }
@@ -128,7 +130,9 @@
             isOpen = true;
           }}
           on:blur={() => {
-            isOpen = false;
+            setTimeout(() => {
+              isOpen = false;
+            }, 500);
           }}
           class="input-container mt-2 sparrow-fs-12"
         />
