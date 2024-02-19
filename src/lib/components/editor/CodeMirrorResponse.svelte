@@ -46,7 +46,7 @@
       });
       selectedTabId = currentTabId;
     }
-    if (rawValue.toString() !== codeMirrorView.state.doc.toString()) {
+    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,
@@ -57,6 +57,16 @@
     }
     if (formatter === ResponseFormatter.PRETTY) {
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
+      if (rawTab === RequestDataType.JSON) {
+        rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
+        codeMirrorView.dispatch({
+          changes: {
+            from: 0,
+            to: codeMirrorView.state.doc.length,
+            insert: rawValue,
+          },
+        });
+      }
     } else {
       codeMirrorView.dispatch({
         effects: languageConf.reconfigure([]),
