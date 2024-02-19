@@ -79,56 +79,56 @@
   },
   "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
   "release": {
-      "branches": [
-          "main"
-      ],
-      "plugins": [
-          "@semantic-release/commit-analyzer",
-          "@semantic-release/release-notes-generator",
-          "@semantic-release/changelog",
-          "@semantic-release/exec",
-          "@semantic-release/npm",
-          [
-              "@semantic-release/git",
-              {
-                  "assets": [
-                      "CHANGELOG.md",
-                      "package.json"
-                  ],
-                  "message": "chore(release): ${nextRelease.version} [skip ci]"
-              }
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/exec",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
           ],
-          [
-              "@semantic-release/github",
-              {
-                  "assets": [
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64.dmg",
-                          "label": "sparrow.dmg"
-                      },
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/*.exe",
-                          "label": "sparrow.exe"
-                      },
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/*.msi",
-                          "label": "sparrow.msi"
-                      },
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64_en-US.msi.zip",
-                          "label": "sparrow-app_1.0.0_x64_en-US.msi.zip"
-                      },
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_1.0.0_x64-setup.nsis.zip",
-                          "label": "sparrow-app_1.0.0_x64-setup.nsis.zip"
-                      },
-                      {
-                          "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app.app.tar.gz",
-                          "label": "sparrow-app.app.tar.gz"
-                      }
-                  ]
-              }
+          "message": "chore(release): ${nextRelease.version} [skip ci]"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64.dmg",
+              "label": "sparrow.dmg"
+            },
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/*.exe",
+              "label": "sparrow.exe"
+            },
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/*.msi",
+              "label": "sparrow.msi"
+            },
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64_en-US.msi.zip",
+              "label": "sparrow-app_1.0.0_x64_en-US.msi.zip"
+            },
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_1.0.0_x64-setup.nsis.zip",
+              "label": "sparrow-app_1.0.0_x64-setup.nsis.zip"
+            },
+            {
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app.app.tar.gz",
+              "label": "sparrow-app.app.tar.gz"
+            }
           ]
+        }
       ]
+    ]
   }
 }
