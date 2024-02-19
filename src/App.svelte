@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route, navigate } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Toast from "$lib/components/notifications/Toast.svelte";
+  import Toast from "$lib/components/toast-notification/ToastNotification.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
@@ -25,7 +25,7 @@
   import { appWindow } from "@tauri-apps/api/window";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
   import constants from "$lib/utils/constants";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { invoke } from "@tauri-apps/api";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";

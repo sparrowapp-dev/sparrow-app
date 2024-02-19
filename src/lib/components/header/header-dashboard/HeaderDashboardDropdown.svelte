@@ -12,7 +12,8 @@
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import type {
     CurrentTeam,
     CurrentWorkspace,

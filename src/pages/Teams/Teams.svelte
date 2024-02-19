@@ -32,7 +32,7 @@
   import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
