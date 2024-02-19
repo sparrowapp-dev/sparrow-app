@@ -151,7 +151,6 @@
       loader={false}
       onClick={() => {
         updateAvailable = false;
-        showProgressBar = true;
       }}
     />
 
@@ -165,6 +164,7 @@
         updateAvailable = false;
         showProgressBar = true;
         installUpdate().then(() => {
+          showProgressBar = false;
           notifications.success("Update Completed. App will relaunch now!");
           relaunch();
         });
