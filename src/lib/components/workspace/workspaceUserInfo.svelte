@@ -9,7 +9,7 @@
     TeamServiceMethods,
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Dropdown from "../dropdown/Dropdown.svelte";
   import MemberInfoPopup from "../workspace/member-info/MemberInfo.svelte";
   import Button from "../buttons/Button.svelte";
@@ -233,7 +233,7 @@
         {
           name: "Remove",
           id: "teamRemove",
-           dynamicClasses: "text-dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -298,7 +298,7 @@
     {#if hasPermission && role !== "admin"}
       <Dropdown
         dropdownId={id}
-        dropDownType={{type:"text",title:role ? role : ""}}            
+        dropDownType={{ type: "text", title: role ? role : "" }}
         data={[
           {
             name: "Editor",
@@ -314,7 +314,6 @@
             name: "Remove",
             id: "remove",
             dynamicClasses: "text-dangerColor",
-
           },
         ]}
         onclick={handleDropdown}

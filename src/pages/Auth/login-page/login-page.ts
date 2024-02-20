@@ -1,7 +1,7 @@
 import { loginUser } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import type { loginUserPostBody } from "$lib/utils/dto";
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
@@ -49,8 +49,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
       Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
-    navigate("/dashboard/collections");
-    _activeSidebarTabViewModel.addActiveTab("collections");
+    navigate("/dashboard/workspaces");
+    _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
   } else {
     navigate("/");

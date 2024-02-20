@@ -16,7 +16,7 @@
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";

@@ -94,7 +94,9 @@ export class TeamViewModel {
    */
   public leaveTeam = async (teamId: string): Promise<any> => {
     const rxDBResponse = await this.teamRepository.removeTeam(teamId);
-    if ((await this.teamRepository.checkActiveTeam(teamId)) && rxDBResponse) {
+    const activeTeam = await this.teamRepository.checkActiveTeam(teamId);
+
+    if (activeTeam && rxDBResponse) {
       const teamIdToActivate =
         await this.workspaceRepository.activateInitialWorkspace();
       if (teamIdToActivate)

@@ -3,13 +3,13 @@
   export let teamName: string = "";
   export let teamId: string = "";
   import closeIcon from "$lib/assets/close.svg";
-  import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import {
     base64ToURL,
     createDynamicComponents,
     validateEmail,
   } from "$lib/utils/helpers";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";

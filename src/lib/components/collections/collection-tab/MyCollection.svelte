@@ -26,55 +26,69 @@
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
-  let isLoading: boolean = false;
   let activeTabId: string;
 
   let tabName: string = "";
   let componentData: NewTab;
   let totalFolder: number = 0;
   let totalRequest: number = 0;
-  let newCollectionName: string = "";
+  let tabDescription = "";
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
+      tabDescription = event?.description;
       componentData = event;
       activeTabId = event.id;
     }
   });
+  let collectionCountArr = [];
+  const refreshCount = () => {
+    if (collectionCountArr && activeTabId) {
+      collectionCountArr.forEach(async (collection) => {
+        if (collection._data.id === activeTabId) {
+          const collectionData =
+            await collectionsMethods.getNoOfApisandFolders(collection);
+          totalRequest = collectionData.requestCount;
+          totalFolder = collectionData.folderCount;
+          return;
+        }
+      });
+    }
+  };
+
   const collectionSubscribe = collections.subscribe(
-    (collectionArr: CollectionDocument[]) => {
-      if (collectionArr) {
-        collectionArr.forEach(async (collection) => {
-          if (collection._data.id === activeTabId) {
-            const collectionData =
-              await collectionsMethods.getNoOfApisandFolders(collection);
-            totalRequest = collectionData.requestCount;
-            totalFolder = collectionData.folderCount;
-            return;
-          }
-        });
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
       }
     },
   );
 
-  const handleCollectionInput = (event) => {
-    newCollectionName = event.target.value;
-    collectionsMethods.updateTab(
-      false,
-      "save",
-      componentData.path.collectionId,
+  $: {
+    if (activeTabId) {
+      refreshCount();
+    }
+  }
+  const onUpdate = async (property: string, event) => {
+    const value = event.target.value;
+    await _myColllectionViewModel.modifyCollection(
+      componentData,
+      property,
+      value,
+      collectionsMethods,
     );
   };
 
-  const onRenameBlur = async () => {
-    await _myColllectionViewModel.modifyCollection(
-      componentData,
-      newCollectionName,
-      collectionsMethods,
-      tabName,
-    );
+  const onDescInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "updateCollectionDescField",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
   };
 
   const handleApiRequest = async () => {
@@ -107,7 +121,9 @@
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
   });
-  onDestroy(() => {});
+  onDestroy(() => {
+    collectionSubscribe.unsubscribe();
+  });
   let autofocus = isCollectionNameVisibility;
 
   let inputElement;
@@ -154,10 +170,7 @@
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.SAVE_REQUEST,
           )}
-          on:input={(event) => {
-            handleCollectionInput(event);
-          }}
-          on:blur={onRenameBlur}
+          on:blur={(event) => onUpdate("name", event)}
           on:keydown={onRenameInputKeyPress}
           bind:this={inputElement}
         />
@@ -196,9 +209,13 @@
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.EDIT_COLLECTION_DESC,
           )}
-          style="font-size: 12px; "
+          id="updateCollectionDescField"
+          style="font-size: 12px;"
+          value={tabDescription}
           class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+          on:blur={(event) => onUpdate("description", event)}
+          on:keydown={onDescInputKeyPress}
         />
       </div>
     </Tooltip>

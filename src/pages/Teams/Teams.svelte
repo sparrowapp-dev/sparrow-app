@@ -18,17 +18,21 @@
   import { user } from "$lib/store/auth.store";
 
   import type { WorkspaceDocument } from "$lib/database/app.database";
-  import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
+  /**
+   * @deprecated referes to teams store
+   * import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
+   * import { isTeamCreatedFirstTime } from "$lib/store/team.store";
+   **/
+
   import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
-  import { isTeamCreatedFirstTime } from "$lib/store/team.store";
   import {} from "$lib/store";
   import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
@@ -45,7 +49,6 @@
 
   let allTeams: any[] = [];
   let userId: string | undefined = undefined;
-  let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
@@ -106,22 +109,28 @@
     }
   });
 
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) {
-      currOpenedTeam = value;
-    }
-  });
+  /**
+   * @deprecated referes to teams store
+   *   const openedTeamSubscribe = openedTeam.subscribe((value) => {
+   *   if (value) {
+   *    currOpenedTeam = value;
+   *    }
+   *  });
+   **/
 
   const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
     if (value) {
       activeTeamRxDoc = value;
-      setOpenedTeam(
-        currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
-        currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
-        currOpenedTeam.base64String
-          ? currOpenedTeam.base64String
-          : value.get("logo"),
-      );
+      /**
+       * @deprecated referes to teams store
+       *  setOpenedTeam(
+       *    currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
+       *    currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
+       *    currOpenedTeam.base64String
+       *      ? currOpenedTeam.base64String
+       *      : value.get("logo"),
+       *  );
+       **/
     }
   });
 
@@ -136,19 +145,19 @@
   });
 
   const handleCreateWorkspace = async () => {
-    workspaceUnderCreation = true;  
+    workspaceUnderCreation = true;
     isWorkspaceCreatedFirstTime.set(true);
     isWorkspaceLoaded.set(false);
     const workspaceObj = generateSampleWorkspace(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toISOString(),
       undefined,
-      currOpenedTeam.id,
+      $openTeam?.teamId,
     );
 
     const workspaceData = {
       name: workspaceObj.name,
-      id: currOpenedTeam.id,
+      id: $openTeam?.teamId,
       createdAt: workspaceObj.createdAt,
     };
 
@@ -158,33 +167,34 @@
 
     if (response.isSuccessful) {
       let totalRequest: number = 0;
-
+      const responseData = response.data?.data;
       $data.map((item) => {
         if (item) {
-          if (item._data._id !== response.data.data._id) {
+          if (item._data._id !== responseData._id) {
             totalRequest = 0;
           }
         }
       });
 
       let path: Path = {
-        workspaceId: response.data.data._id,
+        workspaceId: responseData._id,
         collectionId: "",
       };
 
-      workspaceObj._id = response.data.data._id;
-      workspaceObj.id = response.data.data._id;
-      workspaceObj.name = response.data.data.name;
-      workspaceObj.description = response.data.data?.description ?? workspaceObj.description;
+      workspaceObj._id = responseData._id;
+      workspaceObj.id = responseData._id;
+      workspaceObj.name = responseData.name;
+      workspaceObj.description =
+        responseData?.description ?? workspaceObj.description;
       workspaceObj.team = {
-        teamId: response.data.data?.team?.id,
+        teamId: responseData?.team?.id,
         teamName: response?.data?.data?.team?.teamName,
       };
-      workspaceObj.users = response.data.data?.users;
-      workspaceObj.createdAt = response.data.data?.createdAt;
-      workspaceObj.createdBy = response.data.data?.createdBy;
+      workspaceObj.users = responseData?.users;
+      workspaceObj.createdAt = responseData?.createdAt;
+      workspaceObj.createdBy = responseData?.createdBy;
       workspaceObj.isActiveWorkspace = false;
-      workspaceObj.environments = response.data.data?.environments;
+      workspaceObj.environments = responseData?.environments;
       workspaceObj.path = path;
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
@@ -219,43 +229,55 @@
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
 
-    isTeamCreatedFirstTime.set(true);
+    // isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
-
     await _viewModel.addTeam(teamObj);
     const response = await _viewModel.createTeam(teamObj);
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
-      setOpenedTeam(
-        response.data.data?._id,
-        response?.data?.data?.name,
-        response?.data?.data?.logo,
-      );
+      await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   response.data.data?._id,
+       *   response?.data?.data?.name,
+       *   response?.data?.data?.logo,
+       * );
+       **/
+
+      await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
       handleCreateTeamModal();
-      notifications.error("Failed to create a new team.");
+      notifications.error(
+        "Failed to create a new team. " + response.message ??
+          "Failed to create a new team.",
+      );
     }
   };
 
   const handleLeaveTeam = async () => {
-    if (!currOpenedTeam?.id) return;
+    if (!$openTeam?.teamId) return;
     isLeavingTeam = true;
-    const response = await _viewModel.leaveTeam(currOpenedTeam.id);
+    const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
       await _viewModel.refreshTeams(userId);
       await _viewModelWorkspace.refreshWorkspaces(userId);
       notifications.success("You left a team.");
-      setOpenedTeam(
-        activeTeamRxDoc?._data?.teamId,
-        activeTeamRxDoc?._data?.name,
-        //@ts-ignore
-        activeTeamRxDoc?._data?.logo,
-      );
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   activeTeamRxDoc?._data?.teamId,
+       *   activeTeamRxDoc?._data?.name,
+       *   //@ts-ignore
+       *   activeTeamRxDoc?._data?.logo,
+       * );
+       **/
+      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();
@@ -375,7 +397,6 @@
 
   onDestroy(() => {
     userSubscribe();
-    openedTeamSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
@@ -488,7 +509,7 @@
 >
   <p class="warning-text text-lightGray mt-3">
     Are you sure you want to leave team <span class="fw-semibold"
-      >"{currOpenedTeam?.name}"</span
+      >"{$openTeam?.name}"</span
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
@@ -517,6 +538,7 @@
     <WorkspaceList
       {userId}
       {handleCreateTeamModal}
+      openTeam={$openTeam}
       teams={allTeams}
       {data}
       tabList={$tabList}

@@ -1,14 +1,13 @@
 <script lang="ts">
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ProgressBar from "$lib/components/Transition/SyntaxCheckProgressBar .svelte";
+  import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import FetchDataProgressBar from "$lib/components/Transition/FetchDataProgressBar.svelte";
   import Request from "../request/Request.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -22,11 +21,20 @@
   const _viewImportCollection = new ImportCollectionViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
 
-  let isLoading: boolean = false;
+  const ProgressTitle = {
+    IDENTIFYING_SYNTAX: "Identifying Syntax...",
+    FETCHING_DATA: "Fetching Data...",
+  };
+
   let isDataEmpty: boolean = false;
   let isSyntaxError: boolean = false;
-  let isResponseLoading: boolean = false;
   let importData: string = "";
+
+  let progressBar = {
+    isLoading: false,
+    isProgress: false,
+    title: ProgressTitle.IDENTIFYING_SYNTAX,
+  };
 
   const handleError = () => {
     isSyntaxError = false;
@@ -92,13 +100,17 @@
 
   async function handleFileUpload(file: Request) {
     if (file) {
+      progressBar.isLoading = true;
+      progressBar.isProgress = false;
+      progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
       const response = await _viewImportCollection.importCollectionFromFile(
         currentWorkspaceId,
         file,
       );
       if (response.isSuccessful) {
-        onClick(false);
-        isLoading = false;
+        progressBar.title = ProgressTitle.FETCHING_DATA;
+        progressBar.isProgress = true;
+
         let path: Path = {
           workspaceId: currentWorkspaceId,
           collectionId: response.data.data._id,
@@ -134,7 +146,7 @@
         });
         return;
       } else {
-        isLoading = false;
+        progressBar.isLoading = false;
         isSyntaxError = true;
       }
     }
@@ -153,15 +165,15 @@
   };
 
   const handleImportJsonObject = async () => {
-    isLoading = true;
     const contentType = _viewImportCollection.validateImportBody(importData);
     if (!contentType) {
-      isLoading = false;
+      progressBar.isLoading = false;
       isSyntaxError = true;
       return;
     }
-    isLoading = false;
-    isResponseLoading = true;
+    progressBar.isLoading = true;
+    progressBar.isProgress = false;
+    progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
     const response = await _viewImportCollection.importCollectionFromJsonObject(
       currentWorkspaceId,
       importData,
@@ -169,8 +181,8 @@
     );
 
     if (response.isSuccessful) {
-      onClick(false);
-      isResponseLoading = false;
+      progressBar.title = ProgressTitle.FETCHING_DATA;
+      progressBar.isProgress = true;
       let path: Path = {
         workspaceId: currentWorkspaceId,
         collectionId: response.data.data._id,
@@ -206,15 +218,19 @@
       });
       return;
     } else {
-      isLoading = false;
-      isResponseLoading = false;
+      progressBar.isLoading = false;
       isSyntaxError = true;
     }
   };
 </script>
 
-{#if isLoading}
-  <ProgressBar {onClick} />
+{#if progressBar.isLoading}
+  <ProgressBar
+    {onClick}
+    title={progressBar.title}
+    zIndex={10000}
+    isProgress={progressBar.isProgress}
+  />
 {/if}
 
 <ModalWrapperV1
@@ -252,16 +268,13 @@
     </div>
   </div>
 </ModalWrapperV1>
-{#if isResponseLoading}
-  <FetchDataProgressBar {onClick}></FetchDataProgressBar>
-{/if}
 
 <ModalWrapperV1
   title={"New Collection"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
-  isOpen={!isLoading && !isSyntaxError}
+  isOpen={!progressBar.isLoading && !isSyntaxError}
   handleModalState={onClick}
 >
   <div class="importData-lightGray sparrow-fs-14">
@@ -308,7 +321,7 @@
       }}
     >
       <span class="me-3">
-        {#if isLoading}
+        {#if progressBar.isLoading}
           <Spinner size={"16px"} />
         {/if}</span
       > Import Collection</button

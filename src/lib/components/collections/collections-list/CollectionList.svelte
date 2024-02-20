@@ -49,7 +49,7 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
@@ -455,7 +455,6 @@
   </div>
   <div class="px-3 pt-2">
     <Dropdown
-      mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
       data={[
         {
@@ -487,7 +486,7 @@
       hoverClasses={[
         {
           id: "hash129-btn-div",
-          classToAdd: ["border-bottom","border-labelColor"],
+          classToAdd: ["border-bottom", "border-labelColor"],
         },
       ]}
     ></Dropdown>
@@ -546,7 +545,11 @@
         )}
         dropDownType={{ type: "img", title: plusIcon }}
         staticCustomStyles={[
-          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+          {
+            id: "collectionDropdown-options-container",
+            styleKey: "minWidth",
+            styleValue: "160px",
+          },
         ]}
         data={[
           {
@@ -570,10 +573,10 @@
             id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
-          
+
           {
             id: "collectionDropdown-options-container",
-            classToAdd: ["end-0","mt-1"],
+            classToAdd: ["end-0", "mt-1"],
           },
         ]}
       ></Dropdown>
@@ -662,14 +665,15 @@
               />
             {/each}
           </List>
+        {:else}
+          <EmptyCollection
+            {loggedUserRoleInWorkspace}
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+            {showDefault}
+          />
         {/if}
-        <EmptyCollection
-          {loggedUserRoleInWorkspace}
-          {handleCreateCollection}
-          {collectionsMethods}
-          {showDefault}
-          {currentWorkspaceId}
-        />
       {/if}
     </div>
   </div>

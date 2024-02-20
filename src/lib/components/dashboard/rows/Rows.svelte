@@ -106,7 +106,7 @@
     class="tab-data py-3"
     >{list?.collections?.length ? list.collections.length : 0}</td
   >
-  {#if $currOpenedTeamRxDoc?._data?.users?.length > 1}
+  {#if currOpenedTeamRxDoc?.users?.length > 1}
     <td
       on:click={(e) => {
         e.stopPropagation();

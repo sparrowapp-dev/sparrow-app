@@ -184,6 +184,7 @@
         (currentWorkspaceDetails = {
           id: value._data._id,
           name: value._data.name,
+          users: value._data.users,
         }),
           (currentTeamDetails = {
             name: value._data?.team?.teamName,
@@ -349,6 +350,7 @@
     <InviteToWorkspace
       {handleInvitePopup}
       {currentWorkspaceDetails}
+      users={currentActiveTeam?.users}
       teamName={currentTeamDetails.name}
       addUsersInWorkspace={_viewModel.addUsersInWorkspace}
       addUsersInWorkspaceInRxDB={_viewModel.addUsersInWorkspaceInRxDB}

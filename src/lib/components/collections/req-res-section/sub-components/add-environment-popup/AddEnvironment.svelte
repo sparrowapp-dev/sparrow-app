@@ -6,7 +6,7 @@
     EnvironmentResponseDto,
     UpdateEnvironmentPostBody,
   } from "$lib/utils/dto";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   export let environmentAxisX;
   export let environmentAxisY;
