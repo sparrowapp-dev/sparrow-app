@@ -120,7 +120,7 @@ jobs:
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_1.0.0_x64.dmg -g Collaborators --app techdome/Sparrow-1 --build-version v12.23.${{ github.run_number }} --build-number ${{ github.run_number }}
+          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_0.0.0_x64.dmg -g Collaborators --app techdome/Sparrow-1 --build-version v12.23.${{ github.run_number }} --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
         if: always()
