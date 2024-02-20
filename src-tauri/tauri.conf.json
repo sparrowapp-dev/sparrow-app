@@ -59,6 +59,14 @@
         "center": true,
         "fileDropEnabled":false
       }
-    ]
+    ],
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://api.sparrowapp.dev/updater/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCRkNBNDkwNUI2NjMwMDcKUldRSE1HWmJrS1Q4S3l4Slo5KzhUNGZoSXdlZmNuRDk3Qkh6NmY5aWJiKzU5a2FUUnQ2UlJhZUIK"
+    }
   }
 }
