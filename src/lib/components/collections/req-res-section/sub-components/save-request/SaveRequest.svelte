@@ -31,6 +31,11 @@
   import FileType from "$lib/components/file-types/FileType.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import {
+    bestPractice,
+    dos,
+    donts,
+  } from "$lib/utils/constants/request.constant";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -747,8 +752,7 @@
           {:else if path.length === 0}
             <div>
               <p class="w-100 save-text-clr text-center sparrow-fs-12">
-                You have no collections in this workspace. Create a Collection
-                to easily organize and use your API requests.
+                {RequestConstant.bestPractice}
               </p>
               <div class="w-100 d-flex justify-content-center">
                 <Button
@@ -803,31 +807,23 @@
               />
             </div>
             <p class="save-as-instructions">
-              When naming your requests, remember that resources are at the core
-              of REST. Use nouns to represent your resources, such as 'user
-              accounts' or 'managed devices.' Keep your URIs clear and
-              consistent by using forward slashes to indicate hierarchy, avoid
-              file extensions.
+              {bestPractice}
             </p>
             <div class="d-flex">
               <div class="w-50">
                 <p class="save-as-instructions">Do's:</p>
                 <ol class="save-as-instructions">
-                  <li>Use nouns to represent resources</li>
-                  <li>Use forward slashes for hierarchy</li>
-                  <li>Use hyphens for readability</li>
-                  <li>Use lowercase letters in URIs</li>
-                  <li>Use HTTP methods for CRUD actions</li>
+                  {#each dos as para}
+                    <li>{para}</li>
+                  {/each}
                 </ol>
               </div>
               <div class="w-50">
                 <p class="save-as-instructions">Don'ts:</p>
                 <ol class="save-as-instructions">
-                  <li>Don't use file extensions.</li>
-                  <li>Don't use underscores in URIs.</li>
-                  <li>Don't use verbs in the URIs.</li>
-                  <li>Don't put CRUD function names in URIs.</li>
-                  <li>Don't use capital letters in URIs.</li>
+                  {#each donts as para}
+                    <li>{para}</li>
+                  {/each}
                 </ol>
               </div>
             </div>
