@@ -64,8 +64,9 @@
   </p>
   <p><img class="w-100" src={environment} alt="" /></p>
   <p class="heading-para text-textColor">
-    All the global variables are marked with G. Where as all local variables
-    within an environment are marked with E.
+    All the global variables are marked with <span class="global-env-G">G</span>
+    . Where as all local variables within an environment are marked with
+    <span class="local-env-E">E</span>.
   </p>
   <p class="heading-para text-textColor">
     You can use variables in URL, query parameters, headers, authorization,
@@ -109,6 +110,12 @@
     }
     .icon {
       cursor: pointer;
+    }
+    .local-env-E {
+      color: var(--request-patc);
+    }
+    .global-env-G {
+      color: var(--request-con);
     }
   }
 </style>
