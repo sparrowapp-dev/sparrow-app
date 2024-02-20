@@ -1,22 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
-  import { relaunch } from "@tauri-apps/api/process";
+  import { Update, check } from "@tauri-apps/plugin-updater";
+  import { relaunch } from "@tauri-apps/plugin-process";
   import { ModalWrapperV1 } from "$lib/components";
   import Button from "$lib/components/buttons/Button.svelte";
 
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
+  let updater: Update | null;
 
   onMount(async () => {
     try {
-      const { shouldUpdate, manifest } = await checkUpdate();
-      if (shouldUpdate) {
+      updater = await check();
+      if (updater?.available) {
         notifications.info("Update Available");
-        newAppVersion = manifest?.version;
+        newAppVersion = updater.version;
         updateAvailable = true;
       }
     } catch (error) {
@@ -27,10 +28,28 @@
   const handleUpdatePopUp = (flag: boolean) => {
     updateAvailable = flag;
   };
+
+  const initiateUpdate = async () => {
+    try {
+      updateAvailable = false;
+      showProgressBar = true;
+      if (updater) {
+        await updater.downloadAndInstall();
+        notifications.success("Update Completed. App will relaunch now!");
+        await relaunch();
+      }
+    } catch (e) {
+      notifications.error("Update Failed!");
+      console.error(e);
+    } finally {
+      showProgressBar = false;
+      updateAvailable = false;
+    }
+  };
 </script>
 
 {#if showProgressBar === true}
-  <ProgressBar onClick="" title="Update in progress" />{/if}
+  <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
 
 {#if updateAvailable === true}
   <ModalWrapperV1
@@ -64,20 +83,7 @@
         textStyleProp={"font-size: var(--base-text)"}
         type={"primary"}
         loader={false}
-        onClick={() => {
-          updateAvailable = false;
-          showProgressBar = true;
-          installUpdate()
-            .then(() => {
-              showProgressBar = false;
-              notifications.success("Update Completed. App will relaunch now!");
-              relaunch();
-            })
-            .catch(() => {
-              showProgressBar = false;
-              notifications.error("Update Failed!");
-            });
-        }}
+        onClick={initiateUpdate}
       />
     </div></ModalWrapperV1
   >{/if}

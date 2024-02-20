@@ -34,6 +34,7 @@
   let folderDescription = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
+  let newFolderName: string = "";
   let collectionId: string;
   let folderId: string;
   let collectionArray = [];
@@ -48,23 +49,35 @@
       folderId = event.path?.folderId;
     }
   });
+  let collectionCountArr = [];
+
+  const refreshCount = () => {
+    if (collectionCountArr && collectionId) {
+      collectionCountArr.forEach(async (collection) => {
+        if (collection._data.id === collectionId) {
+          const collectionData = await collectionsMethods.getNoOfApisandFolders(
+            collection,
+            folderId,
+          );
+          totalRequest = collectionData.requestCount;
+        }
+      });
+    }
+  };
   const collectionSubscribe = collections.subscribe(
-    (collectionArr: CollectionDocument[]) => {
-      if (collectionArr) {
-        collectionArray = collectionArr;
-        collectionArr.forEach(async (collection) => {
-          if (collection._data.id === collectionId) {
-            const collectionData =
-              await collectionsMethods.getNoOfApisandFolders(
-                collection,
-                folderId,
-              );
-            totalRequest = collectionData.requestCount;
-          }
-        });
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
       }
     },
   );
+
+  $: {
+    if (folderId) {
+      refreshCount();
+    }
+  }
 
   const onUpdate = async (property: string, event) => {
     const value = event.target.value;
@@ -109,6 +122,7 @@
     tabSubscribe();
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
+    collectionSubscribe.unsubscribe();
   });
   onDestroy(() => {});
 
