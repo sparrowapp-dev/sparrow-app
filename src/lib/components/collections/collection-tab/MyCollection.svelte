@@ -43,22 +43,33 @@
       activeTabId = event.id;
     }
   });
+  let collectionCountArr = [];
+  const refreshCount = () => {
+    if (collectionCountArr && activeTabId) {
+      collectionCountArr.forEach(async (collection) => {
+        if (collection._data.id === activeTabId) {
+          const collectionData =
+            await collectionsMethods.getNoOfApisandFolders(collection);
+          totalRequest = collectionData.requestCount;
+          totalFolder = collectionData.folderCount;
+          return;
+        }
+      });
+    }
+  };
+
   const collectionSubscribe = collections.subscribe(
-    (collectionArr: CollectionDocument[]) => {
-      if (collectionArr) {
-        collectionArr.forEach(async (collection) => {
-          if (collection._data.id === activeTabId) {
-            const collectionData =
-              await collectionsMethods.getNoOfApisandFolders(collection);
-            totalRequest = collectionData.requestCount;
-            totalFolder = collectionData.folderCount;
-            return;
-          }
-        });
-      }
+    (value: CollectionDocument[]) => {
+      collectionCountArr = value;
+      refreshCount();
     },
   );
 
+  $: {
+    if (activeTabId) {
+      refreshCount();
+    }
+  }
   const onUpdate = async (property: string, event) => {
     const value = event.target.value;
     await _myColllectionViewModel.modifyCollection(
@@ -108,7 +119,9 @@
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
   });
-  onDestroy(() => {});
+  onDestroy(() => {
+    collectionSubscribe.unsubscribe();
+  });
   let autofocus = isCollectionNameVisibility;
 
   let inputElement;
