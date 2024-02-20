@@ -60,8 +60,10 @@
 
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
-      collectionCountArr = value;
-      refreshCount();
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
     },
   );
 
