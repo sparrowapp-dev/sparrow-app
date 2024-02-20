@@ -2777,9 +2777,9 @@ flat-cache@^3.0.4:
     rimraf "^3.0.2"
 
 flatted@^3.2.9:
-  version "3.2.9"
-  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.9.tgz#7eb4c67ca1ba34232ca9d2d93e9886e611ad7daf"
-  integrity sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==
+  version "3.2.10"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.10.tgz#b4afc0fc288e39b97dc3843b0941a71ffc11c941"
+  integrity sha512-hla0i4X34dHDV1/QqK0ZfSfx/Vo4VVFZj5PVxFsM9UNRXQzkml6q4TJIm8d6lsyV1Klu+27l/db3r6xPOqdXXg==
 
 follow-redirects@^1.15.4:
   version "1.15.5"

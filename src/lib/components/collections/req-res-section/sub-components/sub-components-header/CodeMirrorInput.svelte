@@ -37,7 +37,6 @@
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    debugger;
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
     if (rawValue?.length > 0) {

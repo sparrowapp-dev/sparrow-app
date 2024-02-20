@@ -4,13 +4,11 @@ import { invoke } from "@tauri-apps/api/core";
 const windowSettingRepository = new WindowSettingReposistory();
 
 export async function zoomIn() {
-  console.log("HERE");
   let windowScaleFactor =
     await windowSettingRepository.getWindowSetting("windowScaleFactor");
   windowScaleFactor = windowScaleFactor
     ? +windowScaleFactor._data.value + 0.2
     : 1.2;
-  debugger;
   invoke("zoom_window", { scaleFactor: windowScaleFactor });
   setScaleFactorToDb(windowScaleFactor);
 }
