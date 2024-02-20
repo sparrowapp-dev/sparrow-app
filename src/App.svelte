@@ -31,18 +31,11 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
-  import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
-  import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
-  import { relaunch } from "@tauri-apps/api/process";
-  import { ModalWrapperV1 } from "$lib/components";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
-  let showProgressBar = false;
-  let updateAvailable = false;
-  let newAppVersion: string | undefined = "";
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -72,17 +65,6 @@
   });
 
   onMount(async () => {
-    try {
-      const { shouldUpdate, manifest } = await checkUpdate();
-      if (shouldUpdate) {
-        notifications.info("Update Available");
-        newAppVersion = manifest?.version;
-        updateAvailable = true;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
     listen("receive-login", async (event: any) => {
       const params = new URLSearchParams(event.payload.url.split("?")[1]);
       const accessToken = params.get("accessToken");
@@ -110,60 +92,9 @@
       resizeWindowOnLogin();
     }
   });
-
-  const handleUpdatePopUp = (flag: boolean) => {
-    updateAvailable = flag;
-  };
 </script>
 
-{#if showProgressBar === true}
-  <ProgressBar onClick="" title="Update in progress" />{/if}
-<ModalWrapperV1
-  title={`New Update Available - v${newAppVersion}`}
-  type={"primary"}
-  width={"50%"}
-  zIndex={1000}
-  isOpen={updateAvailable}
-  handleModalState={handleUpdatePopUp}
->
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>Update for new features and improvements</p>
-  </div>
-  <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-  >
-    <Button
-      disable={showProgressBar}
-      title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
-      loader={false}
-      onClick={() => {
-        updateAvailable = false;
-      }}
-    />
-
-    <Button
-      disable={showProgressBar}
-      title={"Update"}
-      textStyleProp={"font-size: var(--base-text)"}
-      type={"primary"}
-      loader={false}
-      onClick={() => {
-        updateAvailable = false;
-        showProgressBar = true;
-        installUpdate().then(() => {
-          showProgressBar = false;
-          notifications.success("Update Completed. App will relaunch now!");
-          relaunch();
-        }).catch(()=>{
-          showProgressBar = false;
-          notifications.error("Update Failed!");
-        });
-      }}
-    />
-  </div></ModalWrapperV1
->
+<AutoUpdateDialog />
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
