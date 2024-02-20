@@ -15,8 +15,9 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { setBodyType } from "$lib/utils/helpers/auth.helper";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let name: string;
   export let id: string;
@@ -105,15 +106,14 @@
 
   let showMenu: boolean = false;
 
-  let containerRef;
-
+  let noOfColumns = 180;
+  let noOfRows = 3;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -295,7 +295,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -306,7 +306,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -318,28 +318,13 @@
 >
 
 {#if showMenu}
-  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-    <div
-      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-      id="navbar"
-    >
-      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
-        {#each menuItems as item}
-          <li class="align-items-center">
-            <button
-              disabled={item.disabled}
-              class={`align-items-center mb-1 px-3 py-2 ${
-                item.disabled && "text-requestBodyColor"
-              }`}
-              on:click={item.onClick}
-              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-              >{item.displayText}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </nav>
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window

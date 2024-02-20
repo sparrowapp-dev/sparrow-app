@@ -12,29 +12,33 @@
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import type { WorkspaceRole } from "$lib/utils/enums";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let _collectionListViewModel: CollectionListViewModel;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
-  let isLoading: boolean = false;
   let activeTabId: string;
 
   let tabName: string = "";
   let componentData: NewTab;
   let totalFolder: number = 0;
   let totalRequest: number = 0;
-  let newCollectionName: string = "";
+  let tabDescription = "";
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
+      tabDescription = event?.description;
       componentData = event;
       activeTabId = event.id;
     }
@@ -44,9 +48,8 @@
       if (collectionArr) {
         collectionArr.forEach(async (collection) => {
           if (collection._data.id === activeTabId) {
-            const collectionData = await collectionsMethods.getNoOfApisandFolders(
-             collection
-            );
+            const collectionData =
+              await collectionsMethods.getNoOfApisandFolders(collection);
             totalRequest = collectionData.requestCount;
             totalFolder = collectionData.folderCount;
             return;
@@ -56,22 +59,23 @@
     },
   );
 
-  const handleCollectionInput = (event) => {
-    newCollectionName = event.target.value;
-    collectionsMethods.updateTab(
-      false,
-      "save",
-      componentData.path.collectionId,
+  const onUpdate = async (property: string, event) => {
+    const value = event.target.value;
+    await _myColllectionViewModel.modifyCollection(
+      componentData,
+      property,
+      value,
+      collectionsMethods,
     );
   };
 
-  const onRenameBlur = async () => {
-    await _myColllectionViewModel.modifyCollection(
-      componentData,
-      newCollectionName,
-      collectionsMethods,
-      tabName,
-    );
+  const onDescInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "updateCollectionDescField",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
   };
 
   const handleApiRequest = async () => {
@@ -131,28 +135,41 @@
     class="my-collection d-flex flex-column"
     style="width:calc(100% - 280px); margin-top: 15px;"
   >
-    <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
-      <input
-        type="text"
-        required
-        {autofocus}
-        maxlength={100}
-        id="renameInputFieldCollection"
-        value={tabName}
-        class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
-        on:input={(event) => {
-          handleCollectionInput(event);
-        }}
-        on:blur={onRenameBlur}
-        on:keydown={onRenameInputKeyPress}
-        bind:this={inputElement}
-      />
+    <Tooltip
+      title={PERMISSION_NOT_FOUND_TEXT}
+      show={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )}
+    >
+      <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
+        <input
+          type="text"
+          required
+          {autofocus}
+          maxlength={100}
+          id="renameInputFieldCollection"
+          value={tabName}
+          class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )}
+          on:blur={(event) => onUpdate("name", event)}
+          on:keydown={onRenameInputKeyPress}
+          bind:this={inputElement}
+        />
 
-      <button
-        class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
-        on:click={handleApiRequest}>New Request</button
-      >
-    </div>
+        <button
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )}
+          class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
+          on:click={handleApiRequest}>New Request</button
+        >
+      </div>
+    </Tooltip>
 
     <div class="d-flex gap-4 mb-4 ps-2">
       <div class="d-flex align-items-center gap-2">
@@ -164,15 +181,29 @@
         <p style="font-size: 12px;" class="mb-0">Folder</p>
       </div>
     </div>
-    <div class="d-flex align-items-start ps-0 h-100">
-      <textarea
-       disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.EDIT_COLLECTION_DESC)}
-        type="text"
-        style="font-size: 12px; "
-        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-      />
-    </div>
+    <Tooltip
+      title={PERMISSION_NOT_FOUND_TEXT}
+      show={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.EDIT_COLLECTION_DESC,
+      )}
+    >
+      <div class="d-flex align-items-start ps-0 h-100">
+        <textarea
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.EDIT_COLLECTION_DESC,
+          )}
+          id="updateCollectionDescField"
+          style="font-size: 12px;"
+          value={tabDescription}
+          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+          placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+          on:blur={(event) => onUpdate("description", event)}
+          on:keydown={onDescInputKeyPress}
+        />
+      </div>
+    </Tooltip>
   </div>
   <div
     class="d-flex flex-column align-items-left justify-content-start"

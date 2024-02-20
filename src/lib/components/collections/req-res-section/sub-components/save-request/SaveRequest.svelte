@@ -1,15 +1,10 @@
 <script lang="ts">
-  import Collection from "$lib/components/file-types/collection/Collection.svelte";
-  import Folder from "$lib/components/file-types/folder/Folder.svelte";
-  import Request from "$lib/components/file-types/request/Request.svelte";
-  import { fade, fly } from "svelte/transition";
   import { onDestroy, onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import collectionAsset from "$lib/assets/collection.svg";
   import workspaceAsset from "$lib/assets/workspace.svg";
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
-  import crossAsset from "$lib/assets/close.svg";
   import {
     insertCollection,
     insertCollectionDirectory,
@@ -21,12 +16,11 @@
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -34,6 +28,9 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "$lib/components/buttons/Button.svelte";
+  import FileType from "$lib/components/file-types/FileType.svelte";
+  import ComboText from "$lib/components/text/ComboText.svelte";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -632,17 +629,21 @@
                 navigateToDirectory(col);
               }}
             >
-              <Folder name={col.name} />
+              <FileType name={col.name} type={ItemType.FOLDER} />
             </div>
           {:else if col.type === ItemType.REQUEST}
-            <Request name={col.name} method={col.request.method} />
+            <FileType
+              name={col.name}
+              method={col.request.method}
+              type={ItemType.REQUEST}
+            />
           {:else}
             <div
               on:click={() => {
                 navigateToDirectory(col);
               }}
             >
-              <Collection name={col.name} />
+              <FileType name={col.name} type={ItemType.COLLECTION} />
             </div>
           {/if}
         {/each}
@@ -838,7 +839,14 @@
       </p>
     {/if}
     <div class="d-flex">
-      <MethodButton method={componentData?.property.request.method} />
+      <ComboText
+        value={componentData?.property.request.method}
+        comboContainerClassProp={"d-flex flex-start pb-2"}
+        singleTextClassProp={"rounded d-flex align-items-center justify-content-center"}
+        valueClassProp={`text-${getMethodStyle(
+          componentData?.property.request.method,
+        )}`}
+      />
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>

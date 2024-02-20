@@ -1,4 +1,8 @@
 <script lang="ts">
+  /**
+   * @deprecated please do not use this file
+   * Instead of this we can use src\lib\components\dropdown\Dropdown
+   * **/
   let visibilty = false;
   import plusIcon from "$lib/assets/plus.svg";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -9,19 +13,23 @@
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { slide } from "svelte/transition";
   import Spinner from "../Transition/Spinner.svelte";
-  import ImportCollection from "../collections/collections-list/ImportCollection.svelte";
+  import ImportCollection from "../collections/collections-list/import-collection/ImportCollection.svelte";
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import type { WorkspaceRole } from "$lib/utils/enums";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
+  import Tooltip from "../tooltip/Tooltip.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
   export let collectionUnderCreation: boolean = false;
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   let isImportCollectionPopup: boolean = false;
   const handleImportCollectionPopup = (flag) => {
     createCollectionSource.set("AddIcon");
@@ -64,36 +72,47 @@
   class="d-flex align-items-center justify-content-center"
   bind:this={container}
 >
-  <button
-  disabled={!hasWorkpaceLevelPermission(loggedUserRoleInWorkspace,workspaceLevelPermissions.ADD_COLLECTIONS)}
-    id="dropdown-btn-color"
-    class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
-      ? 'drop-active'
-      : ''}"
-    style="width: 32px; height:32px;"
-    on:click={() => {
-      visibilty = !visibilty;
-      changeBtnBackground();
-    }}
+  <Tooltip
+    title={PERMISSION_NOT_FOUND_TEXT}
+    show={!hasWorkpaceLevelPermission(
+      loggedUserRoleInWorkspace,
+      workspaceLevelPermissions.ADD_COLLECTIONS,
+    )}
   >
-    {#if collectionUnderCreation}
-      <Spinner size={"15px"} />
-    {/if}
-    {#if !collectionUnderCreation}
-      <img src={plusIcon} alt="plus" />
-    {/if}
+    <button
+      disabled={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_COLLECTIONS,
+      )}
+      id="dropdown-btn-color"
+      class="dropdown border-0 dropdown-btn btn p-0 d-flex align-items-center justify-content-center bg-backgroundDark {visibilty
+        ? 'drop-active'
+        : ''}"
+      style="width: 32px; height:32px;"
+      on:click={() => {
+        visibilty = !visibilty;
+        changeBtnBackground();
+      }}
+    >
+      {#if collectionUnderCreation}
+        <Spinner size={"15px"} />
+      {/if}
+      {#if !collectionUnderCreation}
+        <img src={plusIcon} alt="plus" />
+      {/if}
 
-    {#if visibilty}
-      <div class="dropdown-content" transition:slide={{ duration: 100 }}>
-        <button
-          on:click={() => {
-            handleImportCollectionPopup(true);
-          }}>Collection</button
-        >
-        <button on:click={addApiRequest}>API Request</button>
-      </div>
-    {/if}
-  </button>
+      {#if visibilty}
+        <div class="dropdown-content" transition:slide={{ duration: 100 }}>
+          <button
+            on:click={() => {
+              handleImportCollectionPopup(true);
+            }}>Collection</button
+          >
+          <button on:click={addApiRequest}>API Request</button>
+        </div>
+      {/if}
+    </button>
+  </Tooltip>
 </div>
 
 <style>

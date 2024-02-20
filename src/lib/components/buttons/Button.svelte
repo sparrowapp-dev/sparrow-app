@@ -66,7 +66,7 @@
   }}
 >
   {#if loader && !allowChild}
-    <span class="mx-2">
+    <span class="mx-2 d-flex justify-content-center">
       <Spinner size={`${loaderSize}px`} />
     </span>
   {:else if !loader && !allowChild}

@@ -21,8 +21,8 @@
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import { notifications } from "$lib/utils/notifications";
-  import ImportCollection from "$lib/components/collections/collections-list/ImportCollection.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import ImportCollection from "$lib/components/collections/collections-list/import-collection/ImportCollection.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { createCollectionSource } from "$lib/store/event-source.store";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";

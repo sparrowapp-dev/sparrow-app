@@ -13,10 +13,11 @@
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
-  const emailstoBeSentArr: string[] = [];
+  import { validateEmail } from "$lib/utils/helpers";
+  let emailstoBeSentArr: string[] = [];
   export let addUsersInWorkspace: (
     id: string,
     data: addUsersInWorkspacePayload,
@@ -30,21 +31,32 @@
   let defaultRole = "select";
   let selectedRole = defaultRole;
   let currentEmailEntered: string;
+  let invalidEmails: string[] = [];
   function removeElement(event: Event): void {
-    const id = event.target?.id;
-    const removeElement = document.getElementById(id) as HTMLElement;
+    const email = event.target?.id;
+    const removeElement = document.getElementById(email) as HTMLElement;
     const emailContainer = document.getElementById(
       "input-email",
     ) as HTMLElement;
     emailContainer.removeChild(removeElement);
+    emailstoBeSentArr = emailstoBeSentArr.filter((e) => e != email);
+    invalidEmails = invalidEmails.filter((e) => e != email);
   }
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
-    emailstoBeSentArr.push(email);
+    const isValidEmail = validateEmail(email);
+    if (!isValidEmail) {
+      invalidEmails.push(email);
+    } else {
+      emailstoBeSentArr.push(email);
+    }
+
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
-      "d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center",
+      `d-flex bg-emailInviteBackgroundColor gx-1 px-1 justify-content-center rounded-1 align-items-center ${
+        !isValidEmail ? "border border-danger" : ""
+      }`,
     );
     const emailContentSpan = createDynamicComponents("span", "");
     const closeIconBtn = createDynamicComponents("img", "bg-transparent", [
@@ -73,6 +85,11 @@
     ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
+    if (emailstoBeSentArr.length && !invalidEmails.length) {
+      showErrors = false;
+    } else {
+      showErrors = true;
+    }
   };
   const handleInvite = async () => {
     showErrors = true;
@@ -80,7 +97,13 @@
       users: emailstoBeSentArr,
       role: selectedRole,
     };
-    if (emailstoBeSentArr && emailstoBeSentArr.length > 0 && selectedRole) {
+    if (
+      emailstoBeSentArr &&
+      emailstoBeSentArr.length > 0 &&
+      !invalidEmails.length &&
+      selectedRole &&
+      selectedRole != "select"
+    ) {
       const response = await addUsersInWorkspace(
         currentWorkspaceDetails.id,
         data,
@@ -147,14 +170,30 @@
         bind:value={currentEmailEntered}
         class="input-container mt-2"
         on:keyup={(event) => {
-          if (event.key === "," || event.key === "Enter") {
+          if (
+            (event.key === "," || event.key === "Enter" || event.key === " ") &&
+            currentEmailEntered &&
+            currentEmailEntered.trim() != "" &&
+            currentEmailEntered.trim() != ","
+          ) {
+            handleEmailOnAdd(currentEmailEntered);
+          }
+        }}
+        on:blur={() => {
+          if (
+            currentEmailEntered &&
+            currentEmailEntered.trim() != "" &&
+            currentEmailEntered.trim() != ","
+          ) {
             handleEmailOnAdd(currentEmailEntered);
           }
         }}
       />
     </div>
-    {#if showErrors && emailstoBeSentArr.length === 0}
-      <p class="error-text">Email ID cannot be Empty</p>
+    {#if showErrors && invalidEmails.length}
+      <p class="error-text sparrow-fs-12">One or more Email IDs are invalid</p>
+    {:else if showErrors && emailstoBeSentArr.length === 0}
+      <p class="error-text">Email ID cannot be Empty.</p>
     {/if}
   </div>
   <div class="mt-4">

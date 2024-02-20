@@ -6,7 +6,7 @@
     EnvironmentResponseDto,
     UpdateEnvironmentPostBody,
   } from "$lib/utils/dto";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   export let environmentAxisX;
   export let environmentAxisY;
@@ -149,15 +149,16 @@ left:{environmentAxisX}px;
     </div>
     <div class="input-class">
       <input
+        disabled
         type="text"
-        placeholder="Enter Variable"
+        placeholder="Enter Variable1"
         class="variable-name"
         bind:value={variableData}
         on:input={checkDataInput}
       />
       <input
         type="text"
-        placeholder="Enter Value"
+        placeholder="Enter Value1"
         class="variable-name"
         bind:value={valueData}
         on:input={checkDataInput}

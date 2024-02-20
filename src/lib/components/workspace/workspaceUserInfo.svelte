@@ -9,11 +9,11 @@
     TeamServiceMethods,
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import Dropdown from "../dropdown/Dropdown.svelte";
+  import MemberInfoPopup from "../workspace/member-info/MemberInfo.svelte";
   import Button from "../buttons/Button.svelte";
-  import MemberDropDown from "../dropdown/MemberDropdown.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
-  import MemberInfoPopup from "./member-info/MemberInfo.svelte";
   export let id: string;
   export let name: string;
   export let email: string;
@@ -202,12 +202,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -221,7 +221,7 @@
         {
           name: "Remove",
           id: "teamRemove",
-          color: "dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -233,7 +233,7 @@
         {
           name: "Remove",
           id: "teamRemove",
-          color: "dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -241,7 +241,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+          dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -295,29 +295,28 @@
   </div>
   <div></div>
   <div class="user-info-role">
-    {#if hasPermission}
-      <MemberDropDown
-        {id}
+    {#if hasPermission && role !== "admin"}
+      <Dropdown
+        dropdownId={id}
+        dropDownType={{ type: "text", title: role ? role : "" }}
         data={[
           {
             name: "Editor",
             id: "editor",
-            color: "whiteColor",
+            dynamicClasses: "text-whiteColor",
           },
           {
             name: "Viewer",
             id: "viewer",
-            color: "whiteColor",
+            dynamicClasses: "text-whiteColor",
           },
           {
             name: "Remove",
             id: "remove",
-            color: "dangerColor",
+            dynamicClasses: "text-dangerColor",
           },
         ]}
-        method={role ? role : ""}
         onclick={handleDropdown}
-        isWorkspaceMemberDropDown={true}
       />
     {:else}
       <div class="default-admin-container p-2 rounded z-2">
@@ -360,7 +359,7 @@
         <Button
           disable={memberRemoveLoader}
           title={"Cancel"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -371,7 +370,7 @@
         <Button
           disable={memberRemoveLoader}
           title={"Remove"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={memberRemoveLoader}
@@ -408,7 +407,7 @@
         <Button
           disable={teamMemberRemoveLoader}
           title={"Cancel"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           type={"dark"}
           loader={false}
           onClick={() => {
@@ -419,7 +418,7 @@
         <Button
           disable={teamMemberRemoveLoader}
           title={"Remove"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={teamMemberRemoveLoader}

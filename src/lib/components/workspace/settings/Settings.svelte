@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FileInput from "$lib/components/inputs/FileInput.svelte";
+  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import type {
     Team,
     TeamRepositoryMethods,
@@ -148,7 +148,7 @@
           <div class="row pb-3">
             <div class="col-12">
               <div>
-                <FileInput
+                <DragDrop
                   value={uploadTeamIcon.file.value}
                   maxFileSize={100}
                   onChange={handleLogoInputChange}

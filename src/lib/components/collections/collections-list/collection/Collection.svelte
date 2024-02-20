@@ -1,9 +1,9 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import FileExplorer from "./FileExplorer.svelte";
-  import { getNextName } from "./collectionList";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import Folder from "../folder/Folder.svelte";
+  import { getNextName } from "../collectionList";
+  import { CollectionListViewModel } from "../CollectionList.ViewModel";
 
   import { CollectionService } from "$lib/services/collection.service";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -25,13 +25,22 @@
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import type { WorkspaceRole } from "$lib/utils/enums";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let title: string;
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
@@ -44,6 +53,14 @@
   let visibility = false;
 
   const handleFolderClick = async (): Promise<void> => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_FOLDER,
+      )
+    ) {
+      return;
+    }
     isFolderCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -98,6 +115,14 @@
   };
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -161,14 +186,14 @@
 
   let showMenu: boolean = false;
 
-  let containerRef;
+  let noOfColumns = 180;
+  let noOfRows = 5;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -367,7 +392,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -378,7 +403,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -390,28 +415,13 @@
 >
 
 {#if showMenu}
-  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-    <div
-      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-      id="navbar"
-    >
-      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
-        {#each menuItems as item}
-          <li class="align-items-center">
-            <button
-              disabled={item.disabled}
-              class={`align-items-center mb-1 px-3 py-2 ${
-                item.disabled && "text-requestBodyColor"
-              }`}
-              on:click={item.onClick}
-              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-              >{item.displayText}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </nav>
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window
@@ -497,7 +507,8 @@
 >
   <div class="sub-folders ps-3">
     {#each collection.items as exp}
-      <FileExplorer
+      <Folder
+        {loggedUserRoleInWorkspace}
         {collectionsMethods}
         {collectionList}
         {collectionId}
@@ -509,20 +520,29 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2">
-        <img
-          class="list-icons"
-          src={folderIcon}
-          alt="+ Folder"
-          on:click={handleFolderClick}
-        />
-        <img
-          class="list-icons"
-          src={requestIcon}
-          alt="+ API Request"
-          on:click={handleAPIClick}
-        />
-      </div>
+      <Tooltip
+        classProp="mt-2 mb-2"
+        title={PERMISSION_NOT_FOUND_TEXT}
+        show={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.SAVE_REQUEST,
+        )}
+      >
+        <div class="mt-2 mb-2">
+          <img
+            class="list-icons"
+            src={folderIcon}
+            alt="+ Folder"
+            on:click={handleFolderClick}
+          />
+          <img
+            class="list-icons"
+            src={requestIcon}
+            alt="+ API Request"
+            on:click={handleAPIClick}
+          />
+        </div>
+      </Tooltip>
     {/if}
   </div>
 </div>
@@ -563,31 +583,6 @@
   .btn-primary:hover {
     background-color: var(--border-color);
     color: var(--white-color);
-  }
-
-  .navbar {
-    width: 180px;
-    height: auto;
-    overflow: hidden;
-  }
-
-  ul li {
-    display: block;
-  }
-
-  ul li button {
-    font-size: 12px;
-    display: flex;
-    width: 100%;
-    border: 0px;
-    background-color: var(--blackColor);
-  }
-
-  ul li button:hover {
-    width: 100%;
-    color: var(--white-color);
-    border-radius: 8px;
-    background-color: #232527;
   }
 
   .renameInputFieldCollection {

@@ -3,7 +3,7 @@
   import copyIcon from "$lib/assets/copy.svg";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -123,27 +123,32 @@
         >
           <Dropdown
             dropdownId={"hash565"}
-            title={apiState.responseRaw}
+            dropDownType={{ type: "text", title: apiState.responseRaw }}
             data={[
               {
                 name: "JSON",
                 id: RequestDataType.JSON,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "XML",
                 id: RequestDataType.XML,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "HTML",
                 id: RequestDataType.HTML,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Javascript",
                 id: RequestDataType.JAVASCRIPT,
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Text",
                 id: RequestDataType.TEXT,
+                dynamicClasses: "text-whiteColor",
               },
             ]}
             onclick={handleTypeDropdown}

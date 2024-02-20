@@ -6,7 +6,7 @@
   import closeIcon from "$lib/assets/close.svg";
   import { CollectionService } from "$lib/services/collection.service";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { fade, fly } from "svelte/transition";
   import Button from "../buttons/Button.svelte";
   export let folderId: string;
@@ -115,7 +115,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       onClick={() => {
         closePopup(false);
@@ -125,7 +125,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={19}
       type={"danger"}
       loader={deleteLoader}

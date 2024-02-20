@@ -6,15 +6,11 @@
   import googleLogo from "$lib/assets/googlelogo.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
-
-  // import githubLogo from "$lib/assets/githublogo.svg";
-  // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
-
   import { authNavigate, handleLoginValidation } from "./login-page";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
   import { Window } from "@tauri-apps/api/window";
-  import LoginLoader from "$lib/components/Transition/LoginLoader.svelte";
+  import LoginWaitingScreen from "$lib/components/Transition/LoginWaitingScreen.svelte";
 
   let isEmailTouched = false;
 
@@ -112,7 +108,7 @@
 </script>
 
 {#if isSignInPopup}
-  <LoginLoader onClick={handleSignInPopup} {isLoadingPage} />
+  <LoginWaitingScreen onClick={handleSignInPopup} {isLoadingPage} />
 {/if}
 
 <div

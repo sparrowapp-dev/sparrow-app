@@ -7,7 +7,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "../buttons/Button.svelte";
   import { fly, fade } from "svelte/transition";
   export let collectionId: string;
@@ -113,7 +113,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       onClick={() => {
         closePopup(false);
@@ -123,7 +123,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {

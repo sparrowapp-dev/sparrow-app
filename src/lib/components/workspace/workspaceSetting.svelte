@@ -14,7 +14,7 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { navigate } from "svelte-navigator";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   import Button from "../buttons/Button.svelte";
@@ -239,7 +239,7 @@
           disable={workspaceDeletePopupLoader ||
             confirmationText !== currentWorkspaceDetails.name}
           title={"Delete Workspace"}
-          textStyleProp={"font-size: var(--base-size)"}
+          textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={workspaceDeletePopupLoader}

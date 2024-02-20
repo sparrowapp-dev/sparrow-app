@@ -13,7 +13,8 @@
         "minHeight": 700,
         "minWidth": 570,
         "resizable": true,
-        "title": "sparrow-app"
+        "title": "sparrow-app",
+        "shadow": true
       }
     ],
     "withGlobalTauri": false

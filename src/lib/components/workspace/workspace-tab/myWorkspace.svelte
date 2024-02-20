@@ -67,9 +67,9 @@
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
 
-  const handleWorkspaceInput = (event) => {
+  const handleWorkspaceInput = (event: any) => {
     newWorkspaceName = event.target.value;
-    collectionsMethods.updateTab(false, "save", componentData.path.workspaceId);
+    collectionsMethods.updateTab(false, "save", componentData.id);
   };
 
   const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe(
@@ -83,18 +83,18 @@
     },
   );
 
-  const handleWorkspaceDescription = (event) => {
+  const handleWorkspaceDescription = (event: any) => {
     workspaceDescription = event.target.value;
     collectionsMethods.updateTab(
       workspaceDescription,
       "description",
-      componentData.path.workspaceId,
+      componentData.id,
     );
   };
 
   const onRenameBlur = async () => {
     await _viewModel.modifyWorkspace(
-      componentData,
+      componentData.id,
       collectionsMethods,
       newWorkspaceName,
       tabName,
@@ -103,9 +103,8 @@
 
   const onUpdateBlur = async () => {
     await _viewModel.modifyWorkspaceDescription(
-      componentData,
+      componentData.id,
       collectionsMethods,
-      tabName,
       workspaceDescription,
     );
   };
@@ -185,6 +184,7 @@
         (currentWorkspaceDetails = {
           id: value._data._id,
           name: value._data.name,
+          users: value._data.users,
         }),
           (currentTeamDetails = {
             name: value._data?.team?.teamName,
@@ -310,7 +310,7 @@
           on:input={(event) => {
             handleWorkspaceDescription(event);
           }}
-          disabled={hasPermission}
+          disabled={!hasPermission}
           on:blur={onUpdateBlur}
           on:keydown={onUpdateWorkspaceDescription}
           bind:this={inputElement}
@@ -350,6 +350,7 @@
     <InviteToWorkspace
       {handleInvitePopup}
       {currentWorkspaceDetails}
+      users={currentActiveTeam?.users}
       teamName={currentTeamDetails.name}
       addUsersInWorkspace={_viewModel.addUsersInWorkspace}
       addUsersInWorkspaceInRxDB={_viewModel.addUsersInWorkspaceInRxDB}

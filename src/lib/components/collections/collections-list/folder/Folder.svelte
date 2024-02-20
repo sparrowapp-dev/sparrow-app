@@ -1,15 +1,16 @@
 <script lang="ts">
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import folder from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
 
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
 
-  import File from "./File.svelte";
+  import Request from "../request/Request.svelte";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { v4 as uuidv4 } from "uuid";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
+  import { CollectionListViewModel } from "../CollectionList.ViewModel";
   import type { CreateApiRequestPostBody } from "$lib/utils/dto";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -18,7 +19,6 @@
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
@@ -26,8 +26,15 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    workspaceLevelPermissions,
+    PERMISSION_NOT_FOUND_TEXT,
+  } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "$lib/utils/enums";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   let expand: boolean = false;
   export let explorer;
@@ -44,10 +51,19 @@
 
   const _colllectionListViewModel = new CollectionListViewModel();
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
 
   const handleAPIClick = async () => {
+    if (
+      !hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.SAVE_REQUEST,
+      )
+    ) {
+      return;
+    }
     isApiCreatedFirstTime.set(true);
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
@@ -128,16 +144,14 @@
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
 
-  // Assuming you have a container reference (e.g., containerRef) in your component
-  let containerRef;
-
+  let noOfColumns = 180;
+  let noOfRows = 4;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -311,7 +325,7 @@
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -322,7 +336,7 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -340,28 +354,13 @@
 />
 
 {#if showMenu}
-  <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-    <div
-      class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-      id="navbar"
-    >
-      <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
-        {#each menuItems as item}
-          <li class="align-items-center">
-            <button
-              disabled={item.disabled}
-              class={`align-items-center mb-1 px-3 py-2 ${
-                item.disabled && "text-requestBodyColor"
-              }`}
-              on:click={item.onClick}
-              style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-              >{item.displayText}</button
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </nav>
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 {#if explorer.type === "FOLDER"}
@@ -470,24 +469,33 @@
       {/each}
       {#if showFolderAPIButtons}
         <div class="mt-2 mb-2 ms-0">
-          <img
-            class="list-icons"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={() => {
-              handleAPIClick();
-              MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                source: "Side Panel Collection List",
-              });
-            }}
-          />
+          <Tooltip
+            classProp="mt-2 mb-2 ms-0"
+            title={PERMISSION_NOT_FOUND_TEXT}
+            show={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
+          >
+            <img
+              class="list-icons"
+              src={requestIcon}
+              alt="+ API Request"
+              on:click={() => {
+                handleAPIClick();
+                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                  source: "Side Panel Collection List",
+                });
+              }}
+            />
+          </Tooltip>
         </div>
       {/if}
     </div>
   </div>
 {:else}
   <div style="cursor:pointer;">
-    <File
+    <Request
       api={explorer}
       {folderId}
       {folderName}

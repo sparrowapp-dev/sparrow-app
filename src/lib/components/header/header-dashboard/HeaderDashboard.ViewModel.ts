@@ -5,12 +5,9 @@ import { WorkspaceService } from "$lib/services/workspace.service";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
 
 import { clearAuthJwt } from "$lib/utils/jwt";
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { TabRepository } from "$lib/repositories/tab.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
 import {
   RxDB,
   type TeamDocument,
@@ -24,23 +21,20 @@ import type { Observable } from "rxjs";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
+import { setCurrentWorkspace } from "$lib/store";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type {
   addUsersInWorkspace,
   addUsersInWorkspacePayload,
 } from "$lib/utils/dto/workspace-dto";
-import type { WorkspaceRole } from "$lib/utils/enums";
+import { type WorkspaceRole } from "$lib/utils/enums";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 
 export class HeaderDashboardViewModel {
   constructor() {}
   private workspaceRepository = new WorkspaceRepository();
   private teamRepository = new TeamRepository();
-  private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
-  private collectionRepository = new CollectionRepository();
-  private activeSideBarTabRepository = new ActiveSideBarTabReposistory();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private environmentTabRepository = new EnvironmentTabRepository();
@@ -105,60 +99,47 @@ export class HeaderDashboardViewModel {
   };
 
   public modifyWorkspace = async (
-    componentData,
+    workspaceId: string,
     collectionsMethods: CollectionsMethods,
     newWorkspaceName: string,
     tabName: string,
   ) => {
     if (newWorkspaceName) {
       const workspace = await this.workspaceService.updateWorkspace(
-        componentData.id,
+        workspaceId,
         {
           name: newWorkspaceName,
         },
       );
 
       tabName = workspace?.data?.data.name;
-      this.updateWorkspace(componentData.id, tabName);
+      this.updateWorkspace(workspaceId, {
+        name: newWorkspaceName,
+      });
 
-      collectionsMethods.updateTab(
-        tabName,
-        "name",
-        componentData.path.workspaceId,
-      );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.workspaceId,
-      );
+      collectionsMethods.updateTab(tabName, "name", workspaceId);
+      collectionsMethods.updateTab(true, "save", workspaceId);
     }
   };
 
   public modifyWorkspaceDescription = async (
-    componentData,
+    workspaceId: string,
     collectionsMethods: CollectionsMethods,
-    tabName: string,
     workspaceDescription: string,
   ) => {
     if (workspaceDescription) {
-      const workspace = await this.workspaceService.updateWorkspace(
-        componentData.id,
-        {
-          description: workspaceDescription,
-        },
-      );
-      tabName = workspace?.data?.data.name;
-      this.updateWorkspace(componentData.id, tabName, workspaceDescription);
+      await this.workspaceService.updateWorkspace(workspaceId, {
+        description: workspaceDescription,
+      });
+      this.updateWorkspace(workspaceId, {
+        description: workspaceDescription,
+      });
       collectionsMethods.updateTab(
         workspaceDescription,
         "description",
-        componentData.path.workspaceId,
+        workspaceId,
       );
-      collectionsMethods.updateTab(
-        true,
-        "save",
-        componentData.path.workspaceId,
-      );
+      collectionsMethods.updateTab(true, "save", workspaceId);
     }
   };
 
@@ -222,7 +203,6 @@ export class HeaderDashboardViewModel {
   public clientLogout = async (): Promise<void> => {
     setUser(null);
     setCurrentWorkspace("", "");
-    setOpenedTeam("", "", {});
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();

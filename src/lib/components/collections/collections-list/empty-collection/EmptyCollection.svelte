@@ -5,11 +5,19 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { v4 as uuidv4 } from "uuid";
-  import ImportCollection from "./ImportCollection.svelte";
+  import ImportCollection from "../import-collection/ImportCollection.svelte";
   import { createCollectionSource } from "$lib/store/event-source.store";
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import {
+    PERMISSION_NOT_FOUND_TEXT,
+    workspaceLevelPermissions,
+  } from "$lib/utils/constants/permissions.constant";
+  import { WorkspaceRole } from "$lib/utils/enums";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;
-  export let currentWorkspaceId;
+  export let currentWorkspaceId: string;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let isImportCollectionPopup: boolean = false;
   const handleImportCollectionPopup = (flag) => {
@@ -50,14 +58,27 @@ font-weight: 300;"
       request directly
     </p>
     <div class="d-flex flex-column gap-3 w-100 mt-3 align-items-center">
-      <button
-        class="buttons d-flex justify-content-center align-items-center gap-1"
-        on:click={() => {
-          handleImportCollectionPopup(true);
-        }}
+      <Tooltip
+        title={PERMISSION_NOT_FOUND_TEXT}
+        show={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_ENVIRONMENT,
+        )}
       >
-        <img src={whitePlus} alt="+" />Collection
-      </button>
+        <button
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.ADD_ENVIRONMENT,
+          )}
+          class="buttons d-flex justify-content-center align-items-center gap-1"
+          on:click={() => {
+            handleImportCollectionPopup(true);
+          }}
+        >
+          <img src={whitePlus} alt="+" />Collection
+        </button>
+      </Tooltip>
+
       <button class="buttons" on:click={addApiRequest}>
         <img src={whitePlus} alt="+" />
         API Request</button

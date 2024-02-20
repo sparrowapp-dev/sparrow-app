@@ -12,7 +12,6 @@
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
   import KeyValue from "$lib/components/key-value/KeyValue.svelte";
-  import KeyValueFile from "$lib/components/key-value/KeyValueFile.svelte";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
@@ -147,23 +146,31 @@
     <span class="pe-3" />
     <Dropdown
       dropdownId={"hash124"}
-      title={mainTab}
+      dropDownType={{type:"text",title:mainTab}}            
       data={[
         {
           name: "Raw",
           id: RequestDataset.RAW,
+         dynamicClasses:"text-whiteColor"
+
         },
         {
           name: "Form data",
           id: RequestDataset.FORMDATA,
+          dynamicClasses:"text-whiteColor"
+
         },
         {
           name: "Encoded URL",
           id: RequestDataset.URLENCODED,
+          dynamicClasses:"text-whiteColor"
+
         },
         {
           name: "None",
           id: RequestDataset.NONE,
+          dynamicClasses:"text-whiteColor"
+
         },
       ]}
       onclick={handleDropdown}
@@ -172,27 +179,37 @@
     {#if mainTab === RequestDataset.RAW}
       <Dropdown
         dropdownId={"hash987"}
-        title={rawTab}
+      dropDownType={{type:"text",title:rawTab}}            
         data={[
           {
             name: "HTML",
             id: RequestDataType.HTML,
+             dynamicClasses:"text-whiteColor"
+
           },
           {
             name: "JSON",
             id: RequestDataType.JSON,
+             dynamicClasses:"text-whiteColor"
+
           },
           {
             name: "JavaScript",
             id: RequestDataType.JAVASCRIPT,
+             dynamicClasses:"text-whiteColor"
+
           },
           {
             name: "Text",
             id: RequestDataType.TEXT,
+             dynamicClasses:"text-whiteColor"
+
           },
           {
             name: "XML",
             id: RequestDataType.XML,
+             dynamicClasses:"text-whiteColor"
+
           },
         ]}
         onclick={handleRawDropDown}
@@ -220,10 +237,11 @@
       {environmentVariables}
     />
     <p>File</p>
-    <KeyValueFile
+    <KeyValue
       keyValue={formDataFile}
       callback={handleFormDataFileChange}
       {environmentVariables}
+      type="file"
     />
   {/if}
 </div>

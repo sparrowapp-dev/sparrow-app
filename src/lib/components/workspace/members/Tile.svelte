@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MemberDropdown from "$lib/components/dropdown/MemberDropdown.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
   import type {
     TeamRepositoryMethods,
@@ -8,12 +7,13 @@
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import MemberInfoPopup from "../member-info/MemberInfo.svelte";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { TeamRole } from "$lib/utils/enums/team.enum";
   import { v4 as uuidv4 } from "uuid";
   import { AdminLevelPermission } from "$lib/utils/constants/permissions.constant";
   import type { MemberPopType } from "$lib/utils/types/common.type";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
@@ -146,12 +146,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "whiteColor",
+         dynamicClasses: "whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "whiteColor",
+         dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -164,7 +164,7 @@
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -175,13 +175,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-          color: "dangerColor",
+           dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -189,7 +189,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-          color: "whiteColor",
+           dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -229,7 +229,7 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       type={"dark"}
       loader={false}
       onClick={() => {
@@ -240,7 +240,7 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Remove"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
@@ -311,7 +311,7 @@
     <Button
       disable={memberPromotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
@@ -376,7 +376,7 @@
     <Button
       disable={memberDemotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberDemotePopupLoader}
@@ -429,8 +429,8 @@
     </p>
   </div>
 
-  <p class="confirm-header mb-0">
-    Enter Team name to confirm<span class="asterik">*</span>
+  <p class="confirm-header mb-0 sparrow-fs-14">
+    Enter team name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
@@ -452,10 +452,12 @@
         confirmationError = "";
       }
     }}
-    class="input-container mt-2 mb-1 {confirmationError ? 'error-border' : ''}"
+    class="input-container rounded w-100 p-2 mt-2 mb-1 {confirmationError
+      ? 'error-border'
+      : ''}"
   />
   {#if confirmationError}
-    <p class="error-text">{confirmationError}</p>
+    <p class="error-text sparrow-fs-12">{confirmationError}</p>
   {/if}
   <br />
 
@@ -473,7 +475,7 @@
       disable={memberOwnershipPopupLoader ||
         confirmationText !== openTeam?.name}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-size)"}
+      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}
@@ -536,32 +538,29 @@
   </div>
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+      <Dropdown
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
       />
     {:else}
-      <MemberDropdown
-        id={user.id + uuidv4()}
+        <Dropdown
         disabled={true}
         data={getPermissionsData()}
-        method={user.role ? user.role : ""}
+        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
         onclick={handleDropdown}
-      />
+     /> 
     {/if}
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .tile:hover {
     background-color: var(--background-light) !important;
   }
@@ -579,5 +578,24 @@
   .position {
     width: 120px;
     padding: 8px;
+  }
+  .team-icon {
+    height: 24px;
+    width: 24px;
+  }
+  .asterik {
+    color: var(--dangerColor);
+  }
+  .input-container {
+    background-color: var(--background-dropdown);
+    border: 1px solid var(--border-color) !important;
+  }
+  .error-text {
+    margin-top: 2px;
+    margin-bottom: 0 !important;
+    color: var(--error--color);
+  }
+  .error-border {
+    border: 1px solid var(--error--color) !important;
   }
 </style>

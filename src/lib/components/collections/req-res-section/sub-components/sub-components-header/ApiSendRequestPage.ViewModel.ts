@@ -112,7 +112,11 @@ class ApiSendRequestViewModel {
     return response;
   };
 
-  private extractURl = (url: string, request: NewTab): string => {
+  private extractURl = (
+    url: string,
+    request: NewTab,
+    environmentVariables,
+  ): string => {
     const authHeader: {
       key: string;
       value: string;
@@ -124,24 +128,18 @@ class ApiSendRequestViewModel {
           flag = true;
         }
       }
+
       if (!flag) {
-        return (
-          this.ensureHttpOrHttps(url) +
-          url +
-          "?" +
-          authHeader.key +
-          "=" +
-          authHeader.value
-        );
+        url = this.ensureHttpOrHttps(url) + url + "?";
+      } else {
+        url = this.ensureHttpOrHttps(url) + url + "&";
       }
-      return (
-        this.ensureHttpOrHttps(url) +
-        url +
-        "&" +
-        authHeader.key +
-        "=" +
-        authHeader.value
+
+      url = this.setEnvironmentVariables(
+        url + authHeader.key + "=" + authHeader.value,
+        environmentVariables,
       );
+      return url;
     }
     return this.ensureHttpOrHttps(url) + url;
   };
@@ -248,8 +246,9 @@ class ApiSendRequestViewModel {
 
   public decodeRestApiData(request: any, environmentVariables): string[] {
     return [
-      this.setEnvironmentVariables(
-        this.extractURl(request.url, request),
+      this.extractURl(
+        this.setEnvironmentVariables(request.url, environmentVariables),
+        request,
         environmentVariables,
       ),
       this.extractMethod(request.method),

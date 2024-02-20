@@ -26,7 +26,8 @@
     "window:allow-set-focus",
     "window:allow-start-dragging",
     "os:allow-platform",
-    "deep-link:allow-get-current"
+    "deep-link:allow-get-current",
+    "window:allow-set-shadow"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route, navigate } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Toast from "$lib/components/notifications/Toast.svelte";
+  import Toast from "$lib/components/toast-notification/ToastNotification.svelte";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
@@ -20,14 +20,8 @@
 
   import { onMount } from "svelte";
 
-  import { setUser, user } from "$lib/store/auth.store";
-  import { listen } from "@tauri-apps/api/event";
-  import { Window } from "@tauri-apps/plugin-window";
-  import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-  import constants from "$lib/utils/constants";
-  import { notifications } from "$lib/utils/notifications";
+  import { user } from "$lib/store/auth.store";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { invoke } from "@tauri-apps/api/core";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
@@ -64,22 +58,6 @@
   });
 
   onMount(async () => {
-    listen("receive-login", async (event: any) => {
-      const params = new URLSearchParams(event.payload.url.split("?")[1]);
-      const accessToken = params.get("accessToken");
-      const refreshToken = params.get("refreshToken");
-      if (accessToken && refreshToken) {
-        await invoke("close_oauth_window");
-        await Window.getByLabel("main")!.setFocus();
-        setAuthJwt(constants.AUTH_TOKEN, accessToken);
-        setAuthJwt(constants.REF_TOKEN, refreshToken);
-        setUser(jwtDecode(accessToken));
-        notifications.success("Login successful!");
-        navigate("/dashboard/collections");
-        await resizeWindowOnLogin();
-      }
-    });
-
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;
@@ -114,7 +92,7 @@
 </Router>
 
 <Toast />
-<svelte:window on:keydown={handleShortcuts} />;
+<svelte:window on:keydown={handleShortcuts} on:keyup={handleShortcuts} />;
 
 <style>
 </style>

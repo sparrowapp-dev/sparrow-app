@@ -11,12 +11,17 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
 
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums";
   const _viewModel = new EnvironmentViewModel();
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const environments = _viewModel.environments;
   let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
+  onMount(() => {
+    MixpanelEvent(Events.ENVIRONMENT_SIDE_PANEL);
+  });
 
   const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
     createEnvironment: _viewModel.createEnvironment,
@@ -60,6 +65,7 @@
 <Motion {...scaleMotionProps} let:motion>
   <div class="environment" use:motion>
     <EnvironmentList
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentWorkspace={$activeWorkspace}
@@ -67,7 +73,7 @@
       currentEnvironment={$activeEnvironment}
     />
     <EnvironmentPanel
-    {loggedUserRoleInWorkspace}
+      {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentEnvironment={$activeEnvironment
