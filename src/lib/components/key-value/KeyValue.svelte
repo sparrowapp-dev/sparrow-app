@@ -6,7 +6,7 @@
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
-  import { invoke } from "@tauri-apps/api";
+  import { invoke } from "@tauri-apps/api/core";
   import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
   import close from "$lib/assets/close.svg";
   type Mode = "READ" | "WRITE";

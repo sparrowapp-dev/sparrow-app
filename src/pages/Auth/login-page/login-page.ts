@@ -10,7 +10,6 @@ import {
   resizeWindowOnLogOut,
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
-import { invoke } from "@tauri-apps/api";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -28,9 +27,7 @@ export const navigateToRegister = () => {
   navigate("/register");
 };
 
-export const authNavigate = async () => {
-  await invoke("open_oauth_window");
-};
+export const authNavigate = async () => {};
 const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 
 //---------------- Handle Login ------------------//

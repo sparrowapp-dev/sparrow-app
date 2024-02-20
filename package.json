@@ -1,8 +1,8 @@
 {
   "name": "sparrow-app",
-  "private": true,
-  "author": "Techdome",
-  "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and while making you a better programmer.",
+  "private": false,
+  "author": "Sparrow",
+  "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -21,8 +21,11 @@
     "@codemirror/language": "^6.10.0",
     "@codemirror/state": "^6.4.0",
     "@lezer/highlight": "^1.2.0",
-    "@tauri-apps/api": "^1.4.0",
-    "@tauri-apps/cli": "^1.5.1",
+    "@tauri-apps/api": "^2.0.0-beta.0",
+    "@tauri-apps/cli": "^2.0.0-beta.1",
+    "@tauri-apps/plugin-deep-link": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-os": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-window": "^2.0.0-alpha.1",
     "axios": "^1.5.1",
     "body-scroll-lock": "^4.0.0-beta.0",
     "bootstrap": "^5.3.1",
@@ -52,6 +55,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "@tsconfig/svelte": "^5.0.0",
+    "@types/mixpanel-browser": "^2.49.0",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
     "eslint": "^8.54.0",

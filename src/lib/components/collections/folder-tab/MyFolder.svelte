@@ -34,6 +34,7 @@
   let folderDescription = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
+  let newFolderName: string = "";
   let collectionId: string;
   let folderId: string;
   let collectionArray = [];
