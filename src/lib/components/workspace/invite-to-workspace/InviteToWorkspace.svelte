@@ -14,6 +14,8 @@
   import { validateEmail } from "$lib/utils/helpers";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import InputSelect from "$lib/components/inputs/InputSelect.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
+  let loader = false;
   let emailstoBeSentArr: string[] = [];
   export let users;
   export let addUsersInWorkspace: (
@@ -31,6 +33,7 @@
   let invalidEmails: string[] = [];
 
   const handleInvite = async () => {
+    loader = true;
     showErrors = true;
     const data: addUsersInWorkspacePayload = {
       users: emailstoBeSentArr,
@@ -47,17 +50,20 @@
         currentWorkspaceDetails.id,
         data,
       );
-      if (response && response.data.data) {
+      if (response?.data?.data) {
         const newTeam: addUsersInWorkspace[] = response.data.data.users;
         addUsersInWorkspaceInRxDB(currentWorkspaceDetails.id, newTeam);
         notifications.success(
           `Invite Sent to ${emailstoBeSentArr.length} for ${currentWorkspaceDetails.name}`,
         );
+        loader = false;
+        handleInvitePopup(false);
       } else {
+        loader = false;
         notifications.error(`Failed to sent invites, please try again`);
       }
-      handleInvitePopup(false);
     }
+    loader = false;
   };
   const handleDropdown = (role: string) => {
     selectedRole = role as WorkspaceRole;
@@ -156,9 +162,17 @@
     </p>
   </div>
   <div>
-    <button class="invite-btn btn rounded border-0 py-2" on:click={handleInvite}
-      >Send Invite</button
-    >
+    <Button
+      disable={loader}
+      title={"Send Invite"}
+      loaderSize={19}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"primary"}
+      {loader}
+      onClick={() => {
+        handleInvite();
+      }}
+    />
   </div>
 </div>
 

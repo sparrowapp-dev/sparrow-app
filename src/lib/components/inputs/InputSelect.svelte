@@ -135,7 +135,7 @@
           on:blur={() => {
             setTimeout(() => {
               isOpen = false;
-            }, 500);
+            }, 100);
           }}
           class="input-container mt-2 sparrow-fs-12 my-1"
         />
