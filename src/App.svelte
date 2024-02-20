@@ -25,6 +25,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
+  import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -71,6 +72,7 @@
   });
 </script>
 
+<AutoUpdateDialog />
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">

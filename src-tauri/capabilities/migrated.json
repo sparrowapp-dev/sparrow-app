@@ -27,7 +27,10 @@
     "window:allow-start-dragging",
     "os:allow-platform",
     "deep-link:allow-get-current",
-    "window:allow-set-shadow"
+    "window:allow-set-shadow",
+    "updater:allow-check",
+    "updater:default",
+    "process:allow-restart"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

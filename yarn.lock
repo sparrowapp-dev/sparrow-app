@@ -1273,6 +1273,20 @@
   dependencies:
     "@tauri-apps/api" "2.0.0-beta.0"
 
+"@tauri-apps/plugin-process@^2.0.0-beta.0":
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-process/-/plugin-process-2.0.0-beta.0.tgz#4f449cfd8cbe48c0e0cd13209b9eaf2c1a9868f1"
+  integrity sha512-tKWua399alYVYSLhAGArrEOpGEC1v2FJlUku0oWROzDnEYNdAekP4SMzVPVUUdVH7r6zoaTorWUgXBfspyCGxw==
+  dependencies:
+    "@tauri-apps/api" "2.0.0-beta.0"
+
+"@tauri-apps/plugin-updater@^2.0.0-beta.0":
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-updater/-/plugin-updater-2.0.0-beta.0.tgz#dc02bd878103a6b4dcf2bbdc83f4afae3463d892"
+  integrity sha512-TkKzngrgg8dQOr869OcObLdN10yXNiT/ERQp7sRYvV0vMpRJhYSIwTkpF+UkZGuEXtSqqE0FJEnb+4WuCelMdw==
+  dependencies:
+    "@tauri-apps/api" "2.0.0-beta.0"
+
 "@tauri-apps/plugin-window@^2.0.0-alpha.1":
   version "2.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-window/-/plugin-window-2.0.0-alpha.1.tgz#28a0217100fc5a34fb2a6d76103ba056b2348286"
@@ -2777,9 +2791,9 @@ flat-cache@^3.0.4:
     rimraf "^3.0.2"
 
 flatted@^3.2.9:
-  version "3.2.10"
-  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.10.tgz#b4afc0fc288e39b97dc3843b0941a71ffc11c941"
-  integrity sha512-hla0i4X34dHDV1/QqK0ZfSfx/Vo4VVFZj5PVxFsM9UNRXQzkml6q4TJIm8d6lsyV1Klu+27l/db3r6xPOqdXXg==
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.3.0.tgz#5fdca2b5e671cd38d1537427a10e02a2caa8257e"
+  integrity sha512-noqGuLw158+DuD9UPRKHpJ2hGxpFyDlYYrfM0mWt4XhT4n0lwzTLh70Tkdyy4kyTmyTT9Bv7bWAJqw7cgkEXDg==
 
 follow-redirects@^1.15.4:
   version "1.15.5"

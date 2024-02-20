@@ -25,6 +25,8 @@ reqwest = { version = "0.11", features = ["blocking", "json", "multipart", "stre
 tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.6", features = ["full"] }
 tauri-plugin-os = "2.0.0-beta.0"
+tauri-plugin-updater = "2.0.0-beta"
+tauri-plugin-process = "2.0.0-beta"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 

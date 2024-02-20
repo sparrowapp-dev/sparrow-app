@@ -205,6 +205,14 @@ fn main() {
     // Initiate Tauri Runtime
     tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.handle()
+                .plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
             fetch_file_command,
@@ -224,8 +232,6 @@ fn main() {
                     .unwrap();
             }
         })
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_deep_link::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

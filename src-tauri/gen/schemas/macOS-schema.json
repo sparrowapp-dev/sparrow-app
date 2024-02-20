@@ -853,6 +853,34 @@
           ]
         },
         {
+          "description": "process:allow-exit -> Enables the exit command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "process:allow-exit"
+          ]
+        },
+        {
+          "description": "process:allow-restart -> Enables the restart command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "process:allow-restart"
+          ]
+        },
+        {
+          "description": "process:deny-exit -> Denies the exit command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "process:deny-exit"
+          ]
+        },
+        {
+          "description": "process:deny-restart -> Denies the restart command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "process:deny-restart"
+          ]
+        },
+        {
           "description": "resources:default -> Default permissions for the plugin.",
           "type": "string",
           "enum": [
@@ -1004,6 +1032,41 @@
           "type": "string",
           "enum": [
             "tray:deny-set-visible"
+          ]
+        },
+        {
+          "description": "updater:default -> Allows checking for new updates and installing them",
+          "type": "string",
+          "enum": [
+            "updater:default"
+          ]
+        },
+        {
+          "description": "updater:allow-check -> Enables the check command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "updater:allow-check"
+          ]
+        },
+        {
+          "description": "updater:allow-download-and-install -> Enables the download_and_install command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "updater:allow-download-and-install"
+          ]
+        },
+        {
+          "description": "updater:deny-check -> Denies the check command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "updater:deny-check"
+          ]
+        },
+        {
+          "description": "updater:deny-download-and-install -> Denies the download_and_install command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "updater:deny-download-and-install"
           ]
         },
         {
