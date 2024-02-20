@@ -69,7 +69,7 @@
     Invite By Email<span class="asterik">*</span>
   </p>
   <InputSelect
-    list={users.filter((element) => {
+    list={users?.filter((element) => {
       if (
         currentWorkspaceDetails.users
           .map((element) => {

@@ -7,8 +7,8 @@
   import { validateEmail } from "$lib/utils/helpers";
   import { onDestroy, onMount } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
-  let isOpen: boolean = false;
-  export let isError: boolean = false;
+  let isOpen = false;
+  export let isError = false;
   export let list = [];
   export let showErrors;
   export let id;
@@ -112,8 +112,11 @@
     style=" position: relative;"
   >
     <div>
-      <div class="email-container rounded">
-        <div id="input-email"></div>
+      <div class="email-container rounded d-flex flex-wrap">
+        <div
+          id="input-email"
+          class="d-flex align-items-start flex-wrap gap-2"
+        ></div>
         <input
           id="input"
           placeholder={!emailstoBeSentArr.length
@@ -134,7 +137,7 @@
               isOpen = false;
             }, 500);
           }}
-          class="input-container mt-2 sparrow-fs-12"
+          class="input-container mt-2 sparrow-fs-12 my-1"
         />
       </div>
     </div>
@@ -147,7 +150,7 @@
       >
         {#each data as user, index}
           <div
-            class="d-flex w-100 px-2 py-2 highlight"
+            class="d-flex w-100 px-2 py-2 highlight rounded"
             on:click={() => {
               handleEmailOnAdd(user.email);
               filterUser();
@@ -161,22 +164,17 @@
                   <span>{user.name[0].toUpperCase()}</span>
                 </div>
                 <div class="name px-2">
-                  <span style="font-size:12px;" class="text-whiteColor"
+                  <span class="sparrow-fs-12 text-whiteColor"
                     >{user.name || ""}</span
                   ><br />
-                  <span style="font-size:12px;" class="text-textColor"
-                    >{user.email}</span
-                  >
+                  <span class="sparrow-fs-12 text-textColor">{user.email}</span>
                 </div>
               </div>
             </div>
           </div>
         {/each}
         {#if !data?.length}
-          <p
-            class="m-0 ps-2 p-0 pt-1 pb-1 text-whiteColor"
-            style="font-size: 12px;"
-          >
+          <p class="sparrow-fs-12 m-0 ps-2 p-0 pt-1 pb-1 text-whiteColor">
             {"No members found!"}
           </p>
         {/if}
@@ -187,24 +185,12 @@
 
 <style>
   .email-container {
-    display: flex;
-    flex-wrap: wrap;
     background-color: transparent;
     border: 1px solid;
     padding: 3px 8px 3px 8px;
     border: 1px solid var(--border-color);
-    max-height: 100px;
+    max-height: calc(100px);
     overflow-y: auto;
-  }
-  input {
-    margin-bottom: 4px !important;
-    margin-top: 4px !important;
-  }
-  #input-email {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 5px;
   }
   .select-data {
     background-color: rgba(0, 0, 0, 0.7);
@@ -215,24 +201,19 @@
     right: 0;
     transform: translateY(100%);
     border: 1px solid rgb(44, 44, 44);
-    max-height: 200px;
+    max-height: calc(200px);
     overflow-y: auto;
     -webkit-backdrop-filter: blur(10px); /* For some older versions of Safari */
     backdrop-filter: blur(10px);
-  }
-  .select-data p {
-    font-size: 12px;
-    font-weight: 400;
   }
   .select-active {
     display: block !important;
   }
   .highlight {
-    border-radius: 4px;
     cursor: pointer;
   }
   .highlight:hover {
-    background-color: #232424;
+    background-color: var(--dull-background-color);
   }
 
   .icon {
