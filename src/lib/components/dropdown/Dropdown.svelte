@@ -231,7 +231,7 @@
     {#each data as list}
       <div
         id="{dropdownId}-options-div"
-        class="d-flex px-2 py-1 justify-content-between highlight {list?.hide ===
+        class="d-flex px-2 py-1 justify-content-between highlight text-break {list?.hide ===
         true
           ? 'd-none'
           : ''}"
