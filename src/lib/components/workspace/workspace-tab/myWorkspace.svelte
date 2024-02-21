@@ -267,7 +267,7 @@
   };
 
   const onUpdateWorkspaceDescription = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "workspaceDescription",
       ) as HTMLInputElement;
