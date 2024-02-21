@@ -70,7 +70,7 @@
           .reverse()
           .filter((item) => item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase())).length == 0}
+              .includes(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
       {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
@@ -88,7 +88,7 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()))
+              .includes(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
@@ -108,7 +108,7 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase())).length > 0}
+              .includes(filterText.toLowerCase())).length > 0}
       <div
         class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
       >
