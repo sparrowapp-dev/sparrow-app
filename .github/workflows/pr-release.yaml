@@ -35,14 +35,14 @@ jobs:
 
       - name: Build Tauri App
         run: |
-          $TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          $TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
           $TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
           yarn cache clean
           npm install -g pnpm
           yarn install
           yarn tauri build --debug
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
@@ -102,7 +102,7 @@ jobs:
 
       - name: Build Tauri App
         run: |
-          TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
           TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
           APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
@@ -110,7 +110,7 @@ jobs:
           yarn install
           yarn tauri build --debug
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
