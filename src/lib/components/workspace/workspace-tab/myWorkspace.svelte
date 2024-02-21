@@ -60,7 +60,8 @@
   type currentTabType = "ABOUT" | "SETTING";
   let currentTab: currentTabType = "ABOUT";
   let users: userDetails[] = [];
-  let hasPermission: boolean = false;
+  let hasPermission = false;
+  let hasEditPermission = false;
   let loggedInUser: userDetails;
   let loggedUserRole: TeamRole;
   export let _collectionListViewModel: CollectionListViewModel;
@@ -78,6 +79,10 @@
         hasPermission = hasWorkpaceLevelPermission(
           value,
           workspaceLevelPermissions.SEND_INVITE,
+        );
+        hasEditPermission = hasWorkpaceLevelPermission(
+          value,
+          workspaceLevelPermissions.EDIT_WORKSPACE,
         );
       }
     },
@@ -310,7 +315,7 @@
           on:input={(event) => {
             handleWorkspaceDescription(event);
           }}
-          disabled={!hasPermission}
+          disabled={!hasEditPermission}
           on:blur={onUpdateBlur}
           on:keydown={onUpdateWorkspaceDescription}
           bind:this={inputElement}
