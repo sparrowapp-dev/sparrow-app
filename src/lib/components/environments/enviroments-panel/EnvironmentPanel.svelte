@@ -116,14 +116,14 @@
           disabled={currentEnvironment?.type == "GLOBAL"}
         />
         <div class={`d-flex env-btn-container`}>
-          <button class={`d-flex env-help-btn border-0 my-auto`}>
+          <button
+            on:click={() => {
+              quickHelp = true;
+            }}
+            class={`d-flex env-help-btn border-0 p-1 pe-2 my-auto rounded`}
+          >
             <HelpIcon width={19} height={19} classProp={`me-2`} />
-            <span
-              class={``}
-              on:click={() => {
-                quickHelp = true;
-              }}>How to use variables</span
-            >
+            <span class={``}>How to use variables</span>
           </button>
           <Tooltip
             title={PERMISSION_NOT_FOUND_TEXT}
@@ -209,8 +209,11 @@
   .env-help-btn {
     background: transparent;
     border: 0;
-    color: var(--send-button);
+    color: var(--primary-btn-color);
     font-size: 12px;
+  }
+  .env-help-btn:hover {
+    color: var(--send-button) !important;
   }
   .env-save-btn {
     padding: 6px 16px;
@@ -251,5 +254,8 @@
   }
   .quick-help-active {
     width: calc(100% - 280px) !important;
+  }
+  .env-help-btn:active {
+    background-color: var(--selected-active-sidebar);
   }
 </style>
