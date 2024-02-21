@@ -130,7 +130,7 @@
   }
 
   const calculateLimitedWorkspace = () => {
-    let temp = allworkspaces
+    let workspaces = allworkspaces
       .filter((elem) => {
         if (currentTeam.id === elem.team.teamId) return true;
         return false;
@@ -147,18 +147,19 @@
         };
         return workspaceObj;
       });
-    temp.push({
+    workspaces.push({
       id: currentWorkspace?.name,
       name: currentWorkspace?.name,
       dynamicClasses: "text-whiteColor",
       description: currentTeam?.name,
       selectedOptionClasses: "ellipsis mw-25",
     });
-    const res = createSetFromArray(temp, "name");
+    const res = createSetFromArray(workspaces, "name");
     if (res.length > workspaceLimit) {
       res.shift();
     }
     sharedData = res;
+    return;
   };
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
