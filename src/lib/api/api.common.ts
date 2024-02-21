@@ -7,7 +7,7 @@ import constants from "$lib/utils/constants";
 import { setAuthJwt } from "$lib/utils/jwt";
 import { isLoading } from "$lib/store/auth.store";
 import { ErrorMessages } from "$lib/utils/enums/enums";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";

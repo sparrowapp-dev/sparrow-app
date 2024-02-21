@@ -1,28 +1,35 @@
 <script lang="ts">
-  import { openedTeam } from "$lib/store";
+  /**
+   * @deprecated referes to teams store
+   * import { openedTeam } from "$lib/store";
+   **/
   import { navigate } from "svelte-navigator";
-  import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import constants from "$lib/utils/constants";
   import List from "$lib/components/list/List.svelte";
+  import type { Team } from "$lib/utils/interfaces";
+  export let openTeam: Team;
   export let data: any;
   export let handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     activeSideBarTabMethods: any;
-  let currOpenedTeam: any;
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
-  });
-  onDestroy(() => {
-    openedTeamSubscribe();
-  });
+  /**
+   * @deprecated referes to teams store
+   * let currOpenedTeam: any;
+   * const openedTeamSubscribe = openedTeam.subscribe((value) => {
+   *   if (value) currOpenedTeam = value;
+   * });
+   * onDestroy(() => {
+   *   openedTeamSubscribe();
+   * });
+   **/
   const handleOpenCollection = (workspace: any) => {
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
       workspace.team.teamId,
       workspace.team.teamName,
-      currOpenedTeam.base64String,
+      openTeam.logo,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
@@ -49,7 +56,7 @@
                 >
               </div>
               <PeopleIcon
-                color={currOpenedTeam.id == list.team.teamId
+                color={openTeam?.teamId == list.team.teamId
                   ? "var(--sparrow-text-color)"
                   : "var(--defaultcolor)"}
                 classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}

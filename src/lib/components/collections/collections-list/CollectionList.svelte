@@ -49,7 +49,7 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
@@ -665,14 +665,15 @@
               />
             {/each}
           </List>
+        {:else}
+          <EmptyCollection
+            {loggedUserRoleInWorkspace}
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+            {showDefault}
+          />
         {/if}
-        <EmptyCollection
-          {loggedUserRoleInWorkspace}
-          {handleCreateCollection}
-          {collectionsMethods}
-          {currentWorkspaceId}
-          {showDefault}
-        />
       {/if}
     </div>
   </div>
