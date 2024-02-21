@@ -13,8 +13,9 @@
     TeamDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
+  import type { Observable } from "rxjs";
 
   export let userId: string;
   export let currActiveTeam: CurrentTeam;
@@ -26,9 +27,25 @@
   export let openTeam: Team;
   export let workspaceUnderCreation = false;
 
-  let filterText: string = "";
-  let workspacePerPage: number = 5;
+  const _viewModel = new TeamViewModel();
+  const openTeamObservable: Observable<TeamDocument> = _viewModel.openTeam;
+
+  let filterText = "";
+  let workspacePerPage = 5;
   let currPage = 1;
+  let isAdminOrOwner: boolean;
+
+  openTeamObservable.subscribe((openTeam) => {
+    currPage = 1;
+    if (!(openTeam?.admins?.includes(userId) || openTeam?.owner == userId)) {
+      workspacePerPage = 6;
+      isAdminOrOwner = false;
+    }
+    else{
+      workspacePerPage = 5;
+      isAdminOrOwner = true;
+    }
+  });
 
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
@@ -92,8 +109,7 @@
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
-          isAdminOrOwner={openTeam?.admins?.includes(userId) ||
-            openTeam?.owner == userId}
+          {isAdminOrOwner}
           {workspace}
           {handleWorkspaceSwitch}
           {currActiveTeam}
@@ -136,7 +152,7 @@
         <div class="tab-head tab-change">
           <button
             on:click={() => (
-              (currPage = 1), (workspacePerPage = currPage > 1 ? 6 : 5)
+              (currPage = 1), (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
             )}
             class="bg-transparent border-0"
             ><DoubleLeftIcon
@@ -146,7 +162,7 @@
           <button
             on:click={() => {
               if (currPage > 1) currPage -= 1;
-              workspacePerPage = currPage > 1 ? 6 : 5;
+              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
             }}
             class="bg-transparent border-0"
             ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
@@ -194,7 +210,7 @@
                 )
               )
                 currPage += 1;
-              workspacePerPage = currPage > 1 ? 6 : 5;
+              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
             }}
             class="bg-transparent border-0"
             ><RightIcon
@@ -243,7 +259,7 @@
                   6 !==
                 0
               ) {
-                workspacePerPage = currPage > 1 ? 6 : 5;
+                workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
               }
               if (
                 currPage - 1 ===

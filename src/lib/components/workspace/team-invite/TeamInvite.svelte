@@ -354,7 +354,7 @@
           hide: true,
         },
         {
-          name: "Select ALL",
+          name: "Select All",
           id: "select-all",
           dynamicClasses: "text-whiteColor",
           isInvalidOption: true,
@@ -371,6 +371,10 @@
         {
           id: "check-select-workspace-options-container",
           classToAdd: ["end-0", "start-0"],
+        },
+        {
+          id: "check-select-workspace-btn-div",
+          classToAdd: ["flex-wrap", "overflow-auto"],
         },
       ]}
     ></Dropdown>
