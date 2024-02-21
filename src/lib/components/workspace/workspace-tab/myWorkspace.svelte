@@ -287,6 +287,7 @@
           type="text"
           value={tabName}
           id="renameInputFieldWorkspace"
+          disabled={!hasEditPermission}
           {autofocus}
           class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
           on:input={(event) => {
