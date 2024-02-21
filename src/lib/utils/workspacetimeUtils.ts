@@ -16,8 +16,8 @@ export function calculateTimeDifferenceInDays(currentTime, previousTime) {
 
 export function formatDateInString(inputDate: string): string {
   const date = new Date(inputDate);
-  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(
-    date.getUTCMinutes(),
+  return `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
   ).padStart(2, "0")}, ${date.toLocaleString("en-US", {
     month: "short",
     day: "2-digit",
