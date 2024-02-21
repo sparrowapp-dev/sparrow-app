@@ -147,16 +147,6 @@ export class WorkspaceRepository {
       value.isActiveWorkspace = true;
       return value;
     });
-    // const data = workspaces.map((elem: WorkspaceDocument) => {
-    //   const res = this.getDocument(elem);
-    //   if (res._id === workspaceId) {
-    //     res.isActiveWorkspace = true;
-    //   } else {
-    //     res.isActiveWorkspace = false;
-    //   }
-    //   return res;
-    // });
-    // await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 

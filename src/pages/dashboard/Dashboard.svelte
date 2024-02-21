@@ -117,9 +117,7 @@
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
-
-    // setCurrentWorkspace(workspaceId, workspaceName);
-    // isWorkspaceLoaded.set(true);
+    isWorkspaceLoaded.set(true);
   };
 
   const handleWorkspaceTab = (
