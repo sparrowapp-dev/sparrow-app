@@ -7,6 +7,7 @@ export const workspaceView = writable("GRID");
 /**
  * The writable store containing the current workspace information.
  * @type {import("svelte/store").Writable<CurrentWorkspace>}
+ * @deprecated
  */
 const currentWorkspace = writable<CurrentWorkspace>({
   name: "",
@@ -15,6 +16,7 @@ const currentWorkspace = writable<CurrentWorkspace>({
 
 /**
  * Sets the current workspace with the provided id and name (force over writes)..
+ * @deprecated
  */
 const setCurrentWorkspace = (
   workspaceId: string,
@@ -25,6 +27,7 @@ const setCurrentWorkspace = (
 
 /**
  * Sets the current workspace with the provided id and name (do not over writes)..
+ * @deprecated
  */
 const updateCurrentWorkspace = (
   workspaceId: string,

@@ -21,7 +21,6 @@ import type { Observable } from "rxjs";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-import { setCurrentWorkspace } from "$lib/store";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type {
   addUsersInWorkspace,
@@ -154,11 +153,7 @@ export class HeaderDashboardViewModel {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
-    if (
-      response?.isSuccessful &&
-      response?.data?.data &&
-      response?.data?.data?.length > 0
-    ) {
+    if (response?.isSuccessful && response?.data?.data) {
       for (const elem of response.data.data) {
         const {
           _id,
@@ -202,7 +197,6 @@ export class HeaderDashboardViewModel {
   // logout to frontend - clears local db, store, and cookies.
   public clientLogout = async (): Promise<void> => {
     setUser(null);
-    setCurrentWorkspace("", "");
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();

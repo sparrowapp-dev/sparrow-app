@@ -125,19 +125,38 @@ export class WorkspaceRepository {
    * Sets a workspace as active.
    */
   public setActiveWorkspace = async (workspaceId: string): Promise<void> => {
-    const workspaces: WorkspaceDocument[] = await RxDB.getInstance()
-      .rxdb.workspace.find()
+    const workspaces: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
       .exec();
-    const data = workspaces.map((elem: WorkspaceDocument) => {
-      const res = this.getDocument(elem);
-      if (res._id === workspaceId) {
-        res.isActiveWorkspace = true;
-      } else {
-        res.isActiveWorkspace = false;
-      }
-      return res;
+    workspaces?.incrementalModify((value) => {
+      value.isActiveWorkspace = false;
+      return value;
     });
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    const inactiveWorkspace: WorkspaceDocument = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+    inactiveWorkspace.incrementalModify((value) => {
+      value.isActiveWorkspace = true;
+      return value;
+    });
+    // const data = workspaces.map((elem: WorkspaceDocument) => {
+    //   const res = this.getDocument(elem);
+    //   if (res._id === workspaceId) {
+    //     res.isActiveWorkspace = true;
+    //   } else {
+    //     res.isActiveWorkspace = false;
+    //   }
+    //   return res;
+    // });
+    // await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };
 

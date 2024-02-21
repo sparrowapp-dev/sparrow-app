@@ -45,6 +45,11 @@
   export let collectionsMethods: CollectionsMethods;
   export let allworkspaces = [];
 
+  $: {
+    if (currentWorkspace || currentTeam) {
+      calculateLimitedWorkspace();
+    }
+  }
   let workspaceNameExistsErr: boolean = false;
 
   let workspaceLimit = constants.WORKSPACE_LIMIT;
@@ -112,6 +117,49 @@
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
+  let sharedData = [];
+  function createSetFromArray(arr, key) {
+    const seen = new Set();
+    return arr.filter((obj) => {
+      if (!obj.hasOwnProperty(key)) {
+        throw new Error(`Object does not have key "${key}"`);
+      }
+      const keyValue = obj[key];
+      return !seen.has(keyValue) && seen.add(keyValue);
+    });
+  }
+
+  const calculateLimitedWorkspace = () => {
+    let temp = allworkspaces
+      .filter((elem) => {
+        if (currentTeam.id === elem.team.teamId) return true;
+        return false;
+      })
+      .reverse()
+      .slice(0, workspaceLimit)
+      .map((workspace) => {
+        const workspaceObj = {
+          id: workspace.name,
+          name: workspace.name,
+          dynamicClasses: "text-whiteColor",
+          description: currentTeam?.name,
+          selectedOptionClasses: "ellipsis mw-25",
+        };
+        return workspaceObj;
+      });
+    temp.push({
+      id: currentWorkspace?.name,
+      name: currentWorkspace?.name,
+      dynamicClasses: "text-whiteColor",
+      description: currentTeam?.name,
+      selectedOptionClasses: "ellipsis mw-25",
+    });
+    const res = createSetFromArray(temp, "name");
+    if (res.length > workspaceLimit) {
+      res.shift();
+    }
+    sharedData = res;
+  };
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
     workspaceNameExistsErr = false;
@@ -346,20 +394,7 @@
       img: plusIcon,
       hasDivider: true,
     },
-    ...allworkspaces
-      .slice()
-      .reverse()
-      .slice(0, workspaceLimit)
-      .map((workspace) => {
-        const workspaceObj = {
-          id: workspace.name,
-          name: workspace.name,
-          dynamicClasses: "text-whiteColor",
-          description: currentTeam?.name,
-          selectedOptionClasses: "ellipsis mw-25",
-        };
-        return workspaceObj;
-      }),
+    ...sharedData,
     {
       id: "",
       name: "You will see your five most recent workspaces",

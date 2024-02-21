@@ -56,7 +56,6 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { setCurrentWorkspace } from "$lib/store";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
@@ -185,10 +184,6 @@
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        setCurrentWorkspace(
-          activeWorkspaceRxDoc.get("_id"),
-          activeWorkspaceRxDoc.get("name"),
-        );
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
           const response =

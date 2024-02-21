@@ -161,8 +161,6 @@
       createdAt: workspaceObj.createdAt,
     };
 
-    await _viewModel.addWorkspace(workspaceObj);
-
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
@@ -199,17 +197,23 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      if (userId) await _viewModel.refreshTeams(userId);
-      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      navigate("/dashboard/collections");
+      // if (userId) await _viewModel.refreshTeams(userId);
+      // if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
+      let d = response.data.data;
+      d.team.teamId = d.team.id;
+      d.team.teamName = d.team.name;
+      delete d.team.id;
+      delete d.team.name;
+      await _viewModel.addWorkspace(d);
+      await _viewModelWorkspace.activateWorkspace(d._id);
       activeSideBarTabMethods.updateActiveTab("collections");
+      navigate("/dashboard/collections");
     } else {
       await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
       isWorkspaceLoaded.set(true);
