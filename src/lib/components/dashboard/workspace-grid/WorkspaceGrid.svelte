@@ -68,7 +68,7 @@
           onClick: (e) => {
             e.stopPropagation();
           },
-          displayText: "Delete",
+          displayText: "Delete Workspace",
           disabled: false,
         },
       ];

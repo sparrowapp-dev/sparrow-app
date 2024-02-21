@@ -82,7 +82,7 @@
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Delete",
+      displayText: "Delete Workspace",
       disabled: false,
       visible: openTeam?.admins?.includes(userId) || openTeam?.owner == userId,
     },
