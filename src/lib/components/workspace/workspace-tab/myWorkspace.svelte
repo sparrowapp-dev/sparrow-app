@@ -282,7 +282,7 @@
       class="my-workspace d-flex flex-column"
       style="width:calc(100% - 280px); margin-top: 15px;"
     >
-      <div class="d-flex aling-items-center justify-content-between gap-2 mb-5">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-5">
         <input
           type="text"
           value={tabName}
