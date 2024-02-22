@@ -206,28 +206,37 @@
               <span
                 style="padding: 8px 8px;"
                 on:click={() => (selectedTab = "all-workspace")}
-                class="team-menu__link cursor-pointer"
+                class="team-menu__link cursor-pointer rounded"
                 class:tab-active={selectedTab === "all-workspace"}
-                >Workspaces {`(${
-                  workspaces?.filter((elem) => {
-                    return elem?.team?.teamId === openTeam?.teamId;
-                  }).length || 0
-                })`}</span
-              >
+                >Workspaces <span
+                  class="item-count"
+                  class:item-count-active={selectedTab === "all-workspace"}
+                >
+                  {`(${
+                    workspaces?.filter((elem) => {
+                      return elem?.team?.teamId === openTeam?.teamId;
+                    }).length || 0
+                  })`}
+                </span>
+              </span>
               <span
                 style="padding: 8px 8px;"
                 on:click={() => (selectedTab = "members")}
-                class="team-menu__link cursor-pointer"
+                class="team-menu__link cursor-pointer rounded"
                 class:tab-active={selectedTab === "members"}
-                >Members {openTeam?.users?.length
-                  ? `(${openTeam.users.length})`
-                  : ""}</span
-              >
+                >Members <span
+                  class="item-count"
+                  class:item-count-active={selectedTab === "members"}
+                  >{openTeam?.users?.length
+                    ? `(${openTeam.users.length})`
+                    : ""}</span
+                >
+              </span>
               {#if openTeam?.owner === userId}
                 <span
                   style="padding: 8px 8px;"
                   on:click={() => (selectedTab = "settings")}
-                  class="team-menu__link cursor-pointer"
+                  class="team-menu__link cursor-pointer rounded"
                   class:tab-active={selectedTab === "settings"}>Settings</span
                 >
               {/if}
@@ -328,6 +337,9 @@
   .team-menu__link {
     color: var(--button-color);
   }
+  .team-menu__link:hover {
+    background-color: var(--dull-background-color);
+  }
   .content-teams__btn-new-workspace {
     height: 30px;
     background-color: #1193f0;
@@ -338,7 +350,8 @@
   }
   .tab-active {
     color: var(--white-color);
-
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
     border-bottom: 3px solid var(--workspace-hover-color);
   }
   .view-active {
@@ -353,5 +366,11 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .item-count-active {
+    color: unset !important;
+  }
+  .item-count {
+    color: var(--primary-btn-color);
   }
 </style>
