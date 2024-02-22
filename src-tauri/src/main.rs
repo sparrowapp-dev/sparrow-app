@@ -26,7 +26,9 @@ extern crate objc;
 
 #[cfg(target_os = "windows")]
 use std::path::Path;
+#[cfg(target_os = "windows")]
 use winreg::enums::*;
+#[cfg(target_os = "windows")]
 use winreg::RegKey;
 
 // Commands
@@ -188,8 +190,8 @@ async fn make_request(
     return Ok(combined_json.to_string());
 }
 
-// This functions enables deep linking in windows.
-fn set_registry_key() -> std::io::Result<()> {
+#[cfg(target_os = "windows")]
+fn set_registry_key() -> std::io::Result<()> { // This functions enables deep linking in windows.
     let hkcr = RegKey::predef(HKEY_CLASSES_ROOT);
     let path = Path::new("sparrow")
         .join("shell")
@@ -213,7 +215,6 @@ fn set_registry_key() -> std::io::Result<()> {
     command_key.set_value("", &"C:\\Program Files\\sparrow-app\\sparrow-app.exe")?;
     Ok(())
 }
-
 // Sturct Types
 #[derive(Clone, serde::Serialize)]
 struct Payload {
