@@ -365,13 +365,12 @@
     fileInput.click();
   };
 
-  const handleOnShowMoreClick = (e) => {
-    e.stopPropagation();
-    isShowMoreVisible = !isShowMoreVisible;
+  const handleOnShowMoreClick = () => {
+    isShowMoreVisible = true;
   };
 
-  const handleCloseShowMoreClick = (e) => {
-    if (!isShowMoreVisible) isShowMoreVisible = !isShowMoreVisible;
+  const handleCloseShowMoreClick = () => {
+    isShowMoreVisible = false;
   };
 
   const handleLeaveTeamModal = () => {
@@ -407,10 +406,10 @@
 
 <svelte:window
   on:click={(e) => {
-    handleCloseShowMoreClick(e);
+    handleCloseShowMoreClick();
   }}
-  on:contextmenu|preventDefault={(e) => {
-    handleCloseShowMoreClick(e);
+  on:contextmenu|preventDefault={() => {
+    handleCloseShowMoreClick();
   }}
 />
 <!-- Create New Team POP UP -->
@@ -561,6 +560,7 @@
       {data}
       {activeSideBarTabMethods}
       {isShowMoreVisible}
+      {handleCloseShowMoreClick}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
       {workspaceUnderCreation}
