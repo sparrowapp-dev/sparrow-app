@@ -18,17 +18,21 @@
   import { user } from "$lib/store/auth.store";
 
   import type { WorkspaceDocument } from "$lib/database/app.database";
-  import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
+  /**
+   * @deprecated referes to teams store
+   * import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
+   * import { isTeamCreatedFirstTime } from "$lib/store/team.store";
+   **/
+
   import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
-  import { isTeamCreatedFirstTime } from "$lib/store/team.store";
   import {} from "$lib/store";
   import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { v4 as uuidv4 } from "uuid";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
@@ -45,7 +49,6 @@
 
   let allTeams: any[] = [];
   let userId: string | undefined = undefined;
-  let currOpenedTeam: CurrentTeam;
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
@@ -106,22 +109,28 @@
     }
   });
 
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) {
-      currOpenedTeam = value;
-    }
-  });
+  /**
+   * @deprecated referes to teams store
+   *   const openedTeamSubscribe = openedTeam.subscribe((value) => {
+   *   if (value) {
+   *    currOpenedTeam = value;
+   *    }
+   *  });
+   **/
 
   const activeTeamSubscribe = activeTeam.subscribe((value: TeamDocument) => {
     if (value) {
       activeTeamRxDoc = value;
-      setOpenedTeam(
-        currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
-        currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
-        currOpenedTeam.base64String
-          ? currOpenedTeam.base64String
-          : value.get("logo"),
-      );
+      /**
+       * @deprecated referes to teams store
+       *  setOpenedTeam(
+       *    currOpenedTeam.id ? currOpenedTeam.id : value.get("teamId"),
+       *    currOpenedTeam.name ? currOpenedTeam.name : value.get("name"),
+       *    currOpenedTeam.base64String
+       *      ? currOpenedTeam.base64String
+       *      : value.get("logo"),
+       *  );
+       **/
     }
   });
 
@@ -143,16 +152,14 @@
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toISOString(),
       undefined,
-      currOpenedTeam.id,
+      $openTeam?.teamId,
     );
 
     const workspaceData = {
       name: workspaceObj.name,
-      id: currOpenedTeam.id,
+      id: $openTeam?.teamId,
       createdAt: workspaceObj.createdAt,
     };
-
-    await _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
@@ -190,19 +197,23 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      if (userId) await _viewModel.refreshTeams(userId);
-      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      navigate("/dashboard/collections");
+      let newWorkspace = response.data.data;
+      newWorkspace.team.teamId = newWorkspace.team.id;
+      newWorkspace.team.teamName = newWorkspace.team.name;
+      delete newWorkspace.team.id;
+      delete newWorkspace.team.name;
+      await _viewModel.addWorkspace(newWorkspace);
+      await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
+      if (userId) await _viewModel.refreshTeams(userId);
       activeSideBarTabMethods.updateActiveTab("collections");
+      navigate("/dashboard/collections");
     } else {
-      await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
       isWorkspaceLoaded.set(true);
       notifications.error("Failed to create new Workspace!");
     }
@@ -220,7 +231,7 @@
     if (newTeam.file.showFileSizeError || newTeam.file.showFileTypeError)
       return;
 
-    isTeamCreatedFirstTime.set(true);
+    // isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
     await _viewModel.addTeam(teamObj);
     const response = await _viewModel.createTeam(teamObj);
@@ -229,11 +240,16 @@
       const res = response.data.data;
       await _viewModel.refreshTeams(userId);
       await teamRepositoryMethods.setOpenTeam(response.data.data?._id);
-      setOpenedTeam(
-        response.data.data?._id,
-        response?.data?.data?.name,
-        response?.data?.data?.logo,
-      );
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   response.data.data?._id,
+       *   response?.data?.data?.name,
+       *   response?.data?.data?.logo,
+       * );
+       **/
+
+      await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
@@ -247,19 +263,22 @@
   };
 
   const handleLeaveTeam = async () => {
-    if (!currOpenedTeam?.id) return;
+    if (!$openTeam?.teamId) return;
     isLeavingTeam = true;
-    const response = await _viewModel.leaveTeam(currOpenedTeam.id);
+    const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
       await _viewModel.refreshTeams(userId);
       await _viewModelWorkspace.refreshWorkspaces(userId);
       notifications.success("You left a team.");
-      setOpenedTeam(
-        activeTeamRxDoc?._data?.teamId,
-        activeTeamRxDoc?._data?.name,
-        //@ts-ignore
-        activeTeamRxDoc?._data?.logo,
-      );
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   activeTeamRxDoc?._data?.teamId,
+       *   activeTeamRxDoc?._data?.name,
+       *   //@ts-ignore
+       *   activeTeamRxDoc?._data?.logo,
+       * );
+       **/
       await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
       isShowMoreVisible = false;
       isLeavingTeam = false;
@@ -380,7 +399,6 @@
 
   onDestroy(() => {
     userSubscribe();
-    openedTeamSubscribe();
     teamSubscribe.unsubscribe();
     activeTeamSubscribe.unsubscribe();
   });
@@ -493,7 +511,7 @@
 >
   <p class="warning-text text-lightGray mt-3">
     Are you sure you want to leave team <span class="fw-semibold"
-      >"{currOpenedTeam?.name}"</span
+      >"{$openTeam?.name}"</span
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
@@ -522,6 +540,7 @@
     <WorkspaceList
       {userId}
       {handleCreateTeamModal}
+      openTeam={$openTeam}
       teams={allTeams}
       {data}
       tabList={$tabList}

@@ -6,7 +6,7 @@
     TeamServiceMethods,
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   export let workspace: workspaceDocumentWithPosition;
   export let user;
   export let isWorkspaceMemberInfo = false;
@@ -90,26 +90,28 @@
     <span style="font-size:12px;" class="text-whiteColor">{workspace.name}</span
     >
     <div class="dropdown-workspace-access">
-      
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER))}
         <Dropdown
           dropdownId={workspace._id}
-          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
+          dropDownType={{
+            type: "text",
+            title: workspace.position ? workspace.position : "",
+          }}
           data={[
             {
               name: "Editor",
               id: WorkspaceRole.WORKSPACE_EDITOR,
-               dynamicClasses: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Viewer",
               id: WorkspaceRole.WORKSPACE_VIEWER,
-               dynamicClasses: "text-whiteColor",
+              dynamicClasses: "text-whiteColor",
             },
             {
               name: "Remove",
               id: "remove",
-               dynamicClasses: "text-dangerColor",
+              dynamicClasses: "text-dangerColor",
             },
           ]}
           onclick={isWorkspaceMemberInfo
@@ -117,10 +119,12 @@
             : handleDropdown}
         />
       {:else}
-        
         <Dropdown
           dropdownId={workspace._id + "member-workspace"}
-          dropDownType={{type:"text",title:workspace.position ? workspace.position : ""}}            
+          dropDownType={{
+            type: "text",
+            title: workspace.position ? workspace.position : "",
+          }}
           disabled={true}
           method={user.role || teamRole === TeamRole.TEAM_OWNER
             ? TeamRole.TEAM_ADMIN

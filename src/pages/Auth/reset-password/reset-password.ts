@@ -1,7 +1,7 @@
 import { resetPassword } from "$lib/services/auth.service";
 import type { resetPasswordPostBody } from "$lib/utils/dto";
 
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { checkValidation, resetPasswordSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 

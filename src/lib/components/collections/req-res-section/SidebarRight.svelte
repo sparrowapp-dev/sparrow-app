@@ -12,8 +12,10 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
+
   import { Events, type WorkspaceRole } from "$lib/utils/enums";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import {
     getMethodStyle,

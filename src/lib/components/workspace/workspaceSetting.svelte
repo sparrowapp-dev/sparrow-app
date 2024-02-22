@@ -14,7 +14,7 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { navigate } from "svelte-navigator";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   import Button from "../buttons/Button.svelte";

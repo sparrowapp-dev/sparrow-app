@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
@@ -254,13 +254,13 @@
     </div>
     <div class="format-btns">
       <button
-        class="format-btn fw-normal sparrow-fs-16 p-1 text-start"
+        class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           onClick(false);
         }}>Close</button
       >
       <button
-        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-start"
+        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           handleError();
         }}>+ Collection</button

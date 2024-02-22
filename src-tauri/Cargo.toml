@@ -10,10 +10,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4", features = [] }
+tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = [ "window-set-fullscreen", "window-set-focus", "os-all", "window-center", "window-set-size", "window-unminimize", "window-start-dragging", "window-show", "window-hide", "window-maximize", "window-minimize", "window-unmaximize", "window-close"] }
+tauri = { version = "2.0.0-beta", features = [] }
+tauri-plugin-deep-link = "2.0.0-beta"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 json = "0.12.4"
@@ -23,7 +24,9 @@ nfd = "0.0.4"
 reqwest = { version = "0.11", features = ["blocking", "json", "multipart", "stream"] }
 tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.6", features = ["full"] }
-window-shadows = "0.2.2"
+tauri-plugin-os = "2.0.0-beta.0"
+tauri-plugin-updater = "2.0.0-beta"
+tauri-plugin-process = "2.0.0-beta"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 

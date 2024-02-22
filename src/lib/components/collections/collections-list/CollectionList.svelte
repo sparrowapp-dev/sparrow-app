@@ -49,14 +49,13 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { setCurrentWorkspace } from "$lib/store";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
@@ -185,10 +184,6 @@
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        setCurrentWorkspace(
-          activeWorkspaceRxDoc.get("_id"),
-          activeWorkspaceRxDoc.get("name"),
-        );
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
           const response =
@@ -658,14 +653,15 @@
               />
             {/each}
           </List>
+        {:else}
+          <EmptyCollection
+            {loggedUserRoleInWorkspace}
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+            {showDefault}
+          />
         {/if}
-        <EmptyCollection
-          {loggedUserRoleInWorkspace}
-          {handleCreateCollection}
-          {collectionsMethods}
-          {currentWorkspaceId}
-          {showDefault}
-        />
       {/if}
     </div>
   </div>

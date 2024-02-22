@@ -43,22 +43,35 @@
       activeTabId = event.id;
     }
   });
+  let collectionCountArr = [];
+  const refreshCount = () => {
+    if (collectionCountArr && activeTabId) {
+      collectionCountArr.forEach(async (collection) => {
+        if (collection._data.id === activeTabId) {
+          const collectionData =
+            await collectionsMethods.getNoOfApisandFolders(collection);
+          totalRequest = collectionData.requestCount;
+          totalFolder = collectionData.folderCount;
+          return;
+        }
+      });
+    }
+  };
+
   const collectionSubscribe = collections.subscribe(
-    (collectionArr: CollectionDocument[]) => {
-      if (collectionArr) {
-        collectionArr.forEach(async (collection) => {
-          if (collection._data.id === activeTabId) {
-            const collectionData =
-              await collectionsMethods.getNoOfApisandFolders(collection);
-            totalRequest = collectionData.requestCount;
-            totalFolder = collectionData.folderCount;
-            return;
-          }
-        });
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
       }
     },
   );
 
+  $: {
+    if (activeTabId) {
+      refreshCount();
+    }
+  }
   const onUpdate = async (property: string, event) => {
     const value = event.target.value;
     await _myColllectionViewModel.modifyCollection(
@@ -70,7 +83,7 @@
   };
 
   const onDescInputKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "updateCollectionDescField",
       ) as HTMLInputElement;
@@ -108,7 +121,9 @@
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
   });
-  onDestroy(() => {});
+  onDestroy(() => {
+    collectionSubscribe.unsubscribe();
+  });
   let autofocus = isCollectionNameVisibility;
 
   let inputElement;
@@ -181,29 +196,21 @@
         <p style="font-size: 12px;" class="mb-0">Folder</p>
       </div>
     </div>
-    <Tooltip
-      title={PERMISSION_NOT_FOUND_TEXT}
-      show={!hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-      )}
-    >
-      <div class="d-flex align-items-start ps-0 h-100">
-        <textarea
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-          )}
-          id="updateCollectionDescField"
-          style="font-size: 12px;"
-          value={tabDescription}
-          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-          placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) => onUpdate("description", event)}
-          on:keydown={onDescInputKeyPress}
-        />
-      </div>
-    </Tooltip>
+    <div class="d-flex align-items-start ps-0 h-100">
+      <textarea
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.EDIT_COLLECTION_DESC,
+        )}
+        id="updateCollectionDescField"
+        style="font-size: 12px;"
+        value={tabDescription}
+        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+        on:blur={(event) => onUpdate("description", event)}
+        on:keydown={onDescInputKeyPress}
+      />
+    </div>
   </div>
   <div
     class="d-flex flex-column align-items-left justify-content-start"

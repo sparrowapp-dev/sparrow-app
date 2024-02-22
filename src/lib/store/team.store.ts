@@ -1,3 +1,8 @@
+/**
+ * @deprecated please do not use this file
+ * to access team model refer this file: src\lib\models\team.model.ts
+ * **/
+
 import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
 import { writable } from "svelte/store";
 export const isTeamCreatedFirstTime = writable(false);

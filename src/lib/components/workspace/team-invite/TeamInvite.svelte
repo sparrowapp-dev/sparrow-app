@@ -3,13 +3,13 @@
   export let teamName: string = "";
   export let teamId: string = "";
   import closeIcon from "$lib/assets/close.svg";
-  import CheckSelectDropdown from "../../dropdown/CheckSelectDropdown.svelte";
   import {
     base64ToURL,
     createDynamicComponents,
     validateEmail,
   } from "$lib/utils/helpers";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums/team.enum";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
@@ -354,7 +354,7 @@
           hide: true,
         },
         {
-          name: "Select ALL",
+          name: "Select All",
           id: "select-all",
           dynamicClasses: "text-whiteColor",
           isInvalidOption: true,
@@ -371,6 +371,10 @@
         {
           id: "check-select-workspace-options-container",
           classToAdd: ["end-0", "start-0"],
+        },
+        {
+          id: "check-select-workspace-btn-div",
+          classToAdd: ["flex-wrap", "overflow-auto"],
         },
       ]}
     ></Dropdown>

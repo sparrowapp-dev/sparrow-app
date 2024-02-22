@@ -13,7 +13,7 @@
     addUsersInWorkspace,
     addUsersInWorkspacePayload,
   } from "$lib/utils/dto";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { WorkspaceRole } from "$lib/utils/enums";
   import { createDynamicComponents } from "$lib/utils/helpers/common.helper";
   import { validateEmail } from "$lib/utils/helpers";
@@ -235,7 +235,7 @@
       <p class="error-text">Role Cannot Be Empty</p>
     {/if}
   </div>
-  <div class="text-textColor mt-2" style="font-size: 12px;">
+  <div class="text-textColor mt-2 text-break" style="font-size: 12px;">
     You can invite your team members or external collaborators to a this
     workspace. Invited people will have access to only the <span
       style="color:white">{currentWorkspaceDetails.name}</span

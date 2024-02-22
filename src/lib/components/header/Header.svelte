@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { appWindow } from "@tauri-apps/api/window";
+  import { getCurrent } from "@tauri-apps/api/window";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import icons from "$lib/assets/app.asset";
 
   let isMaximizeWindow: boolean = false;
 
   const onMinimize = () => {
-    appWindow.minimize();
+    getCurrent().minimize();
   };
 
   const onClose = () => {
-    appWindow.close();
+    getCurrent().close();
   };
 
   const toggleSize = () => {
-    appWindow.toggleMaximize();
+    getCurrent().toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
 </script>
