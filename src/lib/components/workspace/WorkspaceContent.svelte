@@ -159,7 +159,7 @@
                     }}
                     disabled={openTeam?.owner == userId}
                     style="font-size: 14px;"
-                    class="leave-btn position-absolute {!isShowMoreVisible &&
+                    class="leave-btn border-1 position-absolute {!isShowMoreVisible &&
                       'd-none'} bg-blackColor pe-5 py-2 px-3 mt-3 ms-2 rounded {openTeam?.owner ==
                     userId
                       ? 'text-lightGray'
@@ -378,6 +378,7 @@
     transform: rotate(90deg);
   }
   .leave-btn {
-    border: 1px solid var(--border-color);
+    border-style: solid;
+    border-color: var(--border-color);
   }
 </style>
