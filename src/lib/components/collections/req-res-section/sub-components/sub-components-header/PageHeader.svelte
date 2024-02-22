@@ -26,13 +26,11 @@
   } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  let display: boolean = false;
-  window.addEventListener("click", () => {
-    display = false;
-  });
+
   let visibility: boolean = false;
   const handleBackdrop = (flag) => {
     visibility = flag;
@@ -132,6 +130,7 @@
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     }
+    notifications.success("API request saved");
   };
 
   let handleInputValue = () => {
