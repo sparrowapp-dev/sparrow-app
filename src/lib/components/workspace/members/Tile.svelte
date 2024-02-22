@@ -539,25 +539,28 @@
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <Dropdown
-        dropdownId={Math.random().toString()}
+        dropdownId={user.id}
         data={getPermissionsData()}
         dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <Dropdown
-        dropdownId={Math.random().toString()}
+        dropdownId={user.id}
         data={getPermissionsData()}
         dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {:else}
       <Dropdown
-        dropdownId={Math.random().toString()}
+        dropdownId={user.id}
         disabled={true}
         data={getPermissionsData()}
         dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {/if}
   </div>

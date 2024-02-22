@@ -1,5 +1,6 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import Dropdown from "$lib/assets/dropdown.svelte";
   import checkIcon from "$lib/assets/check.svg";
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -28,9 +29,10 @@
   }[] = [];
   export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
   export let activeClasses: string = "";
+  export let dropdownDataContainer = "";
   export let additonalSelectedOptionText: string = "";
   export let additionalSelectedOptionHeading = "";
-  export let additionalType: "environment" | "other" = "other";
+  export let additionalType: "environment" | "other" | "memberinfo" = "other";
 
   export let onclick: (tab: string) => void;
   export let dropDownType: {
@@ -54,6 +56,7 @@
   };
 
   let isOpen: boolean = false;
+  let isHover = false;
 
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(
@@ -61,15 +64,23 @@
     );
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
+      isHover = false;
     }
   }
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
-    const boxes = document.getElementsByClassName("dropdown-data");
-    for (const box of boxes) {
+    isHover = !isHover;
+    const dataElements = document.getElementsByClassName("dropdown-data");
+    const headingElements = document.getElementsByClassName("dropdown-btn");
+    for (const box of dataElements) {
       if (box.id !== `${dropdownId}-options-container`) {
         box.classList.remove("dropdown-active");
+      }
+    }
+    for (const box of headingElements) {
+      if (box.id !== `${dropdownId}-btn-div`) {
+        box.classList.remove("dropdown-btn-hover");
       }
     }
     if (mixpanelEvent && mixpanelEvent !== Events.NO_EVENT) {
@@ -163,7 +174,7 @@
         id={`${dropdownId}-btn-div`}
         class="dropdown-btn d-flex align-items-center justify-content-between {isOpen
           ? activeClasses
-          : ''}"
+          : ''} {isHover ? 'dropdown-btn-hover' : ''} "
         on:mouseenter={() => {
           handleHover(`${dropdownId}-btn-div`, "add");
         }}
@@ -238,13 +249,13 @@
             >{additonalSelectedOptionText}</span
           >
         {/if}
-        <span class:dropdown-logo-active={isOpen}
-          ><img
-            style="margin-left:10px; height:12px; width:12px;"
-            src={dropdown}
-            alt=""
-          /></span
-        >
+        <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
+          <Dropdown
+            height={12}
+            width={12}
+            color={disabled ? "var(--sparrow-text-color)" : "white"}
+          />
+        </span>
       </div>
     {:else}
       <div id={`${dropdownId}-img`}>
@@ -256,6 +267,9 @@
     class="d-none dropdown-data border-1 border-dropdownBorderColor rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
+    style={`${dropdownDataContainer} ${
+      additionalType === "memberinfo" ? "right: 5%" : ""
+    }`}
   >
     {#each data as list}
       <div
@@ -319,7 +333,7 @@
     color: white;
     position: absolute;
     z-index: 2;
-    background-color: var(--blackColor);
+    background-color: var(--background-dropdown);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
@@ -348,5 +362,8 @@
 
   .disabled-text {
     color: var(--sparrow-text-color) !important;
+  }
+  .dropdown-btn-hover {
+    background-color: var(--border-color);
   }
 </style>
