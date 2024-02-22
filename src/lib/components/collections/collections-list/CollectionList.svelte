@@ -458,23 +458,16 @@
       dropdownId={"hash129"}
       data={[
         {
-          name: "Select Environment",
+          name: "None",
           id: "none",
           type: environmentType.LOCAL,
-          hide: true,
-          selectedOptionClasses: "mb-0 ellipsis text-textColor",
         },
-        {
-          name: "None",
-          id: "",
-          type: environmentType.LOCAL,
-        },
-
         ...environments,
       ].filter((elem) => {
         elem["dynamicClasses"] = "text-whiteColor";
         return elem.type === environmentType.LOCAL;
       })}
+      additionalType={"environment"}
       onclick={handleDropdown}
       dropDownType={{ type: "text", title: currentEnvironment?.id }}
       staticClasses={[

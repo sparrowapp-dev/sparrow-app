@@ -29,6 +29,8 @@
   export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
   export let activeClasses: string = "";
   export let additonalSelectedOptionText: string = "";
+  export let additionalSelectedOptionHeading = "";
+  export let additionalType: "environment" | "other" = "other";
 
   export let onclick: (tab: string) => void;
   export let dropDownType: {
@@ -53,8 +55,23 @@
 
   let isOpen: boolean = false;
 
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(
+      `${dropdownId}-dropdown-${dropDownType.title}`,
+    );
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+    }
+  }
+
   const toggleDropdown = () => {
     isOpen = !isOpen;
+    const boxes = document.getElementsByClassName("dropdown-data");
+    for (const box of boxes) {
+      if (box.id !== `${dropdownId}-options-container`) {
+        box.classList.remove("dropdown-active");
+      }
+    }
     if (mixpanelEvent && mixpanelEvent !== Events.NO_EVENT) {
       MixpanelEvent(mixpanelEvent);
     }
@@ -70,16 +87,6 @@
       if (!selectedOption && dropDownType.type !== "checkbox") {
         selectedOption = data[0];
       }
-    }
-  }
-
-  function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(
-      `${dropdownId}-dropdown-${dropDownType.title}`,
-    ) as HTMLElement;
-
-    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-      isOpen = false;
     }
   }
 
@@ -194,6 +201,28 @@
                 {/if}
               {/each}
             </div>
+          {/if}
+        {:else if additionalSelectedOptionHeading && additionalType === "other"}
+          <p
+            class="{disabled
+              ? 'disabled-text'
+              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+              ? selectedOption.selectedOptionClasses
+              : ''}"
+          >
+            {additonalSelectedOptionText}
+          </p>
+          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
+            >{additionalSelectedOptionHeading}</span
+          >
+        {:else if additionalType === "environment"}
+          {#if selectedOption?.id === "none"}
+            <p class=" mb-0 ellipsis text-textColor">Select Environment</p>
+          {:else}
+            <p class=" mb-0 ellipsis">
+              <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
+              {selectedOption?.name}
+            </p>
           {/if}
         {:else}
           <p
