@@ -139,7 +139,7 @@
       .slice(0, workspaceLimit)
       .map((workspace) => {
         const workspaceObj = {
-          id: workspace.name,
+          id: workspace._id,
           name: workspace.name,
           dynamicClasses: "text-whiteColor",
           description: currentTeam?.name,
@@ -148,7 +148,7 @@
         return workspaceObj;
       });
     workspaces.push({
-      id: currentWorkspace?.name,
+      id: currentWorkspace?.id,
       name: currentWorkspace?.name,
       dynamicClasses: "text-whiteColor",
       description: currentTeam?.name,
@@ -284,7 +284,7 @@
        **/
     } else {
       allworkspaces.forEach((workspace) => {
-        if (id === workspace.name) {
+        if (id === workspace._id) {
           handleWorkspaceSwitch(workspace._id);
           return;
         }
@@ -365,7 +365,7 @@
   dropdownId="header-dropdown"
   dropDownType={{
     type: "text",
-    title: currentWorkspace ? `${currentWorkspace?.name}` : "",
+    title: currentWorkspace ? `${currentWorkspace?.id}` : "",
   }}
   additonalSelectedOptionText={`/${currentTeam?.name}`}
   staticCustomStyles={[
