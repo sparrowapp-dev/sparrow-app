@@ -60,7 +60,8 @@
   type currentTabType = "ABOUT" | "SETTING";
   let currentTab: currentTabType = "ABOUT";
   let users: userDetails[] = [];
-  let hasPermission: boolean = false;
+  let hasPermission = false;
+  let hasEditPermission = false;
   let loggedInUser: userDetails;
   let loggedUserRole: TeamRole;
   export let _collectionListViewModel: CollectionListViewModel;
@@ -78,6 +79,10 @@
         hasPermission = hasWorkpaceLevelPermission(
           value,
           workspaceLevelPermissions.SEND_INVITE,
+        );
+        hasEditPermission = hasWorkpaceLevelPermission(
+          value,
+          workspaceLevelPermissions.EDIT_WORKSPACE,
         );
       }
     },
@@ -262,7 +267,7 @@
   };
 
   const onUpdateWorkspaceDescription = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "workspaceDescription",
       ) as HTMLInputElement;
@@ -282,6 +287,7 @@
           type="text"
           value={tabName}
           id="renameInputFieldWorkspace"
+          disabled={!hasEditPermission}
           {autofocus}
           class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
           on:input={(event) => {
@@ -310,7 +316,7 @@
           on:input={(event) => {
             handleWorkspaceDescription(event);
           }}
-          disabled={!hasPermission}
+          disabled={!hasEditPermission}
           on:blur={onUpdateBlur}
           on:keydown={onUpdateWorkspaceDescription}
           bind:this={inputElement}
