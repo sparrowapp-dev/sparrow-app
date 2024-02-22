@@ -31,7 +31,8 @@
     teamRepositoryMethods: TeamRepositoryMethods,
     workspaces;
   export let handleLeaveTeamModal: () => void;
-  export let handleOnShowMoreClick: (e) => void;
+  export let handleOnShowMoreClick: () => void;
+  export let handleCloseShowMoreClick: () => void;
   export let isShowMoreVisible: boolean = false;
   export let workspaceUnderCreation = false;
 
@@ -99,15 +100,10 @@
     }}
   /></ModalWrapperV1
 >
-
+<svelte:window on:click={handleCloseShowMoreClick()} />
 <div class="teams-content bg-backgroundColor">
   <div class="content-teams px-md-1 px-lg-3 px-3 pt-5">
-    <div
-      class="container-fluid"
-      on:mouseleave={(e) => {
-        if (!isShowMoreVisible) handleOnShowMoreClick(e);
-      }}
-    >
+    <div class="container-fluid">
       <div class="row">
         <div class="col-12 pb-3">
           <div
@@ -133,25 +129,38 @@
               </span>
               <div class="mr-4 position-relative my-auto">
                 {#if openTeam?.owner !== userId}
-                  <Button
-                    onClick={handleOnShowMoreClick}
-                    allowChild={true}
-                    buttonClassProp={`rounded mx-2 my-auto p-0 d-flex ${
-                      isShowMoreVisible ? "transparent" : "bg-plusButton"
-                    } `}
-                    type={`icon`}
-                  >
-                    <ShowMoreIcon classProp="" />
-                  </Button>
+                  <div class="leave-team-container">
+                    <Button
+                      onClick={() => {
+                        if (!isShowMoreVisible) {
+                          setTimeout(() => {
+                            handleOnShowMoreClick();
+                          }, 100);
+                        }
+                      }}
+                      allowChild={true}
+                      buttonClassProp={`rounded mx-2 my-auto p-0 d-flex ${
+                        !isShowMoreVisible ? "transparent" : "bg-plusButton"
+                      } `}
+                      type={`icon`}
+                    >
+                      <ShowMoreIcon
+                        color={!isShowMoreVisible
+                          ? "var(--white-color)"
+                          : "var(--blackColor)"}
+                        classProp=""
+                      />
+                    </Button>
+                  </div>
                   <button
                     on:click={(e) => {
                       handleLeaveTeamModal();
-                      handleOnShowMoreClick(e);
+                      handleOnShowMoreClick();
                     }}
                     disabled={openTeam?.owner == userId}
                     style="font-size: 14px;"
-                    class="position-absolute {isShowMoreVisible &&
-                      'd-none'} bg-blackColor border-0 py-2 px-3 mt-3 ms-2 rounded {openTeam?.owner ==
+                    class="leave-btn position-absolute {!isShowMoreVisible &&
+                      'd-none'} bg-blackColor pe-5 py-2 px-3 mt-3 ms-2 rounded {openTeam?.owner ==
                     userId
                       ? 'text-lightGray'
                       : 'text-dangerColor'}
@@ -364,5 +373,12 @@
   }
   .item-count {
     color: var(--primary-btn-color);
+  }
+  .leave-team-container {
+    /* display: inline-block; */
+    transform: rotate(90deg);
+  }
+  .leave-btn {
+    border: 1px solid var(--border-color);
   }
 </style>
