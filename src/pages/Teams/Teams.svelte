@@ -161,8 +161,6 @@
       createdAt: workspaceObj.createdAt,
     };
 
-    await _viewModel.addWorkspace(workspaceObj);
-
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
@@ -199,19 +197,23 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      if (userId) await _viewModel.refreshTeams(userId);
-      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      navigate("/dashboard/collections");
+      let newWorkspace = response.data.data;
+      newWorkspace.team.teamId = newWorkspace.team.id;
+      newWorkspace.team.teamName = newWorkspace.team.name;
+      delete newWorkspace.team.id;
+      delete newWorkspace.team.name;
+      await _viewModel.addWorkspace(newWorkspace);
+      await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
+      if (userId) await _viewModel.refreshTeams(userId);
       activeSideBarTabMethods.updateActiveTab("collections");
+      navigate("/dashboard/collections");
     } else {
-      await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
       isWorkspaceLoaded.set(true);
       notifications.error("Failed to create new Workspace!");
     }

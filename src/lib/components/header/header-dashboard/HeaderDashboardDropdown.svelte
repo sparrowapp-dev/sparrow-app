@@ -45,6 +45,11 @@
   export let collectionsMethods: CollectionsMethods;
   export let allworkspaces = [];
 
+  $: {
+    if (currentWorkspace || currentTeam) {
+      calculateLimitedWorkspace();
+    }
+  }
   let workspaceNameExistsErr: boolean = false;
 
   let workspaceLimit = constants.WORKSPACE_LIMIT;
@@ -112,6 +117,50 @@
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
+  let sharedData = [];
+  function createSetFromArray(arr, key) {
+    const seen = new Set();
+    return arr.filter((obj) => {
+      if (!obj.hasOwnProperty(key)) {
+        throw new Error(`Object does not have key "${key}"`);
+      }
+      const keyValue = obj[key];
+      return !seen.has(keyValue) && seen.add(keyValue);
+    });
+  }
+
+  const calculateLimitedWorkspace = () => {
+    let workspaces = allworkspaces
+      .filter((elem) => {
+        if (currentTeam.id === elem.team.teamId) return true;
+        return false;
+      })
+      .reverse()
+      .slice(0, workspaceLimit)
+      .map((workspace) => {
+        const workspaceObj = {
+          id: workspace._id,
+          name: workspace.name,
+          dynamicClasses: "text-whiteColor",
+          description: currentTeam?.name,
+          selectedOptionClasses: "ellipsis mw-25",
+        };
+        return workspaceObj;
+      });
+    workspaces.push({
+      id: currentWorkspace?.id,
+      name: currentWorkspace?.name,
+      dynamicClasses: "text-whiteColor",
+      description: currentTeam?.name,
+      selectedOptionClasses: "ellipsis mw-25",
+    });
+    const res = createSetFromArray(workspaces, "name");
+    if (res.length > workspaceLimit) {
+      res.shift();
+    }
+    sharedData = res;
+    return;
+  };
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
     workspaceNameExistsErr = false;
@@ -235,7 +284,7 @@
        **/
     } else {
       allworkspaces.forEach((workspace) => {
-        if (id === workspace.name) {
+        if (id === workspace._id) {
           handleWorkspaceSwitch(workspace._id);
           return;
         }
@@ -316,7 +365,7 @@
   dropdownId="header-dropdown"
   dropDownType={{
     type: "text",
-    title: currentWorkspace ? `${currentWorkspace?.name}` : "",
+    title: currentWorkspace ? `${currentWorkspace?.id}` : "",
   }}
   additonalSelectedOptionText={`/${currentTeam?.name}`}
   staticCustomStyles={[
@@ -346,20 +395,7 @@
       img: plusIcon,
       hasDivider: true,
     },
-    ...allworkspaces
-      .slice()
-      .reverse()
-      .slice(0, workspaceLimit)
-      .map((workspace) => {
-        const workspaceObj = {
-          id: workspace.name,
-          name: workspace.name,
-          dynamicClasses: "text-whiteColor",
-          description: currentTeam?.name,
-          selectedOptionClasses: "ellipsis mw-25",
-        };
-        return workspaceObj;
-      }),
+    ...sharedData,
     {
       id: "",
       name: "You will see your five most recent workspaces",

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Link } from "svelte-navigator";
   import table from "$lib/assets/table.svg";
   import hamburger from "$lib/assets/hamburger.svg";
   import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
@@ -15,11 +14,8 @@
   } from "$lib/utils/interfaces";
   import TeamInvite from "./team-invite/TeamInvite.svelte";
   import { base64ToURL } from "$lib/utils/helpers";
-  import type { TeamDocument } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
   import { PeopleIcon, ShowMoreIcon } from "$lib/assets/app.asset";
   import Settings from "./settings/Settings.svelte";
-
   import Button from "../buttons/Button.svelte";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   export let userId: string;
@@ -39,11 +35,8 @@
   export let isShowMoreVisible: boolean = false;
   export let workspaceUnderCreation = false;
 
-  let isLoading: boolean = false;
   let selectedTab = "all-workspace";
   let selectedView: string;
-
-  let isTooltipVisible: boolean = false;
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
