@@ -1,5 +1,5 @@
 import { WindowSettingReposistory } from "$lib/repositories/window-settings.repository";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
 
 const windowSettingRepository = new WindowSettingReposistory();
 
@@ -23,7 +23,7 @@ export async function zoomOut() {
   setScaleFactorToDb(windowScaleFactor);
 }
 
-async function setScaleFactorToDb(windowScaleFactor) {
+async function setScaleFactorToDb(windowScaleFactor: string) {
   await windowSettingRepository.setWindowSetting(
     "windowScaleFactor",
     windowScaleFactor,

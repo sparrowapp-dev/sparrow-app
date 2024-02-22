@@ -1,64 +1,55 @@
 {
-  "build": {
-    "beforeDevCommand": "yarn dev",
-    "beforeBuildCommand": "yarn build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist",
-    "withGlobalTauri": false
-  },
-  "package": {
-    "productName": "sparrow-app",
-    "version": "0.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "os": {
-        "all": true
-      },
-      "all": false,
-      "window": {
-        "all": false,
-        "close": true,
-        "hide": true,
-        "show": true,
-        "maximize": true,
-        "minimize": true,
-        "unmaximize": true,
-        "unminimize": true,
-        "startDragging": true,
-        "setSize": true,
-        "setFocus": true,
-        "setFullscreen": true,
-        "center": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.tauri.app",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ]
-    },
+  "app": {
     "security": {
       "csp": null
     },
     "windows": [
       {
-        "label": "main",
+        "center": true,
         "decorations": false,
+        "fileDropEnabled": false,
         "fullscreen": false,
+        "label": "main",
+        "minHeight": 700,
+        "minWidth": 570,
         "resizable": true,
         "title": "sparrow-app",
-        "minWidth": 570,
-        "minHeight": 700,
-        "center": true,
-        "fileDropEnabled":false
+        "shadow": true
       }
-    ]
-  }
+    ],
+    "withGlobalTauri": false
+  },
+  "build": {
+    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "yarn dev",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "bundle": {
+    "active": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": "all"
+  },
+  "identifier": "dev.sparrowapp.desktop",
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://api.sparrowapp.dev/updater/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCRkNBNDkwNUI2NjMwMDcKUldRSE1HWmJrS1Q4S3l4Slo5KzhUNGZoSXdlZmNuRDk3Qkh6NmY5aWJiKzU5a2FUUnQ2UlJhZUIK"
+    },
+    "deep-link": {
+      "domains": []
+    }
+  },
+  "productName": "sparrow-app",
+  "version": "0.0.0"
 }

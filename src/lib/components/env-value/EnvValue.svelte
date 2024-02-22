@@ -326,14 +326,15 @@
                   <button
                     class="border-0 delete-btn pb-1 rounded"
                     style="width:30px;"
+                    disabled={!hasWorkpaceLevelPermission(
+                      loggedUserRoleInWorkspace,
+                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
+                    )}
+                    on:click={() => {
+                      deleteParam(index);
+                    }}
                   >
-                    <img
-                      src={trashIcon}
-                      on:click={() => {
-                        deleteParam(index);
-                      }}
-                      alt=""
-                    />
+                    <img src={trashIcon} alt="" />
                   </button>
                 </div>
               {:else}

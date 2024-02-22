@@ -83,7 +83,7 @@
   };
 
   const onDescInputKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "updateCollectionDescField",
       ) as HTMLInputElement;
@@ -196,29 +196,21 @@
         <p style="font-size: 12px;" class="mb-0">Folder</p>
       </div>
     </div>
-    <Tooltip
-      title={PERMISSION_NOT_FOUND_TEXT}
-      show={!hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-      )}
-    >
-      <div class="d-flex align-items-start ps-0 h-100">
-        <textarea
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-          )}
-          id="updateCollectionDescField"
-          style="font-size: 12px;"
-          value={tabDescription}
-          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-          placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) => onUpdate("description", event)}
-          on:keydown={onDescInputKeyPress}
-        />
-      </div>
-    </Tooltip>
+    <div class="d-flex align-items-start ps-0 h-100">
+      <textarea
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.EDIT_COLLECTION_DESC,
+        )}
+        id="updateCollectionDescField"
+        style="font-size: 12px;"
+        value={tabDescription}
+        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+        on:blur={(event) => onUpdate("description", event)}
+        on:keydown={onDescInputKeyPress}
+      />
+    </div>
   </div>
   <div
     class="d-flex flex-column align-items-left justify-content-start"

@@ -30,13 +30,10 @@
   let collapsExpandToggle: boolean = false;
   let tabName = "";
   let tabDescription = "";
-  let collectionDescription = "";
-  let folderDescription = "";
   let componentData: NewTab;
   let totalRequest: number = 0;
   let collectionId: string;
   let folderId: string;
-  let collectionArray = [];
   const _myFolderViewModel = new MyFolderViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
@@ -135,7 +132,7 @@
   };
 
   const onDescInputKeyPress = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "updateFolderDescField",
       ) as HTMLInputElement;
@@ -187,29 +184,21 @@
         <p style="font-size: 12px;" class="mb-0">API Requests</p>
       </div>
     </div>
-    <Tooltip
-      title={PERMISSION_NOT_FOUND_TEXT}
-      show={!hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.EDIT_FOLDER_DESC,
-      )}
-    >
-      <div class="d-flex align-items-start ps-0 h-100">
-        <textarea
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.EDIT_FOLDER_DESC,
-          )}
-          id="updateFolderDescField"
-          style="font-size: 12px; "
-          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-          value={tabDescription}
-          placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) => onUpdate("description", event)}
-          on:keydown={onDescInputKeyPress}
-        />
-      </div>
-    </Tooltip>
+    <div class="d-flex align-items-start ps-0 h-100">
+      <textarea
+        disabled={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.EDIT_FOLDER_DESC,
+        )}
+        id="updateFolderDescField"
+        style="font-size: 12px; "
+        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        value={tabDescription}
+        placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
+        on:blur={(event) => onUpdate("description", event)}
+        on:keydown={onDescInputKeyPress}
+      />
+    </div>
   </div>
   <div
     class="d-flex flex-column align-items-left justify-content-start"
