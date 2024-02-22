@@ -260,10 +260,11 @@
     {#each data as list}
       <div
         id="{dropdownId}-options-div"
-        class="d-flex px-2 py-1 justify-content-between highlight text-break {list?.hide ===
-        true
+        class="d-flex px-2 py-1 highlight text-break {list?.hide === true
           ? 'd-none'
-          : ''}"
+          : ''}
+          {dropDownType.type !== 'checkbox' ? 'justify-content-between' : ''}
+          "
         on:click={(event) => {
           event.stopPropagation();
           if (dropDownType.type === "checkbox") {
@@ -274,9 +275,14 @@
           }
         }}
       >
+        {#if dropDownType.type === "checkbox"}
+          <label class="me-1">
+            <input type="checkbox" bind:checked={list.checked} />
+          </label>
+        {/if}
         <p
           class="m-0 {list?.dynamicClasses}"
-          style="font-size: 12px;"
+          style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
           id="{dropdownId}-options-name"
           class:selected-request={list.id === selectedOption?.id}
         >
@@ -289,10 +295,6 @@
 
         {#if selectedOption?.id === list.id && dropDownType.type === "text"}
           <img src={checkIcon} alt="" />
-        {:else if dropDownType.type === "checkbox"}
-          <label>
-            <input type="checkbox" bind:checked={list.checked} />
-          </label>
         {:else if list?.img}
           <img src={list.img} />
         {/if}
