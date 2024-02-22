@@ -340,14 +340,6 @@
   .team-menu__link:hover {
     background-color: var(--dull-background-color);
   }
-  .content-teams__btn-new-workspace {
-    height: 30px;
-    background-color: #1193f0;
-  }
-  .content-teams__btn-invite {
-    height: 30px;
-    background-color: var(--border-color);
-  }
   .tab-active {
     color: var(--white-color);
     border-bottom-left-radius: 0 !important;
