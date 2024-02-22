@@ -375,7 +375,6 @@
     color: var(--primary-btn-color);
   }
   .leave-team-container {
-    /* display: inline-block; */
     transform: rotate(90deg);
   }
   .leave-btn {
