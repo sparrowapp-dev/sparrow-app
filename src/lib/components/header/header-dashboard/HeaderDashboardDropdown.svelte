@@ -132,7 +132,7 @@
   const calculateLimitedWorkspace = () => {
     let workspaces = allworkspaces
       .filter((elem) => {
-        if (currentTeam.id === elem.team.teamId) return true;
+        if (currentTeam?.id === elem?.team?.teamId) return true;
         return false;
       })
       .reverse()
