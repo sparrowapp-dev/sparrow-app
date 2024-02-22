@@ -254,13 +254,13 @@
     </div>
     <div class="format-btns">
       <button
-        class="format-btn fw-normal sparrow-fs-16 p-1 text-start"
+        class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           onClick(false);
         }}>Close</button
       >
       <button
-        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-start"
+        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           handleError();
         }}>+ Collection</button
