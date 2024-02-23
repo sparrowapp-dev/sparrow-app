@@ -17,7 +17,7 @@
 </script>
 
 <div
-  class="d-flex text-requestBodyColor flex-column {isHorizontalMode
+  class="d-flex text-requestBodyColor mt-1 flex-column {isHorizontalMode
     ? 'align-items-start'
     : 'align-items-center'} justify-content-between py-3 ps-3"
 >
