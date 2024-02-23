@@ -6,7 +6,7 @@ on:
       - feat/onboarding-v2
 
 env: 
-    VITE_API_URL: ${{ secrets.VITE_API_URL }}
+    VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
     VITE_MIX_PANEL_TOKEN: ${{ secrets.VITE_MIX_PANEL_TOKEN }}
     VITE_ENABLE_MIX_PANEL: ${{ secrets.VITE_ENABLE_MIX_PANEL }}
     VITE_API_TIMEOUT: ${{ secrets.VITE_API_TIMEOUT }}
