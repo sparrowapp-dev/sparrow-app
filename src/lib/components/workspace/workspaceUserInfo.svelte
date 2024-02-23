@@ -317,6 +317,7 @@
           },
         ]}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {:else}
       <div class="default-admin-container p-2 rounded z-2">

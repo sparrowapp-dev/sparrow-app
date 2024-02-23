@@ -1,5 +1,6 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import Dropdown from "$lib/assets/dropdown.svelte";
   import checkIcon from "$lib/assets/check.svg";
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -28,7 +29,10 @@
   }[] = [];
   export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
   export let activeClasses: string = "";
+  export let dropdownDataContainer = "";
   export let additonalSelectedOptionText: string = "";
+  export let additionalSelectedOptionHeading = "";
+  export let additionalType: "environment" | "other" | "memberinfo" = "other";
 
   export let onclick: (tab: string) => void;
   export let dropDownType: {
@@ -52,9 +56,33 @@
   };
 
   let isOpen: boolean = false;
+  let isHover = false;
+
+  function handleDropdownClick(event: MouseEvent) {
+    const dropdownElement = document.getElementById(
+      `${dropdownId}-dropdown-${dropDownType.title}`,
+    );
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      isOpen = false;
+      isHover = false;
+    }
+  }
 
   const toggleDropdown = () => {
     isOpen = !isOpen;
+    isHover = !isHover;
+    const dataElements = document.getElementsByClassName("dropdown-data");
+    const headingElements = document.getElementsByClassName("dropdown-btn");
+    for (const box of dataElements) {
+      if (box.id !== `${dropdownId}-options-container`) {
+        box.classList.remove("dropdown-active");
+      }
+    }
+    for (const box of headingElements) {
+      if (box.id !== `${dropdownId}-btn-div`) {
+        box.classList.remove("dropdown-btn-hover");
+      }
+    }
     if (mixpanelEvent && mixpanelEvent !== Events.NO_EVENT) {
       MixpanelEvent(mixpanelEvent);
     }
@@ -70,16 +98,6 @@
       if (!selectedOption && dropDownType.type !== "checkbox") {
         selectedOption = data[0];
       }
-    }
-  }
-
-  function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(
-      `${dropdownId}-dropdown-${dropDownType.title}`,
-    ) as HTMLElement;
-
-    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-      isOpen = false;
     }
   }
 
@@ -156,7 +174,7 @@
         id={`${dropdownId}-btn-div`}
         class="dropdown-btn d-flex align-items-center justify-content-between {isOpen
           ? activeClasses
-          : ''}"
+          : ''} {isHover ? 'dropdown-btn-hover' : ''} "
         on:mouseenter={() => {
           handleHover(`${dropdownId}-btn-div`, "add");
         }}
@@ -195,6 +213,28 @@
               {/each}
             </div>
           {/if}
+        {:else if additionalSelectedOptionHeading && additionalType === "other"}
+          <p
+            class="{disabled
+              ? 'disabled-text'
+              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+              ? selectedOption.selectedOptionClasses
+              : ''}"
+          >
+            {additonalSelectedOptionText}
+          </p>
+          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
+            >{additionalSelectedOptionHeading}</span
+          >
+        {:else if additionalType === "environment"}
+          {#if selectedOption?.id === "none"}
+            <p class=" mb-0 ellipsis text-textColor">Select Environment</p>
+          {:else}
+            <p class=" mb-0 ellipsis">
+              <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
+              {selectedOption?.name}
+            </p>
+          {/if}
         {:else}
           <p
             class="{disabled
@@ -209,13 +249,13 @@
             >{additonalSelectedOptionText}</span
           >
         {/if}
-        <span class:dropdown-logo-active={isOpen}
-          ><img
-            style="margin-left:10px; height:12px; width:12px;"
-            src={dropdown}
-            alt=""
-          /></span
-        >
+        <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
+          <Dropdown
+            height={12}
+            width={12}
+            color={disabled ? "var(--sparrow-text-color)" : "white"}
+          />
+        </span>
       </div>
     {:else}
       <div id={`${dropdownId}-img`}>
@@ -227,14 +267,18 @@
     class="d-none dropdown-data border-1 border-dropdownBorderColor rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
+    style={`${dropdownDataContainer} ${
+      additionalType === "memberinfo" ? "right: 5%" : ""
+    }`}
   >
     {#each data as list}
       <div
         id="{dropdownId}-options-div"
-        class="d-flex px-2 py-1 justify-content-between highlight text-break {list?.hide ===
-        true
+        class="d-flex px-2 py-1 highlight text-break {list?.hide === true
           ? 'd-none'
-          : ''}"
+          : ''}
+          {dropDownType.type !== 'checkbox' ? 'justify-content-between' : ''}
+          "
         on:click={(event) => {
           event.stopPropagation();
           if (dropDownType.type === "checkbox") {
@@ -245,9 +289,14 @@
           }
         }}
       >
+        {#if dropDownType.type === "checkbox"}
+          <label class="me-1">
+            <input type="checkbox" bind:checked={list.checked} />
+          </label>
+        {/if}
         <p
           class="m-0 {list?.dynamicClasses}"
-          style="font-size: 12px;"
+          style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
           id="{dropdownId}-options-name"
           class:selected-request={list.id === selectedOption?.id}
         >
@@ -260,10 +309,6 @@
 
         {#if selectedOption?.id === list.id && dropDownType.type === "text"}
           <img src={checkIcon} alt="" />
-        {:else if dropDownType.type === "checkbox"}
-          <label>
-            <input type="checkbox" bind:checked={list.checked} />
-          </label>
         {:else if list?.img}
           <img src={list.img} />
         {/if}
@@ -288,7 +333,7 @@
     color: white;
     position: absolute;
     z-index: 2;
-    background-color: var(--blackColor);
+    background-color: var(--background-dropdown);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
@@ -317,5 +362,8 @@
 
   .disabled-text {
     color: var(--sparrow-text-color) !important;
+  }
+  .dropdown-btn-hover {
+    background-color: var(--border-color);
   }
 </style>

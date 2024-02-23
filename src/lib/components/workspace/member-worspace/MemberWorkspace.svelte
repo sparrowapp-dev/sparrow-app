@@ -117,6 +117,7 @@
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
+          additionalType={"memberinfo"}
         />
       {:else}
         <Dropdown
@@ -161,6 +162,7 @@
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
+          additionalType={"memberinfo"}
         />
       {/if}
     </div>

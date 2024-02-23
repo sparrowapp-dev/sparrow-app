@@ -11,10 +11,8 @@
     workspaceDocumentWithPosition,
   } from "$lib/utils/interfaces";
   import type { MemberPopType } from "$lib/utils/types/common.type";
-  
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
-  
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export let user: userDetails;
   export let teamRole: TeamRole;
@@ -85,29 +83,40 @@
     <div class="position">
       {#if (userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)) || (userType === TeamRole.TEAM_ADMIN && isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_MEMBER : user.role === TeamRole.TEAM_MEMBER)}
         <Dropdown
-         dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
+          dropDownType={{
+            type: "text",
+            title: isWorkspaceMemberInfo ? teamRole : user.role,
+          }}
           data={getPermissionsData()}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
+          additionalType={"memberinfo"}
         />
-        
       {:else if userType === TeamRole.TEAM_OWNER && (isWorkspaceMemberInfo ? teamRole === TeamRole.TEAM_ADMIN : user.role === TeamRole.TEAM_ADMIN)}
         <Dropdown
           data={getPermissionsData()}
-          dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
+          dropDownType={{
+            type: "text",
+            title: isWorkspaceMemberInfo ? teamRole : user.role,
+          }}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
+          additionalType={"memberinfo"}
         />
       {:else}
         <Dropdown
           disabled={true}
           data={getPermissionsData()}
-          dropDownType={{type:"text",title:isWorkspaceMemberInfo ? teamRole : user.role}}            
+          dropDownType={{
+            type: "text",
+            title: isWorkspaceMemberInfo ? teamRole : user.role,
+          }}
           onclick={isWorkspaceMemberInfo
             ? handleDropDownWorkspaceLevel
             : handleDropdown}
+          additionalType={"memberinfo"}
         />
       {/if}
     </div>

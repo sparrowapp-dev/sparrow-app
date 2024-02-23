@@ -367,7 +367,8 @@
     type: "text",
     title: currentWorkspace ? `${currentWorkspace?.id}` : "",
   }}
-  additonalSelectedOptionText={`/${currentTeam?.name}`}
+  additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
+  additonalSelectedOptionText={`${currentTeam?.name}`}
   staticCustomStyles={[
     { id: "header-dropdown-btn-div", styleKey: "maxWidth", styleValue: "15vw" },
   ]}
