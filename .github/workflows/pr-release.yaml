@@ -1,4 +1,4 @@
-name: App Center Release
+name: App Center-Release
 
 on:
   pull_request:
