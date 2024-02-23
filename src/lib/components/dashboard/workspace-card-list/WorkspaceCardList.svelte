@@ -40,8 +40,7 @@
     if (!(openTeam?.admins?.includes(userId) || openTeam?.owner == userId)) {
       workspacePerPage = 6;
       isAdminOrOwner = false;
-    }
-    else{
+    } else {
       workspacePerPage = 5;
       isAdminOrOwner = true;
     }
@@ -126,7 +125,7 @@
               .toLowerCase()
               .includes(filterText.toLowerCase())).length > 0}
       <div
-        class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
+        class="justify-content-between bottom-0 position-absolute w-75 bg-backgroundColor d-flex"
       >
         <div class="tab-head">
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
@@ -152,7 +151,8 @@
         <div class="tab-head tab-change">
           <button
             on:click={() => (
-              (currPage = 1), (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
+              (currPage = 1),
+              (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
             )}
             class="bg-transparent border-0"
             ><DoubleLeftIcon
