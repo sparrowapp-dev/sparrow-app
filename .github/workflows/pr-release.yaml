@@ -1,8 +1,7 @@
-name: App Center Release
+name: App Center-Release
 
 on:
-  pull_request_target:
-    types: [opened, reopened, edited]
+  push:
     branches:
       - feat/onboarding-v2
 
@@ -49,10 +48,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
       - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_0.0.0_x64_en-US.msi.zip.sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
   
       - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_0.0.0_x64-setup.nsis.zip.sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
@@ -60,7 +59,7 @@ jobs:
            $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
            $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
            Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_0.0.0_x64_en-US.msi"
+           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
            
       - name: Install App Center CLI
         run: |
@@ -70,14 +69,14 @@ jobs:
 
       - name: Get PR Branch Name
         id: pr_branch
-        run: echo "::set-output name=branch::$(echo ${{ github.head_ref }})"
+        run: echo "::set-output name=branch::${{ github.head_ref }}"
       
       - name: Upload to App Center
         run: |
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           $branch_name = "${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
-          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_0.0.0_x64_en-US.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
         if: always()
@@ -135,7 +134,7 @@ jobs:
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           branch_name="${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
-          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_0.0.0_x64.dmg -g Collaborators --app techdome/Sparrow-1 --build-version branch-${branch_name} --build-number ${{ github.run_number }}
+          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version branch-${branch_name} --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
         if: always()

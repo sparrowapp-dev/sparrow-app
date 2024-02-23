@@ -13,7 +13,7 @@
         "minHeight": 700,
         "minWidth": 1200,
         "resizable": true,
-        "title": "sparrow-app",
+        "title": "Sparrow",
         "shadow": true
       }
     ],
@@ -34,7 +34,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "targets": "all"
+    "targets": "all",
+    "windows": {
+      "wix": {
+        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs"],
+        "componentRefs": ["DeepLinkRegistryEntries"]
+      }
+    }
   },
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
@@ -50,6 +56,6 @@
       "domains": []
     }
   },
-  "productName": "sparrow-app",
+  "productName": "Sparrow",
   "version": "0.0.0"
 }

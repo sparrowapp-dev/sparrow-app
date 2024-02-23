@@ -1,10 +1,10 @@
 [package]
 name = "sparrow-app"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+description = "Sparrow"
+authors = ["sparrow"]
+license = "https://github.com/sparrowapp-dev/sparrow-app/blob/main/LICENSE"
+repository = "https://github.com/sparrowapp-dev/sparrow-app"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -27,8 +27,6 @@ tokio-util = { version = "0.6", features = ["full"] }
 tauri-plugin-os = "2.0.0-beta.0"
 tauri-plugin-updater = "2.0.0-beta"
 tauri-plugin-process = "2.0.0-beta"
-[target.'cfg(target_os = "windows")'.dependencies]
-winreg = "0.52.0"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 
