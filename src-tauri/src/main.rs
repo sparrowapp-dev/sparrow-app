@@ -24,13 +24,6 @@ use urlencoded_handler::make_www_form_urlencoded_request;
 #[macro_use]
 extern crate objc;
 
-#[cfg(target_os = "windows")]
-use std::path::Path;
-#[cfg(target_os = "windows")]
-use winreg::enums::*;
-#[cfg(target_os = "windows")]
-use winreg::RegKey;
-
 // Commands
 #[tauri::command]
 fn zoom_window(window: tauri::Window, scale_factor: f64) {
@@ -190,31 +183,6 @@ async fn make_request(
     return Ok(combined_json.to_string());
 }
 
-#[cfg(target_os = "windows")]
-fn set_registry_key() -> std::io::Result<()> { // This functions enables deep linking in windows.
-    let hkcr = RegKey::predef(HKEY_CLASSES_ROOT);
-    let path = Path::new("sparrow")
-        .join("shell")
-        .join("open")
-        .join("command");
-
-    // Check if the command key already exists
-    if let Ok(_existing_command_key) = hkcr.open_subkey(&path) {
-        return Ok(());
-    }
-
-    // Create registry key with path sparrow/shell/open/command
-    let (command_key, disp) = hkcr.create_subkey(&path)?;
-
-    // Open newly created sparrow key and set required values in it
-    let sparrow_key = hkcr.open_subkey_with_flags("sparrow", KEY_ALL_ACCESS)?;
-    sparrow_key.set_value("", &"Sparrow")?;
-    sparrow_key.set_value("URL Protocol", &"")?;
-
-    // Set Default value of command key to app install location
-    command_key.set_value("", &"C:\\Program Files\\sparrow-app\\sparrow-app.exe")?;
-    Ok(())
-}
 // Sturct Types
 #[derive(Clone, serde::Serialize)]
 struct Payload {
@@ -243,8 +211,6 @@ fn main() {
             #[cfg(desktop)]
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
-            #[cfg(target_os = "windows")]
-            set_registry_key().expect("Failed to set registry keys");
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
