@@ -752,7 +752,7 @@
           {:else if path.length === 0}
             <div>
               <p class="w-100 save-text-clr text-center sparrow-fs-12">
-                {RequestConstant.bestPractice}
+                {bestPractice}
               </p>
               <div class="w-100 d-flex justify-content-center">
                 <Button
