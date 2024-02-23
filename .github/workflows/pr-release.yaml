@@ -76,24 +76,12 @@ jobs:
           $branch_name = "${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
       
-      # - name: Upload to App Center
-      #   run: |
-      #     appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-      #     $branch_name = "${{ steps.pr_branch.outputs.branch }}"
-      #     echo "Branch Name: $branch_name"
-      #     appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
-      
-      - name: upload artefact to App Center
-        uses: wzieba/AppCenter-Github-Action@v1
-        with:
-          appName: wzieba/Sample-App
-          token: ${{ secrets.APPCENTER_API_TOKEN }}
-          group: Collaborators
-          file: D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi
-          buildNumber: ${{ github.run_number }}
-          buildVersion: "branch-$branch_name"
-          notifyTesters: true
-          debug: false
+      - name: Upload to App Center
+        run: |
+          appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
+          $branch_name = "${{ steps.pr_branch.outputs.branch }}"
+          echo "Branch Name: $branch_name"
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_0.0.0_x64_en-US.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
       
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
