@@ -11,7 +11,7 @@
         "fullscreen": false,
         "label": "main",
         "minHeight": 700,
-        "minWidth": 570,
+        "minWidth": 1200,
         "resizable": true,
         "title": "sparrow-app",
         "shadow": true
