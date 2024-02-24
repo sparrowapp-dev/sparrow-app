@@ -58,10 +58,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
   }
 };
 export async function handleLoginV2(url: string) {
-  console.log("url", url);
   const params = new URLSearchParams(url.split("?")[1]);
   const accessToken = params.get("accessToken");
-  console.log("at", accessToken);
   const refreshToken = params.get("refreshToken");
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
@@ -76,6 +74,8 @@ export async function handleLoginV2(url: string) {
     notifications.success("Login successful!");
     navigate("/dashboard/workspaces");
     await resizeWindowOnLogin();
+  } else {
+    notifications.error("Invalid token!");
   }
 }
 

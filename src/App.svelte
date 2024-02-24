@@ -14,6 +14,7 @@
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
+  import EntryPoint from "./pages/Auth/entry-point/EntryPoint.svelte";
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
@@ -28,6 +29,7 @@
   import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
+  import { listen } from "@tauri-apps/api/event";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -61,8 +63,8 @@
   });
 
   onMount(async () => {
-    console.log("running");
     await onOpenUrl(handleDeepLinkHandler);
+    await listen("deep-link-urls", handleDeepLinkHandler);
 
     let isloggedIn;
     user.subscribe((value) => {
@@ -85,15 +87,15 @@
       <Route path="/*"><Navigate to="/dashboard" /></Route>
     </section>
     <section slot="unauthorized">
-      <Route path="/forgot/password" component={ForgotPassword} />
+      <Route path="/init" component={EntryPoint} />
+      <!-- <Route path="/forgot/password" component={ForgotPassword} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/update/password" component={UpdatePassword} />
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/waiting" component={Waiting} />
-      <Route path="/welcome" component={WelcomeScreen} />
-
-      <Route path="/*"><Navigate to="/login" /></Route>
+      <Route path="/welcome" component={WelcomeScreen} /> -->
+      <Route path="/*"><Navigate to="/init" /></Route>
     </section>
   </Authguard>
 </Router>
