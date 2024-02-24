@@ -61,7 +61,7 @@
     );
     if (response && response.data) {
       notifications.success(
-        `${currentWorkspaceDetails.name}is removed from ${currentTeamDetails.name}`,
+        `${currentWorkspaceDetails.name} is removed from ${currentTeamDetails.name}`,
       );
       navigate("/dashboard/workspaces");
     } else {
