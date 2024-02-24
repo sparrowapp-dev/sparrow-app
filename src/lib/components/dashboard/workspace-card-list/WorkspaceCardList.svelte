@@ -125,7 +125,7 @@
               .toLowerCase()
               .includes(filterText.toLowerCase())).length > 0}
       <div
-        class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
+        class="justify-content-between bottom-0 position-absolute w-75 bg-backgroundColor d-flex"
       >
         <div class="tab-head">
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -

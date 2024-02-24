@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getCurrent } from "@tauri-apps/api/window";
   import { Observable } from "rxjs";
-  import HeaderDropdown from "./HeaderDashboardDropdown.svelte"
+  import HeaderDropdown from "./HeaderDashboardDropdown.svelte";
   import icons, {
     NotifyIcon,
     SearchIcon,
@@ -185,7 +185,6 @@
     isWorkspaceLoaded.set(true);
   };
 
-
   onDestroy(() => {
     workspaceSubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
@@ -267,8 +266,8 @@
         {collectionsMethods}
         {activeSideBarTabMethods}
         {activeWorkspaceId}
-        allworkspaces={allworkspaces}
-      /> 
+        {allworkspaces}
+      />
     </div>
   </div>
 
@@ -593,7 +592,7 @@
     border-radius: 4px;
     border: none;
     outline: none;
-    padding: 6px 12px;
+    padding: 5px 12px;
   }
   .search-container {
     border: 1px solid transparent;
@@ -640,7 +639,7 @@
       display: none !important;
     }
     .input-search-bar {
-      padding: 6px;
+      padding: 5px;
       padding-left: 32px;
     }
   }

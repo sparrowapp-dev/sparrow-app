@@ -81,7 +81,10 @@
   style="width:calc(100% - 280px); margin-top: 15px;padding:24px;"
 >
   <div class="workspace-setting-header">
-    <p class="workspace-name" style="font-size: 18px;">
+    <p
+      class="workspace-name w-50 overflow-hidden text-truncate"
+      style="font-size: 18px;"
+    >
       {currentWorkspaceDetails.name}
     </p>
     {#if hasPermission}
