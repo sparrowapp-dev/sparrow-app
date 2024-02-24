@@ -13,10 +13,12 @@
   import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
+  import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
+  import { handleDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
 
   import { onMount } from "svelte";
 
@@ -59,6 +61,9 @@
   });
 
   onMount(async () => {
+    console.log("running");
+    await onOpenUrl(handleDeepLinkHandler);
+
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

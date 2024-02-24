@@ -57,6 +57,27 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     throw "error login user: " + response.message;
   }
 };
+export async function handleLoginV2(url: string) {
+  console.log("url", url);
+  const params = new URLSearchParams(url.split("?")[1]);
+  const accessToken = params.get("accessToken");
+  console.log("at", accessToken);
+  const refreshToken = params.get("refreshToken");
+  if (accessToken && refreshToken) {
+    const userDetails = jwtDecode(accessToken);
+    setAuthJwt(constants.AUTH_TOKEN, accessToken);
+    setAuthJwt(constants.REF_TOKEN, refreshToken);
+    setUser(jwtDecode(accessToken));
+    sendUserDataToMixpanel(userDetails);
+    MixpanelEvent(Events.USER_LOGIN, {
+      Login_Method: "Email",
+      Success: true,
+    });
+    notifications.success("Login successful!");
+    navigate("/dashboard/workspaces");
+    await resizeWindowOnLogin();
+  }
+}
 
 //------------------------- Handle Login Validation -----------------//
 export const handleLoginValidation = async (
