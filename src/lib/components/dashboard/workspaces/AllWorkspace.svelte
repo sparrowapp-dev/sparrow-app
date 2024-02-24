@@ -190,8 +190,8 @@
           .toLowerCase()
           .startsWith(filterText.toLowerCase()))
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
-      <table class="w-100">
-        <tfoot class="bottom-0">
+      <table class="w-75 position-absolute bottom-0">
+        <tfoot>
           <tr class="d-flex justify-content-between">
             <th class="tab-head"
               >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
