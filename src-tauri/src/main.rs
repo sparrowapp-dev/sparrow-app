@@ -1,5 +1,4 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![windows_subsystem = "windows"]
+
 
 mod config;
 mod formdata_handler;
@@ -16,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::env;
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
@@ -208,7 +208,14 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
-            println!("{}, {argv:?}, {cwd}", app.package_info().name);
+            println!("{}, {argv:?}, {cwd}", app.package_info().name);         
+            app.emit(
+                "deep-link-urls",
+                Payload {
+                    url: argv[1].to_string(),
+                },
+            )
+            .unwrap();
         }))
         .setup(|app| {
             #[cfg(desktop)]
