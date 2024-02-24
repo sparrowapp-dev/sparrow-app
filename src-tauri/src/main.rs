@@ -208,7 +208,13 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
-            println!("{}, {argv:?}, {cwd}", app.package_info().name);
+            app.emit(
+                "deep-link-urls",
+                Payload {
+                    url: argv[1].to_string(),
+                },
+            )
+            .unwrap();
         }))
         .setup(|app| {
             #[cfg(desktop)]
