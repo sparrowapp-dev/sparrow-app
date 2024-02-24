@@ -289,8 +289,8 @@
                 />
               {/if}
               <p
-                class="mb-0 text-whiteColor"
-                style="font-size: 14px; font-weight:400;"
+                class="mb-0 text-whiteColor sparrow-fs-14"
+                style="font-weight:400;"
               >
                 Save Request
               </p>

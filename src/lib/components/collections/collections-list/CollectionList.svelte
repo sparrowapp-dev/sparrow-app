@@ -390,10 +390,10 @@
 {#if collapsExpandToggle}
   <div>
     <button
-      class="border-0 rounded pb-3 pe-1 angleRight"
+      class="border-0 pb-5 angleRight"
       style="display: {collapsExpandToggle
         ? 'block'
-        : 'none'};position: absolute;left:72px;top: 100px;width:16px;height:86px;z-index:{collapsExpandToggle
+        : 'none'};position: absolute;left:72px;top: 95px;width:16px;height:92px;z-index:{collapsExpandToggle
         ? '2'
         : '0'}"
       on:click={setcollapsExpandToggle}
@@ -407,7 +407,10 @@
         }}
         class:view-active={selectedView === "grid"}
       />
-      <div style="transform: rotate(270deg);font-size:10px;" class="mt-3 mb-2">
+      <div
+        style="transform: rotate(270deg);font-size:10px; color:var(--sparrow-text-color)"
+        class="mt-3 ml-2"
+      >
         Collections
       </div>
     </button>
@@ -691,6 +694,8 @@
 
   .angleRight {
     background-color: var(--blackColor);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
   }
   .angleRight:hover {
     color: var(--blackColor);
