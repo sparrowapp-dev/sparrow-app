@@ -1,3 +1,6 @@
+// Prevents additional console window on Windows in release, DO NOT REMOVE!!
+#![windows_subsystem = "windows"]
+
 mod config;
 mod formdata_handler;
 mod json_handler;
