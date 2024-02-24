@@ -63,8 +63,9 @@
   });
 
   onMount(async () => {
-    await onOpenUrl(handleDeepLinkHandler);
-    await listen("deep-link-urls", handleDeepLinkHandler);
+    const isWin = navigator.platform.toLowerCase().includes("win");
+    if (!isWin) await onOpenUrl(handleDeepLinkHandler);
+    else await listen("deep-link-urls", handleDeepLinkHandler);
 
     let isloggedIn;
     user.subscribe((value) => {
@@ -88,6 +89,10 @@
     </section>
     <section slot="unauthorized">
       <Route path="/init" component={EntryPoint} />
+      <!-- - -->
+      <!-- deprecate - visit sparrow auth repo -->
+      <!-- - -->
+
       <!-- <Route path="/forgot/password" component={ForgotPassword} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />

@@ -38,34 +38,31 @@
       <img src={sparrowIcon} width="60px" alt="" class="" />
     </div>
     <p
-      class="container-header pt-4 pb-0 fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"
-      style="font-size: 28px;"
+      class="container-header pt-4 pb-0 sparrow-fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"
     >
       {title}
     </p>
 
-    <div style="font-size: 14px;text-align:center" class="text-lightGray">
+    <div class="text-center sparrow-fs-14 text-lightGray">
       <p>{description}</p>
     </div>
 
-    <div style="font-size: 14px;text-align:center" class="text-lightGray mt-2">
+    <div class="text-center sparrow-fs-14 text-lightGray mt-2">
       <slot />
     </div>
 
     {#if isSpinner}
       <div
-        style="font-size: 14px;text-align:center"
-        class="text-lightGray d-flex align-items-center justify-content-center mt-3"
+        class="text-lightGray text-center sparrow-fs-14 d-flex align-items-center justify-content-center mt-3"
       >
         <Spinner size={"80px"} />
       </div>
     {:else}
       <div
-        style="font-size: 14px;text-align:center"
-        class="text-lightGray d-flex align-items-center justify-content-center mt-3"
+        class="text-lightGray sparrow-fs-14 text-center d-flex align-items-center justify-content-center mt-3"
       >
         <button
-          class="buttons d-flex justify-content-center align-items-center gap-1"
+          class="buttons d-flex justify-content-center align-items-center gap-1 rounded border-0"
           on:click={buttonClick}
         >
           {buttonText}
@@ -74,7 +71,9 @@
     {/if}
 
     {#if loadingMessage}
-      <div class="welcome-spinner text-lightGray mt-4">
+      <div
+        class="welcome-spinner text-lightGray mt-4 sparrow-fs-12 text-center"
+      >
         <p>{loadingMessage}</p>
       </div>
     {/if}
@@ -116,15 +115,9 @@
     width: 180px;
     height: 32px;
     padding: 4px, 12px, 4px, 4px;
-    border-radius: 4px;
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
-    border: none;
   }
 
-  .welcome-spinner {
-    font-size: 14px;
-    text-align: center;
-  }
   a {
     text-decoration: none;
   }

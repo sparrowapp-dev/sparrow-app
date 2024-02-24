@@ -66,8 +66,7 @@
         <img src={sparrowicon} width="60px" alt="" class="" />
       </div>
       <p
-        class="container-header pt-4 pb-4 fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"
-        style="font-size: 28px;"
+        class="container-header pt-4 pb-4 sparrow-fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"
       >
         Welcome to Sparrow!
       </p>
