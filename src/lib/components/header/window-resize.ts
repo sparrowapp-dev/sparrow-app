@@ -1,27 +1,27 @@
-import { platform } from "@tauri-apps/api/os";
-import { appWindow, currentMonitor, getCurrent } from "@tauri-apps/api/window";
+import { platform } from "@tauri-apps/plugin-os";
+import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 
 export const resizeWindowOnLogin = async () => {
-  const isMaximized = await appWindow.isMaximized();
+  const isMaximized = await getCurrent().isMaximized();
   if (!isMaximized) {
     const platformName = await platform();
-    if (platformName == "darwin") {
+    if (platformName == "macos") {
       const resizeButton = document.getElementById("resize-button");
       if (resizeButton) {
         resizeButton.click();
       }
     } else {
-      await appWindow.maximize();
+      await getCurrent().maximize();
     }
   }
 };
 
 export const resizeWindowOnLogOut = async () => {
-  const isMaximized = await appWindow.isMaximized();
+  const isMaximized = await getCurrent().isMaximized();
   if (isMaximized) {
     const monitor = await currentMonitor();
     const monitorPhysicalSize = await getCurrent().innerSize();
-    const scaleFactor = monitor.scaleFactor;
+    const scaleFactor = monitor!.scaleFactor;
     const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
 
     const minWidth = 570;

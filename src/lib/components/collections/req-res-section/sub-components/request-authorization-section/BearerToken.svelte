@@ -48,7 +48,7 @@
     <p class="col-2 mb-0">Token</p>
     <div class="col-10 position-relative">
       <textarea
-        style="outline: none;"
+        style="outline: none; height:12vh"
         id={"bearer-token-key"}
         class="w-100 bg-backgroundColor border-0 ps-1"
         placeholder="Enter Token"

@@ -16,7 +16,7 @@
     CreateDirectoryPostBody,
   } from "$lib/utils/dto";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
@@ -24,13 +24,18 @@
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import questionIcon from "$lib/assets/question.svg";
+  import QuestionIcon from "$lib/assets/question.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import Button from "$lib/components/buttons/Button.svelte";
   import FileType from "$lib/components/file-types/FileType.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import {
+    bestPractice,
+    dos,
+    donts,
+  } from "$lib/utils/constants/request.constant";
 
   export let collectionsMethods: CollectionsMethods;
   export let onClick;
@@ -747,8 +752,7 @@
           {:else if path.length === 0}
             <div>
               <p class="w-100 save-text-clr text-center sparrow-fs-12">
-                You have no collections in this workspace. Create a Collection
-                to easily organize and use your API requests.
+                {bestPractice}
               </p>
               <div class="w-100 d-flex justify-content-center">
                 <Button
@@ -766,7 +770,7 @@
       {/if}
     </div>
   </div>
-  <div class="col-6">
+  <div class="col-6 ps-5">
     <!-- Right panel  -->
     <div class="d-flex justify-content-between" on:click={handleDropdownClick}>
       <p class="save-text-clr mb-1 sparrow-fs-12">
@@ -778,50 +782,56 @@
           ? 'bg-sparrowBottomBorder'
           : ''} rounded d-flex align-items-center justify-content-center position-relative"
       >
-        <img
+        <span
           on:click={() => {
             instructionEnabled = !instructionEnabled;
           }}
-          src={questionIcon}
-          alt="question"
-        />
+        >
+          <QuestionIcon
+            color={instructionEnabled
+              ? "var(--blackColor)"
+              : "var(--sparrow-text-color)"}
+          />
+        </span>
         {#if instructionEnabled}
-          <div class="bg-blackColor api-name-usage p-2">
-            <p class="text-whiteColor">Best Practices</p>
+          <div class="bg-blackColor api-name-usage p-3">
+            <div class="d-flex justify-content-between">
+              <p class="text-whiteColor">Best Practices</p>
+              <img
+                src={crossIcon}
+                on:click={() => {
+                  instructionEnabled = !instructionEnabled;
+                }}
+                class="mb-4 cursor-pointer"
+                alt=""
+              />
+            </div>
             <p class="save-as-instructions">
-              When naming your requests, remember that resources are at the core
-              of REST. Use nouns to represent your resources, such as 'user
-              accounts' or 'managed devices.' Keep your URIs clear and
-              consistent by using forward slashes to indicate hierarchy, avoid
-              file extensions.
+              {bestPractice}
             </p>
             <div class="d-flex">
               <div class="w-50">
                 <p class="save-as-instructions">Do's:</p>
-                <ul class="save-as-instructions">
-                  <li>Use nouns to represent resources</li>
-                  <li>Use forward slashes for hierarchy</li>
-                  <li>Use hyphens for readability</li>
-                  <li>Use lowercase letters in URIs</li>
-                  <li>Use HTTP methods for CRUD actions</li>
-                </ul>
+                <ol class="save-as-instructions">
+                  {#each dos as para}
+                    <li>{para}</li>
+                  {/each}
+                </ol>
               </div>
               <div class="w-50">
                 <p class="save-as-instructions">Don'ts:</p>
-                <ul class="save-as-instructions">
-                  <li>Don't use file extensions.</li>
-                  <li>Don't use underscores in URIs.</li>
-                  <li>Don't use verbs in the URIs.</li>
-                  <li>Don't put CRUD function names in URIs.</li>
-                  <li>Don't use capital letters in URIs.</li>
-                </ul>
+                <ol class="save-as-instructions">
+                  {#each donts as para}
+                    <li>{para}</li>
+                  {/each}
+                </ol>
               </div>
             </div>
           </div>
         {/if}
       </span>
     </div>
-    <div class="pb-2">
+    <div class="pb-2 pt-1">
       <input
         type="text"
         style="width: 100%; {tabName?.length === 0
@@ -1004,16 +1014,16 @@
   }
   .api-name-usage {
     position: absolute;
-    top: 25px;
+    top: 29px;
     right: 0;
-    width: 521px;
+    width: 2000%;
     border-radius: 8px;
   }
   .save-as-instructions {
     font-size: 12px;
     color: #cccccc;
   }
-  ul.save-as-instructions {
+  ol.save-as-instructions {
     padding-left: 15px;
   }
   .instruction-btn {

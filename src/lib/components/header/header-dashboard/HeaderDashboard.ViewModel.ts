@@ -5,7 +5,7 @@ import { WorkspaceService } from "$lib/services/workspace.service";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
 
 import { clearAuthJwt } from "$lib/utils/jwt";
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { resizeWindowOnLogOut } from "../window-resize";
 import {
@@ -21,7 +21,6 @@ import type { Observable } from "rxjs";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-import { setCurrentWorkspace, setOpenedTeam } from "$lib/store";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type {
   addUsersInWorkspace,
@@ -154,12 +153,12 @@ export class HeaderDashboardViewModel {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
-    if (
-      response?.isSuccessful &&
-      response?.data?.data &&
-      response?.data?.data?.length > 0
-    ) {
-      for (const elem of response.data.data) {
+    const {
+      isSuccessful,
+      data: { data: res },
+    } = response;
+    if (isSuccessful && res) {
+      for (const elem of res) {
         const {
           _id,
           name,
@@ -202,8 +201,6 @@ export class HeaderDashboardViewModel {
   // logout to frontend - clears local db, store, and cookies.
   public clientLogout = async (): Promise<void> => {
     setUser(null);
-    setCurrentWorkspace("", "");
-    setOpenedTeam("", "", {});
     await requestResponseStore.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();

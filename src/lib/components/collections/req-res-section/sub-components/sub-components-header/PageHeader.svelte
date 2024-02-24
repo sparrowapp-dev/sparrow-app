@@ -26,13 +26,11 @@
   } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  let display: boolean = false;
-  window.addEventListener("click", () => {
-    display = false;
-  });
+
   let visibility: boolean = false;
   const handleBackdrop = (flag) => {
     visibility = flag;
@@ -132,6 +130,7 @@
         collectionsMethods.updateTab(false, "saveInProgress", _id);
       }
     }
+    notifications.success("API request saved");
   };
 
   let handleInputValue = () => {
@@ -356,10 +355,9 @@
               disabled
               class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
             >
-              <img src={lockicon} alt="lock-icon" />
               <p
-                class="mb-0 text-whiteColor"
-                style="font-size: 14px; font-weight:400"
+                class="mb-0 text-whiteColor sparrow-fs-14"
+                style="font-weight:400"
               >
                 Share
               </p>

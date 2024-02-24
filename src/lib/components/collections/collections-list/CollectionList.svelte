@@ -49,14 +49,13 @@
 
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { username } from "$lib/store/auth.store";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { setCurrentWorkspace } from "$lib/store";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
@@ -185,10 +184,6 @@
         }
         currentWorkspaceName = activeWorkspaceRxDoc.get("name");
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        setCurrentWorkspace(
-          activeWorkspaceRxDoc.get("_id"),
-          activeWorkspaceRxDoc.get("name"),
-        );
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
           const response =
@@ -455,27 +450,19 @@
   </div>
   <div class="px-3 pt-2">
     <Dropdown
-      mixpanelEvent={Events.ENVIRONMENT_SIDE_PANEL}
       dropdownId={"hash129"}
       data={[
         {
-          name: "Select Environment",
+          name: "None",
           id: "none",
           type: environmentType.LOCAL,
-          hide: true,
-          selectedOptionClasses: "mb-0 ellipsis text-textColor",
         },
-        {
-          name: "None",
-          id: "",
-          type: environmentType.LOCAL,
-        },
-
         ...environments,
       ].filter((elem) => {
         elem["dynamicClasses"] = "text-whiteColor";
         return elem.type === environmentType.LOCAL;
       })}
+      additionalType={"environment"}
       onclick={handleDropdown}
       dropDownType={{ type: "text", title: currentEnvironment?.id }}
       staticClasses={[
@@ -487,7 +474,7 @@
       hoverClasses={[
         {
           id: "hash129-btn-div",
-          classToAdd: ["border-bottom","border-labelColor"],
+          classToAdd: ["border-bottom", "border-labelColor"],
         },
       ]}
     ></Dropdown>
@@ -546,7 +533,11 @@
         )}
         dropDownType={{ type: "img", title: plusIcon }}
         staticCustomStyles={[
-          { id: "collectionDropdown-options-container", styleKey: "minWidth", styleValue: "160px" },
+          {
+            id: "collectionDropdown-options-container",
+            styleKey: "minWidth",
+            styleValue: "160px",
+          },
         ]}
         data={[
           {
@@ -570,10 +561,10 @@
             id: "collectionDropdown-options-div",
             classToAdd: ["border-bottom"],
           },
-          
+
           {
             id: "collectionDropdown-options-container",
-            classToAdd: ["end-0","mt-1"],
+            classToAdd: ["end-0", "mt-1"],
           },
         ]}
       ></Dropdown>
@@ -662,14 +653,18 @@
               />
             {/each}
           </List>
+        {:else}
+          <EmptyCollection
+            {loggedUserRoleInWorkspace}
+            {handleCreateCollection}
+            {collectionsMethods}
+            {currentWorkspaceId}
+            {showDefault}
+          />
         {/if}
-        <EmptyCollection
-          {loggedUserRoleInWorkspace}
-          {handleCreateCollection}
-          {collectionsMethods}
-          {showDefault}
-          {currentWorkspaceId}
-        />
+      {/if}
+      {#if searchData !== "" && !filteredCollection.length && !filteredFolder.length && !filteredFile.length}
+        <span class="not-found-text mx-auto ellipsis">No results found</span>
       {/if}
     </div>
   </div>
