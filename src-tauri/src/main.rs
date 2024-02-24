@@ -16,11 +16,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::{thread, time};
 use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
-use window_shadows::set_shadow;
 
 #[cfg(target_os = "macos")]
 #[macro_use]
@@ -29,10 +27,10 @@ extern crate objc;
 // Commands
 #[tauri::command]
 fn zoom_window(window: tauri::Window, scale_factor: f64) {
-    let _ = window.with_webview(move |webview| {
+    let main_webview = window.get_webview_window("main").unwrap();
+    let _ = main_webview.with_webview(move |webview| {
         #[cfg(windows)]
         unsafe {
-            // see https://docs.rs/webview2-com/0.19.1/webview2_com/Microsoft/Web/WebView2/Win32/struct.ICoreWebView2Controller.html
             webview.controller().SetZoomFactor(scale_factor).unwrap();
         }
 
@@ -74,46 +72,8 @@ fn fetch_file_command() -> String {
 }
 
 #[tauri::command]
-async fn open_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth");
-    if oauth_window == None {
-        tauri::WindowBuilder::new(
-            &handle,
-            "oauth", /* the unique window label */
-            tauri::WindowUrl::External(
-                "https://dev-api.sparrow.techdomeaks.com/api/auth/google"
-                    .parse()
-                    .unwrap(),
-            ),
-        )
-        .title("")
-        .build()
-        .unwrap();
-    } else {
-        let oauth_window = handle.get_window("oauth").unwrap();
-        let _ = oauth_window.eval(&format!(
-            "window.location.replace('https://dev-api.sparrow.techdomeaks.com/api/auth/google')"
-        ));
-        let one_sec = time::Duration::from_secs(1);
-        thread::sleep(one_sec);
-
-        let _ = oauth_window.center();
-        let _ = oauth_window.show();
-    }
-    let oauth_window = handle.get_window("oauth").unwrap();
-    oauth_window
-        .emit(
-            "onclose",
-            OnClosePayload {
-                message: "Window Close Event".into(),
-            },
-        )
-        .unwrap();
-}
-
-#[tauri::command]
 async fn close_oauth_window(handle: tauri::AppHandle) {
-    let oauth_window = handle.get_window("oauth").unwrap();
+    let oauth_window = handle.get_webview_window("oauth").unwrap();
     let _ = oauth_window.eval(&format!(
         "window.location.replace('https://accounts.google.com/logout')"
     ));
@@ -244,26 +204,29 @@ struct MyResponse {
 fn main() {
     // Initiate Tauri Runtime
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.handle()
+                .plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
             fetch_file_command,
-            open_oauth_window,
             close_oauth_window,
             make_http_request,
             zoom_window
         ])
-        .setup(|app| {
-            let window = app.get_window("main").unwrap();
-            set_shadow(&window, true).expect("Unsupported platform!");
-            Ok(())
-        })
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
                 wry_window
-                    .emit_all(
+                    .emit(
                         "receive-login",
                         Payload {
-                            url: _payload.url().into(),
+                            url: _payload.url().to_string(),
                         },
                     )
                     .unwrap();

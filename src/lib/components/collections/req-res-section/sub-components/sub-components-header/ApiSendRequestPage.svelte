@@ -347,7 +347,11 @@
         dropdownId="api-request"
         dropDownType={{ type: "text", title: method ? method : "" }}
         staticCustomStyles={[
-          { id: "api-request-options-container", styleKey: "minWidth", styleValue: "120px" },
+          {
+            id: "api-request-options-container",
+            styleKey: "minWidth",
+            styleValue: "120px",
+          },
         ]}
         staticClasses={[
           {
@@ -356,7 +360,7 @@
           },
           {
             id: "api-request-options-container",
-            classToAdd: ["start-0","bg-backgroundDropdown"],
+            classToAdd: ["start-0", "bg-backgroundDropdown"],
           },
         ]}
         data={[

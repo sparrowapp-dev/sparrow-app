@@ -8,7 +8,7 @@
   } from "$lib/utils/interfaces/environment.interface";
   import { onDestroy } from "svelte";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
@@ -120,6 +120,7 @@
         workspaceId: currentWorkspace._id,
       });
       notifications.success("New Environment Created!");
+      MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
       notifications.error("Failed to create environment. Please try again.");

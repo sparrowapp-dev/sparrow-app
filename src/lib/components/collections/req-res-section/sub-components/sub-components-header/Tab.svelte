@@ -54,7 +54,7 @@
           <img
             src={folderTab}
             alt="folder-tab"
-            style="width: 32px;heigh:25px;margin-right:5px;"
+            style="width: 30px;heigh:24px;margin-right:5px;"
           /></span
         >
       {:else if tab.type === ItemType.COLLECTION}

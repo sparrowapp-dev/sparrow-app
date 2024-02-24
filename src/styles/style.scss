@@ -167,7 +167,7 @@ $theme-colors: map-merge(
 
 
 // Define a map for font sizes in pixels
-$font-sizes: (
+$sparrow-font-sizes: (
   8: 0.5rem, // 8px in rem
   9: 0.5625rem, // 9px in rem
   10: 0.625rem, // 10px in rem
@@ -185,11 +185,11 @@ $font-sizes: (
 );
 
 // Generate utility classes for font sizes
-@each $size, $value in $font-sizes {
-  .sparrow-fs-#{$size} {
-    font-size: $value;
+  @each $size, $value in $sparrow-font-sizes {
+    .sparrow-fs-#{$size} {
+      font-size: $value;
+    }
   }
-}
 
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/mixins";
@@ -256,4 +256,8 @@ body {
     color: #FE8C98;
     background-color: #230408;
   }
+}
+
+textarea {
+  resize: none;
 }

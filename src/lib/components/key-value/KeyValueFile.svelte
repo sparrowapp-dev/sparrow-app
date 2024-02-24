@@ -1,10 +1,14 @@
 <script lang="ts">
+  /**
+   * @deprecated This component is deprecated and will be removed in future releases.
+   * Please use KeyValue Component instead.
+   */
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import { onDestroy } from "svelte";
   import type { KeyValuePairWithBase } from "$lib/utils/interfaces/request.interface";
   import close from "$lib/assets/close.svg";
-  import { invoke } from "@tauri-apps/api";
+  import { invoke } from "@tauri-apps/api/core";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
   export let keyValue: KeyValuePairWithBase[];

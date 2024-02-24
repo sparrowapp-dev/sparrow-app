@@ -11,7 +11,7 @@
   import { ShowMoreOptions, UserProfileList } from "$lib/components";
   import type { TeamDocument } from "$lib/database/app.database";
   import { WorkspaceMemberRole } from "$lib/utils/enums";
-  import type { CurrentTeam } from "$lib/utils/interfaces/team.interface";
+  import type { CurrentTeam, Team } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
   import type { Observable } from "rxjs";
   import { navigate } from "svelte-navigator";
@@ -21,12 +21,11 @@
   export let userId: string;
   export let data: any;
   export let selectedTab: string;
-  export let openedTeam: CurrentTeam;
   export let handleWorkspaceSwitch: any;
   export let activeSideBarTabMethods: any;
   export let handleWorkspaceTab: any;
-  export let currOpenedTeamRxDoc: Observable<TeamDocument>;
-  export let userType;
+  export let userType = "";
+  export let openTeam: Team;
 
   let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
@@ -46,9 +45,9 @@
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
-      openedTeam.id,
-      openedTeam.name,
-      openedTeam.base64String,
+      openTeam?.teamId,
+      openTeam?.name,
+      openTeam?.logo,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
@@ -77,19 +76,15 @@
       },
       displayText: "Add Members",
       disabled: false,
-      visible:
-        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
-        $currOpenedTeamRxDoc?._data?.owner == userId,
+      visible: openTeam?.admins?.includes(userId) || openTeam?.owner == userId,
     },
     {
       onClick: (e) => {
         e.stopPropagation();
       },
-      displayText: "Delete",
+      displayText: "Delete Workspace",
       disabled: false,
-      visible:
-        $currOpenedTeamRxDoc?._data?.admins?.includes(userId) ||
-        $currOpenedTeamRxDoc?._data?.owner == userId,
+      visible: openTeam?.admins?.includes(userId) || openTeam?.owner == userId,
     },
   ];
 
@@ -118,16 +113,14 @@
 />
 {#if selectedTab == "all-workspace"}
   <div class="ps-3">
-    {#if $data && $data
-        .slice()
-        .filter((item) => item.team.teamId == openedTeam.id).length > 0}
+    {#if data && data.slice().length > 0}
       <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
         <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
         <input
           type="text"
           id="search-input"
           class={`bg-transparent w-100 border-0 my-auto`}
-          placeholder="Search workspaces in {openedTeam.name}"
+          placeholder="Search workspaces in {openTeam?.name}"
           bind:value={filterText}
           on:input={(e) => handleFilterTextChange(e)}
         />
@@ -151,22 +144,22 @@
         dataSearch="true"
         tableHeaderClassProp="position-sticky bg-backgroundColor top-0 z-2"
         tableHeaderStyleProp={"background-color: var(--background-color) !important;"}
-        contributorsCount={$currOpenedTeamRxDoc?._data?.users?.length}
+        contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
       >
         <tbody class="overflow-y-auto position-relative z-0">
-          {#if $data}
-            {#each $data
+          {#if data}
+            {#each data
               .slice()
               .reverse()
               .filter((item) => item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+                  .toLowerCase()
+                  .startsWith(filterText.toLowerCase()))
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
               <Rows
                 {list}
-                {currOpenedTeamRxDoc}
+                currOpenedTeamRxDoc={openTeam}
                 {handleOpenCollection}
                 {calculateTimeDifferenceInDays}
                 {WorkspaceMemberRole}
@@ -177,27 +170,25 @@
         </tbody>
       </Table>
 
-      {#if $data && $data
-          .slice()
-          .filter((item) => item.team.teamId == openedTeam.id).length == 0}
+      {#if data && data.slice().filter.length == 0}
         <p class="not-found-text mt-3">Add Workspaces to this team</p>
-      {:else if filterText !== "" && $data
+      {:else if filterText !== "" && data
           .slice()
           .reverse()
           .filter((item) => item.name
-                .toLowerCase()
-                .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+              .toLowerCase()
+              .startsWith(filterText.toLowerCase()))
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
         <p class="not-found-text mt-3">No results found.</p>
       {/if}
     </div>
 
-    {#if $data
+    {#if data
       .slice()
       .reverse()
       .filter((item) => item.name
-            .toLowerCase()
-            .startsWith(filterText.toLowerCase()) && item.team.teamId == openedTeam.id)
+          .toLowerCase()
+          .startsWith(filterText.toLowerCase()))
       .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0}
       <table class="w-100">
         <tfoot class="bottom-0">
@@ -205,19 +196,11 @@
             <th class="tab-head"
               >showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
                 currPage * workspacePerPage,
-                $data?.filter(
-                  (item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()) &&
-                    item.team.teamId == openedTeam.id,
+                data?.filter((item) =>
+                  item.name.toLowerCase().startsWith(filterText.toLowerCase()),
                 ).length,
-              )} of {$data?.filter(
-                (item) =>
-                  item.name
-                    .toLowerCase()
-                    .startsWith(filterText.toLowerCase()) &&
-                  item.team.teamId == openedTeam.id,
+              )} of {data?.filter((item) =>
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
               ).length}
             </th>
             <th class="tab-head" style="">
@@ -242,12 +225,10 @@
                   if (
                     currPage <
                     Math.ceil(
-                      $data?.filter(
-                        (item) =>
-                          item.name
-                            .toLowerCase()
-                            .startsWith(filterText.toLowerCase()) &&
-                          item.team.teamId == openedTeam.id,
+                      data?.filter((item) =>
+                        item.name
+                          .toLowerCase()
+                          .startsWith(filterText.toLowerCase()),
                       ).length / workspacePerPage,
                     )
                   )
@@ -257,12 +238,10 @@
                 ><RightIcon
                   color={currPage ===
                   Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                     ? "var(--border-color)"
@@ -272,24 +251,20 @@
               <button
                 on:click={() =>
                   (currPage = Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   ))}
                 class="bg-transparent border-0"
                 ><DoubleRightIcon
                   color={currPage ===
                   Math.ceil(
-                    $data?.filter(
-                      (item) =>
-                        item.name
-                          .toLowerCase()
-                          .startsWith(filterText.toLowerCase()) &&
-                        item.team.teamId == openedTeam.id,
+                    data?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
                     ).length / workspacePerPage,
                   )
                     ? "var(--border-color)"

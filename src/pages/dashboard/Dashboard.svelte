@@ -23,7 +23,6 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-    setCurrentWorkspace,
   } from "$lib/store/workspace.store";
   import { TeamViewModel } from "../Teams/team.viewModel";
   import type { Path } from "$lib/utils/interfaces/request.interface";
@@ -44,7 +43,7 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
-  let loggedInUserId:string;
+  let loggedInUserId: string;
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
   let currentTeam: CurrentTeam;
@@ -55,11 +54,11 @@
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
   let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
-  let loggedUserRoleInWorkspace:WorkspaceRole;
+  let loggedUserRoleInWorkspace: WorkspaceRole;
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      loggedInUserId=value._id;
+      loggedInUserId = value._id;
       await _viewModelHome.refreshTeams(value._id);
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
@@ -76,11 +75,11 @@
         };
         let currentTeam = value.get("team");
         _viewModelHome.activateTeam(currentTeam.teamId);
-         value._data.users.forEach((user)=>{
-          if(user.id===loggedInUserId){
+        value._data.users.forEach((user) => {
+          if (user.id === loggedInUserId) {
             userWorkspaceLevelRole.set(user.role);
           }
-        })
+        });
       }
     },
   );
@@ -118,8 +117,6 @@
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
-
-    setCurrentWorkspace(workspaceId, workspaceName);
     isWorkspaceLoaded.set(true);
   };
 
@@ -207,11 +204,13 @@
 
   const getActiveTab = handleActiveTab();
 
-  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe((value:WorkspaceRole) => {
-    if(value){
-      loggedUserRoleInWorkspace=value;
-    }
-  });
+  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe(
+    (value: WorkspaceRole) => {
+      if (value) {
+        loggedUserRoleInWorkspace = value;
+      }
+    },
+  );
 
   onMount(() => {
     handleResize();
@@ -247,7 +246,9 @@
       />
     {/if}
     <section class="w-100">
-      <Route path="/collections/*"><CollectionsHome {loggedUserRoleInWorkspace} /></Route>
+      <Route path="/collections/*"
+        ><CollectionsHome {loggedUserRoleInWorkspace} /></Route
+      >
       <Route path="/workspaces/*"
         ><Teams
           {currentTeam}
@@ -259,7 +260,9 @@
         /></Route
       >
       <Route path="/mock/*"><Mock /></Route>
-      <Route path="/environment/*"><Environment loggedUserRoleInWorkspace={loggedUserRoleInWorkspace} /></Route>
+      <Route path="/environment/*"
+        ><Environment {loggedUserRoleInWorkspace} /></Route
+      >
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#if activeSidebarTabName}

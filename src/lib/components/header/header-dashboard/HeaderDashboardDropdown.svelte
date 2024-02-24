@@ -12,7 +12,8 @@
     isWorkspaceLoaded,
   } from "$lib/store/workspace.store";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
   import type {
     CurrentTeam,
     CurrentWorkspace,
@@ -25,7 +26,11 @@
   } from "$lib/utils/dto";
   import type { Observable } from "rxjs";
   import type { TeamDocument } from "$lib/database/app.database";
-  import { setOpenedTeam } from "$lib/store";
+  /**
+   * @deprecated referes to teams store
+   * import { setOpenedTeam } from "$lib/store";
+   **/
+
   import { v4 as uuidv4 } from "uuid";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import Dropdown from "../../dropdown/Dropdown.svelte";
@@ -40,6 +45,11 @@
   export let collectionsMethods: CollectionsMethods;
   export let allworkspaces = [];
 
+  $: {
+    if (currentWorkspace || currentTeam) {
+      calculateLimitedWorkspace();
+    }
+  }
   let workspaceNameExistsErr: boolean = false;
 
   let workspaceLimit = constants.WORKSPACE_LIMIT;
@@ -107,6 +117,50 @@
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
+  let sharedData = [];
+  function createSetFromArray(arr, key) {
+    const seen = new Set();
+    return arr.filter((obj) => {
+      if (!obj.hasOwnProperty(key)) {
+        throw new Error(`Object does not have key "${key}"`);
+      }
+      const keyValue = obj[key];
+      return !seen.has(keyValue) && seen.add(keyValue);
+    });
+  }
+
+  const calculateLimitedWorkspace = () => {
+    let workspaces = allworkspaces
+      .filter((elem) => {
+        if (currentTeam?.id === elem?.team?.teamId) return true;
+        return false;
+      })
+      .reverse()
+      .slice(0, workspaceLimit)
+      .map((workspace) => {
+        const workspaceObj = {
+          id: workspace._id,
+          name: workspace.name,
+          dynamicClasses: "text-whiteColor",
+          description: currentTeam?.name,
+          selectedOptionClasses: "ellipsis mw-25",
+        };
+        return workspaceObj;
+      });
+    workspaces.push({
+      id: currentWorkspace?.id,
+      name: currentWorkspace?.name,
+      dynamicClasses: "text-whiteColor",
+      description: currentTeam?.name,
+      selectedOptionClasses: "ellipsis mw-25",
+    });
+    const res = createSetFromArray(workspaces, "name");
+    if (res.length > workspaceLimit) {
+      res.shift();
+    }
+    sharedData = res;
+    return;
+  };
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
     workspaceNameExistsErr = false;
@@ -166,7 +220,7 @@
         if (item) {
           if (item._data._id != response.data.data._id) {
             totalRequest = 0;
-          } 
+          }
         }
       });
 
@@ -220,14 +274,17 @@
       navigate("/dashboard/workspaces");
       activeSideBarTabMethods.updateActiveTab("workspaces");
       isOpen = true;
-      setOpenedTeam(
-        currentTeam?.id,
-        currentTeam?.name,
-        currentTeam?.base64String,
-      );
+      /**
+       * @deprecated referes to teams store
+       * setOpenedTeam(
+       *   currentTeam?.id,
+       *   currentTeam?.name,
+       *   currentTeam?.base64String,
+       * );
+       **/
     } else {
       allworkspaces.forEach((workspace) => {
-        if (id === workspace.name) {
+        if (id === workspace._id) {
           handleWorkspaceSwitch(workspace._id);
           return;
         }
@@ -308,9 +365,10 @@
   dropdownId="header-dropdown"
   dropDownType={{
     type: "text",
-    title: currentWorkspace ? `${currentWorkspace?.name}` : "",
+    title: currentWorkspace ? `${currentWorkspace?.id}` : "",
   }}
-  additonalSelectedOptionText={`/${currentTeam?.name}`}
+  additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
+  additonalSelectedOptionText={`${currentTeam?.name}`}
   staticCustomStyles={[
     { id: "header-dropdown-btn-div", styleKey: "maxWidth", styleValue: "15vw" },
   ]}
@@ -338,20 +396,7 @@
       img: plusIcon,
       hasDivider: true,
     },
-    ...allworkspaces
-      .slice()
-      .reverse()
-      .slice(0, workspaceLimit)
-      .map((workspace) => {
-        const workspaceObj = {
-          id: workspace.name,
-          name: workspace.name,
-          dynamicClasses: "text-whiteColor",
-          description: currentTeam?.name,
-          selectedOptionClasses: "ellipsis mw-25",
-        };
-        return workspaceObj;
-      }),
+    ...sharedData,
     {
       id: "",
       name: "You will see your five most recent workspaces",
