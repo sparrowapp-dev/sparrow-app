@@ -223,8 +223,10 @@
           >
             {additonalSelectedOptionText}
           </p>
-          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
-            >{additionalSelectedOptionHeading}</span
+          <span
+            style="font-size: 12px;"
+            id={`${dropdownId}-additional-option`}
+            class="text-whiteColor">{additionalSelectedOptionHeading}</span
           >
         {:else if additionalType === "environment"}
           {#if selectedOption?.id === "none"}

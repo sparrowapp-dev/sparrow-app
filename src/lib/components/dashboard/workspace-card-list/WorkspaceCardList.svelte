@@ -40,8 +40,7 @@
     if (!(openTeam?.admins?.includes(userId) || openTeam?.owner == userId)) {
       workspacePerPage = 6;
       isAdminOrOwner = false;
-    }
-    else{
+    } else {
       workspacePerPage = 5;
       isAdminOrOwner = true;
     }
@@ -152,7 +151,8 @@
         <div class="tab-head tab-change">
           <button
             on:click={() => (
-              (currPage = 1), (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
+              (currPage = 1),
+              (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
             )}
             class="bg-transparent border-0"
             ><DoubleLeftIcon
@@ -344,7 +344,6 @@
     -webkit-text-fill-color: transparent;
     max-width: 47.5%;
     max-height: 32%;
-    min-height: 15vh;
   }
 
   :global(.add-new-workspace.empty) {

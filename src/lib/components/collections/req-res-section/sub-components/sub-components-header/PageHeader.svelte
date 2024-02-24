@@ -289,8 +289,8 @@
                 />
               {/if}
               <p
-                class="mb-0 text-whiteColor"
-                style="font-size: 14px; font-weight:400;"
+                class="mb-0 text-whiteColor sparrow-fs-14"
+                style="font-weight:400;"
               >
                 Save Request
               </p>
@@ -355,10 +355,9 @@
               disabled
               class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
             >
-              <img src={lockicon} alt="lock-icon" />
               <p
-                class="mb-0 text-whiteColor"
-                style="font-size: 14px; font-weight:400"
+                class="mb-0 text-whiteColor sparrow-fs-14"
+                style="font-weight:400"
               >
                 Share
               </p>

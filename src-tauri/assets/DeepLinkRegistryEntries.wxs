@@ -12,7 +12,7 @@
         >
 					<RegistryValue
             Type="string"
-            Value=`"C:\Program Files\sparrow-app\sparrow-app.exe" "%1"`
+            Value=`"C:\Program Files\Sparrow\Sparrow.exe" "%1"`
             KeyPath="yes"
           />
 				</RegistryKey>
