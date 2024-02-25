@@ -13,6 +13,7 @@ interface DeepLinkHandlerWindowsPayload {
 export const deepLinkHandlerWindows = async (
   deepLinkUrl: DeepLinkHandlerWindowsPayload,
 ) => {
+  await getCurrent().setFocus();
   const url = deepLinkUrl.payload.url;
   if (url) {
     await handleLoginV2(url);
@@ -29,7 +30,6 @@ export const registerDeepLinkHandler = async () => {
   const os = await platform();
   if (os === "windows") {
     await listen("deep-link-urls", deepLinkHandlerWindows);
-    await getCurrent().setFocus();
   } else if (os === "macos") {
     await onOpenUrl(deepLinkHandlerMacOs);
   }

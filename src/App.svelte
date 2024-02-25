@@ -19,6 +19,7 @@
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
+  import { getCurrent } from "@tauri-apps/api/window";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -52,6 +53,7 @@
   });
 
   onMount(async () => {
+    await getCurrent().setFocus();
     await registerDeepLinkHandler();
     let isloggedIn;
     user.subscribe((value) => {
