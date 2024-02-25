@@ -18,7 +18,7 @@
     buttonClick: () => {},
     loadingMessage: "Please wait while we sign you in....",
   };
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}/init`;
+  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
