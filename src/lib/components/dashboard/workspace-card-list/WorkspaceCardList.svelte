@@ -97,6 +97,7 @@
           type="other"
           buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
           onClick={handleCreateWorkspace}
+          buttonStyleProp={workspaces.length == 0 ? "min-height:18vh" : ""}
         />
       {/if}
       {#each workspaces
