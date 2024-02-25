@@ -6,9 +6,7 @@ export class CommonService {
 
   private apiUrl: string = constants.API_URL;
 
-  public isFeatureEnabled = async (
-    feature: string
-  ) => {
+  public isFeatureEnabled = async (feature: string) => {
     const response = await makeRequest(
       "GET",
       `${this.apiUrl}/api/feature/check`,
@@ -19,7 +17,7 @@ export class CommonService {
     );
 
     if (response.isSuccessful) {
-        return response;
+      return response;
     }
     return false;
   };
