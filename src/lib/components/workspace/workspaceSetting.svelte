@@ -190,8 +190,8 @@
     <div class="workspace-delete-confirmation">
       <div class="text-lightGray mb-1 sparrow-fs-14">
         <p class="text-textColor sparrow-fs-12">
-          Everything in '<span class="text-whiteColor"
-            >{currentWorkspaceDetails.name}</span
+          Everything in <span class="text-whiteColor"
+            >"{currentWorkspaceDetails.name}"</span
           > will be permanently removed, and all contributors will lose access. This
           action cannot be undone.
         </p>
@@ -230,14 +230,17 @@
       <br />
 
       <div
-        class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+        class="d-flex align-items-center justify-content-end gap-3 mt-1 pb-3 mb-0 rounded"
         style="font-size: 16px;"
       >
-        <div class="d-flex align-items-center">
-          <p style="font-size:16px;" class="mb-0">
-            {currentWorkspaceDetails.name}
-          </p>
-        </div>
+        <Button
+          title={"Cancel"}
+          textStyleProp={"font-size: var(--base-text)"}
+          type={"dark"}
+          onClick={() => {
+            handleDeletePopup(false);
+          }}
+        />
         <Button
           disable={workspaceDeletePopupLoader ||
             confirmationText !== currentWorkspaceDetails.name}
