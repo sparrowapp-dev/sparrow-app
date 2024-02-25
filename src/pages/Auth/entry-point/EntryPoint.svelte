@@ -1,12 +1,12 @@
 <script lang="ts">
   import sparrowicon from "$lib/assets/sparrow-icon-bg.svg";
-  import { navigate } from "svelte-navigator";
   import Redirect from "../redirect/Redirect.svelte";
   import constants from "$lib/utils/constants";
   import Header from "$lib/components/header/Header.svelte";
   import star from "$lib/assets/star.svg";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-
+  import { open } from "@tauri-apps/plugin-shell"; 
+  
   let isEntry = false;
 
   let redirectRules = {
