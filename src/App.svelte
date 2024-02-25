@@ -1,35 +1,24 @@
 <script lang="ts">
-  import { Router, Route, navigate } from "svelte-navigator";
+  import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
   import Toast from "$lib/components/toast-notification/ToastNotification.svelte";
-  import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
-  import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/dashboard/Dashboard.svelte";
-  import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
-  import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
-  import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
-  import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
-  import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import EntryPoint from "./pages/Auth/entry-point/EntryPoint.svelte";
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
-  import { handleDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
-
+  import { registerDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
-
   import { user } from "$lib/store/auth.store";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-  import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
-  import { listen } from "@tauri-apps/api/event";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -63,10 +52,7 @@
   });
 
   onMount(async () => {
-    const isWin = navigator.platform.toLowerCase().includes("win");
-    if (!isWin) await onOpenUrl(handleDeepLinkHandler);
-    else await listen("deep-link-urls", handleDeepLinkHandler);
-
+    await registerDeepLinkHandler();
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;
