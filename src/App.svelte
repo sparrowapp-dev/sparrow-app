@@ -78,7 +78,7 @@
     <section slot="unauthorized">
       <Route path="/init" component={EntryPoint} />
       <!-- - -->
-      <!-- deprecate - visit sparrow auth repo -->
+      <!-- deprecated - visit sparrow auth repo -->
       <!-- - -->
 
       <!-- <Route path="/forgot/password" component={ForgotPassword} />
