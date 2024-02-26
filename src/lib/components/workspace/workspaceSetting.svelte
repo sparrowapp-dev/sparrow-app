@@ -230,31 +230,42 @@
       <br />
 
       <div
-        class="d-flex align-items-center justify-content-end gap-3 mt-1 pb-3 mb-0 rounded"
+        class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded"
         style="font-size: 16px;"
       >
-        <Button
-          title={"Cancel"}
-          textStyleProp={"font-size: var(--base-text)"}
-          type={"dark"}
-          onClick={() => {
-            handleDeletePopup(false);
-          }}
-        />
-        <Button
-          disable={workspaceDeletePopupLoader ||
-            confirmationText !== currentWorkspaceDetails.name}
-          title={"Delete Workspace"}
-          textStyleProp={"font-size: var(--base-text)"}
-          loaderSize={18}
-          type={"danger"}
-          loader={workspaceDeletePopupLoader}
-          onClick={async () => {
-            workspaceDeletePopupLoader = true;
-            await handleDeleteWorkspaceFlow();
-            workspaceDeletePopupLoader = false;
-          }}
-        />
+        <div class="d-flex align-items-center">
+          <p style="font-size:16px;" class="mb-0">
+            {currentWorkspaceDetails.name}
+          </p>
+        </div>
+        <div class="d-flex">
+          <Button
+            disable={workspaceDeletePopupLoader}
+            title={"Cancel"}
+            textStyleProp={"font-size: var(--base-text)"}
+            buttonClassProp={"me-2"}
+            loaderSize={18}
+            type={"dark"}
+            loader={false}
+            onClick={async () => {
+              handleDeletePopup(false);
+            }}
+          />
+          <Button
+            disable={workspaceDeletePopupLoader ||
+              confirmationText !== currentWorkspaceDetails.name}
+            title={"Delete Workspace"}
+            textStyleProp={"font-size: var(--base-text)"}
+            loaderSize={18}
+            type={"danger"}
+            loader={workspaceDeletePopupLoader}
+            onClick={async () => {
+              workspaceDeletePopupLoader = true;
+              await handleDeleteWorkspaceFlow();
+              workspaceDeletePopupLoader = false;
+            }}
+          />
+        </div>
       </div>
     </div>
   </ModalWrapperV1>
