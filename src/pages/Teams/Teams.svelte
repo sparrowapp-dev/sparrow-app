@@ -508,7 +508,7 @@
     handleLeaveTeamModal();
   }}
 >
-  <p class="warning-text text-lightGray mt-3">
+  <p class="warning-text text-lightGray mt-3 mw-50 text-wrap">
     Are you sure you want to leave team <span class="fw-semibold"
       >"{$openTeam?.name}"</span
     >? You will lose access to all the resources in this team.
