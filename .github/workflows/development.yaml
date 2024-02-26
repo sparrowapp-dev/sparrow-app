@@ -1,10 +1,11 @@
 name: Development release
 
 on:
-    pull_request:
-      branches:
-        - development
-      types: [opened, synchronize]
+  pull_request:
+    types:
+      - opened
+    branches:
+      - development
 
 env: 
     VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
