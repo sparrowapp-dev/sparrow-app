@@ -275,13 +275,13 @@
   let teamMemberRemoveLoader: boolean = false;
 </script>
 
-<div
-  class="team-details user d-flex w-100% justify-content-between"
-  on:click={() => {
-    handleMemberPopup(true);
-  }}
->
-  <div class="user-info">
+<div class="team-details user d-flex w-100% justify-content-between">
+  <div
+    class="user-info w-100"
+    on:click={() => {
+      handleMemberPopup(true);
+    }}
+  >
     <p
       class="profile-circle bg-dullBackgroundr text-white text-center d-flex align-items-center justify-content-center"
       style="width: 36px; height:36px;border-radius:50%;border:2px solid #45494D ;"
@@ -487,7 +487,6 @@
   .user-info {
     display: flex;
     gap: 5px;
-    justify-content: center;
   }
   .user-info-details {
     display: flex;
