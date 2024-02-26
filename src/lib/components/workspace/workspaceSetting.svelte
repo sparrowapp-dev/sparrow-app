@@ -190,8 +190,8 @@
     <div class="workspace-delete-confirmation">
       <div class="text-lightGray mb-1 sparrow-fs-14">
         <p class="text-textColor sparrow-fs-12">
-          Everything in '<span class="text-whiteColor"
-            >{currentWorkspaceDetails.name}</span
+          Everything in <span class="text-whiteColor"
+            >"{currentWorkspaceDetails.name}"</span
           > will be permanently removed, and all contributors will lose access. This
           action cannot be undone.
         </p>

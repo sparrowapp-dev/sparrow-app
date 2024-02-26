@@ -71,6 +71,7 @@
     font-weight: 500;
     margin-right: 8px;
     text-align: left;
+    width: 40px;
   }
   .api-name p {
     font-size: 12px;

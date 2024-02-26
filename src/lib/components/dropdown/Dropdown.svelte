@@ -266,7 +266,7 @@
     {/if}
   </div>
   <div
-    class="d-none dropdown-data border-1 border-dropdownBorderColor rounded dropdown-menu"
+    class="d-none dropdown-data border-2 border-dropdownBorderColor rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
     style={`${dropdownDataContainer} ${
