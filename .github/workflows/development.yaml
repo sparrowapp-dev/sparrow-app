@@ -12,7 +12,7 @@ env:
     VITE_ENABLE_MIX_PANEL: ${{ secrets.VITE_ENABLE_MIX_PANEL }}
     VITE_API_TIMEOUT: ${{ secrets.VITE_API_TIMEOUT }}
     VITE_SPARROW_SUPPORT_EMAIL: ${{ secrets.VITE_SPARROW_SUPPORT_EMAIL }}
-    VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL }}
+    VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
 
 jobs:
   release_win:
