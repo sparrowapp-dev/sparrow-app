@@ -82,7 +82,7 @@
           } else handleEnvironmentBox(false, localEnvKey);
         });
       }
-    }
+    } else handleEnvironmentBox(false, localEnvKey);
   };
 
   const checkEnvExist = (

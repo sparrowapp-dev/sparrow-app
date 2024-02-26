@@ -451,7 +451,7 @@
           {handleInputValue}
         />
       {/if}
-      {#if envMissing}
+      {#if envMissing && trackParanthesis.length == 0}
         <AddEnvironment
           {environmentAxisX}
           {environmentAxisY}
@@ -463,17 +463,14 @@
           {localEnvKey}
         />
       {/if}
-
       <button
         disabled={disabledSend}
-        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-3 pe-3 py-2"
+        class="d-flex align-items-center justify-content-center btn btn-primary text-whiteColor ps-4 pe-4 py-2"
         style="font-size: 15px;height:34px; font-weight:400"
         on:click|preventDefault={handleSendRequest}>Send</button
       >
     </div>
-    <div class="ps-2 {isCollaps ? 'ps-4' : 'ps-2'}">
-      <img src={lineIcon} alt="" />
-    </div>
+    <div class="ps-2 text-secondary fs-2 {isCollaps ? 'ps-4' : 'ps-2'}">|</div>
 
     <div class="d-flex gap-1 ps-2">
       <span style="cursor:pointer;">
