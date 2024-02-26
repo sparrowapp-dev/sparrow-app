@@ -297,7 +297,7 @@
           </label>
         {/if}
         <p
-          class="m-0 {list?.dynamicClasses}"
+          class="m-0 pt-1 {list?.dynamicClasses}"
           style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
           id="{dropdownId}-options-name"
           class:selected-request={list.id === selectedOption?.id}
