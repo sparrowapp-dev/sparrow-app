@@ -62,6 +62,7 @@
 
   onMount(async () => {
     await getCurrent().setFocus();
+    await getCurrent().center();
     await registerDeepLinkHandler();
     let isloggedIn;
     user.subscribe((value) => {

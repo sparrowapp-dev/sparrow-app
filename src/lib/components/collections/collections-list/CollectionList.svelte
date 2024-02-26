@@ -182,9 +182,9 @@
           isLoading = true;
           isComponentRenderedFirstTime = false;
         }
-        currentWorkspaceName = activeWorkspaceRxDoc.get("name");
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        const workspaceId = activeWorkspaceRxDoc.get("_id");
+        currentWorkspaceName = activeWorkspaceRxDoc?.name;
+        currentWorkspaceId = activeWorkspaceRxDoc?._id;
+        const workspaceId = activeWorkspaceRxDoc?._id;
         if (trackWorkspaceId !== workspaceId) {
           const response =
             await collectionsMethods.getAllCollections(workspaceId);
@@ -560,11 +560,6 @@
             id: "collectionDropdown-img",
             classToAdd: ["bg-backgroundDark", "p-1", "rounded"],
           },
-          {
-            id: "collectionDropdown-options-div",
-            classToAdd: ["border-bottom"],
-          },
-
           {
             id: "collectionDropdown-options-container",
             classToAdd: ["end-0", "mt-1"],

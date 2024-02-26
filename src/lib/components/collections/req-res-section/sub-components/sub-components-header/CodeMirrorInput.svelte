@@ -82,7 +82,7 @@
           } else handleEnvironmentBox(false, localEnvKey);
         });
       }
-    }
+    } else handleEnvironmentBox(false, localEnvKey);
   };
 
   const checkEnvExist = (
@@ -168,6 +168,37 @@
     );
   };
 
+  const wordHover = hoverTooltip((view, pos, side) => {
+    let { from, to, text } = view.state.doc.lineAt(pos);
+    let start = pos,
+      end = pos;
+    while (start > from && /\w/.test(text[start - from - 1])) start--;
+    while (end < to && /\w/.test(text[end - from])) end++;
+    if ((start == pos && side < 0) || (end == pos && side > 0)) return null;
+    const envKey = text.slice(start - from, end - from);
+    let envExist = false;
+    let envValue = "";
+    filterData.find((k: { key: string; value: string }) => {
+      if (k.key === envKey) {
+        envExist = true;
+        envValue = k.value;
+      }
+    });
+    if (!envExist) {
+      return null;
+    }
+    return {
+      pos: start,
+      end,
+      above: true,
+      create(view) {
+        let dom = document.createElement("div");
+        dom.textContent = `${envKey} = ${envValue}`;
+        return { dom };
+      },
+    };
+  });
+
   function initalizeCodeMirrorEditor(value: string) {
     let state = EditorState.create({
       doc: value,
@@ -179,6 +210,7 @@
         handleEventsRegister,
         placeholder("Enter URL or paste text"),
         cursorTooltipField(filterData),
+        wordHover,
       ],
     });
     codeMirrorView = new EditorView({
