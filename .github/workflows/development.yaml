@@ -1,4 +1,4 @@
-name: Dev-App Center-Release
+name: Development Release
 
 on:
     pull_request:
