@@ -79,7 +79,7 @@
           );
           if (!envExist) {
             handleEnvironmentBox(true, localEnvKey);
-          }
+          } else handleEnvironmentBox(false, localEnvKey);
         });
       }
     }

@@ -284,7 +284,7 @@
       Are you sure you want to delete this Request? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
       >
-      will be removed.
+      will be removed and cannot be restored.
     </p>
   </div>
 
