@@ -127,11 +127,7 @@
             title: workspace.position ? workspace.position : "",
           }}
           disabled={true}
-          method={user.role || teamRole === TeamRole.TEAM_OWNER
-            ? TeamRole.TEAM_ADMIN
-            : workspace.position
-            ? workspace.position
-            : ""}
+          method={workspace.position ? workspace.position : ""}
           data={[
             {
               name: "Editor",
@@ -144,7 +140,7 @@
               dynamicClasses: "text-whiteColor",
             },
             {
-              name: "Admins",
+              name: "Admin",
               id: TeamRole.TEAM_ADMIN,
               dynamicClasses: "text-whiteColor",
             },
@@ -154,7 +150,7 @@
               dynamicClasses: "text-whiteColor",
             },
             {
-              name: "Removes",
+              name: "Remove",
               id: "remove",
               dynamicClasses: "text-dangerColor",
             },
