@@ -9,6 +9,8 @@
   import { basicSetup, basicTheme } from "./codeMirrorTheme";
   import { EditorState, Compartment } from "@codemirror/state";
   import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
+  import { html_beautify, js_beautify } from "js-beautify";
+
   export let currentTabId: string;
   export let rawTab: RequestDataType;
   export let rawValue: string;
@@ -59,14 +61,21 @@
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
         rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: rawValue,
-          },
-        });
+      } else if (
+        rawTab === RequestDataType.HTML ||
+        rawTab === RequestDataType.XML
+      ) {
+        rawValue = html_beautify(rawValue);
+      } else if (rawTab === RequestDataType.JAVASCRIPT) {
+        rawValue = js_beautify(rawValue);
       }
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: rawValue,
+        },
+      });
     } else {
       codeMirrorView.dispatch({
         effects: languageConf.reconfigure([]),

@@ -36,6 +36,7 @@
     "codemirror": "^6.0.1",
     "codemirror-json-schema": "^0.6.1",
     "font-awesome": "^4.7.0",
+    "js-beautify": "^1.15.1",
     "js-yaml": "^4.1.0",
     "jsoneditor": "^9.10.3",
     "mixpanel-browser": "^2.48.1",
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "@tsconfig/svelte": "^5.0.0",
+    "@types/js-beautify": "^1.14.3",
     "@types/mixpanel-browser": "^2.49.0",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "@typescript-eslint/parser": "^6.4.0",
