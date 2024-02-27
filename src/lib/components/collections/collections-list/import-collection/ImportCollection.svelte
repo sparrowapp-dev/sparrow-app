@@ -419,7 +419,7 @@
         class="form-check-input"
         type="checkbox"
         role="switch"
-        bind:value={activeSync}
+        bind:checked={activeSync}
         id="enableActiveSync"
       />
     </div>
