@@ -10,8 +10,9 @@ export class ImportCollectionViewModel {
   public importCollectionData = async (
     workspaceId: string,
     url: ImportBodyUrl,
+    activeSync:boolean
   ) => {
-    return await this.collectionService.importCollection(workspaceId, url);
+    return await this.collectionService.importCollection(workspaceId, url, activeSync);
   };
 
   public importCollectionFile = async (workspaceId: string, file) => {
