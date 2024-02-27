@@ -129,7 +129,10 @@
           items: response.data.data.items,
           createdAt: response.data.data.createdAt,
         };
-        collectionsMethods.addCollection(newCollection);
+        collectionsMethods.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+        });
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
           new Date().toString(),
@@ -204,7 +207,10 @@
         items: response.data.data.items,
         createdAt: response.data.data.createdAt,
       };
-      collectionsMethods.addCollection(newCollection);
+      collectionsMethods.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+      });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),
@@ -257,7 +263,10 @@
         items: response.data.data.items,
         createdAt: response.data.data.createdAt,
       };
-      collectionsMethods.addCollection(newCollection);
+      collectionsMethods.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+      });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),

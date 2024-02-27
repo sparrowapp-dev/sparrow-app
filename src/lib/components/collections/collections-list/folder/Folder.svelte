@@ -54,7 +54,6 @@
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
-
   const handleAPIClick = async () => {
     if (
       !hasWorkpaceLevelPermission(
@@ -363,7 +362,7 @@
   />
 {/if}
 
-{#if explorer.type === "FOLDER"}
+{#if explorer.type === "FOLDER" && !explorer?.isDeleted}
   <div
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
@@ -493,7 +492,7 @@
       {/if}
     </div>
   </div>
-{:else}
+{:else if explorer.type === "REQUEST" && !explorer?.isDeleted}
   <div style="cursor:pointer;">
     <Request
       api={explorer}
