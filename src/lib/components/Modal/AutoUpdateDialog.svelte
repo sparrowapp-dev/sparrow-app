@@ -35,8 +35,10 @@
       showProgressBar = true;
       if (updater) {
         await updater.downloadAndInstall();
-        notifications.success("Update Completed. App will relaunch now!");
-        await relaunch();
+        notifications.success(
+          "Update Completed. Kindly restart the application.",
+        );
+        // await relaunch();
       }
     } catch (e) {
       notifications.error("Update Failed!");
