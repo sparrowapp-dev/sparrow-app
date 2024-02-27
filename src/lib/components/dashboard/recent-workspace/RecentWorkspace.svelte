@@ -45,10 +45,15 @@
         {#if index < constants.WORKSPACE_LIMIT}
           <div class="pb-0" on:click={() => handleOpenCollection(list)}>
             <div
-              class="recent-workspace-item py-1 overflow-hidden rounded justify-content-between d-flex"
+              class="recent-workspace-item py-1 px-2 overflow-hidden rounded justify-content-between d-flex"
             >
-              <div class="overflow-hidden ellipsis">
-                <p class="mb-0 recent-workspace ellipsis overflow-hidden">
+              <div
+                class="overflow-hidden ellipsis"
+                style="width: calc(100% - 30px);"
+              >
+                <p
+                  class="mb-0 recent-workspace ellipsis overflow-hidden ellipsis"
+                >
                   {list.name}
                 </p>
                 <span class="team-name ellipsis overflow-hidden"
