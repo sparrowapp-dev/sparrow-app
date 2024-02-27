@@ -60,7 +60,7 @@
     if (formatter === ResponseFormatter.PRETTY) {
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
-        rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
+        rawValue = JSON.stringify(JSON.parse(rawValue), null, 6);
       } else if (
         rawTab === RequestDataType.HTML ||
         rawTab === RequestDataType.XML
