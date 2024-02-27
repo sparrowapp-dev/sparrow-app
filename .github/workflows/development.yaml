@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - development
-# on:
-#   pull_request:
-#     types: [opened, edited]  
-#     branches:
-#       - development
 
 env: 
     VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
