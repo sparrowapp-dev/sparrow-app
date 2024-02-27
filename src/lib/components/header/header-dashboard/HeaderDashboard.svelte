@@ -62,7 +62,6 @@
   let activeWorkspaceName: string;
   let searchData: string = "";
   let ownerName: string = "";
-  let hideHeaders = false;
   let profile: boolean = false;
   let activeWorkspaceRxDocVal: WorkspaceDocument;
   let showGlobalSearchPopup: boolean = false;
@@ -198,7 +197,6 @@
   function handleWindowSize() {
     const minWidthThreshold = 500;
     isSearchVisible = window.innerWidth >= minWidthThreshold;
-    hideHeaders = window.innerWidth <= 700;
   }
 
   const toggleDropdown = () => {
@@ -250,12 +248,7 @@
         <img src={icons.appIcon} class="app-icon" alt="sparrowLogo" />
       </div>
     </div>
-    <div
-      class="d-flex d-flex align-items-center justify-content-center gap-2 {showGlobalSearchPopup &&
-      hideHeaders
-        ? ''
-        : ''}"
-    >
+    <div class="d-flex d-flex align-items-center justify-content-center gap-2">
       <HeaderDropdown
         {teams}
         {userId}
@@ -276,10 +269,10 @@
     
     {!showGlobalSearchPopup ? 'width:180px;' : 'width:400px;'}
     
-     position: relative;{showGlobalSearchPopup && hideHeaders
+     position: relative;{showGlobalSearchPopup
       ? 'left:50%;transform: translateX(-50%);'
       : ''}"
-    class="{showGlobalSearchPopup && hideHeaders
+    class="{showGlobalSearchPopup
       ? 'position-absolute'
       : ''} search-container sc-desktop bg-backgroundLight pe-2 d-flex align-items-center search-bar justify-content-end rounded"
   >
@@ -316,10 +309,6 @@
       />
     {/if}
   </div>
-
-  {#if showGlobalSearchPopup && hideHeaders}
-    <div style="height:32px; width:400px;position: relative;"></div>
-  {/if}
 
   {#if showGlobalSearchPopup}
     <div
@@ -395,18 +384,14 @@
           />
         {/if}
       </div>
-      <div
-        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
-      >
+      <div class="my-auto">
         <Tooltip placement={"bottom"} title={"Coming Soon!"}>
           <button class="bg-backgroundColor border-0" style="height:40px;">
             <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
       </div>
-      <div
-        class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
-      >
+      <div class="my-auto">
         <Tooltip placement={"bottom"} title={"Coming Soon!"}>
           <button class="bg-backgroundColor border-0" style="height:40px;">
             <NotifyIcon width={39} height={39} />
@@ -414,7 +399,7 @@
         </Tooltip>
       </div>
       <div
-        class="my-auto px-1 {showGlobalSearchPopup && hideHeaders
+        class="my-auto px-1
           ? 'd-none'
           : ''}"
       >
@@ -426,13 +411,11 @@
             on:click={toggleDropdown}
           >
             <p
-              class="{showGlobalSearchPopup && hideHeaders
-                ? 'd-none'
-                : ''}{`profile-circle ${
+              class={`profile-circle ${
                 isOpen
-                  ? 'bg-plusButton text-black'
-                  : 'profile-btn text-defaultColor'
-              } m-auto text-center d-flex align-items-center justify-content-center `}"
+                  ? "bg-plusButton text-black"
+                  : "profile-btn text-defaultColor"
+              } m-auto text-center d-flex align-items-center justify-content-center `}
               style={`font-size: 12px; width: 100%; height: 100%; margin: 0; ${
                 isOpen
                   ? "border: 2.2px solid #1193F0;"
@@ -530,10 +513,6 @@
   </div>
 </div>
 
-<!-- {:else}
-  <PageLoader />
-{/if} -->
-
 <style>
   .signOut:hover {
     background-color: var(--background-color);
@@ -603,9 +582,6 @@
   .controller-btn button {
     height: 44px;
     width: 44px;
-  }
-  .search-container {
-    transition: 0.1s ease-in-out;
   }
   .app-icon {
     width: 17.5px;
