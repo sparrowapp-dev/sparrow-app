@@ -69,7 +69,7 @@
   }
 </script>
 
-{#if showMenu}
+<!-- {#if showMenu && false}
   <RightOption
     xAxis={pos.x}
     yAxis={pos.y}
@@ -77,7 +77,7 @@
     {noOfColumns}
     {menuItems}
   />
-{/if}
+{/if} -->
 
 <svelte:window
   on:click={closeRightClickContextMenu}
@@ -140,7 +140,7 @@
   >
   <td class="tab-data rounded-end py-3">
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
+      class="d-none threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-relative {showMenu
         ? 'threedot-active'
         : ''}"
       on:click={(e) => {

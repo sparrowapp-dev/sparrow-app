@@ -230,11 +230,11 @@
       <br />
 
       <div
-        class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded"
+        class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis"
         style="font-size: 16px;"
       >
-        <div class="d-flex align-items-center">
-          <p style="font-size:16px;" class="mb-0">
+        <div class="d-flex align-items-center ellipsis">
+          <p style="font-size:16px;" class="mb-0 ellipsis">
             {currentWorkspaceDetails.name}
           </p>
         </div>
