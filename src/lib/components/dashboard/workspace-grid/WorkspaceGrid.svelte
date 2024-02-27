@@ -93,7 +93,7 @@
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
-{#if showMenu}
+<!-- {#if showMenu}
   <RightOption
     xAxis={pos.x}
     yAxis={pos.y}
@@ -101,7 +101,7 @@
     {noOfColumns}
     {menuItems}
   />
-{/if}
+{/if} -->
 
 <div class="workspace-card-outer w-100">
   <Card
@@ -109,7 +109,7 @@
     cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
   >
     <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+      class="d-none threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
         ? 'threedot-active'
         : ''}"
       style="top:15px;

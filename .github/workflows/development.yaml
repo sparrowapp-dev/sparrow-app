@@ -2,8 +2,7 @@ name: Development release
 
 on:
   pull_request:
-    types:
-      - opened
+    types: [opened, edited]  
     branches:
       - development
 
@@ -68,7 +67,7 @@ jobs:
 
       - name: Upload win updater to Azure Blob Storage
         run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.0.0_x64_en-US.msi.zip --name Sparrow_1.0.0_x64_en-US.msi.zip
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.0.0_x64_en-US.msi.zip --name Sparrow_1.0.0_x64_en-US.msi.zip --overwrite
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
@@ -145,7 +144,7 @@ jobs:
       
       - name: Upload mac updater to Azure Blob Storage
         run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
