@@ -38,7 +38,7 @@
         notifications.success(
           "Update Completed. Kindly restart the application.",
         );
-        // await relaunch();
+        await relaunch();
       }
     } catch (e) {
       notifications.error("Update Failed!");
