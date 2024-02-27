@@ -13,14 +13,14 @@ export class EnvironmentTabRepository {
     workspaceId: string,
   ): Promise<void> => {
     const existedTab = await RxDB.getInstance()
-      .rxdb.environmentTab.findOne({
+      .rxdb.environmenttab.findOne({
         selector: {
           id: environmentTab.id,
         },
       })
       .exec();
     const activeTab = await RxDB.getInstance()
-      .rxdb.environmentTab.findOne({
+      .rxdb.environmenttab.findOne({
         selector: {
           isActive: true,
           workspaceId,
@@ -33,7 +33,7 @@ export class EnvironmentTabRepository {
     if (existedTab) {
       await existedTab.incrementalUpdate({ $set: { isActive: true } });
     } else {
-      await RxDB.getInstance().rxdb.environmentTab.insert(environmentTab);
+      await RxDB.getInstance().rxdb.environmenttab.insert(environmentTab);
     }
   };
 
@@ -44,7 +44,7 @@ export class EnvironmentTabRepository {
     environmentId: string,
   ): Promise<boolean> => {
     const existedTab = await RxDB.getInstance()
-      .rxdb.environmentTab.findOne({
+      .rxdb.environmenttab.findOne({
         selector: {
           id: environmentId,
         },
@@ -63,7 +63,7 @@ export class EnvironmentTabRepository {
   public getEnvironmentTab = (
     workspaceId,
   ): Observable<EnvironmentTabDocument> => {
-    return RxDB.getInstance().rxdb.environmentTab.findOne({
+    return RxDB.getInstance().rxdb.environmenttab.findOne({
       selector: {
         isActive: true,
         workspaceId,
@@ -81,7 +81,7 @@ export class EnvironmentTabRepository {
     id,
   ): Promise<void> => {
     const query = RxDB.getInstance()
-      .rxdb.environmentTab.findOne({
+      .rxdb.environmenttab.findOne({
         selector: {
           id,
         },

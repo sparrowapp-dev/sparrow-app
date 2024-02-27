@@ -145,9 +145,12 @@ const setRequestProperty = async (
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.id === id) {
+      if (elem.id === id && elem.property.request) {
+        const prevData = JSON.stringify(elem.property.request[route]);
         elem.property.request[route] = data;
-        elem.property.request.save.api = false;
+        if (prevData !== JSON.stringify(data)) {
+          elem.property.request.save.api = false;
+        }
         if (elem.isActive) {
           progressiveTab.set(elem);
         }
@@ -166,9 +169,8 @@ const updateRequestPropertyResponseBody = async (
 ): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.id === id) {
+      if (elem.id === id && elem.property.request) {
         elem.property.request[route].body = data;
-        elem.save = false;
         if (elem.isActive) {
           progressiveTab.set(elem);
         }
@@ -187,9 +189,6 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive && elem.property.request) {
         elem.property.request.state[route] = data;
-        if (route === "dataset" || route === "raw") {
-          elem.property.request.save.api = false;
-        }
         progressiveTab.set(elem);
       }
       return elem;

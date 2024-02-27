@@ -1,27 +1,35 @@
 <script lang="ts">
-  import { openedTeam } from "$lib/store";
+  /**
+   * @deprecated referes to teams store
+   * import { openedTeam } from "$lib/store";
+   **/
   import { navigate } from "svelte-navigator";
-  import { onDestroy } from "svelte";
   import { PeopleIcon } from "$lib/assets/app.asset";
   import constants from "$lib/utils/constants";
+  import List from "$lib/components/list/List.svelte";
+  import type { Team } from "$lib/utils/interfaces";
+  export let openTeam: Team;
   export let data: any;
   export let handleWorkspaceSwitch: any,
     handleWorkspaceTab: any,
     activeSideBarTabMethods: any;
-  let currOpenedTeam: any;
-  const openedTeamSubscribe = openedTeam.subscribe((value) => {
-    if (value) currOpenedTeam = value;
-  });
-  onDestroy(() => {
-    openedTeamSubscribe();
-  });
+  /**
+   * @deprecated referes to teams store
+   * let currOpenedTeam: any;
+   * const openedTeamSubscribe = openedTeam.subscribe((value) => {
+   *   if (value) currOpenedTeam = value;
+   * });
+   * onDestroy(() => {
+   *   openedTeamSubscribe();
+   * });
+   **/
   const handleOpenCollection = (workspace: any) => {
     handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
       workspace.team.teamId,
       workspace.team.teamName,
-      currOpenedTeam.base64String,
+      openTeam.logo,
     );
     handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
     navigate("/dashboard/collections");
@@ -29,33 +37,35 @@
   };
 </script>
 
-<section class="p-1">
-  <h6 class="teams-heading">Recent Workspace</h6>
+<section>
+  <h6 class="teams-heading p-3 mb-0">Recent Workspace</h6>
   {#if $data}
-    {#each $data.slice().reverse() as list, index}
-      {#if index < constants.WORKSPACE_LIMIT}
-        <div class="pb-1" on:click={() => handleOpenCollection(list)}>
-          <div
-            class="recent-workspace-item p-1 overflow-hidden ps-2 rounded justify-content-between d-flex"
-          >
-            <div class="overflow-hidden ellipsis">
-              <p class="mb-0 recent-workspace ellipsis overflow-hidden">
-                {list.name}
-              </p>
-              <span class="team-name ellipsis overflow-hidden"
-                >{list.team.teamName ? list.team.teamName : ""}</span
-              >
+    <List height={"calc((100vh - 230px) / 3)"} classProps={"px-3 py-0"}>
+      {#each $data.slice().reverse() as list, index}
+        {#if index < constants.WORKSPACE_LIMIT}
+          <div class="pb-0" on:click={() => handleOpenCollection(list)}>
+            <div
+              class="recent-workspace-item py-1 overflow-hidden rounded justify-content-between d-flex"
+            >
+              <div class="overflow-hidden ellipsis">
+                <p class="mb-0 recent-workspace ellipsis overflow-hidden">
+                  {list.name}
+                </p>
+                <span class="team-name ellipsis overflow-hidden"
+                  >{list?.team?.teamName}</span
+                >
+              </div>
+              <PeopleIcon
+                color={openTeam?.teamId == list.team.teamId
+                  ? "var(--sparrow-text-color)"
+                  : "var(--defaultcolor)"}
+                classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}
+              />
             </div>
-            <PeopleIcon
-              color={currOpenedTeam.id == list.team.teamId
-                ? "#8A9299"
-                : "#45494D"}
-              classProp={`${list.users.length <= 1 && "d-none"} my-auto me-1`}
-            />
           </div>
-        </div>
-      {/if}
-    {/each}
+        {/if}
+      {/each}
+    </List>
   {/if}
 </section>
 

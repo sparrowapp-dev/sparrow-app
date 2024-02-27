@@ -6,15 +6,16 @@
   import ApiSendRequestPage from "./sub-components/sub-components-header/ApiSendRequestPage.svelte";
   import PageHeader from "./sub-components/sub-components-header/PageHeader.svelte";
   import SidebarRight from "./SidebarRight.svelte";
-
+  import type { WorkspaceRole } from "$lib/utils/enums";
   export let activeTab: Observable<TabDocument>;
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
+  export let loggedUserRoleInWorkspace:WorkspaceRole;
 </script>
 
 <div class="d-flex">
   <div class="request-response w-100">
-    <PageHeader {activeTab} {collectionsMethods} />
+    <PageHeader {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
     <ApiSendRequestPage
       {activeTab}
       {collectionsMethods}
@@ -23,7 +24,7 @@
     <RequestParam {activeTab} {collectionsMethods} {environmentVariables} />
   </div>
   <div>
-    <SidebarRight {activeTab} {collectionsMethods} />
+    <SidebarRight {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
   </div>
 </div>
 

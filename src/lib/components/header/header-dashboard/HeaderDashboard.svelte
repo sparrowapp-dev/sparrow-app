@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { appWindow } from "@tauri-apps/api/window";
+  import { getCurrent } from "@tauri-apps/api/window";
   import { Observable } from "rxjs";
-  import HeaderDropdown from "../../dropdown/HeaderDropdown.svelte";
+  import HeaderDropdown from "./HeaderDashboardDropdown.svelte";
   import icons, {
     NotifyIcon,
     SearchIcon,
@@ -20,7 +20,7 @@
     type WorkspaceDocument,
   } from "$lib/database/app.database";
   import { useNavigate } from "svelte-navigator";
-  import GlobalSearchBarPopup from "$lib/components/Modal/GlobalSearchBarPopup.svelte";
+  import GlobalSearchBarPopup from "$lib/components/header/global-search-bar/GlobalSearchBar.svelte";
   import { useTree } from "$lib/components/collections/collections-list/collectionList";
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
@@ -37,14 +37,14 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
-  export let activeSideBarTabMethods: any;
   export let handleWorkspaceSwitch;
+
+  export let activeSideBarTabMethods: any;
   export let activeWorkspaceRxDoc: Observable<WorkspaceDocument>;
   export let currentTeam: CurrentTeam;
   export let currentWorkspace: CurrentWorkspace;
   export let currWorkspace: CurrentWorkspace;
   export let teams: Observable<TeamDocument[]>;
-
   const isWin = navigator.platform.toLowerCase().includes("win");
   const navigate = useNavigate();
   const _workspaceViewModel = new TeamViewModel();
@@ -96,7 +96,6 @@
         activeWorkspaceRxDocVal = value;
         activeWorkspaceId = value._data._id;
         activeWorkspaceName = value._data.name;
-        ownerName = value._data?.owner?.name;
         if (ownerName) {
           name = ownerName;
           firstLetter = name[0];
@@ -139,11 +138,9 @@
 
   const unsubscribeUser = user.subscribe((value) => {
     if (value) {
-      if (value.personalWorkspaces) {
-        name = value?.personalWorkspaces[0]?.name;
-      }
       userId = value._id;
       email = value?.email;
+      name = value?.name;
       if (name) {
         firstLetter = name[0];
       }
@@ -151,15 +148,15 @@
   });
 
   const onMinimize = () => {
-    appWindow.minimize();
+    getCurrent().minimize();
   };
 
   const onClose = () => {
-    appWindow.close();
+    getCurrent().close();
   };
 
   const toggleSize = () => {
-    appWindow.toggleMaximize();
+    getCurrent().toggleMaximize();
     isMaximizeWindow = !isMaximizeWindow;
   };
 
@@ -180,9 +177,10 @@
     profile = false;
   });
 
-  const handleDropdown = (id: string, tab: string, team: any) => {
+  const handleDropdown = (id: string) => {
     isWorkspaceLoaded.set(false);
     _viewModel.activateWorkspace(id);
+
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };
@@ -257,7 +255,6 @@
       hideHeaders
         ? ''
         : ''}"
-      style="height: 36px; width:216px"
     >
       <HeaderDropdown
         {teams}
@@ -265,10 +262,11 @@
         {currentTeam}
         {currentWorkspace}
         data={workspaces}
-        onclick={handleDropdown}
+        handleWorkspaceSwitch={handleDropdown}
         {collectionsMethods}
         {activeSideBarTabMethods}
         {activeWorkspaceId}
+        {allworkspaces}
       />
     </div>
   </div>
@@ -400,8 +398,8 @@
       <div
         class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
-        <Tooltip>
-          <button class="bg-backgroundColor border-0">
+        <Tooltip placement={"bottom"} title={"Coming Soon!"}>
+          <button class="bg-backgroundColor border-0" style="height:40px;">
             <SettingIcon width={33} height={33} />
           </button>
         </Tooltip>
@@ -409,8 +407,8 @@
       <div
         class="my-auto {showGlobalSearchPopup && hideHeaders ? 'd-none' : ''}"
       >
-        <Tooltip>
-          <button class="bg-backgroundColor border-0">
+        <Tooltip placement={"bottom"} title={"Coming Soon!"}>
+          <button class="bg-backgroundColor border-0" style="height:40px;">
             <NotifyIcon width={39} height={39} />
           </button>
         </Tooltip>
@@ -594,7 +592,7 @@
     border-radius: 4px;
     border: none;
     outline: none;
-    padding: 6px 12px;
+    padding: 5px 12px;
   }
   .search-container {
     border: 1px solid transparent;
@@ -641,7 +639,7 @@
       display: none !important;
     }
     .input-search-bar {
-      padding: 6px;
+      padding: 5px;
       padding-left: 32px;
     }
   }

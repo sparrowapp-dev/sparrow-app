@@ -1,43 +1,103 @@
 <script lang="ts">
   import dropdown from "$lib/assets/dropdown.svg";
+  import Dropdown from "$lib/assets/dropdown.svelte";
   import checkIcon from "$lib/assets/check.svg";
-  import { onDestroy, onMount } from "svelte";
-
+  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import closeIcon from "$lib/assets/close.svg";
+  type dropdownType = "text" | "img" | "checkbox";
+  type dropdownHoverType = "add" | "remove";
   export let data: Array<{
     name: string;
     id: string;
+    dynamicClasses: string;
+    hide?: boolean;
+    description?: string;
+    selectedOptionClasses?: string;
+    checked?: boolean;
+    isInvalidOption?: boolean;
+    img?: string;
+    hasDivider?: boolean;
   }>;
-  export let onclick: (tab: string) => void;
-  export let title: string;
-  export let dropdownId: string = "";
 
-  let selectedTitle: {
+  export let staticClasses: { id: string; classToAdd: string[] }[] = [];
+  export let staticCustomStyles: {
+    id: string;
+    styleKey: string;
+    styleValue: string;
+  }[] = [];
+  export let hoverClasses: { id: string; classToAdd: string[] }[] = [];
+  export let activeClasses: string = "";
+  export let dropdownDataContainer = "";
+  export let additonalSelectedOptionText: string = "";
+  export let additionalSelectedOptionHeading = "";
+  export let additionalType: "environment" | "other" | "memberinfo" = "other";
+
+  export let onclick: (tab: string) => void;
+  export let dropDownType: {
+    type: dropdownType;
+    title: string;
+  };
+  export let dropdownId: string = "";
+  export let disabled: boolean = false;
+  export let mixpanelEvent: Events = Events.NO_EVENT;
+
+  let selectedOption: {
     name: string;
     id: string;
+    dynamicClasses: string;
+    description?: string;
+    selectedOptionClasses?: string;
+    checked?: boolean;
+    isInvalidOption?: boolean;
+    img?: string;
+    hasDivider?: boolean;
   };
 
   let isOpen: boolean = false;
-
-  const toggleDropdown = () => {
-    isOpen = !isOpen;
-  };
-
-  $: {
-    if (title) {
-      data.forEach((element) => {
-        if (element.id === title) {
-          selectedTitle = element;
-        }
-      });
-    }
-  }
+  let isHover = false;
 
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(
-      `${dropdownId}-dropdown-${title}`,
+      `${dropdownId}-dropdown-${dropDownType.title}`,
     );
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       isOpen = false;
+      isHover = false;
+    }
+  }
+
+  const toggleDropdown = () => {
+    isOpen = !isOpen;
+    isHover = !isHover;
+    const dataElements = document.getElementsByClassName("dropdown-data");
+    const headingElements = document.getElementsByClassName("dropdown-btn");
+    for (const box of dataElements) {
+      if (box.id !== `${dropdownId}-options-container`) {
+        box.classList.remove("dropdown-active");
+      }
+    }
+    for (const box of headingElements) {
+      if (box.id !== `${dropdownId}-btn-div`) {
+        box.classList.remove("dropdown-btn-hover");
+      }
+    }
+    if (mixpanelEvent && mixpanelEvent !== Events.NO_EVENT) {
+      MixpanelEvent(mixpanelEvent);
+    }
+  };
+
+  $: {
+    if (dropDownType?.title) {
+      data.forEach((element) => {
+        if (element?.id === dropDownType?.title) {
+          selectedOption = element;
+        }
+      });
+      if (!selectedOption && dropDownType.type !== "checkbox") {
+        selectedOption = data[0];
+      }
     }
   }
 
@@ -45,53 +105,219 @@
     window.removeEventListener("click", handleDropdownClick);
   });
 
+  function handleHover(elementId: string, handleType: dropdownHoverType) {
+    if (hoverClasses && hoverClasses.length > 0) {
+      let selectedHoverClasses = hoverClasses.filter((cls) => {
+        return cls.id === elementId;
+      })[0];
+      if (selectedHoverClasses) {
+        const elementDiv = document.getElementById(elementId) as HTMLElement;
+        if (handleType === "add") {
+          elementDiv.classList.add(...selectedHoverClasses.classToAdd);
+        } else {
+          selectedHoverClasses.classToAdd.forEach((cls) => {
+            elementDiv.classList.remove(cls);
+          });
+        }
+      }
+    }
+  }
+  function handleStaticClasses() {
+    staticClasses.length > 0 &&
+      staticClasses.forEach((classes) => {
+        const element = document.getElementById(classes.id);
+        element?.classList.add(...classes.classToAdd);
+      });
+    staticCustomStyles?.length > 0 &&
+      staticCustomStyles.forEach((stylesObj) => {
+        const element = document.getElementById(stylesObj.id);
+        if (element) {
+          element.style[stylesObj.styleKey] = stylesObj.styleValue;
+        }
+      });
+  }
+  const countCheckedList = (list: any[]) => {
+    let count = 0;
+    list.forEach((element) => {
+      if (element?.checked) {
+        count++;
+      }
+    });
+    return count;
+  };
+
   onMount(() => {
+    handleStaticClasses();
     window.addEventListener("click", handleDropdownClick);
+  });
+  afterUpdate(() => {
+    handleStaticClasses();
   });
 </script>
 
 <div
-  class="parent-dropdown display-inline-block z-2"
+  class="parent-dropdown display-inline-block"
   style=" position: relative;"
   on:click={handleDropdownClick}
 >
-  <div on:click={toggleDropdown} id={`${dropdownId}-dropdown-${title}`}>
-    <div
-      class="dropdown-btn d-flex align-items-center justify-content-between"
-      class:dropdown-btn-active={isOpen}
-    >
-      <p class=" mb-0">
-        {selectedTitle?.name}
-      </p>
-      <span class:dropdown-logo-active={isOpen}
-        ><img
-          style="margin-left:10px; height:12px; width:12px;"
-          src={dropdown}
-          alt=""
-        /></span
-      >
-    </div>
-  </div>
-  <div class="d-none dropdown-data p-1 rounded" class:dropdown-active={isOpen}>
-    {#each data as list}
+  <div
+    on:click={(event) => {
+      event.stopPropagation();
+      if (!disabled) {
+        toggleDropdown();
+      }
+    }}
+    id={`${dropdownId}-dropdown-${dropDownType.title}`}
+  >
+    {#if dropDownType.type === "text" || dropDownType.type === "checkbox"}
       <div
-        class="d-flex px-2 py-1 justify-content-between highlight"
-        on:click={() => {
-          isOpen = false;
-          onclick(list.id);
+        id={`${dropdownId}-btn-div`}
+        class="dropdown-btn d-flex align-items-center justify-content-between {isOpen
+          ? activeClasses
+          : ''} {isHover ? 'dropdown-btn-hover' : ''} "
+        on:mouseenter={() => {
+          handleHover(`${dropdownId}-btn-div`, "add");
+        }}
+        on:mouseleave={() => {
+          handleHover(`${dropdownId}-btn-div`, "remove");
         }}
       >
+        {#if dropDownType.type === "checkbox"}
+          {#if !countCheckedList(data)}
+            <p
+              class="{disabled
+                ? 'disabled-text'
+                : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+                ? selectedOption.selectedOptionClasses
+                : ''}"
+            >
+              {selectedOption?.name}
+              <span id={`${dropdownId}-additional-option`}
+                >{additonalSelectedOptionText}</span
+              >
+            </p>
+          {:else}
+            <div class="me-4 navigator">
+              {#each data as element}
+                {#if element?.checked && !element?.isInvalidOption}
+                  <span class="bg-backgroundDropdown p-1 ps-2 pe-0 rounded me-2"
+                    >{element.name}
+                    <img
+                      src={closeIcon}
+                      on:click={() => {
+                        onclick(element.id);
+                      }}
+                    /></span
+                  >
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        {:else if additionalSelectedOptionHeading && additionalType === "other"}
+          <p
+            class="{disabled
+              ? 'disabled-text'
+              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+              ? selectedOption.selectedOptionClasses
+              : ''}"
+          >
+            {additonalSelectedOptionText}
+          </p>
+          <span
+            style="font-size: 12px;"
+            id={`${dropdownId}-additional-option`}
+            class="text-whiteColor">{additionalSelectedOptionHeading}</span
+          >
+        {:else if additionalType === "environment"}
+          {#if selectedOption?.id === "none"}
+            <p class=" mb-0 ellipsis text-textColor">Select Environment</p>
+          {:else}
+            <p class=" mb-0 ellipsis">
+              <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
+              {selectedOption?.name}
+            </p>
+          {/if}
+        {:else}
+          <p
+            class="{disabled
+              ? 'disabled-text'
+              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+              ? selectedOption.selectedOptionClasses
+              : ''}"
+          >
+            {selectedOption?.name}
+          </p>
+          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
+            >{additonalSelectedOptionText}</span
+          >
+        {/if}
+        <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
+          <Dropdown
+            height={12}
+            width={12}
+            color={disabled ? "var(--sparrow-text-color)" : "white"}
+          />
+        </span>
+      </div>
+    {:else}
+      <div id={`${dropdownId}-img`}>
+        <img src={dropDownType.title} alt="+" />
+      </div>
+    {/if}
+  </div>
+  <div
+    class="d-none dropdown-data border-2 border-dropdownBorderColor rounded dropdown-menu"
+    class:dropdown-active={isOpen}
+    id="{dropdownId}-options-container"
+    style={`${dropdownDataContainer} ${
+      additionalType === "memberinfo" ? "right: 5%" : ""
+    }`}
+  >
+    {#each data as list}
+      <div
+        id="{dropdownId}-options-div"
+        class="d-flex px-2 py-1 highlight text-break {list?.hide === true
+          ? 'd-none'
+          : ''}
+          {dropDownType.type !== 'checkbox' ? 'justify-content-between' : ''}
+          "
+        on:click={(event) => {
+          event.stopPropagation();
+          if (dropDownType.type === "checkbox") {
+            onclick(list.id);
+          } else {
+            isOpen = false;
+            onclick(list.id);
+          }
+        }}
+      >
+        {#if dropDownType.type === "checkbox"}
+          <label class="me-1">
+            <input type="checkbox" bind:checked={list.checked} />
+          </label>
+        {/if}
         <p
-          class="m-0 p-0"
-          style="font-size: 12px;"
-          class:selected-request={list.id === selectedTitle?.id}
+          class="m-0 pt-1 {list?.dynamicClasses}"
+          style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+          id="{dropdownId}-options-name"
+          class:selected-request={list.id === selectedOption?.id}
         >
           {list.name}
+          {#if list.description}
+            <br />
+            <small class="text-textColor">{list.description}</small>
+          {/if}
         </p>
-        {#if selectedTitle?.id === list.id}
+
+        {#if selectedOption?.id === list.id && dropDownType.type === "text"}
           <img src={checkIcon} alt="" />
+        {:else if list?.img}
+          <img src={list.img} />
         {/if}
       </div>
+      {#if list?.hasDivider}
+        <div style="margin-top:-10px"><hr class="dropdown-divider" /></div>
+      {/if}
     {/each}
   </div>
 </div>
@@ -100,21 +326,20 @@
   .dropdown-btn {
     background: none;
     outline: none;
-    border: none;
     height: 26px;
+    width: auto;
+    padding: 0 10px;
   }
-  .dropdown-btn:hover {
-    border-bottom: 1px solid var(--send-button);
-  }
+
   .dropdown-data {
-    background-color: var(--background-dropdown);
     color: white;
     position: absolute;
-    top: 32px;
-    left: 0;
-    min-width: 136px;
-    border: 1px solid rgb(44, 44, 44);
+    z-index: 2;
+    background-color: var(--background-dropdown);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
+
   .dropdown-btn p,
   .dropdown-data p {
     font-size: 12px;
@@ -136,8 +361,11 @@
   .dropdown-btn {
     cursor: pointer;
   }
-  .dropdown-btn-active {
+
+  .disabled-text {
+    color: var(--sparrow-text-color) !important;
+  }
+  .dropdown-btn-hover {
     background-color: var(--border-color);
-    border-bottom: 1px solid var(--send-button);
   }
 </style>

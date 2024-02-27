@@ -16,6 +16,8 @@ import info from "$lib/assets/circle-info-white.svg";
 import setting from "$lib/assets/setting-white.svg";
 import line from "$lib/assets/right-line.svg";
 import uploadIcon from "$lib/assets/upload.svg";
+import logoSparrow from "$lib/assets/logoSparrow.svg";
+import appIcon from "$lib/assets/sparrow-favicon.svg";
 export { default as PlusIcon } from "./plus.svelte";
 export { default as PeopleIcon } from "$lib/assets/people.svelte";
 export { default as TickIcon } from "./tick.svelte";
@@ -36,9 +38,6 @@ export { default as ShowMoreIcon } from "$lib/assets/showmore.svelte";
 export { default as EditIcon } from "$lib/assets/edit.svelte";
 export { default as UploadIcon } from "$lib/assets/upload.svelte";
 export { default as DeleteIcon } from "$lib/assets/delete.svelte";
-import logoSparrow from "$lib/assets/logoSparrow.svg";
-import appIcon from "$lib/assets/sparrow-favicon.svg";
-
 export default {
   closeIcon,
   resizeIcon,

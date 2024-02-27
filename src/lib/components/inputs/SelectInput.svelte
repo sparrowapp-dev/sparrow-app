@@ -1,16 +1,43 @@
 <script lang="ts">
-  export let labelText: string = "Select";
-  export let isRequired: boolean = false;
-  export let inputId: string = "";
-  export let labelDescription: string = "";
-  export let selectInputPlaceholder: string = "Select an option";
+  import { DownArrow } from "$lib/assets";
+  import { PeopleIcon } from "$lib/assets/app.asset";
+  import { fly } from "svelte/transition";
+
+  export let labelText = "Select";
+  export let isRequired = false;
+  export let inputId = "";
+  export let labelDescription = "";
+  export let selectInputPlaceholder = "Select an option";
   export let options: any[];
-  export let invalidValue: boolean = false;
-  export let errorText: string = "Invalid Value.";
-  export let handleOnSelect: (e: any) => void;
+  export let invalidValue = false;
+  export let endIconVisible = false;
+  export let errorText = "Invalid Value.";
+  export let handleOnSelect: (value: any) => void;
+
+  let isDropdownVisible = false;
+  let selectedOption = "";
+
+  const closeSparrowDropdown = () => {
+    isDropdownVisible = false;
+  };
+
+  const handleSelectOption = (name: string, e) => {
+    e.stopPropagation();
+    selectedOption = name;
+  };
+
+  const toggleSparrowDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDropdownVisible = !isDropdownVisible;
+  };
 </script>
 
-<div class="sparrow-select-input-container mt-3">
+<svelte:window
+  on:click={closeSparrowDropdown}
+  on:contextmenu|preventDefault={closeSparrowDropdown}
+/>
+<div class="sparrow-select-input-container position-relative mt-3 w-100">
   <div class="sparrow-input-label-container mb-1">
     <div class="sparrow-input-label-heading">
       <label class="sparrow-input-label text-lightGray fw-light" for={inputId}
@@ -22,21 +49,63 @@
     </div>
     <span class="sparrow-input-label-desc">{labelDescription}</span>
   </div>
-  <select
-    on:change={(e) => handleOnSelect(e)}
-    class={`${invalidValue && "invalid"} sparrow-select-input py-2 px-3 w-100`}
+  <div
+    on:click={(e) => {
+      toggleSparrowDropdown(e);
+    }}
+    class={`${
+      invalidValue && "invalid"
+    } sparrow-select-input py-2 justify-content-between d-flex px-3 w-100`}
   >
-    {#if selectInputPlaceholder !== ""}
-      <option class="sparrow-placeholder-option" disabled selected
-        >{selectInputPlaceholder}</option
-      >
+    {#if selectedOption !== ""}
+      <span class="sparrow-selected-option">{selectedOption}</span>
+    {:else if selectInputPlaceholder !== ""}
+      <span class="sparrow-placeholder-option">{selectInputPlaceholder}</span>
     {/if}
-    {#each options as option}
-      <option value={option.id}>{option.name}</option>
-    {/each}
-  </select>
+    <DownArrow classProp="my-auto" />
+  </div>
+  {#if isDropdownVisible}
+    <div
+      transition:fly={{ y: -20, duration: 100 }}
+      class="mt-2 position-absolute sparrow-dropdown-options ellipsis w-100 sparrow-thin-scrollbar"
+    >
+      {#each options as option}
+        <div
+          class="sparrow-select-option border-0 d-flex justify-content-between w-100 ellipsis"
+          on:click={(e) => {
+            handleSelectOption(option.name, e);
+            handleOnSelect(option.id);
+            closeSparrowDropdown();
+          }}
+        >
+          <div class="d-flex ellipsis overflow-hidden">
+            <div class="sparrow-img-logo-container mx-2 overflow-hidden">
+              {#if option.logo == "" || option.logo == undefined}
+                <div
+                  class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor sparrow-option-name`}
+                  style={`font-size: 15px; padding-top: 2px; width: 20px !important; height: 20px !important; display: flex; border: 1px solid #45494D; border-radius: 50%;`}
+                >
+                  {option.name[0] ? option.name[0].toUpperCase() : ""}
+                </div>
+              {:else}
+                <img
+                  class="w-100"
+                  src={option.logo}
+                  alt="sparrow-dropdown-img"
+                />
+              {/if}
+            </div>
+            <span class="ellipsis overflow-hidden">{option.name}</span>
+          </div>
+          {#if option.endIconVisible}
+            <PeopleIcon color={"#45494D"} />
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {/if}
   {#if invalidValue}
-    <span class="sparrow-input-error-text">{errorText}</span>
+    <span class="sparrow-input-error-text ms-1">{errorText}</span>
   {/if}
 </div>
 
@@ -48,6 +117,7 @@
     background-color: var(--blackColor);
     outline: none;
     border-radius: 4px;
+    cursor: pointer;
     font-size: 14px;
     border: 1px solid var(--border-color);
   }
@@ -56,5 +126,32 @@
   }
   .sparrow-placeholder-option {
     color: var(--request-arc) !important;
+  }
+  .sparrow-select-option:hover {
+    background: rgba(19, 19, 19, 0.8);
+    backdrop-filter: blur(10px);
+  }
+  .sparrow-select-option {
+    border-radius: 4px;
+    padding: 8px 7px;
+    border: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .sparrow-dropdown-options {
+    max-height: 20vh;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow-y: scroll;
+  }
+  .sparrow-input-error-text {
+    font-size: 12px;
+    color: var(--dangerColor);
+  }
+  .sparrow-img-logo-container {
+    width: 20px !important;
+    height: 20px !important;
   }
 </style>
