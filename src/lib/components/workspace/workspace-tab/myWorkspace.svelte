@@ -242,6 +242,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    activeTeamsSubscribe.unsubscribe();
     // Not required for now may be used in future if things breaks
     // userUnsubscribe();
   });

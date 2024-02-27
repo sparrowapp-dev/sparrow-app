@@ -377,6 +377,18 @@
           classToAdd: ["flex-wrap", "overflow-auto"],
         },
       ]}
+      staticCustomStyles={[
+        {
+          id:"check-select-workspace-options-container",
+          styleKey:"overflow",
+          styleValue:"auto"
+        },
+        {
+          id:"check-select-workspace-options-container",
+          styleKey:"max-height",
+          styleValue:"calc(100vh - 700px)"
+        }
+      ]}
     ></Dropdown>
   </div>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}

@@ -24,6 +24,7 @@
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
+  let isActiveInternet: boolean = true;
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -52,8 +53,16 @@
     }
   });
 
+  const doOnlineCheck = () => {
+    if (!navigator.onLine && isActiveInternet) {
+      isActiveInternet = false;
+      notifications.error("The network connection has been lost.");
+    } else isActiveInternet = true;
+  };
+
   onMount(async () => {
     await getCurrent().setFocus();
+    await getCurrent().center();
     await registerDeepLinkHandler();
     let isloggedIn;
     user.subscribe((value) => {
@@ -65,6 +74,25 @@
     } else {
       resizeWindowOnLogin();
     }
+    window.addEventListener(
+      "dragover",
+      function (e) {
+        e = e || event;
+        e.preventDefault();
+      },
+      false,
+    );
+    window.addEventListener(
+      "drop",
+      function (e) {
+        e = e || event;
+        e.preventDefault();
+      },
+      false,
+    );
+    setInterval(() => {
+      doOnlineCheck();
+    }, 5000);
   });
 </script>
 
@@ -78,7 +106,7 @@
     <section slot="unauthorized">
       <Route path="/init" component={EntryPoint} />
       <!-- - -->
-      <!-- deprecate - visit sparrow auth repo -->
+      <!-- deprecated - visit sparrow auth repo -->
       <!-- - -->
 
       <!-- <Route path="/forgot/password" component={ForgotPassword} />

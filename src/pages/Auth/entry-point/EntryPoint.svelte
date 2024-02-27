@@ -6,7 +6,7 @@
   import star from "$lib/assets/star.svg";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { open } from "@tauri-apps/plugin-shell"; 
-  
+  import {version} from "../../../../src-tauri/tauri.conf.json"
   let isEntry = false;
 
   let redirectRules = {
@@ -18,7 +18,7 @@
     buttonClick: () => {},
     loadingMessage: "Please wait while we sign you in....",
   };
-  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}/init`;
+  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
@@ -99,6 +99,7 @@
         <p class="text-center sparrow-fs-16">
           <img src={star} alt="" /> Star us on GitHub
         </p>
+        <p class="text-center sparrow-fs-12">v{version}</p>
       </div>
     </div>
   </div>

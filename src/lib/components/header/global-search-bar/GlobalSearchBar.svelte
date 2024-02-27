@@ -363,6 +363,7 @@
     font-weight: 500;
     margin-right: 8px;
     text-align: left;
+    width: 40px;
   }
   .api-name {
     font-size: 12px;
