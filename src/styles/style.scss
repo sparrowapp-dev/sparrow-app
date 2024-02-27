@@ -201,6 +201,10 @@ body {
   background-color: var(--background-color);
 }
 
+p, h1, h2, h3, h4, h5, h6, a, li, span{
+  word-wrap: break-word;
+}
+
 .border-error {
   border-color: $sparrow-error;
   border-width: 3px;

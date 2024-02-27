@@ -20,7 +20,9 @@
   function handleDropdownClick(event: MouseEvent) {
     const dropdownElement = document.getElementById(`input-select-list-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-      isOpen = false;
+      setTimeout(() => {
+        isOpen = false;
+      }, 100);
     }
   }
 
@@ -132,11 +134,6 @@
           on:focus={() => {
             isOpen = true;
           }}
-          on:blur={() => {
-            setTimeout(() => {
-              isOpen = false;
-            }, 100);
-          }}
           class="input-container mt-2 sparrow-fs-12 my-1"
         />
       </div>
@@ -153,21 +150,24 @@
             class="d-flex w-100 px-2 py-2 highlight rounded"
             on:click={() => {
               handleEmailOnAdd(user.email);
+              isOpen = false;
               filterUser();
             }}
           >
             <div class="d-flex tile w-100 rounded align-items-center">
-              <div class="info d-flex align-items-center">
+              <div class="info d-flex align-items-center w-100">
                 <div
                   class="icon d-flex align-items-center justify-content-center"
                 >
                   <span>{user.name[0].toUpperCase()}</span>
                 </div>
-                <div class="name px-2">
-                  <span class="sparrow-fs-12 text-whiteColor"
+                <div class="name px-2 ellipsis">
+                  <span class="sparrow-fs-12 text-whiteColor w-100 ellipsis"
                     >{user.name || ""}</span
                   ><br />
-                  <span class="sparrow-fs-12 text-textColor">{user.email}</span>
+                  <span class="sparrow-fs-12 text-textColor w-100 ellipsis"
+                    >{user.email}</span
+                  >
                 </div>
               </div>
             </div>
