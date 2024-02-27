@@ -65,13 +65,13 @@ jobs:
            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
       
 
-      # - name: Upload win updater to Azure Blob Storage
-      #   run: |
-      #     az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_0.0.0_x64_en-US.msi.zip --name Sparrow_0.0.0_x64_en-US.msi.zip --overwrite
-      #   env:
-      #     AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-      #     AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-      #     AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+      - name: Upload win updater to Azure Blob Storage
+        run: |
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.0.0_x64_en-US.msi.zip --name Sparrow_1.0.0_x64_en-US.msi.zip --overwrite
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
            
       - name: Install App Center CLI
         run: |
@@ -93,7 +93,7 @@ jobs:
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           $branch_name = "${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
-          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_0.0.0_x64_en-US.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
+          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.0.0_x64_en-US.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
       
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
@@ -142,13 +142,13 @@ jobs:
       - name: file content
         run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
       
-      # - name: Upload mac updater to Azure Blob Storage
-      #   run: |
-      #     az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
-      #   env:
-      #     AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-      #     AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-      #     AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+      - name: Upload mac updater to Azure Blob Storage
+        run: |
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
 
       - name: Install App Center CLI
         run: |
