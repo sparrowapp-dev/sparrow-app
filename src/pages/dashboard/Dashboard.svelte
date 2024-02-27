@@ -23,14 +23,16 @@
   import {
     isWorkspaceCreatedFirstTime,
     isWorkspaceLoaded,
-    setCurrentWorkspace,
   } from "$lib/store/workspace.store";
   import { TeamViewModel } from "../Teams/team.viewModel";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
-  import { user } from "$lib/store";
+  import { user, userWorkspaceLevelRole } from "$lib/store";
   import { TeamRepository } from "$lib/repositories/team.repository";
+  import { DashboardViewModel } from "./Dashboard.ViewModel";
+  import type { WorkspaceRole } from "$lib/utils/enums";
 
+  const _dashboardViewModel = new DashboardViewModel();
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -41,7 +43,7 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
   const teams: Observable<TeamDocument[]> = _viewModelHome.teams;
-
+  let loggedInUserId: string;
   let currentWorkspaceId: string;
   let currentWorkspaceName: string;
   let currentTeam: CurrentTeam;
@@ -52,13 +54,16 @@
   let activeSidebarTab: Observable<ActiveSideBarTabDocument> =
     _viewModel.getActiveTab();
   let activeSidbarTabRxDoc: ActiveSideBarTabDocument;
+  let loggedUserRoleInWorkspace: WorkspaceRole;
 
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
+      loggedInUserId = value._id;
       await _viewModelHome.refreshTeams(value._id);
       await _viewModelWorkspace.refreshWorkspaces(value._id);
     }
   });
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value) {
@@ -70,6 +75,11 @@
         };
         let currentTeam = value.get("team");
         _viewModelHome.activateTeam(currentTeam.teamId);
+        value._data.users.forEach((user) => {
+          if (user.id === loggedInUserId) {
+            userWorkspaceLevelRole.set(user.role);
+          }
+        });
       }
     },
   );
@@ -107,8 +117,6 @@
     isWorkspaceLoaded.set(false);
     _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
-
-    setCurrentWorkspace(workspaceId, workspaceName);
     isWorkspaceLoaded.set(true);
   };
 
@@ -139,7 +147,7 @@
       workspaceId,
       new Date().toString(),
     );
-    sampleWorkspace.id = workspaceId;
+    sampleWorkspace._id = workspaceId;
     sampleWorkspace.name = workspaceName;
     sampleWorkspace.description = workspaceDesc;
     sampleWorkspace.path = path;
@@ -147,7 +155,7 @@
     sampleWorkspace.property.workspace.collectionCount = totalCollection;
     sampleWorkspace.save = true;
     collectionsMethods.handleCreateTab(sampleWorkspace);
-    collectionsMethods.handleActiveTab(sampleWorkspace.id);
+    collectionsMethods.handleActiveTab(sampleWorkspace._id);
     moveNavigation("right");
   };
   let collapsExpandToggle = false;
@@ -196,6 +204,14 @@
 
   const getActiveTab = handleActiveTab();
 
+  const unsubscribeRegisterUser = userWorkspaceLevelRole.subscribe(
+    (value: WorkspaceRole) => {
+      if (value) {
+        loggedUserRoleInWorkspace = value;
+      }
+    },
+  );
+
   onMount(() => {
     handleResize();
     return () => {
@@ -230,7 +246,9 @@
       />
     {/if}
     <section class="w-100">
-      <Route path="/collections/*"><CollectionsHome /></Route>
+      <Route path="/collections/*"
+        ><CollectionsHome {loggedUserRoleInWorkspace} /></Route
+      >
       <Route path="/workspaces/*"
         ><Teams
           {currentTeam}
@@ -242,7 +260,9 @@
         /></Route
       >
       <Route path="/mock/*"><Mock /></Route>
-      <Route path="/environment/*"><Environment /></Route>
+      <Route path="/environment/*"
+        ><Environment {loggedUserRoleInWorkspace} /></Route
+      >
       <Route path="/help">Help</Route>
       <Route path="/*">
         {#if activeSidebarTabName}

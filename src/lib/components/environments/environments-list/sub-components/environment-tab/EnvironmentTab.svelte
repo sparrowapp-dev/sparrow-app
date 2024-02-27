@@ -7,9 +7,12 @@
     EnvironmentRepositoryMethods,
     EnvironmentServiceMethods,
   } from "$lib/utils/interfaces/environment.interface";
-  import DeleteConfirmationPopup from "$lib/components/Modal/DeleteConfirmationPopup.svelte";
   import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { boolean } from "yup";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -17,20 +20,22 @@
   export let env;
   export let currentEnvironment;
 
+  let rightClickPanelHeight;
+
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
-  let containerRef;
   let isEnvironmentPopup: boolean = false;
   let newEnvironmentName: string = "";
   let isRenaming = false;
 
+  let noOfColumns = 180;
+  let noOfRows = 4;
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -168,53 +173,66 @@
       ];
     }
   }
+  let deleteEnvironmentLoader: boolean = false;
 </script>
 
-{#if isEnvironmentPopup}
-  <DeleteConfirmationPopup
-    {env}
-    {currentWorkspace}
-    title={`Delete Environment?`}
-    description={`<p>
+<ModalWrapperV1
+  title={"Delete Environment?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isEnvironmentPopup}
+  handleModalState={handleEnvironmentPopUpCancel}
+>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
-        class="text-whiteColor">"${env.name}"</span
+        class="text-whiteColor">"{env.name}"</span
       >
       and all its variables will be removed and cannot be restored. It will also
       impact all the API requests that use the variables in this environment.
-    </p>`}
-    onSuccess={handleEnvironmentPopUpSuccess}
-    onCancel={handleEnvironmentPopUpCancel}
-    {environmentRepositoryMethods}
-    {environmentServiceMethods}
-  />
-{/if}
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    style="font-size: 16px;"
+  >
+    <Button
+      disable={deleteEnvironmentLoader}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"dark"}
+      loader={false}
+      onClick={() => {
+        handleEnvironmentPopUpCancel(false);
+      }}
+    />
+
+    <Button
+      disable={deleteEnvironmentLoader}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"danger"}
+      loader={deleteEnvironmentLoader}
+      onClick={async () => {
+        deleteEnvironmentLoader = true;
+        await handleEnvironmentPopUpSuccess();
+        deleteEnvironmentLoader = false;
+      }}
+    />
+  </div></ModalWrapperV1
+>
 
 {#if showMenu}
-  <div class="environment-tab">
-    <nav style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index:4;">
-      <div
-        class="navbar pb-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
-        id="navbar"
-      >
-        <ul class="ps-2 pt-2 pe-2 pb-0 w-100">
-          {#each menuItems as item}
-            <li class="align-items-center">
-              <button
-                disabled={item.disabled}
-                class={`align-items-center mb-1 px-3 py-2 ${
-                  item.disabled && "text-requestBodyColor"
-                }`}
-                on:click={item.onClick}
-                style={item.displayText === "Delete" ? "color: #ff7878" : ""}
-                >{item.displayText}</button
-              >
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </nav>
-  </div>
+  <RightOption
+    xAxis={pos.x}
+    yAxis={pos.y}
+    {menuItems}
+    {noOfRows}
+    {noOfColumns}
+  />
 {/if}
 
 <svelte:window

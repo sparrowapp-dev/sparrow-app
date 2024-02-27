@@ -1,7 +1,7 @@
 import { loginUser } from "$lib/services/auth.service";
 import constants from "$lib/utils/constants";
 import type { loginUserPostBody } from "$lib/utils/dto";
-import { notifications } from "$lib/utils/notifications";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { checkValidation, loginSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
@@ -10,7 +10,6 @@ import {
   resizeWindowOnLogOut,
   resizeWindowOnLogin,
 } from "$lib/components/header/window-resize";
-import { invoke } from "@tauri-apps/api";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
@@ -28,9 +27,7 @@ export const navigateToRegister = () => {
   navigate("/register");
 };
 
-export const authNavigate = async () => {
-  await invoke("open_oauth_window");
-};
+export const authNavigate = async () => {};
 const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
 
 //---------------- Handle Login ------------------//
@@ -49,8 +46,8 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
       Success: response.isSuccessful,
     });
     notifications.success("Login successful!");
-    navigate("/dashboard/collections");
-    _activeSidebarTabViewModel.addActiveTab("collections");
+    navigate("/dashboard/workspaces");
+    _activeSidebarTabViewModel.addActiveTab("workspaces");
     return response;
   } else {
     navigate("/");
@@ -60,6 +57,27 @@ const handleLogin = async (loginCredentials: loginUserPostBody) => {
     throw "error login user: " + response.message;
   }
 };
+export async function handleLoginV2(url: string) {
+  const params = new URLSearchParams(url.split("?")[1]);
+  const accessToken = params.get("accessToken");
+  const refreshToken = params.get("refreshToken");
+  if (accessToken && refreshToken) {
+    const userDetails = jwtDecode(accessToken);
+    setAuthJwt(constants.AUTH_TOKEN, accessToken);
+    setAuthJwt(constants.REF_TOKEN, refreshToken);
+    setUser(jwtDecode(accessToken));
+    sendUserDataToMixpanel(userDetails);
+    MixpanelEvent(Events.USER_LOGIN, {
+      Login_Method: "Email",
+      Success: true,
+    });
+    notifications.success("Login successful!");
+    navigate("/dashboard/workspaces");
+    await resizeWindowOnLogin();
+  } else {
+    notifications.error("Invalid token!");
+  }
+}
 
 //------------------------- Handle Login Validation -----------------//
 export const handleLoginValidation = async (

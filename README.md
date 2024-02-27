@@ -31,7 +31,7 @@
  
 ## <a name="what-is-sparrow">🐦 What is Sparrow ?</a>
  
-Sparrow is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.
+Sparrow is your next go-to API development buddy which can help you test, debug, and distribute better APIs while collaborating with your colleagues and making you a better programmer.
  
 ## <a name="installation">🔨 Installation</a>
  
@@ -41,8 +41,13 @@ To install this project, you will need to have the following installed on your m
 ![Yarn](https://img.shields.io/badge/-Yarn-black?style=for-the-badge&logoColor=white&logo=yarn&color=2C8EBB)
 ![Rust](https://img.shields.io/badge/-Rust-black?style=for-the-badge&logoColor=white&logo=rust&color=000000)
 
+Check if you already have the prerequisites installed by running the below commands in your terminal
 
-Install the above dependencies by heading over to the links below,
+1) Node: node -v 
+2) Yarn: yarn check
+3) Rust: rustc --version
+
+Install the required dependencies by heading over to the links below,
 
 1) [Node](https://nodejs.org/en)
 2) [Tauri](https://tauri.app/v1/guides/getting-started/prerequisites)
@@ -69,6 +74,8 @@ yarn tauri dev
 ```
  
 The above command will start the app in development mode and watch for changes on local.
+
+Follow [this](https://github.com/sparrowapp-dev/sparrow-api/blob/main/README.md) guide to set up the backend server.
  
 ## <a name="recommended-ide-setup">👨‍💻 Recommended IDE Setup</a>
  

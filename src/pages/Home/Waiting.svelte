@@ -1,9 +1,9 @@
 <script>
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
+  import Loader from "$lib/components/Transition/loader/Loader.svelte";
   import { setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-  import { notifications } from "$lib/utils/notifications";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
 
@@ -28,6 +28,6 @@
 
 <div class="d-flex align-items-center justify-content-center m-auto pt-5">
   <div>
-    <PageLoader />
+    <Loader loaderSize={"80px"} loaderMessage="Please Wait..." />
   </div>
 </div>

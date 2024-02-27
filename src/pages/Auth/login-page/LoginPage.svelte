@@ -6,16 +6,11 @@
   import googleLogo from "$lib/assets/googlelogo.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
-
-  // import githubLogo from "$lib/assets/githublogo.svg";
-  // import microsoftLogo from "$lib/assets/microsoftlogo.svg";
-
   import { authNavigate, handleLoginValidation } from "./login-page";
-  import PageLoader from "$lib/components/Transition/PageLoader.svelte";
   import sparrowicon from "$lib/assets/sparrowIcon.svg";
   import { once } from "@tauri-apps/api/event";
-  import { WebviewWindow } from "@tauri-apps/api/window";
-  import LoginLoader from "$lib/components/Transition/LoginLoader.svelte";
+  import { Window } from "@tauri-apps/api/window";
+  import LoginWaitingScreen from "$lib/components/Transition/LoginWaitingScreen.svelte";
 
   let isEmailTouched = false;
 
@@ -65,9 +60,12 @@
   };
 
   once("onclose", async (event) => {
-    await WebviewWindow.getByLabel("oauth").onCloseRequested(() => {
-      isLoadingPage = false;
-    });
+    const oauthWindow = await Window.getByLabel("oauth");
+    if (oauthWindow) {
+      oauthWindow.onCloseRequested(() => {
+        isLoadingPage = false;
+      });
+    }
   });
 
   let isPasswordtouched: boolean = false;
@@ -102,13 +100,15 @@
   };
 
   let isSignInPopup: boolean = false;
-  const handleSignInPopup = (flag) => {
-    isSignInPopup = flag;
+  const handleSignInPopup = (flag: boolean) => {
+    if (validationErrors.isSuccessful) {
+      isSignInPopup = flag;
+    }
   };
 </script>
 
 {#if isSignInPopup}
-  <LoginLoader onClick={handleSignInPopup} {isLoadingPage} />
+  <LoginWaitingScreen onClick={handleSignInPopup} {isLoadingPage} />
 {/if}
 
 <div
@@ -155,6 +155,8 @@
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           placeholder="Please enter your registered email id"
+          autocorrect="off"
+          autocapitalize="none"
           bind:value={loginCredentials.email}
           on:input={validateEmail}
         />
@@ -282,7 +284,6 @@
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
 
-
   @media (min-width: 1000px) {
     .eye-icon > img {
       position: absolute;
@@ -306,6 +307,5 @@
       gap: 16px;
       height: auto;
     }
-
   }
 </style>

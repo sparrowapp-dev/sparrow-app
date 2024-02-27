@@ -23,6 +23,7 @@
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+  import type { WorkspaceRole } from "$lib/utils/enums";
   let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -72,8 +73,10 @@
     initActiveEnvironmentToWorkspace:
       _viewModel.initActiveEnvironmentToWorkspace,
     currentEnvironment: _viewModel.currentEnvironment,
+    updateEnvironment: _viewModel.updateEnvironment,
+    getGlobalEnvironment: _viewModel.getGlobalEnvironment,
   };
-
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const environments = _viewModel.environments;
@@ -90,44 +93,56 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
   let environmentVariables = [];
+  let environmentId: string;
+
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
-        const environmentId = activeWorkspaceRxDoc.get("environmentId");
-        if (environments) {
-          const env = $environments;
-          if (env?.length > 0) {
-            const filteredEnv = env.filter((elem) => {
-              if (
-                elem.type === environmentType.GLOBAL ||
-                elem.id === environmentId
-              ) {
-                return true;
-              }
-            });
-            if (filteredEnv?.length > 0) {
-              environmentVariables.length = 0;
-              filteredEnv.forEach((elem) => {
-                const temp = elem.toMutableJSON();
-                temp.variable.forEach((variable) => {
-                  if (variable.key && variable.checked) {
-                    environmentVariables.push({
-                      key: variable.key,
-                      value: variable.value,
-                      type: temp.type === environmentType.GLOBAL ? "G" : "E",
-                      environment: temp.name,
-                    });
-                  }
-                });
-              });
-            }
-          }
-        }
+        environmentId = activeWorkspaceRxDoc.get("environmentId");
       }
     },
   );
 
+  const refreshEnvironment = () => {
+    if ($environments) {
+      if ($environments?.length > 0) {
+        const filteredEnv = $environments.filter((elem) => {
+          if (
+            elem.type === environmentType.GLOBAL ||
+            elem.id === environmentId
+          ) {
+            return true;
+          }
+        });
+        if (filteredEnv?.length > 0) {
+          environmentVariables.length = 0;
+          filteredEnv.forEach((elem) => {
+            const temp = elem.toMutableJSON();
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                environmentVariables.push({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
+              }
+            });
+          });
+        }
+      }
+    }
+  };
+
+  $: {
+    if (environmentId) {
+      refreshEnvironment();
+    }
+    if ($environments) {
+      refreshEnvironment();
+    }
+  }
   const onTabsSwitched = () => {
     _viewModel.syncTabWithStore();
   };
@@ -150,6 +165,7 @@
         activePath={$activeTab?.path}
         environments={$environments}
         {collectionsMethods}
+        {loggedUserRoleInWorkspace}
       />
     </div>
     <div
@@ -167,6 +183,7 @@
           _tabId={$activeTab?.id}
           {collectionsMethods}
           {onTabsSwitched}
+          {loggedUserRoleInWorkspace}
         />
       </div>
       <div class="tab__content d-flex">
@@ -176,6 +193,7 @@
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
             <RequestResponse
               {activeTab}
+              {loggedUserRoleInWorkspace}
               {collectionsMethods}
               environmentVariables={environmentVariables.reverse()}
             />
@@ -190,12 +208,14 @@
               {collectionsMethods}
               {activeTab}
               {_collectionListViewModel}
+              {loggedUserRoleInWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
             <MyCollection
               {collectionsMethods}
               {activeTab}
               {_collectionListViewModel}
+              {loggedUserRoleInWorkspace}
             />
           {/if}
         </div>

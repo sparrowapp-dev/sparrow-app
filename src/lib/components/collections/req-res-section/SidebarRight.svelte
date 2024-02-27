@@ -4,7 +4,6 @@
   import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import MethodButton from "$lib/components/buttons/MethodButton.svelte";
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
@@ -13,9 +12,21 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
-  import { notifications } from "$lib/utils/notifications";
+
+  import { Events, type WorkspaceRole } from "$lib/utils/enums";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+  import {
+    getMethodStyle,
+    hasWorkpaceLevelPermission,
+  } from "$lib/utils/helpers";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import ComboText from "$lib/components/text/ComboText.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let componentData: NewTab;
   let description: string;
@@ -133,6 +144,7 @@
       } else {
       }
     }
+    MixpanelEvent(Events.SAVE_API_DOCUMENTATION);
   };
 
   onDestroy(() => {
@@ -151,7 +163,14 @@
     <div class="sidebar-content p-3 bg-backgroundLight">
       <div class="d-flex">
         <div>
-          <MethodButton method={componentData?.property.request.method} />
+          <ComboText
+            value={componentData?.property.request.method}
+            comboContainerClassProp={"d-flex flex-start pb-2"}
+            singleTextClassProp={"rounded d-flex align-items-center justify-content-center"}
+            valueClassProp={`text-${getMethodStyle(
+              componentData?.property.request.method,
+            )}`}
+          />
         </div>
         <div style="width: calc(100% - 70px);">
           <p class="ellipsis mb-0" style="font-size:12px;">
@@ -179,10 +198,17 @@
           <p
             class="description-field text-labelColor"
             on:click={() => {
-              collectionsMethods.updateRequestState(
-                !isSaveDescription,
-                "isSaveDescription",
-              );
+              if (
+                hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.EDIT_API_DESC,
+                )
+              ) {
+                collectionsMethods.updateRequestState(
+                  !isSaveDescription,
+                  "isSaveDescription",
+                );
+              }
             }}
           >
             <img src={EditIcon} alt="" />
@@ -262,7 +288,14 @@
   </div>
 </div>
 
-{#if visibility}
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={visibility}
+  handleModalState={handleBackdrop}
+>
   <SaveRequest
     {collectionsMethods}
     {componentData}
@@ -275,7 +308,7 @@
     }}
     type="SAVE_DESCRIPTION"
   />
-{/if}
+</ModalWrapperV1>
 
 <style>
   .sidebar-right {

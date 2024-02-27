@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type Method } from "axios";
 import type { RequestData } from "../utils/dto/requestdata";
 import { getUserToken, getRefToken } from "$lib/utils/token";
@@ -6,16 +7,18 @@ import constants from "$lib/utils/constants";
 import { setAuthJwt } from "$lib/utils/jwt";
 import { isLoading } from "$lib/store/auth.store";
 import { ErrorMessages } from "$lib/utils/enums/enums";
-import { invoke } from "@tauri-apps/api";
-
+import { invoke } from "@tauri-apps/api/core";
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
-const _viewModel = new HeaderDashboardViewModel();
-
-const error = (error, data?, tabId?) => {
+const error = (
+  error: string,
+  data?: any,
+  tabId: string = "",
+): MakeRequestResponse => {
   return {
     status: "error",
     isSuccessful: false,
@@ -25,7 +28,7 @@ const error = (error, data?, tabId?) => {
   };
 };
 
-const success = (data, tabId) => {
+const success = (data: any, tabId: string): MakeRequestResponse => {
   return {
     status: "success",
     isSuccessful: true,
@@ -108,6 +111,7 @@ const makeRequest = async (
       e.response?.data?.statusCode === 401 &&
       e.response.data.message === ErrorMessages.Unauthorized
     ) {
+      const _viewModel = new HeaderDashboardViewModel();
       await _viewModel.clientLogout();
       return error("unauthorized");
     }
@@ -138,6 +142,7 @@ const makeHttpRequest = async (
   request: string,
   tabId: string,
 ) => {
+  console.table({ url, method, headers, body, request });
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
 
