@@ -376,6 +376,7 @@
 
   .btn-primary {
     z-index: 5;
+    background-color: var(--primary-btn-color) !important;
   }
 
   .profile-circle {
