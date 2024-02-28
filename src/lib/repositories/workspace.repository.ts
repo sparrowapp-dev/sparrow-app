@@ -74,23 +74,20 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-    // if (
-    //   typeof workspace.collection !== "undefined" &&
-    //   Symbol.iterator in Object(workspace.collection)
-    // ) {
-    //   // If it's iterable, create a new array by spreading the existing elements and adding collectionObj
-    //   workspace?.incrementalPatch({
-    //     collections: [...workspace.collection, collectionObj],
-    //   });
-    // } else {
-    //   // If it's not iterable, create a new array with collectionObj
-    //   workspace?.incrementalPatch({
-    //     collections: [collectionObj],
-    //   });
-    // }
-    workspace.incrementalPatch({
-      collections: [...workspace.collections, collectionObj],
-    });
+    if (
+      typeof workspace.collection !== "undefined" &&
+      Symbol.iterator in Object(workspace.collection)
+    ) {
+      // If it's iterable, create a new array by spreading the existing elements and adding collectionObj
+      workspace?.incrementalPatch({
+        collections: [...workspace.collection, collectionObj],
+      });
+    } else {
+      // If it's not iterable, create a new array with collectionObj
+      workspace?.incrementalPatch({
+        collections: [collectionObj],
+      });
+    }
   };
 
   public updateEnvironmentInWorkspace = async (
