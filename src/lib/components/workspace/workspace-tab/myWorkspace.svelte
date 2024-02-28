@@ -334,7 +334,6 @@
       {handleInvitePopup}
       currentTeamworkspaces={currentTeamWorkspacesArr}
       {currentTeamDetails}
-      getUserDetailsOfWorkspace={_viewModel.getUserDetailsOfWorkspace}
       loggedInUserEmail={email}
       {currentWorkspaceDetails}
       {workspaceInvitePermissonMethods}
