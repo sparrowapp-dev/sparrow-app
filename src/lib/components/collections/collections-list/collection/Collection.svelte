@@ -378,7 +378,10 @@
     );
 
     if (response.isSuccessful) {
-      collectionsMethods.updateCollection(collection.id, response.data.data);
+      collectionsMethods.updateCollection(
+        collection.id,
+        response.data.data.collection,
+      );
       notifications.success("Collection fetched successfully.");
     } else {
       notifications.error("Failed to fetch the Collection.");
@@ -498,7 +501,7 @@
       />
     {:else}
       <div
-        class="collection-title d-flex align-items-center py-1 mb-0 flex-column"
+        class="collection-title justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
         on:click={() => {
           isCollectionCreatedFirstTime.set(false);
@@ -511,13 +514,13 @@
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
-        {#if isActiveSyncEnabled}
+        <!-- {#if isActiveSyncEnabled}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
             >branch name - current branch
           </span>
-        {/if}
+        {/if} -->
       </div>
     {/if}
   </div>
