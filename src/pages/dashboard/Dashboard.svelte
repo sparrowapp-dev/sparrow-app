@@ -107,7 +107,7 @@
     },
   );
 
-  const handleWorkspaceSwitch = (
+  const handleWorkspaceSwitch = async (
     workspaceId: string,
     workspaceName: string,
     teamId: string,
@@ -115,7 +115,7 @@
     base64String: object,
   ) => {
     isWorkspaceLoaded.set(false);
-    _viewModelWorkspace.activateWorkspace(workspaceId);
+    await _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };
