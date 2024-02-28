@@ -4,7 +4,7 @@
   import leftIcon from "$lib/assets/left.svg";
   import constants from "$lib/utils/constants";
   import { fly, fade } from "svelte/transition";
-
+  import { version } from "../../../../src-tauri/tauri.conf.json";
   export let title = "Title";
   export let description = "Description";
   export let message = "Detailed Message";
@@ -17,11 +17,11 @@
 
 <!-- <Header /> -->
 <div
-  class="background-overlay d-flex align-items-center justify-content-center"
+  class="background-overlay d-flex align-items-center justify-content-center z-2"
   transition:fade={{ delay: 0, duration: 100 }}
 >
   <div
-    class="container rounded container d-flex flex-column align-items-center justify-content-center w-100"
+    class="container rounded container d-flex flex-column align-items-center justify-content-center w-100 z-2"
     transition:fly={{ y: 50, delay: 0, duration: 100 }}
     on:introstart
     on:outroend
@@ -84,12 +84,13 @@
         href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
         class="px-2 sparrow-fs-12">Need Help?</a
       >
-      <span class="px-2">|</span>
+      <span class="px-2 text-textColor fw-bold">|</span>
       <a
         href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
         class="px-2 sparrow-fs-12">Report Issue</a
       >
     </div>
+    <p class="text-center sparrow-fs-14 mt-3">Version {version}</p>
   </div>
 </div>
 
