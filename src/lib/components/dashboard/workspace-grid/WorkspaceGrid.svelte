@@ -18,8 +18,8 @@
   let showMenu: boolean = false;
 
   let menuItems = [];
-  const handleOpenWorkspace = () => {
-    handleWorkspaceSwitch(
+  const handleOpenWorkspace = async () => {
+    await handleWorkspaceSwitch(
       workspace._id,
       workspace.name,
       openTeam?.teamId,
