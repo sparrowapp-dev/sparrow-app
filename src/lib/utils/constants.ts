@@ -10,6 +10,7 @@ const constants = {
   API_LIMIT: 5,
   SPARROW_SUPPORT_EMAIL: import.meta.env.VITE_SPARROW_SUPPORT_EMAIL,
   SPARROW_AUTH_URL: import.meta.env.VITE_AUTH_URL,
+  SPARROW_GITHUB: import.meta.env.VITE_SPARROW_GITHUB,
 };
 
 export default constants;
