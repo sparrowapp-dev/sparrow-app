@@ -153,7 +153,7 @@
       Invite By Email<span class="asterik">*</span>
     </p>
     <p class="invite-subheader text-textColor mt-0 mb-0">
-      use commas to separate emails
+      Use commas to separate emails
     </p>
     <div
       class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary"
