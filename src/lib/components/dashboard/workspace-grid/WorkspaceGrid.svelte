@@ -376,7 +376,7 @@
   </div>
 </ModalWrapperV1>
 
-<style>
+<style lang="scss">
   .workspace-card-outer {
     display: contents;
   }
@@ -417,5 +417,62 @@
   .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
+  }
+  .workspace-delete-confirmation {
+    .btn-close1 {
+      background-color: var(--background-color);
+    }
+
+    .btn-close1:hover {
+      background-color: var(--background-dropdown);
+    }
+
+    .btn-close1:active {
+      background-color: var(--background-dropdown);
+    }
+    .btn-primary {
+      background-color: var(--border-color);
+    }
+
+    .btn-primary:hover {
+      color: var(--blackColor);
+      background-color: var(--workspace-hover-color);
+    }
+
+    .btn-primary:active {
+      color: var(--blackColor);
+      background-color: var(--button-pressed);
+    }
+
+    .btn-secondary {
+      background-color: var(--dangerColor);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--delete-hover);
+    }
+    .team-icon {
+      height: 24px;
+      width: 24px;
+    }
+    .asterik {
+      color: var(--dangerColor);
+      margin-left: 4px;
+    }
+    .input-container {
+      background-color: var(--background-dropdown);
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color) !important;
+      width: 100%;
+    }
+    .error-text {
+      margin-top: 2px;
+      margin-bottom: 0 !important;
+      color: var(--error--color);
+    }
+    .error-border {
+      border: 1px solid var(--error--color) !important;
+    }
   }
 </style>
