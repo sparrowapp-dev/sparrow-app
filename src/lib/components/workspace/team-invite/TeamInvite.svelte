@@ -229,7 +229,7 @@
     Invite By Email<span class="asterik">*</span>
   </p>
   <p class="invite-subheader text-textColor mt-0 mb-1">
-    use commas to separate emails
+    Use commas to separate emails
   </p>
   <div
     class="email-container rounded {emailError && emailstoBeSentArr.length === 0
@@ -399,12 +399,12 @@
   {/if}
 {/if}
 <div class="d-flex align-items-center justify-content-between mt-4">
-  <div class="description">
-    <div class="d-flex align-items-center">
+  <div class="description ellipsis">
+    <div class="d-flex align-items-center ellipsis">
       {#if teamLogo}
         <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
       {/if}
-      <p style="font-size:16px;" class="mb-0">{teamName}</p>
+      <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>
   </div>
   <div>
@@ -412,7 +412,7 @@
       disable={loader}
       title={"Send Invite"}
       loaderSize={19}
-      textStyleProp={"font-size: var(--base-text)"}
+      textStyleProp={"font-size: var(--base-text); min-width:80px;"}
       type={"primary"}
       {loader}
       onClick={() => {

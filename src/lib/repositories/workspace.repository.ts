@@ -153,7 +153,7 @@ export class WorkspaceRepository {
         },
       })
       .exec();
-    inactiveWorkspace.incrementalModify((value) => {
+    await inactiveWorkspace.incrementalModify((value) => {
       value.isActiveWorkspace = true;
       return value;
     });
