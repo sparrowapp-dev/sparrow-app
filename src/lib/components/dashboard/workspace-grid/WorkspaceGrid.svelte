@@ -89,6 +89,9 @@
       if (activeWorkspaceBeingDeleted) {
         handleActivateWorkspacePopup(true);
       }
+      else{
+        await requestResponseStore.removeTab(workspace._id);
+      }
       onDeleteWorkspace(workspace._id);
     } else {
       notifications.error(
@@ -160,15 +163,15 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        // {
-        //   onClick: async (e) => {
-        //     handleDeletePopup(true);
-        //   },
-        //   displayText: "Delete Workspace",
-        //   disabled: !(
-        //     openTeam?.admins?.includes(userId) || openTeam?.owner == userId
-        //   ),
-        // },
+        {
+          onClick: async (e) => {
+            handleDeletePopup(true);
+          },
+          displayText: "Delete Workspace",
+          disabled: !(
+            openTeam?.admins?.includes(userId) || openTeam?.owner == userId
+          ),
+        },
       ];
     } else {
       menuItems = [
