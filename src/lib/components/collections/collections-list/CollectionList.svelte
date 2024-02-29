@@ -186,6 +186,7 @@
         currentWorkspaceId = activeWorkspaceRxDoc?._id;
         const workspaceId = activeWorkspaceRxDoc?._id;
         if (trackWorkspaceId !== workspaceId) {
+          debugger;
           const response =
             await collectionsMethods.getAllCollections(workspaceId);
           if (response.isSuccessful && response.data.data) {

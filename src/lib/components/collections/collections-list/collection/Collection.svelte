@@ -37,6 +37,7 @@
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
+  import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
 
   export let title: string;
   export let collection: any;
@@ -49,7 +50,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activePath;
-
+  const _viewImportCollection = new ImportCollectionViewModel();
   const collectionService = new CollectionService();
   const commonService = new CommonService();
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -366,17 +367,26 @@
       "isActiveSyncEnabled",
     );
   };
+  let refreshCollectionLoader = false;
   const refetchCollection = async () => {
-    deleteLoader = true;
-    const response =
-      await collectionService.fetchCollection(currentWorkspaceId);
+    if (refreshCollectionLoader) return;
+    refreshCollectionLoader = true;
+    const response = await _viewImportCollection.importCollectionData(
+      currentWorkspaceId,
+      { url: collection.activeSyncUrl },
+      collection.activeSync,
+    );
 
     if (response.isSuccessful) {
-      // existing collection with the new one
+      collectionsMethods.updateCollection(
+        collection.id,
+        response.data.data.collection,
+      );
+      notifications.success("Collection fetched successfully.");
     } else {
       notifications.error("Failed to fetch the Collection.");
-      deleteLoader = false;
     }
+    refreshCollectionLoader = false;
   };
 </script>
 
@@ -491,7 +501,7 @@
       />
     {:else}
       <div
-        class="collection-title d-flex align-items-center py-1 mb-0 flex-column"
+        class="collection-title justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
         on:click={() => {
           isCollectionCreatedFirstTime.set(false);
@@ -504,29 +514,33 @@
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
-        {#if isActiveSyncEnabled}
+        <!-- {#if isActiveSyncEnabled}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
             >branch name - current branch
           </span>
-        {/if}
+        {/if} -->
       </div>
     {/if}
   </div>
   {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    {#if isActiveSyncEnabled}
+    {#if isActiveSyncEnabled && collection?.activeSync}
       <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
+        class="threedot-icon-container p-1 border-0 rounded d-flex justify-content-center align-items-center {refreshCollectionLoader
+          ? 'refresh-collection-loader-active'
+          : ''} "
         on:click={() => {
           refetchCollection();
         }}
       >
-        <img src={refreshIcon} alt="refetch" />
+        <img
+          src={refreshIcon}
+          alt="refetch"
+          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
+        />
       </button>
     {/if}
     <button
@@ -611,6 +625,9 @@
     visibility: visible;
     background-color: var(--workspace-hover-color);
   }
+  .refresh-collection-loader-active {
+    visibility: visible;
+  }
   .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
   }
@@ -645,5 +662,16 @@
   .collection-title {
     width: calc(100% - 30px);
     text-align: left;
+  }
+  .refresh-collection-loader {
+    animation: loader-animation 1s linear infinite;
+  }
+  @keyframes loader-animation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>

@@ -129,7 +129,10 @@
           items: response.data.data.items,
           createdAt: response.data.data.createdAt,
         };
-        collectionsMethods.addCollection(newCollection);
+        collectionsMethods.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+        });
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
           new Date().toString(),
@@ -204,7 +207,10 @@
         items: response.data.data.items,
         createdAt: response.data.data.createdAt,
       };
-      collectionsMethods.addCollection(newCollection);
+      collectionsMethods.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+      });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),
@@ -249,35 +255,40 @@
       progressBar.isProgress = true;
       let path: Path = {
         workspaceId: currentWorkspaceId,
-        collectionId: response.data.data._id,
+        collectionId: response.data.data.collection._id,
       };
-      const newCollection = {
-        id: response.data.data._id,
-        name: response.data.data.name,
-        items: response.data.data.items,
-        createdAt: response.data.data.createdAt,
-      };
-      collectionsMethods.addCollection(newCollection);
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),
       );
 
-      Samplecollection.id = response.data.data._id;
+      Samplecollection.id = response.data.data.collection._id;
       Samplecollection.path = path;
-      Samplecollection.name = response.data.data.name;
+      Samplecollection.name = response.data.data.collection.name;
       Samplecollection.save = true;
+      if (response.data.data.existingCollection) {
+        collectionsMethods.updateCollection(response.data.data.collection._id, {
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+        });
+        notifications.error("Collection already exists.");
+      } else {
+        collectionsMethods.addCollection({
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+        });
+        _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+          id: Samplecollection.id,
+          name: Samplecollection.name,
+        });
+        notifications.success("New Collection Created");
+      }
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: Samplecollection.id,
-        name: Samplecollection.name,
-      });
-      notifications.success("New Collection Created");
       MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
+        collectionName: response.data.data.collection.name,
+        collectionId: response.data.data.collection._id,
         importThrough: "ByObject",
       });
       return;
@@ -419,7 +430,7 @@
         class="form-check-input"
         type="checkbox"
         role="switch"
-        bind:value={activeSync}
+        bind:checked={activeSync}
         id="enableActiveSync"
       />
     </div>
