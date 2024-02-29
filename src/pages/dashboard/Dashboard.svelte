@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Route } from "svelte-navigator";
+  import { Route, navigate } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
@@ -101,6 +101,7 @@
       if (value) {
         activeSidbarTabRxDoc = value;
         activeSidebarTabName = activeSidbarTabRxDoc.get("activeTabName");
+        navigate(activeSidebarTabName);
       } else {
         await activeSideBarTabMethods.addActiveTab("workspaces");
       }
