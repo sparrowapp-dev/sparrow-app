@@ -229,7 +229,7 @@
     Invite By Email<span class="asterik">*</span>
   </p>
   <p class="invite-subheader text-textColor mt-0 mb-1">
-    use commas to separate emails
+    Use commas to separate emails
   </p>
   <div
     class="email-container rounded {emailError && emailstoBeSentArr.length === 0

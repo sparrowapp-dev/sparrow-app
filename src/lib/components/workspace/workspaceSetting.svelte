@@ -74,9 +74,23 @@
     const workspaceObj = currentTeamworkspaces.find(
       (ws) => ws._id === workspaceId,
     ) as any;
-    workspaceObj._data.id = workspaceObj?._id;
-    // collectionsMethods.handleCreateTab(workspaceObj);
-    // collectionsMethods.handleActiveTab(workspaceId);
+    const newWorkspaceObj = workspaceObj._data
+    newWorkspaceObj.isActiveWorkspace = true;
+    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+    newWorkspaceObj.type = "WORKSPACE";
+    newWorkspaceObj.save =  true;
+    newWorkspaceObj.path = {
+      collectionId: "",
+      workspaceId,
+    };
+    newWorkspaceObj.property = {
+      workspace: {
+        requestCount: 0,
+        collectionCount: 0,
+      },
+    };
+    collectionsMethods.handleCreateTab(newWorkspaceObj);
+    collectionsMethods.handleActiveTab(workspaceId);
   };
 
   const handleDeleteWorkspaceFlow = async () => {
@@ -104,7 +118,9 @@
       notifications.success(
         `${currentWorkspaceDetails.name} is removed from ${currentTeamDetails.name}`,
       );
-      showActivateWorkspacePopup = true;
+      if (activeWorkspaceBeingDeleted) {
+        showActivateWorkspacePopup = true;
+      }
     } else {
       notifications.error(
         `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,

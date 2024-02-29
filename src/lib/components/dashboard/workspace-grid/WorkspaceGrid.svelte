@@ -5,7 +5,7 @@
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
   import { formatDateInString } from "$lib/utils/workspacetimeUtils";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { navigate } from "svelte-navigator";
   import Card from "../card/Card.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
@@ -16,6 +16,7 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { requestResponseStore } from "$lib/store";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
 
   export let workspace: any;
   export let handleWorkspaceSwitch: any;
@@ -45,6 +46,7 @@
     };
   });
   const _viewModel = new HeaderDashboardViewModel();
+  const collectionsViewModel = new CollectionsViewModel();
 
   let menuItems = [];
   const handleOpenWorkspace = async () => {
@@ -84,13 +86,15 @@
       notifications.success(
         `${workspace.name} is removed from ${currActiveTeam.name}`,
       );
-      showActivateWorkspacePopup = true;
+      if (activeWorkspaceBeingDeleted) {
+        handleActivateWorkspacePopup(true);
+      }
+      onDeleteWorkspace(workspace._id);
     } else {
       notifications.error(
         `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
       );
     }
-    onDeleteWorkspace(workspace._id);
     handleDeletePopup(false);
   };
 
@@ -112,9 +116,24 @@
     await requestResponseStore.clearTabs();
     const workspaceObj = workspaces.find((ws) => ws._id === workspaceId) as any;
     workspaceObj._data.id = workspaceObj?._id;
+    const newWorkspaceObj = workspaceObj._data;
+    newWorkspaceObj.isActiveWorkspace = true;
+    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+    newWorkspaceObj.type = "WORKSPACE";
+    newWorkspaceObj.save = true;
+    newWorkspaceObj.path = {
+      collectionId: "",
+      workspaceId,
+    };
+    newWorkspaceObj.property = {
+      workspace: {
+        requestCount: 0,
+        collectionCount: 0,
+      },
+    };
+    collectionsViewModel.handleCreateTab(newWorkspaceObj);
+    collectionsViewModel.handleActiveTab(workspaceId);
     navigate("/dashboard/collections");
-    // collectionsMethods.handleCreateTab(workspaceObj);
-    // collectionsMethods.handleActiveTab(workspaceId);
   };
 
   onDestroy(() => {
@@ -141,15 +160,15 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        {
-          onClick: async (e) => {
-            handleDeletePopup(true);
-          },
-          displayText: "Delete Workspace",
-          disabled: !(
-            openTeam?.admins?.includes(userId) || openTeam?.owner == userId
-          ),
-        },
+        // {
+        //   onClick: async (e) => {
+        //     handleDeletePopup(true);
+        //   },
+        //   displayText: "Delete Workspace",
+        //   disabled: !(
+        //     openTeam?.admins?.includes(userId) || openTeam?.owner == userId
+        //   ),
+        // },
       ];
     } else {
       menuItems = [
@@ -324,7 +343,7 @@
   title={"Activate Workspace"}
   type={"primary"}
   width={"35%"}
-  zIndex={1000}
+  zIndex={1000000}
   isOpen={showActivateWorkspacePopup}
   canClose={false}
   handleModalState={handleActivateWorkspacePopup}
