@@ -29,7 +29,7 @@
     {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
           return workspace.isActiveWorkspace === true;
         }, )}
-      <Tooltip title="Select A Workspace To Be Active" placement={"right"}>
+      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
         <Helper
           {activeSideBarTabMethods}
           route=""
@@ -60,7 +60,20 @@
         />
       </Tooltip>
     {/if}
-    {#if $workspaces && $workspaces.length > 0}
+    {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
+          return workspace.isActiveWorkspace === true;
+        }, )}
+      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
+        <Helper
+          {activeSideBarTabMethods}
+          route=""
+          heading="Environment"
+          logo={environmentFaded}
+          isSelected={"environment" === activeSidebarTabName && false}
+          disabled={true}
+        />
+      </Tooltip>
+    {:else if $workspaces && $workspaces.length > 0}
       <Helper
         {activeSideBarTabMethods}
         route={"environment"}

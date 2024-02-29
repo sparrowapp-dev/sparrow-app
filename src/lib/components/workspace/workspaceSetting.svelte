@@ -15,9 +15,11 @@
   } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import { navigate } from "svelte-navigator";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   import Button from "../buttons/Button.svelte";
+  import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
+  import Dropdown from "../dropdown/Dropdown.svelte";
+  import { requestResponseStore } from "$lib/store";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };
@@ -33,13 +35,23 @@
     Pick<TeamRepositoryMethods, "updateUserRoleInTeam" | "removeUserFromTeam">;
   export let workspaceInvitePermissonMethods: workspaceInviteMethods;
   export let currentActiveTeam: TeamDocument;
-  let isshowDeletePopupOpen: boolean = false;
+  let isshowDeletePopupOpen = false;
+  let showActivateWorkspacePopup = false;
   export let users: userDetails[] = [];
   export let hasPermission: boolean;
   export let loggedInUser: userDetails;
   let filterText = "";
   export let handleInvitePopup: (showPopup: boolean) => void;
-  export let getUserDetailsOfWorkspace: (workspaceId: string) => any;
+  const _viewModel = new HeaderDashboardViewModel();
+  let activeWorkspaceBeingDeleted = false;
+  let teamSpecificWorkspace = currentTeamworkspaces.map((elem) => {
+    return {
+      id: elem._id,
+      name: elem.name,
+      dynamicClasses: "text-whiteColor",
+    };
+  });
+
   const handleUserOnRemove = async (workspaceId: string, userId: string) => {
     users = users.filter(
       (userObj) =>
@@ -51,7 +63,47 @@
     isshowDeletePopupOpen = showPopup;
   };
 
+  const handleActivateWorkspacePopup = (showPopup: boolean) => {
+    showActivateWorkspacePopup = showPopup;
+  };
+
+  const handleActivateWorkspace = async (workspaceId: string) => {
+    await _viewModel.activateWorkspace(workspaceId);
+    showActivateWorkspacePopup = false;
+    await requestResponseStore.clearTabs();
+    const workspaceObj = currentTeamworkspaces.find(
+      (ws) => ws._id === workspaceId,
+    ) as any;
+    const newWorkspaceObj = workspaceObj._data
+    newWorkspaceObj.isActiveWorkspace = true;
+    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+    newWorkspaceObj.type = "WORKSPACE";
+    newWorkspaceObj.save =  true;
+    newWorkspaceObj.path = {
+      collectionId: "",
+      workspaceId,
+    };
+    newWorkspaceObj.property = {
+      workspace: {
+        requestCount: 0,
+        collectionCount: 0,
+      },
+    };
+    collectionsMethods.handleCreateTab(newWorkspaceObj);
+    collectionsMethods.handleActiveTab(workspaceId);
+  };
+
   const handleDeleteWorkspaceFlow = async () => {
+    activeWorkspaceBeingDeleted = await _viewModel.checkActiveWorkspace(
+      currentWorkspaceDetails.id,
+    );
+    if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
+      notifications.error(
+        "Cannot Delete Only Active Workspace of the Team: Please Create a New Workspace Before Deleting the Current Active Workspace.",
+      );
+      handleDeletePopup(false);
+      return;
+    }
     const response = await workspaceInvitePermissonMethods.deleteWorkspace(
       currentWorkspaceDetails.id,
     );
@@ -60,10 +112,15 @@
       currentWorkspaceDetails.id,
     );
     if (response && response.data) {
+      teamSpecificWorkspace = teamSpecificWorkspace.filter(
+        (ws) => ws.id != currentWorkspaceDetails.id,
+      );
       notifications.success(
         `${currentWorkspaceDetails.name} is removed from ${currentTeamDetails.name}`,
       );
-      navigate("/dashboard/workspaces");
+      if (activeWorkspaceBeingDeleted) {
+        showActivateWorkspacePopup = true;
+      }
     } else {
       notifications.error(
         `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,
@@ -267,6 +324,62 @@
           />
         </div>
       </div>
+    </div>
+  </ModalWrapperV1>
+
+  <ModalWrapperV1
+    title={"Activate Workspace"}
+    type={"primary"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={showActivateWorkspacePopup}
+    canClose={false}
+    handleModalState={handleActivateWorkspacePopup}
+  >
+    <div class="mt-4">
+      <p class="role-title mb-0">
+        Choose your next active workspace<span class="asterik">*</span>
+      </p>
+      <Dropdown
+        dropDownType={{ type: "text", title: "select" }}
+        dropdownId="check-select-workspace"
+        data={[
+          {
+            name: "Select",
+            id: "select",
+            dynamicClasses: "text-whiteColor",
+            hide: true,
+          },
+          ...teamSpecificWorkspace,
+        ]}
+        onclick={handleActivateWorkspace}
+        staticClasses={[
+          {
+            id: `check-select-workspace-dropdown-select`,
+            classToAdd: ["border", "rounded", "py-1"],
+          },
+          {
+            id: "check-select-workspace-options-container",
+            classToAdd: ["end-0", "start-0"],
+          },
+          {
+            id: "check-select-workspace-btn-div",
+            classToAdd: ["flex-wrap", "overflow-auto"],
+          },
+        ]}
+        staticCustomStyles={[
+          {
+            id: "check-select-workspace-options-container",
+            styleKey: "overflow",
+            styleValue: "auto",
+          },
+          {
+            id: "check-select-workspace-options-container",
+            styleKey: "max-height",
+            styleValue: "calc(100vh - 500px)",
+          },
+        ]}
+      ></Dropdown>
     </div>
   </ModalWrapperV1>
 </div>

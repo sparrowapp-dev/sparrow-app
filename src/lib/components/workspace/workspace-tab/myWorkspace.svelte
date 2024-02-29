@@ -206,7 +206,7 @@
         await getUserDetails();
         currentActiveTeam = team;
         team._data.users.forEach((user) => {
-          if (user.id === loggedInUser.id) {
+          if (user.id === loggedInUser?.id) {
             loggedUserRole = user.role as TeamRole;
           }
         });
@@ -334,7 +334,6 @@
       {handleInvitePopup}
       currentTeamworkspaces={currentTeamWorkspacesArr}
       {currentTeamDetails}
-      getUserDetailsOfWorkspace={_viewModel.getUserDetailsOfWorkspace}
       loggedInUserEmail={email}
       {currentWorkspaceDetails}
       {workspaceInvitePermissonMethods}

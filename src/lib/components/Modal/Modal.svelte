@@ -4,6 +4,7 @@
   export let isOpen = false;
   export let title: string;
   export let type: "primary" | "dark" | "danger" = "primary";
+  export let canClose = true;
   /**
    * Takes x-index, recommended values => 1, 100, 1000, 10000, 100000.
    */
@@ -19,7 +20,7 @@
   <div
     class="sparrow-modal-bg-overlay"
     style={`z-index: ${zIndex}`}
-    on:click={handleModalState(false)}
+    on:click={canClose ? handleModalState(false) : null}
     transition:fade={{ delay: 0, duration: 100 }}
   />
   <div
@@ -31,12 +32,14 @@
   >
     <div class="sparrow-modal-header justify-content-between d-flex">
       <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
-      <button
-        class="sparrow-modal-close-icon-btn border-0"
-        on:click={handleModalState(false)}
-      >
-        <CrossIcon />
-      </button>
+      {#if canClose}
+        <button
+          class="sparrow-modal-close-icon-btn border-0"
+          on:click={handleModalState(false)}
+        >
+          <CrossIcon />
+        </button>
+      {/if}
     </div>
     <div class="sparrow-modal-body">
       <slot />
