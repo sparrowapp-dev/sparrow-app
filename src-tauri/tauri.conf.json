@@ -38,8 +38,11 @@
     "targets": "all",
     "windows": {
       "wix": {
-        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs","./assets/CleanupOnUninstall.wxs"],
-        "componentRefs": ["DeepLinkRegistryEntries","CleanupAppFolder"]
+        "fragmentPaths": [
+          "./assets/DeepLinkRegistryEntries.wxs",
+          "./assets/CleanupOnUninstall.wxs"
+        ],
+        "componentRefs": ["DeepLinkRegistryEntries", "CleanupAppFolder"]
       }
     }
   },
@@ -58,5 +61,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "0.0.0"
+  "version": "1.0.0"
 }
