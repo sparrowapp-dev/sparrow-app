@@ -271,7 +271,6 @@
 
   const handleLeaveTeam = async () => {
     if (!$openTeam?.teamId) return;
-    const openTeamId = $openTeam?.teamId;
     isLeavingTeam = true;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
