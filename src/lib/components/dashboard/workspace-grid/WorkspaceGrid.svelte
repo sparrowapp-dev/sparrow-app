@@ -351,7 +351,6 @@
           loader={workspaceDeletePopupLoader}
           onClick={async () => {
             if (confirmationText === "") {
-              debugger;
               confirmationError = `Workspace name cannot be empty.`;
             } else if (confirmationText !== workspace.name) {
               confirmationError = `Workspace name does not match.`;
