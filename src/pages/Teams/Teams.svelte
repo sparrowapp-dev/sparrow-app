@@ -249,7 +249,7 @@
        * );
        **/
 
-      await teamRepositoryMethods.setOpenTeam(res?._id);
+      // await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
@@ -279,7 +279,14 @@
        *   activeTeamRxDoc?._data?.logo,
        * );
        **/
-      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
+      let nextTeamId = "";
+      $teams.forEach((element) => {
+        if (element.teamId !== response.data.data._id) {
+          nextTeamId = element.teamId;
+          return;
+        }
+      });
+      await teamRepositoryMethods.setOpenTeam(nextTeamId);
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();
@@ -554,6 +561,7 @@
     <WorkspaceContent
       {currentTeam}
       {userId}
+      teams={allTeams}
       {handleCreateWorkspace}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
