@@ -72,11 +72,10 @@
       handleDeletePopup(false);
       return;
     }
-
-    if (activeWorkspaceBeingDeleted) {
-      teamSpecificWorkspace = teamSpecificWorkspace.filter(
+    teamSpecificWorkspace = teamSpecificWorkspace.filter(
         (ws) => ws.id != workspace._id,
       );
+    if (activeWorkspaceBeingDeleted) {
       handleDeletePopup(false);
       handleActivateWorkspacePopup(true);
       return;
@@ -89,9 +88,6 @@
         workspace._id,
       );
       if (response && response.data) {
-        teamSpecificWorkspace = teamSpecificWorkspace.filter(
-          (ws) => ws.id != workspace._id,
-        );
         notifications.success(
           `${workspace.name} is removed from ${currActiveTeam.name}`,
         );
