@@ -62,6 +62,18 @@
   /**
    * @description Configures and populates the save-as popup on the user's screen.
    */
+
+  //    async function downloadBlob(inputblob) {
+  //   const downloadelem = document.createElement("a");
+  //   const url = URL.createObjectURL(inputblob);
+  //   document.body.appendChild(downloadelem);
+  //   downloadelem.src = url;
+  //   downloadelem.click();
+  //   downloadelem.remove();
+  //   window.URL.revokeObjectURL(url);
+  // }
+  // downloadBlob(yourblob);
+
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
       suggestedName: `api_response_${

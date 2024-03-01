@@ -8,7 +8,11 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  import type { CurrentTeam, Team } from "$lib/utils/interfaces";
+  import type {
+    CurrentTeam,
+    Team,
+    workspaceInviteMethods,
+  } from "$lib/utils/interfaces";
   import type {
     TeamDocument,
     WorkspaceDocument,
@@ -16,6 +20,7 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
   import type { Observable } from "rxjs";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
   export let userId: string;
   export let currActiveTeam: CurrentTeam;
@@ -28,7 +33,21 @@
   export let workspaceUnderCreation = false;
 
   const _viewModel = new TeamViewModel();
+  const headerDashboardViewModel = new HeaderDashboardViewModel();
   const openTeamObservable: Observable<TeamDocument> = _viewModel.openTeam;
+  const workspaceInvitePermissonMethods: workspaceInviteMethods = {
+    deleteWorkspace: headerDashboardViewModel.deleteWorkspace,
+    updateRoleInWorkspace: headerDashboardViewModel.updateUserRoleInWorkspace,
+    updateUsersInWorkspaceInRXDB:
+      headerDashboardViewModel.updateUserRoleInWorkspaceInRXDB,
+    checkIfUserIsPartOfMutipleWorkspaces:
+      headerDashboardViewModel.isUserInMultipleWorkspaces,
+    deleteUserFromWorkspace: headerDashboardViewModel.deleteUserFromWorkspace,
+    deleteUserFromWorkspaceRxDB:
+      headerDashboardViewModel.removeUserFromWorkspaceRxDB,
+    activateWorkspace: headerDashboardViewModel.activateWorkspace,
+    handleWorkspaceDeletion: headerDashboardViewModel.handleWorkspaceDeletion,
+  };
 
   let filterText = "";
   let workspacePerPage = 5;
@@ -52,6 +71,12 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
+
+  const onDeleteWorkspace = (workspaceId: string) => {
+    workspaces = workspaces.filter((ws) => ws._id != workspaceId);
+  };
+
+  const hasPermissionToDelete = openTeam?.admins?.includes(userId) || openTeam?.owner == userId;
 </script>
 
 <div class="p-2">
@@ -97,7 +122,9 @@
           type="other"
           buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
           onClick={handleCreateWorkspace}
+          buttonStyleProp={workspaces.length == 0 ? "min-height:132px" : ""}
         />
+        <!-- update later the above width -->
       {/if}
       {#each workspaces
         .slice()
@@ -113,6 +140,10 @@
           {handleWorkspaceSwitch}
           {currActiveTeam}
           {openTeam}
+          {workspaces}
+          {workspaceInvitePermissonMethods}
+          {userId}
+          {onDeleteWorkspace}
           {handleWorkspaceTab}
           {activeSideBarTabMethods}
         />
@@ -125,7 +156,7 @@
               .toLowerCase()
               .includes(filterText.toLowerCase())).length > 0}
       <div
-        class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
+        class="justify-content-between bottom-0 position-absolute w-75 bg-backgroundColor d-flex"
       >
         <div class="tab-head">
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -

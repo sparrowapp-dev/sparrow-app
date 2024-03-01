@@ -68,6 +68,7 @@
           confirmationError = "";
         }}
         on:blur={() => {
+          confirmationText = confirmationText.replace(/’/g, "'");
           if (confirmationText === "") {
             confirmationError = `${
               isTeam ? "Team" : "Workspace"

@@ -360,58 +360,63 @@
     />
   </div>
 </ModalWrapperV1>
+{#if currentWorkspace?.name && currentWorkspace?.id && currentTeam?.name}
+  <Dropdown
+    dropdownId="header-dropdown"
+    dropDownType={{
+      type: "text",
+      title: currentWorkspace ? `${currentWorkspace?.id}` : "",
+    }}
+    additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
+    additonalSelectedOptionText={`${currentTeam?.name}`}
+    staticCustomStyles={[
+      {
+        id: "header-dropdown-btn-div",
+        styleKey: "maxWidth",
+        styleValue: "15vw",
+      },
+    ]}
+    activeClasses="border border-labelColor"
+    staticClasses={[
+      {
+        id: "header-dropdown-btn-div",
+        classToAdd: ["w-100", "py-3", "px-2", "rounded"],
+      },
 
-<Dropdown
-  dropdownId="header-dropdown"
-  dropDownType={{
-    type: "text",
-    title: currentWorkspace ? `${currentWorkspace?.id}` : "",
-  }}
-  additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
-  additonalSelectedOptionText={`${currentTeam?.name}`}
-  staticCustomStyles={[
-    { id: "header-dropdown-btn-div", styleKey: "maxWidth", styleValue: "15vw" },
-  ]}
-  activeClasses="border border-labelColor"
-  staticClasses={[
-    {
-      id: "header-dropdown-btn-div",
-      classToAdd: ["w-100", "py-3", "px-2", "rounded"],
-    },
-
-    {
-      id: "header-dropdown-additional-option",
-      classToAdd: ["ellipsis", "mw-25"],
-    },
-    {
-      id: "header-dropdown-options-container",
-      classToAdd: ["w-100", "mt-2", "bg-backgroundDropdown"],
-    },
-  ]}
-  data={[
-    {
-      id: "createWorkspace",
-      name: "Create New Workspace",
-      dynamicClasses: "text-labelColor",
-      img: plusIcon,
-      hasDivider: true,
-    },
-    ...sharedData,
-    {
-      id: "",
-      name: "You will see your five most recent workspaces",
-      dynamicClasses: "text-textColor text-wrap text-center px-2 py-1",
-      hasDivider: true,
-    },
-    {
-      id: "view-all",
-      name: "View All Workspaces",
-      dynamicClasses:
-        "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
-    },
-  ]}
-  onclick={handleDropdown}
-></Dropdown>
+      {
+        id: "header-dropdown-additional-option",
+        classToAdd: ["ellipsis", "mw-25"],
+      },
+      {
+        id: "header-dropdown-options-container",
+        classToAdd: ["w-100", "mt-2", "bg-backgroundDropdown"],
+      },
+    ]}
+    data={[
+      {
+        id: "createWorkspace",
+        name: "Create New Workspace",
+        dynamicClasses: "text-labelColor",
+        img: plusIcon,
+        hasDivider: true,
+      },
+      ...sharedData,
+      {
+        id: "",
+        name: "You will see your five most recent workspaces",
+        dynamicClasses: "text-textColor text-wrap text-center px-2 py-1",
+        hasDivider: true,
+      },
+      {
+        id: "view-all",
+        name: "View All Workspaces",
+        dynamicClasses:
+          "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
+      },
+    ]}
+    onclick={handleDropdown}
+  ></Dropdown>
+{/if}
 
 <!-- <div
     class="rounded z-2"

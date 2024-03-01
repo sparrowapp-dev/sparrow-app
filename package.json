@@ -27,6 +27,7 @@
     "@tauri-apps/plugin-deep-link": "^2.0.0-beta.0",
     "@tauri-apps/plugin-os": "^2.0.0-beta.0",
     "@tauri-apps/plugin-process": "^2.0.0-beta.0",
+    "@tauri-apps/plugin-shell": "^2.0.0-beta.1",
     "@tauri-apps/plugin-updater": "^2.0.0-beta.0",
     "@tauri-apps/plugin-window": "^2.0.0-alpha.1",
     "axios": "^1.5.1",
@@ -109,28 +110,28 @@
         {
           "assets": [
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.1.0_x64.dmg",
-              "label": "sparrow.dmg"
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/Sparrow_1.1.0_x64.dmg",
+              "label": "Sparrow.dmg"
             },
             {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/*.exe",
-              "label": "sparrow.exe"
+              "label": "Sparrow.exe"
             },
             {
               "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/*.msi",
-              "label": "sparrow.msi"
+              "label": "Sparrow.msi"
             },
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.1.0_x64_en-US.msi.zip",
-              "label": "sparrow-app_1.0.0_x64_en-US.msi.zip"
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/Sparrow_1.1.0_x64_en-US.msi.zip",
+              "label": "Sparrow_1.1.0_x64_en-US.msi.zip"
             },
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_1.1.0_x64-setup.nsis.zip",
-              "label": "sparrow-app_1.0.0_x64-setup.nsis.zip"
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/Sparrow_1.1.0_x64-setup.nsis.zip",
+              "label": "Sparrow_1.1.0_x64-setup.nsis.zip"
             },
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app.app.tar.gz",
-              "label": "sparrow-app.app.tar.gz"
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/Sparrow.app.tar.gz",
+              "label": "Sparrow.app.tar.gz"
             }
           ]
         }

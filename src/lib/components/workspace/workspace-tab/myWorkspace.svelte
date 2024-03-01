@@ -206,7 +206,7 @@
         await getUserDetails();
         currentActiveTeam = team;
         team._data.users.forEach((user) => {
-          if (user.id === loggedInUser.id) {
+          if (user.id === loggedInUser?.id) {
             loggedUserRole = user.role as TeamRole;
           }
         });
@@ -242,6 +242,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    activeTeamsSubscribe.unsubscribe();
     // Not required for now may be used in future if things breaks
     // userUnsubscribe();
   });
@@ -333,7 +334,6 @@
       {handleInvitePopup}
       currentTeamworkspaces={currentTeamWorkspacesArr}
       {currentTeamDetails}
-      getUserDetailsOfWorkspace={_viewModel.getUserDetailsOfWorkspace}
       loggedInUserEmail={email}
       {currentWorkspaceDetails}
       {workspaceInvitePermissonMethods}
@@ -375,6 +375,7 @@
 
   .btn-primary {
     z-index: 5;
+    background-color: var(--primary-btn-color) !important;
   }
 
   .profile-circle {

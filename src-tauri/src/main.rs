@@ -207,6 +207,16 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            app.emit(
+                "deep-link-urls",
+                Payload {
+                    url: argv[1].to_string(),
+                },
+            )
+            .unwrap();
+        }))
         .setup(|app| {
             #[cfg(desktop)]
             app.handle()

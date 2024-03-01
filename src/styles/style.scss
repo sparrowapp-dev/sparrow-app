@@ -181,6 +181,7 @@ $sparrow-font-sizes: (
   18: 1.125rem, // 18px in rem
   19: 1.1875rem, // 19px in rem
   20: 1.25rem, // 20px in rem
+  28: 1.75rem, // 28px in rem
   36: 2.25rem // 36px in rem
 );
 
@@ -198,6 +199,10 @@ $sparrow-font-sizes: (
 
 body {
   background-color: var(--background-color);
+}
+
+p, h1, h2, h3, h4, h5, h6, a, li, span{
+  word-wrap: break-word;
 }
 
 .border-error {

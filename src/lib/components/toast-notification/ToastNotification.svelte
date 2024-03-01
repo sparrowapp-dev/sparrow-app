@@ -1,7 +1,7 @@
 <script>
-  import { ToastContainer, FlatToast } from "svelte-toasts";
+  import { ToastContainer, BootstrapToast } from "svelte-toasts";
 </script>
 
 <ToastContainer let:data>
-  <FlatToast {data} />
+  <BootstrapToast {data} />
 </ToastContainer>

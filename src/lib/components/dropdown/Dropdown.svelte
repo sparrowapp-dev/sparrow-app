@@ -223,8 +223,10 @@
           >
             {additonalSelectedOptionText}
           </p>
-          <span style="font-size: 12px;" id={`${dropdownId}-additional-option`}
-            >{additionalSelectedOptionHeading}</span
+          <span
+            style="font-size: 12px;"
+            id={`${dropdownId}-additional-option`}
+            class="text-whiteColor">{additionalSelectedOptionHeading}</span
           >
         {:else if additionalType === "environment"}
           {#if selectedOption?.id === "none"}
@@ -264,7 +266,7 @@
     {/if}
   </div>
   <div
-    class="d-none dropdown-data border-1 border-dropdownBorderColor rounded dropdown-menu"
+    class="d-none dropdown-data border-1 border-dropdownBorderColor px-2 rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
     style={`${dropdownDataContainer} ${
@@ -295,7 +297,7 @@
           </label>
         {/if}
         <p
-          class="m-0 {list?.dynamicClasses}"
+          class="m-0 pt-1 {list?.dynamicClasses}"
           style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
           id="{dropdownId}-options-name"
           class:selected-request={list.id === selectedOption?.id}

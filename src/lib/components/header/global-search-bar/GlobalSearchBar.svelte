@@ -12,7 +12,6 @@
     handleRequestClick,
     handleFolderClick,
   } from "$lib/utils/helpers/handle-clicks.helper";
-  import { slide } from "svelte/transition";
   export let handleGlobalSearchPopup: (show: boolean) => void;
   export let searchData: string;
   export let filteredRequest: any[];
@@ -55,7 +54,7 @@
   }
 </script>
 
-<div class="container" transition:slide={{ duration: 200 }}>
+<div class="container">
   <div class="workspace-options-container">
     <button
       id="all"
@@ -364,6 +363,7 @@
     font-weight: 500;
     margin-right: 8px;
     text-align: left;
+    width: 40px;
   }
   .api-name {
     font-size: 12px;

@@ -14,7 +14,8 @@
         "minWidth": 1200,
         "resizable": true,
         "title": "Sparrow",
-        "shadow": true
+        "shadow": true,
+        "focus": true
       }
     ],
     "withGlobalTauri": false
@@ -37,8 +38,11 @@
     "targets": "all",
     "windows": {
       "wix": {
-        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs"],
-        "componentRefs": ["DeepLinkRegistryEntries"]
+        "fragmentPaths": [
+          "./assets/DeepLinkRegistryEntries.wxs",
+          "./assets/CleanupOnUninstall.wxs"
+        ],
+        "componentRefs": ["DeepLinkRegistryEntries", "CleanupAppFolder"]
       }
     }
   },

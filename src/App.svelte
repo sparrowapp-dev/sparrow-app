@@ -1,35 +1,31 @@
 <script lang="ts">
-  import { Router, Route, navigate } from "svelte-navigator";
+  import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
   import Toast from "$lib/components/toast-notification/ToastNotification.svelte";
-  import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
-  import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
   import Authguard from "./routing/Authguard.svelte";
   import Navigate from "./routing/Navigate.svelte";
   import Dashboard from "./pages/dashboard/Dashboard.svelte";
-  import UpdatePassword from "./pages/Auth/update-password/UpdatePassword.svelte";
-  import ResetPassword from "./pages/Auth/reset-password/ResetPassword.svelte";
-  import ForgotPassword from "./pages/Auth/forgot-password/ForgotPassword.svelte";
-  import Waiting from "./pages/Home/Waiting.svelte";
   import { TabRepository } from "$lib/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
+  import EntryPoint from "./pages/Auth/entry-point/EntryPoint.svelte";
   import {
     resizeWindowOnLogOut,
     resizeWindowOnLogin,
   } from "$lib/components/header/window-resize";
-
+  import { registerDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
-
   import { user } from "$lib/store/auth.store";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
-  import WelcomeScreen from "$lib/components/Transition/WelcomeScreen.svelte";
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
+  import { getCurrent } from "@tauri-apps/api/window";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
   export let url = "/";
   const tabRepository = new TabRepository();
   let flag: boolean = true;
+  let isActiveInternet: boolean = true;
   let tabList = tabRepository.getTabList();
   let sample = generateSampleRequest("id", new Date().toString());
   tabList.subscribe((val) => {
@@ -58,7 +54,17 @@
     }
   });
 
+  const doOnlineCheck = () => {
+    if (!navigator.onLine && isActiveInternet) {
+      isActiveInternet = false;
+      notifications.error("The network connection has been lost.");
+    } else isActiveInternet = true;
+  };
+
   onMount(async () => {
+    await getCurrent().setFocus();
+    await getCurrent().center();
+    await registerDeepLinkHandler();
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;
@@ -69,6 +75,25 @@
     } else {
       resizeWindowOnLogin();
     }
+    window.addEventListener(
+      "dragover",
+      function (e) {
+        e = e || event;
+        e.preventDefault();
+      },
+      false,
+    );
+    window.addEventListener(
+      "drop",
+      function (e) {
+        e = e || event;
+        e.preventDefault();
+      },
+      false,
+    );
+    setInterval(() => {
+      doOnlineCheck();
+    }, 5000);
   });
 </script>
 
@@ -80,15 +105,19 @@
       <Route path="/*"><Navigate to="/dashboard" /></Route>
     </section>
     <section slot="unauthorized">
-      <Route path="/forgot/password" component={ForgotPassword} />
+      <Route path="/init" component={EntryPoint} />
+      <!-- - -->
+      <!-- deprecated - visit sparrow auth repo -->
+      <!-- - -->
+
+      <!-- <Route path="/forgot/password" component={ForgotPassword} />
       <Route path="/login" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/update/password" component={UpdatePassword} />
       <Route path="/reset/password" component={ResetPassword} />
       <Route path="/waiting" component={Waiting} />
-      <Route path="/welcome" component={WelcomeScreen} />
-
-      <Route path="/*"><Navigate to="/login" /></Route>
+      <Route path="/welcome" component={WelcomeScreen} /> -->
+      <Route path="/*"><Navigate to="/init" /></Route>
     </section>
   </Authguard>
 </Router>
