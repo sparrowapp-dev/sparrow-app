@@ -213,6 +213,9 @@
 
   //open collection
   function openCollections() {
+    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+      handleCollectionClick(collection, currentWorkspaceId, collectionId);
+    }
     if (!visibility) {
       visibility = !visibility;
     }

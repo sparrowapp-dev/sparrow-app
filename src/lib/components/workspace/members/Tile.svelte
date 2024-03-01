@@ -443,15 +443,6 @@
     on:input={() => {
       confirmationError = "";
     }}
-    on:blur={() => {
-      if (confirmationText === "") {
-        confirmationError = `Team name cannot be empty.`;
-      } else if (confirmationText !== openTeam?.name) {
-        confirmationError = `Team name does not match.`;
-      } else {
-        confirmationError = "";
-      }
-    }}
     class="input-container rounded w-100 p-2 mt-2 mb-1 {confirmationError
       ? 'error-border'
       : ''}"
@@ -472,17 +463,24 @@
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
     <Button
-      disable={memberOwnershipPopupLoader ||
-        confirmationText !== openTeam?.name}
+      disable={memberOwnershipPopupLoader}
       title={"Update Access"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}
       onClick={() => {
-        memberOwnershipPopupLoader = true;
-        handleMemberOwnershipPopUpSuccess();
-        memberOwnershipPopupLoader = false;
+        confirmationText = confirmationText.replace(/’/g, "'");
+        if (confirmationText === "") {
+          confirmationError = `Team name cannot be empty.`;
+        } else if (confirmationText !== openTeam?.name) {
+          confirmationError = `Team name does not match.`;
+        } else {
+          confirmationError = "";
+          memberOwnershipPopupLoader = true;
+          handleMemberOwnershipPopUpSuccess();
+          memberOwnershipPopupLoader = false;
+        }
       }}
     />
   </div>
