@@ -38,6 +38,9 @@
 
   const handleUpdatePopUp = (flag: boolean) => {
     updateAvailable = flag;
+  };
+
+  const handleWindowsUpdatePopUp = (flag: boolean) => {
     windowsUpdateAvailable = flag;
   };
 
@@ -109,7 +112,7 @@
     width={"50%"}
     zIndex={1000}
     isOpen={windowsUpdateAvailable}
-    handleModalState={handleUpdatePopUp}
+    handleModalState={handleWindowsUpdatePopUp}
     icon={"warning"}
   >
     <div class="text-lightGray mb-1 sparrow-fs-14">
