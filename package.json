@@ -3,7 +3,7 @@
   "private": false,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -109,7 +109,7 @@
         {
           "assets": [
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64.dmg",
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.1.0_x64.dmg",
               "label": "sparrow.dmg"
             },
             {
@@ -121,11 +121,11 @@
               "label": "sparrow.msi"
             },
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.0.0_x64_en-US.msi.zip",
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/msi/sparrow-app_1.1.0_x64_en-US.msi.zip",
               "label": "sparrow-app_1.0.0_x64_en-US.msi.zip"
             },
             {
-              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_1.0.0_x64-setup.nsis.zip",
+              "path": "D:/a/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/nsis/sparrow-app_1.1.0_x64-setup.nsis.zip",
               "label": "sparrow-app_1.0.0_x64-setup.nsis.zip"
             },
             {
