@@ -1,9 +1,7 @@
 name: Development release
 
 on:
-  pull_request:
-    types:
-      - opened
+  push:
     branches:
       - development
 
