@@ -58,7 +58,11 @@
     if (formatter === ResponseFormatter.PRETTY) {
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
-        rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
+        try {
+          rawValue = JSON.stringify(JSON.parse(rawValue), null, 6);
+        } catch (err) {
+          return;
+        }
         codeMirrorView.dispatch({
           changes: {
             from: 0,
