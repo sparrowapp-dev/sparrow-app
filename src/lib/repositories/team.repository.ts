@@ -116,7 +116,7 @@ export class TeamRepository {
    */
   public bulkInsertData = async (data: any): Promise<void> => {
     await this.clearTeams();
-    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+    await RxDB.getInstance().rxdb.team.bulkInsert(data);
     return;
   };
 
@@ -265,6 +265,30 @@ export class TeamRepository {
     team.incrementalPatch({
       workspaces: filteredWorkspaces,
     });
+    return;
+  };
+
+  public addWorkspaceInTeam = async (
+    teamId: string,
+    workspaceId: string,
+    name: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    if (team && team?.workspaces?.length > 0) {
+      team.incrementalPatch({
+        workspaces: [...team.workspaces, { workspaceId, name }],
+      });
+    } else if (team) {
+      team.incrementalPatch({
+        workspaces: [{ workspaceId, name }],
+      });
+    }
     return;
   };
 }
