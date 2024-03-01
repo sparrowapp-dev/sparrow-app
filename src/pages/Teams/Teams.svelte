@@ -210,7 +210,14 @@
       delete newWorkspace.team.name;
       await _viewModel.addWorkspace(newWorkspace);
       await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
-      if (userId) await _viewModel.refreshTeams(userId);
+      // if (userId) await _viewModel.refreshTeams(userId);
+      if (userId)
+        await _viewModel.addWorkspaceInTeam(
+          $openTeam?.teamId,
+          newWorkspace._id,
+          newWorkspace.name,
+        );
+
       activeSideBarTabMethods.updateActiveTab("collections");
       navigate("/dashboard/collections");
     } else {
