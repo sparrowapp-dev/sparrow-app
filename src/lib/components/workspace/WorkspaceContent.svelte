@@ -158,7 +158,7 @@
                     on:click={(e) => {
                       if (teams.length === 1) {
                         notifications.error(
-                          "Can't leave the team. as you have only 1 team.",
+                          "Failed to leave the last team. Please create a new team before leaving this team.",
                         );
                       } else {
                         handleLeaveTeamModal();

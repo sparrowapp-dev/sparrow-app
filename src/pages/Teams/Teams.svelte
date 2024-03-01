@@ -267,7 +267,6 @@
     isLeavingTeam = true;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
-      debugger;
       await _viewModel.refreshTeams(userId);
       await _viewModelWorkspace.refreshWorkspaces(userId);
       notifications.success("You left a team.");
