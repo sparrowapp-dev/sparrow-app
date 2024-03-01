@@ -5,6 +5,7 @@
   import { workspaceView } from "$lib/store";
   import WorkspaceCardList from "../dashboard/workspace-card-list/WorkspaceCardList.svelte";
   import Members from "$lib/components/workspace/members/Members.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { onDestroy } from "svelte";
   import type {
     CurrentTeam,
@@ -35,6 +36,7 @@
   export let handleCloseShowMoreClick: () => void;
   export let isShowMoreVisible: boolean = false;
   export let workspaceUnderCreation = false;
+  export let teams;
 
   let selectedTab = "all-workspace";
   let selectedView: string;
@@ -154,8 +156,14 @@
                   </div>
                   <button
                     on:click={(e) => {
-                      handleLeaveTeamModal();
-                      handleOnShowMoreClick();
+                      if (teams.length === 1) {
+                        notifications.error(
+                          "Can't leave the team. as you have only 1 team.",
+                        );
+                      } else {
+                        handleLeaveTeamModal();
+                        handleOnShowMoreClick();
+                      }
                     }}
                     disabled={openTeam?.owner == userId}
                     style="font-size: 14px;"

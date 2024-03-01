@@ -6,11 +6,13 @@ import {
 //get path for url
 export function getPathFromUrl(url: string) {
   try {
-    const urlObject = new URL(url);
+    const sanitizedUrl = url.replace(/\{\{.*?\}\}/g, "");
+    const urlObject = new URL(sanitizedUrl);
     return urlObject.pathname;
   } catch (error) {
     console.error("Invalid URL:", url);
   }
+  return "";
 }
 
 // replace / with >
