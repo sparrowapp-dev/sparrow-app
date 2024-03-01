@@ -107,7 +107,7 @@
 
     if (str.trim() === "") {
       isInputEmpty = true;
-      inputElement.focus();
+      inputElement?.focus();
     } else {
       collectionsMethods.updateRequestProperty(
         true,
@@ -325,7 +325,7 @@
     if (event.ctrlKey && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
-      inputElement.focus();
+      inputElement?.focus();
     }
   };
 
