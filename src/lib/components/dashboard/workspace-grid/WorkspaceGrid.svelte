@@ -67,7 +67,7 @@
     );
     if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
       notifications.error(
-        "Cannot Delete Only Active Workspace of the Team: Please Create a New Workspace Before Deleting the Current Active Workspace.",
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
       );
       handleDeletePopup(false);
       return;
