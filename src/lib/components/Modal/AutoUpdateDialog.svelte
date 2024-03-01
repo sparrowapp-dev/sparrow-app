@@ -115,7 +115,7 @@
     <div class="text-lightGray mb-1 sparrow-fs-14">
       <p>
         Auto update is a known issue for Windows users in Sparrow. Kindly visit
-        Github to download the latest build for new features and improvements.
+        Github to download the latest version for new features and improvements.
       </p>
     </div>
     <div
