@@ -74,7 +74,7 @@
     const workspaceObj = currentTeamworkspaces.find(
       (ws) => ws._id === workspaceId,
     ) as any;
-    const newWorkspaceObj = workspaceObj._data
+    const newWorkspaceObj = {...workspaceObj._data};
     newWorkspaceObj.isActiveWorkspace = true;
     newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
     newWorkspaceObj.type = "WORKSPACE";

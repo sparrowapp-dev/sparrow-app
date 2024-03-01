@@ -72,31 +72,32 @@
       handleDeletePopup(false);
       return;
     }
-    const response = await workspaceInvitePermissonMethods.deleteWorkspace(
-      workspace._id,
-    );
-    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
-      currActiveTeam.id,
-      workspace._id,
-    );
-    if (response && response.data) {
+
+    if (activeWorkspaceBeingDeleted) {
       teamSpecificWorkspace = teamSpecificWorkspace.filter(
         (ws) => ws.id != workspace._id,
       );
-      notifications.success(
-        `${workspace.name} is removed from ${currActiveTeam.name}`,
-      );
-      if (activeWorkspaceBeingDeleted) {
-        handleActivateWorkspacePopup(true);
-      }
-      else{
-        await requestResponseStore.removeTab(workspace._id);
-      }
-      onDeleteWorkspace(workspace._id);
+      handleDeletePopup(false);
+      handleActivateWorkspacePopup(true);
+      return;
     } else {
-      notifications.error(
-        `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
+      const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+        workspace._id,
       );
+      await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+        currActiveTeam.id,
+        workspace._id,
+      );
+      if (response && response.data) {
+        teamSpecificWorkspace = teamSpecificWorkspace.filter(
+          (ws) => ws.id != workspace._id,
+        );
+        notifications.success(
+          `${workspace.name} is removed from ${currActiveTeam.name}`,
+        );
+        await requestResponseStore.removeTab(workspace._id);
+        onDeleteWorkspace(workspace._id);
+      }
     }
     handleDeletePopup(false);
   };
@@ -114,29 +115,53 @@
   };
 
   const handleActivateWorkspace = async (workspaceId: string) => {
-    await _viewModel.activateWorkspace(workspaceId);
-    showActivateWorkspacePopup = false;
-    await requestResponseStore.clearTabs();
-    const workspaceObj = workspaces.find((ws) => ws._id === workspaceId) as any;
-    workspaceObj._data.id = workspaceObj?._id;
-    const newWorkspaceObj = workspaceObj._data;
-    newWorkspaceObj.isActiveWorkspace = true;
-    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
-    newWorkspaceObj.type = "WORKSPACE";
-    newWorkspaceObj.save = true;
-    newWorkspaceObj.path = {
-      collectionId: "",
-      workspaceId,
-    };
-    newWorkspaceObj.property = {
-      workspace: {
-        requestCount: 0,
-        collectionCount: 0,
-      },
-    };
-    collectionsViewModel.handleCreateTab(newWorkspaceObj);
-    collectionsViewModel.handleActiveTab(workspaceId);
-    navigate("/dashboard/collections");
+    const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+      workspace._id,
+    );
+    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+      currActiveTeam.id,
+      workspace._id,
+    );
+    if (response && response.data) {
+      teamSpecificWorkspace = teamSpecificWorkspace.filter(
+        (ws) => ws.id != workspace._id,
+      );
+      notifications.success(
+        `${workspace.name} is removed from ${currActiveTeam.name}`,
+      );
+      onDeleteWorkspace(workspace._id);
+
+      //Activate new workpsace
+      await _viewModel.activateWorkspace(workspaceId);
+      showActivateWorkspacePopup = false;
+      await requestResponseStore.clearTabs();
+      const workspaceObj = workspaces.find(
+        (ws) => ws._id === workspaceId,
+      ) as any;
+
+      const newWorkspaceObj = {...workspaceObj._data};
+      newWorkspaceObj.isActiveWorkspace = true;
+      newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+      newWorkspaceObj.type = "WORKSPACE";
+      newWorkspaceObj.save = true;
+      newWorkspaceObj.path = {
+        collectionId: "",
+        workspaceId,
+      };
+      newWorkspaceObj.property = {
+        workspace: {
+          requestCount: 0,
+          collectionCount: 0,
+        },
+      };
+      collectionsViewModel.handleCreateTab(newWorkspaceObj);
+      collectionsViewModel.handleActiveTab(workspaceId);
+      navigate("/dashboard/collections");
+    } else {
+      notifications.error(
+        `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
+      );
+    }
   };
 
   onDestroy(() => {
@@ -367,7 +392,9 @@
         },
         ...teamSpecificWorkspace,
       ]}
-      onclick={handleActivateWorkspace}
+      onclick={async (e) => {
+        await handleActivateWorkspace(e);
+      }}
       staticClasses={[
         {
           id: `check-select-workspace-dropdown-select`,
