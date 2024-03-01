@@ -67,7 +67,7 @@
     );
     if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
       notifications.error(
-        "Cannot Delete Only Active Workspace of the Team: Please Create a New Workspace Before Deleting the Current Active Workspace.",
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
       );
       handleDeletePopup(false);
       return;
@@ -107,6 +107,7 @@
   window.addEventListener("click", handleWindowClick);
 
   const handleDeletePopup = (showPopup: boolean) => {
+    confirmationText = "";
     isshowDeletePopupOpen = showPopup;
   };
 
@@ -139,7 +140,7 @@
         (ws) => ws._id === workspaceId,
       ) as any;
 
-      const newWorkspaceObj = {...workspaceObj._data};
+      const newWorkspaceObj = { ...workspaceObj._data };
       newWorkspaceObj.isActiveWorkspace = true;
       newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
       newWorkspaceObj.type = "WORKSPACE";
@@ -308,15 +309,6 @@
       on:input={() => {
         confirmationError = "";
       }}
-      on:blur={() => {
-        if (confirmationText === "") {
-          confirmationError = `Workspace name cannot be empty.`;
-        } else if (confirmationText !== workspace.name) {
-          confirmationError = `Workspace name does not match.`;
-        } else {
-          confirmationError = "";
-        }
-      }}
       class="input-container mt-2 mb-1 {confirmationError
         ? 'error-border'
         : ''}"
@@ -345,21 +337,30 @@
           type={"dark"}
           loader={false}
           onClick={async () => {
+            confirmationError = "";
+            confirmationText = "";
             handleDeletePopup(false);
           }}
         />
         <Button
-          disable={workspaceDeletePopupLoader ||
-            confirmationText !== workspace.name}
+          disable={workspaceDeletePopupLoader}
           title={"Delete Workspace"}
           textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={workspaceDeletePopupLoader}
           onClick={async () => {
-            workspaceDeletePopupLoader = true;
-            await handleDeleteWorkspaceFlow();
-            workspaceDeletePopupLoader = false;
+            if (confirmationText === "") {
+              debugger;
+              confirmationError = `Workspace name cannot be empty.`;
+            } else if (confirmationText !== workspace.name) {
+              confirmationError = `Workspace name does not match.`;
+            } else {
+              confirmationError = "";
+              workspaceDeletePopupLoader = true;
+              await handleDeleteWorkspaceFlow();
+              workspaceDeletePopupLoader = false;
+            }
           }}
         />
       </div>
@@ -380,6 +381,7 @@
     <p class="role-title mb-0">
       Choose your next active workspace<span class="asterik">*</span>
     </p>
+    <br />
     <Dropdown
       dropDownType={{ type: "text", title: "select" }}
       dropdownId="check-select-workspace"
