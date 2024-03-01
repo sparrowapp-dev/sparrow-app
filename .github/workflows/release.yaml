@@ -110,13 +110,8 @@ jobs:
 
       - name: Download dmg file from Azure Blob Storage
         run: |
-<<<<<<< HEAD
            az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow_1.1.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.1.0_x64.dmg --overwrite
            az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow.app.tar.gz --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow.app.tar.gz --overwrite
-=======
-           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app_1.1.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.1.0_x64.dmg --overwrite
-           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app.app.tar.gz --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app.app.tar.gz --overwrite
->>>>>>> b3f90a301da7cfaf2206d8df36e7cf1f2883b93b
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
