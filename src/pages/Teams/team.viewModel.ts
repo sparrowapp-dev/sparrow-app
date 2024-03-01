@@ -130,6 +130,10 @@ export class TeamViewModel {
     await this.teamRepository.updateUserRoleInTeam(teamId, userId, role);
     return;
   };
+
+  public removeTeam = async (teamId: string) => {
+    await this.teamRepository.removeTeam(teamId);
+  };
   public removeUserFromTeam = async (teamId: string, userId: string) => {
     await this.teamRepository.removeUserFromTeam(teamId, userId);
     return;
