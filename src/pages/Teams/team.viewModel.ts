@@ -185,6 +185,10 @@ export class TeamViewModel {
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
   };
+
+  public addWorkspaceInTeam = (teamId, workspaceId, name) => {
+    this.teamRepository.addWorkspaceInTeam(teamId, workspaceId, name);
+  };
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
     let openTeamId: string = "";
