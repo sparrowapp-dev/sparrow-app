@@ -373,7 +373,7 @@
   type={"primary"}
   width={"35%"}
   zIndex={1000000}
-  isOpen={true}
+  isOpen={showActivateWorkspacePopup}
   canClose={false}
   handleModalState={handleActivateWorkspacePopup}
 >
