@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - development
+  workflow_dispatch:
 
 env: 
     VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
@@ -139,6 +140,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
       
       - name: file content
         run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
