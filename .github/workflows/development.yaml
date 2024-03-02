@@ -15,14 +15,6 @@ env:
     VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
     VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
     VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
-    APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
-    APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
-    APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
-    TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-    TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-    GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-    APPLE_ID: ${{ secrets.APPLE_ID }}
-    APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
 
 jobs:
   release_win:
@@ -49,8 +41,6 @@ jobs:
 
       - name: Build Tauri App
         run: |
-          $TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
-          $TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
           yarn cache clean
           npm install -g pnpm
           yarn install
@@ -148,6 +138,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       
       - name: file content
         run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
