@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - development
+  workflow_dispatch:
 
 env: 
     VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
@@ -14,6 +15,8 @@ env:
     VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
     VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
     VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
+    APPLE_ID: ${{ secrets.APPLE_ID }}
+    APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
 
 jobs:
   release_win:
