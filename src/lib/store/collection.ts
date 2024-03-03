@@ -64,6 +64,7 @@ const insertionHelper: (
           body: request.body,
           Headers: request.headers,
           queryParams: request.queryParams,
+          auth: request.auth,
         },
       });
     } else if (type === ItemType.FOLDER) {
@@ -117,6 +118,7 @@ const updationNodeHelper = (tree, id, data) => {
     tree.request.headers = data.request.headers;
     tree.request.method = data.request.method;
     tree.request.queryParams = data.request.queryParams;
+    tree.request.auth = data.request.auth;
     return 0;
   }
 

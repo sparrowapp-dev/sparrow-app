@@ -1,5 +1,6 @@
 import type { ItemType } from "../enums/item-type.enum";
 import type { RequestMethod } from "../enums/request.enum";
+import type { Auth } from "./request.interface";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export enum BodyModeEnum {
@@ -34,6 +35,7 @@ export interface RequestMetaData {
   queryParams?: Params[];
   pathParams?: Params[];
   headers?: Params[];
+  auth?: Auth;
 }
 
 export interface CollectionItem {

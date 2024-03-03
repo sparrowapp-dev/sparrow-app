@@ -9,7 +9,10 @@
     RequestBody,
   } from "$lib/utils/interfaces/request.interface";
   import { RequestDataset } from "$lib/utils/enums/request.enum";
-  import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
+  import {
+    setAuthType,
+    setContentTypeHeader,
+  } from "$lib/utils/helpers/auth.helper";
   import Button from "$lib/components/buttons/Button.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
@@ -35,13 +38,16 @@
       componentData.property.request.state.dataset === RequestDataset.RAW
         ? componentData.property.request.state.raw
         : componentData.property.request.state.dataset;
+    const authType = componentData.property.request.state?.auth;
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
+      auth: componentData.property.request.auth,
       selectedRequestBodyType: setContentTypeHeader(bodyType),
+      selectedRequestAuthType: authType,
     };
 
     if (!folderId) {
