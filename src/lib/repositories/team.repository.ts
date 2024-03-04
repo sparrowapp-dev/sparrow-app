@@ -36,7 +36,7 @@ export class TeamRepository {
   /**
    * Check whether the team is active
    */
-  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+  public checkActiveTeam = async (): Promise<boolean> => {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {
@@ -44,7 +44,8 @@ export class TeamRepository {
         },
       })
       .exec();
-    return team?.teamId == teamId ? true : false;
+    if (!team) return true;
+    else return false;
   };
   /**
    * clear teams data
@@ -145,8 +146,8 @@ export class TeamRepository {
   /**
    * get teams data
    */
-  public getTeamData = (): TeamDocument[] => {
-    return RxDB.getInstance().rxdb.team.find().exec();
+  public getTeamData = async (): TeamDocument[] => {
+    return await RxDB.getInstance().rxdb.team.find().exec();
   };
 
   /**
