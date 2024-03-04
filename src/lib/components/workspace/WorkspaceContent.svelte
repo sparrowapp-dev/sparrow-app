@@ -167,8 +167,7 @@
                         }
                       }}
                       disabled={openTeam?.owner == userId}
-                      style="font-size: 14px;"
-                      class="leave-btn border-1 position-absolute {!isShowMoreVisible &&
+                      class="leave-btn border-1 sparrow-fs-14 position-absolute {!isShowMoreVisible &&
                         'd-none'} bg-blackColor pe-5 py-2 px-3 mt-3 ms-2 rounded {openTeam?.owner ==
                       userId
                         ? 'text-lightGray'
@@ -181,7 +180,7 @@
 
               <div class="d-flex align-items-end justify-content-end">
                 {#if openTeam?.users?.length > 0}
-                  <p class="d-flex my-auto ms-1 me-4" style="font-size: 13px;">
+                  <p class="d-flex my-auto ms-1 me-4 sparrow-fs-12">
                     <PeopleIcon
                       color={"var(--sparrow-text-color)"}
                       classProp="mx-2 my-auto d-flex"
