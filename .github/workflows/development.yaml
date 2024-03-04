@@ -15,6 +15,7 @@ env:
     VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
     VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
     VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
+    ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   release_win:
@@ -67,49 +68,20 @@ jobs:
            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
       
 
-      - name: Upload win updater to Azure Blob Storage
-        run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.1.0_x64_en-US.msi.zip --name Sparrow_1.1.0_x64_en-US.msi.zip --overwrite
-        env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
-           
-      - name: Install App Center CLI
-        run: |
-          npm install -g appcenter-cli@latest
-      - name: Log in to App Center
-        run: appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-
-      - name: Get PR Branch Name
-        id: pr_branch
-        run: echo "::set-output name=branch::${{ github.head_ref }}"
-        
-      - name: var
-        run: |
-          $branch_name = "${{ steps.pr_branch.outputs.branch }}"
-          echo "Branch Name: $branch_name"
-      
-      - name: Upload to App Center
-        run: |
-          appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          $branch_name = "${{ steps.pr_branch.outputs.branch }}"
-          echo "Branch Name: $branch_name"
-          appcenter distribute release -f D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.1.0_x64_en-US.msi -g Collaborators --app techdome/Sparrow --build-version "branch-$branch_name" --build-number ${{ github.run_number }}
-      
-      - name: status check and upload
-        uses: neonidian/teams-notify-build-status@v3
-        if: always()
+      - name: Install AWS CLI
+        uses: chrislennon/action-aws-cli@v1.1
         with:
-          webhookUrl: |
-           ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          message: |
-            🚀 **Build Status Update** 🚀
-            The workflow (sparrow-app for windows) has completed with status: **${{ job.status }}**.
-            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow)!
-          titleBackgroundColor: ${{ job.status }}
+          version: latest
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+   
+      - name: Upload files to S3
+        run: |
+          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests --recursive --exclude "*" --include "*.zip" --include "*.msi"
         env:
-          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           
 
 
   release_macos:
@@ -145,13 +117,26 @@ jobs:
       - name: file content
         run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
       
-      - name: Upload mac updater to Azure Blob Storage
+      - name: Install AWS CLI
         run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+          aws --version
+      - name: Upload & downlode File to S3
+        run: |
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests --recursive --exclude "*" --include "*.dmg"
         env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Download MSI files from S3 bucket
+        run: |
+          mkdir msi_files
+          aws s3 cp s3://sparrow-release-assests/ msi_files/ --recursive --exclude "*" --include "*.msi"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Install App Center CLI
         run: |
@@ -167,6 +152,7 @@ jobs:
           branch_name="${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
           appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version branch-${branch_name} --build-number ${{ github.run_number }}
+          appcenter distribute release -f msi_files/*.msi -g Collaborators --app techdome/Sparrow --build-version test-${branch_name} --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
         if: always()
@@ -177,6 +163,20 @@ jobs:
             🚀 **Build Status Update** 🚀
             The workflow (sparrow-app for **Mac**) has completed with status: **${{ job.status }}**.
             👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow-mac)!
+          titleBackgroundColor: ${{ job.status }}
+        env:
+          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
+
+      - name: status check and upload
+        uses: neonidian/teams-notify-build-status@v3
+        if: always()
+        with:
+          webhookUrl: |
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          message: |
+            🚀 **Build Status Update** 🚀
+            The workflow (sparrow-app for windows) has completed with status: **${{ job.status }}**.
+            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow)!
           titleBackgroundColor: ${{ job.status }}
         env:
           SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
