@@ -18,4 +18,5 @@ const donts = [
   "Don't put CRUD function names in URIs.",
   "Don't use capital letters in URIs.",
 ];
+export const CollectionMessage = ["Add Folder", "Add Request"];
 export { bestPractice, dos, donts };

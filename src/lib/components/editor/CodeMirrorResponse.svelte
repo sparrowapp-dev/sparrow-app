@@ -88,12 +88,12 @@
   });
 </script>
 
-<div id="code-editor" bind:this={codeMirrorEditorDiv} />
+<div id="code-editor-response" bind:this={codeMirrorEditorDiv} />
 
 <style>
-  #code-editor {
+  #code-editor-response {
     width: 100%;
-    height: calc(100vh - 360px);
+    height: 100%;
     margin-left: 1%;
   }
 </style>

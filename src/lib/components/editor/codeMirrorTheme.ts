@@ -48,11 +48,15 @@ import {
   handleRefresh,
 } from "codemirror-json-schema";
 import { hoverTooltip } from "@codemirror/view";
+import { EditorFont } from "$lib/utils/constants/fonts.constant";
+
 export const basicTheme = EditorView.theme({
   "&": {
     height: "100%",
     width: "100%",
     flex: "1",
+    fontSize: "80%",
+    fontFamily: EditorFont,
   },
   ".cm-content": {
     caretColor: "var(--white-color)",
