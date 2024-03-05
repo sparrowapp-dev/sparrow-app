@@ -109,6 +109,8 @@
     }
   });
 
+  let leaveTeamName = "";
+
   /**
    * @deprecated referes to teams store
    *   const openedTeamSubscribe = openedTeam.subscribe((value) => {
@@ -272,31 +274,27 @@
   const handleLeaveTeam = async () => {
     if (!$openTeam?.teamId) return;
     isLeavingTeam = true;
+    const teamId = $openTeam?.teamId;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
-      await _viewModel.refreshTeams(userId);
-      await _viewModelWorkspace.refreshWorkspaces(userId);
-      notifications.success("You left a team.");
-      /**
-       * @deprecated referes to teams store
-       * setOpenedTeam(
-       *   activeTeamRxDoc?._data?.teamId,
-       *   activeTeamRxDoc?._data?.name,
-       *   //@ts-ignore
-       *   activeTeamRxDoc?._data?.logo,
-       * );
-       **/
-      let nextTeamId = "";
-      $teams.forEach((element) => {
-        if (element.teamId !== response.data.data._id) {
-          nextTeamId = element.teamId;
-          return;
+      let x = await _viewModel.removeTeam($openTeam?.teamId);
+      setTimeout(async () => {
+        const activeTeam = await _viewModel.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate = await _viewModel.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await _viewModel.activateTeam(teamIdToActivate);
+          }
         }
-      });
-      await teamRepositoryMethods.setOpenTeam(nextTeamId);
-      isShowMoreVisible = false;
-      isLeavingTeam = false;
-      handleLeaveTeamModal();
+        setTimeout(async () => {
+          await _viewModel.refreshTeams(userId);
+          await _viewModelWorkspace.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+          handleLeaveTeamModal();
+          isShowMoreVisible = false;
+          isLeavingTeam = false;
+        }, 500);
+      }, 500);
     } else {
       notifications.error("Failed to leave the team. Please try again.");
       isShowMoreVisible = false;
@@ -388,6 +386,7 @@
   };
 
   const handleLeaveTeamModal = () => {
+    leaveTeamName = $openTeam?.name;
     openLeaveTeamModal = !openLeaveTeamModal;
   };
 
@@ -524,7 +523,7 @@
 >
   <p class="warning-text text-lightGray mt-3 mw-50 text-wrap">
     Are you sure you want to leave team <span class="fw-semibold"
-      >"{$openTeam?.name}"</span
+      >"{leaveTeamName || ""}"</span
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
