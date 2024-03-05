@@ -87,7 +87,7 @@ jobs:
 
   release_macos:
     runs-on: macos-latest
-    needs: release_win
+    # needs: release_win
     
     steps:
       - name: Checkout Repository
