@@ -48,6 +48,7 @@ import {
   handleRefresh,
 } from "codemirror-json-schema";
 import { hoverTooltip } from "@codemirror/view";
+import { EditorFont } from "$lib/utils/constants/fonts.constant";
 
 export const basicTheme = EditorView.theme({
   "&": {
@@ -55,7 +56,7 @@ export const basicTheme = EditorView.theme({
     width: "100%",
     flex: "1",
     fontSize: "80%",
-    fontFamily: "'Source Code Pro', monospace",
+    fontFamily: EditorFont,
   },
   ".cm-content": {
     caretColor: "var(--white-color)",
