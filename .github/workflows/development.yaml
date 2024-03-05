@@ -1,8 +1,7 @@
 name: Development release
 
 on:
-  pull_request:
-    types: [opened, edited]
+  push:
     branches:
       - development
   workflow_dispatch:
@@ -87,7 +86,7 @@ jobs:
 
   release_macos:
     runs-on: macos-latest
-    # needs: release_win
+    needs: release_win
     
     steps:
       - name: Checkout Repository
@@ -126,7 +125,7 @@ jobs:
           aws --version
       - name: Upload & downlode File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive --exclude "*" --include "*.gz"
           
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
