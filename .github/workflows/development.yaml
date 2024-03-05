@@ -1,7 +1,8 @@
 name: Development release
 
 on:
-  push:
+  pull_request:
+    types: [opened, edited]
     branches:
       - development
   workflow_dispatch:
@@ -126,6 +127,7 @@ jobs:
       - name: Upload & downlode File to S3
         run: |
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive --exclude "*" --include "*.app"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -151,7 +153,7 @@ jobs:
           appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
           branch_name="${{ steps.pr_branch.outputs.branch }}"
           echo "Branch Name: $branch_name"
-          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app -g Collaborators --app techdome/Sparrow-1 --build-version test-${branch_name} --build-number ${{ github.run_number }}
+          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version test-${branch_name} --build-number ${{ github.run_number }}
           appcenter distribute release -f msi_files/*.msi -g Collaborators --app techdome/Sparrow --build-version test-${branch_name} --build-number ${{ github.run_number }}
       - name: status check and upload
         uses: neonidian/teams-notify-build-status@v3
