@@ -333,7 +333,7 @@
   </Pane>
 
   <Pane
-    class="right-panel pt-3 px-4 position-relative overflow-y-auto"
+    class="right-panel px-4 position-relative overflow-y-auto"
     minSize={35}
     size={isHorizontalMode ? bottomPanelHeightSize : rightPanelWidthSize}
   >
@@ -342,6 +342,20 @@
         <DefaultPage />
       {:else if response?.status === "Not Found"}
         <ResponseError />
+      {:else if progress}
+        <DefaultPage />
+        <div
+          style="    
+          top: 10px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index:3;
+          position:absolute;
+          "
+        >
+          <Loader loaderSize={"80px"} />
+        </div>
       {:else if response?.status}
         <ResponseParams
           {apiState}
@@ -349,19 +363,6 @@
           {response}
           {currentTabId}
         />
-      {/if}
-      {#if progress}
-        <div
-          class="position-absolute"
-          style="    
-          top: 10px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          z-index:3;"
-        >
-          <Loader loaderSize={"80px"} />
-        </div>
       {/if}
     </div>
   </Pane>
