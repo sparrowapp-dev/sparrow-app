@@ -37,6 +37,7 @@
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
+  import { CollectionMessage } from "$lib/utils/constants/request.constant";
 
   export let title: string;
   export let collection: any;
@@ -565,29 +566,42 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <Tooltip
-        classProp="mt-2 mb-2"
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.SAVE_REQUEST,
-        )}
-      >
-        <div class="mt-2 mb-2">
+      <div class="mt-2 mb-2 d-flex">
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[0]}
+          classProp="mt-2 mb-2"
+        >
           <img
             class="list-icons"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
           />
+        </Tooltip>
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[1]}
+          classProp="mt-2 mb-2"
+        >
           <img
             class="list-icons"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}
           />
-        </div>
-      </Tooltip>
+        </Tooltip>
+      </div>
     {/if}
   </div>
 </div>
