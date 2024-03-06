@@ -40,6 +40,13 @@ jobs:
         with:
           dotnet-version: 3.1
 
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"${{ secrets.UPDATER_ENDPOINT }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
+
       - name: Build Tauri App
         run: |
           $TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
@@ -99,6 +106,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.8'
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"${{ secrets.UPDATER_ENDPOINT }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > src-tauri/tauri.conf.json
+        shell: bash
 
       - name: Build Tauri App
         run: |
