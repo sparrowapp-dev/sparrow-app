@@ -64,14 +64,14 @@
 
   <p><img class="w-100" src={dropdown} alt="" /></p>
 
-  <h6 class="heading-title">Protect Sensitive information</h6>
+  <!-- <h6 class="heading-title">Protect Sensitive information</h6>
   <p class="heading-para text-textColor">
     {QuickHelp.protectSensitiveinformation[0]}
   </p>
   <p><img class="w-100" src={variables} alt="" /></p>
   <p class="heading-para text-textColor">
     {QuickHelp.protectSensitiveinformation[1]}
-  </p>
+  </p> -->
 </div>
 
 <style lang="scss">

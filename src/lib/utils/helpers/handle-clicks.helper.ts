@@ -54,6 +54,7 @@ export const handleRequestClick = (req: any, path: any) => {
   if (req.request.method) request.property.request.method = req.request.method;
   if (req.request.queryParams)
     request.property.request.queryParams = req.request.queryParams;
+  if (req.request.auth) request.property.request.auth = req.request.auth;
   if (req.request.headers)
     request.property.request.headers = req.request.headers;
   request.save = true;
