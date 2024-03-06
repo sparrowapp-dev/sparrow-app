@@ -301,7 +301,7 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
@@ -366,7 +366,7 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
@@ -456,7 +456,7 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
@@ -517,6 +517,7 @@
     {getPermissionsData}
   />
 </ModalWrapperV1>
+
 <div class="d-flex tile rounded align-items-center">
   <div
     class="info d-flex align-items-center"
