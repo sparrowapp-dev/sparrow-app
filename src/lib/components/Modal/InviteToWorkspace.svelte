@@ -153,7 +153,7 @@
       Invite By Email<span class="asterik">*</span>
     </p>
     <p class="invite-subheader text-textColor mt-0 mb-0">
-      use commas to separate emails
+      Use commas to separate emails
     </p>
     <div
       class="email-container d-flex flex-wrap bg-transparent border border-1 border-secondary"
@@ -235,7 +235,7 @@
       <p class="error-text">Role Cannot Be Empty</p>
     {/if}
   </div>
-  <div class="text-textColor mt-2" style="font-size: 12px;">
+  <div class="text-textColor mt-2 text-break" style="font-size: 12px;">
     You can invite your team members or external collaborators to a this
     workspace. Invited people will have access to only the <span
       style="color:white">{currentWorkspaceDetails.name}</span

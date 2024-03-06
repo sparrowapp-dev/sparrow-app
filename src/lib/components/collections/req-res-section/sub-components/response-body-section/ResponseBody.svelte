@@ -62,6 +62,18 @@
   /**
    * @description Configures and populates the save-as popup on the user's screen.
    */
+
+  //    async function downloadBlob(inputblob) {
+  //   const downloadelem = document.createElement("a");
+  //   const url = URL.createObjectURL(inputblob);
+  //   document.body.appendChild(downloadelem);
+  //   downloadelem.src = url;
+  //   downloadelem.click();
+  //   downloadelem.remove();
+  //   window.URL.revokeObjectURL(url);
+  // }
+  // downloadBlob(yourblob);
+
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
       suggestedName: `api_response_${
@@ -83,7 +95,7 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-start justify-content-between mt-2 w-100"
+  class="d-flex flex-column align-items-start justify-content-between mt-5 w-100"
 >
   <div
     class="response-container d-flex align-items-center justify-content-between mb-2 w-100"

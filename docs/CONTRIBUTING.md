@@ -6,7 +6,7 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Pull Request Process
 
-1. Always create a new branch  from the **main** branch. Make sure to follow the branch naming conventions explained below.
+1. Always create a new branch from the **main** branch. Make sure to follow the branch naming conventions explained below.
 
 2. Name your PR's using Conventional Commits e.g. "fix: ..." or "feat: ..." . More details stated below.
 

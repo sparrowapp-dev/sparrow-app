@@ -1,5 +1,5 @@
 import type { ContentTypeEnum } from "../enums/request.enum";
-import type { KeyValuePair } from "../interfaces/request.interface";
+import type { Auth, KeyValuePair } from "../interfaces/request.interface";
 
 export interface CreateDirectoryPostBody {
   name?: string;
@@ -70,6 +70,7 @@ export interface CreateApiRequestPostBody {
       };
       headers?: KeyValuePair[];
       queryParams?: KeyValuePair[];
+      auth?: Auth;
     };
     items?: {
       id?: string;
@@ -82,6 +83,7 @@ export interface CreateApiRequestPostBody {
         body?: unknown;
         headers?: KeyValuePair[];
         queryParams?: KeyValuePair[];
+        auth?: Auth;
       };
     };
   };

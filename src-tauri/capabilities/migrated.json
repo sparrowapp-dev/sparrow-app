@@ -30,7 +30,11 @@
     "window:allow-set-shadow",
     "updater:allow-check",
     "updater:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "webview:allow-internal-toggle-devtools",
+    "webview:default",
+    "webview:allow-set-webview-focus",
+    "shell:allow-open"
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

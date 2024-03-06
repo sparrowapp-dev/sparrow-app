@@ -45,6 +45,11 @@
   export let collectionsMethods: CollectionsMethods;
   export let allworkspaces = [];
 
+  $: {
+    if (currentWorkspace || currentTeam) {
+      calculateLimitedWorkspace();
+    }
+  }
   let workspaceNameExistsErr: boolean = false;
 
   let workspaceLimit = constants.WORKSPACE_LIMIT;
@@ -112,6 +117,50 @@
     openCreateWorkspaceModal = !openCreateWorkspaceModal;
   };
 
+  let sharedData = [];
+  function createSetFromArray(arr, key) {
+    const seen = new Set();
+    return arr.filter((obj) => {
+      if (!obj.hasOwnProperty(key)) {
+        throw new Error(`Object does not have key "${key}"`);
+      }
+      const keyValue = obj[key];
+      return !seen.has(keyValue) && seen.add(keyValue);
+    });
+  }
+
+  const calculateLimitedWorkspace = () => {
+    let workspaces = allworkspaces
+      .filter((elem) => {
+        if (currentTeam?.id === elem?.team?.teamId) return true;
+        return false;
+      })
+      .reverse()
+      .slice(0, workspaceLimit)
+      .map((workspace) => {
+        const workspaceObj = {
+          id: workspace._id,
+          name: workspace.name,
+          dynamicClasses: "text-whiteColor",
+          description: currentTeam?.name,
+          selectedOptionClasses: "ellipsis mw-25",
+        };
+        return workspaceObj;
+      });
+    workspaces.push({
+      id: currentWorkspace?.id,
+      name: currentWorkspace?.name,
+      dynamicClasses: "text-whiteColor",
+      description: currentTeam?.name,
+      selectedOptionClasses: "ellipsis mw-25",
+    });
+    const res = createSetFromArray(workspaces, "name");
+    if (res.length > workspaceLimit) {
+      res.shift();
+    }
+    sharedData = res;
+    return;
+  };
   const handleCreateWorkspaceNameChange = (e) => {
     workspacePostInput.name = e.target.value;
     workspaceNameExistsErr = false;
@@ -235,7 +284,7 @@
        **/
     } else {
       allworkspaces.forEach((workspace) => {
-        if (id === workspace.name) {
+        if (id === workspace._id) {
           handleWorkspaceSwitch(workspace._id);
           return;
         }
@@ -311,70 +360,63 @@
     />
   </div>
 </ModalWrapperV1>
+{#if currentWorkspace?.name && currentWorkspace?.id && currentTeam?.name}
+  <Dropdown
+    dropdownId="header-dropdown"
+    dropDownType={{
+      type: "text",
+      title: currentWorkspace ? `${currentWorkspace?.id}` : "",
+    }}
+    additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
+    additonalSelectedOptionText={`${currentTeam?.name}`}
+    staticCustomStyles={[
+      {
+        id: "header-dropdown-btn-div",
+        styleKey: "maxWidth",
+        styleValue: "15vw",
+      },
+    ]}
+    activeClasses="border border-labelColor"
+    staticClasses={[
+      {
+        id: "header-dropdown-btn-div",
+        classToAdd: ["w-100", "py-3", "px-2", "rounded"],
+      },
 
-<Dropdown
-  dropdownId="header-dropdown"
-  dropDownType={{
-    type: "text",
-    title: currentWorkspace ? `${currentWorkspace?.name}` : "",
-  }}
-  additonalSelectedOptionText={`/${currentTeam?.name}`}
-  staticCustomStyles={[
-    { id: "header-dropdown-btn-div", styleKey: "maxWidth", styleValue: "15vw" },
-  ]}
-  activeClasses="border border-labelColor"
-  staticClasses={[
-    {
-      id: "header-dropdown-btn-div",
-      classToAdd: ["w-100", "py-3", "px-2", "rounded"],
-    },
-
-    {
-      id: "header-dropdown-additional-option",
-      classToAdd: ["ellipsis", "mw-25"],
-    },
-    {
-      id: "header-dropdown-options-container",
-      classToAdd: ["w-100", "mt-2", "bg-backgroundDropdown"],
-    },
-  ]}
-  data={[
-    {
-      id: "createWorkspace",
-      name: "Create New Workspace",
-      dynamicClasses: "text-labelColor",
-      img: plusIcon,
-      hasDivider: true,
-    },
-    ...allworkspaces
-      .slice()
-      .reverse()
-      .slice(0, workspaceLimit)
-      .map((workspace) => {
-        const workspaceObj = {
-          id: workspace.name,
-          name: workspace.name,
-          dynamicClasses: "text-whiteColor",
-          description: currentTeam?.name,
-          selectedOptionClasses: "ellipsis mw-25",
-        };
-        return workspaceObj;
-      }),
-    {
-      id: "",
-      name: "You will see your five most recent workspaces",
-      dynamicClasses: "text-textColor text-wrap text-center px-2 py-1",
-      hasDivider: true,
-    },
-    {
-      id: "view-all",
-      name: "View All Workspaces",
-      dynamicClasses:
-        "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
-    },
-  ]}
-  onclick={handleDropdown}
-></Dropdown>
+      {
+        id: "header-dropdown-additional-option",
+        classToAdd: ["ellipsis", "mw-25"],
+      },
+      {
+        id: "header-dropdown-options-container",
+        classToAdd: ["w-100", "mt-2", "bg-backgroundDropdown"],
+      },
+    ]}
+    data={[
+      {
+        id: "createWorkspace",
+        name: "Create New Workspace",
+        dynamicClasses: "text-labelColor",
+        img: plusIcon,
+        hasDivider: true,
+      },
+      ...sharedData,
+      {
+        id: "",
+        name: "You will see your five most recent workspaces",
+        dynamicClasses: "text-textColor text-wrap text-center px-2 py-1",
+        hasDivider: true,
+      },
+      {
+        id: "view-all",
+        name: "View All Workspaces",
+        dynamicClasses:
+          "text-textColor d-flex align-items-center mt-n5  p-1 rounded",
+      },
+    ]}
+    onclick={handleDropdown}
+  ></Dropdown>
+{/if}
 
 <!-- <div
     class="rounded z-2"

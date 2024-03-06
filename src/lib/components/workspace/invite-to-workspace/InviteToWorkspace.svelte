@@ -153,11 +153,11 @@
   > workspace.
 </div>
 <div class="d-flex align-items-center justify-content-between">
-  <div class="description mt-4 sparrow-fs-12">
-    <p class="mb-0 text-textColor">
+  <div class="description mt-4 sparrow-fs-12 ellipsis">
+    <p class="mb-0 text-textColor ellipsis">
       Workspace<span style="color:white">: {currentWorkspaceDetails.name}</span>
     </p>
-    <p class="text-textColor">
+    <p class="text-textColor ellipsis">
       Team:<span style="color:white">: {teamName}</span>
     </p>
   </div>
@@ -166,7 +166,7 @@
       disable={loader}
       title={"Send Invite"}
       loaderSize={19}
-      textStyleProp={"font-size: var(--base-text)"}
+      textStyleProp={"font-size: var(--base-text); min-width:80px;"}
       type={"primary"}
       {loader}
       onClick={() => {

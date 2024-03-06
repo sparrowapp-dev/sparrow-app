@@ -36,20 +36,13 @@
           displayText: "Open Workspace",
           disabled: false,
         },
-        {
-          onClick: (e) => {
-            e.stopPropagation();
-          },
-          displayText: "Add Members",
-          disabled: false,
-        },
-        {
-          onClick: (e) => {
-            e.stopPropagation();
-          },
-          displayText: "Delete",
-          disabled: false,
-        },
+        // {
+        //   onClick: (e) => {
+        //     e.stopPropagation();
+        //   },
+        //   displayText: "Delete Workspace",
+        //   disabled: false,
+        // },
       ];
     } else {
       menuItems = [

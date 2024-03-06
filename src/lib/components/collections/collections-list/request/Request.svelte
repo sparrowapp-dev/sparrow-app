@@ -13,7 +13,7 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { setBodyType } from "$lib/utils/helpers/auth.helper";
+  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
@@ -44,9 +44,11 @@
     body,
     headers,
     queryParams,
+    auth,
     type,
     description,
-    selectedRequestBodyType;
+    selectedRequestBodyType,
+    selectedRequestAuthType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -65,9 +67,12 @@
     if (body) request.property.request.body = body;
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
+    if (auth) request.property.request.auth = auth;
     if (headers) request.property.request.headers = headers;
     if (selectedRequestBodyType)
       request = setBodyType(request, selectedRequestBodyType);
+    if (selectedRequestAuthType)
+      request = setAuthType(request, selectedRequestAuthType);
     request.property.request.save.api = true;
     request.property.request.save.description = true;
     collectionsMethods.handleCreateTab(request);
@@ -83,10 +88,12 @@
       method = api.request?.method;
       headers = api.request?.headers;
       queryParams = api.request?.queryParams;
+      auth = api.request?.auth;
       body = api.request?.body;
       type = api.request?.type;
       description = api.description;
       selectedRequestBodyType = api.request?.selectedRequestBodyType;
+      selectedRequestAuthType = api.request?.selectedRequestAuthType;
     }
   }
 
@@ -284,7 +291,7 @@
       Are you sure you want to delete this Request? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
       >
-      will be removed.
+      will be removed and cannot be restored.
     </p>
   </div>
 

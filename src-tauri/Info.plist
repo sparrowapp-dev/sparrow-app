@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>sparrow-app</string>
+	<string>Sparrow</string>
 	<key>CFBundleExecutable</key>
-	<string>sparrow-app</string>
+	<string>Sparrow</string>
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.sparrow.app</string>
 	<key>CFBundleName</key>
-	<string>sparrow-app</string>
+	<string>Sparrow</string>
 	<key>CFBundleSpokenName</key>
-	<string>sparrow-app</string>
+	<string>Sparrow</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -28,6 +28,6 @@
 	<key>NSPrefPaneIconFile</key>
 	<string>icon.icns</string>
 	<key>NSPrefPaneIconLabel</key>
-	<string>sparrow-app</string>
+	<string>Sparrow</string>
 </dict>
 </plist>

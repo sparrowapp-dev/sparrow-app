@@ -194,6 +194,10 @@
           type === saveType.SAVE_DESCRIPTION
             ? request.queryParams
             : componentData.property.request.queryParams,
+        auth:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.auth
+            : componentData.property.request.auth,
       };
 
       if (path[path.length - 1].type === ItemType.COLLECTION) {
@@ -265,6 +269,7 @@
             sampleRequest.property.request.body = res.data.data.request.body;
             sampleRequest.property.request.queryParams =
               res.data.data.request.queryParams;
+            sampleRequest.property.request.auth = res.data.data.request.auth;
             sampleRequest.property.request.headers =
               res.data.data.request.headers;
             collectionsMethods.handleCreateTab(sampleRequest);
@@ -348,6 +353,7 @@
             sampleRequest.property.request.body = res.data.data.request.body;
             sampleRequest.property.request.queryParams =
               res.data.data.request.queryParams;
+            sampleRequest.property.request.auth = res.data.data.request.auth;
             sampleRequest.property.request.headers =
               res.data.data.request.headers;
             collectionsMethods.handleCreateTab(sampleRequest);
@@ -752,7 +758,7 @@
           {:else if path.length === 0}
             <div>
               <p class="w-100 save-text-clr text-center sparrow-fs-12">
-                {RequestConstant.bestPractice}
+                {bestPractice}
               </p>
               <div class="w-100 d-flex justify-content-center">
                 <Button

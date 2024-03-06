@@ -1,4 +1,4 @@
-name: Release
+name: Production Release
 
 on:
   push:
@@ -10,6 +10,10 @@ env:
   VITE_MIX_PANEL_TOKEN: ${{secrets.VITE_MIX_PANEL_TOKEN}}
   VITE_ENABLE_MIX_PANEL: ${{secrets.VITE_ENABLE_MIX_PANEL}}
   VITE_API_TIMEOUT: ${{secrets.VITE_API_TIMEOUT}}
+  VITE_SPARROW_SUPPORT_EMAIL: ${{ secrets.VITE_SPARROW_SUPPORT_EMAIL }}
+  VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
+  VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
+  VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
 
 jobs:
   build_and_release_macos:
@@ -29,29 +33,31 @@ jobs:
 
       - name: Build Tauri App
         run: |
-          TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
-          TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
+          TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
           APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
           APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
           yarn install
           yarn tauri build --debug
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Print file content
-        run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/sparrow-app.app.tar.gz.sig
+      - name: dmg sig
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
           
 
       - name: Upload mac-build to Azure Blob Storage
         run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/sparrow-app_1.0.0_x64.dmg --name sparrow-app_1.0.0_x64.dmg
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/Sparrow_1.1.0_x64.dmg --name Sparrow_1.1.0_x64.dmg --overwrite
+          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
           AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+
 
   build_and_release_windows:
     runs-on: windows-latest
@@ -76,26 +82,36 @@ jobs:
 
       - name: Build Tauri App
         run: |
-          $TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
-          $TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
+          $TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          $TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
           yarn cache clean
           npm install -g pnpm
           yarn install
           yarn tauri build --debug
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Print file content
-        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64_en-US.msi.zip.sig
+      - name: msi sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.sig
+  
+      - name: nsis sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\*.sig
 
-      # - name: Print file content
-      #   run: Get-Content D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis\sparrow-app_1.0.0_x64-setup.nsis.zip.sig
-
-      - name: Download mac-build from Azure-Blob-Storage
+      - name: sign msi
         run: |
-           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name sparrow-app_1.0.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\sparrow-app_1.0.0_x64.dmg
+           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
+              
+
+      - name: Download dmg file from Azure Blob Storage
+        run: |
+           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow_1.1.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.1.0_x64.dmg --overwrite
+           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow.app.tar.gz --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow.app.tar.gz --overwrite
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
@@ -111,4 +127,5 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          
           

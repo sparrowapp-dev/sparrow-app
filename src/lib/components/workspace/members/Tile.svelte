@@ -146,12 +146,12 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-         dynamicClasses: "whiteColor",
+        dynamicClasses: "whiteColor",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-         dynamicClasses: "text-whiteColor",
+        dynamicClasses: "text-whiteColor",
       },
     ];
     if (
@@ -164,7 +164,7 @@
         {
           name: "Remove",
           id: "remove",
-           dynamicClasses: "text-dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else if (
@@ -175,13 +175,13 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-           dynamicClasses: "text-whiteColor",
+          dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
         {
           name: "Remove",
           id: "remove",
-           dynamicClasses: "text-dangerColor",
+          dynamicClasses: "text-dangerColor",
         },
       ];
     } else {
@@ -189,7 +189,7 @@
         {
           name: "Owner",
           id: TeamRole.TEAM_OWNER,
-           dynamicClasses: "text-whiteColor",
+          dynamicClasses: "text-whiteColor",
         },
         ...commonPermissions,
       ];
@@ -443,15 +443,6 @@
     on:input={() => {
       confirmationError = "";
     }}
-    on:blur={() => {
-      if (confirmationText === "") {
-        confirmationError = `Team name cannot be empty.`;
-      } else if (confirmationText !== openTeam?.name) {
-        confirmationError = `Team name does not match.`;
-      } else {
-        confirmationError = "";
-      }
-    }}
     class="input-container rounded w-100 p-2 mt-2 mb-1 {confirmationError
       ? 'error-border'
       : ''}"
@@ -472,17 +463,24 @@
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
     <Button
-      disable={memberOwnershipPopupLoader ||
-        confirmationText !== openTeam?.name}
+      disable={memberOwnershipPopupLoader}
       title={"Update Access"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}
       onClick={() => {
-        memberOwnershipPopupLoader = true;
-        handleMemberOwnershipPopUpSuccess();
-        memberOwnershipPopupLoader = false;
+        confirmationText = confirmationText.replace(/’/g, "'");
+        if (confirmationText === "") {
+          confirmationError = `Team name cannot be empty.`;
+        } else if (confirmationText !== openTeam?.name) {
+          confirmationError = `Team name does not match.`;
+        } else {
+          confirmationError = "";
+          memberOwnershipPopupLoader = true;
+          handleMemberOwnershipPopUpSuccess();
+          memberOwnershipPopupLoader = false;
+        }
       }}
     />
   </div>
@@ -539,23 +537,29 @@
   <div class="position">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <Dropdown
+        dropdownId={user.id}
         data={getPermissionsData()}
-        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
+        dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {:else if userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN}
       <Dropdown
+        dropdownId={user.id}
         data={getPermissionsData()}
-        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
+        dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
+        additionalType={"memberinfo"}
       />
     {:else}
-        <Dropdown
+      <Dropdown
+        dropdownId={user.id}
         disabled={true}
         data={getPermissionsData()}
-        dropDownType={{type:"text",title:user.role ? user.role : ""}} 
+        dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}
-     /> 
+        additionalType={"memberinfo"}
+      />
     {/if}
   </div>
 </div>

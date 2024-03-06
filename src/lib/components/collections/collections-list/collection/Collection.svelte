@@ -1,6 +1,7 @@
 <script lang="ts">
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
+  import refreshIcon from "$lib/assets/refresh.svg";
   import Folder from "../folder/Folder.svelte";
   import { getNextName } from "../collectionList";
   import { CollectionListViewModel } from "../CollectionList.ViewModel";
@@ -35,6 +36,8 @@
   import type { WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { CommonService } from "$lib/services-v2/common.service";
+  import { CollectionMessage } from "$lib/utils/constants/request.constant";
 
   export let title: string;
   export let collection: any;
@@ -49,9 +52,10 @@
   export let activePath;
 
   const collectionService = new CollectionService();
+  const commonService = new CommonService();
   const _colllectionListViewModel = new CollectionListViewModel();
   let visibility = false;
-
+  let isActiveSyncEnabled = true;
   const handleFolderClick = async (): Promise<void> => {
     if (
       !hasWorkpaceLevelPermission(
@@ -210,6 +214,9 @@
 
   //open collection
   function openCollections() {
+    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+      handleCollectionClick(collection, currentWorkspaceId, collectionId);
+    }
     if (!visibility) {
       visibility = !visibility;
     }
@@ -358,6 +365,23 @@
       deleteLoader = false;
     }
   };
+  const getFeatures = async () => {
+    isActiveSyncEnabled = await commonService.isFeatureEnabled(
+      "isActiveSyncEnabled",
+    );
+  };
+  const refetchCollection = async () => {
+    deleteLoader = true;
+    const response =
+      await collectionService.fetchCollection(currentWorkspaceId);
+
+    if (response.isSuccessful) {
+      // existing collection with the new one
+    } else {
+      notifications.error("Failed to fetch the Collection.");
+      deleteLoader = false;
+    }
+  };
 </script>
 
 <ModalWrapperV1
@@ -427,6 +451,9 @@
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
+  on:load={() => {
+    getFeatures();
+  }}
 />
 
 <button
@@ -468,7 +495,7 @@
       />
     {:else}
       <div
-        class="collection-title d-flex align-items-center py-1 mb-0"
+        class="collection-title d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
         on:click={() => {
           isCollectionCreatedFirstTime.set(false);
@@ -478,15 +505,34 @@
           }
         }}
       >
-        <p class="ellipsis w-100 mb-0" style="font-size: 12px;">
+        <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
+        {#if isActiveSyncEnabled}
+          <span
+            class="text-muted small w-100 ellipsis"
+            style="font-size: 0.5rem;"
+            >branch name - current branch
+          </span>
+        {/if}
       </div>
     {/if}
   </div>
   {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
+    {#if isActiveSyncEnabled}
+      <button
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={() => {
+          refetchCollection();
+        }}
+      >
+        <img src={refreshIcon} alt="refetch" />
+      </button>
+    {/if}
     <button
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
@@ -520,29 +566,42 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <Tooltip
-        classProp="mt-2 mb-2"
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.SAVE_REQUEST,
-        )}
-      >
-        <div class="mt-2 mb-2">
+      <div class="mt-2 mb-2 d-flex">
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[0]}
+          classProp="mt-2 mb-2"
+        >
           <img
             class="list-icons"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
           />
+        </Tooltip>
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[1]}
+          classProp="mt-2 mb-2"
+        >
           <img
             class="list-icons"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}
           />
-        </div>
-      </Tooltip>
+        </Tooltip>
+      </div>
     {/if}
   </div>
 </div>
@@ -595,7 +654,7 @@
     border-left: 1px solid var(--border-color);
   }
   .main-collection {
-    width: calc(100% - 24px);
+    width: calc(100% - 48px);
   }
   .active-collection-tab {
     background-color: var(--selected-active-sidebar) !important;

@@ -109,6 +109,8 @@
     }
   });
 
+  let leaveTeamName = "";
+
   /**
    * @deprecated referes to teams store
    *   const openedTeamSubscribe = openedTeam.subscribe((value) => {
@@ -161,8 +163,6 @@
       createdAt: workspaceObj.createdAt,
     };
 
-    await _viewModel.addWorkspace(workspaceObj);
-
     const response = await _viewModel.createWorkspace(workspaceData);
 
     if (response.isSuccessful) {
@@ -199,19 +199,30 @@
       workspaceObj.property.workspace.requestCount = totalRequest;
       workspaceObj.property.workspace.collectionCount = 0;
       workspaceObj.save = true;
-      if (userId) await _viewModel.refreshTeams(userId);
-      if (userId) await _viewModelWorkspace.refreshWorkspaces(userId);
-      await _viewModelWorkspace.activateWorkspace(workspaceObj._id);
       collectionsMethods.handleCreateTab(workspaceObj);
       collectionsMethods.handleActiveTab(workspaceObj._id);
       moveNavigation("right");
       isWorkspaceCreatedFirstTime.set(true);
       notifications.success("New Workspace Created");
       isWorkspaceLoaded.set(true);
-      navigate("/dashboard/collections");
+      let newWorkspace = response.data.data;
+      newWorkspace.team.teamId = newWorkspace.team.id;
+      newWorkspace.team.teamName = newWorkspace.team.name;
+      delete newWorkspace.team.id;
+      delete newWorkspace.team.name;
+      await _viewModel.addWorkspace(newWorkspace);
+      await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
+      // if (userId) await _viewModel.refreshTeams(userId);
+      if (userId)
+        await _viewModel.addWorkspaceInTeam(
+          $openTeam?.teamId,
+          newWorkspace._id,
+          newWorkspace.name,
+        );
+
       activeSideBarTabMethods.updateActiveTab("collections");
+      navigate("/dashboard/collections");
     } else {
-      await _viewModelWorkspace.removeWorkspace(workspaceObj._id);
       isWorkspaceLoaded.set(true);
       notifications.error("Failed to create new Workspace!");
     }
@@ -247,7 +258,7 @@
        * );
        **/
 
-      await teamRepositoryMethods.setOpenTeam(res?._id);
+      // await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
@@ -263,24 +274,27 @@
   const handleLeaveTeam = async () => {
     if (!$openTeam?.teamId) return;
     isLeavingTeam = true;
+    const teamId = $openTeam?.teamId;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
-      await _viewModel.refreshTeams(userId);
-      await _viewModelWorkspace.refreshWorkspaces(userId);
-      notifications.success("You left a team.");
-      /**
-       * @deprecated referes to teams store
-       * setOpenedTeam(
-       *   activeTeamRxDoc?._data?.teamId,
-       *   activeTeamRxDoc?._data?.name,
-       *   //@ts-ignore
-       *   activeTeamRxDoc?._data?.logo,
-       * );
-       **/
-      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
-      isShowMoreVisible = false;
-      isLeavingTeam = false;
-      handleLeaveTeamModal();
+      let x = await _viewModel.removeTeam($openTeam?.teamId);
+      setTimeout(async () => {
+        const activeTeam = await _viewModel.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate = await _viewModel.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await _viewModel.activateTeam(teamIdToActivate);
+          }
+        }
+        setTimeout(async () => {
+          await _viewModel.refreshTeams(userId);
+          await _viewModelWorkspace.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+          handleLeaveTeamModal();
+          isShowMoreVisible = false;
+          isLeavingTeam = false;
+        }, 500);
+      }, 500);
     } else {
       notifications.error("Failed to leave the team. Please try again.");
       isShowMoreVisible = false;
@@ -363,16 +377,16 @@
     fileInput.click();
   };
 
-  const handleOnShowMoreClick = (e) => {
-    e.stopPropagation();
-    isShowMoreVisible = !isShowMoreVisible;
+  const handleOnShowMoreClick = () => {
+    isShowMoreVisible = true;
   };
 
-  const handleCloseShowMoreClick = (e) => {
-    if (!isShowMoreVisible) isShowMoreVisible = !isShowMoreVisible;
+  const handleCloseShowMoreClick = () => {
+    isShowMoreVisible = false;
   };
 
   const handleLeaveTeamModal = () => {
+    leaveTeamName = $openTeam?.name;
     openLeaveTeamModal = !openLeaveTeamModal;
   };
 
@@ -405,10 +419,10 @@
 
 <svelte:window
   on:click={(e) => {
-    handleCloseShowMoreClick(e);
+    handleCloseShowMoreClick();
   }}
-  on:contextmenu|preventDefault={(e) => {
-    handleCloseShowMoreClick(e);
+  on:contextmenu|preventDefault={() => {
+    handleCloseShowMoreClick();
   }}
 />
 <!-- Create New Team POP UP -->
@@ -507,9 +521,9 @@
     handleLeaveTeamModal();
   }}
 >
-  <p class="warning-text text-lightGray mt-3">
+  <p class="warning-text text-lightGray mt-3 mw-50 text-wrap">
     Are you sure you want to leave team <span class="fw-semibold"
-      >"{$openTeam?.name}"</span
+      >"{leaveTeamName || ""}"</span
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
@@ -553,12 +567,14 @@
     <WorkspaceContent
       {currentTeam}
       {userId}
+      teams={allTeams}
       {handleCreateWorkspace}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
       {data}
       {activeSideBarTabMethods}
       {isShowMoreVisible}
+      {handleCloseShowMoreClick}
       {handleLeaveTeamModal}
       {handleOnShowMoreClick}
       {workspaceUnderCreation}

@@ -60,7 +60,8 @@
   type currentTabType = "ABOUT" | "SETTING";
   let currentTab: currentTabType = "ABOUT";
   let users: userDetails[] = [];
-  let hasPermission: boolean = false;
+  let hasPermission = false;
+  let hasEditPermission = false;
   let loggedInUser: userDetails;
   let loggedUserRole: TeamRole;
   export let _collectionListViewModel: CollectionListViewModel;
@@ -78,6 +79,10 @@
         hasPermission = hasWorkpaceLevelPermission(
           value,
           workspaceLevelPermissions.SEND_INVITE,
+        );
+        hasEditPermission = hasWorkpaceLevelPermission(
+          value,
+          workspaceLevelPermissions.EDIT_WORKSPACE,
         );
       }
     },
@@ -201,7 +206,7 @@
         await getUserDetails();
         currentActiveTeam = team;
         team._data.users.forEach((user) => {
-          if (user.id === loggedInUser.id) {
+          if (user.id === loggedInUser?.id) {
             loggedUserRole = user.role as TeamRole;
           }
         });
@@ -237,6 +242,7 @@
     unsubscribeisWorkspaceCreatedFirstTime();
     unsubscribeUser();
     tabSubscribe();
+    activeTeamsSubscribe.unsubscribe();
     // Not required for now may be used in future if things breaks
     // userUnsubscribe();
   });
@@ -262,7 +268,7 @@
   };
 
   const onUpdateWorkspaceDescription = (event) => {
-    if (event.key === "Enter") {
+    if (event.shiftKey && event.key === "Enter") {
       const inputField = document.getElementById(
         "workspaceDescription",
       ) as HTMLInputElement;
@@ -277,11 +283,12 @@
       class="my-workspace d-flex flex-column"
       style="width:calc(100% - 280px); margin-top: 15px;"
     >
-      <div class="d-flex aling-items-center justify-content-between gap-2 mb-5">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-5">
         <input
           type="text"
           value={tabName}
           id="renameInputFieldWorkspace"
+          disabled={!hasEditPermission}
           {autofocus}
           class="bg-backgroundColor form-control border-0 text-left w-100 ps-2 py-0 fs-5 input-outline"
           on:input={(event) => {
@@ -310,7 +317,7 @@
           on:input={(event) => {
             handleWorkspaceDescription(event);
           }}
-          disabled={!hasPermission}
+          disabled={!hasEditPermission}
           on:blur={onUpdateBlur}
           on:keydown={onUpdateWorkspaceDescription}
           bind:this={inputElement}
@@ -327,7 +334,6 @@
       {handleInvitePopup}
       currentTeamworkspaces={currentTeamWorkspacesArr}
       {currentTeamDetails}
-      getUserDetailsOfWorkspace={_viewModel.getUserDetailsOfWorkspace}
       loggedInUserEmail={email}
       {currentWorkspaceDetails}
       {workspaceInvitePermissonMethods}
@@ -369,6 +375,7 @@
 
   .btn-primary {
     z-index: 5;
+    background-color: var(--primary-btn-color) !important;
   }
 
   .profile-circle {

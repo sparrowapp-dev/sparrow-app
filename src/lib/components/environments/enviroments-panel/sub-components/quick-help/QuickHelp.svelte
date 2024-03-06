@@ -3,6 +3,7 @@
   import environment from "$lib/assets/environment.png";
   import dropdown from "$lib/assets/environment-dropdown.png";
   import variables from "$lib/assets/variables.png";
+  import { QuickHelp } from "$lib/utils/constants/environment.constant";
   export let closeQuickHelp;
 </script>
 
@@ -22,76 +23,55 @@
     </div>
   </div>
   <h6 class="heading-title">Environments</h6>
-  <p class="heading-para text-textColor">
-    When working with APIs, an environment is like the testing ground for your
-    code and the API to interact. It defines where your code and the API will
-    meet, specifying things like server locations, authentication details, and
-    other settings. Think of it as the virtual space where your code
-    communicates with the API.
-  </p>
-  <p class="heading-para text-textColor">
-    To create a environment, simply click on the plus button in the left panel.
-  </p>
+  {#each QuickHelp.environments as env}
+    <p class="heading-para text-textColor">
+      {env}
+    </p>
+  {/each}
 
   <h6 class="heading-title">Variables</h6>
-  <p class="heading-para text-textColor">
-    In the API world, variables are like the details you pass back and forth
-    between your code and the API. They serve as placeholders for information
-    such as user IDs, authentication tokens, or data you want to send or
-    receive. Variables act as the messengers, carrying specific details needed
-    for your code to talk effectively with the API.
-  </p>
-  <p class="heading-para text-textColor">
-    In Sparrow, you can define variables as key-value pairs. Simply enter the
-    variable name and it’s value.
-  </p>
+  {#each QuickHelp.variables as variables}
+    <p class="heading-para text-textColor">
+      {variables}
+    </p>
+  {/each}
 
   <h6 class="heading-title">Variables Types</h6>
-  <p class="heading-para text-textColor">
-    In Sparrow, you can define Global variables and Local variables within an
-    environment.
-  </p>
-  <p class="heading-para text-textColor">
-    You can use global variables anywhere within your workspace, regardless of
-    which environment you have selected. But to use any variable that is defined
-    under an environment, you need to ensure that the environment is selected.
-  </p>
+  {#each QuickHelp.variablesTypes as types}
+    <p class="heading-para text-textColor">
+      {types}
+    </p>
+  {/each}
 
   <h6 class="heading-title">Using Variables in REST API tool</h6>
   <p class="heading-para text-textColor">
-    To use variables in the REST API tool, start typing curly brackets and we
-    will show you all the variables that you have defined.
+    {QuickHelp.usingVariables[0]}
   </p>
   <p><img class="w-100" src={environment} alt="" /></p>
   <p class="heading-para text-textColor">
-    All the global variables are marked with G. Where as all local variables
-    within an environment are marked with E.
+    {@html QuickHelp.usingVariables[1]}
   </p>
   <p class="heading-para text-textColor">
-    You can use variables in URL, query parameters, headers, authorization,
-    request body or anywhere else while testing a REST API request.
+    {QuickHelp.usingVariables[2]}
   </p>
 
   <h6 class="heading-title">Switching Environments</h6>
-  <p class="heading-para text-textColor">
-    To switch an environment for API testing, select the dropdown present in the
-    collections list side panel in the REST API tool.
-  </p>
+  {#each QuickHelp.switchingEnvironments as switchEnv}
+    <p class="heading-para text-textColor">
+      {switchEnv}
+    </p>
+  {/each}
+
   <p><img class="w-100" src={dropdown} alt="" /></p>
 
-  <h6 class="heading-title">Protect Sensitive information</h6>
+  <!-- <h6 class="heading-title">Protect Sensitive information</h6>
   <p class="heading-para text-textColor">
-    In scenarios where confidentiality is key, you can safeguard variable values
-    by clicking on the lock icon. This will ensure that the variable value is
-    not disclosed to other people. Protecting a variable will also mask the
-    value in the UI. You can always unmask if necessary by clicking on the eye
-    icon. To remove the protection click back on the lock icon.
+    {QuickHelp.protectSensitiveinformation[0]}
   </p>
   <p><img class="w-100" src={variables} alt="" /></p>
   <p class="heading-para text-textColor">
-    In this example, the variable Authheader is protected and its value is not
-    revealed when sending any API requests.
-  </p>
+    {QuickHelp.protectSensitiveinformation[1]}
+  </p> -->
 </div>
 
 <style lang="scss">
@@ -109,6 +89,12 @@
     }
     .icon {
       cursor: pointer;
+    }
+    :global(.local-env-E) {
+      color: var(--request-patc);
+    }
+    :global(.global-env-G) {
+      color: var(--request-con);
     }
   }
 </style>

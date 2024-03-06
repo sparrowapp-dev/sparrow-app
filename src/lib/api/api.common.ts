@@ -8,14 +8,11 @@ import { setAuthJwt } from "$lib/utils/jwt";
 import { isLoading } from "$lib/store/auth.store";
 import { ErrorMessages } from "$lib/utils/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
-
 import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
-
-const _viewModel = new HeaderDashboardViewModel();
 
 const error = (
   error: string,
@@ -114,6 +111,7 @@ const makeRequest = async (
       e.response?.data?.statusCode === 401 &&
       e.response.data.message === ErrorMessages.Unauthorized
     ) {
+      const _viewModel = new HeaderDashboardViewModel();
       await _viewModel.clientLogout();
       return error("unauthorized");
     }
@@ -147,10 +145,9 @@ const makeHttpRequest = async (
   console.table({ url, method, headers, body, request });
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-
+  url = url.trim().replace(/ /g, "%20");
   return Promise.race([
     timeout(apiTimeOut),
-
     invoke("make_http_request", {
       url,
       method,

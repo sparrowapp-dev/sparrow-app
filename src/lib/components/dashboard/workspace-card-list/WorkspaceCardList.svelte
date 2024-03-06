@@ -8,13 +8,19 @@
     RightIcon,
     SearchIcon,
   } from "$lib/assets/app.asset";
-  import type { CurrentTeam, Team } from "$lib/utils/interfaces";
+  import type {
+    CurrentTeam,
+    Team,
+    workspaceInviteMethods,
+  } from "$lib/utils/interfaces";
   import type {
     TeamDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
+  import type { Observable } from "rxjs";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
 
   export let userId: string;
   export let currActiveTeam: CurrentTeam;
@@ -26,9 +32,38 @@
   export let openTeam: Team;
   export let workspaceUnderCreation = false;
 
-  let filterText: string = "";
-  let workspacePerPage: number = 5;
+  const _viewModel = new TeamViewModel();
+  const headerDashboardViewModel = new HeaderDashboardViewModel();
+  const openTeamObservable: Observable<TeamDocument> = _viewModel.openTeam;
+  const workspaceInvitePermissonMethods: workspaceInviteMethods = {
+    deleteWorkspace: headerDashboardViewModel.deleteWorkspace,
+    updateRoleInWorkspace: headerDashboardViewModel.updateUserRoleInWorkspace,
+    updateUsersInWorkspaceInRXDB:
+      headerDashboardViewModel.updateUserRoleInWorkspaceInRXDB,
+    checkIfUserIsPartOfMutipleWorkspaces:
+      headerDashboardViewModel.isUserInMultipleWorkspaces,
+    deleteUserFromWorkspace: headerDashboardViewModel.deleteUserFromWorkspace,
+    deleteUserFromWorkspaceRxDB:
+      headerDashboardViewModel.removeUserFromWorkspaceRxDB,
+    activateWorkspace: headerDashboardViewModel.activateWorkspace,
+    handleWorkspaceDeletion: headerDashboardViewModel.handleWorkspaceDeletion,
+  };
+
+  let filterText = "";
+  let workspacePerPage = 5;
   let currPage = 1;
+  let isAdminOrOwner: boolean;
+
+  openTeamObservable.subscribe((openTeam) => {
+    currPage = 1;
+    if (!(openTeam?.admins?.includes(userId) || openTeam?.owner == userId)) {
+      workspacePerPage = 6;
+      isAdminOrOwner = false;
+    } else {
+      workspacePerPage = 5;
+      isAdminOrOwner = true;
+    }
+  });
 
   const handleFilterTextChange = (e) => {
     filterText = e.target.value;
@@ -36,6 +71,12 @@
   const handleEraseSearch = () => {
     filterText = "";
   };
+
+  const onDeleteWorkspace = (workspaceId: string) => {
+    workspaces = workspaces.filter((ws) => ws._id != workspaceId);
+  };
+
+  const hasPermissionToDelete = openTeam?.admins?.includes(userId) || openTeam?.owner == userId;
 </script>
 
 <div class="p-2">
@@ -70,7 +111,7 @@
           .reverse()
           .filter((item) => item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase())).length == 0}
+              .includes(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
       {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
@@ -81,23 +122,28 @@
           type="other"
           buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
           onClick={handleCreateWorkspace}
+          buttonStyleProp={workspaces.length == 0 ? "min-height:132px" : ""}
         />
+        <!-- update later the above width -->
       {/if}
       {#each workspaces
         .slice()
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase()))
+              .includes(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
         <WorkspaceGrid
-          isAdminOrOwner={openTeam?.admins?.includes(userId) ||
-            openTeam?.owner == userId}
+          {isAdminOrOwner}
           {workspace}
           {handleWorkspaceSwitch}
           {currActiveTeam}
           {openTeam}
+          {workspaces}
+          {workspaceInvitePermissonMethods}
+          {userId}
+          {onDeleteWorkspace}
           {handleWorkspaceTab}
           {activeSideBarTabMethods}
         />
@@ -108,9 +154,9 @@
         .reverse()
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
-              .startsWith(filterText.toLowerCase())).length > 0}
+              .includes(filterText.toLowerCase())).length > 0}
       <div
-        class="justify-content-between bottom-0 position-static bg-backgroundColor d-flex"
+        class="justify-content-between bottom-0 position-absolute w-75 bg-backgroundColor d-flex"
       >
         <div class="tab-head">
           showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
@@ -136,7 +182,8 @@
         <div class="tab-head tab-change">
           <button
             on:click={() => (
-              (currPage = 1), (workspacePerPage = currPage > 1 ? 6 : 5)
+              (currPage = 1),
+              (workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5)
             )}
             class="bg-transparent border-0"
             ><DoubleLeftIcon
@@ -146,7 +193,7 @@
           <button
             on:click={() => {
               if (currPage > 1) currPage -= 1;
-              workspacePerPage = currPage > 1 ? 6 : 5;
+              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
             }}
             class="bg-transparent border-0"
             ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
@@ -194,7 +241,7 @@
                 )
               )
                 currPage += 1;
-              workspacePerPage = currPage > 1 ? 6 : 5;
+              workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
             }}
             class="bg-transparent border-0"
             ><RightIcon
@@ -243,7 +290,7 @@
                   6 !==
                 0
               ) {
-                workspacePerPage = currPage > 1 ? 6 : 5;
+                workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
               }
               if (
                 currPage - 1 ===
@@ -328,7 +375,6 @@
     -webkit-text-fill-color: transparent;
     max-width: 47.5%;
     max-height: 32%;
-    min-height: 15vh;
   }
 
   :global(.add-new-workspace.empty) {

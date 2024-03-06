@@ -15,9 +15,11 @@
   } from "$lib/database/app.database";
   export let collectionsMethods: CollectionsMethods;
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import { navigate } from "svelte-navigator";
   import ModalWrapperV1 from "../Modal/Modal.svelte";
   import Button from "../buttons/Button.svelte";
+  import { HeaderDashboardViewModel } from "../header/header-dashboard/HeaderDashboard.ViewModel";
+  import Dropdown from "../dropdown/Dropdown.svelte";
+  import { requestResponseStore } from "$lib/store";
   export let currentTeamworkspaces: WorkspaceDocument[];
   export let currentWorkspaceDetails: { id: string; name: string };
   export let currentTeamDetails: { id: string; name: string };
@@ -33,13 +35,23 @@
     Pick<TeamRepositoryMethods, "updateUserRoleInTeam" | "removeUserFromTeam">;
   export let workspaceInvitePermissonMethods: workspaceInviteMethods;
   export let currentActiveTeam: TeamDocument;
-  let isshowDeletePopupOpen: boolean = false;
+  let isshowDeletePopupOpen = false;
+  let showActivateWorkspacePopup = false;
   export let users: userDetails[] = [];
   export let hasPermission: boolean;
   export let loggedInUser: userDetails;
   let filterText = "";
   export let handleInvitePopup: (showPopup: boolean) => void;
-  export let getUserDetailsOfWorkspace: (workspaceId: string) => any;
+  const _viewModel = new HeaderDashboardViewModel();
+  let activeWorkspaceBeingDeleted = false;
+  let teamSpecificWorkspace = currentTeamworkspaces.map((elem) => {
+    return {
+      id: elem._id,
+      name: elem.name,
+      dynamicClasses: "text-whiteColor",
+    };
+  });
+
   const handleUserOnRemove = async (workspaceId: string, userId: string) => {
     users = users.filter(
       (userObj) =>
@@ -51,7 +63,47 @@
     isshowDeletePopupOpen = showPopup;
   };
 
+  const handleActivateWorkspacePopup = (showPopup: boolean) => {
+    showActivateWorkspacePopup = showPopup;
+  };
+
+  const handleActivateWorkspace = async (workspaceId: string) => {
+    await _viewModel.activateWorkspace(workspaceId);
+    showActivateWorkspacePopup = false;
+    await requestResponseStore.clearTabs();
+    const workspaceObj = currentTeamworkspaces.find(
+      (ws) => ws._id === workspaceId,
+    ) as any;
+    const newWorkspaceObj = { ...workspaceObj._data };
+    newWorkspaceObj.isActiveWorkspace = true;
+    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+    newWorkspaceObj.type = "WORKSPACE";
+    newWorkspaceObj.save = true;
+    newWorkspaceObj.path = {
+      collectionId: "",
+      workspaceId,
+    };
+    newWorkspaceObj.property = {
+      workspace: {
+        requestCount: 0,
+        collectionCount: 0,
+      },
+    };
+    collectionsMethods.handleCreateTab(newWorkspaceObj);
+    collectionsMethods.handleActiveTab(workspaceId);
+  };
+
   const handleDeleteWorkspaceFlow = async () => {
+    activeWorkspaceBeingDeleted = await _viewModel.checkActiveWorkspace(
+      currentWorkspaceDetails.id,
+    );
+    if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
+      notifications.error(
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+      );
+      handleDeletePopup(false);
+      return;
+    }
     const response = await workspaceInvitePermissonMethods.deleteWorkspace(
       currentWorkspaceDetails.id,
     );
@@ -60,10 +112,15 @@
       currentWorkspaceDetails.id,
     );
     if (response && response.data) {
-      notifications.success(
-        `${currentWorkspaceDetails.name}is removed from ${currentTeamDetails.name}`,
+      teamSpecificWorkspace = teamSpecificWorkspace.filter(
+        (ws) => ws.id != currentWorkspaceDetails.id,
       );
-      navigate("/dashboard/workspaces");
+      notifications.success(
+        `${currentWorkspaceDetails.name} is removed from ${currentTeamDetails.name}`,
+      );
+      if (activeWorkspaceBeingDeleted) {
+        showActivateWorkspacePopup = true;
+      }
     } else {
       notifications.error(
         `Failed to remove ${currentWorkspaceDetails.name} from ${currentTeamDetails.name}. Please try again`,
@@ -81,7 +138,10 @@
   style="width:calc(100% - 280px); margin-top: 15px;padding:24px;"
 >
   <div class="workspace-setting-header">
-    <p class="workspace-name" style="font-size: 18px;">
+    <p
+      class="workspace-name w-50 overflow-hidden text-truncate"
+      style="font-size: 18px;"
+    >
       {currentWorkspaceDetails.name}
     </p>
     {#if hasPermission}
@@ -187,8 +247,8 @@
     <div class="workspace-delete-confirmation">
       <div class="text-lightGray mb-1 sparrow-fs-14">
         <p class="text-textColor sparrow-fs-12">
-          Everything in '<span class="text-whiteColor"
-            >{currentWorkspaceDetails.name}</span
+          Everything in <span class="text-whiteColor"
+            >"{currentWorkspaceDetails.name}"</span
           > will be permanently removed, and all contributors will lose access. This
           action cannot be undone.
         </p>
@@ -208,15 +268,6 @@
         on:input={() => {
           confirmationError = "";
         }}
-        on:blur={() => {
-          if (confirmationText === "") {
-            confirmationError = `Workspace name cannot be empty.`;
-          } else if (confirmationText !== currentWorkspaceDetails.name) {
-            confirmationError = `Workspace name does not match.`;
-          } else {
-            confirmationError = "";
-          }
-        }}
         class="input-container mt-2 mb-1 {confirmationError
           ? 'error-border'
           : ''}"
@@ -227,29 +278,109 @@
       <br />
 
       <div
-        class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
+        class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis"
         style="font-size: 16px;"
       >
-        <div class="d-flex align-items-center">
-          <p style="font-size:16px;" class="mb-0">
+        <div class="d-flex align-items-center ellipsis">
+          <p style="font-size:16px;" class="mb-0 ellipsis">
             {currentWorkspaceDetails.name}
           </p>
         </div>
-        <Button
-          disable={workspaceDeletePopupLoader ||
-            confirmationText !== currentWorkspaceDetails.name}
-          title={"Delete Workspace"}
-          textStyleProp={"font-size: var(--base-text)"}
-          loaderSize={18}
-          type={"danger"}
-          loader={workspaceDeletePopupLoader}
-          onClick={async () => {
-            workspaceDeletePopupLoader = true;
-            await handleDeleteWorkspaceFlow();
-            workspaceDeletePopupLoader = false;
-          }}
-        />
+        <div class="d-flex">
+          <Button
+            disable={workspaceDeletePopupLoader}
+            title={"Cancel"}
+            textStyleProp={"font-size: var(--base-text)"}
+            buttonClassProp={"me-2"}
+            loaderSize={18}
+            type={"dark"}
+            loader={false}
+            onClick={async () => {
+              confirmationError = "";
+              confirmationText = "";
+              handleDeletePopup(false);
+            }}
+          />
+          <Button
+            disable={workspaceDeletePopupLoader}
+            title={"Delete Workspace"}
+            textStyleProp={"font-size: var(--base-text)"}
+            loaderSize={18}
+            type={"danger"}
+            loader={workspaceDeletePopupLoader}
+            onClick={async () => {
+              confirmationText = confirmationText.replace(/’/g, "'");
+              if (confirmationText === "") {
+                confirmationError = `Workspace name cannot be empty.`;
+              } else if (confirmationText !== currentWorkspaceDetails.name) {
+                confirmationError = `Workspace name does not match.`;
+              } else {
+                confirmationError = "";
+                workspaceDeletePopupLoader = true;
+                await handleDeleteWorkspaceFlow();
+                workspaceDeletePopupLoader = false;
+              }
+            }}
+          />
+        </div>
       </div>
+    </div>
+  </ModalWrapperV1>
+
+  <ModalWrapperV1
+    title={"Activate Workspace"}
+    type={"primary"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={showActivateWorkspacePopup}
+    canClose={false}
+    handleModalState={handleActivateWorkspacePopup}
+  >
+    <div class="mt-4">
+      <p class="role-title mb-0">
+        Choose your next active workspace<span class="asterik">*</span>
+      </p>
+      <br />
+      <Dropdown
+        dropDownType={{ type: "text", title: "select" }}
+        dropdownId="check-select-workspace"
+        data={[
+          {
+            name: "Select",
+            id: "select",
+            dynamicClasses: "text-whiteColor",
+            hide: true,
+          },
+          ...teamSpecificWorkspace,
+        ]}
+        onclick={handleActivateWorkspace}
+        staticClasses={[
+          {
+            id: `check-select-workspace-dropdown-select`,
+            classToAdd: ["border", "rounded", "py-1"],
+          },
+          {
+            id: "check-select-workspace-options-container",
+            classToAdd: ["end-0", "start-0"],
+          },
+          {
+            id: "check-select-workspace-btn-div",
+            classToAdd: ["flex-wrap", "overflow-auto"],
+          },
+        ]}
+        staticCustomStyles={[
+          {
+            id: "check-select-workspace-options-container",
+            styleKey: "overflow",
+            styleValue: "auto",
+          },
+          {
+            id: "check-select-workspace-options-container",
+            styleKey: "max-height",
+            styleValue: "calc(100vh - 500px)",
+          },
+        ]}
+      ></Dropdown>
     </div>
   </ModalWrapperV1>
 </div>

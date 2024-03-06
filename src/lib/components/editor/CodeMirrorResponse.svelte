@@ -58,7 +58,11 @@
     if (formatter === ResponseFormatter.PRETTY) {
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
-        rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
+        try {
+          rawValue = JSON.stringify(JSON.parse(rawValue), null, 6);
+        } catch (err) {
+          return;
+        }
         codeMirrorView.dispatch({
           changes: {
             from: 0,
@@ -84,12 +88,12 @@
   });
 </script>
 
-<div id="code-editor" bind:this={codeMirrorEditorDiv} />
+<div id="code-editor-response" bind:this={codeMirrorEditorDiv} />
 
 <style>
-  #code-editor {
+  #code-editor-response {
     width: 100%;
-    height: calc(100vh - 360px);
+    height: 100%;
     margin-left: 1%;
   }
 </style>
