@@ -15,6 +15,11 @@
   import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
+  import {
+    environmentLeftPanelWidth,
+    environmentRightPanelWidth,
+  } from "$lib/store/environment";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
   const _viewModel = new EnvironmentViewModel();
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const environments = _viewModel.environments;
@@ -57,13 +62,33 @@
       }
     },
   );
+
+  let splitter;
+  onMount(() => {
+    splitter = document.querySelector(
+      ".splitter-sidebar .splitpanes__splitter",
+    );
+    splitter.style.width = "0px";
+  });
+
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
-<Motion {...scaleMotionProps} let:motion>
-  <div class="environment" use:motion>
+<Splitpanes
+  class="splitter-sidebar"
+  direction="vertical"
+  on:resize={(e) => {
+    environmentLeftPanelWidth.set(e.detail[0].size);
+    environmentRightPanelWidth.set(e.detail[1].size);
+  }}
+>
+  <Pane
+    class="sidebar-left-panel"
+    minSize={20}
+    size={$environmentLeftPanelWidth}
+  >
     <EnvironmentList
       {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
@@ -72,6 +97,12 @@
       environments={$environments}
       currentEnvironment={$activeEnvironment}
     />
+  </Pane>
+  <Pane
+    class="sidebar-right-panel"
+    minSize={60}
+    size={$environmentRightPanelWidth}
+  >
     <EnvironmentPanel
       {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
@@ -81,13 +112,11 @@
         : $activeEnvironment}
       activeWorkspace={$activeWorkspace}
     />
-  </div>
-</Motion>
+  </Pane>
+</Splitpanes>
 
 <style>
-  .environment {
-    display: flex;
-    height: calc(100vh - 44px);
-    overflow: hidden;
+  :global(.splitpanes) {
+    width: calc(100vw - 72px);
   }
 </style>

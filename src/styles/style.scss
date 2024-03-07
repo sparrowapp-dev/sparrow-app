@@ -267,12 +267,12 @@ textarea {
   resize: none;
 }
 .splitpanes__splitter{
-  border-right:  solid #313233 !important;
-  border-top: solid #313233 !important;
+  border-right:  1px solid #313233 !important;
+  border-top: 1px solid #313233 !important;
   border-left: transparent !important;
   border-bottom: transparent !important;
 }
 .splitpanes__splitter:active, .splitpanes__splitter:hover{
-  border-right: solid #1193f0 !important;
-  border-top: solid #1193f0 !important;;
+  border-right: 1px solid #1193f0 !important;
+  border-top: 1px solid #1193f0 !important;;
 }

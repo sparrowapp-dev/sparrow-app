@@ -4,6 +4,9 @@ export const isWorkspaceCreatedFirstTime = writable(false);
 export const isWorkspaceLoaded = writable(true);
 export const workspaceView = writable("GRID");
 
+export const workspaceLeftPanelWidth = writable(20);
+export const workspaceRightPanelWidth = writable(80);
+
 /**
  * The writable store containing the current workspace information.
  * @type {import("svelte/store").Writable<CurrentWorkspace>}

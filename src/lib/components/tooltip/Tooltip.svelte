@@ -22,7 +22,6 @@
 <style>
   .tooltip {
     z-index: 1 !important;
-    width: -webkit-fill-available;
   }
   .top {
     top: -5px;
