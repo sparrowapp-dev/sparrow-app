@@ -56,7 +56,6 @@ export const basicTheme = EditorView.theme({
     width: "100%",
     flex: "1",
     fontSize: "80%",
-    fontFamily: EditorFont,
   },
   ".cm-content": {
     caretColor: "var(--white-color)",
@@ -98,6 +97,12 @@ export const basicTheme = EditorView.theme({
   },
   ".cm-activeLineGutter": {
     backgroundColor: "transparent",
+  },
+  span: {
+    fontFamily: EditorFont,
+  },
+  div: {
+    fontFamily: EditorFont,
   },
 });
 

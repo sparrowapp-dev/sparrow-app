@@ -150,12 +150,15 @@
               <div>
                 <DragDrop
                   value={uploadTeamIcon.file.value}
-                  maxFileSize={100}
+                  maxFileSize={2048}
                   onChange={handleLogoInputChange}
+                  iconHeight={30}
+                  iconWidth={30}
                   resetValue={handleLogoReset}
                   editValue={handleLogoEdit}
-                  labelText="Logo"
-                  labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 100 KB. Supported formats are .jpg, .jpeg, .png "
+                  labelText=""
+                  labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 2 MB. Supported formats are .jpg, .jpeg, .png"
+                  labelDescriptionSize={"14px"}
                   inputId="upload-team-icon-file-input"
                   inputPlaceholder="Drag and Drop or"
                   isRequired={false}
@@ -164,12 +167,14 @@
                   showFileTypeError={uploadTeamIcon.file.showFileTypeError}
                   fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
                   fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+                  width={"80px"}
+                  height={"80px"}
                 />
               </div>
             </div>
           </div>
           <div class="row pb-3">
-            <div class="col-2">
+            <div class="title-width">
               <p class="team-title fs-12 text-textColor">Team Name</p>
             </div>
             <div class="col-10">
@@ -194,7 +199,7 @@
             </div>
           </div>
           <div class="row pb-3">
-            <div class="col-2">
+            <div class="title-width">
               <p class="team-title fs-12 text-textColor">Owner</p>
             </div>
             <div class="col-10">
@@ -205,7 +210,7 @@
             </div>
           </div>
           <div class="row pb-3">
-            <div class="col-2">
+            <div class="title-width">
               <p class="team-title fs-12 text-textColor">About</p>
             </div>
             <div class="col-10">
@@ -249,7 +254,9 @@
   .settings-team-name,
   .settings-team-description {
     background-color: transparent !important;
+    margin-top: -18px;
   }
+  .settings-team-name:hover,
   .settings-team-description:hover {
     outline: 1px solid var(--send-button);
   }
@@ -259,5 +266,8 @@
   }
   .fs-12 {
     font-size: 12px;
+  }
+  .title-width {
+    width: 90px;
   }
 </style>
