@@ -379,22 +379,22 @@
       ]}
       staticCustomStyles={[
         {
-          id:"check-select-workspace-options-container",
-          styleKey:"overflow",
-          styleValue:"auto"
+          id: "check-select-workspace-options-container",
+          styleKey: "overflow",
+          styleValue: "auto",
         },
         {
-          id:"check-select-workspace-options-container",
-          styleKey:"max-height",
-          styleValue:"calc(100vh - 700px)"
-        }
+          id: "check-select-workspace-options-container",
+          styleKey: "max-height",
+          styleValue: "calc(100vh - 700px)",
+        },
       ]}
     ></Dropdown>
   </div>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to
-      all workspaces, plese click on select all.
+      all workspaces, please click on select all.
     </p>
   {/if}
 {/if}

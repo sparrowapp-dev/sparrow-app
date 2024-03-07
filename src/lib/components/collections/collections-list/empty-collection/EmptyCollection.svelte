@@ -78,10 +78,11 @@ font-weight: 300;"
           <img src={whitePlus} alt="+" />Collection
         </button>
       </Tooltip>
-
-      <button class="buttons" on:click={addApiRequest}>
-        <img src={whitePlus} alt="+" />
-        API Request</button
+      <Tooltip title={"API Request"} show={false}>
+        <button class="buttons" on:click={addApiRequest}>
+          <img src={whitePlus} alt="+" />
+          API Request</button
+        ></Tooltip
       >
     </div>
   </div>
