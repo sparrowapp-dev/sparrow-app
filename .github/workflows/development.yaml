@@ -43,7 +43,7 @@ jobs:
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           $content = Get-Content src-tauri/tauri.conf.json -Raw
-          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"'
           Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
         shell: pwsh
 
@@ -84,7 +84,7 @@ jobs:
    
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -110,7 +110,7 @@ jobs:
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<src-tauri/tauri.conf.json)
-          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
           echo "$newContent" > src-tauri/tauri.conf.json
         shell: bash
 
@@ -139,7 +139,7 @@ jobs:
           aws --version
       - name: Upload & downlode File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
           
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -148,7 +148,7 @@ jobs:
       - name: Download MSI files from S3 bucket
         run: |
           mkdir msi_files
-          aws s3 cp s3://sparrow-release-assests/ msi_files/ --recursive --exclude "*" --include "*.msi"
+          aws s3 cp s3://sparrow-release-assests-dev/ msi_files/ --recursive --exclude "*" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
