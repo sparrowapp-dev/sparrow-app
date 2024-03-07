@@ -1,6 +1,6 @@
 <script lang="ts">
   import spin from "$lib/assets/spin.svg";
-  export let size: number;
+  export let size: string;
   export let classProp: string = "";
 </script>
 

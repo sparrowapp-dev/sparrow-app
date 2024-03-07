@@ -95,7 +95,7 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-start justify-content-between mt-2 w-100"
+  class="d-flex flex-column align-items-start justify-content-between mt-5 w-100"
 >
   <div
     class="response-container d-flex align-items-center justify-content-between mb-2 w-100"

@@ -80,6 +80,11 @@
             userWorkspaceLevelRole.set(user.role);
           }
         });
+      } else {
+        currentWorkspace = {
+          id: "",
+          name: "",
+        };
       }
     },
   );

@@ -167,11 +167,15 @@ export class WorkspaceRepository {
     const workspace: WorkspaceDocument = await RxDB.getInstance()
       .rxdb.workspace.findOne()
       .exec();
-    const rxDoc = workspace.toMutableJSON();
-    rxDoc.isActiveWorkspace = true;
-    const teamId = rxDoc.team.teamId;
-    await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
-    return teamId;
+    if (workspace) {
+      const rxDoc = workspace.toMutableJSON();
+      rxDoc.isActiveWorkspace = true;
+      const teamId = rxDoc.team.teamId;
+      await RxDB.getInstance().rxdb.workspace.upsert(rxDoc);
+      return teamId;
+    } else {
+      return "";
+    }
   };
 
   public setCurrentEnvironmentId = async (
