@@ -420,7 +420,7 @@
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
     );
-    splitter.style.width = "0px";
+    splitter.style.width = "1px";
   });
 
   onDestroy(() => {

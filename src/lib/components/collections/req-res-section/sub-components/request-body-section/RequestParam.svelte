@@ -187,12 +187,12 @@
     );
     if (splitter && isHorizontalMode) {
       // splitter.style.border = "solid #313233";
-      splitter.style.height = "0px";
+      splitter.style.height = "1px";
       splitter.style.width = "100%";
     } else if (splitter && !isHorizontalMode) {
       // splitter.style.border = "solid #313233";
       splitter.style.height = "85vh";
-      splitter.style.width = "0px";
+      splitter.style.width = "1px";
     }
   }
 </script>
