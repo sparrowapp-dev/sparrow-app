@@ -197,8 +197,8 @@ $sparrow-font-sizes: (
 @import "bootstrap/scss/root";
 @import "bootstrap";
 
-body {
-  background-color: var(--background-color);
+body, .splitpanes.default-theme .splitpanes__pane {
+  background-color: var(--background-color) !important;
 }
 
 p, h1, h2, h3, h4, h5, h6, a, li, span{
@@ -265,4 +265,14 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
 textarea {
   resize: none;
+}
+.splitpanes__splitter{
+  border-right:  solid #313233 !important;
+  border-top: solid #313233 !important;
+  border-left: transparent !important;
+  border-bottom: transparent !important;
+}
+.splitpanes__splitter:active, .splitpanes__splitter:hover{
+  border-right: solid #1193f0 !important;
+  border-top: solid #1193f0 !important;;
 }

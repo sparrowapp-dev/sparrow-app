@@ -48,7 +48,7 @@
 
 {#if showDefault}
   <div
-    class="container-fluid row d-flex flex-column align-items-center ps-4 pe-3 pt-3"
+    class="container-fluid row d-flex flex-column align-items-center ps-4 pe-0 pt-3"
   >
     <p
       style="font-size: 14px;
@@ -70,7 +70,7 @@ font-weight: 300;"
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.ADD_ENVIRONMENT,
           )}
-          class="buttons d-flex justify-content-center align-items-center gap-1"
+          class="buttons w-100 d-flex justify-content-center align-items-center gap-1"
           on:click={() => {
             handleImportCollectionPopup(true);
           }}
@@ -79,7 +79,7 @@ font-weight: 300;"
         </button>
       </Tooltip>
       <Tooltip title={"API Request"} show={false}>
-        <button class="buttons" on:click={addApiRequest}>
+        <button class="buttons w-100" on:click={addApiRequest}>
           <img src={whitePlus} alt="+" />
           API Request</button
         ></Tooltip

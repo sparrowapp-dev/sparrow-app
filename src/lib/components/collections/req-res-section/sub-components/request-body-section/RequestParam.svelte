@@ -130,12 +130,13 @@
     }
   };
   onMount(() => {
-    const splitter = document.querySelector(".splitpanes__splitter");
+    const splitter = document.querySelector(
+      ".splitter-request .splitpanes__splitter",
+    );
     const leftPanel = document.getElementsByClassName("left-panel");
     const rightPanel = document.getElementsByClassName("right-panel");
     if (splitter && leftPanel && rightPanel) {
       splitter.addEventListener("mousedown" || "mouseover", () => {
-        splitter.style.border = "solid #1193f0";
         splitter.style.cursor = isHorizontalMode ? "row-resize" : "col-resize";
         if (
           isHorizontalMode &&
@@ -165,9 +166,6 @@
           });
         }
       });
-      window.addEventListener("mouseup", () => {
-        splitter.style.border = "solid #313233";
-      });
     }
   });
   function stylePanes() {
@@ -184,15 +182,17 @@
       bottomPanelHeightSize = value;
     });
 
-    const splitter = document.querySelector(".splitpanes__splitter");
+    const splitter = document.querySelector(
+      ".splitter-request .splitpanes__splitter",
+    );
     if (splitter && isHorizontalMode) {
-      splitter.style.border = "solid #313233";
-      splitter.style.height = "0%";
+      // splitter.style.border = "solid #313233";
+      splitter.style.height = "0px";
       splitter.style.width = "100%";
     } else if (splitter && !isHorizontalMode) {
-      splitter.style.border = "solid #313233";
+      // splitter.style.border = "solid #313233";
       splitter.style.height = "85vh";
-      splitter.style.width = "2px";
+      splitter.style.width = "0px";
     }
   }
 </script>
@@ -201,7 +201,7 @@
   style={isHorizontal && "height: 78vh; "}
   on:ready={stylePanes}
   theme=""
-  class="d-flex align-items-start {isHorizontalMode
+  class="splitter-request d-flex align-items-start {isHorizontalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
   horizontal={isHorizontalMode ? true : false}
