@@ -351,7 +351,9 @@
             dynamicClasses: "text-whiteColor",
             hide: true,
           },
-          ...teamSpecificWorkspace,
+          ...teamSpecificWorkspace.filter((workspaceitem) => {
+            workspaceitem.id !== currentWorkspaceDetails.id;
+          }),
         ]}
         onclick={handleActivateWorkspace}
         staticClasses={[

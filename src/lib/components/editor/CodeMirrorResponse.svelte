@@ -25,6 +25,7 @@
         basicTheme,
         languageConf.of([]),
         EditorState.readOnly.of(true),
+        EditorView.lineWrapping, // Enable line wrapping
       ],
     });
     codeMirrorView = new EditorView({

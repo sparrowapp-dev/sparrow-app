@@ -2,6 +2,9 @@ import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { RequestBody } from "$lib/utils/interfaces/request.interface";
 import { writable } from "svelte/store";
 
+export const collectionLeftPanelWidth = writable(20);
+export const collectionRightPanelWidth = writable(80);
+
 const collectionList = writable([]);
 export const isShowCollectionPopup = writable(false);
 export const isShowFolderPopup = writable(false);

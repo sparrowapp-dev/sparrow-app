@@ -24,7 +24,12 @@
    * import { isTeamCreatedFirstTime } from "$lib/store/team.store";
    **/
 
-  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import {
+    isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
+    workspaceLeftPanelWidth,
+    workspaceRightPanelWidth,
+  } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
@@ -39,6 +44,7 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import Input from "$lib/components/inputs/Input.svelte";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -409,6 +415,14 @@
     };
   });
 
+  let splitter;
+  onMount(() => {
+    splitter = document.querySelector(
+      ".splitter-sidebar .splitpanes__splitter",
+    );
+    splitter.style.width = "1px";
+  });
+
   onDestroy(() => {
     userSubscribe();
     teamSubscribe.unsubscribe();
@@ -547,8 +561,15 @@
   </div>
 </ModalWrapperV1>
 
-<Motion {...scaleMotionProps} let:motion>
-  <div class="workspace bg -backgroundColor" use:motion>
+<Splitpanes
+  class="splitter-sidebar"
+  direction="vertical"
+  on:resize={(e) => {
+    workspaceLeftPanelWidth.set(e.detail[0].size);
+    workspaceRightPanelWidth.set(e.detail[1].size);
+  }}
+>
+  <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
     <WorkspaceList
       {userId}
       {handleCreateTeamModal}
@@ -564,6 +585,12 @@
       {teamServiceMethods}
       {collectionsMethods}
     />
+  </Pane>
+  <Pane
+    class="sidebar-right-panel"
+    minSize={60}
+    size={$workspaceRightPanelWidth}
+  >
     <WorkspaceContent
       {currentTeam}
       {userId}
@@ -583,27 +610,17 @@
       {teamRepositoryMethods}
       workspaces={$workspaces}
     />
-  </div>
-</Motion>
+  </Pane>
+</Splitpanes>
 
 <style>
-  .workspace {
-    font-size: 12px;
-    display: flex;
-    height: calc(100vh - 44px);
-    overflow: hidden;
-  }
-  .workspace::-webkit-scrollbar {
-    width: 2px;
-  }
-  .workspace::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-
   .warning-text {
     color: var(--colors-neutral-text-3, #ccc);
     font-size: 14px;
     font-weight: 400;
     line-height: 150%;
+  }
+  :global(.splitpanes) {
+    width: calc(100vw - 72px);
   }
 </style>
