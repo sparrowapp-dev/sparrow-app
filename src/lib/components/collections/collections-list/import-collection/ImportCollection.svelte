@@ -13,7 +13,17 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { debounce, isUrlValid } from "../collection/collection-utils/utils";
+  import {
+    debounce,
+    isUrlValid,
+    validateClientJSON,
+    validateClientURL,
+    validateClientXML,
+  } from "../collection/collection-utils/utils";
+  import linkIcon from "$lib/assets/linkIcon.svg";
+  import { invoke } from "@tauri-apps/api/core";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -44,10 +54,25 @@
     isSyntaxError = false;
     isDataEmpty = false;
   };
-  const handleInputField = (e) => {
-    importData = e.target.value;
-    isurl = isUrlValid(importData);
-    if (isurl) {
+
+  let isValidClientURL = false,
+    isValidClientJSON = false,
+    isValidClientXML = false;
+
+  let isValidServerURL = false,
+    isValidServerJSON = false,
+    isValidServerXML = false;
+
+  const handleInputField = () => {
+    isValidClientURL = false;
+    isValidClientJSON = false;
+    isValidClientXML = false;
+    if (validateClientURL(importData)) {
+      isValidClientURL = true;
+    } else if (validateClientJSON(importData)) {
+      isValidClientJSON = true;
+    } else if (validateClientXML(importData)) {
+      isValidClientXML = true;
     }
   };
   let uploadCollection = {
@@ -162,24 +187,28 @@
     }
   }
 
+  const validateJSON = () => {
+    return _viewImportCollection.validateImportBody(importData);
+  };
   const handleImport = () => {
-    if (importData && !isurl) {
-      handleImportJsonObject();
+    if (importType === "text" && importData && !isurl) {
+      const contentType = validateJSON();
+      handleImportJsonObject(contentType);
       return;
-    }
-    if (importData) {
+    } else if (importType === "text" && importData && isurl) {
       handleImportUrl();
       return;
-    }
-    if (uploadCollection?.file?.value?.length !== 0) {
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length !== 0
+    ) {
       handleFileUpload(uploadCollection?.file?.value);
       return;
     }
     isDataEmpty = true;
   };
 
-  const handleImportJsonObject = async () => {
-    const contentType = _viewImportCollection.validateImportBody(importData);
+  const handleImportJsonObject = async (contentType) => {
     if (!contentType) {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -297,6 +326,20 @@
       isSyntaxError = true;
     }
   };
+  let repositoryPath = "";
+  let isRepositoryPath = false;
+  const uploadFormFile = async () => {
+    const filePathResponse: string = await invoke("fetch_file_command");
+    if (filePathResponse !== "Canceled") {
+      repositoryPath = filePathResponse;
+      isRepositoryPath = true;
+    }
+  };
+
+  let repositoryBranch = "none";
+  let handleDropdown = (tabId: string) => {
+    repositoryBranch = tabId;
+  };
 </script>
 
 {#if progressBar.isLoading}
@@ -387,8 +430,8 @@
     </div>
     <div class="textarea-div rounded border-0">
       <textarea
-        on:input={(e) => {
-          debounce(handleInputField(e));
+        on:blur={() => {
+          handleInputField();
         }}
         bind:value={importData}
         class="form-control border-0 rounded bg-blackColor"
@@ -421,20 +464,134 @@
       />
     </div>
   {/if}
-  {#if isurl}
-    <div class="form-check form-switch">
-      <label class="form-check-label" for="enableActiveSync"
-        >Enable Active Sync</label
-      >
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        bind:checked={activeSync}
-        id="enableActiveSync"
-      />
+  {#if isValidServerURL}
+    <div>
+      <div>
+        <small class="text-textColor sparrow-fs-12"
+          >This link supports Active Sync.</small
+        >
+      </div>
+      <div class="form-check form-switch ps-0">
+        <div class="d-flex justify-content-between">
+          <span class="sparrow-fs-14">Enable Active Sync</span>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            bind:checked={activeSync}
+            id="enableActiveSync"
+          />
+        </div>
+      </div>
+      <div>
+        <small class="text-textColor sparrow-fs-12"
+          >Enabling Active Sync auto-updates APIs via Swagger Link.</small
+        >
+      </div>
+      <div class="d-flex align-items-center gap-2 pb-2">
+        <img src={linkIcon} alt="" />
+        <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
+          >Learn more about Active Sync</a
+        >
+      </div>
+      {#if activeSync}
+        <!-- Local repository path -->
+        <div>
+          <p class="sparrow-fs-14 mb-1">
+            Paste or browse local repository path
+          </p>
+          <div class="pb-2">
+            <small class="sparrow-fs-12 text-textColor"
+              >The repository location is required to track your branch.</small
+            >
+          </div>
+          <div class="d-flex justify-content-between pb-2">
+            <input
+              class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
+              type="text"
+              style="width:80%;"
+              bind:value={repositoryPath}
+            />
+            <Button
+              disable={false}
+              title={"Browse"}
+              textStyleProp={"font-size: var(--base-text);f"}
+              type={"dark"}
+              loader={false}
+              onClick={() => {
+                uploadFormFile();
+              }}
+            />
+          </div>
+        </div>
+        {#if isRepositoryPath}
+          <div>
+            <div>
+              <p class="sparrow-fs-14 mb-1">Select Primary Branch</p>
+              <div class="pb-2">
+                <small class="sparrow-fs-12 text-textColor"
+                  >The selected primary branch is considered the default branch.</small
+                >
+              </div>
+
+              <div class="bg-blackColor rounded">
+                <Dropdown
+                  dropdownId={"hashfref129"}
+                  data={[
+                    {
+                      name: "None",
+                      id: "none",
+                    },
+                    {
+                      name: "Active Sync",
+                      id: "act",
+                    },
+                    {
+                      name: "Default Branch",
+                      id: "db",
+                    },
+                  ]}
+                  additionalType={"branch"}
+                  onclick={handleDropdown}
+                  dropDownType={{ type: "text", title: repositoryBranch }}
+                  staticClasses={[
+                    {
+                      id: "hashfref129-options-container",
+                      classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
+                    },
+                  ]}
+                  hoverClasses={[
+                    {
+                      id: "hashfref129-btn-div",
+                      classToAdd: ["border-bottom", "border-labelColor"],
+                    },
+                  ]}
+                ></Dropdown>
+              </div>
+            </div>
+          </div>
+        {/if}
+      {/if}
     </div>
   {/if}
+  {#if !importData}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      Please paste your OpenAPI specification text or Swagger/localhost link.
+    </p>
+  {:else if isValidClientURL && !isValidServerURL}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      Unable to process the specified Swagger link. Please verify the URL for
+      accuracy and accessibility. If the problem persists, contact the API
+      provider for assistance.
+    </p>
+  {:else if (isValidClientXML && !isValidServerXML) || (isValidClientJSON && !isValidServerJSON)}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      We have identified that text you pasted is not written in Open API
+      Specification (OAS). Please visit https://swagger.io/specification/ for
+      more information on OAS.
+    </p>
+  {/if}
+
   <div
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
   >
@@ -450,12 +607,6 @@
         {/if}</span
       > Import Collection</button
     >
-
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      {#if isDataEmpty && !importData}
-        Please Paste or Upload your file in order to import the workspace
-      {/if}
-    </p>
     <p class="importData-whiteColor mb-2 sparrow-fs-14 fw-bold">OR</p>
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
@@ -526,6 +677,10 @@
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+  }
+  .learn-active-link {
+    color: var(--primary-btn-color) !important;
+    text-decoration: none;
   }
   .invalid-type-content {
     .format-types-container {
