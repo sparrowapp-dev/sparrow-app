@@ -167,13 +167,14 @@
     </h1>
     <Tooltip
       title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
+      placement={"left"}
     >
       <button
         disabled={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
-        class={`border-0 mx-3 rounded add-env-mini-btn  ${
+        class={`border-0 me-3 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
         on:click={handleCreateEnvironment}
@@ -202,8 +203,8 @@
   <hr class="mb-0" />
 
   {#if localEnvironment && localEnvironment.length === 0}
-    <div class={`add-env-container `}>
-      <p class={`add-env-desc-text fw-light text-center mb-5 p-2 pe-4`}>
+    <div class={`add-env-container p-3`}>
+      <p class={`add-env-desc-text fw-light text-center mb-3`}>
         Add Environments to your Workspace to test your APIs with the relevant
         set of resources and constraints.
       </p>
@@ -219,7 +220,7 @@
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.ADD_COLLECTIONS,
           )}
-          class={`add-env-btn d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
+          class={`add-env-btn w-100 d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
           on:click={handleCreateEnvironment}
         >
           <PlusIcon classProp={`my-auto me-2`} />
@@ -247,7 +248,6 @@
 
 <style lang="scss">
   .navbar {
-    width: 180px;
     height: auto;
     overflow: hidden;
   }
@@ -271,9 +271,7 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    border-right: 1px solid var(--border-color);
     padding: 0px 0px 8px 2px;
-    width: calc(280px);
     height: calc(100vh - 44px);
   }
   .curr-workspace {

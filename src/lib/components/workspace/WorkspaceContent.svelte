@@ -341,7 +341,6 @@
   }
 
   .teams-content {
-    width: calc(100vw - 352px);
     height: calc(100vh - 44px);
   }
   @media only screen and (max-width: 1000px) {

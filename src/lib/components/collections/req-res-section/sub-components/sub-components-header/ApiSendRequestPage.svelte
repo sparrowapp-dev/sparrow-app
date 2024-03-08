@@ -479,9 +479,15 @@
           on:click={() => isHorizontal.set(false)}
           on:click={() => {
             selectedView = "vertical";
-            const splitter = document.querySelector(".splitpanes__splitter");
-            const leftPanel = document.querySelector(".left-panel");
-            const rightPanel = document.querySelector(".right-panel");
+            const splitter = document.querySelector(
+              ".splitter-request .splitpanes__splitter",
+            );
+            const leftPanel = document.querySelector(
+              ".splitter-request .left-panel",
+            );
+            const rightPanel = document.querySelector(
+              ".splitter-request .right-panel",
+            );
             leftPanel.style.width = `${leftPanelWidth}%`;
             rightPanel.style.width = `${rightPanelWidth}%`;
             splitter.style.height = "85vh";
@@ -498,9 +504,15 @@
           on:click={() => isHorizontal.set(true)}
           on:click={() => {
             selectedView = "horizontal";
-            const splitter = document.querySelector(".splitpanes__splitter");
-            const leftPanel = document.querySelector(".left-panel");
-            const rightPanel = document.querySelector(".right-panel");
+            const splitter = document.querySelector(
+              ".splitter-request .splitpanes__splitter",
+            );
+            const leftPanel = document.querySelector(
+              ".splitter-request .left-panel",
+            );
+            const rightPanel = document.querySelector(
+              ".splitter-request .right-panel",
+            );
             splitter.style.height = "0%";
             splitter.style.width = "100%";
             rightPanel.style.width = `${rightPanelWidth}%`;

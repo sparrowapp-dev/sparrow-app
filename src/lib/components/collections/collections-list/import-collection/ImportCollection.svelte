@@ -338,7 +338,7 @@
       on:click={() => {
         onClick(false);
         handleCreateCollection();
-      }}>Create Collection</button
+      }}>Create Empty Collection</button
     >
   </div>
 </ModalWrapperV1>
