@@ -164,6 +164,7 @@
           let data = {
             users: emailstoBeSentArr,
             role: selectedRole,
+            teamId: teamId,
             workspaces: teamSpecificWorkspace
               .filter((elem) => {
                 if (elem.checked) {
@@ -189,6 +190,7 @@
         let data = {
           users: emailstoBeSentArr,
           role: selectedRole,
+          teamId: teamId,
         };
         const response = await onSubmit(teamId, data);
         if (response) {
