@@ -322,7 +322,7 @@
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
     }
-    if (event.ctrlKey && event.key === "Enter") {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement?.focus();
