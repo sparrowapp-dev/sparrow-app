@@ -32,7 +32,8 @@
   export let dropdownDataContainer = "";
   export let additonalSelectedOptionText: string = "";
   export let additionalSelectedOptionHeading = "";
-  export let additionalType: "environment" | "other" | "memberinfo" = "other";
+  export let additionalType: "environment" | "other" | "memberinfo" | "branch" =
+    "other";
 
   export let onclick: (tab: string) => void;
   export let dropDownType: {
@@ -234,6 +235,15 @@
           {:else}
             <p class=" mb-0 ellipsis">
               <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
+              {selectedOption?.name}
+            </p>
+          {/if}
+        {:else if additionalType === "branch"}
+          {#if selectedOption?.id === "none"}
+            <p class=" mb-0 ellipsis text-textColor">Select Branch</p>
+          {:else}
+            <p class=" mb-0 ellipsis">
+              <!-- <span class="text-sparrowBottomBorder">ENVIRONMENT</span> -->
               {selectedOption?.name}
             </p>
           {/if}
