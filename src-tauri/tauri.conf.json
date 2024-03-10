@@ -49,6 +49,9 @@
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
+      "windows": {
+        "installMode": "passive"
+      },
       "active": true,
       "endpoints": [
         "https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"

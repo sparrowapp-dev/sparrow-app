@@ -6,30 +6,19 @@
   import { relaunch } from "@tauri-apps/plugin-process";
   import { ModalWrapperV1 } from "$lib/components";
   import Button from "$lib/components/buttons/Button.svelte";
-  import { platform } from "@tauri-apps/plugin-os";
-  import { open } from "@tauri-apps/plugin-shell";
-  import constants from "$lib/utils/constants";
 
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
-
-  const externalSparrowDownloadLink = constants.SPARROW_DOWNLOAD_LINK;
-
-  let windowsUpdateAvailable = false;
+  const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
   onMount(async () => {
     try {
       updater = await check();
       if (updater?.available) {
         notifications.info("Update Available");
         newAppVersion = updater.version;
-        const os = await platform();
-        if (os === "windows") {
-          windowsUpdateAvailable = true;
-        } else if (os === "macos") {
-          updateAvailable = true;
-        }
+        updateAvailable = true;
       }
     } catch (error) {
       console.error(error);
@@ -40,10 +29,6 @@
     updateAvailable = flag;
   };
 
-  const handleWindowsUpdatePopUp = (flag: boolean) => {
-    windowsUpdateAvailable = flag;
-  };
-
   const initiateUpdate = async () => {
     try {
       updateAvailable = false;
@@ -51,9 +36,11 @@
       if (updater) {
         await updater.downloadAndInstall();
         notifications.success(
-          "Update Completed. Kindly restart the application.",
+          "Update Completed. Application will restart automatically.",
         );
-        await relaunch();
+        setTimeout(async () => {
+          await relaunch();
+        }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
       notifications.error("Update Failed!");
@@ -101,50 +88,6 @@
         type={"primary"}
         loader={false}
         onClick={initiateUpdate}
-      />
-    </div></ModalWrapperV1
-  >{/if}
-
-{#if windowsUpdateAvailable === true}
-  <ModalWrapperV1
-    title={`New Update Available - v${newAppVersion}`}
-    type={"primary"}
-    width={"50%"}
-    zIndex={1000}
-    isOpen={windowsUpdateAvailable}
-    handleModalState={handleWindowsUpdatePopUp}
-    icon={"warning"}
-  >
-    <div class="text-lightGray mb-1 sparrow-fs-14">
-      <p>
-        Auto update is a known issue for Windows users in Sparrow. Kindly visit
-        Github to download the latest version for new features and improvements.
-      </p>
-    </div>
-    <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-    >
-      <Button
-        disable={false}
-        title={"Cancel"}
-        textStyleProp={"font-size: var(--base-text)"}
-        type={"dark"}
-        loader={false}
-        onClick={() => {
-          windowsUpdateAvailable = false;
-        }}
-      />
-
-      <Button
-        disable={false}
-        title={"Go to Download Page"}
-        textStyleProp={"font-size: var(--base-text)"}
-        type={"primary"}
-        loader={false}
-        onClick={async () => {
-          await open(externalSparrowDownloadLink);
-          windowsUpdateAvailable = false;
-        }}
       />
     </div></ModalWrapperV1
   >{/if}
