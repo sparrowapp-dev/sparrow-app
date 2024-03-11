@@ -13,6 +13,7 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { CollectionService } from "$lib/services/collection.service";
   import {
     debounce,
     isUrlValid,
@@ -32,12 +33,14 @@
   export let onClick: (flag: boolean) => void;
   const _viewImportCollection = new ImportCollectionViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
+  const _collectionService = new CollectionService();
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
     FETCHING_DATA: "Fetching Data...",
   };
 
+  let isInputDataTouched = false;
   let isDataEmpty: boolean = false;
   let isSyntaxError: boolean = false;
   let importData: string = "";
@@ -63,12 +66,21 @@
     isValidServerJSON = false,
     isValidServerXML = false;
 
-  const handleInputField = () => {
+  const handleInputField = async () => {
+    isInputDataTouched = true;
     isValidClientURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
+    isValidServerURL = false;
+    isValidServerJSON = false;
+    isValidServerXML = false;
     if (validateClientURL(importData)) {
       isValidClientURL = true;
+      const response =
+        await _collectionService.validateImportCollectionInput(importData);
+      if (response.isSuccessful) {
+        isValidServerURL = true;
+      }
     } else if (validateClientJSON(importData)) {
       isValidClientJSON = true;
     } else if (validateClientXML(importData)) {
@@ -574,17 +586,17 @@
       {/if}
     </div>
   {/if}
-  {#if !importData}
+  {#if !importData && isInputDataTouched}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Please paste your OpenAPI specification text or Swagger/localhost link.
     </p>
-  {:else if isValidClientURL && !isValidServerURL}
+  {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Unable to process the specified Swagger link. Please verify the URL for
       accuracy and accessibility. If the problem persists, contact the API
       provider for assistance.
     </p>
-  {:else if (isValidClientXML && !isValidServerXML) || (isValidClientJSON && !isValidServerJSON)}
+  {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       We have identified that text you pasted is not written in Open API
       Specification (OAS). Please visit https://swagger.io/specification/ for

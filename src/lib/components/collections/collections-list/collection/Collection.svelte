@@ -320,7 +320,7 @@
       deletedIds.length = [];
       requestCount = 0;
       folderCount = 0;
-      collection.items.forEach((item) => {
+      collection?.items?.forEach((item) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
@@ -481,7 +481,7 @@
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
       on:click={() => {
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
           visibility = !visibility;
         }
       }}

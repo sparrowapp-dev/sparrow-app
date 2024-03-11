@@ -162,12 +162,24 @@ export class CollectionService {
     return response;
   };
 
-  public importCollection = async (workspaceId: string, url: ImportBodyUrl, activeSync:boolean=false) => {
+  public validateImportCollectionInput = async (data: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/validate/oapi`, {
+      body: { data },
+      headers: { ...getAuthHeaders(), "x-oapi-url": data },
+    });
+    return response;
+  };
+
+  public importCollection = async (
+    workspaceId: string,
+    url: ImportBodyUrl,
+    activeSync: boolean = false,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importUrl/collection`,
       {
-        body: {...url,activeSync},
+        body: { ...url, activeSync },
         headers: getAuthHeaders(),
       },
     );
