@@ -189,22 +189,9 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive && elem.property.request) {
         elem.property.request.state[route] = data;
-        progressiveTab.set(elem);
-      }
-      return elem;
-    });
-    return [...updatedTab];
-  });
-};
-/**
- * Configures the request with state in request body and authorization such as raw, form data, encodedurl, none and no auth, api key, bearer token, basic auth.
- */
-const setRequestStateType = async (data, route: string): Promise<void> => {
-  tabs.update((value: NewTab[]): NewTab[] => {
-    const updatedTab = value.map((elem: NewTab): NewTab => {
-      if (elem.isActive && elem.property.request) {
-        elem.property.request.state[route] = data;
-        elem.property.request.save.api = false;
+        if (route == "auth" || route == "dataset") {
+          elem.property.request.save.api = false;
+        }
         progressiveTab.set(elem);
       }
       return elem;
@@ -328,7 +315,6 @@ const requestResponseStore = {
   setRequestBody,
   setRequestAuth,
   setRequestState,
-  setRequestStateType,
   setRequestProperty,
   updateRequestPropertyResponseBody,
   getTabList,

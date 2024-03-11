@@ -35,7 +35,6 @@
     updateTab: _viewModel.updateTab,
     updateRequestProperty: _viewModel.updateRequestProperty,
     updateRequestState: _viewModel.updateRequestState,
-    updateRequestStateType: _viewModel.updateRequestStateType,
     updateRequestAuth: _viewModel.updateRequestAuth,
     updateRequestBody: _viewModel.updateRequestBody,
     updateRequestBodyFormData: _viewModel.updateRequestBodyFormData,

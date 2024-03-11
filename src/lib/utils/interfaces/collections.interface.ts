@@ -16,7 +16,6 @@ export interface CollectionsMethods {
   updateTab: (data, route: string, _id: string) => void;
   updateRequestProperty: (data, route: string, id?: string) => void;
   updateRequestState: (data, route: string, id?: string) => void;
-  updateRequestStateType: (data, route: string, id?: string) => void;
   updateRequestAuth: (data, route: string) => void;
   updateRequestBody: (data, route: string) => void;
   updateRequestBodyFormData: (data, route: string) => void;

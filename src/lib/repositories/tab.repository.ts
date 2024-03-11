@@ -139,25 +139,6 @@ export class TabRepository {
     });
   };
   /**
-   * Configures the request with state such as raw, dataset, auth, section.
-   */
-  public setRequestStateType = async (
-    data: any,
-    route: string,
-  ): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.state[route] = data;
-      return value;
-    });
-  };
-  /**
    * Configures the request with Auth such as API key, bearer token, basic auth.
    */
   public setRequestAuth = async (data: any, route: string): Promise<void> => {

@@ -14,7 +14,7 @@
   let currentTab: string;
 
   let handleDropdown = (tab: string) => {
-    collectionsMethods.updateRequestStateType(tab, "auth");
+    collectionsMethods.updateRequestState(tab, "auth");
   };
 
   $: {

@@ -53,7 +53,7 @@
   });
 
   let handleDropdown = (tab: string) => {
-    collectionsMethods.updateRequestStateType(tab, "dataset");
+    collectionsMethods.updateRequestState(tab, "dataset");
   };
 
   let handleRawDropDown = (tab: string) => {
