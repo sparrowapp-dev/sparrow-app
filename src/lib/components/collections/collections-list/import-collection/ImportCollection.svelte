@@ -76,8 +76,9 @@
     isValidServerXML = false;
     if (validateClientURL(importData)) {
       isValidClientURL = true;
-      const response =
-        await _collectionService.validateImportCollectionInput(importData);
+      const response = await _collectionService.validateImportCollectionInput(
+        importData.replace("localhost", "127.0.0.1") + "-json",
+      );
       if (response.isSuccessful) {
         isValidServerURL = true;
       }
@@ -352,6 +353,7 @@
   let handleDropdown = (tabId: string) => {
     repositoryBranch = tabId;
   };
+  const debouncedImport = debounce(handleInputField, 1000);
 </script>
 
 {#if progressBar.isLoading}
@@ -442,8 +444,8 @@
     </div>
     <div class="textarea-div rounded border-0">
       <textarea
-        on:blur={() => {
-          handleInputField();
+        on:input={() => {
+          debouncedImport();
         }}
         bind:value={importData}
         class="form-control border-0 rounded bg-blackColor"
