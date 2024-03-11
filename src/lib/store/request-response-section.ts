@@ -236,7 +236,6 @@ const setRequestBody = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
         if (elem.property.request.body[route] != data) {
-          console.log(elem.property.request.body[route], data);
           elem.property.request.body[route] = data;
           elem.property.request.save.api = false;
         }
