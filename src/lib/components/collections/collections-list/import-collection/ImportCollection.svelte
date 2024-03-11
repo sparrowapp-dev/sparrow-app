@@ -228,7 +228,6 @@
     ) {
       const contentType = validateJSON(importData);
       handleImportJsonObject(contentType);
-      return;
     } else if (
       importType === "text" &&
       importData &&
@@ -236,8 +235,22 @@
       isValidServerURL
     ) {
       const data = importData.replace("localhost", "127.0.0.1") + "-json";
-      handleImportUrl(data);
-      return;
+      if (!activeSync) {
+        const requestBody = { url: data };
+        handleImportUrl(requestBody);
+      } else if (
+        activeSync &&
+        isRepositoryPath &&
+        repositoryBranch &&
+        repositoryBranch !== "not exist"
+      ) {
+        const requestBody = {
+          url: data,
+          primaryBranch: repositoryBranch,
+          currentBranch: repositoryBranch,
+        };
+        handleImportUrl(requestBody);
+      }
     } else if (
       importType === "file" &&
       uploadCollection?.file?.value?.length !== 0
@@ -309,20 +322,10 @@
     }
   };
 
-  const handleImportUrl = async (data) => {
+  const handleImportUrl = async (requestBody) => {
     progressBar.isLoading = true;
     progressBar.isProgress = false;
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
-    let requestBody;
-    if (!activeSync) {
-      requestBody = { url: data };
-    } else {
-      requestBody = {
-        url: data,
-        primaryBranch: "development",
-        currentBranch: "feat/onboarding-v2",
-      };
-    }
     const response = await _viewImportCollection.importCollectionData(
       currentWorkspaceId,
       requestBody,
@@ -386,7 +389,7 @@
     }
   };
 
-  let repositoryBranch = "none";
+  let repositoryBranch = "not exist";
   let handleDropdown = (tabId: string) => {
     repositoryBranch = tabId;
   };
@@ -591,7 +594,7 @@
                   data={[
                     {
                       name: "None",
-                      id: "none",
+                      id: "not exist",
                     },
                     {
                       name: "Active Sync",

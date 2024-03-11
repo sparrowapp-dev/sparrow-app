@@ -239,7 +239,7 @@
             </p>
           {/if}
         {:else if additionalType === "branch"}
-          {#if selectedOption?.id === "none"}
+          {#if selectedOption?.id === "not exist"}
             <p class=" mb-0 ellipsis text-textColor">Select Branch</p>
           {:else}
             <p class=" mb-0 ellipsis">
