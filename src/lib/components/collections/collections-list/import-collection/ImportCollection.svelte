@@ -74,18 +74,34 @@
     isValidServerURL = false;
     isValidServerJSON = false;
     isValidServerXML = false;
+
     if (validateClientURL(importData)) {
       isValidClientURL = true;
       const response = await _collectionService.validateImportCollectionInput(
         importData.replace("localhost", "127.0.0.1") + "-json",
+        importData,
       );
       if (response.isSuccessful) {
         isValidServerURL = true;
       }
     } else if (validateClientJSON(importData)) {
       isValidClientJSON = true;
-    } else if (validateClientXML(importData)) {
-      isValidClientXML = true;
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidServerJSON = true;
+      }
+    } else {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidClientXML = true;
+        isValidServerXML = true;
+      }
     }
   };
   let uploadCollection = {
@@ -200,16 +216,27 @@
     }
   }
 
-  const validateJSON = () => {
-    return _viewImportCollection.validateImportBody(importData);
+  const validateJSON = (data) => {
+    return _viewImportCollection.validateImportBody(data);
   };
   const handleImport = () => {
-    if (importType === "text" && importData && !isurl) {
-      const contentType = validateJSON();
+    if (
+      importType === "text" &&
+      importData &&
+      ((isValidClientJSON && isValidServerJSON) ||
+        (isValidClientXML && isValidServerXML))
+    ) {
+      const contentType = validateJSON(importData);
       handleImportJsonObject(contentType);
       return;
-    } else if (importType === "text" && importData && isurl) {
-      handleImportUrl();
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientURL &&
+      isValidServerURL
+    ) {
+      const data = importData.replace("localhost", "127.0.0.1") + "-json";
+      handleImportUrl(data);
       return;
     } else if (
       importType === "file" &&
@@ -282,13 +309,23 @@
     }
   };
 
-  const handleImportUrl = async () => {
+  const handleImportUrl = async (data) => {
     progressBar.isLoading = true;
     progressBar.isProgress = false;
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+    let requestBody;
+    if (!activeSync) {
+      requestBody = { url: data };
+    } else {
+      requestBody = {
+        url: data,
+        primaryBranch: "development",
+        currentBranch: "feat/onboarding-v2",
+      };
+    }
     const response = await _viewImportCollection.importCollectionData(
       currentWorkspaceId,
-      { url: importData },
+      requestBody,
       activeSync,
     );
 
@@ -478,7 +515,7 @@
       />
     </div>
   {/if}
-  {#if isValidServerURL}
+  {#if isValidClientURL && isValidServerURL}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"

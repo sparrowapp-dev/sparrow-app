@@ -162,10 +162,17 @@ export class CollectionService {
     return response;
   };
 
-  public validateImportCollectionInput = async (data: string) => {
+  public validateImportCollectionInput = async (
+    data: string = "",
+    jsonXml = "",
+  ) => {
     const response = await makeRequest("POST", `${this.apiUrl}/validate/oapi`, {
-      body: { data },
-      headers: { ...getAuthHeaders(), "x-oapi-url": data },
+      body: jsonXml,
+      headers: {
+        ...getAuthHeaders(),
+        "x-oapi-url": data,
+        "Content-type": ContentTypeEnum["application/json"],
+      },
     });
     return response;
   };
