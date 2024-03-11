@@ -345,8 +345,10 @@
                     const elem = document.getElementById(
                       "query-param-key" + index,
                     );
-                    environmentAxisY = elem.getBoundingClientRect().top + 30;
-                    environmentAxisX = elem.getBoundingClientRect().left;
+                    if (elem) {
+                      environmentAxisY = elem.getBoundingClientRect().top + 30;
+                      environmentAxisX = elem.getBoundingClientRect().left;
+                    }
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
@@ -403,8 +405,10 @@
                     const elem = document.getElementById(
                       "query-param-value" + index,
                     );
-                    environmentAxisY = elem.getBoundingClientRect().top + 30;
-                    environmentAxisX = elem.getBoundingClientRect().left;
+                    if (elem) {
+                      environmentAxisY = elem.getBoundingClientRect().top + 30;
+                      environmentAxisX = elem.getBoundingClientRect().left;
+                    }
                   }}
                 />
                 {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}

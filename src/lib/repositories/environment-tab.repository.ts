@@ -78,21 +78,23 @@ export class EnvironmentTabRepository {
   public setEnvironmentTabProperty = async (
     data: any,
     route: string,
-    id,
+    id: string,
   ): Promise<void> => {
-    const query = RxDB.getInstance()
+    const query = await RxDB.getInstance()
       .rxdb.environmenttab.findOne({
         selector: {
           id,
         },
       })
       .exec();
-    (await query).incrementalModify((value) => {
-      value[route] = data;
-      if (route === "name" || route === "variable") {
-        value["isSave"] = false;
-      }
-      return value;
-    });
+    if (query) {
+      query.incrementalModify((value: any) => {
+        value[route] = data;
+        if (route === "name" || route === "variable") {
+          value["isSave"] = false;
+        }
+        return value;
+      });
+    }
   };
 }
