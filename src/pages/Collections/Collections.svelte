@@ -84,7 +84,7 @@
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const environments = _viewModel.environments;
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.code === "KeyN") {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
         generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
       );
