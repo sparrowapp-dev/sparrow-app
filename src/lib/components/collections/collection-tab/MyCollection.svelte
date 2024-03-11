@@ -18,6 +18,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -33,6 +34,7 @@
   let totalFolder: number = 0;
   let totalRequest: number = 0;
   let tabDescription = "";
+  let isSynced = false;
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
@@ -102,6 +104,16 @@
       isLoading = false;
     }
   };
+  const handleSyncCollection = async () => {
+    // isApiCreatedFirstTime.set(true);
+    // const response = await _myColllectionViewModel.createApiRequest(
+    //   componentData,
+    //   collectionsMethods,
+    // );
+    // if (response.isSuccessful) {
+    //   isLoading = false;
+    // }
+  };
 
   let collapsExpandToggle: boolean = false;
 
@@ -134,7 +146,9 @@
       inputElement.select();
     }
   });
-
+  const handleBranchChange = () => {
+    alert("branch changed");
+  };
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
@@ -157,59 +171,129 @@
         workspaceLevelPermissions.SAVE_REQUEST,
       )}
     >
-      <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
-        <input
-          type="text"
-          required
-          {autofocus}
-          maxlength={100}
-          id="renameInputFieldCollection"
-          value={tabName}
-          class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )}
-          on:blur={(event) => onUpdate("name", event)}
-          on:keydown={onRenameInputKeyPress}
-          bind:this={inputElement}
-        />
+      <div class="d-flex aling-items-center gap-2 mb-4">
+        <div class="d-flex flex-column flex-grow-1">
+          <input
+            type="text"
+            required
+            {autofocus}
+            maxlength={100}
+            id="renameInputFieldCollection"
+            value={tabName}
+            class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+            disabled={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            )}
+            on:blur={(event) => onUpdate("name", event)}
+            on:keydown={onRenameInputKeyPress}
+            bind:this={inputElement}
+          />
+          <Dropdown
+            dropdownId={"branchselection"}
+            data={[
+              {
+                name: "branch Name-current branch",
+                id: "none",
+                type: "rfgh",
+              },
+            ]}
+            onclick={handleBranchChange}
+            dropDownType={{ type: "text", title: "change branch " }}
+            staticClasses={[
+              {
+                id: "branchselection",
+                classToAdd: ["bg-backgroundDropdown"],
+              },
+              {
+                id: "branchselection",
+                classToAdd: ["text-muted"],
+              },
+            ]}
+            hoverClasses={[
+              {
+                id: "branchselection",
+                classToAdd: ["border-bottom", "border-labelColor"],
+              },
+            ]}
+          ></Dropdown>
+        </div>
+        <div class="d-flex flex-row">
+          <div class="d-flex flex-column justify-content-center">
+            <button
+              disabled={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
+              class="btn btn-secondary m-1 rounded border-0 text-align-right py-1"
+              style="max-height:40px"
+              on:click={handleSyncCollection}>Sync Collection</button
+            >
+          </div>
 
-        <button
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )}
-          class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
-          on:click={handleApiRequest}>New Request</button
-        >
+          <div class="d-flex flex-column justify-content-center">
+            <button
+              disabled={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
+              class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+              style="max-height:40px"
+              on:click={handleApiRequest}>New Request</button
+            >
+          </div>
+        </div>
       </div>
     </Tooltip>
-
-    <div class="d-flex gap-4 mb-4 ps-2">
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-plusButton">{totalRequest}</span>
-        <p style="font-size: 12px;" class="mb-0">API Requests</p>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-plusButton">{totalFolder}</span>
-        <p style="font-size: 12px;" class="mb-0">Folder</p>
+    <div
+      class={`${
+        isSynced ? "d-flex" : "d-none"
+      } flex-column align-items-center flex-grow-1 justify-content-center`}
+    >
+      <div class="d-flex flex-column align-items-center">
+        <div class="text-secondary">Branch Info Unavailable</div>
+        <div class="text-muted">the current branch is not available</div>
+        <div class="text-muted">
+          To resolve this issue,please follow these steps:
+        </div>
+        <ul type="1">
+          <li class="text-muted">
+            Run the project to initialize development environment
+          </li>
+          <li class="text-muted">
+            Click on 'Sync Collection' button to synchronize the branch
+            information
+          </li>
+        </ul>
+        <button class="btn btn-primary">Sync Collection</button>
       </div>
     </div>
-    <div class="d-flex align-items-start ps-0 h-100">
-      <textarea
-        disabled={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-        )}
-        id="updateCollectionDescField"
-        style="font-size: 12px;"
-        value={tabDescription}
-        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
-        placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-        on:blur={(event) => onUpdate("description", event)}
-        on:keydown={onDescInputKeyPress}
-      />
+    <div class={`${isSynced ? "d-none" : "d-flex"} align-items-center`}>
+      <div class="d-flex gap-4 mb-4 ps-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-plusButton">{totalRequest}</span>
+          <p style="font-size: 12px;" class="mb-0">API Requests</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-plusButton">{totalFolder}</span>
+          <p style="font-size: 12px;" class="mb-0">Folder</p>
+        </div>
+      </div>
+      <div class="d-flex align-items-start ps-0 h-100">
+        <textarea
+          disabled={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.EDIT_COLLECTION_DESC,
+          )}
+          id="updateCollectionDescField"
+          style="font-size: 12px;"
+          value={tabDescription}
+          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+          placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+          on:blur={(event) => onUpdate("description", event)}
+          on:keydown={onDescInputKeyPress}
+        />
+      </div>
     </div>
   </div>
   <div
