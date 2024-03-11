@@ -47,17 +47,17 @@
   });
   let collectionCountArr = [];
 
-  const refreshCount = () => {
+  const refreshCount = async () => {
     if (collectionCountArr && collectionId) {
-      collectionCountArr.forEach(async (collection) => {
+      for (const collection of collectionCountArr) {
         if (collection._data.id === collectionId) {
           const collectionData = await collectionsMethods.getNoOfApisandFolders(
             collection,
             folderId,
           );
-          totalRequest = collectionData.requestCount;
+          totalRequest = collectionData.requestCount ?? 0;
         }
-      });
+      }
     }
   };
   const collectionSubscribe = collections.subscribe(
