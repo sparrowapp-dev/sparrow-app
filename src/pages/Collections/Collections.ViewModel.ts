@@ -85,6 +85,10 @@ export class CollectionsViewModel {
     requestResponseStore.setRequestState(data, route);
     this.debouncedTab();
   };
+  public updateRequestStateType = async (data: any, route: string) => {
+    requestResponseStore.setRequestStateType(data, route);
+    this.debouncedTab();
+  };
 
   public updateRequestAuth = async (data: any, route: string) => {
     requestResponseStore.setRequestAuth(data, route);
