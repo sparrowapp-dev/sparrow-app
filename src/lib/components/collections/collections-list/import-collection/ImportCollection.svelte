@@ -25,6 +25,14 @@
   import { invoke } from "@tauri-apps/api/core";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { onMount } from "svelte";
+  import {
+    simpleGit,
+    type SimpleGit,
+    CleanOptions,
+    type SimpleGitOptions,
+  } from "simple-git";
+  // const git: SimpleGit = simpleGit().clean(CleanOptions.FORCE);
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -220,6 +228,13 @@
     return _viewImportCollection.validateImportBody(data);
   };
   const handleImport = () => {
+    isInputDataTouched = true;
+    if (activeSync) {
+      isRepositoryPathTouched = true;
+    }
+    if (isRepositoryPath) {
+      isRepositoryBranchTouched = true;
+    }
     if (
       importType === "text" &&
       importData &&
@@ -381,16 +396,43 @@
   };
   let repositoryPath = "";
   let isRepositoryPath = false;
+  let isRepositoryPathTouched = false;
+  let getBranchList = [];
   const uploadFormFile = async () => {
-    const filePathResponse: string = await invoke("fetch_file_command");
+    const filePathResponse: string = await invoke("fetch_folder_command");
     if (filePathResponse !== "Canceled") {
-      repositoryPath = filePathResponse;
-      isRepositoryPath = true;
+      extractGitBranch(filePathResponse);
     }
   };
 
+  const extractGitBranch = async (filePathResponse) => {
+    repositoryPath = "";
+    getBranchList = [];
+    isRepositoryPath = false;
+
+    repositoryPath = filePathResponse;
+    try {
+      const response = await invoke("get_git_branches", {
+        path: repositoryPath,
+      });
+      // console.log(response);
+
+      if (response) {
+        getBranchList = response.map((elem) => {
+          return {
+            name: elem,
+            id: elem,
+          };
+        });
+        isRepositoryPath = true;
+      }
+    } catch (e) {}
+  };
+
   let repositoryBranch = "not exist";
+  let isRepositoryBranchTouched = false;
   let handleDropdown = (tabId: string) => {
+    isRepositoryBranchTouched = true;
     repositoryBranch = tabId;
   };
   const debouncedImport = debounce(handleInputField, 1000);
@@ -487,10 +529,30 @@
         on:input={() => {
           debouncedImport();
         }}
+        on:blur={() => {
+          isInputDataTouched = true;
+        }}
         bind:value={importData}
         class="form-control border-0 rounded bg-blackColor"
       />
     </div>
+    {#if !importData && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please paste your OpenAPI specification text or Swagger/localhost link.
+      </p>
+    {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Unable to process the specified Swagger link. Please verify the URL for
+        accuracy and accessibility. If the problem persists, contact the API
+        provider for assistance.
+      </p>
+    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        We have identified that text you pasted is not written in Open API
+        Specification (OAS). Please visit https://swagger.io/specification/ for
+        more information on OAS.
+      </p>
+    {/if}
   {/if}
 
   {#if importType === "file"}
@@ -565,6 +627,12 @@
               type="text"
               style="width:80%;"
               bind:value={repositoryPath}
+              on:input={() => {
+                extractGitBranch(repositoryPath);
+              }}
+              on:blur={() => {
+                isRepositoryPathTouched = true;
+              }}
             />
             <Button
               disable={false}
@@ -572,11 +640,30 @@
               textStyleProp={"font-size: var(--base-text);f"}
               type={"dark"}
               loader={false}
-              onClick={() => {
-                uploadFormFile();
+              onClick={async () => {
+                await uploadFormFile();
+                isRepositoryPathTouched = true;
               }}
             />
           </div>
+          {#if !repositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Please paste or browse local repository path.
+              </p>
+            </div>
+          {:else if !isRepositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Repository is not found at the provided location. Please ensure
+                that the path is accurate and accessible.
+              </p>
+            </div>
+          {/if}
         </div>
         {#if isRepositoryPath}
           <div>
@@ -596,14 +683,7 @@
                       name: "None",
                       id: "not exist",
                     },
-                    {
-                      name: "Active Sync",
-                      id: "act",
-                    },
-                    {
-                      name: "Default Branch",
-                      id: "db",
-                    },
+                    ...getBranchList,
                   ]}
                   additionalType={"branch"}
                   onclick={handleDropdown}
@@ -622,28 +702,20 @@
                   ]}
                 ></Dropdown>
               </div>
+              {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
+                <div>
+                  <p
+                    class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+                  >
+                    Please select primary branch.
+                  </p>
+                </div>
+              {/if}
             </div>
           </div>
         {/if}
       {/if}
     </div>
-  {/if}
-  {#if !importData && isInputDataTouched}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Please paste your OpenAPI specification text or Swagger/localhost link.
-    </p>
-  {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Unable to process the specified Swagger link. Please verify the URL for
-      accuracy and accessibility. If the problem persists, contact the API
-      provider for assistance.
-    </p>
-  {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      We have identified that text you pasted is not written in Open API
-      Specification (OAS). Please visit https://swagger.io/specification/ for
-      more information on OAS.
-    </p>
   {/if}
 
   <div

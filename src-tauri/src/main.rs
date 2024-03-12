@@ -9,6 +9,11 @@ mod url_fetch_handler;
 mod urlencoded_handler;
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
+
+use std::path::PathBuf;
+use std::process::Command;
+use tauri::Window;
+
 use nfd::Response;
 use raw_handler::make_text_request;
 use reqwest::Client;
@@ -52,12 +57,59 @@ fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Val
 }
 
 #[tauri::command]
+fn get_git_branches(path: String) -> Result<Vec<String>, String> {
+    let output = Command::new("git")
+        .arg("branch -r")
+        .current_dir(&path)
+        .output()
+        .map_err(|e| format!("Failed to execute git branch command: {}", e))?;
+
+    if output.status.success() {
+        let branches = String::from_utf8(output.stdout)
+            .map_err(|e| format!("Failed to parse command output: {}", e))?;
+        let branch_list: Vec<String> = branches
+            .lines()
+            .map(|branch| {
+                // Optionally, you can extract more details about each branch here
+                // For now, we are just returning the branch name
+                branch.trim_start().to_string()
+            })
+            .collect();
+        Ok(branch_list)
+    } else {
+        let error_message =
+            String::from_utf8(output.stderr).unwrap_or_else(|_| "Unknown error".to_string());
+        Err(error_message)
+    }
+}
+
+#[tauri::command]
 fn fetch_file_command() -> String {
     let result = nfd::open_file_dialog(None, None).expect("Error opening file dialog");
     let response;
     match result {
         Response::Okay(file_path) => {
             response = file_path;
+        }
+        Response::OkayMultiple(_) => {
+            let temp = "Multiple Files Selected";
+            response = temp.to_string();
+        }
+        Response::Cancel => {
+            let temp = "Canceled";
+            response = temp.to_string();
+        }
+    }
+    return response;
+}
+
+#[tauri::command]
+fn fetch_folder_command() -> String {
+    let result = nfd::open_pick_folder(None).expect("Error opening file dialog");
+    let response;
+    match result {
+        Response::Okay(folder_path) => {
+            response = folder_path;
         }
         Response::OkayMultiple(_) => {
             let temp = "Multiple Files Selected";
@@ -225,7 +277,9 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
+            get_git_branches,
             fetch_file_command,
+            fetch_folder_command,
             close_oauth_window,
             make_http_request,
             zoom_window
