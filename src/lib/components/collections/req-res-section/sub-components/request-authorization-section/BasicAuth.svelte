@@ -78,8 +78,10 @@
           focusedInput = "username";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
           const elem = document.getElementById("basic-auth-key");
-          environmentAxisY = elem.getBoundingClientRect().top + 30;
-          environmentAxisX = elem.getBoundingClientRect().left;
+          if (elem) {
+            environmentAxisY = elem.getBoundingClientRect().top + 30;
+            environmentAxisX = elem.getBoundingClientRect().left;
+          }
         }}
       />
       {#if focusedInput === "username" && trackParanthesis.length === 2 && filterData.length > 0}
@@ -139,8 +141,10 @@
           focusedInput = "password";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
           const elem = document.getElementById("basic-auth-value");
-          environmentAxisY = elem.getBoundingClientRect().top + 30;
-          environmentAxisX = elem.getBoundingClientRect().left;
+          if (elem) {
+            environmentAxisY = elem.getBoundingClientRect().top + 30;
+            environmentAxisX = elem.getBoundingClientRect().left;
+          }
         }}
       />
       {#if focusedInput === "password" && trackParanthesis.length === 2 && filterData.length > 0}

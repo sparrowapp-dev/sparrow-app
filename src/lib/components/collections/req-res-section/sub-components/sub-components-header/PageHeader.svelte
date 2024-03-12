@@ -166,7 +166,7 @@
     window.addEventListener("click", handleDropdownClick);
   });
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.code === "KeyS") {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       if (componentData?.path.collectionId && componentData?.path.workspaceId) {
         handleSaveRequest();
       } else {

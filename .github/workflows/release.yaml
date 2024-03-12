@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env: 
   VITE_API_URL: ${{secrets.VITE_API_URL}}
@@ -11,55 +12,13 @@ env:
   VITE_ENABLE_MIX_PANEL: ${{secrets.VITE_ENABLE_MIX_PANEL}}
   VITE_API_TIMEOUT: ${{secrets.VITE_API_TIMEOUT}}
   VITE_SPARROW_SUPPORT_EMAIL: ${{ secrets.VITE_SPARROW_SUPPORT_EMAIL }}
-  VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL_DEV }}
+  VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL }}
   VITE_SPARROW_GITHUB: ${{ secrets.VITE_SPARROW_GITHUB }}
   VITE_SPARROW_DOWNLOAD_LINK: ${{ secrets.VITE_SPARROW_DOWNLOAD_LINK }}
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  build_and_release_macos:
-    runs-on: macos-latest
-    
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.8'
-
-      - name: Build Tauri App
-        run: |
-          TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
-          APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
-          APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
-          APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
-          yarn install
-          yarn tauri build --debug
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-      - name: dmg sig
-        run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
-          
-
-      - name: Upload mac-build to Azure Blob Storage
-        run: |
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/dmg/Sparrow_1.1.0_x64.dmg --name Sparrow_1.1.0_x64.dmg --overwrite
-          az storage blob upload --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --file /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz --name Sparrow.app.tar.gz --overwrite
-        env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
-
-
-  build_and_release_windows:
+  release_win:
     runs-on: windows-latest
     
     steps:
@@ -79,6 +38,13 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
 
       - name: Build Tauri App
         run: |
@@ -106,17 +72,88 @@ jobs:
            $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
            Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\*.msi"
-              
 
-      - name: Download dmg file from Azure Blob Storage
+      - name: Install AWS CLI
+        uses: chrislennon/action-aws-cli@v1.1
+        with:
+          version: latest
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
+      - name: Upload files to S3
         run: |
-           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow_1.1.0_x64.dmg --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow_1.1.0_x64.dmg --overwrite
-           az storage blob download --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }} --container-name ${{ secrets.AZURE_CONTAINER_NAME }} --name Sparrow.app.tar.gz --file D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi\Sparrow.app.tar.gz --overwrite
+          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\src-tauri\target\debug\bundle\nsis s3://sparrow-release-assests-prod --exclude "*" --include "*.exe"
         env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
 
+
+
+  release_macos:
+    runs-on: macos-latest
+    needs: release_win
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.8'
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Build Tauri App
+        run: |
+          TAURI_SIGNING_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}" 
+          APPLE_SIGNING_IDENTITY="${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE="${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD="${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" 
+          yarn install
+          yarn tauri build --debug
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: dmg sig
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos/*.sig
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+          aws --version
+      - name: Upload & File to S3
+        run: |
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
+          
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Download MSI files from S3 bucket
+        run: |
+          mkdir msi_files
+          aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}       
 
           
       - name: Fetch Version from package.json

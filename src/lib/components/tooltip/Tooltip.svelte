@@ -6,7 +6,7 @@
   export let placement: "left" | "right" | "top" | "bottom" = "bottom";
 </script>
 
-<div class={"tooltip position-relative opacity-100 z-2"}>
+<div class={"tooltip position-relative opacity-100 z-2"} style="">
   {#if show}
     <span
       class={`tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 opacity-0 z-1

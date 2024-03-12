@@ -578,7 +578,7 @@
           classProp="mt-2 mb-2"
         >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
@@ -595,7 +595,7 @@
           classProp="mt-2 mb-2"
         >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2 ms-3"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}

@@ -257,8 +257,10 @@
                     const elem = document.getElementById(
                       "pair-file-key" + index,
                     );
-                    environmentAxisY = elem.getBoundingClientRect().top + 30;
-                    environmentAxisX = elem.getBoundingClientRect().left;
+                    if (elem) {
+                      environmentAxisY = elem.getBoundingClientRect().top + 30;
+                      environmentAxisX = elem.getBoundingClientRect().left;
+                    }
                   }}
                 />
                 {#if focusedInput === index && trackParanthesis.length === 2 && filterData.length > 0}

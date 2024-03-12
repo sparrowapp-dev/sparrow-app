@@ -24,6 +24,9 @@
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
   import type { WorkspaceRole } from "$lib/utils/enums";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
+  import { collectionLeftPanelWidth } from "$lib/store";
+  import { collectionRightPanelWidth } from "$lib/store";
   let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -81,7 +84,7 @@
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const environments = _viewModel.environments;
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.code === "KeyN") {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyN") {
       collectionsMethods.handleCreateTab(
         generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
       );
@@ -89,7 +92,6 @@
     }
   };
 
-  const collapseCollectionPanel = collapsibleState;
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
   let environmentVariables = [];
@@ -150,33 +152,56 @@
     runAnimation = true;
   };
 
+  let splitter;
+  onMount(() => {
+    splitter = document.querySelector(
+      ".splitter-sidebar .splitpanes__splitter",
+    );
+    splitter.style.width = "1px";
+  });
+
+  $: {
+    if (splitter && $collapsibleState === true) {
+      splitter.style.display = "none";
+    }
+    if (splitter && $collapsibleState === false) {
+      splitter.style.display = "unset";
+    }
+  }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
-<Motion {...scaleMotionProps} let:motion>
-  <div class="d-flex collection" use:motion>
-    <div class="collections__list">
-      <CollectionsList
-        {runAnimation}
-        {changeAnimation}
-        activeTabId={$activeTab?.id}
-        activePath={$activeTab?.path}
-        environments={$environments}
-        {collectionsMethods}
-        {loggedUserRoleInWorkspace}
-      />
-    </div>
-    <div
-      style="width: {$collapseCollectionPanel
-        ? 'calc(100vw - 72px)'
-        : 'calc(100vw - 352px)'};"
-      class="collections__tools bg-backgroundColor {$collapseCollectionPanel &&
-      runAnimation
-        ? 'sidebar-collapse'
-        : runAnimation && 'sidebar-expand'}"
-    >
+<Splitpanes
+  class="splitter-sidebar"
+  direction="vertical"
+  on:resize={(e) => {
+    collectionLeftPanelWidth.set(e.detail[0].size);
+    collectionRightPanelWidth.set(e.detail[1].size);
+  }}
+>
+  <Pane
+    class="sidebar-left-panel"
+    minSize={20}
+    size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
+  >
+    <CollectionsList
+      {runAnimation}
+      {changeAnimation}
+      activeTabId={$activeTab?.id}
+      activePath={$activeTab?.path}
+      environments={$environments}
+      {collectionsMethods}
+      {loggedUserRoleInWorkspace}
+    />
+  </Pane>
+  <Pane
+    class="sidebar-right-panel"
+    minSize={60}
+    size={$collapsibleState ? 100 : $collectionRightPanelWidth}
+  >
+    <div>
       <div class="tab__bar">
         <TabBar
           tabList={$tabList}
@@ -221,37 +246,12 @@
         </div>
       </div>
     </div>
-  </div>
-</Motion>
+  </Pane>
+</Splitpanes>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  .collections__tools {
-    height: calc(100vh - 44px);
-  }
-  @keyframes increaseWidth {
-    0% {
-      width: calc(100vw - 352px);
-    }
-
-    100% {
-      width: calc(100vw - 72px);
-    }
-  }
-  @keyframes decreaseWidth {
-    0% {
-      width: calc(100vw - 72px);
-    }
-    100% {
-      width: calc(100vw - 352px);
-    }
-  }
-  .sidebar-expand {
-    width: calc(100vw - 352px);
-    animation: decreaseWidth 0.3s;
-  }
-  .sidebar-collapse {
+  :global(.splitpanes) {
     width: calc(100vw - 72px);
-    animation: increaseWidth 0.3s;
   }
 </style>
