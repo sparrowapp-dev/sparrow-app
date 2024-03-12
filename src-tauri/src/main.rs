@@ -59,7 +59,7 @@ fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Val
 #[tauri::command]
 fn get_git_branches(path: String) -> Result<Vec<String>, String> {
     let output = Command::new("git")
-        .arg("branch -r")
+        .arg("branch")
         .current_dir(&path)
         .output()
         .map_err(|e| format!("Failed to execute git branch command: {}", e))?;

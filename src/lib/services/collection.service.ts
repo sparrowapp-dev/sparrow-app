@@ -177,6 +177,21 @@ export class CollectionService {
     return response;
   };
 
+  public validateImportCollectionURL = async (url = "") => {
+    const response = await makeRequest(
+      "GET",
+      url,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-type": ContentTypeEnum["application/json"],
+        },
+      },
+      true,
+    );
+    return response;
+  };
+
   public importCollection = async (
     workspaceId: string,
     url: ImportBodyUrl,

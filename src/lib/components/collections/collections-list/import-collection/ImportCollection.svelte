@@ -85,9 +85,8 @@
 
     if (validateClientURL(importData)) {
       isValidClientURL = true;
-      const response = await _collectionService.validateImportCollectionInput(
+      const response = await _collectionService.validateImportCollectionURL(
         importData.replace("localhost", "127.0.0.1") + "-json",
-        importData,
       );
       if (response.isSuccessful) {
         isValidServerURL = true;
@@ -227,7 +226,7 @@
   const validateJSON = (data) => {
     return _viewImportCollection.validateImportBody(data);
   };
-  const handleImport = () => {
+  const handleImport = async () => {
     isInputDataTouched = true;
     if (activeSync) {
       isRepositoryPathTouched = true;
@@ -249,18 +248,25 @@
       isValidClientURL &&
       isValidServerURL
     ) {
-      const data = importData.replace("localhost", "127.0.0.1") + "-json";
-      if (!activeSync) {
-        const requestBody = { url: data };
+      const response = await _collectionService.validateImportCollectionURL(
+        importData.replace("localhost", "127.0.0.1") + "-json",
+      );
+      if (!activeSync && response.isSuccessful) {
+        const requestBody = {
+          urlData: response.data,
+          url: "asif.raza@techdome.net.in",
+        };
         handleImportUrl(requestBody);
       } else if (
         activeSync &&
+        response.isSuccessful &&
         isRepositoryPath &&
         repositoryBranch &&
         repositoryBranch !== "not exist"
       ) {
         const requestBody = {
-          url: data,
+          urlData: response.data,
+          url: "asif.raza@techdome.net.in",
           primaryBranch: repositoryBranch,
           currentBranch: repositoryBranch,
         };
@@ -415,7 +421,7 @@
       const response = await invoke("get_git_branches", {
         path: repositoryPath,
       });
-      // console.log(response);
+      console.log(response);
 
       if (response) {
         getBranchList = response.map((elem) => {
