@@ -60,6 +60,7 @@ fn fetch_swagger_url_command(url: &str, headers: &str, workspaceid: &str) -> Val
 fn get_git_branches(path: String) -> Result<Vec<String>, String> {
     let output = Command::new("git")
         .arg("branch")
+        .arg("-r")
         .current_dir(&path)
         .output()
         .map_err(|e| format!("Failed to execute git branch command: {}", e))?;
@@ -76,6 +77,33 @@ fn get_git_branches(path: String) -> Result<Vec<String>, String> {
             })
             .collect();
         Ok(branch_list)
+    } else {
+        let error_message =
+            String::from_utf8(output.stderr).unwrap_or_else(|_| "Unknown error".to_string());
+        Err(error_message)
+    }
+}
+
+#[tauri::command]
+fn get_git_active_branch(path: String) -> Result<String, String> {
+    let output = Command::new("git")
+        .arg("branch")
+        .current_dir(&path)
+        .output()
+        .map_err(|e| format!("Failed to execute git branch command: {}", e))?;
+
+    if output.status.success() {
+        let branches = String::from_utf8(output.stdout)
+            .map_err(|e| format!("Failed to parse command output: {}", e))?;
+
+        // Split the output by newlines and find the branch with the asterisk
+        let active_branch = branches
+            .lines()
+            .find(|line| line.starts_with('*'))
+            .map(|line| line.trim_start_matches("* ").to_string())
+            .ok_or_else(|| "Active branch not found".to_string())?;
+
+        Ok(active_branch)
     } else {
         let error_message =
             String::from_utf8(output.stderr).unwrap_or_else(|_| "Unknown error".to_string());
@@ -278,6 +306,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
             get_git_branches,
+            get_git_active_branch,
             fetch_file_command,
             fetch_folder_command,
             close_oauth_window,

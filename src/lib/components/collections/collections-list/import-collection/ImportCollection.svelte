@@ -262,15 +262,28 @@
         response.isSuccessful &&
         isRepositoryPath &&
         repositoryBranch &&
-        repositoryBranch !== "not exist"
+        repositoryBranch !== "not exist" &&
+        currentBranch
       ) {
-        const requestBody = {
-          urlData: response.data,
-          url: "asif.raza@techdome.net.in",
-          primaryBranch: repositoryBranch,
-          currentBranch: repositoryBranch,
-        };
-        handleImportUrl(requestBody);
+        if (
+          getBranchList
+            .map((elem) => {
+              return elem.name;
+            })
+            .includes(currentBranch)
+        ) {
+          const requestBody = {
+            urlData: response.data,
+            url: "asif.raza@techdome.net.in",
+            primaryBranch: repositoryBranch,
+            currentBranch: currentBranch,
+          };
+          handleImportUrl(requestBody);
+        } else {
+          notifications.error(
+            `Can't import local branch. Please push ${currentBranch} to remote first.`,
+          );
+        }
       }
     } else if (
       importType === "file" &&
@@ -413,6 +426,7 @@
 
   const extractGitBranch = async (filePathResponse) => {
     repositoryPath = "";
+    currentBranch = "";
     getBranchList = [];
     isRepositoryPath = false;
 
@@ -421,21 +435,32 @@
       const response = await invoke("get_git_branches", {
         path: repositoryPath,
       });
-      console.log(response);
-
       if (response) {
-        getBranchList = response.map((elem) => {
-          return {
-            name: elem,
-            id: elem,
-          };
-        });
+        getBranchList = response
+          .filter((elem) => {
+            if (elem.includes("upstream/")) return false;
+            else if (elem.includes("origin/HEAD")) return false;
+            return true;
+          })
+          .map((elem) => {
+            return {
+              name: elem.replace("origin/", ""),
+              id: elem.replace("origin/", ""),
+            };
+          });
         isRepositoryPath = true;
+        const activeResponse = await invoke("get_git_active_branch", {
+          path: repositoryPath,
+        });
+        if (activeResponse) {
+          currentBranch = activeResponse;
+        }
       }
     } catch (e) {}
   };
 
   let repositoryBranch = "not exist";
+  let currentBranch = "";
   let isRepositoryBranchTouched = false;
   let handleDropdown = (tabId: string) => {
     isRepositoryBranchTouched = true;
