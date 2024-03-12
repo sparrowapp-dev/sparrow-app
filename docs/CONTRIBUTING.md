@@ -46,11 +46,13 @@ Fork the repository to your GitHub account
 
 #### Step 3
 
-Create a new branch from **main** in the below format, 
+Create a new branch from the corresponding **feature** branch that will be mentioned in the issue as a tag, in the below format, 
 ```
 git checkout -b <commit-type>/[<issue-number>]/{<change-title>}
 example - "feat/496/add-indent"
 ```
+Point to note:- 
+You will get the feature branch tagged in the issue itself. 
   
 #### Step 4
 
