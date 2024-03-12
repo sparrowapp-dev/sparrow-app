@@ -1,7 +1,8 @@
 name: Development release
 
 on:
-  push:
+  pull_request:
+    types: [opened, edited]
     branches:
       - development
   workflow_dispatch:
