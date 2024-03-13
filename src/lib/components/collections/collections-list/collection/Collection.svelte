@@ -320,7 +320,7 @@
       deletedIds.length = [];
       requestCount = 0;
       folderCount = 0;
-      collection.items.forEach((item) => {
+      collection?.items?.forEach((item) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
@@ -371,20 +371,36 @@
   const refetchCollection = async () => {
     if (refreshCollectionLoader) return;
     refreshCollectionLoader = true;
-    const response = await _viewImportCollection.importCollectionData(
-      currentWorkspaceId,
-      { url: collection.activeSyncUrl },
-      collection.activeSync,
+    const responseJSON = await collectionService.validateImportCollectionURL(
+      collection.activeSyncUrl,
     );
-
-    if (response.isSuccessful) {
-      collectionsMethods.updateCollection(
-        collection.id,
-        response.data.data.collection,
+    if (responseJSON.isSuccessful) {
+      const response = await _viewImportCollection.importCollectionData(
+        currentWorkspaceId,
+        {
+          url: collection.activeSyncUrl,
+          urlData: responseJSON.data,
+          primaryBranch: collection?.primaryBranch,
+          currentBranch: collection?.currentBranch
+            ? collection?.currentBranch
+            : collection?.primaryBranch,
+        },
+        collection.activeSync,
       );
-      notifications.success("Collection fetched successfully.");
+
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(
+          collection.id,
+          response.data.data.collection,
+        );
+        notifications.success("Collection fetched successfully.");
+      } else {
+        notifications.error("Failed to fetch the Collection.");
+      }
     } else {
-      notifications.error("Failed to fetch the Collection.");
+      notifications.error(
+        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+      );
     }
     refreshCollectionLoader = false;
   };
@@ -481,7 +497,7 @@
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
       on:click={() => {
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
           visibility = !visibility;
         }
       }}
@@ -514,13 +530,20 @@
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
-        <!-- {#if isActiveSyncEnabled}
+        {#if isActiveSyncEnabled && collection.activeSync}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
-            >branch name - current branch
+            >{collection?.currentBranch
+              ? collection?.currentBranch
+              : collection?.primaryBranch}
+            {collection?.currentBranch
+              ? collection?.currentBranch === collection?.primaryBranch
+                ? "(Default)"
+                : ""
+              : "(Default)"}
           </span>
-        {/if} -->
+        {/if}
       </div>
     {/if}
   </div>

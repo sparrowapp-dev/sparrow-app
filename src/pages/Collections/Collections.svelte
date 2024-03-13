@@ -94,11 +94,13 @@
     _viewModel.getActiveWorkspace();
   let environmentVariables = [];
   let environmentId: string;
+  let currentWorkspaceId = "";
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         environmentId = activeWorkspaceRxDoc.get("environmentId");
       }
     },
@@ -216,6 +218,7 @@
               {activeTab}
               {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
+              {currentWorkspaceId}
             />
           {/if}
         </div>

@@ -118,7 +118,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     collectionId: {
       type: "string",
@@ -144,6 +144,22 @@ export const collectionSchemaLiteral = {
     activeSyncUrl: {
       type: "string",
     },
+    branches: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+          },
+          name: {
+            type: "string",
+          },
+        },
+      },
+    },
+    primaryBranch: { type: "string" },
+    currentBranch: { type: "string" },
     createdAt: {
       type: "string",
     },

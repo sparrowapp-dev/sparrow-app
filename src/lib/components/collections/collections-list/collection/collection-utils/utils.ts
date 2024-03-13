@@ -11,12 +11,17 @@ export function isUrlValid(str: string) {
   return pattern.test(str);
 }
 
-export const debounce = (callback = () => {}, wait = 500) => {
-  let timeout: ReturnType<typeof setTimeout>;
+export const debounce = (func, delay = 1000) => {
+  let timerId;
 
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => callback(...args), wait);
+  return function (...args) {
+    /* eslint-disable @typescript-eslint/no-this-alias */
+    const context = this;
+
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      func.apply(context, args);
+    }, delay);
   };
 };
 

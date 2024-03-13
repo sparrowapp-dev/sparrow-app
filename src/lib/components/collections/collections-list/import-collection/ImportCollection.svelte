@@ -13,6 +13,7 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { CollectionService } from "$lib/services/collection.service";
   import {
     debounce,
     isUrlValid,
@@ -32,12 +33,14 @@
   export let onClick: (flag: boolean) => void;
   const _viewImportCollection = new ImportCollectionViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
+  const _collectionService = new CollectionService();
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
     FETCHING_DATA: "Fetching Data...",
   };
 
+  let isInputDataTouched = false;
   let isDataEmpty: boolean = false;
   let isSyntaxError: boolean = false;
   let importData: string = "";
@@ -63,17 +66,42 @@
     isValidServerJSON = false,
     isValidServerXML = false;
 
-  const handleInputField = () => {
+  const handleInputField = async () => {
     isValidClientURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
+    isValidServerURL = false;
+    isValidServerJSON = false;
+    isValidServerXML = false;
+
     if (validateClientURL(importData)) {
       isValidClientURL = true;
+      const response = await _collectionService.validateImportCollectionURL(
+        importData.replace("localhost", "127.0.0.1") + "-json",
+      );
+      if (response.isSuccessful) {
+        isValidServerURL = true;
+      }
     } else if (validateClientJSON(importData)) {
       isValidClientJSON = true;
-    } else if (validateClientXML(importData)) {
-      isValidClientXML = true;
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidServerJSON = true;
+      }
+    } else {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidClientXML = true;
+        isValidServerXML = true;
+      }
     }
+    isInputDataTouched = true;
   };
   let uploadCollection = {
     file: {
@@ -187,17 +215,68 @@
     }
   }
 
-  const validateJSON = () => {
-    return _viewImportCollection.validateImportBody(importData);
+  const validateJSON = (data) => {
+    return _viewImportCollection.validateImportBody(data);
   };
-  const handleImport = () => {
-    if (importType === "text" && importData && !isurl) {
-      const contentType = validateJSON();
+  const handleImport = async () => {
+    isInputDataTouched = true;
+    if (activeSync) {
+      isRepositoryPathTouched = true;
+    }
+    if (isRepositoryPath) {
+      isRepositoryBranchTouched = true;
+    }
+    if (
+      importType === "text" &&
+      importData &&
+      ((isValidClientJSON && isValidServerJSON) ||
+        (isValidClientXML && isValidServerXML))
+    ) {
+      const contentType = validateJSON(importData);
       handleImportJsonObject(contentType);
-      return;
-    } else if (importType === "text" && importData && isurl) {
-      handleImportUrl();
-      return;
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientURL &&
+      isValidServerURL
+    ) {
+      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const response =
+        await _collectionService.validateImportCollectionURL(importUrl);
+      if (!activeSync && response.isSuccessful) {
+        const requestBody = {
+          urlData: response.data,
+          url: importUrl,
+        };
+        handleImportUrl(requestBody);
+      } else if (
+        activeSync &&
+        response.isSuccessful &&
+        isRepositoryPath &&
+        repositoryBranch &&
+        repositoryBranch !== "not exist" &&
+        currentBranch
+      ) {
+        if (
+          getBranchList
+            .map((elem) => {
+              return elem.name;
+            })
+            .includes(currentBranch)
+        ) {
+          const requestBody = {
+            urlData: response.data,
+            url: importUrl,
+            primaryBranch: repositoryBranch,
+            currentBranch: currentBranch,
+          };
+          handleImportUrl(requestBody);
+        } else {
+          notifications.error(
+            `Can't import local branch. Please push ${currentBranch} to remote first.`,
+          );
+        }
+      }
     } else if (
       importType === "file" &&
       uploadCollection?.file?.value?.length !== 0
@@ -269,13 +348,13 @@
     }
   };
 
-  const handleImportUrl = async () => {
+  const handleImportUrl = async (requestBody) => {
     progressBar.isLoading = true;
     progressBar.isProgress = false;
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
     const response = await _viewImportCollection.importCollectionData(
       currentWorkspaceId,
-      { url: importData },
+      requestBody,
       activeSync,
     );
 
@@ -300,12 +379,14 @@
         collectionsMethods.updateCollection(response.data.data.collection._id, {
           ...response.data.data.collection,
           id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
         });
         notifications.error("Collection already exists.");
       } else {
         collectionsMethods.addCollection({
           ...response.data.data.collection,
           id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
         });
         _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
           id: Samplecollection.id,
@@ -329,18 +410,58 @@
   };
   let repositoryPath = "";
   let isRepositoryPath = false;
+  let isRepositoryPathTouched = false;
+  let getBranchList = [];
   const uploadFormFile = async () => {
-    const filePathResponse: string = await invoke("fetch_file_command");
+    const filePathResponse: string = await invoke("fetch_folder_command");
     if (filePathResponse !== "Canceled") {
-      repositoryPath = filePathResponse;
-      isRepositoryPath = true;
+      await extractGitBranch(filePathResponse);
     }
   };
 
-  let repositoryBranch = "none";
+  const extractGitBranch = async (filePathResponse) => {
+    repositoryPath = "";
+    currentBranch = "";
+    getBranchList = [];
+    isRepositoryPath = false;
+
+    repositoryPath = filePathResponse;
+    try {
+      const response = await invoke("get_git_branches", {
+        path: repositoryPath,
+      });
+      if (response) {
+        getBranchList = response
+          .filter((elem) => {
+            if (elem.includes("upstream/")) return false;
+            else if (elem.includes("origin/HEAD")) return false;
+            return true;
+          })
+          .map((elem) => {
+            return {
+              name: elem.replace("origin/", ""),
+              id: elem.replace("origin/", ""),
+            };
+          });
+        isRepositoryPath = true;
+        const activeResponse = await invoke("get_git_active_branch", {
+          path: repositoryPath,
+        });
+        if (activeResponse) {
+          currentBranch = activeResponse;
+        }
+      }
+    } catch (e) {}
+  };
+
+  let repositoryBranch = "not exist";
+  let currentBranch = "";
+  let isRepositoryBranchTouched = false;
   let handleDropdown = (tabId: string) => {
+    isRepositoryBranchTouched = true;
     repositoryBranch = tabId;
   };
+  const debouncedImport = debounce(handleInputField, 1000);
 </script>
 
 {#if progressBar.isLoading}
@@ -427,17 +548,37 @@
   <br />
   {#if importType === "text"}
     <div class="importData-lightGray sparrow-fs-14 text-muted">
-      <p>Paste your YAML/JSON/OAS text or Swagger/Localhost Link</p>
+      <p>Paste your OAS text or Swagger/Localhost Link</p>
     </div>
     <div class="textarea-div rounded border-0">
       <textarea
+        on:input={() => {
+          debouncedImport();
+        }}
         on:blur={() => {
-          handleInputField();
+          isInputDataTouched = true;
         }}
         bind:value={importData}
-        class="form-control border-0 rounded bg-blackColor"
+        class="form-control mb-1 border-0 rounded bg-blackColor"
       />
     </div>
+    {#if !importData && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please paste your OpenAPI specification text or Swagger/localhost link.
+      </p>
+    {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Unable to process the specified Swagger link. Please verify the URL for
+        accuracy and accessibility. If the problem persists, contact the API
+        provider for assistance.
+      </p>
+    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        We have identified that text you pasted is not written in Open API
+        Specification (OAS). Please visit https://swagger.io/specification/ for
+        more information on OAS.
+      </p>
+    {/if}
   {/if}
 
   {#if importType === "file"}
@@ -465,7 +606,7 @@
       />
     </div>
   {/if}
-  {#if isValidServerURL}
+  {#if isValidClientURL && isValidServerURL}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"
@@ -499,7 +640,7 @@
         <!-- Local repository path -->
         <div>
           <p class="sparrow-fs-14 mb-1">
-            Paste or browse local repository path
+            Paste or browse local repository path <span class="asterik">*</span>
           </p>
           <div class="pb-2">
             <small class="sparrow-fs-12 text-textColor"
@@ -511,24 +652,52 @@
               class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
               type="text"
               style="width:80%;"
+              placeholder="Paste or browse path"
               bind:value={repositoryPath}
+              on:input={() => {
+                extractGitBranch(repositoryPath);
+              }}
+              on:blur={() => {
+                isRepositoryPathTouched = true;
+              }}
             />
             <Button
               disable={false}
               title={"Browse"}
-              textStyleProp={"font-size: var(--base-text);f"}
+              textStyleProp={"font-size: var(--base-text);"}
               type={"dark"}
               loader={false}
-              onClick={() => {
-                uploadFormFile();
+              onClick={async () => {
+                await uploadFormFile();
+                isRepositoryPathTouched = true;
               }}
             />
           </div>
+          {#if !repositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Please paste or browse local repository path.
+              </p>
+            </div>
+          {:else if !isRepositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Repository is not found at the provided location. Please ensure
+                that the path is accurate and accessible.
+              </p>
+            </div>
+          {/if}
         </div>
         {#if isRepositoryPath}
           <div>
             <div>
-              <p class="sparrow-fs-14 mb-1">Select Primary Branch</p>
+              <p class="sparrow-fs-14 mb-1">
+                Select Primary Branch <span class="asterik">*</span>
+              </p>
               <div class="pb-2">
                 <small class="sparrow-fs-12 text-textColor"
                   >The selected primary branch is considered the default branch.</small
@@ -541,16 +710,9 @@
                   data={[
                     {
                       name: "None",
-                      id: "none",
+                      id: "not exist",
                     },
-                    {
-                      name: "Active Sync",
-                      id: "act",
-                    },
-                    {
-                      name: "Default Branch",
-                      id: "db",
-                    },
+                    ...getBranchList,
                   ]}
                   additionalType={"branch"}
                   onclick={handleDropdown}
@@ -567,30 +729,34 @@
                       classToAdd: ["border-bottom", "border-labelColor"],
                     },
                   ]}
+                  staticCustomStyles={[
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "height",
+                      styleValue: "140px",
+                    },
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "overflowY",
+                      styleValue: "auto",
+                    },
+                  ]}
                 ></Dropdown>
               </div>
+              {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
+                <div>
+                  <p
+                    class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+                  >
+                    Please select primary branch.
+                  </p>
+                </div>
+              {/if}
             </div>
           </div>
         {/if}
       {/if}
     </div>
-  {/if}
-  {#if !importData}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Please paste your OpenAPI specification text or Swagger/localhost link.
-    </p>
-  {:else if isValidClientURL && !isValidServerURL}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      Unable to process the specified Swagger link. Please verify the URL for
-      accuracy and accessibility. If the problem persists, contact the API
-      provider for assistance.
-    </p>
-  {:else if (isValidClientXML && !isValidServerXML) || (isValidClientJSON && !isValidServerJSON)}
-    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      We have identified that text you pasted is not written in Open API
-      Specification (OAS). Please visit https://swagger.io/specification/ for
-      more information on OAS.
-    </p>
   {/if}
 
   <div
@@ -682,6 +848,10 @@
   .learn-active-link {
     color: var(--primary-btn-color) !important;
     text-decoration: none;
+  }
+  .asterik {
+    color: var(--dangerColor);
+    margin-left: 4px;
   }
   .invalid-type-content {
     .format-types-container {

@@ -38,6 +38,9 @@ export class CollectionRepository {
       if (data.activeSync) value.activeSync = data.activeSync;
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
+      if (data.branches) value.branches = data.branches;
+      if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
+      if (data.currentBranch) value.currentBranch = data.currentBranch;
       return value;
     });
 
