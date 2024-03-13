@@ -162,12 +162,16 @@ export class CollectionService {
     return response;
   };
 
-  public importCollection = async (workspaceId: string, url: ImportBodyUrl, activeSync:boolean=false) => {
+  public importCollection = async (
+    workspaceId: string,
+    url: ImportBodyUrl,
+    activeSync: boolean = false,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importUrl/collection`,
       {
-        body: {...url,activeSync},
+        body: { ...url, activeSync },
         headers: getAuthHeaders(),
       },
     );
@@ -214,6 +218,17 @@ export class CollectionService {
         headers: { ...getAuthHeaders(), "Content-type": contentType },
       },
     );
+    return response;
+  };
+
+  public importCollectionFromCurl = async (curl: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
+      body: curl,
+      headers: {
+        ...getAuthHeaders(),
+        "Content-type": ContentTypeEnum["application/json"],
+      },
+    });
     return response;
   };
 }
