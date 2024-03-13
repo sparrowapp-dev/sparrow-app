@@ -240,13 +240,13 @@
       isValidClientURL &&
       isValidServerURL
     ) {
-      const response = await _collectionService.validateImportCollectionURL(
-        importData.replace("localhost", "127.0.0.1") + "-json",
-      );
+      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const response =
+        await _collectionService.validateImportCollectionURL(importUrl);
       if (!activeSync && response.isSuccessful) {
         const requestBody = {
           urlData: response.data,
-          url: "asif.raza@techdome.net.in",
+          url: importUrl,
         };
         handleImportUrl(requestBody);
       } else if (
@@ -266,7 +266,7 @@
         ) {
           const requestBody = {
             urlData: response.data,
-            url: "asif.raza@techdome.net.in",
+            url: importUrl,
             primaryBranch: repositoryBranch,
             currentBranch: currentBranch,
           };
