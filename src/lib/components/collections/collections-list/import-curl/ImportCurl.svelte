@@ -111,7 +111,7 @@
         <Spinner size={"16px"} />
       {/if}</span
     >
-    Import Collection</button
+    Import API Request</button
   >
 </ModalWrapperV1>
 
