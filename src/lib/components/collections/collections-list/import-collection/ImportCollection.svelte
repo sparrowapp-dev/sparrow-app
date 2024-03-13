@@ -25,14 +25,6 @@
   import { invoke } from "@tauri-apps/api/core";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
-  import { onMount } from "svelte";
-  import {
-    simpleGit,
-    type SimpleGit,
-    CleanOptions,
-    type SimpleGitOptions,
-  } from "simple-git";
-  // const git: SimpleGit = simpleGit().clean(CleanOptions.FORCE);
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -75,7 +67,6 @@
     isValidServerXML = false;
 
   const handleInputField = async () => {
-    isInputDataTouched = true;
     isValidClientURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
@@ -110,6 +101,7 @@
         isValidServerXML = true;
       }
     }
+    isInputDataTouched = true;
   };
   let uploadCollection = {
     file: {
@@ -420,7 +412,7 @@
   const uploadFormFile = async () => {
     const filePathResponse: string = await invoke("fetch_folder_command");
     if (filePathResponse !== "Canceled") {
-      extractGitBranch(filePathResponse);
+      await extractGitBranch(filePathResponse);
     }
   };
 
@@ -553,7 +545,7 @@
   <br />
   {#if importType === "text"}
     <div class="importData-lightGray sparrow-fs-14 text-muted">
-      <p>Paste your YAML/JSON/OAS text or Swagger/Localhost Link</p>
+      <p>Paste your OAS text or Swagger/Localhost Link</p>
     </div>
     <div class="textarea-div rounded border-0">
       <textarea
@@ -564,7 +556,7 @@
           isInputDataTouched = true;
         }}
         bind:value={importData}
-        class="form-control border-0 rounded bg-blackColor"
+        class="form-control mb-1 border-0 rounded bg-blackColor"
       />
     </div>
     {#if !importData && isInputDataTouched}
@@ -668,7 +660,7 @@
             <Button
               disable={false}
               title={"Browse"}
-              textStyleProp={"font-size: var(--base-text);f"}
+              textStyleProp={"font-size: var(--base-text);"}
               type={"dark"}
               loader={false}
               onClick={async () => {
@@ -729,6 +721,18 @@
                     {
                       id: "hashfref129-btn-div",
                       classToAdd: ["border-bottom", "border-labelColor"],
+                    },
+                  ]}
+                  staticCustomStyles={[
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "height",
+                      styleValue: "140px",
+                    },
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "overflowY",
+                      styleValue: "auto",
                     },
                   ]}
                 ></Dropdown>
