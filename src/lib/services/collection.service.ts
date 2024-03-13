@@ -267,4 +267,15 @@ export class CollectionService {
     );
     return response;
   };
+
+  public importCollectionFromCurl = async (curl: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
+      body: curl,
+      headers: {
+        ...getAuthHeaders(),
+        "Content-type": ContentTypeEnum["application/json"],
+      },
+    });
+    return response;
+  };
 }

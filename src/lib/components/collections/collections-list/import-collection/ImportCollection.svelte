@@ -360,6 +360,7 @@
 
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
+
       progressBar.isProgress = true;
       let path: Path = {
         workspaceId: currentWorkspaceId,
