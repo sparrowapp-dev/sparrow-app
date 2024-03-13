@@ -213,9 +213,12 @@ export class CollectionService {
     branchName: string,
   ) => {
     const response = await makeRequest(
-      "GET",
-      `${this.apiUrl}/api/collection/${collectionId}/branch/${branchName}`,
+      "POST",
+      `${this.apiUrl}/api/collection/${collectionId}/branch`,
       {
+        body: {
+          branchName,
+        },
         headers: getAuthHeaders(),
       },
     );

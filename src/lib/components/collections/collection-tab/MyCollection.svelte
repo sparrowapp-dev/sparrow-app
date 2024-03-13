@@ -41,7 +41,7 @@
   let totalFolder: number = 0;
   let totalRequest: number = 0;
   let tabDescription = "";
-  let isSynced = true;
+  let isSynced = false;
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
@@ -63,6 +63,17 @@
           totalRequest = collectionData.requestCount;
           totalFolder = collectionData.folderCount;
           currentCollection = collection;
+          const response = await _collectionService.switchCollectionBranch(
+            currentCollection?.id,
+            currentCollection?.currentBranch
+              ? currentCollection?.currentBranch
+              : currentCollection?.PrimaryBranch,
+          );
+          if (response.isSuccessful) {
+            isSynced = true;
+          } else {
+            isSynced = false;
+          }
           return;
         }
       });
@@ -140,7 +151,6 @@
           response.data.data.collection,
         );
         notifications.success("Collection synced successfully.");
-        isSynced = true;
       } else {
         notifications.error("Failed to sync the Collection.");
       }
