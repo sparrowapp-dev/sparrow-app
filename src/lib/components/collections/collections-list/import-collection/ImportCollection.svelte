@@ -637,7 +637,7 @@
         <!-- Local repository path -->
         <div>
           <p class="sparrow-fs-14 mb-1">
-            Paste or browse local repository path
+            Paste or browse local repository path <span class="asterik">*</span>
           </p>
           <div class="pb-2">
             <small class="sparrow-fs-12 text-textColor"
@@ -649,6 +649,7 @@
               class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
               type="text"
               style="width:80%;"
+              placeholder="Paste or browse path"
               bind:value={repositoryPath}
               on:input={() => {
                 extractGitBranch(repositoryPath);
@@ -691,7 +692,9 @@
         {#if isRepositoryPath}
           <div>
             <div>
-              <p class="sparrow-fs-14 mb-1">Select Primary Branch</p>
+              <p class="sparrow-fs-14 mb-1">
+                Select Primary Branch <span class="asterik">*</span>
+              </p>
               <div class="pb-2">
                 <small class="sparrow-fs-12 text-textColor"
                   >The selected primary branch is considered the default branch.</small
@@ -842,6 +845,10 @@
   .learn-active-link {
     color: var(--primary-btn-color) !important;
     text-decoration: none;
+  }
+  .asterik {
+    color: var(--dangerColor);
+    margin-left: 4px;
   }
   .invalid-type-content {
     .format-types-container {
