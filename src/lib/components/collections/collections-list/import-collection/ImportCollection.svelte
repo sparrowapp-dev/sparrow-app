@@ -378,12 +378,14 @@
         collectionsMethods.updateCollection(response.data.data.collection._id, {
           ...response.data.data.collection,
           id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
         });
         notifications.error("Collection already exists.");
       } else {
         collectionsMethods.addCollection({
           ...response.data.data.collection,
           id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
         });
         _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
           id: Samplecollection.id,

@@ -51,6 +51,9 @@ export interface ImportCollectionBody {}
 
 export interface ImportBodyUrl {
   url: string;
+  urlData: string;
+  primaryBranch: string;
+  currentBranch: string;
 }
 
 export interface CreateApiRequestPostBody {
