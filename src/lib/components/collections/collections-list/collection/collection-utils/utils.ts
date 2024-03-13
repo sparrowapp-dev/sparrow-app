@@ -11,15 +11,6 @@ export function isUrlValid(str: string) {
   return pattern.test(str);
 }
 
-// export const debounce = (callback = () => {}, wait = 500) => {
-//   let timeout: ReturnType<typeof setTimeout>;
-
-//   return (...args) => {
-//     clearTimeout(timeout);
-//     timeout = setTimeout(() => callback(...args), wait);
-//   };
-// };
-
 export const debounce = (func, delay = 1000) => {
   let timerId;
 
