@@ -208,6 +208,20 @@ export class CollectionService {
     return response;
   };
 
+  public switchCollectionBranch = async (
+    collectionId: string,
+    branchName: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${this.apiUrl}/api/collection/${collectionId}/branch/${branchName}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public importCollectionFile = async (workspaceId: string, file) => {
     const response = await makeRequest(
       "POST",
