@@ -381,7 +381,9 @@
           url: collection.activeSyncUrl,
           urlData: responseJSON.data,
           primaryBranch: collection?.primaryBranch,
-          currentBranch: collection?.currentBranch,
+          currentBranch: collection?.currentBranch
+            ? collection?.currentBranch
+            : collection?.primaryBranch,
         },
         collection.activeSync,
       );
