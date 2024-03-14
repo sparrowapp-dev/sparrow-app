@@ -80,9 +80,13 @@
       (!tab?.property?.request?.save?.api ||
         !tab?.property?.request?.save?.description)
     ) {
-      tabId = id;
-      removeTab = tab;
-      closePopup = true;
+      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        tabId = id;
+        removeTab = tab;
+        closePopup = true;
+      } else {
+        collectionsMethods.handleRemoveTab(id);
+      }
     } else {
       collectionsMethods.handleRemoveTab(id);
     }

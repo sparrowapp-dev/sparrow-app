@@ -22,6 +22,8 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -127,6 +129,32 @@
   let refreshCollectionLoader = false;
   const handleSyncCollection = async () => {
     if (refreshCollectionLoader) return;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${currentCollection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (currentCollection?.currentBranch) {
+          if (currentBranch !== currentCollection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== currentCollection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
+    }
     refreshCollectionLoader = true;
     const responseJSON = await _collectionService.validateImportCollectionURL(
       currentCollection.activeSyncUrl,
@@ -150,9 +178,9 @@
           currentCollection?.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced successfully.");
+        notifications.success("Collection synced.");
       } else {
-        notifications.error("Failed to sync the Collection.");
+        notifications.error("Failed to sync the collection. Please try again.");
       }
     } else {
       notifications.error(
@@ -205,15 +233,13 @@
         currentBranch: branch,
         items: response.data.data.items,
       });
-
-      isSynced = true;
     } else {
       collectionsMethods.updateCollection(currentCollection?.id, {
         currentBranch: branch,
         items: [],
       });
-      isSynced = false;
     }
+    notifications.success("Branch switched successfully.");
   };
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -256,68 +282,72 @@
             bind:this={inputElement}
           />
           {#if currentCollection?.activeSync}
-            <Dropdown
-              dropdownId={"hashfref128"}
-              data={[
-                ...currentCollection.branches.map((elem) => {
-                  elem.id = elem.name;
-                  return elem;
-                }),
-                {
-                  name: currentCollection?.primaryBranch,
-                  id: currentCollection?.primaryBranch,
-                },
-              ].filter(
-                (value, index, self) =>
-                  index === self.findIndex((t) => t.id === value.id),
-              )}
-              additionalType={"branch"}
-              onclick={handleBranchChange}
-              dropDownType={{
-                type: "text",
-                title: currentCollection?.currentBranch
-                  ? currentCollection?.currentBranch
-                  : currentCollection?.primaryBranch,
-              }}
-              staticClasses={[
-                {
-                  id: "hashfref128-options-container",
-                  classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-                },
-              ]}
-              hoverClasses={[
-                {
-                  id: "hashfref128-btn-div",
-                  classToAdd: ["border-bottom", "border-labelColor"],
-                },
-              ]}
-              staticCustomStyles={[
-                {
-                  id: "hashfref128-options-container",
-                  styleKey: "maxHeight",
-                  styleValue: "140px",
-                },
-                {
-                  id: "hashfref128-options-container",
-                  styleKey: "overflowY",
-                  styleValue: "auto",
-                },
-              ]}
-            ></Dropdown>
+            <div class="d-flex">
+              <Dropdown
+                dropdownId={"hashfref128"}
+                data={[
+                  ...currentCollection.branches.map((elem) => {
+                    elem.id = elem.name;
+                    return elem;
+                  }),
+                  {
+                    name: currentCollection?.primaryBranch,
+                    id: currentCollection?.primaryBranch,
+                  },
+                ].filter(
+                  (value, index, self) =>
+                    index === self.findIndex((t) => t.id === value.id),
+                )}
+                additionalType={"branch"}
+                onclick={handleBranchChange}
+                dropDownType={{
+                  type: "text",
+                  title: currentCollection?.currentBranch
+                    ? currentCollection?.currentBranch
+                    : currentCollection?.primaryBranch,
+                }}
+                staticClasses={[
+                  {
+                    id: "hashfref128-options-container",
+                    classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
+                  },
+                ]}
+                hoverClasses={[
+                  {
+                    id: "hashfref128-btn-div",
+                    classToAdd: ["border-bottom", "border-labelColor"],
+                  },
+                ]}
+                staticCustomStyles={[
+                  {
+                    id: "hashfref128-options-container",
+                    styleKey: "maxHeight",
+                    styleValue: "140px",
+                  },
+                  {
+                    id: "hashfref128-options-container",
+                    styleKey: "overflowY",
+                    styleValue: "auto",
+                  },
+                ]}
+              ></Dropdown>
+            </div>
           {/if}
         </div>
         <div class="d-flex flex-row">
           {#if currentCollection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
-              <button
-                disabled={!hasWorkpaceLevelPermission(
+              <Button
+                disable={!hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
-                )}
-                class="btn btn-secondary m-1 rounded border-0 text-align-right py-1"
-                style="max-height:40px"
-                on:click={handleSyncCollection}>Sync Collection</button
-              >
+                ) || refreshCollectionLoader}
+                title={`Sync Collection`}
+                type="dark"
+                loader={refreshCollectionLoader}
+                buttonClassProp={`me-2`}
+                onClick={handleSyncCollection}
+              />
             </div>
           {/if}
 
@@ -338,26 +368,40 @@
     {#if currentCollection?.activeSync && !isSynced}
       <div
         class={`"d-flex"
-        } flex-column align-items-center flex-grow-1 justify-content-center`}
+        } flex-column align-items-center flex-grow-1 justify-content-center pt-5`}
       >
         <div class="d-flex flex-column align-items-center">
-          <div class="text-secondary">Branch Info Unavailable</div>
-          <div class="text-muted">the current branch is not available</div>
-          <div class="text-muted">
-            To resolve this issue,please follow these steps:
+          <div class="text-secondary pb-3 sparrow-fs-16">
+            Branch Information Unavailable
           </div>
-          <ul type="1">
-            <li class="text-muted">
-              Run the project to initialize development environment
+          <div class="text-secondary pb-3 sparrow-fs-12">
+            the current branch {currentCollection?.currentBranch
+              ? currentCollection?.currentBranch
+              : currentCollection?.currentBranch} is not available
+          </div>
+          <div class="text-secondary sparrow-fs-12">
+            To resolve this issue, please follow these steps:
+          </div>
+          <ol type="1">
+            <li class="text-secondary sparrow-fs-12">
+              Run the project to initialize the development environment.
             </li>
-            <li class="text-muted">
-              Click on 'Sync Collection' button to synchronize the branch
-              information
+            <li class="text-secondary sparrow-fs-12">
+              Click on ‘Sync Collection’ button to synchronize the branch
+              information.
             </li>
-          </ul>
-          <button class="btn btn-primary" on:click={handleSyncCollection}
-            >Sync Collection</button
-          >
+          </ol>
+          <Button
+            disable={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            ) || refreshCollectionLoader}
+            title={`Sync Collection`}
+            type="primary"
+            loader={refreshCollectionLoader}
+            buttonClassProp={`me-2`}
+            onClick={handleSyncCollection}
+          />
         </div>
       </div>
     {/if}
