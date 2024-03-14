@@ -13,11 +13,12 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
   import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { setBodyType } from "$lib/utils/helpers/auth.helper";
+  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
 
   export let name: string;
   export let id: string;
@@ -28,6 +29,7 @@
   export let api;
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
+  export let activeSync = false;
 
   let showPath = false;
   let isFilePopup: boolean = false;
@@ -44,9 +46,14 @@
     body,
     headers,
     queryParams,
+    auth,
     type,
     description,
-    selectedRequestBodyType;
+    selectedRequestBodyType,
+    actSync,
+    isDeleted,
+    source;
+  selectedRequestAuthType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -65,9 +72,15 @@
     if (body) request.property.request.body = body;
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
+    if (auth) request.property.request.auth = auth;
     if (headers) request.property.request.headers = headers;
+    if (actSync) request.activeSync = actSync;
+    if (isDeleted) request.isDeleted = isDeleted;
+    if (source === "SPEC") request.source = source;
     if (selectedRequestBodyType)
       request = setBodyType(request, selectedRequestBodyType);
+    if (selectedRequestAuthType)
+      request = setAuthType(request, selectedRequestAuthType);
     request.property.request.save.api = true;
     request.property.request.save.description = true;
     collectionsMethods.handleCreateTab(request);
@@ -83,10 +96,15 @@
       method = api.request?.method;
       headers = api.request?.headers;
       queryParams = api.request?.queryParams;
+      auth = api.request?.auth;
       body = api.request?.body;
       type = api.request?.type;
       description = api.description;
       selectedRequestBodyType = api.request?.selectedRequestBodyType;
+      actSync = activeSync;
+      isDeleted = api?.isDeleted;
+      source = api?.source;
+      selectedRequestAuthType = api.request?.selectedRequestAuthType;
     }
   }
 
@@ -353,6 +371,9 @@
       ? 'unclickable'
       : ''}"
   >
+    {#if actSync && !isDeleted && source === "SPEC"}
+      <img src={reloadSyncIcon} class="ms-2" alt="" />
+    {/if}
     <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>

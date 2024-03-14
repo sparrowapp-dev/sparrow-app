@@ -6,6 +6,7 @@
   export let value: any = [];
   export let labelText: string;
   export let labelDescription = "";
+  export let labelDescriptionSize = "0.75rem";
   export let inputId: string;
   export let inputPlaceholder: string;
   export let maxFileSize: number;
@@ -25,6 +26,10 @@
     supportedFileTypes: string[],
   ) => void;
   export let type = "image";
+  export let width = "100%";
+  export let height = "auto";
+  export let iconHeight = 12;
+  export let iconWidth = 12;
   let isDragOver = false;
 
   const FileSize = {
@@ -72,8 +77,8 @@
   };
 </script>
 
-<div class="sparrow-text-input-container mt-3">
-  <div class="sparrow-input-label-container mb-1">
+<div class="sparrow-text-input-container mb-2">
+  <div class="sparrow-input-label-container">
     <div class="sparrow-input-label-heading">
       {#if labelText}
         <label class="sparrow-input-label text-lightGray fw-light" for={inputId}
@@ -84,62 +89,89 @@
         {/if}
       {/if}
     </div>
-    {#if (value.length === 0 || value.size === 0) && type === "image"}
-      <span class="sparrow-input-label-desc">{labelDescription}</span>
+    {#if (value.length === 0 || value.size === 0) && type === "image" && width === "100%"}
+      <span
+        class="sparrow-input-label-desc"
+        style="font-size:{labelDescriptionSize}">{labelDescription}</span
+      >
     {/if}
   </div>
-  {#if value.length == 0 || value.size === 0}
-    <div
-      style="border: 3px dashed {showFileTypeError || showFileSizeError
-        ? 'var(--dangerColor)'
-        : 'var(--request-arc)'}; border-width: 2px;"
-      class="sparrow-file-input w-100 px-auto {isDragOver &&
-        'opacity-75 bg-lightBackground'}"
-      on:dragover={(e) => {
-        e.preventDefault();
-        isDragOver = true;
-      }}
-      on:dragleave={() => {
-        isDragOver = false;
-      }}
-      on:drop={(e) => {
-        e.preventDefault();
-        isDragOver = false;
-        handleDrop(e, maxFileSize, supportedFileTypes);
-      }}
-    >
-      <span
-        class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
-        >Drag and Drop or</span
-      >
+  <div class="d-flex">
+    {#if value.length == 0 || value.size === 0}
       <div
-        class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
+        style="width:{width} !important; height:{height} !important;  border: 3px dashed {showFileTypeError ||
+        showFileSizeError
+          ? 'var(--dangerColor)'
+          : 'var(--request-arc)'}; border-width: 2px;"
+        class="sparrow-file-input w-100 px-auto {isDragOver &&
+          'opacity-75 bg-lightBackground'}"
+        on:dragover={(e) => {
+          e.preventDefault();
+          isDragOver = true;
+        }}
+        on:dragleave={() => {
+          isDragOver = false;
+        }}
+        on:drop={(e) => {
+          e.preventDefault();
+          isDragOver = false;
+          handleDrop(e, maxFileSize, supportedFileTypes);
+        }}
       >
-        <UploadIcon classProp="my-auto" />
-        <label for={inputId} class="sparrow-choose-file-label ps-2"
-          >Choose File</label
+        {#if width === "100%"}
+          <span
+            class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
+            >Drag and Drop or</span
+          >
+        {/if}
+        <div
+          class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
-        <input
-          class="sparrow-choose-file-input visually-hidden"
-          type="file"
-          {value}
-          id={inputId}
-          placeholder={inputPlaceholder}
-          accept={generateAcceptString()}
-          on:change={(e) => {
-            onChange(e, maxFileSize, supportedFileTypes);
-          }}
-        />
+          <label for={inputId}>
+            <UploadIcon
+              classProp="my-auto"
+              width={iconWidth}
+              height={iconHeight}
+            />
+          </label>
+          {#if width === "100%"}
+            <label for={inputId} class="sparrow-choose-file-label ps-2"
+              >Choose File</label
+            >
+          {/if}
+          <input
+            class="sparrow-choose-file-input visually-hidden"
+            type="file"
+            {value}
+            id={inputId}
+            placeholder={inputPlaceholder}
+            accept={generateAcceptString()}
+            on:change={(e) => {
+              onChange(e, maxFileSize, supportedFileTypes);
+            }}
+          />
+        </div>
       </div>
-    </div>
-  {/if}
-  <p class="sparrow-file-input-error-text mt-2">
-    {#if showFileTypeError}
-      {fileTypeError}
-    {:else if showFileSizeError}
-      {fileSizeError}
     {/if}
-  </p>
+    {#if (value.length === 0 || value.size === 0) && type === "image" && width !== "100%"}
+      <span
+        class="sparrow-input-label-desc sparrow-fs-18 ms-4"
+        style="font-size:{labelDescriptionSize}; width: calc(100% - {width})"
+        >{labelDescription}</span
+      >
+    {/if}
+  </div>
+
+  {#if showFileTypeError}
+    <p class="sparrow-file-input-error-text mt-2">
+      {fileTypeError}
+    </p>
+  {:else if showFileSizeError}
+    <p class="sparrow-file-input-error-text mt-2">
+      {fileSizeError}
+    </p>
+  {/if}
+
   {#if showFileTypeError}
     <div class="d-flex gap-2">
       {#each supportedFileTypes as fileType}
@@ -151,7 +183,7 @@
   {/if}
   {#if !Array.isArray(value) && value.size > 0}
     {#if type === "image"}
-      <div class="sparrow-input-image-preview rounded p-1 d-flex gap-2">
+      <div class="sparrow-input-image-preview rounded d-flex gap-2">
         {#if value.bufferString}
           <img class="rounded p-2" src={base64ToURL(value)} alt="" />
         {:else}

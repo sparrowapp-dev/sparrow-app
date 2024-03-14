@@ -1,6 +1,6 @@
 <script lang="ts">
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { setBodyType } from "$lib/utils/helpers/auth.helper";
+  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { navigate } from "svelte-navigator";
   export let api: any;
@@ -21,12 +21,19 @@
       request.property.request.method = api.property.request.method;
     if (api.property.request.queryParams)
       request.property.request.queryParams = api.property.request.queryParams;
+    if (api.property.request.auth)
+      request.property.request.auth = api.property.request.auth;
     if (api.property.request.headers)
       request.property.request.headers = api.property.request.headers;
     if (api.property.request.selectedRequestBodyType)
       request = setBodyType(
         request,
         api.property.request.selectedRequestBodyType,
+      );
+    if (api.property.request.selectedRequestAuthType)
+      request = setAuthType(
+        request,
+        api.property.request.selectedRequestAuthType,
       );
     request.property.request.save.api = true;
     request.property.request.save.description = true;

@@ -164,6 +164,7 @@
           let data = {
             users: emailstoBeSentArr,
             role: selectedRole,
+            teamId: teamId,
             workspaces: teamSpecificWorkspace
               .filter((elem) => {
                 if (elem.checked) {
@@ -189,6 +190,7 @@
         let data = {
           users: emailstoBeSentArr,
           role: selectedRole,
+          teamId: teamId,
         };
         const response = await onSubmit(teamId, data);
         if (response) {
@@ -229,7 +231,7 @@
     Invite By Email<span class="asterik">*</span>
   </p>
   <p class="invite-subheader text-textColor mt-0 mb-1">
-    use commas to separate emails
+    Use commas to separate emails
   </p>
   <div
     class="email-container rounded {emailError && emailstoBeSentArr.length === 0
@@ -379,32 +381,32 @@
       ]}
       staticCustomStyles={[
         {
-          id:"check-select-workspace-options-container",
-          styleKey:"overflow",
-          styleValue:"auto"
+          id: "check-select-workspace-options-container",
+          styleKey: "overflow",
+          styleValue: "auto",
         },
         {
-          id:"check-select-workspace-options-container",
-          styleKey:"max-height",
-          styleValue:"calc(100vh - 700px)"
-        }
+          id: "check-select-workspace-options-container",
+          styleKey: "max-height",
+          styleValue: "calc(100vh - 700px)",
+        },
       ]}
     ></Dropdown>
   </div>
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
     <p class="error-text">
       You need to select at least one workspace. If you wish to give access to
-      all workspaces, plese click on select all.
+      all workspaces, please click on select all.
     </p>
   {/if}
 {/if}
 <div class="d-flex align-items-center justify-content-between mt-4">
-  <div class="description">
-    <div class="d-flex align-items-center">
+  <div class="description ellipsis">
+    <div class="d-flex align-items-center ellipsis">
       {#if teamLogo}
         <img class="team-icon me-2" src={base64ToURL(teamLogo)} alt="" />
       {/if}
-      <p style="font-size:16px;" class="mb-0">{teamName}</p>
+      <p style="font-size:16px;" class="mb-0 ellipsis">{teamName}</p>
     </div>
   </div>
   <div>
@@ -412,7 +414,7 @@
       disable={loader}
       title={"Send Invite"}
       loaderSize={19}
-      textStyleProp={"font-size: var(--base-text)"}
+      textStyleProp={"font-size: var(--base-text); min-width:80px;"}
       type={"primary"}
       {loader}
       onClick={() => {

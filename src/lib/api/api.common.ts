@@ -86,6 +86,7 @@ const makeRequest = async (
   method: Method,
   url: string,
   requestData?: RequestData,
+  includeAxiosData?: boolean,
 ) => {
   isLoading.set(true);
   try {
@@ -97,7 +98,11 @@ const makeRequest = async (
     });
 
     if (response.status === 201 || response.status === 200) {
-      return success(response.data, "");
+      if (includeAxiosData) {
+        return success(response, "");
+      } else {
+        return success(response.data, "");
+      }
     } else {
       return error(response.data.message);
     }
@@ -145,10 +150,9 @@ const makeHttpRequest = async (
   console.table({ url, method, headers, body, request });
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-
+  url = url.trim().replace(/ /g, "%20");
   return Promise.race([
     timeout(apiTimeOut),
-
     invoke("make_http_request", {
       url,
       method,

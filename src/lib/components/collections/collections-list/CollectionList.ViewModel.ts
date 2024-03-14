@@ -25,6 +25,10 @@ export class CollectionListViewModel {
       createdAt: elem.get("createdAt"),
       updatedBy: elem.get("updatedBy"),
       updatedAt: elem.get("updatedAt"),
+      branches: elem.get("branches"),
+      primaryBranch: elem.get("primaryBranch"),
+      currentBranch: elem.get("currentBranch"),
+      localRepositoryPath: elem.get("localRepositoryPath"),
     };
   };
   public get collection() {

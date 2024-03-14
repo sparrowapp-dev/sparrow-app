@@ -239,7 +239,7 @@
             </p>
           {/if}
         {:else if additionalType === "branch"}
-          {#if selectedOption?.id === "none"}
+          {#if selectedOption?.id === "not exist"}
             <p class=" mb-0 ellipsis text-textColor">Select Branch</p>
           {:else}
             <p class=" mb-0 ellipsis">
@@ -276,7 +276,7 @@
     {/if}
   </div>
   <div
-    class="d-none dropdown-data border-2 border-dropdownBorderColor rounded dropdown-menu"
+    class="d-none dropdown-data border-1 border-dropdownBorderColor px-2 rounded dropdown-menu"
     class:dropdown-active={isOpen}
     id="{dropdownId}-options-container"
     style={`${dropdownDataContainer} ${

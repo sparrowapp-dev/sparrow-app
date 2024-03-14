@@ -50,12 +50,14 @@
        </div>
      </div>
    </div>
-   <div class="workspace-info gap-3 text-defaultColor">
+   <!-- This is not dynamic. So commenting for now. - Nayan (29 Feb, 2024) 
+    
+    <div class="workspace-info gap-3 text-defaultColor">
      <p>
        <span class="me-1 fs-6 text-plusButton">{noOfCollections}</span
        >COLLECTION
      </p>
-   </div>
+   </div> -->
  </div>
 
 

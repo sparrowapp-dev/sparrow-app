@@ -17,6 +17,9 @@ const generateSampleRequest = (id: string, date: string): NewTab => {
     name: RequestDefault.NAME,
     type: ItemType.REQUEST,
     description: "",
+    source: "USER",
+    isDeleted: false,
+    activeSync: false,
     property: {
       request: {
         method: RequestMethod.GET,

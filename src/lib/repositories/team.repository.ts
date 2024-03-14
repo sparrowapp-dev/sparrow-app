@@ -36,7 +36,7 @@ export class TeamRepository {
   /**
    * Check whether the team is active
    */
-  public checkActiveTeam = async (teamId: string): Promise<boolean> => {
+  public checkActiveTeam = async (): Promise<boolean> => {
     const team = await RxDB.getInstance()
       .rxdb.team.findOne({
         selector: {
@@ -44,7 +44,8 @@ export class TeamRepository {
         },
       })
       .exec();
-    return team?.teamId == teamId ? true : false;
+    if (!team) return true;
+    else return false;
   };
   /**
    * clear teams data
@@ -116,7 +117,7 @@ export class TeamRepository {
    */
   public bulkInsertData = async (data: any): Promise<void> => {
     await this.clearTeams();
-    await RxDB.getInstance().rxdb.team.bulkUpsert(data);
+    await RxDB.getInstance().rxdb.team.bulkInsert(data);
     return;
   };
 
@@ -145,8 +146,8 @@ export class TeamRepository {
   /**
    * get teams data
    */
-  public getTeamData = (): TeamDocument[] => {
-    return RxDB.getInstance().rxdb.team.find().exec();
+  public getTeamData = async (): TeamDocument[] => {
+    return await RxDB.getInstance().rxdb.team.find().exec();
   };
 
   /**
@@ -265,6 +266,30 @@ export class TeamRepository {
     team.incrementalPatch({
       workspaces: filteredWorkspaces,
     });
+    return;
+  };
+
+  public addWorkspaceInTeam = async (
+    teamId: string,
+    workspaceId: string,
+    name: string,
+  ): Promise<void> => {
+    const team: TeamDocument = await RxDB.getInstance()
+      .rxdb.team.findOne({
+        selector: {
+          teamId,
+        },
+      })
+      .exec();
+    if (team && team?.workspaces?.length > 0) {
+      team.incrementalPatch({
+        workspaces: [...team.workspaces, { workspaceId, name }],
+      });
+    } else if (team) {
+      team.incrementalPatch({
+        workspaces: [{ workspaceId, name }],
+      });
+    }
     return;
   };
 }

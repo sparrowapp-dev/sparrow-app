@@ -46,7 +46,14 @@ const requestItems = {
   selectedRequestBodyType: {
     type: "string",
   },
+  selectedRequestAuthType: {
+    type: "string",
+  },
   queryParams: {
+    type: "array",
+    properties: params,
+  },
+  auth: {
     type: "array",
     properties: params,
   },
@@ -118,7 +125,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 2,
+  version: 4,
   properties: {
     collectionId: {
       type: "string",
@@ -144,6 +151,25 @@ export const collectionSchemaLiteral = {
     activeSyncUrl: {
       type: "string",
     },
+    localRepositoryPath: {
+      type: "string",
+    },
+    branches: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+          },
+          name: {
+            type: "string",
+          },
+        },
+      },
+    },
+    primaryBranch: { type: "string" },
+    currentBranch: { type: "string" },
     createdAt: {
       type: "string",
     },

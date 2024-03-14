@@ -14,7 +14,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
@@ -38,6 +38,9 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
+  import { invoke } from "@tauri-apps/api/core";
+  import gitBranchIcon from "$lib/assets/git-branch.svg";
+  import { CollectionMessage } from "$lib/utils/constants/request.constant";
 
   export let title: string;
   export let collection: any;
@@ -82,6 +85,10 @@
       currentWorkspaceId,
       collectionId,
       {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
         name: folder.name,
         description: folder.description,
       },
@@ -136,6 +143,10 @@
     const requestObj = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
+      currentBranch: collection?.currentBranch
+        ? collection?.currentBranch
+        : collection?.primaryBranch,
+      source: "USER",
       items: {
         name: request.name,
         type: request.type,
@@ -214,6 +225,9 @@
 
   //open collection
   function openCollections() {
+    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+      handleCollectionClick(collection, currentWorkspaceId, collectionId);
+    }
     if (!visibility) {
       visibility = !visibility;
     }
@@ -310,17 +324,42 @@
   let requestCount: number = 0;
   let folderCount: number = 0;
   let deletedIds: string[] = [];
+
+  const handleBranchSwitch = async () => {
+    const detectBranch = collection?.currentBranch
+      ? collection?.currentBranch
+      : collection?.primaryBranch;
+    const collectionId = collection?.id;
+    const response = await collectionService.switchCollectionBranch(
+      collectionId,
+      detectBranch,
+    );
+    if (response.isSuccessful) {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: response.data.data.items,
+      });
+    } else {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: [],
+      });
+    }
+  };
   $: {
     if (activePath) {
       if (activePath.collectionId === collection.id) {
         visibility = true;
       }
     }
+    // if (collection?.activeSync) {
+    //   handleBranchSwitch();
+    // }
     if (collection) {
       deletedIds.length = [];
       requestCount = 0;
       folderCount = 0;
-      collection.items.forEach((item) => {
+      collection?.items?.forEach((item) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
@@ -338,6 +377,11 @@
   }
 
   // delete collection
+  onMount(() => {
+    if (collection?.activeSync) {
+      handleBranchSwitch();
+    }
+  });
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -370,21 +414,63 @@
   let refreshCollectionLoader = false;
   const refetchCollection = async () => {
     if (refreshCollectionLoader) return;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: collection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (collection?.currentBranch) {
+          if (currentBranch !== collection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== collection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
+    }
     refreshCollectionLoader = true;
-    const response = await _viewImportCollection.importCollectionData(
-      currentWorkspaceId,
-      { url: collection.activeSyncUrl },
-      collection.activeSync,
+    const responseJSON = await collectionService.validateImportCollectionURL(
+      collection.activeSyncUrl,
     );
-
-    if (response.isSuccessful) {
-      collectionsMethods.updateCollection(
-        collection.id,
-        response.data.data.collection,
+    if (responseJSON.isSuccessful) {
+      const response = await _viewImportCollection.importCollectionData(
+        currentWorkspaceId,
+        {
+          url: collection.activeSyncUrl,
+          urlData: responseJSON.data,
+          primaryBranch: collection?.primaryBranch,
+          currentBranch: collection?.currentBranch
+            ? collection?.currentBranch
+            : collection?.primaryBranch,
+        },
+        collection.activeSync,
       );
-      notifications.success("Collection fetched successfully.");
+
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(
+          collection.id,
+          response.data.data.collection,
+        );
+        notifications.success("Collection synced.");
+      } else {
+        notifications.error("Failed to sync the collection. Please try again.");
+      }
     } else {
-      notifications.error("Failed to fetch the Collection.");
+      notifications.error(
+        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+      );
     }
     refreshCollectionLoader = false;
   };
@@ -481,7 +567,7 @@
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
       on:click={() => {
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
           visibility = !visibility;
         }
       }}
@@ -514,13 +600,21 @@
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
-        <!-- {#if isActiveSyncEnabled}
+        {#if isActiveSyncEnabled && collection.activeSync}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
-            >branch name - current branch
+            ><img src={gitBranchIcon} alt="" />
+            {collection?.currentBranch
+              ? collection?.currentBranch
+              : collection?.primaryBranch}
+            {collection?.currentBranch
+              ? collection?.currentBranch === collection?.primaryBranch
+                ? "(Default)"
+                : ""
+              : "(Default)"}
           </span>
-        {/if} -->
+        {/if}
       </div>
     {/if}
   </div>
@@ -573,32 +667,48 @@
         {visibility}
         {activeTabId}
         {activePath}
+        activeSync={collection?.activeSync}
+        currentBranch={collection?.currentBranch}
+        primaryBranch={collection?.primaryBranch}
       />
     {/each}
     {#if showFolderAPIButtons}
-      <Tooltip
-        classProp="mt-2 mb-2"
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.SAVE_REQUEST,
-        )}
-      >
-        <div class="mt-2 mb-2">
+      <div class="mt-2 mb-2 d-flex">
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[0]}
+          classProp="mt-2 mb-2"
+        >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
           />
+        </Tooltip>
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[1]}
+          classProp="mt-2 mb-2"
+        >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2 ms-3"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}
           />
-        </div>
-      </Tooltip>
+        </Tooltip>
+      </div>
     {/if}
   </div>
 </div>

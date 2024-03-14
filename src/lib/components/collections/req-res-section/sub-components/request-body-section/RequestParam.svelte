@@ -130,12 +130,13 @@
     }
   };
   onMount(() => {
-    const splitter = document.querySelector(".splitpanes__splitter");
+    const splitter = document.querySelector(
+      ".splitter-request .splitpanes__splitter",
+    );
     const leftPanel = document.getElementsByClassName("left-panel");
     const rightPanel = document.getElementsByClassName("right-panel");
     if (splitter && leftPanel && rightPanel) {
       splitter.addEventListener("mousedown" || "mouseover", () => {
-        splitter.style.border = "solid #1193f0";
         splitter.style.cursor = isHorizontalMode ? "row-resize" : "col-resize";
         if (
           isHorizontalMode &&
@@ -165,9 +166,6 @@
           });
         }
       });
-      window.addEventListener("mouseup", () => {
-        splitter.style.border = "solid #313233";
-      });
     }
   });
   function stylePanes() {
@@ -184,15 +182,17 @@
       bottomPanelHeightSize = value;
     });
 
-    const splitter = document.querySelector(".splitpanes__splitter");
+    const splitter = document.querySelector(
+      ".splitter-request .splitpanes__splitter",
+    );
     if (splitter && isHorizontalMode) {
-      splitter.style.border = "solid #313233";
-      splitter.style.height = "0%";
+      // splitter.style.border = "solid #313233";
+      splitter.style.height = "1px";
       splitter.style.width = "100%";
     } else if (splitter && !isHorizontalMode) {
-      splitter.style.border = "solid #313233";
+      // splitter.style.border = "solid #313233";
       splitter.style.height = "85vh";
-      splitter.style.width = "2px";
+      splitter.style.width = "1px";
     }
   }
 </script>
@@ -201,7 +201,7 @@
   style={isHorizontal && "height: 78vh; "}
   on:ready={stylePanes}
   theme=""
-  class="d-flex align-items-start {isHorizontalMode
+  class="splitter-request d-flex align-items-start {isHorizontalMode
     ? 'flex-column'
     : 'flex-row'} justify-content-between w-100"
   horizontal={isHorizontalMode ? true : false}
@@ -333,7 +333,7 @@
   </Pane>
 
   <Pane
-    class="right-panel pt-3 px-4 position-relative overflow-y-auto"
+    class="right-panel px-4 position-relative overflow-y-auto"
     minSize={35}
     size={isHorizontalMode ? bottomPanelHeightSize : rightPanelWidthSize}
   >
@@ -342,6 +342,20 @@
         <DefaultPage />
       {:else if response?.status === "Not Found"}
         <ResponseError />
+      {:else if progress}
+        <DefaultPage />
+        <div
+          style="    
+          top: 10px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index:3;
+          position:absolute;
+          "
+        >
+          <Loader loaderSize={"80px"} />
+        </div>
       {:else if response?.status}
         <ResponseParams
           {apiState}
@@ -349,19 +363,6 @@
           {response}
           {currentTabId}
         />
-      {/if}
-      {#if progress}
-        <div
-          class="position-absolute"
-          style="    
-          top: 10px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          z-index:3;"
-        >
-          <Loader loaderSize={"80px"} />
-        </div>
       {/if}
     </div>
   </Pane>

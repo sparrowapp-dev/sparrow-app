@@ -38,7 +38,9 @@ export interface RequestBody {
   body?: unknown;
   headers?: KeyValuePair[];
   queryParams?: KeyValuePair[];
+  auth?: Auth;
   selectedRequestBodyType?: ContentTypeEnum;
+  selectedRequestAuthType?: RequestAuthTypes;
 }
 export interface KeyValuePair {
   key: string;
@@ -146,6 +148,9 @@ export interface NewTab {
     | ItemType.REQUEST
     | ItemType.WORKSPACE;
   description: string;
+  isDeleted: boolean;
+  activeSync: boolean;
+  source: string;
   property: {
     request?: Request;
     collection?: Collection;

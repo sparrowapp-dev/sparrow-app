@@ -19,12 +19,21 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { CollectionService } from "$lib/services/collection.service";
+  import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let _collectionListViewModel: CollectionListViewModel;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let currentWorkspaceId: "";
+
+  const _collectionService = new CollectionService();
+  const _viewImportCollection = new ImportCollectionViewModel();
   const collections: Observable<CollectionDocument[]> =
     _collectionListViewModel.collection;
   let activeTabId: string;
@@ -46,6 +55,7 @@
     }
   });
   let collectionCountArr = [];
+  let currentCollection;
   const refreshCount = () => {
     if (collectionCountArr && activeTabId) {
       collectionCountArr.forEach(async (collection) => {
@@ -54,6 +64,18 @@
             await collectionsMethods.getNoOfApisandFolders(collection);
           totalRequest = collectionData.requestCount;
           totalFolder = collectionData.folderCount;
+          currentCollection = collection;
+          const response = await _collectionService.switchCollectionBranch(
+            currentCollection?.id,
+            currentCollection?.currentBranch
+              ? currentCollection?.currentBranch
+              : currentCollection?.PrimaryBranch,
+          );
+          if (response.isSuccessful) {
+            isSynced = true;
+          } else {
+            isSynced = false;
+          }
           return;
         }
       });
@@ -104,15 +126,71 @@
       isLoading = false;
     }
   };
+  let refreshCollectionLoader = false;
   const handleSyncCollection = async () => {
-    // isApiCreatedFirstTime.set(true);
-    // const response = await _myColllectionViewModel.createApiRequest(
-    //   componentData,
-    //   collectionsMethods,
-    // );
-    // if (response.isSuccessful) {
-    //   isLoading = false;
-    // }
+    if (refreshCollectionLoader) return;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${currentCollection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (currentCollection?.currentBranch) {
+          if (currentBranch !== currentCollection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== currentCollection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
+    }
+    refreshCollectionLoader = true;
+    const responseJSON = await _collectionService.validateImportCollectionURL(
+      currentCollection.activeSyncUrl,
+    );
+    if (responseJSON.isSuccessful) {
+      const response = await _viewImportCollection.importCollectionData(
+        currentWorkspaceId,
+        {
+          url: currentCollection?.activeSyncUrl,
+          urlData: responseJSON.data,
+          primaryBranch: currentCollection?.primaryBranch,
+          currentBranch: currentCollection?.currentBranch
+            ? currentCollection?.currentBranch
+            : currentCollection?.primaryBranch,
+        },
+        currentCollection.activeSync,
+      );
+
+      if (response.isSuccessful) {
+        await collectionsMethods.updateCollection(
+          currentCollection?.id,
+          response.data.data.collection,
+        );
+        notifications.success("Collection synced.");
+      } else {
+        notifications.error("Failed to sync the collection. Please try again.");
+      }
+    } else {
+      notifications.error(
+        `Unable to detect ${currentCollection?.activeSyncUrl.replace(
+          "-json",
+          "",
+        )}.`,
+      );
+    }
+    refreshCollectionLoader = false;
   };
 
   let collapsExpandToggle: boolean = false;
@@ -132,10 +210,9 @@
     tabSubscribe();
     collapsibleStateUnsubscribe();
     unsubscribeisCollectionCreatedFirstTime();
-  });
-  onDestroy(() => {
     collectionSubscribe.unsubscribe();
   });
+
   let autofocus = isCollectionNameVisibility;
 
   let inputElement;
@@ -146,8 +223,23 @@
       inputElement.select();
     }
   });
-  const handleBranchChange = () => {
-    alert("branch changed");
+  const handleBranchChange = async (branch: string) => {
+    const response = await _collectionService.switchCollectionBranch(
+      currentCollection?.id,
+      branch,
+    );
+    if (response.isSuccessful) {
+      collectionsMethods.updateCollection(currentCollection?.id, {
+        currentBranch: branch,
+        items: response.data.data.items,
+      });
+    } else {
+      collectionsMethods.updateCollection(currentCollection?.id, {
+        currentBranch: branch,
+        items: [],
+      });
+    }
+    notifications.success("Branch switched successfully.");
   };
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -189,47 +281,75 @@
             on:keydown={onRenameInputKeyPress}
             bind:this={inputElement}
           />
-          <Dropdown
-            dropdownId={"branchselection"}
-            data={[
-              {
-                name: "branch Name-current branch",
-                id: "none",
-                type: "rfgh",
-              },
-            ]}
-            onclick={handleBranchChange}
-            dropDownType={{ type: "text", title: "change branch " }}
-            staticClasses={[
-              {
-                id: "branchselection",
-                classToAdd: ["bg-backgroundDropdown"],
-              },
-              {
-                id: "branchselection",
-                classToAdd: ["text-muted"],
-              },
-            ]}
-            hoverClasses={[
-              {
-                id: "branchselection",
-                classToAdd: ["border-bottom", "border-labelColor"],
-              },
-            ]}
-          ></Dropdown>
+          {#if currentCollection?.activeSync}
+            <div class="d-flex">
+              <Dropdown
+                dropdownId={"hashfref128"}
+                data={[
+                  ...currentCollection.branches.map((elem) => {
+                    elem.id = elem.name;
+                    return elem;
+                  }),
+                  {
+                    name: currentCollection?.primaryBranch,
+                    id: currentCollection?.primaryBranch,
+                  },
+                ].filter(
+                  (value, index, self) =>
+                    index === self.findIndex((t) => t.id === value.id),
+                )}
+                additionalType={"branch"}
+                onclick={handleBranchChange}
+                dropDownType={{
+                  type: "text",
+                  title: currentCollection?.currentBranch
+                    ? currentCollection?.currentBranch
+                    : currentCollection?.primaryBranch,
+                }}
+                staticClasses={[
+                  {
+                    id: "hashfref128-options-container",
+                    classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
+                  },
+                ]}
+                hoverClasses={[
+                  {
+                    id: "hashfref128-btn-div",
+                    classToAdd: ["border-bottom", "border-labelColor"],
+                  },
+                ]}
+                staticCustomStyles={[
+                  {
+                    id: "hashfref128-options-container",
+                    styleKey: "maxHeight",
+                    styleValue: "140px",
+                  },
+                  {
+                    id: "hashfref128-options-container",
+                    styleKey: "overflowY",
+                    styleValue: "auto",
+                  },
+                ]}
+              ></Dropdown>
+            </div>
+          {/if}
         </div>
         <div class="d-flex flex-row">
-          <div class="d-flex flex-column justify-content-center">
-            <button
-              disabled={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-              class="btn btn-secondary m-1 rounded border-0 text-align-right py-1"
-              style="max-height:40px"
-              on:click={handleSyncCollection}>Sync Collection</button
-            >
-          </div>
+          {#if currentCollection?.activeSync}
+            <div class="d-flex flex-column justify-content-center">
+              <Button
+                disable={!hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                ) || refreshCollectionLoader}
+                title={`Sync Collection`}
+                type="dark"
+                loader={refreshCollectionLoader}
+                buttonClassProp={`me-2`}
+                onClick={handleSyncCollection}
+              />
+            </div>
+          {/if}
 
           <div class="d-flex flex-column justify-content-center">
             <button
@@ -245,30 +365,47 @@
         </div>
       </div>
     </Tooltip>
-    <div
-      class={`${
-        isSynced ? "d-flex" : "d-none"
-      } flex-column align-items-center flex-grow-1 justify-content-center`}
-    >
-      <div class="d-flex flex-column align-items-center">
-        <div class="text-secondary">Branch Info Unavailable</div>
-        <div class="text-muted">the current branch is not available</div>
-        <div class="text-muted">
-          To resolve this issue,please follow these steps:
+    {#if currentCollection?.activeSync && !isSynced}
+      <div
+        class={`"d-flex"
+        } flex-column align-items-center flex-grow-1 justify-content-center pt-5`}
+      >
+        <div class="d-flex flex-column align-items-center">
+          <div class="text-secondary pb-3 sparrow-fs-16">
+            Branch Information Unavailable
+          </div>
+          <div class="text-secondary pb-3 sparrow-fs-12">
+            the current branch {currentCollection?.currentBranch
+              ? currentCollection?.currentBranch
+              : currentCollection?.currentBranch} is not available
+          </div>
+          <div class="text-secondary sparrow-fs-12">
+            To resolve this issue, please follow these steps:
+          </div>
+          <ol type="1">
+            <li class="text-secondary sparrow-fs-12">
+              Run the project to initialize the development environment.
+            </li>
+            <li class="text-secondary sparrow-fs-12">
+              Click on ‘Sync Collection’ button to synchronize the branch
+              information.
+            </li>
+          </ol>
+          <Button
+            disable={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            ) || refreshCollectionLoader}
+            title={`Sync Collection`}
+            type="primary"
+            loader={refreshCollectionLoader}
+            buttonClassProp={`me-2`}
+            onClick={handleSyncCollection}
+          />
         </div>
-        <ul type="1">
-          <li class="text-muted">
-            Run the project to initialize development environment
-          </li>
-          <li class="text-muted">
-            Click on 'Sync Collection' button to synchronize the branch
-            information
-          </li>
-        </ul>
-        <button class="btn btn-primary">Sync Collection</button>
       </div>
-    </div>
-    <div class={`${isSynced ? "d-none" : "d-flex"} align-items-center`}>
+    {/if}
+    <div class={`${!isSynced ? "d-none" : "d-block"} align-items-center`}>
       <div class="d-flex gap-4 mb-4 ps-2">
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4 text-plusButton">{totalRequest}</span>

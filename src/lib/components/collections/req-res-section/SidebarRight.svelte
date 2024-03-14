@@ -91,6 +91,7 @@
       body: existingRequest?.request.body,
       headers: existingRequest?.request.headers,
       queryParams: existingRequest?.request.queryParams,
+      auth: existingRequest?.request.auth,
     };
 
     if (!folderId) {

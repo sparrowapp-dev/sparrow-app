@@ -69,13 +69,17 @@
       componentData.property.request.state.dataset === RequestDataset.RAW
         ? componentData.property.request.state.raw
         : componentData.property.request.state.dataset;
+    const authType = componentData.property.request.state?.auth;
+
     const expectedRequest: RequestBody = {
       method: componentData.property.request.method,
       url: componentData.property.request.url,
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
       queryParams: componentData.property.request.queryParams,
+      auth: componentData.property.request.auth,
       selectedRequestBodyType: setContentTypeHeader(bodyType),
+      selectedRequestAuthType: authType,
     };
     if (!folderId) {
       let res = await updateCollectionRequest(_id, {
@@ -162,7 +166,7 @@
     window.addEventListener("click", handleDropdownClick);
   });
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.code === "KeyS") {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       if (componentData?.path.collectionId && componentData?.path.workspaceId) {
         handleSaveRequest();
       } else {
@@ -265,7 +269,10 @@
                 !hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
-                )}
+                ) ||
+                (componentData?.source === "SPEC" &&
+                  componentData?.activeSync &&
+                  !componentData?.isDeleted)}
               style="width:140px;"
               class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
               on:click={() => {
@@ -298,6 +305,9 @@
           </Tooltip>
           <span class="position-relative" style="width:35px;">
             <Dropdown
+              disabled={componentData?.source === "SPEC" &&
+                componentData?.activeSync &&
+                !componentData?.isDeleted}
               dropdownId={"saveAsDropdown"}
               dropDownType={{ type: "img", title: angleDown }}
               data={[
