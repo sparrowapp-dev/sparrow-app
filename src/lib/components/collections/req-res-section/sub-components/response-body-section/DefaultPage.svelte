@@ -1,29 +1,38 @@
 <script lang="ts">
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { isHorizontal } from "$lib/store/request-response-section";
+  import { platform } from "@tauri-apps/plugin-os";
+  import { onMount } from "svelte";
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));
-  const ctrlCommands = {
-    "Send Request": "ctrl + Enter",
-    "Save Request": "ctrl + S",
-    "New Request": "ctrl + N",
-  };
-  const altCommands = {
-    "Edit link": "alt + L",
-    "Add Parameter": "alt + P",
-    "Add Header": "alt + H",
-    "Edit Body": "alt + B",
-  };
+  let ctrlCommands: { [key: string]: string } = {};
+  let altCommands: { [key: string]: string } = {};
+  onMount(async () => {
+    const platformName = await platform();
+    let controlKey = platformName === "macos" ? "cmd" : "ctrl";
+    let altKey = platformName === "macos" ? "option" : "alt";
+     ctrlCommands = {
+      "Send Request": controlKey + " + Enter",
+      "Save Request": controlKey + " + S",
+      "New Request": controlKey + " + N",
+    };
+     altCommands = {
+      "Edit link": altKey + " + L",
+      "Add Parameter": altKey + " + P",
+      "Add Header": altKey + " + H",
+      "Edit Body": altKey + " + B",
+    };
+  });
 </script>
 
 <div
   class="d-flex text-requestBodyColor mt-1 flex-column {isHorizontalMode
-    ? 'align-items-start'
+    ? 'align-items-center'
     : 'align-items-center'} justify-content-between py-3 ps-3"
 >
   <div
     class="d-flex flex-column align-items-start {isHorizontalMode
-      ? 'align-items-start '
+      ? 'align-items-center '
       : 'align-items-center'} justify-content-start {isHorizontalMode
       ? 'mb-2 mt-3'
       : 'mb-3 mt-5'} "
@@ -36,7 +45,7 @@
   <div
     style="font-family: Roboto Mono;font-size: 12px;font-weight: 400;line-height: 18px;letter-spacing: 0em;;"
     class={isHorizontalMode
-      ? "d-flex align-items-start justify-content-between gap-4"
+      ? "d-flex align-items-center justify-content-between gap-4"
       : "d-flex flex-column"}
   >
     <div

@@ -93,17 +93,15 @@ export class TeamViewModel {
    * @returns Left Team Success or Failure
    */
   public leaveTeam = async (teamId: string): Promise<any> => {
-    const rxDBResponse = await this.teamRepository.removeTeam(teamId);
-    const activeTeam = await this.teamRepository.checkActiveTeam(teamId);
+    return await this.teamService.leaveTeam(teamId);
+  };
 
-    if (activeTeam && rxDBResponse) {
-      const teamIdToActivate =
-        await this.workspaceRepository.activateInitialWorkspace();
-      if (teamIdToActivate)
-        await this.teamRepository.setActiveTeam(teamIdToActivate);
-    }
-    const resp = await this.teamService.leaveTeam(teamId);
-    return resp;
+  public removeTeam = async (teamId: string) => {
+    return await this.teamRepository.removeTeam(teamId);
+  };
+
+  public activateInitialWorkspace = async () => {
+    await this.workspaceRepository.activateInitialWorkspace();
   };
 
   public checkActiveTeam = async (teamId: string): Promise<boolean> => {
@@ -184,6 +182,10 @@ export class TeamViewModel {
   };
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
+  };
+
+  public addWorkspaceInTeam = (teamId, workspaceId, name) => {
+    this.teamRepository.addWorkspaceInTeam(teamId, workspaceId, name);
   };
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {

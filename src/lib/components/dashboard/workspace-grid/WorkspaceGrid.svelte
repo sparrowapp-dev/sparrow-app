@@ -67,11 +67,51 @@
     );
     if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
       notifications.error(
-        "Cannot Delete Only Active Workspace of the Team: Please Create a New Workspace Before Deleting the Current Active Workspace.",
+        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
       );
       handleDeletePopup(false);
       return;
     }
+    teamSpecificWorkspace = teamSpecificWorkspace.filter(
+        (ws) => ws.id != workspace._id,
+      );
+    if (activeWorkspaceBeingDeleted) {
+      handleDeletePopup(false);
+      handleActivateWorkspacePopup(true);
+      return;
+    } else {
+      const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+        workspace._id,
+      );
+      await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+        currActiveTeam.id,
+        workspace._id,
+      );
+      if (response && response.data) {
+        notifications.success(
+          `${workspace.name} is removed from ${currActiveTeam.name}`,
+        );
+        await requestResponseStore.removeTab(workspace._id);
+        onDeleteWorkspace(workspace._id);
+      }
+    }
+    handleDeletePopup(false);
+  };
+
+  const handleWindowClick = (event) => {};
+
+  window.addEventListener("click", handleWindowClick);
+
+  const handleDeletePopup = (showPopup: boolean) => {
+    confirmationText = "";
+    isshowDeletePopupOpen = showPopup;
+  };
+
+  const handleActivateWorkspacePopup = (showPopup: boolean) => {
+    showActivateWorkspacePopup = showPopup;
+  };
+
+  const handleActivateWorkspace = async (workspaceId: string) => {
     const response = await workspaceInvitePermissonMethods.deleteWorkspace(
       workspace._id,
     );
@@ -86,57 +126,39 @@
       notifications.success(
         `${workspace.name} is removed from ${currActiveTeam.name}`,
       );
-      if (activeWorkspaceBeingDeleted) {
-        handleActivateWorkspacePopup(true);
-      }
-      else{
-        await requestResponseStore.removeTab(workspace._id);
-      }
       onDeleteWorkspace(workspace._id);
+
+      //Activate new workpsace
+      await _viewModel.activateWorkspace(workspaceId);
+      showActivateWorkspacePopup = false;
+      await requestResponseStore.clearTabs();
+      const workspaceObj = workspaces.find(
+        (ws) => ws._id === workspaceId,
+      ) as any;
+
+      const newWorkspaceObj = { ...workspaceObj._data };
+      newWorkspaceObj.isActiveWorkspace = true;
+      newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+      newWorkspaceObj.type = "WORKSPACE";
+      newWorkspaceObj.save = true;
+      newWorkspaceObj.path = {
+        collectionId: "",
+        workspaceId,
+      };
+      newWorkspaceObj.property = {
+        workspace: {
+          requestCount: 0,
+          collectionCount: 0,
+        },
+      };
+      collectionsViewModel.handleCreateTab(newWorkspaceObj);
+      collectionsViewModel.handleActiveTab(workspaceId);
+      navigate("/dashboard/collections");
     } else {
       notifications.error(
         `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
       );
     }
-    handleDeletePopup(false);
-  };
-
-  const handleWindowClick = (event) => {};
-
-  window.addEventListener("click", handleWindowClick);
-
-  const handleDeletePopup = (showPopup: boolean) => {
-    isshowDeletePopupOpen = showPopup;
-  };
-
-  const handleActivateWorkspacePopup = (showPopup: boolean) => {
-    showActivateWorkspacePopup = showPopup;
-  };
-
-  const handleActivateWorkspace = async (workspaceId: string) => {
-    await _viewModel.activateWorkspace(workspaceId);
-    showActivateWorkspacePopup = false;
-    await requestResponseStore.clearTabs();
-    const workspaceObj = workspaces.find((ws) => ws._id === workspaceId) as any;
-    workspaceObj._data.id = workspaceObj?._id;
-    const newWorkspaceObj = workspaceObj._data;
-    newWorkspaceObj.isActiveWorkspace = true;
-    newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
-    newWorkspaceObj.type = "WORKSPACE";
-    newWorkspaceObj.save = true;
-    newWorkspaceObj.path = {
-      collectionId: "",
-      workspaceId,
-    };
-    newWorkspaceObj.property = {
-      workspace: {
-        requestCount: 0,
-        collectionCount: 0,
-      },
-    };
-    collectionsViewModel.handleCreateTab(newWorkspaceObj);
-    collectionsViewModel.handleActiveTab(workspaceId);
-    navigate("/dashboard/collections");
   };
 
   onDestroy(() => {
@@ -283,15 +305,6 @@
       on:input={() => {
         confirmationError = "";
       }}
-      on:blur={() => {
-        if (confirmationText === "") {
-          confirmationError = `Workspace name cannot be empty.`;
-        } else if (confirmationText !== workspace.name) {
-          confirmationError = `Workspace name does not match.`;
-        } else {
-          confirmationError = "";
-        }
-      }}
       class="input-container mt-2 mb-1 {confirmationError
         ? 'error-border'
         : ''}"
@@ -320,21 +333,30 @@
           type={"dark"}
           loader={false}
           onClick={async () => {
+            confirmationError = "";
+            confirmationText = "";
             handleDeletePopup(false);
           }}
         />
         <Button
-          disable={workspaceDeletePopupLoader ||
-            confirmationText !== workspace.name}
+          disable={workspaceDeletePopupLoader}
           title={"Delete Workspace"}
           textStyleProp={"font-size: var(--base-text)"}
           loaderSize={18}
           type={"danger"}
           loader={workspaceDeletePopupLoader}
           onClick={async () => {
-            workspaceDeletePopupLoader = true;
-            await handleDeleteWorkspaceFlow();
-            workspaceDeletePopupLoader = false;
+            confirmationText = confirmationText.replace(/’/g, "'");
+            if (confirmationText === "") {
+              confirmationError = `Workspace name cannot be empty.`;
+            } else if (confirmationText !== workspace.name) {
+              confirmationError = `Workspace name does not match.`;
+            } else {
+              confirmationError = "";
+              workspaceDeletePopupLoader = true;
+              await handleDeleteWorkspaceFlow();
+              workspaceDeletePopupLoader = false;
+            }
           }}
         />
       </div>
@@ -355,6 +377,7 @@
     <p class="role-title mb-0">
       Choose your next active workspace<span class="asterik">*</span>
     </p>
+    <br />
     <Dropdown
       dropDownType={{ type: "text", title: "select" }}
       dropdownId="check-select-workspace"
@@ -367,7 +390,9 @@
         },
         ...teamSpecificWorkspace,
       ]}
-      onclick={handleActivateWorkspace}
+      onclick={async (e) => {
+        await handleActivateWorkspace(e);
+      }}
       staticClasses={[
         {
           id: `check-select-workspace-dropdown-select`,

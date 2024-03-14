@@ -11,7 +11,7 @@
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
-
+  const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
   onMount(async () => {
     try {
       updater = await check();
@@ -36,9 +36,11 @@
       if (updater) {
         await updater.downloadAndInstall();
         notifications.success(
-          "Update Completed. Kindly restart the application.",
+          "Update Completed. Application will restart automatically.",
         );
-        await relaunch();
+        setTimeout(async () => {
+          await relaunch();
+        }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
       notifications.error("Update Failed!");

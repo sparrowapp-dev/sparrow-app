@@ -150,10 +150,9 @@ const makeHttpRequest = async (
   console.table({ url, method, headers, body, request });
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-
+  url = url.trim().replace(/ /g, "%20");
   return Promise.race([
     timeout(apiTimeOut),
-
     invoke("make_http_request", {
       url,
       method,

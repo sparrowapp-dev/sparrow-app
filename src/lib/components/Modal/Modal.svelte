@@ -1,10 +1,12 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
   import { fade, fly } from "svelte/transition";
+  import warningIcon from "$lib/assets/download-warning.svg";
   export let isOpen = false;
   export let title: string;
   export let type: "primary" | "dark" | "danger" = "primary";
   export let canClose = true;
+  export let icon = "";
   /**
    * Takes x-index, recommended values => 1, 100, 1000, 10000, 100000.
    */
@@ -31,7 +33,12 @@
     on:outroend
   >
     <div class="sparrow-modal-header justify-content-between d-flex">
-      <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+      <div class="d-flex ellipsis">
+        {#if icon === "warning"}
+          <img src={warningIcon} height="26px" class="me-2" alt="" />
+        {/if}
+        <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+      </div>
       {#if canClose}
         <button
           class="sparrow-modal-close-icon-btn border-0"
