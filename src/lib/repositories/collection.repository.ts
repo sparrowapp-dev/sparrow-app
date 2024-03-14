@@ -41,6 +41,8 @@ export class CollectionRepository {
       if (data.branches) value.branches = data.branches;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
+      if (data.localRepositoryPath)
+        value.localRepositoryPath = data.localRepositoryPath;
       return value;
     });
 

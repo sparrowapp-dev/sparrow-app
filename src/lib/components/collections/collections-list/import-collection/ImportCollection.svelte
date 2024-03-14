@@ -254,6 +254,7 @@
         response.isSuccessful &&
         isRepositoryPath &&
         repositoryBranch &&
+        repositoryPath &&
         repositoryBranch !== "not exist" &&
         currentBranch
       ) {
@@ -269,6 +270,7 @@
             url: importUrl,
             primaryBranch: repositoryBranch,
             currentBranch: currentBranch,
+            localRepositoryPath: repositoryPath,
           };
           handleImportUrl(requestBody);
         } else {

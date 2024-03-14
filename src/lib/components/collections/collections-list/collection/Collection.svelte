@@ -14,7 +14,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
@@ -38,6 +38,7 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
+  import { invoke } from "@tauri-apps/api/core";
 
   export let title: string;
   export let collection: any;
@@ -310,12 +311,37 @@
   let requestCount: number = 0;
   let folderCount: number = 0;
   let deletedIds: string[] = [];
+
+  const handleBranchSwitch = async () => {
+    const detectBranch = collection?.currentBranch
+      ? collection?.currentBranch
+      : collection?.primaryBranch;
+    const collectionId = collection?.id;
+    const response = await collectionService.switchCollectionBranch(
+      collectionId,
+      detectBranch,
+    );
+    if (response.isSuccessful) {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: response.data.data.items,
+      });
+    } else {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: [],
+      });
+    }
+  };
   $: {
     if (activePath) {
       if (activePath.collectionId === collection.id) {
         visibility = true;
       }
     }
+    // if (collection?.activeSync) {
+    //   handleBranchSwitch();
+    // }
     if (collection) {
       deletedIds.length = [];
       requestCount = 0;
@@ -338,6 +364,11 @@
   }
 
   // delete collection
+  onMount(() => {
+    if (collection?.activeSync) {
+      handleBranchSwitch();
+    }
+  });
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -370,6 +401,32 @@
   let refreshCollectionLoader = false;
   const refetchCollection = async () => {
     if (refreshCollectionLoader) return;
+    const errMessage = `Local reposisitory branch is not set to ${collection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: collection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (collection?.currentBranch) {
+          if (currentBranch !== collection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== collection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
+    }
     refreshCollectionLoader = true;
     const responseJSON = await collectionService.validateImportCollectionURL(
       collection.activeSyncUrl,

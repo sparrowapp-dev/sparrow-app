@@ -118,7 +118,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     collectionId: {
       type: "string",
@@ -142,6 +142,9 @@ export const collectionSchemaLiteral = {
       type: "boolean",
     },
     activeSyncUrl: {
+      type: "string",
+    },
+    localRepositoryPath: {
       type: "string",
     },
     branches: {

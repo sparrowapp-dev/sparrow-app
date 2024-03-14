@@ -22,6 +22,8 @@
   import { CollectionService } from "$lib/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -127,6 +129,32 @@
   let refreshCollectionLoader = false;
   const handleSyncCollection = async () => {
     if (refreshCollectionLoader) return;
+    const errMessage = `Local reposisitory branch is not set to ${currentCollection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (currentCollection?.currentBranch) {
+          if (currentBranch !== currentCollection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== currentCollection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
+    }
     refreshCollectionLoader = true;
     const responseJSON = await _collectionService.validateImportCollectionURL(
       currentCollection.activeSyncUrl,
@@ -309,15 +337,17 @@
         <div class="d-flex flex-row">
           {#if currentCollection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
-              <button
-                disabled={!hasWorkpaceLevelPermission(
+              <Button
+                disable={!hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
-                )}
-                class="btn btn-secondary m-1 rounded border-0 text-align-right py-1"
-                style="max-height:40px"
-                on:click={handleSyncCollection}>Sync Collection</button
-              >
+                ) || refreshCollectionLoader}
+                title={`Sync Collection`}
+                type="dark"
+                loader={refreshCollectionLoader}
+                buttonClassProp={`me-2`}
+                onClick={handleSyncCollection}
+              />
             </div>
           {/if}
 
@@ -355,9 +385,17 @@
               information
             </li>
           </ul>
-          <button class="btn btn-primary" on:click={handleSyncCollection}
-            >Sync Collection</button
-          >
+          <Button
+            disable={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.SAVE_REQUEST,
+            ) || refreshCollectionLoader}
+            title={`Sync Collection`}
+            type="primary"
+            loader={refreshCollectionLoader}
+            buttonClassProp={`me-2`}
+            onClick={handleSyncCollection}
+          />
         </div>
       </div>
     {/if}
