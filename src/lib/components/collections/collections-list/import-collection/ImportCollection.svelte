@@ -201,7 +201,7 @@
           id: Samplecollection.id,
           name: Samplecollection.name,
         });
-        notifications.success("New Collection Created");
+        notifications.success("Collection Imported successfully.");
         MixpanelEvent(Events.IMPORT_COLLECTION, {
           collectionName: response.data.data.name,
           collectionId: response.data.data._id,
@@ -209,6 +209,7 @@
         });
         return;
       } else {
+        notifications.error("Failed to import collection. Please try again.");
         progressBar.isLoading = false;
         isSyntaxError = true;
       }
@@ -254,6 +255,7 @@
         response.isSuccessful &&
         isRepositoryPath &&
         repositoryBranch &&
+        repositoryPath &&
         repositoryBranch !== "not exist" &&
         currentBranch
       ) {
@@ -269,6 +271,7 @@
             url: importUrl,
             primaryBranch: repositoryBranch,
             currentBranch: currentBranch,
+            localRepositoryPath: repositoryPath,
           };
           handleImportUrl(requestBody);
         } else {
@@ -341,8 +344,10 @@
         collectionId: response.data.data._id,
         importThrough: "ByObject",
       });
+      notifications.success("Collection Imported successfully.");
       return;
     } else {
+      notifications.error("Failed to import collection. Please try again.");
       progressBar.isLoading = false;
       isSyntaxError = true;
     }
@@ -392,7 +397,7 @@
           id: Samplecollection.id,
           name: Samplecollection.name,
         });
-        notifications.success("New Collection Created");
+        notifications.success("Collection Imported successfully.");
       }
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
@@ -404,6 +409,7 @@
       });
       return;
     } else {
+      notifications.error("Failed to import collection. Please try again.");
       progressBar.isLoading = false;
       isSyntaxError = true;
     }
