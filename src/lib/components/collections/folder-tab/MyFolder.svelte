@@ -55,7 +55,8 @@
             collection,
             folderId,
           );
-          totalRequest = collectionData.requestCount ?? 0;
+          totalRequest = 0;
+          if (collectionData) totalRequest = collectionData.requestCount ?? 0;
         }
       }
     }

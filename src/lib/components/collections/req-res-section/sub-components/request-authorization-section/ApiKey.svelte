@@ -86,8 +86,10 @@
           focusedInput = "first";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
           const elem = document.getElementById("auth-key");
-          environmentAxisY = elem.getBoundingClientRect().top + 30;
-          environmentAxisX = elem.getBoundingClientRect().left;
+          if (elem) {
+            environmentAxisY = elem.getBoundingClientRect().top + 30;
+            environmentAxisX = elem.getBoundingClientRect().left;
+          }
         }}
       />
       {#if focusedInput === "first" && trackParanthesis.length === 2 && filterData.length > 0}
@@ -145,8 +147,10 @@
           focusedInput = "second";
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
           const elem = document.getElementById("auht-value");
-          environmentAxisY = elem.getBoundingClientRect().top + 30;
-          environmentAxisX = elem.getBoundingClientRect().left;
+          if (elem) {
+            environmentAxisY = elem.getBoundingClientRect().top + 30;
+            environmentAxisX = elem.getBoundingClientRect().left;
+          }
         }}
       />
       {#if focusedInput === "second" && trackParanthesis.length === 2 && filterData.length > 0}
@@ -179,17 +183,17 @@
       <button class="bg-backgroundColor border-0">
         <p class="">
           <Dropdown
-           dropDownType={{type:"text",title:apiData.addTo}}
+            dropDownType={{ type: "text", title: apiData.addTo }}
             data={[
               {
                 name: "Header",
                 id: AuthSection.HEADER,
-                dynamicClasses:"text-whiteColor"
+                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Query Parameter",
                 id: AuthSection.QUERY_PARAMETER,
-                dynamicClasses:"text-whiteColor"
+                dynamicClasses: "text-whiteColor",
               },
             ]}
             onclick={handleDropdown}

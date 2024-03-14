@@ -280,8 +280,10 @@
   let handleFocusValue = () => {
     handleInputValue();
     const elem = document.getElementById("input-request-url");
-    environmentAxisY = elem.getBoundingClientRect().top + 40;
-    environmentAxisX = elem.getBoundingClientRect().left;
+    if (elem) {
+      environmentAxisY = elem.getBoundingClientRect().top + 40;
+      environmentAxisX = elem.getBoundingClientRect().left;
+    }
   };
   let handleBlurValue = () => {
     setTimeout(() => {

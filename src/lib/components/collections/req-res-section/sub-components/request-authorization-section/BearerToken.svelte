@@ -73,8 +73,10 @@
           tempText = bearerToken;
           trackParanthesis = environmentHelper.balanceParanthesis(tempText);
           const elem = document.getElementById("bearer-token-key");
-          environmentAxisY = elem.getBoundingClientRect().top + 30;
-          environmentAxisX = elem.getBoundingClientRect().left;
+          if (elem) {
+            environmentAxisY = elem.getBoundingClientRect().top + 30;
+            environmentAxisX = elem.getBoundingClientRect().left;
+          }
         }}
       />
       {#if trackParanthesis.length === 2 && filterData.length > 0}
