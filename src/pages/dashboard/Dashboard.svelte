@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Route } from "svelte-navigator";
+  import { Route, navigate } from "svelte-navigator";
   import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
   import Navigate from "../../routing/Navigate.svelte";
   import HeaderDashboard from "$lib/components/header/header-dashboard/HeaderDashboard.svelte";
@@ -80,6 +80,11 @@
             userWorkspaceLevelRole.set(user.role);
           }
         });
+      } else {
+        currentWorkspace = {
+          id: "",
+          name: "",
+        };
       }
     },
   );
@@ -101,13 +106,14 @@
       if (value) {
         activeSidbarTabRxDoc = value;
         activeSidebarTabName = activeSidbarTabRxDoc.get("activeTabName");
+        navigate(activeSidebarTabName);
       } else {
         await activeSideBarTabMethods.addActiveTab("workspaces");
       }
     },
   );
 
-  const handleWorkspaceSwitch = (
+  const handleWorkspaceSwitch = async (
     workspaceId: string,
     workspaceName: string,
     teamId: string,
@@ -115,7 +121,7 @@
     base64String: object,
   ) => {
     isWorkspaceLoaded.set(false);
-    _viewModelWorkspace.activateWorkspace(workspaceId);
+    await _viewModelWorkspace.activateWorkspace(workspaceId);
     isWorkspaceCreatedFirstTime.set(false);
     isWorkspaceLoaded.set(true);
   };

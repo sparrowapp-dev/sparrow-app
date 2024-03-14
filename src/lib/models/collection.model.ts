@@ -46,7 +46,14 @@ const requestItems = {
   selectedRequestBodyType: {
     type: "string",
   },
+  selectedRequestAuthType: {
+    type: "string",
+  },
   queryParams: {
+    type: "array",
+    properties: params,
+  },
+  auth: {
     type: "array",
     properties: params,
   },

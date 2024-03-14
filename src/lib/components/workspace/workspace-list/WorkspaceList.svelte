@@ -52,7 +52,6 @@
 
 <style>
   .sidebar {
-    width: 280px;
     height: calc(100vh - 44px);
   }
 </style>

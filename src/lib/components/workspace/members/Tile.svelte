@@ -301,7 +301,7 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
@@ -366,7 +366,7 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
@@ -443,15 +443,6 @@
     on:input={() => {
       confirmationError = "";
     }}
-    on:blur={() => {
-      if (confirmationText === "") {
-        confirmationError = `Team name cannot be empty.`;
-      } else if (confirmationText !== openTeam?.name) {
-        confirmationError = `Team name does not match.`;
-      } else {
-        confirmationError = "";
-      }
-    }}
     class="input-container rounded w-100 p-2 mt-2 mb-1 {confirmationError
       ? 'error-border'
       : ''}"
@@ -465,24 +456,31 @@
     class="d-flex align-items-center justify-content-between gap-3 mt-1 pb-3 mb-0 rounded"
     style="font-size: 16px;"
   >
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ellipsis">
       {#if openTeam?.logo}
         <img class="team-icon me-2" src={base64ToURL(openTeam?.logo)} alt="" />
       {/if}
       <p style="font-size:16px;" class="mb-0">{openTeam?.name}</p>
     </div>
     <Button
-      disable={memberOwnershipPopupLoader ||
-        confirmationText !== openTeam?.name}
+      disable={memberOwnershipPopupLoader}
       title={"Update Access"}
       textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberOwnershipPopupLoader}
       onClick={() => {
-        memberOwnershipPopupLoader = true;
-        handleMemberOwnershipPopUpSuccess();
-        memberOwnershipPopupLoader = false;
+        confirmationText = confirmationText.replace(/’/g, "'");
+        if (confirmationText === "") {
+          confirmationError = `Team name cannot be empty.`;
+        } else if (confirmationText !== openTeam?.name) {
+          confirmationError = `Team name does not match.`;
+        } else {
+          confirmationError = "";
+          memberOwnershipPopupLoader = true;
+          handleMemberOwnershipPopUpSuccess();
+          memberOwnershipPopupLoader = false;
+        }
       }}
     />
   </div>
@@ -519,6 +517,7 @@
     {getPermissionsData}
   />
 </ModalWrapperV1>
+
 <div class="d-flex tile rounded align-items-center">
   <div
     class="info d-flex align-items-center"

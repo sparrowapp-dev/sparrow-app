@@ -85,14 +85,16 @@ export class WorkspaceService {
   };
 
   public getUserDetailsOfWorkspace = async (workspaceId: string) => {
-    const response = await makeRequest(
-      "GET",
-      `${apiUrl}/api/workspace/${workspaceId}/users`,
-      {
-        headers: getAuthHeaders(),
-      },
-    );
-    return response;
+    if (workspaceId) {
+      const response = await makeRequest(
+        "GET",
+        `${apiUrl}/api/workspace/${workspaceId}/users`,
+        {
+          headers: getAuthHeaders(),
+        },
+      );
+      return response;
+    }
   };
 
   public changeUserRoleAtWorkspace = async (
