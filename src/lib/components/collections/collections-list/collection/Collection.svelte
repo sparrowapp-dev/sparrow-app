@@ -39,6 +39,7 @@
   import { CommonService } from "$lib/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
   import { invoke } from "@tauri-apps/api/core";
+  import gitBranchIcon from "$lib/assets/git-branch.svg";
 
   export let title: string;
   export let collection: any;
@@ -401,7 +402,7 @@
   let refreshCollectionLoader = false;
   const refetchCollection = async () => {
     if (refreshCollectionLoader) return;
-    const errMessage = `Local reposisitory branch is not set to ${collection?.currentBranch}.`;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
     try {
       const activeResponse = await invoke("get_git_active_branch", {
         path: collection?.localRepositoryPath,
@@ -450,9 +451,9 @@
           collection.id,
           response.data.data.collection,
         );
-        notifications.success("Collection fetched successfully.");
+        notifications.success("Collection synced.");
       } else {
-        notifications.error("Failed to fetch the Collection.");
+        notifications.error("Failed to sync the collection. Please try again.");
       }
     } else {
       notifications.error(
@@ -591,7 +592,8 @@
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
-            >{collection?.currentBranch
+            ><img src={gitBranchIcon} alt="" />
+            {collection?.currentBranch
               ? collection?.currentBranch
               : collection?.primaryBranch}
             {collection?.currentBranch

@@ -129,7 +129,7 @@
   let refreshCollectionLoader = false;
   const handleSyncCollection = async () => {
     if (refreshCollectionLoader) return;
-    const errMessage = `Local reposisitory branch is not set to ${currentCollection?.currentBranch}.`;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${currentCollection?.currentBranch}.`;
     try {
       const activeResponse = await invoke("get_git_active_branch", {
         path: currentCollection?.localRepositoryPath,
@@ -178,9 +178,9 @@
           currentCollection?.id,
           response.data.data.collection,
         );
-        notifications.success("Collection synced successfully.");
+        notifications.success("Collection synced.");
       } else {
-        notifications.error("Failed to sync the Collection.");
+        notifications.error("Failed to sync the collection. Please try again.");
       }
     } else {
       notifications.error(
@@ -233,15 +233,13 @@
         currentBranch: branch,
         items: response.data.data.items,
       });
-
-      isSynced = true;
     } else {
       collectionsMethods.updateCollection(currentCollection?.id, {
         currentBranch: branch,
         items: [],
       });
-      isSynced = false;
     }
+    notifications.success("Branch switched successfully.");
   };
   const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {

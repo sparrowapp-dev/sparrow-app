@@ -79,10 +79,12 @@
         {tab.name}
       </span>
       {#if tab?.property?.request && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
-        <span
-          class="position-absolute"
-          style="right:0; top:6px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
-        />
+        {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+          <span
+            class="position-absolute"
+            style="right:0; top:6px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+          />
+        {/if}
       {/if}
     </button>
 

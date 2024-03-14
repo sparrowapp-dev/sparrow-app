@@ -18,6 +18,7 @@
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
 
   export let name: string;
   export let id: string;
@@ -363,6 +364,9 @@
       ? 'unclickable'
       : ''}"
   >
+    {#if actSync && !isDeleted && source === "SPEC"}
+      <img src={reloadSyncIcon} class="ms-2" alt="" />
+    {/if}
     <div class="api-method text-{getMethodStyle(method)}">
       {method?.toUpperCase()}
     </div>
