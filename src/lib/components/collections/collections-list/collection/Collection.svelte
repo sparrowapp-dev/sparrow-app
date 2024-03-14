@@ -84,6 +84,10 @@
       currentWorkspaceId,
       collectionId,
       {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
         name: folder.name,
         description: folder.description,
       },
@@ -138,6 +142,10 @@
     const requestObj = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
+      currentBranch: collection?.currentBranch
+        ? collection?.currentBranch
+        : collection?.primaryBranch,
+      source: "USER",
       items: {
         name: request.name,
         type: request.type,
@@ -656,6 +664,8 @@
         {activeTabId}
         {activePath}
         activeSync={collection?.activeSync}
+        currentBranch={collection?.currentBranch}
+        primaryBranch={collection?.primaryBranch}
       />
     {/each}
     {#if showFolderAPIButtons}

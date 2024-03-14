@@ -47,6 +47,8 @@
   export let activeTabId: string;
   export let activePath;
   export let activeSync = false;
+  export let currentBranch;
+  export let primaryBranch;
   const collectionService = new CollectionService();
 
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -72,6 +74,8 @@
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
+      currentBranch: currentBranch ? currentBranch : primaryBranch,
+      source: "USER",
       folderId: explorer.id,
       items: {
         name: explorer.name,
@@ -465,6 +469,8 @@
           {collectionsMethods}
           {activeTabId}
           {activeSync}
+          {currentBranch}
+          {primaryBranch}
         />
       {/each}
       {#if showFolderAPIButtons}
