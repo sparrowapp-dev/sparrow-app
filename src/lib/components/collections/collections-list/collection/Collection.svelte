@@ -653,6 +653,7 @@
         {visibility}
         {activeTabId}
         {activePath}
+        activeSync={collection?.activeSync}
       />
     {/each}
     {#if showFolderAPIButtons}

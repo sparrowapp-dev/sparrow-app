@@ -46,7 +46,7 @@
   export let visibility;
   export let activeTabId: string;
   export let activePath;
-
+  export let activeSync = false;
   const collectionService = new CollectionService();
 
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -464,6 +464,7 @@
           {currentWorkspaceId}
           {collectionsMethods}
           {activeTabId}
+          {activeSync}
         />
       {/each}
       {#if showFolderAPIButtons}
@@ -504,6 +505,7 @@
       name={explorer.name}
       id={explorer.id}
       {activeTabId}
+      {activeSync}
     />
   </div>
 {/if}

@@ -146,6 +146,9 @@ export interface NewTab {
     | ItemType.REQUEST
     | ItemType.WORKSPACE;
   description: string;
+  isDeleted: boolean;
+  activeSync: boolean;
+  source: string;
   property: {
     request?: Request;
     collection?: Collection;

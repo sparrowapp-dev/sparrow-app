@@ -265,7 +265,10 @@
                 !hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
-                )}
+                ) ||
+                (componentData?.source === "SPEC" &&
+                  componentData?.activeSync &&
+                  !componentData?.isDeleted)}
               style="width:140px;"
               class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
               on:click={() => {
@@ -298,6 +301,9 @@
           </Tooltip>
           <span class="position-relative" style="width:35px;">
             <Dropdown
+              disabled={componentData?.source === "SPEC" &&
+                componentData?.activeSync &&
+                !componentData?.isDeleted}
               dropdownId={"saveAsDropdown"}
               dropDownType={{ type: "img", title: angleDown }}
               data={[

@@ -28,6 +28,7 @@
   export let api;
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
+  export let activeSync = false;
 
   let showPath = false;
   let isFilePopup: boolean = false;
@@ -46,7 +47,10 @@
     queryParams,
     type,
     description,
-    selectedRequestBodyType;
+    selectedRequestBodyType,
+    actSync,
+    isDeleted,
+    source;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -66,6 +70,9 @@
     if (method) request.property.request.method = method;
     if (queryParams) request.property.request.queryParams = queryParams;
     if (headers) request.property.request.headers = headers;
+    if (actSync) request.activeSync = actSync;
+    if (isDeleted) request.isDeleted = isDeleted;
+    if (source === "SPEC") request.source = source;
     if (selectedRequestBodyType)
       request = setBodyType(request, selectedRequestBodyType);
     request.property.request.save.api = true;
@@ -87,6 +94,9 @@
       type = api.request?.type;
       description = api.description;
       selectedRequestBodyType = api.request?.selectedRequestBodyType;
+      actSync = activeSync;
+      isDeleted = api?.isDeleted;
+      source = api?.source;
     }
   }
 
