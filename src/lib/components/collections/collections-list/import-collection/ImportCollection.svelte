@@ -780,8 +780,6 @@
         {/if}</span
       > Import Collection</button
     >
-    <p class="importData-whiteColor mb-2 sparrow-fs-14 fw-bold">OR</p>
-
     {#if isDataEmpty && !importData}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please Paste or Upload your file in order to import the workspace
