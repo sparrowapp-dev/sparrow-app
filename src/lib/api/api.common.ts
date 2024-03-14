@@ -86,6 +86,7 @@ const makeRequest = async (
   method: Method,
   url: string,
   requestData?: RequestData,
+  includeAxiosData?: boolean,
 ) => {
   isLoading.set(true);
   try {
@@ -97,7 +98,11 @@ const makeRequest = async (
     });
 
     if (response.status === 201 || response.status === 200) {
-      return success(response.data, "");
+      if (includeAxiosData) {
+        return success(response, "");
+      } else {
+        return success(response.data, "");
+      }
     } else {
       return error(response.data.message);
     }
