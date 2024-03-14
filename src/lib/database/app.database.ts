@@ -142,7 +142,13 @@ export class RxDB {
         schema: collectionSchema,
         migrationStrategies: {
           // database  migration functions
-          1: function (oldDoc: TabDocument) {
+          1: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
           2: function (oldDoc: TabDocument) {

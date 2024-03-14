@@ -13,22 +13,39 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { CollectionService } from "$lib/services/collection.service";
+  import {
+    debounce,
+    isUrlValid,
+    validateClientJSON,
+    validateClientURL,
+    validateClientXML,
+  } from "../collection/collection-utils/utils";
+  import linkIcon from "$lib/assets/linkIcon.svg";
+  import { invoke } from "@tauri-apps/api/core";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
+  export let isurl = false;
   export let collectionsMethods: CollectionsMethods;
   export let onClick: (flag: boolean) => void;
   const _viewImportCollection = new ImportCollectionViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
+  const _collectionService = new CollectionService();
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
     FETCHING_DATA: "Fetching Data...",
   };
 
+  let isInputDataTouched = false;
   let isDataEmpty: boolean = false;
   let isSyntaxError: boolean = false;
   let importData: string = "";
+  let importType: string = "text";
+  let activeSync = false;
 
   let progressBar = {
     isLoading: false,
@@ -40,8 +57,51 @@
     isSyntaxError = false;
     isDataEmpty = false;
   };
-  const handleInputField = (e) => {
-    importData = e.target.value;
+
+  let isValidClientURL = false,
+    isValidClientJSON = false,
+    isValidClientXML = false;
+
+  let isValidServerURL = false,
+    isValidServerJSON = false,
+    isValidServerXML = false;
+
+  const handleInputField = async () => {
+    isValidClientURL = false;
+    isValidClientJSON = false;
+    isValidClientXML = false;
+    isValidServerURL = false;
+    isValidServerJSON = false;
+    isValidServerXML = false;
+
+    if (validateClientURL(importData)) {
+      isValidClientURL = true;
+      const response = await _collectionService.validateImportCollectionURL(
+        importData.replace("localhost", "127.0.0.1") + "-json",
+      );
+      if (response.isSuccessful) {
+        isValidServerURL = true;
+      }
+    } else if (validateClientJSON(importData)) {
+      isValidClientJSON = true;
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidServerJSON = true;
+      }
+    } else {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidClientXML = true;
+        isValidServerXML = true;
+      }
+    }
+    isInputDataTouched = true;
   };
   let uploadCollection = {
     file: {
@@ -122,7 +182,10 @@
           items: response.data.data.items,
           createdAt: response.data.data.createdAt,
         };
-        collectionsMethods.addCollection(newCollection);
+        collectionsMethods.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+        });
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
           new Date().toString(),
@@ -152,20 +215,79 @@
     }
   }
 
-  const handleImport = () => {
-    if (importData) {
-      handleImportJsonObject();
-      return;
+  const validateJSON = (data) => {
+    return _viewImportCollection.validateImportBody(data);
+  };
+  const handleImport = async () => {
+    isInputDataTouched = true;
+    if (activeSync) {
+      isRepositoryPathTouched = true;
     }
-    if (uploadCollection?.file?.value?.length !== 0) {
+    if (isRepositoryPath) {
+      isRepositoryBranchTouched = true;
+    }
+    if (
+      importType === "text" &&
+      importData &&
+      ((isValidClientJSON && isValidServerJSON) ||
+        (isValidClientXML && isValidServerXML))
+    ) {
+      const contentType = validateJSON(importData);
+      handleImportJsonObject(contentType);
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientURL &&
+      isValidServerURL
+    ) {
+      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const response =
+        await _collectionService.validateImportCollectionURL(importUrl);
+      if (!activeSync && response.isSuccessful) {
+        const requestBody = {
+          urlData: response.data,
+          url: importUrl,
+        };
+        handleImportUrl(requestBody);
+      } else if (
+        activeSync &&
+        response.isSuccessful &&
+        isRepositoryPath &&
+        repositoryBranch &&
+        repositoryBranch !== "not exist" &&
+        currentBranch
+      ) {
+        if (
+          getBranchList
+            .map((elem) => {
+              return elem.name;
+            })
+            .includes(currentBranch)
+        ) {
+          const requestBody = {
+            urlData: response.data,
+            url: importUrl,
+            primaryBranch: repositoryBranch,
+            currentBranch: currentBranch,
+          };
+          handleImportUrl(requestBody);
+        } else {
+          notifications.error(
+            `Can't import local branch. Please push ${currentBranch} to remote first.`,
+          );
+        }
+      }
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length !== 0
+    ) {
       handleFileUpload(uploadCollection?.file?.value);
       return;
     }
     isDataEmpty = true;
   };
 
-  const handleImportJsonObject = async () => {
-    const contentType = _viewImportCollection.validateImportBody(importData);
+  const handleImportJsonObject = async (contentType) => {
     if (!contentType) {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -193,7 +315,10 @@
         items: response.data.data.items,
         createdAt: response.data.data.createdAt,
       };
-      collectionsMethods.addCollection(newCollection);
+      collectionsMethods.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+      });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
         new Date().toString(),
@@ -222,6 +347,121 @@
       isSyntaxError = true;
     }
   };
+
+  const handleImportUrl = async (requestBody) => {
+    progressBar.isLoading = true;
+    progressBar.isProgress = false;
+    progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+    const response = await _viewImportCollection.importCollectionData(
+      currentWorkspaceId,
+      requestBody,
+      activeSync,
+    );
+
+    if (response.isSuccessful) {
+      progressBar.title = ProgressTitle.FETCHING_DATA;
+
+      progressBar.isProgress = true;
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data.collection._id,
+      };
+      const Samplecollection = generateSampleCollection(
+        response.data.data._id,
+        new Date().toString(),
+      );
+
+      Samplecollection.id = response.data.data.collection._id;
+      Samplecollection.path = path;
+      Samplecollection.name = response.data.data.collection.name;
+      Samplecollection.save = true;
+      if (response.data.data.existingCollection) {
+        collectionsMethods.updateCollection(response.data.data.collection._id, {
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
+        });
+        notifications.error("Collection already exists.");
+      } else {
+        collectionsMethods.addCollection({
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
+        });
+        _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+          id: Samplecollection.id,
+          name: Samplecollection.name,
+        });
+        notifications.success("New Collection Created");
+      }
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
+
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.collection.name,
+        collectionId: response.data.data.collection._id,
+        importThrough: "ByObject",
+      });
+      return;
+    } else {
+      progressBar.isLoading = false;
+      isSyntaxError = true;
+    }
+  };
+  let repositoryPath = "";
+  let isRepositoryPath = false;
+  let isRepositoryPathTouched = false;
+  let getBranchList = [];
+  const uploadFormFile = async () => {
+    const filePathResponse: string = await invoke("fetch_folder_command");
+    if (filePathResponse !== "Canceled") {
+      await extractGitBranch(filePathResponse);
+    }
+  };
+
+  const extractGitBranch = async (filePathResponse) => {
+    repositoryPath = "";
+    currentBranch = "";
+    getBranchList = [];
+    isRepositoryPath = false;
+
+    repositoryPath = filePathResponse;
+    try {
+      const response = await invoke("get_git_branches", {
+        path: repositoryPath,
+      });
+      if (response) {
+        getBranchList = response
+          .filter((elem) => {
+            if (elem.includes("upstream/")) return false;
+            else if (elem.includes("origin/HEAD")) return false;
+            return true;
+          })
+          .map((elem) => {
+            return {
+              name: elem.replace("origin/", ""),
+              id: elem.replace("origin/", ""),
+            };
+          });
+        isRepositoryPath = true;
+        const activeResponse = await invoke("get_git_active_branch", {
+          path: repositoryPath,
+        });
+        if (activeResponse) {
+          currentBranch = activeResponse;
+        }
+      }
+    } catch (e) {}
+  };
+
+  let repositoryBranch = "not exist";
+  let currentBranch = "";
+  let isRepositoryBranchTouched = false;
+  let handleDropdown = (tabId: string) => {
+    isRepositoryBranchTouched = true;
+    repositoryBranch = tabId;
+  };
+  const debouncedImport = debounce(handleInputField, 1000);
 </script>
 
 {#if progressBar.isLoading}
@@ -277,39 +517,247 @@
   isOpen={!progressBar.isLoading && !isSyntaxError}
   handleModalState={onClick}
 >
-  <div class="importData-lightGray sparrow-fs-14">
-    <p>Paste your YAML/JSON file</p>
+  <div class="d-flex">
+    <div class="form-check flex-grow-1">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="flexRadioDefault"
+        id="flexRadioDefault1"
+        value="text"
+        bind:group={importType}
+      />
+      <label class="form-check-label" for="flexRadioDefault1">
+        Paste Text
+      </label>
+    </div>
+    <div class="form-check flex-grow-1">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="flexRadioDefault"
+        id="flexRadioDefault2"
+        value="file"
+        bind:group={importType}
+      />
+      <label class="form-check-label" for="flexRadioDefault2">
+        Upload File
+      </label>
+    </div>
   </div>
-  <div class="textarea-div rounded border-0">
-    <textarea
-      on:input={(e) => handleInputField(e)}
-      bind:value={importData}
-      class="form-control border-0 rounded bg-blackColor"
-    />
-  </div>
-  <div class="importData-lightGray sparrow-fs-14">
-    <p class="mb-1">Drag and drop your YAML/JSON file</p>
-  </div>
-  <div>
-    <DragDrop
-      value={uploadCollection.file.value}
-      maxFileSize={100}
-      onChange={handleLogoInputChange}
-      resetValue={handleLogoReset}
-      editValue={handleLogoEdit}
-      labelText=""
-      labelDescription="Drag and drop your YAML/JSON file"
-      inputId="upload-collection-file-input"
-      inputPlaceholder="Drag and Drop or"
-      isRequired={false}
-      supportedFileTypes={[".yaml", ".json"]}
-      showFileSizeError={uploadCollection.file.showFileSizeError}
-      showFileTypeError={uploadCollection.file.showFileTypeError}
-      type={"file"}
-      fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
-      fileSizeError="The size of the file you are trying to upload is more than 100 KB."
-    />
-  </div>
+  <br />
+  {#if importType === "text"}
+    <div class="importData-lightGray sparrow-fs-14 text-muted">
+      <p>Paste your OAS text or Swagger/Localhost Link</p>
+    </div>
+    <div class="textarea-div rounded border-0">
+      <textarea
+        on:input={() => {
+          debouncedImport();
+        }}
+        on:blur={() => {
+          isInputDataTouched = true;
+        }}
+        bind:value={importData}
+        class="form-control mb-1 border-0 rounded bg-blackColor"
+      />
+    </div>
+    {#if !importData && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please paste your OpenAPI specification text or Swagger/localhost link.
+      </p>
+    {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Unable to process the specified Swagger link. Please verify the URL for
+        accuracy and accessibility. If the problem persists, contact the API
+        provider for assistance.
+      </p>
+    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        We have identified that text you pasted is not written in Open API
+        Specification (OAS). Please visit https://swagger.io/specification/ for
+        more information on OAS.
+      </p>
+    {/if}
+  {/if}
+
+  {#if importType === "file"}
+    <div class="importData-lightGray sparrow-fs-14">
+      <p class="mb-1">Drag and drop your YAML/JSON file</p>
+    </div>
+    <div>
+      <DragDrop
+        value={uploadCollection.file.value}
+        maxFileSize={100}
+        onChange={handleLogoInputChange}
+        resetValue={handleLogoReset}
+        editValue={handleLogoEdit}
+        labelText=""
+        labelDescription="Drag and drop your YAML/JSON file"
+        inputId="upload-collection-file-input"
+        inputPlaceholder="Drag and Drop or"
+        isRequired={false}
+        supportedFileTypes={[".yaml", ".json"]}
+        showFileSizeError={uploadCollection.file.showFileSizeError}
+        showFileTypeError={uploadCollection.file.showFileTypeError}
+        type={"file"}
+        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+      />
+    </div>
+  {/if}
+  {#if isValidClientURL && isValidServerURL}
+    <div>
+      <div>
+        <small class="text-textColor sparrow-fs-12"
+          >This link supports Active Sync.</small
+        >
+      </div>
+      <div class="form-check form-switch ps-0">
+        <div class="d-flex justify-content-between">
+          <span class="sparrow-fs-14">Enable Active Sync</span>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            bind:checked={activeSync}
+            id="enableActiveSync"
+          />
+        </div>
+      </div>
+      <div>
+        <small class="text-textColor sparrow-fs-12"
+          >Enabling Active Sync auto-updates APIs via Swagger Link.</small
+        >
+      </div>
+      <div class="d-flex align-items-center gap-2 pb-2">
+        <img src={linkIcon} alt="" />
+        <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
+          >Learn more about Active Sync</a
+        >
+      </div>
+      {#if activeSync}
+        <!-- Local repository path -->
+        <div>
+          <p class="sparrow-fs-14 mb-1">
+            Paste or browse local repository path <span class="asterik">*</span>
+          </p>
+          <div class="pb-2">
+            <small class="sparrow-fs-12 text-textColor"
+              >The repository location is required to track your branch.</small
+            >
+          </div>
+          <div class="d-flex justify-content-between pb-2">
+            <input
+              class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
+              type="text"
+              style="width:80%;"
+              placeholder="Paste or browse path"
+              bind:value={repositoryPath}
+              on:input={() => {
+                extractGitBranch(repositoryPath);
+              }}
+              on:blur={() => {
+                isRepositoryPathTouched = true;
+              }}
+            />
+            <Button
+              disable={false}
+              title={"Browse"}
+              textStyleProp={"font-size: var(--base-text);"}
+              type={"dark"}
+              loader={false}
+              onClick={async () => {
+                await uploadFormFile();
+                isRepositoryPathTouched = true;
+              }}
+            />
+          </div>
+          {#if !repositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Please paste or browse local repository path.
+              </p>
+            </div>
+          {:else if !isRepositoryPath && isRepositoryPathTouched}
+            <div>
+              <p
+                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+              >
+                Repository is not found at the provided location. Please ensure
+                that the path is accurate and accessible.
+              </p>
+            </div>
+          {/if}
+        </div>
+        {#if isRepositoryPath}
+          <div>
+            <div>
+              <p class="sparrow-fs-14 mb-1">
+                Select Primary Branch <span class="asterik">*</span>
+              </p>
+              <div class="pb-2">
+                <small class="sparrow-fs-12 text-textColor"
+                  >The selected primary branch is considered the default branch.</small
+                >
+              </div>
+
+              <div class="bg-blackColor rounded">
+                <Dropdown
+                  dropdownId={"hashfref129"}
+                  data={[
+                    {
+                      name: "None",
+                      id: "not exist",
+                    },
+                    ...getBranchList,
+                  ]}
+                  additionalType={"branch"}
+                  onclick={handleDropdown}
+                  dropDownType={{ type: "text", title: repositoryBranch }}
+                  staticClasses={[
+                    {
+                      id: "hashfref129-options-container",
+                      classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
+                    },
+                  ]}
+                  hoverClasses={[
+                    {
+                      id: "hashfref129-btn-div",
+                      classToAdd: ["border-bottom", "border-labelColor"],
+                    },
+                  ]}
+                  staticCustomStyles={[
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "height",
+                      styleValue: "140px",
+                    },
+                    {
+                      id: "hashfref129-options-container",
+                      styleKey: "overflowY",
+                      styleValue: "auto",
+                    },
+                  ]}
+                ></Dropdown>
+              </div>
+              {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
+                <div>
+                  <p
+                    class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+                  >
+                    Please select primary branch.
+                  </p>
+                </div>
+              {/if}
+            </div>
+          </div>
+        {/if}
+      {/if}
+    </div>
+  {/if}
 
   <div
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
@@ -326,6 +774,7 @@
         {/if}</span
       > Import Collection</button
     >
+    <p class="importData-whiteColor mb-2 sparrow-fs-14 fw-bold">OR</p>
 
     {#if isDataEmpty && !importData}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
@@ -402,6 +851,14 @@
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+  }
+  .learn-active-link {
+    color: var(--primary-btn-color) !important;
+    text-decoration: none;
+  }
+  .asterik {
+    color: var(--dangerColor);
+    margin-left: 4px;
   }
   .invalid-type-content {
     .format-types-container {

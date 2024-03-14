@@ -43,6 +43,7 @@
   export let environments = [];
   export let runAnimation: boolean = false;
   let isImportCollectionPopup = false;
+  let isImportCurlPopup = false;
   export let changeAnimation: () => void;
   const _colllectionListViewModel = new CollectionListViewModel();
   const _workspaceViewModel = new HeaderDashboardViewModel();
@@ -63,6 +64,8 @@
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   import List from "$lib/components/list/List.svelte";
+  import ImportCurl from "./import-curl/ImportCurl.svelte";
+
   const [, , searchNode] = useTree();
   let collection: any[];
   let currentWorkspaceId: string = "";
@@ -207,6 +210,10 @@
   createCollectionSource.subscribe((value) => {
     collectionSource = value;
   });
+
+  const handleImportCurlPopup = (flag: boolean) => {
+    isImportCurlPopup = flag;
+  };
 
   let collectionUnderCreation: boolean = false;
   const handleCreateCollection = async () => {
@@ -379,6 +386,8 @@
   const handleRequestClick = (id: string) => {
     if (id === "apiRequest") {
       addApiRequest();
+    } else if (id === "importcURL") {
+      isImportCurlPopup = true;
     } else {
       isImportCollectionPopup = true;
     }
@@ -553,6 +562,11 @@
               id: "apiRequest",
               dynamicClasses: "text-whiteColor mt-1",
             },
+            {
+              name: "Import via cURL",
+              id: "importcURL",
+              dynamicClasses: "text-whiteColor mt-1",
+            },
           ]}
           onclick={handleRequestClick}
           staticClasses={[
@@ -675,6 +689,9 @@
     {currentWorkspaceId}
     {collectionsMethods}
   />
+{/if}
+{#if isImportCurlPopup}
+  <ImportCurl onClick={handleImportCurlPopup} {collectionsMethods} />
 {/if}
 
 <style>
