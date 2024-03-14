@@ -60,10 +60,10 @@
   });
 </script>
 
-<div id="code-editor" bind:this={codeMirrorEditorDiv} />
+<div id="request-code-editor" bind:this={codeMirrorEditorDiv} />
 
 <style>
-  #code-editor {
+  #request-code-editor {
     width: 100%;
     height: calc(100vh - 360px);
     margin-right: 1%;

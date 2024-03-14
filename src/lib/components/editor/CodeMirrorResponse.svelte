@@ -58,14 +58,18 @@
     if (formatter === ResponseFormatter.PRETTY) {
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
-        rawValue = JSON.stringify(JSON.parse(rawValue), null, 2);
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: rawValue,
-          },
-        });
+        try {
+          rawValue = JSON.stringify(JSON?.parse(rawValue), null, 2);
+          codeMirrorView.dispatch({
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: rawValue,
+            },
+          });
+        } catch (error) {
+          console.log("invalid json");
+        }
       }
     } else {
       codeMirrorView.dispatch({
@@ -84,10 +88,10 @@
   });
 </script>
 
-<div id="code-editor" bind:this={codeMirrorEditorDiv} />
+<div id="response-code-editor" bind:this={codeMirrorEditorDiv} />
 
 <style>
-  #code-editor {
+  #response-code-editor {
     width: 100%;
     height: calc(100vh - 360px);
     margin-left: 1%;
