@@ -208,13 +208,13 @@
           description: "Select role",
           color: "whiteColor",
         },
-        {
-          name: "Admin",
-          id: WorkspaceRole.WORKSPACE_ADMIN,
-          description:
-            "Add & edit resources within a workspace,add & remove members to workspace",
-          color: "whiteColor",
-        },
+        // {
+        //   name: "Admin",
+        //   id: WorkspaceRole.WORKSPACE_ADMIN,
+        //   description:
+        //     "Add & edit resources within a workspace,add & remove members to workspace",
+        //   color: "whiteColor",
+        // },
         {
           name: "Editor",
           id: WorkspaceRole.WORKSPACE_EDITOR,

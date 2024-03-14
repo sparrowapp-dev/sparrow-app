@@ -121,6 +121,8 @@
     }
     if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
       workspaceError = true;
+    } else {
+      workspaceError = false;
     }
   };
 
@@ -212,6 +214,7 @@
       teamSpecificWorkspace.forEach((elem: any) => {
         elem.checked = isAllSelectedCheck;
       });
+      checkInviteValidation();
     } else {
       teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
         if (elem?.id === id) {
