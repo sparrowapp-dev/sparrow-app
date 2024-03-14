@@ -11,7 +11,10 @@
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import type { TabDocument } from "$lib/database/app.database";
+  import type {
+    TabDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { onDestroy } from "svelte";
   import SaveRequest from "../save-request/SaveRequest.svelte";
@@ -21,6 +24,7 @@
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { Observable } from "rxjs";
 
   export let collectionsMethods: CollectionsMethods;
   export let onTabsSwitched: () => void;
@@ -31,6 +35,19 @@
   let movedTabStartIndex: number;
   let movedTabEndIndex: number;
   let closePopup: boolean = false;
+
+  const activeWorkspace: Observable<WorkspaceDocument> =
+    collectionsMethods.getActiveWorkspace();
+  let activeWorkspaceId: string;
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        activeWorkspaceId = activeWorkspaceRxDoc.get("_id");
+      }
+    },
+  );
 
   $: {
     if (tabList) {
@@ -96,7 +113,9 @@
   const handleDropOnEnd = (index: number) => {
     movedTabEndIndex = index;
   };
-  onDestroy(() => {});
+  onDestroy(() => {
+    activeWorkspaceSubscribe.unsubscribe();
+  });
 </script>
 
 <div

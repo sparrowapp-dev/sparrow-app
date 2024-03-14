@@ -24,7 +24,12 @@
    * import { isTeamCreatedFirstTime } from "$lib/store/team.store";
    **/
 
-  import { isWorkspaceCreatedFirstTime, isWorkspaceLoaded } from "$lib/store";
+  import {
+    isWorkspaceCreatedFirstTime,
+    isWorkspaceLoaded,
+    workspaceLeftPanelWidth,
+    workspaceRightPanelWidth,
+  } from "$lib/store";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { onDestroy, onMount } from "svelte";
@@ -39,6 +44,7 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import Input from "$lib/components/inputs/Input.svelte";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let data: any;
   export let handleWorkspaceSwitch: any;
@@ -108,6 +114,8 @@
       userId = value._id;
     }
   });
+
+  let leaveTeamName = "";
 
   /**
    * @deprecated referes to teams store
@@ -210,7 +218,14 @@
       delete newWorkspace.team.name;
       await _viewModel.addWorkspace(newWorkspace);
       await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
-      if (userId) await _viewModel.refreshTeams(userId);
+      // if (userId) await _viewModel.refreshTeams(userId);
+      if (userId)
+        await _viewModel.addWorkspaceInTeam(
+          $openTeam?.teamId,
+          newWorkspace._id,
+          newWorkspace.name,
+        );
+
       activeSideBarTabMethods.updateActiveTab("collections");
       navigate("/dashboard/collections");
     } else {
@@ -249,7 +264,7 @@
        * );
        **/
 
-      await teamRepositoryMethods.setOpenTeam(res?._id);
+      // await teamRepositoryMethods.setOpenTeam(res?._id);
       notifications.success(`New team ${teamObj.name} is created.`);
       handleCreateTeamModal();
     } else {
@@ -265,24 +280,27 @@
   const handleLeaveTeam = async () => {
     if (!$openTeam?.teamId) return;
     isLeavingTeam = true;
+    const teamId = $openTeam?.teamId;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
-      await _viewModel.refreshTeams(userId);
-      await _viewModelWorkspace.refreshWorkspaces(userId);
-      notifications.success("You left a team.");
-      /**
-       * @deprecated referes to teams store
-       * setOpenedTeam(
-       *   activeTeamRxDoc?._data?.teamId,
-       *   activeTeamRxDoc?._data?.name,
-       *   //@ts-ignore
-       *   activeTeamRxDoc?._data?.logo,
-       * );
-       **/
-      await teamRepositoryMethods.setOpenTeam(activeTeamRxDoc?._data?.teamId);
-      isShowMoreVisible = false;
-      isLeavingTeam = false;
-      handleLeaveTeamModal();
+      let x = await _viewModel.removeTeam($openTeam?.teamId);
+      setTimeout(async () => {
+        const activeTeam = await _viewModel.checkActiveTeam();
+        if (activeTeam) {
+          const teamIdToActivate = await _viewModel.activateInitialWorkspace();
+          if (teamIdToActivate) {
+            await _viewModel.activateTeam(teamIdToActivate);
+          }
+        }
+        setTimeout(async () => {
+          await _viewModel.refreshTeams(userId);
+          await _viewModelWorkspace.refreshWorkspaces(userId);
+          notifications.success("You left a team.");
+          handleLeaveTeamModal();
+          isShowMoreVisible = false;
+          isLeavingTeam = false;
+        }, 500);
+      }, 500);
     } else {
       notifications.error("Failed to leave the team. Please try again.");
       isShowMoreVisible = false;
@@ -374,6 +392,7 @@
   };
 
   const handleLeaveTeamModal = () => {
+    leaveTeamName = $openTeam?.name;
     openLeaveTeamModal = !openLeaveTeamModal;
   };
 
@@ -394,6 +413,14 @@
         showFileTypeError: false,
       },
     };
+  });
+
+  let splitter;
+  onMount(() => {
+    splitter = document.querySelector(
+      ".splitter-sidebar .splitpanes__splitter",
+    );
+    splitter.style.width = "1px";
   });
 
   onDestroy(() => {
@@ -510,7 +537,7 @@
 >
   <p class="warning-text text-lightGray mt-3 mw-50 text-wrap">
     Are you sure you want to leave team <span class="fw-semibold"
-      >"{$openTeam?.name}"</span
+      >"{leaveTeamName || ""}"</span
     >? You will lose access to all the resources in this team.
   </p>
   <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
@@ -534,8 +561,15 @@
   </div>
 </ModalWrapperV1>
 
-<Motion {...scaleMotionProps} let:motion>
-  <div class="workspace bg -backgroundColor" use:motion>
+<Splitpanes
+  class="splitter-sidebar"
+  direction="vertical"
+  on:resize={(e) => {
+    workspaceLeftPanelWidth.set(e.detail[0].size);
+    workspaceRightPanelWidth.set(e.detail[1].size);
+  }}
+>
+  <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
     <WorkspaceList
       {userId}
       {handleCreateTeamModal}
@@ -551,9 +585,16 @@
       {teamServiceMethods}
       {collectionsMethods}
     />
+  </Pane>
+  <Pane
+    class="sidebar-right-panel"
+    minSize={60}
+    size={$workspaceRightPanelWidth}
+  >
     <WorkspaceContent
       {currentTeam}
       {userId}
+      teams={allTeams}
       {handleCreateWorkspace}
       {handleWorkspaceSwitch}
       {handleWorkspaceTab}
@@ -569,27 +610,17 @@
       {teamRepositoryMethods}
       workspaces={$workspaces}
     />
-  </div>
-</Motion>
+  </Pane>
+</Splitpanes>
 
 <style>
-  .workspace {
-    font-size: 12px;
-    display: flex;
-    height: calc(100vh - 44px);
-    overflow: hidden;
-  }
-  .workspace::-webkit-scrollbar {
-    width: 2px;
-  }
-  .workspace::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-
   .warning-text {
     color: var(--colors-neutral-text-3, #ccc);
     font-size: 14px;
     font-weight: 400;
     line-height: 150%;
+  }
+  :global(.splitpanes) {
+    width: calc(100vw - 72px);
   }
 </style>

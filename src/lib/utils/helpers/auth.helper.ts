@@ -125,6 +125,24 @@ const setBodyType = (request: NewTab, header: string) => {
   return request;
 };
 
+const setAuthType = (request: NewTab, auth: string) => {
+  switch (auth) {
+    case AuthType.NO_AUTH:
+      request.property.request.state.auth = AuthType.NO_AUTH;
+      break;
+    case AuthType.API_KEY:
+      request.property.request.state.auth = AuthType.API_KEY;
+      break;
+    case AuthType.BASIC_AUTH:
+      request.property.request.state.auth = AuthType.BASIC_AUTH;
+      break;
+    case AuthType.BEARER_TOKEN:
+      request.property.request.state.auth = AuthType.BEARER_TOKEN;
+      break;
+  }
+  return request;
+};
+
 const validateEmail = (email: string) => {
   const emailRegex = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
   return emailRegex.test(email);
@@ -135,5 +153,6 @@ export {
   findAuthParameter,
   setContentTypeHeader,
   setBodyType,
+  setAuthType,
   validateEmail,
 };

@@ -186,7 +186,6 @@
 <style lang="scss">
   .env-panel {
     background-color: var(--background-color);
-    width: calc(100vw - 352px);
     height: calc(100vh - 44px);
   }
   .env-header {

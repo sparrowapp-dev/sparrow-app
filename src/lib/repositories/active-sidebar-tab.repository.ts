@@ -12,11 +12,11 @@ export class ActiveSideBarTabReposistory {
       .exec();
   };
   public setActiveTab = async (activeTabName: string) => {
-    const activTab = await RxDB.getInstance().rxdb.activesidebartab.insert({
+    const activeTab = await RxDB.getInstance().rxdb.activesidebartab.insert({
       activeTabId: "activeTabId",
       activeTabName,
     });
-    return activTab;
+    return activeTab;
   };
   public getActiveTab = () => {
     return RxDB.getInstance().rxdb.activesidebartab.findOne({

@@ -781,12 +781,19 @@
       > Import Collection</button
     >
     <p class="importData-whiteColor mb-2 sparrow-fs-14 fw-bold">OR</p>
+
+    {#if isDataEmpty && !importData}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please Paste or Upload your file in order to import the workspace
+      </p>
+    {/if}
+    <p class="importData-whiteColor my-2 sparrow-fs-14 fw-bold">OR</p>
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
         onClick(false);
         handleCreateCollection();
-      }}>Create Collection</button
+      }}>Create Empty Collection</button
     >
   </div>
 </ModalWrapperV1>

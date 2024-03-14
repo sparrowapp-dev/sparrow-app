@@ -38,7 +38,9 @@ export interface RequestBody {
   body?: unknown;
   headers?: KeyValuePair[];
   queryParams?: KeyValuePair[];
+  auth?: Auth;
   selectedRequestBodyType?: ContentTypeEnum;
+  selectedRequestAuthType?: RequestAuthTypes;
 }
 export interface KeyValuePair {
   key: string;

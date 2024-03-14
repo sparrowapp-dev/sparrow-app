@@ -107,7 +107,7 @@
 
     if (str.trim() === "") {
       isInputEmpty = true;
-      inputElement.focus();
+      inputElement?.focus();
     } else {
       collectionsMethods.updateRequestProperty(
         true,
@@ -280,8 +280,10 @@
   let handleFocusValue = () => {
     handleInputValue();
     const elem = document.getElementById("input-request-url");
-    environmentAxisY = elem.getBoundingClientRect().top + 40;
-    environmentAxisX = elem.getBoundingClientRect().left;
+    if (elem) {
+      environmentAxisY = elem.getBoundingClientRect().top + 40;
+      environmentAxisX = elem.getBoundingClientRect().left;
+    }
   };
   let handleBlurValue = () => {
     setTimeout(() => {
@@ -322,10 +324,10 @@
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
     }
-    if (event.ctrlKey && event.key === "Enter") {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
-      inputElement.focus();
+      inputElement?.focus();
     }
   };
 
@@ -479,9 +481,15 @@
           on:click={() => isHorizontal.set(false)}
           on:click={() => {
             selectedView = "vertical";
-            const splitter = document.querySelector(".splitpanes__splitter");
-            const leftPanel = document.querySelector(".left-panel");
-            const rightPanel = document.querySelector(".right-panel");
+            const splitter = document.querySelector(
+              ".splitter-request .splitpanes__splitter",
+            );
+            const leftPanel = document.querySelector(
+              ".splitter-request .left-panel",
+            );
+            const rightPanel = document.querySelector(
+              ".splitter-request .right-panel",
+            );
             leftPanel.style.width = `${leftPanelWidth}%`;
             rightPanel.style.width = `${rightPanelWidth}%`;
             splitter.style.height = "85vh";
@@ -498,9 +506,15 @@
           on:click={() => isHorizontal.set(true)}
           on:click={() => {
             selectedView = "horizontal";
-            const splitter = document.querySelector(".splitpanes__splitter");
-            const leftPanel = document.querySelector(".left-panel");
-            const rightPanel = document.querySelector(".right-panel");
+            const splitter = document.querySelector(
+              ".splitter-request .splitpanes__splitter",
+            );
+            const leftPanel = document.querySelector(
+              ".splitter-request .left-panel",
+            );
+            const rightPanel = document.querySelector(
+              ".splitter-request .right-panel",
+            );
             splitter.style.height = "0%";
             splitter.style.width = "100%";
             rightPanel.style.width = `${rightPanelWidth}%`;

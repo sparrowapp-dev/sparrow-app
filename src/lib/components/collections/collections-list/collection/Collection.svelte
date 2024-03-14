@@ -40,6 +40,7 @@
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
   import { invoke } from "@tauri-apps/api/core";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
+  import { CollectionMessage } from "$lib/utils/constants/request.constant";
 
   export let title: string;
   export let collection: any;
@@ -224,6 +225,9 @@
 
   //open collection
   function openCollections() {
+    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+      handleCollectionClick(collection, currentWorkspaceId, collectionId);
+    }
     if (!visibility) {
       visibility = !visibility;
     }
@@ -669,29 +673,42 @@
       />
     {/each}
     {#if showFolderAPIButtons}
-      <Tooltip
-        classProp="mt-2 mb-2"
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.SAVE_REQUEST,
-        )}
-      >
-        <div class="mt-2 mb-2">
+      <div class="mt-2 mb-2 d-flex">
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[0]}
+          classProp="mt-2 mb-2"
+        >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
           />
+        </Tooltip>
+        <Tooltip
+          placement="bottom"
+          title={!hasWorkpaceLevelPermission(
+            loggedUserRoleInWorkspace,
+            workspaceLevelPermissions.SAVE_REQUEST,
+          )
+            ? PERMISSION_NOT_FOUND_TEXT
+            : CollectionMessage[1]}
+          classProp="mt-2 mb-2"
+        >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2 ms-3"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}
           />
-        </div>
-      </Tooltip>
+        </Tooltip>
+      </div>
     {/if}
   </div>
 </div>

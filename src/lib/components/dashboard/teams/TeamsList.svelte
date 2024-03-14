@@ -43,7 +43,7 @@
   <div class="sidebar-teams-header d-flex justify-content-between p-3 pb-0">
     <h6 class="teams-heading">Teams</h6>
     <div>
-      <Tooltip title="New Team" placement={"bottom"}>
+      <Tooltip title="New Team" placement={"left"}>
         <button
           class="new-team-btn rounded border-0"
           on:click={handleCreateTeamModal}
