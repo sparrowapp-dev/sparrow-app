@@ -291,13 +291,13 @@
         dynamicClasses: "text-whiteColor",
         hide: true,
       },
-      // {
-      //   name: "Admin",
-      //   id: WorkspaceRole.WORKSPACE_ADMIN,
-      //   description:
-      //     "Add & edit resources within a workspace,add & remove members to workspace",
-      //   dynamicClasses: "text-whiteColor",
-      // },
+      {
+        name: "Admin",
+        id: WorkspaceRole.WORKSPACE_ADMIN,
+        description:
+          "Add & edit resources within a workspace,add & remove members to workspace",
+        dynamicClasses: "text-whiteColor",
+      },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
