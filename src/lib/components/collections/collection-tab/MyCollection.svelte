@@ -228,6 +228,14 @@
       currentCollection?.id,
       branch,
     );
+    var result = window.confirm(
+      "Switching branch will close all the open tabs!",
+    );
+    if (result) {
+      await collectionsMethods.clearTabs();
+    } else {
+      return;
+    }
     if (response.isSuccessful) {
       collectionsMethods.updateCollection(currentCollection?.id, {
         currentBranch: branch,
