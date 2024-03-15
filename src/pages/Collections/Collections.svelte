@@ -78,6 +78,7 @@
     currentEnvironment: _viewModel.currentEnvironment,
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
+    clearTabs: _viewModel.clearTabs,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
