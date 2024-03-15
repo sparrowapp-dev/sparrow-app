@@ -46,7 +46,9 @@
   export let visibility;
   export let activeTabId: string;
   export let activePath;
-
+  export let activeSync = false;
+  export let currentBranch;
+  export let primaryBranch;
   const collectionService = new CollectionService();
 
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -54,7 +56,6 @@
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   let showFolderAPIButtons: boolean = true;
-
   const handleAPIClick = async () => {
     if (
       !hasWorkpaceLevelPermission(
@@ -70,9 +71,18 @@
       new Date().toString(),
     );
 
+    let userSource = {};
+    if (activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
+
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
+      ...userSource,
       folderId: explorer.id,
       items: {
         name: explorer.name,
@@ -173,11 +183,19 @@
 
   const onRenameBlur = async () => {
     if (newFolderName) {
+      let userSource = {};
+      if (activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: currentBranch ? currentBranch : primaryBranch,
+          source: "USER",
+        };
+      }
       const response = await collectionService.updateFolderInCollection(
         currentWorkspaceId,
         collectionId,
         explorer.id,
         {
+          ...userSource,
           name: newFolderName,
         },
       );
@@ -220,31 +238,7 @@
     });
   }
 
-  let menuItems = [
-    {
-      onClick: openFolder,
-      displayText: "Open Folder",
-      disabled: false,
-    },
-    {
-      onClick: renameFolder,
-      displayText: "Rename Folder",
-      disabled: false,
-    },
-    {
-      onClick: addRequest,
-      displayText: "Add Request",
-      disabled: false,
-    },
-
-    {
-      onClick: () => {
-        handleFolderPopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
 
   let workspaceId = currentWorkspaceId;
 
@@ -266,6 +260,42 @@
         });
       }
       requestIds.push(explorer?.id);
+
+      if (explorer?.source === "USER") {
+        menuItems = [
+          {
+            onClick: openFolder,
+            displayText: "Open Folder",
+            disabled: false,
+          },
+          {
+            onClick: renameFolder,
+            displayText: "Rename Folder",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+
+          {
+            onClick: () => {
+              handleFolderPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: openFolder,
+            displayText: "Open Folder",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 
@@ -274,10 +304,19 @@
 
   const handleDelete = async () => {
     deleteLoader = true;
+    let userSource = {};
+    if (activeSync && explorer?.source === "USER") {
+      userSource = {
+        branchName: currentBranch ? currentBranch : primaryBranch,
+      };
+    }
     const response = await collectionService.deleteFolderInCollection(
       workspaceId,
       collectionId,
       explorer.id,
+      {
+        ...userSource,
+      },
     );
 
     if (response.isSuccessful) {
@@ -404,7 +443,12 @@
       {:else}
         <div
           on:click={() => {
-            handleFolderClick(explorer, currentWorkspaceId, collectionId);
+            handleFolderClick(
+              explorer,
+              currentWorkspaceId,
+              collectionId,
+              activeSync,
+            );
           }}
           class="folder-title d-flex align-items-center"
           style="cursor:pointer; font-size:12px;
@@ -465,9 +509,12 @@
           {currentWorkspaceId}
           {collectionsMethods}
           {activeTabId}
+          {activeSync}
+          {currentBranch}
+          {primaryBranch}
         />
       {/each}
-      {#if showFolderAPIButtons}
+      {#if showFolderAPIButtons && explorer?.source === "USER"}
         <div class="mt-2 mb-2 ms-0">
           <Tooltip
             classProp="mt-2 mb-2 ms-0"
@@ -493,7 +540,7 @@
       {/if}
     </div>
   </div>
-{:else}
+{:else if explorer.type === "REQUEST"}
   <div style="cursor:pointer;">
     <Request
       api={explorer}
@@ -505,6 +552,9 @@
       name={explorer.name}
       id={explorer.id}
       {activeTabId}
+      {activeSync}
+      {currentBranch}
+      {primaryBranch}
     />
   </div>
 {/if}

@@ -82,6 +82,9 @@ const itemsProperties = {
   source: {
     type: "string",
   },
+  isDeleted: {
+    type: "boolean",
+  },
   request: {
     type: "object",
     properties: requestItems,
@@ -122,7 +125,7 @@ export const collectionSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 2,
+  version: 5,
   properties: {
     collectionId: {
       type: "string",
@@ -145,6 +148,28 @@ export const collectionSchemaLiteral = {
     activeSync: {
       type: "boolean",
     },
+    activeSyncUrl: {
+      type: "string",
+    },
+    localRepositoryPath: {
+      type: "string",
+    },
+    branches: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+          },
+          name: {
+            type: "string",
+          },
+        },
+      },
+    },
+    primaryBranch: { type: "string" },
+    currentBranch: { type: "string" },
     createdAt: {
       type: "string",
     },

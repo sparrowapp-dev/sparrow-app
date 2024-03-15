@@ -232,7 +232,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     tabId: {
       type: "string",
@@ -246,6 +246,15 @@ export const tabSchemaLiteral = {
       type: "string",
     },
     description: {
+      type: "string",
+    },
+    isDeleted: {
+      type: "boolean",
+    },
+    activeSync: {
+      type: "boolean",
+    },
+    source: {
       type: "string",
     },
     type: {

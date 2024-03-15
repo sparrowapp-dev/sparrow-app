@@ -166,7 +166,7 @@
     window.addEventListener("click", handleDropdownClick);
   });
   const handleKeyPress = (event) => {
-    if (event.ctrlKey && event.code === "KeyS") {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       if (componentData?.path.collectionId && componentData?.path.workspaceId) {
         handleSaveRequest();
       } else {
@@ -235,6 +235,19 @@
 
 <div class="d-flex flex-column" data-tauri-drag-region>
   <div
+    class="bg-danger p-3"
+    style={`display:${
+      componentData?.source === "SPEC" &&
+      componentData?.activeSync &&
+      componentData?.isDeleted
+        ? "block"
+        : "none"
+    }`}
+  >
+    The "{tabName}" request is removed from swagger and will be automatically
+    deleted from Sparrow in two weeks.
+  </div>
+  <div
     class="d-flex align-items-center justify-content-between {$collapsibleState
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
@@ -251,6 +264,7 @@
         maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
+        disabled={componentData?.source === "SPEC"}
       />
     </div>
 
@@ -269,7 +283,10 @@
                 !hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
-                )}
+                ) ||
+                (componentData?.source === "SPEC" &&
+                  componentData?.activeSync &&
+                  !componentData?.isDeleted)}
               style="width:140px;"
               class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
               on:click={() => {
@@ -302,6 +319,9 @@
           </Tooltip>
           <span class="position-relative" style="width:35px;">
             <Dropdown
+              disabled={componentData?.source === "SPEC" &&
+                componentData?.activeSync &&
+                !componentData?.isDeleted}
               dropdownId={"saveAsDropdown"}
               dropDownType={{ type: "img", title: angleDown }}
               data={[

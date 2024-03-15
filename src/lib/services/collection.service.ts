@@ -105,11 +105,13 @@ export class CollectionService {
     workspaceId: string,
     collectionId: string,
     folderId: string,
+    body,
   ) => {
     const response = await makeRequest(
       "DELETE",
       `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
       {
+        body,
         headers: getAuthHeaders(),
       },
     );
@@ -162,12 +164,63 @@ export class CollectionService {
     return response;
   };
 
-  public importCollection = async (workspaceId: string, url: ImportBodyUrl) => {
+  public validateImportCollectionInput = async (
+    data: string = "",
+    jsonXml = "",
+  ) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/validate/oapi`, {
+      body: jsonXml,
+      headers: {
+        ...getAuthHeaders(),
+        "x-oapi-url": data,
+        "Content-type": ContentTypeEnum["application/json"],
+      },
+    });
+    return response;
+  };
+
+  public validateImportCollectionURL = async (url = "") => {
+    const response = await makeRequest(
+      "GET",
+      url,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-type": ContentTypeEnum["application/json"],
+        },
+      },
+      true,
+    );
+    return response;
+  };
+
+  public importCollection = async (
+    workspaceId: string,
+    url: ImportBodyUrl,
+    activeSync: boolean = false,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/workspace/${workspaceId}/importUrl/collection`,
       {
-        body: url,
+        body: { ...url, activeSync },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public switchCollectionBranch = async (
+    collectionId: string,
+    branchName: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/${collectionId}/branch`,
+      {
+        body: {
+          branchName,
+        },
         headers: getAuthHeaders(),
       },
     );
@@ -214,6 +267,17 @@ export class CollectionService {
         headers: { ...getAuthHeaders(), "Content-type": contentType },
       },
     );
+    return response;
+  };
+
+  public importCollectionFromCurl = async (curl: string) => {
+    const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
+      body: curl,
+      headers: {
+        ...getAuthHeaders(),
+        "Content-type": ContentTypeEnum["application/json"],
+      },
+    });
     return response;
   };
 }

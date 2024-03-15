@@ -19,10 +19,16 @@ export class CollectionListViewModel {
       name: elem.get("name"),
       totalRequests: elem.get("totalRequests"),
       items: elem.get("items"),
+      activeSync: elem.get("activeSync"),
+      activeSyncUrl: elem.get("activeSyncUrl"),
       createdBy: elem.get("createdBy"),
       createdAt: elem.get("createdAt"),
       updatedBy: elem.get("updatedBy"),
       updatedAt: elem.get("updatedAt"),
+      branches: elem.get("branches"),
+      primaryBranch: elem.get("primaryBranch"),
+      currentBranch: elem.get("currentBranch"),
+      localRepositoryPath: elem.get("localRepositoryPath"),
     };
   };
   public get collection() {

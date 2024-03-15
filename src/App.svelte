@@ -20,6 +20,7 @@
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
   import { getCurrent } from "@tauri-apps/api/window";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
   export let url = "/";
   const tabRepository = new TabRepository();

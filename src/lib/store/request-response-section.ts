@@ -189,6 +189,9 @@ const setRequestState = async (data, route: string): Promise<void> => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive && elem.property.request) {
         elem.property.request.state[route] = data;
+        if (route == "auth" || route == "dataset") {
+          elem.property.request.save.api = false;
+        }
         progressiveTab.set(elem);
       }
       return elem;
@@ -219,8 +222,10 @@ const setRequestBody = async (data, route: string): Promise<void> => {
   tabs.update((value: NewTab[]): NewTab[] => {
     const updatedTab = value.map((elem: NewTab): NewTab => {
       if (elem.isActive) {
-        elem.property.request.body[route] = data;
-        elem.property.request.save.api = false;
+        if (elem.property.request.body[route] != data) {
+          elem.property.request.body[route] = data;
+          elem.property.request.save.api = false;
+        }
         progressiveTab.set(elem);
       }
       return elem;

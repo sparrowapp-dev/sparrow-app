@@ -14,7 +14,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
@@ -37,6 +37,9 @@
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
+  import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
+  import { invoke } from "@tauri-apps/api/core";
+  import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
 
   export let title: string;
@@ -50,7 +53,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activePath;
-
+  const _viewImportCollection = new ImportCollectionViewModel();
   const collectionService = new CollectionService();
   const commonService = new CommonService();
   const _colllectionListViewModel = new CollectionListViewModel();
@@ -78,10 +81,20 @@
 
     collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
 
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const response = await _colllectionListViewModel.addFolder(
       currentWorkspaceId,
       collectionId,
       {
+        ...userSource,
         name: folder.name,
         description: folder.description,
       },
@@ -133,9 +146,19 @@
       new Date().toString(),
     );
 
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const requestObj = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
+      ...userSource,
       items: {
         name: request.name,
         type: request.type,
@@ -280,50 +303,46 @@
     showMenu = false;
   };
 
-  let menuItems = [
-    {
-      onClick: openCollections,
-      displayText: "Open collection",
-      disabled: false,
-    },
-    {
-      onClick: renameCollection,
-      displayText: "Rename collection",
-      disabled: false,
-    },
-    {
-      onClick: addRequest,
-      displayText: "Add Request",
-      disabled: false,
-    },
-    {
-      onClick: addFolder,
-      displayText: "Add Folder",
-      disabled: false,
-    },
-
-    {
-      onClick: () => {
-        handleCollectionPopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
   let requestCount: number = 0;
   let folderCount: number = 0;
   let deletedIds: string[] = [];
+
+  const handleBranchSwitch = async () => {
+    const detectBranch = collection?.currentBranch
+      ? collection?.currentBranch
+      : collection?.primaryBranch;
+    const collectionId = collection?.id;
+    const response = await collectionService.switchCollectionBranch(
+      collectionId,
+      detectBranch,
+    );
+    if (response.isSuccessful) {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: response.data.data.items,
+      });
+    } else {
+      collectionsMethods.updateCollection(collectionId, {
+        currentBranch: detectBranch,
+        items: [],
+      });
+    }
+  };
   $: {
     if (activePath) {
       if (activePath.collectionId === collection.id) {
         visibility = true;
       }
     }
+    // if (collection?.activeSync) {
+    //   handleBranchSwitch();
+    // }
     if (collection) {
       deletedIds.length = [];
       requestCount = 0;
       folderCount = 0;
-      collection.items.forEach((item) => {
+      collection?.items?.forEach((item) => {
         if (item.type === ItemType.FOLDER) {
           deletedIds.push(item.id);
           folderCount++;
@@ -337,10 +356,73 @@
         }
       });
       deletedIds.push(collectionId);
+
+      if (collection?.activeSync) {
+        menuItems = [
+          {
+            onClick: openCollections,
+            displayText: "Open collection",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+          {
+            onClick: addFolder,
+            displayText: "Add Folder",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleCollectionPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: openCollections,
+            displayText: "Open collection",
+            disabled: false,
+          },
+          {
+            onClick: renameCollection,
+            displayText: "Rename collection",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+          {
+            onClick: addFolder,
+            displayText: "Add Folder",
+            disabled: false,
+          },
+
+          {
+            onClick: () => {
+              handleCollectionPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 
   // delete collection
+  onMount(() => {
+    if (collection?.activeSync) {
+      handleBranchSwitch();
+    }
+  });
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -370,17 +452,68 @@
       "isActiveSyncEnabled",
     );
   };
+  let refreshCollectionLoader = false;
   const refetchCollection = async () => {
-    deleteLoader = true;
-    const response =
-      await collectionService.fetchCollection(currentWorkspaceId);
-
-    if (response.isSuccessful) {
-      // existing collection with the new one
-    } else {
-      notifications.error("Failed to fetch the Collection.");
-      deleteLoader = false;
+    if (refreshCollectionLoader) return;
+    const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: collection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        if (collection?.currentBranch) {
+          if (currentBranch !== collection?.currentBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        } else {
+          if (currentBranch !== collection?.primaryBranch) {
+            notifications.error(errMessage);
+            return;
+          }
+        }
+      } else {
+        notifications.error(errMessage);
+        return;
+      }
+    } catch (e) {
+      notifications.error(errMessage);
+      return;
     }
+    refreshCollectionLoader = true;
+    const responseJSON = await collectionService.validateImportCollectionURL(
+      collection.activeSyncUrl,
+    );
+    if (responseJSON.isSuccessful) {
+      const response = await _viewImportCollection.importCollectionData(
+        currentWorkspaceId,
+        {
+          url: collection.activeSyncUrl,
+          urlData: responseJSON.data,
+          primaryBranch: collection?.primaryBranch,
+          currentBranch: collection?.currentBranch
+            ? collection?.currentBranch
+            : collection?.primaryBranch,
+        },
+        collection.activeSync,
+      );
+
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(
+          collection.id,
+          response.data.data.collection,
+        );
+        notifications.success("Collection synced.");
+      } else {
+        notifications.error("Failed to sync the collection. Please try again.");
+      }
+    } else {
+      notifications.error(
+        `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
+      );
+    }
+    refreshCollectionLoader = false;
   };
 </script>
 
@@ -475,7 +608,7 @@
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
       on:click={() => {
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
           visibility = !visibility;
         }
       }}
@@ -495,7 +628,7 @@
       />
     {:else}
       <div
-        class="collection-title d-flex align-items-center py-1 mb-0 flex-column"
+        class="collection-title justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
         on:click={() => {
           isCollectionCreatedFirstTime.set(false);
@@ -508,11 +641,19 @@
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
         </p>
-        {#if isActiveSyncEnabled}
+        {#if isActiveSyncEnabled && collection.activeSync}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
-            >branch name - current branch
+            ><img src={gitBranchIcon} alt="" />
+            {collection?.currentBranch
+              ? collection?.currentBranch
+              : collection?.primaryBranch}
+            {collection?.currentBranch
+              ? collection?.currentBranch === collection?.primaryBranch
+                ? "(Default)"
+                : ""
+              : "(Default)"}
           </span>
         {/if}
       </div>
@@ -521,16 +662,20 @@
   {#if collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    {#if isActiveSyncEnabled}
+    {#if isActiveSyncEnabled && collection?.activeSync}
       <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
+        class="threedot-icon-container p-1 border-0 rounded d-flex justify-content-center align-items-center {refreshCollectionLoader
+          ? 'refresh-collection-loader-active'
+          : ''} "
         on:click={() => {
           refetchCollection();
         }}
       >
-        <img src={refreshIcon} alt="refetch" />
+        <img
+          src={refreshIcon}
+          alt="refetch"
+          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
+        />
       </button>
     {/if}
     <button
@@ -563,6 +708,9 @@
         {visibility}
         {activeTabId}
         {activePath}
+        activeSync={collection?.activeSync}
+        currentBranch={collection?.currentBranch}
+        primaryBranch={collection?.primaryBranch}
       />
     {/each}
     {#if showFolderAPIButtons}
@@ -578,7 +726,7 @@
           classProp="mt-2 mb-2"
         >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2"
             src={folderIcon}
             alt="+ Folder"
             on:click={handleFolderClick}
@@ -595,7 +743,7 @@
           classProp="mt-2 mb-2"
         >
           <img
-            class="list-icons"
+            class="list-icons mb-2 mt-2 ms-3"
             src={requestIcon}
             alt="+ API Request"
             on:click={handleAPIClick}
@@ -627,6 +775,9 @@
   .threedot-active {
     visibility: visible;
     background-color: var(--workspace-hover-color);
+  }
+  .refresh-collection-loader-active {
+    visibility: visible;
   }
   .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
@@ -662,5 +813,16 @@
   .collection-title {
     width: calc(100% - 30px);
     text-align: left;
+  }
+  .refresh-collection-loader {
+    animation: loader-animation 1s linear infinite;
+  }
+  @keyframes loader-animation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>

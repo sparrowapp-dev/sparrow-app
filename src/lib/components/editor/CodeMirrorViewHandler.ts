@@ -13,32 +13,40 @@ const CodeMirrorViewHandler = (
 ) => {
   switch (tab) {
     case RequestDataType.HTML:
-      codeMirrorView.dispatch({
-        effects: languageConf.reconfigure(
-          html({
-            matchClosingTags: true,
-            selfClosingTags: true,
-            autoCloseTags: true,
-          }),
-        ),
-      });
+      if (codeMirrorView) {
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(
+            html({
+              matchClosingTags: true,
+              selfClosingTags: true,
+              autoCloseTags: true,
+            }),
+          ),
+        });
+      }
       break;
     case RequestDataType.JAVASCRIPT:
-      codeMirrorView.dispatch({
-        effects: languageConf.reconfigure(
-          javascript({ jsx: true, typescript: true }),
-        ),
-      });
+      if (codeMirrorView) {
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(
+            javascript({ jsx: true, typescript: true }),
+          ),
+        });
+      }
       break;
     case RequestDataType.JSON:
-      codeMirrorView.dispatch({
-        effects: languageConf.reconfigure(jsonSetup),
-      });
+      if (codeMirrorView) {
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(jsonSetup),
+        });
+      }
       break;
     case RequestDataType.XML:
-      codeMirrorView.dispatch({
-        effects: languageConf.reconfigure(xml()),
-      });
+      if (codeMirrorView) {
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(xml()),
+        });
+      }
       break;
     default:
       codeMirrorView.dispatch({

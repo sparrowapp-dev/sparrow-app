@@ -34,9 +34,15 @@ export class CollectionRepository {
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.totalRequests) value.totalRequests = data.totalRequests;
-
+      if (data.activeSyncUrl) value.activeSyncUrl = data.activeSyncUrl;
+      if (data.activeSync) value.activeSync = data.activeSync;
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
+      if (data.branches) value.branches = data.branches;
+      if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
+      if (data.currentBranch) value.currentBranch = data.currentBranch;
+      if (data.localRepositoryPath)
+        value.localRepositoryPath = data.localRepositoryPath;
       return value;
     });
 
