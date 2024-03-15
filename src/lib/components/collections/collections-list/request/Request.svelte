@@ -568,5 +568,13 @@
   }
   .active-request-tab {
     background-color: var(--selected-active-sidebar) !important;
+    .delete-ticker {
+      background-color: var(--selected-active-sidebar) !important;
+    }
+  }
+  .active-request-tab:hover {
+    .delete-ticker {
+      background-color: var(--selected-active-sidebar) !important;
+    }
   }
 </style>

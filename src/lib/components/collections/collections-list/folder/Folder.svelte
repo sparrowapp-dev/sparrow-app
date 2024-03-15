@@ -443,7 +443,12 @@
       {:else}
         <div
           on:click={() => {
-            handleFolderClick(explorer, currentWorkspaceId, collectionId);
+            handleFolderClick(
+              explorer,
+              currentWorkspaceId,
+              collectionId,
+              activeSync,
+            );
           }}
           class="folder-title d-flex align-items-center"
           style="cursor:pointer; font-size:12px;

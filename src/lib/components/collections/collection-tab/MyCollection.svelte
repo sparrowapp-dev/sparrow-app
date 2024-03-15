@@ -276,7 +276,7 @@
             disabled={!hasWorkpaceLevelPermission(
               loggedUserRoleInWorkspace,
               workspaceLevelPermissions.SAVE_REQUEST,
-            )}
+            ) || currentCollection?.activeSync}
             on:blur={(event) => onUpdate("name", event)}
             on:keydown={onRenameInputKeyPress}
             bind:this={inputElement}
@@ -405,7 +405,11 @@
         </div>
       </div>
     {/if}
-    <div class={`${!isSynced ? "d-none" : "d-block"} align-items-center`}>
+    <div
+      class={`${
+        !isSynced && currentCollection?.activeSync ? "d-none" : "d-block"
+      } align-items-center`}
+    >
       <div class="d-flex gap-4 mb-4 ps-2">
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4 text-plusButton">{totalRequest}</span>
@@ -421,7 +425,7 @@
           disabled={!hasWorkpaceLevelPermission(
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.EDIT_COLLECTION_DESC,
-          )}
+          ) || currentCollection?.activeSync}
           id="updateCollectionDescField"
           style="font-size: 12px;"
           value={tabDescription}

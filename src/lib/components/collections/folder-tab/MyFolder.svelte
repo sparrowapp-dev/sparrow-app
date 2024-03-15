@@ -19,6 +19,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
@@ -43,6 +44,7 @@
       componentData = event;
       collectionId = event.path?.collectionId;
       folderId = event.path?.folderId;
+      console.log(componentData);
     }
   });
   let collectionCountArr = [];
@@ -161,6 +163,7 @@
           {autofocus}
           id="renameInputFieldFolder"
           value={tabName}
+          disabled={componentData?.source === "SPEC"}
           class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
           on:blur={(event) => onUpdate("name", event)}
@@ -172,7 +175,7 @@
           disabled={!hasWorkpaceLevelPermission(
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.SAVE_REQUEST,
-          )}
+          ) || componentData?.source === "SPEC"}
           class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
           on:click={handleApiRequest}>New Request</button
         >
@@ -190,7 +193,7 @@
         disabled={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.EDIT_FOLDER_DESC,
-        )}
+        ) || componentData?.source === "SPEC"}
         id="updateFolderDescField"
         style="font-size: 12px; "
         class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
