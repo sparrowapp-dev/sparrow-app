@@ -63,6 +63,11 @@ export class CollectionsViewModel {
     this.debouncedTab();
   };
 
+  public clearTabs = () => {
+    tabs.set([]);
+    this.debouncedTab();
+  };
+
   public handleActiveTab = (id: string) => {
     requestResponseStore.activeTab(id);
     this.debouncedTab();
