@@ -239,7 +239,7 @@
     style={`display:${
       componentData?.source === "SPEC" &&
       componentData?.activeSync &&
-      !componentData?.isDeleted
+      componentData?.isDeleted
         ? "block"
         : "none"
     }`}

@@ -399,12 +399,19 @@
     on:click={() => {
       handleClick();
     }}
-    class="main-file d-flex align-items-center {id?.includes(
+    class="main-file d-flex align-items-center position-relative {id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    {#if api?.isDeleted}
+      <span
+        class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
+        style="right: 0; background-color: var(--background-color); "
+        >DELETED</span
+      >
+    {/if}
     {#if actSync && !isDeleted && source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
@@ -452,7 +459,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .api-method {
     font-size: 10px;
     font-weight: 500;
@@ -515,6 +522,12 @@
   .btn-primary:hover {
     background-color: var(--border-color);
     color: var(--white-color);
+  }
+
+  .btn-primary:hover {
+    .delete-ticker {
+      background-color: var(--border-color) !important;
+    }
   }
 
   .navbar {

@@ -402,7 +402,7 @@
   />
 {/if}
 
-{#if explorer.type === "FOLDER" && !explorer?.isDeleted}
+{#if explorer.type === "FOLDER"}
   <div
     style="height:36px;"
     class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
@@ -509,7 +509,7 @@
           {primaryBranch}
         />
       {/each}
-      {#if showFolderAPIButtons}
+      {#if showFolderAPIButtons && explorer?.source === "USER"}
         <div class="mt-2 mb-2 ms-0">
           <Tooltip
             classProp="mt-2 mb-2 ms-0"
@@ -535,7 +535,7 @@
       {/if}
     </div>
   </div>
-{:else if explorer.type === "REQUEST" && !explorer?.isDeleted}
+{:else if explorer.type === "REQUEST"}
   <div style="cursor:pointer;">
     <Request
       api={explorer}
