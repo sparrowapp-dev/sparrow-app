@@ -66,7 +66,9 @@ export const handleFolderClick = (
   folder: any,
   currentWorkspaceId: string,
   collectionId: string,
+  activeSync,
 ) => {
+  console.log(folder);
   isFolderCreatedFirstTime.set(false);
   const path: Path = {
     workspaceId: currentWorkspaceId,
@@ -81,6 +83,9 @@ export const handleFolderClick = (
   sampleFolder.path = path;
   sampleFolder.name = folder.name;
   sampleFolder.save = true;
+  sampleFolder.activeSync = activeSync;
+  sampleFolder.source = !folder?.source ? "SPEC" : folder?.source;
+  sampleFolder.isDeleted = folder?.isDeleted;
 
   _collectionMethods.handleCreateTab(sampleFolder);
   moveNavigation("right");
