@@ -30,6 +30,8 @@
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activeSync = false;
+  export let currentBranch;
+  export let primaryBranch;
 
   let showPath = false;
   let isFilePopup: boolean = false;
@@ -52,8 +54,8 @@
     selectedRequestBodyType,
     actSync,
     isDeleted,
-    source;
-  selectedRequestAuthType;
+    source,
+    selectedRequestAuthType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -105,6 +107,40 @@
       isDeleted = api?.isDeleted;
       source = api?.source;
       selectedRequestAuthType = api.request?.selectedRequestAuthType;
+
+      if (source === "USER") {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
+            disabled: false,
+          },
+          {
+            onClick: renameRequest,
+            displayText: "Rename Request",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleFilePopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 
@@ -148,6 +184,13 @@
   };
 
   const onRenameBlur = async () => {
+    let userSource = {};
+    if (source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
     if (newRequestName) {
       if (!folderId) {
         let storage = api;
@@ -157,6 +200,7 @@
           {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
+            ...userSource,
             items: storage,
           },
         );
@@ -176,6 +220,7 @@
           {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
+            ...userSource,
             folderId,
             items: {
               name: folderName,
@@ -214,31 +259,18 @@
     }
   };
 
-  let menuItems = [
-    {
-      onClick: () => {
-        handleClick();
-      },
-      displayText: "Open Request",
-      disabled: false,
-    },
-    {
-      onClick: renameRequest,
-      displayText: "Rename Request",
-      disabled: false,
-    },
-    {
-      onClick: () => {
-        handleFilePopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
 
   let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
+    let userSource = {};
+    if (activeSync && source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
     if (folderId && collectionId && currentWorkspaceId) {
       deleteLoader = true;
       const response = await collectionService.deleteRequestInCollection(
@@ -247,6 +279,7 @@
           collectionId,
           workspaceId: currentWorkspaceId,
           folderId,
+          ...userSource,
         },
       );
       if (response.isSuccessful) {
@@ -270,6 +303,7 @@
         {
           collectionId,
           workspaceId: currentWorkspaceId,
+          ...userSource,
         },
       );
       if (response.isSuccessful) {

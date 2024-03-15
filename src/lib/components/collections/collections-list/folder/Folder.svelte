@@ -71,11 +71,18 @@
       new Date().toString(),
     );
 
+    let userSource = {};
+    if (activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
+
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
-      currentBranch: currentBranch ? currentBranch : primaryBranch,
-      source: "USER",
+      ...userSource,
       folderId: explorer.id,
       items: {
         name: explorer.name,
@@ -176,11 +183,19 @@
 
   const onRenameBlur = async () => {
     if (newFolderName) {
+      let userSource = {};
+      if (activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: currentBranch ? currentBranch : primaryBranch,
+          source: "USER",
+        };
+      }
       const response = await collectionService.updateFolderInCollection(
         currentWorkspaceId,
         collectionId,
         explorer.id,
         {
+          ...userSource,
           name: newFolderName,
         },
       );
@@ -223,31 +238,7 @@
     });
   }
 
-  let menuItems = [
-    {
-      onClick: openFolder,
-      displayText: "Open Folder",
-      disabled: false,
-    },
-    {
-      onClick: renameFolder,
-      displayText: "Rename Folder",
-      disabled: false,
-    },
-    {
-      onClick: addRequest,
-      displayText: "Add Request",
-      disabled: false,
-    },
-
-    {
-      onClick: () => {
-        handleFolderPopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
 
   let workspaceId = currentWorkspaceId;
 
@@ -269,6 +260,42 @@
         });
       }
       requestIds.push(explorer?.id);
+
+      if (explorer?.source === "USER") {
+        menuItems = [
+          {
+            onClick: openFolder,
+            displayText: "Open Folder",
+            disabled: false,
+          },
+          {
+            onClick: renameFolder,
+            displayText: "Rename Folder",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+
+          {
+            onClick: () => {
+              handleFolderPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: openFolder,
+            displayText: "Open Folder",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 
@@ -277,10 +304,19 @@
 
   const handleDelete = async () => {
     deleteLoader = true;
+    let userSource = {};
+    if (activeSync && explorer?.source === "USER") {
+      userSource = {
+        branchName: currentBranch ? currentBranch : primaryBranch,
+      };
+    }
     const response = await collectionService.deleteFolderInCollection(
       workspaceId,
       collectionId,
       explorer.id,
+      {
+        ...userSource,
+      },
     );
 
     if (response.isSuccessful) {
@@ -512,6 +548,8 @@
       id={explorer.id}
       {activeTabId}
       {activeSync}
+      {currentBranch}
+      {primaryBranch}
     />
   </div>
 {/if}

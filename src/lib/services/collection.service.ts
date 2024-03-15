@@ -105,11 +105,13 @@ export class CollectionService {
     workspaceId: string,
     collectionId: string,
     folderId: string,
+    body,
   ) => {
     const response = await makeRequest(
       "DELETE",
       `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
       {
+        body,
         headers: getAuthHeaders(),
       },
     );
