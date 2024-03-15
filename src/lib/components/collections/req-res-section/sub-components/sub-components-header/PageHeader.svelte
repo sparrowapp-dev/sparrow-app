@@ -234,7 +234,16 @@
 </script>
 
 <div class="d-flex flex-column" data-tauri-drag-region>
-  <div class="bg-danger p-3">
+  <div
+    class="bg-danger p-3"
+    style={`display:${
+      componentData?.source === "SPEC" &&
+      componentData?.activeSync &&
+      !componentData?.isDeleted
+        ? "block"
+        : "none"
+    }`}
+  >
     The "{tabName}" request is removed from swagger and will be automatically
     deleted from Sparrow in two weeks.
   </div>
@@ -255,6 +264,7 @@
         maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
+        disabled={componentData?.source === "SPEC"}
       />
     </div>
 
