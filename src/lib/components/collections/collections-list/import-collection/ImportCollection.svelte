@@ -74,7 +74,11 @@
     isValidServerJSON = false;
     isValidServerXML = false;
 
-    if (validateClientURL(importData)) {
+    if (
+      validateClientURL(importData) &&
+      importData.includes("://127.0.0.1")!! &&
+      importData.includes("://localhost")
+    ) {
       isValidClientURL = true;
       const response = await _collectionService.validateImportCollectionURL(
         importData.replace("localhost", "127.0.0.1") + "-json",

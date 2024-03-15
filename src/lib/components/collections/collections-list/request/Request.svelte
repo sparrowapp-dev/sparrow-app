@@ -30,6 +30,8 @@
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activeSync = false;
+  export let currentBranch;
+  export let primaryBranch;
 
   let showPath = false;
   let isFilePopup: boolean = false;
@@ -52,8 +54,8 @@
     selectedRequestBodyType,
     actSync,
     isDeleted,
-    source;
-  selectedRequestAuthType;
+    source,
+    selectedRequestAuthType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
@@ -105,6 +107,40 @@
       isDeleted = api?.isDeleted;
       source = api?.source;
       selectedRequestAuthType = api.request?.selectedRequestAuthType;
+
+      if (source === "USER") {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
+            disabled: false,
+          },
+          {
+            onClick: renameRequest,
+            displayText: "Rename Request",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleFilePopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 
@@ -148,6 +184,13 @@
   };
 
   const onRenameBlur = async () => {
+    let userSource = {};
+    if (source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
     if (newRequestName) {
       if (!folderId) {
         let storage = api;
@@ -157,6 +200,7 @@
           {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
+            ...userSource,
             items: storage,
           },
         );
@@ -176,6 +220,7 @@
           {
             collectionId: collectionId,
             workspaceId: currentWorkspaceId,
+            ...userSource,
             folderId,
             items: {
               name: folderName,
@@ -214,31 +259,18 @@
     }
   };
 
-  let menuItems = [
-    {
-      onClick: () => {
-        handleClick();
-      },
-      displayText: "Open Request",
-      disabled: false,
-    },
-    {
-      onClick: renameRequest,
-      displayText: "Rename Request",
-      disabled: false,
-    },
-    {
-      onClick: () => {
-        handleFilePopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
 
   let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
+    let userSource = {};
+    if (activeSync && source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
     if (folderId && collectionId && currentWorkspaceId) {
       deleteLoader = true;
       const response = await collectionService.deleteRequestInCollection(
@@ -247,6 +279,7 @@
           collectionId,
           workspaceId: currentWorkspaceId,
           folderId,
+          ...userSource,
         },
       );
       if (response.isSuccessful) {
@@ -270,6 +303,7 @@
         {
           collectionId,
           workspaceId: currentWorkspaceId,
+          ...userSource,
         },
       );
       if (response.isSuccessful) {
@@ -365,12 +399,19 @@
     on:click={() => {
       handleClick();
     }}
-    class="main-file d-flex align-items-center {id?.includes(
+    class="main-file d-flex align-items-center position-relative {id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    {#if api?.isDeleted}
+      <span
+        class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
+        style="right: 0; background-color: var(--background-color); "
+        >DELETED</span
+      >
+    {/if}
     {#if actSync && !isDeleted && source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
@@ -418,7 +459,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .api-method {
     font-size: 10px;
     font-weight: 500;
@@ -483,6 +524,12 @@
     color: var(--white-color);
   }
 
+  .btn-primary:hover {
+    .delete-ticker {
+      background-color: var(--border-color) !important;
+    }
+  }
+
   .navbar {
     width: 180px;
     height: auto;
@@ -521,5 +568,13 @@
   }
   .active-request-tab {
     background-color: var(--selected-active-sidebar) !important;
+    .delete-ticker {
+      background-color: var(--selected-active-sidebar) !important;
+    }
+  }
+  .active-request-tab:hover {
+    .delete-ticker {
+      background-color: var(--selected-active-sidebar) !important;
+    }
   }
 </style>
