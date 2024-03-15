@@ -52,8 +52,8 @@
     selectedRequestBodyType,
     actSync,
     isDeleted,
-    source;
-  selectedRequestAuthType;
+    source,
+    selectedRequestAuthType;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
