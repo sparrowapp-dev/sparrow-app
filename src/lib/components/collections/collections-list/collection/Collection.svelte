@@ -81,14 +81,20 @@
 
     collectionsMethods.addRequestOrFolderInCollection(collectionId, folder);
 
-    const response = await _colllectionListViewModel.addFolder(
-      currentWorkspaceId,
-      collectionId,
-      {
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
         currentBranch: collection?.currentBranch
           ? collection?.currentBranch
           : collection?.primaryBranch,
         source: "USER",
+      };
+    }
+    const response = await _colllectionListViewModel.addFolder(
+      currentWorkspaceId,
+      collectionId,
+      {
+        ...userSource,
         name: folder.name,
         description: folder.description,
       },
@@ -140,13 +146,19 @@
       new Date().toString(),
     );
 
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const requestObj = {
       collectionId: collectionId,
       workspaceId: currentWorkspaceId,
-      currentBranch: collection?.currentBranch
-        ? collection?.currentBranch
-        : collection?.primaryBranch,
-      source: "USER",
+      ...userSource,
       items: {
         name: request.name,
         type: request.type,
@@ -291,36 +303,7 @@
     showMenu = false;
   };
 
-  let menuItems = [
-    {
-      onClick: openCollections,
-      displayText: "Open collection",
-      disabled: false,
-    },
-    {
-      onClick: renameCollection,
-      displayText: "Rename collection",
-      disabled: false,
-    },
-    {
-      onClick: addRequest,
-      displayText: "Add Request",
-      disabled: false,
-    },
-    {
-      onClick: addFolder,
-      displayText: "Add Folder",
-      disabled: false,
-    },
-
-    {
-      onClick: () => {
-        handleCollectionPopUp(true);
-      },
-      displayText: "Delete",
-      disabled: false,
-    },
-  ];
+  let menuItems = [];
   let requestCount: number = 0;
   let folderCount: number = 0;
   let deletedIds: string[] = [];
@@ -373,6 +356,64 @@
         }
       });
       deletedIds.push(collectionId);
+
+      if (collection?.activeSync) {
+        menuItems = [
+          {
+            onClick: openCollections,
+            displayText: "Open collection",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+          {
+            onClick: addFolder,
+            displayText: "Add Folder",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleCollectionPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else {
+        menuItems = [
+          {
+            onClick: openCollections,
+            displayText: "Open collection",
+            disabled: false,
+          },
+          {
+            onClick: renameCollection,
+            displayText: "Rename collection",
+            disabled: false,
+          },
+          {
+            onClick: addRequest,
+            displayText: "Add Request",
+            disabled: false,
+          },
+          {
+            onClick: addFolder,
+            displayText: "Add Folder",
+            disabled: false,
+          },
+
+          {
+            onClick: () => {
+              handleCollectionPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      }
     }
   }
 

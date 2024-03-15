@@ -5,6 +5,9 @@ import type { NewTab } from "../interfaces/request.interface";
 const generateSampleFolder = (id: string, date: string): NewTab => {
   return {
     id,
+    source: "USER",
+    isDeleted: false,
+    activeSync: false,
     name: FolderDefault.NAME,
     type: ItemType.FOLDER,
     description: "",

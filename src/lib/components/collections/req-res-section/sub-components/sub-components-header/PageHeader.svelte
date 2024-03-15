@@ -235,6 +235,19 @@
 
 <div class="d-flex flex-column" data-tauri-drag-region>
   <div
+    class="bg-danger p-3"
+    style={`display:${
+      componentData?.source === "SPEC" &&
+      componentData?.activeSync &&
+      componentData?.isDeleted
+        ? "block"
+        : "none"
+    }`}
+  >
+    The "{tabName}" request is removed from swagger and will be automatically
+    deleted from Sparrow in two weeks.
+  </div>
+  <div
     class="d-flex align-items-center justify-content-between {$collapsibleState
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
@@ -251,6 +264,7 @@
         maxlength={100}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
+        disabled={componentData?.source === "SPEC"}
       />
     </div>
 
