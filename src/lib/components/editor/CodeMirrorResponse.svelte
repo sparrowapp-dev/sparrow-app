@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import {
     RequestDataType,
@@ -107,4 +107,4 @@
     height: 100%;
     margin-left: 1%;
   }
-</style> -->
+</style>
