@@ -47,7 +47,7 @@
     }
   });
   let collectionCountArr = [];
-
+  let currentCollection;
   const refreshCount = async () => {
     if (collectionCountArr && collectionId) {
       for (const collection of collectionCountArr) {
@@ -58,6 +58,7 @@
           );
           totalRequest = 0;
           if (collectionData) totalRequest = collectionData.requestCount ?? 0;
+          currentCollection = collection;
         }
       }
     }
@@ -84,6 +85,7 @@
       property,
       value,
       collectionsMethods,
+      currentCollection,
     );
   };
 
@@ -92,6 +94,7 @@
     const response = await _myFolderViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;
