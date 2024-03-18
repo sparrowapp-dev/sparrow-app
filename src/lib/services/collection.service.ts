@@ -9,6 +9,7 @@ import type {
   UpdateCollectionName,
 } from "$lib/utils/dto";
 import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+import { createApiRequest } from "./rest-api.service";
 
 export class CollectionService {
   constructor() {}
@@ -180,18 +181,10 @@ export class CollectionService {
   };
 
   public validateImportCollectionURL = async (url = "") => {
-    const response = await makeRequest(
-      "GET",
-      url,
-      {
-        headers: {
-          ...getAuthHeaders(),
-          "Content-type": ContentTypeEnum["application/json"],
-        },
-      },
-      true,
+    return createApiRequest(
+      [url, `GET`, `Accept=*/*&Connection=keep-alive`, ``, `TEXT`],
+      `UNTRACKED-96bff9dc-299e-4c71-a0d8-562dee34d572`,
     );
-    return response;
   };
 
   public importCollection = async (

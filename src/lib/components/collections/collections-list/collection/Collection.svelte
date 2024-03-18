@@ -485,7 +485,7 @@
     const responseJSON = await collectionService.validateImportCollectionURL(
       collection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON.data.status === "200 OK") {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {

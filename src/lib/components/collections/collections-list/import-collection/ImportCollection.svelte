@@ -88,14 +88,14 @@
         const response = await _collectionService.validateImportCollectionURL(
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
-        if (response.isSuccessful) {
+        if (response.data.status === "200 OK") {
           isValidServerURL = true;
         }
       } else {
         isValidClientURL = false;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
-        if (response.isSuccessful) {
+        if (response.data.status === "200 OK") {
           isValidClientDeployedURL = true;
           isValidServerDeployedURL = true;
         }
@@ -261,10 +261,10 @@
     ) {
       const response =
         await _collectionService.validateImportCollectionURL(importData);
-      if (response.isSuccessful) {
+      if (response.data.status === "200 OK") {
         handleImportJsonObject(
           ContentTypeEnum["application/json"],
-          JSON.stringify(response.data.data),
+          response.data,
         );
       }
     } else if (
@@ -276,7 +276,8 @@
       const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
       const response =
         await _collectionService.validateImportCollectionURL(importUrl);
-      if (!activeSync && response.isSuccessful) {
+      console.log(response.data);
+      if (!activeSync && response.data.status === "200 OK") {
         const requestBody = {
           urlData: response.data,
           url: importUrl,
@@ -284,7 +285,7 @@
         handleImportUrl(requestBody);
       } else if (
         activeSync &&
-        response.isSuccessful &&
+        response.data.status === "200 OK" &&
         isRepositoryPath &&
         repositoryBranch &&
         repositoryPath &&
