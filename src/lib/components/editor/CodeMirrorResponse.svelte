@@ -62,7 +62,7 @@
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
         try {
-          rawValue = JSON.stringify(JSON.parse(rawValue), null, 6);
+          rawValue = JSON.stringify(JSON.parse(rawValue), null, 3);
         } catch (err) {
           return;
         }
