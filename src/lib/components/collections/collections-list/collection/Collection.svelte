@@ -33,7 +33,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, type WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
@@ -485,7 +485,7 @@
     const responseJSON = await collectionService.validateImportCollectionURL(
       collection.activeSyncUrl,
     );
-    if (responseJSON.data.status === "200 OK") {
+    if (responseJSON.data.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
