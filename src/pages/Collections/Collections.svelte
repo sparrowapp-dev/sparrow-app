@@ -257,7 +257,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  :global(.splitpanes) {
-    width: calc(100vw - 72px);
+  :global(.splitter-sidebar.splitpanes) {
+    width: calc(100vw - 72px) !important;
   }
 </style>
