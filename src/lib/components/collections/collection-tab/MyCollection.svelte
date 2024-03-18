@@ -24,6 +24,7 @@
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import { invoke } from "@tauri-apps/api/core";
+  import { ModalWrapperV1 } from "$lib/components";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -44,6 +45,9 @@
   let totalRequest: number = 0;
   let tabDescription = "";
   let isSynced = false;
+  let isBranchSwitchPopupOpen = false;
+  let newBranch = "";
+  let branchSwitchLoader: boolean = false;
   const _myColllectionViewModel = new MyCollectionViewModel();
 
   const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
@@ -223,22 +227,34 @@
       inputElement.select();
     }
   });
+
+  const handleBranchSwitchPopup = (flag: boolean) => {
+    isBranchSwitchPopupOpen = flag;
+  };
+
   const handleBranchChange = async (branch: string) => {
+    handleBranchSwitchPopup(true);
+    newBranch = branch; 
+  };
+
+  const handleBranchChangePopup = async () => {
     const response = await _collectionService.switchCollectionBranch(
       currentCollection?.id,
-      branch,
+      newBranch,
     );
     if (response.isSuccessful) {
       collectionsMethods.updateCollection(currentCollection?.id, {
-        currentBranch: branch,
+        currentBranch: newBranch,
         items: response.data.data.items,
       });
     } else {
       collectionsMethods.updateCollection(currentCollection?.id, {
-        currentBranch: branch,
+        currentBranch: newBranch,
         items: [],
       });
     }
+    await collectionsMethods.clearTabs();
+    handleBranchSwitchPopup(false);
     notifications.success("Branch switched successfully.");
   };
   const onRenameInputKeyPress = (event) => {
@@ -252,6 +268,47 @@
 </script>
 
 <div class="main-container d-flex">
+  <ModalWrapperV1
+    title={"Switch Branch?"}
+    type={"danger"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={isBranchSwitchPopupOpen}
+    handleModalState={handleBranchSwitchPopup}
+  >
+    <div class="text-lightGray mb-1 sparrow-fs-14">
+      <p>
+        Switching branch will close all the open tabs! Do you really want to
+        switch branch?
+      </p>
+    </div>
+    <div
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    >
+      <Button
+        disable={branchSwitchLoader}
+        title={"Cancel"}
+        textStyleProp={"font-size: var(--base-text)"}
+        type={"dark"}
+        loader={false}
+        onClick={() => {
+          handleBranchSwitchPopup(false);
+        }}
+      />
+
+      <Button
+        disable={branchSwitchLoader}
+        title={"Switch"}
+        textStyleProp={"font-size: var(--base-text)"}
+        loaderSize={18}
+        type={"danger"}
+        loader={branchSwitchLoader}
+        onClick={() => {
+          handleBranchChangePopup();
+        }}
+      />
+    </div>
+  </ModalWrapperV1>
   <div
     class="my-collection d-flex flex-column"
     style="width:calc(100% - 280px); margin-top: 15px;"

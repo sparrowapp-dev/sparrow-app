@@ -25,6 +25,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { ContentTypeEnum } from "$lib/utils/enums";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -60,11 +61,13 @@
 
   let isValidClientURL = false,
     isValidClientJSON = false,
-    isValidClientXML = false;
+    isValidClientXML = false,
+    isValidClientDeployedURL = false;
 
   let isValidServerURL = false,
     isValidServerJSON = false,
-    isValidServerXML = false;
+    isValidServerXML = false,
+    isValidServerDeployedURL = false;
 
   const handleInputField = async () => {
     isValidClientURL = false;
@@ -73,18 +76,29 @@
     isValidServerURL = false;
     isValidServerJSON = false;
     isValidServerXML = false;
+    isValidClientDeployedURL = false;
+    isValidServerDeployedURL = false;
 
-    if (
-      validateClientURL(importData) &&
-      importData.includes("://127.0.0.1")!! &&
-      importData.includes("://localhost")
-    ) {
+    if (validateClientURL(importData)) {
       isValidClientURL = true;
-      const response = await _collectionService.validateImportCollectionURL(
-        importData.replace("localhost", "127.0.0.1") + "-json",
-      );
-      if (response.isSuccessful) {
-        isValidServerURL = true;
+      if (
+        importData.includes("://127.0.0.1") ||
+        importData.includes("://localhost")
+      ) {
+        const response = await _collectionService.validateImportCollectionURL(
+          importData.replace("localhost", "127.0.0.1") + "-json",
+        );
+        if (response.isSuccessful) {
+          isValidServerURL = true;
+        }
+      } else {
+        isValidClientURL = false;
+        const response =
+          await _collectionService.validateImportCollectionURL(importData);
+        if (response.isSuccessful) {
+          isValidClientDeployedURL = true;
+          isValidServerDeployedURL = true;
+        }
       }
     } else if (validateClientJSON(importData)) {
       isValidClientJSON = true;
@@ -238,7 +252,21 @@
         (isValidClientXML && isValidServerXML))
     ) {
       const contentType = validateJSON(importData);
-      handleImportJsonObject(contentType);
+      handleImportJsonObject(contentType, importData);
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientDeployedURL &&
+      isValidServerDeployedURL
+    ) {
+      const response =
+        await _collectionService.validateImportCollectionURL(importData);
+      if (response.isSuccessful) {
+        handleImportJsonObject(
+          ContentTypeEnum["application/json"],
+          JSON.stringify(response.data.data),
+        );
+      }
     } else if (
       importType === "text" &&
       importData &&
@@ -294,7 +322,7 @@
     isDataEmpty = true;
   };
 
-  const handleImportJsonObject = async (contentType) => {
+  const handleImportJsonObject = async (contentType, importJSON) => {
     if (!contentType) {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -305,7 +333,7 @@
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
     const response = await _viewImportCollection.importCollectionFromJsonObject(
       currentWorkspaceId,
-      importData,
+      importJSON,
       contentType,
     );
 
@@ -342,7 +370,6 @@
         id: Samplecollection.id,
         name: Samplecollection.name,
       });
-      notifications.success("New Collection Created");
       MixpanelEvent(Events.IMPORT_COLLECTION, {
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
@@ -582,7 +609,7 @@
         accuracy and accessibility. If the problem persists, contact the API
         provider for assistance.
       </p>
-    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && isInputDataTouched)}
+    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         We have identified that text you pasted is not written in Open API
         Specification (OAS). Please visit https://swagger.io/specification/ for
