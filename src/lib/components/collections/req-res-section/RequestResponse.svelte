@@ -34,6 +34,7 @@
       {activeTab}
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
+      {_collectionListViewModel}
     />
   </div>
 </div>

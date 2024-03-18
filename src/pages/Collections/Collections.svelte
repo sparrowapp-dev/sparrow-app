@@ -211,6 +211,7 @@
           _tabId={$activeTab?.id}
           {collectionsMethods}
           {onTabsSwitched}
+          {_collectionListViewModel}
           {loggedUserRoleInWorkspace}
         />
       </div>

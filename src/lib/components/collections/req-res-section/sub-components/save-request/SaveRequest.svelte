@@ -19,7 +19,10 @@
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
@@ -42,7 +45,36 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
-  export let currentCollection;
+  export let _collectionListViewModel;
+
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
+
+  let collectionCountArr = [];
+  let currentCollection;
+  const refreshCount = async () => {
+    if (collectionCountArr && componentData?.path?.collectionId) {
+      for (const collection of collectionCountArr) {
+        if (collection._data.id === componentData?.path?.collectionId) {
+          currentCollection = collection;
+        }
+      }
+    }
+  };
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
+    },
+  );
+
+  $: {
+    if (componentData?.path?.collectionId) {
+      refreshCount();
+    }
+  }
 
   interface Path {
     name: string;
@@ -449,6 +481,7 @@
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
+    collectionSubscribe.unsubscribe();
   });
 </script>
 

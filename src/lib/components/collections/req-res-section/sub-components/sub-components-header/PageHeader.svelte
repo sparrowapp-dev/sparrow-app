@@ -415,6 +415,7 @@
                 {collectionsMethods}
                 {componentData}
                 {currentCollection}
+                {_collectionListViewModel}
                 onClick={handleBackdrop}
               />
             </ModalWrapperV1>
