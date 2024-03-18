@@ -223,6 +223,7 @@
               {activeTab}
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
+              {_collectionListViewModel}
               environmentVariables={environmentVariables.reverse()}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}

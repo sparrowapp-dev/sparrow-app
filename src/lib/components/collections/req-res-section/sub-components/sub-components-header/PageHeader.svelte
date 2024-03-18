@@ -27,9 +27,16 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  export let _collectionListViewModel: CollectionListViewModel;
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+
+  const collections: Observable<CollectionDocument[]> =
+    _collectionListViewModel.collection;
 
   let visibility: boolean = false;
   const handleBackdrop = (flag) => {
@@ -47,6 +54,15 @@
   });
 
   const handleSaveRequest = async () => {
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const _id = componentData.id;
     collectionsMethods.updateTab(true, "saveInProgress", _id);
     const { folderId, folderName, collectionId, workspaceId } =
@@ -85,6 +101,7 @@
       let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
+        ...userSource,
         items: {
           id: _id,
           name: tabName,
@@ -109,6 +126,7 @@
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
+        ...userSource,
         items: {
           name: folderName,
           type: ItemType.FOLDER,
@@ -228,9 +246,37 @@
       inputField.blur();
     }
   };
+
   onDestroy(() => {
     unsubscribeisApiCreatedFirstTime();
+    collectionSubscribe.unsubscribe();
   });
+
+  let collectionCountArr = [];
+  let currentCollection;
+  const refreshCount = async () => {
+    if (collectionCountArr && componentData?.path?.collectionId) {
+      for (const collection of collectionCountArr) {
+        if (collection._data.id === componentData?.path?.collectionId) {
+          currentCollection = collection;
+        }
+      }
+    }
+  };
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
+    },
+  );
+
+  $: {
+    if (componentData?.path?.collectionId) {
+      refreshCount();
+    }
+  }
 </script>
 
 <div class="d-flex flex-column" data-tauri-drag-region>
@@ -368,6 +414,7 @@
               <SaveRequest
                 {collectionsMethods}
                 {componentData}
+                {currentCollection}
                 onClick={handleBackdrop}
               />
             </ModalWrapperV1>

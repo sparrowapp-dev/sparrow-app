@@ -42,6 +42,7 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
+  export let currentCollection;
 
   interface Path {
     name: string;
@@ -147,6 +148,15 @@
   };
 
   const handleSaveAsRequest = async () => {
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
@@ -205,6 +215,7 @@
         const res = await insertCollectionRequest({
           collectionId: path[path.length - 1].id,
           workspaceId: workspace.id,
+          ...userSource,
           items: {
             name: tabName,
             description,
@@ -284,6 +295,7 @@
           collectionId: path[0].id,
           workspaceId: workspace.id,
           folderId: path[path.length - 1].id,
+          ...userSource,
           items: {
             name: path[path.length - 1].name,
             type: ItemType.FOLDER,

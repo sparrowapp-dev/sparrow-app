@@ -10,12 +10,18 @@
   export let activeTab: Observable<TabDocument>;
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let _collectionListViewModel;
 </script>
 
 <div class="d-flex">
   <div class="request-response w-100">
-    <PageHeader {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
+    <PageHeader
+      {activeTab}
+      {collectionsMethods}
+      {loggedUserRoleInWorkspace}
+      {_collectionListViewModel}
+    />
     <ApiSendRequestPage
       {activeTab}
       {collectionsMethods}
@@ -24,7 +30,11 @@
     <RequestParam {activeTab} {collectionsMethods} {environmentVariables} />
   </div>
   <div>
-    <SidebarRight {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
+    <SidebarRight
+      {activeTab}
+      {collectionsMethods}
+      {loggedUserRoleInWorkspace}
+    />
   </div>
 </div>
 
