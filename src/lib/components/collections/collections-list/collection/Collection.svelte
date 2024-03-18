@@ -659,7 +659,7 @@
       </div>
     {/if}
   </div>
-  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     {#if isActiveSyncEnabled && collection?.activeSync}

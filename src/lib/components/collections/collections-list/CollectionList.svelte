@@ -600,6 +600,7 @@
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
@@ -613,6 +614,7 @@
               {#if filteredFolder.length > 0}
                 {#each filteredFolder as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
@@ -624,6 +626,7 @@
               {#if filteredCollection.length > 0}
                 {#each filteredCollection as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
