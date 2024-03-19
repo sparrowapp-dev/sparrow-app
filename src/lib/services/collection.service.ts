@@ -183,7 +183,7 @@ export class CollectionService {
   public validateImportCollectionURL = async (url = "") => {
     return createApiRequest(
       [url, `GET`, `Accept=*/*&Connection=keep-alive`, ``, `TEXT`],
-      `UNTRACKED-96bff9dc-299e-4c71-a0d8-562dee34d572`,
+      ``,
     );
   };
 

@@ -88,14 +88,14 @@
         const response = await _collectionService.validateImportCollectionURL(
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
-        if (response.data.status === ResponseStatusCode.OK) {
+        if (response?.data?.status === ResponseStatusCode.OK) {
           isValidServerURL = true;
         }
       } else {
         isValidClientURL = false;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
-        if (response.data.status === ResponseStatusCode.OK) {
+        if (response?.data?.status === ResponseStatusCode.OK) {
           isValidClientDeployedURL = true;
           isValidServerDeployedURL = true;
         }
@@ -262,7 +262,7 @@
     ) {
       const response =
         await _collectionService.validateImportCollectionURL(importData);
-      if (response.data.status === ResponseStatusCode.OK) {
+      if (response?.data?.status === ResponseStatusCode.OK) {
         handleImportJsonObject(
           ContentTypeEnum["application/json"],
           response.data.response,
@@ -277,7 +277,7 @@
       const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
       const response =
         await _collectionService.validateImportCollectionURL(importUrl);
-      if (!activeSync && response.data.status === ResponseStatusCode.OK) {
+      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
         const requestBody = {
           urlData: {
             data: JSON.parse(response.data.response),
@@ -288,7 +288,7 @@
         handleImportUrl(requestBody);
       } else if (
         activeSync &&
-        response.data.status === ResponseStatusCode.OK &&
+        response?.data?.status === ResponseStatusCode.OK &&
         isRepositoryPath &&
         repositoryBranch &&
         repositoryPath &&
