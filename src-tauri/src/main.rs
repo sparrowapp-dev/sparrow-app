@@ -208,9 +208,9 @@ async fn make_request(
 
     // Convert header string into hashmap
     let header_map: HashMap<_, _> = headers
-        .split('&')
+        .split("[SPARROW_AMPERSAND]")
         .map(|s| {
-            let mut parts = s.split('=');
+            let mut parts = s.split("[SPARROW_EQUALS]");
             (
                 parts.next().unwrap().to_owned(),
                 parts.next().unwrap_or("").to_owned(),
