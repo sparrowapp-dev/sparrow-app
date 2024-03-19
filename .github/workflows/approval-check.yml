@@ -1,4 +1,4 @@
-name: actions_on_main_branch
+name: Approval Actions
 on: 
   pull_request_target:
     types:
