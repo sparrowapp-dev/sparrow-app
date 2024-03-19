@@ -200,6 +200,7 @@
           items: response.data.data.items,
           createdAt: response.data.data.createdAt,
         };
+
         collectionsMethods.addCollection({
           ...response.data.data,
           id: response.data.data._id,
@@ -278,7 +279,10 @@
         await _collectionService.validateImportCollectionURL(importUrl);
       if (!activeSync && response.data.status === ResponseStatusCode.OK) {
         const requestBody = {
-          urlData: response.data,
+          urlData: {
+            data: JSON.parse(response.data.response),
+            headers: response.data.headers,
+          },
           url: importUrl,
         };
         handleImportUrl(requestBody);
@@ -299,7 +303,10 @@
             .includes(currentBranch)
         ) {
           const requestBody = {
-            urlData: response.data,
+            urlData: {
+              data: JSON.parse(response.data.response),
+              headers: response.data.headers,
+            },
             url: importUrl,
             primaryBranch: repositoryBranch,
             currentBranch: currentBranch,

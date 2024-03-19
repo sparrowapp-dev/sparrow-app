@@ -164,7 +164,10 @@
         currentWorkspaceId,
         {
           url: currentCollection?.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: currentCollection?.primaryBranch,
           currentBranch: currentCollection?.currentBranch
             ? currentCollection?.currentBranch

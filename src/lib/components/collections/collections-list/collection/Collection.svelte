@@ -490,7 +490,10 @@
         currentWorkspaceId,
         {
           url: collection.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: collection?.primaryBranch,
           currentBranch: collection?.currentBranch
             ? collection?.currentBranch
