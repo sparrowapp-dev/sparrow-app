@@ -1,4 +1,5 @@
 <script lang="ts">
+  import refreshIcon from "$lib/assets/refresh.svg";
   import { onDestroy, onMount } from "svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
@@ -234,7 +235,7 @@
 
   const handleBranchChange = async (branch: string) => {
     handleBranchSwitchPopup(true);
-    newBranch = branch; 
+    newBranch = branch;
   };
 
   const handleBranchChangePopup = async () => {
@@ -263,6 +264,35 @@
         "renameInputFieldCollection",
       ) as HTMLInputElement;
       inputField.blur();
+    }
+  };
+
+  const refetchBranch = async () => {
+    if (refreshCollectionLoader) return;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        const currentBranchObj = {
+          id: currentBranch,
+          name: currentBranch,
+        };
+        let branchExists = false;
+        currentCollection.branches.forEach((branch) => {
+          if (branch.name == currentBranchObj.name) {
+            branchExists = true;
+          }
+        });
+        if (!branchExists) {
+          currentCollection.branches.push(currentBranchObj);
+          currentCollection.branches = currentCollection.branches;
+        }
+        notifications.success(`Branch refreshed.`);
+      }
+    } catch (e) {
+      notifications.error("Failed to fetch branch from repository.");
     }
   };
 </script>
@@ -388,6 +418,14 @@
                   },
                 ]}
               ></Dropdown>
+              <button
+                class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
+                on:click={() => {
+                  refetchBranch();
+                }}
+              >
+                <img src={refreshIcon} alt="refetch" />
+              </button>
             </div>
           {/if}
         </div>
