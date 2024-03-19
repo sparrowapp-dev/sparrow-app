@@ -3,7 +3,6 @@ name = "sparrow-app"
 version = "0.0.0"
 description = "Sparrow"
 authors = ["sparrow"]
-license = "https://github.com/sparrowapp-dev/sparrow-app/blob/main/LICENSE"
 repository = "https://github.com/sparrowapp-dev/sparrow-app"
 edition = "2021"
 

@@ -27,6 +27,7 @@
     "frontendDist": "../dist"
   },
   "bundle": {
+    "license": "AGPL-3.0-only",
     "active": true,
     "icon": [
       "icons/32x32.png",
