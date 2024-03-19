@@ -265,10 +265,12 @@ export class CollectionService {
 
   public importCollectionFromCurl = async (curl: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
-      body: curl,
+      body: {
+        curl: curl,
+      },
       headers: {
         ...getAuthHeaders(),
-        "Content-type": ContentTypeEnum["application/json"],
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
     return response;

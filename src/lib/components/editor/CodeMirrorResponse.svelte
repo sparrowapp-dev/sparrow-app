@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import {
     RequestDataType,
@@ -62,7 +62,7 @@
       CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
       if (rawTab === RequestDataType.JSON) {
         try {
-          rawValue = JSON.stringify(JSON.parse(rawValue), null, 6);
+          rawValue = JSON.stringify(JSON.parse(rawValue), null, 3);
         } catch (err) {
           return;
         }
@@ -107,4 +107,4 @@
     height: 100%;
     margin-left: 1%;
   }
-</style> -->
+</style>
