@@ -45,10 +45,9 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
-  export let _collectionListViewModel;
 
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
 
   let collectionCountArr = [];
   let currentCollection;

@@ -79,6 +79,7 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
     clearTabs: _viewModel.clearTabs,
+    collection: _viewModel.collection,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
@@ -211,7 +212,6 @@
           _tabId={$activeTab?.id}
           {collectionsMethods}
           {onTabsSwitched}
-          {_collectionListViewModel}
           {loggedUserRoleInWorkspace}
         />
       </div>
@@ -224,20 +224,14 @@
               {activeTab}
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
-              {_collectionListViewModel}
               environmentVariables={environmentVariables.reverse()}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace
-              {activeTab}
-              {collectionsMethods}
-              {_collectionListViewModel}
-            />
+            <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
             <MyFolder
               {collectionsMethods}
               {activeTab}
-              {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}

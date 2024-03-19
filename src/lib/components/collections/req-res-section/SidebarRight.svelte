@@ -25,13 +25,13 @@
   import ComboText from "$lib/components/text/ComboText.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let _collectionListViewModel;
 
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
 
   let componentData: NewTab;
   let description: string;

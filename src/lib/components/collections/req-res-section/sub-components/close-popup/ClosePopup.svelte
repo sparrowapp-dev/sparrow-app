@@ -29,10 +29,9 @@
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let _collectionListViewModel;
 
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
 
   let collectionCountArr = [];
   let currentCollection;

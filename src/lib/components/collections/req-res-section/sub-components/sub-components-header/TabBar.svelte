@@ -31,7 +31,7 @@
   export let tabList: TabDocument[];
   export let _tabId: string;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let _collectionListViewModel;
+
   let removeTab;
   let movedTabStartIndex: number;
   let movedTabEndIndex: number;
@@ -234,7 +234,6 @@
     componentData={removeTab}
     {handleSaveAsBackdrop}
     closeCallback={handleClosePopupBackdrop}
-    {_collectionListViewModel}
     {loggedUserRoleInWorkspace}
   />
 </ModalWrapperV1>

@@ -53,6 +53,10 @@ export class CollectionsViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
+  get collection() {
+    return this.collectionRepository.getCollection();
+  }
+
   public handleCreateTab = (data: any) => {
     requestResponseStore.createTab(data);
     this.debouncedTab();

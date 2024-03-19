@@ -27,16 +27,14 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import type { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  export let _collectionListViewModel: CollectionListViewModel;
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
 
   let visibility: boolean = false;
   const handleBackdrop = (flag) => {
@@ -415,7 +413,6 @@
                 {collectionsMethods}
                 {componentData}
                 {currentCollection}
-                {_collectionListViewModel}
                 onClick={handleBackdrop}
               />
             </ModalWrapperV1>

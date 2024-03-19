@@ -11,17 +11,11 @@
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let _collectionListViewModel;
 </script>
 
 <div class="d-flex">
   <div class="request-response w-100">
-    <PageHeader
-      {activeTab}
-      {collectionsMethods}
-      {loggedUserRoleInWorkspace}
-      {_collectionListViewModel}
-    />
+    <PageHeader {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
     <ApiSendRequestPage
       {activeTab}
       {collectionsMethods}
@@ -34,7 +28,6 @@
       {activeTab}
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
-      {_collectionListViewModel}
     />
   </div>
 </div>
