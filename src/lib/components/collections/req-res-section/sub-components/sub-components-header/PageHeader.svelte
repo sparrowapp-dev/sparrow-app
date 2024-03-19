@@ -281,11 +281,7 @@
   <div
     class="bg-danger p-3"
     style={`display:${
-      componentData?.source === "SPEC" &&
-      componentData?.activeSync &&
-      componentData?.isDeleted
-        ? "block"
-        : "none"
+      componentData?.activeSync && componentData?.isDeleted ? "block" : "none"
     }`}
   >
     The "{tabName}" request is removed from swagger and will be automatically
@@ -323,14 +319,12 @@
             )}
           >
             <button
-              disabled={componentData?.save ||
+              disabled={componentData.saveInProgress ||
                 !hasWorkpaceLevelPermission(
                   loggedUserRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
                 ) ||
-                (componentData?.source === "SPEC" &&
-                  componentData?.activeSync &&
-                  !componentData?.isDeleted)}
+                (componentData?.source === "SPEC" && componentData?.activeSync)}
               style="width:140px;"
               class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
               on:click={() => {
@@ -345,7 +339,9 @@
               }}
             >
               {#if componentData.saveInProgress}
-                <Spinner size={"14px"} />
+                <span class="me-1">
+                  <Spinner size={"14px"} />
+                </span>
               {:else}
                 <img
                   src={floppyDisk}
@@ -364,8 +360,7 @@
           <span class="position-relative" style="width:35px;">
             <Dropdown
               disabled={componentData?.source === "SPEC" &&
-                componentData?.activeSync &&
-                !componentData?.isDeleted}
+                componentData?.activeSync}
               dropdownId={"saveAsDropdown"}
               dropDownType={{ type: "img", title: angleDown }}
               data={[

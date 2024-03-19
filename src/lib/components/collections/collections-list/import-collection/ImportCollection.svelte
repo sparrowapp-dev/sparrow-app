@@ -674,12 +674,12 @@
           >Enabling Active Sync auto-updates APIs via Swagger Link.</small
         >
       </div>
-      <div class="d-flex align-items-center gap-2 pb-2">
+      <!-- <div class="d-flex align-items-center gap-2 pb-2">
         <img src={linkIcon} alt="" />
         <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
           >Learn more about Active Sync</a
         >
-      </div>
+      </div> -->
       {#if activeSync}
         <!-- Local repository path -->
         <div>

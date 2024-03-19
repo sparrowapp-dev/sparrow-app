@@ -114,13 +114,14 @@
       inputField.blur();
     }
   };
-
+  let isLoading;
   const handleApiRequest = async () => {
     isApiCreatedFirstTime.set(true);
 
     const response = await _myColllectionViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;
