@@ -76,6 +76,7 @@ const searchHelper: (
   collectionId: string,
   path: string[],
   folderDetails: Record<string, string>,
+  activeSync: boolean,
 ) => void = (
   tree,
   searchText,
@@ -85,6 +86,7 @@ const searchHelper: (
   collectionId,
   path,
   folderDetails,
+  activeSync,
 ) => {
   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
     if (tree.type === "REQUEST") {
@@ -93,18 +95,21 @@ const searchHelper: (
         collectionId,
         folderDetails,
         path: createPath(path),
+        activeSync,
       });
     } else if (tree.type === "FOLDER") {
       folder.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
+        activeSync,
       });
     } else {
       collection.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
         path: createPath(path),
+        activeSync,
       });
     }
   }
@@ -122,6 +127,7 @@ const searchHelper: (
         collectionId,
         path,
         tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
+        activeSync,
       );
       path.pop();
     }
@@ -255,6 +261,7 @@ const useTree = (): any[] => {
         filteredTrees[i].id,
         path,
         {},
+        filteredTrees[i]?.activeSync,
       );
     }
     return;

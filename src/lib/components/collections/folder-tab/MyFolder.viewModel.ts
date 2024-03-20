@@ -32,15 +32,25 @@ export class MyFolderViewModel {
     property: string,
     value: string,
     collectionsMethods: CollectionsMethods,
+    currentCollection,
   ) => {
     const updateObj = {};
     updateObj[property] = value;
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const updateFolderElement =
       await this.collectionService.updateFolderInCollection(
         componentData.path.workspaceId,
         componentData.path.collectionId,
         componentData.path.folderId,
-        updateObj,
+        { ...updateObj, ...userSource },
       );
     await collectionsMethods.updateRequestOrFolderInCollection(
       componentData.path.collectionId,
@@ -58,18 +68,30 @@ export class MyFolderViewModel {
   public createApiRequest = async (
     componentData,
     collectionsMethods: CollectionsMethods,
+    currentCollection,
   ) => {
     const sampleRequest = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
     );
 
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
+
     const requestObj: CreateApiRequestPostBody = {
       collectionId: componentData.path.collectionId,
       workspaceId: componentData.path.workspaceId,
       folderId: componentData.path.folderId,
+      ...userSource,
       items: {
-        name: componentData.path.folderName,
+        name: componentData.name,
         type: ItemType.FOLDER,
         items: {
           name: sampleRequest.name,

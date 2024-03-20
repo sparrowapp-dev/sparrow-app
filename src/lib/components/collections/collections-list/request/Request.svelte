@@ -405,7 +405,7 @@
       ? 'unclickable'
       : ''}"
   >
-    {#if api?.isDeleted}
+    {#if api?.isDeleted && activeSync}
       <span
         class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
         style="right: 0; background-color: var(--background-color); "

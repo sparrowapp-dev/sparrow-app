@@ -19,7 +19,10 @@
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
@@ -42,6 +45,35 @@
   export let componentData: NewTab;
   export let onFinish = (_id) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
+
+  const collections: Observable<CollectionDocument[]> =
+    collectionsMethods.collection;
+
+  let collectionCountArr = [];
+  let currentCollection;
+  const refreshCount = async () => {
+    if (collectionCountArr && componentData?.path?.collectionId) {
+      for (const collection of collectionCountArr) {
+        if (collection._data.id === componentData?.path?.collectionId) {
+          currentCollection = collection;
+        }
+      }
+    }
+  };
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
+    },
+  );
+
+  $: {
+    if (componentData?.path?.collectionId) {
+      refreshCount();
+    }
+  }
 
   interface Path {
     name: string;
@@ -147,6 +179,15 @@
   };
 
   const handleSaveAsRequest = async () => {
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
@@ -205,6 +246,7 @@
         const res = await insertCollectionRequest({
           collectionId: path[path.length - 1].id,
           workspaceId: workspace.id,
+          ...userSource,
           items: {
             name: tabName,
             description,
@@ -284,6 +326,7 @@
           collectionId: path[0].id,
           workspaceId: workspace.id,
           folderId: path[path.length - 1].id,
+          ...userSource,
           items: {
             name: path[path.length - 1].name,
             type: ItemType.FOLDER,
@@ -437,6 +480,7 @@
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
+    collectionSubscribe.unsubscribe();
   });
 </script>
 

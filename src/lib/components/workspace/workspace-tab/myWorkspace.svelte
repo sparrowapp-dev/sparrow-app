@@ -64,9 +64,9 @@
   let hasEditPermission = false;
   let loggedInUser: userDetails;
   let loggedUserRole: TeamRole;
-  export let _collectionListViewModel: CollectionListViewModel;
+
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
 
   const handleWorkspaceInput = (event: any) => {
     newWorkspaceName = event.target.value;
