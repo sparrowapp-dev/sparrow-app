@@ -44,6 +44,7 @@
         updateRequestProperty: collectionsMethods.updateRequestProperty,
         getGlobalEnvironment: collectionsMethods.getGlobalEnvironment,
         currentEnvironment: collectionsMethods.currentEnvironment,
+        updateEnvironment: collectionsMethods.updateEnvironment,
       }}
       {environmentVariables}
     />
