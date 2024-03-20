@@ -89,15 +89,31 @@
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
         if (response?.data?.status === ResponseStatusCode.OK) {
-          isValidServerURL = true;
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidServerURL = true;
+            }
+          } catch (e) {}
         }
       } else {
-        isValidClientURL = false;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
-          isValidClientDeployedURL = true;
-          isValidServerDeployedURL = true;
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidClientURL = false;
+              isValidClientDeployedURL = true;
+              isValidServerDeployedURL = true;
+            }
+          } catch (e) {}
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -649,6 +665,11 @@
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
+    {#if isDataEmpty}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please upload your file in order to import collections.
+      </p>
+    {/if}
   {/if}
   {#if isValidClientURL && isValidServerURL}
     <div>
@@ -818,11 +839,6 @@
         {/if}</span
       > Import Collection</button
     >
-    {#if isDataEmpty && !importData}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Please Paste or Upload your file in order to import the workspace
-      </p>
-    {/if}
     <p class="importData-whiteColor my-2 sparrow-fs-14 fw-bold">OR</p>
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"

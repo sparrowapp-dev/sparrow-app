@@ -121,9 +121,9 @@ const makeRequest = async (
       return error("unauthorized");
     }
     if (e.message) {
-      return error(e.response.data.message);
-    } else if (e.response.data) {
-      return error(e.response.data.message);
+      return error(e.response?.data?.message);
+    } else if (e.response?.data) {
+      return error(e.response?.data?.message);
     }
     return error(e);
   } finally {

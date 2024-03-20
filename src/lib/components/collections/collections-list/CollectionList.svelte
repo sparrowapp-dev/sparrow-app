@@ -381,6 +381,7 @@
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     usernameUnsubscribe();
+    workspaceUnsubscribe.unsubscribe();
   });
 
   const handleRequestClick = (id: string) => {

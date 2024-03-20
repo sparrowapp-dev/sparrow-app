@@ -132,20 +132,10 @@ export class CollectionRepository {
         delete collectionObj._id;
         return collectionObj;
       });
-      RxDB.getInstance()
-        .rxdb.collection.find()
-        .remove()
-        .then(() => {
-          // Remove all documents from the collection
-          return RxDB.getInstance().rxdb.collection.bulkInsert(
-            updatedCollections,
-          );
-        })
-        .catch((error) => {
-          console.error("Error occurred:", error);
-        });
+      await this.clearCollections();
+      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
     } else {
-      await RxDB.getInstance().rxdb.collection.find().remove();
+      await this.clearCollections();
     }
   };
 
