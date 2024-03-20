@@ -24,9 +24,14 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+
+  const collections: Observable<CollectionDocument[]> =
+    collectionsMethods.collection;
 
   let componentData: NewTab;
   let description: string;
@@ -68,6 +73,15 @@
   };
 
   const handleSaveRequest = async () => {
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const _id = componentData?.id;
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
@@ -98,6 +112,7 @@
       let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
+        ...userSource,
         items: {
           id: existingRequest?.id,
           name: existingRequest?.name,
@@ -121,6 +136,7 @@
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
+        ...userSource,
         items: {
           name: folderName,
           type: ItemType.FOLDER,
@@ -148,8 +164,35 @@
     MixpanelEvent(Events.SAVE_API_DOCUMENTATION);
   };
 
+  let collectionCountArr = [];
+  let currentCollection;
+  const refreshCount = async () => {
+    if (collectionCountArr && componentData?.path?.collectionId) {
+      for (const collection of collectionCountArr) {
+        if (collection._data.id === componentData?.path?.collectionId) {
+          currentCollection = collection;
+        }
+      }
+    }
+  };
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
+    },
+  );
+
+  $: {
+    if (componentData?.path?.collectionId) {
+      refreshCount();
+    }
+  }
+
   onDestroy(() => {
     tabSubscribe();
+    collectionSubscribe.unsubscribe();
   });
 </script>
 

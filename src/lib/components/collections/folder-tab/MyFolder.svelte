@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
 
   import {
@@ -9,7 +9,6 @@
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { MyFolderViewModel } from "./MyFolder.viewModel";
   import { isFolderCreatedFirstTime } from "$lib/store/collection";
-  import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import type { WorkspaceRole } from "$lib/utils/enums";
@@ -19,14 +18,13 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
   export let loaderColor = "default";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let _collectionListViewModel: CollectionListViewModel;
+
   const collections: Observable<CollectionDocument[]> =
-    _collectionListViewModel.collection;
+    collectionsMethods.collection;
   let isLoading: boolean = false;
   let collapsExpandToggle: boolean = false;
   let tabName = "";
@@ -44,11 +42,10 @@
       componentData = event;
       collectionId = event.path?.collectionId;
       folderId = event.path?.folderId;
-      console.log(componentData);
     }
   });
   let collectionCountArr = [];
-
+  let currentCollection;
   const refreshCount = async () => {
     if (collectionCountArr && collectionId) {
       for (const collection of collectionCountArr) {
@@ -59,6 +56,7 @@
           );
           totalRequest = 0;
           if (collectionData) totalRequest = collectionData.requestCount ?? 0;
+          currentCollection = collection;
         }
       }
     }
@@ -85,6 +83,7 @@
       property,
       value,
       collectionsMethods,
+      currentCollection,
     );
   };
 
@@ -93,6 +92,7 @@
     const response = await _myFolderViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;

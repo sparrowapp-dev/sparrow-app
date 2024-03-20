@@ -63,7 +63,17 @@ export class MyCollectionViewModel {
   public createApiRequest = async (
     componentData,
     collectionsMethods: CollectionsMethods,
+    currentCollection,
   ) => {
+    let userSource = {};
+    if (currentCollection?.activeSync) {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const request = generateSampleRequest(
       UntrackedItems.UNTRACKED + uuidv4(),
       new Date().toString(),
@@ -71,6 +81,7 @@ export class MyCollectionViewModel {
     const requestObj = {
       collectionId: componentData.path.collectionId,
       workspaceId: componentData.path.workspaceId,
+      ...userSource,
       items: {
         name: request.name,
         type: request.type,

@@ -12,7 +12,7 @@
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -119,13 +119,14 @@
       inputField.blur();
     }
   };
-
+  let isLoading;
   const handleApiRequest = async () => {
     isApiCreatedFirstTime.set(true);
 
     const response = await _myColllectionViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;
@@ -164,12 +165,15 @@
     const responseJSON = await _collectionService.validateImportCollectionURL(
       currentCollection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
           url: currentCollection?.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: currentCollection?.primaryBranch,
           currentBranch: currentCollection?.currentBranch
             ? currentCollection?.currentBranch

@@ -31,6 +31,7 @@
   export let tabList: TabDocument[];
   export let _tabId: string;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+
   let removeTab;
   let movedTabStartIndex: number;
   let movedTabEndIndex: number;

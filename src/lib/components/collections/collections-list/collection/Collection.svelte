@@ -33,7 +33,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, type WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
@@ -485,12 +485,15 @@
     const responseJSON = await collectionService.validateImportCollectionURL(
       collection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
           url: collection.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: collection?.primaryBranch,
           currentBranch: collection?.currentBranch
             ? collection?.currentBranch
@@ -659,7 +662,7 @@
       </div>
     {/if}
   </div>
-  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     {#if isActiveSyncEnabled && collection?.activeSync}

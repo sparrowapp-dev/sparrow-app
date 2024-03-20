@@ -28,7 +28,7 @@ export class CollectionRepository {
       })
       .exec();
 
-    collection.incrementalModify((value) => {
+    await collection?.incrementalModify((value) => {
       if (data.name) value.name = data.name;
       if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
@@ -132,8 +132,18 @@ export class CollectionRepository {
         delete collectionObj._id;
         return collectionObj;
       });
-      await RxDB.getInstance().rxdb.collection.find().remove();
-      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
+      RxDB.getInstance()
+        .rxdb.collection.find()
+        .remove()
+        .then(() => {
+          // Remove all documents from the collection
+          return RxDB.getInstance().rxdb.collection.bulkInsert(
+            updatedCollections,
+          );
+        })
+        .catch((error) => {
+          console.error("Error occurred:", error);
+        });
     } else {
       await RxDB.getInstance().rxdb.collection.find().remove();
     }
