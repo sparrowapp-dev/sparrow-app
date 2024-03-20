@@ -207,7 +207,7 @@ export class CollectionRepository {
       })
       .exec();
     let response: CollectionItem;
-    collection.toJSON().items.forEach((element) => {
+    collection?.toJSON().items.forEach((element) => {
       if (element.id === uuid) {
         response = element;
         return;
