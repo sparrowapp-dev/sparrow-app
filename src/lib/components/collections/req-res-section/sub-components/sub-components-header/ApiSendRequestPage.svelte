@@ -32,6 +32,8 @@
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { editLink } from "$lib/store/api-request";
+  import { v4 as uuidv4 } from "uuid";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -328,6 +330,7 @@
       if (!disabledSend) handleSendRequest();
     } else if (event.altKey && event.code === "KeyL") {
       inputElement?.focus();
+      editLink.set(uuidv4());
     }
   };
 

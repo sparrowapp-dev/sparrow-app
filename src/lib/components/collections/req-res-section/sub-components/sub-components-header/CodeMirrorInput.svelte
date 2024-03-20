@@ -14,6 +14,7 @@
     type Tooltip,
   } from "@codemirror/view";
   import { environmentHoverHighlightStyle } from "./EnvironmentHighlight";
+  import { editLink } from "$lib/store/api-request";
   export let currentTabId: string;
   export let rawValue: string;
   export let handleRawChange: () => void;
@@ -67,6 +68,10 @@
     keydown: (event, view: EditorView) => {
       handleKeyDownChange(event);
     },
+  });
+
+  editLink.subscribe((value) => {
+    codeMirrorView?.focus();
   });
 
   const handleHighlightClass = () => {
