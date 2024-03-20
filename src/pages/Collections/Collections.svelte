@@ -161,6 +161,14 @@
       ".splitter-sidebar .splitpanes__splitter",
     );
     splitter.style.width = "1px";
+
+    let url = window.location.href;
+    const params = new URLSearchParams(url.split("?")[1]);
+    const isNew = params.get("first");
+    if (isNew)
+      collectionsMethods.handleCreateTab(
+        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      );
   });
 
   $: {
