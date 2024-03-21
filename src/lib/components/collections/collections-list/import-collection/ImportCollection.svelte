@@ -776,6 +776,7 @@
                     {
                       name: "None",
                       id: "not exist",
+                      hide: true,
                     },
                     ...getBranchList,
                   ]}
