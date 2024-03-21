@@ -125,19 +125,53 @@ export class CollectionRepository {
     });
   };
 
-  public bulkInsertData = async (collection: any[]): Promise<void> => {
-    if (collection.length > 0) {
-      const updatedCollections = collection.map((collectionObj) => {
-        collectionObj["id"] = collectionObj._id;
-        delete collectionObj._id;
-        return collectionObj;
+  public async bulkInsertData(col: any[], recursionLimit = 5): Promise<void> {
+    // Base case: if recursion limit is reached, stop recursion
+    if (recursionLimit === 0) {
+      return;
+    }
+
+    const data = await RxDB.getInstance().rxdb.collection.find().exec();
+
+    // Extract relevant information from fetched data
+    const idToBranchMap = {};
+    data.forEach((element) => {
+      // Store either currentBranch or primaryBranch for each id
+      idToBranchMap[element.id] = element?.currentBranch
+        ? element.currentBranch
+        : element?.primaryBranch;
+    });
+
+    if (col.length > 0) {
+      const updatedCollections = col.map((collectionObj) => {
+        let temp = JSON.parse(JSON.stringify(collectionObj));
+
+        temp["id"] = temp._id;
+
+        // If activeSync is enabled, set currentBranch based on idToBranchMap
+        if (temp.activeSync) {
+          temp["currentBranch"] = idToBranchMap[temp.id]
+            ? idToBranchMap[temp.id]
+            : temp.primaryBranch;
+        }
+
+        // Remove _id field to avoid conflicts during insertion
+        delete temp._id;
+        return temp;
       });
-      await this.clearCollections();
-      await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
+
+      try {
+        await this.clearCollections();
+
+        await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
+      } catch (e) {
+        // If an error occurs during insertion, retry with reduced recursion limit
+        await this.bulkInsertData(col, recursionLimit - 1);
+      }
     } else {
       await this.clearCollections();
     }
-  };
+  }
 
   /**
    * @description
