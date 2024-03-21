@@ -44,7 +44,7 @@ export const handleCollectionClick = (
   moveNavigation("right");
 };
 
-export const handleRequestClick = (req: any, path: any) => {
+export const handleRequestClick = (req: any, path: any, activeSync) => {
   const request = generateSampleRequest(req.id, new Date().toString());
   request.path = path;
   request.name = req.name;
@@ -57,6 +57,9 @@ export const handleRequestClick = (req: any, path: any) => {
   if (req.request.auth) request.property.request.auth = req.request.auth;
   if (req.request.headers)
     request.property.request.headers = req.request.headers;
+  request.activeSync = activeSync;
+  request.isDeleted = req.isDeleted;
+  request.source = req.source;
   request.save = true;
   _collectionMethods.handleCreateTab(request);
   moveNavigation("right");

@@ -462,7 +462,7 @@
     errorText={"Team name cannot be empty."}
     type={"input"}
     inputStyleProp={"border: 1px solid var(--border-color);"}
-    inputClassProp={`py-2 px-3 mb-3`}
+    inputClassProp={`py-2 px-3`}
     labelTextClassProp={`mt-3`}
   />
   <Input
@@ -477,6 +477,7 @@
     onChange={handleTeamDescChange}
     type={"textarea"}
     inputClassProp={`py-2 px-3 border-0`}
+    labelTextClassProp={`mt-3`}
   />
   <DragDrop
     value={newTeam.file.value}

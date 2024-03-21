@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import sparrowicon from "$lib/assets/sparrow-icon-bg.svg";
   import Redirect from "../redirect/Redirect.svelte";
   import constants from "$lib/utils/constants";
@@ -55,6 +56,7 @@
         class="text-labelColor cursor-pointer text-decoration-underline"
         on:click={async () => {
           await copyToClipBoard(externalSparrowLink);
+          notifications.success("Link copied to clipboard!");
         }}><img src={copyIcon} class="px-2" />Copy</span
       >
     </p></Redirect

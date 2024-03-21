@@ -353,7 +353,7 @@
             class="form-check-label ms-2"
             for="tnsCheckbox"
             >I agree to the <a
-              href="/register"
+              href="https://sparrowapp.dev/terms-of-service"
               class="text-decoration-none text-primaryColor">Terms of Service</a
             ></label
           >

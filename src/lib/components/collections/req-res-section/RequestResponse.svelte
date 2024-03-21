@@ -10,21 +10,52 @@
   export let activeTab: Observable<TabDocument>;
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
-  export let loggedUserRoleInWorkspace:WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole;
 </script>
 
 <div class="d-flex">
   <div class="request-response w-100">
-    <PageHeader {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
+    <PageHeader
+      {activeTab}
+      collectionsMethods={{
+        getActiveWorkspace: collectionsMethods.getActiveWorkspace,
+        getCollectionList: collectionsMethods.getCollectionList,
+        readRequestOrFolderInCollection:
+          collectionsMethods.readRequestOrFolderInCollection,
+        readRequestInFolder: collectionsMethods.readRequestInFolder,
+        addRequestOrFolderInCollection:
+          collectionsMethods.addRequestOrFolderInCollection,
+        addRequestInFolder: collectionsMethods.addRequestInFolder,
+        updateTab: collectionsMethods.updateTab,
+        updateRequestOrFolderInCollection:
+          collectionsMethods.updateRequestOrFolderInCollection,
+        updateRequestInFolder: collectionsMethods.updateRequestInFolder,
+        setRequestSave: collectionsMethods.setRequestSave,
+        handleCreateTab: collectionsMethods.handleCreateTab,
+        addCollection: collectionsMethods.addCollection,
+        collection: collectionsMethods.collection,
+      }}
+      {loggedUserRoleInWorkspace}
+    />
     <ApiSendRequestPage
       {activeTab}
-      {collectionsMethods}
+      collectionsMethods={{
+        getActiveWorkspace: collectionsMethods.getActiveWorkspace,
+        updateRequestProperty: collectionsMethods.updateRequestProperty,
+        getGlobalEnvironment: collectionsMethods.getGlobalEnvironment,
+        currentEnvironment: collectionsMethods.currentEnvironment,
+        updateEnvironment: collectionsMethods.updateEnvironment,
+      }}
       {environmentVariables}
     />
     <RequestParam {activeTab} {collectionsMethods} {environmentVariables} />
   </div>
   <div>
-    <SidebarRight {activeTab} {collectionsMethods} {loggedUserRoleInWorkspace} />
+    <SidebarRight
+      {activeTab}
+      {collectionsMethods}
+      {loggedUserRoleInWorkspace}
+    />
   </div>
 </div>
 

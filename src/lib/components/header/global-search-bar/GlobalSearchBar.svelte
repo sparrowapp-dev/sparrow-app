@@ -114,16 +114,20 @@
           <button
             class="request-btn"
             on:click={() => {
-              handleRequestClick(filterRequest.tree, {
-                workspaceId: activeWorkspaceId,
-                collectionId: filterRequest.collectionId,
-                folderId: filterRequest.folderDetails
-                  ? filterRequest.folderDetails.id
-                  : "",
-                folderName: filterRequest.folderDetails
-                  ? filterRequest.folderDetails.name
-                  : "",
-              });
+              handleRequestClick(
+                filterRequest.tree,
+                {
+                  workspaceId: activeWorkspaceId,
+                  collectionId: filterRequest.collectionId,
+                  folderId: filterRequest.folderDetails
+                    ? filterRequest.folderDetails.id
+                    : "",
+                  folderName: filterRequest.folderDetails
+                    ? filterRequest.folderDetails.name
+                    : "",
+                },
+                filterRequest.activeSync,
+              );
               handleGlobalSearchPopup(false);
             }}
           >
@@ -173,6 +177,7 @@
                 filterFolder.tree,
                 activeWorkspaceId,
                 filterFolder.collectionId,
+                filterFolder.activeSync,
               );
               handleGlobalSearchPopup(false);
             }}
