@@ -432,7 +432,7 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div class="api-name ellipsis">
+      <div class="api-name ellipsis {isDeleted && 'api-name-deleted'}">
         {name}
         {#if showPath}
           <span class="path-name ellipsis"
@@ -475,6 +475,9 @@
     font-size: 12px;
     font-weight: 400;
     width: calc(100% - 48px);
+  }
+  .api-name-deleted {
+    color: var(--sparrow-text-color);
   }
   .api-info {
     display: flex;

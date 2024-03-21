@@ -73,8 +73,8 @@
       return;
     }
     teamSpecificWorkspace = teamSpecificWorkspace.filter(
-        (ws) => ws.id != workspace._id,
-      );
+      (ws) => ws.id != workspace._id,
+    );
     if (activeWorkspaceBeingDeleted) {
       handleDeletePopup(false);
       handleActivateWorkspacePopup(true);

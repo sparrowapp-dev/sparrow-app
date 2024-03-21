@@ -29,7 +29,7 @@
 
 <div
   class="d-flex flex-column gap-2 justify-content-center w-100"
-  style="position: fixed; z-index: 10; height:30px; background-color:var(--background-color); padding-top:0"
+  style="position: fixed; height:30px; background-color:var(--background-color); padding-top:0"
 >
   <div class="d-flex align-items-center justify-content-between">
     <div class="d-flex gap-3 text-requestBodyColor">
