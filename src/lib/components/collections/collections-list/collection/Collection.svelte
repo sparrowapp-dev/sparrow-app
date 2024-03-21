@@ -431,12 +431,19 @@
   });
 
   let prevCurrentBranch = "";
+  let prevBranches = "";
   $: {
-    if (collection?.currentBranch) {
+    if (collection?.activeSync && collection?.currentBranch) {
       if (collection.currentBranch !== prevCurrentBranch) {
         handleBranchSwitch();
       }
       prevCurrentBranch = collection.currentBranch;
+    }
+    if (collection?.activeSync && collection?.branches) {
+      if (JSON.stringify(collection.branches) !== prevBranches) {
+        handleBranchSwitch();
+      }
+      prevBranches = JSON.stringify(collection.branches);
     }
   }
 
