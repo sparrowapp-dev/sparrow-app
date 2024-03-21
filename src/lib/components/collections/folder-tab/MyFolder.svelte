@@ -44,7 +44,6 @@
       componentData = event;
       collectionId = event.path?.collectionId;
       folderId = event.path?.folderId;
-      console.log(componentData);
     }
   });
   let collectionCountArr = [];

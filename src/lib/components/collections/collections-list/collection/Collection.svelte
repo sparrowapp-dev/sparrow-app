@@ -599,6 +599,15 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center"
+    on:click={() => {
+      isCollectionCreatedFirstTime.set(false);
+
+      if (visibility) {
+        visibility = !visibility;
+      } else if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        handleCollectionClick(collection, currentWorkspaceId, collectionId);
+      }
+    }}
   >
     <img
       src={angleRight}
@@ -607,11 +616,6 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
-      on:click={() => {
-        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
-          visibility = !visibility;
-        }
-      }}
     />
     {#if isRenaming}
       <input
@@ -630,13 +634,6 @@
       <div
         class="collection-title justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
-        on:click={() => {
-          isCollectionCreatedFirstTime.set(false);
-
-          if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-            handleCollectionClick(collection, currentWorkspaceId, collectionId);
-          }
-        }}
       >
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}

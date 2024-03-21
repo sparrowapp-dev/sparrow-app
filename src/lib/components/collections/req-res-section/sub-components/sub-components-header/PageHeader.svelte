@@ -27,6 +27,7 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { styleTags } from "@lezer/highlight";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -345,7 +346,7 @@
               staticClasses={[
                 {
                   id: "saveAsDropdown-img",
-                  classToAdd: ["bg-dullBackground", "px-2", "py-1"],
+                  classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
                 },
                 {
                   id: "saveAsDropdown-options-name",

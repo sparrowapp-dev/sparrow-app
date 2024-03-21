@@ -68,7 +68,6 @@ export const handleFolderClick = (
   collectionId: string,
   activeSync,
 ) => {
-  console.log(folder);
   isFolderCreatedFirstTime.set(false);
   const path: Path = {
     workspaceId: currentWorkspaceId,
