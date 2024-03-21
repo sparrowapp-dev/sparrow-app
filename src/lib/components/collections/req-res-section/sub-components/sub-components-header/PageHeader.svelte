@@ -384,7 +384,7 @@
               staticClasses={[
                 {
                   id: "saveAsDropdown-img",
-                  classToAdd: ["bg-dullBackground", "px-2", "py-1"],
+                  classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
                 },
                 {
                   id: "saveAsDropdown-options-name",

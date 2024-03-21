@@ -161,7 +161,7 @@
   </small>
 </div>
 <div class="d-flex justify-content-between">
-  <div>
+  <div style="margin-right: 15px;">
     <Button
       title={"Cancel"}
       textClassProp={"fs-6"}

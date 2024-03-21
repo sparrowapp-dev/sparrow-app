@@ -39,11 +39,11 @@
       headers of the request. Remember to keep your tokens secure.
     </p>
   </div>
-  <div class="d-flex align-items-center gap-2">
+  <!-- <div class="d-flex align-items-center gap-2">
     <a class="learn-auth-link sparrow-fs-12" href="" on:click={handleLinkClick}
       >Learn more about Authorization</a
     > <img src={linkIcon} alt="" />
-  </div>
+  </div> -->
 </div>
 
 <style>

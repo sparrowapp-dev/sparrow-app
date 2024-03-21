@@ -27,6 +27,7 @@
     "frontendDist": "../dist"
   },
   "bundle": {
+    "licenseFile": "agpl-3.0.txt",
     "active": true,
     "icon": [
       "icons/32x32.png",

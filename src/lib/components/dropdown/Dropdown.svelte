@@ -270,7 +270,10 @@
         </span>
       </div>
     {:else}
-      <div id={`${dropdownId}-img`}>
+      <div
+        id={`${dropdownId}-img`}
+        style={isOpen ? "background-color: var(--send-button) !important;" : ""}
+      >
         <img src={dropDownType.title} alt="+" />
       </div>
     {/if}
