@@ -72,7 +72,8 @@ export async function handleLoginV2(url: string) {
       Success: true,
     });
     notifications.success("Login successful!");
-    navigate("/dashboard/workspaces");
+    navigate("/dashboard/collections?first=true");
+    _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {
     notifications.error("Invalid token!");

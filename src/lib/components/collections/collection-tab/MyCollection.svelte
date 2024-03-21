@@ -1,4 +1,5 @@
 <script lang="ts">
+  import refreshIcon from "$lib/assets/refresh.svg";
   import { onDestroy, onMount } from "svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
@@ -11,7 +12,7 @@
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -118,13 +119,14 @@
       inputField.blur();
     }
   };
-
+  let isLoading;
   const handleApiRequest = async () => {
     isApiCreatedFirstTime.set(true);
 
     const response = await _myColllectionViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;
@@ -163,12 +165,15 @@
     const responseJSON = await _collectionService.validateImportCollectionURL(
       currentCollection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
           url: currentCollection?.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: currentCollection?.primaryBranch,
           currentBranch: currentCollection?.currentBranch
             ? currentCollection?.currentBranch
@@ -234,7 +239,7 @@
 
   const handleBranchChange = async (branch: string) => {
     handleBranchSwitchPopup(true);
-    newBranch = branch; 
+    newBranch = branch;
   };
 
   const handleBranchChangePopup = async () => {
@@ -263,6 +268,35 @@
         "renameInputFieldCollection",
       ) as HTMLInputElement;
       inputField.blur();
+    }
+  };
+
+  const refetchBranch = async () => {
+    if (refreshCollectionLoader) return;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        const currentBranchObj = {
+          id: currentBranch,
+          name: currentBranch,
+        };
+        let branchExists = false;
+        currentCollection.branches.forEach((branch) => {
+          if (branch.name == currentBranchObj.name) {
+            branchExists = true;
+          }
+        });
+        if (!branchExists) {
+          currentCollection.branches.push(currentBranchObj);
+          currentCollection.branches = currentCollection.branches;
+        }
+        notifications.success(`Branch refreshed.`);
+      }
+    } catch (e) {
+      notifications.error("Failed to fetch branch from repository.");
     }
   };
 </script>
@@ -388,6 +422,14 @@
                   },
                 ]}
               ></Dropdown>
+              <button
+                class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
+                on:click={() => {
+                  refetchBranch();
+                }}
+              >
+                <img src={refreshIcon} alt="refetch" />
+              </button>
             </div>
           {/if}
         </div>

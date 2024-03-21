@@ -18,21 +18,23 @@
   function getIndex(text: string, searchData: string): number {
     return text.toLowerCase().indexOf(searchData.toLowerCase());
   }
+  export let activeSync;
 </script>
 
 <div>
   {#if explorer.type === "FOLDER"}
     <div>
-      <div 
+      <div
         style="height:36px;"
         class="folder rounded d-flex align-items-center p-1"
         on:click={() => {
           folderExpand = !folderExpand;
-          handleFolderClick(explorer, workspaceId, collectionId);
+          handleFolderClick(explorer, workspaceId, collectionId, activeSync);
         }}
       >
         <img src={folder} alt="" style="height:16px; width:16px;" />
-        <span class="ellipsis"
+        <span
+          class="ellipsis"
           style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
           >{explorer.name.substring(
             0,
@@ -61,7 +63,10 @@
       </div>
     </div>
   {:else if explorer.type === "REQUEST"}
-    <div style="padding-left: 0; cursor:pointer;width:100%" class="request rounded">
+    <div
+      style="padding-left: 0; cursor:pointer;width:100%"
+      class="request rounded"
+    >
       <Request
         {path}
         request={explorer}
@@ -70,6 +75,7 @@
         {folderDetails}
         {collectionId}
         {workspaceId}
+        {activeSync}
       />
     </div>
   {:else}
@@ -135,10 +141,14 @@
   .highlight {
     color: var(--white-color);
   }
-  .folder,.collection,.request{
+  .folder,
+  .collection,
+  .request {
     width: 100%;
   }
-  .folder:hover, .collection:hover,.request:hover{
+  .folder:hover,
+  .collection:hover,
+  .request:hover {
     background-color: var(--border-color);
   }
 </style>

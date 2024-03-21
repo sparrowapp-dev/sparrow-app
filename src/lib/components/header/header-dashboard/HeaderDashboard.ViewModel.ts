@@ -153,10 +153,8 @@ export class HeaderDashboardViewModel {
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
-    const {
-      isSuccessful,
-      data: { data: res },
-    } = response;
+    const isSuccessful = response?.isSuccessful;
+    const res = response?.data?.data;
     if (isSuccessful && res) {
       for (const elem of res) {
         const {

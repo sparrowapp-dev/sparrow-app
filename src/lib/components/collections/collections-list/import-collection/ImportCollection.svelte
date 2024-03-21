@@ -25,7 +25,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
-  import { ContentTypeEnum } from "$lib/utils/enums";
+  import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -88,16 +88,32 @@
         const response = await _collectionService.validateImportCollectionURL(
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
-        if (response.isSuccessful) {
-          isValidServerURL = true;
+        if (response?.data?.status === ResponseStatusCode.OK) {
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidServerURL = true;
+            }
+          } catch (e) {}
         }
       } else {
-        isValidClientURL = false;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
-        if (response.isSuccessful) {
-          isValidClientDeployedURL = true;
-          isValidServerDeployedURL = true;
+        if (response?.data?.status === ResponseStatusCode.OK) {
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidClientURL = false;
+              isValidClientDeployedURL = true;
+              isValidServerDeployedURL = true;
+            }
+          } catch (e) {}
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -200,6 +216,7 @@
           items: response.data.data.items,
           createdAt: response.data.data.createdAt,
         };
+
         collectionsMethods.addCollection({
           ...response.data.data,
           id: response.data.data._id,
@@ -261,10 +278,10 @@
     ) {
       const response =
         await _collectionService.validateImportCollectionURL(importData);
-      if (response.isSuccessful) {
+      if (response?.data?.status === ResponseStatusCode.OK) {
         handleImportJsonObject(
           ContentTypeEnum["application/json"],
-          JSON.stringify(response.data.data),
+          response.data.response,
         );
       }
     } else if (
@@ -276,15 +293,18 @@
       const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
       const response =
         await _collectionService.validateImportCollectionURL(importUrl);
-      if (!activeSync && response.isSuccessful) {
+      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
         const requestBody = {
-          urlData: response.data,
+          urlData: {
+            data: JSON.parse(response.data.response),
+            headers: response.data.headers,
+          },
           url: importUrl,
         };
         handleImportUrl(requestBody);
       } else if (
         activeSync &&
-        response.isSuccessful &&
+        response?.data?.status === ResponseStatusCode.OK &&
         isRepositoryPath &&
         repositoryBranch &&
         repositoryPath &&
@@ -299,7 +319,10 @@
             .includes(currentBranch)
         ) {
           const requestBody = {
-            urlData: response.data,
+            urlData: {
+              data: JSON.parse(response.data.response),
+              headers: response.data.headers,
+            },
             url: importUrl,
             primaryBranch: repositoryBranch,
             currentBranch: currentBranch,
@@ -642,6 +665,11 @@
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
+    {#if isDataEmpty}
+      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+        Please upload your file in order to import collections.
+      </p>
+    {/if}
   {/if}
   {#if isValidClientURL && isValidServerURL}
     <div>
@@ -667,12 +695,12 @@
           >Enabling Active Sync auto-updates APIs via Swagger Link.</small
         >
       </div>
-      <div class="d-flex align-items-center gap-2 pb-2">
+      <!-- <div class="d-flex align-items-center gap-2 pb-2">
         <img src={linkIcon} alt="" />
         <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
           >Learn more about Active Sync</a
         >
-      </div>
+      </div> -->
       {#if activeSync}
         <!-- Local repository path -->
         <div>
@@ -811,11 +839,6 @@
         {/if}</span
       > Import Collection</button
     >
-    {#if isDataEmpty && !importData}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Please Paste or Upload your file in order to import the workspace
-      </p>
-    {/if}
     <p class="importData-whiteColor my-2 sparrow-fs-14 fw-bold">OR</p>
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"

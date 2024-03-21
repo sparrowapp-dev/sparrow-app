@@ -9,18 +9,23 @@
   export let request: any;
   export let workspaceId: string = "";
   export let collectionId: string = "";
+  export let activeSync;
 </script>
 
 <div
   class="d-flex align-items-center api-request p-1"
   style="height: {path !== '' ? '40px' : '32px'};"
   on:click={() => {
-    handleRequestClick(request, {
-      collectionId,
-      workspaceId,
-      folderId: folderDetails.id ? folderDetails.id : "",
-      folderName: folderDetails.name ? folderDetails.name : "",
-    });
+    handleRequestClick(
+      request,
+      {
+        collectionId,
+        workspaceId,
+        folderId: folderDetails.id ? folderDetails.id : "",
+        folderName: folderDetails.name ? folderDetails.name : "",
+      },
+      activeSync,
+    );
   }}
 >
   <div class="api-method text-{getMethodStyle(request.request.method)}">

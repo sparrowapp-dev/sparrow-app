@@ -79,6 +79,7 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
     clearTabs: _viewModel.clearTabs,
+    collection: _viewModel.collection,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
@@ -161,6 +162,14 @@
       ".splitter-sidebar .splitpanes__splitter",
     );
     splitter.style.width = "1px";
+
+    let url = window.location.href;
+    const params = new URLSearchParams(url.split("?")[1]);
+    const isNew = params.get("first");
+    if (isNew)
+      collectionsMethods.handleCreateTab(
+        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      );
   });
 
   $: {
@@ -226,16 +235,11 @@
               environmentVariables={environmentVariables.reverse()}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace
-              {activeTab}
-              {collectionsMethods}
-              {_collectionListViewModel}
-            />
+            <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
             <MyFolder
               {collectionsMethods}
               {activeTab}
-              {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
@@ -255,7 +259,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  :global(.splitpanes) {
-    width: calc(100vw - 72px);
+  :global(.splitter-sidebar.splitpanes) {
+    width: calc(100vw - 72px) !important;
   }
 </style>

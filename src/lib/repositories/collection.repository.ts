@@ -28,7 +28,7 @@ export class CollectionRepository {
       })
       .exec();
 
-    collection.incrementalModify((value) => {
+    await collection?.incrementalModify((value) => {
       if (data.name) value.name = data.name;
       if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
@@ -132,10 +132,10 @@ export class CollectionRepository {
         delete collectionObj._id;
         return collectionObj;
       });
-      await RxDB.getInstance().rxdb.collection.find().remove();
+      await this.clearCollections();
       await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
     } else {
-      await RxDB.getInstance().rxdb.collection.find().remove();
+      await this.clearCollections();
     }
   };
 
@@ -207,7 +207,7 @@ export class CollectionRepository {
       })
       .exec();
     let response: CollectionItem;
-    collection.toJSON().items.forEach((element) => {
+    collection?.toJSON().items.forEach((element) => {
       if (element.id === uuid) {
         response = element;
         return;

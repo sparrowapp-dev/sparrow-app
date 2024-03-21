@@ -20,6 +20,9 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import type { WorkspaceRole } from "$lib/utils/enums";
+  import type { Observable } from "rxjs";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import { onDestroy } from "svelte";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
@@ -27,9 +30,47 @@
   export let onFinish = (_id) => {};
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
+  const collections: Observable<CollectionDocument[]> =
+    collectionsMethods.collection;
+
+  let collectionCountArr = [];
+  let currentCollection;
+  const refreshCount = async () => {
+    if (collectionCountArr && componentData?.path?.collectionId) {
+      for (const collection of collectionCountArr) {
+        if (collection._data.id === componentData?.path?.collectionId) {
+          currentCollection = collection;
+        }
+      }
+    }
+  };
+  const collectionSubscribe = collections.subscribe(
+    (value: CollectionDocument[]) => {
+      if (value) {
+        collectionCountArr = value;
+        refreshCount();
+      }
+    },
+  );
+
+  $: {
+    if (componentData?.path?.collectionId) {
+      refreshCount();
+    }
+  }
+
   let loader: boolean = false;
 
   const handleSaveRequest = async () => {
+    let userSource = {};
+    if (componentData?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: currentCollection?.currentBranch
+          ? currentCollection?.currentBranch
+          : currentCollection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const _id = componentData.id;
     loader = true;
     const { folderId, folderName, collectionId, workspaceId } =
@@ -54,6 +95,7 @@
       let res = await updateCollectionRequest(_id, {
         collectionId: collectionId,
         workspaceId: workspaceId,
+        ...userSource,
         items: {
           id: _id,
           name: componentData.name,
@@ -79,6 +121,7 @@
         collectionId: collectionId,
         workspaceId: workspaceId,
         folderId: folderId,
+        ...userSource,
         items: {
           name: folderName,
           type: ItemType.FOLDER,
@@ -106,6 +149,10 @@
       }
     }
   };
+
+  onDestroy(() => {
+    collectionSubscribe.unsubscribe();
+  });
 </script>
 
 <div class="pb-3">

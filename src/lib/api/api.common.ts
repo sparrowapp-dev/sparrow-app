@@ -121,9 +121,9 @@ const makeRequest = async (
       return error("unauthorized");
     }
     if (e.message) {
-      return error(e.response.data.message);
-    } else if (e.response.data) {
-      return error(e.response.data.message);
+      return error(e.response?.data?.message);
+    } else if (e.response?.data) {
+      return error(e.response?.data?.message);
     }
     return error(e);
   } finally {
@@ -151,6 +151,7 @@ const makeHttpRequest = async (
   let response;
   MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
   url = url.trim().replace(/ /g, "%20");
+  body = body.replace(/\[SPARROW_AMPERSAND$/, "");
   return Promise.race([
     timeout(apiTimeOut),
     invoke("make_http_request", {
