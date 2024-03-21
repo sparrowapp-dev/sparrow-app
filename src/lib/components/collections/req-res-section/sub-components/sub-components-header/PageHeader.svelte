@@ -27,12 +27,8 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-<<<<<<< HEAD
-  import { styleTags } from "@lezer/highlight";
-=======
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
->>>>>>> b36dabe3e89e6c479818ff75c0c84ea8baf588dc
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
