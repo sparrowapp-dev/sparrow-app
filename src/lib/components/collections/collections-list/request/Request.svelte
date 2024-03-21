@@ -477,7 +477,7 @@
     width: calc(100% - 48px);
   }
   .api-name-deleted {
-    color: #999999;
+    color: var(--sparrow-text-color);
   }
   .api-info {
     display: flex;
