@@ -261,7 +261,7 @@
       }
       requestIds.push(explorer?.id);
 
-      if (explorer?.source === "USER") {
+      if (!activeSync || (explorer?.source === "USER" && activeSync)) {
         menuItems = [
           {
             onClick: openFolder,

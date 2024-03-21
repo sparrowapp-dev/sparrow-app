@@ -108,7 +108,7 @@
       source = api?.source;
       selectedRequestAuthType = api.request?.selectedRequestAuthType;
 
-      if (source === "USER") {
+      if (!activeSync || (source === "USER" && activeSync)) {
         menuItems = [
           {
             onClick: () => {
