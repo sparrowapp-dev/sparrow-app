@@ -573,7 +573,7 @@
           staticClasses={[
             {
               id: "collectionDropdown-img",
-              classToAdd: ["bg-backgroundDark", "p-1", "rounded"],
+              classToAdd: ["btn", "bg-backgroundDark", "p-1", "rounded"],
             },
             {
               id: "collectionDropdown-options-container",
@@ -742,6 +742,7 @@
   }
   .inputField {
     outline: none;
+    border: 1px solid transparent;
   }
   .inputField:hover {
     border: 1px solid var(--workspace-hover-color);
