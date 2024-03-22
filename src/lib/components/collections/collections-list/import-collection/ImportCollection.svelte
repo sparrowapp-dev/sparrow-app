@@ -14,6 +14,7 @@
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { CollectionService } from "$lib/services/collection.service";
+  import Select from "$lib/components/inputs/Select.svelte";
   import {
     debounce,
     isUrlValid,
@@ -505,6 +506,8 @@
             return {
               name: elem.replace("origin/", ""),
               id: elem.replace("origin/", ""),
+              hide: false,
+              color: "whiteColor",
             };
           });
         isRepositoryPath = true;
@@ -624,7 +627,15 @@
           isInputDataTouched = true;
         }}
         bind:value={importData}
-        class="form-control mb-1 border-0 rounded bg-blackColor pe-4"
+        class="mb-1 border-0 rounded bg-blackColor pe-4 ps-2 pb-2 pt-2"
+        style={!isValidServerDeployedURL &&
+        !isValidServerJSON &&
+        !isValidServerURL &&
+        !isValidServerXML &&
+        !isimportDataLoading &&
+        isInputDataTouched
+          ? `border: 1px solid var(--dangerColor) !important;`
+          : ``}
       />
       {#if isimportDataLoading}
         <div class="position-absolute" style="right: 10px; top:10px;">
@@ -646,7 +657,7 @@
         accuracy and accessibility. If the problem persists, contact the API
         provider for assistance.
       </p>
-    {:else if (!isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if (!isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         We have identified that text you pasted is not written in Open API
         Specification (OAS). Please visit https://swagger.io/specification/ for
@@ -730,7 +741,10 @@
             <input
               class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
               type="text"
-              style="width:80%;"
+              style="width:80%; {(!repositoryPath && isRepositoryPathTouched) ||
+              (!isRepositoryPath && isRepositoryPathTouched)
+                ? `border: 1px solid var(--dangerColor) !important`
+                : ``}"
               placeholder="Paste or browse path"
               bind:value={repositoryPath}
               on:input={() => {
@@ -783,45 +797,30 @@
                 >
               </div>
 
-              <div class="bg-blackColor rounded">
-                <Dropdown
-                  dropdownId={"hashfref129"}
+              <div
+                class="bg-blackColor rounded w-100"
+                style="width:80%; {repositoryBranch === 'not exist' &&
+                isRepositoryBranchTouched
+                  ? `border: 1px solid var(--dangerColor) !important`
+                  : ``}"
+              >
+                <Select
+                  isError={repositoryBranch === "not exist" &&
+                    isRepositoryBranchTouched}
+                  id={"select-branch"}
                   data={[
                     {
-                      name: "None",
+                      name: "Select Branch",
                       id: "not exist",
+                      color: "whiteColor",
                       hide: true,
                     },
                     ...getBranchList,
                   ]}
-                  additionalType={"branch"}
+                  method={repositoryBranch}
                   onclick={handleDropdown}
-                  dropDownType={{ type: "text", title: repositoryBranch }}
-                  staticClasses={[
-                    {
-                      id: "hashfref129-options-container",
-                      classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-                    },
-                  ]}
-                  hoverClasses={[
-                    {
-                      id: "hashfref129-btn-div",
-                      classToAdd: ["border-bottom", "border-labelColor"],
-                    },
-                  ]}
-                  staticCustomStyles={[
-                    {
-                      id: "hashfref129-options-container",
-                      styleKey: "height",
-                      styleValue: "140px",
-                    },
-                    {
-                      id: "hashfref129-options-container",
-                      styleKey: "overflowY",
-                      styleValue: "auto",
-                    },
-                  ]}
-                ></Dropdown>
+                  maxHeight={"150px"}
+                />
               </div>
               {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
                 <div>
@@ -893,6 +892,10 @@
     line-height: 18px;
     letter-spacing: 0em;
     padding: 2px;
+  }
+  textarea,
+  input {
+    outline: none;
   }
   .container {
     display: flex;
