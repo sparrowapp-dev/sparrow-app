@@ -1,3 +1,4 @@
+import { debounce } from "$lib/components/collections/collections-list/collection/collection-utils/utils";
 import { platform } from "@tauri-apps/plugin-os";
 import { handleLoginV2 } from "../../../pages/Auth/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
@@ -10,13 +11,15 @@ interface DeepLinkHandlerWindowsPayload {
   };
 }
 
+const handleLoginDebouncer = debounce(handleLoginV2, 1000)
+
 export const deepLinkHandlerWindows = async (
   deepLinkUrl: DeepLinkHandlerWindowsPayload,
 ) => {
   await getCurrent().setFocus();
   const url = deepLinkUrl.payload.url;
   if (url) {
-    await handleLoginV2(url);
+    handleLoginDebouncer(url);
   }
 };
 
