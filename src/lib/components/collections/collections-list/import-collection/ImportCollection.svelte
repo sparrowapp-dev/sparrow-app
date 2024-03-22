@@ -26,6 +26,7 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
+  import TickMark from "$lib/assets/tick-mark-rounded.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -59,6 +60,8 @@
     isDataEmpty = false;
   };
 
+  let isimportDataLoading = false;
+
   let isValidClientURL = false,
     isValidClientJSON = false,
     isValidClientXML = false,
@@ -70,6 +73,7 @@
     isValidServerDeployedURL = false;
 
   const handleInputField = async () => {
+    isimportDataLoading = true;
     isValidClientURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
@@ -80,11 +84,11 @@
     isValidServerDeployedURL = false;
 
     if (validateClientURL(importData)) {
-      isValidClientURL = true;
       if (
         importData.includes("://127.0.0.1") ||
         importData.includes("://localhost")
       ) {
+        isValidClientURL = true;
         const response = await _collectionService.validateImportCollectionURL(
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
@@ -100,6 +104,7 @@
           } catch (e) {}
         }
       } else {
+        isValidClientDeployedURL = true;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
@@ -109,8 +114,6 @@
               JSON.parse(response?.data?.response),
             );
             if (res.isSuccessful) {
-              isValidClientURL = false;
-              isValidClientDeployedURL = true;
               isValidServerDeployedURL = true;
             }
           } catch (e) {}
@@ -136,6 +139,7 @@
       }
     }
     isInputDataTouched = true;
+    isimportDataLoading = false;
   };
   let uploadCollection = {
     file: {
@@ -610,29 +614,39 @@
     <div class="importData-lightGray sparrow-fs-14 text-muted">
       <p>Paste your OAS text or Swagger/Localhost Link</p>
     </div>
-    <div class="textarea-div rounded border-0">
+    <div class="textarea-div rounded border-0 position-relative">
       <textarea
         on:input={() => {
+          isimportDataLoading = true;
           debouncedImport();
         }}
         on:blur={() => {
           isInputDataTouched = true;
         }}
         bind:value={importData}
-        class="form-control mb-1 border-0 rounded bg-blackColor"
+        class="form-control mb-1 border-0 rounded bg-blackColor pe-4"
       />
+      {#if isimportDataLoading}
+        <div class="position-absolute" style="right: 10px; top:10px;">
+          <Spinner size={`16px`} />
+        </div>
+      {:else if (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
+        <div class="position-absolute" style="right: 10px; top:8px;">
+          <TickMark />
+        </div>
+      {/if}
     </div>
-    {#if !importData && isInputDataTouched}
+    {#if !importData && isInputDataTouched && !isimportDataLoading}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please paste your OpenAPI specification text or Swagger/localhost link.
       </p>
-    {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
+    {:else if (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Unable to process the specified Swagger link. Please verify the URL for
         accuracy and accessibility. If the problem persists, contact the API
         provider for assistance.
       </p>
-    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if (!isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         We have identified that text you pasted is not written in Open API
         Specification (OAS). Please visit https://swagger.io/specification/ for
