@@ -219,6 +219,10 @@
   const handleCreateCollection = async () => {
     showDefault = false;
     collectionUnderCreation = true;
+
+    let tempActivePath = activePath;
+    activePath = null;
+
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -277,6 +281,8 @@
         collectionId: response.data.data._id,
       });
       return;
+    } else {
+      activePath = tempActivePath;
     }
     return;
   };
