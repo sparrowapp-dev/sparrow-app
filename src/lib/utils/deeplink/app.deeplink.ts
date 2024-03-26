@@ -1,4 +1,4 @@
-import { debounce } from "$lib/components/collections/collections-list/collection/collection-utils/utils";
+import { throttle } from "$lib/utils/throttle";
 import { platform } from "@tauri-apps/plugin-os";
 import { handleLoginV2 } from "../../../pages/Auth/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
@@ -11,7 +11,7 @@ interface DeepLinkHandlerWindowsPayload {
   };
 }
 
-const handleLoginDebouncer = debounce(handleLoginV2, 1000)
+const handleLoginThrottler = throttle(handleLoginV2, 5000)
 
 export const deepLinkHandlerWindows = async (
   deepLinkUrl: DeepLinkHandlerWindowsPayload,
@@ -19,7 +19,7 @@ export const deepLinkHandlerWindows = async (
   await getCurrent().setFocus();
   const url = deepLinkUrl.payload.url;
   if (url) {
-    handleLoginDebouncer(url);
+    handleLoginThrottler(url);
   }
 };
 
