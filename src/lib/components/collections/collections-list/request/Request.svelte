@@ -130,6 +130,23 @@
             disabled: false,
           },
         ];
+      } else if (isDeleted) {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleFilePopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
       } else {
         menuItems = [
           {
@@ -264,62 +281,22 @@
   let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
-    let userSource = {};
-    if (activeSync && source === "USER") {
-      userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
-      };
+    deleteLoader = true;
+    const res = await collectionsMethods.deleteApiRequest(
+      currentWorkspaceId,
+      collectionId,
+      api.id,
+      api.name,
+      activeSync,
+      source,
+      currentBranch,
+      primaryBranch,
+      folderId,
+    );
+    if (res) {
+      handleFilePopUp(false);
     }
-    if (folderId && collectionId && currentWorkspaceId) {
-      deleteLoader = true;
-      const response = await collectionService.deleteRequestInCollection(
-        api.id,
-        {
-          collectionId,
-          workspaceId: currentWorkspaceId,
-          folderId,
-          ...userSource,
-        },
-      );
-      if (response.isSuccessful) {
-        collectionsMethods.deleteRequestInFolder(
-          collectionId,
-          folderId,
-          api.id,
-        );
-        notifications.success(`"${api.name}" Request deleted.`);
-        deleteLoader = false;
-        collectionsMethods.handleRemoveTab(api.id);
-        handleFilePopUp(false);
-      } else {
-        notifications.error("Failed to delete the Request.");
-        deleteLoader = false;
-      }
-    } else if (currentWorkspaceId && collectionId) {
-      deleteLoader = true;
-      const response = await collectionService.deleteRequestInCollection(
-        api.id,
-        {
-          collectionId,
-          workspaceId: currentWorkspaceId,
-          ...userSource,
-        },
-      );
-      if (response.isSuccessful) {
-        collectionsMethods.deleteRequestOrFolderInCollection(
-          collectionId,
-          api.id,
-        );
-        notifications.success(`"${api.name}" Request deleted.`);
-        deleteLoader = false;
-        collectionsMethods.handleRemoveTab(api.id);
-        handleFilePopUp(false);
-      } else {
-        notifications.error("Failed to delete the Request.");
-        deleteLoader = false;
-      }
-    }
+    deleteLoader = false;
   };
 </script>
 
