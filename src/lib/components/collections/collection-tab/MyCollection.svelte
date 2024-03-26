@@ -26,6 +26,8 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { ModalWrapperV1 } from "$lib/components";
+  import Select from "$lib/components/inputs/Select.svelte";
+  import { GitBranchIcon } from "$lib/assets/icons";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -374,8 +376,13 @@
           />
           {#if currentCollection?.activeSync}
             <div class="d-flex">
-              <Dropdown
-                dropdownId={"hashfref128"}
+              <Select
+                isError={false}
+                icon={GitBranchIcon}
+                search={true}
+                searchText={"Search Branch"}
+                searchErrorMessage={"No Branch found"}
+                id={"hashfderef128"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
                     elem.id = elem.name;
@@ -389,39 +396,23 @@
                   (value, index, self) =>
                     index === self.findIndex((t) => t.id === value.id),
                 )}
-                additionalType={"branch"}
+                method={currentCollection?.currentBranch
+                  ? currentCollection?.currentBranch
+                  : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
-                dropDownType={{
-                  type: "text",
-                  title: currentCollection?.currentBranch
-                    ? currentCollection?.currentBranch
-                    : currentCollection?.primaryBranch,
-                }}
-                staticClasses={[
-                  {
-                    id: "hashfref128-options-container",
-                    classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-                  },
-                ]}
-                hoverClasses={[
-                  {
-                    id: "hashfref128-btn-div",
-                    classToAdd: ["border-bottom", "border-labelColor"],
-                  },
-                ]}
-                staticCustomStyles={[
-                  {
-                    id: "hashfref128-options-container",
-                    styleKey: "maxHeight",
-                    styleValue: "140px",
-                  },
-                  {
-                    id: "hashfref128-options-container",
-                    styleKey: "overflowY",
-                    styleValue: "auto",
-                  },
-                ]}
-              ></Dropdown>
+                maxHeight={"150px"}
+              >
+                <div slot="pre-select">
+                  <div class="d-flex justify-content-between p-2">
+                    <small>Switch branches</small>
+                    <small>2 branches</small>
+                  </div>
+                </div>
+                <div slot="post-select">
+                  <hr class="mb-2 mt-2" />
+                  <p class="sparrow-fs-12 mb-2 ps-2 pe-2">View all Branches</p>
+                </div>
+              </Select>
               <button
                 class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
                 on:click={() => {

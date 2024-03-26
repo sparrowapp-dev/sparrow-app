@@ -1,14 +1,9 @@
 <script lang="ts">
-  /**
-   * @deprecated please do not use this file
-   * Instead of this we can use src\lib\components\dropdown\Dropdown
-   * **/
-  import dropdown from "$lib/assets/dropdown.svg";
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
+  import select from "$lib/assets/dropdown.svg";
   import { fade, fly, slide } from "svelte/transition";
-
-  let isOpen: boolean = false;
+  import { SearchIcon } from "$lib/assets/";
 
   export let data: Array<{
     name: string;
@@ -21,14 +16,17 @@
   export let id: string;
   export let isError: boolean = false;
   export let maxHeight = "200px";
-
+  export let search = false;
+  export let searchText = "Search";
+  export let searchErrorMessage = "No value found";
+  export let icon;
+  let isOpen: boolean = false;
   let selectedRequest: {
     name: string;
     id: string;
     color: string;
   };
-
-  const toggleDropdown = () => {
+  const toggleSelect = () => {
     isOpen = !isOpen;
   };
 
@@ -42,43 +40,45 @@
     }
   }
 
-  function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(`color-dropdown-${id}`);
-    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(`color-select-${id}`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
       isOpen = false;
     }
   }
 
   onDestroy(() => {
-    window.removeEventListener("click", handleDropdownClick);
+    window.removeEventListener("click", handleSelectClick);
   });
 
   onMount(() => {
-    window.addEventListener("click", handleDropdownClick);
+    window.addEventListener("click", handleSelectClick);
   });
+
+  let searchData = "";
 </script>
 
 <div
-  class="parent-dropdown display-inline-block"
+  class="parent-select display-inline-block"
   style=" position: relative;"
-  on:click={handleDropdownClick}
+  id={`color-select-${id}`}
 >
-  <div on:click={toggleDropdown}>
+  <div on:click={toggleSelect}>
     <div
-      id={`color-dropdown-${id}`}
-      class="dropdown-btn rounded d-flex align-items-center justify-content-between {isError
+      class="select-btn rounded d-flex align-items-center justify-content-between {isError
         ? 'isError'
         : ''}"
-      class:dropdown-btn-active={isOpen}
+      class:select-btn-active={isOpen}
     >
+      <span>{@html icon}</span>
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
         {selectedRequest?.name}
       </p>
-      <span class="d-flex" class:dropdown-logo-active={isOpen}
+      <span class="d-flex" class:select-logo-active={isOpen}
         ><img
           style="height:12px; width:12px;"
           class="ms-2"
-          src={dropdown}
+          src={select}
           alt=""
         /></span
       >
@@ -87,42 +87,73 @@
 
   {#if isOpen}
     <div
-      class="d-none z-2 dropdown-data p-1 rounded"
-      class:dropdown-active={isOpen}
-      style="max-height:{maxHeight}; overflow:auto;"
+      class="d-none z-2 select-data p-1 rounded"
+      class:select-active={isOpen}
       transition:slide={{ duration: 100 }}
     >
-      {#each data as list}
-        <div
-          class="d-flex px-2 py-2 justify-content-between highlight {list.hide
-            ? 'd-none'
-            : ''}"
-          on:click={() => {
-            isOpen = false;
-            onclick(list.id);
-          }}
-        >
-          <p
-            class="m-0 p-0 text-{list.color} ellipsis"
-            style="font-size: 12px;"
-            class:selected-request={list.id === selectedRequest?.id}
+      <slot name="pre-select" />
+      {#if search}
+        <div class="position-relative">
+          <input
+            type="text"
+            class="inputField searchField rounded border-0 p-2 w-100 bg-backgroundDark"
+            style="font-size: 12px; font-weight:500; padding-left:35px !important;"
+            placeholder={searchText}
+            bind:value={searchData}
+          />
+          <span
+            class="position-absolute"
+            style="top:5px;
+                  left: 10px"
           >
-            {list.name}<br />
-            {#if list.description}
-              <small class="text-textColor">{list.description}</small>
-            {/if}
-          </p>
-          {#if selectedRequest?.id === list.id}
-            <img src={checkIcon} alt="" />
-          {/if}
+            <SearchIcon />
+          </span>
+          <hr class="my-2" />
         </div>
-      {/each}
+      {/if}
+      <div style="max-height:{maxHeight}; overflow:auto;">
+        {#each data.filter((element) => {
+          return element.name.toLowerCase().includes(searchData.toLowerCase());
+        }) as list}
+          <div
+            class="d-flex px-2 py-2 justify-content-between highlight {list.hide
+              ? 'd-none'
+              : ''}"
+            on:click={() => {
+              isOpen = false;
+              onclick(list.id);
+            }}
+          >
+            <p
+              class="m-0 p-0 text-{list.color} ellipsis"
+              style="font-size: 12px;"
+              class:selected-request={list.id === selectedRequest?.id}
+            >
+              {list.name}<br />
+              {#if list.description}
+                <small class="text-textColor">{list.description}</small>
+              {/if}
+            </p>
+            {#if selectedRequest?.id === list.id}
+              <img src={checkIcon} alt="" />
+            {/if}
+          </div>
+        {/each}
+      </div>
+      {#if data.filter((element) => {
+        return element.name.toLowerCase().includes(searchData.toLowerCase());
+      }).length === 0}
+        <div class="p-2">
+          <small class="sparrow-fs-12">{searchErrorMessage}</small>
+        </div>
+      {/if}
+      <slot name="post-select" />
     </div>
   {/if}
 </div>
 
 <style>
-  .dropdown-btn {
+  .select-btn {
     background: none;
     outline: none;
     border: none;
@@ -130,10 +161,10 @@
     width: auto;
     padding: 0 10px;
   }
-  .dropdown-btn:hover {
+  .select-btn:hover {
     background-color: var(--border-color);
   }
-  .dropdown-data {
+  .select-data {
     background-color: var(--blackColor);
     color: white;
     position: absolute;
@@ -142,15 +173,15 @@
     right: 0;
     border: 1px solid rgb(44, 44, 44);
   }
-  .dropdown-btn p,
-  .dropdown-data p {
+  .select-btn p,
+  .select-data p {
     font-size: 12px;
     font-weight: 400;
   }
-  .dropdown-active {
+  .select-active {
     display: block !important;
   }
-  .dropdown-logo-active {
+  .select-logo-active {
     transform: rotateX(180deg) !important;
   }
   .highlight {
@@ -160,14 +191,17 @@
   .highlight:hover {
     background-color: #232424;
   }
-  .dropdown-btn {
+  .select-btn {
     border: 1px solid #313233;
     cursor: pointer;
   }
   .isError {
     border: 1px solid var(--error--color) !important;
   }
-  .dropdown-btn-active {
+  .select-btn-active {
     border: 1px solid var(--send-button);
+  }
+  input {
+    outline: none;
   }
 </style>

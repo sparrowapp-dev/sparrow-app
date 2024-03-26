@@ -41,6 +41,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
+  import { ReloadCollectionIcon } from "$lib/assets";
 
   export let title: string;
   export let collection: any;
@@ -518,6 +519,7 @@
     }
     refreshCollectionLoader = false;
   };
+  let isCollectionHover = false;
 </script>
 
 <ModalWrapperV1
@@ -594,6 +596,12 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  on:mouseenter={() => {
+    isCollectionHover = true;
+  }}
+  on:mouseleave={() => {
+    isCollectionHover = false;
+  }}
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -662,22 +670,6 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    {#if isActiveSyncEnabled && collection?.activeSync}
-      <button
-        class="threedot-icon-container p-1 border-0 rounded d-flex justify-content-center align-items-center {refreshCollectionLoader
-          ? 'refresh-collection-loader-active'
-          : ''} "
-        on:click={() => {
-          refetchCollection();
-        }}
-      >
-        <img
-          src={refreshIcon}
-          alt="refetch"
-          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
-        />
-      </button>
-    {/if}
     <button
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
@@ -688,6 +680,25 @@
     >
       <img src={threedotIcon} alt="threedotIcon" />
     </button>
+    {#if isActiveSyncEnabled && collection?.activeSync}
+      <button
+        class="p-1 border-0 rounded d-flex justify-content-center align-items-center"
+        style="background-color:transparent;"
+        on:click={() => {
+          refetchCollection();
+        }}
+      >
+        <span
+          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
+        >
+          <ReloadCollectionIcon
+            color={isCollectionHover || collection.id === activeTabId
+              ? "#8DC599"
+              : "grey"}
+          />
+        </span>
+      </button>
+    {/if}
   {/if}
 </button>
 
