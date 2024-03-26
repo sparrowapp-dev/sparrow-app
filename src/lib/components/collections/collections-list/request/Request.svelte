@@ -412,10 +412,13 @@
         >DELETED</span
       >
     {/if}
-    {#if actSync && !isDeleted && source === "SPEC"}
+    {#if actSync && source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
-    <div class="api-method text-{getMethodStyle(method)}">
+    <div
+      class="api-method text-{getMethodStyle(method)} {isDeleted &&
+        'api-method-deleted'}"
+    >
       {method?.toUpperCase()}
     </div>
 
@@ -477,7 +480,10 @@
     width: calc(100% - 48px);
   }
   .api-name-deleted {
-    color: #999999;
+    color: var(--sparrow-text-color);
+  }
+  .api-method-deleted {
+    color: var(--recentApiText) !important;
   }
   .api-info {
     display: flex;
