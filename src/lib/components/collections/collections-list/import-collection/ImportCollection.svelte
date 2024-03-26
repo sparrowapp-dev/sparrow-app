@@ -738,22 +738,30 @@
             >
           </div>
           <div class="d-flex justify-content-between pb-2">
-            <input
-              class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
-              type="text"
-              style="width:80%; {(!repositoryPath && isRepositoryPathTouched) ||
-              (!isRepositoryPath && isRepositoryPathTouched)
-                ? `border: 1px solid var(--dangerColor) !important`
-                : ``}"
-              placeholder="Paste or browse path"
-              bind:value={repositoryPath}
-              on:input={() => {
-                extractGitBranch(repositoryPath);
-              }}
-              on:blur={() => {
-                isRepositoryPathTouched = true;
-              }}
-            />
+            <div class="position-relative w-100 me-3">
+              <input
+                class="p-2 pe-4 bg-blackColor w-100 rounded border-0 sparrow-fs-12"
+                type="text"
+                style="width:80%; {(!repositoryPath &&
+                  isRepositoryPathTouched) ||
+                (!isRepositoryPath && isRepositoryPathTouched)
+                  ? `border: 1px solid var(--dangerColor) !important`
+                  : ``}"
+                placeholder="Paste or browse path"
+                bind:value={repositoryPath}
+                on:input={() => {
+                  extractGitBranch(repositoryPath);
+                }}
+                on:blur={() => {
+                  isRepositoryPathTouched = true;
+                }}
+              />
+              {#if repositoryPath && isRepositoryPath && isRepositoryPathTouched}
+                <div class="position-absolute" style="right: 10px; top:4px;">
+                  <TickMark />
+                </div>
+              {/if}
+            </div>
             <Button
               disable={false}
               title={"Browse"}
