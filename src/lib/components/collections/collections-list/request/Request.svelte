@@ -407,7 +407,7 @@
   >
     {#if api?.isDeleted && activeSync}
       <span
-        class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
+        class="delete-ticker position-absolute sparrow-fs-10 px-2"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
@@ -463,6 +463,10 @@
 </div>
 
 <style lang="scss">
+  .delete-ticker {
+    color: var(--delete-hover);
+    font-weight: 500;
+  }
   .api-method {
     font-size: 10px;
     font-weight: 500;
