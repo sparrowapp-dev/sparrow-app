@@ -95,7 +95,7 @@
                 />
               {/if}
             </div>
-            <span class="ellipsis overflow-hidden">{option.name}</span>
+            <span class="ellipsis">{option.name}</span>
           </div>
           {#if option.endIconVisible}
             <PeopleIcon color={"#45494D"} />
