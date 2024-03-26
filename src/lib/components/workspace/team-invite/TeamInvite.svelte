@@ -391,7 +391,7 @@
         {
           id: "check-select-workspace-options-container",
           styleKey: "max-height",
-          styleValue: "calc(100vh - 700px)",
+          styleValue: "calc(30vh)",
         },
       ]}
     ></Dropdown>

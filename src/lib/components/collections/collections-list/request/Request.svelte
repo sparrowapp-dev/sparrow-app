@@ -483,9 +483,6 @@
     font-weight: 400;
     width: calc(100% - 48px);
   }
-  .api-name-deleted {
-    color: var(--sparrow-text-color);
-  }
   .api-method-deleted {
     color: var(--recentApiText) !important;
   }
