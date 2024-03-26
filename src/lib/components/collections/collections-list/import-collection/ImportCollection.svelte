@@ -578,7 +578,7 @@
   handleModalState={onClick}
 >
   <div class="d-flex">
-    <div class="form-check flex-grow-1">
+    <div class="form-check import-type-inp">
       <input
         class="form-check-input"
         type="radio"
@@ -591,7 +591,7 @@
         Paste Text
       </label>
     </div>
-    <div class="form-check flex-grow-1">
+    <div class="form-check import-type-inp">
       <input
         class="form-check-input"
         type="radio"
@@ -678,22 +678,24 @@
           >This link supports Active Sync.</small
         >
       </div>
-      <div class="form-check form-switch ps-0">
-        <div class="d-flex justify-content-between">
-          <span class="sparrow-fs-14">Enable Active Sync</span>
-          <input
-            class="form-check-input"
-            type="checkbox"
-            role="switch"
-            bind:checked={activeSync}
-            id="enableActiveSync"
-          />
+      <div class="enable-active-sync">
+        <div class="form-check form-switch ps-0">
+          <div class="d-flex justify-content-between">
+            <span class="sparrow-fs-14">Enable Active Sync</span>
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              bind:checked={activeSync}
+              id="enableActiveSync"
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <small class="text-textColor sparrow-fs-12"
-          >Enabling Active Sync auto-updates APIs via Swagger Link.</small
-        >
+        <div>
+          <small class="text-textColor sparrow-fs-12"
+            >Enabling Active Sync auto-updates APIs via Swagger Link.</small
+          >
+        </div>
       </div>
       <!-- <div class="d-flex align-items-center gap-2 pb-2">
         <img src={linkIcon} alt="" />
@@ -792,7 +794,11 @@
                   hoverClasses={[
                     {
                       id: "hashfref129-btn-div",
-                      classToAdd: ["border-bottom", "border-labelColor"],
+                      classToAdd: [
+                        "border-bottom",
+                        "border-labelColor",
+                        "text-primaryColor",
+                      ],
                     },
                   ]}
                   staticCustomStyles={[
@@ -854,6 +860,35 @@
 <style lang="scss">
   #file-input {
     display: none;
+  }
+
+  .import-type-inp {
+    padding: 1% 2%;
+    margin-right: 5%;
+  }
+  .import-type-inp input {
+    margin-left: 0;
+    margin-right: 5px;
+    border-width: 2px;
+  }
+  .import-type-inp:hover {
+    background-color: var(--defaultcolor);
+    color: var(--sparrow-blue);
+  }
+  .import-type-inp:hover input {
+    border-width: 2px;
+    border-color: var(--sparrow-blue);
+  }
+
+  .enable-active-sync {
+    margin: 1% 0;
+    padding: 1%;
+  }
+  .enable-active-sync:hover {
+    margin: 1% 0;
+    padding: 1%;
+    background-color: var(--defaultcolor);
+    border-radius: 10px;
   }
 
   textarea {
