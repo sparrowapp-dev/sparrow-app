@@ -309,126 +309,129 @@
     </div>
 
     <div class="d-flex gap-3">
-      <div class="d-flex gap-3">
-        <div class="d-flex gap-1">
-          <Tooltip
-            title={PERMISSION_NOT_FOUND_TEXT}
-            show={!hasWorkpaceLevelPermission(
-              loggedUserRoleInWorkspace,
-              workspaceLevelPermissions.SAVE_REQUEST,
-            )}
-          >
-            <button
-              disabled={componentData.saveInProgress ||
-                !hasWorkpaceLevelPermission(
-                  loggedUserRoleInWorkspace,
-                  workspaceLevelPermissions.SAVE_REQUEST,
-                ) ||
-                (componentData?.source === "SPEC" && componentData?.activeSync)}
-              style="width:140px;"
-              class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
-              on:click={() => {
-                if (
-                  componentData?.path.collectionId &&
-                  componentData?.path.workspaceId
-                ) {
-                  handleSaveRequest();
-                } else {
+      {#if componentData?.source !== "SPEC" || !componentData?.activeSync}
+        <div class="d-flex gap-3">
+          <div class="d-flex gap-1">
+            <Tooltip
+              title={PERMISSION_NOT_FOUND_TEXT}
+              show={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
+            >
+              <button
+                disabled={componentData.saveInProgress ||
+                  !hasWorkpaceLevelPermission(
+                    loggedUserRoleInWorkspace,
+                    workspaceLevelPermissions.SAVE_REQUEST,
+                  ) ||
+                  (componentData?.source === "SPEC" &&
+                    componentData?.activeSync)}
+                style="width:140px;"
+                class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+                on:click={() => {
+                  if (
+                    componentData?.path.collectionId &&
+                    componentData?.path.workspaceId
+                  ) {
+                    handleSaveRequest();
+                  } else {
+                    visibility = true;
+                  }
+                }}
+              >
+                {#if componentData.saveInProgress}
+                  <span class="me-1">
+                    <Spinner size={"14px"} />
+                  </span>
+                {:else}
+                  <img
+                    src={floppyDisk}
+                    alt=""
+                    style="height: 20px; width:20px;"
+                  />
+                {/if}
+                <p
+                  class="mb-0 text-whiteColor sparrow-fs-14"
+                  style="font-weight:400;"
+                >
+                  Save Request
+                </p>
+              </button>
+            </Tooltip>
+            <span class="position-relative" style="width:35px;">
+              <Dropdown
+                disabled={componentData?.source === "SPEC" &&
+                  componentData?.activeSync}
+                dropdownId={"saveAsDropdown"}
+                dropDownType={{ type: "img", title: angleDown }}
+                data={[
+                  {
+                    name: "Save As",
+                    id: "collection",
+                    dynamicClasses: "text-whiteColor",
+                  },
+                ]}
+                onclick={() => {
+                  isOpen = false;
                   visibility = true;
-                }
-              }}
-            >
-              {#if componentData.saveInProgress}
-                <span class="me-1">
-                  <Spinner size={"14px"} />
-                </span>
-              {:else}
-                <img
-                  src={floppyDisk}
-                  alt=""
-                  style="height: 20px; width:20px;"
+                }}
+                staticCustomStyles={[
+                  {
+                    id: "saveAsDropdown-options-container",
+                    styleKey: "minWidth",
+                    styleValue: "180px",
+                  },
+                ]}
+                staticClasses={[
+                  {
+                    id: "saveAsDropdown-img",
+                    classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
+                  },
+                  {
+                    id: "saveAsDropdown-options-name",
+                    classToAdd: ["fs-6"],
+                  },
+                  {
+                    id: "saveAsDropdown-options-container",
+                    classToAdd: ["end-0", "mt-1", "rounded"],
+                  },
+                ]}
+              ></Dropdown>
+              <ModalWrapperV1
+                title={"Save Request"}
+                type={"dark"}
+                width={"55%"}
+                zIndex={10000}
+                isOpen={visibility}
+                handleModalState={handleBackdrop}
+              >
+                <SaveRequest
+                  {collectionsMethods}
+                  {componentData}
+                  {currentCollection}
+                  onClick={handleBackdrop}
                 />
-              {/if}
-              <p
-                class="mb-0 text-whiteColor sparrow-fs-14"
-                style="font-weight:400;"
+              </ModalWrapperV1>
+            </span>
+          </div>
+          <div>
+            <Tooltip placement={"bottom"} title={"Coming Soon!"}>
+              <button
+                disabled
+                class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
               >
-                Save Request
-              </p>
-            </button>
-          </Tooltip>
-          <span class="position-relative" style="width:35px;">
-            <Dropdown
-              disabled={componentData?.source === "SPEC" &&
-                componentData?.activeSync}
-              dropdownId={"saveAsDropdown"}
-              dropDownType={{ type: "img", title: angleDown }}
-              data={[
-                {
-                  name: "Save As",
-                  id: "collection",
-                  dynamicClasses: "text-whiteColor",
-                },
-              ]}
-              onclick={() => {
-                isOpen = false;
-                visibility = true;
-              }}
-              staticCustomStyles={[
-                {
-                  id: "saveAsDropdown-options-container",
-                  styleKey: "minWidth",
-                  styleValue: "180px",
-                },
-              ]}
-              staticClasses={[
-                {
-                  id: "saveAsDropdown-img",
-                  classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
-                },
-                {
-                  id: "saveAsDropdown-options-name",
-                  classToAdd: ["fs-6"],
-                },
-                {
-                  id: "saveAsDropdown-options-container",
-                  classToAdd: ["end-0", "mt-1", "rounded"],
-                },
-              ]}
-            ></Dropdown>
-            <ModalWrapperV1
-              title={"Save Request"}
-              type={"dark"}
-              width={"55%"}
-              zIndex={10000}
-              isOpen={visibility}
-              handleModalState={handleBackdrop}
-            >
-              <SaveRequest
-                {collectionsMethods}
-                {componentData}
-                {currentCollection}
-                onClick={handleBackdrop}
-              />
-            </ModalWrapperV1>
-          </span>
+                <p
+                  class="mb-0 text-whiteColor sparrow-fs-14"
+                  style="font-weight:400"
+                >
+                  Share
+                </p>
+              </button>
+            </Tooltip>
+          </div>
         </div>
-        <div>
-          <Tooltip placement={"bottom"} title={"Coming Soon!"}>
-            <button
-              disabled
-              class="btn btn-primary d-flex align-items-center justify-content-center gap-2 px-3 py-1.3 rounded border-0"
-            >
-              <p
-                class="mb-0 text-whiteColor sparrow-fs-14"
-                style="font-weight:400"
-              >
-                Share
-              </p>
-            </button>
-          </Tooltip>
-        </div>
-      </div>
+      {/if}
     </div>
   </div>
 </div>
