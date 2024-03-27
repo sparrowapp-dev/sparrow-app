@@ -281,9 +281,7 @@
   .select-btn {
     cursor: pointer;
   }
-  /* .isError {
-    border: 1px solid var(--error--color) !important;
-  } */
+
   input {
     outline: none;
   }
@@ -293,23 +291,23 @@
   }
 
   .select-border-all {
-    border: 1px solid #313233; /* Define your desired border style */
+    border: 1px solid #313233;
   }
 
   .select-border-top {
-    border-top: 1px solid #313233; /* Define your desired border style */
+    border-top: 1px solid #313233;
   }
 
   .select-border-bottom {
-    border-bottom: 1px solid #313233; /* Define your desired border style */
+    border-bottom: 1px solid #313233;
   }
 
   .select-border-left {
-    border-left: 1px solid #313233; /* Define your desired border style */
+    border-left: 1px solid #313233;
   }
 
   .select-border-right {
-    border-right: 1px solid #313233; /* Define your desired border style */
+    border-right: 1px solid #313233;
   }
 
   .select-active-border-none {
