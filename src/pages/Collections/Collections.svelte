@@ -80,6 +80,7 @@
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
     clearTabs: _viewModel.clearTabs,
     collection: _viewModel.collection,
+    deleteApiRequest: _viewModel.deleteApiRequest,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;

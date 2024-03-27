@@ -34,6 +34,7 @@
         handleCreateTab: collectionsMethods.handleCreateTab,
         addCollection: collectionsMethods.addCollection,
         collection: collectionsMethods.collection,
+        deleteApiRequest: collectionsMethods.deleteApiRequest,
       }}
       {loggedUserRoleInWorkspace}
     />

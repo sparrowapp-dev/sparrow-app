@@ -14,6 +14,7 @@
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { CollectionService } from "$lib/services/collection.service";
+  import Select from "$lib/components/inputs/Select.svelte";
   import {
     debounce,
     isUrlValid,
@@ -26,6 +27,7 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
+  import TickMark from "$lib/assets/tick-mark-rounded.svelte";
 
   export let handleCreateCollection;
   export let currentWorkspaceId;
@@ -59,6 +61,8 @@
     isDataEmpty = false;
   };
 
+  let isimportDataLoading = false;
+
   let isValidClientURL = false,
     isValidClientJSON = false,
     isValidClientXML = false,
@@ -70,6 +74,7 @@
     isValidServerDeployedURL = false;
 
   const handleInputField = async () => {
+    isimportDataLoading = true;
     isValidClientURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
@@ -80,11 +85,11 @@
     isValidServerDeployedURL = false;
 
     if (validateClientURL(importData)) {
-      isValidClientURL = true;
       if (
         importData.includes("://127.0.0.1") ||
         importData.includes("://localhost")
       ) {
+        isValidClientURL = true;
         const response = await _collectionService.validateImportCollectionURL(
           importData.replace("localhost", "127.0.0.1") + "-json",
         );
@@ -100,6 +105,7 @@
           } catch (e) {}
         }
       } else {
+        isValidClientDeployedURL = true;
         const response =
           await _collectionService.validateImportCollectionURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
@@ -109,8 +115,6 @@
               JSON.parse(response?.data?.response),
             );
             if (res.isSuccessful) {
-              isValidClientURL = false;
-              isValidClientDeployedURL = true;
               isValidServerDeployedURL = true;
             }
           } catch (e) {}
@@ -136,6 +140,7 @@
       }
     }
     isInputDataTouched = true;
+    isimportDataLoading = false;
   };
   let uploadCollection = {
     file: {
@@ -501,6 +506,8 @@
             return {
               name: elem.replace("origin/", ""),
               id: elem.replace("origin/", ""),
+              hide: false,
+              color: "whiteColor",
             };
           });
         isRepositoryPath = true;
@@ -610,29 +617,47 @@
     <div class="importData-lightGray sparrow-fs-14 text-muted">
       <p>Paste your OAS text or Swagger/Localhost Link</p>
     </div>
-    <div class="textarea-div rounded border-0">
+    <div class="textarea-div rounded border-0 position-relative">
       <textarea
         on:input={() => {
+          isimportDataLoading = true;
           debouncedImport();
         }}
         on:blur={() => {
           isInputDataTouched = true;
         }}
         bind:value={importData}
-        class="form-control mb-1 border-0 rounded bg-blackColor"
+        class="mb-1 border-0 rounded bg-blackColor pe-4 ps-2 pb-2 pt-2"
+        style={!isValidServerDeployedURL &&
+        !isValidServerJSON &&
+        !isValidServerURL &&
+        !isValidServerXML &&
+        !isimportDataLoading &&
+        isInputDataTouched
+          ? `border: 1px solid var(--dangerColor) !important;`
+          : ``}
       />
+      {#if isimportDataLoading}
+        <div class="position-absolute" style="right: 10px; top:10px;">
+          <Spinner size={`16px`} />
+        </div>
+      {:else if (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
+        <div class="position-absolute" style="right: 10px; top:8px;">
+          <TickMark />
+        </div>
+      {/if}
     </div>
-    {#if !importData && isInputDataTouched}
+    {#if !importData && isInputDataTouched && !isimportDataLoading}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please paste your OpenAPI specification text or Swagger/localhost link.
       </p>
-    {:else if isValidClientURL && !isValidServerURL && isInputDataTouched}
+    {:else if (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Unable to process the specified Swagger link. Please verify the URL for
         accuracy and accessibility. If the problem persists, contact the API
         provider for assistance.
       </p>
-    {:else if (isValidClientXML && !isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if (!isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         We have identified that text you pasted is not written in Open API
         Specification (OAS). Please visit https://swagger.io/specification/ for
@@ -671,7 +696,7 @@
       </p>
     {/if}
   {/if}
-  {#if isValidClientURL && isValidServerURL}
+  {#if importType === "text" && isValidClientURL && isValidServerURL}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"
@@ -686,6 +711,7 @@
               class="form-check-input"
               type="checkbox"
               role="switch"
+              style="cursor: pointer;"
               bind:checked={activeSync}
               id="enableActiveSync"
             />
@@ -715,19 +741,30 @@
             >
           </div>
           <div class="d-flex justify-content-between pb-2">
-            <input
-              class="p-2 bg-blackColor rounded border-0 sparrow-fs-12"
-              type="text"
-              style="width:80%;"
-              placeholder="Paste or browse path"
-              bind:value={repositoryPath}
-              on:input={() => {
-                extractGitBranch(repositoryPath);
-              }}
-              on:blur={() => {
-                isRepositoryPathTouched = true;
-              }}
-            />
+            <div class="position-relative w-100 me-3">
+              <input
+                class="p-2 pe-4 bg-blackColor w-100 rounded border-0 sparrow-fs-12"
+                type="text"
+                style="width:80%; {(!repositoryPath &&
+                  isRepositoryPathTouched) ||
+                (!isRepositoryPath && isRepositoryPathTouched)
+                  ? `border: 1px solid var(--dangerColor) !important`
+                  : ``}"
+                placeholder="Paste or browse path"
+                bind:value={repositoryPath}
+                on:input={() => {
+                  extractGitBranch(repositoryPath);
+                }}
+                on:blur={() => {
+                  isRepositoryPathTouched = true;
+                }}
+              />
+              {#if repositoryPath && isRepositoryPath && isRepositoryPathTouched}
+                <div class="position-absolute" style="right: 10px; top:4px;">
+                  <TickMark />
+                </div>
+              {/if}
+            </div>
             <Button
               disable={false}
               title={"Browse"}
@@ -771,49 +808,30 @@
                 >
               </div>
 
-              <div class="bg-blackColor rounded">
-                <Dropdown
-                  dropdownId={"hashfref129"}
+              <div
+                class="bg-blackColor rounded w-100"
+                style="width:80%; {repositoryBranch === 'not exist' &&
+                isRepositoryBranchTouched
+                  ? `border: 1px solid var(--dangerColor) !important`
+                  : ``}"
+              >
+                <Select
+                  isError={repositoryBranch === "not exist" &&
+                    isRepositoryBranchTouched}
+                  id={"select-branch"}
                   data={[
                     {
-                      name: "None",
+                      name: "Select Branch",
                       id: "not exist",
+                      color: "whiteColor",
                       hide: true,
                     },
                     ...getBranchList,
                   ]}
-                  additionalType={"branch"}
+                  title={repositoryBranch}
                   onclick={handleDropdown}
-                  dropDownType={{ type: "text", title: repositoryBranch }}
-                  staticClasses={[
-                    {
-                      id: "hashfref129-options-container",
-                      classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-                    },
-                  ]}
-                  hoverClasses={[
-                    {
-                      id: "hashfref129-btn-div",
-                      classToAdd: [
-                        "border-bottom",
-                        "border-labelColor",
-                        "text-primaryColor",
-                      ],
-                    },
-                  ]}
-                  staticCustomStyles={[
-                    {
-                      id: "hashfref129-options-container",
-                      styleKey: "height",
-                      styleValue: "140px",
-                    },
-                    {
-                      id: "hashfref129-options-container",
-                      styleKey: "overflowY",
-                      styleValue: "auto",
-                    },
-                  ]}
-                ></Dropdown>
+                  maxHeight={"150px"}
+                />
               </div>
               {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
                 <div>
@@ -914,6 +932,10 @@
     line-height: 18px;
     letter-spacing: 0em;
     padding: 2px;
+  }
+  textarea,
+  input {
+    outline: none;
   }
   .container {
     display: flex;

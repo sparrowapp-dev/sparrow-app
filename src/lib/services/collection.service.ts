@@ -1,4 +1,5 @@
 import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 import constants from "$lib/utils/constants";
 import type {
   CreateApiRequestPostBody,
@@ -15,6 +16,7 @@ export class CollectionService {
   constructor() {}
 
   private apiUrl: string = constants.API_URL;
+  private collectionRepository = new CollectionRepository();
 
   public fetchCollection = async (workspaceId: string) => {
     const response = await makeRequest(
@@ -161,7 +163,27 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-
+    if (response.isSuccessful) {
+      if (
+        deleteRequestBody.folderId &&
+        deleteRequestBody.collectionId &&
+        deleteRequestBody.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          deleteRequestBody.collectionId,
+          deleteRequestBody.folderId,
+          requestId,
+        );
+      } else if (
+        deleteRequestBody.workspaceId &&
+        deleteRequestBody.collectionId
+      ) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          deleteRequestBody.collectionId,
+          requestId,
+        );
+      }
+    }
     return response;
   };
 
