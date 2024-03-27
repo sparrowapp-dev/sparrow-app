@@ -3,6 +3,7 @@
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
+  import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus.svg";
   import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
@@ -521,12 +522,13 @@
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
-          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center
+          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2
         {showfilterDropdown ? 'filter-active' : ''}"
           style="width: 32px; height:32px; position:relative"
           on:click={handleFilterDropdown}
         >
-          <img src={filterIcon} alt="" />
+          <!-- <img src={filterIcon} alt="" /> -->
+          <FilterIcon width={300} height={30} color="gray" />
           {#if showfilterDropdown}
             <span
               class="position-absolute"
