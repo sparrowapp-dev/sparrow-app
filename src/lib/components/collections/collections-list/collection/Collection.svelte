@@ -317,17 +317,22 @@
       collectionId,
       detectBranch,
     );
-    if (response.isSuccessful) {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: response.data.data.items,
-      });
-    } else {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: [],
-      });
-    }
+    setTimeout(() => {
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: response.data.data.items,
+        });
+        isBranchSynced = true;
+      } else {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: [],
+        });
+        isBranchSynced = false;
+      }
+      activeSyncLoad = true;
+    }, 500);
   };
   $: {
     if (activePath) {
@@ -416,13 +421,31 @@
       }
     }
   }
-
+  let activeSyncLoad = false;
+  let isBranchSynced = false;
   // delete collection
   onMount(() => {
     if (collection?.activeSync) {
       handleBranchSwitch();
     }
   });
+
+  let prevCurrentBranch = "";
+  let prevBranches = "";
+  $: {
+    if (collection?.activeSync && collection?.currentBranch) {
+      if (collection.currentBranch !== prevCurrentBranch) {
+        handleBranchSwitch();
+      }
+      prevCurrentBranch = collection.currentBranch;
+    }
+    if (collection?.activeSync && collection?.branches) {
+      if (JSON.stringify(collection.branches) !== prevBranches) {
+        handleBranchSwitch();
+      }
+      prevBranches = JSON.stringify(collection.branches);
+    }
+  }
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -690,69 +713,75 @@
     </button>
   {/if}
 </button>
-
-<div
-  style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
-    ? 'block'
-    : 'none'};"
->
-  <div class="sub-folders ps-3">
-    {#each collection.items as exp}
-      <Folder
-        {loggedUserRoleInWorkspace}
-        {collectionsMethods}
-        {collectionList}
-        {collectionId}
-        {currentWorkspaceId}
-        explorer={exp}
-        {visibility}
-        {activeTabId}
-        {activePath}
-        activeSync={collection?.activeSync}
-        currentBranch={collection?.currentBranch}
-        primaryBranch={collection?.primaryBranch}
-      />
-    {/each}
-    {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 d-flex">
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[0]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2"
-            src={folderIcon}
-            alt="+ Folder"
-            on:click={handleFolderClick}
+{#if !collection?.activeSync || activeSyncLoad}
+  {#if !collection?.activeSync || isBranchSynced}
+    <div
+      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+        ? 'block'
+        : 'none'};"
+    >
+      <div class="sub-folders ps-3">
+        {#each collection.items as exp}
+          <Folder
+            {loggedUserRoleInWorkspace}
+            {collectionsMethods}
+            {collectionList}
+            {collectionId}
+            {currentWorkspaceId}
+            explorer={exp}
+            {visibility}
+            {activeTabId}
+            {activePath}
+            activeSync={collection?.activeSync}
+            currentBranch={collection?.currentBranch}
+            primaryBranch={collection?.primaryBranch}
           />
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[1]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2 ms-3"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={handleAPIClick}
-          />
-        </Tooltip>
+        {/each}
+        {#if showFolderAPIButtons}
+          <div class="mt-2 mb-2 d-flex">
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[0]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2"
+                src={folderIcon}
+                alt="+ Folder"
+                on:click={handleFolderClick}
+              />
+            </Tooltip>
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[1]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2 ms-3"
+                src={requestIcon}
+                alt="+ API Request"
+                on:click={handleAPIClick}
+              />
+            </Tooltip>
+          </div>
+        {/if}
       </div>
-    {/if}
-  </div>
-</div>
+    </div>
+  {:else}
+    <span class="sparrow-fs-12 ms-4 text-muted">This branch is unavailable</span
+    >
+  {/if}
+{/if}
 
 <style>
   .my-button:hover .threedot-icon-container {
