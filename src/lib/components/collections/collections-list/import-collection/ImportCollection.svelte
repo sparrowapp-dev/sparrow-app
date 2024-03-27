@@ -831,6 +831,7 @@
                   title={repositoryBranch}
                   onclick={handleDropdown}
                   maxHeight={"150px"}
+                  maxWidth={"900px"}
                 />
               </div>
               {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
@@ -853,10 +854,14 @@
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
   >
     <button
-      class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
+      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded {uploadCollection
+        ?.file?.showFileTypeError
+        ? 'btn-disabled'
+        : 'btn-primary'} "
       on:click={() => {
         handleImport();
       }}
+      disabled={uploadCollection?.file?.showFileTypeError}
     >
       <span class="me-3">
         {#if progressBar.isLoading}
@@ -967,6 +972,9 @@
   }
   .btn-primary {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+  }
+  .btn-disabled {
+    background-color: var(--button-disabled);
   }
   .learn-active-link {
     color: var(--primary-btn-color) !important;

@@ -381,8 +381,9 @@
         disabled={componentData?.source === "SPEC"}
       />
     </div>
-    {#if componentData?.source !== "SPEC" || !componentData?.activeSync}
-      <div class="d-flex gap-3">
+
+    <div class="d-flex gap-3">
+      {#if componentData?.source !== "SPEC" || !componentData?.activeSync}
         <div class="d-flex gap-3">
           <div class="d-flex gap-1">
             <Tooltip
@@ -505,8 +506,9 @@
             </Tooltip>
           </div>
         </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
+
     {#if componentData?.source === "SPEC" && componentData?.activeSync && componentData?.isDeleted}
       <div class="d-flex gap-3">
         <div class="d-flex gap-3">
