@@ -122,7 +122,13 @@
     >
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
         {#if iconRequired}
-          <span><Icon height={12} width={12} /></span>
+          <span
+            ><Icon
+              height={12}
+              width={12}
+              color={"var(--sparrow-text-color)"}
+            /></span
+          >
         {/if}
         {selectedRequest?.name}
       </p>
@@ -158,7 +164,7 @@
             style="top:5px;
                   left: 10px"
           >
-            <SearchIcon />
+            <SearchIcon height={16} width={16} color={"var(--defaultcolor)"} />
           </span>
           <hr class="my-2" />
         </div>
