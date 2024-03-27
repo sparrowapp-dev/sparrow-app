@@ -696,7 +696,7 @@
       </p>
     {/if}
   {/if}
-  {#if isValidClientURL && isValidServerURL}
+  {#if importType === "text" && isValidClientURL && isValidServerURL}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"
@@ -825,7 +825,7 @@
                     },
                     ...getBranchList,
                   ]}
-                  method={repositoryBranch}
+                  title={repositoryBranch}
                   onclick={handleDropdown}
                   maxHeight={"150px"}
                 />

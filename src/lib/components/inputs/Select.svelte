@@ -12,14 +12,96 @@
     color: string;
   }>;
   export let onclick: (tab: string) => void;
-  export let method: string;
+  export let title: string;
   export let id: string;
   export let isError: boolean = false;
   export let maxHeight = "200px";
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found";
-  export let icon;
+  export let borderType = "all";
+  export let borderActiveType = "all";
+  export let headerTheme = "dark";
+  export let rounded = true;
+  export let iconRequired = false;
+  export let icon = "";
+  const Icon = icon;
+
+  let selectBorderClass = "";
+  switch (borderType) {
+    case "none":
+      selectBorderClass = "select-border-none";
+      break;
+    case "all":
+      selectBorderClass = "select-border-all";
+      break;
+    case "top":
+      selectBorderClass = "select-border-top";
+      break;
+    case "bottom":
+      selectBorderClass = "select-border-bottom";
+      break;
+    case "left":
+      selectBorderClass = "select-border-left";
+      break;
+    case "right":
+      selectBorderClass = "select-border-right";
+      break;
+  }
+
+  let selectActiveBorderClass = "";
+  switch (borderActiveType) {
+    case "none":
+      selectActiveBorderClass = "select-active-border-none";
+      break;
+    case "all":
+      selectActiveBorderClass = "select-active-border-all";
+      break;
+    case "top":
+      selectActiveBorderClass = "select-active-border-top";
+      break;
+    case "bottom":
+      selectActiveBorderClass = "select-active-border-bottom";
+      break;
+    case "left":
+      selectActiveBorderClass = "select-active-border-left";
+      break;
+    case "right":
+      selectActiveBorderClass = "select-active-border-right";
+      break;
+  }
+  let selectErrorBorderClass = "";
+  switch (borderActiveType) {
+    case "none":
+      selectErrorBorderClass = "select-error-border-none";
+      break;
+    case "all":
+      selectErrorBorderClass = "select-error-border-all";
+      break;
+    case "top":
+      selectErrorBorderClass = "select-error-border-top";
+      break;
+    case "bottom":
+      selectErrorBorderClass = "select-error-border-bottom";
+      break;
+    case "left":
+      selectErrorBorderClass = "select-error-border-left";
+      break;
+    case "right":
+      selectErrorBorderClass = "select-error-border-right";
+      break;
+  }
+
+  let selectBackgroundClass = "";
+  switch (headerTheme) {
+    case "transparent":
+      selectBackgroundClass = "select-background-transparent";
+      break;
+    case "dark":
+      selectBackgroundClass = "select-background-dark";
+      break;
+  }
+
   let isOpen: boolean = false;
   let selectedRequest: {
     name: string;
@@ -31,9 +113,9 @@
   };
 
   $: {
-    if (method) {
+    if (title) {
       data.forEach((element) => {
-        if (element.id === method) {
+        if (element.id === title) {
           selectedRequest = element;
         }
       });
@@ -65,13 +147,16 @@
 >
   <div on:click={toggleSelect}>
     <div
-      class="select-btn rounded d-flex align-items-center justify-content-between {isError
-        ? 'isError'
-        : ''}"
-      class:select-btn-active={isOpen}
+      class="select-btn {selectBackgroundClass} {rounded
+        ? 'rounded'
+        : ''}  d-flex align-items-center justify-content-between {selectBorderClass} {isOpen
+        ? selectActiveBorderClass
+        : ''} {isError ? selectErrorBorderClass : ''}"
     >
-      <span>{@html icon}</span>
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
+        {#if iconRequired}
+          <span><Icon height={12} width={12} /></span>
+        {/if}
         {selectedRequest?.name}
       </p>
       <span class="d-flex" class:select-logo-active={isOpen}
@@ -154,7 +239,6 @@
 
 <style>
   .select-btn {
-    background: none;
     outline: none;
     border: none;
     height: 34px;
@@ -192,16 +276,100 @@
     background-color: #232424;
   }
   .select-btn {
-    border: 1px solid #313233;
     cursor: pointer;
   }
-  .isError {
+  /* .isError {
     border: 1px solid var(--error--color) !important;
-  }
-  .select-btn-active {
-    border: 1px solid var(--send-button);
-  }
+  } */
   input {
     outline: none;
+  }
+
+  .select-border-none {
+    border: none;
+  }
+
+  .select-border-all {
+    border: 1px solid #313233; /* Define your desired border style */
+  }
+
+  .select-border-top {
+    border-top: 1px solid #313233; /* Define your desired border style */
+  }
+
+  .select-border-bottom {
+    border-bottom: 1px solid #313233; /* Define your desired border style */
+  }
+
+  .select-border-left {
+    border-left: 1px solid #313233; /* Define your desired border style */
+  }
+
+  .select-border-right {
+    border-right: 1px solid #313233; /* Define your desired border style */
+  }
+
+  .select-active-border-none {
+    border: none;
+  }
+
+  .select-active-border-all {
+    border: none;
+    border: 1px solid var(--send-button);
+  }
+
+  .select-active-border-top {
+    border: none;
+    border-top: 1px solid var(--send-button);
+  }
+
+  .select-active-border-bottom {
+    border: none;
+    border-bottom: 1px solid var(--send-button);
+  }
+
+  .select-active-border-left {
+    border: none;
+    border-left: 1px solid var(--send-button);
+  }
+
+  .select-active-border-right {
+    border: none;
+    border-right: 1px solid var(--send-button);
+  }
+
+  .select-error-border-none {
+    border: none !important;
+  }
+
+  .select-error-border-all {
+    border: none !important;
+    border: 1px solid var(--error--color) !important;
+  }
+
+  .select-error-border-top {
+    border: none !important;
+    border-top: 1px solid var(--error--color) !important;
+  }
+
+  .select-error-border-bottom {
+    border: none !important;
+    border-bottom: 1px solid var(--error--color) !important;
+  }
+
+  .select-error-border-left {
+    border: none !important;
+    border-left: 1px solid var(--error--color) !important;
+  }
+
+  .select-error-border-right {
+    border: none !important;
+    border-right: 1px solid var(--error--color) !important;
+  }
+  .select-background-dark {
+    background-color: var(--blackColor);
+  }
+  .select-background-transparent {
+    background-color: transparent;
   }
 </style>

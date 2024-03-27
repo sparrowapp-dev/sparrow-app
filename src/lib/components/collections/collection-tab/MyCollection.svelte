@@ -378,8 +378,13 @@
             <div class="d-flex">
               <Select
                 isError={false}
+                iconRequired={true}
                 icon={GitBranchIcon}
+                rounded={true}
                 search={true}
+                borderType={"none"}
+                borderActiveType={"all"}
+                headerTheme={"transparent"}
                 searchText={"Search Branch"}
                 searchErrorMessage={"No Branch found"}
                 id={"hashfderef128"}
@@ -396,7 +401,7 @@
                   (value, index, self) =>
                     index === self.findIndex((t) => t.id === value.id),
                 )}
-                method={currentCollection?.currentBranch
+                title={currentCollection?.currentBranch
                   ? currentCollection?.currentBranch
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
