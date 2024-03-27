@@ -556,6 +556,7 @@
       <Dropdown
         dropdownId={user.id}
         disabled={true}
+        showDropdownIcon={false}
         data={getPermissionsData()}
         dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}

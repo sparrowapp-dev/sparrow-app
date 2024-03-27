@@ -43,6 +43,7 @@
   export let dropdownId: string = "";
   export let disabled: boolean = false;
   export let mixpanelEvent: Events = Events.NO_EVENT;
+  export let showDropdownIcon: boolean = true;
 
   let selectedOption: {
     name: string;
@@ -261,13 +262,15 @@
             >{additonalSelectedOptionText}</span
           >
         {/if}
-        <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
-          <Dropdown
-            height={12}
-            width={12}
-            color={disabled ? "var(--sparrow-text-color)" : "white"}
-          />
-        </span>
+        {#if showDropdownIcon}
+          <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
+            <Dropdown
+              height={12}
+              width={12}
+              color={disabled ? "var(--sparrow-text-color)" : "white"}
+            />
+          </span>
+        {/if}
       </div>
     {:else}
       <div
