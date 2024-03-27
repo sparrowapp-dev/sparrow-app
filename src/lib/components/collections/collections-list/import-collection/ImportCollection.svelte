@@ -711,6 +711,7 @@
               class="form-check-input"
               type="checkbox"
               role="switch"
+              style="cursor: pointer;"
               bind:checked={activeSync}
               id="enableActiveSync"
             />

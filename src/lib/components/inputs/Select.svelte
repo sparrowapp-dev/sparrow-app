@@ -3,7 +3,7 @@
   import { onDestroy, onMount } from "svelte";
   import select from "$lib/assets/dropdown.svg";
   import { fade, fly, slide } from "svelte/transition";
-  import { SearchIcon } from "$lib/assets/";
+  import { SearchIcon } from "$lib/assets/icons";
 
   export let data: Array<{
     name: string;

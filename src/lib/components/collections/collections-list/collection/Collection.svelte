@@ -41,7 +41,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import { ReloadCollectionIcon } from "$lib/assets";
+  import { ReloadCollectionIcon } from "$lib/assets/icons";
 
   export let title: string;
   export let collection: any;
