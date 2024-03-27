@@ -36,60 +36,25 @@
     case "all":
       selectBorderClass = "select-border-all";
       break;
-    case "top":
-      selectBorderClass = "select-border-top";
-      break;
     case "bottom":
       selectBorderClass = "select-border-bottom";
-      break;
-    case "left":
-      selectBorderClass = "select-border-left";
-      break;
-    case "right":
-      selectBorderClass = "select-border-right";
       break;
   }
 
   let selectActiveBorderClass = "";
-  switch (borderActiveType) {
-    case "none":
-      selectActiveBorderClass = "select-active-border-none";
-      break;
-    case "all":
-      selectActiveBorderClass = "select-active-border-all";
-      break;
-    case "top":
-      selectActiveBorderClass = "select-active-border-top";
-      break;
-    case "bottom":
-      selectActiveBorderClass = "select-active-border-bottom";
-      break;
-    case "left":
-      selectActiveBorderClass = "select-active-border-left";
-      break;
-    case "right":
-      selectActiveBorderClass = "select-active-border-right";
-      break;
-  }
   let selectErrorBorderClass = "";
   switch (borderActiveType) {
     case "none":
+      selectActiveBorderClass = "select-active-border-none";
       selectErrorBorderClass = "select-error-border-none";
       break;
     case "all":
+      selectActiveBorderClass = "select-active-border-all";
       selectErrorBorderClass = "select-error-border-all";
       break;
-    case "top":
-      selectErrorBorderClass = "select-error-border-top";
-      break;
     case "bottom":
+      selectActiveBorderClass = "select-active-border-bottom";
       selectErrorBorderClass = "select-error-border-bottom";
-      break;
-    case "left":
-      selectErrorBorderClass = "select-error-border-left";
-      break;
-    case "right":
-      selectErrorBorderClass = "select-error-border-right";
       break;
   }
 
@@ -275,7 +240,7 @@
     cursor: pointer;
   }
   .highlight:hover {
-    background-color: #232424;
+    background-color: var(--dull-background-color);
     color: var(--send-button);
   }
   .select-btn {
@@ -291,23 +256,11 @@
   }
 
   .select-border-all {
-    border: 1px solid #313233;
-  }
-
-  .select-border-top {
-    border-top: 1px solid #313233;
+    border: 1px solid var(--border-color);
   }
 
   .select-border-bottom {
-    border-bottom: 1px solid #313233;
-  }
-
-  .select-border-left {
-    border-left: 1px solid #313233;
-  }
-
-  .select-border-right {
-    border-right: 1px solid #313233;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .select-active-border-none {
@@ -319,24 +272,9 @@
     border: 1px solid var(--send-button);
   }
 
-  .select-active-border-top {
-    border: none;
-    border-top: 1px solid var(--send-button);
-  }
-
   .select-active-border-bottom {
     border: none;
     border-bottom: 1px solid var(--send-button);
-  }
-
-  .select-active-border-left {
-    border: none;
-    border-left: 1px solid var(--send-button);
-  }
-
-  .select-active-border-right {
-    border: none;
-    border-right: 1px solid var(--send-button);
   }
 
   .select-error-border-none {
@@ -348,25 +286,11 @@
     border: 1px solid var(--error--color) !important;
   }
 
-  .select-error-border-top {
-    border: none !important;
-    border-top: 1px solid var(--error--color) !important;
-  }
-
   .select-error-border-bottom {
     border: none !important;
     border-bottom: 1px solid var(--error--color) !important;
   }
 
-  .select-error-border-left {
-    border: none !important;
-    border-left: 1px solid var(--error--color) !important;
-  }
-
-  .select-error-border-right {
-    border: none !important;
-    border-right: 1px solid var(--error--color) !important;
-  }
   .select-background-dark {
     background-color: var(--blackColor);
   }
