@@ -16,6 +16,7 @@
   export let id: string;
   export let isError: boolean = false;
   export let maxHeight = "200px";
+  export let minWidth = "50px";
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found";
@@ -152,6 +153,7 @@
         : ''}  d-flex align-items-center justify-content-between {selectBorderClass} {isOpen
         ? selectActiveBorderClass
         : ''} {isError ? selectErrorBorderClass : ''}"
+      style="min-width:{minWidth};"
     >
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
         {#if iconRequired}
@@ -274,6 +276,7 @@
   }
   .highlight:hover {
     background-color: #232424;
+    color: var(--send-button);
   }
   .select-btn {
     cursor: pointer;

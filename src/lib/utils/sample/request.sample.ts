@@ -109,8 +109,8 @@ const generateSampleRequest = (id: string, date: string): NewTab => {
         },
         requestInProgress: false,
         save: {
-          api: false,
-          description: false,
+          api: true,
+          description: true,
         },
       },
     },

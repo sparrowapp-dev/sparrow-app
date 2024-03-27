@@ -381,4 +381,7 @@
   .dropdown-btn-hover {
     background-color: var(--border-color);
   }
+  .text-primaryColor {
+    color: var(--sparrow-blue);
+  }
 </style>

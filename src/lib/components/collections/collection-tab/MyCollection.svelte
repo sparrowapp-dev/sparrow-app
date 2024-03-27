@@ -386,7 +386,7 @@
                 borderActiveType={"all"}
                 headerTheme={"transparent"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No Branch found"}
+                searchErrorMessage={"No branch found"}
                 id={"hashfderef128"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
@@ -406,14 +406,31 @@
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
                 maxHeight={"150px"}
+                minWidth={"200px"}
               >
                 <div slot="pre-select">
                   <div class="d-flex justify-content-between p-2">
-                    <small>Switch branches</small>
-                    <small>2 branches</small>
+                    <small class="text-textColor fw-normal"
+                      >Switch branches</small
+                    >
+                    <small class="text-textColor fw-normal"
+                      >{[
+                        ...currentCollection.branches.map((elem) => {
+                          elem.id = elem.name;
+                          return elem;
+                        }),
+                        {
+                          name: currentCollection?.primaryBranch,
+                          id: currentCollection?.primaryBranch,
+                        },
+                      ].filter(
+                        (value, index, self) =>
+                          index === self.findIndex((t) => t.id === value.id),
+                      ).length} branches</small
+                    >
                   </div>
                 </div>
-                <div slot="post-select">
+                <div slot="post-select" class="d-none">
                   <hr class="mb-2 mt-2" />
                   <p class="sparrow-fs-12 mb-2 ps-2 pe-2">View all Branches</p>
                 </div>

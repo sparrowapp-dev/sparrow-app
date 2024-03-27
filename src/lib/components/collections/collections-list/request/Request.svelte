@@ -384,15 +384,18 @@
   >
     {#if api?.isDeleted && activeSync}
       <span
-        class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
+        class="delete-ticker position-absolute sparrow-fs-10 px-2"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
     {/if}
-    {#if actSync && !isDeleted && source === "SPEC"}
+    {#if actSync && source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
-    <div class="api-method text-{getMethodStyle(method)}">
+    <div
+      class="api-method text-{getMethodStyle(method)} {isDeleted &&
+        'api-method-deleted'}"
+    >
       {method?.toUpperCase()}
     </div>
 
@@ -437,6 +440,10 @@
 </div>
 
 <style lang="scss">
+  .delete-ticker {
+    color: var(--delete-hover);
+    font-weight: 500;
+  }
   .api-method {
     font-size: 10px;
     font-weight: 500;
@@ -453,8 +460,8 @@
     font-weight: 400;
     width: calc(100% - 48px);
   }
-  .api-name-deleted {
-    color: var(--sparrow-text-color);
+  .api-method-deleted {
+    color: var(--recentApiText) !important;
   }
   .api-info {
     display: flex;

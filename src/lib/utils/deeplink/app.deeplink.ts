@@ -1,3 +1,4 @@
+import { throttle } from "$lib/utils/throttle";
 import { platform } from "@tauri-apps/plugin-os";
 import { handleLoginV2 } from "../../../pages/Auth/login-page/login-page";
 import { listen } from "@tauri-apps/api/event";
@@ -10,19 +11,21 @@ interface DeepLinkHandlerWindowsPayload {
   };
 }
 
+const handleLoginThrottler = throttle(handleLoginV2, 5000)
+
 export const deepLinkHandlerWindows = async (
   deepLinkUrl: DeepLinkHandlerWindowsPayload,
 ) => {
   await getCurrent().setFocus();
   const url = deepLinkUrl.payload.url;
   if (url) {
-    await handleLoginV2(url);
+    handleLoginThrottler(url);
   }
 };
 
 export const deepLinkHandlerMacOs = async (deepLinkUrls: string[]) => {
   if (deepLinkUrls && deepLinkUrls.length) {
-    await handleLoginV2(deepLinkUrls[0]);
+    await handleLoginThrottler(deepLinkUrls[0]);
   }
 };
 
