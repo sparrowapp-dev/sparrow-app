@@ -78,7 +78,12 @@ font-weight: 300;"
           }}
         >
           <Plus
-            color={hasWorkpaceLevelPermission ? "gray" : "white"}
+            color={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_ENVIRONMENT,
+            )
+              ? "gray"
+              : "white"}
             height="14"
             width="14"
           />Collection
