@@ -48,7 +48,7 @@
   }
   const applyVariable = async () => {
     if (isGlobalVariable) {
-      const payload = {
+      let payload = {
         name: modifiedGlobalEnvironment.name,
         variable: [
           ...modifiedGlobalEnvironment.variable,
@@ -59,6 +59,16 @@
           },
         ],
       };
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
       const response = await updateEnvironment(
         currentWorkspaceId,
         modifiedGlobalEnvironment.id,
@@ -81,6 +91,16 @@
           },
         ],
       };
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
       const response = await updateEnvironment(
         currentWorkspaceId,
         currentEnvironment.id,
