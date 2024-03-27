@@ -41,6 +41,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
+  import { ReloadCollectionIcon } from "$lib/assets/icons";
 
   export let title: string;
   export let collection: any;
@@ -317,17 +318,22 @@
       collectionId,
       detectBranch,
     );
-    if (response.isSuccessful) {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: response.data.data.items,
-      });
-    } else {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: [],
-      });
-    }
+    setTimeout(() => {
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: response.data.data.items,
+        });
+        isBranchSynced = true;
+      } else {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: [],
+        });
+        isBranchSynced = false;
+      }
+      activeSyncLoad = true;
+    }, 500);
   };
   $: {
     if (activePath) {
@@ -416,13 +422,31 @@
       }
     }
   }
-
+  let activeSyncLoad = false;
+  let isBranchSynced = false;
   // delete collection
   onMount(() => {
     if (collection?.activeSync) {
       handleBranchSwitch();
     }
   });
+
+  let prevCurrentBranch = "";
+  let prevBranches = "";
+  $: {
+    if (collection?.activeSync && collection?.currentBranch) {
+      if (collection.currentBranch !== prevCurrentBranch) {
+        handleBranchSwitch();
+      }
+      prevCurrentBranch = collection.currentBranch;
+    }
+    if (collection?.activeSync && collection?.branches) {
+      if (JSON.stringify(collection.branches) !== prevBranches) {
+        handleBranchSwitch();
+      }
+      prevBranches = JSON.stringify(collection.branches);
+    }
+  }
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -518,6 +542,7 @@
     }
     refreshCollectionLoader = false;
   };
+  let isCollectionHover = false;
 </script>
 
 <ModalWrapperV1
@@ -594,6 +619,12 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  on:mouseenter={() => {
+    isCollectionHover = true;
+  }}
+  on:mouseleave={() => {
+    isCollectionHover = false;
+  }}
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -662,22 +693,6 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    {#if isActiveSyncEnabled && collection?.activeSync}
-      <button
-        class="threedot-icon-container p-1 border-0 rounded d-flex justify-content-center align-items-center {refreshCollectionLoader
-          ? 'refresh-collection-loader-active'
-          : ''} "
-        on:click={() => {
-          refetchCollection();
-        }}
-      >
-        <img
-          src={refreshIcon}
-          alt="refetch"
-          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
-        />
-      </button>
-    {/if}
     <button
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
@@ -688,71 +703,96 @@
     >
       <img src={threedotIcon} alt="threedotIcon" />
     </button>
+    {#if isActiveSyncEnabled && collection?.activeSync}
+      <button
+        class="p-1 border-0 rounded d-flex justify-content-center align-items-center"
+        style="background-color:transparent;"
+        on:click={() => {
+          refetchCollection();
+        }}
+      >
+        <span
+          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
+        >
+          <ReloadCollectionIcon
+            color={isCollectionHover || collection.id === activeTabId
+              ? "#8DC599"
+              : "grey"}
+          />
+        </span>
+      </button>
+    {/if}
   {/if}
 </button>
-
-<div
-  style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
-    ? 'block'
-    : 'none'};"
->
-  <div class="sub-folders ps-3">
-    {#each collection.items as exp}
-      <Folder
-        {loggedUserRoleInWorkspace}
-        {collectionsMethods}
-        {collectionList}
-        {collectionId}
-        {currentWorkspaceId}
-        explorer={exp}
-        {visibility}
-        {activeTabId}
-        {activePath}
-        activeSync={collection?.activeSync}
-        currentBranch={collection?.currentBranch}
-        primaryBranch={collection?.primaryBranch}
-      />
-    {/each}
-    {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 d-flex">
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[0]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2"
-            src={folderIcon}
-            alt="+ Folder"
-            on:click={handleFolderClick}
+{#if !collection?.activeSync || activeSyncLoad}
+  {#if !collection?.activeSync || isBranchSynced}
+    <div
+      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+        ? 'block'
+        : 'none'};"
+    >
+      <div class="sub-folders ps-3">
+        {#each collection.items as exp}
+          <Folder
+            {loggedUserRoleInWorkspace}
+            {collectionsMethods}
+            {collectionList}
+            {collectionId}
+            {currentWorkspaceId}
+            explorer={exp}
+            {visibility}
+            {activeTabId}
+            {activePath}
+            activeSync={collection?.activeSync}
+            currentBranch={collection?.currentBranch}
+            primaryBranch={collection?.primaryBranch}
           />
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[1]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2 ms-3"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={handleAPIClick}
-          />
-        </Tooltip>
+        {/each}
+        {#if showFolderAPIButtons}
+          <div class="mt-2 mb-2 d-flex">
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[0]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2"
+                src={folderIcon}
+                alt="+ Folder"
+                on:click={handleFolderClick}
+              />
+            </Tooltip>
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[1]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2 ms-3"
+                src={requestIcon}
+                alt="+ API Request"
+                on:click={handleAPIClick}
+              />
+            </Tooltip>
+          </div>
+        {/if}
       </div>
-    {/if}
-  </div>
-</div>
+    </div>
+  {:else}
+    <span class="sparrow-fs-12 ms-4 text-muted">This branch is unavailable</span
+    >
+  {/if}
+{/if}
 
 <style>
   .my-button:hover .threedot-icon-container {
