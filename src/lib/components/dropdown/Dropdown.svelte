@@ -370,6 +370,7 @@
   }
   .highlight:hover {
     background-color: #232424;
+    color: var(--sparrow-blue);
   }
   .dropdown-btn {
     cursor: pointer;

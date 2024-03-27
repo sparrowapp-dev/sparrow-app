@@ -794,11 +794,7 @@
                   hoverClasses={[
                     {
                       id: "hashfref129-btn-div",
-                      classToAdd: [
-                        "border-bottom",
-                        "border-labelColor",
-                        "text-primaryColor",
-                      ],
+                      classToAdd: ["border-bottom", "border-labelColor"],
                     },
                   ]}
                   staticCustomStyles={[
