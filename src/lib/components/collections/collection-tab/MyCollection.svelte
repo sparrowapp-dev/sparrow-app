@@ -385,8 +385,9 @@
                 borderType={"none"}
                 borderActiveType={"all"}
                 headerTheme={"transparent"}
+                headerHighlight={"hover"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No branch found"}
+                searchErrorMessage={"No results found."}
                 id={"hashfderef128"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
@@ -401,7 +402,7 @@
                   (value, index, self) =>
                     index === self.findIndex((t) => t.id === value.id),
                 )}
-                title={currentCollection?.currentBranch
+                titleId={currentCollection?.currentBranch
                   ? currentCollection?.currentBranch
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
@@ -432,7 +433,9 @@
                 </div>
                 <div slot="post-select" class="d-none">
                   <hr class="mb-2 mt-2" />
-                  <p class="sparrow-fs-12 mb-2 ps-2 pe-2">View all Branches</p>
+                  <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
+                    View all Branches
+                  </p>
                 </div>
               </Select>
               <button

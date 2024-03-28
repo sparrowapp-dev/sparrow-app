@@ -789,8 +789,13 @@
       </div>
     </div>
   {:else}
-    <span class="sparrow-fs-12 ms-4 text-muted">This branch is unavailable</span
+    <div
+      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+        ? 'block'
+        : 'none'};"
     >
+      <span class="sparrow-fs-12 text-muted">This branch is unavailable</span>
+    </div>
   {/if}
 {/if}
 
