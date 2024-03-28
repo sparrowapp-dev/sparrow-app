@@ -36,6 +36,7 @@
       <button class="d-flex bg-backgroundColor border-0">
         <p>
           <Dropdown
+            dropdownId={"hash999"}
             dropDownType={{ type: "text", title: currentTab }}
             data={[
               {
@@ -60,6 +61,12 @@
               },
             ]}
             onclick={handleDropdown}
+            hoverClasses={[
+              {
+                id: "hash999-btn-div",
+                classToAdd: ["border-bottom", "border-labelColor"],
+              },
+            ]}
           />
         </p>
       </button>
