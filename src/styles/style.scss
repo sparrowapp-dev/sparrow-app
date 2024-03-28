@@ -66,6 +66,9 @@ $sparrow-small-text-size: 0.75rem;
 $sparrow-base-text-size: 0.875rem;
 $sparrow-medium-text-size: 1.125rem;
 $sparrow-right-click-menu:#232527;
+$sparrow-active-sync:#8DC599;
+$deleted-api-method: #939699;
+
 
 :root {
   --blackColor: #{$sparrow-black};
@@ -122,6 +125,8 @@ $sparrow-right-click-menu:#232527;
   --medium-text: #{$sparrow-medium-text-size};
   --right-click-menu : #{$sparrow-right-click-menu};
   --button-disabled: #{$sparrow-button-disabled};
+  --active-sync-btn: #{$sparrow-active-sync};
+  --deleted-api-method: #{$deleted-api-method};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -163,7 +168,8 @@ $theme-colors: map-merge(
     "dullBackground": $sparrow-dull-background,
     "sparrowBottomBorder": $sparrow-bottom-border,
     "emailInviteBackgroundColor":$sparrow-email-invite-bg-color,
-    "dropdownBorderColor":$sparrow-dropdown-border-color
+    "dropdownBorderColor":$sparrow-dropdown-border-color,
+    "activeSyncBtn": $sparrow-active-sync
   )
 );
 
