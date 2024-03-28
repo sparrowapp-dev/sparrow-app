@@ -125,7 +125,12 @@ export class CollectionRepository {
     });
   };
 
-  public async bulkInsertData(col: any[], recursionLimit = 5): Promise<void> {
+  public async bulkInsertData(
+    col: any[],
+    recursionLimit = 5,
+    _revisedCollection = [],
+  ): Promise<void> {
+    let revisedCollections = _revisedCollection;
     // Base case: if recursion limit is reached, stop recursion
     if (recursionLimit === 0) {
       return;
@@ -143,30 +148,32 @@ export class CollectionRepository {
     });
 
     if (col.length > 0) {
-      const updatedCollections = col.map((collectionObj) => {
-        let temp = JSON.parse(JSON.stringify(collectionObj));
+      if (recursionLimit === 5) {
+        revisedCollections = col.map((collectionObj) => {
+          let temp = JSON.parse(JSON.stringify(collectionObj));
 
-        temp["id"] = temp._id;
+          temp["id"] = temp._id;
 
-        // If activeSync is enabled, set currentBranch based on idToBranchMap
-        if (temp.activeSync) {
-          temp["currentBranch"] = idToBranchMap[temp.id]
-            ? idToBranchMap[temp.id]
-            : temp.primaryBranch;
-        }
+          // If activeSync is enabled, set currentBranch based on idToBranchMap
+          if (temp.activeSync) {
+            temp["currentBranch"] = idToBranchMap[temp.id]
+              ? idToBranchMap[temp.id]
+              : temp.primaryBranch;
+          }
 
-        // Remove _id field to avoid conflicts during insertion
-        delete temp._id;
-        return temp;
-      });
+          // Remove _id field to avoid conflicts during insertion
+          delete temp._id;
+          return temp;
+        });
+      }
 
       try {
         await this.clearCollections();
 
-        await RxDB.getInstance().rxdb.collection.bulkInsert(updatedCollections);
+        await RxDB.getInstance().rxdb.collection.bulkInsert(revisedCollections);
       } catch (e) {
         // If an error occurs during insertion, retry with reduced recursion limit
-        await this.bulkInsertData(col, recursionLimit - 1);
+        await this.bulkInsertData(col, recursionLimit - 1, revisedCollections);
       }
     } else {
       await this.clearCollections();
