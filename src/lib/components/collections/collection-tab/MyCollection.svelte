@@ -19,14 +19,13 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { CollectionService } from "$lib/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { ModalWrapperV1 } from "$lib/components";
-  import Select from "$lib/components/inputs/Select.svelte";
+  import { Select } from "$lib/components/inputs";
   import { GitBranchIcon } from "$lib/assets/icons";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
 
@@ -401,12 +400,12 @@
                 isError={false}
                 iconRequired={true}
                 icon={GitBranchIcon}
-                rounded={true}
+                borderRounded={true}
                 search={true}
                 borderType={"none"}
                 borderActiveType={"all"}
                 headerTheme={"transparent"}
-                headerHighlight={"hover"}
+                headerHighlight={"hover-active"}
                 searchText={"Search Branch"}
                 searchErrorMessage={"No results found."}
                 id={"hashfderef128"}

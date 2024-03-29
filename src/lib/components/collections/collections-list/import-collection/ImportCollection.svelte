@@ -14,7 +14,7 @@
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { CollectionService } from "$lib/services/collection.service";
-  import Select from "$lib/components/inputs/Select.svelte";
+  import { Select } from "$lib/components/inputs";
   import {
     debounce,
     isUrlValid,
@@ -24,7 +24,6 @@
   } from "../collection/collection-utils/utils";
   import linkIcon from "$lib/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";

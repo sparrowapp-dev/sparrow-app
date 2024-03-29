@@ -2,36 +2,109 @@
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
   import select from "$lib/assets/dropdown.svg";
-  import { fade, fly, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import { SearchIcon } from "$lib/assets/icons";
-
+  import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
+  import { GitBranchIcon } from "$lib/assets/icons";
+  /**
+   * Determines id of the menu item.
+   */
+  export let titleId: string;
+  /**
+   * Determines Menu Item data.
+   */
   export let data: Array<{
     name: string;
     id: string;
     description: string;
-    color: string;
+    color: "primary" | "danger" | "dark" | "light";
     hide: boolean;
   }>;
+
+  /**
+   * Callback to parent component.
+   */
   export let onclick: (tab: string) => void;
-  export let titleId: string;
+
+  /**
+   * Determines unique id of Select.
+   */
   export let id: string;
+
+  /**
+   * Determines unselected Select.
+   */
   export let isError: boolean = false;
+
+  /**
+   * Determines the dimensions of a Select.
+   */
   export let maxHeight = "200px";
   export let minWidth = "50px";
   export let maxWidth = "500px";
+
+  /**
+   * Determines search bar Select body.
+   */
   export let search = false;
   export let searchText = "Search";
-  export let searchErrorMessage = "No value found";
-  export let borderType = "all";
-  export let borderActiveType = "all";
+  export let searchErrorMessage = "No value found.";
+
+  /**
+   * Determines the border positioning state for the Select header.
+   */
+  export let borderType: "all" | "bottom" | "none" = "all"; // normal case
+  export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
+
+  /**
+   * Determines the background state for the Select header.
+   */
   export let headerTheme = "dark";
-  export let headerHighlight: "active" | "hover" | "hover-active" | "none" =
-    "none";
-  export let rounded = true;
+
+  /**
+   * Determines the background state for the Select body.
+   */
+  export let bodyTheme = "dark";
+
+  /**
+   * Determines the background highlighting state for the Select header.
+   */
+  export let headerHighlight: "active" | "hover" | "hover-active" | "" =
+    "hover-active";
+  /**
+   * Determines the border highlighting state for the Select header.
+   */
+  export let borderHighlight: "active" | "hover" | "hover-active" | "" =
+    "hover-active";
+  /**
+   * Determines the border radius of Select header.
+   */
+  export let borderRounded = true;
+  /**
+   * Determines the z-index of Select.
+   */
   export let zIndex = 40;
+  /**
+   * Determines versions of the Select menu.
+   */
+  export let menuItem: "v1" | "v2" | "v3" = "v1";
+  /**
+   * Determines icons used in Select header.
+   */
   export let iconRequired = false;
-  export let icon = "";
+  export let icon = GitBranchIcon;
+
   const Icon = icon;
+  let searchData = "";
+  let isOpen = false;
+  let isHover = false;
+  let selectedRequest: {
+    name: string;
+    id: string;
+    color: "primary" | "danger" | "dark" | "light";
+    description: string;
+    hide: boolean;
+  };
 
   let selectBorderClass = "";
   switch (borderType) {
@@ -73,12 +146,16 @@
       break;
   }
 
-  let isOpen: boolean = false;
-  let selectedRequest: {
-    name: string;
-    id: string;
-    color: string;
-  };
+  let selectBodyBackgroundClass = "";
+  switch (bodyTheme) {
+    case "blur":
+      selectBodyBackgroundClass = "select-body-background-blur";
+      break;
+    case "dark":
+      selectBodyBackgroundClass = "select-body-background-dark";
+      break;
+  }
+
   const toggleSelect = () => {
     isOpen = !isOpen;
   };
@@ -108,7 +185,50 @@
     window.addEventListener("click", handleSelectClick);
   });
 
-  let searchData = "";
+  const extractHeaderHighlight = (
+    _headerHighlight: string,
+    _isOpen: boolean,
+    _isHover: boolean,
+  ) => {
+    if (
+      (_headerHighlight === "hover" && isHover) ||
+      (_headerHighlight === "active" && _isOpen) ||
+      (_headerHighlight === "hover-active" && (_isOpen || isHover))
+    ) {
+      return "select-btn-state-active";
+    } else {
+      return "";
+    }
+  };
+  const extractBorderHighlight = (
+    _borderHighlight: string,
+    _isHover: boolean,
+    _isOpen: boolean,
+  ) => {
+    if (
+      (_borderHighlight === "hover" && _isHover) ||
+      (_borderHighlight === "active" && _isOpen) ||
+      (_borderHighlight === "hover-active" && (_isOpen || _isHover))
+    ) {
+      return selectActiveBorderClass;
+    } else {
+      return "";
+    }
+  };
+
+  const getTextColor = (_color: string) => {
+    if (_color === "primary") {
+      return "text-primaryColor";
+    } else if (_color === "danger") {
+      return "text-dangerColor";
+    } else if (_color === "dark") {
+      return "text-defaultColor";
+    } else if (_color === "light") {
+      return "text-whiteColor";
+    } else {
+      return "text-whiteColor";
+    }
+  };
 </script>
 
 <div
@@ -116,21 +236,25 @@
   style=" position: relative; z-index:{zIndex};"
   id={`color-select-${id}`}
 >
-  <div on:click={toggleSelect}>
+  <div on:click={toggleSelect} role="button" tabindex="0" on:keydown={() => {}}>
     <div
-      class="select-btn {headerHighlight === 'active' && isOpen
-        ? 'select-btn-state-active'
-        : headerHighlight === 'hover'
-        ? 'select-btn-state-hover'
-        : headerHighlight === 'hover-active' && isOpen
-        ? 'select-btn-state-hover-active-active'
-        : headerHighlight === 'hover-active' && !isOpen
-        ? 'select-btn-state-hover-active'
-        : ''} {selectBackgroundClass} {rounded
-        ? 'rounded'
-        : ''}  d-flex align-items-center justify-content-between {selectBorderClass} {isOpen
-        ? selectActiveBorderClass
-        : ''} {isError ? selectErrorBorderClass : ''}"
+      role="button"
+      tabindex="0"
+      on:keydown={() => {}}
+      on:mouseenter={() => {
+        isHover = true;
+      }}
+      on:mouseleave={() => {
+        isHover = false;
+      }}
+      class="select-btn
+      {selectBackgroundClass} 
+      {extractHeaderHighlight(headerHighlight, isOpen, isHover)}  
+      {borderRounded ? 'rounded' : ''}  
+      {selectBorderClass} 
+      {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
+      {isError ? selectErrorBorderClass : ''}
+        d-flex align-items-center justify-content-between"
       style="min-width:{minWidth}; max-width:{maxWidth};"
     >
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
@@ -158,7 +282,7 @@
 
   {#if isOpen}
     <div
-      class="d-none z-2 select-data p-1 rounded"
+      class="d-none z-2 select-data {selectBodyBackgroundClass} p-1 rounded"
       class:select-active={isOpen}
       transition:slide={{ duration: 100 }}
     >
@@ -166,6 +290,9 @@
         on:click={() => {
           isOpen = false;
         }}
+        role="button"
+        tabindex="0"
+        on:keydown={() => {}}
       >
         <slot name="pre-select" />
       </div>
@@ -193,33 +320,29 @@
           return element.name.toLowerCase().includes(searchData.toLowerCase());
         }) as list}
           <div
-            class="d-flex px-2 py-2 justify-content-between highlight {list.hide
-              ? 'd-none'
-              : ''}"
+            class=" {list.hide ? 'd-none' : ''}"
             on:click={() => {
               isOpen = false;
               onclick(list.id);
             }}
+            role="button"
+            tabindex="0"
+            on:keydown={() => {}}
           >
-            <p
-              class="m-0 p-0 text-{list.color} ellipsis"
-              style="font-size: 12px;"
-              class:selected-request={list.id === selectedRequest?.id}
-            >
-              {list.name}<br />
-              {#if list.description}
-                <small class="text-textColor">{list.description}</small>
-              {/if}
-            </p>
-            {#if selectedRequest?.id === list.id}
-              <img src={checkIcon} alt="" />
+            {#if menuItem === "v1"}
+              <MenuItemsV1
+                {list}
+                {selectedRequest}
+                {checkIcon}
+                {getTextColor}
+              />
             {/if}
           </div>
         {/each}
       </div>
       {#if data.filter((element) => {
         return element.name.toLowerCase().includes(searchData.toLowerCase());
-      }).length === 0}
+      }).length === 0 && search}
         <div class="p-2">
           <p class="sparrow-fs-12 mb-0 text-textColor text-center">
             {searchErrorMessage}
@@ -230,6 +353,9 @@
         on:click={() => {
           isOpen = false;
         }}
+        role="button"
+        tabindex="0"
+        on:keydown={() => {}}
       >
         <slot name="post-select" />
       </div>
@@ -251,20 +377,23 @@
   .select-background-dark {
     background-color: var(--blackColor);
   }
-  .select-btn-state-active,
-  .select-btn-state-hover:hover,
-  .select-btn-state-hover-active-active,
-  .select-btn-state-hover-active:hover {
+  .select-btn-state-active {
     background-color: var(--border-color);
   }
   .select-data {
-    background-color: var(--blackColor);
     color: white;
     position: absolute;
     top: 40px;
     left: 0;
     right: 0;
     border: 1px solid rgb(44, 44, 44);
+  }
+  .select-body-background-dark {
+    background-color: var(--blackColor);
+  }
+  .select-body-background-blur {
+    background: var(--background-hover);
+    backdrop-filter: blur(2px);
   }
   .select-btn p,
   .select-data p {
@@ -276,19 +405,6 @@
   }
   .select-logo-active {
     transform: rotateX(180deg) !important;
-  }
-  .highlight {
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .highlight:hover {
-    background-color: var(--dull-background-color);
-  }
-  .highlight:hover p {
-    color: var(--send-button) !important;
-  }
-  .highlight .select-btn {
-    cursor: pointer;
   }
 
   input {
