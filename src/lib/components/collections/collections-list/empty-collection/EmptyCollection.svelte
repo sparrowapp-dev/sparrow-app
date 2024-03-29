@@ -66,6 +66,7 @@ font-weight: 300;"
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
         placement="top"
+        classProp="w-100"
       >
         <button
           disabled={!hasWorkpaceLevelPermission(
@@ -78,7 +79,12 @@ font-weight: 300;"
           }}
         >
           <Plus
-            color={hasWorkpaceLevelPermission ? "gray" : "white"}
+            color={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_ENVIRONMENT,
+            )
+              ? "gray"
+              : "white"}
             height="14"
             width="14"
           />Collection

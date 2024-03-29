@@ -18,6 +18,7 @@
   export let isError: boolean = false;
   export let maxHeight = "200px";
   export let minWidth = "50px";
+  export let maxWidth = "500px";
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found";
@@ -27,6 +28,7 @@
   export let headerHighlight: "active" | "hover" | "hover-active" | "none" =
     "none";
   export let rounded = true;
+  export let zIndex = 40;
   export let iconRequired = false;
   export let icon = "";
   const Icon = icon;
@@ -111,7 +113,7 @@
 
 <div
   class="parent-select display-inline-block cursor-pointer"
-  style=" position: relative;"
+  style=" position: relative; z-index:{zIndex};"
   id={`color-select-${id}`}
 >
   <div on:click={toggleSelect}>
@@ -129,7 +131,7 @@
         : ''}  d-flex align-items-center justify-content-between {selectBorderClass} {isOpen
         ? selectActiveBorderClass
         : ''} {isError ? selectErrorBorderClass : ''}"
-      style="min-width:{minWidth};"
+      style="min-width:{minWidth}; max-width:{maxWidth};"
     >
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
         {#if iconRequired}

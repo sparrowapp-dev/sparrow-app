@@ -368,7 +368,7 @@
   </ModalWrapperV1>
   <div
     class="my-collection d-flex flex-column"
-    style="width:calc(100% - 280px); margin-top: 15px;"
+    style="width:calc(100% - 280px); margin-top: 15px; min-width: 450px"
   >
     <Tooltip
       title={PERMISSION_NOT_FOUND_TEXT}
@@ -428,7 +428,8 @@
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
                 maxHeight={"150px"}
-                minWidth={"200px"}
+                minWidth={"190px"}
+                maxWidth={"250px"}
               >
                 <div slot="pre-select">
                   <div class="d-flex justify-content-between p-2">
@@ -515,7 +516,7 @@
                 workspaceLevelPermissions.SAVE_REQUEST,
               )}
               class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-              style="max-height:40px"
+              style="max-height:60px"
               on:click={handleApiRequest}>New Request</button
             >
           </div>
