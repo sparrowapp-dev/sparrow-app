@@ -194,7 +194,9 @@
             await collectionsMethods.getAllCollections(workspaceId);
           if (response.isSuccessful && response.data.data) {
             const collections = response.data.data;
-            isLoading = false;
+            setTimeout(() => {
+              isLoading = false;
+            }, 200);
             collectionsMethods.bulkInsert(collections);
           }
         }

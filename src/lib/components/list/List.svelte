@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
+
   export let height = "100%";
   export let overflowY = "scroll";
   export let overflowX = "auto";
@@ -8,6 +10,7 @@
 <div
   class={`list-container gap-2 sparrow-thin-scrollbar ${classProps}`}
   style={`max-height: ${height}; overflow-y=${overflowY}; overflow-x: ${overflowX};`}
+  transition:fade
 >
   <div class="list-body">
     <slot />
