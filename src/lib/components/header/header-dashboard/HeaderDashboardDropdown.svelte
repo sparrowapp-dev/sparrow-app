@@ -367,7 +367,7 @@
       type: "text",
       title: currentWorkspace ? `${currentWorkspace?.id}` : "",
     }}
-    additionalSelectedOptionHeading={`/${currentWorkspace?.name}`}
+    additionalSelectedOptionHeading={`/ ${currentWorkspace?.name}`}
     additonalSelectedOptionText={`${currentTeam?.name}`}
     staticCustomStyles={[
       {

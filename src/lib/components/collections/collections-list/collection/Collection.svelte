@@ -424,6 +424,7 @@
   }
   let activeSyncLoad = false;
   let isBranchSynced = false;
+  let isSyncBtnHovered = false;
   // delete collection
   onMount(() => {
     if (collection?.activeSync) {
@@ -705,19 +706,24 @@
     </button>
     {#if isActiveSyncEnabled && collection?.activeSync}
       <button
-        class="p-1 border-0 rounded d-flex justify-content-center align-items-center"
-        style="background-color:transparent;"
+        class="sync-button p-1 border-0 rounded"
         on:click={() => {
           refetchCollection();
         }}
+        on:mouseenter={() => {
+          isSyncBtnHovered = true;
+        }}
+        on:mouseleave={() => {
+          isSyncBtnHovered = false;
+        }}
       >
         <span
-          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
+          class="{refreshCollectionLoader
+            ? 'refresh-collection-loader'
+            : ''}  d-flex justify-content-center align-items-center p-1"
         >
           <ReloadCollectionIcon
-            color={isCollectionHover || collection.id === activeTabId
-              ? "#8DC599"
-              : "grey"}
+            color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
           />
         </span>
       </button>
@@ -795,6 +801,12 @@
 {/if}
 
 <style>
+  .sync-button {
+    background-color: transparent;
+  }
+  .sync-button:active {
+    background-color: var(--editor-angle-bracket);
+  }
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }

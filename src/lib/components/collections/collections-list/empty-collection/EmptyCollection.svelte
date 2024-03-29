@@ -66,6 +66,7 @@ font-weight: 300;"
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
         placement="top"
+        classProp="w-100"
       >
         <button
           disabled={!hasWorkpaceLevelPermission(

@@ -507,7 +507,6 @@
               name: elem.replace("origin/", ""),
               id: elem.replace("origin/", ""),
               hide: false,
-              color: "whiteColor",
             };
           });
         isRepositoryPath = true;
@@ -895,23 +894,24 @@
     border-width: 2px;
   }
   .import-type-inp:hover {
-    background-color: var(--defaultcolor);
-    color: var(--sparrow-blue);
+    background-color: var(--keyvalue-pair);
+    color: var(--send-button);
   }
-  .import-type-inp:hover input {
+  .import-type-inp:hover .import-type-inp input {
     border-width: 2px;
-    border-color: var(--sparrow-blue);
+    border-color: var(--send-button);
   }
 
   .enable-active-sync {
     margin: 1% 0;
-    padding: 1%;
+    padding: 1% 2%;
+    border-radius: 10px;
+  }
+  .enable-active-sync input {
+    background-color: var(--defaultcolor);
   }
   .enable-active-sync:hover {
-    margin: 1% 0;
-    padding: 1%;
-    background-color: var(--defaultcolor);
-    border-radius: 10px;
+    background-color: var(--keyvalue-pair);
   }
 
   textarea {

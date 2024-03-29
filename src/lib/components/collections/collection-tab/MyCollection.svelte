@@ -347,7 +347,7 @@
   </ModalWrapperV1>
   <div
     class="my-collection d-flex flex-column"
-    style="width:calc(100% - 280px); margin-top: 15px;"
+    style="width:calc(100% - 280px); margin-top: 15px; min-width: 450px"
   >
     <Tooltip
       title={PERMISSION_NOT_FOUND_TEXT}
