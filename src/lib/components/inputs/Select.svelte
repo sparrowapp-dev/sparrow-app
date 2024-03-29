@@ -10,9 +10,10 @@
     id: string;
     description: string;
     color: string;
+    hide: boolean;
   }>;
   export let onclick: (tab: string) => void;
-  export let title: string;
+  export let titleId: string;
   export let id: string;
   export let isError: boolean = false;
   export let maxHeight = "200px";
@@ -24,7 +25,10 @@
   export let borderType = "all";
   export let borderActiveType = "all";
   export let headerTheme = "dark";
+  export let headerHighlight: "active" | "hover" | "hover-active" | "none" =
+    "none";
   export let rounded = true;
+  export let zIndex = 40;
   export let iconRequired = false;
   export let icon = "";
   const Icon = icon;
@@ -80,9 +84,9 @@
   };
 
   $: {
-    if (title) {
+    if (titleId) {
       data.forEach((element) => {
-        if (element.id === title) {
+        if (element.id === titleId) {
           selectedRequest = element;
         }
       });
@@ -108,13 +112,21 @@
 </script>
 
 <div
-  class="parent-select display-inline-block"
-  style=" position: relative;"
+  class="parent-select display-inline-block cursor-pointer"
+  style=" position: relative; z-index:{zIndex};"
   id={`color-select-${id}`}
 >
   <div on:click={toggleSelect}>
     <div
-      class="select-btn {selectBackgroundClass} {rounded
+      class="select-btn {headerHighlight === 'active' && isOpen
+        ? 'select-btn-state-active'
+        : headerHighlight === 'hover'
+        ? 'select-btn-state-hover'
+        : headerHighlight === 'hover-active' && isOpen
+        ? 'select-btn-state-hover-active-active'
+        : headerHighlight === 'hover-active' && !isOpen
+        ? 'select-btn-state-hover-active'
+        : ''} {selectBackgroundClass} {rounded
         ? 'rounded'
         : ''}  d-flex align-items-center justify-content-between {selectBorderClass} {isOpen
         ? selectActiveBorderClass
@@ -150,7 +162,13 @@
       class:select-active={isOpen}
       transition:slide={{ duration: 100 }}
     >
-      <slot name="pre-select" />
+      <div
+        on:click={() => {
+          isOpen = false;
+        }}
+      >
+        <slot name="pre-select" />
+      </div>
       {#if search}
         <div class="position-relative">
           <input
@@ -203,15 +221,23 @@
         return element.name.toLowerCase().includes(searchData.toLowerCase());
       }).length === 0}
         <div class="p-2">
-          <small class="sparrow-fs-12">{searchErrorMessage}</small>
+          <p class="sparrow-fs-12 mb-0 text-textColor text-center">
+            {searchErrorMessage}
+          </p>
         </div>
       {/if}
-      <slot name="post-select" />
+      <div
+        on:click={() => {
+          isOpen = false;
+        }}
+      >
+        <slot name="post-select" />
+      </div>
     </div>
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .select-btn {
     outline: none;
     border: none;
@@ -219,7 +245,16 @@
     width: auto;
     padding: 0 10px;
   }
-  .select-btn:hover {
+  .select-background-transparent {
+    background-color: transparent;
+  }
+  .select-background-dark {
+    background-color: var(--blackColor);
+  }
+  .select-btn-state-active,
+  .select-btn-state-hover:hover,
+  .select-btn-state-hover-active-active,
+  .select-btn-state-hover-active:hover {
     background-color: var(--border-color);
   }
   .select-data {
@@ -248,9 +283,11 @@
   }
   .highlight:hover {
     background-color: var(--dull-background-color);
-    color: var(--send-button);
   }
-  .select-btn {
+  .highlight:hover p {
+    color: var(--send-button) !important;
+  }
+  .highlight .select-btn {
     cursor: pointer;
   }
 
@@ -298,10 +335,12 @@
     border-bottom: 1px solid var(--error--color) !important;
   }
 
-  .select-background-dark {
-    background-color: var(--blackColor);
+  .cursor-pointer {
+    cursor: pointer;
   }
-  .select-background-transparent {
-    background-color: transparent;
+
+  input:focus {
+    border: 1px solid var(--send-button) !important;
+    caret-color: var(--send-button) !important;
   }
 </style>

@@ -818,6 +818,7 @@
                   isError={repositoryBranch === "not exist" &&
                     isRepositoryBranchTouched}
                   id={"select-branch"}
+                  headerHighlight={"hover"}
                   data={[
                     {
                       name: "Select Branch",
@@ -827,7 +828,7 @@
                     },
                     ...getBranchList,
                   ]}
-                  title={repositoryBranch}
+                  titleId={repositoryBranch}
                   onclick={handleDropdown}
                   maxHeight={"150px"}
                   maxWidth={"900px"}

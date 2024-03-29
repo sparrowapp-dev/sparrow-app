@@ -100,11 +100,13 @@
   let environmentVariables = [];
   let environmentId: string;
   let currentWorkspaceId = "";
+  let currentWorkspace;
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        currentWorkspace = activeWorkspaceRxDoc;
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         environmentId = activeWorkspaceRxDoc.get("environmentId");
       }
@@ -234,6 +236,7 @@
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
               environmentVariables={environmentVariables.reverse()}
+              {currentWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
@@ -250,6 +253,7 @@
               {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
               {currentWorkspaceId}
+              {currentWorkspace}
             />
           {/if}
         </div>
