@@ -59,12 +59,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme = "dark";
+  export let headerTheme: "dark" | "transparent" = "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme = "dark";
+  export let bodyTheme: "dark" | "blur" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.

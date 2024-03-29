@@ -405,10 +405,12 @@
                 borderType={"none"}
                 borderActiveType={"all"}
                 headerTheme={"transparent"}
+                bodyTheme={"dark"}
                 headerHighlight={"hover-active"}
+                borderHighlight={"hover-active"}
                 searchText={"Search Branch"}
                 searchErrorMessage={"No results found."}
-                id={"hashfderef128"}
+                id={"git-branch-select"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
                     elem.id = elem.name;
