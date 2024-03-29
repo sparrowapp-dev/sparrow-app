@@ -129,7 +129,7 @@
       if (response.isSuccessful) {
         isValidServerJSON = true;
       }
-    } else {
+    } else if (validateClientXML(importData)) {
       const response = await _collectionService.validateImportCollectionInput(
         "",
         importData,
