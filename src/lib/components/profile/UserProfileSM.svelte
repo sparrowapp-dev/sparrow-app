@@ -15,7 +15,9 @@
     }; border-radius: ${borderRadius + "px"}; ${stypeProp}`}
     class="sparrow-user-profile-sm d-flex align-items-center justify-content-center {classProp}"
   >
-    {username?.length > 0 && username[0]}
+    <p class="sparrow-fs-10 mb-0">
+      {username?.length > 0 && username}
+    </p>
   </div>
 {/if}
 
