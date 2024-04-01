@@ -35,12 +35,12 @@
         {width}
         {height}
         {borderRadius}
-        username={user.name}
+        username={user.name[0].toUpperCase()}
         {userProfileUrl}
       />
     {/if}
   {/each}
-  {#if generateUsersList(users).length > maxProfiles}
+  {#if generateUsersList(users).length < users.length}
     <UserProfileSM
       classProp={classProp + `position-absolute bg-backgroundColor`}
       stypeProp={stypeProp +

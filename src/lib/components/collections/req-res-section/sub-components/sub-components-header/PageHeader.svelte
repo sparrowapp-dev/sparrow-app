@@ -30,9 +30,11 @@
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
+  import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let currentWorkspace;
 
   const collections: Observable<CollectionDocument[]> =
     collectionsMethods.collection;
@@ -44,11 +46,47 @@
 
   let tabName: string = "";
   let componentData: NewTab;
-
-  const tabSubscribe = activeTab.subscribe((event: NewTab) => {
+  let existingRequest;
+  const monthNamesAbbreviated = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  let lastUpdatedAt = "";
+  const tabSubscribe = activeTab.subscribe(async (event: NewTab) => {
     if (event) {
       tabName = event?.name;
       componentData = event;
+      if (event?.path?.collectionId && event?.path?.folderId) {
+        existingRequest = await collectionsMethods.readRequestInFolder(
+          event.path.collectionId,
+          event.path.folderId,
+          event.id,
+        );
+      } else if (event?.path?.collectionId) {
+        existingRequest =
+          await collectionsMethods.readRequestOrFolderInCollection(
+            event.path.collectionId,
+            event.id,
+          );
+      }
+      if (existingRequest?.updatedAt) {
+        const date = new Date(existingRequest?.updatedAt);
+        lastUpdatedAt = `${
+          monthNamesAbbreviated[date.getMonth()]
+        } ${date.getDate()}, ${date.getFullYear()}`;
+      } else {
+        lastUpdatedAt = "";
+      }
     }
   });
 
@@ -528,6 +566,27 @@
       </div>
     {/if}
   </div>
+  {#if lastUpdatedAt && componentData?.activeSync && componentData?.source === "SPEC"}
+    <div class="pt-2 ps-3 d-flex align-items-center">
+      {#if currentWorkspace?.users}
+        <div class="d-flex">
+          <UserProfileList
+            width={25}
+            height={25}
+            borderRadius={24}
+            users={currentWorkspace.users}
+            maxProfiles={3}
+            classProp="position-absolute"
+          />
+        </div>
+      {/if}
+      <p class="sparrow-fs-12 mb-0 ps-2">
+        <span class="text-textColor"> Last updated on: </span>
+        {lastUpdatedAt} <span class="text-textColor">by:</span>
+        {existingRequest?.updatedBy}
+      </p>
+    </div>
+  {/if}
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
