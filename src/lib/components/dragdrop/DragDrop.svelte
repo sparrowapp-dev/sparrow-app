@@ -173,7 +173,7 @@
   {/if}
 
   {#if showFileTypeError}
-    <div class="d-flex gap-2" style="justify-content:center">
+    <div class="d-flex gap-2 justify-content-center">
       {#each supportedFileTypes as fileType}
         <span class="px-2 py-1 sparrow-input-file-type rounded">
           {fileType.toUpperCase()}
