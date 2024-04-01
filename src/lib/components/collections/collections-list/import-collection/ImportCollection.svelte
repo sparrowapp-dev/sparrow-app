@@ -667,7 +667,7 @@
 
   {#if importType === "file"}
     <div class="importData-lightGray sparrow-fs-14">
-      <p class="mb-1">Drag and drop your YAML/JSON file</p>
+      <p class="mb-1">Upload YAML/JSON file</p>
     </div>
     <div>
       <DragDrop

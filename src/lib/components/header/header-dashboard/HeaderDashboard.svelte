@@ -497,9 +497,9 @@
             id="resize-button"
           >
             {#if isMaximizeWindow === true}
-              <img src={icons.doubleResizeIcon} alt="" />
-            {:else}
               <img src={icons.resizeIcon} alt="" />
+            {:else}
+              <img src={icons.doubleResizeIcon} alt="" />
             {/if}
           </button>
         </div>
