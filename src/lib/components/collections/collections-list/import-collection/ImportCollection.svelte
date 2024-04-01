@@ -685,7 +685,7 @@
         showFileSizeError={uploadCollection.file.showFileSizeError}
         showFileTypeError={uploadCollection.file.showFileTypeError}
         type={"file"}
-        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+        fileTypeError="The file type you are trying to upload is not supported. Please re-upload in any of the following file formats."
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
