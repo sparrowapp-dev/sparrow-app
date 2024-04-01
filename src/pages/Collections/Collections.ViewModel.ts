@@ -353,10 +353,9 @@ export class CollectionsViewModel {
     folderId,
   ): boolean => {
     let userSource = {};
-    if (activeSync && source === "USER") {
+    if (activeSync) {
       userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
+        currentBranch: currentBranch,
       };
     }
 

@@ -64,7 +64,7 @@
   const handleFilePopUp = (flag) => {
     isFilePopup = flag;
   };
-
+  let path;
   const handleClick = () => {
     let request = generateSampleRequest(id, new Date().toString());
     request.path = path;
@@ -158,15 +158,16 @@
           },
         ];
       }
+
+      path = {
+        workspaceId: currentWorkspaceId,
+        collectionId,
+        folderId,
+        folderName,
+      };
     }
   }
 
-  let path: Path = {
-    workspaceId: currentWorkspaceId,
-    collectionId,
-    folderId,
-    folderName,
-  };
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
