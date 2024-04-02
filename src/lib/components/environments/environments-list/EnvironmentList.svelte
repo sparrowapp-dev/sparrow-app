@@ -31,7 +31,7 @@
   export let environments;
   export let currentEnvironment;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-
+  export let isEnvLoading = false;
   let localEnvironment;
   let globalEnvironment;
   let isLoading: boolean = false;
@@ -188,62 +188,68 @@
     </Tooltip>
   </div>
 
-  {#if globalEnvironment && globalEnvironment.length > 0}
-    <p
-      class={`fw-normal env-item rounded m-2 px-2 ${
-        globalEnvironment[0]?.id === currentEnvironment?.id && "active"
-      }`}
-      on:click={() => {
-        handleOpenEnvironment(globalEnvironment[0]?.id);
-      }}
-    >
-      {globalEnvironment[0]?.name}
-    </p>
-  {/if}
-  <hr class="mb-0" />
-
-  {#if localEnvironment && localEnvironment.length === 0}
-    <div class={`add-env-container p-3`}>
-      <p class={`add-env-desc-text fw-light text-center mb-3`}>
-        Add Environments to your Workspace to test your APIs with the relevant
-        set of resources and constraints.
-      </p>
-      <Tooltip
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.ADD_COLLECTIONS,
-        )}
+  {#if isEnvLoading}
+    <div class="spinner">
+      <Spinner size={`32px`} />
+    </div>
+  {:else}
+    {#if globalEnvironment && globalEnvironment.length > 0}
+      <p
+        class={`fw-normal env-item rounded m-2 px-2 ${
+          globalEnvironment[0]?.id === currentEnvironment?.id && "active"
+        }`}
+        on:click={() => {
+          handleOpenEnvironment(globalEnvironment[0]?.id);
+        }}
       >
-        <button
-          disabled={!hasWorkpaceLevelPermission(
+        {globalEnvironment[0]?.name}
+      </p>
+    {/if}
+    <hr class="mb-0" />
+
+    {#if localEnvironment && localEnvironment.length === 0}
+      <div class={`add-env-container p-3`}>
+        <p class={`add-env-desc-text fw-light text-center mb-3`}>
+          Add Environments to your Workspace to test your APIs with the relevant
+          set of resources and constraints.
+        </p>
+        <Tooltip
+          title={PERMISSION_NOT_FOUND_TEXT}
+          show={!hasWorkpaceLevelPermission(
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.ADD_COLLECTIONS,
           )}
-          class={`add-env-btn w-100 d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
-          on:click={handleCreateEnvironment}
         >
-          <PlusIcon classProp={`my-auto me-2`} />
-          <span class={`my-auto ps-2`}>Environment</span>
-        </button>
-      </Tooltip>
-    </div>
-  {/if}
-  <ul class={`env-side-tab-list p-0`}>
-    {#if localEnvironment && localEnvironment.length > 0}
-      <List height={"calc(100vh - 180px)"} classProps={"p-2"}>
-        {#each localEnvironment as env}
-          <EnvironmentTab
-            {env}
-            {environmentServiceMethods}
-            {environmentRepositoryMethods}
-            {currentWorkspace}
-            {currentEnvironment}
-          />
-        {/each}
-      </List>
+          <button
+            disabled={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_COLLECTIONS,
+            )}
+            class={`add-env-btn w-100 d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
+            on:click={handleCreateEnvironment}
+          >
+            <PlusIcon classProp={`my-auto me-2`} />
+            <span class={`my-auto ps-2`}>Environment</span>
+          </button>
+        </Tooltip>
+      </div>
     {/if}
-  </ul>
+    <ul class={`env-side-tab-list p-0`}>
+      {#if localEnvironment && localEnvironment.length > 0}
+        <List height={"calc(100vh - 180px)"} classProps={"p-2"}>
+          {#each localEnvironment as env}
+            <EnvironmentTab
+              {env}
+              {environmentServiceMethods}
+              {environmentRepositoryMethods}
+              {currentWorkspace}
+              {currentEnvironment}
+            />
+          {/each}
+        </List>
+      {/if}
+    </ul>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -335,5 +341,13 @@
     outline: none;
     background-color: var(--border-color);
     border-bottom: 1px solid #85c2ff !important;
+  }
+  .spinner {
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 </style>

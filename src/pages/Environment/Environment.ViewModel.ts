@@ -57,6 +57,37 @@ export class EnvironmentViewModel {
     );
   };
 
+  public refreshEnvironment = async (workspaceId) => {
+    const activeTab =
+      await this.environmentTabRepository.getActiveEnvironmentTab(workspaceId);
+    const response =
+      await this.environmentService.fetchAllEnvironments(workspaceId);
+    if (response.isSuccessful && response.data.data) {
+      const environments = response.data.data;
+      this.environmentRepository.refreshEnvironment(environments, workspaceId);
+      if (!activeTab) {
+        environments.forEach((environment) => {
+          if (environment.type === environmentType.GLOBAL) {
+            const sampleEnvironment = generateSampleEnvironment(
+              environment.id,
+              workspaceId,
+              new Date().toString(),
+            );
+            sampleEnvironment.name = environment.name;
+            sampleEnvironment.isActive = true;
+            sampleEnvironment.type = environmentType.GLOBAL;
+            sampleEnvironment.variable = environment.variable;
+            this.environmentTabRepository.createTab(
+              sampleEnvironment,
+              workspaceId,
+            );
+          }
+        });
+      }
+    }
+    return;
+  };
+
   public deleteEnvironmentTab = async (environmentId) => {
     const flag =
       await this.environmentTabRepository.deleteEnvironmentTab(environmentId);

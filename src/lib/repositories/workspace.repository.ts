@@ -161,6 +161,19 @@ export class WorkspaceRepository {
   };
 
   /**
+   * remove workspaces by teamId
+   */
+  public removeWorkspaces = async (teamId: string): Promise<any> => {
+    return RxDB.getInstance()
+      .rxdb.workspace.find({
+        selector: {
+          "team.teamId": teamId,
+        },
+      })
+      .remove();
+  };
+
+  /**
    * Activate Initial Workspace
    */
   public activateInitialWorkspace = async (): Promise<string> => {
@@ -224,7 +237,6 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearWorkspaces();
     await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
     return;
   };

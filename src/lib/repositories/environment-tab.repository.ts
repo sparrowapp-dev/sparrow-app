@@ -97,4 +97,20 @@ export class EnvironmentTabRepository {
       });
     }
   };
+
+  /**
+   * Extracts an active environment tab.
+   */
+  public getActiveEnvironmentTab = async (
+    workspaceId,
+  ): EnvironmentTabDocument => {
+    return await RxDB.getInstance()
+      .rxdb.environmenttab.findOne({
+        selector: {
+          isActive: true,
+          workspaceId,
+        },
+      })
+      .exec();
+  };
 }

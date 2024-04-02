@@ -3,11 +3,16 @@ import {
   getMultipartAuthHeaders,
   makeRequest,
 } from "$lib/api/api.common";
+import { TeamRepository } from "$lib/repositories/team.repository";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import constants from "$lib/utils/constants";
 import type { InviteBody, TeamPostBody } from "$lib/utils/dto/team-dto";
 const apiUrl: string = constants.API_URL;
 export class TeamService {
   constructor() {}
+
+  private teamRepository = new TeamRepository();
+  private workspaceRepository = new WorkspaceRepository();
 
   public fetchTeams = async (userId: string) => {
     const response = await makeRequest(
@@ -44,6 +49,10 @@ export class TeamService {
         headers: getAuthHeaders(),
       },
     );
+    if (response.isSuccessful) {
+      await this.teamRepository.removeTeam(teamId);
+      await this.workspaceRepository.removeWorkspaces(teamId);
+    }
     return response;
   };
 

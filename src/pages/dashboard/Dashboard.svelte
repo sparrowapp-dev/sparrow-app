@@ -33,6 +33,7 @@
   import type { WorkspaceRole } from "$lib/utils/enums";
 
   const _dashboardViewModel = new DashboardViewModel();
+  const refreshTeamsWorkspaces = _dashboardViewModel.refreshTeamsWorkspaces;
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -59,8 +60,7 @@
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
       loggedInUserId = value._id;
-      await _viewModelHome.refreshTeams(value._id);
-      await _viewModelWorkspace.refreshWorkspaces(value._id);
+      _dashboardViewModel.refreshTeamsWorkspaces(value._id);
     }
   });
 
@@ -257,6 +257,7 @@
       >
       <Route path="/workspaces/*"
         ><Teams
+          {refreshTeamsWorkspaces}
           {currentTeam}
           data={workspaces}
           {handleWorkspaceSwitch}

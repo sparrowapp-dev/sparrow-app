@@ -47,6 +47,7 @@
     updateEnvironment: _viewModel.updateServerEnvironment,
   };
   let trackWorkspaceId;
+  let isEnvLoading = false;
   const activeWorkspace: Observable<WorkspaceDocument> =
     environmentRepositoryMethods.getActiveWorkspace();
 
@@ -56,7 +57,10 @@
       if (activeWorkspaceRxDoc) {
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
+          isEnvLoading = true;
           activeEnvironment = _viewModel.getactiveEnvironmentTab(workspaceId);
+          await _viewModel.refreshEnvironment(workspaceId);
+          isEnvLoading = false;
         }
         trackWorkspaceId = workspaceId;
       }
@@ -93,6 +97,7 @@
       {loggedUserRoleInWorkspace}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
+      {isEnvLoading}
       currentWorkspace={$activeWorkspace}
       environments={$environments}
       currentEnvironment={$activeEnvironment}

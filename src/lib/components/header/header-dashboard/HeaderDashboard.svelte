@@ -101,16 +101,6 @@
         } else {
           name = name;
         }
-        if (trackWorkspaceId !== value.get("_id")) {
-          const response = await _viewModel.getServerEnvironments(
-            value.get("_id"),
-          );
-          if (response.isSuccessful && response.data.data) {
-            const environments = response.data.data;
-            _viewModel.refreshEnvironment(environments, value.get("_id"));
-          }
-        }
-        trackWorkspaceId = value.get("_id");
       }
     },
   );
