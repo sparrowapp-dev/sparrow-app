@@ -56,7 +56,7 @@
       authValue = findAuthParameter(request);
       let flag: boolean = false;
       for (let i = 0; i < params.length - 1; i++) {
-        if (params[i].checked === false) {
+        if (params[i]?.checked === false) {
           flag = true;
         }
       }
@@ -84,7 +84,7 @@
     let queryString: string = "";
     let count: number = 0;
     for (let param of params) {
-      if (param.checked) {
+      if (param?.checked) {
         count++;
         queryString += `${param.key}=${param.value}&`;
       }

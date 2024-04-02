@@ -33,7 +33,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, type WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
@@ -41,6 +41,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
+  import { ReloadCollectionIcon } from "$lib/assets/icons";
 
   export let title: string;
   export let collection: any;
@@ -317,17 +318,22 @@
       collectionId,
       detectBranch,
     );
-    if (response.isSuccessful) {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: response.data.data.items,
-      });
-    } else {
-      collectionsMethods.updateCollection(collectionId, {
-        currentBranch: detectBranch,
-        items: [],
-      });
-    }
+    setTimeout(() => {
+      if (response.isSuccessful) {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: response.data.data.items,
+        });
+        isBranchSynced = true;
+      } else {
+        collectionsMethods.updateCollection(collectionId, {
+          currentBranch: detectBranch,
+          items: [],
+        });
+        isBranchSynced = false;
+      }
+      activeSyncLoad = true;
+    }, 500);
   };
   $: {
     if (activePath) {
@@ -416,13 +422,32 @@
       }
     }
   }
-
+  let activeSyncLoad = false;
+  let isBranchSynced = false;
+  let isSyncBtnHovered = false;
   // delete collection
   onMount(() => {
     if (collection?.activeSync) {
       handleBranchSwitch();
     }
   });
+
+  let prevCurrentBranch = "";
+  let prevBranches = "";
+  $: {
+    if (collection?.activeSync && collection?.currentBranch) {
+      if (collection.currentBranch !== prevCurrentBranch) {
+        handleBranchSwitch();
+      }
+      prevCurrentBranch = collection.currentBranch;
+    }
+    if (collection?.activeSync && collection?.branches) {
+      if (JSON.stringify(collection.branches) !== prevBranches) {
+        handleBranchSwitch();
+      }
+      prevBranches = JSON.stringify(collection.branches);
+    }
+  }
 
   let deleteLoader: boolean = false;
   const handleDelete = async () => {
@@ -485,12 +510,15 @@
     const responseJSON = await collectionService.validateImportCollectionURL(
       collection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
           url: collection.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: collection?.primaryBranch,
           currentBranch: collection?.currentBranch
             ? collection?.currentBranch
@@ -515,6 +543,7 @@
     }
     refreshCollectionLoader = false;
   };
+  let isCollectionHover = false;
 </script>
 
 <ModalWrapperV1
@@ -591,6 +620,12 @@
 
 <button
   style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  on:mouseenter={() => {
+    isCollectionHover = true;
+  }}
+  on:mouseleave={() => {
+    isCollectionHover = false;
+  }}
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -599,6 +634,15 @@
   <div
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center"
+    on:click={() => {
+      isCollectionCreatedFirstTime.set(false);
+
+      if (visibility) {
+        visibility = !visibility;
+      } else if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        handleCollectionClick(collection, currentWorkspaceId, collectionId);
+      }
+    }}
   >
     <img
       src={angleRight}
@@ -607,11 +651,6 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
-      on:click={() => {
-        if (!collection?.id?.includes(UntrackedItems.UNTRACKED)) {
-          visibility = !visibility;
-        }
-      }}
     />
     {#if isRenaming}
       <input
@@ -630,13 +669,6 @@
       <div
         class="collection-title justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 36px;"
-        on:click={() => {
-          isCollectionCreatedFirstTime.set(false);
-
-          if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-            handleCollectionClick(collection, currentWorkspaceId, collectionId);
-          }
-        }}
       >
         <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
           {title}
@@ -659,25 +691,9 @@
       </div>
     {/if}
   </div>
-  {#if collection.id.includes(UntrackedItems.UNTRACKED)}
+  {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    {#if isActiveSyncEnabled && collection?.activeSync}
-      <button
-        class="threedot-icon-container p-1 border-0 rounded d-flex justify-content-center align-items-center {refreshCollectionLoader
-          ? 'refresh-collection-loader-active'
-          : ''} "
-        on:click={() => {
-          refetchCollection();
-        }}
-      >
-        <img
-          src={refreshIcon}
-          alt="refetch"
-          class={refreshCollectionLoader ? "refresh-collection-loader" : ""}
-        />
-      </button>
-    {/if}
     <button
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
@@ -688,73 +704,114 @@
     >
       <img src={threedotIcon} alt="threedotIcon" />
     </button>
+    {#if isActiveSyncEnabled && collection?.activeSync}
+      <button
+        class="sync-button p-1 border-0 rounded"
+        on:click={() => {
+          refetchCollection();
+        }}
+        on:mouseenter={() => {
+          isSyncBtnHovered = true;
+        }}
+        on:mouseleave={() => {
+          isSyncBtnHovered = false;
+        }}
+      >
+        <span
+          class="{refreshCollectionLoader
+            ? 'refresh-collection-loader'
+            : ''}  d-flex justify-content-center align-items-center p-1"
+        >
+          <ReloadCollectionIcon
+            color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
+          />
+        </span>
+      </button>
+    {/if}
   {/if}
 </button>
-
-<div
-  style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
-    ? 'block'
-    : 'none'};"
->
-  <div class="sub-folders ps-3">
-    {#each collection.items as exp}
-      <Folder
-        {loggedUserRoleInWorkspace}
-        {collectionsMethods}
-        {collectionList}
-        {collectionId}
-        {currentWorkspaceId}
-        explorer={exp}
-        {visibility}
-        {activeTabId}
-        {activePath}
-        activeSync={collection?.activeSync}
-        currentBranch={collection?.currentBranch}
-        primaryBranch={collection?.primaryBranch}
-      />
-    {/each}
-    {#if showFolderAPIButtons}
-      <div class="mt-2 mb-2 d-flex">
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[0]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2"
-            src={folderIcon}
-            alt="+ Folder"
-            on:click={handleFolderClick}
+{#if !collection?.activeSync || activeSyncLoad}
+  {#if !collection?.activeSync || isBranchSynced}
+    <div
+      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+        ? 'block'
+        : 'none'};"
+    >
+      <div class="sub-folders ps-3">
+        {#each collection.items as exp}
+          <Folder
+            {loggedUserRoleInWorkspace}
+            {collectionsMethods}
+            {collectionList}
+            {collectionId}
+            {currentWorkspaceId}
+            explorer={exp}
+            {visibility}
+            {activeTabId}
+            {activePath}
+            activeSync={collection?.activeSync}
+            currentBranch={collection?.currentBranch}
+            primaryBranch={collection?.primaryBranch}
           />
-        </Tooltip>
-        <Tooltip
-          placement="bottom"
-          title={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.SAVE_REQUEST,
-          )
-            ? PERMISSION_NOT_FOUND_TEXT
-            : CollectionMessage[1]}
-          classProp="mt-2 mb-2"
-        >
-          <img
-            class="list-icons mb-2 mt-2 ms-3"
-            src={requestIcon}
-            alt="+ API Request"
-            on:click={handleAPIClick}
-          />
-        </Tooltip>
+        {/each}
+        {#if showFolderAPIButtons}
+          <div class="mt-2 mb-2 d-flex">
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[0]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2"
+                src={folderIcon}
+                alt="+ Folder"
+                on:click={handleFolderClick}
+              />
+            </Tooltip>
+            <Tooltip
+              placement="bottom"
+              title={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )
+                ? PERMISSION_NOT_FOUND_TEXT
+                : CollectionMessage[1]}
+              classProp="mt-2 mb-2"
+            >
+              <img
+                class="list-icons mb-2 mt-2 ms-3"
+                src={requestIcon}
+                alt="+ API Request"
+                on:click={handleAPIClick}
+              />
+            </Tooltip>
+          </div>
+        {/if}
       </div>
-    {/if}
-  </div>
-</div>
+    </div>
+  {:else}
+    <div
+      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+        ? 'block'
+        : 'none'};"
+    >
+      <span class="sparrow-fs-12 text-muted">This branch is unavailable</span>
+    </div>
+  {/if}
+{/if}
 
 <style>
+  .sync-button {
+    background-color: transparent;
+  }
+  .sync-button:active {
+    background-color: var(--editor-angle-bracket);
+  }
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }

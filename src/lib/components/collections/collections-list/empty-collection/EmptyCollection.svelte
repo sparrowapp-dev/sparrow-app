@@ -1,5 +1,6 @@
 <script lang="ts">
   import whitePlus from "$lib/assets/plus-white.svg";
+  import Plus from "$lib/assets/plus.svelte";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -64,6 +65,8 @@ font-weight: 300;"
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
+        placement="top"
+        classProp="w-100"
       >
         <button
           disabled={!hasWorkpaceLevelPermission(
@@ -75,12 +78,24 @@ font-weight: 300;"
             handleImportCollectionPopup(true);
           }}
         >
-          <img src={whitePlus} alt="+" />Collection
+          <Plus
+            color={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_ENVIRONMENT,
+            )
+              ? "gray"
+              : "white"}
+            height="14"
+            width="14"
+          />Collection
         </button>
       </Tooltip>
       <Tooltip title={"API Request"} show={false}>
-        <button class="buttons w-100" on:click={addApiRequest}>
-          <img src={whitePlus} alt="+" />
+        <button
+          class="buttons w-100 d-flex mb-3 justify-content-center align-items-center gap-1"
+          on:click={addApiRequest}
+        >
+          <Plus height="14" width="14" classProp="my-auto" />
           API Request</button
         ></Tooltip
       >

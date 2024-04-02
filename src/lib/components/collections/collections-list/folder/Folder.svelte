@@ -261,7 +261,7 @@
       }
       requestIds.push(explorer?.id);
 
-      if (explorer?.source === "USER") {
+      if (!activeSync || (explorer?.source === "USER" && activeSync)) {
         menuItems = [
           {
             onClick: openFolder,
@@ -413,6 +413,18 @@
     <div
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
       class="main-folder d-flex align-items-center pe-0"
+      on:click={() => {
+        if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+          expand = !expand;
+        } else {
+          handleFolderClick(
+            explorer,
+            currentWorkspaceId,
+            collectionId,
+            activeSync,
+          );
+        }
+      }}
     >
       <img
         src={angleRight}
@@ -421,11 +433,6 @@
           ? 'transform:rotate(90deg);'
           : 'transform:rotate(0deg);'}"
         alt="angleRight"
-        on:click={() => {
-          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-            expand = !expand;
-          }
-        }}
       />
       {#if isRenaming}
         <input
@@ -442,14 +449,6 @@
         />
       {:else}
         <div
-          on:click={() => {
-            handleFolderClick(
-              explorer,
-              currentWorkspaceId,
-              collectionId,
-              activeSync,
-            );
-          }}
           class="folder-title d-flex align-items-center"
           style="cursor:pointer; font-size:12px;
           height: 36px;

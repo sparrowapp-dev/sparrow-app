@@ -108,7 +108,7 @@
       source = api?.source;
       selectedRequestAuthType = api.request?.selectedRequestAuthType;
 
-      if (source === "USER") {
+      if (!activeSync || (source === "USER" && activeSync)) {
         menuItems = [
           {
             onClick: () => {
@@ -120,6 +120,23 @@
           {
             onClick: renameRequest,
             displayText: "Rename Request",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleFilePopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else if (isDeleted) {
+        menuItems = [
+          {
+            onClick: () => {
+              handleClick();
+            },
+            displayText: "Open Request",
             disabled: false,
           },
           {
@@ -264,62 +281,22 @@
   let deleteLoader: boolean = false;
 
   const handleDelete = async () => {
-    let userSource = {};
-    if (activeSync && source === "USER") {
-      userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
-      };
+    deleteLoader = true;
+    const res = await collectionsMethods.deleteApiRequest(
+      currentWorkspaceId,
+      collectionId,
+      api.id,
+      api.name,
+      activeSync,
+      source,
+      currentBranch,
+      primaryBranch,
+      folderId,
+    );
+    if (res) {
+      handleFilePopUp(false);
     }
-    if (folderId && collectionId && currentWorkspaceId) {
-      deleteLoader = true;
-      const response = await collectionService.deleteRequestInCollection(
-        api.id,
-        {
-          collectionId,
-          workspaceId: currentWorkspaceId,
-          folderId,
-          ...userSource,
-        },
-      );
-      if (response.isSuccessful) {
-        collectionsMethods.deleteRequestInFolder(
-          collectionId,
-          folderId,
-          api.id,
-        );
-        notifications.success(`"${api.name}" Request deleted.`);
-        deleteLoader = false;
-        collectionsMethods.handleRemoveTab(api.id);
-        handleFilePopUp(false);
-      } else {
-        notifications.error("Failed to delete the Request.");
-        deleteLoader = false;
-      }
-    } else if (currentWorkspaceId && collectionId) {
-      deleteLoader = true;
-      const response = await collectionService.deleteRequestInCollection(
-        api.id,
-        {
-          collectionId,
-          workspaceId: currentWorkspaceId,
-          ...userSource,
-        },
-      );
-      if (response.isSuccessful) {
-        collectionsMethods.deleteRequestOrFolderInCollection(
-          collectionId,
-          api.id,
-        );
-        notifications.success(`"${api.name}" Request deleted.`);
-        deleteLoader = false;
-        collectionsMethods.handleRemoveTab(api.id);
-        handleFilePopUp(false);
-      } else {
-        notifications.error("Failed to delete the Request.");
-        deleteLoader = false;
-      }
-    }
+    deleteLoader = false;
   };
 </script>
 
@@ -405,17 +382,20 @@
       ? 'unclickable'
       : ''}"
   >
-    {#if api?.isDeleted}
+    {#if api?.isDeleted && activeSync}
       <span
-        class="delete-ticker position-absolute sparrow-fs-10 px-2 text-danger"
+        class="delete-ticker position-absolute sparrow-fs-10 px-2"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
     {/if}
-    {#if actSync && !isDeleted && source === "SPEC"}
+    {#if actSync && source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
-    <div class="api-method text-{getMethodStyle(method)}">
+    <div
+      class="api-method text-{getMethodStyle(method)} {isDeleted &&
+        'api-method-deleted'}"
+    >
       {method?.toUpperCase()}
     </div>
 
@@ -432,7 +412,7 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div class="api-name ellipsis">
+      <div class="api-name ellipsis {isDeleted && 'api-name-deleted'}">
         {name}
         {#if showPath}
           <span class="path-name ellipsis"
@@ -460,6 +440,10 @@
 </div>
 
 <style lang="scss">
+  .delete-ticker {
+    color: var(--error--color);
+    font-weight: 500;
+  }
   .api-method {
     font-size: 10px;
     font-weight: 500;
@@ -475,6 +459,12 @@
     font-size: 12px;
     font-weight: 400;
     width: calc(100% - 48px);
+  }
+  .api-name-deleted {
+    color: var(--editor-angle-bracket) !important;
+  }
+  .api-method-deleted {
+    color: var(--deleted-api-method) !important;
   }
   .api-info {
     display: flex;

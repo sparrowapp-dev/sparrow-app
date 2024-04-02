@@ -1,4 +1,5 @@
 <script lang="ts">
+  import refreshIcon from "$lib/assets/refresh.svg";
   import { onDestroy, onMount } from "svelte";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { MyCollectionViewModel } from "./MyCollection.viewModel";
@@ -11,7 +12,7 @@
   import type { CollectionListViewModel } from "../collections-list/CollectionList.ViewModel";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -25,6 +26,9 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { ModalWrapperV1 } from "$lib/components";
+  import Select from "$lib/components/inputs/Select.svelte";
+  import { GitBranchIcon } from "$lib/assets/icons";
+  import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -32,6 +36,7 @@
   export let _collectionListViewModel: CollectionListViewModel;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   export let currentWorkspaceId: "";
+  export let currentWorkspace;
 
   const _collectionService = new CollectionService();
   const _viewImportCollection = new ImportCollectionViewModel();
@@ -60,6 +65,21 @@
   });
   let collectionCountArr = [];
   let currentCollection;
+  let lastUpdatedAt;
+  const monthNamesAbbreviated = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const refreshCount = () => {
     if (collectionCountArr && activeTabId) {
       collectionCountArr.forEach(async (collection) => {
@@ -69,6 +89,10 @@
           totalRequest = collectionData.requestCount;
           totalFolder = collectionData.folderCount;
           currentCollection = collection;
+          const date = new Date(currentCollection.updatedAt);
+          lastUpdatedAt = `${
+            monthNamesAbbreviated[date.getMonth()]
+          } ${date.getDate()}, ${date.getFullYear()}`;
           const response = await _collectionService.switchCollectionBranch(
             currentCollection?.id,
             currentCollection?.currentBranch
@@ -118,13 +142,14 @@
       inputField.blur();
     }
   };
-
+  let isLoading;
   const handleApiRequest = async () => {
     isApiCreatedFirstTime.set(true);
 
     const response = await _myColllectionViewModel.createApiRequest(
       componentData,
       collectionsMethods,
+      currentCollection,
     );
     if (response.isSuccessful) {
       isLoading = false;
@@ -163,12 +188,15 @@
     const responseJSON = await _collectionService.validateImportCollectionURL(
       currentCollection.activeSyncUrl,
     );
-    if (responseJSON.isSuccessful) {
+    if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
         currentWorkspaceId,
         {
           url: currentCollection?.activeSyncUrl,
-          urlData: responseJSON.data,
+          urlData: {
+            data: JSON.parse(responseJSON.data.response),
+            headers: responseJSON.data.headers,
+          },
           primaryBranch: currentCollection?.primaryBranch,
           currentBranch: currentCollection?.currentBranch
             ? currentCollection?.currentBranch
@@ -234,7 +262,7 @@
 
   const handleBranchChange = async (branch: string) => {
     handleBranchSwitchPopup(true);
-    newBranch = branch; 
+    newBranch = branch;
   };
 
   const handleBranchChangePopup = async () => {
@@ -263,6 +291,35 @@
         "renameInputFieldCollection",
       ) as HTMLInputElement;
       inputField.blur();
+    }
+  };
+
+  const refetchBranch = async () => {
+    if (refreshCollectionLoader) return;
+    try {
+      const activeResponse = await invoke("get_git_active_branch", {
+        path: currentCollection?.localRepositoryPath,
+      });
+      if (activeResponse) {
+        let currentBranch = activeResponse;
+        const currentBranchObj = {
+          id: currentBranch,
+          name: currentBranch,
+        };
+        let branchExists = false;
+        currentCollection.branches.forEach((branch) => {
+          if (branch.name == currentBranchObj.name) {
+            branchExists = true;
+          }
+        });
+        if (!branchExists) {
+          currentCollection.branches.push(currentBranchObj);
+          currentCollection.branches = currentCollection.branches;
+        }
+        notifications.success(`Branch refreshed.`);
+      }
+    } catch (e) {
+      notifications.error("Failed to fetch branch from repository.");
     }
   };
 </script>
@@ -311,7 +368,7 @@
   </ModalWrapperV1>
   <div
     class="my-collection d-flex flex-column"
-    style="width:calc(100% - 280px); margin-top: 15px;"
+    style="width:calc(100% - 280px); margin-top: 15px; min-width: 450px"
   >
     <Tooltip
       title={PERMISSION_NOT_FOUND_TEXT}
@@ -340,8 +397,19 @@
           />
           {#if currentCollection?.activeSync}
             <div class="d-flex">
-              <Dropdown
-                dropdownId={"hashfref128"}
+              <Select
+                isError={false}
+                iconRequired={true}
+                icon={GitBranchIcon}
+                rounded={true}
+                search={true}
+                borderType={"none"}
+                borderActiveType={"all"}
+                headerTheme={"transparent"}
+                headerHighlight={"hover"}
+                searchText={"Search Branch"}
+                searchErrorMessage={"No results found."}
+                id={"hashfderef128"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
                     elem.id = elem.name;
@@ -355,39 +423,72 @@
                   (value, index, self) =>
                     index === self.findIndex((t) => t.id === value.id),
                 )}
-                additionalType={"branch"}
+                titleId={currentCollection?.currentBranch
+                  ? currentCollection?.currentBranch
+                  : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
-                dropDownType={{
-                  type: "text",
-                  title: currentCollection?.currentBranch
-                    ? currentCollection?.currentBranch
-                    : currentCollection?.primaryBranch,
+                maxHeight={"150px"}
+                minWidth={"190px"}
+                maxWidth={"250px"}
+              >
+                <div slot="pre-select">
+                  <div class="d-flex justify-content-between p-2">
+                    <small class="text-textColor fw-normal"
+                      >Switch branches</small
+                    >
+                    <small class="text-textColor fw-normal"
+                      >{[
+                        ...currentCollection.branches.map((elem) => {
+                          elem.id = elem.name;
+                          return elem;
+                        }),
+                        {
+                          name: currentCollection?.primaryBranch,
+                          id: currentCollection?.primaryBranch,
+                        },
+                      ].filter(
+                        (value, index, self) =>
+                          index === self.findIndex((t) => t.id === value.id),
+                      ).length} branches</small
+                    >
+                  </div>
+                </div>
+                <div slot="post-select" class="d-none">
+                  <hr class="mb-2 mt-2" />
+                  <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
+                    View all Branches
+                  </p>
+                </div>
+              </Select>
+              <button
+                class="ms-2 p-1 border-0 rounded d-flex justify-content-center align-items-center btn btn-dark"
+                on:click={() => {
+                  refetchBranch();
                 }}
-                staticClasses={[
-                  {
-                    id: "hashfref128-options-container",
-                    classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-                  },
-                ]}
-                hoverClasses={[
-                  {
-                    id: "hashfref128-btn-div",
-                    classToAdd: ["border-bottom", "border-labelColor"],
-                  },
-                ]}
-                staticCustomStyles={[
-                  {
-                    id: "hashfref128-options-container",
-                    styleKey: "maxHeight",
-                    styleValue: "140px",
-                  },
-                  {
-                    id: "hashfref128-options-container",
-                    styleKey: "overflowY",
-                    styleValue: "auto",
-                  },
-                ]}
-              ></Dropdown>
+              >
+                <img src={refreshIcon} alt="refetch" />
+              </button>
+            </div>
+            <div class="pt-2 ps-2 d-flex align-items-center">
+              {#if currentWorkspace?.users}
+                <div class="d-flex">
+                  <UserProfileList
+                    width={25}
+                    height={25}
+                    borderRadius={24}
+                    users={currentWorkspace.users}
+                    maxProfiles={3}
+                    classProp="position-absolute"
+                  />
+                </div>
+              {/if}
+              <div class="ps-2">
+                <p class="sparrow-fs-12 mb-0">
+                  <span class="text-textColor"> Last updated on: </span>
+                  {lastUpdatedAt} <span class="text-textColor">by:</span>
+                  {currentCollection.updatedBy.name}
+                </p>
+              </div>
             </div>
           {/if}
         </div>
@@ -415,7 +516,7 @@
                 workspaceLevelPermissions.SAVE_REQUEST,
               )}
               class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-              style="max-height:40px"
+              style="max-height:60px"
               on:click={handleApiRequest}>New Request</button
             >
           </div>
@@ -521,7 +622,7 @@
   }
 
   .my-collection {
-    padding: 20px;
+    padding: 10px;
   }
 
   .input-outline {

@@ -121,6 +121,8 @@
     }
     if (!teamSpecificWorkspace || !countCheckedList(teamSpecificWorkspace)) {
       workspaceError = true;
+    } else {
+      workspaceError = false;
     }
   };
 
@@ -212,6 +214,7 @@
       teamSpecificWorkspace.forEach((elem: any) => {
         elem.checked = isAllSelectedCheck;
       });
+      checkInviteValidation();
     } else {
       teamSpecificWorkspace = teamSpecificWorkspace.map((elem) => {
         if (elem?.id === id) {
@@ -388,7 +391,7 @@
         {
           id: "check-select-workspace-options-container",
           styleKey: "max-height",
-          styleValue: "calc(100vh - 700px)",
+          styleValue: "calc(30vh)",
         },
       ]}
     ></Dropdown>

@@ -1,4 +1,5 @@
 import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 import constants from "$lib/utils/constants";
 import type {
   CreateApiRequestPostBody,
@@ -9,11 +10,13 @@ import type {
   UpdateCollectionName,
 } from "$lib/utils/dto";
 import { ContentTypeEnum } from "$lib/utils/enums/request.enum";
+import { createApiRequest } from "./rest-api.service";
 
 export class CollectionService {
   constructor() {}
 
   private apiUrl: string = constants.API_URL;
+  private collectionRepository = new CollectionRepository();
 
   public fetchCollection = async (workspaceId: string) => {
     const response = await makeRequest(
@@ -160,7 +163,27 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-
+    if (response.isSuccessful) {
+      if (
+        deleteRequestBody.folderId &&
+        deleteRequestBody.collectionId &&
+        deleteRequestBody.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          deleteRequestBody.collectionId,
+          deleteRequestBody.folderId,
+          requestId,
+        );
+      } else if (
+        deleteRequestBody.workspaceId &&
+        deleteRequestBody.collectionId
+      ) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          deleteRequestBody.collectionId,
+          requestId,
+        );
+      }
+    }
     return response;
   };
 
@@ -180,18 +203,16 @@ export class CollectionService {
   };
 
   public validateImportCollectionURL = async (url = "") => {
-    const response = await makeRequest(
-      "GET",
-      url,
-      {
-        headers: {
-          ...getAuthHeaders(),
-          "Content-type": ContentTypeEnum["application/json"],
-        },
-      },
-      true,
+    return createApiRequest(
+      [
+        url,
+        `GET`,
+        `Accept[SPARROW_EQUALS]*/*[SPARROW_AMPERSAND]Connection[SPARROW_EQUALS]keep-alive`,
+        ``,
+        `TEXT`,
+      ],
+      ``,
     );
-    return response;
   };
 
   public importCollection = async (
@@ -272,10 +293,12 @@ export class CollectionService {
 
   public importCollectionFromCurl = async (curl: string) => {
     const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
-      body: curl,
+      body: {
+        curl: curl,
+      },
       headers: {
         ...getAuthHeaders(),
-        "Content-type": ContentTypeEnum["application/json"],
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
     return response;

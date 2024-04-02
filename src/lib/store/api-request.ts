@@ -19,3 +19,6 @@ export const bodyText = writable("");
 
 //store for storing response
 export const responseText = writable("");
+
+//store for storing edit link shortcut flag
+export const editLink = writable("");

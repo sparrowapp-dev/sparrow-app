@@ -79,6 +79,8 @@
     updateEnvironment: _viewModel.updateEnvironment,
     getGlobalEnvironment: _viewModel.getGlobalEnvironment,
     clearTabs: _viewModel.clearTabs,
+    collection: _viewModel.collection,
+    deleteApiRequest: _viewModel.deleteApiRequest,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
@@ -98,11 +100,13 @@
   let environmentVariables = [];
   let environmentId: string;
   let currentWorkspaceId = "";
+  let currentWorkspace;
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        currentWorkspace = activeWorkspaceRxDoc;
         currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
         environmentId = activeWorkspaceRxDoc.get("environmentId");
       }
@@ -161,6 +165,14 @@
       ".splitter-sidebar .splitpanes__splitter",
     );
     splitter.style.width = "1px";
+
+    let url = window.location.href;
+    const params = new URLSearchParams(url.split("?")[1]);
+    const isNew = params.get("first");
+    if (isNew)
+      collectionsMethods.handleCreateTab(
+        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      );
   });
 
   $: {
@@ -224,18 +236,14 @@
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
               environmentVariables={environmentVariables.reverse()}
+              {currentWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace
-              {activeTab}
-              {collectionsMethods}
-              {_collectionListViewModel}
-            />
+            <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
             <MyFolder
               {collectionsMethods}
               {activeTab}
-              {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
             />
           {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
@@ -245,6 +253,7 @@
               {_collectionListViewModel}
               {loggedUserRoleInWorkspace}
               {currentWorkspaceId}
+              {currentWorkspace}
             />
           {/if}
         </div>
@@ -255,7 +264,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  :global(.splitpanes) {
-    width: calc(100vw - 72px);
+  :global(.splitter-sidebar.splitpanes) {
+    width: calc(100vw - 72px) !important;
   }
 </style>

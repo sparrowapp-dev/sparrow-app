@@ -58,7 +58,7 @@
     } sparrow-select-input py-2 justify-content-between d-flex px-3 w-100`}
   >
     {#if selectedOption !== ""}
-      <span class="sparrow-selected-option">{selectedOption}</span>
+      <span class="sparrow-selected-option w-100">{selectedOption}</span>
     {:else if selectInputPlaceholder !== ""}
       <span class="sparrow-placeholder-option">{selectInputPlaceholder}</span>
     {/if}
@@ -95,7 +95,7 @@
                 />
               {/if}
             </div>
-            <span class="ellipsis overflow-hidden">{option.name}</span>
+            <span class="ellipsis">{option.name}</span>
           </div>
           {#if option.endIconVisible}
             <PeopleIcon color={"#45494D"} />

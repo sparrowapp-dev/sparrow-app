@@ -289,7 +289,7 @@
     <p style="font-size:12px;" class="text-textColor">
       You are assigning the role of an '<span class="text-whiteColor"
         >Admin</span
-      >' to ${user.name}. Following access will be provided to ${user.name}:
+      >' to {user.name}. Following access will be provided to {user.name}:
     </p>
     <ul class="ps-4 text-textColor" style="font-size:12px;">
       {#each AdminLevelPermission as permission}
@@ -556,6 +556,7 @@
       <Dropdown
         dropdownId={user.id}
         disabled={true}
+        showDropdownIcon={false}
         data={getPermissionsData()}
         dropDownType={{ type: "text", title: user.role ? user.role : "" }}
         onclick={handleDropdown}

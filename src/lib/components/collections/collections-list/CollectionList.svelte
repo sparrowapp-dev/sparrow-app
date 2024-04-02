@@ -3,6 +3,7 @@
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
+  import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus.svg";
   import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
@@ -219,6 +220,10 @@
   const handleCreateCollection = async () => {
     showDefault = false;
     collectionUnderCreation = true;
+
+    let tempActivePath = activePath;
+    activePath = null;
+
     isCollectionCreatedFirstTime.set(true);
     let totalFolder: number = 0;
     let totalRequest: number = 0;
@@ -277,6 +282,8 @@
         collectionId: response.data.data._id,
       });
       return;
+    } else {
+      activePath = tempActivePath;
     }
     return;
   };
@@ -381,6 +388,7 @@
     collapsibleStateUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     usernameUnsubscribe();
+    workspaceUnsubscribe.unsubscribe();
   });
 
   const handleRequestClick = (id: string) => {
@@ -514,12 +522,13 @@
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
-          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center
+          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2
         {showfilterDropdown ? 'filter-active' : ''}"
           style="width: 32px; height:32px; position:relative"
           on:click={handleFilterDropdown}
         >
-          <img src={filterIcon} alt="" />
+          <!-- <img src={filterIcon} alt="" /> -->
+          <FilterIcon width={300} height={30} color="gray" />
           {#if showfilterDropdown}
             <span
               class="position-absolute"
@@ -572,7 +581,7 @@
           staticClasses={[
             {
               id: "collectionDropdown-img",
-              classToAdd: ["bg-backgroundDark", "p-1", "rounded"],
+              classToAdd: ["btn", "bg-backgroundDark", "p-1", "rounded"],
             },
             {
               id: "collectionDropdown-options-container",
@@ -600,6 +609,7 @@
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
@@ -613,6 +623,7 @@
               {#if filteredFolder.length > 0}
                 {#each filteredFolder as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
@@ -624,6 +635,7 @@
               {#if filteredCollection.length > 0}
                 {#each filteredCollection as exp}
                   <SearchTree
+                    activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
                     workspaceId={currentWorkspaceId}
@@ -738,6 +750,7 @@
   }
   .inputField {
     outline: none;
+    border: 1px solid transparent;
   }
   .inputField:hover {
     border: 1px solid var(--workspace-hover-color);

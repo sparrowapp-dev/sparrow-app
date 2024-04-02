@@ -13,12 +13,15 @@ import type { CollectionItem } from "$lib/utils/interfaces/collection.interface"
 import type { Collection } from "$lib/utils/interfaces/request.interface";
 import { EnvironmentService } from "$lib/services-v2/environment.service";
 import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
+import { CollectionService } from "$lib/services/collection.service";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
+  private collectionService = new CollectionService();
   constructor() {}
 
   public debounce = (func, delay) => {
@@ -51,6 +54,10 @@ export class CollectionsViewModel {
 
   get environments() {
     return this.environmentRepository.getEnvironment();
+  }
+
+  get collection() {
+    return this.collectionRepository.getCollection();
   }
 
   public handleCreateTab = (data: any) => {
@@ -332,5 +339,51 @@ export class CollectionsViewModel {
       environmentId,
       environment,
     );
+  };
+
+  public deleteApiRequest = async (
+    currentWorkspaceId,
+    collectionId,
+    requestId,
+    requestName,
+    activeSync,
+    source,
+    currentBranch,
+    primaryBranch,
+    folderId,
+  ): boolean => {
+    let userSource = {};
+    if (activeSync && source === "USER") {
+      userSource = {
+        currentBranch: currentBranch ? currentBranch : primaryBranch,
+        source: "USER",
+      };
+    }
+
+    let requestObject = {
+      collectionId,
+      workspaceId: currentWorkspaceId,
+      ...userSource,
+    };
+
+    if (folderId && collectionId && currentWorkspaceId) {
+      requestObject = {
+        ...requestObject,
+        folderId,
+      };
+    }
+    const response = await this.collectionService.deleteRequestInCollection(
+      requestId,
+      requestObject,
+    );
+
+    if (response.isSuccessful) {
+      notifications.success(`"${requestName}" Request deleted.`);
+      this.handleRemoveTab(requestId);
+      return true;
+    } else {
+      notifications.error("Failed to delete the Request.");
+      return false;
+    }
   };
 }
