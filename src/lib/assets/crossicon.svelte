@@ -1,11 +1,11 @@
 <script lang="ts">
-    export let color: string = '#8A9299';
+  export let color: string = "#8A9299";
 </script>
 
 <svg
   width="12"
-  height="16"
-  viewBox="0 0 12 16"
+  height="12"
+  viewBox="0 2 12 12"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >

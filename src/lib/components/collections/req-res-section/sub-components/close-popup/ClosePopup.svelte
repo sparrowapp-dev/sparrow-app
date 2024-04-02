@@ -155,7 +155,7 @@
   });
 </script>
 
-<div class="pb-3">
+<div class="pt-2 pb-4">
   <small class="">
     You have unsaved changes. Do you want to save them before closing the file?
   </small>

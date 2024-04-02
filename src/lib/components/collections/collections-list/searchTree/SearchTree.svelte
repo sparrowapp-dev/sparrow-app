@@ -72,7 +72,7 @@
         request={explorer}
         {searchData}
         {getIndex}
-        {folderDetails}
+        folderDetails={explorer}
         {collectionId}
         {workspaceId}
         {activeSync}

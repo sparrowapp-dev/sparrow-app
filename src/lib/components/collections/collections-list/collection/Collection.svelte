@@ -694,39 +694,43 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu(e);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
-    {#if isActiveSyncEnabled && collection?.activeSync}
+    <Tooltip placement="bottom" title="More options" styleProp="bottom: -8px">
       <button
-        class="sync-button p-1 border-0 rounded"
-        on:click={() => {
-          refetchCollection();
-        }}
-        on:mouseenter={() => {
-          isSyncBtnHovered = true;
-        }}
-        on:mouseleave={() => {
-          isSyncBtnHovered = false;
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu(e);
         }}
       >
-        <span
-          class="{refreshCollectionLoader
-            ? 'refresh-collection-loader'
-            : ''}  d-flex justify-content-center align-items-center p-1"
-        >
-          <ReloadCollectionIcon
-            color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
-          />
-        </span>
+        <img src={threedotIcon} alt="threedotIcon" />
       </button>
+    </Tooltip>
+    {#if isActiveSyncEnabled && collection?.activeSync}
+      <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
+        <button
+          class="sync-button p-1 border-0 rounded"
+          on:click={() => {
+            refetchCollection();
+          }}
+          on:mouseenter={() => {
+            isSyncBtnHovered = true;
+          }}
+          on:mouseleave={() => {
+            isSyncBtnHovered = false;
+          }}
+        >
+          <span
+            class="{refreshCollectionLoader
+              ? 'refresh-collection-loader'
+              : ''}  d-flex justify-content-center align-items-center p-1"
+          >
+            <ReloadCollectionIcon
+              color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
+            />
+          </span>
+        </button>
+      </Tooltip>
     {/if}
   {/if}
 </button>

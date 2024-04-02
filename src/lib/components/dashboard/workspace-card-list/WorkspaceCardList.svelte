@@ -76,7 +76,8 @@
     workspaces = workspaces.filter((ws) => ws._id != workspaceId);
   };
 
-  const hasPermissionToDelete = openTeam?.admins?.includes(userId) || openTeam?.owner == userId;
+  const hasPermissionToDelete =
+    openTeam?.admins?.includes(userId) || openTeam?.owner == userId;
 </script>
 
 <div class="p-2">
@@ -114,18 +115,6 @@
               .includes(filterText.toLowerCase())).length == 0}
         <span class="not-found-text mx-auto ellipsis">No results found.</span>
       {/if}
-      {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
-        <Button
-          disable={workspaceUnderCreation}
-          loader={workspaceUnderCreation}
-          title={`+ Add New Workspace`}
-          type="other"
-          buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-          onClick={handleCreateWorkspace}
-          buttonStyleProp={workspaces.length == 0 ? "min-height:132px" : ""}
-        />
-        <!-- update later the above width -->
-      {/if}
       {#each workspaces
         .slice()
         .reverse()
@@ -148,6 +137,18 @@
           {activeSideBarTabMethods}
         />
       {/each}
+      {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
+        <Button
+          disable={workspaceUnderCreation}
+          loader={workspaceUnderCreation}
+          title={`+ Add New Workspace`}
+          type="other"
+          buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
+          onClick={handleCreateWorkspace}
+          buttonStyleProp={"min-height: 132px"}
+        />
+        <!-- update later the above width -->
+      {/if}
     </div>
     {#if !workspaces || workspaces
         .slice()

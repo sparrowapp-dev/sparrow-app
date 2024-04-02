@@ -44,7 +44,8 @@
   };
 
   let isInputDataTouched = false;
-  let isDataEmpty: boolean = false;
+  let isTextEmpty: boolean = true;
+  let isFileEmpty: boolean = true;
   let isSyntaxError: boolean = false;
   let importData: string = "";
   let importType: string = "text";
@@ -58,7 +59,8 @@
 
   const handleError = () => {
     isSyntaxError = false;
-    isDataEmpty = false;
+    isTextEmpty = false;
+    isFileEmpty = false;
   };
 
   let isimportDataLoading = false;
@@ -183,7 +185,7 @@
     uploadCollection.file.value =
       (targetFile && targetFile[0]) ||
       (dataTransferFile && dataTransferFile[0]);
-    isDataEmpty = false;
+    isFileEmpty = false;
   };
 
   const handleLogoReset = (e: any) => {
@@ -267,6 +269,9 @@
     if (isRepositoryPath) {
       isRepositoryBranchTouched = true;
     }
+    if (importType === "text" && importData === "") {
+      isTextEmpty = true;
+    }
     if (
       importType === "text" &&
       importData &&
@@ -346,8 +351,12 @@
     ) {
       handleFileUpload(uploadCollection?.file?.value);
       return;
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length === 0
+    ) {
+      isFileEmpty = true;
     }
-    isDataEmpty = true;
   };
 
   const handleImportJsonObject = async (contentType, importJSON) => {
@@ -592,6 +601,9 @@
         id="flexRadioDefault1"
         value="text"
         bind:group={importType}
+        on:click={() => {
+          isInputDataTouched = false;
+        }}
       />
       <label class="form-check-label" for="flexRadioDefault1">
         Paste Text
@@ -605,6 +617,9 @@
         id="flexRadioDefault2"
         value="file"
         bind:group={importType}
+        on:click={() => {
+          isInputDataTouched = false;
+        }}
       />
       <label class="form-check-label" for="flexRadioDefault2">
         Upload File
@@ -620,6 +635,8 @@
       <textarea
         on:input={() => {
           isimportDataLoading = true;
+          isInputDataTouched = true;
+          isTextEmpty = false;
           debouncedImport();
         }}
         on:blur={() => {
@@ -646,7 +663,7 @@
         </div>
       {/if}
     </div>
-    {#if !importData && isInputDataTouched && !isimportDataLoading}
+    {#if isTextEmpty && isInputDataTouched && !isimportDataLoading}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please paste your OpenAPI specification text or Swagger/localhost link.
       </p>
@@ -656,11 +673,30 @@
         accuracy and accessibility. If the problem persists, contact the API
         provider for assistance.
       </p>
-    {:else if (!isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         We have identified that text you pasted is not written in Open API
         Specification (OAS). Please visit https://swagger.io/specification/ for
-        more information on OAS.
+        more information on OAS. text is "{importData}"
+        {!isTextEmpty &&
+          !isimportDataLoading &&
+          isValidClientXML &&
+          !isValidServerXML &&
+          isInputDataTouched}{!isTextEmpty &&
+          !isimportDataLoading &&
+          isValidClientJSON &&
+          !isValidServerJSON &&
+          isInputDataTouched}{!isTextEmpty &&
+          !isimportDataLoading &&
+          !isValidClientJSON &&
+          !isValidClientURL &&
+          !isValidClientXML &&
+          !isValidServerJSON &&
+          !isValidServerURL &&
+          !isValidServerXML &&
+          !isValidClientDeployedURL &&
+          !isValidServerDeployedURL &&
+          isInputDataTouched}
       </p>
     {/if}
   {/if}
@@ -689,7 +725,7 @@
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
-    {#if isDataEmpty}
+    {#if isFileEmpty && isInputDataTouched}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please upload your file in order to import collections.
       </p>

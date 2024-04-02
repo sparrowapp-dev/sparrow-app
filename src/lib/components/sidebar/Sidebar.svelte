@@ -29,7 +29,10 @@
     {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
           return workspace.isActiveWorkspace === true;
         }, )}
-      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
+      <Tooltip
+        title="Select a workspace to activate this option"
+        placement={"right"}
+      >
         <Helper
           {activeSideBarTabMethods}
           route=""
@@ -63,7 +66,10 @@
     {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
           return workspace.isActiveWorkspace === true;
         }, )}
-      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
+      <Tooltip
+        title="Select a workspace to activate this option"
+        placement={"right"}
+      >
         <Helper
           {activeSideBarTabMethods}
           route=""
@@ -111,16 +117,6 @@
         </div>
         <div class={`sidebar__container--text mt-1 text-textColor`}>
           <p>Help</p>
-        </div>
-      </div>
-    </Tooltip>
-    <Tooltip placement={"right"} title={"Coming Soon!"}>
-      <div class="sidebar__container sidebar__container_background2">
-        <div class="sidebar__container--icon pt-2">
-          <SettingsIcon color={"#8A9299"} />
-        </div>
-        <div class={`sidebar__container--text mt-1 text-textColor`}>
-          <p>Settings</p>
         </div>
       </div>
     </Tooltip>
