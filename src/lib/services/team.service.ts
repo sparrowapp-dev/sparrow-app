@@ -51,7 +51,6 @@ export class TeamService {
     );
     if (response.isSuccessful) {
       await this.teamRepository.removeTeam(teamId);
-      await this.workspaceRepository.removeWorkspaces(teamId);
     }
     return response;
   };

@@ -91,9 +91,9 @@ export class EnvironmentViewModel {
   public deleteEnvironmentTab = async (environmentId) => {
     const flag =
       await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
-    if (flag) {
+    if (flag[0]) {
       const globalEnvironment =
-        await this.environmentRepository.getGlobalEnvironment();
+        await this.environmentRepository.getGlobalEnvironment(flag[1]);
       const sampleEnvironment = generateSampleEnvironment(
         globalEnvironment.id,
         globalEnvironment.workspaceId,

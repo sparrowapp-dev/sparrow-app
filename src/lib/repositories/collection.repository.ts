@@ -205,6 +205,19 @@ export class CollectionRepository {
   };
 
   /**
+   * remove collections by workspaceId
+   */
+  public removeCollections = async (_workspaceId: string): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.collection.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .remove();
+  };
+
+  /**
    * @description
    * Updates an API request or folder within a collection.
    */

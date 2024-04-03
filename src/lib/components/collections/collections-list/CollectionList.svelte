@@ -98,7 +98,6 @@
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
   const mapCollectionsWithWorkspace = (_documents, _workspaceId) => {
-    // debugger;
     if (_documents) {
       const collectionArr = _documents
         .map((collectionDocument: CollectionDocument) => {
@@ -109,7 +108,6 @@
         .filter((collectionDocument: CollectionDocument) => {
           return collectionDocument.workspaceId === _workspaceId;
         });
-      // console.log(collectionArr);
       collection = collectionArr;
     }
     if (searchData || selectedApiMethods.length > 0) {
@@ -120,7 +118,6 @@
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
       collectionRxDoc = value;
-      // debugger;
       mapCollectionsWithWorkspace(collectionRxDoc, currentWorkspaceId);
     },
   );

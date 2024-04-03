@@ -2,10 +2,12 @@ import { RxDB, type TeamDocument } from "$lib/database/app.database";
 import { TeamRole } from "$lib/utils/enums";
 import type { userDetails } from "$lib/utils/interfaces";
 import type { Observable } from "rxjs";
+import { WorkspaceRepository } from "./workspace.repository";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class TeamRepository {
   constructor() {}
+  private workspaceRepository = new WorkspaceRepository();
   /**
    * extracts RxDocument of Team.
    */
@@ -242,6 +244,7 @@ export class TeamRepository {
         },
       })
       .exec();
+    await this.workspaceRepository.removeWorkspaces(teamId);
     return await team.remove();
   };
 
