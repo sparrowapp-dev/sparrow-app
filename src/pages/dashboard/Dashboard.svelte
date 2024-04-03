@@ -34,6 +34,7 @@
 
   const _dashboardViewModel = new DashboardViewModel();
   const refreshTeamsWorkspaces = _dashboardViewModel.refreshTeamsWorkspaces;
+  const refreshEnvironment = _dashboardViewModel.refreshEnvironment;
   const _viewModelWorkspace = new HeaderDashboardViewModel();
   const _viewModel = new ActiveSideBarTabViewModel();
   const collectionsMethods = new CollectionsViewModel();
@@ -253,7 +254,10 @@
     {/if}
     <section class="w-100">
       <Route path="/collections/*"
-        ><CollectionsHome {loggedUserRoleInWorkspace} /></Route
+        ><CollectionsHome
+          {loggedUserRoleInWorkspace}
+          refreshEnv={refreshEnvironment}
+        /></Route
       >
       <Route path="/workspaces/*"
         ><Teams

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { TabDocument } from "$lib/database/app.database";
+  import type {
+    EnvironmentDocument,
+    TabDocument,
+  } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import RequestParam from "./sub-components/request-body-section/RequestParam.svelte";

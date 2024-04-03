@@ -1,5 +1,7 @@
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { EnvironmentService } from "$lib/services/environment.service";
 import { TeamService } from "$lib/services/team.service";
 import { WorkspaceService } from "$lib/services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
@@ -10,6 +12,8 @@ export class DashboardViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private teamService = new TeamService();
   private workspaceService = new WorkspaceService();
+  private environmentService = new EnvironmentService();
+  private environmentRepository = new EnvironmentRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -102,6 +106,11 @@ export class DashboardViewModel {
 
   // sync workspace data with backend server
   public refreshWorkspaces = async (userId: string): Promise<void> => {
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    const idToEnvironmentMap = {};
+    workspaces.forEach((element) => {
+      idToEnvironmentMap[element._id] = element?.environmentId;
+    });
     const response = await this.workspaceService.fetchWorkspaces(userId);
     let isAnyWorkspaceActive: undefined | string = undefined;
     const data = [];
@@ -133,7 +142,7 @@ export class DashboardViewModel {
             teamId: team.id,
             teamName: team.name,
           },
-
+          environmentId: idToEnvironmentMap[_id],
           isActiveWorkspace: isActiveWorkspace,
           createdAt,
           createdBy,
@@ -159,5 +168,18 @@ export class DashboardViewModel {
 
   public refreshTeamsWorkspaces = async (_userId: string) => {
     this.refreshTeamsWorkspacesThrottler(_userId);
+  };
+
+  public refreshEnvironment = async (workspaceId) => {
+    const response =
+      await this.environmentService.fetchAllEnvironments(workspaceId);
+    if (response.isSuccessful && response.data.data) {
+      const environments = response.data.data;
+      await this.environmentRepository.refreshEnvironment(
+        environments,
+        workspaceId,
+      );
+    }
+    return;
   };
 }

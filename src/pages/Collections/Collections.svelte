@@ -19,7 +19,10 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { onDestroy, onMount } from "svelte";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type {
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
@@ -31,6 +34,7 @@
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
   const _activeSidebarTabViewModel = new ActiveSideBarTabReposistory();
+  export let refreshEnv: EnvironmentDocument;
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
@@ -209,6 +213,7 @@
       environments={$environments}
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
+      {refreshEnv}
     />
   </Pane>
   <Pane

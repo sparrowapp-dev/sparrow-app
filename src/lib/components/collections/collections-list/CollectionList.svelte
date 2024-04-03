@@ -43,6 +43,7 @@
   export let activePath;
   export let environments = [];
   export let runAnimation: boolean = false;
+  export let refreshEnv;
   let isImportCollectionPopup = false;
   let isImportCurlPopup = false;
   export let changeAnimation: () => void;
@@ -168,20 +169,20 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
+      await refreshEnv(activeWorkspaceRxDoc?._id);
+      const env: EnvironmentDocument =
+        await collectionsMethods.currentEnvironment(
+          activeWorkspaceRxDoc.get("environmentId"),
+        );
+      if (env) {
+        currentEnvironment = env.toMutableJSON();
+      } else {
+        currentEnvironment = {
+          name: "None",
+          id: "none",
+        };
+      }
       if (activeWorkspaceRxDoc) {
-        const env: EnvironmentDocument =
-          await collectionsMethods.currentEnvironment(
-            activeWorkspaceRxDoc.get("environmentId"),
-          );
-        if (env) {
-          currentEnvironment = env.toMutableJSON();
-        } else {
-          currentEnvironment = {
-            name: "None",
-            id: "none",
-          };
-        }
-
         if (isComponentRenderedFirstTime) {
           isLoading = true;
           isComponentRenderedFirstTime = false;

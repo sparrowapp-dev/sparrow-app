@@ -22,6 +22,10 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().$;
   };
 
+  public getWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find().exec();
+  };
+
   /**
    * get filtered workspaces
    */
