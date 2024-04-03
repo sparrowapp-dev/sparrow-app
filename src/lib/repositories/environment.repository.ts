@@ -96,7 +96,6 @@ export class EnvironmentRepository {
       delete environment._id;
       return environment;
     });
-    await RxDB.getInstance().rxdb.environment.find().remove();
     await RxDB.getInstance().rxdb.environment.bulkUpsert(env);
     return;
   };

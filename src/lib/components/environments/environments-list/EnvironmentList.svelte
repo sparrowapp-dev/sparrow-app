@@ -37,18 +37,28 @@
   let isLoading: boolean = false;
   let environmentUnderCreation: boolean = false;
   let addEnvDisabled = false;
-  $: {
-    if (environments) {
+
+  const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
+    if (_env && _workspaceId) {
       localEnvironment = [];
       globalEnvironment = [];
-      environments.forEach((element) => {
-        const _element = element.toMutableJSON();
-        if (_element.type === "GLOBAL") {
-          globalEnvironment.push(_element);
-        } else if (_element.type === "LOCAL") {
-          localEnvironment.push(_element);
-        }
-      });
+      environments
+        .filter((element) => {
+          return element.workspaceId === _workspaceId;
+        })
+        .forEach((element) => {
+          const _element = element.toMutableJSON();
+          if (_element.type === "GLOBAL") {
+            globalEnvironment.push(_element);
+          } else if (_element.type === "LOCAL") {
+            localEnvironment.push(_element);
+          }
+        });
+    }
+  };
+  $: {
+    if (environments || currentWorkspace?._id) {
+      mapEnvironmentToWorkspace(environments, currentWorkspace?._id);
     }
     addEnvDisabled = !hasWorkpaceLevelPermission(
       loggedUserRoleInWorkspace,
@@ -115,14 +125,18 @@
         currentWorkspace._id,
       );
       environmentUnderCreation = false;
-      environmentRepositoryMethods.updateEnvironment(newEnvironment.id, {
+      environmentRepositoryMethods.removeEnvironment(newEnvironment.id);
+
+      environmentRepositoryMethods.createEnvironment({
         ...res,
         workspaceId: currentWorkspace._id,
+        id: res._id,
       });
       notifications.success("New Environment Created!");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
+      environmentRepositoryMethods.removeEnvironment(newEnvironment.id);
       notifications.error("Failed to create environment. Please try again.");
     }
     MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
@@ -188,7 +202,7 @@
     </Tooltip>
   </div>
 
-  {#if isEnvLoading}
+  {#if false}
     <div class="spinner">
       <Spinner size={`32px`} />
     </div>

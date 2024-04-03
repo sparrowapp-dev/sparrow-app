@@ -118,16 +118,20 @@
   );
 
   const refreshEnvironment = () => {
-    if ($environments) {
+    if ($environments && environmentId && currentWorkspaceId) {
       if ($environments?.length > 0) {
-        const filteredEnv = $environments.filter((elem) => {
-          if (
-            elem.type === environmentType.GLOBAL ||
-            elem.id === environmentId
-          ) {
-            return true;
-          }
-        });
+        const filteredEnv = $environments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
         if (filteredEnv?.length > 0) {
           environmentVariables.length = 0;
           filteredEnv.forEach((elem) => {
@@ -153,6 +157,9 @@
       refreshEnvironment();
     }
     if ($environments) {
+      refreshEnvironment();
+    }
+    if (currentWorkspaceId) {
       refreshEnvironment();
     }
   }
@@ -210,7 +217,9 @@
       {changeAnimation}
       activeTabId={$activeTab?.id}
       activePath={$activeTab?.path}
-      environments={$environments}
+      environments={$environments?.filter((element) => {
+        return element?.workspaceId === currentWorkspaceId;
+      }) || []}
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
       {refreshEnv}
