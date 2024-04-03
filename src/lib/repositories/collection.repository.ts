@@ -167,16 +167,16 @@ export class CollectionRepository {
         });
       }
 
-      try {
-        await this.clearCollections();
+      // try {
+      // await this.clearCollections();
 
-        await RxDB.getInstance().rxdb.collection.bulkInsert(revisedCollections);
-      } catch (e) {
-        // If an error occurs during insertion, retry with reduced recursion limit
-        await this.bulkInsertData(col, recursionLimit - 1, revisedCollections);
-      }
+      await RxDB.getInstance().rxdb.collection.bulkUpsert(revisedCollections);
+      // } catch (e) {
+      // If an error occurs during insertion, retry with reduced recursion limit
+      await this.bulkInsertData(col, recursionLimit - 1, revisedCollections);
+      // }
     } else {
-      await this.clearCollections();
+      // await this.clearCollections();
     }
   }
 

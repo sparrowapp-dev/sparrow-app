@@ -29,6 +29,7 @@ export class CollectionListViewModel {
       primaryBranch: elem.get("primaryBranch"),
       currentBranch: elem.get("currentBranch"),
       localRepositoryPath: elem.get("localRepositoryPath"),
+      workspaceId: elem.get("workspaceId"),
     };
   };
   public get collection() {
