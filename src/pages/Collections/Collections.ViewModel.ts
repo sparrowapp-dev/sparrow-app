@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { CollectionDocument } from "$lib/database/app.database";
+import type {
+  CollectionDocument,
+  WorkspaceDocument,
+} from "$lib/database/app.database";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
@@ -203,6 +206,10 @@ export class CollectionsViewModel {
 
   public readCollection = (uuid: string): Promise<CollectionDocument> => {
     return this.collectionRepository.readCollection(uuid);
+  };
+
+  public readWorkspace = (uuid: string): Promise<WorkspaceDocument> => {
+    return this.workspaceRepository.readWorkspace(uuid);
   };
 
   public updateRequestInFolderCollection = (

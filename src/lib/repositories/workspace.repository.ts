@@ -249,6 +249,16 @@ export class WorkspaceRepository {
     return;
   };
 
+  public readWorkspace = async (uuid: string): Promise<WorkspaceDocument> => {
+    return await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: uuid,
+        },
+      })
+      .exec();
+  };
+
   /**
    * Sync | refresh data
    */

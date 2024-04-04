@@ -131,24 +131,40 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     collectionsMethods.getActiveWorkspace();
 
+  const getFilteredCOllection = (value) => {
+    collection = value.filter((collectionDocument: CollectionDocument) => {
+      return collectionDocument.workspaceId === workspace.id;
+    });
+    directory = JSON.parse(JSON.stringify(collection));
+    if (latestRoute.id) navigateToDirectory(latestRoute);
+  };
+  let col = [];
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      if (value) {
+        if (componentData?.path?.workspaceId) {
+          const _workspace = await collectionsMethods.readWorkspace(
+            componentData?.path?.workspaceId,
+          );
+          workspace.id = _workspace._id;
+          workspace.name = _workspace.name;
+        } else {
+          workspace.id = value.get("_id");
+          workspace.name = value.get("name");
+        }
+        getFilteredCOllection(col);
+      }
+    },
+  );
+
   const collectionListUnsubscribe = collectionsMethods
     .getCollectionList()
     .subscribe((value) => {
       if (value) {
-        collection = value;
-        directory = JSON.parse(JSON.stringify(collection));
-        if (latestRoute.id) navigateToDirectory(latestRoute);
+        col = value;
+        getFilteredCOllection(col);
       }
     });
-
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      if (value) {
-        workspace.id = value.get("_id");
-        workspace.name = value.get("name");
-      }
-    },
-  );
 
   const navigateToWorkspace = () => {
     directory = JSON.parse(JSON.stringify(collection));
@@ -180,14 +196,6 @@
 
   const handleSaveAsRequest = async () => {
     let userSource = {};
-    if (componentData?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
-        source: "USER",
-      };
-    }
     const _id = componentData.id;
     isLoading = true;
     if (path.length > 0) {
@@ -242,7 +250,15 @@
       };
 
       if (path[path.length - 1].type === ItemType.COLLECTION) {
-        // create new request
+        const _collection = await collectionsMethods.readCollection(
+          path[path.length - 1].id,
+        );
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
         const res = await insertCollectionRequest({
           collectionId: path[path.length - 1].id,
           workspaceId: workspace.id,
@@ -322,6 +338,13 @@
           isLoading = false;
         }
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        const _collection = await collectionsMethods.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
         const res = await insertCollectionRequest({
           collectionId: path[0].id,
           workspaceId: workspace.id,
@@ -413,9 +436,18 @@
 
   const handleFolderClick = async (folderName): Promise<void> => {
     createDirectoryLoader = true;
+    let userSource = {};
+    const _collection = await collectionsMethods.readCollection(path[0].id);
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
     let directory: CreateDirectoryPostBody = {
       name: folderName,
       description: "",
+      ...userSource,
     };
     const res = await insertCollectionDirectory(
       workspace.id,
@@ -454,6 +486,7 @@
       let _id = res.data.data._id;
       delete storage._id;
       storage.id = _id;
+      storage.workspaceId = workspace.id;
       collectionsMethods.addCollection(storage);
       notifications.success("New Collection Created");
       MixpanelEvent(Events.CREATE_COLLECTION, {
@@ -679,13 +712,15 @@
           --
           -->
           {#if col.type === ItemType.FOLDER}
-            <div
-              on:click={() => {
-                navigateToDirectory(col);
-              }}
-            >
-              <FileType name={col.name} type={ItemType.FOLDER} />
-            </div>
+            {#if col.source === "USER"}
+              <div
+                on:click={() => {
+                  navigateToDirectory(col);
+                }}
+              >
+                <FileType name={col.name} type={ItemType.FOLDER} />
+              </div>
+            {/if}
           {:else if col.type === ItemType.REQUEST}
             <FileType
               name={col.name}

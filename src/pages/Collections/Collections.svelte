@@ -76,6 +76,7 @@
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
     deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
+    readWorkspace: _viewModel.readWorkspace,
 
     initActiveEnvironmentToWorkspace:
       _viewModel.initActiveEnvironmentToWorkspace,

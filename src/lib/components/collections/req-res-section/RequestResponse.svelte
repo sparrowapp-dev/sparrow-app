@@ -37,6 +37,8 @@
         setRequestSave: collectionsMethods.setRequestSave,
         handleCreateTab: collectionsMethods.handleCreateTab,
         addCollection: collectionsMethods.addCollection,
+        readWorkspace: collectionsMethods.readWorkspace,
+        readCollection: collectionsMethods.readCollection,
         collection: collectionsMethods.collection,
         deleteApiRequest: collectionsMethods.deleteApiRequest,
       }}
