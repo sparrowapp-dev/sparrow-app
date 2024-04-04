@@ -13,12 +13,18 @@
 
   export let onSendButtonClicked = () => {};
   export let requestUrl: string;
+  export let httpMethod: string;
+
+  const handleDropdown = (tab: string) => {
+    httpMethod = tab;
+  };
 </script>
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
   <Dropdown
     dropdownId="api-request"
+    onclick={handleDropdown}
     dropDownType={{ type: "text", title: "GET" }}
     staticCustomStyles={[
       {

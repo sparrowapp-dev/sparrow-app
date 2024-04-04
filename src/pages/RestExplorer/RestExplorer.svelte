@@ -41,6 +41,7 @@
   <HttpUrlSection
     class="py-1 px-3"
     bind:requestUrl={_viewModel.requestUrl}
+    bind:httpMethod={_viewModel.httpMethod}
     onSendButtonClicked={_viewModel.sendRequest}
   />
 

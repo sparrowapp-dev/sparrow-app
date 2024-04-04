@@ -26,6 +26,15 @@ class RestExplorerViewModel {
     this._requestUrl = value;
   }
 
+  _httpMethod = "";
+
+  get httpMethod() {
+    return this._httpMethod;
+  }
+  set httpMethod(value) {
+    this._httpMethod = value;
+  }
+
   // // attached to database as well as
   // // derived from other properties
   // // here, it is recalculated whenever `selectedProductIndex` changes
@@ -40,7 +49,19 @@ class RestExplorerViewModel {
    * Send the HTTP request
    */
   sendRequest = async () => {
-    makeHttpRequest(this.requestUrl, "GET", "", "", "", "");
+    try {
+      const response = await makeHttpRequest(
+        this.requestUrl,
+        this.httpMethod,
+        "",
+        `[ { "key": "Connection", "value": "keep-alive" } ]`,
+        "",
+        "",
+      );
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
 }
 

@@ -3,6 +3,7 @@
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
+  import Collections from "../Collections/Collections.old.svelte";
 </script>
 
 <div class="dashboard vh-100">
@@ -19,7 +20,7 @@
       </Route>
 
       <!-- Route for Workspaces -->
-      <Route path="/workspaces/*">Workspaces</Route>
+      <Route path="/workspaces/*"><Collections /></Route>
 
       <!-- Route for Mock -->
       <Route path="/mock/*">Mock</Route>

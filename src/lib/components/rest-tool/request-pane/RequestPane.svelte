@@ -20,8 +20,9 @@
 
   // Headers
   let headers: TableRow[] = [
-    { id: "1", Key: "Content-Type", Value: "application/json" },
-    { id: "2", Key: "", Value: "" },
+    { id: "1", Key: "Accept", Value: "*/*" },
+    { id: "2", Key: "Connection", Value: "keep-alive" },
+    { id: "3", Key: "", Value: "" },
   ];
 
   // Parameters

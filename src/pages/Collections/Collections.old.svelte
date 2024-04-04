@@ -235,10 +235,7 @@
       </div>
       <div class="tab__content d-flex vh-100">
         <div class="w-100">
-          <Route path="/rest-explorer/*">
-            <RestExplorer />
-          </Route>
-          <!-- {#if $tabList && $tabList.length == 0}
+          {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
             <RequestResponse
@@ -248,7 +245,6 @@
               environmentVariables={environmentVariables.reverse()}
               {currentWorkspace}
             />
-            
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
@@ -266,7 +262,7 @@
               {currentWorkspaceId}
               {currentWorkspace}
             />
-          {/if} -->
+          {/if}
         </div>
       </div>
     </div>
