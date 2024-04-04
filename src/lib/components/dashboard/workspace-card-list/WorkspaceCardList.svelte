@@ -105,7 +105,7 @@
   <div>
     <div
       class="d-flex flex-wrap gap-5 row-gap-0 overflow-y-auto sparrow-thin-scrollbar"
-      style="max-height: 59vh; height: auto;"
+      style="max-height: calc(100vh - 350px); height: auto;"
     >
       {#if filterText !== "" && workspaces
           .slice()

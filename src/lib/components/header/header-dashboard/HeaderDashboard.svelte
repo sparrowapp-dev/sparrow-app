@@ -575,6 +575,7 @@
   }
   .search-container {
     border: 1px solid transparent;
+    transition: width 200ms ease;
   }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);

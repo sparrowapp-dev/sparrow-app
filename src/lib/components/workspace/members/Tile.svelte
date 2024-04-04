@@ -79,6 +79,7 @@
       openTeam.teamId,
       user.id,
     );
+    console.log(response);
     if (response) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);

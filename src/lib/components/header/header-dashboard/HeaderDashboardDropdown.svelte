@@ -375,6 +375,11 @@
         styleKey: "maxWidth",
         styleValue: "15vw",
       },
+      {
+        id: "header-dropdown-btn-text",
+        styleKey: "maxWidth",
+        styleValue: "50%",
+      },
     ]}
     activeClasses="border border-labelColor"
     staticClasses={[

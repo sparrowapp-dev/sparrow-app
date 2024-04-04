@@ -739,9 +739,14 @@
         >
       </div>
       <div class="enable-active-sync">
-        <div class="form-check form-switch ps-0">
-          <div class="d-flex justify-content-between">
-            <span class="sparrow-fs-14">Enable Active Sync</span>
+        <div class="form-check form-switch ps-0 position-relative">
+          <div class="d-flex justify-content-between flex-column">
+            <span class="sparrow-fs-14 mb-1">Enable Active Sync</span>
+            <small class="text-textColor sparrow-fs-12"
+              >Enabling Active Sync auto-updates APIs via Swagger Link.</small
+            >
+          </div>
+          <div class="custom-switch position-absolute end-0" style="top: 10%;">
             <input
               class="form-check-input"
               type="checkbox"
@@ -750,12 +755,8 @@
               bind:checked={activeSync}
               id="enableActiveSync"
             />
+            <label class="slider" for="enableActiveSync"></label>
           </div>
-        </div>
-        <div>
-          <small class="text-textColor sparrow-fs-12"
-            >Enabling Active Sync auto-updates APIs via Swagger Link.</small
-          >
         </div>
       </div>
       <!-- <div class="d-flex align-items-center gap-2 pb-2">
@@ -1081,5 +1082,51 @@
     .btn-close1:active {
       background-color: var(--background-dropdown);
     }
+  }
+
+  .custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+  }
+
+  .custom-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    border-radius: 100px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--defaultcolor);
+    transition: 200ms;
+  }
+
+  .slider:before {
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    content: "";
+    height: 16px;
+    width: 16px;
+    background-color: white;
+    transition: 200ms;
+  }
+
+  input:checked + .slider {
+    background-color: var(--sparrow-input-slider-button);
+  }
+
+  input:checked + .slider:before {
+    background-color: var(--send-button);
+    transform: translateX(16px);
   }
 </style>

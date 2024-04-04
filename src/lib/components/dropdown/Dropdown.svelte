@@ -223,6 +223,7 @@
               ? selectedOption.selectedOptionClasses
               : ''}"
             style="max-width: 15vh;"
+            id={`${dropdownId}-btn-text`}
           >
             {additonalSelectedOptionText}
           </p>
