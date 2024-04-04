@@ -80,45 +80,49 @@
   });
 </script>
 
-<Splitpanes
-  class="splitter-sidebar"
-  direction="vertical"
-  on:resize={(e) => {
-    environmentLeftPanelWidth.set(e.detail[0].size);
-    environmentRightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <Pane
-    class="sidebar-left-panel"
-    minSize={20}
-    size={$environmentLeftPanelWidth}
-  >
-    <EnvironmentList
-      {loggedUserRoleInWorkspace}
-      {environmentRepositoryMethods}
-      {environmentServiceMethods}
-      {isEnvLoading}
-      currentWorkspace={$activeWorkspace}
-      environments={$environments}
-      currentEnvironment={$activeEnvironment}
-    />
-  </Pane>
-  <Pane
-    class="sidebar-right-panel"
-    minSize={60}
-    size={$environmentRightPanelWidth}
-  >
-    <EnvironmentPanel
-      {loggedUserRoleInWorkspace}
-      {environmentRepositoryMethods}
-      {environmentServiceMethods}
-      currentEnvironment={$activeEnvironment
-        ? createDeepCopy($activeEnvironment)
-        : $activeEnvironment}
-      activeWorkspace={$activeWorkspace}
-    />
-  </Pane>
-</Splitpanes>
+<Motion {...scaleMotionProps} let:motion>
+  <div use:motion>
+    <Splitpanes
+      class="splitter-sidebar"
+      direction="vertical"
+      on:resize={(e) => {
+        environmentLeftPanelWidth.set(e.detail[0].size);
+        environmentRightPanelWidth.set(e.detail[1].size);
+      }}
+    >
+      <Pane
+        class="sidebar-left-panel"
+        minSize={20}
+        size={$environmentLeftPanelWidth}
+      >
+        <EnvironmentList
+          {loggedUserRoleInWorkspace}
+          {environmentRepositoryMethods}
+          {environmentServiceMethods}
+          {isEnvLoading}
+          currentWorkspace={$activeWorkspace}
+          environments={$environments}
+          currentEnvironment={$activeEnvironment}
+        />
+      </Pane>
+      <Pane
+        class="sidebar-right-panel"
+        minSize={60}
+        size={$environmentRightPanelWidth}
+      >
+        <EnvironmentPanel
+          {loggedUserRoleInWorkspace}
+          {environmentRepositoryMethods}
+          {environmentServiceMethods}
+          currentEnvironment={$activeEnvironment
+            ? createDeepCopy($activeEnvironment)
+            : $activeEnvironment}
+          activeWorkspace={$activeWorkspace}
+        />
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 
 <style>
   :global(.splitpanes) {

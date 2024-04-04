@@ -193,7 +193,7 @@
                 ? selectedOption.selectedOptionClasses
                 : ''}"
             >
-              {selectedOption?.name}
+              {selectedOption?.name || ""}
               <span id={`${dropdownId}-additional-option`}
                 >{additonalSelectedOptionText}</span
               >
@@ -237,7 +237,7 @@
           {:else}
             <p class=" mb-0 ellipsis">
               <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
-              {selectedOption?.name}
+              {selectedOption?.name || ""}
             </p>
           {/if}
         {:else if additionalType === "branch"}

@@ -169,12 +169,12 @@
   });
 </script>
 
-<div class={`env-sidebar`} style={``}>
+<div class={`env-sidebar p-3`} style={``}>
   <div
-    class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
+    class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace ps-3 my-auto ellipsis`}
+      class={`fw-normal lh-1 curr-workspace my-auto ellipsis`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currentWorkspace?.name || ""}
@@ -188,7 +188,7 @@
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
-        class={`border-0 me-3 rounded add-env-mini-btn  ${
+        class={`border-0 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
         on:click={handleCreateEnvironment}
@@ -209,7 +209,7 @@
   {:else}
     {#if globalEnvironment && globalEnvironment.length > 0}
       <p
-        class={`fw-normal env-item rounded m-2 px-2 ${
+        class={`fw-normal env-item rounded my-2 ${
           globalEnvironment[0]?.id === currentEnvironment?.id && "active"
         }`}
         on:click={() => {
@@ -222,7 +222,7 @@
     <hr class="mb-0" />
 
     {#if localEnvironment && localEnvironment.length === 0}
-      <div class={`add-env-container p-3`}>
+      <div class={`add-env-container py-3`}>
         <p class={`add-env-desc-text fw-light text-center mb-3`}>
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
@@ -239,10 +239,10 @@
               loggedUserRoleInWorkspace,
               workspaceLevelPermissions.ADD_COLLECTIONS,
             )}
-            class={`add-env-btn w-100 d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
+            class={`add-env-btn w-100 d-flex rounded justify-content-center py-1 px-4 border-0 mx-auto w-fit`}
             on:click={handleCreateEnvironment}
           >
-            <PlusIcon classProp={`my-auto me-2`} />
+            <PlusIcon classProp={`my-auto`} />
             <span class={`my-auto ps-2`}>Environment</span>
           </button>
         </Tooltip>
@@ -250,7 +250,7 @@
     {/if}
     <ul class={`env-side-tab-list p-0`}>
       {#if localEnvironment && localEnvironment.length > 0}
-        <List height={"calc(100vh - 180px)"} classProps={"p-2"}>
+        <List height={"calc(100vh - 180px)"} classProps={"py-2"}>
           {#each localEnvironment as env}
             <EnvironmentTab
               {env}
@@ -291,14 +291,10 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    padding: 0px 0px 8px 2px;
     height: calc(100vh - 44px);
   }
   .curr-workspace {
     max-height: 20vw;
-  }
-  .curr-workspace-heading-container {
-    padding: 18px 4px 6px 0px;
   }
   .add-env-container {
     padding: 32px 0px;

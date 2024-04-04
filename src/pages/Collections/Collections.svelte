@@ -118,7 +118,7 @@
   );
 
   const refreshEnvironment = () => {
-    if ($environments && environmentId && currentWorkspaceId) {
+    if ($environments && currentWorkspaceId) {
       if ($environments?.length > 0) {
         const filteredEnv = $environments
           .filter((elem) => {
@@ -199,82 +199,86 @@
   });
 </script>
 
-<Splitpanes
-  class="splitter-sidebar"
-  direction="vertical"
-  on:resize={(e) => {
-    collectionLeftPanelWidth.set(e.detail[0].size);
-    collectionRightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <Pane
-    class="sidebar-left-panel"
-    minSize={20}
-    size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
-  >
-    <CollectionsList
-      {runAnimation}
-      {changeAnimation}
-      activeTabId={$activeTab?.id}
-      activePath={$activeTab?.path}
-      environments={$environments?.filter((element) => {
-        return element?.workspaceId === currentWorkspaceId;
-      }) || []}
-      {collectionsMethods}
-      {loggedUserRoleInWorkspace}
-      {refreshEnv}
-    />
-  </Pane>
-  <Pane
-    class="sidebar-right-panel"
-    minSize={60}
-    size={$collapsibleState ? 100 : $collectionRightPanelWidth}
-  >
-    <div>
-      <div class="tab__bar">
-        <TabBar
-          tabList={$tabList}
-          _tabId={$activeTab?.id}
+<Motion {...scaleMotionProps} let:motion>
+  <div use:motion>
+    <Splitpanes
+      class="splitter-sidebar"
+      direction="vertical"
+      on:resize={(e) => {
+        collectionLeftPanelWidth.set(e.detail[0].size);
+        collectionRightPanelWidth.set(e.detail[1].size);
+      }}
+    >
+      <Pane
+        class="sidebar-left-panel"
+        minSize={20}
+        size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
+      >
+        <CollectionsList
+          {runAnimation}
+          {changeAnimation}
+          activeTabId={$activeTab?.id}
+          activePath={$activeTab?.path}
+          environments={$environments?.filter((element) => {
+            return element?.workspaceId === currentWorkspaceId;
+          }) || []}
           {collectionsMethods}
-          {onTabsSwitched}
           {loggedUserRoleInWorkspace}
+          {refreshEnv}
         />
-      </div>
-      <div class="tab__content d-flex">
-        <div class="w-100">
-          {#if $tabList && $tabList.length == 0}
-            <DefaultTabBar {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
-            <RequestResponse
-              {activeTab}
-              {loggedUserRoleInWorkspace}
+      </Pane>
+      <Pane
+        class="sidebar-right-panel"
+        minSize={60}
+        size={$collapsibleState ? 100 : $collectionRightPanelWidth}
+      >
+        <div>
+          <div class="tab__bar">
+            <TabBar
+              tabList={$tabList}
+              _tabId={$activeTab?.id}
               {collectionsMethods}
-              environmentVariables={environmentVariables.reverse()}
-              {currentWorkspace}
-            />
-          {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-            <MyFolder
-              {collectionsMethods}
-              {activeTab}
+              {onTabsSwitched}
               {loggedUserRoleInWorkspace}
             />
-          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-            <MyCollection
-              {collectionsMethods}
-              {activeTab}
-              {_collectionListViewModel}
-              {loggedUserRoleInWorkspace}
-              {currentWorkspaceId}
-              {currentWorkspace}
-            />
-          {/if}
+          </div>
+          <div class="tab__content d-flex">
+            <div class="w-100">
+              {#if $tabList && $tabList.length == 0}
+                <DefaultTabBar {collectionsMethods} />
+              {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
+                <RequestResponse
+                  {activeTab}
+                  {loggedUserRoleInWorkspace}
+                  {collectionsMethods}
+                  environmentVariables={environmentVariables.reverse()}
+                  {currentWorkspace}
+                />
+              {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+                <MyWorkspace {activeTab} {collectionsMethods} />
+              {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+                <MyFolder
+                  {collectionsMethods}
+                  {activeTab}
+                  {loggedUserRoleInWorkspace}
+                />
+              {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+                <MyCollection
+                  {collectionsMethods}
+                  {activeTab}
+                  {_collectionListViewModel}
+                  {loggedUserRoleInWorkspace}
+                  {currentWorkspaceId}
+                  {currentWorkspace}
+                />
+              {/if}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </Pane>
-</Splitpanes>
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>

@@ -253,7 +253,20 @@ export class WorkspaceRepository {
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    const workspaces = await this.getWorkspacesDocs();
+    const idToEnvironmentMap = {};
+    workspaces.forEach((element) => {
+      idToEnvironmentMap[element._id] = element?.environmentId ?? "";
+    });
+
+    const revisedWorkspaces = data.map((workspaceObj) => {
+      let workspaceCopy = workspaceObj;
+      workspaceCopy["environmentId"] =
+        idToEnvironmentMap[workspaceCopy._id] ?? "";
+      return workspaceCopy;
+    });
+
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(revisedWorkspaces);
     return;
   };
 

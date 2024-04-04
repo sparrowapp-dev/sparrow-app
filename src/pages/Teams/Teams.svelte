@@ -556,57 +556,65 @@
   </div>
 </ModalWrapperV1>
 
-<Splitpanes
-  class="splitter-sidebar"
-  direction="vertical"
-  on:resize={(e) => {
-    workspaceLeftPanelWidth.set(e.detail[0].size);
-    workspaceRightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
-    <WorkspaceList
-      {userId}
-      {handleCreateTeamModal}
-      openTeam={$openTeam}
-      teams={allTeams}
-      {data}
-      tabList={$tabList}
-      collectionList={$collectionList}
-      {handleWorkspaceSwitch}
-      {handleWorkspaceTab}
-      {activeSideBarTabMethods}
-      {teamRepositoryMethods}
-      {teamServiceMethods}
-      {collectionsMethods}
-    />
-  </Pane>
-  <Pane
-    class="sidebar-right-panel"
-    minSize={60}
-    size={$workspaceRightPanelWidth}
-  >
-    <WorkspaceContent
-      {currentTeam}
-      {userId}
-      teams={allTeams}
-      {handleCreateWorkspace}
-      {handleWorkspaceSwitch}
-      {handleWorkspaceTab}
-      {data}
-      {activeSideBarTabMethods}
-      {isShowMoreVisible}
-      {handleCloseShowMoreClick}
-      {handleLeaveTeamModal}
-      {handleOnShowMoreClick}
-      {workspaceUnderCreation}
-      openTeam={$openTeam}
-      {teamServiceMethods}
-      {teamRepositoryMethods}
-      workspaces={$workspaces}
-    />
-  </Pane>
-</Splitpanes>
+<Motion {...scaleMotionProps} let:motion>
+  <div use:motion>
+    <Splitpanes
+      class="splitter-sidebar"
+      direction="vertical"
+      on:resize={(e) => {
+        workspaceLeftPanelWidth.set(e.detail[0].size);
+        workspaceRightPanelWidth.set(e.detail[1].size);
+      }}
+    >
+      <Pane
+        class="sidebar-left-panel"
+        minSize={20}
+        size={$workspaceLeftPanelWidth}
+      >
+        <WorkspaceList
+          {userId}
+          {handleCreateTeamModal}
+          openTeam={$openTeam}
+          teams={allTeams}
+          {data}
+          tabList={$tabList}
+          collectionList={$collectionList}
+          {handleWorkspaceSwitch}
+          {handleWorkspaceTab}
+          {activeSideBarTabMethods}
+          {teamRepositoryMethods}
+          {teamServiceMethods}
+          {collectionsMethods}
+        />
+      </Pane>
+      <Pane
+        class="sidebar-right-panel"
+        minSize={60}
+        size={$workspaceRightPanelWidth}
+      >
+        <WorkspaceContent
+          {currentTeam}
+          {userId}
+          teams={allTeams}
+          {handleCreateWorkspace}
+          {handleWorkspaceSwitch}
+          {handleWorkspaceTab}
+          {data}
+          {activeSideBarTabMethods}
+          {isShowMoreVisible}
+          {handleCloseShowMoreClick}
+          {handleLeaveTeamModal}
+          {handleOnShowMoreClick}
+          {workspaceUnderCreation}
+          openTeam={$openTeam}
+          {teamServiceMethods}
+          {teamRepositoryMethods}
+          workspaces={$workspaces}
+        />
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 
 <style>
   .warning-text {
