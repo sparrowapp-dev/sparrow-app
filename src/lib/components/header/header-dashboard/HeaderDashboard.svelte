@@ -227,7 +227,7 @@
 
 <!-- {#if !isLoadingPage} -->
 <div
-  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-backgroundColor header"
+  class="d-flex w-100 ps-1 mt-1 align-items-center justify-content-between bg-backgroundColor header"
   style="height:44px;"
   data-tauri-drag-region
 >
