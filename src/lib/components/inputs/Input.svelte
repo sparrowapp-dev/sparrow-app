@@ -9,6 +9,7 @@
   export let errorText = "Invalid Value";
   export let onChange: (e: any) => void;
   export let type: "input" | "textarea" = "input";
+  export let noBackground = false;
   export let maxCharacter = 100;
   export let inputStyleProp = "";
   export let inputClassProp = "";
@@ -16,6 +17,8 @@
   export let labelDescriptionStyleProp = "";
   export let labelTextClassProp = "";
   export let labelTextStyleProp = "";
+  let componentClass = "";
+  export { componentClass as class };
 
   enum InputType {
     INPUT = "input",
@@ -23,7 +26,7 @@
   }
 </script>
 
-<div class="sparrow-input-label-container">
+<div class={`sparrow-input-label-container ${componentClass}`}>
   {#if labelText.length > 0}
     <div class="sparrow-input-label-heading mb-1">
       <label
@@ -53,7 +56,10 @@
     id={inputId}
     placeholder={inputPlaceholder}
     on:input={(e) => onChange(e)}
-    style={`${inputStyleProp}`}
+    style={`${inputStyleProp} ${
+      noBackground &&
+      "outline: none; background-color: transparent; border: none;"
+    }`}
     maxlength={maxCharacter}
   />
 {:else}

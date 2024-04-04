@@ -16,7 +16,7 @@
   import type { WorkspaceDocument } from "$lib/database/app.database";
   import { requestResponseStore } from "$lib/store";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
+  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel.old";
 
   export let workspace: any;
   export let handleWorkspaceSwitch: any;

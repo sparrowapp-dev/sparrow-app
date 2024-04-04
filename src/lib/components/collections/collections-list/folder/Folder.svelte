@@ -11,8 +11,8 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { CollectionListViewModel } from "../CollectionList.ViewModel";
-  import type { CreateApiRequestPostBody } from "$lib/utils/dto";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { type CreateApiRequestPostBody } from "$lib/utils/dto";
+  import { type CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { CollectionService } from "$lib/services/collection.service";
@@ -42,18 +42,19 @@
   export let currentWorkspaceId: string;
   export let folderId: string = "";
   export let folderName: string = "";
-  export let collectionList;
-  export let visibility;
+  export let visibility: boolean = false;
   export let activeTabId: string;
-  export let activePath;
+  export let activePath: string = "";
   export let activeSync = false;
   export let currentBranch;
   export let primaryBranch;
   const collectionService = new CollectionService();
 
   const _colllectionListViewModel = new CollectionListViewModel();
+
   export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole =
+    WorkspaceRole.WORKSPACE_VIEWER;
 
   let showFolderAPIButtons: boolean = true;
   const handleAPIClick = async () => {
@@ -336,227 +337,228 @@
   };
 </script>
 
-<ModalWrapperV1
-  title={"Delete Folder?"}
-  type={"danger"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isFolderPopup}
-  handleModalState={handleFolderPopUp}
->
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>
-      Are you sure you want to delete this Folder? Everything in <span
-        class="text-whiteColor fw-bold">"{explorer.name}"</span
-      >
-      will be removed.
-    </p>
-  </div>
-  <div class="d-flex gap-3 sparrow-fs-12">
-    <div class="d-flex gap-1">
-      <span class="text-plusButton">{requestCount}</span>
-      <p>API Requests</p>
-    </div>
-  </div>
-  <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-  >
-    <Button
-      disable={deleteLoader}
-      title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
-      type={"dark"}
-      loader={false}
-      onClick={() => {
-        handleFolderPopUp(false);
-      }}
-    />
-
-    <Button
-      disable={deleteLoader}
-      title={"Delete"}
-      textStyleProp={"font-size: var(--base-text)"}
-      loaderSize={18}
-      type={"danger"}
-      loader={deleteLoader}
-      onClick={() => {
-        handleDelete();
-      }}
-    />
-  </div></ModalWrapperV1
->
-<!-- {/if} -->
-
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 
-{#if showMenu}
-  <RightOption
-    xAxis={pos.x}
-    yAxis={pos.y}
-    {menuItems}
-    {noOfRows}
-    {noOfColumns}
-  />
-{/if}
-
-{#if explorer.type === "FOLDER"}
-  <div
-    style="height:36px;"
-    class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
-    activeTabId
-      ? 'active-folder-tab'
-      : ''}"
+<div>
+  <ModalWrapperV1
+    title={"Delete Folder?"}
+    type={"danger"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={isFolderPopup}
+    handleModalState={handleFolderPopUp}
   >
-    <div
-      on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-      class="main-folder d-flex align-items-center pe-0"
-      on:click={() => {
-        if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-          expand = !expand;
-        } else {
-          handleFolderClick(
-            explorer,
-            currentWorkspaceId,
-            collectionId,
-            activeSync,
-          );
-        }
-      }}
-    >
-      <img
-        src={angleRight}
-        class=""
-        style="height:14px; width:14px; margin-right:8px; {expand
-          ? 'transform:rotate(90deg);'
-          : 'transform:rotate(0deg);'}"
-        alt="angleRight"
-      />
-      {#if isRenaming}
-        <input
-          class="form-control py-0 renameInputFieldFolder"
-          id="renameInputFieldFolder"
-          type="text"
-          style="font-size: 12px;"
-          autofocus
-          maxlength={100}
-          value={explorer.name}
-          on:input={handleRenameInput}
-          on:blur={onRenameBlur}
-          on:keydown={onRenameInputKeyPress}
-        />
-      {:else}
-        <div
-          class="folder-title d-flex align-items-center"
-          style="cursor:pointer; font-size:12px;
-          height: 36px;
-           font-weight:400;"
+    <div class="text-lightGray mb-1 sparrow-fs-14">
+      <p>
+        Are you sure you want to delete this Folder? Everything in <span
+          class="text-whiteColor fw-bold">"{explorer.name}"</span
         >
-          {#if expand}
-            <div
-              style="height:16px; width:16px;"
-              class="d-flex align-items-center justify-content-center me-2"
-            >
-              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
-            </div>
-          {:else}
-            <div class="d-flex me-2" style="height:16px; width:16px;">
-              <img
-                src={folder}
-                alt=""
-                style="height:16px; width:16px;"
-                class="folder-icon"
-              />
-            </div>
-          {/if}
-          <p class="ellipsis mb-0">
-            {explorer.name}
-          </p>
-        </div>
-      {/if}
+        will be removed.
+      </p>
     </div>
+    <div class="d-flex gap-3 sparrow-fs-12">
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{requestCount}</span>
+        <p>API Requests</p>
+      </div>
+    </div>
+    <div
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    >
+      <Button
+        disable={deleteLoader}
+        title={"Cancel"}
+        textStyleProp={"font-size: var(--base-text)"}
+        type={"dark"}
+        loader={false}
+        onClick={() => {
+          handleFolderPopUp(false);
+        }}
+      />
 
-    {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
-      <Spinner size={"15px"} />
-    {:else}
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
+      <Button
+        disable={deleteLoader}
+        title={"Delete"}
+        textStyleProp={"font-size: var(--base-text)"}
+        loaderSize={18}
+        type={"danger"}
+        loader={deleteLoader}
+        onClick={() => {
+          handleDelete();
+        }}
+      />
+    </div></ModalWrapperV1
+  >
+
+  {#if showMenu}
+    <RightOption
+      xAxis={pos.x}
+      yAxis={pos.y}
+      {menuItems}
+      {noOfRows}
+      {noOfColumns}
+    />
+  {/if}
+
+  {#if explorer.type === "FOLDER"}
+    <div
+      style="height:36px;"
+      class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
+      activeTabId
+        ? 'active-folder-tab'
+        : ''}"
+    >
+      <div
+        on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+        class="main-folder d-flex align-items-center pe-0"
+        on:click={() => {
+          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+            expand = !expand;
+          } else {
+            handleFolderClick(
+              explorer,
+              currentWorkspaceId,
+              collectionId,
+              activeSync,
+            );
+          }
         }}
       >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    {/if}
-  </div>
-  <div
-    style="padding-left: 12px; cursor:pointer; display: {expand
-      ? 'block'
-      : 'none'};"
-  >
-    <div class="sub-files ps-3">
-      {#each explorer.items as exp}
-        <svelte:self
-          folderId={explorer.id}
-          folderName={explorer.name}
-          explorer={exp}
-          {collectionId}
-          {currentWorkspaceId}
-          {collectionsMethods}
-          {activeTabId}
-          {activeSync}
-          {currentBranch}
-          {primaryBranch}
+        <img
+          src={angleRight}
+          class=""
+          style="height:14px; width:14px; margin-right:8px; {expand
+            ? 'transform:rotate(90deg);'
+            : 'transform:rotate(0deg);'}"
+          alt="angleRight"
         />
-      {/each}
-      {#if showFolderAPIButtons && explorer?.source === "USER"}
-        <div class="mt-2 mb-2 ms-0">
-          <Tooltip
-            classProp="mt-2 mb-2 ms-0"
-            title={PERMISSION_NOT_FOUND_TEXT}
-            show={!hasWorkpaceLevelPermission(
-              loggedUserRoleInWorkspace,
-              workspaceLevelPermissions.SAVE_REQUEST,
-            )}
+        {#if isRenaming}
+          <input
+            class="form-control py-0 renameInputFieldFolder"
+            id="renameInputFieldFolder"
+            type="text"
+            style="font-size: 12px;"
+            autofocus
+            maxlength={100}
+            value={explorer.name}
+            on:input={handleRenameInput}
+            on:blur={onRenameBlur}
+            on:keydown={onRenameInputKeyPress}
+          />
+        {:else}
+          <div
+            class="folder-title d-flex align-items-center"
+            style="cursor:pointer; font-size:12px;
+        height: 36px;
+         font-weight:400;"
           >
-            <img
-              class="list-icons"
-              src={requestIcon}
-              alt="+ API Request"
-              on:click={() => {
-                handleAPIClick();
-                MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                  source: "Side Panel Collection List",
-                });
-              }}
-            />
-          </Tooltip>
-        </div>
+            {#if expand}
+              <div
+                style="height:16px; width:16px;"
+                class="d-flex align-items-center justify-content-center me-2"
+              >
+                <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+              </div>
+            {:else}
+              <div class="d-flex me-2" style="height:16px; width:16px;">
+                <img
+                  src={folder}
+                  alt=""
+                  style="height:16px; width:16px;"
+                  class="folder-icon"
+                />
+              </div>
+            {/if}
+            <p class="ellipsis mb-0">
+              {explorer.name}
+            </p>
+          </div>
+        {/if}
+      </div>
+
+      {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
+        <Spinner size={"15px"} />
+      {:else}
+        <button
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          on:click={(e) => {
+            rightClickContextMenu(e);
+          }}
+        >
+          <img src={threedotIcon} alt="threedotIcon" />
+        </button>
       {/if}
     </div>
-  </div>
-{:else if explorer.type === "REQUEST"}
-  <div style="cursor:pointer;">
-    <Request
-      api={explorer}
-      {folderId}
-      {folderName}
-      {collectionsMethods}
-      {collectionId}
-      {currentWorkspaceId}
-      name={explorer.name}
-      id={explorer.id}
-      {activeTabId}
-      {activeSync}
-      {currentBranch}
-      {primaryBranch}
-    />
-  </div>
-{/if}
+    <div
+      style="padding-left: 12px; cursor:pointer; display: {expand
+        ? 'block'
+        : 'none'};"
+    >
+      <div class="sub-files ps-3">
+        {#each explorer.items as exp}
+          <svelte:self
+            folderId={explorer.id}
+            folderName={explorer.name}
+            explorer={exp}
+            {collectionId}
+            {currentWorkspaceId}
+            {collectionsMethods}
+            {activeTabId}
+            {activeSync}
+            {currentBranch}
+            {primaryBranch}
+          />
+        {/each}
+        {#if showFolderAPIButtons && explorer?.source === "USER"}
+          <div class="mt-2 mb-2 ms-0">
+            <Tooltip
+              classProp="mt-2 mb-2 ms-0"
+              title={PERMISSION_NOT_FOUND_TEXT}
+              show={!hasWorkpaceLevelPermission(
+                loggedUserRoleInWorkspace,
+                workspaceLevelPermissions.SAVE_REQUEST,
+              )}
+            >
+              <img
+                class="list-icons"
+                src={requestIcon}
+                alt="+ API Request"
+                on:click={() => {
+                  handleAPIClick();
+                  MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                    source: "Side Panel Collection List",
+                  });
+                }}
+              />
+            </Tooltip>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {:else if explorer.type === "REQUEST"}
+    <div style="cursor:pointer;">
+      <Request
+        api={explorer}
+        {folderId}
+        {folderName}
+        {collectionsMethods}
+        {collectionId}
+        {currentWorkspaceId}
+        name={explorer.name}
+        id={explorer.id}
+        {activeTabId}
+        {activeSync}
+        {currentBranch}
+        {primaryBranch}
+      />
+    </div>
+  {/if}
+</div>
 
 <style>
   .btn-primary {

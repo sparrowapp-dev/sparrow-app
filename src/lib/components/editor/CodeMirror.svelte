@@ -2,31 +2,58 @@
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import { RequestDataType } from "$lib/utils/enums/request.enum";
   import { isHorizontal } from "$lib/store/request-response-section";
-  import { EditorView } from "codemirror";
-  import { basicSetup, basicTheme } from "./codeMirrorTheme";
-  import { EditorState, Compartment } from "@codemirror/state";
+  import {
+    basicSetup,
+    basicTheme,
+  } from "./code-mirror-themes/BasicCodeMirrorTheme";
+  import {
+    UrlInputSetup,
+    UrlInputTheme,
+  } from "./code-mirror-themes/UrlInputCodeMirrorTheme";
+  import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
-  export let currentTabId: string;
-  export let rawTab: RequestDataType;
-  export let rawValue: string;
-  export let handleRawChange: (data: string) => void;
+  import { javascriptLanguage } from "@codemirror/lang-javascript";
+  import { EditorView } from "codemirror";
+
+  export let currentTabId: string | undefined = undefined;
+  export let rawTab: RequestDataType | undefined = undefined;
+  export let rawValue: string | undefined = undefined;
+  export let handleRawChange: (data: string) => void = () => {};
+  export let codeMirrorStyle: "basic" | "url" = "basic";
+
+  let componentClass = "";
+  export { componentClass as class };
+
   let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
+    rawValue = userInput;
     handleRawChange(userInput);
   });
+
   function initalizeCodeMirrorEditor(value: string) {
-    let state = EditorState.create({
-      doc: value,
-      extensions: [
+    let extensions: Extension[];
+    if (codeMirrorStyle === "basic") {
+      extensions = [
         basicSetup,
         basicTheme,
         updateExtensionView,
         languageConf.of([]),
-      ],
+      ];
+    } else if (codeMirrorStyle === "url") {
+      extensions = [
+        UrlInputSetup,
+        UrlInputTheme,
+        updateExtensionView,
+        languageConf.of([javascriptLanguage]),
+      ];
+    }
+    let state = EditorState.create({
+      doc: value,
+      extensions: extensions,
     });
     codeMirrorView = new EditorView({
       parent: codeMirrorEditorDiv,
@@ -60,12 +87,27 @@
   });
 </script>
 
-<div id="request-code-editor" bind:this={codeMirrorEditorDiv} />
+<div
+  id="request-code-editor"
+  class={`${componentClass} ${
+    codeMirrorStyle === "url" ? "url-codemirror" : "basic-codemirror"
+  }`}
+  bind:this={codeMirrorEditorDiv}
+/>
 
 <style>
   #request-code-editor {
     width: 100%;
-    height: calc(100vh - 360px);
     margin-right: 1%;
+  }
+
+  .basic-codemirror {
+    height: calc(100vh - 360px);
+  }
+
+  .url-codemirror {
+    min-height: 20px; /* Adjust as needed */
+    max-height: 100px; /* Adjust as needed */
+    overflow: auto;
   }
 </style>

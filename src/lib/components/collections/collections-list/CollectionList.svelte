@@ -37,7 +37,7 @@
   import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-  export let deleteCollectionData;
+
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
   export let activePath;

@@ -23,7 +23,7 @@
   import GlobalSearchBarPopup from "$lib/components/header/global-search-bar/GlobalSearchBar.svelte";
   import { useTree } from "$lib/components/collections/collections-list/collectionList";
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
-  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel";
+  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel.old";
   const [, , searchNode] = useTree();
   import type {
     CollectionsMethods,

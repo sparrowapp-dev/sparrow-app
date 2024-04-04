@@ -6,7 +6,10 @@
   } from "$lib/utils/enums/request.enum";
   import { isHorizontal } from "$lib/store/request-response-section";
   import { EditorView } from "codemirror";
-  import { basicSetup, basicTheme } from "./codeMirrorTheme";
+  import {
+    basicSetup,
+    basicTheme,
+  } from "./code-mirror-themes/BasicCodeMirrorTheme";
   import { EditorState, Compartment } from "@codemirror/state";
   import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
   import { html_beautify, js_beautify } from "js-beautify";

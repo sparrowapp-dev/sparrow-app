@@ -5,7 +5,7 @@
   import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { CollectionsViewModel } from "./Collections.ViewModel";
+  import { CollectionsViewModel } from "./Collections.ViewModel.old";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import MyWorkspace from "$lib/components/workspace/workspace-tab/myWorkspace.svelte";
   import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
@@ -27,6 +27,10 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { collectionLeftPanelWidth } from "$lib/store";
   import { collectionRightPanelWidth } from "$lib/store";
+
+  import RestExplorer from "../RestExplorer/RestExplorer.svelte";
+  import { Route, navigate } from "svelte-navigator";
+
   let runAnimation: boolean = false;
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
@@ -161,6 +165,10 @@
 
   let splitter;
   onMount(() => {
+    // debugger;
+    if (window.location.pathname === "/dashboard/collections") {
+      navigate("/dashboard/collections/rest-explorer/");
+    }
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
     );
@@ -190,7 +198,6 @@
 
 <Splitpanes
   class="splitter-sidebar"
-  direction="vertical"
   on:resize={(e) => {
     collectionLeftPanelWidth.set(e.detail[0].size);
     collectionRightPanelWidth.set(e.detail[1].size);
@@ -226,9 +233,12 @@
           {loggedUserRoleInWorkspace}
         />
       </div>
-      <div class="tab__content d-flex">
+      <div class="tab__content d-flex vh-100">
         <div class="w-100">
-          {#if $tabList && $tabList.length == 0}
+          <Route path="/rest-explorer/*">
+            <RestExplorer />
+          </Route>
+          <!-- {#if $tabList && $tabList.length == 0}
             <DefaultTabBar {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
             <RequestResponse
@@ -238,6 +248,7 @@
               environmentVariables={environmentVariables.reverse()}
               {currentWorkspace}
             />
+            
           {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
             <MyWorkspace {activeTab} {collectionsMethods} />
           {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
@@ -255,7 +266,7 @@
               {currentWorkspaceId}
               {currentWorkspace}
             />
-          {/if}
+          {/if} -->
         </div>
       </div>
     </div>

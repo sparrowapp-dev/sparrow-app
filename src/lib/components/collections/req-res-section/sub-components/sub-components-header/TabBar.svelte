@@ -155,7 +155,6 @@
         {#each tabList as tab, index}
           <Tab
             {tab}
-            handleTabRemove={collectionsMethods.handleRemoveTab}
             updateCurrentTab={collectionsMethods.handleActiveTab}
             {closeTab}
             {index}

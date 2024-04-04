@@ -564,7 +564,6 @@
 
 <Splitpanes
   class="splitter-sidebar"
-  direction="vertical"
   on:resize={(e) => {
     workspaceLeftPanelWidth.set(e.detail[0].size);
     workspaceRightPanelWidth.set(e.detail[1].size);
