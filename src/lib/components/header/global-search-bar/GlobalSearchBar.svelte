@@ -125,7 +125,7 @@
     </button>
   </div>
   <div class="search-options-container">
-    {#if searchData.length > 0}
+    {#if searchData.length >= 0}
       {#if filteredRequest.length > 0 && (currentSelectedId === "all" || currentSelectedId === "request")}
         {#each filteredRequest as filterRequest}
           <button
@@ -349,7 +349,7 @@
         {/each}
       {/if}
       {#if filteredRequest.length === 0 && filteredCollection.length === 0 && filteredFolder.length === 0 && !workspaces.some(isFilteredWorkspaces)}
-        <p class="result-none">No Results Found</p>
+        <p class="result-none text-muted sparrow-fs-16">No Results Found</p>
       {/if}
     {/if}
   </div>
@@ -432,9 +432,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: Roboto;
-    font-size: 20px;
-    font-weight: 600;
     color: var(--lightGray);
   }
   .request-btn:hover,
