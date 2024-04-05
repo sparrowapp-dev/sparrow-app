@@ -507,15 +507,17 @@
           {/if}
 
           <div class="d-flex flex-column justify-content-center">
-            <button
-              disabled={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-              class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-              style="max-height:60px"
-              on:click={handleApiRequest}>New Request</button
-            >
+            {#if !currentCollection?.activeSync || isSynced}
+              <button
+                disabled={!hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+                class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+                style="max-height:60px"
+                on:click={handleApiRequest}>New Request</button
+              >
+            {/if}
           </div>
         </div>
       </div>
