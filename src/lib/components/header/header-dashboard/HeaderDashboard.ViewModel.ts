@@ -111,13 +111,16 @@ export class HeaderDashboardViewModel {
         },
       );
 
-      tabName = workspace?.data?.data.name;
-      this.updateWorkspace(workspaceId, {
-        name: newWorkspaceName,
-      });
+      if (workspace.isSuccessful) {
+        tabName = workspace?.data?.data.name;
+        this.updateWorkspace(workspaceId, {
+          name: newWorkspaceName,
+        });
 
-      collectionsMethods.updateTab(tabName, "name", workspaceId);
-      collectionsMethods.updateTab(true, "save", workspaceId);
+        collectionsMethods.updateTab(tabName, "name", workspaceId);
+        collectionsMethods.updateTab(true, "save", workspaceId);   
+      }
+      return workspace;
     }
   };
 

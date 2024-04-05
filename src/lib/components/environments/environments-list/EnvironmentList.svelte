@@ -115,6 +115,7 @@
         currentWorkspace._id,
       );
       environmentUnderCreation = false;
+      console.log(res);
       environmentRepositoryMethods.updateEnvironment(newEnvironment.id, {
         ...res,
         workspaceId: currentWorkspace._id,
@@ -123,7 +124,11 @@
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
-      notifications.error("Failed to create environment. Please try again.");
+      environmentRepositoryMethods.removeEnvironment(newEnvironment.id);
+      environmentUnderCreation = false;
+      notifications.error(
+        response.message ?? "Failed to create environment. Please try again.",
+      );
     }
     MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
     return;

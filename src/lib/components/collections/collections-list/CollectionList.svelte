@@ -196,6 +196,9 @@
             const collections = response.data.data;
             isLoading = false;
             collectionsMethods.bulkInsert(collections);
+          } else {
+            isLoading = false;
+            notifications.error(response.message);
           }
         }
         trackWorkspaceId = workspaceId;
@@ -284,6 +287,8 @@
       return;
     } else {
       activePath = tempActivePath;
+      collectionsMethods.deleteCollection(newCollection.id);
+      notifications.error(response.message ?? "Failed to create collection!");
     }
     return;
   };
@@ -518,7 +523,6 @@
           }}
         />
       </div>
-
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"

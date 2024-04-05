@@ -229,8 +229,10 @@
       activeSideBarTabMethods.updateActiveTab("collections");
       navigate("/dashboard/collections");
     } else {
+      workspaceUnderCreation = false;
+      isWorkspaceCreatedFirstTime.set(false);
       isWorkspaceLoaded.set(true);
-      notifications.error("Failed to create new Workspace!");
+      notifications.error(response.message);
     }
   };
 
@@ -269,11 +271,9 @@
       handleCreateTeamModal();
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
+      await _viewModel.removeTeam(teamObj.teamId);
       handleCreateTeamModal();
-      notifications.error(
-        "Failed to create a new team. " + response.message ??
-          "Failed to create a new team.",
-      );
+      notifications.error(response.message ?? "Failed to create a new team.");
     }
   };
 
@@ -302,7 +302,9 @@
         }, 500);
       }, 500);
     } else {
-      notifications.error("Failed to leave the team. Please try again.");
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();

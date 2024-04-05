@@ -153,6 +153,9 @@
     );
     if (response.isSuccessful) {
       isLoading = false;
+    } else {
+      notifications.error(response.message);
+      isLoading = false;
     }
   };
   let refreshCollectionLoader = false;

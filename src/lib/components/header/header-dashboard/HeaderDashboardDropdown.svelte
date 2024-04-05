@@ -262,7 +262,9 @@
       handleCreateWorkspaceModal();
       workspaceUnderCreation = false;
       isWorkspaceLoaded.set(true);
-      notifications.error("Failed to create new Workspace!");
+      notifications.error(
+        response.message ?? "Failed to create new Workspace!",
+      );
     }
   };
 

@@ -33,6 +33,7 @@
   const handleImport = async () => {
     progressBar.isLoading = true;
     const response = await _viewImportCurl.importCollectionFromCurl(importCurl);
+    console.log(response);
     if (response.isSuccessful) {
       const sampleRequest = generateSampleRequest(
         UntrackedItems.UNTRACKED + uuidv4(),
@@ -75,9 +76,13 @@
       notifications.success("API request is imported successfully.");
     } else {
       progressBar.isLoading = false;
-      notifications.error(
-        "Failed to import API request. Please check the cURL text and try again.",
-      );
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          "Failed to import API request. Please check the cURL text and try again.",
+        );
+      }
     }
   };
 </script>

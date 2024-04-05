@@ -58,6 +58,9 @@
         );
         loader = false;
         handleInvitePopup(false);
+      } else if (response.message === "Network Error") {
+        handleInvitePopup(false);
+        notifications.error(response.message);
       } else {
         loader = false;
         notifications.error(`Failed to sent invites, please try again`);

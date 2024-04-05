@@ -268,7 +268,7 @@ export class TeamViewModel {
     if (response.isSuccessful === true) {
       return response.data.data;
     }
-    return;
+    return response;
   };
 
   public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
@@ -279,7 +279,7 @@ export class TeamViewModel {
     if (response.isSuccessful === true) {
       return response.data.data;
     }
-    return;
+    return response;
   };
 
   public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
@@ -290,7 +290,7 @@ export class TeamViewModel {
     if (response.isSuccessful === true) {
       return response.data.data;
     }
-    return;
+    return response;
   };
 
   public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
@@ -301,7 +301,7 @@ export class TeamViewModel {
     if (response.isSuccessful === true) {
       return response.data.data;
     }
-    return;
+    return response;
   };
 
   public changeUserRoleAtWorkspace = async (
