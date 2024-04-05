@@ -39,6 +39,7 @@
         addCollection: collectionsMethods.addCollection,
         readWorkspace: collectionsMethods.readWorkspace,
         readCollection: collectionsMethods.readCollection,
+        saveApiRequest: collectionsMethods.saveApiRequest,
         collection: collectionsMethods.collection,
         deleteApiRequest: collectionsMethods.deleteApiRequest,
       }}

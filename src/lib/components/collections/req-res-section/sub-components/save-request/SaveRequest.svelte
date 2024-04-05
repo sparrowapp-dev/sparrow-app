@@ -49,32 +49,6 @@
   const collections: Observable<CollectionDocument[]> =
     collectionsMethods.collection;
 
-  let collectionCountArr = [];
-  let currentCollection;
-  const refreshCount = async () => {
-    if (collectionCountArr && componentData?.path?.collectionId) {
-      for (const collection of collectionCountArr) {
-        if (collection._data.id === componentData?.path?.collectionId) {
-          currentCollection = collection;
-        }
-      }
-    }
-  };
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value) {
-        collectionCountArr = value;
-        refreshCount();
-      }
-    },
-  );
-
-  $: {
-    if (componentData?.path?.collectionId) {
-      refreshCount();
-    }
-  }
-
   interface Path {
     name: string;
     id: string;
@@ -513,7 +487,6 @@
     collectionListUnsubscribe.unsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
-    collectionSubscribe.unsubscribe();
   });
 </script>
 

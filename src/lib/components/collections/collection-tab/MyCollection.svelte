@@ -94,9 +94,7 @@
           } ${date.getDate()}, ${date.getFullYear()}`;
           const response = await _collectionService.switchCollectionBranch(
             currentCollection?.id,
-            currentCollection?.currentBranch
-              ? currentCollection?.currentBranch
-              : currentCollection?.PrimaryBranch,
+            currentCollection?.currentBranch,
           );
           if (response.isSuccessful) {
             isSynced = true;
@@ -189,7 +187,7 @@
     );
     if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
-        currentWorkspaceId,
+        componentData?.path?.workspaceId,
         {
           url: currentCollection?.activeSyncUrl,
           urlData: {
@@ -197,9 +195,7 @@
             headers: responseJSON.data.headers,
           },
           primaryBranch: currentCollection?.primaryBranch,
-          currentBranch: currentCollection?.currentBranch
-            ? currentCollection?.currentBranch
-            : currentCollection?.primaryBranch,
+          currentBranch: currentCollection?.currentBranch,
         },
         currentCollection.activeSync,
       );

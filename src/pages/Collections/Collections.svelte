@@ -86,6 +86,7 @@
     clearTabs: _viewModel.clearTabs,
     collection: _viewModel.collection,
     deleteApiRequest: _viewModel.deleteApiRequest,
+    saveApiRequest: _viewModel.saveAPIRequest,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
