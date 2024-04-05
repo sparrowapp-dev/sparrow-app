@@ -19,7 +19,7 @@
   export let filteredCollection: any[];
   export let workspaces: any[];
   export let activeWorkspaceId: string;
-  export let handleDropdown: (id: string, name: string, team: any) => void;
+  export let handleDropdown: (id: string) => void;
   let currentSelectedId = "all";
 
   function getIndex(text: string, searchData: string): number {
@@ -61,7 +61,7 @@
 
   const handleWorkspaceClick = (id: string, name: string, team: any) => {
     if (id !== activeWorkspaceId) {
-      handleDropdown(id, name, team);
+      handleDropdown(id);
     }
     handleGlobalSearchPopup(false);
   };
@@ -131,6 +131,9 @@
           <button
             class="request-btn"
             on:click={() => {
+              if (filterRequest.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterRequest.workspaceId);
+              }
               handleRequestClick(
                 filterRequest.tree,
                 {
@@ -198,6 +201,9 @@
           <button
             class="folder-btn"
             on:click={() => {
+              if (filterFolder.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterFolder.workspaceId);
+              }
               handleFolderClick(
                 filterFolder.tree,
                 filterFolder.workspaceId,
@@ -251,6 +257,9 @@
           <button
             class="collection-btn"
             on:click={() => {
+              if (filterCollection.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterCollection.workspaceId);
+              }
               handleCollectionClick(
                 filterCollection.tree,
                 filterCollection.workspaceId,

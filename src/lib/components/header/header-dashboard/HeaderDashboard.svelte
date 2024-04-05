@@ -282,6 +282,7 @@
         }}
         on:click={() => {
           handleGlobalSearchPopup(true);
+          handleSearch();
         }}
       />
     </div>
@@ -334,6 +335,7 @@
           <div
             on:click={() => {
               handleGlobalSearchPopup(true);
+              handleSearch();
             }}
             class="position-absolute"
             style="
@@ -357,6 +359,7 @@
             }}
             on:click={() => {
               handleGlobalSearchPopup(true);
+              handleSearch();
             }}
           />
         </div>
