@@ -455,7 +455,6 @@ export class CollectionsViewModel {
       };
     } else {
       // Save api description only
-      console.log(existingRequest);
       expectedRequest = {
         method: existingRequest?.request.method,
         url: existingRequest?.request.url,

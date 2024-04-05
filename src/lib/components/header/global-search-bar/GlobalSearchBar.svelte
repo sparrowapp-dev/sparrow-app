@@ -26,6 +26,23 @@
     return text.toLowerCase().indexOf(searchData.toLowerCase());
   }
 
+  let mapCollectionWithWorkspaceAndTeam = {};
+  $: {
+    if (workspaces) {
+      mapCollectionWithWorkspaceAndTeam = {};
+      workspaces.forEach((_workspace) => {
+        _workspace.collections.forEach((_collection) => {
+          mapCollectionWithWorkspaceAndTeam[_collection.id] = {
+            workspaceId: _workspace._id,
+            workspaceName: _workspace.name,
+            teamId: _workspace.team.teamId,
+            teamName: _workspace.team.teamName,
+          };
+        });
+      });
+    }
+  }
+
   function handleSelection(id: string) {
     const previousSelectedButton = document.getElementById(
       currentSelectedId,
@@ -117,7 +134,7 @@
               handleRequestClick(
                 filterRequest.tree,
                 {
-                  workspaceId: activeWorkspaceId,
+                  workspaceId: filterRequest.workspaceId,
                   collectionId: filterRequest.collectionId,
                   folderId: filterRequest.folderDetails
                     ? filterRequest.folderDetails.id
@@ -161,7 +178,15 @@
             <div class="api-path ellipsis">
               <span
                 >{filterRequest.path
-                  ? replaceSlashWithGreaterThanSymbol(filterRequest.path)
+                  ? mapCollectionWithWorkspaceAndTeam[
+                      filterRequest.collectionId
+                    ]?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[
+                      filterRequest.collectionId
+                    ]?.workspaceName +
+                    " > " +
+                    replaceSlashWithGreaterThanSymbol(filterRequest.path)
                   : ""}</span
               >
             </div>
@@ -175,7 +200,7 @@
             on:click={() => {
               handleFolderClick(
                 filterFolder.tree,
-                activeWorkspaceId,
+                filterFolder.workspaceId,
                 filterFolder.collectionId,
                 filterFolder.activeSync,
               );
@@ -208,7 +233,13 @@
             <div class="api-path ellipsis">
               <span
                 >{filterFolder.path
-                  ? replaceSlashWithGreaterThanSymbol(filterFolder.path)
+                  ? mapCollectionWithWorkspaceAndTeam[filterFolder.collectionId]
+                      ?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[filterFolder.collectionId]
+                      ?.workspaceName +
+                    " > " +
+                    replaceSlashWithGreaterThanSymbol(filterFolder.path)
                   : ""}</span
               >
             </div>
@@ -222,7 +253,7 @@
             on:click={() => {
               handleCollectionClick(
                 filterCollection.tree,
-                activeWorkspaceId,
+                filterCollection.workspaceId,
                 filterCollection.tree._id,
               );
               handleGlobalSearchPopup(false);
@@ -257,8 +288,14 @@
             </div>
             <div class="api-path ellipsis">
               <span
-                >{filterCollection.path
-                  ? replaceSlashWithGreaterThanSymbol(filterCollection.path)
+                >{true
+                  ? mapCollectionWithWorkspaceAndTeam[
+                      filterCollection.collectionId
+                    ]?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[
+                      filterCollection.collectionId
+                    ]?.workspaceName
                   : ""}</span
               >
             </div>
@@ -303,6 +340,9 @@
                     getIndex(workspace.name, searchData) + searchData.length,
                   )}
                 </span>
+              </div>
+              <div class="api-path ellipsis">
+                <span>{true ? workspace?.team?.teamName : ""}</span>
               </div>
             </button>
           {/if}

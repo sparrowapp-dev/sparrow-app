@@ -159,7 +159,6 @@
       filteredFolder,
       filteredRequest,
       collections,
-      activeWorkspaceName,
     );
   };
   window.addEventListener("click", () => {

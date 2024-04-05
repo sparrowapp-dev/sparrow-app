@@ -74,6 +74,7 @@ const searchHelper: (
   folder: any[],
   file: any[],
   collectionId: string,
+  workspaceId: string,
   path: string[],
   folderDetails: Record<string, string>,
   activeSync: boolean,
@@ -84,6 +85,7 @@ const searchHelper: (
   folder,
   file,
   collectionId,
+  workspaceId,
   path,
   folderDetails,
   activeSync,
@@ -93,6 +95,7 @@ const searchHelper: (
       file.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
+        workspaceId,
         folderDetails,
         path: createPath(path),
         activeSync,
@@ -101,6 +104,7 @@ const searchHelper: (
       folder.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
+        workspaceId,
         path: createPath(path),
         activeSync,
       });
@@ -108,6 +112,7 @@ const searchHelper: (
       collection.push({
         tree: JSON.parse(JSON.stringify(tree)),
         collectionId,
+        workspaceId,
         path: createPath(path),
         activeSync,
       });
@@ -125,6 +130,7 @@ const searchHelper: (
         folder,
         file,
         collectionId,
+        workspaceId,
         path,
         tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
         activeSync,
@@ -201,15 +207,7 @@ const useTree = (): any[] => {
     folder: any[],
     file: any[],
     collectionData: any[],
-    workspacePath?: string,
-  ) => void = (
-    searchText,
-    collection,
-    folder,
-    file,
-    collectionData,
-    workspacePath,
-  ) => {
+  ) => void = (searchText, collection, folder, file, collectionData) => {
     const filteredByMethodTrees = [];
     tree = collectionData;
     // iterate through the tree and filter according to api methods selected
@@ -249,9 +247,6 @@ const useTree = (): any[] => {
     // Iterate through the tree to find the target folder and add the item
     for (let i = 0; i < filteredTrees.length; i++) {
       const path = [];
-      if (workspacePath) {
-        path.push(workspacePath);
-      }
       searchHelper(
         filteredTrees[i],
         searchText,
@@ -259,6 +254,7 @@ const useTree = (): any[] => {
         folder,
         file,
         filteredTrees[i].id,
+        filteredTrees[i].workspaceId,
         path,
         {},
         filteredTrees[i]?.activeSync,

@@ -627,7 +627,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     path={exp.path}
                     explorer={exp.tree}
                     {searchData}
@@ -641,7 +641,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
                   />
@@ -653,7 +653,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
                   />
@@ -667,7 +667,7 @@
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}
@@ -683,7 +683,7 @@
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}
