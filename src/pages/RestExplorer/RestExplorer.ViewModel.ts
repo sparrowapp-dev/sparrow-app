@@ -1,4 +1,4 @@
-import { makeHttpRequest } from "$lib/api/api.common";
+import { makeHttpRequest, makeHttpRequestV2 } from "$lib/api/api.common";
 import { BehaviorSubject } from "rxjs";
 
 class RestExplorerViewModel {
@@ -50,13 +50,9 @@ class RestExplorerViewModel {
    */
   sendRequest = async () => {
     try {
-      const response = await makeHttpRequest(
+      const response = await makeHttpRequestV2(
         this.requestUrl,
         this.httpMethod,
-        "",
-        `[ { "key": "Connection", "value": "keep-alive" } ]`,
-        "",
-        "",
       );
       console.log(response);
     } catch (error) {

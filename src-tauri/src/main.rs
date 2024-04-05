@@ -5,10 +5,13 @@ mod config;
 mod formdata_handler;
 mod json_handler;
 mod raw_handler;
+mod request_handler;
 mod url_fetch_handler;
 mod urlencoded_handler;
+
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
+use request_handler::http_requests::make_without_body_request;
 
 use std::path::PathBuf;
 use std::process::Command;
@@ -186,6 +189,82 @@ async fn make_http_request(
     };
 }
 
+#[tauri::command]
+async fn make_http_request_v2(url: &str, method: &str) -> Result<String, String> {
+    let result = make_request_v2(url, method).await;
+
+    let result_value = match result {
+        Ok(value) => value.to_string(),
+        Err(err) => err.to_string(),
+    };
+
+    let response = json!({
+        "body": result_value,
+    });
+
+    return match serde_json::to_string(&response) {
+        Ok(value) => Ok(value.to_string()),
+        Err(err) => Err(err.to_string()),
+    };
+}
+
+async fn make_request_v2(url: &str, method: &str) -> Result<String, std::io::Error> {
+    // Make a client
+    let client = Client::new();
+
+    // Convert the method string to reqwest::Method
+    let reqwest_method = match method {
+        "GET" => reqwest::Method::GET,
+        "POST" => reqwest::Method::POST,
+        "PUT" => reqwest::Method::PUT,
+        "DELETE" => reqwest::Method::DELETE,
+        "PATCH" => reqwest::Method::PATCH,
+        // Add other HTTP methods as needed
+        _ => reqwest::Method::GET,
+    };
+
+    // TODO: Convert header string into hashmap
+
+    let request_builder = client.request(reqwest_method, url);
+
+    // Add headers in request builder
+    // for (key, value) in header_map.iter() {
+    //     request_builder = request_builder.header(key, value);
+    // }
+
+    let check = make_without_body_request(request_builder).await;
+
+    let response_value = match check {
+        Ok(value) => value,
+        Err(err) => {
+            // converting `reqwest::Error` to `std::io::Error
+            return Err(err);
+        }
+    };
+
+    let headers = response_value.headers().clone();
+    let status = response_value.status().clone();
+    let response_text_result = response_value.text().await;
+    let headers_json: serde_json::Value = headers
+        .iter()
+        .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
+        .collect();
+
+    let response_text = match response_text_result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {}", err),
+    };
+
+    // Combining all parameters
+    let combined_json = json!({
+        "headers": headers_json,
+        "status": status.to_string(),
+        "response": response_text,
+    });
+
+    return Ok(combined_json.to_string());
+}
+
 async fn make_request(
     url: &str,
     method: &str,
@@ -311,7 +390,8 @@ fn main() {
             fetch_folder_command,
             close_oauth_window,
             make_http_request,
-            zoom_window
+            zoom_window,
+            make_http_request_v2,
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {

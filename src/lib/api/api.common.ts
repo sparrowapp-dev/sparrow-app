@@ -178,11 +178,33 @@ const makeHttpRequest = async (
     });
 };
 
+const makeHttpRequestV2 = async (url: string, method: string) => {
+  // create a race condition between the timeout and the api call
+  return Promise.race([
+    timeout(apiTimeOut),
+    invoke("make_http_request_v2", {
+      url,
+      method,
+    }),
+  ])
+    .then(async (data: string) => {
+      try {
+        return success(JSON.parse(data), "");
+      } catch (e) {
+        return error("error");
+      }
+    })
+    .catch(() => {
+      return error("error");
+    });
+};
+
 export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
   makeHttpRequest,
   getMultipartAuthHeaders,
+  makeHttpRequestV2,
   // getHeaders,
 };
