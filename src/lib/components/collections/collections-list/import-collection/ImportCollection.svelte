@@ -487,6 +487,7 @@
   const extractGitBranch = async (filePathResponse) => {
     repositoryPath = "";
     currentBranch = "";
+    repositoryBranch = "not exist";
     getBranchList = [];
     isRepositoryPath = false;
 
@@ -498,14 +499,21 @@
       if (response) {
         getBranchList = response
           .filter((elem) => {
-            if (elem.includes("upstream/")) return false;
-            else if (elem.includes("origin/HEAD")) return false;
+            if (elem.startsWith("upstream/")) return false;
+            else if (elem.startsWith("origin/HEAD -> origin/")) {
+              const branchIterator = elem;
+              repositoryBranch = branchIterator.replace(
+                /^origin\/HEAD -> origin\//,
+                "",
+              );
+              return false;
+            }
             return true;
           })
           .map((elem) => {
             return {
-              name: elem.replace("origin/", ""),
-              id: elem.replace("origin/", ""),
+              name: elem.replace(/^origin\//, ""),
+              id: elem.replace(/^origin\//, ""),
               hide: false,
               color: "whiteColor",
             };
