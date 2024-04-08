@@ -2,22 +2,43 @@
   export let list: {
     name: string;
     id: string;
-    color: "primary" | "danger" | "dark" | "light";
-    description: string;
-    hide: boolean;
+    color?:
+      | "primary"
+      | "danger"
+      | "dark"
+      | "light"
+      | "success"
+      | "warning"
+      | "secondary"
+      | "patch";
+    description?: string;
+    default?: boolean;
+    hide?: boolean;
   };
   export let selectedRequest: {
     id: string;
   };
   export let checkIcon: string;
   export let getTextColor: (color: string) => {};
+
+  let isMenuItemHover = false;
 </script>
 
-<div class="d-flex px-2 py-2 justify-content-between highlight rounded">
+<div
+  class="d-flex px-2 py-2 justify-content-between highlight rounded"
+  on:mouseenter={() => {
+    isMenuItemHover = true;
+  }}
+  on:mouseleave={() => {
+    isMenuItemHover = false;
+  }}
+>
   <p
-    class="m-0 p-0 {getTextColor(list?.color)} ellipsis"
+    class="m-0 p-0 {getTextColor(list?.color)} ellipsis {isMenuItemHover &&
+    !list?.color
+      ? 'highlight-menu-item'
+      : ''}"
     style="font-size: 12px;"
-    class:selected-request={list.id === selectedRequest?.id}
   >
     {list.name}<br />
     {#if list.description}
@@ -33,7 +54,7 @@
   .highlight:hover {
     background-color: var(--dull-background-color);
   }
-  .highlight:hover p {
+  .highlight-menu-item {
     color: var(--send-button) !important;
   }
   .highlight {

@@ -823,6 +823,7 @@
                       name: "Select Branch",
                       id: "not exist",
                       color: "whiteColor",
+                      default: true,
                       hide: true,
                     },
                     ...getBranchList,

@@ -16,9 +16,18 @@
   export let data: Array<{
     name: string;
     id: string;
-    description: string;
-    color: "primary" | "danger" | "dark" | "light";
-    hide: boolean;
+    description?: string;
+    color?:
+      | "primary"
+      | "danger"
+      | "dark"
+      | "light"
+      | "success"
+      | "warning"
+      | "secondary"
+      | "patch";
+    default?: boolean;
+    hide?: boolean;
   }>;
 
   /**
@@ -101,9 +110,18 @@
   let selectedRequest: {
     name: string;
     id: string;
-    color: "primary" | "danger" | "dark" | "light";
-    description: string;
-    hide: boolean;
+    color?:
+      | "primary"
+      | "danger"
+      | "dark"
+      | "light"
+      | "success"
+      | "warning"
+      | "secondary"
+      | "patch";
+    default?: boolean;
+    description?: string;
+    hide?: boolean;
   };
 
   let selectBorderClass = "";
@@ -225,6 +243,14 @@
       return "text-defaultColor";
     } else if (_color === "light") {
       return "text-whiteColor";
+    } else if (_color === "success") {
+      return "text-getColor";
+    } else if (_color === "warning") {
+      return "text-postColor";
+    } else if (_color === "secondary") {
+      return "text-putColor";
+    } else if (_color === "patch") {
+      return "text-patchColor";
     } else {
       return "text-whiteColor";
     }
@@ -267,12 +293,18 @@
             /></span
           >
         {/if}
-        {selectedRequest?.name}
+        <span
+          class={selectedRequest?.default
+            ? "text-textColor"
+            : getTextColor(selectedRequest?.color)}
+        >
+          {selectedRequest?.name}
+        </span>
       </p>
       <span class="d-flex" class:select-logo-active={isOpen}
         ><img
           style="height:12px; width:12px;"
-          class="ms-2"
+          class="ms-2 select-arrow-icon"
           src={select}
           alt=""
         /></span
@@ -389,7 +421,7 @@
     border: 1px solid rgb(44, 44, 44);
   }
   .select-body-background-dark {
-    background-color: var(--blackColor);
+    background-color: var(--background-dropdown);
   }
   .select-body-background-blur {
     background: var(--background-hover);
