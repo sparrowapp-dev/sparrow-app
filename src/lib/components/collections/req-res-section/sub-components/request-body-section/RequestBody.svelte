@@ -170,6 +170,12 @@
         },
       ]}
       onclick={handleDropdown}
+      hoverClasses={[
+        {
+          id: "hash124-btn-div",
+          classToAdd: ["border-bottom", "border-labelColor"],
+        },
+      ]}
     />
     <span class="pe-3" />
     {#if mainTab === RequestDataset.RAW}
@@ -204,6 +210,12 @@
           },
         ]}
         onclick={handleRawDropDown}
+        hoverClasses={[
+          {
+            id: "hash987-btn-div",
+            classToAdd: ["border-bottom", "border-labelColor"],
+          },
+        ]}
       />
     {/if}
   </div>

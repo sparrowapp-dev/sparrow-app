@@ -441,7 +441,7 @@
 
 <style lang="scss">
   .delete-ticker {
-    color: var(--delete-hover);
+    color: var(--error--color);
     font-weight: 500;
   }
   .api-method {
@@ -460,8 +460,11 @@
     font-weight: 400;
     width: calc(100% - 48px);
   }
+  .api-name-deleted {
+    color: var(--editor-angle-bracket) !important;
+  }
   .api-method-deleted {
-    color: var(--recentApiText) !important;
+    color: var(--deleted-api-method) !important;
   }
   .api-info {
     display: flex;

@@ -121,7 +121,7 @@
         {#if width === "100%"}
           <span
             class="sparrow-file-input-placeholder fw-normal d-flex justify-content-center mt-4"
-            >Drag and Drop or</span
+            >Drag and Drop your YAML/JSON file or</span
           >
         {/if}
         <div
@@ -173,10 +173,10 @@
   {/if}
 
   {#if showFileTypeError}
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 justify-content-center">
       {#each supportedFileTypes as fileType}
         <span class="px-2 py-1 sparrow-input-file-type rounded">
-          {fileType}
+          {fileType.toUpperCase()}
         </span>
       {/each}
     </div>

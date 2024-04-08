@@ -43,6 +43,7 @@
   export let dropdownId: string = "";
   export let disabled: boolean = false;
   export let mixpanelEvent: Events = Events.NO_EVENT;
+  export let showDropdownIcon: boolean = true;
 
   let selectedOption: {
     name: string;
@@ -188,7 +189,7 @@
             <p
               class="{disabled
                 ? 'disabled-text'
-                : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+                : ''} mb-0 w-100 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
                 ? selectedOption.selectedOptionClasses
                 : ''}"
             >
@@ -218,14 +219,15 @@
           <p
             class="{disabled
               ? 'disabled-text'
-              : ''} mb-0 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
+              : ''} mb-0 flex-shrink-0 me-1 {selectedOption?.dynamicClasses} {selectedOption?.selectedOptionClasses
               ? selectedOption.selectedOptionClasses
               : ''}"
+            style="max-width: 15vh;"
           >
             {additonalSelectedOptionText}
           </p>
           <span
-            style="font-size: 12px;"
+            style="font-size: 12px; width: fit-content;"
             id={`${dropdownId}-additional-option`}
             class="text-whiteColor">{additionalSelectedOptionHeading}</span
           >
@@ -261,13 +263,15 @@
             >{additonalSelectedOptionText}</span
           >
         {/if}
-        <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
-          <Dropdown
-            height={12}
-            width={12}
-            color={disabled ? "var(--sparrow-text-color)" : "white"}
-          />
-        </span>
+        {#if showDropdownIcon}
+          <span class:dropdown-logo-active={isOpen} style="margin-left: 10px;">
+            <Dropdown
+              height={12}
+              width={12}
+              color={disabled ? "var(--sparrow-text-color)" : "white"}
+            />
+          </span>
+        {/if}
       </div>
     {:else}
       <div
@@ -370,6 +374,7 @@
   }
   .highlight:hover {
     background-color: #232424;
+    color: var(--sparrow-blue);
   }
   .dropdown-btn {
     cursor: pointer;

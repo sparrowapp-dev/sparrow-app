@@ -11,7 +11,7 @@ interface DeepLinkHandlerWindowsPayload {
   };
 }
 
-const handleLoginThrottler = throttle(handleLoginV2, 5000)
+const handleLoginThrottler = throttle(handleLoginV2, 5000);
 
 export const deepLinkHandlerWindows = async (
   deepLinkUrl: DeepLinkHandlerWindowsPayload,

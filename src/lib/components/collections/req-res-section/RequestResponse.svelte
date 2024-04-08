@@ -11,6 +11,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let currentWorkspace;
 </script>
 
 <div class="d-flex">
@@ -37,6 +38,7 @@
         deleteApiRequest: collectionsMethods.deleteApiRequest,
       }}
       {loggedUserRoleInWorkspace}
+      {currentWorkspace}
     />
     <ApiSendRequestPage
       {activeTab}
