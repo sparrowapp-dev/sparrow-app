@@ -15,16 +15,16 @@
 
   let sidebarItems: SidebarItemObj[] = [
     {
-      route: "/app/workspaces",
-      heading: "Home",
-      logo: home,
+      route: "/app/collections",
+      heading: "Collections",
+      logo: collections,
       disabled: false,
       position: "primary",
     },
     {
-      route: "/app/collections",
-      heading: "Collections",
-      logo: collections,
+      route: "/app/workspaces",
+      heading: "Workspaces",
+      logo: home,
       disabled: false,
       position: "primary",
     },

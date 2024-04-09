@@ -17,8 +17,9 @@
     collectionRightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
-    >Collections List</Pane
+  <Pane size={$collapsibleState ? 0 : $collectionLeftPanelWidth}>
+    <!-- TODO: Add new collection list component -->
+    Collections List</Pane
   >
   <Pane size={$collapsibleState ? 100 : $collectionRightPanelWidth}>
     Tabs
