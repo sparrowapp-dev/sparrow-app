@@ -43,6 +43,7 @@
   export let activePath;
   export let environments = [];
   export let runAnimation: boolean = false;
+  export let refreshEnv;
   let isImportCollectionPopup = false;
   let isImportCurlPopup = false;
   export let changeAnimation: () => void;
@@ -96,21 +97,28 @@
     collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
+  const mapCollectionsWithWorkspace = (_documents, _workspaceId) => {
+    if (_documents) {
+      const collectionArr = _documents
+        .map((collectionDocument: CollectionDocument) => {
+          const collectionObj =
+            collectionsMethods.getCollectionDocument(collectionDocument);
+          return collectionObj;
+        })
+        .filter((collectionDocument: CollectionDocument) => {
+          return collectionDocument.workspaceId === _workspaceId;
+        });
+      collection = collectionArr;
+    }
+    if (searchData || selectedApiMethods.length > 0) {
+      handleSearch();
+    }
+  };
+  let collectionRxDoc = [];
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
-      if (value) {
-        const collectionArr = value.map(
-          (collectionDocument: CollectionDocument) => {
-            const collectionObj =
-              collectionsMethods.getCollectionDocument(collectionDocument);
-            return collectionObj;
-          },
-        );
-        collection = collectionArr;
-      }
-      if (searchData || selectedApiMethods.length > 0) {
-        handleSearch();
-      }
+      collectionRxDoc = value;
+      mapCollectionsWithWorkspace(collectionRxDoc, currentWorkspaceId);
     },
   );
   const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
@@ -169,6 +177,7 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        await refreshEnv(activeWorkspaceRxDoc?._id);
         const env: EnvironmentDocument =
           await collectionsMethods.currentEnvironment(
             activeWorkspaceRxDoc.get("environmentId"),
@@ -181,7 +190,6 @@
             id: "none",
           };
         }
-
         if (isComponentRenderedFirstTime) {
           isLoading = true;
           isComponentRenderedFirstTime = false;
@@ -190,11 +198,15 @@
         currentWorkspaceId = activeWorkspaceRxDoc?._id;
         const workspaceId = activeWorkspaceRxDoc?._id;
         if (trackWorkspaceId !== workspaceId) {
+          mapCollectionsWithWorkspace(collectionRxDoc, workspaceId);
           const response =
             await collectionsMethods.getAllCollections(workspaceId);
           if (response.isSuccessful && response.data.data) {
             const collections = response.data.data;
             isLoading = false;
+            collections.forEach((element) => {
+              element.workspaceId = workspaceId;
+            });
             collectionsMethods.bulkInsert(collections);
           }
         }
@@ -234,7 +246,6 @@
       createdAt: new Date().toISOString(),
     };
 
-    collectionsMethods.addCollection(newCollection);
     const response = await _colllectionListViewModel.addCollection({
       name: newCollection.name,
       workspaceId: currentWorkspaceId,
@@ -242,6 +253,11 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+      collectionsMethods.addCollection({
+        ...res,
+        id: res._id,
+        workspaceId: currentWorkspaceId,
+      });
       collectionUnderCreation = false;
       let path: Path = {
         workspaceId: currentWorkspaceId,
@@ -270,7 +286,6 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(newCollection.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
@@ -596,7 +611,7 @@
       style="overflow:hidden; margin-top:5px;"
     >
       <div class="d-flex flex-column justify-content-center">
-        {#if isLoading}
+        {#if false}
           <div class="spinner">
             <Spinner size={`32px`} />
           </div>
@@ -612,7 +627,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     path={exp.path}
                     explorer={exp.tree}
                     {searchData}
@@ -626,7 +641,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
                   />
@@ -638,7 +653,7 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
                   />
@@ -652,7 +667,7 @@
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}
@@ -668,7 +683,7 @@
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}

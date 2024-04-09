@@ -224,6 +224,7 @@
         collectionsMethods.addCollection({
           ...response.data.data,
           id: response.data.data._id,
+          workspaceId: currentWorkspaceId,
         });
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
@@ -380,6 +381,7 @@
       collectionsMethods.addCollection({
         ...response.data.data,
         id: response.data.data._id,
+        workspaceId: currentWorkspaceId,
       });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
@@ -450,6 +452,7 @@
           ...response.data.data.collection,
           id: response.data.data.collection._id,
           currentBranch: requestBody.currentBranch,
+          workspaceId: currentWorkspaceId,
         });
         _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
           id: Samplecollection.id,

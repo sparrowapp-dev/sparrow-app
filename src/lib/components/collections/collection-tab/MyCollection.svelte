@@ -94,9 +94,7 @@
           } ${date.getDate()}, ${date.getFullYear()}`;
           const response = await _collectionService.switchCollectionBranch(
             currentCollection?.id,
-            currentCollection?.currentBranch
-              ? currentCollection?.currentBranch
-              : currentCollection?.PrimaryBranch,
+            currentCollection?.currentBranch,
           );
           if (response.isSuccessful) {
             isSynced = true;
@@ -189,7 +187,7 @@
     );
     if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
-        currentWorkspaceId,
+        componentData?.path?.workspaceId,
         {
           url: currentCollection?.activeSyncUrl,
           urlData: {
@@ -197,9 +195,7 @@
             headers: responseJSON.data.headers,
           },
           primaryBranch: currentCollection?.primaryBranch,
-          currentBranch: currentCollection?.currentBranch
-            ? currentCollection?.currentBranch
-            : currentCollection?.primaryBranch,
+          currentBranch: currentCollection?.currentBranch,
         },
         currentCollection.activeSync,
       );
@@ -511,15 +507,17 @@
           {/if}
 
           <div class="d-flex flex-column justify-content-center">
-            <button
-              disabled={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-              class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-              style="max-height:60px"
-              on:click={handleApiRequest}>New Request</button
-            >
+            {#if !currentCollection?.activeSync || isSynced}
+              <button
+                disabled={!hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+                class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+                style="max-height:60px"
+                on:click={handleApiRequest}>New Request</button
+              >
+            {/if}
           </div>
         </div>
       </div>

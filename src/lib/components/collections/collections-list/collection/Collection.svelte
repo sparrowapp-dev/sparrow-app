@@ -363,7 +363,7 @@
       });
       deletedIds.push(collectionId);
 
-      if (collection?.activeSync) {
+      if (collection?.activeSync && isBranchSynced) {
         menuItems = [
           {
             onClick: openCollections,
@@ -378,6 +378,21 @@
           {
             onClick: addFolder,
             displayText: "Add Folder",
+            disabled: false,
+          },
+          {
+            onClick: () => {
+              handleCollectionPopUp(true);
+            },
+            displayText: "Delete",
+            disabled: false,
+          },
+        ];
+      } else if (collection?.activeSync && !isBranchSynced) {
+        menuItems = [
+          {
+            onClick: openCollections,
+            displayText: "Open collection",
             disabled: false,
           },
           {

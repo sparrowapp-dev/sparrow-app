@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { CollectionDocument } from "$lib/database/app.database";
+import type {
+  CollectionDocument,
+  WorkspaceDocument,
+} from "$lib/database/app.database";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
@@ -11,11 +14,17 @@ import {
 } from "$lib/store/request-response-section";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
-import type { Collection } from "$lib/utils/interfaces/request.interface";
+import type {
+  Collection,
+  RequestBody,
+} from "$lib/utils/interfaces/request.interface";
 import { EnvironmentService } from "$lib/services-v2/environment.service";
 import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
 import { CollectionService } from "$lib/services/collection.service";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
+import { setContentTypeHeader } from "$lib/utils/helpers";
+import { RequestDataset } from "$lib/utils/enums";
+import { updateCollectionRequest } from "$lib/services/collection";
 export class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
@@ -205,6 +214,10 @@ export class CollectionsViewModel {
     return this.collectionRepository.readCollection(uuid);
   };
 
+  public readWorkspace = (uuid: string): Promise<WorkspaceDocument> => {
+    return this.workspaceRepository.readWorkspace(uuid);
+  };
+
   public updateRequestInFolderCollection = (
     collectionId: string,
     uuid: string,
@@ -385,6 +398,118 @@ export class CollectionsViewModel {
     } else {
       notifications.error("Failed to delete the Request.");
       return false;
+    }
+  };
+
+  public saveAPIRequest = async (
+    componentData,
+    saveDescriptionOnly = false,
+  ) => {
+    const { folderId, folderName, collectionId, workspaceId } =
+      componentData.path;
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+    let existingRequest;
+    if (!folderId) {
+      existingRequest = await this.readRequestOrFolderInCollection(
+        collectionId,
+        _id,
+      );
+    } else {
+      existingRequest = await this.readRequestInFolder(
+        collectionId,
+        folderId,
+        _id,
+      );
+    }
+    const bodyType =
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
+    let expectedRequest: RequestBody;
+    let expectedMetaData;
+    if (!saveDescriptionOnly) {
+      // Save overall api
+      expectedRequest = {
+        method: componentData.property.request.method,
+        url: componentData.property.request.url,
+        body: componentData.property.request.body,
+        headers: componentData.property.request.headers,
+        queryParams: componentData.property.request.queryParams,
+        auth: componentData.property.request.auth,
+        selectedRequestBodyType: setContentTypeHeader(bodyType),
+        selectedRequestAuthType: componentData.property.request.state?.auth,
+      };
+      expectedMetaData = {
+        id: _id,
+        name: componentData?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    } else {
+      // Save api description only
+      expectedRequest = {
+        method: existingRequest?.request.method,
+        url: existingRequest?.request.url,
+        body: existingRequest?.request.body,
+        headers: existingRequest?.request.headers,
+        queryParams: existingRequest?.request.queryParams,
+        auth: existingRequest?.request.auth,
+        selectedRequestBodyType:
+          existingRequest?.request?.selectedRequestBodyType,
+        selectedRequestAuthType:
+          existingRequest?.request?.selectedRequestAuthType,
+      };
+      expectedMetaData = {
+        id: _id,
+        name: existingRequest?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    }
+
+    if (!folderId) {
+      const res = await updateCollectionRequest(_id, folderId, collectionId, {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...userSource,
+        items: {
+          ...expectedMetaData,
+          request: expectedRequest,
+        },
+      });
+      if (res.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      const res = await updateCollectionRequest(_id, folderId, collectionId, {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        folderId: folderId,
+        ...userSource,
+        items: {
+          name: folderName,
+          type: ItemType.FOLDER,
+          items: {
+            ...expectedMetaData,
+            request: expectedRequest,
+          },
+        },
+      });
+      if (res.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 }

@@ -209,7 +209,6 @@
       id: workspacePostInput.id,
       createdAt: new Date(workspaceObj.createdAt).toISOString(),
     };
-    await _viewModel.addWorkspace(workspaceObj);
 
     const response = await _viewModel.createWorkspace(workspaceData);
 
@@ -258,7 +257,6 @@
       handleCreateWorkspaceModal();
     } else {
       //only to remove the dummy workspace at fail workspace creation
-      await _viewModel.removeWorkspace(workspaceObj._id);
       handleCreateWorkspaceModal();
       workspaceUnderCreation = false;
       isWorkspaceLoaded.set(true);

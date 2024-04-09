@@ -54,7 +54,7 @@ export class EnvironmentTabRepository {
     if (existedTab) {
       await existedTab.remove();
     }
-    return del?.get("isActive");
+    return [del?.get("isActive"), del?.get("workspaceId")];
   };
 
   /**
@@ -96,5 +96,34 @@ export class EnvironmentTabRepository {
         return value;
       });
     }
+  };
+
+  /**
+   * Extracts an active environment tab.
+   */
+  public getActiveEnvironmentTab = async (
+    workspaceId,
+  ): EnvironmentTabDocument => {
+    return await RxDB.getInstance()
+      .rxdb.environmenttab.findOne({
+        selector: {
+          isActive: true,
+          workspaceId,
+        },
+      })
+      .exec();
+  };
+
+  /**
+   * remove environment tab by workspaceId
+   */
+  public removeEnvironmentTabs = async (_workspaceId: string): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environmenttab.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .remove();
   };
 }
