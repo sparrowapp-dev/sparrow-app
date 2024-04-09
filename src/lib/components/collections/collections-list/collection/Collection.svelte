@@ -128,6 +128,12 @@
         folderObj,
       );
       return;
+    } else {
+      notifications.error(response.message);
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        folder.id,
+      );
     }
     return;
   };
@@ -192,6 +198,12 @@
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
       return;
+    } else {
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        request.id,
+      );
+      notifications.error(response.message);
     }
   };
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -264,6 +276,11 @@
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
         collectionsMethods.updateTab(newCollectionName, "name", collectionId);
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
       }
     }
     isRenaming = false;
@@ -483,7 +500,10 @@
       collectionsMethods.removeMultipleTabs(deletedIds);
       deleteLoader = false;
     } else {
-      notifications.error("Failed to delete the Collection.");
+      handleCollectionPopUp(false);
+      notifications.error(
+        response.message ?? "Failed to delete the Collection.",
+      );
       deleteLoader = false;
     }
   };
@@ -709,7 +729,11 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip placement="bottom" title="More options" styleProp="bottom: -8px">
+    <Tooltip
+      placement="bottom"
+      title="More options"
+      styleProp="bottom: -8px; {isActiveSyncEnabled ? 'left: -50%' : ''}"
+    >
       <button
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'

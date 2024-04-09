@@ -102,6 +102,8 @@
             );
             if (res.isSuccessful) {
               isValidServerURL = true;
+            } else {
+              notifications.error(res.message);
             }
           } catch (e) {}
         }
@@ -250,6 +252,9 @@
           importThrough: "ByFile",
         });
         return;
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+        progressBar.isLoading = false;
       } else {
         notifications.error("Failed to import collection. Please try again.");
         progressBar.isLoading = false;

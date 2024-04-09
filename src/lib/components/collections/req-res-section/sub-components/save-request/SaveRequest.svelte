@@ -310,6 +310,12 @@
           onClick(false);
           navigateToWorkspace();
           isLoading = false;
+        } else if (res.message === "Network Error") {
+          onClick(false);
+          notifications.error(res.message);
+        } else {
+          onClick(false);
+          notifications.error("Failed tol save the request!");
         }
       } else if (path[path.length - 1].type === ItemType.FOLDER) {
         const _collection = await collectionsMethods.readCollection(path[0].id);
@@ -470,6 +476,8 @@
       });
     } else {
       createDirectoryLoader = false;
+      onClick(false);
+      notifications.error(res.message);
     }
   };
 
@@ -574,7 +582,6 @@
             </small>
           {/if}
         </p>
-
         <small class="save-text-clr" style="font-size: 12px;"
           >Save your request inside a collection or a folder.</small
         >

@@ -56,6 +56,9 @@
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,
       );
+    } else if (response.message === "Network Error") {
+      handleEnvironmentPopUpCancel(false);
+      notifications.error(response.message);
     } else {
       notifications.error(
         `Failed to remove ${env.name} environment from ${currentWorkspace.mame}.`,
@@ -104,6 +107,10 @@
           "name",
           env.id,
         );
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename environment");
       }
     }
     isRenaming = false;
