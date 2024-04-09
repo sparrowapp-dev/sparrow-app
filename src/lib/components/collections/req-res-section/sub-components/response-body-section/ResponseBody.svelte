@@ -95,11 +95,10 @@
   };
 </script>
 
-<div
-  class="d-flex flex-column align-items-start justify-content-between mt-5 w-100"
->
+<div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center justify-content-between mb-2 w-100"
+    class="response-container d-flex align-items-center justify-content-between pb-3 w-100 z-1 position-sticky"
+    style="top:55.4px; background-color: var(--background-color); margin-top: -1px;"
   >
     <div class="d-flex gap-4 align-items-center justify-content-center">
       <div class="bg-dullBackground rounded" style="height: 22px;">
