@@ -260,7 +260,9 @@
       handleCreateWorkspaceModal();
       workspaceUnderCreation = false;
       isWorkspaceLoaded.set(true);
-      notifications.error("Failed to create new Workspace!");
+      notifications.error(
+        response.message ?? "Failed to create new Workspace!",
+      );
     }
   };
 
@@ -372,6 +374,11 @@
         id: "header-dropdown-btn-div",
         styleKey: "maxWidth",
         styleValue: "15vw",
+      },
+      {
+        id: "header-dropdown-btn-text",
+        styleKey: "maxWidth",
+        styleValue: "50%",
       },
     ]}
     activeClasses="border border-labelColor"

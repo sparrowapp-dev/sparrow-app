@@ -223,6 +223,7 @@
               ? selectedOption.selectedOptionClasses
               : ''}"
             style="max-width: 15vh;"
+            id={`${dropdownId}-btn-text`}
           >
             {additonalSelectedOptionText}
           </p>
@@ -276,6 +277,7 @@
     {:else}
       <div
         id={`${dropdownId}-img`}
+        class="dropdownImg"
         style={isOpen ? "background-color: var(--send-button) !important;" : ""}
       >
         <img src={dropDownType.title} alt="+" />
@@ -340,6 +342,13 @@
 </div>
 
 <style>
+  .dropdownImg:hover {
+    border: 1px solid transparent;
+  }
+  .dropdownImg:hover {
+    border: 1px solid var(--request-arc);
+  }
+
   .dropdown-btn {
     background: none;
     outline: none;

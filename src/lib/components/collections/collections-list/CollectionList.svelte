@@ -59,7 +59,7 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { FolderDefault, type WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
   import ImportCollection from "../../collections/collections-list/import-collection/ImportCollection.svelte";
@@ -208,6 +208,9 @@
               element.workspaceId = workspaceId;
             });
             collectionsMethods.bulkInsert(collections);
+          } else {
+            isLoading = false;
+            notifications.error(response.message);
           }
         }
         trackWorkspaceId = workspaceId;
@@ -299,6 +302,8 @@
       return;
     } else {
       activePath = tempActivePath;
+      collectionsMethods.deleteCollection(newCollection.id);
+      notifications.error(response.message ?? "Failed to create collection!");
     }
     return;
   };
@@ -533,7 +538,6 @@
           }}
         />
       </div>
-
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
@@ -620,7 +624,11 @@
             <FilterDropDown {handleSearch} />
           {/if}
           {#if searchData.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
@@ -631,7 +639,7 @@
                     path={exp.path}
                     explorer={exp.tree}
                     {searchData}
-                    folderDetails={exp.folderDetails}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
@@ -641,9 +649,11 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
+                    path={exp.path}
                     workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
@@ -656,12 +666,18 @@
                     workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
             </List>
           {:else if selectedApiMethods.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              minHeight={"180px"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
                   {loggedUserRoleInWorkspace}
@@ -677,7 +693,12 @@
               {/each}
             </List>
           {:else if collection && collection.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              minHeight={"180px"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#each collection as col}
                 <Collection
                   {loggedUserRoleInWorkspace}

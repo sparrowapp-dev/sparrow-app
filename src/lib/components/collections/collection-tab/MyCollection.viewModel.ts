@@ -111,6 +111,9 @@ export class MyCollectionViewModel {
 
       moveNavigation("right");
       return response;
+    } else {
+      collectionsMethods.deleteRequestOrFolderInCollection(componentData.path.collectionId, request.id);
+      return response;
     }
   };
 }

@@ -4,7 +4,7 @@
     collapsibleState,
     isApiCreatedFirstTime,
   } from "$lib/store/request-response-section";
-  import floppyDisk from "$lib/assets/floppy-disk.svg";
+  import floppyDisk from "$lib/assets/floppy-disk.svelte";
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -31,6 +31,7 @@
   import type { Observable } from "rxjs";
   import Button from "$lib/components/buttons/Button.svelte";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
+  import FloppyDisk from "$lib/assets/floppy-disk.svelte";
   import { PenIcon } from "$lib/assets/icons";
   import Pen from "$lib/assets/icons/pen.svelte";
   export let activeTab;
@@ -45,7 +46,7 @@
   const handleBackdrop = (flag) => {
     visibility = flag;
   };
-
+  let saveBtnHover = false;
   let tabName: string = "";
   let componentData: NewTab;
   let existingRequest;
@@ -354,8 +355,8 @@
                     loggedUserRoleInWorkspace,
                     workspaceLevelPermissions.SAVE_REQUEST,
                   )}
-                style="width:140px;"
-                class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-center rounded border-0"
+                style="width:130px;"
+                class="save-request-btn btn btn-primary d-flex align-items-center py-1.6 justify-content-between rounded border-0"
                 on:click={() => {
                   if (
                     componentData?.path.collectionId &&
@@ -366,22 +367,26 @@
                     visibility = true;
                   }
                 }}
+                on:mouseenter={() => (saveBtnHover = true)}
+                on:mouseleave={() => (saveBtnHover = false)}
               >
                 {#if componentData.saveInProgress}
                   <span class="me-1">
                     <Spinner size={"14px"} />
                   </span>
                 {:else}
-                  <img
+                  <!-- <img
                     src={floppyDisk}
                     alt=""
                     style="height: 20px; width:20px;"
+                  /> -->
+                  <FloppyDisk
+                    height={20}
+                    width={20}
+                    color={saveBtnHover ? "var(--background-dark)" : "white"}
                   />
                 {/if}
-                <p
-                  class="mb-0 text-whiteColor sparrow-fs-14"
-                  style="font-weight:400;"
-                >
+                <p class="mb-0 sparrow-fs-14" style="font-weight:400;">
                   Save Request
                 </p>
               </button>
@@ -554,8 +559,14 @@
     border-bottom: 1px solid var(--send-button);
   }
   .save-request-btn {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+  }
+  .save-request-btn:hover {
+    background-color: var(--workspace-hover-color);
+    color: var(--background-dark);
+  }
+  .save-request-btn:active {
+    background-color: var(--button-active);
+    color: white;
   }
   .save-request-dropdown-btn {
     border-top-left-radius: 0 !important;

@@ -19,6 +19,7 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   export let name: string;
   export let id: string;
@@ -427,16 +428,18 @@
   {#if id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu(e);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
+    <Tooltip title="More options" styleProp="left: -50%">
+      <button
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu(e);
+        }}
+      >
+        <img src={threedotIcon} alt="threedotIcon" />
+      </button>
+    </Tooltip>
   {/if}
 </div>
 

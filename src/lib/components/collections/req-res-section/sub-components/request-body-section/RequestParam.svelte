@@ -198,7 +198,7 @@
 </script>
 
 <Splitpanes
-  style={isHorizontal && "height: 78vh; "}
+  style={isHorizontal && "height: calc(100vh - 200px) !important; "}
   on:ready={stylePanes}
   theme=""
   class="splitter-request d-flex align-items-start {isHorizontalMode

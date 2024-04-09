@@ -15,6 +15,7 @@
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   export let user: userDetails;
   export let userType: TeamRole;
   export let openTeam;
@@ -75,71 +76,90 @@
   };
 
   const handleMemberPopUpSuccess = async () => {
+    memberRemovePopupLoader = true;
     const response = await teamServiceMethods.removeMembersAtTeam(
       openTeam.teamId,
       user.id,
     );
-    if (response) {
+    if (!response.message) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
-      memberPopObj.isMemberRemovePopup = false;
       notifications.success(`${user.name} is removed from ${openTeam.name}`);
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
     } else {
       notifications.error(
-        `Failed to remove ${user.name} from ${openTeam.name}`,
+        response ?? `Failed to remove ${user.name} from ${openTeam.name}`,
       );
     }
+    memberPopObj.isMemberRemovePopup = false;
+    memberRemovePopupLoader = false;
   };
   const handleMemberDemotePopUpSuccess = async () => {
+    memberDemotePopupLoader = true;
     const response = await teamServiceMethods.demoteToMemberAtTeam(
       openTeam.teamId,
       user.id,
     );
-    if (response) {
+    if (!response.message) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       memberPopObj.isMemberDemotePopup = false;
       notifications.success(`${user.name} is now a member`);
+    } else if (response.message === "Network Error") {
+      memberPopObj.isMemberDemotePopup = false;
+      notifications.error(response.message);
     } else {
       notifications.error(
         `Failed to change role for ${user.name}. Please try again.`,
       );
     }
+    memberDemotePopupLoader = true;
   };
   export const handleMemberPromotePopUpSuccess = async () => {
+    memberPromotePopupLoader = true;
     const response = await teamServiceMethods.promoteToAdminAtTeam(
       openTeam.teamId,
       user.id,
     );
-    if (response) {
+    if (!response.message) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       memberPopObj.isMemberPromotePopup = false;
       notifications.success(`${user.name} is now an admin`);
+    } else if (response.message === "Network Error") {
+      memberPopObj.isMemberPromotePopup = false;
+      notifications.error(response.message);
     } else {
       notifications.error(
         `Failed to change role for ${user.name}. Please try again.`,
       );
     }
+    memberPromotePopupLoader = false;
   };
 
   const handleMemberOwnershipPopUpSuccess = async () => {
+    memberOwnershipPopupLoader = true;
     const response = await teamServiceMethods.promoteToOwnerAtTeam(
       openTeam.teamId,
       user.id,
     );
-    if (response) {
+    if (!response.message) {
       teamRepositoryMethods.modifyTeam(openTeam.teamId, response);
       await teamServiceMethods.refreshWorkspace(userId);
       memberPopObj.isMemberOwnershipPopup = false;
       notifications.success(
         `${user.name} is now the new Owner of ${openTeam.name}.`,
       );
+    } else if (response.message === "Network Error") {
+      memberPopObj.isMemberOwnershipPopup = false;
+      notifications.error(response.message);
     } else {
       notifications.error(
         `Failed to update access of Owner. Please try again.`,
       );
     }
+    memberOwnershipPopupLoader = false;
   };
   export let getPermissionsData = () => {
     const commonPermissions = [
@@ -244,11 +264,7 @@
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
-      onClick={() => {
-        memberRemovePopupLoader = true;
-        handleMemberPopUpSuccess();
-        memberRemovePopupLoader = false;
-      }}
+      onClick={handleMemberPopUpSuccess}
     />
   </div>
 </ModalWrapperV1>
@@ -316,9 +332,7 @@
       type={"primary"}
       loader={memberPromotePopupLoader}
       onClick={() => {
-        memberPromotePopupLoader = true;
         handleMemberPromotePopUpSuccess();
-        memberPromotePopupLoader = false;
       }}
     />
   </div></ModalWrapperV1
@@ -381,9 +395,7 @@
       type={"primary"}
       loader={memberDemotePopupLoader}
       onClick={() => {
-        memberDemotePopupLoader = true;
         handleMemberDemotePopUpSuccess();
-        memberDemotePopupLoader = false;
       }}
     />
   </div></ModalWrapperV1
@@ -477,9 +489,7 @@
           confirmationError = `Team name does not match.`;
         } else {
           confirmationError = "";
-          memberOwnershipPopupLoader = true;
           handleMemberOwnershipPopUpSuccess();
-          memberOwnershipPopupLoader = false;
         }
       }}
     />

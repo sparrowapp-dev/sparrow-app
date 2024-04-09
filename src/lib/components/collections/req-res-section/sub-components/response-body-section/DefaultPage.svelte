@@ -11,12 +11,12 @@
     const platformName = await platform();
     let controlKey = platformName === "macos" ? "cmd" : "ctrl";
     let altKey = platformName === "macos" ? "option" : "alt";
-     ctrlCommands = {
+    ctrlCommands = {
       "Send Request": controlKey + " + Enter",
       "Save Request": controlKey + " + S",
       "New Request": controlKey + " + N",
     };
-     altCommands = {
+    altCommands = {
       "Edit link": altKey + " + L",
       "Add Parameter": altKey + " + P",
       "Add Header": altKey + " + H",

@@ -481,16 +481,18 @@
     {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
     {:else}
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <Tooltip title="More options" styleProp="left: -50%">
+        <button
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          on:click={(e) => {
+            rightClickContextMenu(e);
+          }}
+        >
+          <img src={threedotIcon} alt="threedotIcon" />
+        </button>
+      </Tooltip>
     {/if}
   </div>
   <div

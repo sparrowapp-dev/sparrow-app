@@ -128,6 +128,12 @@
         folderObj,
       );
       return;
+    } else {
+      notifications.error(response.message);
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        folder.id,
+      );
     }
     return;
   };
@@ -192,6 +198,12 @@
       collectionsMethods.handleCreateTab(request);
       moveNavigation("right");
       return;
+    } else {
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        collectionId,
+        request.id,
+      );
+      notifications.error(response.message);
     }
   };
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -264,6 +276,11 @@
       if (response.isSuccessful) {
         collectionsMethods.updateCollection(collectionId, response.data.data);
         collectionsMethods.updateTab(newCollectionName, "name", collectionId);
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
       }
     }
     isRenaming = false;
@@ -483,7 +500,10 @@
       collectionsMethods.removeMultipleTabs(deletedIds);
       deleteLoader = false;
     } else {
-      notifications.error("Failed to delete the Collection.");
+      handleCollectionPopUp(false);
+      notifications.error(
+        response.message ?? "Failed to delete the Collection.",
+      );
       deleteLoader = false;
     }
   };
@@ -709,39 +729,47 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <button
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu(e);
-      }}
+    <Tooltip
+      placement="bottom"
+      title="More options"
+      styleProp="bottom: -8px; {isActiveSyncEnabled ? 'left: -50%' : ''}"
     >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
-    {#if isActiveSyncEnabled && collection?.activeSync}
       <button
-        class="sync-button p-1 border-0 rounded"
-        on:click={() => {
-          refetchCollection();
-        }}
-        on:mouseenter={() => {
-          isSyncBtnHovered = true;
-        }}
-        on:mouseleave={() => {
-          isSyncBtnHovered = false;
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu(e);
         }}
       >
-        <span
-          class="{refreshCollectionLoader
-            ? 'refresh-collection-loader'
-            : ''}  d-flex justify-content-center align-items-center p-1"
-        >
-          <ReloadCollectionIcon
-            color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
-          />
-        </span>
+        <img src={threedotIcon} alt="threedotIcon" />
       </button>
+    </Tooltip>
+    {#if isActiveSyncEnabled && collection?.activeSync}
+      <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
+        <button
+          class="sync-button p-1 border-0 rounded"
+          on:click={() => {
+            refetchCollection();
+          }}
+          on:mouseenter={() => {
+            isSyncBtnHovered = true;
+          }}
+          on:mouseleave={() => {
+            isSyncBtnHovered = false;
+          }}
+        >
+          <span
+            class="{refreshCollectionLoader
+              ? 'refresh-collection-loader'
+              : ''}  d-flex justify-content-center align-items-center p-1"
+          >
+            <ReloadCollectionIcon
+              color={isSyncBtnHovered ? "var(--active-sync-btn)" : "grey"}
+            />
+          </span>
+        </button>
+      </Tooltip>
     {/if}
   {/if}
 </button>

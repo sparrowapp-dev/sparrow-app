@@ -78,8 +78,11 @@
             closeSparrowDropdown();
           }}
         >
-          <div class="d-flex ellipsis overflow-hidden">
-            <div class="sparrow-img-logo-container mx-2 overflow-hidden">
+          <div class="d-flex ellipsis overflow-hidden" style="max-width: 93%;">
+            <div
+              class="sparrow-img-logo-container me-2 overflow-hidden w-10"
+              style="min-width: 20px;"
+            >
               {#if option.logo == "" || option.logo == undefined}
                 <div
                   class={`m-0 text-defaultColor me-2 text-center align-items-center justify-content-center bg-transparent border-defaultColor sparrow-option-name`}
@@ -98,7 +101,9 @@
             <span class="ellipsis">{option.name}</span>
           </div>
           {#if option.endIconVisible}
-            <PeopleIcon color={"#45494D"} />
+            <div style="width: 5%;">
+              <PeopleIcon color={"#45494D"} />
+            </div>
           {/if}
         </div>
       {/each}
@@ -130,6 +135,11 @@
   .sparrow-select-option:hover {
     background: rgba(19, 19, 19, 0.8);
     backdrop-filter: blur(10px);
+    color: var(--send-button);
+  }
+  .sparrow-select-option:active {
+    background: var(--border-color);
+    color: var(--white-color);
   }
   .sparrow-select-option {
     border-radius: 4px;
