@@ -385,6 +385,7 @@
         headerHighlight={"hover"}
         minBodyWidth={"150px"}
         zIndex={2}
+        menuItem={"v2"}
       />
 
       <CodeMirrorInput

@@ -174,6 +174,7 @@
       headerHighlight={"active"}
       minBodyWidth={"150px"}
       borderRounded={false}
+      menuItem={"v2"}
     />
     <span class="pe-3" />
     {#if mainTab === RequestDataset.RAW}
@@ -210,6 +211,7 @@
         headerHighlight={"active"}
         minBodyWidth={"150px"}
         borderRounded={false}
+        menuItem={"v2"}
       />
     {/if}
   </div>

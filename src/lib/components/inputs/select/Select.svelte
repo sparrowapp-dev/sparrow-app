@@ -1,11 +1,11 @@
 <script lang="ts">
   import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
-  import select from "$lib/assets/dropdown.svg";
   import { slide } from "svelte/transition";
   import { SearchIcon } from "$lib/assets/icons";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
+  import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   /**
    * Determines id of the menu item.
    */
@@ -364,6 +364,13 @@
           >
             {#if menuItem === "v1"}
               <MenuItemsV1
+                {list}
+                {selectedRequest}
+                {checkIcon}
+                {getTextColor}
+              />
+            {:else if menuItem === "v2"}
+              <MenuItemsv2
                 {list}
                 {selectedRequest}
                 {checkIcon}

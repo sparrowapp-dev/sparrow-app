@@ -167,6 +167,7 @@
             headerHighlight={"active"}
             minBodyWidth={"150px"}
             borderRounded={false}
+            menuItem={"v2"}
           />
         </button>
       {/if}
