@@ -86,9 +86,13 @@
         "isSaveInProgress",
         currentEnvironment.id,
       );
-      notifications.error(
-        `Failed to save changes for ${currentEnvironment.name} environment.`,
-      );
+      if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error(
+          `Failed to save changes for ${currentEnvironment.name} environment.`,
+        );
+      }
     }
     if (currentEnvironment.type === environmentType.GLOBAL) {
       MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
