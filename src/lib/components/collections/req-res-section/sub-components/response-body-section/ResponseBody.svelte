@@ -19,6 +19,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
+  import { Select } from "$lib/components/inputs";
 
   export let response;
   export let apiState;
@@ -94,11 +95,10 @@
   };
 </script>
 
-<div
-  class="d-flex flex-column align-items-start justify-content-between mt-5 w-100"
->
+<div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center justify-content-between mb-2 w-100"
+    class="response-container d-flex align-items-center justify-content-between pb-3 w-100 z-1 position-sticky"
+    style="top:55.4px; background-color: var(--background-color); margin-top: -1px;"
   >
     <div class="d-flex gap-4 align-items-center justify-content-center">
       <div class="bg-dullBackground rounded" style="height: 22px;">
@@ -133,37 +133,40 @@
         <button
           class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
         >
-          <Dropdown
-            dropdownId={"hash565"}
-            dropDownType={{ type: "text", title: apiState.responseRaw }}
+          <Select
+            id={"hash565"}
             data={[
               {
                 name: "JSON",
                 id: RequestDataType.JSON,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "XML",
                 id: RequestDataType.XML,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "HTML",
                 id: RequestDataType.HTML,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Javascript",
                 id: RequestDataType.JAVASCRIPT,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Text",
                 id: RequestDataType.TEXT,
-                dynamicClasses: "text-whiteColor",
               },
             ]}
+            titleId={apiState.responseRaw}
             onclick={handleTypeDropdown}
+            headerTheme={"transparent"}
+            borderType={"none"}
+            borderActiveType={"bottom"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"active"}
+            minBodyWidth={"150px"}
+            borderRounded={false}
+            menuItem={"v2"}
           />
         </button>
       {/if}

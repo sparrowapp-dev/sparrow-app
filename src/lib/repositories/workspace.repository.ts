@@ -3,11 +3,16 @@ import { RxDB, type WorkspaceDocument } from "$lib/database/app.database";
 import type { addUsersInWorkspace } from "$lib/utils/dto/workspace-dto";
 import type { WorkspaceRole } from "$lib/utils/enums";
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
-
 import type { Observable } from "rxjs";
+import { CollectionRepository } from "./collection.repository";
+import { EnvironmentRepository } from "./environment.repository";
+import { EnvironmentTabRepository } from "./environment-tab.repository";
 
 export class WorkspaceRepository {
   constructor() {}
+  private collectionRepository = new CollectionRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private environmentTabRepository = new EnvironmentTabRepository();
   /**
    * extracts RxDocument of workspace.
    */
@@ -20,6 +25,10 @@ export class WorkspaceRepository {
    */
   public getWorkspaces = (): Observable<WorkspaceDocument[]> => {
     return RxDB.getInstance().rxdb.workspace.find().$;
+  };
+
+  public getWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find().exec();
   };
 
   /**
@@ -161,6 +170,26 @@ export class WorkspaceRepository {
   };
 
   /**
+   * remove workspaces by teamId
+   */
+  public removeWorkspaces = async (teamId: string): Promise<any> => {
+    const workspaces = await RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        "team.teamId": teamId,
+      },
+    });
+    let workspaceDoc = await workspaces.exec();
+    for (let i = 0; i < workspaceDoc.length; i++) {
+      await this.collectionRepository.removeCollections(workspaceDoc[i]._id);
+      await this.environmentRepository.removeEnvironments(workspaceDoc[i]._id);
+      await this.environmentTabRepository.removeEnvironmentTabs(
+        workspaceDoc[i]._id,
+      );
+    }
+    return await workspaces.remove();
+  };
+
+  /**
    * Activate Initial Workspace
    */
   public activateInitialWorkspace = async (): Promise<string> => {
@@ -220,12 +249,34 @@ export class WorkspaceRepository {
     return;
   };
 
+  public readWorkspace = async (uuid: string): Promise<WorkspaceDocument> => {
+    return await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: uuid,
+        },
+      })
+      .exec();
+  };
+
   /**
    * Sync | refresh data
    */
   public bulkInsertData = async (data: any): Promise<void> => {
-    await this.clearWorkspaces();
-    await RxDB.getInstance().rxdb.workspace.bulkUpsert(data);
+    const workspaces = await this.getWorkspacesDocs();
+    const idToEnvironmentMap = {};
+    workspaces.forEach((element) => {
+      idToEnvironmentMap[element._id] = element?.environmentId ?? "";
+    });
+
+    const revisedWorkspaces = data.map((workspaceObj) => {
+      let workspaceCopy = workspaceObj;
+      workspaceCopy["environmentId"] =
+        idToEnvironmentMap[workspaceCopy._id] ?? "";
+      return workspaceCopy;
+    });
+
+    await RxDB.getInstance().rxdb.workspace.bulkUpsert(revisedWorkspaces);
     return;
   };
 
@@ -260,6 +311,9 @@ export class WorkspaceRepository {
         },
       })
       .exec();
+    await this.collectionRepository.removeCollections(workspaceId);
+    await this.environmentRepository.removeEnvironments(workspaceId);
+    await this.environmentTabRepository.removeEnvironmentTabs(workspaceId);
     return await workspace.remove();
   };
   public addUserInWorkspace = async (

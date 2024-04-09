@@ -23,6 +23,7 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "$lib/database/app.database";
   import { onDestroy } from "svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
@@ -62,92 +63,16 @@
   let loader: boolean = false;
 
   const handleSaveRequest = async () => {
-    let userSource = {};
-    if (componentData?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
-        source: "USER",
-      };
-    }
-    const _id = componentData.id;
+    const id = componentData?.id;
     loader = true;
-    const { folderId, folderName, collectionId, workspaceId } =
-      componentData.path;
-    const bodyType =
-      componentData.property.request.state.dataset === RequestDataset.RAW
-        ? componentData.property.request.state.raw
-        : componentData.property.request.state.dataset;
-    const authType = componentData.property.request.state?.auth;
-    const expectedRequest: RequestBody = {
-      method: componentData.property.request.method,
-      url: componentData.property.request.url,
-      body: componentData.property.request.body,
-      headers: componentData.property.request.headers,
-      queryParams: componentData.property.request.queryParams,
-      auth: componentData.property.request.auth,
-      selectedRequestBodyType: setContentTypeHeader(bodyType),
-      selectedRequestAuthType: authType,
-    };
-
-    if (!folderId) {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        ...userSource,
-        items: {
-          id: _id,
-          name: componentData.name,
-          description: componentData.description,
-          type: ItemType.REQUEST,
-          request: expectedRequest,
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestOrFolderInCollection(
-          collectionId,
-          _id,
-          res.data.data,
-        );
-        loader = false;
-        onFinish(_id);
-        closeCallback(false);
-      } else {
-        loader = false;
-      }
-    } else {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: folderName,
-          type: ItemType.FOLDER,
-          items: {
-            id: _id,
-            name: componentData.name,
-            description: componentData.description,
-            type: ItemType.REQUEST,
-            request: expectedRequest,
-          },
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestInFolder(
-          collectionId,
-          folderId,
-          _id,
-          res.data.data,
-        );
-        loader = false;
-        onFinish(_id);
-        closeCallback(false);
-      } else {
-        loader = false;
-      }
+    const res = await collectionsMethods.saveApiRequest(componentData);
+    if (res) {
+      loader = false;
+      onFinish(id);
+      closeCallback(false);
+      notifications.success("API request saved");
     }
+    loader = false;
   };
 
   onDestroy(() => {
@@ -155,7 +80,7 @@
   });
 </script>
 
-<div class="pb-3">
+<div class="pt-2 pb-4">
   <small class="">
     You have unsaved changes. Do you want to save them before closing the file?
   </small>

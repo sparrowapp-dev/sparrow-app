@@ -32,7 +32,9 @@
     on:introstart
     on:outroend
   >
-    <div class="sparrow-modal-header justify-content-between d-flex">
+    <div
+      class="sparrow-modal-header justify-content-between d-flex align-items-start"
+    >
       <div class="d-flex ellipsis">
         {#if icon === "warning"}
           <img src={warningIcon} height="26px" class="me-2" alt="" />

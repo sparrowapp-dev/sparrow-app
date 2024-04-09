@@ -19,15 +19,15 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { CollectionService } from "$lib/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { ModalWrapperV1 } from "$lib/components";
-  import Select from "$lib/components/inputs/Select.svelte";
+  import { Select } from "$lib/components/inputs";
   import { GitBranchIcon } from "$lib/assets/icons";
+  import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
 
   export let loaderColor = "default";
   export let activeTab;
@@ -35,6 +35,7 @@
   export let _collectionListViewModel: CollectionListViewModel;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   export let currentWorkspaceId: "";
+  export let currentWorkspace;
 
   const _collectionService = new CollectionService();
   const _viewImportCollection = new ImportCollectionViewModel();
@@ -63,6 +64,21 @@
   });
   let collectionCountArr = [];
   let currentCollection;
+  let lastUpdatedAt;
+  const monthNamesAbbreviated = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const refreshCount = () => {
     if (collectionCountArr && activeTabId) {
       collectionCountArr.forEach(async (collection) => {
@@ -72,11 +88,13 @@
           totalRequest = collectionData.requestCount;
           totalFolder = collectionData.folderCount;
           currentCollection = collection;
+          const date = new Date(currentCollection.updatedAt);
+          lastUpdatedAt = `${
+            monthNamesAbbreviated[date.getMonth()]
+          } ${date.getDate()}, ${date.getFullYear()}`;
           const response = await _collectionService.switchCollectionBranch(
             currentCollection?.id,
-            currentCollection?.currentBranch
-              ? currentCollection?.currentBranch
-              : currentCollection?.PrimaryBranch,
+            currentCollection?.currentBranch,
           );
           if (response.isSuccessful) {
             isSynced = true;
@@ -169,7 +187,7 @@
     );
     if (responseJSON?.data?.status === ResponseStatusCode.OK) {
       const response = await _viewImportCollection.importCollectionData(
-        currentWorkspaceId,
+        componentData?.path?.workspaceId,
         {
           url: currentCollection?.activeSyncUrl,
           urlData: {
@@ -177,9 +195,7 @@
             headers: responseJSON.data.headers,
           },
           primaryBranch: currentCollection?.primaryBranch,
-          currentBranch: currentCollection?.currentBranch
-            ? currentCollection?.currentBranch
-            : currentCollection?.primaryBranch,
+          currentBranch: currentCollection?.currentBranch,
         },
         currentCollection.activeSync,
       );
@@ -380,14 +396,17 @@
                 isError={false}
                 iconRequired={true}
                 icon={GitBranchIcon}
-                rounded={true}
+                borderRounded={true}
                 search={true}
                 borderType={"none"}
                 borderActiveType={"all"}
                 headerTheme={"transparent"}
+                bodyTheme={"dark"}
+                headerHighlight={"hover-active"}
+                borderHighlight={"hover-active"}
                 searchText={"Search Branch"}
-                searchErrorMessage={"No branch found"}
-                id={"hashfderef128"}
+                searchErrorMessage={"No results found."}
+                id={"git-branch-select"}
                 data={[
                   ...currentCollection.branches.map((elem) => {
                     elem.id = elem.name;
@@ -401,13 +420,13 @@
                   (value, index, self) =>
                     index === self.findIndex((t) => t.id === value.id),
                 )}
-                title={currentCollection?.currentBranch
+                titleId={currentCollection?.currentBranch
                   ? currentCollection?.currentBranch
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
-                maxHeight={"150px"}
-                minWidth={"190px"}
-                maxWidth={"250px"}
+                maxBodyHeight={"150px"}
+                minHeaderWidth={"190px"}
+                maxHeaderWidth={"250px"}
               >
                 <div slot="pre-select">
                   <div class="d-flex justify-content-between p-2">
@@ -433,7 +452,9 @@
                 </div>
                 <div slot="post-select" class="d-none">
                   <hr class="mb-2 mt-2" />
-                  <p class="sparrow-fs-12 mb-2 ps-2 pe-2">View all Branches</p>
+                  <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
+                    View all Branches
+                  </p>
                 </div>
               </Select>
               <button
@@ -444,6 +465,27 @@
               >
                 <img src={refreshIcon} alt="refetch" />
               </button>
+            </div>
+            <div class="pt-2 ps-2 d-flex align-items-center">
+              {#if currentWorkspace?.users}
+                <div class="d-flex">
+                  <UserProfileList
+                    width={25}
+                    height={25}
+                    borderRadius={24}
+                    users={currentWorkspace.users}
+                    maxProfiles={3}
+                    classProp="position-absolute"
+                  />
+                </div>
+              {/if}
+              <div class="ps-2">
+                <p class="sparrow-fs-12 mb-0">
+                  <span class="text-textColor"> Last updated on: </span>
+                  {lastUpdatedAt} <span class="text-textColor">by:</span>
+                  {currentCollection.updatedBy.name}
+                </p>
+              </div>
             </div>
           {/if}
         </div>
@@ -465,15 +507,17 @@
           {/if}
 
           <div class="d-flex flex-column justify-content-center">
-            <button
-              disabled={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
-              class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-              style="max-height:60px"
-              on:click={handleApiRequest}>New Request</button
-            >
+            {#if !currentCollection?.activeSync || isSynced}
+              <button
+                disabled={!hasWorkpaceLevelPermission(
+                  loggedUserRoleInWorkspace,
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+                class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+                style="max-height:60px"
+                on:click={handleApiRequest}>New Request</button
+              >
+            {/if}
           </div>
         </div>
       </div>
@@ -577,7 +621,7 @@
   }
 
   .my-collection {
-    padding: 20px;
+    padding: 10px;
   }
 
   .input-outline {

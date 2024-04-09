@@ -1,5 +1,6 @@
 <script lang="ts">
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import Select from "$lib/components/inputs/select/Select.svelte";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
   import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
@@ -57,7 +58,7 @@
   >
     <p class="col-2 mb-0">Auth Key</p>
 
-    <div class="col-10 position-relative">
+    <div class="col-10 ps-2 position-relative">
       <input
         type="text"
         style="outline: none;"
@@ -118,7 +119,7 @@
     style="font-size: 12px; font-weight:500"
   >
     <p class="col-2 mb-0">Auth Value</p>
-    <div class="col-10 position-relative">
+    <div class="col-10 ps-2 position-relative">
       <input
         type="text"
         style="outline: none;"
@@ -182,21 +183,28 @@
     <div class="col-10 p-2 ps-0 position-relative">
       <button class="bg-backgroundColor border-0">
         <p class="">
-          <Dropdown
-            dropDownType={{ type: "text", title: apiData.addTo }}
+          <Select
+            id={"hash156"}
             data={[
               {
                 name: "Header",
                 id: AuthSection.HEADER,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Query Parameter",
                 id: AuthSection.QUERY_PARAMETER,
-                dynamicClasses: "text-whiteColor",
               },
             ]}
+            titleId={apiData.addTo}
             onclick={handleDropdown}
+            headerTheme={"transparent"}
+            borderType={"none"}
+            borderActiveType={"bottom"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"active"}
+            minBodyWidth={"150px"}
+            borderRounded={false}
+            menuItem={"v2"}
           />
         </p>
       </button>

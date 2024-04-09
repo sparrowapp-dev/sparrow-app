@@ -20,7 +20,7 @@ export function replaceSlashWithGreaterThanSymbol(str: string) {
   const stringWithoutFirstSlash = str.replace(/^\//, "");
   const replacedStringwithoutSlash = stringWithoutFirstSlash.replace(
     /([^/])\//g,
-    "$1>",
+    "$1 > ",
   );
 
   return replacedStringwithoutSlash;

@@ -1,3 +1,4 @@
+import yaml from "js-yaml";
 export function isUrlValid(str: string) {
   const pattern = new RegExp(
     "^(https?:\\/\\/)?" + // protocol
@@ -39,17 +40,16 @@ export const validateClientJSON = (jsonString = "") => {
   }
 };
 
-export const validateClientXML = (xmlString = "") => {
-  const parser = new DOMParser();
-
+export const validateClientXML = (yamlString = "") => {
   try {
-    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-    const parseErrors = xmlDoc.getElementsByTagName("parsererror");
-    if (parseErrors.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
+    const parsedYaml = yaml.load(yamlString);
+
+    // Check if parsed content is either an object or an array
+    return (
+      typeof parsedYaml === "object" &&
+      parsedYaml !== null &&
+      !Array.isArray(parsedYaml)
+    );
   } catch (error) {
     return false;
   }

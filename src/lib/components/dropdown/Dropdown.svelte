@@ -193,7 +193,7 @@
                 ? selectedOption.selectedOptionClasses
                 : ''}"
             >
-              {selectedOption?.name}
+              {selectedOption?.name || ""}
               <span id={`${dropdownId}-additional-option`}
                 >{additonalSelectedOptionText}</span
               >
@@ -237,7 +237,7 @@
           {:else}
             <p class=" mb-0 ellipsis">
               <span class="text-sparrowBottomBorder">ENVIRONMENT</span>
-              {selectedOption?.name}
+              {selectedOption?.name || ""}
             </p>
           {/if}
         {:else if additionalType === "branch"}
@@ -276,6 +276,7 @@
     {:else}
       <div
         id={`${dropdownId}-img`}
+        class="dropdownImg"
         style={isOpen ? "background-color: var(--send-button) !important;" : ""}
       >
         <img src={dropDownType.title} alt="+" />
@@ -340,6 +341,13 @@
 </div>
 
 <style>
+  .dropdownImg:hover {
+    border: 1px solid transparent;
+  }
+  .dropdownImg:hover {
+    border: 1px solid var(--request-arc);
+  }
+
   .dropdown-btn {
     background: none;
     outline: none;

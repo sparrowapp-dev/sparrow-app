@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { TabDocument } from "$lib/database/app.database";
+  import type {
+    EnvironmentDocument,
+    TabDocument,
+  } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
   import RequestParam from "./sub-components/request-body-section/RequestParam.svelte";
@@ -11,6 +14,7 @@
   export let collectionsMethods: CollectionsMethods;
   export let environmentVariables;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let currentWorkspace;
 </script>
 
 <div class="d-flex">
@@ -33,10 +37,14 @@
         setRequestSave: collectionsMethods.setRequestSave,
         handleCreateTab: collectionsMethods.handleCreateTab,
         addCollection: collectionsMethods.addCollection,
+        readWorkspace: collectionsMethods.readWorkspace,
+        readCollection: collectionsMethods.readCollection,
+        saveApiRequest: collectionsMethods.saveApiRequest,
         collection: collectionsMethods.collection,
         deleteApiRequest: collectionsMethods.deleteApiRequest,
       }}
       {loggedUserRoleInWorkspace}
+      {currentWorkspace}
     />
     <ApiSendRequestPage
       {activeTab}
