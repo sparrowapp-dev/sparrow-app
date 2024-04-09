@@ -33,7 +33,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import { ResponseStatusCode, type WorkspaceRole } from "$lib/utils/enums";
+  import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
@@ -47,13 +47,14 @@
   export let collection: any;
   export let collectionId: string;
   export let currentWorkspaceId: string;
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let loggedUserRoleInWorkspace: WorkspaceRole =
+    WorkspaceRole.WORKSPACE_VIEWER;
 
   let showFolderAPIButtons: boolean = true;
   export let collectionList;
   export let collectionsMethods: CollectionsMethods;
   export let activeTabId: string;
-  export let activePath;
+  export let activePath: string;
   const _viewImportCollection = new ImportCollectionViewModel();
   const collectionService = new CollectionService();
   const commonService = new CommonService();
@@ -785,11 +786,9 @@
           <Folder
             {loggedUserRoleInWorkspace}
             {collectionsMethods}
-            {collectionList}
             {collectionId}
             {currentWorkspaceId}
             explorer={exp}
-            {visibility}
             {activeTabId}
             {activePath}
             activeSync={collection?.activeSync}

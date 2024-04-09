@@ -3,7 +3,7 @@ import type { EditorView } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { RequestDataType } from "$lib/utils/enums";
 import { html } from "@codemirror/lang-html";
-import { jsonSetup } from "./codeMirrorTheme";
+import { jsonSetup } from "./code-mirror-themes/BasicCodeMirrorTheme";
 import { xml } from "@codemirror/lang-xml";
 
 const CodeMirrorViewHandler = (

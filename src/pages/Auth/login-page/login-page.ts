@@ -13,7 +13,7 @@ import {
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-import ActiveSideBarTabViewModel from "./../../dashboard/ActiveSideBarTab.ViewModel";
+import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
 //------------------------------MixPanel-------------------------------//
 export const sendUserDataToMixpanel = (userDetails) => {
   if (constants.ENABLE_MIX_PANEL === "true") {

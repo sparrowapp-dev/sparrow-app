@@ -12,6 +12,8 @@ import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboar
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Response } from "$lib/utils/interfaces/request.interface";
+
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const error = (
@@ -120,7 +122,7 @@ const makeRequest = async (
       await _viewModel.clientLogout();
       return error("Unauthorized");
     }
-    if (e.code === "ERR_NETWORK" ) {
+    if (e.code === "ERR_NETWORK") {
       return error(e.message);
     } else if (e.response?.data) {
       return error(e.response?.data?.message);
@@ -178,11 +180,35 @@ const makeHttpRequest = async (
     });
 };
 
+const makeHttpRequestV2 = async (url: string, method: string) => {
+  // create a race condition between the timeout and the api call
+  return Promise.race([
+    timeout(apiTimeOut),
+    invoke("make_http_request_v2", {
+      url,
+      method,
+    }),
+  ])
+    .then(async (data: string) => {
+      try {
+        const responseBody = JSON.parse(data);
+        const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+        return success(apiResponse, "");
+      } catch (e) {
+        return error("error");
+      }
+    })
+    .catch(() => {
+      return error("error");
+    });
+};
+
 export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
   makeHttpRequest,
   getMultipartAuthHeaders,
+  makeHttpRequestV2,
   // getHeaders,
 };

@@ -8,7 +8,6 @@ import type {
 } from "../dto";
 import type { Observable } from "rxjs";
 import type { Collection } from "./request.interface";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CollectionsMethods {
   handleActiveTab: (id: string) => void;
   handleRemoveTab: (id: string) => void;

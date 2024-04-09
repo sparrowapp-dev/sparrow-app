@@ -25,7 +25,7 @@ export interface Path {
  */
 
 export interface Response {
-  headers: string;
+  headers: KeyValuePair[];
   status: string;
   body: string;
   time: number;

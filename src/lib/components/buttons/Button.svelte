@@ -10,6 +10,7 @@
   export let buttonClassProp = "";
   export let textClassProp = "";
   export let textStyleProp = "";
+  export let buttonStartIcon: string | undefined = undefined;
   export let allowChild = false;
   export let type:
     | "primary"
@@ -26,6 +27,8 @@
     OTHER = "other",
     ICON = "icon",
   }
+
+  // define button variants
   let btnClass = "";
   switch (type) {
     case BtnType.PRIMARY:
@@ -53,7 +56,7 @@
   disabled={disable}
   style={`${buttonStyleProp} ${
     type !== "other" && type !== "icon"
-      ? "border-radius: 4px; padding: 6px 12px;"
+      ? "border-radius: 4px; padding: 6px 12px; white-space: nowrap;"
       : ""
   } `}
   class={`${buttonClassProp} ${
@@ -65,11 +68,19 @@
     onClick(e);
   }}
 >
+  {#if buttonStartIcon !== undefined}
+    <img
+      src={buttonStartIcon}
+      class="me-2"
+      style="height: 20px; width:20px;"
+      alt="icon"
+    />
+  {/if}
   {#if loader && !allowChild}
     <span class="mx-2 d-flex justify-content-center">
       <Spinner size={`${loaderSize}px`} />
     </span>
-  {:else if !loader && !allowChild}
+  {:else if !loader && !allowChild && title !== ""}
     <span class={textClassProp} style={textStyleProp}>
       {title}
     </span>

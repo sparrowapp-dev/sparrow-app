@@ -150,7 +150,7 @@ export class CollectionRepository {
     if (col.length > 0) {
       if (recursionLimit === 5) {
         revisedCollections = col.map((collectionObj) => {
-          let temp = JSON.parse(JSON.stringify(collectionObj));
+          const temp = JSON.parse(JSON.stringify(collectionObj));
 
           temp["id"] = temp._id;
 

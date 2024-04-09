@@ -178,7 +178,7 @@ export class WorkspaceRepository {
         "team.teamId": teamId,
       },
     });
-    let workspaceDoc = await workspaces.exec();
+    const workspaceDoc = await workspaces.exec();
     for (let i = 0; i < workspaceDoc.length; i++) {
       await this.collectionRepository.removeCollections(workspaceDoc[i]._id);
       await this.environmentRepository.removeEnvironments(workspaceDoc[i]._id);
@@ -270,7 +270,7 @@ export class WorkspaceRepository {
     });
 
     const revisedWorkspaces = data.map((workspaceObj) => {
-      let workspaceCopy = workspaceObj;
+      const workspaceCopy = workspaceObj;
       workspaceCopy["environmentId"] =
         idToEnvironmentMap[workspaceCopy._id] ?? "";
       return workspaceCopy;
