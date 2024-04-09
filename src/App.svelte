@@ -21,6 +21,7 @@
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
   import { getCurrent } from "@tauri-apps/api/window";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
   const tabRepository = new TabRepository();
@@ -65,6 +66,7 @@
     await getCurrent().setFocus();
     await getCurrent().center();
     await registerDeepLinkHandler();
+    await singleInstanceHandler();
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

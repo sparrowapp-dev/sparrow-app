@@ -19,11 +19,28 @@
   export let filteredCollection: any[];
   export let workspaces: any[];
   export let activeWorkspaceId: string;
-  export let handleDropdown: (id: string, name: string, team: any) => void;
+  export let handleDropdown: (id: string) => void;
   let currentSelectedId = "all";
 
   function getIndex(text: string, searchData: string): number {
     return text.toLowerCase().indexOf(searchData.toLowerCase());
+  }
+
+  let mapCollectionWithWorkspaceAndTeam = {};
+  $: {
+    if (workspaces) {
+      mapCollectionWithWorkspaceAndTeam = {};
+      workspaces.forEach((_workspace) => {
+        _workspace.collections.forEach((_collection) => {
+          mapCollectionWithWorkspaceAndTeam[_collection.id] = {
+            workspaceId: _workspace._id,
+            workspaceName: _workspace.name,
+            teamId: _workspace.team.teamId,
+            teamName: _workspace.team.teamName,
+          };
+        });
+      });
+    }
   }
 
   function handleSelection(id: string) {
@@ -44,7 +61,7 @@
 
   const handleWorkspaceClick = (id: string, name: string, team: any) => {
     if (id !== activeWorkspaceId) {
-      handleDropdown(id, name, team);
+      handleDropdown(id);
     }
     handleGlobalSearchPopup(false);
   };
@@ -108,16 +125,19 @@
     </button>
   </div>
   <div class="search-options-container">
-    {#if searchData.length > 0}
+    {#if searchData.length >= 0}
       {#if filteredRequest.length > 0 && (currentSelectedId === "all" || currentSelectedId === "request")}
         {#each filteredRequest as filterRequest}
           <button
             class="request-btn"
             on:click={() => {
+              if (filterRequest.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterRequest.workspaceId);
+              }
               handleRequestClick(
                 filterRequest.tree,
                 {
-                  workspaceId: activeWorkspaceId,
+                  workspaceId: filterRequest.workspaceId,
                   collectionId: filterRequest.collectionId,
                   folderId: filterRequest.folderDetails
                     ? filterRequest.folderDetails.id
@@ -161,7 +181,15 @@
             <div class="api-path ellipsis">
               <span
                 >{filterRequest.path
-                  ? replaceSlashWithGreaterThanSymbol(filterRequest.path)
+                  ? mapCollectionWithWorkspaceAndTeam[
+                      filterRequest.collectionId
+                    ]?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[
+                      filterRequest.collectionId
+                    ]?.workspaceName +
+                    " > " +
+                    replaceSlashWithGreaterThanSymbol(filterRequest.path)
                   : ""}</span
               >
             </div>
@@ -173,9 +201,12 @@
           <button
             class="folder-btn"
             on:click={() => {
+              if (filterFolder.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterFolder.workspaceId);
+              }
               handleFolderClick(
                 filterFolder.tree,
-                activeWorkspaceId,
+                filterFolder.workspaceId,
                 filterFolder.collectionId,
                 filterFolder.activeSync,
               );
@@ -208,7 +239,13 @@
             <div class="api-path ellipsis">
               <span
                 >{filterFolder.path
-                  ? replaceSlashWithGreaterThanSymbol(filterFolder.path)
+                  ? mapCollectionWithWorkspaceAndTeam[filterFolder.collectionId]
+                      ?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[filterFolder.collectionId]
+                      ?.workspaceName +
+                    " > " +
+                    replaceSlashWithGreaterThanSymbol(filterFolder.path)
                   : ""}</span
               >
             </div>
@@ -220,9 +257,12 @@
           <button
             class="collection-btn"
             on:click={() => {
+              if (filterCollection.workspaceId !== activeWorkspaceId) {
+                handleDropdown(filterCollection.workspaceId);
+              }
               handleCollectionClick(
                 filterCollection.tree,
-                activeWorkspaceId,
+                filterCollection.workspaceId,
                 filterCollection.tree._id,
               );
               handleGlobalSearchPopup(false);
@@ -257,8 +297,14 @@
             </div>
             <div class="api-path ellipsis">
               <span
-                >{filterCollection.path
-                  ? replaceSlashWithGreaterThanSymbol(filterCollection.path)
+                >{true
+                  ? mapCollectionWithWorkspaceAndTeam[
+                      filterCollection.collectionId
+                    ]?.teamName +
+                    " > " +
+                    mapCollectionWithWorkspaceAndTeam[
+                      filterCollection.collectionId
+                    ]?.workspaceName
                   : ""}</span
               >
             </div>
@@ -304,12 +350,15 @@
                   )}
                 </span>
               </div>
+              <div class="api-path ellipsis">
+                <span>{true ? workspace?.team?.teamName : ""}</span>
+              </div>
             </button>
           {/if}
         {/each}
       {/if}
       {#if filteredRequest.length === 0 && filteredCollection.length === 0 && filteredFolder.length === 0 && !workspaces.some(isFilteredWorkspaces)}
-        <p class="result-none">No Results Found</p>
+        <p class="result-none text-muted sparrow-fs-16">No Results Found</p>
       {/if}
     {/if}
   </div>
@@ -392,9 +441,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: Roboto;
-    font-size: 20px;
-    font-weight: 600;
     color: var(--lightGray);
   }
   .request-btn:hover,

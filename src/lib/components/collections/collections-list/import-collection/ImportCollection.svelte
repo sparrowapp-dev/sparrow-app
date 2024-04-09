@@ -14,7 +14,7 @@
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { CollectionService } from "$lib/services/collection.service";
-  import Select from "$lib/components/inputs/Select.svelte";
+  import { Select } from "$lib/components/inputs";
   import {
     debounce,
     isUrlValid,
@@ -24,7 +24,6 @@
   } from "../collection/collection-utils/utils";
   import linkIcon from "$lib/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
@@ -227,6 +226,7 @@
         collectionsMethods.addCollection({
           ...response.data.data,
           id: response.data.data._id,
+          workspaceId: currentWorkspaceId,
         });
         const Samplecollection = generateSampleCollection(
           response.data.data._id,
@@ -390,6 +390,7 @@
       collectionsMethods.addCollection({
         ...response.data.data,
         id: response.data.data._id,
+        workspaceId: currentWorkspaceId,
       });
       const Samplecollection = generateSampleCollection(
         response.data.data._id,
@@ -460,6 +461,7 @@
           ...response.data.data.collection,
           id: response.data.data.collection._id,
           currentBranch: requestBody.currentBranch,
+          workspaceId: currentWorkspaceId,
         });
         _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
           id: Samplecollection.id,
@@ -496,6 +498,7 @@
   const extractGitBranch = async (filePathResponse) => {
     repositoryPath = "";
     currentBranch = "";
+    repositoryBranch = "not exist";
     getBranchList = [];
     isRepositoryPath = false;
 
@@ -507,14 +510,21 @@
       if (response) {
         getBranchList = response
           .filter((elem) => {
-            if (elem.includes("upstream/")) return false;
-            else if (elem.includes("origin/HEAD")) return false;
+            if (elem.startsWith("upstream/")) return false;
+            else if (elem.startsWith("origin/HEAD -> origin/")) {
+              const branchIterator = elem;
+              repositoryBranch = branchIterator.replace(
+                /^origin\/HEAD -> origin\//,
+                "",
+              );
+              return false;
+            }
             return true;
           })
           .map((elem) => {
             return {
-              name: elem.replace("origin/", ""),
-              id: elem.replace("origin/", ""),
+              name: elem.replace(/^origin\//, ""),
+              id: elem.replace(/^origin\//, ""),
               hide: false,
             };
           });
@@ -703,7 +713,7 @@
 
   {#if importType === "file"}
     <div class="importData-lightGray sparrow-fs-14">
-      <p class="mb-1">Drag and drop your YAML/JSON file</p>
+      <p class="mb-1">Upload YAML/JSON file</p>
     </div>
     <div>
       <DragDrop
@@ -721,7 +731,7 @@
         showFileSizeError={uploadCollection.file.showFileSizeError}
         showFileTypeError={uploadCollection.file.showFileTypeError}
         type={"file"}
-        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
+        fileTypeError="The file type you are trying to upload is not supported. Please re-upload in any of the following file formats."
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
@@ -861,14 +871,15 @@
                       name: "Select Branch",
                       id: "not exist",
                       color: "whiteColor",
+                      default: true,
                       hide: true,
                     },
                     ...getBranchList,
                   ]}
                   titleId={repositoryBranch}
                   onclick={handleDropdown}
-                  maxHeight={"150px"}
-                  maxWidth={"900px"}
+                  maxBodyHeight={"150px"}
+                  maxHeaderWidth={"900px"}
                 />
               </div>
               {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
