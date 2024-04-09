@@ -49,7 +49,7 @@
     style="font-size: 12px; font-weight:500"
   >
     <p class="col-2 mb-0">Username</p>
-    <div class="col-10 position-relative">
+    <div class="col-10 ps-2 position-relative">
       <input
         type="text"
         style="outline: none;"
@@ -112,7 +112,7 @@
   >
     <p class="col-2 mb-0">Password</p>
 
-    <div class="col-10 position-relative">
+    <div class="col-10 ps-2 position-relative">
       <input
         type="text"
         style="outline: none;"

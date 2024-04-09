@@ -5,6 +5,7 @@ import { EnvironmentRepository } from "$lib/repositories/environment.repository"
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import {
+  progressiveTab,
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
@@ -72,6 +73,7 @@ export class CollectionsViewModel {
 
   public clearTabs = () => {
     tabs.set([]);
+    progressiveTab.set({});
     this.debouncedTab();
   };
 
@@ -353,10 +355,9 @@ export class CollectionsViewModel {
     folderId,
   ): boolean => {
     let userSource = {};
-    if (activeSync && source === "USER") {
+    if (activeSync) {
       userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
+        currentBranch: currentBranch,
       };
     }
 

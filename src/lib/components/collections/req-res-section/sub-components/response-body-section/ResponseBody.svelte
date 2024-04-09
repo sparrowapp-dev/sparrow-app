@@ -19,6 +19,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
+  import { Select } from "$lib/components/inputs";
 
   export let response;
   export let apiState;
@@ -133,37 +134,40 @@
         <button
           class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
         >
-          <Dropdown
-            dropdownId={"hash565"}
-            dropDownType={{ type: "text", title: apiState.responseRaw }}
+          <Select
+            id={"hash565"}
             data={[
               {
                 name: "JSON",
                 id: RequestDataType.JSON,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "XML",
                 id: RequestDataType.XML,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "HTML",
                 id: RequestDataType.HTML,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Javascript",
                 id: RequestDataType.JAVASCRIPT,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Text",
                 id: RequestDataType.TEXT,
-                dynamicClasses: "text-whiteColor",
               },
             ]}
+            titleId={apiState.responseRaw}
             onclick={handleTypeDropdown}
+            headerTheme={"transparent"}
+            borderType={"none"}
+            borderActiveType={"bottom"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"active"}
+            minBodyWidth={"150px"}
+            borderRounded={false}
+            menuItem={"v2"}
           />
         </button>
       {/if}
