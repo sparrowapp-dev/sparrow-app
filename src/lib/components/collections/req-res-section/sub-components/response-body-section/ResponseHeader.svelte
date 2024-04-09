@@ -4,8 +4,7 @@
 </script>
 
 <div
-  style="height: 400px;overflow:auto;"
-  class="d-flex flex-column align-items-center bg-backgroundColor mt-5 w-100 pe-2"
+  class="d-flex flex-column align-items-center bg-backgroundColor pt-0 w-100 pe-2"
 >
   {#each responseHeader as [key, value]}
     <div

@@ -225,30 +225,6 @@ export class HeaderDashboardViewModel {
     return response;
   };
 
-  public refreshEnvironment = async (data, workspaceId) => {
-    this.environmentRepository.refreshEnvironment(data, workspaceId);
-    if (data) {
-      data.forEach((environment) => {
-        if (environment.type === environmentType.GLOBAL) {
-          const sampleEnvironment = generateSampleEnvironment(
-            environment.id,
-            workspaceId,
-            new Date().toString(),
-          );
-          sampleEnvironment.name = environment.name;
-          sampleEnvironment.isActive = true;
-          sampleEnvironment.type = environmentType.GLOBAL;
-          sampleEnvironment.variable = environment.variable;
-          this.environmentTabRepository.createTab(
-            sampleEnvironment,
-            workspaceId,
-          );
-        }
-      });
-    }
-    return;
-  };
-
   public getServerEnvironments = async (workspaceId: string) => {
     return await this.environmentService.fetchAllEnvironments(workspaceId);
   };

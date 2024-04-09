@@ -116,16 +116,9 @@ export const items = {
 
 export const collectionSchemaLiteral = {
   title: "collection",
-  primaryKey: {
-    // where should the composed string be stored
-    key: "collectionId",
-    // fields that will be used to create the composed key
-    fields: ["createdAt"],
-    // separator which is used to concat the fields values.
-    separator: "|",
-  },
+  primaryKey: "id",
   type: "object",
-  version: 5,
+  version: 6,
   properties: {
     collectionId: {
       type: "string",
@@ -153,6 +146,10 @@ export const collectionSchemaLiteral = {
     },
     localRepositoryPath: {
       type: "string",
+    },
+    workspaceId: {
+      type: "string",
+      maxLength: 100,
     },
     branches: {
       type: "array",

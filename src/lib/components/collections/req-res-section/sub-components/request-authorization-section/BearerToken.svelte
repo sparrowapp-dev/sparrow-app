@@ -46,7 +46,7 @@
     style="font-size: 12px; font-weight:500"
   >
     <p class="col-2 mb-0">Token</p>
-    <div class="col-10 position-relative">
+    <div class="col-10 ps-2 position-relative">
       <textarea
         style="outline: none; height:12vh"
         id={"bearer-token-key"}
