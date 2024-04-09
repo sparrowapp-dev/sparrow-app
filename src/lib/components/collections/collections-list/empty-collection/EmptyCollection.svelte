@@ -48,9 +48,7 @@
 {/if}
 
 {#if showDefault}
-  <div
-    class="container-fluid row d-flex flex-column align-items-center ps-4 pe-0 pt-3"
-  >
+  <div class="d-flex flex-column align-items-center px-3 pt-3">
     <p
       style="font-size: 14px;
 font-weight: 300;"

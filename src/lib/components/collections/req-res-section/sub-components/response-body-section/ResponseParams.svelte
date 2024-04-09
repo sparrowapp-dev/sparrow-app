@@ -28,8 +28,8 @@
 </script>
 
 <div
-  class="d-flex flex-column gap-2 justify-content-center w-100"
-  style="position: fixed; height:30px; background-color:var(--background-color); padding-top:0"
+  class="d-flex flex-column gap-2 justify-content-center w-100 py-3 z-1"
+  style="position: sticky; background-color:var(--background-color); padding-top:0; top:0; height: 56.4px;"
 >
   <div class="d-flex align-items-center justify-content-between">
     <div class="d-flex gap-3 text-requestBodyColor">

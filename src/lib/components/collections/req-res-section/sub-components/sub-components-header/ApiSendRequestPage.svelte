@@ -34,6 +34,7 @@
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
+  import { Select } from "$lib/components/inputs";
 
   export const loaderColor = "default";
   export let activeTab;
@@ -348,86 +349,44 @@
     style="width:calc(100%-302px);"
   >
     <div class="d-flex gap-2 w-100 position-relative">
-      <Dropdown
-        dropdownId="api-request"
-        dropDownType={{ type: "text", title: method ? method : "" }}
-        staticCustomStyles={[
-          {
-            id: "api-request-options-container",
-            styleKey: "minWidth",
-            styleValue: "120px",
-          },
-        ]}
-        staticClasses={[
-          {
-            id: "api-request-btn-div",
-            classToAdd: ["px-2", "py-3", "border", "rounded"],
-          },
-          {
-            id: "api-request-options-container",
-            classToAdd: ["start-0", "bg-backgroundDropdown"],
-          },
-        ]}
+      <Select
+        id={"api-request"}
         data={[
           {
             name: "GET",
             id: RequestMethod.GET,
-            dynamicClasses: "text-getColor",
+            color: "success",
           },
           {
             name: "POST",
             id: RequestMethod.POST,
-            dynamicClasses: "text-postColor",
+            color: "warning",
           },
           {
             name: "PUT",
             id: RequestMethod.PUT,
-            dynamicClasses: "text-putColor",
+            color: "secondary",
           },
           {
             name: "DELETE",
             id: RequestMethod.DELETE,
-            dynamicClasses: "text-deleteColor",
+            color: "danger",
           },
           {
             name: "PATCH",
             id: RequestMethod.PATCH,
-            dynamicClasses: "text-patchColor",
+            color: "patch",
           },
         ]}
+        titleId={method}
         onclick={handleDropdown}
-      ></Dropdown>
-      <!-- <ColorDropdown
-        data={[
-          {
-            name: "GET",
-            id: RequestMethod.GET,
-            color: "getColor",
-          },
-          {
-            name: "POST",
-            id: RequestMethod.POST,
-            color: "postColor",
-          },
-          {
-            name: "PUT",
-            id: RequestMethod.PUT,
-            color: "putColor",
-          },
-          {
-            name: "DELETE",
-            id: RequestMethod.DELETE,
-            color: "deleteColor",
-          },
-          {
-            name: "PATCH",
-            id: RequestMethod.PATCH,
-            color: "patchColor",
-          },
-        ]}
-        method={method ? method : ""}
-        onclick={handleDropdown}
-      /> -->
+        headerTheme={"transparent"}
+        borderHighlight={"active"}
+        headerHighlight={"hover"}
+        minBodyWidth={"150px"}
+        zIndex={2}
+        menuItem={"v2"}
+      />
 
       <CodeMirrorInput
         rawValue={urlText}
