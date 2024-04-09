@@ -31,24 +31,34 @@
   export let environments;
   export let currentEnvironment;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-
+  export let isEnvLoading = false;
   let localEnvironment;
   let globalEnvironment;
   let isLoading: boolean = false;
   let environmentUnderCreation: boolean = false;
   let addEnvDisabled = false;
-  $: {
-    if (environments) {
+
+  const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
+    if (_env && _workspaceId) {
       localEnvironment = [];
       globalEnvironment = [];
-      environments.forEach((element) => {
-        const _element = element.toMutableJSON();
-        if (_element.type === "GLOBAL") {
-          globalEnvironment.push(_element);
-        } else if (_element.type === "LOCAL") {
-          localEnvironment.push(_element);
-        }
-      });
+      environments
+        .filter((element) => {
+          return element.workspaceId === _workspaceId;
+        })
+        .forEach((element) => {
+          const _element = element.toMutableJSON();
+          if (_element.type === "GLOBAL") {
+            globalEnvironment.push(_element);
+          } else if (_element.type === "LOCAL") {
+            localEnvironment.push(_element);
+          }
+        });
+    }
+  };
+  $: {
+    if (environments || currentWorkspace?._id) {
+      mapEnvironmentToWorkspace(environments, currentWorkspace?._id);
     }
     addEnvDisabled = !hasWorkpaceLevelPermission(
       loggedUserRoleInWorkspace,
@@ -115,20 +125,19 @@
         currentWorkspace._id,
       );
       environmentUnderCreation = false;
-      console.log(res);
-      environmentRepositoryMethods.updateEnvironment(newEnvironment.id, {
+      environmentRepositoryMethods.removeEnvironment(newEnvironment.id);
+
+      environmentRepositoryMethods.createEnvironment({
         ...res,
         workspaceId: currentWorkspace._id,
+        id: res._id,
       });
       notifications.success("New Environment Created!");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
       environmentRepositoryMethods.removeEnvironment(newEnvironment.id);
-      environmentUnderCreation = false;
-      notifications.error(
-        response.message ?? "Failed to create environment. Please try again.",
-      );
+      notifications.error("Failed to create environment. Please try again.");
     }
     MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
     return;
@@ -160,12 +169,12 @@
   });
 </script>
 
-<div class={`env-sidebar`} style={``}>
+<div class={`env-sidebar p-3`} style={``}>
   <div
-    class={`d-flex justify-content-between curr-workspace-heading-container my-2 `}
+    class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
     <h1
-      class={`fw-medium lh-1 curr-workspace ps-3 my-auto ellipsis`}
+      class={`fw-normal lh-1 curr-workspace my-auto ellipsis`}
       style={`font-size: 18px; text-color: #FFF;`}
     >
       {currentWorkspace?.name || ""}
@@ -179,7 +188,7 @@
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
-        class={`border-0 me-3 rounded add-env-mini-btn  ${
+        class={`border-0 rounded add-env-mini-btn  ${
           !environmentUnderCreation ? "pb-2 py-1" : "py-2"
         } px-2`}
         on:click={handleCreateEnvironment}
@@ -193,62 +202,68 @@
     </Tooltip>
   </div>
 
-  {#if globalEnvironment && globalEnvironment.length > 0}
-    <p
-      class={`fw-normal env-item rounded m-2 px-2 ${
-        globalEnvironment[0]?.id === currentEnvironment?.id && "active"
-      }`}
-      on:click={() => {
-        handleOpenEnvironment(globalEnvironment[0]?.id);
-      }}
-    >
-      {globalEnvironment[0]?.name}
-    </p>
-  {/if}
-  <hr class="mb-0" />
-
-  {#if localEnvironment && localEnvironment.length === 0}
-    <div class={`add-env-container p-3`}>
-      <p class={`add-env-desc-text fw-light text-center mb-3`}>
-        Add Environments to your Workspace to test your APIs with the relevant
-        set of resources and constraints.
-      </p>
-      <Tooltip
-        title={PERMISSION_NOT_FOUND_TEXT}
-        show={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.ADD_COLLECTIONS,
-        )}
+  {#if false}
+    <div class="spinner">
+      <Spinner size={`32px`} />
+    </div>
+  {:else}
+    {#if globalEnvironment && globalEnvironment.length > 0}
+      <p
+        class={`fw-normal env-item rounded my-2 ${
+          globalEnvironment[0]?.id === currentEnvironment?.id && "active"
+        }`}
+        on:click={() => {
+          handleOpenEnvironment(globalEnvironment[0]?.id);
+        }}
       >
-        <button
-          disabled={!hasWorkpaceLevelPermission(
+        {globalEnvironment[0]?.name}
+      </p>
+    {/if}
+    <hr class="mb-0" />
+
+    {#if localEnvironment && localEnvironment.length === 0}
+      <div class={`add-env-container py-3`}>
+        <p class={`add-env-desc-text fw-light text-center mb-3`}>
+          Add Environments to your Workspace to test your APIs with the relevant
+          set of resources and constraints.
+        </p>
+        <Tooltip
+          title={PERMISSION_NOT_FOUND_TEXT}
+          show={!hasWorkpaceLevelPermission(
             loggedUserRoleInWorkspace,
             workspaceLevelPermissions.ADD_COLLECTIONS,
           )}
-          class={`add-env-btn w-100 d-flex rounded py-1 px-4 border-0 mx-auto w-fit`}
-          on:click={handleCreateEnvironment}
         >
-          <PlusIcon classProp={`my-auto me-2`} />
-          <span class={`my-auto ps-2`}>Environment</span>
-        </button>
-      </Tooltip>
-    </div>
-  {/if}
-  <ul class={`env-side-tab-list p-0`}>
-    {#if localEnvironment && localEnvironment.length > 0}
-      <List height={"calc(100vh - 180px)"} classProps={"p-2"}>
-        {#each localEnvironment as env}
-          <EnvironmentTab
-            {env}
-            {environmentServiceMethods}
-            {environmentRepositoryMethods}
-            {currentWorkspace}
-            {currentEnvironment}
-          />
-        {/each}
-      </List>
+          <button
+            disabled={!hasWorkpaceLevelPermission(
+              loggedUserRoleInWorkspace,
+              workspaceLevelPermissions.ADD_COLLECTIONS,
+            )}
+            class={`add-env-btn w-100 d-flex rounded justify-content-center py-1 px-4 border-0 mx-auto w-fit`}
+            on:click={handleCreateEnvironment}
+          >
+            <PlusIcon classProp={`my-auto`} />
+            <span class={`my-auto ps-2`}>Environment</span>
+          </button>
+        </Tooltip>
+      </div>
     {/if}
-  </ul>
+    <ul class={`env-side-tab-list p-0`}>
+      {#if localEnvironment && localEnvironment.length > 0}
+        <List height={"calc(100vh - 180px)"} classProps={"py-2"}>
+          {#each localEnvironment as env}
+            <EnvironmentTab
+              {env}
+              {environmentServiceMethods}
+              {environmentRepositoryMethods}
+              {currentWorkspace}
+              {currentEnvironment}
+            />
+          {/each}
+        </List>
+      {/if}
+    </ul>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -276,14 +291,10 @@
   }
   .env-sidebar {
     background-color: var(--background-color);
-    padding: 0px 0px 8px 2px;
     height: calc(100vh - 44px);
   }
   .curr-workspace {
     max-height: 20vw;
-  }
-  .curr-workspace-heading-container {
-    padding: 18px 4px 6px 0px;
   }
   .add-env-container {
     padding: 32px 0px;
@@ -340,5 +351,13 @@
     outline: none;
     background-color: var(--border-color);
     border-bottom: 1px solid #85c2ff !important;
+  }
+  .spinner {
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
 </style>

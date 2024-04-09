@@ -32,6 +32,8 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   import FloppyDisk from "$lib/assets/floppy-disk.svelte";
+  import { PenIcon } from "$lib/assets/icons";
+  import Pen from "$lib/assets/icons/pen.svelte";
   export let activeTab;
   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -92,105 +94,14 @@
   });
 
   const handleSaveRequest = async () => {
-    let userSource = {};
-    if (componentData?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
-        source: "USER",
-      };
+    const id = componentData?.id;
+    collectionsMethods.updateTab(true, "saveInProgress", id);
+    const res = await collectionsMethods.saveApiRequest(componentData);
+    if (res) {
+      collectionsMethods.setRequestSave(true, "api", id);
+      notifications.success("API request saved");
     }
-    const _id = componentData.id;
-    collectionsMethods.updateTab(true, "saveInProgress", _id);
-    const { folderId, folderName, collectionId, workspaceId } =
-      componentData.path;
-    let existingRequest;
-    if (!folderId) {
-      existingRequest =
-        await collectionsMethods.readRequestOrFolderInCollection(
-          collectionId,
-          _id,
-        );
-    } else {
-      existingRequest = await collectionsMethods.readRequestInFolder(
-        collectionId,
-        folderId,
-        _id,
-      );
-    }
-    const bodyType =
-      componentData.property.request.state.dataset === RequestDataset.RAW
-        ? componentData.property.request.state.raw
-        : componentData.property.request.state.dataset;
-    const authType = componentData.property.request.state?.auth;
-
-    const expectedRequest: RequestBody = {
-      method: componentData.property.request.method,
-      url: componentData.property.request.url,
-      body: componentData.property.request.body,
-      headers: componentData.property.request.headers,
-      queryParams: componentData.property.request.queryParams,
-      auth: componentData.property.request.auth,
-      selectedRequestBodyType: setContentTypeHeader(bodyType),
-      selectedRequestAuthType: authType,
-    };
-    if (!folderId) {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        ...userSource,
-        items: {
-          id: _id,
-          name: tabName,
-          description: existingRequest?.description,
-          type: ItemType.REQUEST,
-          request: expectedRequest,
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestOrFolderInCollection(
-          collectionId,
-          _id,
-          res.data.data,
-        );
-        collectionsMethods.setRequestSave(true, "api", _id);
-        collectionsMethods.updateTab(false, "saveInProgress", _id);
-      } else {
-        collectionsMethods.updateTab(false, "saveInProgress", _id);
-      }
-    } else {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: folderName,
-          type: ItemType.FOLDER,
-          items: {
-            id: _id,
-            name: tabName,
-            description: existingRequest.description,
-            type: ItemType.REQUEST,
-            request: expectedRequest,
-          },
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestInFolder(
-          collectionId,
-          folderId,
-          _id,
-          res.data.data,
-        );
-        collectionsMethods.setRequestSave(true, "api", _id);
-        collectionsMethods.updateTab(false, "saveInProgress", _id);
-      } else {
-        collectionsMethods.updateTab(false, "saveInProgress", _id);
-      }
-    }
-    notifications.success("API request saved");
+    collectionsMethods.updateTab(false, "saveInProgress", id);
   };
 
   let handleInputValue = () => {
@@ -405,13 +316,13 @@
       ? 'ps-5 pt-4 pe-3'
       : 'pt-4 px-3'}"
   >
-    <div class="w-100 me-3">
+    <div class="w-100 me-3 position-relative input-container">
       <input
         {autofocus}
         id="renameInputFieldNamePageHeader"
         bind:value={tabName}
         on:input={handleInputValue}
-        class="tabbar-tabName w-100"
+        class="tabbar-tabName w-100 p-1 pe-4"
         bind:this={inputElement}
         style="outline: none;"
         maxlength={100}
@@ -419,6 +330,12 @@
         on:keydown={onRenameInputKeyPress}
         disabled={componentData?.source === "SPEC"}
       />
+      <div
+        class="pen-icon position-absolute d-none"
+        style="right:5px; top: 5px;"
+      >
+        <Pen color={"var(--sparrow-text-color)"}></Pen>
+      </div>
     </div>
 
     <div class="d-flex gap-3">
@@ -631,6 +548,15 @@
     outline: none;
     font-size: 18px;
     font-weight: 400;
+    border-bottom: 1px solid transparent;
+    caret-color: var(--send-button);
+  }
+  .tabbar-tabName:hover {
+    border-bottom: 1px solid var(--send-button);
+  }
+  .tabbar-tabName:focus {
+    background-color: var(--border-color);
+    border-bottom: 1px solid var(--send-button);
   }
   .save-request-btn {
   }
@@ -652,5 +578,8 @@
   .deleted-banner {
     background-color: var(--error--color);
     color: var(--background-dark);
+  }
+  .input-container:hover .pen-icon {
+    display: block !important;
   }
 </style>

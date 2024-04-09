@@ -73,93 +73,11 @@
   };
 
   const handleSaveRequest = async () => {
-    let userSource = {};
-    if (componentData?.activeSync && componentData?.source === "USER") {
-      userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
-        source: "USER",
-      };
-    }
-    const _id = componentData?.id;
-    const { folderId, folderName, collectionId, workspaceId } =
-      componentData.path;
-    let existingRequest;
-    if (!folderId) {
-      existingRequest =
-        await collectionsMethods.readRequestOrFolderInCollection(
-          collectionId,
-          _id,
-        );
-    } else {
-      existingRequest = await collectionsMethods.readRequestInFolder(
-        collectionId,
-        folderId,
-        _id,
-      );
-    }
-    const expectedRequest: RequestBody = {
-      method: existingRequest?.request.method,
-      url: existingRequest?.request.url,
-      body: existingRequest?.request.body,
-      headers: existingRequest?.request.headers,
-      queryParams: existingRequest?.request.queryParams,
-      auth: existingRequest?.request.auth,
-    };
-
-    if (!folderId) {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        ...userSource,
-        items: {
-          id: existingRequest?.id,
-          name: existingRequest?.name,
-          description,
-          type: existingRequest?.type,
-          request: expectedRequest,
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestOrFolderInCollection(
-          collectionId,
-          _id,
-          res.data.data,
-        );
-        collectionsMethods.setRequestSave(true, "description", _id);
-        notifications.success("Documentation updated");
-      } else {
-      }
-    } else {
-      let res = await updateCollectionRequest(_id, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: folderName,
-          type: ItemType.FOLDER,
-          items: {
-            id: existingRequest?.id,
-            name: existingRequest?.name,
-            description,
-            type: existingRequest?.type,
-            request: expectedRequest,
-          },
-        },
-      });
-      if (res.isSuccessful) {
-        collectionsMethods.updateRequestInFolder(
-          collectionId,
-          folderId,
-          _id,
-          res.data.data,
-        );
-        collectionsMethods.setRequestSave(true, "description", _id);
-        notifications.success("Documentation updated");
-      } else {
-      }
+    const id = componentData?.id;
+    const res = await collectionsMethods.saveApiRequest(componentData, true);
+    if (res) {
+      collectionsMethods.setRequestSave(true, "description", id);
+      notifications.success("Documentation updated");
     }
     MixpanelEvent(Events.SAVE_API_DOCUMENTATION);
   };

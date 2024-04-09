@@ -6,16 +6,9 @@ import {
 
 export const environmentSchemaLiteral = {
   title: "environment",
-  primaryKey: {
-    // where should the composed string be stored
-    key: "environmentId",
-    // fields that will be used to create the composed key
-    fields: ["createdAt"],
-    // separator which is used to concat the fields values.
-    separator: "|",
-  },
+  primaryKey: "id",
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     id: {
       type: "string",

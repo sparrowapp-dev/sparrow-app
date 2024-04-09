@@ -79,10 +79,11 @@ export class EnvironmentRepository {
       .$;
   };
 
-  public getGlobalEnvironment = async () => {
+  public getGlobalEnvironment = async (_workspaceId) => {
     return await RxDB.getInstance()
       .rxdb.environment.findOne({
         selector: {
+          workspaceId: _workspaceId,
           type: environmentType.GLOBAL,
         },
       })
@@ -96,8 +97,20 @@ export class EnvironmentRepository {
       delete environment._id;
       return environment;
     });
-    await RxDB.getInstance().rxdb.environment.find().remove();
     await RxDB.getInstance().rxdb.environment.bulkUpsert(env);
     return;
+  };
+
+  /**
+   * remove environments by workspaceId
+   */
+  public removeEnvironments = async (_workspaceId: string): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.find({
+        selector: {
+          workspaceId: _workspaceId,
+        },
+      })
+      .remove();
   };
 }

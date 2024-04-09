@@ -68,9 +68,7 @@ export class MyCollectionViewModel {
     let userSource = {};
     if (currentCollection?.activeSync) {
       userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
+        currentBranch: currentCollection?.currentBranch,
         source: "USER",
       };
     }
