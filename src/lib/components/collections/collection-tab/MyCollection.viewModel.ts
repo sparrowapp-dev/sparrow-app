@@ -68,9 +68,7 @@ export class MyCollectionViewModel {
     let userSource = {};
     if (currentCollection?.activeSync) {
       userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
+        currentBranch: currentCollection?.currentBranch,
         source: "USER",
       };
     }
@@ -112,6 +110,12 @@ export class MyCollectionViewModel {
       collectionsMethods.handleCreateTab(request);
 
       moveNavigation("right");
+      return response;
+    } else {
+      collectionsMethods.deleteRequestOrFolderInCollection(
+        componentData.path.collectionId,
+        request.id,
+      );
       return response;
     }
   };

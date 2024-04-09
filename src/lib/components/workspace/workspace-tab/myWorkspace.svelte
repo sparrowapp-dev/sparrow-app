@@ -26,6 +26,7 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
   export let collectionsMethods: CollectionsMethods;
   export let activeTab;
@@ -37,6 +38,7 @@
   let workspaceDescription: string = "";
   let currentTeamWorkspacesArr: WorkspaceDocument[] = [];
   let componentData: NewTab;
+  let workspaceName: string;
   let newWorkspaceName: string;
   let noOfCollections = 0;
   let isActiveInvitePopup: boolean = false;
@@ -98,12 +100,19 @@
   };
 
   const onRenameBlur = async () => {
-    await _viewModel.modifyWorkspace(
+    const response = await _viewModel.modifyWorkspace(
       componentData.id,
       collectionsMethods,
       newWorkspaceName,
       tabName,
     );
+    if (!response.isSuccessful && response.message === "Network Error") {
+      tabName = currentWorkspaceDetails.name;
+      notifications.error(response.message);
+    } else {
+      tabName = currentWorkspaceDetails.name;
+      notifications.error("Failed to rename workspace!");
+    }
   };
 
   const onUpdateBlur = async () => {

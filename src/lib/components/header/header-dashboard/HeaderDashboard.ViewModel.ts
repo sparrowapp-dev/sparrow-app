@@ -18,9 +18,7 @@ import { requestResponseStore } from "$lib/store/request-response-section";
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
 import type { Observable } from "rxjs";
-import { environmentType } from "$lib/utils/enums/environment.enum";
 import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
-import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
 import { TeamRepository } from "$lib/repositories/team.repository";
 import type {
   addUsersInWorkspace,
@@ -111,13 +109,16 @@ export class HeaderDashboardViewModel {
         },
       );
 
-      tabName = workspace?.data?.data.name;
-      this.updateWorkspace(workspaceId, {
-        name: newWorkspaceName,
-      });
+      if (workspace.isSuccessful) {
+        tabName = workspace?.data?.data.name;
+        this.updateWorkspace(workspaceId, {
+          name: newWorkspaceName,
+        });
 
-      collectionsMethods.updateTab(tabName, "name", workspaceId);
-      collectionsMethods.updateTab(true, "save", workspaceId);
+        collectionsMethods.updateTab(tabName, "name", workspaceId);
+        collectionsMethods.updateTab(true, "save", workspaceId);
+      }
+      return workspace;
     }
   };
 
@@ -223,30 +224,6 @@ export class HeaderDashboardViewModel {
   public createWorkspace = async (workspace) => {
     const response = await this.workspaceService.createWorkspace(workspace);
     return response;
-  };
-
-  public refreshEnvironment = async (data, workspaceId) => {
-    this.environmentRepository.refreshEnvironment(data, workspaceId);
-    if (data) {
-      data.forEach((environment) => {
-        if (environment.type === environmentType.GLOBAL) {
-          const sampleEnvironment = generateSampleEnvironment(
-            environment.id,
-            workspaceId,
-            new Date().toString(),
-          );
-          sampleEnvironment.name = environment.name;
-          sampleEnvironment.isActive = true;
-          sampleEnvironment.type = environmentType.GLOBAL;
-          sampleEnvironment.variable = environment.variable;
-          this.environmentTabRepository.createTab(
-            sampleEnvironment,
-            workspaceId,
-          );
-        }
-      });
-    }
-    return;
   };
 
   public getServerEnvironments = async (workspaceId: string) => {

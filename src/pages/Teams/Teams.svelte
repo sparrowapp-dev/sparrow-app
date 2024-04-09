@@ -52,9 +52,10 @@
   export let activeSideBarTabMethods: any;
   export let collectionsMethods: CollectionsMethods;
   export let currentTeam: CurrentTeam;
+  export let refreshTeamsWorkspaces: (userId: string) => void;
 
   let allTeams: any[] = [];
-  let userId: string | undefined = undefined;
+  let userId: string = "";
   let activeTeamRxDoc: TeamDocument;
   let workspaceUnderCreation: boolean = false;
   let isCreateTeamModalOpen: boolean;
@@ -216,21 +217,17 @@
       newWorkspace.team.teamName = newWorkspace.team.name;
       delete newWorkspace.team.id;
       delete newWorkspace.team.name;
+      if (userId) await _viewModel.refreshTeams(userId);
       await _viewModel.addWorkspace(newWorkspace);
       await _viewModelWorkspace.activateWorkspace(newWorkspace._id);
-      // if (userId) await _viewModel.refreshTeams(userId);
-      if (userId)
-        await _viewModel.addWorkspaceInTeam(
-          $openTeam?.teamId,
-          newWorkspace._id,
-          newWorkspace.name,
-        );
 
       activeSideBarTabMethods.updateActiveTab("collections");
       navigate("/dashboard/collections");
     } else {
+      workspaceUnderCreation = false;
+      isWorkspaceCreatedFirstTime.set(false);
       isWorkspaceLoaded.set(true);
-      notifications.error("Failed to create new Workspace!");
+      notifications.error(response.message);
     }
   };
 
@@ -248,7 +245,6 @@
 
     // isTeamCreatedFirstTime.set(true);
     const teamObj = generateSamepleTeam(name, description, file, userId);
-    await _viewModel.addTeam(teamObj);
     const response = await _viewModel.createTeam(teamObj);
 
     if (response.isSuccessful && response.data.data) {
@@ -269,11 +265,9 @@
       handleCreateTeamModal();
     } else {
       await _viewModel.leaveTeam(teamObj.teamId);
+      await _viewModel.removeTeam(teamObj.teamId);
       handleCreateTeamModal();
-      notifications.error(
-        "Failed to create a new team. " + response.message ??
-          "Failed to create a new team.",
-      );
+      notifications.error(response.message ?? "Failed to create a new team.");
     }
   };
 
@@ -283,7 +277,6 @@
     const teamId = $openTeam?.teamId;
     const response = await _viewModel.leaveTeam($openTeam?.teamId);
     if (response.isSuccessful) {
-      let x = await _viewModel.removeTeam($openTeam?.teamId);
       setTimeout(async () => {
         const activeTeam = await _viewModel.checkActiveTeam();
         if (activeTeam) {
@@ -302,7 +295,9 @@
         }, 500);
       }, 500);
     } else {
-      notifications.error("Failed to leave the team. Please try again.");
+      notifications.error(
+        response.message ?? "Failed to leave the team. Please try again.",
+      );
       isShowMoreVisible = false;
       isLeavingTeam = false;
       handleLeaveTeamModal();
@@ -396,7 +391,7 @@
     openLeaveTeamModal = !openLeaveTeamModal;
   };
 
-  onMount(() => {
+  onMount(async () => {
     newTeam = {
       name: {
         value: "",
@@ -413,6 +408,7 @@
         showFileTypeError: false,
       },
     };
+    refreshTeamsWorkspaces(userId);
   });
 
   let splitter;

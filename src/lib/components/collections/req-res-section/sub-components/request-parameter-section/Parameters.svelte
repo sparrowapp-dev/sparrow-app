@@ -473,7 +473,8 @@
   }
 
   input:checked {
-    background-color: var(--send-button) !important;
+    background-color: var(--primary-btn-color) !important;
+    border: none;
   }
   .keyValuePair {
     background-color: transparent;

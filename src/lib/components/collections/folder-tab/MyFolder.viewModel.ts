@@ -39,9 +39,7 @@ export class MyFolderViewModel {
     let userSource = {};
     if (componentData?.activeSync && componentData?.source === "USER") {
       userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
+        currentBranch: currentCollection?.currentBranch,
         source: "USER",
       };
     }
@@ -78,9 +76,7 @@ export class MyFolderViewModel {
     let userSource = {};
     if (componentData?.activeSync && componentData?.source === "USER") {
       userSource = {
-        currentBranch: currentCollection?.currentBranch
-          ? currentCollection?.currentBranch
-          : currentCollection?.primaryBranch,
+        currentBranch: currentCollection?.currentBranch,
         source: "USER",
       };
     }

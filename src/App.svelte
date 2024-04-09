@@ -23,6 +23,7 @@
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import LoginPage from "./pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "./pages/Auth/register-page/RegisterPage.svelte";
+  import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";
 
   export let url = "/";
   // const tabRepository = new TabRepository();
@@ -67,6 +68,7 @@
     await getCurrent().setFocus();
     await getCurrent().center();
     await registerDeepLinkHandler();
+    await singleInstanceHandler();
     let isloggedIn;
     user.subscribe((value) => {
       isloggedIn = value;

@@ -43,6 +43,7 @@
   export let activePath;
   export let environments = [];
   export let runAnimation: boolean = false;
+  export let refreshEnv;
   let isImportCollectionPopup = false;
   let isImportCurlPopup = false;
   export let changeAnimation: () => void;
@@ -58,7 +59,7 @@
   import { createCollectionSource } from "$lib/store/event-source.store";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import type { WorkspaceRole } from "$lib/utils/enums";
+  import { FolderDefault, type WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
   import ImportCollection from "../../collections/collections-list/import-collection/ImportCollection.svelte";
@@ -96,21 +97,28 @@
     collectionsMethods.getActiveWorkspace();
   let activeWorkspaceRxDoc: WorkspaceDocument;
 
+  const mapCollectionsWithWorkspace = (_documents, _workspaceId) => {
+    if (_documents) {
+      const collectionArr = _documents
+        .map((collectionDocument: CollectionDocument) => {
+          const collectionObj =
+            collectionsMethods.getCollectionDocument(collectionDocument);
+          return collectionObj;
+        })
+        .filter((collectionDocument: CollectionDocument) => {
+          return collectionDocument.workspaceId === _workspaceId;
+        });
+      collection = collectionArr;
+    }
+    if (searchData || selectedApiMethods.length > 0) {
+      handleSearch();
+    }
+  };
+  let collectionRxDoc = [];
   const collectionSubscribe = collections.subscribe(
     (value: CollectionDocument[]) => {
-      if (value) {
-        const collectionArr = value.map(
-          (collectionDocument: CollectionDocument) => {
-            const collectionObj =
-              collectionsMethods.getCollectionDocument(collectionDocument);
-            return collectionObj;
-          },
-        );
-        collection = collectionArr;
-      }
-      if (searchData || selectedApiMethods.length > 0) {
-        handleSearch();
-      }
+      collectionRxDoc = value;
+      mapCollectionsWithWorkspace(collectionRxDoc, currentWorkspaceId);
     },
   );
   const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
@@ -169,6 +177,7 @@
     async (value: WorkspaceDocument) => {
       activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        await refreshEnv(activeWorkspaceRxDoc?._id);
         const env: EnvironmentDocument =
           await collectionsMethods.currentEnvironment(
             activeWorkspaceRxDoc.get("environmentId"),
@@ -181,7 +190,6 @@
             id: "none",
           };
         }
-
         if (isComponentRenderedFirstTime) {
           isLoading = true;
           isComponentRenderedFirstTime = false;
@@ -190,12 +198,21 @@
         currentWorkspaceId = activeWorkspaceRxDoc?._id;
         const workspaceId = activeWorkspaceRxDoc?._id;
         if (trackWorkspaceId !== workspaceId) {
+          mapCollectionsWithWorkspace(collectionRxDoc, workspaceId);
           const response =
             await collectionsMethods.getAllCollections(workspaceId);
           if (response.isSuccessful && response.data.data) {
             const collections = response.data.data;
-            isLoading = false;
+            setTimeout(() => {
+              isLoading = false;
+            }, 200);
+            collections.forEach((element) => {
+              element.workspaceId = workspaceId;
+            });
             collectionsMethods.bulkInsert(collections);
+          } else {
+            isLoading = false;
+            notifications.error(response.message);
           }
         }
         trackWorkspaceId = workspaceId;
@@ -234,7 +251,6 @@
       createdAt: new Date().toISOString(),
     };
 
-    collectionsMethods.addCollection(newCollection);
     const response = await _colllectionListViewModel.addCollection({
       name: newCollection.name,
       workspaceId: currentWorkspaceId,
@@ -242,6 +258,11 @@
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
+      collectionsMethods.addCollection({
+        ...res,
+        id: res._id,
+        workspaceId: currentWorkspaceId,
+      });
       collectionUnderCreation = false;
       let path: Path = {
         workspaceId: currentWorkspaceId,
@@ -270,7 +291,6 @@
       collectionsMethods.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
-      collectionsMethods.updateCollection(newCollection.id, res);
       _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
@@ -284,6 +304,8 @@
       return;
     } else {
       activePath = tempActivePath;
+      collectionsMethods.deleteCollection(newCollection.id);
+      notifications.error(response.message ?? "Failed to create collection!");
     }
     return;
   };
@@ -518,7 +540,6 @@
           }}
         />
       </div>
-
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
@@ -596,7 +617,7 @@
       style="overflow:hidden; margin-top:5px;"
     >
       <div class="d-flex flex-column justify-content-center">
-        {#if isLoading}
+        {#if false}
           <div class="spinner">
             <Spinner size={`32px`} />
           </div>
@@ -605,18 +626,22 @@
             <FilterDropDown {handleSearch} />
           {/if}
           {#if searchData.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     path={exp.path}
                     explorer={exp.tree}
                     {searchData}
-                    folderDetails={exp.folderDetails}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
@@ -626,9 +651,11 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    path={exp.path}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
@@ -638,21 +665,27 @@
                     activeSync={exp.activeSync}
                     editable={true}
                     collectionId={exp.collectionId}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={exp.workspaceId}
                     explorer={exp.tree}
                     {searchData}
+                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
             </List>
           {:else if selectedApiMethods.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              minHeight={"180px"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}
@@ -662,13 +695,18 @@
               {/each}
             </List>
           {:else if collection && collection.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"p-3"}>
+            <List
+              height={"calc(100vh - 180px)"}
+              minHeight={"180px"}
+              classProps={"p-3"}
+              overflowX="hidden"
+            >
               {#each collection as col}
                 <Collection
                   {loggedUserRoleInWorkspace}
                   collectionList={collection}
                   collectionId={col.id}
-                  {currentWorkspaceId}
+                  currentWorkspaceId={col.workspaceId}
                   collection={col}
                   title={col.name}
                   {collectionsMethods}

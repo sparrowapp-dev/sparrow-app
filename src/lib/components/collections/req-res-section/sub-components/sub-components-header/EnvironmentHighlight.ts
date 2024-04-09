@@ -1,6 +1,6 @@
 import type { AggregateEnvironment } from "./InputEditorTheme";
 import { ViewPlugin, MatchDecorator, Decoration } from "@codemirror/view";
-const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_]+}})/g;
+const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
 
 const ENV_HIGHLIGHT = "env-highlight";
 const HOVER_FOUND = "hover-found";

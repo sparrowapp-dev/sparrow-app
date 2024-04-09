@@ -358,7 +358,11 @@ struct MyResponse {
     tab_id: String,
     response: Result<String, String>,
 }
-
+#[derive(Clone, serde::Serialize)]
+struct SingleInstancePayload {
+    args: Vec<String>,
+    cwd: String,
+}
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -369,12 +373,25 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             app.emit(
-                "deep-link-urls",
-                Payload {
-                    url: argv[1].to_string(),
+                "single-instance",
+                SingleInstancePayload {
+                    args: argv.clone(),
+                    cwd: _cwd,
                 },
             )
             .unwrap();
+            if argv.len() > 1 {
+                app.emit(
+                    "deep-link-urls",
+                    Payload {
+                        url: argv[1].to_string(),
+                    },
+                )
+                .unwrap();
+            } else {
+                // Handle the case where argv is empty or doesn't have enough elements
+                println!("No URL provided in command line arguments.");
+            }
         }))
         .setup(|app| {
             #[cfg(desktop)]

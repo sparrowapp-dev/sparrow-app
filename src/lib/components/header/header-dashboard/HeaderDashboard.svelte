@@ -101,16 +101,6 @@
         } else {
           name = name;
         }
-        if (trackWorkspaceId !== value.get("_id")) {
-          const response = await _viewModel.getServerEnvironments(
-            value.get("_id"),
-          );
-          if (response.isSuccessful && response.data.data) {
-            const environments = response.data.data;
-            _viewModel.refreshEnvironment(environments, value.get("_id"));
-          }
-        }
-        trackWorkspaceId = value.get("_id");
       }
     },
   );
@@ -169,7 +159,6 @@
       filteredFolder,
       filteredRequest,
       collections,
-      activeWorkspaceName,
     );
   };
   window.addEventListener("click", () => {
@@ -227,7 +216,7 @@
 
 <!-- {#if !isLoadingPage} -->
 <div
-  class="d-flex w-100 ps-1 align-items-center justify-content-between bg-backgroundColor header"
+  class="d-flex w-100 ps-1 mt-1 align-items-center justify-content-between bg-backgroundColor header"
   style="height:44px;"
   data-tauri-drag-region
 >
@@ -293,6 +282,7 @@
         }}
         on:click={() => {
           handleGlobalSearchPopup(true);
+          handleSearch();
         }}
       />
     </div>
@@ -345,6 +335,7 @@
           <div
             on:click={() => {
               handleGlobalSearchPopup(true);
+              handleSearch();
             }}
             class="position-absolute"
             style="
@@ -368,6 +359,7 @@
             }}
             on:click={() => {
               handleGlobalSearchPopup(true);
+              handleSearch();
             }}
           />
         </div>
@@ -497,9 +489,9 @@
             id="resize-button"
           >
             {#if isMaximizeWindow === true}
-              <img src={icons.doubleResizeIcon} alt="" />
-            {:else}
               <img src={icons.resizeIcon} alt="" />
+            {:else}
+              <img src={icons.doubleResizeIcon} alt="" />
             {/if}
           </button>
         </div>
@@ -575,6 +567,7 @@
   }
   .search-container {
     border: 1px solid transparent;
+    transition: width 200ms ease;
   }
   .search-container:hover {
     border: 1px solid var(--workspace-hover-color);

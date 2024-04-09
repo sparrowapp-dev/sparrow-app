@@ -198,7 +198,7 @@
 </script>
 
 <Splitpanes
-  style={isHorizontal && "height: 78vh; "}
+  style={isHorizontal && "height: calc(100vh - 200px) !important; "}
   on:ready={stylePanes}
   theme=""
   class="splitter-request d-flex align-items-start {isHorizontalMode
@@ -338,11 +338,7 @@
     size={isHorizontalMode ? bottomPanelHeightSize : rightPanelWidthSize}
   >
     <div class=" d-flex flex-column">
-      {#if !response?.status}
-        <DefaultPage />
-      {:else if response?.status === "Not Found"}
-        <ResponseError />
-      {:else if progress}
+      {#if progress}
         <DefaultPage />
         <div
           style="    
@@ -356,6 +352,10 @@
         >
           <Loader loaderSize={"80px"} />
         </div>
+      {:else if !response?.status}
+        <DefaultPage />
+      {:else if response?.status === "Not Found"}
+        <ResponseError />
       {:else if response?.status}
         <ResponseParams
           {apiState}

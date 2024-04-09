@@ -19,7 +19,10 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
   import { onDestroy, onMount } from "svelte";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type {
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
@@ -35,6 +38,7 @@
   const _viewModel = new CollectionsViewModel();
   const _collectionListViewModel = new CollectionListViewModel();
   const _activeSidebarTabViewModel = new ActiveSideBarTabReposistory();
+  export let refreshEnv: EnvironmentDocument;
   const collectionsMethods: CollectionsMethods = {
     handleActiveTab: _viewModel.handleActiveTab,
     handleCreateTab: _viewModel.handleCreateTab,
@@ -76,6 +80,7 @@
     removeMultipleTabs: _viewModel.removeMultipleTabs,
     setRequestSave: _viewModel.setRequestSave,
     deleteCollectioninWorkspace: _viewModel.deleteCollectioninWorkspace,
+    readWorkspace: _viewModel.readWorkspace,
 
     initActiveEnvironmentToWorkspace:
       _viewModel.initActiveEnvironmentToWorkspace,
@@ -85,6 +90,7 @@
     clearTabs: _viewModel.clearTabs,
     collection: _viewModel.collection,
     deleteApiRequest: _viewModel.deleteApiRequest,
+    saveApiRequest: _viewModel.saveAPIRequest,
   };
   export let loggedUserRoleInWorkspace: WorkspaceRole;
   const activeTab = _viewModel.activeTab;
@@ -118,16 +124,20 @@
   );
 
   const refreshEnvironment = () => {
-    if ($environments) {
+    if ($environments && currentWorkspaceId) {
       if ($environments?.length > 0) {
-        const filteredEnv = $environments.filter((elem) => {
-          if (
-            elem.type === environmentType.GLOBAL ||
-            elem.id === environmentId
-          ) {
-            return true;
-          }
-        });
+        const filteredEnv = $environments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
         if (filteredEnv?.length > 0) {
           environmentVariables.length = 0;
           filteredEnv.forEach((elem) => {
@@ -153,6 +163,9 @@
       refreshEnvironment();
     }
     if ($environments) {
+      refreshEnvironment();
+    }
+    if (currentWorkspaceId) {
       refreshEnvironment();
     }
   }
@@ -229,8 +242,8 @@
           tabList={$tabList}
           _tabId={$activeTab?.id}
           {collectionsMethods}
-          {onTabsSwitched}
           {loggedUserRoleInWorkspace}
+          {refreshEnv}
         />
       </div>
       <div class="tab__content d-flex vh-100">
@@ -242,32 +255,47 @@
               {activeTab}
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
-              environmentVariables={environmentVariables.reverse()}
-              {currentWorkspace}
-            />
-          {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
-            <MyWorkspace {activeTab} {collectionsMethods} />
-          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
-            <MyFolder
-              {collectionsMethods}
-              {activeTab}
+              {onTabsSwitched}
               {loggedUserRoleInWorkspace}
             />
-          {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
-            <MyCollection
-              {collectionsMethods}
-              {activeTab}
-              {_collectionListViewModel}
-              {loggedUserRoleInWorkspace}
-              {currentWorkspaceId}
-              {currentWorkspace}
-            />
-          {/if}
+          </div>
+          <div class="tab__content d-flex">
+            <div class="w-100">
+              {#if $tabList && $tabList.length == 0}
+                <DefaultTabBar {collectionsMethods} />
+              {:else if $activeTab && $activeTab.type === ItemType.REQUEST}
+                <RequestResponse
+                  {activeTab}
+                  {loggedUserRoleInWorkspace}
+                  {collectionsMethods}
+                  environmentVariables={environmentVariables.reverse()}
+                  {currentWorkspace}
+                />
+              {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+                <MyWorkspace {activeTab} {collectionsMethods} />
+              {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+                <MyFolder
+                  {collectionsMethods}
+                  {activeTab}
+                  {loggedUserRoleInWorkspace}
+                />
+              {:else if $activeTab && $activeTab.type === ItemType.COLLECTION}
+                <MyCollection
+                  {collectionsMethods}
+                  {activeTab}
+                  {_collectionListViewModel}
+                  {loggedUserRoleInWorkspace}
+                  {currentWorkspaceId}
+                  {currentWorkspace}
+                />
+              {/if}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </Pane>
-</Splitpanes>
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>

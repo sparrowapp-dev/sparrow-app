@@ -28,7 +28,7 @@
   export let handleEnvironmentBox: (change: boolean, envKey: string) => void;
   let localEnvKey = "";
 
-  const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_]+}})/g;
+  const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
 
   const ENV_HIGHLIGHT = "env-highlight";
   const ENV_HIGHLIGHT_FOUND = "env-found";
