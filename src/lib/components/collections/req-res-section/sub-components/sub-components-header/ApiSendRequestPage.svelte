@@ -383,7 +383,8 @@
         headerTheme={"transparent"}
         borderHighlight={"active"}
         headerHighlight={"hover"}
-        minWidth={"100px"}
+        minBodyWidth={"150px"}
+        zIndex={2}
       />
 
       <CodeMirrorInput

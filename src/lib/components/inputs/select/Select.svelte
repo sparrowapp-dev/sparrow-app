@@ -5,7 +5,7 @@
   import { slide } from "svelte/transition";
   import { SearchIcon } from "$lib/assets/icons";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
-  import { GitBranchIcon } from "$lib/assets/icons";
+  import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   /**
    * Determines id of the menu item.
    */
@@ -48,9 +48,10 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let maxHeight = "200px";
-  export let minWidth = "50px";
-  export let maxWidth = "500px";
+  export let maxBodyHeight = "200px";
+  export let minHeaderWidth = "50px";
+  export let maxHeaderWidth = "500px";
+  export let minBodyWidth = "50px";
 
   /**
    * Determines search bar Select body.
@@ -92,7 +93,7 @@
   /**
    * Determines the z-index of Select.
    */
-  export let zIndex = 40;
+  export let zIndex = 1;
   /**
    * Determines versions of the Select menu.
    */
@@ -234,7 +235,7 @@
     }
   };
 
-  const getTextColor = (_color: string) => {
+  const getTextColor = (_color: any) => {
     if (_color === "primary") {
       return "text-primaryColor";
     } else if (_color === "danger") {
@@ -281,7 +282,7 @@
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
       {isError ? selectErrorBorderClass : ''}
         d-flex align-items-center justify-content-between"
-      style="min-width:{minWidth}; max-width:{maxWidth};"
+      style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth};"
     >
       <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
         {#if iconRequired}
@@ -301,14 +302,13 @@
           {selectedRequest?.name}
         </span>
       </p>
-      <span class="d-flex" class:select-logo-active={isOpen}
-        ><img
-          style="height:12px; width:12px;"
-          class="ms-2 select-arrow-icon"
-          src={select}
-          alt=""
-        /></span
-      >
+      <span class="d-flex ps-2" class:select-logo-active={isOpen}>
+        <DownArrowIcon
+          width={12}
+          height={14}
+          color={"var(--sparrow-text-color)"}
+        />
+      </span>
     </div>
   </div>
 
@@ -316,6 +316,7 @@
     <div
       class="d-none z-2 select-data {selectBodyBackgroundClass} p-1 rounded"
       class:select-active={isOpen}
+      style="min-width:{minBodyWidth};"
       transition:slide={{ duration: 100 }}
     >
       <div
@@ -347,7 +348,7 @@
           <hr class="my-2" />
         </div>
       {/if}
-      <div style="max-height:{maxHeight}; overflow:auto;">
+      <div style="max-height:{maxBodyHeight}; overflow:auto;">
         {#each data.filter((element) => {
           return element.name.toLowerCase().includes(searchData.toLowerCase());
         }) as list}

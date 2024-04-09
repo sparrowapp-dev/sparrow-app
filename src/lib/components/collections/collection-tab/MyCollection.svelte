@@ -428,9 +428,9 @@
                   ? currentCollection?.currentBranch
                   : currentCollection?.primaryBranch}
                 onclick={handleBranchChange}
-                maxHeight={"150px"}
-                minWidth={"190px"}
-                maxWidth={"250px"}
+                maxBodyHeight={"150px"}
+                minHeaderWidth={"190px"}
+                maxHeaderWidth={"250px"}
               >
                 <div slot="pre-select">
                   <div class="d-flex justify-content-between p-2">

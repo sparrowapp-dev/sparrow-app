@@ -830,8 +830,8 @@
                   ]}
                   titleId={repositoryBranch}
                   onclick={handleDropdown}
-                  maxHeight={"150px"}
-                  maxWidth={"900px"}
+                  maxBodyHeight={"150px"}
+                  maxHeaderWidth={"900px"}
                 />
               </div>
               {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}

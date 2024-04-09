@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Select } from "$lib/components/inputs";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
@@ -35,38 +36,35 @@
     <div class="col-10">
       <button class="d-flex bg-backgroundColor border-0">
         <p>
-          <Dropdown
-            dropdownId={"hash999"}
-            dropDownType={{ type: "text", title: currentTab }}
+          <Select
+            id={"hash999"}
             data={[
               {
                 name: "No Auth",
                 id: AuthType.NO_AUTH,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "API Key",
                 id: AuthType.API_KEY,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Bearer Token",
                 id: AuthType.BEARER_TOKEN,
-                dynamicClasses: "text-whiteColor",
               },
               {
                 name: "Basic Auth",
                 id: AuthType.BASIC_AUTH,
-                dynamicClasses: "text-whiteColor",
               },
             ]}
+            titleId={currentTab}
             onclick={handleDropdown}
-            hoverClasses={[
-              {
-                id: "hash999-btn-div",
-                classToAdd: ["border-bottom", "border-labelColor"],
-              },
-            ]}
+            headerTheme={"transparent"}
+            borderType={"none"}
+            borderActiveType={"bottom"}
+            borderHighlight={"hover-active"}
+            headerHighlight={"active"}
+            minBodyWidth={"150px"}
+            borderRounded={false}
           />
         </p>
       </button>

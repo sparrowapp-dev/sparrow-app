@@ -22,6 +22,7 @@
   export let environmentVariables;
 
   import CodeMirror from "../../../../editor/CodeMirror.svelte";
+  import { Select } from "$lib/components/inputs";
 
   let currentTabId: string = "";
   let mainTab: string;
@@ -138,84 +139,77 @@
   </div>
   <div class="mb-2 d-flex">
     <p
-      class="team-menu__link pb-1 mb-0"
+      class="team-menu__link pb-1 mb-0 d-flex align-items-center"
       style="font-size: 12px; margin-top:4px;"
     >
       Data Types:
     </p>
     <span class="pe-3" />
-    <Dropdown
-      dropdownId={"hash124"}
-      dropDownType={{ type: "text", title: mainTab }}
+    <Select
+      id={"hash124"}
       data={[
         {
           name: "Raw",
           id: RequestDataset.RAW,
-          dynamicClasses: "text-whiteColor",
         },
         {
           name: "Form data",
           id: RequestDataset.FORMDATA,
-          dynamicClasses: "text-whiteColor",
         },
         {
           name: "Form Encoded URL",
           id: RequestDataset.URLENCODED,
-          dynamicClasses: "text-whiteColor",
         },
         {
           name: "None",
           id: RequestDataset.NONE,
-          dynamicClasses: "text-whiteColor",
         },
       ]}
+      titleId={mainTab}
       onclick={handleDropdown}
-      hoverClasses={[
-        {
-          id: "hash124-btn-div",
-          classToAdd: ["border-bottom", "border-labelColor"],
-        },
-      ]}
+      headerTheme={"transparent"}
+      borderType={"none"}
+      borderActiveType={"bottom"}
+      borderHighlight={"hover-active"}
+      headerHighlight={"active"}
+      minBodyWidth={"150px"}
+      borderRounded={false}
     />
     <span class="pe-3" />
     {#if mainTab === RequestDataset.RAW}
-      <Dropdown
-        dropdownId={"hash987"}
-        dropDownType={{ type: "text", title: rawTab }}
+      <Select
+        id={"hash987"}
         data={[
           {
             name: "HTML",
             id: RequestDataType.HTML,
-            dynamicClasses: "text-whiteColor",
           },
           {
             name: "JSON",
             id: RequestDataType.JSON,
-            dynamicClasses: "text-whiteColor",
           },
           {
             name: "JavaScript",
             id: RequestDataType.JAVASCRIPT,
-            dynamicClasses: "text-whiteColor",
           },
           {
             name: "Text",
             id: RequestDataType.TEXT,
-            dynamicClasses: "text-whiteColor",
           },
           {
             name: "XML",
             id: RequestDataType.XML,
-            dynamicClasses: "text-whiteColor",
           },
         ]}
+        titleId={rawTab}
         onclick={handleRawDropDown}
-        hoverClasses={[
-          {
-            id: "hash987-btn-div",
-            classToAdd: ["border-bottom", "border-labelColor"],
-          },
-        ]}
+        headerTheme={"transparent"}
+        borderType={"none"}
+        borderActiveType={"bottom"}
+        borderHighlight={"hover-active"}
+        headerHighlight={"active"}
+        minBodyWidth={"150px"}
+        borderRounded={false}
       />
     {/if}
   </div>
