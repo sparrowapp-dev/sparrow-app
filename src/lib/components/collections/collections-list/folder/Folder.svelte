@@ -416,13 +416,14 @@
       on:click={() => {
         if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
           expand = !expand;
-        } else {
-          handleFolderClick(
-            explorer,
-            currentWorkspaceId,
-            collectionId,
-            activeSync,
-          );
+          if (expand) {
+            handleFolderClick(
+              explorer,
+              currentWorkspaceId,
+              collectionId,
+              activeSync,
+            );
+          }
         }
       }}
     >
