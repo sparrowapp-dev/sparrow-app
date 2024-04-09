@@ -1,4 +1,5 @@
-import { makeHttpRequest, makeHttpRequestV2 } from "$lib/api/api.common";
+import { makeHttpRequestV2 } from "$lib/api/api.common";
+import type { Response } from "$lib/utils/interfaces/request.interface";
 import { BehaviorSubject } from "rxjs";
 
 class RestExplorerViewModel {
@@ -35,6 +36,7 @@ class RestExplorerViewModel {
     this._httpMethod = value;
   }
 
+  response = new BehaviorSubject<Response | undefined>(undefined);
   // // attached to database as well as
   // // derived from other properties
   // // here, it is recalculated whenever `selectedProductIndex` changes
@@ -54,7 +56,16 @@ class RestExplorerViewModel {
         this.requestUrl,
         this.httpMethod,
       );
-      console.log(response);
+      const responseHeaders = response.data.headers;
+      const formattedResponse: Response = {
+        headers: Object.keys(responseHeaders).map((k) => ({
+          key: k,
+          value: responseHeaders[k],
+          checked: false,
+        })),
+        body: response.data.body,
+      };
+      this.response.next(formattedResponse);
     } catch (error) {
       console.error(error);
     }

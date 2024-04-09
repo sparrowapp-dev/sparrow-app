@@ -12,6 +12,8 @@ import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboar
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import type { Response } from "$lib/utils/interfaces/request.interface";
+
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const error = (
@@ -189,7 +191,9 @@ const makeHttpRequestV2 = async (url: string, method: string) => {
   ])
     .then(async (data: string) => {
       try {
-        return success(JSON.parse(data), "");
+        const responseBody = JSON.parse(data);
+        const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+        return success(apiResponse, "");
       } catch (e) {
         return error("error");
       }

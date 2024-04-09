@@ -259,7 +259,7 @@ async fn make_request_v2(url: &str, method: &str) -> Result<String, std::io::Err
     let combined_json = json!({
         "headers": headers_json,
         "status": status.to_string(),
-        "response": response_text,
+        "body": response_text,
     });
 
     return Ok(combined_json.to_string());

@@ -14,6 +14,8 @@
   import RestExplorerViewModel from "./RestExplorer.ViewModel";
 
   const _viewModel = new RestExplorerViewModel();
+
+  let response = _viewModel.response;
 </script>
 
 <div class="w-100 d-flex flex-column h-100">
@@ -52,7 +54,7 @@
     </Pane>
     <Pane>
       <!-- Response Pane -->
-      <ResponsePane />
+      <ResponsePane response={$response} />
     </Pane>
   </Splitpanes>
 </div>
