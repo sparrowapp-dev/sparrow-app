@@ -30,7 +30,7 @@
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
-    rawValue = userInput;
+    // rawValue = userInput;
     handleRawChange(userInput);
   });
 

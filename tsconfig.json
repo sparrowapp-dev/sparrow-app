@@ -16,6 +16,7 @@
     "isolatedModules": true,
     "paths": {
       "$lib/*": ["./src/lib/*"],
+      "$features/*": ["./src/features/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

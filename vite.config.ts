@@ -8,6 +8,7 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       $lib: path.resolve("./src/lib"),
+      $features: path.resolve("./src/features"),
     },
   },
 
