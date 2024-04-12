@@ -20,52 +20,21 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import type { WorkspaceRole } from "$lib/utils/enums";
-  import type { Observable } from "rxjs";
-  import type { CollectionDocument } from "$lib/database/app.database";
-  import { onDestroy } from "svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  export let collectionsMethods: CollectionsMethods;
   export let closeCallback;
   export let componentData: NewTab;
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-
-  const collections: Observable<CollectionDocument[]> =
-    collectionsMethods.collection;
-
-  let collectionCountArr = [];
-  let currentCollection;
-  const refreshCount = async () => {
-    if (collectionCountArr && componentData?.path?.collectionId) {
-      for (const collection of collectionCountArr) {
-        if (collection._data.id === componentData?.path?.collectionId) {
-          currentCollection = collection;
-        }
-      }
-    }
-  };
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value) {
-        collectionCountArr = value;
-        refreshCount();
-      }
-    },
-  );
-
-  $: {
-    if (componentData?.path?.collectionId) {
-      refreshCount();
-    }
-  }
+  export let saveApiRequest: (newTab: NewTab) => void;
+  export let handleRemoveTab: (id: string) => void;
 
   let loader: boolean = false;
 
   const handleSaveRequest = async () => {
     const id = componentData?.id;
     loader = true;
-    const res = await collectionsMethods.saveApiRequest(componentData);
+    const res = await saveApiRequest(componentData);
     if (res) {
       loader = false;
       onFinish(id);
@@ -74,10 +43,6 @@
     }
     loader = false;
   };
-
-  onDestroy(() => {
-    collectionSubscribe.unsubscribe();
-  });
 </script>
 
 <div class="pt-2 pb-4">
@@ -103,7 +68,7 @@
         textClassProp={"fs-6"}
         type={"dark"}
         onClick={() => {
-          collectionsMethods.handleRemoveTab(componentData.id);
+          handleRemoveTab(componentData.id);
           closeCallback(false);
         }}
       />
