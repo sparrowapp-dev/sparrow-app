@@ -11,15 +11,14 @@
 
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
   import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
-  import { CollectionsViewModel } from "./Collections.ViewModel.old";
   import type { Writable } from "svelte/store";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import { CollectionPageViewModel } from "./CollectionPage.ViewModel";
   import { ModalWrapperV1 } from "$lib/components";
   import ClosePopup from "$lib/components/collections/req-res-section/sub-components/close-popup/ClosePopup.svelte";
-  const _viewModel = new CollectionsViewModel();
-  const tabList: Writable<NewTab[]> = _viewModel.tabs;
+
   const _collectionPageViewModel = new CollectionPageViewModel();
+  const tabList: Writable<NewTab[]> = _collectionPageViewModel.tabs;
 
   let removeTab: NewTab;
   let closePopup: boolean = false;
@@ -85,13 +84,13 @@
 >
   <ClosePopup
     onFinish={(_id) => {
-      _viewModel.handleRemoveTab(_id);
+      _collectionPageViewModel.handleRemoveTab(_id);
     }}
     componentData={removeTab}
     {handleSaveAsBackdrop}
     closeCallback={handleClosePopupBackdrop}
-    saveApiRequest={_viewModel.saveAPIRequest}
-    handleRemoveTab={_viewModel.handleRemoveTab}
+    saveApiRequest={_collectionPageViewModel.saveAPIRequest}
+    handleRemoveTab={_collectionPageViewModel.handleRemoveTab}
   />
 </ModalWrapperV1>
 
