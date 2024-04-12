@@ -19,7 +19,6 @@
   import ClosePopup from "$lib/components/collections/req-res-section/sub-components/close-popup/ClosePopup.svelte";
   const _viewModel = new CollectionsViewModel();
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
-  const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const _collectionPageViewModel = new CollectionPageViewModel();
 
   let removeTab: NewTab;
