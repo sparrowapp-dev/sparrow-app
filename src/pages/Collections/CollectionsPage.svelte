@@ -14,19 +14,15 @@
   import { CollectionsViewModel } from "./Collections.ViewModel.old";
   import type { Writable } from "svelte/store";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import type { TabDocument } from "$lib/database/app.database";
   import { CollectionPageViewModel } from "./CollectionPage.ViewModel";
   import { ModalWrapperV1 } from "$lib/components";
   import ClosePopup from "$lib/components/collections/req-res-section/sub-components/close-popup/ClosePopup.svelte";
-  import { CollectionListViewModel } from "$lib/components/collections/collections-list/CollectionList.ViewModel";
   const _viewModel = new CollectionsViewModel();
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const _collectionPageViewModel = new CollectionPageViewModel();
 
   let removeTab: NewTab;
-  let movedTabStartIndex: number;
-  let movedTabEndIndex: number;
   let closePopup: boolean = false;
   let saveAsVisibility: boolean = false;
   const closeTab = (id: string, tab: NewTab) => {
