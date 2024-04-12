@@ -68,8 +68,11 @@ export class CollectionPageViewModel {
 
   public onDropEvent = (event: Event) => {
     event.preventDefault();
-    const tablist = this.tabs;
-    let updatedTabList: TabDocument[] = tablist;
+    const tabList = this.tabs;
+    let updatedTabList: TabDocument[] = [];
+    tabList.subscribe((value) => {
+      updatedTabList = value;
+    });
     const element = updatedTabList.splice(this.movedTabStartIndex, 1);
     updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
     updatedTabList = updatedTabList.map((tab, index) => {
