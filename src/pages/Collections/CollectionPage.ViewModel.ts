@@ -167,7 +167,7 @@ export class CollectionPageViewModel {
    * @param uuid
    * @returns
    */
-  public readRequestInFolder = (
+  private readRequestInFolder = (
     collectionId: string,
     folderId: string,
     uuid: string,
@@ -185,7 +185,7 @@ export class CollectionPageViewModel {
    * @param uuid
    * @returns
    */
-  public readRequestOrFolderInCollection = (
+  private readRequestOrFolderInCollection = (
     collectionId: string,
     uuid: string,
   ): Promise<CollectionItem> => {
@@ -200,7 +200,7 @@ export class CollectionPageViewModel {
    * @param uuid
    * @returns
    */
-  public readCollection = (uuid: string): Promise<CollectionDocument> => {
+  private readCollection = (uuid: string): Promise<CollectionDocument> => {
     return this.collectionRepository.readCollection(uuid);
   };
 
