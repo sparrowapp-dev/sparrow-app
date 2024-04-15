@@ -11,3 +11,4 @@ export { default as RequestNavigator } from "./request-navigator/RequestNavigato
 export { default as ResponseNavigator } from "./response-navigator/ResponseNavigator.svelte";
 export { default as ResponseDefaultScreen } from "./response-default-screen/ResponseDefaultScreen.svelte";
 export { default as ResponseErrorScreen } from "./response-error-screen/ResponseErrorScreen.svelte";
+export { default as ResponseBodyNavigator } from "./response-body-navigator/ResponseBodyNavigator.svelte";

@@ -1,19 +1,17 @@
-import { makeHttpRequestV2 } from "$lib/api/api.common";
+// import { makeHttpRequestV2 } from "$lib/api/api.common";
 import { ApiSendRequestViewModel } from "$lib/components/collections/req-res-section/sub-components/sub-components-header/ApiSendRequestPage.ViewModel";
 import type { TabDocument } from "$lib/database/app.database";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { createApiRequest } from "$lib/services/rest-api.service";
-import { RequestDataType } from "$lib/utils/enums";
 import { createDeepCopy } from "$lib/utils/helpers";
 import type {
   KeyValuePair,
-  NewTab,
   Response,
 } from "$lib/utils/interfaces/request.interface";
+import { generateSampleRequest } from "$lib/utils/sample";
 import { BehaviorSubject, Observable } from "rxjs";
 
 class RestExplorerViewModel {
-  // _httpMethod = "";
   private _httpMethod: BehaviorSubject<string> = new BehaviorSubject("");
   private _requestUrl: BehaviorSubject<string> = new BehaviorSubject("");
   private emptyHeaders: KeyValuePair[] = [];
@@ -29,7 +27,6 @@ class RestExplorerViewModel {
   // create a behaviour subject for all the tabs
   public constructor() {
     // get active data from rxdb and find using ID And initiate the Rest Explorer
-    // create the behaviour subject
     this.tabRepository.getTabLs().then((res: TabDocument[]) => {
       res.forEach((doc) => {
         if (doc.isActive) {
@@ -169,26 +166,13 @@ class RestExplorerViewModel {
     this.response = _response;
   };
 
-  //   public sendRequest = async () => {
-  //     try {
-  //       const response = await makeHttpRequestV2(
-  //         this._requestUrl.getValue(),
-  //         this._httpMethod.getValue(),
-  //       );
-  //       const responseHeaders = response.data.headers;
-  //       const formattedResponse: Response = {
-  //         headers: Object.keys(responseHeaders).map((k) => ({
-  //           key: k,
-  //           value: responseHeaders[k],
-  //           checked: false,
-  //         })),
-  //         body: response.data.body,
-  //       };
-  //       this.response.next(formattedResponse);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+  public clearResponse = async (_response: string) => {
+    const response = generateSampleRequest(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      new Date().toString(),
+    ).property.request.response;
+    this.updateResponse(response);
+  };
 
   public sendRequest = async () => {
     this.updateRequestState({ requestInProgress: true });

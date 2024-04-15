@@ -16,6 +16,7 @@
     ResponseDefaultScreen,
     ResponseErrorScreen,
     ResponseHeaders,
+    ResponseBodyNavigator,
   } from "@rest-explorer/components";
 
   import RestExplorerViewModel from "./RestExplorer.ViewModel";
@@ -105,7 +106,7 @@
     <Pane class="position-relative">
       <!-- Response Pane -->
       <!-- <ResponsePane response={$response} /> -->
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column h-100">
         {#if $requestState?.requestInProgress}
           <ResponseDefaultScreen />
           <div
@@ -130,6 +131,12 @@
             on:change={handleResponseNavigator}
           />
           {#if $requestState.responseSection === ResponseSection.RESPONSE}
+            <ResponseBodyNavigator
+              response={$response}
+              apiState={$requestState}
+              onUpdateRequestState={_viewModel.updateRequestState}
+              onClearResponse={_viewModel.updateResponse}
+            />
             <ResponseBody response={$response} apiState={$requestState} />
           {:else if $requestState.responseSection === ResponseSection.HEADERS}
             <ResponseHeaders responseHeader={$response?.headers} />

@@ -12,10 +12,10 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class="mt-4 pb-0 ps-1 pe-1 w-100">
+<div class="pb-0 ps-1 pe-1 w-100">
   <div
     class="col-12 d-flex align-items-center"
-    style="font-size: 12px;font-weight:500;border-bottom:1px solid var(--border-color)"
+    style="font-size: 12px; font-weight:500;border-bottom:1px solid var(--border-color)"
   >
     <div class="col-2">
       <p class="text-requestBodyColor ps-1">Auth Type</p>
