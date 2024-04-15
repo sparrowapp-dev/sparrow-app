@@ -64,19 +64,19 @@
     <NoAuth />
   {:else if requestStateAuth === AuthType.API_KEY}
     <ApiKey
-      apiData={auth.apiKey}
+      apiData={$auth.apiKey}
       callback={onUpdateRequestAuth}
       {environmentVariables}
     />
   {:else if requestStateAuth === AuthType.BEARER_TOKEN}
     <BearerToken
-      bearerToken={auth.bearerToken}
+      bearerToken={$auth.bearerToken}
       callback={onUpdateRequestAuth}
       {environmentVariables}
     />
   {:else if requestStateAuth === AuthType.BASIC_AUTH}
     <BasicAuth
-      basicAuth={auth.basicAuth}
+      basicAuth={$auth.basicAuth}
       callback={onUpdateRequestAuth}
       {environmentVariables}
     />

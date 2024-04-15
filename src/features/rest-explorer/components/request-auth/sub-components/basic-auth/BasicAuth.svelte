@@ -2,7 +2,7 @@
   import { RequestAuthProperty } from "$lib/utils/enums/request.enum";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import type { BasicAuth } from "$lib/utils/interfaces/request.interface";
-  import EnvironmentPicker from "../environment-picker/EnvironmentPicker.svelte";
+  import EnvironmentPicker from "$lib/components/collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
 
   export let callback;
   export let basicAuth: BasicAuth;

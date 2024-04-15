@@ -114,6 +114,14 @@ const stateLiteral = {
     isSaveDescription: {
       type: "boolean",
     },
+    requestInProgress: {
+      type: "boolean",
+      default: false,
+    },
+    descriptionInProgress: {
+      type: "boolean",
+      default: false,
+    },
   },
 };
 const basicAuthLiteral = {
@@ -182,10 +190,6 @@ const requestLiteral = {
     response: responseLiteral,
     state: stateLiteral,
     auth: authLiteral,
-    requestInProgress: {
-      type: "boolean",
-      default: false,
-    },
     save: saveLiteral,
   },
 };
@@ -232,7 +236,7 @@ export const tabSchemaLiteral = {
     separator: "|",
   },
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     tabId: {
       type: "string",

@@ -16,7 +16,13 @@
     "isolatedModules": true,
     "paths": {
       "$lib/*": ["./src/lib/*"],
-      "$features/*": ["./src/features/*"]
+
+      "@sparrow/icons/*": ["./src/lib/assets/icons/*"],
+      "@sparrow/ui/*": ["./src/lib/components/*"],
+      "@sparrow/typography/*": ["./src/lib/components/*"],
+      "@sparrow/forms/*": ["./src/lib/components/*"],
+
+      "@rest-explorer/*": ["./src/features/rest-explorer/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

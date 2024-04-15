@@ -9,3 +9,5 @@ export { default as ResponseHeaders } from "./response-headers/ResponseHeaders.s
 export { default as ResponsePane } from "./response-pane/ResponsePane.svelte";
 export { default as RequestNavigator } from "./request-navigator/RequestNavigator.svelte";
 export { default as ResponseNavigator } from "./response-navigator/ResponseNavigator.svelte";
+export { default as ResponseDefaultScreen } from "./response-default-screen/ResponseDefaultScreen.svelte";
+export { default as ResponseErrorScreen } from "./response-error-screen/ResponseErrorScreen.svelte";
