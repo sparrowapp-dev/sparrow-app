@@ -1,28 +1,43 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-
+  // ---- Store
   import {
     collectionRightPanelWidth,
     collectionLeftPanelWidth,
     collapsibleState,
-    tabs,
+    userWorkspaceLevelRole,
   } from "$lib/store";
+  import type { Writable } from "svelte/store";
 
+  // ---- Components
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
   import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
-  import type { Writable } from "svelte/store";
+  import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+
+  // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+
+  // ---- View Model
   import { CollectionPageViewModel } from "./CollectionPage.ViewModel";
-  import { ModalWrapperV1 } from "$lib/components";
-  import ClosePopup from "$lib/components/collections/req-res-section/sub-components/close-popup/ClosePopup.svelte";
+
+  // ---- helpers
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
 
   const _collectionPageViewModel = new CollectionPageViewModel();
   const tabList: Writable<NewTab[]> = _collectionPageViewModel.tabs;
-
+  let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab: NewTab;
   let closePopup: boolean = false;
   let saveAsVisibility: boolean = false;
+  let loader = false;
+
+  /**
+   * This function is to handle close tab functionality in tab bar list
+   */
   const closeTab = (id: string, tab: NewTab) => {
     if (
       tab?.property?.request &&
@@ -39,12 +54,43 @@
       _collectionPageViewModel.handleRemoveTab(id);
     }
   };
+
   const handleClosePopupBackdrop = (flag) => {
     closePopup = flag;
   };
-  const handleSaveAsBackdrop = (flag) => {
-    saveAsVisibility = flag;
+
+  const handlePopupDiscard = () => {
+    _collectionPageViewModel.handleRemoveTab(removeTab.id);
+    closePopup = false;
   };
+
+  /**
+   * This function is to handle the save functionality on close confirmation popup
+   */
+  const handlePopupSave = async () => {
+    console.log("on savee");
+    if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
+      const id = removeTab?.id;
+      loader = true;
+      const res = await _collectionPageViewModel.saveAPIRequest(removeTab);
+      if (res) {
+        loader = false;
+        _collectionPageViewModel.handleRemoveTab(id);
+        closePopup = false;
+        notifications.success("API request saved");
+      }
+      loader = false;
+    } else {
+      closePopup = false;
+      saveAsVisibility = true;
+    }
+  };
+
+  userWorkspaceLevelRole.subscribe((value: WorkspaceRole) => {
+    if (value) {
+      loggedUserRoleInWorkspace = value;
+    }
+  });
 </script>
 
 <Splitpanes
@@ -63,9 +109,9 @@
       onNewTabRequested={_collectionPageViewModel.createNewTab}
       onTabClosed={closeTab}
       onDropEvent={_collectionPageViewModel.onDropEvent}
-      handleDropOnStart={_collectionPageViewModel.handleDropOnStart}
-      handleDropOnEnd={_collectionPageViewModel.handleDropOnEnd}
-      updateCurrentTab={_collectionPageViewModel.handleActiveTab}
+      onDragStart={_collectionPageViewModel.handleDropOnStart}
+      onDropOver={_collectionPageViewModel.handleDropOnEnd}
+      onTabSelected={_collectionPageViewModel.handleActiveTab}
     />
     <br />
     <Route>
@@ -74,25 +120,18 @@
   </Pane>
 </Splitpanes>
 
-<ModalWrapperV1
-  title={"Save Changes"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
+<CloseConfirmationPopup
   isOpen={closePopup}
-  handleModalState={handleClosePopupBackdrop}
->
-  <ClosePopup
-    onFinish={(_id) => {
-      _collectionPageViewModel.handleRemoveTab(_id);
-    }}
-    componentData={removeTab}
-    {handleSaveAsBackdrop}
-    closeCallback={handleClosePopupBackdrop}
-    saveApiRequest={_collectionPageViewModel.saveAPIRequest}
-    handleRemoveTab={_collectionPageViewModel.handleRemoveTab}
-  />
-</ModalWrapperV1>
+  onChangeModalState={handleClosePopupBackdrop}
+  onSave={handlePopupSave}
+  onCancel={handleClosePopupBackdrop}
+  onDiscard={handlePopupDiscard}
+  isSaveDisable={!hasWorkpaceLevelPermission(
+    loggedUserRoleInWorkspace,
+    workspaceLevelPermissions.SAVE_REQUEST,
+  )}
+  {loader}
+/>
 
 <style>
 </style>

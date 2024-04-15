@@ -1,20 +1,29 @@
 <script lang="ts">
+  // ---- SVG
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
+
+  // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
-  import Tab from "../req-res-section/sub-components/sub-components-header/Tab.svelte";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+
+  // ---- Interface
   import type { TabDocument } from "$lib/database/app.database";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
+
+  // ---- Component
+  import Tab from "../req-res-section/sub-components/sub-components-header/Tab.svelte";
+
+  // ---- Helper
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
 
   export let tabList: TabDocument[] = [];
   export let onNewTabRequested: () => void;
   export let onTabClosed: (id: string, tab: NewTab) => void;
   export let onDropEvent: (event: Event) => void;
-  export let handleDropOnStart: (index: number) => void;
-  export let handleDropOnEnd: (index: number) => void;
-  export let updateCurrentTab: (id: string) => void;
+  export let onDragStart: (index: number) => void;
+  export let onDropOver: (index: number) => void;
+  export let onTabSelected: (id: string) => void;
 
   $: {
     if (tabList) {
@@ -32,7 +41,7 @@
   let scrollerParent: number;
   let scrollerWidth: number;
 
-  const onDropOver = (event: Event) => {
+  const handleDropOver = (event: Event) => {
     event.preventDefault();
   };
 </script>
@@ -62,7 +71,7 @@
     {/if}
     <div
       on:dragover={(event) => {
-        onDropOver(event);
+        handleDropOver(event);
       }}
       class=" d-inline-block tab-scroller"
       bind:offsetWidth={scrollerWidth}
@@ -70,15 +79,15 @@
       style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
     >
       {#if tabList}
-        {#each tabList as tab, index}
+        {#each tabList as tab, index (tab.id)}
           <Tab
             {tab}
-            {updateCurrentTab}
-            closeTab={onTabClosed}
+            {onTabSelected}
+            {onTabClosed}
             {index}
             {tabWidth}
-            {handleDropOnStart}
-            {handleDropOnEnd}
+            {onDragStart}
+            {onDropOver}
           />
         {/each}
       {/if}

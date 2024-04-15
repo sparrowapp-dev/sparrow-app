@@ -1,28 +1,42 @@
 <script lang="ts">
+  // ---- Icon
   import Crossicon from "$lib/assets/crossicon.svelte";
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import BookIcon from "$lib/assets/book.svelte";
+  // ----
+
+  // ---- SVG
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
+  // ----
 
-  import BookIcon from "$lib/assets/book.svelte";
+  // ---- Enum
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  // ----
+
+  // ---- helper functions
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  // ----
+
+  // ---- Interface
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  // ----
+
   export let tab: NewTab;
-  export let updateCurrentTab: (id: string) => void;
   export let tabWidth: number;
   export let index: number;
-  export let closeTab;
-  export let handleDropOnStart: (index: number) => void;
-  export let handleDropOnEnd: (index: number) => void;
+  export let onTabSelected: (id: string) => void;
+  export let onTabClosed: (id: string, tab: NewTab) => void;
+  export let onDragStart: (index: number) => void;
+  export let onDropOver: (index: number) => void;
 </script>
 
 <div
   draggable={true}
   on:drop={() => {
-    handleDropOnEnd(index);
+    onDropOver(index);
   }}
   on:dragstart={() => {
-    handleDropOnStart(index);
+    onDragStart(index);
   }}
   class="d-inline-block position-relative pt-1 individual-tab"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
@@ -37,7 +51,7 @@
   >
     <button
       on:click={() => {
-        updateCurrentTab(tab.id);
+        onTabSelected(tab.id);
       }}
       class="position-relative border-0 ellipsis"
       style="    width: 80%;
@@ -93,7 +107,7 @@
         ? 'active-close-btn'
         : 'inactive-close-btn'} btn border-0 d-flex align-items-center"
       on:click={() => {
-        closeTab(tab.id, tab);
+        onTabClosed(tab.id, tab);
       }}
       style="overflow:hidden; height:31px;"
     >

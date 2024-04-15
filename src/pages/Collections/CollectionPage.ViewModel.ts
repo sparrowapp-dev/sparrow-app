@@ -1,28 +1,44 @@
+import { v4 as uuidv4 } from "uuid";
+
+// ---- local db
 import type {
   CollectionDocument,
   TabDocument,
 } from "$lib/database/app.database";
+
+// ---- Repository
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { TabRepository } from "$lib/repositories/tab.repository";
+
+// ---- Services
 import { updateCollectionRequest } from "$lib/services/collection";
+
+// ---- Store
 import {
   isApiCreatedFirstTime,
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
+
+// ---- enums
 import { RequestDataset } from "$lib/utils/enums";
 import { ItemType } from "$lib/utils/enums/item-type.enum";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+
+// ---- helpers
 import { setContentTypeHeader } from "$lib/utils/helpers";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { generateSampleRequest } from "$lib/utils/sample/request.sample";
+
+// ---- Interface
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type {
   NewTab,
   RequestBody,
 } from "$lib/utils/interfaces/request.interface";
+
+// ---- mixpanel
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-import { v4 as uuidv4 } from "uuid";
 export class CollectionPageViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
@@ -31,6 +47,12 @@ export class CollectionPageViewModel {
 
   constructor() {}
 
+  /**
+   * This function is used when a function need to be called after certain interval only.
+   * @param func
+   * @param delay
+   * @returns
+   */
   public debounce = (func, delay) => {
     let timerId;
 
@@ -45,26 +67,43 @@ export class CollectionPageViewModel {
     };
   };
 
+  /**
+   * Return current tabs list of top tab bar component
+   */
   get tabs() {
     return requestResponseStore.getTabList();
   }
 
-  public syncTabWithStore = () => {
+  /**
+   * Sync the tab list with store
+   */
+  private syncTabWithStore = () => {
     this.tabRepository.syncTabsWithStore(tabs);
   };
 
   debouncedTab = this.debounce(this.syncTabWithStore, 2000);
 
+  /**
+   * Create new tab in tab list store
+   * @param data - new tab
+   */
   public handleCreateTab = (data: any) => {
     requestResponseStore.createTab(data);
     this.debouncedTab();
   };
 
+  /**
+   * Remove the tab from tab list in store
+   * @param id - tab id
+   */
   public handleRemoveTab = (id: string) => {
     requestResponseStore.removeTab(id);
     this.debouncedTab();
   };
 
+  /**
+   * Create new tab with untracked id
+   */
   public createNewTab = () => {
     isApiCreatedFirstTime.set(true);
     this.handleCreateTab(
@@ -74,11 +113,19 @@ export class CollectionPageViewModel {
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
   };
 
+  /**
+   * Set active tab in store
+   * @param id - tab id
+   */
   public handleActiveTab = (id: string) => {
     requestResponseStore.activeTab(id);
     this.debouncedTab();
   };
 
+  /**
+   * Handle tab drop on tab list
+   * @param event
+   */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
     const tabList = this.tabs;
@@ -97,13 +144,29 @@ export class CollectionPageViewModel {
     this.syncTabWithStore();
   };
 
+  /**
+   * Set starting index of tab from tab list
+   * @param index - tab index
+   */
   public handleDropOnStart = (index: number) => {
     this.movedTabStartIndex = index;
   };
+
+  /**
+   * Set ending index of tab in tab list
+   * @param index - tab index
+   */
   public handleDropOnEnd = (index: number) => {
     this.movedTabEndIndex = index;
   };
 
+  /**
+   * Retrieve request inside folder from repository
+   * @param collectionId
+   * @param folderId
+   * @param uuid
+   * @returns
+   */
   public readRequestInFolder = (
     collectionId: string,
     folderId: string,
@@ -116,6 +179,12 @@ export class CollectionPageViewModel {
     );
   };
 
+  /**
+   * Retrieve request or folder from repository
+   * @param collectionId
+   * @param uuid
+   * @returns
+   */
   public readRequestOrFolderInCollection = (
     collectionId: string,
     uuid: string,
@@ -126,12 +195,23 @@ export class CollectionPageViewModel {
     );
   };
 
+  /**
+   * Retrieve collection from repository
+   * @param uuid
+   * @returns
+   */
   public readCollection = (uuid: string): Promise<CollectionDocument> => {
     return this.collectionRepository.readCollection(uuid);
   };
 
+  /**
+   * Save API Request from unsaved Tab
+   * @param componentData - New Tab
+   * @param saveDescriptionOnly
+   * @returns
+   */
   public saveAPIRequest = async (
-    componentData,
+    componentData: NewTab,
     saveDescriptionOnly = false,
   ) => {
     const { folderId, folderName, collectionId, workspaceId } =
@@ -196,6 +276,7 @@ export class CollectionPageViewModel {
         selectedRequestAuthType:
           existingRequest?.request?.selectedRequestAuthType,
       };
+      // create meta data
       expectedMetaData = {
         id: _id,
         name: existingRequest?.name,
