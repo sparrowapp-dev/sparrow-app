@@ -1,5 +1,5 @@
 // import { makeHttpRequestV2 } from "$lib/api/api.common";
-import { ApiSendRequestViewModel } from "$lib/components/collections/req-res-section/sub-components/sub-components-header/ApiSendRequestPage.ViewModel";
+import { DecodeRequest } from "@rest-explorer/utils";
 import type { TabDocument } from "$lib/database/app.database";
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { createApiRequest } from "$lib/services/rest-api.service";
@@ -10,6 +10,7 @@ import type {
 } from "$lib/utils/interfaces/request.interface";
 import { generateSampleRequest } from "$lib/utils/sample";
 import { BehaviorSubject, Observable } from "rxjs";
+import { makeHttpRequest } from "$lib/api/api.common";
 
 class RestExplorerViewModel {
   private _httpMethod: BehaviorSubject<string> = new BehaviorSubject("");
@@ -23,7 +24,7 @@ class RestExplorerViewModel {
   private _requestAuth: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
   private _activeTab;
-  private _apiSendRequest = new ApiSendRequestViewModel();
+  private _decodeRequest = new DecodeRequest();
   // create a behaviour subject for all the tabs
   public constructor() {
     // get active data from rxdb and find using ID And initiate the Rest Explorer
@@ -177,13 +178,12 @@ class RestExplorerViewModel {
   public sendRequest = async () => {
     this.updateRequestState({ requestInProgress: true });
     let start = Date.now();
-    createApiRequest(
-      this._apiSendRequest.decodeRestApiData(
-        this.activeTab.property.request,
-        [],
-      ),
-      "",
-    )
+
+    const decodeData = this._decodeRequest.init(
+      this.activeTab.property.request,
+      [],
+    );
+    makeHttpRequest(...decodeData)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
@@ -213,7 +213,7 @@ class RestExplorerViewModel {
           let responseHeaders = head;
           let responseStatus = response.data.status;
           const ct =
-            this._apiSendRequest.setResponseContentType(responseHeaders);
+            this._decodeRequest.setResponseContentType(responseHeaders);
           this.updateRequestState({
             responseRaw: ct,
             requestInProgress: false,
