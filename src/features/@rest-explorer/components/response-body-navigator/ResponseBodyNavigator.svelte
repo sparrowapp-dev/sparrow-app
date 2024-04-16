@@ -73,9 +73,7 @@
   };
 </script>
 
-<div
-  class="d-flex flex-column align-items-start justify-content-between w-100 px-3"
->
+<div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
     class="response-container d-flex align-items-center justify-content-between pb-3 w-100 z-1 position-sticky"
     style="top:55.4px; background-color: var(--background-color); margin-top: -1px;"

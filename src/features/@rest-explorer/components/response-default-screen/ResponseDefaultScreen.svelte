@@ -28,14 +28,11 @@
 <div
   class="d-flex text-requestBodyColor mt-1 flex-column {isHorizontalMode
     ? 'align-items-center'
-    : 'align-items-center'} justify-content-between py-3 ps-3"
+    : 'align-items-center'} justify-content-between py-3"
 >
   <div
-    class="d-flex flex-column align-items-start {isHorizontalMode
-      ? 'align-items-center '
-      : 'align-items-center'} justify-content-start {isHorizontalMode
-      ? 'mb-2 mt-3'
-      : 'mb-3 mt-5'} "
+    class="d-flex flex-column align-items-start justify-content-start mb-2 mt-3
+     "
   >
     <h4 style="font-weight: 500; text-align: center;">
       Click send to get a Response

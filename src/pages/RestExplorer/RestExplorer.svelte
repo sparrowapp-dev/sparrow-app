@@ -17,6 +17,7 @@
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseBodyNavigator,
+    RequestBody,
   } from "@rest-explorer/components";
 
   import RestExplorerViewModel from "./RestExplorer.ViewModel";
@@ -77,15 +78,21 @@
   <Splitpanes class="" style="height: 78vh;" dblClickSplitter={false}>
     <Pane>
       <!-- Request Pane -->
-      <RequestNavigator
-        requestStateSection={$requestState?.section}
-        on:change={handleRequestNavigator}
-      />
-      <div class="d-flex align-items-center justify-content-start ps-4">
+      <div class="px-3">
+        <RequestNavigator
+          requestStateSection={$requestState?.section}
+          on:change={handleRequestNavigator}
+        />
         {#if $requestState?.section === RequestSection.PARAMETERS}
           parameters
         {:else if $requestState?.section === RequestSection.REQUEST_BODY}
-          requestbody
+          <RequestBody
+            body={_viewModel.requestBody}
+            method={_viewModel.httpMethod}
+            requestState={$requestState}
+            onUpdateRequestBody={_viewModel.updateRequestBody}
+            onUpdateRequestState={_viewModel.updateRequestState}
+          />
         {:else if $requestState?.section === RequestSection.HEADERS}
           <RequestHeaders
             headers={_viewModel.requestHeaders}
@@ -106,7 +113,7 @@
     <Pane class="position-relative">
       <!-- Response Pane -->
       <!-- <ResponsePane response={$response} /> -->
-      <div class="d-flex flex-column h-100">
+      <div class="d-flex flex-column h-100 px-3">
         {#if $requestState?.requestInProgress}
           <ResponseDefaultScreen />
           <div

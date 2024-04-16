@@ -7,7 +7,7 @@
 <div
   class="d-flex flex-column align-items-start justify-content-between w-100 h-100 response-body"
 >
-  <div class="w-100 backgroundColor position-relative pe-2">
+  <div class="w-100 backgroundColor position-relative">
     <CodeMirrorResponse
       formatter={apiState.responseFormatter}
       rawTab={apiState.responseRaw}

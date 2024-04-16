@@ -14,7 +14,7 @@
   ];
 </script>
 
-<div class="py-2 px-3">
+<div class="py-2">
   <!-- Tabs -->
   <div class="d-flex mb-3">
     {#each tabs as tab}
