@@ -30,10 +30,8 @@
   export let handleSaveAsBackdrop;
   export let onFinish = (_id) => {};
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-
   const collections: Observable<CollectionDocument[]> =
     collectionsMethods.collection;
-
   let collectionCountArr = [];
   let currentCollection;
   const refreshCount = async () => {
@@ -53,15 +51,12 @@
       }
     },
   );
-
   $: {
     if (componentData?.path?.collectionId) {
       refreshCount();
     }
   }
-
   let loader: boolean = false;
-
   const handleSaveRequest = async () => {
     const id = componentData?.id;
     loader = true;
@@ -74,7 +69,6 @@
     }
     loader = false;
   };
-
   onDestroy(() => {
     collectionSubscribe.unsubscribe();
   });

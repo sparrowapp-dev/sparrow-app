@@ -4,6 +4,7 @@
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import Collections from "../Collections/Collections.old.svelte";
+  import Mock from "../Mock/Mock.svelte";
 </script>
 
 <div class="dashboard vh-100">
@@ -23,7 +24,7 @@
       <Route path="/workspaces/*"><Collections /></Route>
 
       <!-- Route for Mock -->
-      <Route path="/mock/*">Mock</Route>
+      <Route path="/mock/*"><Mock /></Route>
 
       <!-- Route for Environment -->
       <Route path="/environment/*">Environment</Route>
