@@ -22,7 +22,7 @@
       "@sparrow/typography/*": ["./src/lib/components/*"],
       "@sparrow/forms/*": ["./src/lib/components/*"],
 
-      "@rest-explorer/*": ["./src/features/rest-explorer/*"],
+      "@rest-explorer/*": ["./src/features/@rest-explorer/*"],
       "@common/*": ["./src/features/@common/*"]
     }
   },

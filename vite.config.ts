@@ -15,7 +15,7 @@ export default defineConfig(async () => ({
       "@sparrow/typography": path.resolve("./src/lib/components"),
 
       "@common": path.resolve("./src/features/@common"),
-      "@rest-explorer": path.resolve("./src/features/rest-explorer"),
+      "@rest-explorer": path.resolve("./src/features/@rest-explorer"),
     },
   },
 
