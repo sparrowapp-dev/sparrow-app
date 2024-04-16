@@ -2,7 +2,7 @@
   import CollectionsList from "$lib/components/collections/collections-list/CollectionList.svelte";
   import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
   import DefaultTabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/DefaultTabBar.svelte";
-  import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
+  import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.old.svelte";
   import { collapsibleState } from "$lib/store/request-response-section";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import { CollectionsViewModel } from "./Collections.ViewModel.old";
