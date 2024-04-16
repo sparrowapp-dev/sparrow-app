@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { Select } from "$lib/components/inputs";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
-  import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-components";
+  import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
 
   export let auth;
   export let environmentVariables = [];

@@ -1,17 +1,31 @@
 <script lang="ts">
-  import CodeMirrorResponse from "$lib/components/editor/CodeMirrorResponse.svelte";
+  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
   export let response;
   export let apiState;
+
+  let language = apiState.responseRaw;
+  $: {
+    if (apiState) {
+      if (apiState.responseFormatter === "Raw") {
+        language = "Text";
+      } else {
+        language = apiState.responseRaw;
+      }
+    }
+  }
 </script>
 
 <div
   class="d-flex flex-column align-items-start justify-content-between w-100 h-100 response-body"
 >
   <div class="w-100 backgroundColor position-relative">
-    <CodeMirrorResponse
-      formatter={apiState.responseFormatter}
-      rawTab={apiState.responseRaw}
-      rawValue={response.body}
+    <CodeMirror
+      bind:lang={language}
+      bind:value={response.body}
+      on:change={() => {}}
+      codeMirrorStyle={"basic"}
+      isEditable={false}
+      isPretty={true}
     />
   </div>
 </div>

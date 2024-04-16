@@ -22,70 +22,20 @@
     RequestBodyNavigator,
     UrlEncoded,
     WarningScreen,
-  } from "./sub-request-body";
-
-  //   export let collectionsMethods: CollectionsMethods;
+  } from "./sub-body";
 
   export let environmentVariables = [];
-
   export let body;
   export let requestState;
   export let onUpdateRequestBody;
   export let onUpdateRequestState;
   export let method;
 
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
-
-  let currentTabId: string = "";
-  let mainTab: string;
-  let rawTab: RequestDataType;
-  let rawValue: string = "";
-  let urlEncoded: KeyValuePair[] = [];
-  let formDataText: KeyValuePair[] = [];
-  let formDataFile: KeyValuePairWithBase[] = [];
-  let inputValue: string = "";
-  let getMessage: boolean = true;
-  let deleteMessage: boolean = true;
-
-  //   const tabSubscribe = activeTab.subscribe((event: NewTab) => {
-  //     if (event?.id && currentTabId != event?.id) {
-  //       getMessage = true;
-  //       deleteMessage = true;
-  //     }
-  //     if (event && event.property) {
-  //       currentTabId = event?.id;
-  //       rawValue = event?.property?.request?.body?.raw;
-  //       urlEncoded = event?.property?.request?.body?.urlencoded;
-  //       formDataText = event?.property?.request?.body?.formdata?.text;
-  //       formDataFile = event?.property?.request?.body?.formdata?.file;
-  //       mainTab = event?.property?.request?.state?.dataset;
-  //       rawTab = event?.property?.request?.state?.raw;
-  //     }
-  //   });
-
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));
-
-  const handleRawChange = (rawValue) => {
-    collectionsMethods.updateRequestBody(rawValue, "raw");
-  };
-  const handleUrlEncodeChange = (pairs) => {
-    collectionsMethods.updateRequestBody(pairs, "urlencoded");
-  };
-  const handleFormDataTextChange = (pairs) => {
-    collectionsMethods.updateRequestBodyFormData(pairs, "text");
-  };
-
-  const handleFormDataFileChange = (pairs) => {
-    collectionsMethods.updateRequestBodyFormData(pairs, "file");
-  };
-
-  onDestroy(() => {
-    // tabSubscribe();
-  });
 </script>
 
-<div class="ps-0 pe-0 rounded w-100">
+<div class="ps-0 pe-0 rounded w-100 h-100 position-relative">
   <RequestBodyNavigator
     method={$method}
     {onUpdateRequestState}
@@ -96,30 +46,18 @@
   {:else if requestState.dataset === RequestDataset.NONE}
     <None />
   {:else if requestState.dataset === RequestDataset.URLENCODED}
-    <!-- <KeyValue
-      keyValue={urlEncoded}
-      callback={handleUrlEncodeChange}
+    <UrlEncoded
+      value={$body.urlencoded}
+      {onUpdateRequestBody}
       {environmentVariables}
-    /> -->
+    />
   {:else if requestState.dataset === RequestDataset.FORMDATA}
-    <p>Text</p>
-    <!-- <KeyValue
-      keyValue={formDataText}
-      callback={handleFormDataTextChange}
+    <FormData
+      textValue={$body.formdata.text}
+      fileValue={$body.formdata.file}
+      {onUpdateRequestBody}
       {environmentVariables}
-    /> -->
-    <p>File</p>
-    <!-- <KeyValue
-      keyValue={formDataFile}
-      callback={handleFormDataFileChange}
-      {environmentVariables}
-      type="file"
-    /> -->
+      formData={$body.formdata}
+    />
   {/if}
 </div>
-
-<style>
-  .cursor-pointer {
-    cursor: pointer;
-  }
-</style>

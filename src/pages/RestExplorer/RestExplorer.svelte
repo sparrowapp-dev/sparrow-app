@@ -78,7 +78,7 @@
   <Splitpanes class="" style="height: 78vh;" dblClickSplitter={false}>
     <Pane>
       <!-- Request Pane -->
-      <div class="px-3">
+      <div class="px-3 h-100 position-relative">
         <RequestNavigator
           requestStateSection={$requestState?.section}
           on:change={handleRequestNavigator}
