@@ -31,12 +31,12 @@
   const tabList: Writable<NewTab[]> = _collectionPageViewModel.tabs;
   let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab: NewTab;
-  let closePopup: boolean = false;
+  let isPopupClosed: boolean = false;
   let saveAsVisibility: boolean = false;
   let loader = false;
 
   /**
-   * This function is to handle close tab functionality in tab bar list
+   * Handle close tab functionality in tab bar list
    */
   const closeTab = (id: string, tab: NewTab) => {
     if (
@@ -46,7 +46,7 @@
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
-        closePopup = true;
+        isPopupClosed = true;
       } else {
         _collectionPageViewModel.handleRemoveTab(id);
       }
@@ -56,16 +56,16 @@
   };
 
   const handleClosePopupBackdrop = (flag) => {
-    closePopup = flag;
+    isPopupClosed = flag;
   };
 
   const handlePopupDiscard = () => {
     _collectionPageViewModel.handleRemoveTab(removeTab.id);
-    closePopup = false;
+    isPopupClosed = false;
   };
 
   /**
-   * This function is to handle the save functionality on close confirmation popup
+   * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
     console.log("on savee");
@@ -76,12 +76,12 @@
       if (res) {
         loader = false;
         _collectionPageViewModel.handleRemoveTab(id);
-        closePopup = false;
+        isPopupClosed = false;
         notifications.success("API request saved");
       }
       loader = false;
     } else {
-      closePopup = false;
+      isPopupClosed = false;
       saveAsVisibility = true;
     }
   };
@@ -121,12 +121,12 @@
 </Splitpanes>
 
 <CloseConfirmationPopup
-  isOpen={closePopup}
-  onChangeModalState={handleClosePopupBackdrop}
+  isOpen={isPopupClosed}
+  onModalStateChanged={handleClosePopupBackdrop}
   onSave={handlePopupSave}
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
-  isSaveDisable={!hasWorkpaceLevelPermission(
+  isSaveDisabled={!hasWorkpaceLevelPermission(
     loggedUserRoleInWorkspace,
     workspaceLevelPermissions.SAVE_REQUEST,
   )}

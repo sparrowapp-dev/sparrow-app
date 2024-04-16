@@ -3,8 +3,8 @@
   import Button from "../buttons/Button.svelte";
 
   export let isOpen = false;
-  export let isSaveDisable = false;
-  export let onChangeModalState: (flag: boolean) => void;
+  export let isSaveDisabled = false;
+  export let onModalStateChanged: (flag: boolean) => void;
   export let onCancel: (data: boolean) => void;
   export let onSave: () => void;
   export let onDiscard: () => void;
@@ -17,7 +17,7 @@
   width={"35%"}
   zIndex={1000}
   {isOpen}
-  handleModalState={onChangeModalState}
+  handleModalState={onModalStateChanged}
 >
   <div class="pt-2 pb-4">
     <small class="">
@@ -48,7 +48,7 @@
         />
       </span>
       <Button
-        disable={isSaveDisable}
+        disable={isSaveDisabled}
         title={"Save Changes"}
         textClassProp={"fs-6"}
         type={"primary"}

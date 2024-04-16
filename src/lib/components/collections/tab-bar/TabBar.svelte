@@ -16,13 +16,42 @@
 
   // ---- Helper
   import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import Button from "$lib/components/buttons/Button.svelte";
 
+  // ------ Props ------
+  /**
+   * List of tabs
+   */
   export let tabList: TabDocument[] = [];
+  /**
+   * Callback for new tab requested
+   */
   export let onNewTabRequested: () => void;
+  /**
+   * Callback for tab closed
+   * @param id - Tab ID
+   * @param tab - New Tab
+   */
   export let onTabClosed: (id: string, tab: NewTab) => void;
+  /**
+   * Callback for Tab Drop Event
+   * @param event - Event
+   */
   export let onDropEvent: (event: Event) => void;
+  /**
+   * Callback function for drag start from a index
+   * @param index - Index of Tab
+   */
   export let onDragStart: (index: number) => void;
+  /**
+   * Callback function for drop over at a index
+   * @param index - Index of Tab
+   */
   export let onDropOver: (index: number) => void;
+  /**
+   * Callback for Selected Tab
+   * @param id - Tab ID
+   */
   export let onTabSelected: (id: string) => void;
 
   $: {
@@ -40,15 +69,11 @@
   let tabWidth: number = 196;
   let scrollerParent: number;
   let scrollerWidth: number;
-
-  const handleDropOver = (event: Event) => {
-    event.preventDefault();
-  };
 </script>
 
 <div
   class="tab"
-  on:drop={(event) => {
+  on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
 >
@@ -59,20 +84,19 @@
   >
     {#if scrollerParent <= scrollerWidth + 105}
       <div class="d-inline-block" style="height:35px; width:35px;">
-        <button
-          class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
-          on:click={() => {
+        <Button
+          onClick={() => {
             moveNavigation("left");
           }}
-        >
-          <img src={angleLeft} alt="" />
-        </button>
+          title={""}
+          buttonStartIcon={angleLeft}
+          buttonStartIconStyle={"height: 13px; width: 7px"}
+          buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
+        />
       </div>
     {/if}
     <div
-      on:dragover={(event) => {
-        handleDropOver(event);
-      }}
+      on:dragover|preventDefault
       class=" d-inline-block tab-scroller"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
@@ -94,23 +118,24 @@
     </div>
     {#if scrollerParent <= scrollerWidth + 105}
       <div class="d-inline-block" style="height:35px; width:35px;">
-        <button
-          class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
-          on:click={() => {
+        <Button
+          title=""
+          onClick={() => {
             moveNavigation("right");
           }}
-        >
-          <img src={angleRight} alt="" />
-        </button>
+          buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
+          buttonStartIconStyle={"height: 16px; width: 10px"}
+          buttonStartIcon={angleRight}
+        />
       </div>
     {/if}
     <div class="d-inline-block" style="height:35px; width:35px;">
-      <button
-        class=" btn border-0 ps-1 pe-1 py-0 h-100 w-100"
-        on:click={onNewTabRequested}
-      >
-        <img src={plusIcon} alt="" />
-      </button>
+      <Button
+        title=""
+        onClick={onNewTabRequested}
+        buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
+        buttonStartIcon={plusIcon}
+      />
     </div>
   </div>
 </div>

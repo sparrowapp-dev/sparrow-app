@@ -216,6 +216,7 @@ export class CollectionPageViewModel {
   ) => {
     const { folderId, folderName, collectionId, workspaceId } =
       componentData.path;
+    // Retrieve collection data
     const _collection = await this.readCollection(collectionId);
     let userSource = {};
     if (_collection?.activeSync && componentData?.source === "USER") {
@@ -226,6 +227,7 @@ export class CollectionPageViewModel {
     }
     const _id = componentData.id;
     let existingRequest;
+    // Get already existing request details
     if (!folderId) {
       existingRequest = await this.readRequestOrFolderInCollection(
         collectionId,
@@ -238,14 +240,16 @@ export class CollectionPageViewModel {
         _id,
       );
     }
+    // Get Bodytype in request
     const bodyType =
       componentData.property.request.state.dataset === RequestDataset.RAW
         ? componentData.property.request.state.raw
         : componentData.property.request.state.dataset;
     let expectedRequest: RequestBody;
     let expectedMetaData;
+    // Create request details for updating request inside collection
     if (!saveDescriptionOnly) {
-      // Save overall api
+      // Request details when overall API needs to be updated
       expectedRequest = {
         method: componentData.property.request.method,
         url: componentData.property.request.url,
@@ -256,6 +260,7 @@ export class CollectionPageViewModel {
         selectedRequestBodyType: setContentTypeHeader(bodyType),
         selectedRequestAuthType: componentData.property.request.state?.auth,
       };
+      // create meta data
       expectedMetaData = {
         id: _id,
         name: componentData?.name,
@@ -263,7 +268,7 @@ export class CollectionPageViewModel {
         type: ItemType.REQUEST,
       };
     } else {
-      // Save api description only
+      // Request details when only API description needs to be updated
       expectedRequest = {
         method: existingRequest?.request.method,
         url: existingRequest?.request.url,
@@ -285,7 +290,9 @@ export class CollectionPageViewModel {
       };
     }
 
+    // Update the request in particular Collection
     if (!folderId) {
+      // Update Request when not inside folder
       const res = await updateCollectionRequest(_id, folderId, collectionId, {
         collectionId: collectionId,
         workspaceId: workspaceId,
@@ -301,6 +308,7 @@ export class CollectionPageViewModel {
         return false;
       }
     } else {
+      // Update Request when inside folder
       const res = await updateCollectionRequest(_id, folderId, collectionId, {
         collectionId: collectionId,
         workspaceId: workspaceId,
