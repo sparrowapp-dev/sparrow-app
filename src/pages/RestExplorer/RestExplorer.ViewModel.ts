@@ -1,4 +1,3 @@
-// import { makeHttpRequestV2 } from "$lib/api/api.common";
 import {
   DecodeRequest,
   ReduceRequestURL,
@@ -18,6 +17,10 @@ import { makeHttpRequest } from "$lib/api/api.common";
 class RestExplorerViewModel {
   private _httpMethod: BehaviorSubject<string> = new BehaviorSubject("");
   private _requestUrl: BehaviorSubject<string> = new BehaviorSubject("");
+  private _requestName: BehaviorSubject<string> = new BehaviorSubject("");
+  private _requestDescription: BehaviorSubject<string> = new BehaviorSubject(
+    "",
+  );
 
   private emptyHeaders: KeyValuePair[] = [];
   private _requestHeaders: BehaviorSubject<KeyValuePair[]> =
@@ -31,7 +34,7 @@ class RestExplorerViewModel {
   private _requestAuth: BehaviorSubject<any> = new BehaviorSubject({});
   private _requestBody: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
-  private _tab;
+  private _tab: TabDocument;
   private _decodeRequest = new DecodeRequest();
   // create a behaviour subject for all the tabs
   public constructor() {
@@ -41,6 +44,8 @@ class RestExplorerViewModel {
         if (doc.isActive) {
           this.tab = createDeepCopy(doc.toMutableJSON());
           this.requestUrl = this.tab.property.request.url;
+          this.requestName = this.tab.name;
+          this.requestDescription = this.tab.description;
           this.httpMethod = this.tab.property.request.method;
           this.requestHeaders = this.tab.property.request.headers;
           this.requestParams = this.tab.property.request.queryParams;
@@ -80,6 +85,20 @@ class RestExplorerViewModel {
   }
   private set httpMethod(value: string) {
     this._httpMethod.next(value);
+  }
+
+  public get requestName(): Observable<string> {
+    return this._requestName.asObservable();
+  }
+  private set requestName(value: string) {
+    this._requestName.next(value);
+  }
+
+  public get requestDescription(): Observable<string> {
+    return this._requestDescription.asObservable();
+  }
+  private set requestDescription(value: string) {
+    this._requestDescription.next(value);
   }
 
   public get requestHeaders(): Observable<KeyValuePair[]> {
@@ -143,6 +162,22 @@ class RestExplorerViewModel {
       const reducedURL = new ReduceRequestURL(_url);
       this.updateParams(reducedURL.getQueryParameters(), false);
     }
+  };
+
+  public updateRequestDescription = async (_description: string) => {
+    const activeTab = this.tab;
+    activeTab.description = _description;
+    this.tab = activeTab;
+    this.tabRepository.updateTab(activeTab.tabId, activeTab);
+    this.requestDescription = _description;
+  };
+
+  public updateRequestName = async (_name: string) => {
+    const activeTab = this.tab;
+    activeTab.name = _name;
+    this.tab = activeTab;
+    this.tabRepository.updateTab(activeTab.tabId, activeTab);
+    this.requestName = _name;
   };
 
   public updateRequestMethod = async (method: string) => {

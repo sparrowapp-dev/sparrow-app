@@ -103,14 +103,6 @@
     }
   }
 
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
-
-  setTimeout(() => {
-    dispatch("updateGrandChildValue", "world");
-  }, 2000);
-
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
   });

@@ -1,6 +1,7 @@
 <script lang="ts">
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { isHorizontal } from "$lib/store/request-response-section";
+  import { restSplitterDirection } from "@rest-explorer/store/splitpanes";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   let isHorizontalMode: boolean;
@@ -26,9 +27,7 @@
 </script>
 
 <div
-  class="d-flex text-requestBodyColor mt-1 flex-column {isHorizontalMode
-    ? 'align-items-center'
-    : 'align-items-center'} justify-content-between py-3"
+  class="response-default d-flex text-requestBodyColor mt-3 mb-3 flex-column align-items-center justify-content-between"
 >
   <div
     class="d-flex flex-column align-items-start justify-content-start mb-2 mt-3
@@ -41,12 +40,12 @@
   </div>
   <div
     style="font-family: Roboto Mono;font-size: 12px;font-weight: 400;line-height: 18px;letter-spacing: 0em;;"
-    class={isHorizontalMode
+    class={$restSplitterDirection === "horizontal"
       ? "d-flex align-items-center justify-content-between gap-4"
       : "d-flex flex-column"}
   >
     <div
-      class={isHorizontalMode
+      class={$restSplitterDirection === "horizontal"
         ? "d-flex flex-column align-items-start justify-content-between"
         : ""}
     >
@@ -59,7 +58,7 @@
         />
       {/each}
     </div>
-    <div class={isHorizontalMode ? "d-flex flex-column" : "d-flex flex-column"}>
+    <div class="d-flex flex-column">
       {#each Object.entries(altCommands) as [key, value]}
         <ComboText
           comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
@@ -71,3 +70,10 @@
     </div>
   </div>
 </div>
+
+<style>
+  .response-default {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+</style>

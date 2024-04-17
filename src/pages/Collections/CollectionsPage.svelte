@@ -125,10 +125,7 @@
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
-    if (isNew)
-      _collectionPageViewModel.createNewTab(
-        generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
-      );
+    if (isNew) _collectionPageViewModel.createNewTab();
   });
 
   $: {

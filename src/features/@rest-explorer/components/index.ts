@@ -13,3 +13,4 @@ export { default as ResponseDefaultScreen } from "./response-default-screen/Resp
 export { default as ResponseErrorScreen } from "./response-error-screen/ResponseErrorScreen.svelte";
 export { default as ResponseBodyNavigator } from "./response-body-navigator/ResponseBodyNavigator.svelte";
 export { default as RequestUrl } from "./request-url/RequestUrl.svelte";
+export { default as RequestName } from "./request-name/RequestName.svelte";

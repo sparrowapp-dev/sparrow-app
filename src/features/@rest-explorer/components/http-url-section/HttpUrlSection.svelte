@@ -7,18 +7,18 @@
   import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestUrl } from "@rest-explorer/components";
+  import { restSplitterDirection } from "@rest-explorer/store/splitpanes";
 
   let componentClass = "";
   export { componentClass as class };
 
   export let onSendButtonClicked = () => {};
-  export let onUpdateRequestUrl = (url: string) => {};
-  export let onUpdateRequestMethod = (tab: string) => {};
+  export let onUpdateRequestUrl;
+  export let onUpdateRequestMethod;
   export let requestUrl;
   export let httpMethod;
 
   const handleDropdown = (tab: string) => {
-    // httpMethod = tab;
     onUpdateRequestMethod(tab);
   };
 
@@ -96,20 +96,22 @@
 
   <!-- Switch pane layout button -->
   <ToggleButton
+    selectedToggleId={$restSplitterDirection}
     toggleButtons={[
       {
         name: "",
-        id: "horizontal",
+        id: "vertical",
         icon: tableColumnIcon,
-        isSelected: true,
       },
       {
         name: "",
-        id: "vertical",
+        id: "horizontal",
         icon: barIcon,
-        isSelected: false,
       },
     ]}
+    on:click={(e) => {
+      restSplitterDirection.set(e.detail);
+    }}
   />
 </div>
 

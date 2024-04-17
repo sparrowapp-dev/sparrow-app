@@ -38,6 +38,7 @@ import type {
 
 // ---- mixpanel
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { InitRequest } from "@common/utils";
 export class CollectionPageViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
@@ -71,7 +72,10 @@ export class CollectionPageViewModel {
   public createNewTab = () => {
     isApiCreatedFirstTime.set(true);
     this.tabRepository.createTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+      new InitRequest(
+        "UNTRACKED-" + uuidv4(),
+        new Date().toString(),
+      ).getValue(),
     );
     moveNavigation("right");
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });

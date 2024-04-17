@@ -2,7 +2,6 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
 
   import Button from "$lib/components/buttons/Button.svelte";
-  import Input from "$lib/components/inputs/Input.svelte";
 
   import floppyDisk from "$lib/assets/floppy-disk.svg";
 
@@ -17,6 +16,7 @@
     ResponseHeaders,
     ResponseBodyNavigator,
     RequestBody,
+    RequestName,
   } from "@rest-explorer/components";
 
   import RestExplorerViewModel from "./RestExplorer.ViewModel";
@@ -25,6 +25,11 @@
   import Loader from "$lib/components/Transition/loader/Loader.svelte";
   import ResponseBody from "@rest-explorer/components/response-body/ResponseBody.svelte";
   import RequestParameters from "@rest-explorer/components/request-parameters/RequestParameters.svelte";
+  import {
+    restLeftPanelWidth,
+    restRightPanelWidth,
+  } from "@rest-explorer/store";
+  import { restSplitterDirection } from "@rest-explorer/store/splitpanes";
 
   const _viewModel = new RestExplorerViewModel();
   let response = _viewModel.response;
@@ -47,11 +52,9 @@
 <div class="w-100 d-flex flex-column h-100">
   <!-- Request Name Header -->
   <div class="d-flex justify-content-between w-100 p-3">
-    <Input
-      value="New Request"
-      noBackground={true}
-      inputStyleProp="font-size: 1.5rem; font-weight: 500;"
-      class="flex-1"
+    <RequestName
+      name={_viewModel.requestName}
+      onUpdateRequestName={_viewModel.updateRequestName}
     />
     <!-- Save and Share Buttons -->
     <div class="d-flex justify-content-between">
@@ -60,6 +63,9 @@
         type="dark"
         buttonClassProp="ms-2"
         buttonStartIcon={floppyDisk}
+        onClick={() => {
+          // _viewModel.saveRequest();
+        }}
       />
       <Button title="Share" type="dark" buttonClassProp="ms-2" />
     </div>
@@ -75,8 +81,18 @@
     onUpdateRequestMethod={_viewModel.updateRequestMethod}
   />
 
-  <Splitpanes class="" style="height: 78vh;" dblClickSplitter={false}>
-    <Pane>
+  <Splitpanes
+    class=""
+    id={"rest-splitter"}
+    style="height: calc(100vh - 240px); margin-top:10px;"
+    horizontal={$restSplitterDirection === "horizontal" ? true : false}
+    dblClickSplitter={false}
+    on:resize={(e) => {
+      restLeftPanelWidth.set(e.detail[0].size);
+      restRightPanelWidth.set(e.detail[1].size);
+    }}
+  >
+    <Pane minSize={30} size={$restLeftPanelWidth}>
       <!-- Request Pane -->
       <div class="px-3 h-100 position-relative">
         <RequestNavigator
@@ -86,9 +102,7 @@
         {#if $requestState?.section === RequestSection.PARAMETERS}
           <RequestParameters
             params={_viewModel.requestParams}
-            url={_viewModel.requestUrl}
             onUpdateRequestParams={_viewModel.updateParams}
-            onUpdateRequestUrl={_viewModel.updateRequestUrl}
           />
         {:else if $requestState?.section === RequestSection.REQUEST_BODY}
           <RequestBody
@@ -115,7 +129,7 @@
         {/if}
       </div>
     </Pane>
-    <Pane class="position-relative">
+    <Pane minSize={30} size={$restRightPanelWidth} class="position-relative">
       <!-- Response Pane -->
       <!-- <ResponsePane response={$response} /> -->
       <div class="d-flex flex-column h-100 px-3">
