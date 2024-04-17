@@ -17,7 +17,6 @@
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
-  export let onUpdateRequestBody: (data: string) => void = () => {};
   export let codeMirrorStyle: "basic" | "url" = "basic";
   export let isEditable = true;
   export let isPretty = false;
@@ -31,7 +30,6 @@
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
-    onUpdateRequestBody({ raw: userInput });
     dispatch("change", userInput);
   });
 

@@ -1,12 +1,12 @@
 <script lang="ts">
   import Button from "$lib/components/buttons/Button.svelte";
   import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
+  import { RequestUrl } from "@rest-explorer/components";
 
   let componentClass = "";
   export { componentClass as class };
@@ -84,15 +84,7 @@
     menuItem={"v2"}
   />
 
-  <!-- Url input box -->
-  <!-- <CodeMirror bind:rawValue={requestUrl} class="ms-2" codeMirrorStyle="url" /> -->
-  <input
-    type="text"
-    bind:value={_requestUrl}
-    on:input={() => {
-      onUpdateRequestUrl(_requestUrl);
-    }}
-  />
+  <RequestUrl urlText={_requestUrl} {onUpdateRequestUrl} />
 
   <!-- Send button -->
   <Button

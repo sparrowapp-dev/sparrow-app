@@ -9,7 +9,6 @@
   import {
     HttpUrlSection,
     RequestHeaders,
-    ResponsePane,
     RequestNavigator,
     ResponseNavigator,
     RequestAuth,
@@ -25,6 +24,7 @@
   import DefaultPage from "$lib/components/collections/req-res-section/sub-components/response-body-section/DefaultPage.svelte";
   import Loader from "$lib/components/Transition/loader/Loader.svelte";
   import ResponseBody from "@rest-explorer/components/response-body/ResponseBody.svelte";
+  import RequestParameters from "@rest-explorer/components/request-parameters/RequestParameters.svelte";
 
   const _viewModel = new RestExplorerViewModel();
   let response = _viewModel.response;
@@ -84,7 +84,12 @@
           on:change={handleRequestNavigator}
         />
         {#if $requestState?.section === RequestSection.PARAMETERS}
-          parameters
+          <RequestParameters
+            params={_viewModel.requestParams}
+            url={_viewModel.requestUrl}
+            onUpdateRequestParams={_viewModel.updateParams}
+            onUpdateRequestUrl={_viewModel.updateRequestUrl}
+          />
         {:else if $requestState?.section === RequestSection.REQUEST_BODY}
           <RequestBody
             body={_viewModel.requestBody}
