@@ -69,7 +69,7 @@ export class TabRepository {
         },
       })
       .exec();
-    if (deselectedTab && deselectedTab.get("id") === id) return;
+    // if (deselectedTab && deselectedTab.get("id") === id) return;
     if (deselectedTab) {
       await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
     }
@@ -238,8 +238,8 @@ export class TabRepository {
         },
       })
       .exec();
-    (await query).incrementalModify((value)=>{
-      return {...value, ...tab};
+    (await query).incrementalModify((value) => {
+      return { ...value, ...tab };
     });
   };
 }

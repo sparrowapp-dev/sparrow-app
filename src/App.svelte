@@ -109,8 +109,14 @@
       <Route path="/*"><Navigate to="/app/" /></Route>
     </section>
     <section slot="unauthorized">
-      <Route path="/init" component={EntryPoint} />
-      <Route path="/*"><Navigate to="/init" /></Route>
+      {#if 1}
+        <Route path="/init" component={EntryPoint} />
+        <Route path="/*"><Navigate to="/init" /></Route>
+      {:else}
+        <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/*"><Navigate to="/login" /></Route>
+      {/if}
     </section>
   </Authguard>
 </Router>
