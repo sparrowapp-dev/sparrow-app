@@ -80,22 +80,6 @@ const updateCollectionRequest = async (
       headers: getAuthHeaders(),
     },
   );
-  if (response.isSuccessful) {
-    if (!folderId) {
-      collectionRepository.updateRequestOrFolderInCollection(
-        collectionId,
-        id,
-        response.data.data,
-      );
-    } else {
-      collectionRepository.updateRequestInFolder(
-        collectionId,
-        folderId,
-        id,
-        response.data.data,
-      );
-    }
-  }
   return response;
 };
 

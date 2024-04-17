@@ -8,7 +8,7 @@
   };
 </script>
 
-<div class="request-body h-100 position-relative">
+<div class="request-body position-relative">
   <CodeMirror
     bind:lang
     bind:value
@@ -20,6 +20,7 @@
 
 <style>
   .request-body {
+    max-height: calc(100% - 150px);
     overflow-y: scroll;
     overflow-x: hidden;
   }

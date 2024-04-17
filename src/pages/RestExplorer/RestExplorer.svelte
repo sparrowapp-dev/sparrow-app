@@ -30,6 +30,10 @@
     restRightPanelWidth,
   } from "@rest-explorer/store";
   import { restSplitterDirection } from "@rest-explorer/store/splitpanes";
+  import { ModalWrapperV1 } from "$lib/components";
+  import { bool, boolean } from "yup";
+  import SaveAsRequest from "@rest-explorer/components/save-as-request/SaveAsRequest.svelte";
+  import { onMount } from "svelte";
 
   const _viewModel = new RestExplorerViewModel();
   let response = _viewModel.response;
@@ -47,6 +51,22 @@
   const handleResponseNavigator = (event: CustomEvent<string>): void => {
     _viewModel.updateRequestState({ responseSection: event.detail });
   };
+
+  /////  SAVE AS REQUEST
+  let isExposeSaveAsRequest = false;
+  let path _viewModel.path;
+  let workspace;
+  onMount(async () => {
+    if (path?.workspaceId) {
+      const _workspace = await _viewModel.readWorkspace(path?.workspaceId);
+      workspace.id = _workspace._id;
+      workspace.name = _workspace.name;
+    } else {
+      const activeWorkspace = _viewModel.getActiveWorkspace;
+      workspace.id = $activeWorkspace._id;
+      workspace.name = $activeWorkspace.name;
+    }
+  });
 </script>
 
 <div class="w-100 d-flex flex-column h-100">
@@ -63,8 +83,14 @@
         type="dark"
         buttonClassProp="ms-2"
         buttonStartIcon={floppyDisk}
-        onClick={() => {
-          // _viewModel.saveRequest();
+        onClick={async () => {
+          const x = await _viewModel.saveRequest();
+          if (
+            x.status === "error" &&
+            x.message === "request is not a part of any workspace"
+          ) {
+            isExposeSaveAsRequest = true;
+          }
         }}
       />
       <Button title="Share" type="dark" buttonClassProp="ms-2" />
@@ -172,3 +198,30 @@
     >
   </Splitpanes>
 </div>
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsRequest
+    onClick={(flag) => {
+      isExposeSaveAsRequest = flag;
+    }}
+    _method={_viewModel.httpMethod}
+    _url={_viewModel.requestUrl}
+    _name={_viewModel.requestName}
+    _description={_viewModel.requestDescription}
+    _path={_viewModel.requestPath}
+    workspaceMeta={workspace}
+    collections={_viewModel.collection}
+    readCollection={_viewModel.readCollection}
+    addRequestorFolderInCollection={_viewModel.addRequestOrFolderInCollection}
+    addCollection={_viewModel.addCollection}
+    onSaveRequest={_viewModel.saveAsRequest}
+  />
+</ModalWrapperV1>

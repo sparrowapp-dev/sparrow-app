@@ -3,9 +3,13 @@ import {
   ReduceRequestURL,
   ReduceQueryParams,
 } from "@rest-explorer/utils";
-import type { TabDocument } from "$lib/database/app.database";
+import type {
+  TabDocument,
+  WorkspaceDocument,
+} from "$lib/database/app.database";
 import { TabRepository } from "$lib/repositories/tab.repository";
-import { createDeepCopy } from "$lib/utils/helpers";
+import { createDeepCopy, setContentTypeHeader } from "$lib/utils/helpers";
+import { CollectionRepository } from "$lib/repositories/collection.repository";
 import type {
   KeyValuePair,
   Response,
@@ -13,8 +17,12 @@ import type {
 import { generateSampleRequest } from "$lib/utils/sample";
 import { BehaviorSubject, Observable } from "rxjs";
 import { makeHttpRequest } from "$lib/api/api.common";
+import { ItemType, RequestDataset } from "$lib/utils/enums";
+import { updateCollectionRequest } from "$lib/services/collection";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 
 class RestExplorerViewModel {
+  private collectionRepository = new CollectionRepository();
   private _httpMethod: BehaviorSubject<string> = new BehaviorSubject("");
   private _requestUrl: BehaviorSubject<string> = new BehaviorSubject("");
   private _requestName: BehaviorSubject<string> = new BehaviorSubject("");
@@ -34,6 +42,7 @@ class RestExplorerViewModel {
   private _requestAuth: BehaviorSubject<any> = new BehaviorSubject({});
   private _requestBody: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private _tab: TabDocument;
   private _decodeRequest = new DecodeRequest();
   // create a behaviour subject for all the tabs
@@ -333,6 +342,418 @@ class RestExplorerViewModel {
           size: 0,
         });
       });
+  };
+
+  public readCollection = (uuid: string): Promise<CollectionDocument> => {
+    return this.collectionRepository.readCollection(uuid);
+  };
+
+  public readRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+  ): Promise<CollectionItem> => {
+    return this.collectionRepository.readRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+    );
+  };
+
+  public readRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+    );
+  };
+
+  public saveRequest = async (saveDescriptionOnly = false) => {
+    const componentData = this.tab;
+    const { folderId, collectionId, workspaceId } = componentData.path;
+    if (!workspaceId && !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+    let existingRequest;
+    if (!folderId) {
+      existingRequest = await this.readRequestOrFolderInCollection(
+        collectionId,
+        _id,
+      );
+    } else {
+      existingRequest = await this.readRequestInFolder(
+        collectionId,
+        folderId,
+        _id,
+      );
+    }
+    const bodyType =
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
+    let expectedRequest;
+    let expectedMetaData;
+    if (!saveDescriptionOnly) {
+      // Save overall api
+      expectedRequest = {
+        method: componentData.property.request.method,
+        url: componentData.property.request.url,
+        body: componentData.property.request.body,
+        headers: componentData.property.request.headers,
+        queryParams: componentData.property.request.queryParams,
+        auth: componentData.property.request.auth,
+        selectedRequestBodyType: setContentTypeHeader(bodyType),
+        selectedRequestAuthType: componentData.property.request.state?.auth,
+      };
+      expectedMetaData = {
+        id: _id,
+        name: componentData?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    } else {
+      // Save api description only
+      expectedRequest = {
+        method: existingRequest?.request.method,
+        url: existingRequest?.request.url,
+        body: existingRequest?.request.body,
+        headers: existingRequest?.request.headers,
+        queryParams: existingRequest?.request.queryParams,
+        auth: existingRequest?.request.auth,
+        selectedRequestBodyType:
+          existingRequest?.request?.selectedRequestBodyType,
+        selectedRequestAuthType:
+          existingRequest?.request?.selectedRequestAuthType,
+      };
+      expectedMetaData = {
+        id: _id,
+        name: existingRequest?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    }
+    let folderSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+    }
+
+    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: {
+        ...expectedMetaData,
+        request: expectedRequest,
+      },
+    });
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return {
+        status: "success",
+        message: res.message,
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
+  public readWorkspace = (uuid: string): Promise<WorkspaceDocument> => {
+    return this.workspaceRepository.readWorkspace(uuid);
+  };
+
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
+  };
+
+  get collection() {
+    return this.collectionRepository.getCollection();
+  }
+
+  public addRequestOrFolderInCollection = (
+    collectionId: string,
+    items: any,
+  ) => {
+    this.collectionRepository.addRequestOrFolderInCollection(
+      collectionId,
+      items,
+    );
+  };
+
+  public addCollection = (collection) => {
+    this.collectionRepository.addCollection(collection);
+  };
+
+  public saveAsRequest = async () => {
+    // let userSource = {};
+    // const _id = componentData.id;
+    // isLoading = true;
+    // if (path.length > 0) {
+    //   let existingRequest;
+    //   if (path[path.length - 1].type === ItemType.COLLECTION) {
+    //     existingRequest =
+    //       await collectionsMethods.readRequestOrFolderInCollection(
+    //         path[path.length - 1].id,
+    //         _id,
+    //       );
+    //   } else if (path[path.length - 1].type === ItemType.FOLDER) {
+    //     existingRequest = await collectionsMethods.readRequestInFolder(
+    //       path[0].id,
+    //       path[path.length - 1].id,
+    //       _id,
+    //     );
+    //   }
+    //   const randomRequest: NewTab = generateSampleRequest(
+    //     "id",
+    //     new Date().toString(),
+    //   );
+    //   const request = !existingRequest
+    //     ? randomRequest.property.request
+    //     : existingRequest.request;
+    //   const expectedRequest = {
+    //     method:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.method
+    //         : componentData.property.request.method,
+    //     url:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.url
+    //         : componentData.property.request.url,
+    //     body:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.body
+    //         : componentData.property.request.body,
+    //     headers:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.headers
+    //         : componentData.property.request.headers,
+    //     queryParams:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.queryParams
+    //         : componentData.property.request.queryParams,
+    //     auth:
+    //       type === saveType.SAVE_DESCRIPTION
+    //         ? request.auth
+    //         : componentData.property.request.auth,
+    //   };
+    //   if (path[path.length - 1].type === ItemType.COLLECTION) {
+    //     const _collection = await collectionsMethods.readCollection(
+    //       path[path.length - 1].id,
+    //     );
+    //     if (_collection?.activeSync) {
+    //       userSource = {
+    //         currentBranch: _collection?.currentBranch,
+    //         source: "USER",
+    //       };
+    //     }
+    //     const res = await insertCollectionRequest({
+    //       collectionId: path[path.length - 1].id,
+    //       workspaceId: workspace.id,
+    //       ...userSource,
+    //       items: {
+    //         name: tabName,
+    //         description,
+    //         type: ItemType.REQUEST,
+    //         request: expectedRequest,
+    //       },
+    //     });
+    //     if (res.isSuccessful) {
+    //       if (type !== saveType.SAVE_DESCRIPTION) {
+    //         notifications.success("API request saved");
+    //       }
+    //       collectionsMethods.addRequestOrFolderInCollection(
+    //         path[path.length - 1].id,
+    //         res.data.data,
+    //       );
+    //       const expectedPath = {
+    //         folderId: "",
+    //         folderName: "",
+    //         collectionId: path[path.length - 1].id,
+    //         workspaceId: workspace.id,
+    //       };
+    //       if (
+    //         !componentData.path.workspaceId &&
+    //         !componentData.path.collectionId
+    //       ) {
+    //         collectionsMethods.updateTab(expectedPath, "path", _id);
+    //         collectionsMethods.updateTab(res.data.data.name, "name", _id);
+    //         collectionsMethods.updateTab(
+    //           res.data.data.description,
+    //           "description",
+    //           _id,
+    //         );
+    //         collectionsMethods.updateTab(res.data.data.id, "id", _id);
+    //         if (type === saveType.SAVE_DESCRIPTION) {
+    //           collectionsMethods.setRequestSave(
+    //             true,
+    //             "description",
+    //             res.data.data.id,
+    //           );
+    //         } else {
+    //           collectionsMethods.setRequestSave(true, "api", res.data.data.id);
+    //           collectionsMethods.setRequestSave(
+    //             true,
+    //             "description",
+    //             res.data.data.id,
+    //           );
+    //         }
+    //       } else {
+    //         let sampleRequest = generateSampleRequest(
+    //           res.data.data.id,
+    //           new Date().toString(),
+    //         );
+    //         sampleRequest.name = res.data.data.name;
+    //         sampleRequest.description = res.data.data.description;
+    //         sampleRequest.path = expectedPath;
+    //         sampleRequest.property.request.save.api = true;
+    //         sampleRequest.property.request.save.description = true;
+    //         sampleRequest.property.request.url = res.data.data.request.url;
+    //         sampleRequest.property.request.method =
+    //           res.data.data.request.method;
+    //         sampleRequest.property.request.body = res.data.data.request.body;
+    //         sampleRequest.property.request.queryParams =
+    //           res.data.data.request.queryParams;
+    //         sampleRequest.property.request.auth = res.data.data.request.auth;
+    //         sampleRequest.property.request.headers =
+    //           res.data.data.request.headers;
+    //         collectionsMethods.handleCreateTab(sampleRequest);
+    //       }
+    //       onFinish(res.data.data.id);
+    //       onClick(false);
+    //       navigateToWorkspace();
+    //       isLoading = false;
+    //     } else if (res.message === "Network Error") {
+    //       onClick(false);
+    //       notifications.error(res.message);
+    //     } else {
+    //       onClick(false);
+    //       notifications.error("Failed tol save the request!");
+    //     }
+    //   } else if (path[path.length - 1].type === ItemType.FOLDER) {
+    //     const _collection = await collectionsMethods.readCollection(path[0].id);
+    //     if (_collection?.activeSync) {
+    //       userSource = {
+    //         currentBranch: _collection?.currentBranch,
+    //         source: "USER",
+    //       };
+    //     }
+    //     const res = await insertCollectionRequest({
+    //       collectionId: path[0].id,
+    //       workspaceId: workspace.id,
+    //       folderId: path[path.length - 1].id,
+    //       ...userSource,
+    //       items: {
+    //         name: path[path.length - 1].name,
+    //         type: ItemType.FOLDER,
+    //         items: {
+    //           name: tabName,
+    //           description,
+    //           type: ItemType.REQUEST,
+    //           request: expectedRequest,
+    //         },
+    //       },
+    //     });
+    //     if (res.isSuccessful) {
+    //       if (type !== saveType.SAVE_DESCRIPTION) {
+    //         notifications.success("API request saved");
+    //       }
+    //       collectionsMethods.addRequestInFolder(
+    //         path[0].id,
+    //         path[path.length - 1].id,
+    //         res.data.data,
+    //       );
+    //       const expectedPath = {
+    //         folderId: path[path.length - 1].id,
+    //         folderName: path[path.length - 1].name,
+    //         collectionId: path[0].id,
+    //         workspaceId: workspace.id,
+    //       };
+    //       if (
+    //         !componentData.path.workspaceId &&
+    //         !componentData.path.collectionId
+    //       ) {
+    //         collectionsMethods.updateTab(expectedPath, "path", _id);
+    //         collectionsMethods.updateTab(res.data.data.name, "name", _id);
+    //         collectionsMethods.updateTab(
+    //           res.data.data.description,
+    //           "description",
+    //           _id,
+    //         );
+    //         collectionsMethods.updateTab(res.data.data.id, "id", _id);
+    //         if (type === saveType.SAVE_DESCRIPTION) {
+    //           collectionsMethods.setRequestSave(
+    //             true,
+    //             "description",
+    //             res.data.data.id,
+    //           );
+    //         } else {
+    //           collectionsMethods.setRequestSave(true, "api", res.data.data.id);
+    //           collectionsMethods.setRequestSave(
+    //             true,
+    //             "description",
+    //             res.data.data.id,
+    //           );
+    //         }
+    //       } else {
+    //         let sampleRequest = generateSampleRequest(
+    //           res.data.data.id,
+    //           new Date().toString(),
+    //         );
+    //         sampleRequest.name = res.data.data.name;
+    //         sampleRequest.description = res.data.data.description;
+    //         sampleRequest.path = expectedPath;
+    //         sampleRequest.property.request.save.api = true;
+    //         sampleRequest.property.request.save.description = true;
+    //         sampleRequest.property.request.url = res.data.data.request.url;
+    //         sampleRequest.property.request.method =
+    //           res.data.data.request.method;
+    //         sampleRequest.property.request.body = res.data.data.request.body;
+    //         sampleRequest.property.request.queryParams =
+    //           res.data.data.request.queryParams;
+    //         sampleRequest.property.request.auth = res.data.data.request.auth;
+    //         sampleRequest.property.request.headers =
+    //           res.data.data.request.headers;
+    //         collectionsMethods.handleCreateTab(sampleRequest);
+    //       }
+    //       onFinish(res.data.data.id);
+    //       onClick(false);
+    //       navigateToWorkspace();
+    //       isLoading = false;
+    //     }
+    //   }
+    //   MixpanelEvent(Events.SAVE_API_REQUEST);
+    // }
   };
 }
 
