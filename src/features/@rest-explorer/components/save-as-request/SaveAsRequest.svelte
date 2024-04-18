@@ -40,29 +40,22 @@
     donts,
   } from "$lib/utils/constants/request.constant";
 
-//   export let collectionsMethods: CollectionsMethods;
+  //   export let collectionsMethods: CollectionsMethods;
   export let onClick;
   export let onFinish = (_id) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
   ///////////////////////////////////////////
-  export let onSaveRequest;
+  export let onSaveAsRequest;
   export let readCollection;
-  export let addRequestorFolderInCollection;
-  export let addCollection;
+  export let collections: Observable<CollectionDocument[]>;
+  export let readWorkspace;
+  export let onCreateFolder;
+  export let onCreateCollection;
   export let _method;
   export let _url;
   export let _name;
   export let _description;
   export let _path;
-  export let collections: Observable<CollectionDocument[]>;
-
-  let componentData;
-  componentData.path = _path;
-  componentData.name = $_name;
-  componentData.description = $_description;
-  componentData?.property.request.method = $_method;
-  componentData?.property.request.url = $_url;
-  ///////////////////////////////////////////
 
   interface Path {
     name: string;
@@ -74,6 +67,32 @@
     id: string;
   }
 
+  let workspaceMeta: {
+    id: string;
+    name: string;
+  } = {
+    id: "",
+    name: "",
+  };
+
+  const saveType = {
+    SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
+  };
+
+  let componentData = {
+    path: _path,
+    name: _name,
+    description: _description,
+    property: {
+      request: {
+        method: _method,
+        url: _url,
+      },
+    },
+  };
+
+  ///////////////////////////////////////////
+
   const constant = {
     newFolder: "New Folder",
     newCollection: "New Collection",
@@ -82,29 +101,14 @@
   let collection: any[] = [];
   let directory: any[] = [];
   let path: Path[] = [];
-  export let workspaceMeta: {
-    id: string;
-    name: string;
-  };
 
-  const saveType = {
-    SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
-  };
   let tabName: string;
   let description: string;
-  if (!componentData.path.workspaceId && !componentData.path.collectionId) {
-    tabName = componentData.name;
-    description = componentData.description;
-  } else {
-    tabName = componentData.name + " Copy";
-    description = componentData.description + " Copy";
-  }
   let latestRoute: {
     id: string;
   } = {
     id: "",
   };
-
   let isLoading: boolean = false;
   let createCollectionName: string = constant.newCollection;
   let createCollectionNameVisibility: boolean = false;
@@ -114,39 +118,39 @@
 
   let instructionEnabled: boolean = false;
 
-  //   const activeWorkspace: Observable<WorkspaceDocument> =
-  //     collectionsMethods.getActiveWorkspace();
+  const handleDropdownClick = (event: MouseEvent) => {
+    const dropdownElement = document.getElementById(`3456-dropdown900`);
+    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
+      instructionEnabled = false;
+    }
+  };
 
-  const getFilteredCOllection = (value) => {
+  onMount(async () => {
+    window.addEventListener("click", handleDropdownClick);
+    // Setting save request name and description on load
+    if (!componentData.path.workspaceId || !componentData.path.collectionId) {
+      tabName = componentData.name;
+      description = componentData.description;
+    } else {
+      tabName = componentData.name + " Copy";
+      description = componentData.description + " Copy";
+    }
+  });
+
+  const getFilteredCollection = async (value: CollectionDocument[]) => {
+    const _workspace = await readWorkspace(componentData?.path?.workspaceId);
+    workspaceMeta.id = _workspace._id;
+    workspaceMeta.name = _workspace.name;
     collection = value.filter((collectionDocument: CollectionDocument) => {
-      return collectionDocument.workspaceId === workspace.id;
+      return collectionDocument.workspaceId === workspaceMeta.id;
     });
     directory = JSON.parse(JSON.stringify(collection));
     if (latestRoute.id) navigateToDirectory(latestRoute);
   };
-  //   let col = [];
-  //   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-  //     async (value: WorkspaceDocument) => {
-  //       if (value) {
-  //         if (componentData?.path?.workspaceId) {
-  //           const _workspace = await collectionsMethods.readWorkspace(
-  //             componentData?.path?.workspaceId,
-  //           );
-  //           workspace.id = _workspace._id;
-  //           workspace.name = _workspace.name;
-  //         } else {
-  //           workspace.id = value.get("_id");
-  //           workspace.name = value.get("name");
-  //         }
-  //         getFilteredCOllection(col);
-  //       }
-  //     },
-  //   );
 
   const collectionListUnsubscribe = collections.subscribe((value) => {
     if (value) {
-      // col = value;
-      getFilteredCOllection(col);
+      getFilteredCollection(value);
     }
   });
 
@@ -155,7 +159,7 @@
     path = [];
   };
 
-  const navigateToDirectory = (elem) => {
+  const navigateToDirectory = (elem: { _id?: string; id?: string }) => {
     let response = searchTreeDocument(
       collection,
       elem._id ? elem._id : elem.id,
@@ -178,83 +182,39 @@
     }
   };
 
-  const handleFolderClick = async (folderName): Promise<void> => {
+  const handleCreateFolder = async (folderName: string): Promise<void> => {
     createDirectoryLoader = true;
-    let userSource = {};
-    const _collection = await readCollection(path[0].id);
-    if (_collection?.activeSync) {
-      userSource = {
-        currentBranch: _collection?.currentBranch,
-        source: "USER",
-      };
-    }
-    let directory: CreateDirectoryPostBody = {
-      name: folderName,
-      description: "",
-      ...userSource,
-    };
-    const res = await insertCollectionDirectory(
-      workspaceMeta.id,
-      path[0].id,
-      directory,
-    );
-    if (res.isSuccessful) {
-      createDirectoryLoader = false;
+    const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
+    if (res.status === "success") {
+      latestRoute = res.data.latestRoute;
+      res.data.addRequestOrFolderInCollection(
+        res.data.collectionId,
+        res.data.data,
+      );
       createFolderName = constant.newFolder;
-      latestRoute = {
-        id: res.data.data.id,
-      };
-      addRequestOrFolderInCollection(path[0].id, res.data.data);
+      notifications.success("New Folder Created");
     } else {
-      createDirectoryLoader = false;
-    }
-  };
-
-  const handleCreateCollection = async (collectionName) => {
-    createDirectoryLoader = true;
-    const newCollection: CreateCollectionPostBody = {
-      name: collectionName,
-      workspaceId: workspaceMeta.id,
-    };
-    const res = await insertCollection(newCollection);
-    if (res.isSuccessful) {
-      createDirectoryLoader = false;
-      createCollectionName = constant.newCollection;
-      latestRoute = {
-        id: res.data.data._id,
-      };
-      let storage = res.data.data;
-      let _id = res.data.data._id;
-      delete storage._id;
-      storage.id = _id;
-      storage.workspaceId = workspaceMeta.id;
-      addCollection(storage);
-      notifications.success("New Collection Created");
-      MixpanelEvent(Events.CREATE_COLLECTION, {
-        source: "SaveRequest",
-        collectionName: res.data.data.name,
-        collectionId: res.data.data._id,
-      });
-    } else {
-      createDirectoryLoader = false;
-      onClick(false);
       notifications.error(res.message);
     }
+    createDirectoryLoader = false;
   };
 
-  function handleDropdownClick(event: MouseEvent) {
-    const dropdownElement = document.getElementById(`3456-dropdown900`);
-    if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
-      instructionEnabled = false;
+  const handleCreateCollection = async (collectionName: string) => {
+    createDirectoryLoader = true;
+    const res = await onCreateCollection(workspaceMeta, collectionName);
+    if (res.status === "success") {
+      latestRoute = res.data.latestRoute;
+      res.data.addCollection(res.data.storage);
+      createCollectionName = constant.newCollection;
+      notifications.success("New Collection Created");
+    } else {
+      notifications.error(res.message);
     }
-  }
+    createDirectoryLoader = false;
+  };
 
-  onMount(() => {
-    window.addEventListener("click", handleDropdownClick);
-  });
   onDestroy(() => {
     collectionListUnsubscribe.unsubscribe();
-    activeWorkspaceSubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
   });
 </script>
@@ -420,7 +380,7 @@
                     ? ''
                     : 'unclickable'}"
                   on:click={() => {
-                    handleFolderClick(createFolderName);
+                    handleCreateFolder(createFolderName);
                   }}
                 >
                   <img src={tickIcon} alt="" />
@@ -498,7 +458,7 @@
                       ? ''
                       : 'unclickable'}"
                     on:click={() => {
-                      handleFolderClick(createFolderName);
+                      handleCreateFolder(createFolderName);
                     }}
                   >
                     <img src={tickIcon} alt="" />
@@ -785,8 +745,27 @@
         textClassProp={"fs-6"}
         type={"primary"}
         loader={isLoading}
-        onClick={() => {
-          onSaveRequest();
+        onClick={async () => {
+          isLoading = true;
+          const res = await onSaveAsRequest(
+            workspaceMeta,
+            path,
+            tabName,
+            description,
+            type,
+          );
+          if (res.status === "success") {
+            onFinish(res.data.id);
+            onClick(false);
+            if (type !== saveType.SAVE_DESCRIPTION) {
+              notifications.success("API request saved");
+            } else {
+              notifications.success("API documentation saved");
+            }
+          } else {
+            notifications.error(res.message);
+          }
+          isLoading = false;
         }}
         loaderSize={18}
       />

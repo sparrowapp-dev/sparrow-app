@@ -19,9 +19,6 @@ import {
   responseText,
 } from "$lib/store/api-request";
 import { keyStore, valueStore } from "$lib/store/parameter";
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-
-const collectionRepository = new CollectionRepository();
 
 const apiUrl: string = constants.API_URL;
 

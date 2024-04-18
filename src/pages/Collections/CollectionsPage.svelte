@@ -105,13 +105,13 @@
   let prevTabid = "";
   activeTab.subscribe((value: TabDocument) => {
     if (value) {
-      if (prevTabid !== value.id) {
+      if (prevTabid !== value.tabId) {
         isAnimation = false;
         setTimeout(() => {
           isAnimation = true;
         }, 10);
       }
-      prevTabid = value.id;
+      prevTabid = value.tabId;
     }
   });
 
@@ -167,7 +167,6 @@
       onDropOver={_collectionPageViewModel.handleDropOnEnd}
       onTabSelected={_collectionPageViewModel.handleActiveTab}
     />
-    <br />
     <Route>
       {#if isAnimation}
         <Motion {...scaleMotionProps} let:motion>

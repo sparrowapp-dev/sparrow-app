@@ -14,7 +14,7 @@ import {
 
 class InitRequest {
   private _request: TabDocument;
-  constructor(id: string, date: string) {
+  constructor(id: string, _workspaceId: string, date: string) {
     this._request = {
       id,
       name: RequestDefault.NAME,
@@ -121,7 +121,7 @@ class InitRequest {
       },
       save: false,
       path: {
-        workspaceId: "",
+        workspaceId: _workspaceId,
         collectionId: "",
         folderId: "",
         folderName: "",

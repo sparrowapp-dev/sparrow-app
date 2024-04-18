@@ -39,8 +39,10 @@ import type {
 // ---- mixpanel
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { InitRequest } from "@common/utils";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 export class CollectionPageViewModel {
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
@@ -69,11 +71,13 @@ export class CollectionPageViewModel {
   /**
    * Create new tab with untracked id
    */
-  public createNewTab = () => {
+  public createNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
     this.tabRepository.createTab(
       new InitRequest(
         "UNTRACKED-" + uuidv4(),
+        ws._id,
         new Date().toString(),
       ).getValue(),
     );
