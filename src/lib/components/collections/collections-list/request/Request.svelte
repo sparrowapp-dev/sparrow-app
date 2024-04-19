@@ -1,170 +1,66 @@
 <script lang="ts">
+  export let onDeleteRequest: (
+    collection: CollectionDocument,
+    request: any,
+    folder: any,
+  ) => Promise<boolean>;
+  export let onRenameRequest: (
+    collection: CollectionDocument,
+    folder: any,
+    request: any,
+    newRequestName: string,
+  ) => void;
+  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let collection: CollectionDocument;
+  export let folder: any;
+  export let api: any;
+
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import { CollectionService } from "$lib/services/collection.service";
-  import { currentFolderIdName, isShowFilePopup } from "$lib/store/collection";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
-  import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
+  import { currentFolderIdName } from "$lib/store/collection";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-
-  export let name: string;
-  export let id: string;
-  export let collectionId: string;
-  export let currentWorkspaceId: string;
-  export let folderId: string;
-  export let folderName: string;
-  export let api;
-  export let collectionsMethods: CollectionsMethods;
-  export let activeTabId: string;
-  export let activeSync = false;
-  export let currentBranch;
-  export let primaryBranch;
-
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import { UntrackedItems } from "$lib/utils/enums";
   let showPath = false;
-  let isFilePopup: boolean = false;
 
-  const collectionService = new CollectionService();
+  if (folder) {
+    currentFolderIdName.set({
+      folderId: folder.id,
+      folderName: folder.name,
+    });
+  }
 
-  currentFolderIdName.set({
-    folderId: folderId,
-    folderName: folderName,
-  });
-
-  let url,
-    method,
-    body,
-    headers,
-    queryParams,
-    auth,
-    type,
-    description,
-    selectedRequestBodyType,
-    actSync,
-    isDeleted,
-    source,
-    selectedRequestAuthType;
+  let isDeletePopup: boolean = false;
+  let path: Path;
+  let pos = { x: 0, y: 0 };
+  let showMenu: boolean = false;
+  let noOfColumns = 180;
+  let noOfRows = 3;
+  let newRequestName: string = api.name;
+  let inputField: HTMLInputElement;
+  let isRenaming = false;
+  let deleteLoader: boolean = false;
 
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
   });
 
-  const handleFilePopUp = (flag) => {
-    isFilePopup = flag;
-  };
-  let path;
-  const handleClick = () => {
-    let request = generateSampleRequest(id, new Date().toString());
-    request.path = path;
-    request.name = name;
-    if (description) request.description = description;
-    if (url) request.property.request.url = url;
-    if (body) request.property.request.body = body;
-    if (method) request.property.request.method = method;
-    if (queryParams) request.property.request.queryParams = queryParams;
-    if (auth) request.property.request.auth = auth;
-    if (headers) request.property.request.headers = headers;
-    if (actSync) request.activeSync = actSync;
-    if (isDeleted) request.isDeleted = isDeleted;
-    if (source === "SPEC") request.source = source;
-    if (selectedRequestBodyType)
-      request = setBodyType(request, selectedRequestBodyType);
-    if (selectedRequestAuthType)
-      request = setAuthType(request, selectedRequestAuthType);
-    request.property.request.save.api = true;
-    request.property.request.save.description = true;
-    collectionsMethods.handleCreateTab(request);
-    moveNavigation("right");
-  };
-
   $: {
     if (api) {
-      if (api.property) {
-        api = api.property;
-      }
-      url = api.request?.url;
-      method = api.request?.method;
-      headers = api.request?.headers;
-      queryParams = api.request?.queryParams;
-      auth = api.request?.auth;
-      body = api.request?.body;
-      type = api.request?.type;
-      description = api.description;
-      selectedRequestBodyType = api.request?.selectedRequestBodyType;
-      actSync = activeSync;
-      isDeleted = api?.isDeleted;
-      source = api?.source;
-      selectedRequestAuthType = api.request?.selectedRequestAuthType;
-
-      if (!activeSync || (source === "USER" && activeSync)) {
-        menuItems = [
-          {
-            onClick: () => {
-              handleClick();
-            },
-            displayText: "Open Request",
-            disabled: false,
-          },
-          {
-            onClick: renameRequest,
-            displayText: "Rename Request",
-            disabled: false,
-          },
-          {
-            onClick: () => {
-              handleFilePopUp(true);
-            },
-            displayText: "Delete",
-            disabled: false,
-          },
-        ];
-      } else if (isDeleted) {
-        menuItems = [
-          {
-            onClick: () => {
-              handleClick();
-            },
-            displayText: "Open Request",
-            disabled: false,
-          },
-          {
-            onClick: () => {
-              handleFilePopUp(true);
-            },
-            displayText: "Delete",
-            disabled: false,
-          },
-        ];
-      } else {
-        menuItems = [
-          {
-            onClick: () => {
-              handleClick();
-            },
-            displayText: "Open Request",
-            disabled: false,
-          },
-        ];
-      }
-
       path = {
-        workspaceId: currentWorkspaceId,
-        collectionId,
-        folderId,
-        folderName,
+        workspaceId: collection.workspaceId,
+        collectionId: collection.id,
+        folderId: folder ? folder.id : "",
+        folderName: folder ? folder.name : "",
       };
     }
   }
@@ -172,134 +68,6 @@
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
-
-  let openRequestId = null;
-
-  let pos = { x: 0, y: 0 };
-
-  let showMenu: boolean = false;
-
-  let noOfColumns = 180;
-  let noOfRows = 3;
-  function rightClickContextMenu(e) {
-    e.preventDefault();
-    setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
-      showMenu = true;
-    }, 100);
-  }
-
-  function closeRrightClickContextMenu() {
-    showMenu = false;
-  }
-
-  let newRequestName: string = "";
-  let isRenaming = false;
-
-  const handleRenameInput = (event) => {
-    newRequestName = event.target.value;
-  };
-
-  const onRenameBlur = async () => {
-    let userSource = {};
-    if (source === "USER") {
-      userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
-      };
-    }
-    if (newRequestName) {
-      if (!folderId) {
-        let storage = api;
-        storage.name = newRequestName;
-        const response = await collectionService.updateRequestInCollection(
-          api.id,
-          {
-            collectionId: collectionId,
-            workspaceId: currentWorkspaceId,
-            ...userSource,
-            items: storage,
-          },
-        );
-        if (response.isSuccessful) {
-          collectionsMethods.updateRequestOrFolderInCollection(
-            collectionId,
-            api.id,
-            response.data.data,
-          );
-          collectionsMethods.updateTab(newRequestName, "name", api.id);
-        }
-      } else if (collectionId && currentWorkspaceId && folderId) {
-        let storage = api;
-        storage.name = newRequestName;
-        const response = await collectionService.updateRequestInCollection(
-          api.id,
-          {
-            collectionId: collectionId,
-            workspaceId: currentWorkspaceId,
-            ...userSource,
-            folderId,
-            items: {
-              name: folderName,
-              id: folderId,
-              type: ItemType.FOLDER,
-              items: storage,
-            },
-          },
-        );
-        if (response.isSuccessful) {
-          collectionsMethods.updateRequestInFolder(
-            collectionId,
-            folderId,
-            api.id,
-            response.data.data,
-          );
-          collectionsMethods.updateTab(newRequestName, "name", api.id);
-        }
-      }
-    }
-    isRenaming = false;
-    newRequestName = "";
-  };
-
-  //rename collection name
-  const renameRequest = () => {
-    isRenaming = true;
-  };
-
-  const onRenameInputKeyPress = (event) => {
-    if (event.key === "Enter") {
-      const inputField = document.getElementById(
-        "renameInputFieldFile",
-      ) as HTMLInputElement;
-      inputField.blur();
-    }
-  };
-
-  let menuItems = [];
-
-  let deleteLoader: boolean = false;
-
-  const handleDelete = async () => {
-    deleteLoader = true;
-    const res = await collectionsMethods.deleteApiRequest(
-      currentWorkspaceId,
-      collectionId,
-      api.id,
-      api.name,
-      activeSync,
-      source,
-      currentBranch,
-      primaryBranch,
-      folderId,
-    );
-    if (res) {
-      handleFilePopUp(false);
-    }
-    deleteLoader = false;
-  };
 </script>
 
 <ModalWrapperV1
@@ -307,8 +75,8 @@
   type={"danger"}
   width={"35%"}
   zIndex={1000}
-  isOpen={isFilePopup}
-  handleModalState={handleFilePopUp}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
 >
   <div class="text-lightGray mb-1 sparrow-fs-12">
     <p>
@@ -320,7 +88,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
     style="font-size: 16px;"
   >
     <Button
@@ -330,7 +98,7 @@
       type={"dark"}
       loader={false}
       onClick={() => {
-        handleFilePopUp(false);
+        isDeletePopup = false;
       }}
     />
 
@@ -342,7 +110,10 @@
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
-        handleDelete();
+        deleteLoader = true;
+        onDeleteRequest(collection, api, folder);
+        deleteLoader = false;
+        isDeletePopup = false;
       }}
     />
   </div></ModalWrapperV1
@@ -352,53 +123,85 @@
   <RightOption
     xAxis={pos.x}
     yAxis={pos.y}
-    {menuItems}
+    menuItems={[
+      {
+        onClick: () => {
+          onOpenRequestOnTab(api, path);
+        },
+        displayText: "Open Request",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          isRenaming = true;
+          setTimeout(() => inputField.focus(), 100);
+        },
+        displayText: "Rename Request",
+        disabled: false,
+        hidden:
+          !collection.activeSync ||
+          (api.source === "USER" && collection.activeSync)
+            ? false
+            : true,
+      },
+      {
+        onClick: () => {
+          isDeletePopup = true;
+        },
+        displayText: "Delete",
+        disabled: false,
+        hidden:
+          !collection.activeSync ||
+          (api.source === "USER" && collection.activeSync) ||
+          api.isDeleted
+            ? false
+            : true,
+      },
+    ]}
     {noOfRows}
     {noOfColumns}
   />
 {/if}
 
 <svelte:window
-  on:click={closeRrightClickContextMenu}
-  on:contextmenu|preventDefault={closeRrightClickContextMenu}
+  on:click={() => (showMenu = false)}
+  on:contextmenu|preventDefault={() => (showMenu = false)}
 />
 
 <div
-  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {id ===
-  activeTabId
+  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
+  'activeTabId'
     ? 'active-request-tab'
     : ''}"
   style="height:32px;"
-  on:click={() => {
-    isApiCreatedFirstTime.set(false);
-  }}
 >
-  <div
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+  <button
     on:click={() => {
-      handleClick();
+      onOpenRequestOnTab(api, path);
     }}
-    class="main-file d-flex align-items-center position-relative {id?.includes(
+    class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
-    {#if api?.isDeleted && activeSync}
+    {#if api?.isDeleted && "activeSync"}
       <span
         class="delete-ticker position-absolute sparrow-fs-10 px-2"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
     {/if}
-    {#if actSync && source === "SPEC"}
+    {#if "actSync" && api?.source === "SPEC"}
       <img src={reloadSyncIcon} class="ms-2" alt="" />
     {/if}
     <div
-      class="api-method text-{getMethodStyle(method)} {isDeleted &&
-        'api-method-deleted'}"
+      class="api-method text-{getMethodStyle(
+        api.request.method,
+      )} {api?.isDeleted && 'api-method-deleted'}"
     >
-      {method?.toUpperCase()}
+      {api.request.method?.toUpperCase()}
     </div>
 
     {#if isRenaming}
@@ -406,26 +209,35 @@
         class="form-control py-0 renameInputFieldFile sparrow-fs-12"
         id="renameInputFieldFile"
         type="text"
-        autofocus
-        value={name}
         maxlength={100}
-        on:input={handleRenameInput}
-        on:blur={onRenameBlur}
-        on:keydown={onRenameInputKeyPress}
+        value={newRequestName}
+        bind:this={inputField}
+        on:blur={(e) => {
+          onRenameRequest(collection, folder, api, e?.target?.value);
+          isRenaming = false;
+        }}
+        on:keydown={(e) => {
+          if (e.key === "Enter") {
+            onRenameRequest(collection, folder, api, e?.target?.value);
+            isRenaming = false;
+          }
+        }}
       />
     {:else}
-      <div class="api-name ellipsis {isDeleted && 'api-name-deleted'}">
-        {name}
+      <div class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}">
+        {api.name}
         {#if showPath}
           <span class="path-name ellipsis"
-            >{`${url ? getPathFromUrl(url) : ""}`}</span
+            >{`${
+              api?.request?.url ? getPathFromUrl(api?.request?.url) : ""
+            }`}</span
           >
         {/if}
       </div>
     {/if}
-  </div>
+  </button>
 
-  {#if id?.includes(UntrackedItems.UNTRACKED)}
+  {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
     <Tooltip title="More options" styleProp="left: -50%">
@@ -433,8 +245,10 @@
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
+        on:click|preventDefault={(e) => {
+          pos.x = e.clientX;
+          pos.y = e.clientY;
+          setTimeout(() => (showMenu = true), 100);
         }}
       >
         <img src={threedotIcon} alt="threedotIcon" />
@@ -463,6 +277,7 @@
     font-size: 12px;
     font-weight: 400;
     width: calc(100% - 48px);
+    text-align: left;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

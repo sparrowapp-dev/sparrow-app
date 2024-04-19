@@ -9,80 +9,82 @@
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
   export let explorer: any;
-  export let editable: boolean = false;
-  export let workspaceId: string = "";
-  export let collectionId: string = "";
-  export let folderDetails: { id: string; name: string };
-  export let path: string = "";
+  export let explorerData: any;
   export let searchData: string = "";
   function getIndex(text: string, searchData: string): number {
     return text.toLowerCase().indexOf(searchData.toLowerCase());
   }
-  export let activeSync;
 </script>
 
 <div>
-  {#if explorer.type === "FOLDER"}
+  {#if explorerData.type === "FOLDER"}
     <div>
-      <div
+      <button
         style="height:36px;"
-        class="folder rounded d-flex align-items-center p-1"
+        class="folder rounded d-flex align-items-center p-1 bg-transparent border-0 text-left"
         on:click={() => {
           folderExpand = !folderExpand;
-          handleFolderClick(explorer, workspaceId, collectionId, activeSync);
+          handleFolderClick(
+            explorerData,
+            explorer.workspaceId,
+            explorer.collectionId,
+            explorer.activeSync,
+          );
         }}
       >
         <img src={folder} alt="" style="height:16px; width:16px;" />
         <span
           class="ellipsis"
           style=" padding-left: 8px; cursor:pointer; font-size:14px; font-weight:400;color:#999999"
-          >{explorer.name.substring(
+          >{explorerData.name.substring(
             0,
-            getIndex(explorer.name, searchData),
+            getIndex(explorerData.name, searchData),
           )}<span class="highlight"
-            >{explorer.name.substring(
-              getIndex(explorer.name, searchData),
-              getIndex(explorer.name, searchData) + searchData.length,
+            >{explorerData.name.substring(
+              getIndex(explorerData.name, searchData),
+              getIndex(explorerData.name, searchData) + searchData.length,
             )}</span
-          >{explorer.name.substring(
-            getIndex(explorer.name, searchData) + searchData.length,
+          >{explorerData.name.substring(
+            getIndex(explorerData.name, searchData) + searchData.length,
           )}
         </span>
-      </div>
+      </button>
       <div
         style="padding-left: 15px; cursor:pointer; display: {folderExpand
           ? 'block'
           : 'none'};"
       >
-        {#if explorer.items.length === 0}
+        {#if explorerData.items.length === 0}
           <small>Folder is empty</small>
         {/if}
-        {#each explorer.items as exp}
-          <svelte:self explorer={exp} />
+        {#each explorerData.items as exp}
+          <svelte:self explorerData={exp} {explorer} />
         {/each}
       </div>
     </div>
-  {:else if explorer.type === "REQUEST"}
+  {:else if explorerData.type === "REQUEST"}
     <div
-      style="padding-left: 0; cursor:pointer;width:100%"
+      style="padding-left: 0; cursor:pointer;width:100%; text-align:left;"
       class="request rounded"
     >
       <Request
-        {path}
-        request={explorer}
+        {explorer}
+        request={explorerData}
         {searchData}
         {getIndex}
-        folderDetails={explorer}
-        {collectionId}
-        {workspaceId}
-        {activeSync}
+        folderDetails={explorerData}
       />
     </div>
   {:else}
-    <div
+    <button
+      class="bg-transparent border-0 w-100"
       style="cursor:pointer;"
       on:click={() => {
-        handleCollectionClick(explorer, workspaceId, collectionId);
+        handleCollectionClick(
+          explorerData,
+          explorer.workspaceId,
+          explorer.collectionId,
+        );
       }}
     >
       <button
@@ -100,14 +102,16 @@
           alt="angleRight"
         />
         <p class="mb-0 ellipsis" style="font-size: 14px; color:#999999">
-          {explorer.name.substring(0, getIndex(explorer.name, searchData))}<span
-            class="highlight"
-            >{explorer.name.substring(
-              getIndex(explorer.name, searchData),
-              getIndex(explorer.name, searchData) + searchData.length,
+          {explorerData.name.substring(
+            0,
+            getIndex(explorerData.name, searchData),
+          )}<span class="highlight"
+            >{explorerData.name.substring(
+              getIndex(explorerData.name, searchData),
+              getIndex(explorerData.name, searchData) + searchData.length,
             )}</span
-          >{explorer.name.substring(
-            getIndex(explorer.name, searchData) + searchData.length,
+          >{explorerData.name.substring(
+            getIndex(explorerData.name, searchData) + searchData.length,
           )}
         </p>
       </button>
@@ -116,14 +120,14 @@
           ? 'block'
           : 'none'};"
       >
-        {#if explorer.items.length === 0}
+        {#if explorerData.items.length === 0}
           <small>Collection is empty</small>
         {/if}
-        {#each explorer.items as exp}
-          <svelte:self explorer={exp} />
+        {#each explorerData.items as exp}
+          <svelte:self explorerData={exp} {explorer} />
         {/each}
       </div>
-    </div>
+    </button>
   {/if}
 </div>
 

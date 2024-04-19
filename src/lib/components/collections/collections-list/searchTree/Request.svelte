@@ -2,29 +2,26 @@
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
-  export let path: string = "";
+  export let explorer: any;
   export let searchData: string = "";
-  export let getIndex;
+  export let getIndex: (text: string, searchData: string) => number;
   export let folderDetails: { id: string; name: string };
   export let request: any;
-  export let workspaceId: string = "";
-  export let collectionId: string = "";
-  export let activeSync;
 </script>
 
-<div
-  class="d-flex align-items-center api-request p-1"
-  style="height: {path !== '' ? '40px' : '32px'};"
+<button
+  class="d-flex align-items-center api-request p-1 bg-transparent border-0"
+  style="height: {explorer.path !== '' ? '40px' : '32px'}; text-align: left;"
   on:click={() => {
     handleRequestClick(
       request,
       {
-        collectionId,
-        workspaceId,
+        collectionId: explorer.collectionId,
+        workspaceId: explorer.workspaceId,
         folderId: folderDetails.id ? folderDetails.id : "",
         folderName: folderDetails.name ? folderDetails.name : "",
       },
-      activeSync,
+      explorer.activeSync,
     );
   }}
 >
@@ -45,15 +42,15 @@
         )}
       </p>
     </div>
-    {#if path !== ""}
+    {#if explorer.path !== ""}
       <div style="width: 100%;">
         <p class="mb-0 ellipsis" style="font-size:10px;width:100%">
-          {replaceSlashWithGreaterThanSymbol(path)}
+          {replaceSlashWithGreaterThanSymbol(explorer.path)}
         </p>
       </div>
     {/if}
   </div>
-</div>
+</button>
 
 <style>
   .red-api {

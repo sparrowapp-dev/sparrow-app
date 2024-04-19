@@ -1,142 +1,161 @@
 <script lang="ts">
+  export let collectionList: Observable<CollectionDocument[]>;
+  export let environmentList: Observable<EnvironmentDocument[]>;
+  export let onCreateCollection: () => void;
+  export let onCreateRequestInCollection: (
+    collection: CollectionDocument,
+  ) => void;
+  export let onCreateFolderInCollection: (
+    collection: CollectionDocument,
+  ) => void;
+  export let onCreateRequestInFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+  ) => void;
+  export let onDeleteCollection: (
+    collection: CollectionDocument,
+    deletedIds: [string] | [],
+  ) => void;
+  export let onDeleteFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+    requestIds: [string],
+  ) => void;
+  export let onDeleteRequest: (
+    collection: CollectionDocument,
+    request: any,
+    folder: any,
+  ) => Promise<boolean>;
+  export let onRenameCollection: (
+    collection: CollectionDocument,
+    newCollectionName: string,
+  ) => void;
+  export let onRenameFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+    newFolderName: string,
+  ) => void;
+  export let onRenameRequest: (
+    collection: CollectionDocument,
+    folder: any,
+    request: any,
+    newRequestName: string,
+  ) => void;
+  export let onCreateApiRequest: () => void;
+  export let onImportCollection: (
+    importData: any,
+    currentBranch: string,
+    getBranchList: [any],
+    uploadCollection: any,
+    validations: {
+      activeSync: boolean;
+      isRepositoryPath: boolean;
+      isRepositoryPathTouched: boolean;
+      isRepositoryBranchTouched: boolean;
+      importType: "file" | "text";
+      isTextEmpty: boolean;
+      isValidClientJSON: boolean;
+      isValidServerJSON: boolean;
+      isValidClientXML: boolean;
+      isValidServerXML: boolean;
+      isValidClientDeployedURL: boolean;
+      isValidServerDeployedURL: boolean;
+      isValidClientURL: boolean;
+      isValidServerURL: boolean;
+      repositoryBranch: string;
+      repositoryPath: string;
+    },
+  ) => void;
+  export let onSearchCollection: (
+    collection: CollectionDocument[],
+    searchData: string,
+  ) => {
+    filteredCollection: any;
+    filteredFile: any;
+    filteredFolder: any;
+  };
+  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let onBranchSwitch: (collection: CollectionDocument) => void;
+  export let onInputDataChange: (importData: string) => Promise<{
+    isValidClientURL: boolean;
+    isValidClientJSON: boolean;
+    isValidClientXML: boolean;
+    isValidServerURL: boolean;
+    isValidServerJSON: boolean;
+    isValidServerXML: boolean;
+    isValidClientDeployedURL: boolean;
+    isValidServerDeployedURL: boolean;
+    isimportDataLoading: boolean;
+  }>;
+  export let onUploadFile: () => Promise<
+    | undefined
+    | {
+        repositoryPath: string;
+        currentBranch: string;
+        repositoryBranch: string;
+        getBranchList: any;
+        isRepositoryPath: boolean;
+      }
+  >;
+  export let onExtractGitBranch: (filePath: string) => Promise<
+    | undefined
+    | {
+        repositoryPath: string;
+        currentBranch: string;
+        repositoryBranch: string;
+        getBranchList: any;
+        isRepositoryPath: boolean;
+      }
+  >;
+  export let onRefetchCollection: (collection: CollectionDocument) => void;
+  export let getActiveTab: () => Writable<{}>;
+  export let getUserRoleInWorkspace: () => WorkspaceRole;
+  export let onImportCurl: (curl: string) => void;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
-  import filterIcon from "$lib/assets/filter.svg";
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus.svg";
+
+  import { WorkspaceRole } from "$lib/utils/enums";
   import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-  import {
-    collapseAnimationAppliedStore,
-    collapsibleState,
-    isApiCreatedFirstTime,
-  } from "$lib/store/request-response-section";
-  import SearchTree from "$lib/components/collections/collections-list/searchTree/SearchTree.svelte";
-  import { useTree } from "./collectionList";
-  import { v4 as uuidv4 } from "uuid";
-  import { onDestroy } from "svelte";
+  import Select from "$lib/components/inputs/select/Select.svelte";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import ImportCollection from "./import-collection/ImportCollection.svelte";
+  import ImportCurl from "./import-curl/ImportCurl.svelte";
+  import List from "$lib/components/list/List.svelte";
+  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
+  import type { Observable } from "rxjs";
+  import type {
+    CollectionDocument,
+    EnvironmentDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
+  import type { Writable } from "svelte/store";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
-  } from "$lib/store/methods";
-
-  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
-  import {
-    type CollectionDocument,
-    type EnvironmentDocument,
-    type WorkspaceDocument,
-  } from "$lib/database/app.database";
-  import { CollectionListViewModel } from "./CollectionList.ViewModel";
-  import type { Observable } from "rxjs";
-
-  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-
-  export let collectionsMethods: CollectionsMethods;
-  export let activeTabId: string;
-  export let activePath;
-  export let environments = [];
-  export let runAnimation: boolean = false;
-  export let refreshEnv;
-  let isImportCollectionPopup = false;
-  let isImportCurlPopup = false;
-  export let changeAnimation: () => void;
-  const _colllectionListViewModel = new CollectionListViewModel();
-  const _workspaceViewModel = new HeaderDashboardViewModel();
-
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
-  import { username } from "$lib/store/auth.store";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import EnvironmentDropdown from "$lib/components/dropdown/EnvironmentDropdown.svelte";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
-  import { createCollectionSource } from "$lib/store/event-source.store";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { FolderDefault, type WorkspaceRole } from "$lib/utils/enums";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { generateSampleRequest } from "$lib/utils/sample";
-  import ImportCollection from "../../collections/collections-list/import-collection/ImportCollection.svelte";
-  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
-  import List from "$lib/components/list/List.svelte";
-  import ImportCurl from "./import-curl/ImportCurl.svelte";
-
-  const [, , searchNode] = useTree();
-  let collection: any[];
-  let currentWorkspaceId: string = "";
-  let showfilterDropdown = false;
-  let searchData: string = "";
-  let userName: string = "";
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
-  let isComponentRenderedFirstTime = false;
-  let showDefault = false;
-  let isLoading = true;
-  const workspacesArr = _workspaceViewModel.workspaces;
-
-  const usernameUnsubscribe = username.subscribe((value) => {
-    if (value) {
-      userName = value;
-    }
-  });
-
-  let selectedApiMethods: string[] = [];
-  let filteredSelectedMethodsCollection = [];
+  } from "$lib/store";
+  import { onDestroy } from "svelte";
+  import SearchTree from "./searchTree/SearchTree.svelte";
   let collapsExpandToggle: boolean = false;
-
-  let collapseAnimationApplied: boolean = false;
-  const collections: Observable<CollectionDocument[]> =
-    _colllectionListViewModel.collection;
-  const activeWorkspace: Observable<WorkspaceDocument> =
-    collectionsMethods.getActiveWorkspace();
-  let activeWorkspaceRxDoc: WorkspaceDocument;
-
-  const mapCollectionsWithWorkspace = (_documents, _workspaceId) => {
-    if (_documents) {
-      const collectionArr = _documents
-        .map((collectionDocument: CollectionDocument) => {
-          const collectionObj =
-            collectionsMethods.getCollectionDocument(collectionDocument);
-          return collectionObj;
-        })
-        .filter((collectionDocument: CollectionDocument) => {
-          return collectionDocument.workspaceId === _workspaceId;
-        });
-      collection = collectionArr;
-    }
-    if (searchData || selectedApiMethods.length > 0) {
-      handleSearch();
-    }
-  };
-  let collectionRxDoc = [];
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      collectionRxDoc = value;
-      mapCollectionsWithWorkspace(collectionRxDoc, currentWorkspaceId);
-    },
-  );
-  const workspaceUnsubscribe = workspacesArr.subscribe((workspaces) => {
-    workspaces.map((workspace) => {
-      if (workspace._data.isActiveWorkspace) {
-        showDefault = true;
-        if (workspace._data.collections && workspace._data.collections.length) {
-          showDefault = false;
-        }
-        return;
-      }
-    });
-  });
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      selectedApiMethods = value;
-    }
-  });
+  let isImportCollectionPopup: boolean = false;
+  let isImportCurlPopup: boolean = false;
+  let runAnimation: boolean = true;
+  let showfilterDropdown: boolean = false;
+  let currentEnvironment: string = "";
+  let collectionListDocument: CollectionDocument[];
+  let searchData: string = "";
+  let filteredSelectedMethodsCollection: any = [];
+  let filteredCollection: CollectionDocument[] = [];
+  let filteredFolder: any = [];
+  let filteredFile: any = [];
+  let selectedApiMethods: any = [];
 
   const selectedMethodsCollectionUnsubscribe =
     selectedMethodsCollectionStore.subscribe((value) => {
@@ -145,309 +164,58 @@
       }
     });
 
-  const getNextCollection: (list: any[], name: string) => any = (
-    list,
-    name,
-  ) => {
-    const isNameAvailable: (proposedName: string) => boolean = (
-      proposedName,
-    ) => {
-      return list.some((element) => {
-        return element.name === proposedName;
-      });
-    };
-
-    if (!isNameAvailable(name)) {
-      return name;
+  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
+    if (value && value.length > 0) {
+      selectedApiMethods = value;
     }
-
-    for (let i = 2; i < list.length + 10; i++) {
-      const proposedName: string = `${name}${i}`;
-      if (!isNameAvailable(proposedName)) {
-        return proposedName;
-      }
-    }
-
-    return null;
-  };
-  let currentWorkspaceName: string;
-  let currentEnvironment;
-  let trackWorkspaceId: string;
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        await refreshEnv(activeWorkspaceRxDoc?._id);
-        const env: EnvironmentDocument =
-          await collectionsMethods.currentEnvironment(
-            activeWorkspaceRxDoc.get("environmentId"),
-          );
-        if (env) {
-          currentEnvironment = env.toMutableJSON();
-        } else {
-          currentEnvironment = {
-            name: "None",
-            id: "none",
-          };
-        }
-        if (isComponentRenderedFirstTime) {
-          isLoading = true;
-          isComponentRenderedFirstTime = false;
-        }
-        currentWorkspaceName = activeWorkspaceRxDoc?.name;
-        currentWorkspaceId = activeWorkspaceRxDoc?._id;
-        const workspaceId = activeWorkspaceRxDoc?._id;
-        if (trackWorkspaceId !== workspaceId) {
-          mapCollectionsWithWorkspace(collectionRxDoc, workspaceId);
-          const response =
-            await collectionsMethods.getAllCollections(workspaceId);
-          if (response.isSuccessful && response.data.data) {
-            const collections = response.data.data;
-            setTimeout(() => {
-              isLoading = false;
-            }, 200);
-            collections.forEach((element) => {
-              element.workspaceId = workspaceId;
-            });
-            collectionsMethods.bulkInsert(collections);
-          } else {
-            isLoading = false;
-            notifications.error(response.message);
-          }
-        }
-        trackWorkspaceId = workspaceId;
-      }
-    },
-  );
-
-  const handleImportCollectionPopup = (flag: boolean) => {
-    createCollectionSource.set("AddIcon");
-    isImportCollectionPopup = flag;
-  };
-  let collectionSource = "";
-  createCollectionSource.subscribe((value) => {
-    collectionSource = value;
   });
 
-  const handleImportCurlPopup = (flag: boolean) => {
-    isImportCurlPopup = flag;
-  };
-
-  let collectionUnderCreation: boolean = false;
-  const handleCreateCollection = async () => {
-    showDefault = false;
-    collectionUnderCreation = true;
-
-    let tempActivePath = activePath;
-    activePath = null;
-
-    isCollectionCreatedFirstTime.set(true);
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    const newCollection = {
-      id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: getNextCollection(collection, "New collection"),
-      items: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    const response = await _colllectionListViewModel.addCollection({
-      name: newCollection.name,
-      workspaceId: currentWorkspaceId,
-    });
-
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
-      collectionsMethods.addCollection({
-        ...res,
-        id: res._id,
-        workspaceId: currentWorkspaceId,
-      });
-      collectionUnderCreation = false;
-      let path: Path = {
-        workspaceId: currentWorkspaceId,
-        collectionId: response.data.data._id,
-      };
-      const Samplecollection = generateSampleCollection(
-        response.data.data._id,
-        new Date().toString(),
-      );
-
-      response.data.data.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item.items.length;
-        }
-      });
-
-      Samplecollection.id = response.data.data._id;
-      Samplecollection.path = path;
-      Samplecollection.name = response.data.data.name;
-      Samplecollection.property.collection.requestCount = totalRequest;
-      Samplecollection.property.collection.folderCount = totalFolder;
-      Samplecollection.save = true;
-      collectionsMethods.handleCreateTab(Samplecollection);
-      moveNavigation("right");
-
-      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
-        id: Samplecollection.id,
-        name: newCollection.name,
-      });
-      notifications.success("New Collection Created");
-      MixpanelEvent(Events.CREATE_COLLECTION, {
-        source: collectionSource,
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-      });
-      return;
-    } else {
-      activePath = tempActivePath;
-      collectionsMethods.deleteCollection(newCollection.id);
-      notifications.error(response.message ?? "Failed to create collection!");
-    }
-    return;
-  };
-
-  const handleFilterDropdown = () => {
-    const filterBtn = document.getElementById("filter-btn");
-    showfilterDropdown = !showfilterDropdown;
-    filterBtn.style.backgroundColor = showfilterDropdown
-      ? "#85C2FF"
-      : "#000000";
-    if (!showfilterDropdown) {
-      selectMethodsStore.update(() => []);
-      handleSearch();
+  const handleAddButton = (id: string) => {
+    if (id === "collection") {
+      isImportCollectionPopup = !isImportCollectionPopup;
+    } else if (id === "importcURL") {
+      isImportCurlPopup = !isImportCurlPopup;
+    } else if (id === "apiRequest") {
+      onCreateApiRequest();
     }
   };
 
-  const collapsibleStateUnsubscribe = collapsibleState.subscribe((value) => {
-    collapsExpandToggle = value;
-  });
-
-  const setcollapsExpandToggle = () => {
-    collapseAnimationApplied = true;
-    changeAnimation();
-    collapsExpandToggle = !collapsExpandToggle;
-    collapsibleState.set(collapsExpandToggle);
-    if (collapsExpandToggle) {
-      document
-        .getElementsByClassName("sidebar")[0]
-        .classList.add("decrease-width");
-      document
-        .getElementsByClassName("sidebar")[0]
-        .classList.remove("increase-width");
-      collapseAnimationAppliedStore.set(true);
-    } else {
-      document
-        .getElementsByClassName("sidebar")[0]
-        .classList.add("increase-width");
-      document
-        .getElementsByClassName("sidebar")[0]
-        .classList.remove("decrease-width");
-      collapseAnimationAppliedStore.set(true);
+  const handleSearch = () => {
+    let filteredData = onSearchCollection(collectionListDocument, searchData);
+    filteredCollection = filteredData.filteredCollection ?? [];
+    filteredFolder = filteredData.filteredFolder ?? [];
+    filteredFile = filteredData.filteredFile ?? [];
+  };
+  $: {
+    if (collectionList) {
+      collectionList.subscribe((value) => {
+        collectionListDocument = value;
+      });
     }
-  };
-
-  const addApiRequest = () => {
-    isApiCreatedFirstTime.set(true);
-    collectionsMethods.handleCreateTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
-    );
-    moveNavigation("right");
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "Side Panel TopBar" });
-  };
-  let filteredCollection = [];
-  let filteredFolder = [];
-  let filteredFile = [];
-  function handleSearch() {
-    filteredCollection.length = 0;
-    filteredFolder.length = 0;
-    filteredFile.length = 0;
-    searchNode(
-      searchData,
-      filteredCollection,
-      filteredFolder,
-      filteredFile,
-      collection,
-    );
   }
 
-  let handleDropdown = (tabId: string) => {
-    collectionsMethods.initActiveEnvironmentToWorkspace(
-      currentWorkspaceId,
-      tabId,
-    );
-  };
-
   onDestroy(() => {
-    collapsibleStateUnsubscribe();
-    selectedMethodsCollectionUnsubscribe();
     selectedMethodUnsubscibe();
+    selectedMethodsCollectionUnsubscribe();
   });
-
-  const handleResize = () => {
-    const windowWidth = window.innerWidth;
-
-    if (windowWidth <= 800) {
-      // Programmatically trigger a click on the button
-      //@ts-ignore
-      document.querySelector("#doubleAngleButton").click();
-      collapsibleState.set(true);
-    } else {
-      collapsibleState.set(false);
-    }
-  };
-
-  // Add a window resize event listener
-  window.addEventListener("resize", handleResize);
-
-  onDestroy(() => {
-    // Remove the window resize event listener when the component is destroyed
-    window.removeEventListener("resize", handleResize);
-    collectionSubscribe.unsubscribe();
-    collapsibleStateUnsubscribe();
-    activeWorkspaceSubscribe.unsubscribe();
-    usernameUnsubscribe();
-    workspaceUnsubscribe.unsubscribe();
-  });
-
-  const handleRequestClick = (id: string) => {
-    if (id === "apiRequest") {
-      addApiRequest();
-    } else if (id === "importcURL") {
-      isImportCurlPopup = true;
-    } else {
-      isImportCollectionPopup = true;
-    }
-  };
-
-  let selectedView: string = "grid";
 </script>
 
 {#if collapsExpandToggle}
   <div>
     <button
-      class="border-0 pb-5 angleRight"
-      style="display: {collapsExpandToggle
-        ? 'block'
-        : 'none'};position: absolute;left:72px;top: 95px;width:16px;height:92px;z-index:{collapsExpandToggle
+      class="border-0 pb-5 angleRight w-16 position-absolute {collapsExpandToggle
+        ? 'd-block'
+        : 'd-none'}"
+      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {collapsExpandToggle
         ? '2'
         : '0'}"
-      on:click={setcollapsExpandToggle}
+      on:click={() => {
+        collapsExpandToggle = !collapsExpandToggle;
+      }}
     >
-      <img
-        src={doubleangleRight}
-        alt="Expand"
-        class="mb-4 mt-2"
-        on:click={() => {
-          selectedView = "grid";
-        }}
-        class:view-active={selectedView === "grid"}
-      />
+      <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
       <div
-        style="transform: rotate(270deg);font-size:10px; color:var(--sparrow-text-color)"
+        style="transform: rotate(270deg); font-size: 10px; color: var(--sparrow-text-color)"
         class="mt-3 ml-2"
       >
         Collections
@@ -457,14 +225,10 @@
 {/if}
 {#if !collapsExpandToggle}
   <div
-    style="border-right: {collapsExpandToggle
-      ? '0px'
-      : '1px solid #313233'};overflow:auto; width: {collapsExpandToggle
-      ? '100%'
-      : '100%'}"
-    class={`sidebar overflow-y-auto  ${
-      collapsExpandToggle && runAnimation
-        ? "decrease-width"
+    style="overflow-x: auto; overflow-y: auto"
+    class={`sidebar ${
+      collapsExpandToggle
+        ? runAnimation && "decrease-width"
         : runAnimation && " increase-width"
     } d-flex flex-column bg-backgroundColor scroll`}
   >
@@ -472,54 +236,50 @@
       class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
     >
       <p class="mb-0 text-whiteColor ellipsis" style="font-size: 18px;">
-        {currentWorkspaceName || ""}
+        {$currentWorkspace?.name || ""}
       </p>
       <button
         class=" border-0 rounded px-2 angleButton"
-        on:click={setcollapsExpandToggle}
+        on:click={() => {
+          collapsExpandToggle = !collapsExpandToggle;
+        }}
         id="doubleAngleButton"
       >
-        <img
-          src={doubleangleLeft}
-          alt=""
-          class="filter-green"
-          on:click={() => {
-            selectedView = "grid";
-          }}
-          class:view-active={selectedView === "grid"}
-        />
+        <img src={doubleangleLeft} alt="" class="filter-green" />
       </button>
     </div>
     <div class="px-3 pt-2">
-      <Dropdown
-        dropdownId={"hash129"}
+      <Select
+        id="none"
+        titleId={"none"}
         data={[
           {
-            name: "None",
+            name: "none",
             id: "none",
-            type: environmentType.LOCAL,
+            color: "light",
+            default: false,
+            hide: false,
           },
-          ...environments,
-        ].filter((elem) => {
-          elem["dynamicClasses"] = "text-whiteColor";
-          return elem.type === environmentType.LOCAL;
-        })}
-        additionalType={"environment"}
-        onclick={handleDropdown}
-        dropDownType={{ type: "text", title: currentEnvironment?.id }}
-        staticClasses={[
-          {
-            id: "hash129-options-container",
-            classToAdd: ["start-0", "end-0", "bg-backgroundDropdown"],
-          },
-        ]}
-        hoverClasses={[
-          {
-            id: "hash129-btn-div",
-            classToAdd: ["border-bottom", "border-labelColor"],
-          },
-        ]}
-      ></Dropdown>
+        ].concat(
+          $environmentList
+            ? $environmentList.map((env) => {
+                return {
+                  name: env?.name,
+                  id: env?.id,
+                  color: "light",
+                  default: false,
+                  hide: false,
+                };
+              })
+            : [],
+        )}
+        onclick={(env) => (currentEnvironment = env)}
+        headerTheme="transparent"
+        borderType="none"
+        borderActiveType="bottom"
+        borderRounded={false}
+        bodyTheme="dark"
+      />
     </div>
     <div
       class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
@@ -531,9 +291,9 @@
         <SearchIcon />
         <input
           type="search"
-          style="  font-size: 12px;font-weight:500;"
+          style="font-size: 12px; font-weight: 500;"
           class="inputField searchField border-0 w-100 h-100 bg-backgroundDark"
-          placeholder="Search APIs in {currentWorkspaceName || ''}"
+          placeholder="Search APIs in {$currentWorkspace?.name || ''}"
           bind:value={searchData}
           on:input={() => {
             handleSearch();
@@ -544,11 +304,10 @@
         <button
           id="filter-btn"
           class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2
-        {showfilterDropdown ? 'filter-active' : ''}"
+          {showfilterDropdown ? 'filter-active' : ''}"
           style="width: 32px; height:32px; position:relative"
-          on:click={handleFilterDropdown}
+          on:click={() => (showfilterDropdown = !showfilterDropdown)}
         >
-          <!-- <img src={filterIcon} alt="" /> -->
           <FilterIcon width={300} height={30} color="gray" />
           {#if showfilterDropdown}
             <span
@@ -559,20 +318,8 @@
         </button>
       </div>
       <div>
-        <!-- <RequestDropdown
-      <RequestDropdown
-        {loggedUserRoleInWorkspace}
-        {collectionsMethods}
-        {handleCreateCollection}
-        {collectionUnderCreation}
-        {currentWorkspaceId}
-      /> -->
         <Dropdown
           dropdownId={"collectionDropdown"}
-          disabled={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.ADD_COLLECTIONS,
-          )}
           dropDownType={{ type: "img", title: plusIcon }}
           staticCustomStyles={[
             {
@@ -598,7 +345,7 @@
               dynamicClasses: "text-whiteColor mt-1",
             },
           ]}
-          onclick={handleRequestClick}
+          onclick={handleAddButton}
           staticClasses={[
             {
               id: "collectionDropdown-img",
@@ -634,41 +381,27 @@
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
-                    activeSync={exp.activeSync}
-                    editable={true}
-                    collectionId={exp.collectionId}
-                    workspaceId={exp.workspaceId}
-                    path={exp.path}
-                    explorer={exp.tree}
+                    explorer={exp}
+                    explorerData={exp.tree}
                     {searchData}
-                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
               {#if filteredFolder.length > 0}
                 {#each filteredFolder as exp}
                   <SearchTree
-                    activeSync={exp.activeSync}
-                    editable={true}
-                    collectionId={exp.collectionId}
-                    path={exp.path}
-                    workspaceId={exp.workspaceId}
-                    explorer={exp.tree}
+                    explorer={exp}
+                    explorerData={exp.tree}
                     {searchData}
-                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
               {#if filteredCollection.length > 0}
                 {#each filteredCollection as exp}
                   <SearchTree
-                    activeSync={exp.activeSync}
-                    editable={true}
-                    collectionId={exp.collectionId}
-                    workspaceId={exp.workspaceId}
-                    explorer={exp.tree}
+                    explorer={exp}
+                    explorerData={exp.tree}
                     {searchData}
-                    folderDetails={exp.tree}
                   />
                 {/each}
               {/if}
@@ -682,46 +415,58 @@
             >
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
-                  {loggedUserRoleInWorkspace}
-                  collectionList={collection}
-                  collectionId={col.id}
-                  currentWorkspaceId={col.workspaceId}
-                  collection={col}
-                  title={col.name}
-                  {collectionsMethods}
-                  {activeTabId}
-                  {activePath}
+                  {onCreateRequestInCollection}
+                  {onCreateFolderInCollection}
+                  {onCreateRequestInFolder}
+                  {onDeleteCollection}
+                  {onDeleteFolder}
+                  {onDeleteRequest}
+                  {onRenameCollection}
+                  {onRenameFolder}
+                  {onRenameRequest}
+                  {onBranchSwitch}
+                  {onOpenRequestOnTab}
+                  {onRefetchCollection}
+                  {getUserRoleInWorkspace}
+                  {getActiveTab}
+                  collection={col._data}
                 />
               {/each}
             </List>
-          {:else if collection && collection.length > 0}
+          {:else if collectionListDocument && collectionListDocument.length > 0}
             <List
               height={"calc(100vh - 180px)"}
               minHeight={"180px"}
               classProps={"p-3"}
               overflowX="hidden"
             >
-              {#each collection as col}
-                <Collection
-                  {loggedUserRoleInWorkspace}
-                  collectionList={collection}
-                  collectionId={col.id}
-                  currentWorkspaceId={col.workspaceId}
-                  collection={col}
-                  title={col.name}
-                  {collectionsMethods}
-                  {activeTabId}
-                  {activePath}
-                />
-              {/each}
+              {#if collectionListDocument}
+                {#each collectionListDocument as col}
+                  <Collection
+                    {onCreateRequestInCollection}
+                    {onCreateFolderInCollection}
+                    {onCreateRequestInFolder}
+                    {onDeleteCollection}
+                    {onDeleteFolder}
+                    {onDeleteRequest}
+                    {onRenameCollection}
+                    {onRenameFolder}
+                    {onRenameRequest}
+                    {onBranchSwitch}
+                    {onOpenRequestOnTab}
+                    {onRefetchCollection}
+                    {getUserRoleInWorkspace}
+                    {getActiveTab}
+                    collection={col}
+                  />
+                {/each}
+              {/if}
             </List>
           {:else}
             <EmptyCollection
-              {loggedUserRoleInWorkspace}
-              {handleCreateCollection}
-              {collectionsMethods}
-              {currentWorkspaceId}
-              {showDefault}
+              {getUserRoleInWorkspace}
+              handleCreateApiRequest={onCreateApiRequest}
+              onImportCollectionPopup={() => handleAddButton("collection")}
             />
           {/if}
         {/if}
@@ -734,14 +479,20 @@
 {/if}
 {#if isImportCollectionPopup}
   <ImportCollection
-    onClick={handleImportCollectionPopup}
-    {handleCreateCollection}
-    {currentWorkspaceId}
-    {collectionsMethods}
+    onImportCollectionPopup={() => handleAddButton("collection")}
+    {onCreateCollection}
+    {onImportCollection}
+    {onInputDataChange}
+    {onUploadFile}
+    {onExtractGitBranch}
   />
 {/if}
 {#if isImportCurlPopup}
-  <ImportCurl onClick={handleImportCurlPopup} {collectionsMethods} />
+  <!-- <ImportCurl onClick={handleImportCurlPopup} {collectionsMethods} /> -->
+  <ImportCurl
+    onClosePopup={() => handleAddButton("importcURL")}
+    {onImportCurl}
+  />
 {/if}
 
 <style>

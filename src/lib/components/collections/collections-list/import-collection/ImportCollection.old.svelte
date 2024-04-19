@@ -1,70 +1,41 @@
 <script lang="ts">
+  import { ImportCollectionViewModel } from "./ImportCollection.viewModel";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
+  import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
+  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+  import Request from "../request/Request.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import { CollectionService } from "$lib/services/collection.service";
   import { Select } from "$lib/components/inputs";
-  import { debounce } from "../collection/collection-utils/utils";
+  import {
+    debounce,
+    isUrlValid,
+    validateClientJSON,
+    validateClientURL,
+    validateClientXML,
+  } from "../collection/collection-utils/utils";
+  import linkIcon from "$lib/assets/linkIcon.svg";
+  import { invoke } from "@tauri-apps/api/core";
   import Button from "$lib/components/buttons/Button.svelte";
+  import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
 
-  export let onCreateCollection: () => void;
-  export let onImportCollection: (
-    importData: any,
-    currentBranch: string,
-    getBranchList: [any],
-    uploadCollection: any,
-    validations: {
-      activeSync: boolean;
-      isRepositoryPath: boolean;
-      isRepositoryPathTouched: boolean;
-      isRepositoryBranchTouched: boolean;
-      importType: "file" | "text";
-      isTextEmpty: boolean;
-      isValidClientJSON: boolean;
-      isValidServerJSON: boolean;
-      isValidClientXML: boolean;
-      isValidServerXML: boolean;
-      isValidClientDeployedURL: boolean;
-      isValidServerDeployedURL: boolean;
-      isValidClientURL: boolean;
-      isValidServerURL: boolean;
-      repositoryBranch: string;
-      repositoryPath: string;
-    },
-  ) => void;
-  export let onInputDataChange: (importData: string) => Promise<{
-    isValidClientURL: boolean;
-    isValidClientJSON: boolean;
-    isValidClientXML: boolean;
-    isValidServerURL: boolean;
-    isValidServerJSON: boolean;
-    isValidServerXML: boolean;
-    isValidClientDeployedURL: boolean;
-    isValidServerDeployedURL: boolean;
-    isimportDataLoading: boolean;
-  }>;
-  export let onUploadFile: () => Promise<
-    | undefined
-    | {
-        repositoryPath: string;
-        currentBranch: string;
-        repositoryBranch: string;
-        getBranchList: any;
-        isRepositoryPath: boolean;
-      }
-  >;
-  export let onExtractGitBranch: (filePath: string) => Promise<
-    | undefined
-    | {
-        repositoryPath: string;
-        currentBranch: string;
-        repositoryBranch: string;
-        getBranchList: any;
-        isRepositoryPath: boolean;
-      }
-  >;
-  export let onImportCollectionPopup: () => void;
+  export let handleCreateCollection;
+  export let currentWorkspaceId;
+  export let isurl = false;
+  export let collectionsMethods: CollectionsMethods;
+  export let onClick: (flag: boolean) => void;
+  const _viewImportCollection = new ImportCollectionViewModel();
+  const _workspaceViewModel = new HeaderDashboardViewModel();
+  const _collectionService = new CollectionService();
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -76,7 +47,7 @@
   let isFileEmpty: boolean = true;
   let isSyntaxError: boolean = false;
   let importData: string = "";
-  let importType: "text" | "file" = "text";
+  let importType: string = "text";
   let activeSync = false;
 
   let progressBar = {
@@ -104,17 +75,75 @@
     isValidServerDeployedURL = false;
 
   const handleInputField = async () => {
-    const validations: any = await onInputDataChange(importData);
+    isimportDataLoading = true;
+    isValidClientURL = false;
+    isValidClientJSON = false;
+    isValidClientXML = false;
+    isValidServerURL = false;
+    isValidServerJSON = false;
+    isValidServerXML = false;
+    isValidClientDeployedURL = false;
+    isValidServerDeployedURL = false;
 
-    isimportDataLoading = validations.isImportDataLoading;
-    isValidClientURL = validations.isValidClientURL;
-    isValidClientJSON = validations.isValidClientJSON;
-    isValidClientXML = validations.isValidClientXML;
-    isValidServerURL = validations.isValidServerURL;
-    isValidServerJSON = validations.isValidServerJSON;
-    isValidServerXML = validations.isValidServerXML;
-    isValidClientDeployedURL = validations.isValidClientDeployedURL;
-    isValidServerDeployedURL = validations.isValidServerDeployedURL;
+    if (validateClientURL(importData)) {
+      if (
+        importData.includes("://127.0.0.1") ||
+        importData.includes("://localhost")
+      ) {
+        isValidClientURL = true;
+        const response = await _collectionService.validateImportCollectionURL(
+          importData.replace("localhost", "127.0.0.1") + "-json",
+        );
+        if (response?.data?.status === ResponseStatusCode.OK) {
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidServerURL = true;
+            } else {
+              notifications.error(res.message);
+            }
+          } catch (e) {}
+        }
+      } else {
+        isValidClientDeployedURL = true;
+        const response =
+          await _collectionService.validateImportCollectionURL(importData);
+        if (response?.data?.status === ResponseStatusCode.OK) {
+          try {
+            const res = await _collectionService.validateImportCollectionInput(
+              "",
+              JSON.parse(response?.data?.response),
+            );
+            if (res.isSuccessful) {
+              isValidServerDeployedURL = true;
+            }
+          } catch (e) {}
+        }
+      }
+    } else if (validateClientJSON(importData)) {
+      isValidClientJSON = true;
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidServerJSON = true;
+      }
+    } else if (validateClientXML(importData)) {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        importData,
+      );
+      if (response.isSuccessful) {
+        isValidClientXML = true;
+        isValidServerXML = true;
+      }
+    }
+    isInputDataTouched = true;
+    isimportDataLoading = false;
   };
   let uploadCollection = {
     file: {
@@ -165,69 +194,359 @@
   };
 
   const handleLogoEdit = (e: any) => {
-    const uploadFileInput: HTMLElement | null = document.getElementById(
+    const uploadFileInput = document.getElementById(
       "upload-collection-file-input",
     );
-    uploadFileInput?.click();
+    uploadFileInput.click();
   };
 
-  const handleImport = async () => {
-    onImportCollection(
-      importData,
-      currentBranch,
-      getBranchList,
-      uploadCollection,
-      {
-        activeSync,
-        isRepositoryPath,
-        isRepositoryPathTouched,
-        isRepositoryBranchTouched,
-        importType,
-        isTextEmpty,
-        isValidClientJSON,
-        isValidServerJSON,
-        isValidClientXML,
-        isValidServerXML,
-        isValidClientDeployedURL,
-        isValidServerDeployedURL,
-        isValidClientURL,
-        isValidServerURL,
-        repositoryBranch,
-        repositoryPath,
-      },
-    );
-  };
-
-  const extractGitBranch = async (filePathResponse: string) => {
-    const file = await onExtractGitBranch(filePathResponse);
+  async function handleFileUpload(file: Request) {
     if (file) {
-      repositoryPath = file.repositoryPath;
-      currentBranch = file.currentBranch;
-      repositoryBranch = file.repositoryBranch;
-      getBranchList = file.getBranchList;
-      isRepositoryPath = file.isRepositoryPath;
+      progressBar.isLoading = true;
+      progressBar.isProgress = false;
+      progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+      const response = await _viewImportCollection.importCollectionFromFile(
+        currentWorkspaceId,
+        file,
+      );
+      if (response.isSuccessful) {
+        progressBar.title = ProgressTitle.FETCHING_DATA;
+        progressBar.isProgress = true;
+
+        let path: Path = {
+          workspaceId: currentWorkspaceId,
+          collectionId: response.data.data._id,
+        };
+
+        const newCollection = {
+          id: response.data.data._id,
+          name: response.data.data.name,
+          items: response.data.data.items,
+          createdAt: response.data.data.createdAt,
+        };
+
+        collectionsMethods.addCollection({
+          ...response.data.data,
+          id: response.data.data._id,
+          workspaceId: currentWorkspaceId,
+        });
+        const Samplecollection = generateSampleCollection(
+          response.data.data._id,
+          new Date().toString(),
+        );
+        Samplecollection.id = response.data.data._id;
+        Samplecollection.path = path;
+        Samplecollection.name = response.data.data.name;
+        Samplecollection.save = true;
+        collectionsMethods.handleCreateTab(Samplecollection);
+        moveNavigation("right");
+
+        _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+          id: Samplecollection.id,
+          name: Samplecollection.name,
+        });
+        notifications.success("Collection Imported successfully.");
+        MixpanelEvent(Events.IMPORT_COLLECTION, {
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+          importThrough: "ByFile",
+        });
+        return;
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+        progressBar.isLoading = false;
+      } else {
+        notifications.error("Failed to import collection. Please try again.");
+        progressBar.isLoading = false;
+        isSyntaxError = true;
+      }
+    }
+  }
+
+  const validateJSON = (data) => {
+    return _viewImportCollection.validateImportBody(data);
+  };
+  const handleImport = async () => {
+    isInputDataTouched = true;
+    if (activeSync) {
+      isRepositoryPathTouched = true;
+    }
+    if (isRepositoryPath) {
+      isRepositoryBranchTouched = true;
+    }
+    if (importType === "text" && importData === "") {
+      isTextEmpty = true;
+    }
+    if (
+      importType === "text" &&
+      importData &&
+      ((isValidClientJSON && isValidServerJSON) ||
+        (isValidClientXML && isValidServerXML))
+    ) {
+      const contentType = validateJSON(importData);
+      handleImportJsonObject(contentType, importData);
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientDeployedURL &&
+      isValidServerDeployedURL
+    ) {
+      const response =
+        await _collectionService.validateImportCollectionURL(importData);
+      if (response?.data?.status === ResponseStatusCode.OK) {
+        handleImportJsonObject(
+          ContentTypeEnum["application/json"],
+          response.data.response,
+        );
+      }
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientURL &&
+      isValidServerURL
+    ) {
+      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
+      const response =
+        await _collectionService.validateImportCollectionURL(importUrl);
+      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
+        const requestBody = {
+          urlData: {
+            data: JSON.parse(response.data.response),
+            headers: response.data.headers,
+          },
+          url: importUrl,
+        };
+        handleImportUrl(requestBody);
+      } else if (
+        activeSync &&
+        response?.data?.status === ResponseStatusCode.OK &&
+        isRepositoryPath &&
+        repositoryBranch &&
+        repositoryPath &&
+        repositoryBranch !== "not exist" &&
+        currentBranch
+      ) {
+        if (
+          getBranchList
+            .map((elem) => {
+              return elem.name;
+            })
+            .includes(currentBranch)
+        ) {
+          const requestBody = {
+            urlData: {
+              data: JSON.parse(response.data.response),
+              headers: response.data.headers,
+            },
+            url: importUrl,
+            primaryBranch: repositoryBranch,
+            currentBranch: currentBranch,
+            localRepositoryPath: repositoryPath,
+          };
+          handleImportUrl(requestBody);
+        } else {
+          notifications.error(
+            `Can't import local branch. Please push ${currentBranch} to remote first.`,
+          );
+        }
+      }
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length !== 0
+    ) {
+      handleFileUpload(uploadCollection?.file?.value);
+      return;
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length === 0
+    ) {
+      isFileEmpty = true;
     }
   };
 
+  const handleImportJsonObject = async (contentType, importJSON) => {
+    if (!contentType) {
+      progressBar.isLoading = false;
+      isSyntaxError = true;
+      return;
+    }
+    progressBar.isLoading = true;
+    progressBar.isProgress = false;
+    progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+    const response = await _viewImportCollection.importCollectionFromJsonObject(
+      currentWorkspaceId,
+      importJSON,
+      contentType,
+    );
+
+    if (response.isSuccessful) {
+      progressBar.title = ProgressTitle.FETCHING_DATA;
+      progressBar.isProgress = true;
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data._id,
+      };
+      const newCollection = {
+        id: response.data.data._id,
+        name: response.data.data.name,
+        items: response.data.data.items,
+        createdAt: response.data.data.createdAt,
+      };
+      collectionsMethods.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+        workspaceId: currentWorkspaceId,
+      });
+      const Samplecollection = generateSampleCollection(
+        response.data.data._id,
+        new Date().toString(),
+      );
+
+      Samplecollection.id = response.data.data._id;
+      Samplecollection.path = path;
+      Samplecollection.name = response.data.data.name;
+      Samplecollection.save = true;
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
+
+      _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: Samplecollection.id,
+        name: Samplecollection.name,
+      });
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+        importThrough: "ByObject",
+      });
+      notifications.success("Collection Imported successfully.");
+      return;
+    } else {
+      notifications.error("Failed to import collection. Please try again.");
+      progressBar.isLoading = false;
+      isSyntaxError = true;
+    }
+  };
+
+  const handleImportUrl = async (requestBody) => {
+    progressBar.isLoading = true;
+    progressBar.isProgress = false;
+    progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+    const response = await _viewImportCollection.importCollectionData(
+      currentWorkspaceId,
+      requestBody,
+      activeSync,
+    );
+
+    if (response.isSuccessful) {
+      progressBar.title = ProgressTitle.FETCHING_DATA;
+
+      progressBar.isProgress = true;
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data.collection._id,
+      };
+      const Samplecollection = generateSampleCollection(
+        response.data.data._id,
+        new Date().toString(),
+      );
+
+      Samplecollection.id = response.data.data.collection._id;
+      Samplecollection.path = path;
+      Samplecollection.name = response.data.data.collection.name;
+      Samplecollection.save = true;
+      if (response.data.data.existingCollection) {
+        collectionsMethods.updateCollection(response.data.data.collection._id, {
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
+        });
+        notifications.error("Collection already exists.");
+      } else {
+        collectionsMethods.addCollection({
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
+          workspaceId: currentWorkspaceId,
+        });
+        _workspaceViewModel.updateCollectionInWorkspace(currentWorkspaceId, {
+          id: Samplecollection.id,
+          name: Samplecollection.name,
+        });
+        notifications.success("Collection Imported successfully.");
+      }
+      collectionsMethods.handleCreateTab(Samplecollection);
+      moveNavigation("right");
+
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.collection.name,
+        collectionId: response.data.data.collection._id,
+        importThrough: "ByObject",
+      });
+      return;
+    } else {
+      notifications.error("Failed to import collection. Please try again.");
+      progressBar.isLoading = false;
+      isSyntaxError = true;
+    }
+  };
   let repositoryPath = "";
   let isRepositoryPath = false;
   let isRepositoryPathTouched = false;
-  let getBranchList: [] = [];
-  let repositoryBranch = "not exist";
-  let currentBranch = "";
-  let isRepositoryBranchTouched = false;
-
-  let handleFolderUpload = async () => {
-    const file = await onUploadFile();
-    if (file) {
-      repositoryPath = file.repositoryPath;
-      currentBranch = file.currentBranch;
-      repositoryBranch = file.repositoryBranch;
-      getBranchList = file.getBranchList;
-      isRepositoryPath = file.isRepositoryPath;
+  let getBranchList = [];
+  const uploadFormFile = async () => {
+    const filePathResponse: string = await invoke("fetch_folder_command");
+    if (filePathResponse !== "Canceled") {
+      await extractGitBranch(filePathResponse);
     }
   };
 
+  const extractGitBranch = async (filePathResponse) => {
+    repositoryPath = "";
+    currentBranch = "";
+    repositoryBranch = "not exist";
+    getBranchList = [];
+    isRepositoryPath = false;
+
+    repositoryPath = filePathResponse;
+    try {
+      const response = await invoke("get_git_branches", {
+        path: repositoryPath,
+      });
+      if (response) {
+        getBranchList = response
+          .filter((elem) => {
+            if (elem.startsWith("upstream/")) return false;
+            else if (elem.startsWith("origin/HEAD -> origin/")) {
+              const branchIterator = elem;
+              repositoryBranch = branchIterator.replace(
+                /^origin\/HEAD -> origin\//,
+                "",
+              );
+              return false;
+            }
+            return true;
+          })
+          .map((elem) => {
+            return {
+              name: elem.replace(/^origin\//, ""),
+              id: elem.replace(/^origin\//, ""),
+              hide: false,
+            };
+          });
+        isRepositoryPath = true;
+        const activeResponse = await invoke("get_git_active_branch", {
+          path: repositoryPath,
+        });
+        if (activeResponse) {
+          currentBranch = activeResponse;
+        }
+      }
+    } catch (e) {}
+  };
+
+  let repositoryBranch = "not exist";
+  let currentBranch = "";
+  let isRepositoryBranchTouched = false;
   let handleDropdown = (tabId: string) => {
     isRepositoryBranchTouched = true;
     repositoryBranch = tabId;
@@ -237,7 +556,7 @@
 
 {#if progressBar.isLoading}
   <ProgressBar
-    {onImportCollectionPopup}
+    {onClick}
     title={progressBar.title}
     zIndex={10000}
     isProgress={progressBar.isProgress}
@@ -250,7 +569,7 @@
   width={"35%"}
   zIndex={1000}
   isOpen={isSyntaxError}
-  handleModalState={onImportCollectionPopup}
+  handleModalState={onClick}
 >
   <div class="invalid-type-content">
     <div>
@@ -267,7 +586,7 @@
       <button
         class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
-          onImportCollectionPopup();
+          onClick(false);
         }}>Close</button
       >
       <button
@@ -286,7 +605,7 @@
   width={"35%"}
   zIndex={1000}
   isOpen={!progressBar.isLoading && !isSyntaxError}
-  handleModalState={onImportCollectionPopup}
+  handleModalState={onClick}
 >
   <div class="d-flex">
     <div class="form-check import-type-inp">
@@ -455,7 +774,12 @@
           </div>
         </div>
       </div>
-
+      <!-- <div class="d-flex align-items-center gap-2 pb-2">
+        <img src={linkIcon} alt="" />
+        <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
+          >Learn more about Active Sync</a
+        >
+      </div> -->
       {#if activeSync}
         <!-- Local repository path -->
         <div>
@@ -499,7 +823,7 @@
               type={"dark"}
               loader={false}
               onClick={async () => {
-                handleFolderUpload();
+                await uploadFormFile();
                 isRepositoryPathTouched = true;
               }}
             />
@@ -589,7 +913,6 @@
         : 'btn-primary'} "
       on:click={() => {
         handleImport();
-        onImportCollectionPopup();
       }}
       disabled={uploadCollection?.file?.showFileTypeError}
     >
@@ -603,8 +926,8 @@
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
-        onCreateCollection();
-        onImportCollectionPopup();
+        onClick(false);
+        handleCreateCollection();
       }}>Create Empty Collection</button
     >
   </div>

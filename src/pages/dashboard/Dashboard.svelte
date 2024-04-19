@@ -3,7 +3,19 @@
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
-  import Collections from "../Collections/Collections.old.svelte";
+  import Collections from "../Collections/CollectionsPage.svelte";
+  import { DashboardViewModel } from "./Dashboard.ViewModel.old.ts";
+  import { onMount } from "svelte";
+  import { user } from "$lib/store";
+  const _viewModel = new DashboardViewModel();
+  const userUnsubscribe = user.subscribe(async (value) => {
+    if (value) {
+      await _viewModel.refreshTeams(value._id);
+      await _viewModel.refreshWorkspaces(value._id);
+      await _viewModel.refreshTeamsWorkspaces(value._id);
+    }
+  });
+  userUnsubscribe();
 </script>
 
 <div class="dashboard vh-100">

@@ -1,32 +1,51 @@
 <script lang="ts">
+  export let onCreateRequestInFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+  ) => void;
+  export let onDeleteFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+    requestIds: [string],
+  ) => void;
+  export let onDeleteRequest: (
+    collection: CollectionDocument,
+    request: any,
+    folder: any,
+  ) => Promise<boolean>;
+  export let onRenameFolder: (
+    collection: CollectionDocument,
+    explorer: any,
+    newFolderName: string,
+  ) => void;
+  export let onRenameRequest: (
+    collection: CollectionDocument,
+    folder: any,
+    request: any,
+    newRequestName: string,
+  ) => void;
+  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let collection: CollectionDocument;
+  export let getUserRoleInWorkspace: () => WorkspaceRole;
+  export let getActiveTab: () => Writable<{}>;
+  export let explorer: any;
+  export let folder: any = null;
+
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import folder from "$lib/assets/folder.svg";
+  import folderCloseIcon from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
-
-  import { isFolderCreatedFirstTime } from "$lib/store/collection";
-
   import Request from "../request/Request.svelte";
-  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { v4 as uuidv4 } from "uuid";
-  import { generateSampleRequest } from "$lib/utils/sample/request.sample";
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import { CollectionListViewModel } from "../CollectionList.ViewModel";
-  import { type CreateApiRequestPostBody } from "$lib/utils/dto";
-  import { type CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import { CollectionService } from "$lib/services/collection.service";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
-  import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
-  import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
   import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
   import angleRight from "$lib/assets/angleRight.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import Button from "$lib/components/buttons/Button.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
@@ -35,106 +54,39 @@
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { Writable } from "svelte/store";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
 
   let expand: boolean = false;
-  export let explorer;
-  export let collectionId: string;
-  export let currentWorkspaceId: string;
-  export let folderId: string = "";
-  export let folderName: string = "";
-  export let visibility: boolean = false;
-  export let activeTabId: string;
-  export let activePath: string = "";
-  export let activeSync = false;
-  export let currentBranch;
-  export let primaryBranch;
-  const collectionService = new CollectionService();
-
-  const _colllectionListViewModel = new CollectionListViewModel();
-
-  export let collectionsMethods: CollectionsMethods;
-  export let loggedUserRoleInWorkspace: WorkspaceRole =
-    WorkspaceRole.WORKSPACE_VIEWER;
-
   let showFolderAPIButtons: boolean = true;
-  const handleAPIClick = async () => {
-    if (
-      !hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.SAVE_REQUEST,
-      )
-    ) {
-      return;
+  let deleteLoader: boolean = false;
+  let pos = { x: 0, y: 0 };
+  let showMenu: boolean = false;
+  let isFolderPopup: boolean = false;
+  let noOfColumns = 180;
+  let noOfRows = 4;
+  let isRenaming = false;
+  let requestCount: number;
+  let requestIds: [string] | [] = [];
+  $: {
+    // if (activePath) {
+    //   if (activePath.folderId === explorer.id) {
+    //     expand = true;
+    //   }
+    // }
+    if (explorer) {
+      requestIds = [];
+      requestCount = 0;
+      requestCount = explorer?.items?.length;
+      if (explorer?.items) {
+        requestIds = explorer?.items?.map((element) => {
+          return element.id;
+        });
+      }
+      requestIds.push(explorer?.id);
     }
-    isApiCreatedFirstTime.set(true);
-    const sampleRequest = generateSampleRequest(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
-    );
-
-    let userSource = {};
-    if (activeSync && explorer?.source === "USER") {
-      userSource = {
-        currentBranch: currentBranch ? currentBranch : primaryBranch,
-        source: "USER",
-      };
-    }
-
-    const requestObj: CreateApiRequestPostBody = {
-      collectionId: collectionId,
-      workspaceId: currentWorkspaceId,
-      ...userSource,
-      folderId: explorer.id,
-      items: {
-        name: explorer.name,
-        type: ItemType.FOLDER,
-        items: {
-          name: sampleRequest.name,
-          type: sampleRequest.type,
-          description: "",
-          request: {
-            method: sampleRequest.property.request.method,
-          },
-        },
-      },
-    };
-
-    collectionsMethods.addRequestInFolder(
-      requestObj.collectionId,
-      requestObj.folderId,
-
-      {
-        ...requestObj.items.items,
-        id: sampleRequest.id,
-      },
-    );
-    const response =
-      await _colllectionListViewModel.addRequestInFolderInCollection(
-        requestObj,
-      );
-    if (response.isSuccessful && response.data.data) {
-      const request = response.data.data;
-
-      collectionsMethods.updateRequestInFolder(
-        requestObj.collectionId,
-        requestObj.folderId,
-        sampleRequest.id,
-        request,
-      );
-
-      sampleRequest.id = request.id;
-      sampleRequest.path.workspaceId = currentWorkspaceId;
-      sampleRequest.path.collectionId = collectionId;
-      sampleRequest.path.folderId = explorer.id;
-      sampleRequest.path.folderName = explorer.name;
-      sampleRequest.property.request.save.api = true;
-      sampleRequest.property.request.save.description = true;
-
-      collectionsMethods.handleCreateTab(sampleRequest);
-      moveNavigation("right");
-      return;
-    }
-  };
+  }
 
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
@@ -149,197 +101,11 @@
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
-
-  let pos = { x: 0, y: 0 };
-
-  let showMenu: boolean = false;
-  let isFolderPopup: boolean = false;
-
-  let noOfColumns = 180;
-  let noOfRows = 4;
-  function rightClickContextMenu(e) {
-    e.preventDefault();
-    setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
-      showMenu = true;
-    }, 100);
-  }
-
-  function closeRightClickContextMenu() {
-    showMenu = false;
-  }
-
-  const handleFolderPopUp = (flag) => {
-    isFolderPopup = flag;
-  };
-
-  let newFolderName: string = "";
-  let isRenaming = false;
-
-  const handleRenameInput = (event) => {
-    newFolderName = event.target.value;
-  };
-
-  const onRenameBlur = async () => {
-    if (newFolderName) {
-      let userSource = {};
-      if (activeSync && explorer?.source === "USER") {
-        userSource = {
-          currentBranch: currentBranch ? currentBranch : primaryBranch,
-          source: "USER",
-        };
-      }
-      const response = await collectionService.updateFolderInCollection(
-        currentWorkspaceId,
-        collectionId,
-        explorer.id,
-        {
-          ...userSource,
-          name: newFolderName,
-        },
-      );
-      if (response.isSuccessful) {
-        collectionsMethods.updateRequestOrFolderInCollection(
-          collectionId,
-          explorer.id,
-          response.data.data,
-        );
-        collectionsMethods.updateTab(newFolderName, "name", explorer.id);
-      }
-    }
-    isRenaming = false;
-    newFolderName = "";
-  };
-
-  const onRenameInputKeyPress = (event) => {
-    if (event.key === "Enter") {
-      const inputField = document.getElementById(
-        "renameInputFieldFolder",
-      ) as HTMLInputElement;
-      inputField.blur();
-    }
-  };
-
-  const renameFolder = () => {
-    expand = false;
-    isRenaming = true;
-  };
-
-  function openFolder() {
-    if (!expand) expand = !expand;
-  }
-
-  function addRequest() {
-    expand = true;
-    handleAPIClick();
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-      source: "Side Panel Dropdown",
-    });
-  }
-
-  let menuItems = [];
-
-  let workspaceId = currentWorkspaceId;
-
-  let requestCount: number;
-  let requestIds = [];
-  $: {
-    if (activePath) {
-      if (activePath.folderId === explorer.id) {
-        expand = true;
-      }
-    }
-    if (explorer) {
-      requestIds.length = 0;
-      requestCount = 0;
-      requestCount = explorer?.items?.length;
-      if (explorer?.items) {
-        requestIds = explorer?.items?.map((element) => {
-          return element.id;
-        });
-      }
-      requestIds.push(explorer?.id);
-
-      if (!activeSync || (explorer?.source === "USER" && activeSync)) {
-        menuItems = [
-          {
-            onClick: openFolder,
-            displayText: "Open Folder",
-            disabled: false,
-          },
-          {
-            onClick: renameFolder,
-            displayText: "Rename Folder",
-            disabled: false,
-          },
-          {
-            onClick: addRequest,
-            displayText: "Add Request",
-            disabled: false,
-          },
-
-          {
-            onClick: () => {
-              handleFolderPopUp(true);
-            },
-            displayText: "Delete",
-            disabled: false,
-          },
-        ];
-      } else {
-        menuItems = [
-          {
-            onClick: openFolder,
-            displayText: "Open Folder",
-            disabled: false,
-          },
-        ];
-      }
-    }
-  }
-
-  // Delete folder functions
-  let deleteLoader: boolean = false;
-
-  const handleDelete = async () => {
-    deleteLoader = true;
-    let userSource = {};
-    if (activeSync && explorer?.source === "USER") {
-      userSource = {
-        branchName: currentBranch ? currentBranch : primaryBranch,
-      };
-    }
-    const response = await collectionService.deleteFolderInCollection(
-      workspaceId,
-      collectionId,
-      explorer.id,
-      {
-        ...userSource,
-      },
-    );
-
-    if (response.isSuccessful) {
-      collectionsMethods.deleteRequestOrFolderInCollection(
-        collectionId,
-        explorer.id,
-      );
-
-      notifications.success(`"${explorer.name}" Folder deleted.`);
-      deleteLoader = false;
-      collectionsMethods.removeMultipleTabs(requestIds);
-      handleFolderPopUp(false);
-    } else {
-      notifications.error("Failed to delete the Folder.");
-      deleteLoader = false;
-    }
-  };
 </script>
 
 <svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
+  on:click={() => (showMenu = false)}
+  on:contextmenu|preventDefault={() => (showMenu = false)}
 />
 
 <div>
@@ -349,7 +115,7 @@
     width={"35%"}
     zIndex={1000}
     isOpen={isFolderPopup}
-    handleModalState={handleFolderPopUp}
+    handleModalState={(flag) => (isFolderPopup = flag)}
   >
     <div class="text-lightGray mb-1 sparrow-fs-14">
       <p>
@@ -375,7 +141,7 @@
         type={"dark"}
         loader={false}
         onClick={() => {
-          handleFolderPopUp(false);
+          isFolderPopup = false;
         }}
       />
 
@@ -387,7 +153,10 @@
         type={"danger"}
         loader={deleteLoader}
         onClick={() => {
-          handleDelete();
+          deleteLoader = true;
+          onDeleteFolder(collection, explorer, requestIds);
+          deleteLoader = false;
+          isFolderPopup = false;
         }}
       />
     </div></ModalWrapperV1
@@ -397,169 +166,221 @@
     <RightOption
       xAxis={pos.x}
       yAxis={pos.y}
-      {menuItems}
+      menuItems={[
+        {
+          onClick: () => (expand = true),
+          displayText: "Open Folder",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            expand = false;
+            isRenaming = true;
+          },
+          displayText: "Rename Folder",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
+            expand = true;
+            onCreateRequestInFolder(collection, explorer);
+          },
+          displayText: "Add Request",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+
+        {
+          onClick: () => {
+            isFolderPopup = true;
+          },
+          displayText: "Delete",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+      ]}
       {noOfRows}
       {noOfColumns}
     />
   {/if}
 
-  {#if explorer.type === "FOLDER"}
-    <div
-      style="height:36px;"
-      class="d-flex align-items-center justify-content-between my-button btn-primary w-100 ps-2 {explorer.id ===
-      activeTabId
-        ? 'active-folder-tab'
-        : ''}"
-    >
+  {#if explorer}
+    {#if explorer.type === "FOLDER"}
       <div
-        on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-        class="main-folder d-flex align-items-center pe-0"
-        on:click={() => {
-          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-            expand = !expand;
-            if (expand) {
-              handleFolderClick(
-                explorer,
-                currentWorkspaceId,
-                collectionId,
-                activeSync,
-              );
-            }
-          }
-        }}
+        style="height:36px;"
+        class="d-flex align-items-center justify-content-between my-button btn-primary ps-2 {explorer.id ===
+        'activeTabId'
+          ? 'active-folder-tab'
+          : ''}"
       >
-        <img
-          src={angleRight}
-          class=""
-          style="height:14px; width:14px; margin-right:8px; {expand
-            ? 'transform:rotate(90deg);'
-            : 'transform:rotate(0deg);'}"
-          alt="angleRight"
-        />
-        {#if isRenaming}
-          <input
-            class="form-control py-0 renameInputFieldFolder"
-            id="renameInputFieldFolder"
-            type="text"
-            style="font-size: 12px;"
-            autofocus
-            maxlength={100}
-            value={explorer.name}
-            on:input={handleRenameInput}
-            on:blur={onRenameBlur}
-            on:keydown={onRenameInputKeyPress}
+        <button
+          class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
+          on:click={() => {
+            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+              expand = !expand;
+              if (expand) {
+                handleFolderClick(
+                  explorer,
+                  collection.workspaceId,
+                  collection.id,
+                  collection.activeSync,
+                );
+              }
+            }
+          }}
+        >
+          <img
+            src={angleRight}
+            class=""
+            style="height:14px; width:14px; margin-right:8px; {expand
+              ? 'transform:rotate(90deg);'
+              : 'transform:rotate(0deg);'}"
+            alt="angleRight"
           />
-        {:else}
-          <div
-            class="folder-title d-flex align-items-center"
-            style="cursor:pointer; font-size:12px;
-        height: 36px;
-         font-weight:400;"
-          >
-            {#if expand}
-              <div
-                style="height:16px; width:16px;"
-                class="d-flex align-items-center justify-content-center me-2"
-              >
-                <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
-              </div>
-            {:else}
-              <div class="d-flex me-2" style="height:16px; width:16px;">
-                <img
-                  src={folder}
-                  alt=""
-                  style="height:16px; width:16px;"
-                  class="folder-icon"
-                />
-              </div>
-            {/if}
-            <p class="ellipsis mb-0">
-              {explorer.name}
-            </p>
-          </div>
-        {/if}
-      </div>
-
-      {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
-        <Spinner size={"15px"} />
-      {:else}
-        <Tooltip title="More options" styleProp="left: -50%">
-          <button
-            class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-              ? 'threedot-active'
-              : ''}"
-            on:click={(e) => {
-              rightClickContextMenu(e);
-            }}
-          >
-            <img src={threedotIcon} alt="threedotIcon" />
-          </button>
-        </Tooltip>
-      {/if}
-    </div>
-    <div
-      style="padding-left: 12px; cursor:pointer; display: {expand
-        ? 'block'
-        : 'none'};"
-    >
-      <div class="sub-files ps-3">
-        {#each explorer.items as exp}
-          <svelte:self
-            folderId={explorer.id}
-            folderName={explorer.name}
-            explorer={exp}
-            {collectionId}
-            {currentWorkspaceId}
-            {collectionsMethods}
-            {activeTabId}
-            {activeSync}
-            {currentBranch}
-            {primaryBranch}
-          />
-        {/each}
-        {#if showFolderAPIButtons && explorer?.source === "USER"}
-          <div class="mt-2 mb-2 ms-0">
-            <Tooltip
-              classProp="mt-2 mb-2 ms-0"
-              title={PERMISSION_NOT_FOUND_TEXT}
-              show={!hasWorkpaceLevelPermission(
-                loggedUserRoleInWorkspace,
-                workspaceLevelPermissions.SAVE_REQUEST,
-              )}
+          {#if isRenaming}
+            <input
+              class="form-control py-0 renameInputFieldFolder"
+              id="renameInputFieldFolder"
+              type="text"
+              style="font-size: 12px;"
+              autofocus
+              maxlength={100}
+              value={explorer.name}
+              on:blur={(e) => {
+                onRenameFolder(collection, explorer, e?.target?.value);
+                isRenaming = false;
+              }}
+              on:keydown={(e) => {
+                if (e.key === "Enter") {
+                  onRenameFolder(collection, explorer, e?.target?.value);
+                  isRenaming = false;
+                }
+              }}
+            />
+          {:else}
+            <div
+              class="folder-title d-flex align-items-center"
+              style="cursor:pointer; font-size:12px;
+                      height: 36px;
+                      font-weight:400;"
             >
-              <img
-                class="list-icons"
-                src={requestIcon}
-                alt="+ API Request"
-                on:click={() => {
-                  handleAPIClick();
-                  MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                    source: "Side Panel Collection List",
-                  });
-                }}
-              />
-            </Tooltip>
-          </div>
+              {#if expand}
+                <div
+                  style="height:16px; width:16px;"
+                  class="d-flex align-items-center justify-content-center me-2"
+                >
+                  <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+                </div>
+              {:else}
+                <div class="d-flex me-2" style="height:16px; width:16px;">
+                  <img
+                    src={folderCloseIcon}
+                    alt=""
+                    style="height:16px; width:16px;"
+                    class="folder-icon"
+                  />
+                </div>
+              {/if}
+              <p class="ellipsis mb-0">
+                {explorer.name}
+              </p>
+            </div>
+          {/if}
+        </button>
+
+        {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
+          <Spinner size={"15px"} />
+        {:else}
+          <Tooltip title="More options" styleProp="left: -50%">
+            <button
+              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+                ? 'threedot-active'
+                : ''}"
+              on:click|preventDefault={(e) => {
+                pos = { x: e.clientX, y: e.clientY };
+                setTimeout(() => {
+                  showMenu = true;
+                }, 100);
+              }}
+            >
+              <img src={threedotIcon} alt="threedotIcon" />
+            </button>
+          </Tooltip>
         {/if}
       </div>
-    </div>
-  {:else if explorer.type === "REQUEST"}
-    <div style="cursor:pointer;">
-      <Request
-        api={explorer}
-        {folderId}
-        {folderName}
-        {collectionsMethods}
-        {collectionId}
-        {currentWorkspaceId}
-        name={explorer.name}
-        id={explorer.id}
-        {activeTabId}
-        {activeSync}
-        {currentBranch}
-        {primaryBranch}
-      />
-    </div>
+      <div
+        style="padding-left: 12px; cursor:pointer; display: {expand
+          ? 'block'
+          : 'none'};"
+      >
+        <div class="sub-files ps-3">
+          {#each explorer.items as exp}
+            <svelte:self
+              {onCreateRequestInFolder}
+              {onDeleteFolder}
+              {onDeleteRequest}
+              {onRenameFolder}
+              {onRenameRequest}
+              {onOpenRequestOnTab}
+              {collection}
+              {getUserRoleInWorkspace}
+              {getActiveTab}
+              explorer={exp}
+              folder={explorer}
+            />
+          {/each}
+          {#if showFolderAPIButtons && explorer?.source === "USER"}
+            <div class="mt-2 mb-2 ms-0">
+              <Tooltip
+                classProp="mt-2 mb-2 ms-0"
+                title={PERMISSION_NOT_FOUND_TEXT}
+                show={!hasWorkpaceLevelPermission(
+                  getUserRoleInWorkspace(),
+                  workspaceLevelPermissions.SAVE_REQUEST,
+                )}
+              >
+                <img
+                  class="list-icons"
+                  src={requestIcon}
+                  alt="+ API Request"
+                  on:click={() => {
+                    onCreateRequestInFolder(collection, explorer);
+                    MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
+                      source: "Side Panel Collection List",
+                    });
+                  }}
+                />
+              </Tooltip>
+            </div>
+          {/if}
+        </div>
+      </div>
+    {:else if explorer.type === "REQUEST"}
+      <div style="cursor:pointer;">
+        <Request
+          api={explorer}
+          {onRenameRequest}
+          {onDeleteRequest}
+          {onOpenRequestOnTab}
+          {folder}
+          {collection}
+        />
+      </div>
+    {/if}
   {/if}
 </div>
 
