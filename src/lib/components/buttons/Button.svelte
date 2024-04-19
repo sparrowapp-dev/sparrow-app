@@ -11,6 +11,7 @@
   export let textClassProp = "";
   export let textStyleProp = "";
   export let buttonStartIcon: string | undefined = undefined;
+  export let buttonStartIconStyle = "";
   export let allowChild = false;
   export let type:
     | "primary"
@@ -72,7 +73,7 @@
     <img
       src={buttonStartIcon}
       class="me-2"
-      style="height: 20px; width:20px;"
+      style={`${buttonStartIconStyle} height: 20px; width:20px;`}
       alt="icon"
     />
   {/if}

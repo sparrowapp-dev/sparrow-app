@@ -5,7 +5,6 @@
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import Collections from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel.old.ts";
-  import { onMount } from "svelte";
   import { user } from "$lib/store";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -16,6 +15,7 @@
     }
   });
   userUnsubscribe();
+  import Mock from "../Mock/Mock.svelte";
 </script>
 
 <div class="dashboard vh-100">
@@ -35,7 +35,7 @@
       <Route path="/workspaces/*"><Collections /></Route>
 
       <!-- Route for Mock -->
-      <Route path="/mock/*">Mock</Route>
+      <Route path="/mock/*"><Mock /></Route>
 
       <!-- Route for Environment -->
       <Route path="/environment/*">Environment</Route>

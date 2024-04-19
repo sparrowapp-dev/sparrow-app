@@ -1,70 +1,27 @@
 <script lang="ts">
-  // ---- Icon
   import Crossicon from "$lib/assets/crossicon.svelte";
-  import BookIcon from "$lib/assets/book.svelte";
-  // ----
-
-  // ---- SVG
+  import { ItemType } from "$lib/utils/enums/item-type.enum";
+  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
   import collectionAsset from "$lib/assets/collection-nodes.svg";
   import folderTab from "$lib/assets/folder-tab.svg";
-  // ----
-
-  // ---- Enum
-  import { ItemType } from "$lib/utils/enums/item-type.enum";
-  // ----
-
-  // ---- helper functions
-  import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  // ----
-
-  // ---- Interface
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  // ----
-
-  // ------ Props ------
-  /**
-   * New tab with details
-   * @type {NewTab}
-   */
+  import BookIcon from "$lib/assets/book.svelte";
   export let tab: NewTab;
-  /**
-   * Width of each tab
-   */
+  export let updateCurrentTab: (id: string) => void;
   export let tabWidth: number;
-  /**
-   * Index of particular tab
-   */
   export let index: number;
-  /**
-   * Callback function for tab selected
-   * @param id - Tab ID
-   */
-  export let onTabSelected: (id: string) => void;
-  /**
-   * Callback function for tab closed
-   * @param id - Tab ID
-   * @param tab - New Tab
-   */
-  export let onTabClosed: (id: string, tab: NewTab) => void;
-  /**
-   * Callback function for drag start from a index
-   * @param index - Index of Tab
-   */
-  export let onDragStart: (index: number) => void;
-  /**
-   * Callback function for drop over at a index
-   * @param index - Index of Tab
-   */
-  export let onDropOver: (index: number) => void;
+  export let closeTab;
+  export let handleDropOnStart: (index: number) => void;
+  export let handleDropOnEnd: (index: number) => void;
 </script>
 
 <div
   draggable={true}
   on:drop={() => {
-    onDropOver(index);
+    handleDropOnEnd(index);
   }}
   on:dragstart={() => {
-    onDragStart(index);
+    handleDropOnStart(index);
   }}
   class="d-inline-block position-relative pt-1 individual-tab"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
@@ -79,13 +36,11 @@
   >
     <button
       on:click={() => {
-        if (!tab.isActive) {
-          onTabSelected(tab.id);
-        }
+        updateCurrentTab(tab.id);
       }}
       class="position-relative border-0 ellipsis"
       style="    width: 80%;
-       text-align: left; background-color:transparent;"
+         text-align: left; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span
@@ -131,13 +86,12 @@
         {/if}
       {/if}
     </button>
-
     <button
       class="{tab.isActive
         ? 'active-close-btn'
         : 'inactive-close-btn'} btn border-0 d-flex align-items-center"
       on:click={() => {
-        onTabClosed(tab.id, tab);
+        closeTab(tab.id, tab);
       }}
       style="overflow:hidden; height:31px;"
     >

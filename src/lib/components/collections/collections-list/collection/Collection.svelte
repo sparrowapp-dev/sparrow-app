@@ -47,7 +47,7 @@
 
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy, onMount } from "svelte";
@@ -76,7 +76,10 @@
   let requestCount = 0;
   let folderCount = 0;
   let showFolderAPIButtons: boolean = true;
-  let activeTab = getActiveTab();
+  let activeTab: any;
+  const activeTabSubscriber = getActiveTab().subscribe(
+    (value) => (activeTab = value),
+  );
   const commonService = new CommonService();
   let visibility = false;
   let isActiveSyncEnabled = false;
@@ -131,33 +134,30 @@
   }
 
   $: {
-    if (activeTab) {
-      console.log("tab", $activeTab);
+    if (activeTab?.activePath) {
+      if (activeTab?.activePath.collection.id === collection.id) {
+        visibility = true;
+      }
     }
-    // if (activePath) {
-    //   if (activePath.collection.id === collection.id) {
-    //     visibility = true;
-    //   }
-    // }
-    // if (collection) {
-    //   deletedIds = [];
-    //   requestCount = 0;
-    //   folderCount = 0;
-    //   collection?.items?.forEach((item: any) => {
-    //     if (item.type === ItemType.FOLDER) {
-    //       deletedIds.push(item.id);
-    //       folderCount++;
-    //       requestCount += item.items.length;
-    //       for (let i = 0; i < item.items.length; i++) {
-    //         deletedIds.push(item.items[i].id);
-    //       }
-    //     } else if (item.type === ItemType.REQUEST) {
-    //       requestCount++;
-    //       deletedIds.push(item.id);
-    //     }
-    //   });
-    //   deletedIds.push(collection.id);
-    // }
+    if (collection) {
+      deletedIds = [];
+      requestCount = 0;
+      folderCount = 0;
+      collection?.items?.forEach((item: any) => {
+        if (item.type === ItemType.FOLDER) {
+          deletedIds.push(item.id);
+          folderCount++;
+          requestCount += item.items.length;
+          for (let i = 0; i < item.items.length; i++) {
+            deletedIds.push(item.items[i].id);
+          }
+        } else if (item.type === ItemType.REQUEST) {
+          requestCount++;
+          deletedIds.push(item.id);
+        }
+      });
+      deletedIds.push(collection.id);
+    }
   }
   // delete collection
   onMount(async () => {

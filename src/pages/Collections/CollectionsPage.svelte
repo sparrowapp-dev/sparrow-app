@@ -1,18 +1,33 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { onMount } from "svelte";
-
+  // ---- Store
   import {
     collectionRightPanelWidth,
     collectionLeftPanelWidth,
     collapsibleState,
+    userWorkspaceLevelRole,
   } from "$lib/store";
+  import type { Writable } from "svelte/store";
 
-  import CollectionsViewModel from "./Collections.ViewModel";
-
+  // ---- Components
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
+  import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
+  import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import CollectionList from "$lib/components/collections/collections-list/CollectionList.svelte";
+
+  // ---- Interface, enum & constants
+  import type { NewTab } from "$lib/utils/interfaces/request.interface";
+  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
+  import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
+
+  // ---- View Model
+  import CollectionsViewModel from "./CollectionPage.ViewModel";
+
+  // ---- helpers
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+
   import type {
     CollectionDocument,
     EnvironmentDocument,
@@ -29,6 +44,69 @@
     _viewModel.getCollectionList();
   let environmentList: Observable<EnvironmentDocument[]> =
     _viewModel.getEnvironmentList();
+  const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  let loggedUserRoleInWorkspace: WorkspaceRole;
+  let removeTab: NewTab;
+  let isPopupClosed: boolean = false;
+  let saveAsVisibility: boolean = false;
+  let loader = false;
+
+  /**
+   * Handle close tab functionality in tab bar list
+   */
+  const closeTab = (id: string, tab: NewTab) => {
+    if (
+      tab?.property?.request &&
+      (!tab?.property?.request?.save?.api ||
+        !tab?.property?.request?.save?.description)
+    ) {
+      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
+        removeTab = tab;
+        isPopupClosed = true;
+      } else {
+        _viewModel.handleRemoveTab(id);
+      }
+    } else {
+      _viewModel.handleRemoveTab(id);
+    }
+  };
+
+  const handleClosePopupBackdrop = (flag) => {
+    isPopupClosed = flag;
+  };
+
+  const handlePopupDiscard = () => {
+    _viewModel.handleRemoveTab(removeTab.id);
+    isPopupClosed = false;
+  };
+
+  /**
+   * Handle save functionality on close confirmation popup
+   */
+  const handlePopupSave = async () => {
+    console.log("on savee");
+    if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
+      const id = removeTab?.id;
+      loader = true;
+      const res = await _viewModel.saveAPIRequest(removeTab);
+      if (res) {
+        loader = false;
+        _viewModel.handleRemoveTab(id);
+        isPopupClosed = false;
+        notifications.success("API request saved");
+      }
+      loader = false;
+    } else {
+      isPopupClosed = false;
+      saveAsVisibility = true;
+    }
+  };
+
+  userWorkspaceLevelRole.subscribe((value: WorkspaceRole) => {
+    if (value) {
+      loggedUserRoleInWorkspace = value;
+    }
+  });
 </script>
 
 <Splitpanes
@@ -68,13 +146,34 @@
     />
   </Pane>
   <Pane size={$collapsibleState ? 100 : $collectionRightPanelWidth}>
-    Tabs
+    <TabBar
+      bind:tabList={$tabList}
+      onNewTabRequested={_viewModel.createNewTab}
+      onTabClosed={closeTab}
+      onDropEvent={_viewModel.onDropEvent}
+      onDragStart={_viewModel.handleDropOnStart}
+      onDropOver={_viewModel.handleDropOnEnd}
+      onTabSelected={_viewModel.handleActiveTab}
+    />
     <br />
     <Route>
       <RestExplorer />
     </Route>
   </Pane>
 </Splitpanes>
+
+<CloseConfirmationPopup
+  isOpen={isPopupClosed}
+  onModalStateChanged={handleClosePopupBackdrop}
+  onSave={handlePopupSave}
+  onCancel={handleClosePopupBackdrop}
+  onDiscard={handlePopupDiscard}
+  isSaveDisabled={!hasWorkpaceLevelPermission(
+    loggedUserRoleInWorkspace,
+    workspaceLevelPermissions.SAVE_REQUEST,
+  )}
+  {loader}
+/>
 
 <style>
 </style>

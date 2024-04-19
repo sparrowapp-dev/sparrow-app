@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+//-----
+// Local Database
 import type {
   CollectionDocument,
-  WorkspaceDocument,
+  TabDocument,
 } from "$lib/database/app.database";
 
 //-----
 // Stores
 import { user, userWorkspaceLevelRole } from "$lib/store";
+import {
+  isApiCreatedFirstTime,
+  requestResponseStore,
+  tabs,
+  progressiveTab,
+} from "$lib/store/request-response-section";
 //-----
 
 //-----
@@ -16,13 +24,11 @@ import { EnvironmentRepository } from "$lib/repositories/environment.repository"
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 //-----
-import {
-  progressiveTab,
-  requestResponseStore,
-  tabs,
-} from "$lib/store/request-response-section";
+
+//-----
+// Services
 import { EnvironmentService } from "$lib/services-v2/environment.service";
-import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
+//-----
 import { CollectionService } from "$lib/services/collection.service";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { setContentTypeHeader } from "$lib/utils/helpers";
@@ -53,6 +59,7 @@ import {
 } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
 import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
+import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
 //-----
 
 //-----
@@ -87,300 +94,6 @@ import { moveNavigation } from "$lib/utils/helpers/navigation";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
-// import { setCollectionList } from "$lib/store/collection";
-// import { ItemType } from "$lib/utils/enums/item-type.enum";
-// import type { Collection } from "$lib/utils/interfaces/collection.interface";
-// import {
-//   selectMethodsStore,
-//   selectedMethodsCollectionStore,
-// } from "$lib/store/methods";
-// import { Observable } from "rxjs";
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// let tree: any[];
-// const filterTree: Collection[] = [];
-// let selectedAPIMethods: string[] = [];
-// selectMethodsStore.subscribe((value) => {
-//   if (value) {
-//     selectedAPIMethods = value;
-//   }
-// });
-
-// /**
-//  * Recursive helper function to modify the tree data structure by adding files or folders.
-//  */
-
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// const helper: (
-//   tree: any,
-//   folderId: string,
-//   type: string,
-//   name: string,
-//   id: string,
-//   method?: string,
-// ) => number = (tree, folderId, type, name, id, method?) => {
-//   if (tree._id === folderId || tree.id === folderId) {
-//     if (type === "REQUEST") {
-//       tree.items.push({
-//         id,
-//         name,
-//         type,
-//         request: {
-//           method: method,
-//         },
-//         folderId,
-//         folderName: name,
-//       });
-//     } else if (type === "FOLDER") {
-//       tree.items.push({
-//         id,
-//         name,
-//         description: "",
-//         type,
-//         items: [],
-//       });
-//     }
-//     return 0;
-//   }
-
-//   // Recursively search through the tree structure
-//   if (tree && tree.items) {
-//     for (let j = 0; j < tree.items.length; j++) {
-//       if (!helper(tree.items[j], folderId, type, name, id, method)) return 0;
-//     }
-//   }
-//   return 1;
-// };
-
-// const createPath: (path: string[]) => string = (path) => {
-//   const res = "/" + path.join("/");
-//   return res;
-// };
-
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// const searchHelper: (
-//   tree: any,
-//   searchText: string,
-//   collection: any[],
-//   folder: any[],
-//   file: any[],
-//   collectionId: string,
-//   workspaceId: string,
-//   path: string[],
-//   folderDetails: Record<string, string>,
-//   activeSync: boolean,
-// ) => void = (
-//   tree,
-//   searchText,
-//   collection,
-//   folder,
-//   file,
-//   collectionId,
-//   workspaceId,
-//   path,
-//   folderDetails,
-//   activeSync,
-// ) => {
-//   if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
-//     if (tree.type === "REQUEST") {
-//       file.push({
-//         tree: JSON.parse(JSON.stringify(tree)),
-//         collectionId,
-//         workspaceId,
-//         folderDetails,
-//         path: createPath(path),
-//         activeSync,
-//       });
-//     } else if (tree.type === "FOLDER") {
-//       folder.push({
-//         tree: JSON.parse(JSON.stringify(tree)),
-//         collectionId,
-//         workspaceId,
-//         path: createPath(path),
-//         activeSync,
-//       });
-//     } else {
-//       collection.push({
-//         tree: JSON.parse(JSON.stringify(tree)),
-//         collectionId,
-//         workspaceId,
-//         path: createPath(path),
-//         activeSync,
-//       });
-//     }
-//   }
-
-//   // Recursively search through the tree structure
-//   if (tree && tree.items) {
-//     for (let j = 0; j < tree.items.length; j++) {
-//       path.push(tree.name); // Recursive backtracking
-//       searchHelper(
-//         tree.items[j],
-//         searchText,
-//         collection,
-//         folder,
-//         file,
-//         collectionId,
-//         workspaceId,
-//         path,
-//         tree.type === "FOLDER" ? { id: tree.id, name: tree.name } : {},
-//         activeSync,
-//       );
-//       path.pop();
-//     }
-//   }
-//   return;
-// };
-
-// const sortHelperMethod: (
-//   tree: any,
-//   path: string[],
-//   selectedMethods: string[],
-//   filterTree: any[],
-// ) => any[] = (tree, path, selectedMethods, filterTree) => {
-//   if (
-//     tree.type === ItemType.REQUEST &&
-//     selectedMethods.includes(tree.request.method)
-//   ) {
-//     if (path.length === 2) {
-//       filterTree[0].items[filterTree[0].items.length - 1].items.push(tree);
-//     } else {
-//       filterTree[0].items.push(tree);
-//     }
-//   } else if (tree.type == ItemType.FOLDER) {
-//     filterTree[0].items.push({ ...tree, items: [] });
-//   } else if (
-//     !(tree.type === ItemType.REQUEST) &&
-//     !(tree.type === ItemType.FOLDER)
-//   ) {
-//     filterTree = [{ ...tree, items: [] }];
-//   }
-//   // Recursively search through the tree structure
-//   if (tree && tree.items) {
-//     for (let j = 0; j < tree.items.length; j++) {
-//       path.push(tree.name); // Recursive backtracking
-//       sortHelperMethod(tree.items[j], path, selectedMethods, filterTree);
-//       path.pop();
-//     }
-//   }
-//   return filterTree;
-// };
-
-// /**
-//  * Custom hook function for interacting with the tree data structure.
-//  */
-// const useTree = (): any[] => {
-//   const insertNode: (
-//     folderId: string,
-//     type: string,
-//     name: string,
-//     id: string,
-//     method?: string,
-//   ) => void = (folderId, type, name, id, method?) => {
-//     // Iterate through the tree to find the target folder and add the item
-//     for (let i = 0; i < tree.length; i++) {
-//       if (!helper(tree[i], folderId, type, name, id, method)) {
-//         setCollectionList(tree);
-//         return;
-//       }
-//     }
-//     return;
-//   };
-//   const insertHead: (name: string, _id: string) => void = (name, _id) => {
-//     // Iterate through the tree to find the target folder and add the item
-//     tree.push({ name, _id, items: [] });
-//     setCollectionList(tree);
-//     return;
-//   };
-//   const searchNode: (
-//     searchText: string,
-//     collection: any[],
-//     folder: any[],
-//     file: any[],
-//     collectionData: any[],
-//   ) => void = (searchText, collection, folder, file, collectionData) => {
-//     const filteredByMethodTrees = [];
-//     tree = collectionData;
-//     // iterate through the tree and filter according to api methods selected
-//     if (selectedAPIMethods.length > 0) {
-//       for (let i = 0; i < tree.length; i++) {
-//         const path = [];
-//         const treeCol = sortHelperMethod(
-//           tree[i],
-//           path,
-//           selectedAPIMethods,
-//           filterTree,
-//         );
-//         filteredByMethodTrees.push(...treeCol);
-//       }
-//     }
-//     let filteredTrees = [];
-//     // iterate through the tree and remove empty collection and folder on filter
-//     if (filteredByMethodTrees.length > 0) {
-//       filteredTrees = filteredByMethodTrees.filter((collectionObj) => {
-//         if (collectionObj.items.length > 0) {
-//           const items = collectionObj.items.filter(
-//             (item) =>
-//               !(item.type === ItemType.FOLDER && item.items.length === 0),
-//           );
-//           collectionObj.items = items;
-//           if (collectionObj.items.length > 0) {
-//             return true;
-//           } else {
-//             return false;
-//           }
-//         }
-//       });
-//     } else {
-//       filteredTrees = tree;
-//     }
-//     selectedMethodsCollectionStore.update(() => filteredTrees);
-//     // Iterate through the tree to find the target folder and add the item
-//     for (let i = 0; i < filteredTrees.length; i++) {
-//       const path = [];
-//       searchHelper(
-//         filteredTrees[i],
-//         searchText,
-//         collection,
-//         folder,
-//         file,
-//         filteredTrees[i].id,
-//         filteredTrees[i].workspaceId,
-//         path,
-//         {},
-//         filteredTrees[i]?.activeSync,
-//       );
-//     }
-//     return;
-//   };
-//   return [insertNode, insertHead, searchNode];
-// };
-
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// const getNextName: (list: any[], type: string, name: string) => any = (
-//   list,
-//   type,
-//   name,
-// ) => {
-//   const isNameAvailable: (proposedName: string) => boolean = (proposedName) => {
-//     return list.some((element) => {
-//       return element.type === type && element.name === proposedName;
-//     });
-//   };
-
-//   if (!isNameAvailable(name)) {
-//     return name;
-//   }
-
-//   for (let i = 2; i < list.length + 10; i++) {
-//     const proposedName: string = `${name}${i}`;
-//     if (!isNameAvailable(proposedName)) {
-//       return proposedName;
-//     }
-//   }
-
-//   return null;
-// };
-
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
@@ -388,7 +101,10 @@ export default class CollectionsViewModel {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
-  private currentWorkspaceId: string;
+  private currentWorkspaceId: string = "";
+  movedTabStartIndex = 0;
+  movedTabEndIndex = 0;
+
   constructor() {
     const workspaceSubscribe = this.workspaceRepository
       .getActiveWorkspace()
@@ -443,6 +159,13 @@ export default class CollectionsViewModel {
   debouncedTab = this.debounce(this.syncTabWithStore, 2000);
 
   /**
+   * Return current tabs list of top tab bar component
+   */
+  get tabs() {
+    return requestResponseStore.getTabList();
+  }
+
+  /**
    * Get list of all environments
    * @return Observable<Environments[]> - list of all environments
    */
@@ -465,6 +188,245 @@ export default class CollectionsViewModel {
   public handleCreateTab = (data: any) => {
     requestResponseStore.createTab(data);
     this.debouncedTab();
+  };
+
+  /**
+   * Remove the tab from tab list in store
+   * @param id - tab id
+   */
+  public handleRemoveTab = (id: string) => {
+    requestResponseStore.removeTab(id);
+    this.debouncedTab();
+  };
+
+  /**
+   * Create new tab with untracked id
+   */
+  public createNewTab = () => {
+    isApiCreatedFirstTime.set(true);
+    this.handleCreateTab(
+      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+    );
+    moveNavigation("right");
+    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+  };
+
+  /**
+   * Set active tab in store
+   * @param id - tab id
+   */
+  public handleActiveTab = (id: string) => {
+    requestResponseStore.activeTab(id);
+    this.debouncedTab();
+  };
+
+  /**
+   * Handle tab drop on tab list
+   * @param event
+   */
+  public onDropEvent = (event: Event) => {
+    event.preventDefault();
+    const tabList = this.tabs;
+    let updatedTabList: TabDocument[] = [];
+    tabList.subscribe((value) => {
+      updatedTabList = value;
+    });
+    const element = updatedTabList.splice(this.movedTabStartIndex, 1);
+    updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
+    updatedTabList = updatedTabList.map((tab, index) => {
+      tab.index = index;
+      return tab;
+    });
+    const newTabList: NewTab[] = updatedTabList as NewTab[];
+    tabs.set(newTabList);
+    this.syncTabWithStore();
+  };
+
+  /**
+   * Set starting index of tab from tab list
+   * @param index - tab index
+   */
+  public handleDropOnStart = (index: number) => {
+    this.movedTabStartIndex = index;
+  };
+
+  /**
+   * Set ending index of tab in tab list
+   * @param index - tab index
+   */
+  public handleDropOnEnd = (index: number) => {
+    this.movedTabEndIndex = index;
+  };
+
+  /**
+   * Retrieve request inside folder from repository
+   * @param collectionId
+   * @param folderId
+   * @param uuid
+   * @returns
+   */
+  private readRequestInFolder = (
+    collectionId: string,
+    folderId: string,
+    uuid: string,
+  ) => {
+    return this.collectionRepository.readRequestInFolder(
+      collectionId,
+      folderId,
+      uuid,
+    );
+  };
+
+  /**
+   * Retrieve request or folder from repository
+   * @param collectionId
+   * @param uuid
+   * @returns
+   */
+  private readRequestOrFolderInCollection = (
+    collectionId: string,
+    uuid: string,
+  ): Promise<CollectionItem> => {
+    return this.collectionRepository.readRequestOrFolderInCollection(
+      collectionId,
+      uuid,
+    );
+  };
+
+  /**
+   * Retrieve collection from repository
+   * @param uuid
+   * @returns
+   */
+  private readCollection = (uuid: string): Promise<CollectionDocument> => {
+    return this.collectionRepository.readCollection(uuid);
+  };
+
+  /**
+   * Save API Request from unsaved Tab
+   * @param componentData - New Tab
+   * @param saveDescriptionOnly
+   * @returns
+   */
+  public saveAPIRequest = async (
+    componentData: NewTab,
+    saveDescriptionOnly = false,
+  ) => {
+    const { folderId, folderName, collectionId, workspaceId } =
+      componentData.path;
+    // Retrieve collection data
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+    let existingRequest;
+    // Get already existing request details
+    if (!folderId) {
+      existingRequest = await this.readRequestOrFolderInCollection(
+        collectionId,
+        _id,
+      );
+    } else {
+      existingRequest = await this.readRequestInFolder(
+        collectionId,
+        folderId,
+        _id,
+      );
+    }
+    // Get Bodytype in request
+    const bodyType =
+      componentData.property.request.state.dataset === RequestDataset.RAW
+        ? componentData.property.request.state.raw
+        : componentData.property.request.state.dataset;
+    let expectedRequest: RequestBody;
+    let expectedMetaData;
+    // Create request details for updating request inside collection
+    if (!saveDescriptionOnly) {
+      // Request details when overall API needs to be updated
+      expectedRequest = {
+        method: componentData.property.request.method,
+        url: componentData.property.request.url,
+        body: componentData.property.request.body,
+        headers: componentData.property.request.headers,
+        queryParams: componentData.property.request.queryParams,
+        auth: componentData.property.request.auth,
+        selectedRequestBodyType: setContentTypeHeader(bodyType),
+        selectedRequestAuthType: componentData.property.request.state?.auth,
+      };
+      // create meta data
+      expectedMetaData = {
+        id: _id,
+        name: componentData?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    } else {
+      // Request details when only API description needs to be updated
+      expectedRequest = {
+        method: existingRequest?.request.method,
+        url: existingRequest?.request.url,
+        body: existingRequest?.request.body,
+        headers: existingRequest?.request.headers,
+        queryParams: existingRequest?.request.queryParams,
+        auth: existingRequest?.request.auth,
+        selectedRequestBodyType:
+          existingRequest?.request?.selectedRequestBodyType,
+        selectedRequestAuthType:
+          existingRequest?.request?.selectedRequestAuthType,
+      };
+      // create meta data
+      expectedMetaData = {
+        id: _id,
+        name: existingRequest?.name,
+        description: componentData?.description,
+        type: ItemType.REQUEST,
+      };
+    }
+
+    // Update the request in particular Collection
+    if (!folderId) {
+      // Update Request when not inside folder
+      const res = await updateCollectionRequest(_id, folderId, collectionId, {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...userSource,
+        items: {
+          ...expectedMetaData,
+          request: expectedRequest,
+        },
+      });
+      if (res.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Update Request when inside folder
+      const res = await updateCollectionRequest(_id, folderId, collectionId, {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        folderId: folderId,
+        ...userSource,
+        items: {
+          name: folderName,
+          type: ItemType.FOLDER,
+          items: {
+            ...expectedMetaData,
+            request: expectedRequest,
+          },
+        },
+      });
+      if (res.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   };
 
   /**
@@ -1732,9 +1694,12 @@ export default class CollectionsViewModel {
     if (request.isDeleted) _request.isDeleted = request.isDeleted;
     if (request.source === "SPEC") _request.source = request.source;
     if (request.request.selectedRequestBodyType)
-      _request = setBodyType(request, request.request?.selectedRequestBodyType);
+      _request = setBodyType(
+        _request,
+        request.request?.selectedRequestBodyType,
+      );
     if (request.request.selectedRequestAuthType)
-      _request = setAuthType(request, request.request.selectedRequestAuthType);
+      _request = setAuthType(_request, request.request.selectedRequestAuthType);
     _request.property.request.save.api = true;
     _request.property.request.save.description = true;
     this.handleCreateTab(_request);
