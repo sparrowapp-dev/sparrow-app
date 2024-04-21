@@ -86,6 +86,7 @@
   export let onSaveAsRequest;
   export let onCreateFolder;
   export let onCreateCollection;
+
   let isExposeSaveAsRequest = false;
 </script>
 
@@ -168,6 +169,7 @@
       class="py-1 px-3"
       requestUrl={$requestUrl}
       httpMethod={$requestMethod}
+      splitterDirection={$requestState.requestSplitterDirection}
       onSendButtonClicked={onSendRequest}
       {onUpdateRequestUrl}
       {onUpdateRequestMethod}

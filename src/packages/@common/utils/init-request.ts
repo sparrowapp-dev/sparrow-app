@@ -116,11 +116,6 @@ class InitRequest {
             time: 0,
             size: 0,
           },
-          requestInProgress: false,
-          save: {
-            api: true,
-            description: true,
-          },
         },
       },
       path: {

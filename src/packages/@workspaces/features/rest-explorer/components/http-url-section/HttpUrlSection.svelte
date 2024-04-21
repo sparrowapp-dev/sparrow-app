@@ -7,7 +7,6 @@
   import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestUrl } from "@workspaces/features/rest-explorer/components";
-  import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
   let componentClass = "";
   export { componentClass as class };
@@ -18,6 +17,7 @@
   export let requestUrl;
   export let httpMethod;
   export let onUpdateRequestState;
+  export let splitterDirection;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
@@ -77,7 +77,7 @@
 
   <!-- Switch pane layout button -->
   <ToggleButton
-    selectedToggleId={$restSplitterDirection}
+    selectedToggleId={splitterDirection}
     toggleButtons={[
       {
         name: "",

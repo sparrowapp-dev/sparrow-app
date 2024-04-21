@@ -18,7 +18,7 @@
 </script>
 
 <RestExplorer
-  collections={_viewModel.collection}
+  bind:collections={_viewModel.collection}
   bind:requestUrl={_viewModel.requestUrl}
   bind:response={_viewModel.response}
   bind:requestParams={_viewModel.requestParams}

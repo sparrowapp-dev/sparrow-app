@@ -704,6 +704,8 @@ class RestExplorerViewModel {
     return this.collectionRepository.getCollection();
   }
 
+  set collection(e) {}
+
   public addRequestOrFolderInCollection = (
     collectionId: string,
     items: any,
