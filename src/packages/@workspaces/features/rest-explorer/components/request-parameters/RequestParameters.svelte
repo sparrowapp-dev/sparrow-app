@@ -15,8 +15,8 @@
 
 <section class="w-100" style="height: calc(100% - 50px); overflow-y: scroll;">
   <KeyValue
-    readable={$authParameter}
-    keyValue={createDeepCopy($params)}
+    readable={authParameter}
+    keyValue={createDeepCopy(params)}
     callback={handleParamsChange}
     {environmentVariables}
   />

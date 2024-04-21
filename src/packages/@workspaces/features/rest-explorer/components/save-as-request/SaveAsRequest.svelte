@@ -123,11 +123,11 @@
     if (latestRoute.id) navigateToDirectory(latestRoute);
   };
 
-  const collectionListUnsubscribe = collections.subscribe((value) => {
-    if (value) {
-      getFilteredCollection(value);
+  $: {
+    if (collections) {
+      getFilteredCollection(collections);
     }
-  });
+  }
 
   const navigateToWorkspace = () => {
     directory = JSON.parse(JSON.stringify(collection));
@@ -189,7 +189,7 @@
   };
 
   onDestroy(() => {
-    collectionListUnsubscribe.unsubscribe();
+    // collectionListUnsubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
   });
 </script>

@@ -6,8 +6,8 @@
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
-  import { RequestUrl } from "@features/rest-explorer/components";
-  import { restSplitterDirection } from "@features/rest-explorer/store";
+  import { RequestUrl } from "@workspaces/features/rest-explorer/components";
+  import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
   let componentClass = "";
   export { componentClass as class };
@@ -17,30 +17,11 @@
   export let onUpdateRequestMethod;
   export let requestUrl;
   export let httpMethod;
+  export let onUpdateRequestState;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
-
-  let _requestUrl = "";
-  requestUrl.subscribe({
-    next: (data: string) => {
-      _requestUrl = data;
-    },
-    error: (error: string) => {
-      console.error("Error fetching request url:", error);
-    },
-  });
-
-  let _httpMethod = "";
-  httpMethod.subscribe({
-    next: (data: string) => {
-      _httpMethod = data;
-    },
-    error: (error: string) => {
-      console.error("Error fetching request method:", error);
-    },
-  });
 </script>
 
 <div class={`d-flex ${componentClass}`}>
@@ -74,7 +55,7 @@
         color: "patch",
       },
     ]}
-    titleId={_httpMethod}
+    titleId={httpMethod}
     onclick={handleDropdown}
     headerTheme={"transparent"}
     borderHighlight={"active"}
@@ -84,7 +65,7 @@
     menuItem={"v2"}
   />
 
-  <RequestUrl urlText={_requestUrl} {onUpdateRequestUrl} />
+  <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
 
   <!-- Send button -->
   <Button
@@ -110,7 +91,8 @@
       },
     ]}
     on:click={(e) => {
-      restSplitterDirection.set(e.detail);
+      onUpdateRequestState({ requestSplitterDirection: e.detail });
+      // restSplitterDirection.set(e.detail);
     }}
   />
 </div>

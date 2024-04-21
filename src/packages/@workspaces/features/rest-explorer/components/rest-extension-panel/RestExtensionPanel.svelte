@@ -111,14 +111,18 @@
       collectionName = "/" + collection?.name;
     }
   };
-  const collectionSubscribe = collections.subscribe(
-    (value: CollectionDocument[]) => {
-      if (value) {
-        collectionCountArr = value;
-        refreshCount();
-      }
-    },
-  );
+  $: {
+    if (collections) {
+      collectionCountArr = collections;
+      refreshCount();
+    }
+  }
+  // collections.subscribe(
+  //   (value: CollectionDocument[]) =>
+  //     if (value) {
+  //     }
+  //   },
+  // );
 
   $: {
     if (requestPath?.collectionId) {
@@ -127,7 +131,7 @@
   }
 
   onDestroy(() => {
-    collectionSubscribe.unsubscribe();
+    // collectionSubscribe.unsubscribe();
   });
 </script>
 

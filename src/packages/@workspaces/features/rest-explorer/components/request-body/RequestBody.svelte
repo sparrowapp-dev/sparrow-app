@@ -17,32 +17,28 @@
 </script>
 
 <div class="ps-0 pe-0 rounded w-100 h-100 position-relative">
-  <RequestBodyNavigator
-    method={$method}
-    {onUpdateRequestState}
-    {requestState}
-  />
+  <RequestBodyNavigator {method} {onUpdateRequestState} {requestState} />
   {#if requestState.requestBodyNavigation === RequestDataset.RAW}
     <Raw
       {onUpdateRequestBody}
       lang={requestState.requestBodyLanguage}
-      value={$body.raw}
+      value={body.raw}
     />
   {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
     <None />
   {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
     <UrlEncoded
-      value={$body.urlencoded}
+      value={body.urlencoded}
       {onUpdateRequestBody}
       {environmentVariables}
     />
   {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
     <FormData
-      textValue={$body.formdata.text}
-      fileValue={$body.formdata.file}
+      textValue={body.formdata.text}
+      fileValue={body.formdata.file}
       {onUpdateRequestBody}
       {environmentVariables}
-      formData={$body.formdata}
+      formData={body.formdata}
     />
   {/if}
 </div>

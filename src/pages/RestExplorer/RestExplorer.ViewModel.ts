@@ -5,7 +5,7 @@ import {
   ReduceQueryParams,
   ReduceAuthHeader,
   ReduceAuthParameter,
-} from "@features/rest-explorer/utils";
+} from "@workspaces/features/rest-explorer/utils";
 import {
   createDeepCopy,
   moveNavigation,

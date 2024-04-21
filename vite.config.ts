@@ -9,13 +9,12 @@ export default defineConfig(async () => ({
     alias: {
       $lib: path.resolve("./src/lib"),
 
-      "@library/icons": path.resolve("./src/packages/@library/assets/icons"),
-      "@library/ui": path.resolve("./src/packages/@library/components"),
-      "@library/forms": path.resolve("./src/packages/@library/components"),
-      "@library/typography": path.resolve("./src/packages/@library/components"),
-
+      "@library": path.resolve("./src/packages/@library"),
+      "@app": path.resolve("./src/packages/@app"),
       "@common": path.resolve("./src/packages/@common"),
-      "@features": path.resolve("./src/packages/@features"),
+      "@teams": path.resolve("./src/packages/@teams"),
+      "@workspaces": path.resolve("./src/packages/@workspaces"),
+      "@environments": path.resolve("./src/packages/@environments"),
     },
   },
 

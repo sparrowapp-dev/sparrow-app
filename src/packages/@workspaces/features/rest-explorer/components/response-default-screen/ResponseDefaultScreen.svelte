@@ -1,7 +1,7 @@
 <script lang="ts">
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { isHorizontal } from "$lib/store/request-response-section";
-  import { restSplitterDirection } from "@features/rest-explorer/store";
+  import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   let isHorizontalMode: boolean;

@@ -17,13 +17,20 @@
     "paths": {
       "$lib/*": ["./src/lib/*"],
 
-      "@library/icons/*": ["./src/packages/@library/assets/icons/*"],
-      "@library/ui/*": ["./src/packages/@library/components/*"],
-      "@library/typography/*": ["./src/packages/@library/components/*"],
-      "@library/forms/*": ["./src/packages/@library/components/*"],
+      // "@library/icons/*": ["./src/packages/@library/assets/icons/*"],
+      // "@library/ui/*": ["./src/packages/@library/components/*"],
+      // "@library/typography/*": ["./src/packages/@library/components/*"],
+      // "@library/forms/*": ["./src/packages/@library/components/*"],
 
-      "@features/*": ["./src/packages/@features/*"],
-      "@common/*": ["./src/packages/@common/*"]
+      // "@features/*": ["./src/packages/@features/*"],
+      // "@common/*": ["./src/packages/@common/*"]
+
+      "@library/*": ["./src/packages/@library/*"],
+      "@app/*": ["./src/packages/@app/*"],
+      "@common/*": ["./src/packages/@common/*"],
+      "@teams/*": ["./src/packages/@teams/*"],
+      "@workspaces/*": ["./src/packages/@workspaces/*"],
+      "@environments/*": ["./src/packages/@environments/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
