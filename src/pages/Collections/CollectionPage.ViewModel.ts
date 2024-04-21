@@ -89,8 +89,8 @@ export class CollectionPageViewModel {
    * Set active tab in store
    * @param id - tab id
    */
-  public handleActiveTab = (id: string) => {
-    this.tabRepository.activeTab(id);
+  public handleActiveTab = async (id: string) => {
+    await this.tabRepository.activeTab(id);
   };
 
   /**

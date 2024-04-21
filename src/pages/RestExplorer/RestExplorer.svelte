@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Splitpanes, Pane } from "svelte-splitpanes";
-  import Button from "$lib/components/buttons/Button.svelte";
+  // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
+  import angleDown from "$lib/assets/angle-down.svg";
 
+  // ---- Components
   import {
     HttpUrlSection,
     RequestHeaders,
@@ -19,61 +20,55 @@
     RestExtensionPanel,
     SaveAsRequest,
     RequestParameters,
-  } from "@rest-explorer/components";
-
-  import RestExplorerViewModel from "./RestExplorer.ViewModel";
-  import { RequestSection, ResponseSection } from "$lib/utils/enums";
+  } from "@features/rest-explorer/components";
   import Loader from "$lib/components/Transition/loader/Loader.svelte";
-  // import  from "@rest-explorer/components/response-body/ResponseBody.svelte";
-  // import  from "@rest-explorer/components/request-parameters/RequestParameters.svelte";
+  import { ModalWrapperV1 } from "$lib/components";
+  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { Splitpanes, Pane } from "svelte-splitpanes";
+  import Button from "$lib/components/buttons/Button.svelte";
+
+  // ---- View Model
+  import RestExplorerViewModel from "./RestExplorer.ViewModel";
+
+  // ---- types
+  import { RequestSection, ResponseSection } from "$lib/utils/enums";
+
+  // ---- Store
   import {
     restLeftPanelWidth,
     restRightPanelWidth,
-  } from "@rest-explorer/store";
-  import { restSplitterDirection } from "@rest-explorer/store/splitpanes";
-  import { ModalWrapperV1 } from "$lib/components";
-  // import  from "@rest-explorer/components/save-as-request/SaveAsRequest.svelte";
-  import { onMount } from "svelte";
-  import { DashboardViewModel } from "../Dashboard/Dashboard.ViewModel.old";
+    restSplitterDirection,
+  } from "@features/rest-explorer/store";
   import { user } from "$lib/store";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { DashboardViewModel } from "../Dashboard/Dashboard.ViewModel.old";
 
-  //////////////////////////////////
   // TODO: Delete this code
-  // let n = new DashboardViewModel();
-  // user.subscribe(async (value) => {
-  //   await n.refreshTeams(value._id);
-  //   await n.refreshWorkspaces(value._id);
-  // });
+  let n = new DashboardViewModel();
+  user.subscribe(async (value) => {
+    await n.refreshTeams(value._id);
+    await n.refreshWorkspaces(value._id);
+  });
 
-  //////////////////////////////////
-
-  const _viewModel = new RestExplorerViewModel();
+  export let tab;
+  const _viewModel = new RestExplorerViewModel(tab);
   let response = _viewModel.response;
   let requestState = _viewModel.requestState;
-  /////////////////////
-  let _method = _viewModel.httpMethod;
-  let _name = _viewModel.requestName;
-  let _url = _viewModel.requestUrl;
-  let _description = _viewModel.requestDescription;
-
-  let _path = _viewModel.requestPath;
-
-  let environmentVariables = [];
+  let method = _viewModel.httpMethod;
+  let name = _viewModel.requestName;
+  let url = _viewModel.requestUrl;
+  let description = _viewModel.requestDescription;
+  let path = _viewModel.requestPath;
 
   const handleRequestNavigator = (event: CustomEvent<string>): void => {
-    _viewModel.updateRequestState({ section: event.detail });
+    _viewModel.updateRequestState({ requestNavigation: event.detail });
   };
-
   const handleRequestAuth = (event: CustomEvent<string>): void => {
-    _viewModel.updateRequestState({ auth: event.detail });
+    _viewModel.updateRequestState({ requestAuthNavigation: event.detail });
   };
-
   const handleResponseNavigator = (event: CustomEvent<string>): void => {
-    _viewModel.updateRequestState({ responseSection: event.detail });
+    _viewModel.updateRequestState({ responseNavigation: event.detail });
   };
-
-  /////  SAVE AS REQUEST
   let isExposeSaveAsRequest = false;
 </script>
 
@@ -90,6 +85,7 @@
         <Button
           title="Save Request"
           type="dark"
+          loader={$requestState.isSaveRequestInProgress}
           buttonClassProp="ms-2"
           buttonStartIcon={floppyDisk}
           onClick={async () => {
@@ -105,6 +101,45 @@
             }
           }}
         />
+
+        <span class="position-relative" style="width:35px;">
+          <Dropdown
+            disabled={false}
+            dropdownId={"saveAsDropdown"}
+            dropDownType={{ type: "img", title: angleDown }}
+            data={[
+              {
+                name: "Save As",
+                id: "collection",
+                dynamicClasses: "text-whiteColor",
+              },
+            ]}
+            onclick={() => {
+              isExposeSaveAsRequest = true;
+            }}
+            staticCustomStyles={[
+              {
+                id: "saveAsDropdown-options-container",
+                styleKey: "minWidth",
+                styleValue: "180px",
+              },
+            ]}
+            staticClasses={[
+              {
+                id: "saveAsDropdown-img",
+                classToAdd: ["btn", "bg-dullBackground", "px-2", "py-1"],
+              },
+              {
+                id: "saveAsDropdown-options-name",
+                classToAdd: ["fs-6"],
+              },
+              {
+                id: "saveAsDropdown-options-container",
+                classToAdd: ["end-0", "mt-1", "rounded"],
+              },
+            ]}
+          ></Dropdown>
+        </span>
         <Button
           title="Share"
           type="dark"
@@ -131,23 +166,30 @@
       horizontal={$restSplitterDirection === "horizontal" ? true : false}
       dblClickSplitter={false}
       on:resize={(e) => {
+        // _viewModel.updateRequestState({
+        //   requestLeftSplitterWidthPercentage: e.detail[0].size,
+        // });
+        // _viewModel.updateRequestState({
+        //   requestRightSplitterWidthPercentage: e.detail[0].size,
+        // });
         restLeftPanelWidth.set(e.detail[0].size);
         restRightPanelWidth.set(e.detail[1].size);
       }}
     >
       <Pane minSize={30} size={$restLeftPanelWidth}>
         <!-- Request Pane -->
-        <div class="px-3 h-100 position-relative">
+        <div class="px-3 pb-3 h-100 position-relative">
           <RequestNavigator
-            requestStateSection={$requestState?.section}
+            requestStateSection={$requestState?.requestNavigation}
             on:change={handleRequestNavigator}
           />
-          {#if $requestState?.section === RequestSection.PARAMETERS}
+          {#if $requestState?.requestNavigation === RequestSection.PARAMETERS}
             <RequestParameters
               params={_viewModel.requestParams}
               onUpdateRequestParams={_viewModel.updateParams}
+              authParameter={_viewModel.authParameter}
             />
-          {:else if $requestState?.section === RequestSection.REQUEST_BODY}
+          {:else if $requestState?.requestNavigation === RequestSection.REQUEST_BODY}
             <RequestBody
               body={_viewModel.requestBody}
               method={_viewModel.httpMethod}
@@ -155,16 +197,17 @@
               onUpdateRequestBody={_viewModel.updateRequestBody}
               onUpdateRequestState={_viewModel.updateRequestState}
             />
-          {:else if $requestState?.section === RequestSection.HEADERS}
+          {:else if $requestState?.requestNavigation === RequestSection.HEADERS}
             <RequestHeaders
               headers={_viewModel.requestHeaders}
               autoGeneratedHeaders={_viewModel.requestAutoGeneratedHeaders}
               onHeadersChange={_viewModel.updateHeaders}
               onAutoGeneratedHeadersChange={_viewModel.updateAutoGeneratedHeaders}
+              authHeader={_viewModel.authHeader}
             />
-          {:else if $requestState?.section === RequestSection.AUTHORIZATION}
+          {:else if $requestState?.requestNavigation === RequestSection.AUTHORIZATION}
             <RequestAuth
-              requestStateAuth={$requestState?.auth}
+              requestStateAuth={$requestState?.requestAuthNavigation}
               on:change={handleRequestAuth}
               auth={_viewModel.requestAuth}
               onUpdateRequestAuth={_viewModel.updateRequestAuth}
@@ -176,7 +219,7 @@
         <!-- Response Pane -->
         <!-- <ResponsePane response={$response} /> -->
         <div class="d-flex flex-column h-100 px-3">
-          {#if $requestState?.requestInProgress}
+          {#if $requestState?.isSendRequestInProgress}
             <ResponseDefaultScreen />
             <div
               style="    
@@ -196,10 +239,10 @@
             <ResponseErrorScreen />
           {:else if $response?.status}
             <ResponseNavigator
-              requestStateSection={$requestState?.responseSection}
+              requestStateSection={$requestState?.responseNavigation}
               on:change={handleResponseNavigator}
             />
-            {#if $requestState.responseSection === ResponseSection.RESPONSE}
+            {#if $requestState.responseNavigation === ResponseSection.RESPONSE}
               <ResponseBodyNavigator
                 response={$response}
                 apiState={$requestState}
@@ -207,7 +250,7 @@
                 onClearResponse={_viewModel.updateResponse}
               />
               <ResponseBody response={$response} apiState={$requestState} />
-            {:else if $requestState.responseSection === ResponseSection.HEADERS}
+            {:else if $requestState.responseNavigation === ResponseSection.HEADERS}
               <ResponseHeaders responseHeader={$response?.headers} />
             {/if}
           {/if}
@@ -217,12 +260,12 @@
   </div>
   <div>
     <RestExtensionPanel
-      method={$_method}
       state={$requestState}
-      name={$_name}
-      description={$_description}
-      path={$_path}
-      url={$_url}
+      requestMethod={$method}
+      requestUrl={$url}
+      requestName={$name}
+      requestDescription={$description}
+      requestPath={$path}
       collections={_viewModel.collection}
       onSaveRequest={_viewModel.saveRequest}
       readCollection={_viewModel.readCollection}
@@ -250,11 +293,11 @@
     onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
-    _method={$_method}
-    _url={$_url}
-    _name={$_name}
-    _description={$_description}
-    _path={$_path}
+    requestMethod={$method}
+    requestUrl={$url}
+    requestName={$name}
+    requestDescription={$description}
+    requestPath={$path}
     collections={_viewModel.collection}
     readCollection={_viewModel.readCollection}
     readWorkspace={_viewModel.readWorkspace}

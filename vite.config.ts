@@ -9,13 +9,13 @@ export default defineConfig(async () => ({
     alias: {
       $lib: path.resolve("./src/lib"),
 
-      "@sparrow/icons": path.resolve("./src/lib/assets/icons"),
-      "@sparrow/ui": path.resolve("./src/lib/components"),
-      "@sparrow/forms": path.resolve("./src/lib/components"),
-      "@sparrow/typography": path.resolve("./src/lib/components"),
+      "@library/icons": path.resolve("./src/packages/@library/assets/icons"),
+      "@library/ui": path.resolve("./src/packages/@library/components"),
+      "@library/forms": path.resolve("./src/packages/@library/components"),
+      "@library/typography": path.resolve("./src/packages/@library/components"),
 
-      "@common": path.resolve("./src/features/@common"),
-      "@rest-explorer": path.resolve("./src/features/@rest-explorer"),
+      "@common": path.resolve("./src/packages/@common"),
+      "@features": path.resolve("./src/packages/@features"),
     },
   },
 

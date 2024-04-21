@@ -103,9 +103,12 @@
   // Rerender animation on tab switch
   let isAnimation = true;
   let prevTabid = "";
+  let tab;
   activeTab.subscribe((value: TabDocument) => {
     if (value) {
+      // debugger;
       if (prevTabid !== value.tabId) {
+        tab = value;
         isAnimation = false;
         setTimeout(() => {
           isAnimation = true;
@@ -171,7 +174,7 @@
       {#if isAnimation}
         <Motion {...scaleMotionProps} let:motion>
           <div use:motion>
-            <RestExplorer />
+            <RestExplorer {tab} />
           </div>
         </Motion>
       {/if}

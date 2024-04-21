@@ -100,7 +100,7 @@ export class TabRepository {
    * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return RxDB.getInstance().rxdb.tab.find().sort({ index: "asc" }).$;
+    return RxDB.getInstance().rxdb.tab.find().sort({ timestamp: "asc" }).$;
   };
 
   public getTabLs = async (): TabDocument[] => {

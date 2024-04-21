@@ -87,40 +87,52 @@ const responseLiteral = {
 const stateLiteral = {
   type: "object",
   properties: {
-    raw: {
+    requestBodyLanguage: {
       type: "string",
     },
-    dataset: {
+    requestBodyNavigation: {
       type: "string",
     },
-    auth: {
+    requestAuthNavigation: {
       type: "string",
     },
-    section: {
+    requestNavigation: {
       type: "string",
     },
-    responseSection: {
+    responseNavigation: {
       type: "string",
     },
-    responseRaw: {
+    responseBodyLanguage: {
       type: "string",
     },
-    responseFormatter: {
+    responseBodyFormatter: {
       type: "string",
     },
-    additions: {
+    requestExtensionNavigation: {
       type: "string",
     },
-    isSaveDescription: {
+    requestSplitterDirection: {
+      type: "string",
+    },
+    requestLeftSplitterWidthPercentage: {
+      type: "number",
+    },
+    requestRightSplitterWidthPercentage: {
+      type: "number",
+    },
+    isExposeEditDescription: {
       type: "boolean",
     },
-    requestInProgress: {
+    isSendRequestInProgress: {
       type: "boolean",
       default: false,
     },
-    descriptionInProgress: {
+    isSaveDescriptionInProgress: {
       type: "boolean",
       default: false,
+    },
+    isSaveRequestInProgress: {
+      type: "boolean",
     },
   },
 };
@@ -222,9 +234,6 @@ const pathLiteral = {
     folderId: {
       type: "string",
     },
-    folderName: {
-      type: "string",
-    },
   },
 };
 
@@ -232,17 +241,19 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: {
     key: "tabId",
-    fields: ["createdAt"],
+    fields: ["id"],
     separator: "|",
   },
   type: "object",
-  version: 4,
+  version: 5,
   properties: {
     tabId: {
+      // ---- RxDocumentId
       type: "string",
       maxLength: 100,
     },
     id: {
+      // ---- MongoDocumentId
       type: "string",
       maxLength: 100,
     },
@@ -265,18 +276,15 @@ export const tabSchemaLiteral = {
       type: "string",
     },
     property: propertyLiteral,
-    save: {
-      type: "boolean",
-    },
     isActive: {
       type: "boolean",
       default: true,
     },
-    path: pathLiteral,
-    saveInProgress: {
+    isSaved: {
       type: "boolean",
     },
-    createdAt: {
+    path: pathLiteral,
+    timestamp: {
       type: "string",
       maxLength: 100,
     },
@@ -285,7 +293,7 @@ export const tabSchemaLiteral = {
     },
   },
   required: ["id", "name"],
-  indexes: ["createdAt"],
+  indexes: ["timestamp"],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(tabSchemaLiteral);

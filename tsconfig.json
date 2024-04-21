@@ -17,13 +17,13 @@
     "paths": {
       "$lib/*": ["./src/lib/*"],
 
-      "@sparrow/icons/*": ["./src/lib/assets/icons/*"],
-      "@sparrow/ui/*": ["./src/lib/components/*"],
-      "@sparrow/typography/*": ["./src/lib/components/*"],
-      "@sparrow/forms/*": ["./src/lib/components/*"],
+      "@library/icons/*": ["./src/packages/@library/assets/icons/*"],
+      "@library/ui/*": ["./src/packages/@library/components/*"],
+      "@library/typography/*": ["./src/packages/@library/components/*"],
+      "@library/forms/*": ["./src/packages/@library/components/*"],
 
-      "@rest-explorer/*": ["./src/features/@rest-explorer/*"],
-      "@common/*": ["./src/features/@common/*"]
+      "@features/*": ["./src/packages/@features/*"],
+      "@common/*": ["./src/packages/@common/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
