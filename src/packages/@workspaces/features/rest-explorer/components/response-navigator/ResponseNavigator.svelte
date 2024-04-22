@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ResponseSection } from "$lib/utils/enums";
-  export let requestStateSection: string;
+  export let requestStateSection;
+  export let onUpdateRequestState;
 
   let tabs: {
     name: string;

@@ -27,8 +27,7 @@
   export let onFinish = (id: string) => {};
   export let type: "SAVE_DESCRIPTION" | "SAVE_API" = "SAVE_API";
   export let onSaveAsRequest;
-  export let readCollection;
-  export let collections: Observable<CollectionDocument[]>;
+  export let collections: CollectionDocument[];
   export let readWorkspace;
   export let onCreateFolder;
   export let onCreateCollection;

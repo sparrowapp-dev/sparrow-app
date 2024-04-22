@@ -32,7 +32,7 @@
   export let onUpdateRequestState;
   export let onUpdateRequestDescription;
   export let readCollection;
-  export let collections: Observable<CollectionDocument[]>;
+  export let collections: CollectionDocument[];
   export let readWorkspace;
   export let onCreateFolder;
   export let onCreateCollection;

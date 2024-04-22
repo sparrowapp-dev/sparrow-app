@@ -5,7 +5,7 @@
 
   export let auth;
   export let environmentVariables = [];
-  export let requestStateAuth: string;
+  export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
 </script>

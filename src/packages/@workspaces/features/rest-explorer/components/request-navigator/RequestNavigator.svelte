@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { RequestSection } from "$lib/utils/enums";
-  export let requestStateSection: string;
+  export let requestStateSection;
   export let onUpdateRequestState;
   const dispatch = createEventDispatcher();
 
