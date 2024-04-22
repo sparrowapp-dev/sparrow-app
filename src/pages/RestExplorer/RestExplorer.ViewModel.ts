@@ -174,7 +174,9 @@ class RestExplorerViewModel
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
       setTimeout(() => {
-        this.tab = createDeepCopy(doc.toMutableJSON());
+        const t = createDeepCopy(doc.toMutableJSON());
+        delete t.isActive;
+        this.tab = t;
         this.requestUrl = this.tab.property.request.url;
         this.requestName = this.tab.name;
         this.requestDescription = this.tab.description;
