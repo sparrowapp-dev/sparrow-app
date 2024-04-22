@@ -28,29 +28,8 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import Button from "$lib/components/buttons/Button.svelte";
 
-  // ---- View Model
-  //   import RestExplorerViewModel from "./RestExplorer.ViewModel";
-
   // ---- types
   import { RequestSection, ResponseSection } from "$lib/utils/enums";
-
-  // ---- Store
-  import {
-    restLeftPanelWidth,
-    restRightPanelWidth,
-    restSplitterDirection,
-  } from "@workspaces/features/rest-explorer/store";
-  import { user } from "$lib/store";
-
-  const handleRequestNavigator = (event: CustomEvent<string>): void => {
-    onUpdateRequestState({ requestNavigation: event.detail });
-  };
-  const handleRequestAuth = (event: CustomEvent<string>): void => {
-    onUpdateRequestState({ requestAuthNavigation: event.detail });
-  };
-  const handleResponseNavigator = (event: CustomEvent<string>): void => {
-    onUpdateRequestState({ responseNavigation: event.detail });
-  };
 
   export let collections;
   export let requestUrl;
@@ -67,8 +46,8 @@
   export let requestDescription;
   export let requestPath;
   export let requestHeaders;
-  export let onSendRequest;
   export let onUpdateRequestUrl;
+  export let onSendRequest;
   export let onUpdateRequestMethod;
   export let onUpdateRequestParams;
   export let onUpdateRequestName;
@@ -203,7 +182,7 @@
         <div class="px-3 pb-3 h-100 position-relative">
           <RequestNavigator
             requestStateSection={$requestState.requestNavigation}
-            on:change={handleRequestNavigator}
+            {onUpdateRequestState}
           />
           {#if $requestState?.requestNavigation === RequestSection.PARAMETERS}
             <RequestParameters
@@ -230,7 +209,7 @@
           {:else if $requestState?.requestNavigation === RequestSection.AUTHORIZATION}
             <RequestAuth
               requestStateAuth={$requestState?.requestAuthNavigation}
-              on:change={handleRequestAuth}
+              {onUpdateRequestState}
               auth={$requestAuth}
               {onUpdateRequestAuth}
             />
@@ -266,7 +245,7 @@
           {:else if $response?.status}
             <ResponseNavigator
               requestStateSection={$requestState.responseNavigation}
-              on:change={handleResponseNavigator}
+              {onUpdateRequestState}
             />
             {#if $requestState.responseNavigation === ResponseSection.RESPONSE}
               <ResponseBodyNavigator

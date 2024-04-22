@@ -1,1 +1,1 @@
-export { InitRequest } from "./init-request";
+export { InitRequestTab } from "./init-request-tab";

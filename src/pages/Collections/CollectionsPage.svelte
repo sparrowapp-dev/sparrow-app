@@ -47,11 +47,7 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = (id: string, tab: TabDocument) => {
-    if (
-      tab?.property?.request &&
-      (!tab?.property?.request?.save?.api ||
-        !tab?.property?.request?.save?.description)
-    ) {
+    if (tab?.property?.request && !tab?.isSaved) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;

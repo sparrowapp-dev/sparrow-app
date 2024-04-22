@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { Select } from "$lib/components/inputs";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
@@ -8,8 +7,7 @@
   export let environmentVariables = [];
   export let requestStateAuth: string;
   export let onUpdateRequestAuth;
-
-  const dispatch = createEventDispatcher();
+  export let onUpdateRequestState;
 </script>
 
 <div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
@@ -45,7 +43,7 @@
             ]}
             titleId={requestStateAuth}
             onclick={(id) => {
-              dispatch("change", id);
+              onUpdateRequestState({ requestAuthNavigation: id });
             }}
             headerTheme={"transparent"}
             borderType={"none"}

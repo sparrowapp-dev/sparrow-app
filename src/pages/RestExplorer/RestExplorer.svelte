@@ -7,11 +7,11 @@
   import { RestExplorer } from "@workspaces/features";
 
   // TODO: Delete this code
-  // let n = new DashboardViewModel();
-  // user.subscribe(async (value) => {
-  //   await n.refreshTeams(value._id);
-  //   await n.refreshWorkspaces(value._id);
-  // });
+  let n = new DashboardViewModel();
+  user.subscribe(async (value) => {
+    await n.refreshTeams(value._id);
+    await n.refreshWorkspaces(value._id);
+  });
 
   export let tab;
   const _viewModel = new RestExplorerViewModel(tab);

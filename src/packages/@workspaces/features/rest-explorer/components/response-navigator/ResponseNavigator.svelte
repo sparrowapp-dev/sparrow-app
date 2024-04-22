@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { ResponseSection } from "$lib/utils/enums";
   export let requestStateSection: string;
-  const dispatch = createEventDispatcher();
 
   let tabs: {
     name: string;
@@ -25,7 +23,7 @@
           : ''}"
         role="tab"
         on:click={() => {
-          dispatch("change", tab.id);
+          onUpdateRequestState({ responseNavigation: tab.id });
         }}
       >
         <span class="">{tab.name}</span>

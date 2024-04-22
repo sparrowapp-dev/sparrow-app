@@ -27,7 +27,6 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 // ---- helpers
 import { setContentTypeHeader } from "$lib/utils/helpers";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
-import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
 // ---- Interface
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
@@ -38,7 +37,7 @@ import type {
 
 // ---- mixpanel
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { InitRequest } from "@common/utils";
+import { InitRequestTab } from "@common/utils";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 export class CollectionPageViewModel {
   private tabRepository = new TabRepository();
@@ -75,11 +74,7 @@ export class CollectionPageViewModel {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
     this.tabRepository.createTab(
-      new InitRequest(
-        "UNTRACKED-" + uuidv4(),
-        ws._id,
-        new Date().toString(),
-      ).getValue(),
+      new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
     );
     moveNavigation("right");
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
