@@ -7,6 +7,7 @@
     collectionLeftPanelWidth,
     collapsibleState,
     userWorkspaceLevelRole,
+    user,
   } from "$lib/store";
 
   // ---- Animation
@@ -33,6 +34,8 @@
   import type { Observable } from "rxjs";
   import { generateSampleRequest } from "$lib/utils/sample";
   import { onMount } from "svelte";
+  import { ItemType } from "$lib/utils/enums";
+  import { DashboardViewModel } from "../Dashboard/Dashboard.ViewModel.old";
 
   const _collectionPageViewModel = new CollectionPageViewModel();
   const tabList: Observable<TabDocument[]> = _collectionPageViewModel.tabs;
@@ -42,6 +45,13 @@
   let isPopupClosed: boolean = false;
   let saveAsVisibility: boolean = false;
   let loader = false;
+
+  // TODO: Delete this code
+  // let n = new DashboardViewModel();
+  // user.subscribe(async (value) => {
+  //   await n.refreshTeams(value._id);
+  //   await n.refreshWorkspaces(value._id);
+  // });
 
   /**
    * Handle close tab functionality in tab bar list
@@ -98,20 +108,20 @@
 
   // Rerender animation on tab switch
   let isAnimation = true;
-  let prevTabid = "";
-  let tab;
+  let prevTabId = "";
+  let tab: TabDocument | {};
   activeTab.subscribe((value: TabDocument) => {
     if (value) {
-      // debugger;
-      if (prevTabid !== value.tabId) {
+      if (prevTabId !== value.tabId) {
         tab = value;
         isAnimation = false;
         setTimeout(() => {
           isAnimation = true;
         }, 10);
       }
-      prevTabid = value.tabId;
+      prevTabId = value.tabId;
     }
+    // else tab = {};
   });
 
   let splitter;
@@ -168,11 +178,13 @@
     />
     <Route>
       {#if isAnimation}
-        <Motion {...scaleMotionProps} let:motion>
-          <div use:motion>
-            <RestExplorer {tab} />
-          </div>
-        </Motion>
+        {#if $activeTab && $activeTab?.type === ItemType.REQUEST}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <RestExplorer tab={$activeTab} />
+            </div>
+          </Motion>
+        {/if}
       {/if}
     </Route>
   </Pane>

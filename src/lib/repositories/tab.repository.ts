@@ -27,7 +27,7 @@ export class TabRepository {
       })
       .exec();
     if (activeTab) {
-      activeTab.incrementalUpdate({ $set: { isActive: false } });
+      await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     await RxDB.getInstance().rxdb.tab.insert(tab);
   };

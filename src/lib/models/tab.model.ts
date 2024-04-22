@@ -6,11 +6,12 @@ import {
 
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
-  primaryKey: {
-    key: "tabId",
-    fields: ["timestamp"],
-    separator: "|",
-  },
+  primaryKey: "tabId",
+  // {
+  // key: "tabId",
+  // fields: ["timestamp"],
+  // separator: "|",
+  // },
   type: "object",
   version: 0,
   properties: {

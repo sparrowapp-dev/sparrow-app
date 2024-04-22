@@ -17,6 +17,7 @@ import type {
   KeyValuePair,
   Path,
 } from "$lib/utils/interfaces/request.interface";
+import { v4 as uuidv4 } from "uuid";
 
 class InitRequestTab {
   private _tab: TabDocument;
@@ -27,10 +28,11 @@ class InitRequestTab {
    */
   constructor(_id: string, _workspaceId: string) {
     if (!_id || !_workspaceId) {
-      console.error("invalid id or workspace id!");
+      console.error("invalid id or workspace id on create new tab request!");
     } else {
       this._tab = {
         id: _id,
+        tabId: uuidv4(),
         name: RequestDefault.NAME,
         type: ItemType.REQUEST,
         description: "",
