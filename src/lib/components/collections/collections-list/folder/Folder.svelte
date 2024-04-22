@@ -1,35 +1,14 @@
 <script lang="ts">
-  export let onCreateRequestInFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-  ) => void;
-  export let onDeleteFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    requestIds: [string],
-  ) => void;
-  export let onDeleteRequest: (
-    collection: CollectionDocument,
-    request: any,
-    folder: any,
-  ) => Promise<boolean>;
-  export let onRenameFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    newFolderName: string,
-  ) => void;
-  export let onRenameRequest: (
-    collection: CollectionDocument,
-    folder: any,
-    request: any,
-    newRequestName: string,
-  ) => void;
-  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let onCreateItem: (entityType: string, args: any) => void;
+  export let onDeleteItem: (entityType: string, args: any) => void;
+  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
   export let collection: CollectionDocument;
   export let getUserRoleInWorkspace: () => WorkspaceRole;
   export let getActiveTab: () => Writable<{}>;
-  export let explorer: any;
-  export let folder: any = null;
+  export let explorer: Folder;
+  export let folder: Folder | null = null;
 
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import folderCloseIcon from "$lib/assets/folder.svg";
@@ -54,9 +33,17 @@
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Writable } from "svelte/store";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import type {
+    Request as RequestType,
+    Folder,
+    Path,
+  } from "$lib/utils/interfaces/request.interface";
+  import type { Observable } from "rxjs";
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -154,7 +141,12 @@
         loader={deleteLoader}
         onClick={() => {
           deleteLoader = true;
-          onDeleteFolder(collection, explorer, requestIds);
+          onDeleteItem("folder", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+            folder: explorer,
+            requestIds,
+          });
           deleteLoader = false;
           isFolderPopup = false;
         }}
@@ -189,7 +181,11 @@
         {
           onClick: () => {
             expand = true;
-            onCreateRequestInFolder(collection, explorer);
+            onCreateItem("requestFolder", {
+              workspaceId: $currentWorkspace._id,
+              collection,
+              folder: explorer,
+            });
           },
           displayText: "Add Request",
           disabled: false,
@@ -235,7 +231,7 @@
               if (expand) {
                 handleFolderClick(
                   explorer,
-                  collection.workspaceId,
+                  $currentWorkspace._id,
                   collection.id,
                   collection.activeSync,
                 );
@@ -261,12 +257,22 @@
               maxlength={100}
               value={explorer.name}
               on:blur={(e) => {
-                onRenameFolder(collection, explorer, e?.target?.value);
+                onRenameItem("folder", {
+                  workspaceId: $currentWorkspace._id,
+                  collection,
+                  folder: explorer,
+                  newName: e?.target?.value,
+                });
                 isRenaming = false;
               }}
               on:keydown={(e) => {
                 if (e.key === "Enter") {
-                  onRenameFolder(collection, explorer, e?.target?.value);
+                  onRenameItem("folder", {
+                    workspaceId: $currentWorkspace._id,
+                    collection,
+                    folder: explorer,
+                    newName: e?.target?.value,
+                  });
                   isRenaming = false;
                 }
               }}
@@ -330,11 +336,10 @@
         <div class="sub-files ps-3">
           {#each explorer.items as exp}
             <svelte:self
-              {onCreateRequestInFolder}
-              {onDeleteFolder}
-              {onDeleteRequest}
-              {onRenameFolder}
-              {onRenameRequest}
+              {currentWorkspace}
+              {onCreateItem}
+              {onDeleteItem}
+              {onRenameItem}
               {onOpenRequestOnTab}
               {collection}
               {getUserRoleInWorkspace}
@@ -358,7 +363,11 @@
                   src={requestIcon}
                   alt="+ API Request"
                   on:click={() => {
-                    onCreateRequestInFolder(collection, explorer);
+                    onCreateItem("requestFolder", {
+                      workspaceId: $currentWorkspace._id,
+                      collection,
+                      folder: explorer,
+                    });
                     MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
                       source: "Side Panel Collection List",
                     });
@@ -373,8 +382,9 @@
       <div style="cursor:pointer;">
         <Request
           api={explorer}
-          {onRenameRequest}
-          {onDeleteRequest}
+          {currentWorkspace}
+          {onRenameItem}
+          {onDeleteItem}
           {onOpenRequestOnTab}
           {folder}
           {collection}

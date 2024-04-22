@@ -1,46 +1,14 @@
 <script lang="ts">
-  export let onCreateRequestInCollection: (
-    collection: CollectionDocument,
-  ) => void;
-  export let onCreateFolderInCollection: (
-    collection: CollectionDocument,
-  ) => void;
-  export let onCreateRequestInFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-  ) => void;
-  export let onDeleteCollection: (
-    collection: CollectionDocument,
-    deletedIds: [string] | [],
-  ) => void;
-  export let onDeleteFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    requestIds: [string],
-  ) => void;
-  export let onDeleteRequest: (
-    collection: CollectionDocument,
-    request: any,
-    folder: any,
-  ) => Promise<boolean>;
-  export let onRenameCollection: (
-    collection: CollectionDocument,
-    newCollectionName: string,
-  ) => void;
-  export let onRenameFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    newFolderName: string,
-  ) => void;
-  export let onRenameRequest: (
-    collection: CollectionDocument,
-    folder: any,
-    request: any,
-    newRequestName: string,
-  ) => void;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let onCreateItem: (entityType: string, args: any) => void;
+  export let onDeleteItem: (entityType: string, args: any) => void;
+  export let onRenameItem: (entityType: string, args: any) => void;
   export let onOpenRequestOnTab: (request: any, path: Path) => void;
   export let onBranchSwitch: (collection: CollectionDocument) => void;
-  export let onRefetchCollection: (collection: CollectionDocument) => void;
+  export let onRefetchCollection: (
+    workspaceId: string,
+    collection: CollectionDocument,
+  ) => void;
   export let getActiveTab: () => Writable<{}>;
   export let getUserRoleInWorkspace: () => WorkspaceRole;
   export let collection: CollectionDocument;
@@ -62,7 +30,10 @@
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import type { Writable } from "svelte/store";
   import Folder from "../folder/Folder.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -71,6 +42,7 @@
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
+  import type { Observable } from "rxjs";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -94,7 +66,12 @@
   let noOfColumns = 180;
   let noOfRows = 5;
   let inputField: HTMLInputElement;
-  function rightClickContextMenu(e) {
+
+  /**
+   * Handle position of the context menu
+   * @param e: Event
+   */
+  function rightClickContextMenu(e: Event) {
     e.preventDefault();
     setTimeout(() => {
       const mouseX = e.clientX;
@@ -104,6 +81,9 @@
     }, 100);
   }
 
+  /**
+   * Handle selected methods from filter
+   */
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
     if (value && value.length > 0) {
       showFolderAPIButtons = false;
@@ -118,11 +98,16 @@
     selectedMethodUnsubscibe();
   });
 
+  /**
+   * Handle toggling context menu
+   */
   function closeRightClickContextMenu() {
     showMenu = false;
   }
 
-  //open collection
+  /**
+   * Handle opening collection
+   */
   function openCollections() {
     if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
       handleCollectionClick(collection, collection.workspaceId, collection.id);
@@ -159,7 +144,7 @@
       deletedIds.push(collection.id);
     }
   }
-  // delete collection
+
   onMount(async () => {
     if (collection?.activeSync) {
       let response = await onBranchSwitch(collection);
@@ -247,7 +232,11 @@
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
-        onDeleteCollection(collection, deletedIds);
+        onDeleteItem("collection", {
+          workspaceId: $currentWorkspace._id,
+          collection,
+          deletedIds,
+        });
         isCollectionPopup = false;
       }}
     />
@@ -278,7 +267,11 @@
             : true,
       },
       {
-        onClick: () => onCreateRequestInCollection(collection),
+        onClick: () =>
+          onCreateItem("requestCollection", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+          }),
         displayText: "Add Request",
         disabled: false,
         hidden:
@@ -289,7 +282,11 @@
             : true,
       },
       {
-        onClick: () => onCreateFolderInCollection(collection),
+        onClick: () =>
+          onCreateItem("folder", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+          }),
         displayText: "Add Folder",
         disabled: false,
         hidden:
@@ -361,12 +358,20 @@
         maxlength={100}
         bind:this={inputField}
         on:blur={(e) => {
-          onRenameCollection(collection, e?.target?.value);
+          onRenameItem("collection", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+            newName: e?.target?.value,
+          });
           isRenaming = false;
         }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
-            onRenameCollection(collection, e?.target?.value);
+            onRenameItem("collection", {
+              workspaceId: $currentWorkspace._id,
+              collection,
+              newName: e?.target?.value,
+            });
             isRenaming = false;
           }
         }}
@@ -421,7 +426,7 @@
         <button
           class="sync-button p-1 border-0 rounded"
           on:click={() => {
-            onRefetchCollection(collection);
+            onRefetchCollection($currentWorkspace._id, collection);
           }}
           on:mouseenter={() => {
             isSyncBtnHovered = true;
@@ -455,11 +460,10 @@
       <div class="sub-folders ps-3">
         {#each collection.items as explorer}
           <Folder
-            {onCreateRequestInFolder}
-            {onDeleteFolder}
-            {onDeleteRequest}
-            {onRenameFolder}
-            {onRenameRequest}
+            {currentWorkspace}
+            {onCreateItem}
+            {onDeleteItem}
+            {onRenameItem}
             {onOpenRequestOnTab}
             {collection}
             {getUserRoleInWorkspace}
@@ -481,7 +485,11 @@
             >
               <button
                 class="bg-transparent border-0"
-                on:click={() => onCreateFolderInCollection(collection)}
+                on:click={() =>
+                  onCreateItem("folder", {
+                    workspaceId: $currentWorkspace._id,
+                    collection,
+                  })}
               >
                 <img
                   class="list-icons mb-2 mt-2"
@@ -502,7 +510,11 @@
             >
               <button
                 class="bg-transparent border-0"
-                on:click={() => onCreateRequestInCollection(collection)}
+                on:click={() =>
+                  onCreateItem("requestCollection", {
+                    workspaceId: $currentWorkspace._id,
+                    collection,
+                  })}
               >
                 <img
                   class="list-icons mb-2 mt-2 ms-3"

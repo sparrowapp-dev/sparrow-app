@@ -36,7 +36,6 @@
   import type { Observable } from "rxjs";
 
   const _viewModel = new CollectionsViewModel();
-  _viewModel.syncCollectionsWithBackend();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -50,6 +49,7 @@
   let isPopupClosed: boolean = false;
   let saveAsVisibility: boolean = false;
   let loader = false;
+  let currentEnvironment: EnvironmentDocument;
 
   /**
    * Handle close tab functionality in tab bar list
@@ -102,7 +102,20 @@
     }
   };
 
-  userWorkspaceLevelRole.subscribe((value: WorkspaceRole) => {
+  /**
+   * Handles reloading collections and environment of workspace change
+   */
+  currentWorkspace
+    .subscribe(async (workspace) => {
+      currentEnvironment =
+        await _viewModel.syncCollectionsWithBackend(workspace);
+    })
+    .unsubscribe();
+
+  /**
+   * Fetch role of user in workspace
+   */
+  userWorkspaceLevelRole.subscribe((value: any) => {
     if (value) {
       loggedUserRoleInWorkspace = value;
     }
@@ -120,21 +133,13 @@
     <CollectionList
       {collectionList}
       {environmentList}
-      onCreateCollection={_viewModel.handleCreateCollection}
-      onCreateApiRequest={_viewModel.handleCreateApiRequest}
-      onCreateRequestInCollection={_viewModel.handleCreateRequestInCollection}
-      onCreateRequestInFolder={_viewModel.handleCreateRequestInFolder}
-      onCreateFolderInCollection={_viewModel.handleCreateFolderInCollection}
-      onDeleteCollection={_viewModel.handleDeleteCollection}
-      onDeleteFolder={_viewModel.handleDeleteFolder}
-      onDeleteRequest={_viewModel.handleDeleteRequest}
-      onRenameCollection={_viewModel.handleRenameCollection}
-      onRenameFolder={_viewModel.handleRenameFolder}
-      onRenameRequest={_viewModel.handleRenameRequest}
+      {currentEnvironment}
+      onCreateItem={_viewModel.handleCreateItem}
+      onDeleteItem={_viewModel.handleDeleteItem}
+      onRenameItem={_viewModel.handleRenameItem}
+      onImportItem={_viewModel.handleImportItem}
       onOpenRequestOnTab={_viewModel.handleOpenRequestOnTab}
       onBranchSwitch={_viewModel.handleBranchSwitch}
-      onImportCurl={_viewModel.handleImportCurl}
-      onImportCollection={_viewModel.handleImportCollection}
       onInputDataChange={_viewModel.handleInputDataChange}
       onUploadFile={_viewModel.uploadFormFile}
       onExtractGitBranch={_viewModel.extractGitBranch}

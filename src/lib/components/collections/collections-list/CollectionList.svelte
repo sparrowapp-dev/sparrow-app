@@ -1,80 +1,19 @@
 <script lang="ts">
   export let collectionList: Observable<CollectionDocument[]>;
   export let environmentList: Observable<EnvironmentDocument[]>;
-  export let onCreateCollection: () => void;
-  export let onCreateRequestInCollection: (
-    collection: CollectionDocument,
-  ) => void;
-  export let onCreateFolderInCollection: (
-    collection: CollectionDocument,
-  ) => void;
-  export let onCreateRequestInFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-  ) => void;
-  export let onDeleteCollection: (
-    collection: CollectionDocument,
-    deletedIds: [string] | [],
-  ) => void;
-  export let onDeleteFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    requestIds: [string],
-  ) => void;
-  export let onDeleteRequest: (
-    collection: CollectionDocument,
-    request: any,
-    folder: any,
-  ) => Promise<boolean>;
-  export let onRenameCollection: (
-    collection: CollectionDocument,
-    newCollectionName: string,
-  ) => void;
-  export let onRenameFolder: (
-    collection: CollectionDocument,
-    explorer: any,
-    newFolderName: string,
-  ) => void;
-  export let onRenameRequest: (
-    collection: CollectionDocument,
-    folder: any,
-    request: any,
-    newRequestName: string,
-  ) => void;
-  export let onCreateApiRequest: () => void;
-  export let onImportCollection: (
-    importData: any,
-    currentBranch: string,
-    getBranchList: [any],
-    uploadCollection: any,
-    validations: {
-      activeSync: boolean;
-      isRepositoryPath: boolean;
-      isRepositoryPathTouched: boolean;
-      isRepositoryBranchTouched: boolean;
-      importType: "file" | "text";
-      isTextEmpty: boolean;
-      isValidClientJSON: boolean;
-      isValidServerJSON: boolean;
-      isValidClientXML: boolean;
-      isValidServerXML: boolean;
-      isValidClientDeployedURL: boolean;
-      isValidServerDeployedURL: boolean;
-      isValidClientURL: boolean;
-      isValidServerURL: boolean;
-      repositoryBranch: string;
-      repositoryPath: string;
-    },
-  ) => void;
+  export let onCreateItem: (entityType: string, args: any) => void;
+  export let onDeleteItem: (entityType: string, args: any) => void;
+  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onImportItem: (entityType: string, args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
     searchData: string,
   ) => {
-    filteredCollection: any;
-    filteredFile: any;
-    filteredFolder: any;
+    filteredCollection: CollectionDocument[];
+    filteredFile: RequestType[];
+    filteredFolder: Folder[];
   };
-  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
   export let onBranchSwitch: (collection: CollectionDocument) => void;
   export let onInputDataChange: (importData: string) => Promise<{
     isValidClientURL: boolean;
@@ -93,7 +32,7 @@
         repositoryPath: string;
         currentBranch: string;
         repositoryBranch: string;
-        getBranchList: any;
+        getBranchList: string[];
         isRepositoryPath: boolean;
       }
   >;
@@ -103,15 +42,18 @@
         repositoryPath: string;
         currentBranch: string;
         repositoryBranch: string;
-        getBranchList: any;
+        getBranchList: string[];
         isRepositoryPath: boolean;
       }
   >;
-  export let onRefetchCollection: (collection: CollectionDocument) => void;
+  export let onRefetchCollection: (
+    workspaceId: string,
+    collection: CollectionDocument,
+  ) => void;
   export let getActiveTab: () => Writable<{}>;
   export let getUserRoleInWorkspace: () => WorkspaceRole;
-  export let onImportCurl: (curl: string) => void;
   export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let currentEnvironment: Observable<EnvironmentDocument>;
 
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
@@ -136,26 +78,30 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import type { Writable } from "svelte/store";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import type {
+    Folder,
+    Path,
+    Request as RequestType,
+  } from "$lib/utils/interfaces/request.interface";
   import {
     selectMethodsStore,
     selectedMethodsCollectionStore,
   } from "$lib/store";
   import { onDestroy } from "svelte";
   import SearchTree from "./searchTree/SearchTree.svelte";
+  import Request from "./request/Request.svelte";
   let collapsExpandToggle: boolean = false;
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
-  let currentEnvironment: string = "";
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
   let filteredSelectedMethodsCollection: any = [];
   let filteredCollection: CollectionDocument[] = [];
-  let filteredFolder: any = [];
-  let filteredFile: any = [];
-  let selectedApiMethods: any = [];
+  let filteredFolder: Folder[] = [];
+  let filteredFile: RequestType[] = [];
+  let selectedApiMethods: string[] = [];
 
   const selectedMethodsCollectionUnsubscribe =
     selectedMethodsCollectionStore.subscribe((value) => {
@@ -170,16 +116,23 @@
     }
   });
 
+  /**
+   * Handle add button
+   * @param id: string - collection | importURL | apiRequest
+   */
   const handleAddButton = (id: string) => {
     if (id === "collection") {
       isImportCollectionPopup = !isImportCollectionPopup;
     } else if (id === "importcURL") {
       isImportCurlPopup = !isImportCurlPopup;
     } else if (id === "apiRequest") {
-      onCreateApiRequest();
+      onCreateItem("request", {});
     }
   };
 
+  /**
+   * Handle searching and filtering
+   */
   const handleSearch = () => {
     let filteredData = onSearchCollection(collectionListDocument, searchData);
     filteredCollection = filteredData.filteredCollection ?? [];
@@ -415,15 +368,10 @@
             >
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
-                  {onCreateRequestInCollection}
-                  {onCreateFolderInCollection}
-                  {onCreateRequestInFolder}
-                  {onDeleteCollection}
-                  {onDeleteFolder}
-                  {onDeleteRequest}
-                  {onRenameCollection}
-                  {onRenameFolder}
-                  {onRenameRequest}
+                  {currentWorkspace}
+                  {onCreateItem}
+                  {onDeleteItem}
+                  {onRenameItem}
                   {onBranchSwitch}
                   {onOpenRequestOnTab}
                   {onRefetchCollection}
@@ -443,15 +391,10 @@
               {#if collectionListDocument}
                 {#each collectionListDocument as col}
                   <Collection
-                    {onCreateRequestInCollection}
-                    {onCreateFolderInCollection}
-                    {onCreateRequestInFolder}
-                    {onDeleteCollection}
-                    {onDeleteFolder}
-                    {onDeleteRequest}
-                    {onRenameCollection}
-                    {onRenameFolder}
-                    {onRenameRequest}
+                    {currentWorkspace}
+                    {onCreateItem}
+                    {onDeleteItem}
+                    {onRenameItem}
                     {onBranchSwitch}
                     {onOpenRequestOnTab}
                     {onRefetchCollection}
@@ -464,8 +407,9 @@
             </List>
           {:else}
             <EmptyCollection
+              {currentWorkspace}
               {getUserRoleInWorkspace}
-              handleCreateApiRequest={onCreateApiRequest}
+              handleCreateApiRequest={() => handleAddButton("apiRequest")}
               onImportCollectionPopup={() => handleAddButton("collection")}
             />
           {/if}
@@ -480,8 +424,10 @@
 {#if isImportCollectionPopup}
   <ImportCollection
     onImportCollectionPopup={() => handleAddButton("collection")}
-    {onCreateCollection}
-    {onImportCollection}
+    {collectionList}
+    {currentWorkspace}
+    {onCreateItem}
+    {onImportItem}
     {onInputDataChange}
     {onUploadFile}
     {onExtractGitBranch}
@@ -491,7 +437,8 @@
   <!-- <ImportCurl onClick={handleImportCurlPopup} {collectionsMethods} /> -->
   <ImportCurl
     onClosePopup={() => handleAddButton("importcURL")}
-    {onImportCurl}
+    {currentWorkspace}
+    {onImportItem}
   />
 {/if}
 

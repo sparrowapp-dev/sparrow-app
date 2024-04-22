@@ -1,23 +1,19 @@
 <script lang="ts">
-  export let onDeleteRequest: (
-    collection: CollectionDocument,
-    request: any,
-    folder: any,
-  ) => Promise<boolean>;
-  export let onRenameRequest: (
-    collection: CollectionDocument,
-    folder: any,
-    request: any,
-    newRequestName: string,
-  ) => void;
-  export let onOpenRequestOnTab: (request: any, path: Path) => void;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let onDeleteItem: (entityType: string, args: any) => void;
+  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onOpenRequestOnTab: (request: Request, path: Path) => void;
   export let collection: CollectionDocument;
-  export let folder: any;
-  export let api: any;
+  export let folder: Folder;
+  export let api: Request;
 
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
+  import type {
+    Request,
+    Folder,
+    Path,
+  } from "$lib/utils/interfaces/request.interface";
   import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
   import { showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
@@ -28,8 +24,12 @@
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
   import { UntrackedItems } from "$lib/utils/enums";
+  import type { Observable } from "rxjs";
   let showPath = false;
 
   if (folder) {
@@ -40,7 +40,12 @@
   }
 
   let isDeletePopup: boolean = false;
-  let path: Path;
+  let path: Path = {
+    workspaceId: $currentWorkspace._id,
+    collectionId: collection.id,
+    folderId: folder ? folder.id : "",
+    folderName: folder ? folder.name : "",
+  };
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -54,16 +59,16 @@
     showPath = value;
   });
 
-  $: {
-    if (api) {
-      path = {
-        workspaceId: collection.workspaceId,
-        collectionId: collection.id,
-        folderId: folder ? folder.id : "",
-        folderName: folder ? folder.name : "",
-      };
-    }
-  }
+  // $: {
+  //   if (api) {
+  //     path = {
+  //       workspaceId: $currentWorkspace._id,
+  //       collectionId: collection.id,
+  //       folderId: folder ? folder.id : "",
+  //       folderName: folder ? folder.name : "",
+  //     };
+  //   }
+  // }
 
   onDestroy(() => {
     selectedMethodUnsubscibe();
@@ -111,7 +116,12 @@
       loader={deleteLoader}
       onClick={() => {
         deleteLoader = true;
-        onDeleteRequest(collection, api, folder);
+        onDeleteItem("request", {
+          workspaceId: $currentWorkspace._id,
+          collection,
+          request: api,
+          folder,
+        });
         deleteLoader = false;
         isDeletePopup = false;
       }}
@@ -213,12 +223,24 @@
         value={newRequestName}
         bind:this={inputField}
         on:blur={(e) => {
-          onRenameRequest(collection, folder, api, e?.target?.value);
+          onRenameItem("request", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+            folder,
+            request: api,
+            newName: e?.target?.value,
+          });
           isRenaming = false;
         }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
-            onRenameRequest(collection, folder, api, e?.target?.value);
+            onRenameItem("request", {
+              workspaceId: $currentWorkspace._id,
+              collection,
+              folder: folder ? folder : { id: "" },
+              request: api,
+              newName: e?.target?.value,
+            });
             isRenaming = false;
           }
         }}

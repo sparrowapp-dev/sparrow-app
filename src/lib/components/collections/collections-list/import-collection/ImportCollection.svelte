@@ -8,31 +8,10 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
 
-  export let onCreateCollection: () => void;
-  export let onImportCollection: (
-    importData: any,
-    currentBranch: string,
-    getBranchList: [any],
-    uploadCollection: any,
-    validations: {
-      activeSync: boolean;
-      isRepositoryPath: boolean;
-      isRepositoryPathTouched: boolean;
-      isRepositoryBranchTouched: boolean;
-      importType: "file" | "text";
-      isTextEmpty: boolean;
-      isValidClientJSON: boolean;
-      isValidServerJSON: boolean;
-      isValidClientXML: boolean;
-      isValidServerXML: boolean;
-      isValidClientDeployedURL: boolean;
-      isValidServerDeployedURL: boolean;
-      isValidClientURL: boolean;
-      isValidServerURL: boolean;
-      repositoryBranch: string;
-      repositoryPath: string;
-    },
-  ) => void;
+  export let collectionList: Observable<CollectionDocument[]>;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let onCreateItem: (entityType: string, args: any) => void;
+  export let onImportItem: (entityType: string, args: any) => void;
   export let onInputDataChange: (importData: string) => Promise<{
     isValidClientURL: boolean;
     isValidClientJSON: boolean;
@@ -172,12 +151,13 @@
   };
 
   const handleImport = async () => {
-    onImportCollection(
+    onImportItem("collection", {
+      workspaceId: $currentWorkspace._id,
       importData,
       currentBranch,
       getBranchList,
       uploadCollection,
-      {
+      validations: {
         activeSync,
         isRepositoryPath,
         isRepositoryPathTouched,
@@ -195,7 +175,7 @@
         repositoryBranch,
         repositoryPath,
       },
-    );
+    });
   };
 
   const extractGitBranch = async (filePathResponse: string) => {
@@ -603,7 +583,10 @@
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
-        onCreateCollection();
+        onCreateItem("collection", {
+          workspaceId: $currentWorkspace._id,
+          collection: collectionList,
+        });
         onImportCollectionPopup();
       }}>Create Empty Collection</button
     >
