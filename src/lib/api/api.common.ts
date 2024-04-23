@@ -180,13 +180,33 @@ const makeHttpRequest = async (
     });
 };
 
-const makeHttpRequestV2 = async (url: string, method: string) => {
+/**
+ * Invoke RPC Communication
+ * @param url - Request URL
+ * @param method - Request Method
+ * @param headers - Request Headers
+ * @param body - Request Body
+ * @param request - Request Body Type
+ * @param tabId - Tab ID
+ * @returns
+ */
+const makeHttpRequestV2 = async (
+  url: string,
+  method: string,
+  headers: string,
+  body: string,
+  request: string,
+) => {
   // create a race condition between the timeout and the api call
   return Promise.race([
     timeout(apiTimeOut),
+    // Invoke communication
     invoke("make_http_request_v2", {
       url,
       method,
+      headers,
+      body,
+      request,
     }),
   ])
     .then(async (data: string) => {
