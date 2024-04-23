@@ -30,13 +30,12 @@ const error = (
   };
 };
 
-const success = (data: any, tabId: string): MakeRequestResponse => {
+const success = (data: any): MakeRequestResponse => {
   return {
     status: "success",
     isSuccessful: true,
     message: "",
     data,
-    tabId,
   };
 };
 
@@ -147,7 +146,6 @@ const makeHttpRequest = async (
   headers: string,
   body: string,
   request: string,
-  tabId: string,
 ) => {
   console.table({ url, method, headers, body, request });
   let response;
@@ -162,15 +160,13 @@ const makeHttpRequest = async (
       headers,
       body,
       request,
-      tabId,
     }),
   ])
     .then(async (data: string) => {
       try {
         response = JSON.parse(data);
-        const tabId = response.tabId;
         response = JSON.parse(response.body);
-        return success(response, tabId);
+        return success(response);
       } catch (e) {
         return error("error");
       }

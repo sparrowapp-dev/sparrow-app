@@ -87,6 +87,8 @@ const generateSampleRequest = (id: string, date: string): NewTab => {
           responseFormatter: ResponseFormatter.PRETTY,
           additions: "",
           isSaveDescription: true,
+          requestInProgress: false,
+          descriptionInProgress: false,
         },
         auth: {
           bearerToken: "",

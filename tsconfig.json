@@ -16,6 +16,13 @@
     "isolatedModules": true,
     "paths": {
       "$lib/*": ["./src/lib/*"],
+
+      "@library/*": ["./src/packages/@library/*"],
+      "@app/*": ["./src/packages/@app/*"],
+      "@common/*": ["./src/packages/@common/*"],
+      "@teams/*": ["./src/packages/@teams/*"],
+      "@workspaces/*": ["./src/packages/@workspaces/*"],
+      "@environments/*": ["./src/packages/@environments/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

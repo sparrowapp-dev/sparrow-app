@@ -27,7 +27,7 @@ export class TabRepository {
       })
       .exec();
     if (activeTab) {
-      activeTab.incrementalUpdate({ $set: { isActive: false } });
+      await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     await RxDB.getInstance().rxdb.tab.insert(tab);
   };
@@ -69,7 +69,7 @@ export class TabRepository {
         },
       })
       .exec();
-    if (deselectedTab && deselectedTab.get("id") === id) return;
+    // if (deselectedTab && deselectedTab.get("id") === id) return;
     if (deselectedTab) {
       await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
     }
@@ -100,7 +100,14 @@ export class TabRepository {
    * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return RxDB.getInstance().rxdb.tab.find().sort({ index: "asc" }).$;
+    return RxDB.getInstance().rxdb.tab.find().sort({ timestamp: "asc" }).$;
+  };
+
+  public getTabLs = async (): TabDocument[] => {
+    return await RxDB.getInstance()
+      .rxdb.tab.find()
+      .sort({ index: "asc" })
+      .exec();
   };
   /**
    * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
@@ -221,5 +228,18 @@ export class TabRepository {
       RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
     });
     sub();
+  };
+
+  public updateTab = async (tabId, tab) => {
+    const query = RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          tabId,
+        },
+      })
+      .exec();
+    (await query).incrementalModify((value) => {
+      return { ...value, ...tab };
+    });
   };
 }

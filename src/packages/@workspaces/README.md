@@ -1,0 +1,1 @@
+This module has only access to @library and @common module

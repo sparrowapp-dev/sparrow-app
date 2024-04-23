@@ -37,8 +37,8 @@ import {
   windowSettingsSchema,
   type WindowSettingsDocType,
 } from "$lib/models/window-settings-model";
-// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-// addRxPlugin(RxDBDevModePlugin);
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -128,18 +128,24 @@ export class RxDB {
       },
       tab: {
         schema: tabSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-        },
+        // migrationStrategies: {
+        //   // database  migration functions
+        //   1: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   2: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   3: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   4: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   5: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        // },
       },
       collection: {
         schema: collectionSchema,

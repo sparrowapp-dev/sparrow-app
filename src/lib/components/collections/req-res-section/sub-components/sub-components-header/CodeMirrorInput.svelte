@@ -15,7 +15,7 @@
   } from "@codemirror/view";
   import { environmentHoverHighlightStyle } from "./EnvironmentHighlight";
   import { editLink } from "$lib/store/api-request";
-  export let currentTabId: string;
+  // export let currentTabId: string;
   export let rawValue: string;
   export let handleRawChange: () => void;
   export let handleFocusChange: () => void;
@@ -34,7 +34,7 @@
   const ENV_HIGHLIGHT_FOUND = "env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found";
   const HOVER_TIME = 3000;
-  let selectedTabId = currentTabId;
+  // let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
@@ -228,17 +228,18 @@
   });
 
   afterUpdate(() => {
-    if (selectedTabId !== currentTabId) {
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: rawValue,
-        },
-      });
-      selectedTabId = currentTabId;
-      handleEnvironmentBox(false, localEnvKey);
-    }
+    // if (selectedTabId !== currentTabId) {
+    //   codeMirrorView.dispatch({
+    //     changes: {
+    //       from: 0,
+    //       to: codeMirrorView.state.doc.length,
+    //       insert: rawValue,
+    //     },
+    //   });
+    //   selectedTabId = currentTabId;
+    //   handleEnvironmentBox(false, localEnvKey);
+    // }
+    handleEnvironmentBox(false, localEnvKey);
     if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
         changes: {

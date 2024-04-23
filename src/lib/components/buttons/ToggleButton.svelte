@@ -1,14 +1,15 @@
 <script lang="ts">
   import Button from "./Button.svelte";
-
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
   let componentClass = "";
   export { componentClass as class };
+  export let selectedToggleId = "";
 
   type ToggleButton = {
     name: string;
     id: string;
     icon: string;
-    isSelected: boolean;
   };
 
   export let toggleButtons: ToggleButton[];
@@ -17,11 +18,14 @@
 <div class={`${componentClass} d-flex flex-row ps-3 align-self-center`}>
   {#each toggleButtons as toggleButton (toggleButton.id)}
     <span style="cursor:pointer;">
-      <Button
-        type="icon"
-        title={toggleButton.name}
-        buttonStartIcon={toggleButton.icon}
-        buttonClassProp={toggleButton.isSelected ? "view-active" : ""}
+      <img
+        src={toggleButton.icon}
+        class="me-2 {selectedToggleId === toggleButton.id ? 'view-active' : ''}"
+        style={`height: 20px; width:20px;`}
+        alt="icon"
+        on:click={() => {
+          dispatch("click", toggleButton.id);
+        }}
       />
     </span>
   {/each}
