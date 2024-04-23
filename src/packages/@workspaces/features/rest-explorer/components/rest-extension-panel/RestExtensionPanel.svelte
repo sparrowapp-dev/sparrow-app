@@ -41,7 +41,7 @@
   //   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole = "editor";
 
-  export let requestDescription: string;
+  export let requestDescription;
   ////state
   export let state;
   //////

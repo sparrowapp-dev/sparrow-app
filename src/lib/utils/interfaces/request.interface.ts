@@ -45,7 +45,7 @@ export interface RequestBody {
 export interface KeyValuePair {
   key: string;
   value: string;
-  checked: boolean;
+  checked?: boolean;
 }
 
 export interface EnvValuePair {

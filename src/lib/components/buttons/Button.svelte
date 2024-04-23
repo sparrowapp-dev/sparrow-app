@@ -78,6 +78,7 @@
     />
   {/if}
   {#if loader && !allowChild}
+    {console.log("HW")}
     <span class="mx-2 d-flex justify-content-center">
       <Spinner size={`${loaderSize}px`} />
     </span>
