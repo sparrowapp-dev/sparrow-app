@@ -558,20 +558,21 @@ class RestExplorerViewModel
           const responseSizeKB = byteLength / 1024;
           const duration = end - start;
           const responseBody = response.data.body;
-          const temp = Object.entries(response?.data?.headers || {});
-          const head = [];
-          temp.forEach((elem) => {
-            head.push({
+          const formattedHeaders = Object.entries(
+            response?.data?.headers || {},
+          );
+          const responseHeaders = [];
+          formattedHeaders.forEach((elem) => {
+            responseHeaders.push({
               key: elem[0],
               value: elem[1],
             });
           });
-          let responseHeaders = head;
           let responseStatus = response.data.status;
-          const ct =
+          const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
           this.updateRequestState({
-            responseBodyLanguage: ct,
+            responseBodyLanguage: bodyLanguage,
             isSendRequestInProgress: false,
           });
 
