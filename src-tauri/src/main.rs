@@ -1,8 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![windows_subsystem = "windows"]
-//! # Module: HTTP Request Handlers
+//! # Module: HTTP Request Handlers & Sparrow RPC Logic
 //!
-//! This module provides handlers for various types of HTTP requests and related operations.
+//! This module provides handlers for various types of HTTP requests, related operations and RPC Logic of Sparrow App.
 //!
 //! ## Submodules
 //!
