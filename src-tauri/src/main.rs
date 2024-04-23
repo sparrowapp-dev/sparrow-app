@@ -172,7 +172,6 @@ async fn make_http_request(
     headers: &str,
     body: &str,
     request: &str,
-    tab_id: &str,
 ) -> Result<String, String> {
     let result = make_request(url, method, headers, body, request).await;
 
@@ -183,7 +182,6 @@ async fn make_http_request(
 
     let response = json!({
         "body": result_value,
-        "tabId": tab_id
     });
 
     return match serde_json::to_string(&response) {

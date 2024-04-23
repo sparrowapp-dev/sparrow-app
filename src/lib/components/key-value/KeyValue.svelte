@@ -172,7 +172,7 @@
   };
 </script>
 
-<div class="mt-3 mb-3 me-0 w-100">
+<div class="mb-3 me-0 w-100">
   <div class="d-flex gap-3 pb-2 align-items-center">
     <div style="width:30px;">
       <input

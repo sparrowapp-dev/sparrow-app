@@ -376,7 +376,6 @@
 
   .tab-active {
     color: white;
-
     border-bottom: 3px solid var(--send-button);
   }
   .cursor-pointer {

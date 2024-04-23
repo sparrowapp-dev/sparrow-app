@@ -7,7 +7,6 @@
   export let isRequired = false;
   export let invalidValue = false;
   export let errorText = "Invalid Value";
-  export let onChange: (e: any) => void;
   export let type: "input" | "textarea" = "input";
   export let noBackground = false;
   export let maxCharacter = 100;
@@ -20,6 +19,8 @@
   let componentClass = "";
   export { componentClass as class };
 
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
   enum InputType {
     INPUT = "input",
     TEXTAREA = "textarea",
@@ -55,7 +56,7 @@
     type="text"
     id={inputId}
     placeholder={inputPlaceholder}
-    on:input={(e) => onChange(e)}
+    on:input={(e) => dispatch("change", value)}
     style={`${inputStyleProp} ${
       noBackground &&
       "outline: none; background-color: transparent; border: none;"
@@ -71,7 +72,7 @@
     id={inputId}
     placeholder={inputPlaceholder}
     maxlength={maxCharacter}
-    on:input={(e) => onChange(e)}
+    on:input={(e) => dispatch("change", value)}
     style={`${inputStyleProp}`}
   />
 {/if}

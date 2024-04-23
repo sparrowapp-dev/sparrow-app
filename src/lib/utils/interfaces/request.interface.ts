@@ -77,15 +77,21 @@ export interface Body {
 }
 
 export interface State {
-  raw?: RequestRawType;
-  dataset?: RequestDatasetType;
-  auth?: RequestAuthTypes;
-  section?: RequestSectionType;
-  responseSection?: ResponseSectionType;
-  responseRaw?: RequestRawType;
-  responseFormatter?: ResponseFormatterType;
-  additions: string;
-  isSaveDescription: boolean;
+  requestBodyLanguage?: RequestRawType;
+  requestBodyNavigation?: RequestDatasetType;
+  requestAuthNavigation?: RequestAuthTypes;
+  requestNavigation?: RequestSectionType;
+  responseNavigation?: ResponseSectionType;
+  responseBodyLanguage?: RequestRawType;
+  responseBodyFormatter?: ResponseFormatterType;
+  requestExtensionNavigation?: string;
+  isExposeEditDescription?: boolean;
+  requestSplitterDirection?: string;
+  requestLeftSplitterWidthPercentage?: number;
+  requestRightSplitterWidthPercentage?: number;
+  isSendRequestInProgress?: boolean;
+  isSaveDescriptionInProgress?: boolean;
+  isSaveRequestInProgress?: boolean;
 }
 
 export interface BasicAuth {
@@ -111,7 +117,7 @@ export interface Save {
 }
 
 export interface Request {
-  method: RequestMethodType;
+  method?: RequestMethodType;
   body?: Body;
   url?: string;
   headers?: KeyValuePair[];
@@ -120,8 +126,6 @@ export interface Request {
   response?: Response;
   state?: State;
   auth?: Auth;
-  requestInProgress?: boolean;
-  save?: Save;
 }
 
 export interface Collection {
@@ -158,10 +162,9 @@ export interface NewTab {
     folder?: Folder;
   };
   isActive: boolean;
-  save: boolean;
+  isSaved: boolean;
   createdAt: string;
   path?: Path;
-  saveInProgress?: boolean;
   index?: number;
 }
 

@@ -16,7 +16,6 @@ import { updateCollectionRequest } from "$lib/services/collection";
 // ---- Store
 import {
   isApiCreatedFirstTime,
-  requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
 
@@ -28,7 +27,6 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 // ---- helpers
 import { setContentTypeHeader } from "$lib/utils/helpers";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
-import { generateSampleRequest } from "$lib/utils/sample/request.sample";
 
 // ---- Interface
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
@@ -39,8 +37,11 @@ import type {
 
 // ---- mixpanel
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { InitRequestTab } from "@common/utils";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 export class CollectionPageViewModel {
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
@@ -48,66 +49,32 @@ export class CollectionPageViewModel {
   constructor() {}
 
   /**
-   * This function is used when a function need to be called after certain interval only.
-   * @param func
-   * @param delay
-   * @returns
-   */
-  public debounce = (func, delay) => {
-    let timerId;
-
-    return function (...args) {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      const context = this;
-
-      clearTimeout(timerId);
-      timerId = setTimeout(() => {
-        func.apply(context, args);
-      }, delay);
-    };
-  };
-
-  /**
    * Return current tabs list of top tab bar component
    */
   get tabs() {
-    return requestResponseStore.getTabList();
+    return this.tabRepository.getTabList();
   }
 
-  /**
-   * Sync the tab list with store
-   */
-  private syncTabWithStore = () => {
-    this.tabRepository.syncTabsWithStore(tabs);
-  };
-
-  debouncedTab = this.debounce(this.syncTabWithStore, 2000);
-
-  /**
-   * Create new tab in tab list store
-   * @param data - new tab
-   */
-  public handleCreateTab = (data: any) => {
-    requestResponseStore.createTab(data);
-    this.debouncedTab();
-  };
+  get activeTab() {
+    return this.tabRepository.getTab();
+  }
 
   /**
    * Remove the tab from tab list in store
    * @param id - tab id
    */
   public handleRemoveTab = (id: string) => {
-    requestResponseStore.removeTab(id);
-    this.debouncedTab();
+    this.tabRepository.removeTab(id);
   };
 
   /**
    * Create new tab with untracked id
    */
-  public createNewTab = () => {
+  public createNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
-    this.handleCreateTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+    this.tabRepository.createTab(
+      new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
     );
     moveNavigation("right");
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
@@ -117,9 +84,8 @@ export class CollectionPageViewModel {
    * Set active tab in store
    * @param id - tab id
    */
-  public handleActiveTab = (id: string) => {
-    requestResponseStore.activeTab(id);
-    this.debouncedTab();
+  public handleActiveTab = async (id: string) => {
+    await this.tabRepository.activeTab(id);
   };
 
   /**
@@ -128,7 +94,9 @@ export class CollectionPageViewModel {
    */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
+    // TODO - Parse this.tabs observable to RxDoc (Remove these code)
     const tabList = this.tabs;
+    /////////////////////////////////////////////////////////////////////
     let updatedTabList: TabDocument[] = [];
     tabList.subscribe((value) => {
       updatedTabList = value;
@@ -140,8 +108,10 @@ export class CollectionPageViewModel {
       return tab;
     });
     const newTabList: NewTab[] = updatedTabList as NewTab[];
+
+    // TODO - Update RxDB REPO using bulk upsert HERE (Remove these code)
     tabs.set(newTabList);
-    this.syncTabWithStore();
+    /////////////////////////////////////////////////////////////////////
   };
 
   /**

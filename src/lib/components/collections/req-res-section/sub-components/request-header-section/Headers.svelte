@@ -18,11 +18,11 @@
   } from "$lib/utils/enums/request.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   export let request;
-  export let contentType;
   export let collectionsMethods: CollectionsMethods;
   export let currentTabId;
-  export let environmentVariables;
+  export let environmentVariables = [];
 
+  let contentType;
   let authValue: { key: string; value: string } = {
     key: "",
     value: "",

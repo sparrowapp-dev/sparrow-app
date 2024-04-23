@@ -130,7 +130,7 @@
       >
         {tab.name}
       </span>
-      {#if tab?.property?.request && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
+      {#if tab?.property?.request && !tab?.isSaved}
         {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
           <span
             class="position-absolute"

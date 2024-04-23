@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
@@ -837,4 +837,4 @@
   .filter-active {
     background-color: var(--send-button) !important;
   }
-</style>
+</style> -->

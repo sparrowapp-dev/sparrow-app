@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CollectionsList from "$lib/components/collections/collections-list/CollectionList.svelte";
+  // import CollectionsList from "$lib/components/collections/collections-list/CollectionList.svelte";
   import RequestResponse from "$lib/components/collections/req-res-section/RequestResponse.svelte";
   import DefaultTabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/DefaultTabBar.svelte";
   import TabBar from "$lib/components/collections/req-res-section/sub-components/sub-components-header/TabBar.old.svelte";
@@ -221,7 +221,7 @@
     minSize={20}
     size={$collapsibleState ? 0 : $collectionLeftPanelWidth}
   >
-    <CollectionsList
+    <!-- <CollectionsList
       {runAnimation}
       {changeAnimation}
       activeTabId={$activeTab?.id}
@@ -229,7 +229,7 @@
       environments={$environments}
       {collectionsMethods}
       {loggedUserRoleInWorkspace}
-    />
+    /> -->
   </Pane>
   <Pane
     class="sidebar-right-panel"
@@ -255,7 +255,15 @@
               {activeTab}
               {loggedUserRoleInWorkspace}
               {collectionsMethods}
-              {onTabsSwitched}
+              environmentVariables={environmentVariables.reverse()}
+              {currentWorkspace}
+            />
+          {:else if $activeTab && $activeTab.type === ItemType.WORKSPACE}
+            <MyWorkspace {activeTab} {collectionsMethods} />
+          {:else if $activeTab && $activeTab.type === ItemType.FOLDER}
+            <MyFolder
+              {collectionsMethods}
+              {activeTab}
               {loggedUserRoleInWorkspace}
             />
           </div> -->

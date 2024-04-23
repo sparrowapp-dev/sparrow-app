@@ -56,6 +56,19 @@ export class WorkspaceRepository {
   };
 
   /**
+   * get active workspace of the user.
+   */
+  public getActiveWorkspaceDoc = (): WorkspaceDocument => {
+    return RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+  };
+
+  /**
    * Check active Workspace
    */
   public checkActiveWorkspace = async (
