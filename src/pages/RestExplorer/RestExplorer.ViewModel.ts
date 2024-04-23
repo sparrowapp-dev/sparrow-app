@@ -40,7 +40,7 @@ import { Events, ItemType, RequestDataset } from "$lib/utils/enums";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
-import { makeHttpRequest } from "$lib/api/api.common";
+import { makeHttpRequestV2 } from "$lib/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -539,7 +539,7 @@ class RestExplorerViewModel
     const start = Date.now();
 
     const decodeData = this._decodeRequest.init(this.tab.property.request, []);
-    makeHttpRequest(...decodeData)
+    makeHttpRequestV2(...decodeData)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
@@ -557,7 +557,7 @@ class RestExplorerViewModel
           ).length;
           const responseSizeKB = byteLength / 1024;
           const duration = end - start;
-          const responseBody = response.data.response;
+          const responseBody = response.data.body;
           const temp = Object.entries(response?.data?.headers || {});
           const head = [];
           temp.forEach((elem) => {

@@ -1,11 +1,37 @@
+//! # Module: HTTP Request Utilities
+//!
+//! This module provides utilities for handling HTTP requests and related operations.
+//!
+//! ## External Imports
+//!
+//! - `reqwest::multipart`: Provides multipart form handling for Reqwest.
+//! - `reqwest::Body`: Represents the body of an HTTP request or response in Reqwest.
+//! - `reqwest::RequestBuilder`: Builder for constructing HTTP requests in Reqwest.
+//! - `reqwest::Response`: Represents an HTTP response in Reqwest.
+//! - `serde::{Deserialize, Serialize}`: Serialization and deserialization support with Serde.
+//! - `serde_json::Value`: Represents a JSON value in Serde JSON.
+//! - `std::path::Path`: Represents file paths and provides path-related operations.
+//! - `tokio::fs::File`: Asynchronous file operations using Tokio.
+//! - `tokio_util::codec::{BytesCodec, FramedRead}`: Utilities for handling byte streams and framing in Tokio.
+
 use reqwest::multipart;
 use reqwest::{Body, RequestBuilder, Response};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 use tokio::fs::File;
 use tokio_util::codec::{BytesCodec, FramedRead};
 
+/// Extracts the filename from a given file path.
+///
+/// # Arguments
+///
+/// * `path_str` - A string representing the file path.
+///
+/// # Returns
+///
+/// An `Option` containing the filename as a `String`, or `None` if extraction fails.
+///
 fn extract_filename(path_str: &str) -> Option<String> {
     // Use the Path struct to parse the string as a path and extract the file name
     return Path::new(path_str)
@@ -21,7 +47,42 @@ struct KeyValue {
     checked: bool,
     base: Option<String>,
 }
-
+///
+/// Makes an asynchronous multipart/form-data HTTP request.
+///
+/// # Arguments
+///
+/// * `request_builder` - The `RequestBuilder` instance with method and URL set.
+/// * `body` - A JSON string representing the form data to include in the request.
+///
+/// # Returns
+///
+/// A `Result` containing the HTTP response if successful, or an `std::io::Error` if the request fails.
+///
+/// /// # Examples
+///
+/// ```
+/// use reqwest::Client;
+/// use my_module::make_formdata_request_v2;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new();
+///     let request_builder = client.post("https://api.example.com");
+///     let body = r#"[
+///         {"key": "file1", "base": "/path/to/file1.txt"},
+///         {"key": "field1", "value": "value1"},
+///         {"key": "file2", "base": "/path/to/file2.txt"},
+///         {"key": "field2", "value": "value2"}
+///     ]"#;
+///
+///     let result = make_formdata_request_v2(request_builder, body).await;
+///     match result {
+///         Ok(response) => println!("Response: {:?}", response),
+///         Err(err) => eprintln!("Error: {}", err),
+///     }
+/// }
+/// ```
 pub async fn make_formdata_request_v2(
     request_builder: RequestBuilder,
     body: &str,

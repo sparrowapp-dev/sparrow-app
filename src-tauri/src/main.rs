@@ -1,6 +1,39 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![windows_subsystem = "windows"]
-
+//! # Module: HTTP Request Handlers
+//!
+//! This module provides handlers for various types of HTTP requests and related operations.
+//!
+//! ## Submodules
+//!
+//! - `config`: Configuration handling.
+//! - `formdata_handler`: Multipart/form-data request handling.
+//! - `json_handler`: JSON request handling.
+//! - `raw_handler`: Raw text request handling.
+//! - `request_handler`: General request handling utilities.
+//! - `url_fetch_handler`: URL fetching utilities.
+//! - `urlencoded_handler`: URL-encoded request handling.
+//!
+//! ## External Imports
+//!
+//! - `formdata_handler::make_formdata_request`: Function for making multipart/form-data requests.
+//! - `json_handler::make_json_request`: Function for making JSON requests.
+//! - `nfd::Response`: Represents a response from native file dialogs.
+//! - `raw_handler::make_text_request`: Function for making raw text requests.
+//! - `request_handler::formdata_handler_v2::make_formdata_request_v2`: Updated function for multipart/form-data requests.
+//! - `request_handler::http_requests::make_without_body_request`: Function for making HTTP requests without a body.
+//! - `request_handler::json_handler_v2::make_json_request_v2`: Updated function for JSON requests.
+//! - `request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2`: Updated function for URL-encoded requests.
+//! - `reqwest::Client`: HTTP client provided by Reqwest.
+//! - `serde::{Deserialize, Serialize}`: Serialization and deserialization support with Serde.
+//! - `serde_json::{json, Value}`: JSON serialization and deserialization support with Serde JSON.
+//! - `std::collections::HashMap`: Represents a hash map for key-value data storage.
+//! - `std::process::Command`: Represents an external command to be executed.
+//! - `tauri::Manager`: Tauri application manager.
+//! - `tauri::Window`: Represents a window in a Tauri application.
+//! - `url_fetch_handler::import_swagger_url`: Function for importing Swagger URLs.
+//! - `urlencoded_handler::make_www_form_urlencoded_request`: Function for making URL-encoded requests.
+// Submodules
 mod config;
 mod formdata_handler;
 mod json_handler;
@@ -9,24 +42,23 @@ mod request_handler;
 mod url_fetch_handler;
 mod urlencoded_handler;
 
+// External Imports
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
+use nfd::Response;
+use raw_handler::make_text_request;
 use request_handler::formdata_handler_v2::make_formdata_request_v2;
 use request_handler::http_requests::make_without_body_request;
 use request_handler::json_handler_v2::make_json_request_v2;
 use request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2;
-use std::path::PathBuf;
-use std::process::Command;
-use tauri::Window;
-
-use nfd::Response;
-use raw_handler::make_text_request;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::process::Command;
 use tauri::Manager;
+use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 
@@ -224,6 +256,19 @@ async fn make_http_request_v2(
     };
 }
 
+/// Makes an asynchronous HTTP request with various options.
+///
+/// # Arguments
+///
+/// * `url` - The URL to send the request to.
+/// * `method` - The HTTP method to use (e.g., "GET", "POST").
+/// * `headers` - A JSON string representing the headers to include in the request.
+/// * `body` - The body of the request.
+/// * `request` - The type of request to make, such as "application/json", "application/x-www-form-urlencoded", etc.
+///
+/// # Returns
+///
+/// A `Result` containing a JSON string representing the combined response data, or an `std::io::Error` if the request fails.
 async fn make_request_v2(
     url: &str,
     method: &str,
@@ -266,10 +311,12 @@ async fn make_request_v2(
 
     // Make request call as per Body type
     let check = match request {
-        "JSON" => make_json_request_v2(request_builder, body).await,
-        "URLENCODED" => make_www_form_urlencoded_request_v2(request_builder, body).await,
-        "FORMDATA" => make_formdata_request_v2(request_builder, body).await,
-        "TEXT" => make_text_request(request_builder, body).await,
+        "application/json" => make_json_request_v2(request_builder, body).await,
+        "application/x-www-form-urlencoded" => {
+            make_www_form_urlencoded_request_v2(request_builder, body).await
+        }
+        "multipart/form-data" => make_formdata_request_v2(request_builder, body).await,
+        "text/plain" => make_text_request(request_builder, body).await,
         _ => make_without_body_request(request_builder).await,
     };
 

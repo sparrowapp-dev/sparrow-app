@@ -209,7 +209,7 @@ const makeHttpRequestV2 = async (
       try {
         const responseBody = JSON.parse(data);
         const apiResponse: Response = JSON.parse(responseBody.body) as Response;
-        return success(apiResponse, "");
+        return success(apiResponse);
       } catch (e) {
         return error("error");
       }
