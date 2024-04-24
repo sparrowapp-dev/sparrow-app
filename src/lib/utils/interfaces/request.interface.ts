@@ -32,20 +32,20 @@ export interface Response {
   size: number;
 }
 
-// export interface RequestBody {
-//   method: string;
-//   url?: string;
-//   body?: unknown;
-//   headers?: KeyValuePair[];
-//   queryParams?: KeyValuePair[];
-//   auth?: Auth;
-//   selectedRequestBodyType?: ContentTypeEnum;
-//   selectedRequestAuthType?: RequestAuthTypes;
-// }
+export interface RequestBody {
+  method: string;
+  url?: string;
+  body?: unknown;
+  headers?: KeyValuePair[];
+  queryParams?: KeyValuePair[];
+  auth?: Auth;
+  selectedRequestBodyType?: ContentTypeEnum;
+  selectedRequestAuthType?: RequestAuthTypes;
+}
 export interface KeyValuePair {
   key: string;
   value: string;
-  checked?: boolean;
+  checked: boolean;
 }
 
 export interface EnvValuePair {
