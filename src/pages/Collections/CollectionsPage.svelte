@@ -46,12 +46,12 @@
   let saveAsVisibility: boolean = false;
   let loader = false;
 
-  // TODO: Delete this code
-  // let n = new DashboardViewModel();
-  // user.subscribe(async (value) => {
-  //   await n.refreshTeams(value._id);
-  //   await n.refreshWorkspaces(value._id);
-  // });
+  // TODO: Shift this to other place for getting Teams and Workspaces
+  let n = new DashboardViewModel();
+  user.subscribe(async (value) => {
+    await n.refreshTeams(value._id);
+    await n.refreshWorkspaces(value._id);
+  });
 
   /**
    * Handle close tab functionality in tab bar list
