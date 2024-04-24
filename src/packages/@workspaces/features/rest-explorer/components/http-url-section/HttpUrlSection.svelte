@@ -7,17 +7,23 @@
   import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestUrl } from "@workspaces/features/rest-explorer/components";
+  import type {
+    SendRequestType,
+    UpdateRequestMethodType,
+    UpdateRequestStateType,
+    UpdateRequestUrlType,
+  } from "@workspaces/shared/type";
 
   let componentClass = "";
   export { componentClass as class };
 
-  export let onSendButtonClicked = () => {};
-  export let onUpdateRequestUrl;
-  export let onUpdateRequestMethod;
-  export let requestUrl;
-  export let httpMethod;
-  export let onUpdateRequestState;
-  export let splitterDirection;
+  export let requestUrl: string = "";
+  export let httpMethod: string = "";
+  export let splitterDirection: string = "";
+  export let onSendButtonClicked: SendRequestType;
+  export let onUpdateRequestUrl: UpdateRequestUrlType;
+  export let onUpdateRequestMethod: UpdateRequestMethodType;
+  export let onUpdateRequestState: UpdateRequestStateType;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);

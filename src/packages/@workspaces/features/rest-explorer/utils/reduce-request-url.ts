@@ -1,7 +1,7 @@
-import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
+import type { KeyValueChecked } from "@workspaces/shared/type";
 
 class ReduceRequestURL {
-  private queryParams: KeyValuePair[];
+  private queryParams: KeyValueChecked[];
   private requestHost;
   private extractURL(url: string) {
     let response = "";
@@ -31,7 +31,7 @@ class ReduceRequestURL {
       return [{ key: "", value: "", checked: false }];
     } else {
       const paramsArray = queryString.split("&");
-      const params = paramsArray.map((param) => {
+      const params: KeyValueChecked[] = paramsArray.map((param) => {
         const keyValue = param.split("=");
         if (keyValue.length === 1) {
           return { key: keyValue[0], value: "", checked: true };
@@ -39,8 +39,11 @@ class ReduceRequestURL {
           return { key: keyValue[0], value: keyValue[1], checked: true };
         }
       });
-
-      return [...params, { key: "", value: "", checked: false }];
+      const response: KeyValueChecked[] = [
+        ...params,
+        { key: "", value: "", checked: false },
+      ];
+      return response;
     }
   }
   constructor(url: string) {

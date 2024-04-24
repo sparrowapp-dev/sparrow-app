@@ -1,8 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { RequestSection } from "$lib/utils/enums";
-  export let requestStateSection;
-  export let onUpdateRequestState;
+  import type { UpdateRequestStateType } from "@workspaces/shared/type";
+  export let requestStateSection: string = "";
+  export let onUpdateRequestState: UpdateRequestStateType;
   const dispatch = createEventDispatcher();
 
   let tabs: {
