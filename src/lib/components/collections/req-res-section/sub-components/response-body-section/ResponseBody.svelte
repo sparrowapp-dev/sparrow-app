@@ -269,14 +269,14 @@
       </button>
     </div>
   </div>
-  <div class="w-100 mt-3 backgroundColor position-relative">
-    <CodeMirrorResponse
-      formatter={apiState.responseFormatter}
-      rawTab={apiState.responseRaw}
-      rawValue={response.body}
-      {currentTabId}
-    />
-  </div>
+</div>
+<div class="w-100 mt-3 backgroundColor position-relative">
+  <CodeMirrorResponse
+    formatter={apiState.responseFormatter}
+    rawTab={apiState.responseRaw}
+    rawValue={response.body}
+    {currentTabId}
+  />
 </div>
 
 <style>

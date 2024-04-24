@@ -35,49 +35,30 @@ class ApiSendRequestViewModel {
    * @param responseHeaders - Response header object
    * @param collectionsMethods - Methods object coming from Collection View Model
    */
-  public setResponseContentType = (
-    responseHeaders,
-    collectionsMethods: CollectionsMethods,
-  ): void => {
+  public setResponseContentType = (responseHeaders): string => {
     if (responseHeaders) {
-      for (const key in responseHeaders) {
-        if (
-          key === "content-type" &&
-          responseHeaders[key].includes("text/html")
-        ) {
-          collectionsMethods.updateRequestState(
-            RequestDataType.HTML,
-            "responseRaw",
-          );
+      for (let i = 0; i < responseHeaders.length; i++) {
+        const key = responseHeaders[i].key;
+        const value = responseHeaders[i].value;
+        if (key === "content-type" && value.includes("text/html")) {
+          return RequestDataType.HTML;
         } else if (
           key === "content-type" &&
-          responseHeaders[key].includes("application/json")
+          value.includes("application/json")
         ) {
-          collectionsMethods.updateRequestState(
-            RequestDataType.JSON,
-            "responseRaw",
-          );
+          return RequestDataType.JSON;
         } else if (
           key === "content-type" &&
-          responseHeaders[key].includes("application/xml")
+          value.includes("application/xml")
         ) {
-          collectionsMethods.updateRequestState(
-            RequestDataType.XML,
-            "responseRaw",
-          );
+          return RequestDataType.XML;
         } else if (
           key === "content-type" &&
-          responseHeaders[key].includes("application/javascript")
+          value.includes("application/javascript")
         ) {
-          collectionsMethods.updateRequestState(
-            RequestDataType.JAVASCRIPT,
-            "responseRaw",
-          );
+          return RequestDataType.JAVASCRIPT;
         } else if (key === "content-type") {
-          collectionsMethods.updateRequestState(
-            RequestDataType.TEXT,
-            "responseRaw",
-          );
+          return RequestDataType.TEXT;
         }
       }
     }

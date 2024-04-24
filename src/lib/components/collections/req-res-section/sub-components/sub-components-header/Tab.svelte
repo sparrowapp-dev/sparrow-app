@@ -56,6 +56,13 @@
    * @param index - Index of Tab
    */
   export let onDropOver: (index: number) => void;
+
+  function handleMouseDown(event) {
+    if (event.button === 1) {
+      // Check if the middle button is pressed (button code 1)
+      onTabClosed(tab.id, tab);
+    }
+  }
 </script>
 
 <div
@@ -70,6 +77,7 @@
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
+  on:mousedown={handleMouseDown}
 >
   <div
     class="w-100 d-flex justify-content-between ps-2 border-upper-radius"
@@ -122,7 +130,7 @@
       >
         {tab.name}
       </span>
-      {#if tab?.property?.request && (!tab?.property?.request?.save?.api || !tab?.property?.request?.save?.description)}
+      {#if tab?.property?.request && !tab?.isSaved}
         {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
           <span
             class="position-absolute"

@@ -122,7 +122,7 @@
     const filePathResponse = await invoke("fetch_file_command");
     if (filePathResponse !== "Canceled") {
       const filename = extractFileName(filePathResponse);
-      const updatedFilePath = "#@#" + filePathResponse;
+      const updatedFilePath = filePathResponse;
       let filteredPair = pairs.map((elem, i) => {
         if (i == index) {
           elem.value = filename;
@@ -172,7 +172,7 @@
   };
 </script>
 
-<div class="mt-3 mb-3 me-0 w-100">
+<div class="mb-3 me-0 w-100">
   <div class="d-flex gap-3 pb-2 align-items-center">
     <div style="width:30px;">
       <input

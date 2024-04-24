@@ -1,6 +1,5 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
-  import { RequestDataType } from "$lib/utils/enums/request.enum";
   import { isHorizontal } from "$lib/store/request-response-section";
   import {
     basicSetup,
@@ -14,24 +13,24 @@
   import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
   import { EditorView } from "codemirror";
+  import { createEventDispatcher } from "svelte";
 
-  export let currentTabId: string | undefined = undefined;
-  export let rawTab: RequestDataType | undefined = undefined;
-  export let rawValue: string | undefined = undefined;
-  export let handleRawChange: (data: string) => void = () => {};
+  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
+  export let value = "";
   export let codeMirrorStyle: "basic" | "url" = "basic";
-
-  let componentClass = "";
+  export let isEditable = true;
+  export let isPretty = false;
   export { componentClass as class };
 
-  let selectedTabId = currentTabId;
+  const dispatch = createEventDispatcher();
+
+  let componentClass = "";
   const languageConf = new Compartment();
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
-    rawValue = userInput;
-    handleRawChange(userInput);
+    dispatch("change", userInput);
   });
 
   function initalizeCodeMirrorEditor(value: string) {
@@ -42,6 +41,8 @@
         basicTheme,
         updateExtensionView,
         languageConf.of([]),
+        EditorView.lineWrapping, // Enable line wrapping
+        EditorState.readOnly.of(!isEditable ? true : false),
       ];
     } else if (codeMirrorStyle === "url") {
       extensions = [
@@ -49,6 +50,7 @@
         UrlInputTheme,
         updateExtensionView,
         languageConf.of([javascriptLanguage]),
+        EditorState.readOnly.of(!isEditable ? true : false),
       ];
     }
     let state = EditorState.create({
@@ -61,20 +63,10 @@
     });
   }
   onMount(() => {
-    initalizeCodeMirrorEditor(rawValue);
+    initalizeCodeMirrorEditor(value);
   });
   afterUpdate(() => {
-    if (selectedTabId !== currentTabId) {
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: rawValue,
-        },
-      });
-      selectedTabId = currentTabId;
-    }
-    CodeMirrorViewHandler(codeMirrorView, languageConf, rawTab);
+    CodeMirrorViewHandler(codeMirrorView, languageConf, lang, isPretty, value);
   });
 
   let isHorizontalMode: boolean;
@@ -102,7 +94,7 @@
   }
 
   .basic-codemirror {
-    height: calc(100vh - 360px);
+    height: 100%;
   }
 
   .url-codemirror {

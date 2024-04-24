@@ -17,18 +17,18 @@ const findAuthHeader = (
     value: "",
   };
   if (
-    request.state.auth === AuthType.BEARER_TOKEN &&
+    request.state.requestAuthNavigation === AuthType.BEARER_TOKEN &&
     request.auth.bearerToken
   ) {
     authValue.key = "Authorization";
     authValue.value = "Bearer " + request.auth.bearerToken;
-  } else if (request.state.auth === AuthType.BASIC_AUTH) {
+  } else if (request.state.requestAuthNavigation === AuthType.BASIC_AUTH) {
     authValue.key = "Authorization";
     authValue.value = `Basic ${btoa(
       request.auth.basicAuth.username + ":" + request.auth.basicAuth.password,
     )}`;
   } else if (
-    request.state.auth === AuthType.API_KEY &&
+    request.state.requestAuthNavigation === AuthType.API_KEY &&
     request.auth.apiKey.addTo === AuthSection.HEADER &&
     (request.auth.apiKey.authKey || request.auth.apiKey.authValue)
   ) {
@@ -52,7 +52,7 @@ const findAuthParameter = (
     value: "",
   };
   if (
-    request.state.auth === AuthType.API_KEY &&
+    request.state.requestAuthNavigation === AuthType.API_KEY &&
     request.auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
     (request.auth.apiKey.authKey || request.auth.apiKey.authValue)
   ) {
@@ -96,30 +96,33 @@ const setContentTypeHeader = (bodyType: string) => {
 const setBodyType = (request: NewTab, header: string) => {
   switch (header) {
     case ContentTypeEnum["application/json"]:
-      request.property.request.state.dataset = RequestDataset.RAW;
-      request.property.request.state.raw = RequestDataType.JSON;
+      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
+      request.property.request.state.requestBodyLanguage = RequestDataType.JSON;
       break;
     case ContentTypeEnum["application/xml"]:
-      request.property.request.state.dataset = RequestDataset.RAW;
-      request.property.request.state.raw = RequestDataType.XML;
+      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
+      request.property.request.state.requestBodyLanguage = RequestDataType.XML;
       break;
     case ContentTypeEnum["application/javascript"]:
-      request.property.request.state.dataset = RequestDataset.RAW;
-      request.property.request.state.raw = RequestDataType.JAVASCRIPT;
+      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
+      request.property.request.state.requestBodyLanguage =
+        RequestDataType.JAVASCRIPT;
       break;
     case ContentTypeEnum["text/plain"]:
-      request.property.request.state.dataset = RequestDataset.RAW;
-      request.property.request.state.raw = RequestDataType.TEXT;
+      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
+      request.property.request.state.requestBodyLanguage = RequestDataType.TEXT;
       break;
     case ContentTypeEnum["text/html"]:
-      request.property.request.state.dataset = RequestDataset.RAW;
-      request.property.request.state.raw = RequestDataType.HTML;
+      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
+      request.property.request.state.requestBodyLanguage = RequestDataType.HTML;
       break;
     case ContentTypeEnum["application/x-www-form-urlencoded"]:
-      request.property.request.state.dataset = RequestDataset.URLENCODED;
+      request.property.request.state.requestBodyNavigation =
+        RequestDataset.URLENCODED;
       break;
     case ContentTypeEnum["multipart/form-data"]:
-      request.property.request.state.dataset = RequestDataset.FORMDATA;
+      request.property.request.state.requestBodyNavigation =
+        RequestDataset.FORMDATA;
       break;
   }
   return request;

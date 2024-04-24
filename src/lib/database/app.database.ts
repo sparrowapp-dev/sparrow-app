@@ -128,18 +128,24 @@ export class RxDB {
       },
       tab: {
         schema: tabSchema,
-        migrationStrategies: {
-          // database  migration functions
-          1: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          2: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          3: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-        },
+        // migrationStrategies: {
+        //   // database  migration functions
+        //   1: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   2: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   3: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   4: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        //   5: function (oldDoc: TabDocument) {
+        //     return oldDoc;
+        //   },
+        // },
       },
       collection: {
         schema: collectionSchema,

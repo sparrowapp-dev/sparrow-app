@@ -3,7 +3,7 @@
   import folder from "$lib/assets/folder.svg";
   import collection from "$lib/assets/collection.svg";
   import { ItemType, RequestMethod } from "$lib/utils/enums";
-  export let type = ItemType.REQUEST;
+  export let type: ItemType = ItemType.REQUEST;
   export let name = "";
   export let method = RequestMethod.GET;
 </script>

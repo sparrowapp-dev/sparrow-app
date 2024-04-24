@@ -493,7 +493,7 @@
     onClosePopup={() => handleAddButton("importcURL")}
     {onImportCurl}
   />
-{/if}
+{/if} -->
 
 <style>
   .view-active {
