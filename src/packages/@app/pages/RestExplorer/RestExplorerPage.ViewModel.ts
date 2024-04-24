@@ -35,7 +35,7 @@ import {
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
-import { makeHttpRequest } from "$lib/api/api.common";
+import { makeHttpRequestV2 } from "$lib/api/api.common";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -420,7 +420,7 @@ class RestExplorerViewModel
       this._tab.getValue().property.request,
       [],
     );
-    makeHttpRequest(...decodeData)
+    makeHttpRequestV2(...decodeData)
       .then((response) => {
         if (response.isSuccessful === false) {
           this.updateResponse({
@@ -438,21 +438,22 @@ class RestExplorerViewModel
           ).length;
           const responseSizeKB = byteLength / 1024;
           const duration = end - start;
-          const responseBody = response.data.response;
-          const temp = Object.entries(response?.data?.headers || {});
-          const head = [];
-          temp.forEach((elem) => {
-            head.push({
+          const responseBody = response.data.body;
+          const formattedHeaders = Object.entries(
+            response?.data?.headers || {},
+          );
+          const responseHeaders = [];
+          formattedHeaders.forEach((elem) => {
+            responseHeaders.push({
               key: elem[0],
               value: elem[1],
             });
           });
-          let responseHeaders = head;
           let responseStatus = response.data.status;
-          const ct =
+          const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
           this.updateRequestState({
-            responseBodyLanguage: ct,
+            responseBodyLanguage: bodyLanguage,
             isSendRequestInProgress: false,
           });
 
