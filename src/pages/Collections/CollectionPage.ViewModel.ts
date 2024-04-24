@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-//-----
-// Local Database
 import type {
   CollectionDocument,
   EnvironmentDocument,
@@ -61,7 +58,6 @@ import {
 } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
 import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
-import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
 //-----
 
 //-----
@@ -98,7 +94,6 @@ import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { boolean } from "yup";
 import type { Observable } from "rxjs";
 
 export default class CollectionsViewModel {
@@ -447,7 +442,7 @@ export default class CollectionsViewModel {
    * @param collectionId :string - collection id to be deleted
    * @returns :void
    */
-  public deleteCollectioninWorkspace = (
+  private deleteCollectioninWorkspace = (
     workspaceId: string,
     collectionId: string,
   ) => {
@@ -461,7 +456,7 @@ export default class CollectionsViewModel {
    * Handles removing multiple tabs from tab
    * @param ids :string[] - the ids of tab to be removed
    */
-  public removeMultipleTabs = async (ids: string[]) => {
+  private removeMultipleTabs = async (ids: string[]) => {
     requestResponseStore.removeMultipleTabs(ids);
     this.debouncedTab();
   };
@@ -524,7 +519,7 @@ export default class CollectionsViewModel {
    * Adds collection to the repository
    * @param collection :CollectionDocument - the collection to be added
    */
-  public addCollection = (collection: CollectionDocument) => {
+  private addCollection = (collection: CollectionDocument) => {
     this.collectionRepository.addCollection(collection);
   };
 
@@ -562,7 +557,7 @@ export default class CollectionsViewModel {
    * Handle create empty collection
    * @param workspaceId :string
    */
-  public handleCreateCollection = async (
+  private handleCreateCollection = async (
     workspaceId: string,
     collection: Observable<CollectionDocument[]>,
   ) => {
@@ -670,7 +665,7 @@ export default class CollectionsViewModel {
   /**
    * Handle creating new empty api request
    */
-  public handleCreateApiRequest = () => {
+  private handleCreateApiRequest = () => {
     this.handleCreateTab(
       generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
     );
@@ -685,7 +680,7 @@ export default class CollectionsViewModel {
    * @param activeSync: boolean - if the active sync is enabled
    * @returns
    */
-  public importCollectionData = async (
+  private importCollectionData = async (
     workspaceId: string,
     url: ImportBodyUrl,
     activeSync: boolean,
@@ -703,7 +698,7 @@ export default class CollectionsViewModel {
    * @param file: Request - the file to be imported
    * @returns
    */
-  public importCollectionFile = async (workspaceId: string, file: Request) => {
+  private importCollectionFile = async (workspaceId: string, file: Request) => {
     return await this.collectionService.importCollectionFile(workspaceId, file);
   };
 
@@ -714,7 +709,7 @@ export default class CollectionsViewModel {
    * @param contentType: string - the type of content of jsonObject
    * @returns
    */
-  public importCollectionFromJsonObject = async (
+  private importCollectionFromJsonObject = async (
     workspaceId: string,
     jsonObject: string,
     contentType: ContentTypeEnum,
@@ -732,7 +727,7 @@ export default class CollectionsViewModel {
    * @param file: Request - the file to be imported
    * @returns
    */
-  public importCollectionFromFile = async (
+  private importCollectionFromFile = async (
     workspaceId: string,
     file: Request,
   ) => {
@@ -747,7 +742,7 @@ export default class CollectionsViewModel {
    * @param data: string - the data to be validated
    * @returns
    */
-  public validateImportBody = (data: string): ContentTypeEnum => {
+  private validateImportBody = (data: string): ContentTypeEnum => {
     let contentType: ContentTypeEnum;
     try {
       JSON.parse(data);
@@ -773,7 +768,7 @@ export default class CollectionsViewModel {
    * @param importJSON: string - Json object to import
    * @returns
    */
-  public handleImportJsonObject = async (
+  private handleImportJsonObject = async (
     workspaceId: string,
     contentType: string,
     importJSON: string,
@@ -832,7 +827,7 @@ export default class CollectionsViewModel {
    * @param validations : - the validations
    * @returns :void
    */
-  public handleImportUrl = async (
+  private handleImportUrl = async (
     workspaceId: string,
     requestBody: string,
     validations: any,
@@ -899,7 +894,8 @@ export default class CollectionsViewModel {
    * @param file :Request - the file(JSON or YAML) to be uploaded to extract data
    * @returns :void
    */
-  public handleFileUpload = async (workspaceId: string, file: Request) => {
+  private handleFileUpload = async (workspaceId: string, file: Request) => {
+    console.log("file, ", file);
     if (file) {
       const response = await this.importCollectionFromFile(workspaceId, file);
       if (response.isSuccessful) {
@@ -1006,12 +1002,12 @@ export default class CollectionsViewModel {
    * @param validations
    * @returns
    */
-  public handleImportCollection = async (
+  private handleImportCollection = async (
     workspaceId: string,
     importData: string,
     currentBranch: string,
     getBranchList: string[],
-    uploadCollection: string,
+    uploadCollection: any,
     validations: {
       activeSync: boolean;
       isRepositoryPath: boolean;
@@ -1136,7 +1132,7 @@ export default class CollectionsViewModel {
    * @param type: string: type string to be checked from enum
    * @returns Request Body Type
    */
-  public checkBodyType = (type: string) => {
+  private checkBodyType = (type: string) => {
     const contentTypeMapping: { [key: string]: string } = {
       "application/json": RequestDataType.JSON,
       "application/xml": RequestDataType.XML,
@@ -1154,7 +1150,7 @@ export default class CollectionsViewModel {
    * Handle Import Api using Curl
    * @param importCurl: string - Curl string
    */
-  public handleImportCurl = async (importCurl: string) => {
+  private handleImportCurl = async (importCurl: string) => {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
@@ -1213,7 +1209,7 @@ export default class CollectionsViewModel {
    * @param importData: string - data to be validated
    * @returns :{isimportDataLoading = boolean, isValidClientURL = boolean, isValidClientJSON = boolean, isValidClientXML = boolean, isValidServerURL = boolean, isValidServerJSON = boolean, isValidServerXML = boolean, isValidClientDeployedURL = boolean, isValidServerDeployedURL = boolean}
    */
-  public handleInputDataChange = async (importData: string) => {
+  public handleImportDataChange = async (importData: string) => {
     let isValidClientURL = false;
     let isValidClientJSON = false;
     let isValidClientXML = false;
@@ -1285,7 +1281,6 @@ export default class CollectionsViewModel {
         isValidServerXML = true;
       }
     }
-    isimportDataLoading = false;
 
     return {
       isValidClientURL,
@@ -1296,7 +1291,6 @@ export default class CollectionsViewModel {
       isValidServerXML,
       isValidClientDeployedURL,
       isValidServerDeployedURL,
-      isimportDataLoading,
     };
   };
 
@@ -1318,7 +1312,7 @@ export default class CollectionsViewModel {
    * @param name :string - name of new element
    * @returns :string - new proposed name of new collection, folder or request
    */
-  public getNextName: (
+  private getNextName: (
     list: any[],
     type: string,
     name: string,
@@ -1349,7 +1343,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument - the collection in which new request is going to be created
    * @returns :void
    */
-  public handleCreateRequestInCollection = async (
+  private handleCreateRequestInCollection = async (
     workspaceId: string,
     collection: CollectionDocument,
   ) => {
@@ -1428,7 +1422,7 @@ export default class CollectionsViewModel {
    * @param explorer : - the folder in which new request is going to be created
    * @returns :void
    */
-  public handleCreateRequestInFolder = async (
+  private handleCreateRequestInFolder = async (
     workspaceId: string,
     collection: CollectionDocument,
     explorer: Folder,
@@ -1497,7 +1491,7 @@ export default class CollectionsViewModel {
 
       sampleRequest.id = request.id;
       sampleRequest.path.workspaceId = workspaceId;
-      sampleRequest.path.collectionId = collectionId;
+      sampleRequest.path.collectionId = collection.id;
       sampleRequest.path.folderId = explorer.id;
       sampleRequest.path.folderName = explorer.name;
       sampleRequest.property.request.save.api = true;
@@ -1518,7 +1512,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument - the collection in which new folder is going to be created
    * @returns :void
    */
-  public handleCreateFolderInCollection = async (
+  private handleCreateFolderInCollection = async (
     workspaceId: string,
     collection: CollectionDocument,
   ): Promise<void> => {
@@ -1602,7 +1596,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument - the collection going to be renamed
    * @param newCollectionName :string - the new name of the collection
    */
-  public handleRenameCollection = async (
+  private handleRenameCollection = async (
     workspaceId: string,
     collection: CollectionDocument,
     newCollectionName: string,
@@ -1636,7 +1630,7 @@ export default class CollectionsViewModel {
    * @param explorer : - the folder going to be renamed
    * @param newFolderName :string - the new name of the folder
    */
-  public handleRenameFolder = async (
+  private handleRenameFolder = async (
     workspaceId: string,
     collection: CollectionDocument,
     explorer: Folder,
@@ -1677,11 +1671,22 @@ export default class CollectionsViewModel {
    * @param request : - The request going to be opened on tab
    * @param path : - The path to the request
    */
-  public handleOpenRequestOnTab = (request: Request, path: Path) => {
+  public handleOpenRequest = (
+    workspaceId: string,
+    collection: CollectionDocument,
+    folder: Folder,
+    request: Request,
+  ) => {
     let _request: any = generateSampleRequest(
       request.id,
       new Date().toString(),
     );
+    const path: Path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id ?? "",
+      folderId: folder?.id,
+      folderName: folder.name,
+    };
     _request.path = path;
     _request.name = request.name;
     if (request.description) _request.description = request.description;
@@ -1713,6 +1718,66 @@ export default class CollectionsViewModel {
     moveNavigation("right");
   };
 
+  public handleOpenFolder = (
+    workspaceId: string,
+    collection: CollectionDocument,
+    folder: Folder,
+  ) => {
+    const path: Path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id ?? "",
+      folderId: folder?.id,
+      folderName: folder.name,
+    };
+
+    const sampleFolder = generateSampleFolder(folder.id, new Date().toString());
+
+    sampleFolder.id = folder.id;
+    sampleFolder.path = path;
+    sampleFolder.name = folder.name;
+    sampleFolder.save = true;
+    sampleFolder.activeSync = collection.activeSync;
+    sampleFolder.source = !folder?.source ? "SPEC" : folder?.source;
+    sampleFolder.isDeleted = folder?.isDeleted;
+
+    this.handleCreateTab(sampleFolder);
+    moveNavigation("right");
+  };
+
+  public handleOpenCollection = (
+    workspaceId: string,
+    collection: CollectionDocument,
+  ) => {
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    collection.items.map((item) => {
+      if (item.type === ItemType.REQUEST) {
+        totalRequest++;
+      } else {
+        totalFolder++;
+        totalRequest += item.items.length;
+      }
+    });
+
+    const path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id ?? "",
+    };
+
+    const sampleCollection = generateSampleCollection(
+      collection.id,
+      new Date().toString(),
+    );
+
+    sampleCollection.id = collection.id;
+    sampleCollection.path = path;
+    sampleCollection.name = collection.name;
+    sampleCollection.property.collection.requestCount = totalRequest;
+    sampleCollection.property.collection.folderCount = totalFolder;
+    sampleCollection.save = true;
+    this.handleCreateTab(sampleCollection);
+    moveNavigation("right");
+  };
   /**
    * Handles renaming a request
    * @param workspaceId :string
@@ -1721,7 +1786,7 @@ export default class CollectionsViewModel {
    * @param request : - the request which is going to be renamed
    * @param newRequestName : - the new name of the request
    */
-  public handleRenameRequest = async (
+  private handleRenameRequest = async (
     workspaceId: string,
     collection: CollectionDocument,
     folder: Folder,
@@ -1832,7 +1897,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument - the collection going to be deleted
    * @param deletedIds :[string] | [] - the IDs of the collection to be deleted
    */
-  public handleDeleteCollection = async (
+  private handleDeleteCollection = async (
     workspaceId: string,
     collection: CollectionDocument,
     deletedIds: string[] | [],
@@ -1861,7 +1926,7 @@ export default class CollectionsViewModel {
    * @param explorer : - the folder to be deleted
    * @param requestIds : - the request IDs saved inside the folder
    */
-  public handleDeleteFolder = async (
+  private handleDeleteFolder = async (
     workspaceId: string,
     collection: CollectionDocument,
     explorer: Folder,
@@ -1905,7 +1970,7 @@ export default class CollectionsViewModel {
    * @param folder : - The folder in which the request is saved(if is saved in a folder)
    * @returns :void
    */
-  public handleDeleteRequest = async (
+  private handleDeleteRequest = async (
     workspaceId: string,
     collection: CollectionDocument,
     request: Request,
@@ -2127,12 +2192,31 @@ export default class CollectionsViewModel {
           args.importData,
           args.currentBranch,
           args.getBranchList,
-          args.updateCollection,
+          args.uploadCollection,
           args.validations,
         );
         break;
       case "curl":
         this.handleImportCurl(args.importCurl);
+        break;
+    }
+  };
+
+  public handleOpenItem = async (entitytype: string, args: any) => {
+    switch (entitytype) {
+      case "collection":
+        this.handleOpenCollection(args.workspaceId, args.collection);
+        break;
+      case "folder":
+        this.handleOpenFolder(args.workspaceId, args.collection, args.folder);
+        break;
+      case "request":
+        this.handleOpenRequest(
+          args.workspaceId,
+          args.collection,
+          args.folder,
+          args.request,
+        );
         break;
     }
   };

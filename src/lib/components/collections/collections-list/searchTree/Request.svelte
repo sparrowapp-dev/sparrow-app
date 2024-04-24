@@ -1,8 +1,12 @@
 <script lang="ts">
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
+  import type { Observable } from "rxjs";
   export let explorer: any;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let onItemOpened: (entityType: string, args: any) => void;
   export let searchData: string = "";
   export let getIndex: (text: string, searchData: string) => number;
   export let folderDetails: { id: string; name: string };
@@ -13,16 +17,14 @@
   class="d-flex align-items-center api-request p-1 bg-transparent border-0"
   style="height: {explorer.path !== '' ? '40px' : '32px'}; text-align: left;"
   on:click={() => {
-    handleRequestClick(
-      request,
-      {
-        collectionId: explorer.collectionId,
-        workspaceId: explorer.workspaceId,
-        folderId: folderDetails.id ? folderDetails.id : "",
-        folderName: folderDetails.name ? folderDetails.name : "",
+    onItemOpened("request", {
+      workspaceId: $currentWorkspace._id,
+      collection: {
+        id: request.collectionId,
       },
-      explorer.activeSync,
-    );
+      folder: folderDetails,
+      request,
+    });
   }}
 >
   <div class="api-method text-{getMethodStyle(request.request.method)}">

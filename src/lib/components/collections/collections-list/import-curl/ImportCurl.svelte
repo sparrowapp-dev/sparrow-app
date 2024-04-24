@@ -7,7 +7,7 @@
   };
 
   export let onClosePopup: () => void;
-  export let onImportItem: (entityType: string, args: any) => void;
+  export let onItemImported: (entityType: string, args: any) => void;
 </script>
 
 <ModalWrapperV1
@@ -31,7 +31,7 @@
   <button
     class="btn-primary d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded"
     on:click={() => {
-      onImportItem("curl", { importCurl });
+      onItemImported("curl", { importCurl });
       onClosePopup();
     }}
   >

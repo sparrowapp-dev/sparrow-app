@@ -1,16 +1,17 @@
 <script lang="ts">
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let onCreateItem: (entityType: string, args: any) => void;
-  export let onDeleteItem: (entityType: string, args: any) => void;
-  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onItemCreated: (entityType: string, args: any) => void;
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onItemOpened: (entityType: string, args: any) => void;
   export let onOpenRequestOnTab: (request: any, path: Path) => void;
-  export let onBranchSwitch: (collection: CollectionDocument) => void;
+  export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let getActiveTab: () => Writable<{}>;
-  export let getUserRoleInWorkspace: () => WorkspaceRole;
+  export let activeTab: Writable<{}>;
+  export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
 
   import angleRight from "$lib/assets/angleRight.svg";
@@ -48,10 +49,6 @@
   let requestCount = 0;
   let folderCount = 0;
   let showFolderAPIButtons: boolean = true;
-  let activeTab: any;
-  const activeTabSubscriber = getActiveTab().subscribe(
-    (value) => (activeTab = value),
-  );
   const commonService = new CommonService();
   let visibility = false;
   let isActiveSyncEnabled = false;
@@ -105,22 +102,9 @@
     showMenu = false;
   }
 
-  /**
-   * Handle opening collection
-   */
-  function openCollections() {
-    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-      handleCollectionClick(collection, collection.workspaceId, collection.id);
-    }
-    if (!visibility) {
-      visibility = !visibility;
-    }
-    showMenu = false;
-  }
-
   $: {
-    if (activeTab?.activePath) {
-      if (activeTab?.activePath.collection.id === collection.id) {
+    if ($activeTab?.activePath) {
+      if ($activeTab?.activePath.collection.id === collection.id) {
         visibility = true;
       }
     }
@@ -147,7 +131,7 @@
 
   onMount(async () => {
     if (collection?.activeSync) {
-      let response = await onBranchSwitch(collection);
+      let response = await onBranchSwitched(collection);
       if (response) {
         isBranchSynced = response.isBranchSynced;
         activeSyncLoad = response.activeSyncLoad;
@@ -163,13 +147,13 @@
   $: {
     if (collection?.activeSync && collection?.currentBranch) {
       if (collection.currentBranch !== prevCurrentBranch) {
-        onBranchSwitch(collection);
+        onBranchSwitched(collection);
       }
       prevCurrentBranch = collection.currentBranch;
     }
     if (collection?.activeSync && collection?.branches) {
       if (JSON.stringify(collection.branches) !== prevBranches) {
-        onBranchSwitch(collection);
+        onBranchSwitched(collection);
       }
       prevBranches = JSON.stringify(collection.branches);
     }
@@ -232,7 +216,7 @@
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
-        onDeleteItem("collection", {
+        onItemDeleted("collection", {
           workspaceId: $currentWorkspace._id,
           collection,
           deletedIds,
@@ -249,7 +233,11 @@
     yAxis={pos.y}
     menuItems={[
       {
-        onClick: openCollections,
+        onClick: () =>
+          onItemOpened("collection", {
+            workspaceId: $currentWorkspace._id,
+            collection,
+          }),
         displayText: "Open collection",
         disabled: false,
         hidden: false,
@@ -268,7 +256,7 @@
       },
       {
         onClick: () =>
-          onCreateItem("requestCollection", {
+          onItemCreated("requestCollection", {
             workspaceId: $currentWorkspace._id,
             collection,
           }),
@@ -283,7 +271,7 @@
       },
       {
         onClick: () =>
-          onCreateItem("folder", {
+          onItemCreated("folder", {
             workspaceId: $currentWorkspace._id,
             collection,
           }),
@@ -332,11 +320,10 @@
       isCollectionCreatedFirstTime.set(false);
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        handleCollectionClick(
+        onItemOpened("collection", {
+          workspaceId: $currentWorkspace._id,
           collection,
-          collection.workspaceId,
-          collection.id,
-        );
+        });
       }
     }}
   >
@@ -358,7 +345,7 @@
         maxlength={100}
         bind:this={inputField}
         on:blur={(e) => {
-          onRenameItem("collection", {
+          onItemRenamed("collection", {
             workspaceId: $currentWorkspace._id,
             collection,
             newName: e?.target?.value,
@@ -367,7 +354,7 @@
         }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
-            onRenameItem("collection", {
+            onItemRenamed("collection", {
               workspaceId: $currentWorkspace._id,
               collection,
               newName: e?.target?.value,
@@ -461,13 +448,14 @@
         {#each collection.items as explorer}
           <Folder
             {currentWorkspace}
-            {onCreateItem}
-            {onDeleteItem}
-            {onRenameItem}
+            {onItemCreated}
+            {onItemDeleted}
+            {onItemRenamed}
+            {onItemOpened}
             {onOpenRequestOnTab}
             {collection}
-            {getUserRoleInWorkspace}
-            {getActiveTab}
+            {userRoleInWorkspace}
+            {activeTab}
             {explorer}
           />
         {/each}
@@ -476,7 +464,7 @@
             <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
-                getUserRoleInWorkspace(),
+                userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
               )
                 ? PERMISSION_NOT_FOUND_TEXT
@@ -486,7 +474,7 @@
               <button
                 class="bg-transparent border-0"
                 on:click={() =>
-                  onCreateItem("folder", {
+                  onItemCreated("folder", {
                     workspaceId: $currentWorkspace._id,
                     collection,
                   })}
@@ -501,7 +489,7 @@
             <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
-                getUserRoleInWorkspace(),
+                userRoleInWorkspace,
                 workspaceLevelPermissions.SAVE_REQUEST,
               )
                 ? PERMISSION_NOT_FOUND_TEXT
@@ -511,7 +499,7 @@
               <button
                 class="bg-transparent border-0"
                 on:click={() =>
-                  onCreateItem("requestCollection", {
+                  onItemCreated("requestCollection", {
                     workspaceId: $currentWorkspace._id,
                     collection,
                   })}

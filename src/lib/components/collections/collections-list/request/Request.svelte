@@ -1,7 +1,8 @@
 <script lang="ts">
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let onDeleteItem: (entityType: string, args: any) => void;
-  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onItemOpened: (entityType: string, args: any) => void;
   export let onOpenRequestOnTab: (request: Request, path: Path) => void;
   export let collection: CollectionDocument;
   export let folder: Folder;
@@ -116,7 +117,7 @@
       loader={deleteLoader}
       onClick={() => {
         deleteLoader = true;
-        onDeleteItem("request", {
+        onItemDeleted("request", {
           workspaceId: $currentWorkspace._id,
           collection,
           request: api,
@@ -136,7 +137,14 @@
     menuItems={[
       {
         onClick: () => {
-          onOpenRequestOnTab(api, path);
+          onItemOpened("request", {
+            workspaceId: $currentWorkspace._id,
+            collection: {
+              id: collection.id,
+            },
+            folder,
+            request: api,
+          });
         },
         displayText: "Open Request",
         disabled: false,
@@ -188,7 +196,14 @@
 >
   <button
     on:click={() => {
-      onOpenRequestOnTab(api, path);
+      onItemOpened("request", {
+        workspaceId: $currentWorkspace._id,
+        collection: {
+          id: a,
+        },
+        folder,
+        request: api,
+      });
     }}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
@@ -223,7 +238,7 @@
         value={newRequestName}
         bind:this={inputField}
         on:blur={(e) => {
-          onRenameItem("request", {
+          onItemRenamed("request", {
             workspaceId: $currentWorkspace._id,
             collection,
             folder,
@@ -234,7 +249,7 @@
         }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
-            onRenameItem("request", {
+            onItemRenamed("request", {
               workspaceId: $currentWorkspace._id,
               collection,
               folder: folder ? folder : { id: "" },

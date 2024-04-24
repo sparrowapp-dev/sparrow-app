@@ -2,12 +2,13 @@
   import folder from "$lib/assets/folder.svg";
   import Request from "$lib/components/collections/collections-list/searchTree/Request.svelte";
   import collectionIcon from "$lib/assets/collection-icon.svg";
-  import {
-    handleCollectionClick,
-    handleFolderClick,
-  } from "$lib/utils/helpers/handle-clicks.helper";
+  import type { Observable } from "rxjs";
+  import type { WorkspaceDocument } from "$lib/database/app.database";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
+
+  export let onItemOpened: (entityType: string, args: any) => void;
+  export let currentWorkspace: Observable<WorkspaceDocument>;
   export let explorer: any;
   export let explorerData: any;
   export let searchData: string = "";
@@ -24,12 +25,14 @@
         class="folder rounded d-flex align-items-center p-1 bg-transparent border-0 text-left"
         on:click={() => {
           folderExpand = !folderExpand;
-          handleFolderClick(
-            explorerData,
-            explorer.workspaceId,
-            explorer.collectionId,
-            explorer.activeSync,
-          );
+          onItemOpened("folder", {
+            workspaceId: $currentWorkspace._id,
+            collection: {
+              id: explorer.collectionId,
+              activeSync: explorer.activeSync,
+            },
+            folder: explorerData,
+          });
         }}
       >
         <img src={folder} alt="" style="height:16px; width:16px;" />
@@ -69,6 +72,8 @@
     >
       <Request
         {explorer}
+        {currentWorkspace}
+        {onItemOpened}
         request={explorerData}
         {searchData}
         {getIndex}
@@ -80,11 +85,10 @@
       class="bg-transparent border-0 w-100"
       style="cursor:pointer;"
       on:click={() => {
-        handleCollectionClick(
-          explorerData,
-          explorer.workspaceId,
-          explorer.collectionId,
-        );
+        onItemOpened("collection", {
+          workspaceId: $currentWorkspace._id,
+          collection: explorerData,
+        });
       }}
     >
       <button

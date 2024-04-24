@@ -8,7 +8,7 @@
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
-  export let getUserRoleInWorkspace: () => WorkspaceRole;
+  export let userRoleInWorkspace: WorkspaceRole;
   export let onImportCollectionPopup: () => void;
   export let handleCreateApiRequest: () => void;
 </script>
@@ -25,7 +25,7 @@ font-weight: 300;"
     <Tooltip
       title={PERMISSION_NOT_FOUND_TEXT}
       show={!hasWorkpaceLevelPermission(
-        getUserRoleInWorkspace(),
+        userRoleInWorkspace,
         workspaceLevelPermissions.ADD_ENVIRONMENT,
       )}
       placement="top"
@@ -33,7 +33,7 @@ font-weight: 300;"
     >
       <button
         disabled={!hasWorkpaceLevelPermission(
-          getUserRoleInWorkspace(),
+          userRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
         class="buttons w-100 d-flex mb-3 justify-content-center align-items-center gap-1"
@@ -43,7 +43,7 @@ font-weight: 300;"
       >
         <Plus
           color={!hasWorkpaceLevelPermission(
-            getUserRoleInWorkspace(),
+            userRoleInWorkspace,
             workspaceLevelPermissions.ADD_ENVIRONMENT,
           )
             ? "gray"

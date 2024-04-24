@@ -1,12 +1,13 @@
 <script lang="ts">
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let onCreateItem: (entityType: string, args: any) => void;
-  export let onDeleteItem: (entityType: string, args: any) => void;
-  export let onRenameItem: (entityType: string, args: any) => void;
+  export let onItemCreated: (entityType: string, args: any) => void;
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onItemOpened: (entityType: string, args: any) => void;
   export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
   export let collection: CollectionDocument;
-  export let getUserRoleInWorkspace: () => WorkspaceRole;
-  export let getActiveTab: () => Writable<{}>;
+  export let userRoleInWorkspace: WorkspaceRole;
+  export let activeTab: Writable<{}>;
   export let explorer: Folder;
   export let folder: Folder | null = null;
 
@@ -57,11 +58,11 @@
   let requestCount: number;
   let requestIds: [string] | [] = [];
   $: {
-    // if (activePath) {
-    //   if (activePath.folderId === explorer.id) {
-    //     expand = true;
-    //   }
-    // }
+    if ($activeTab?.activePath) {
+      if ($activeTab?.activePath?.folderId === explorer.id) {
+        expand = true;
+      }
+    }
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -141,7 +142,7 @@
         loader={deleteLoader}
         onClick={() => {
           deleteLoader = true;
-          onDeleteItem("folder", {
+          onItemDeleted("folder", {
             workspaceId: $currentWorkspace._id,
             collection,
             folder: explorer,
@@ -160,7 +161,16 @@
       yAxis={pos.y}
       menuItems={[
         {
-          onClick: () => (expand = true),
+          onClick: () => {
+            expand = true;
+            if (expand) {
+              onItemOpened("folder", {
+                workspaceId: $currentWorkspace._id,
+                collection,
+                folder: explorer,
+              });
+            }
+          },
           displayText: "Open Folder",
           disabled: false,
           hidden: false,
@@ -181,7 +191,7 @@
         {
           onClick: () => {
             expand = true;
-            onCreateItem("requestFolder", {
+            onItemCreated("requestFolder", {
               workspaceId: $currentWorkspace._id,
               collection,
               folder: explorer,
@@ -229,12 +239,11 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
-                handleFolderClick(
-                  explorer,
-                  $currentWorkspace._id,
-                  collection.id,
-                  collection.activeSync,
-                );
+                onItemOpened("folder", {
+                  workspaceId: $currentWorkspace._id,
+                  collection,
+                  folder: explorer,
+                });
               }
             }
           }}
@@ -257,7 +266,7 @@
               maxlength={100}
               value={explorer.name}
               on:blur={(e) => {
-                onRenameItem("folder", {
+                onItemRenamed("folder", {
                   workspaceId: $currentWorkspace._id,
                   collection,
                   folder: explorer,
@@ -267,7 +276,7 @@
               }}
               on:keydown={(e) => {
                 if (e.key === "Enter") {
-                  onRenameItem("folder", {
+                  onItemRenamed("folder", {
                     workspaceId: $currentWorkspace._id,
                     collection,
                     folder: explorer,
@@ -337,13 +346,14 @@
           {#each explorer.items as exp}
             <svelte:self
               {currentWorkspace}
-              {onCreateItem}
-              {onDeleteItem}
-              {onRenameItem}
+              {onItemCreated}
+              {onItemDeleted}
+              {onItemRenamed}
+              {onItemOpened}
               {onOpenRequestOnTab}
               {collection}
-              {getUserRoleInWorkspace}
-              {getActiveTab}
+              {userRoleInWorkspace}
+              {activeTab}
               explorer={exp}
               folder={explorer}
             />
@@ -354,7 +364,7 @@
                 classProp="mt-2 mb-2 ms-0"
                 title={PERMISSION_NOT_FOUND_TEXT}
                 show={!hasWorkpaceLevelPermission(
-                  getUserRoleInWorkspace(),
+                  userRoleInWorkspace,
                   workspaceLevelPermissions.SAVE_REQUEST,
                 )}
               >
@@ -363,7 +373,7 @@
                   src={requestIcon}
                   alt="+ API Request"
                   on:click={() => {
-                    onCreateItem("requestFolder", {
+                    onItemCreated("requestFolder", {
                       workspaceId: $currentWorkspace._id,
                       collection,
                       folder: explorer,
@@ -383,9 +393,9 @@
         <Request
           api={explorer}
           {currentWorkspace}
-          {onRenameItem}
-          {onDeleteItem}
-          {onOpenRequestOnTab}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
           {folder}
           {collection}
         />

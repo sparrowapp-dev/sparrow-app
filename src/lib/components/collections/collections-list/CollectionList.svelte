@@ -1,10 +1,12 @@
 <script lang="ts">
   export let collectionList: Observable<CollectionDocument[]>;
   export let environmentList: Observable<EnvironmentDocument[]>;
-  export let onCreateItem: (entityType: string, args: any) => void;
-  export let onDeleteItem: (entityType: string, args: any) => void;
-  export let onRenameItem: (entityType: string, args: any) => void;
-  export let onImportItem: (entityType: string, args: any) => void;
+  export let showImportCollectionPopup: () => void;
+  export let onItemCreated: (entityType: string, args: any) => void;
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onItemImported: (entityType: string, args: any) => void;
+  export let onItemOpened: (entityType: string, args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
     searchData: string,
@@ -14,44 +16,13 @@
     filteredFolder: Folder[];
   };
   export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
-  export let onBranchSwitch: (collection: CollectionDocument) => void;
-  export let onInputDataChange: (importData: string) => Promise<{
-    isValidClientURL: boolean;
-    isValidClientJSON: boolean;
-    isValidClientXML: boolean;
-    isValidServerURL: boolean;
-    isValidServerJSON: boolean;
-    isValidServerXML: boolean;
-    isValidClientDeployedURL: boolean;
-    isValidServerDeployedURL: boolean;
-    isimportDataLoading: boolean;
-  }>;
-  export let onUploadFile: () => Promise<
-    | undefined
-    | {
-        repositoryPath: string;
-        currentBranch: string;
-        repositoryBranch: string;
-        getBranchList: string[];
-        isRepositoryPath: boolean;
-      }
-  >;
-  export let onExtractGitBranch: (filePath: string) => Promise<
-    | undefined
-    | {
-        repositoryPath: string;
-        currentBranch: string;
-        repositoryBranch: string;
-        getBranchList: string[];
-        isRepositoryPath: boolean;
-      }
-  >;
+  export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let getActiveTab: () => Writable<{}>;
-  export let getUserRoleInWorkspace: () => WorkspaceRole;
+  export let activeTab: Writable<{}>;
+  export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let currentEnvironment: Observable<EnvironmentDocument>;
 
@@ -67,7 +38,6 @@
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import Select from "$lib/components/inputs/select/Select.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import ImportCollection from "./import-collection/ImportCollection.svelte";
   import ImportCurl from "./import-curl/ImportCurl.svelte";
   import List from "$lib/components/list/List.svelte";
   import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
@@ -115,20 +85,6 @@
       selectedApiMethods = value;
     }
   });
-
-  /**
-   * Handle add button
-   * @param id: string - collection | importURL | apiRequest
-   */
-  const handleAddButton = (id: string) => {
-    if (id === "collection") {
-      isImportCollectionPopup = !isImportCollectionPopup;
-    } else if (id === "importcURL") {
-      isImportCurlPopup = !isImportCurlPopup;
-    } else if (id === "apiRequest") {
-      onCreateItem("request", {});
-    }
-  };
 
   /**
    * Handle searching and filtering
@@ -298,7 +254,15 @@
               dynamicClasses: "text-whiteColor mt-1",
             },
           ]}
-          onclick={handleAddButton}
+          onclick={(tab) => {
+            if (tab === "collection") {
+              showImportCollectionPopup();
+            } else if (tab === "importcURL") {
+              isImportCurlPopup = !isImportCurlPopup;
+            } else if (tab === "apiRequest") {
+              onItemCreated("request", {});
+            }
+          }}
           staticClasses={[
             {
               id: "collectionDropdown-img",
@@ -334,6 +298,8 @@
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
+                    {currentWorkspace}
+                    {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
                     {searchData}
@@ -343,6 +309,8 @@
               {#if filteredFolder.length > 0}
                 {#each filteredFolder as exp}
                   <SearchTree
+                    {currentWorkspace}
+                    {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
                     {searchData}
@@ -352,6 +320,8 @@
               {#if filteredCollection.length > 0}
                 {#each filteredCollection as exp}
                   <SearchTree
+                    {currentWorkspace}
+                    {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
                     {searchData}
@@ -369,14 +339,15 @@
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
                   {currentWorkspace}
-                  {onCreateItem}
-                  {onDeleteItem}
-                  {onRenameItem}
-                  {onBranchSwitch}
+                  {onItemCreated}
+                  {onItemDeleted}
+                  {onItemRenamed}
+                  {onItemOpened}
+                  {onBranchSwitched}
                   {onOpenRequestOnTab}
                   {onRefetchCollection}
-                  {getUserRoleInWorkspace}
-                  {getActiveTab}
+                  {userRoleInWorkspace}
+                  {activeTab}
                   collection={col._data}
                 />
               {/each}
@@ -392,14 +363,15 @@
                 {#each collectionListDocument as col}
                   <Collection
                     {currentWorkspace}
-                    {onCreateItem}
-                    {onDeleteItem}
-                    {onRenameItem}
-                    {onBranchSwitch}
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {onBranchSwitched}
                     {onOpenRequestOnTab}
                     {onRefetchCollection}
-                    {getUserRoleInWorkspace}
-                    {getActiveTab}
+                    {userRoleInWorkspace}
+                    {activeTab}
                     collection={col}
                   />
                 {/each}
@@ -408,9 +380,9 @@
           {:else}
             <EmptyCollection
               {currentWorkspace}
-              {getUserRoleInWorkspace}
-              handleCreateApiRequest={() => handleAddButton("apiRequest")}
-              onImportCollectionPopup={() => handleAddButton("collection")}
+              {userRoleInWorkspace}
+              handleCreateApiRequest={() => onItemCreated("request", {})}
+              onImportCollectionPopup={showImportCollectionPopup}
             />
           {/if}
         {/if}
@@ -420,26 +392,6 @@
       </div>
     </div>
   </div>
-{/if}
-{#if isImportCollectionPopup}
-  <ImportCollection
-    onImportCollectionPopup={() => handleAddButton("collection")}
-    {collectionList}
-    {currentWorkspace}
-    {onCreateItem}
-    {onImportItem}
-    {onInputDataChange}
-    {onUploadFile}
-    {onExtractGitBranch}
-  />
-{/if}
-{#if isImportCurlPopup}
-  <!-- <ImportCurl onClick={handleImportCurlPopup} {collectionsMethods} /> -->
-  <ImportCurl
-    onClosePopup={() => handleAddButton("importcURL")}
-    {currentWorkspace}
-    {onImportItem}
-  />
 {/if}
 
 <style>

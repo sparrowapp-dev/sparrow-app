@@ -16,6 +16,7 @@
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import CollectionList from "$lib/components/collections/collections-list/CollectionList.svelte";
+  import ImportCollection from "$lib/components/collections/collections-list/import-collection/ImportCollection.svelte";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -34,6 +35,7 @@
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
+  import ImportCurl from "$lib/components/collections/collections-list/import-curl/ImportCurl.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -47,7 +49,8 @@
   let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab: NewTab;
   let isPopupClosed: boolean = false;
-  let saveAsVisibility: boolean = false;
+  let isImportCollectionPopup: boolean = false;
+  let isImportCurlPopup: boolean = false;
   let loader = false;
   let currentEnvironment: EnvironmentDocument;
 
@@ -134,20 +137,18 @@
       {collectionList}
       {environmentList}
       {currentEnvironment}
-      onCreateItem={_viewModel.handleCreateItem}
-      onDeleteItem={_viewModel.handleDeleteItem}
-      onRenameItem={_viewModel.handleRenameItem}
-      onImportItem={_viewModel.handleImportItem}
-      onOpenRequestOnTab={_viewModel.handleOpenRequestOnTab}
-      onBranchSwitch={_viewModel.handleBranchSwitch}
-      onInputDataChange={_viewModel.handleInputDataChange}
-      onUploadFile={_viewModel.uploadFormFile}
-      onExtractGitBranch={_viewModel.extractGitBranch}
+      {currentWorkspace}
+      userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
+      activeTab={_viewModel.getActiveTab()}
+      showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+      onItemCreated={_viewModel.handleCreateItem}
+      onItemDeleted={_viewModel.handleDeleteItem}
+      onItemRenamed={_viewModel.handleRenameItem}
+      onItemImported={_viewModel.handleImportItem}
+      onItemOpened={_viewModel.handleOpenItem}
+      onBranchSwitched={_viewModel.handleBranchSwitch}
       onRefetchCollection={_viewModel.handleRefetchCollection}
       onSearchCollection={_viewModel.handleSearchCollection}
-      getActiveTab={_viewModel.getActiveTab}
-      getUserRoleInWorkspace={_viewModel.getUserRoleInWorspace}
-      {currentWorkspace}
     />
   </Pane>
   <Pane size={$collapsibleState ? 100 : $collectionRightPanelWidth}>
@@ -179,6 +180,27 @@
   )}
   {loader}
 />
+
+{#if isImportCollectionPopup}
+  <ImportCollection
+    {collectionList}
+    {currentWorkspace}
+    closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
+    onItemCreated={_viewModel.handleCreateItem}
+    onItemImported={_viewModel.handleImportItem}
+    onImportDataChange={_viewModel.handleImportDataChange}
+    onUploadFile={_viewModel.uploadFormFile}
+    onExtractGitBranch={_viewModel.extractGitBranch}
+  />
+{/if}
+
+{#if isImportCurlPopup}
+  <ImportCurl
+    onClosePopup={() => (isImportCurlPopup = false)}
+    {currentWorkspace}
+    onItemImported={_viewModel.handleImportItem}
+  />
+{/if}
 
 <style>
 </style>

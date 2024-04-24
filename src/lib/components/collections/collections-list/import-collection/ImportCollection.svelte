@@ -7,12 +7,17 @@
   import { debounce } from "../collection/collection-utils/utils";
   import Button from "$lib/components/buttons/Button.svelte";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
+  import type { Observable } from "rxjs";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "$lib/database/app.database";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let onCreateItem: (entityType: string, args: any) => void;
-  export let onImportItem: (entityType: string, args: any) => void;
-  export let onInputDataChange: (importData: string) => Promise<{
+  export let onItemCreated: (entityType: string, args: any) => void;
+  export let onItemImported: (entityType: string, args: any) => void;
+  export let onImportDataChange: (importData: string) => Promise<{
     isValidClientURL: boolean;
     isValidClientJSON: boolean;
     isValidClientXML: boolean;
@@ -21,7 +26,6 @@
     isValidServerXML: boolean;
     isValidClientDeployedURL: boolean;
     isValidServerDeployedURL: boolean;
-    isimportDataLoading: boolean;
   }>;
   export let onUploadFile: () => Promise<
     | undefined
@@ -43,7 +47,7 @@
         isRepositoryPath: boolean;
       }
   >;
-  export let onImportCollectionPopup: () => void;
+  export let closeImportCollectionPopup: () => void;
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -83,7 +87,7 @@
     isValidServerDeployedURL = false;
 
   const handleInputField = async () => {
-    const validations: any = await onInputDataChange(importData);
+    const validations: any = await onImportDataChange(importData);
 
     isimportDataLoading = validations.isImportDataLoading;
     isValidClientURL = validations.isValidClientURL;
@@ -151,7 +155,7 @@
   };
 
   const handleImport = async () => {
-    onImportItem("collection", {
+    onItemImported("collection", {
       workspaceId: $currentWorkspace._id,
       importData,
       currentBranch,
@@ -217,7 +221,7 @@
 
 {#if progressBar.isLoading}
   <ProgressBar
-    {onImportCollectionPopup}
+    {closeImportCollectionPopup}
     title={progressBar.title}
     zIndex={10000}
     isProgress={progressBar.isProgress}
@@ -230,7 +234,7 @@
   width={"35%"}
   zIndex={1000}
   isOpen={isSyntaxError}
-  handleModalState={onImportCollectionPopup}
+  handleModalState={closeImportCollectionPopup}
 >
   <div class="invalid-type-content">
     <div>
@@ -247,7 +251,7 @@
       <button
         class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
-          onImportCollectionPopup();
+          closeImportCollectionPopup();
         }}>Close</button
       >
       <button
@@ -266,7 +270,7 @@
   width={"35%"}
   zIndex={1000}
   isOpen={!progressBar.isLoading && !isSyntaxError}
-  handleModalState={onImportCollectionPopup}
+  handleModalState={(flag) => closeImportCollectionPopup()}
 >
   <div class="d-flex">
     <div class="form-check import-type-inp">
@@ -569,7 +573,7 @@
         : 'btn-primary'} "
       on:click={() => {
         handleImport();
-        onImportCollectionPopup();
+        closeImportCollectionPopup();
       }}
       disabled={uploadCollection?.file?.showFileTypeError}
     >
@@ -583,11 +587,11 @@
     <button
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
-        onCreateItem("collection", {
+        onItemCreated("collection", {
           workspaceId: $currentWorkspace._id,
           collection: collectionList,
         });
-        onImportCollectionPopup();
+        closeImportCollectionPopup();
       }}>Create Empty Collection</button
     >
   </div>
