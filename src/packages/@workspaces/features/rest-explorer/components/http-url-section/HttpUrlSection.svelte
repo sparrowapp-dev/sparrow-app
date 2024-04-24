@@ -1,79 +1,71 @@
 <script lang="ts">
   import Button from "$lib/components/buttons/Button.svelte";
   import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
   import tableColumnIcon from "$lib/assets/tableColumn.svg";
   import barIcon from "$lib/assets/barIcon.svg";
+  import { Select } from "$lib/components/inputs";
+  import { RequestUrl } from "@workspaces/features/rest-explorer/components";
 
   let componentClass = "";
   export { componentClass as class };
 
   export let onSendButtonClicked = () => {};
-  export let requestUrl: string;
-  export let httpMethod: string;
+  export let onUpdateRequestUrl;
+  export let onUpdateRequestMethod;
+  export let requestUrl;
+  export let httpMethod;
+  export let onUpdateRequestState;
+  export let splitterDirection;
 
   const handleDropdown = (tab: string) => {
-    httpMethod = tab;
+    onUpdateRequestMethod(tab);
   };
 </script>
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
-  <Dropdown
-    dropdownId="api-request"
-    onclick={handleDropdown}
-    dropDownType={{ type: "text", title: "GET" }}
-    staticCustomStyles={[
-      {
-        id: "api-request-options-container",
-        styleKey: "minWidth",
-        styleValue: "120px",
-      },
-    ]}
-    staticClasses={[
-      {
-        id: "api-request-btn-div",
-        classToAdd: ["px-2", "py-3", "border", "rounded"],
-      },
-      {
-        id: "api-request-options-container",
-        classToAdd: ["start-0", "bg-backgroundDropdown"],
-      },
-    ]}
+  <Select
+    id={"api-request"}
     data={[
       {
         name: "GET",
         id: RequestMethod.GET,
-        dynamicClasses: "text-getColor",
+        color: "success",
       },
       {
         name: "POST",
         id: RequestMethod.POST,
-        dynamicClasses: "text-postColor",
+        color: "warning",
       },
       {
         name: "PUT",
         id: RequestMethod.PUT,
-        dynamicClasses: "text-putColor",
+        color: "secondary",
       },
       {
         name: "DELETE",
         id: RequestMethod.DELETE,
-        dynamicClasses: "text-deleteColor",
+        color: "danger",
       },
       {
         name: "PATCH",
         id: RequestMethod.PATCH,
-        dynamicClasses: "text-patchColor",
+        color: "patch",
       },
     ]}
-  ></Dropdown>
+    titleId={httpMethod}
+    onclick={handleDropdown}
+    headerTheme={"transparent"}
+    borderHighlight={"active"}
+    headerHighlight={"hover"}
+    minBodyWidth={"150px"}
+    zIndex={2}
+    menuItem={"v2"}
+  />
 
-  <!-- Url input box -->
-  <CodeMirror bind:rawValue={requestUrl} class="ms-2" codeMirrorStyle="url" />
+  <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
 
   <!-- Send button -->
   <Button
@@ -85,20 +77,23 @@
 
   <!-- Switch pane layout button -->
   <ToggleButton
+    selectedToggleId={splitterDirection}
     toggleButtons={[
       {
         name: "",
-        id: "horizontal",
+        id: "vertical",
         icon: tableColumnIcon,
-        isSelected: true,
       },
       {
         name: "",
-        id: "vertical",
+        id: "horizontal",
         icon: barIcon,
-        isSelected: false,
       },
     ]}
+    on:click={(e) => {
+      onUpdateRequestState({ requestSplitterDirection: e.detail });
+      // restSplitterDirection.set(e.detail);
+    }}
   />
 </div>
 

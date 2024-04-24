@@ -32,7 +32,7 @@
    * @param id - Tab ID
    * @param tab - New Tab
    */
-  export let onTabClosed: (id: string, tab: NewTab) => void;
+  export let onTabClosed: (id: string, tab: TabDocument) => void;
   /**
    * Callback for Tab Drop Event
    * @param event - Event

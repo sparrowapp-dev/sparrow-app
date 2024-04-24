@@ -7,8 +7,12 @@
     collectionLeftPanelWidth,
     collapsibleState,
     userWorkspaceLevelRole,
+    user,
   } from "$lib/store";
-  import type { Writable } from "svelte/store";
+
+  // ---- Animation
+  import { Motion } from "svelte-motion";
+  import { scaleMotionProps } from "$lib/utils/animations";
 
   // ---- Components
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
@@ -28,6 +32,12 @@
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import type { TabDocument } from "$lib/database/app.database";
+  import type { Observable } from "rxjs";
+  import { generateSampleRequest } from "$lib/utils/sample";
+  import { onMount } from "svelte";
+  import { ItemType } from "$lib/utils/enums";
+  import { DashboardViewModel } from "../Dashboard/Dashboard.ViewModel.old";
 
   import type {
     CollectionDocument,
@@ -46,6 +56,8 @@
   let environmentList: Observable<EnvironmentDocument[]> =
     _viewModel.getEnvironmentList();
   const tabList: Writable<NewTab[]> = _viewModel.tabs;
+  const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const activeTab: Observable<TabDocument> = _viewModel.activeTab;
   let loggedUserRoleInWorkspace: WorkspaceRole;
   let removeTab: NewTab;
   let isPopupClosed: boolean = false;
@@ -54,15 +66,18 @@
   let loader = false;
   let currentEnvironment: EnvironmentDocument;
 
+  // TODO: Shift this to other place for getting Teams and Workspaces
+  let n = new DashboardViewModel();
+  user.subscribe(async (value) => {
+    await n.refreshTeams(value._id);
+    await n.refreshWorkspaces(value._id);
+  });
+
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: NewTab) => {
-    if (
-      tab?.property?.request &&
-      (!tab?.property?.request?.save?.api ||
-        !tab?.property?.request?.save?.description)
-    ) {
+  const closeTab = (id: string, tab: TabDocument) => {
+    if (tab?.property?.request && !tab?.isSaved) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
@@ -74,7 +89,7 @@
     }
   };
 
-  const handleClosePopupBackdrop = (flag) => {
+  const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
   };
 
@@ -123,9 +138,50 @@
       loggedUserRoleInWorkspace = value;
     }
   });
+
+  // Rerender animation on tab switch
+  let isAnimation = true;
+  let prevTabId = "";
+  let tab: TabDocument | {};
+  activeTab.subscribe((value: TabDocument) => {
+    if (value) {
+      if (prevTabId !== value.tabId) {
+        tab = value;
+        isAnimation = false;
+        setTimeout(() => {
+          isAnimation = true;
+        }, 10);
+      }
+      prevTabId = value.tabId;
+    }
+    // else tab = {};
+  });
+
+  let splitter;
+  onMount(() => {
+    splitter = document.querySelector(
+      ".splitter-sidebar .splitpanes__splitter",
+    );
+    splitter.style.width = "1px";
+
+    let url = window.location.href;
+    const params = new URLSearchParams(url.split("?")[1]);
+    const isNew = params.get("first");
+    if (isNew) _collectionPageViewModel.createNewTab();
+  });
+
+  $: {
+    if (splitter && $collapsibleState === true) {
+      splitter.style.display = "none";
+    }
+    if (splitter && $collapsibleState === false) {
+      splitter.style.display = "unset";
+    }
+  }
 </script>
 
 <Splitpanes
+  class="splitter-sidebar"
   on:resize={(e) => {
     collectionLeftPanelWidth.set(e.detail[0].size);
     collectionRightPanelWidth.set(e.detail[1].size);
@@ -161,9 +217,16 @@
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
     />
-    <br />
     <Route>
-      <RestExplorer />
+      {#if isAnimation}
+        {#if $activeTab && $activeTab?.type === ItemType.REQUEST}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <RestExplorer tab={$activeTab} />
+            </div>
+          </Motion>
+        {/if}
+      {/if}
     </Route>
   </Pane>
 </Splitpanes>
@@ -203,4 +266,7 @@
 {/if}
 
 <style>
+  :global(.splitter-sidebar.splitpanes) {
+    width: calc(100vw - 72px) !important;
+  }
 </style>

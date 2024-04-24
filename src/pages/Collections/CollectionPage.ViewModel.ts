@@ -10,7 +10,6 @@ import type {
 import { user, userWorkspaceLevelRole } from "$lib/store";
 import {
   isApiCreatedFirstTime,
-  requestResponseStore,
   tabs,
   progressiveTab,
 } from "$lib/store/request-response-section";
@@ -31,9 +30,7 @@ import { EnvironmentService } from "$lib/services-v2/environment.service";
 import { CollectionService } from "$lib/services/collection.service";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { setContentTypeHeader } from "$lib/utils/helpers";
-import { RequestDataset } from "$lib/utils/enums";
-import { updateCollectionRequest } from "$lib/services/collection";
-import { v4 as uuidv4 } from "uuid";
+import { moveNavigation } from "$lib/utils/helpers/navigation";
 
 //-----
 //External Imports
@@ -94,10 +91,20 @@ import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+<<<<<<< HEAD
 import type { Observable } from "rxjs";
+=======
+<<<<<<< HEAD
+>>>>>>> feat/sparrow-refactoring
 
 export default class CollectionsViewModel {
+=======
+import { InitRequestTab } from "@common/utils";
+import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+export class CollectionPageViewModel {
+>>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
   private tabRepository = new TabRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
@@ -109,6 +116,7 @@ export default class CollectionsViewModel {
   constructor() {}
 
   /**
+<<<<<<< HEAD
    * Wrapper function lets fucntion to be executed only one in a time period
    * @param func :Function - the to be debounced
    * @param delay :number - the time period limit for debouncing
@@ -155,12 +163,15 @@ export default class CollectionsViewModel {
   debouncedTab = this.debounce(this.syncTabWithStore, 2000);
 
   /**
+=======
+>>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
    * Return current tabs list of top tab bar component
    */
   get tabs() {
-    return requestResponseStore.getTabList();
+    return this.tabRepository.getTabList();
   }
 
+<<<<<<< HEAD
   /**
    * Get list of all environments
    * @return Observable<Environments[]> - list of all environments
@@ -185,23 +196,28 @@ export default class CollectionsViewModel {
     requestResponseStore.createTab(data);
     this.debouncedTab();
   };
+=======
+  get activeTab() {
+    return this.tabRepository.getTab();
+  }
+>>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
 
   /**
    * Remove the tab from tab list in store
    * @param id - tab id
    */
   public handleRemoveTab = (id: string) => {
-    requestResponseStore.removeTab(id);
-    this.debouncedTab();
+    this.tabRepository.removeTab(id);
   };
 
   /**
    * Create new tab with untracked id
    */
-  public createNewTab = () => {
+  public createNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
-    this.handleCreateTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
+    this.tabRepository.createTab(
+      new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
     );
     moveNavigation("right");
     MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
@@ -211,9 +227,8 @@ export default class CollectionsViewModel {
    * Set active tab in store
    * @param id - tab id
    */
-  public handleActiveTab = (id: string) => {
-    requestResponseStore.activeTab(id);
-    this.debouncedTab();
+  public handleActiveTab = async (id: string) => {
+    await this.tabRepository.activeTab(id);
   };
 
   /**
@@ -222,7 +237,9 @@ export default class CollectionsViewModel {
    */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
+    // TODO - Parse this.tabs observable to RxDoc (Remove these code)
     const tabList = this.tabs;
+    /////////////////////////////////////////////////////////////////////
     let updatedTabList: TabDocument[] = [];
     tabList.subscribe((value) => {
       updatedTabList = value;
@@ -234,8 +251,10 @@ export default class CollectionsViewModel {
       return tab;
     });
     const newTabList: NewTab[] = updatedTabList as NewTab[];
+
+    // TODO - Update RxDB REPO using bulk upsert HERE (Remove these code)
     tabs.set(newTabList);
-    this.syncTabWithStore();
+    /////////////////////////////////////////////////////////////////////
   };
 
   /**
