@@ -19,6 +19,7 @@
     ResponseBody,
     RestExtensionPanel,
     RequestParameters,
+    ResponseStatus,
   } from "@workspaces/features/rest-explorer/components";
   import Loader from "$lib/components/Transition/loader/Loader.svelte";
   import { ModalWrapperV1 } from "$lib/components";
@@ -175,7 +176,7 @@
       <Splitpanes
         class=""
         id={"rest-splitter"}
-        style="height: calc(100vh - 240px); margin-top:10px;"
+        style="height: calc(100vh - 160px); margin-top:10px;"
         horizontal={$tab.property.request?.state?.requestSplitterDirection ===
         "horizontal"
           ? true
@@ -194,9 +195,10 @@
           minSize={30}
           size={$tab.property.request?.state
             ?.requestLeftSplitterWidthPercentage}
+          class="position-relative pb-3"
         >
           <!-- Request Pane -->
-          <div class="px-3 pb-3 h-100 position-relative">
+          <div class="h-100 position-relative">
             <RequestNavigator
               requestStateSection={$tab.property.request?.state
                 ?.requestNavigation}
@@ -240,10 +242,10 @@
           minSize={30}
           size={$tab.property.request?.state
             ?.requestRightSplitterWidthPercentage}
-          class="position-relative"
+          class="position-relative pt-3"
         >
           <!-- Response Pane -->
-          <div class="d-flex flex-column h-100 px-3">
+          <div class="d-flex flex-column h-100">
             {#if $tab.property.request?.state?.isSendRequestInProgress}
               <ResponseDefaultScreen />
               <div
@@ -256,6 +258,7 @@
             {:else if $tab.property.request?.response?.status === "Not Found"}
               <ResponseErrorScreen />
             {:else if $tab.property.request?.response?.status}
+              <ResponseStatus response={$tab.property.request.response} />
               <ResponseNavigator
                 requestStateSection={$tab.property.request.state
                   ?.responseNavigation}

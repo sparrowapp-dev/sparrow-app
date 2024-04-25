@@ -8,7 +8,7 @@
     id: string;
     count: number;
   }[] = [
-    { name: "Response", id: ResponseSection.RESPONSE, count: 0 },
+    { name: "Body", id: ResponseSection.RESPONSE, count: 0 },
     { name: "Headers", id: ResponseSection.HEADERS, count: 0 },
   ];
 </script>
@@ -18,7 +18,7 @@
   <div class="d-flex mb-3">
     {#each tabs as tab}
       <button
-        class="team-menu__link border-0 me-2 sparrow-fs-12 request-tab {tab.id ===
+        class="team-menu__link border-0 me-2 sparrow-fs-12 me-4 request-tab {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -40,10 +40,10 @@
   .team-menu__link {
     color: #8a9299;
     background-color: transparent;
-    border-bottom: 3px transparent;
+    border-bottom: 2px transparent;
   }
   .tab-active {
     color: white;
-    border-bottom: 3px solid var(--send-button) !important;
+    border-bottom: 2px solid var(--send-button) !important;
   }
 </style>

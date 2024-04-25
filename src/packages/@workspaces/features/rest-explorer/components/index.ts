@@ -15,3 +15,4 @@ export { default as ResponseBodyNavigator } from "./response-body-navigator/Resp
 export { default as RequestUrl } from "./request-url/RequestUrl.svelte";
 export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as RestExtensionPanel } from "./rest-extension-panel/RestExtensionPanel.svelte";
+export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";

@@ -19,12 +19,15 @@
 
 <div class={`${comboContainerClassProp}`} style={`${comboContainerStyleProp}`}>
   {#if type === TextType.COMBO}
-    <p class={`${keyClassProp} shortcut-text mb-0`} style={`${keyStyleProp}`}>
+    <p
+      class={`${keyClassProp} shortcut-text mb-0 sparrow-fs-12`}
+      style={`${keyStyleProp}`}
+    >
       {key}
     </p>
     <button
       disabled
-      class={`${valueClassProp} bg-buttonBackColor rounded text-buttonColor border-0 py-1 px-4 shortcut-btn-api`}
+      class={`${valueClassProp} bg-buttonBackColor sparrow-fs-12 text-buttonColor border-0 py-1 px-4 shortcut-btn-api`}
       style={`${valueStyleProp}`}
     >
       {value}
@@ -42,7 +45,7 @@
 </div>
 
 <style>
-  .api-type {
+  /* .api-type {
     height: 34px;
     width: 56px;
     border-color: var(--border-color) !important;
@@ -53,5 +56,5 @@
   .shortcut-text {
     min-width: 80px;
     width: auto;
-  }
+  } */
 </style>

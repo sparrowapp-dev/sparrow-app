@@ -12,9 +12,9 @@
     count: number;
   }[] = [
     { name: "Parameters", id: RequestSection.PARAMETERS, count: 0 },
-    { name: "Request Body", id: RequestSection.REQUEST_BODY, count: 0 },
+    { name: "Body", id: RequestSection.REQUEST_BODY, count: 0 },
     { name: "Headers", id: RequestSection.HEADERS, count: 0 },
-    { name: "Authorization", id: RequestSection.AUTHORIZATION, count: 0 },
+    { name: "Auth", id: RequestSection.AUTHORIZATION, count: 0 },
   ];
 </script>
 
@@ -23,7 +23,7 @@
   <div class="d-flex mb-3">
     {#each tabs as tab}
       <button
-        class="team-menu__link border-0 me-2 sparrow-fs-12 request-tab {tab.id ===
+        class="team-menu__link border-0 me-2 sparrow-fs-12 request-tab me-4 {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -45,10 +45,10 @@
   .team-menu__link {
     color: #8a9299;
     background-color: transparent;
-    border-bottom: 3px transparent;
+    border-bottom: 2px transparent;
   }
   .tab-active {
     color: white;
-    border-bottom: 3px solid var(--send-button) !important;
+    border-bottom: 2px solid var(--send-button) !important;
   }
 </style>

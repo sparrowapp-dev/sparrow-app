@@ -4,6 +4,7 @@
   import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import { SparrowLogo } from "../../assets/images";
   let isHorizontalMode: boolean;
   isHorizontal.subscribe((value) => (isHorizontalMode = value));
   let ctrlCommands: { [key: string]: string } = {};
@@ -26,48 +27,40 @@
   });
 </script>
 
-<div
-  class="response-default d-flex text-requestBodyColor mt-3 mb-3 flex-column align-items-center justify-content-between"
->
-  <div
-    class="d-flex flex-column align-items-start justify-content-start mb-2 mt-3
-     "
-  >
-    <h4 style="font-weight: 500; text-align: center;">
-      Click send to get a Response
-    </h4>
-    <h5 style="font-weight: 700;">Few shortcuts</h5>
+<div class="response-default">
+  <div class="">
+    <div class="d-flex align-items-center flex-column justify-content-center">
+      <div class="my-4">
+        <SparrowLogo />
+      </div>
+      <div><p>Click send to get a Response</p></div>
+    </div>
   </div>
-  <div
-    style="font-family: Roboto Mono;font-size: 12px;font-weight: 400;line-height: 18px;letter-spacing: 0em;;"
-    class={$restSplitterDirection === "horizontal"
-      ? "d-flex align-items-center justify-content-between gap-4"
-      : "d-flex flex-column"}
-  >
-    <div
-      class={$restSplitterDirection === "horizontal"
-        ? "d-flex flex-column align-items-start justify-content-between"
-        : ""}
-    >
-      {#each Object.entries(ctrlCommands) as [key, value]}
+  <div class={"d-flex flex-wrap justify-content-center"}>
+    {#each Object.entries(ctrlCommands) as [key, value]}
+      {#if key === "Save Request" || key === "New Request"}
+        <span class="me-3"></span>
         <ComboText
           comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
           {key}
           {value}
           type="combo"
         />
-      {/each}
-    </div>
-    <div class="d-flex flex-column">
-      {#each Object.entries(altCommands) as [key, value]}
+        <span class="me-3"></span>
+      {/if}
+    {/each}
+    {#each Object.entries(altCommands) as [key, value]}
+      {#if key === "Edit link" || key === "Add Parameter"}
+        <span class="me-3"></span>
         <ComboText
           comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
           {key}
           {value}
           type="combo"
         />
-      {/each}
-    </div>
+        <span class="me-5"></span>
+      {/if}
+    {/each}
   </div>
 </div>
 

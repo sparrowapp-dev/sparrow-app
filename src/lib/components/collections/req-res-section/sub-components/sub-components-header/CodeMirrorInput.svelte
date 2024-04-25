@@ -213,7 +213,7 @@
         keyBinding,
         languageConf.of(javascriptLanguage),
         handleEventsRegister,
-        placeholder("Enter URL or paste text"),
+        placeholder("Enter an URL"),
         cursorTooltipField(filterData),
         wordHover,
       ],
