@@ -42,19 +42,17 @@ import { invoke } from "@tauri-apps/api/core";
 //Utils
 import { debounce } from "@common/utils";
 import {
-  isUrlValid,
   validateClientJSON,
   validateClientURL,
   validateClientXML,
   useTree,
-} from "$lib/utils/collections/utils";
+} from "@common/utils/importCollectionValidations";
 import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
 import {
   PERMISSION_NOT_FOUND_TEXT,
   workspaceLevelPermissions,
 } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
-import { setAuthType, setBodyType } from "$lib/utils/helpers/auth.helper";
 //-----
 
 //-----

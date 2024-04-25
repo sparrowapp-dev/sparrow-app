@@ -1,30 +1,31 @@
 <script lang="ts">
-  import type { WorkspaceDocument } from "$lib/database/app.database";
   import { replaceSlashWithGreaterThanSymbol } from "$lib/utils/helpers/common.helper";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
   import { handleRequestClick } from "$lib/utils/helpers/handle-clicks.helper";
-  import type { Observable } from "rxjs";
-  export let explorer: any;
-  export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let onItemOpened: (entityType: string, args: any) => void;
+  export let path: string = "";
   export let searchData: string = "";
-  export let getIndex: (text: string, searchData: string) => number;
+  export let getIndex;
   export let folderDetails: { id: string; name: string };
   export let request: any;
+  export let workspaceId: string = "";
+  export let collectionId: string = "";
+  export let activeSync;
 </script>
 
-<button
-  class="d-flex align-items-center api-request p-1 bg-transparent border-0"
-  style="height: {explorer.path !== '' ? '40px' : '32px'}; text-align: left;"
+<div
+  class="d-flex align-items-center api-request p-1"
+  style="height: {path !== '' ? '40px' : '32px'};"
   on:click={() => {
-    onItemOpened("request", {
-      workspaceId: $currentWorkspace._id,
-      collection: {
-        id: request.collectionId,
-      },
-      folder: folderDetails,
+    handleRequestClick(
       request,
-    });
+      {
+        collectionId,
+        workspaceId,
+        folderId: folderDetails.id ? folderDetails.id : "",
+        folderName: folderDetails.name ? folderDetails.name : "",
+      },
+      activeSync,
+    );
   }}
 >
   <div class="api-method text-{getMethodStyle(request.request.method)}">
@@ -44,15 +45,15 @@
         )}
       </p>
     </div>
-    {#if explorer.path !== ""}
+    {#if path !== ""}
       <div style="width: 100%;">
         <p class="mb-0 ellipsis" style="font-size:10px;width:100%">
-          {replaceSlashWithGreaterThanSymbol(explorer.path)}
+          {replaceSlashWithGreaterThanSymbol(path)}
         </p>
       </div>
     {/if}
   </div>
-</button>
+</div>
 
 <style>
   .red-api {

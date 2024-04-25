@@ -22,7 +22,7 @@
     selectedMethodsCollectionStore,
   } from "$lib/store/methods";
 
-  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
+  import EmptyCollection from "./empty-collection/EmptyCollection.old.svelte";
   import {
     type CollectionDocument,
     type EnvironmentDocument,
