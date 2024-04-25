@@ -6,11 +6,13 @@ export const InputTheme = EditorView.theme({
     width: "100%",
     flex: "1",
     border: "1px solid #272727",
-    borderRadius: "6px",
+    borderRadius: "0",
+    fontSize: "80%",
   },
   ".cm-content": {
     caretColor: "var(--white-color)",
     height: "100%",
+    paddingTop: "7px",
   },
   ".cm-panels": {
     backgroundColor: "var(--blackColor)",
@@ -54,8 +56,8 @@ export const InputTheme = EditorView.theme({
     fontWeight: "400",
   },
   "&.cm-editor.cm-focused": {
-    border: "2px solid var(--sparrow-blue)",
-    borderRadius: "6px",
+    border: "1px solid var(--sparrow-blue)",
+    borderRadius: "0",
   },
   ".cm-scroller::-webkit-scrollbar": {
     display: "none",
