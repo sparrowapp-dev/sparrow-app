@@ -2,10 +2,10 @@
   export let collectionList: Observable<CollectionDocument[]>;
   export let environmentList: Observable<EnvironmentDocument[]>;
   export let showImportCollectionPopup: () => void;
+  export let showImportCurlPopup: () => void;
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
-  export let onItemImported: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
@@ -15,16 +15,25 @@
     filteredFile: RequestType[];
     filteredFolder: Folder[];
   };
-  export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let activeTab: Writable<{}>;
+  export let activeTab: Observable<TabDocument>;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let currentEnvironment: Observable<EnvironmentDocument>;
+  export let leftPanelController: {
+    leftPanelCollapse: boolean;
+    handleCollapseCollectionList: () => void;
+  };
+
+  import {
+    Collection,
+    EmptyCollection,
+    SearchTree,
+  } from "@workspaces/features/collection-list/components";
 
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
@@ -33,21 +42,18 @@
   import plusIcon from "$lib/assets/plus.svg";
 
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Collection from "./collection/Collection.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import Select from "$lib/components/inputs/select/Select.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import ImportCurl from "./import-curl/ImportCurl.svelte";
   import List from "$lib/components/list/List.svelte";
-  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     EnvironmentDocument,
+    TabDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
-  import type { Writable } from "svelte/store";
   import type {
     Folder,
     Path,
@@ -58,11 +64,6 @@
     selectedMethodsCollectionStore,
   } from "$lib/store";
   import { onDestroy } from "svelte";
-  import SearchTree from "./searchTree/SearchTree.svelte";
-  import Request from "./request/Request.svelte";
-  let collapsExpandToggle: boolean = false;
-  let isImportCollectionPopup: boolean = false;
-  let isImportCurlPopup: boolean = false;
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -109,17 +110,19 @@
   });
 </script>
 
-{#if collapsExpandToggle}
+{#if leftPanelController.leftPanelCollapse}
   <div>
     <button
-      class="border-0 pb-5 angleRight w-16 position-absolute {collapsExpandToggle
+      class="border-0 pb-5 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {collapsExpandToggle
+      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
-        collapsExpandToggle = !collapsExpandToggle;
+        leftPanelController.leftPanelCollapse =
+          !leftPanelController.leftPanelCollapse;
+        leftPanelController.handleCollapseCollectionList();
       }}
     >
       <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
@@ -132,11 +135,11 @@
     </button>
   </div>
 {/if}
-{#if !collapsExpandToggle}
+{#if !leftPanelController.leftPanelCollapse}
   <div
     style="overflow-x: auto; overflow-y: auto"
     class={`sidebar ${
-      collapsExpandToggle
+      leftPanelController.leftPanelCollapse
         ? runAnimation && "decrease-width"
         : runAnimation && " increase-width"
     } d-flex flex-column bg-backgroundColor scroll`}
@@ -150,7 +153,9 @@
       <button
         class=" border-0 rounded px-2 angleButton"
         on:click={() => {
-          collapsExpandToggle = !collapsExpandToggle;
+          leftPanelController.leftPanelCollapse =
+            !leftPanelController.leftPanelCollapse;
+          leftPanelController.handleCollapseCollectionList();
         }}
         id="doubleAngleButton"
       >
@@ -258,7 +263,7 @@
             if (tab === "collection") {
               showImportCollectionPopup();
             } else if (tab === "importcURL") {
-              isImportCurlPopup = !isImportCurlPopup;
+              showImportCurlPopup();
             } else if (tab === "apiRequest") {
               onItemCreated("request", {});
             }
@@ -298,7 +303,7 @@
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
-                    {currentWorkspace}
+                    workspaceId={exp.workspaceId}
                     {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
@@ -309,7 +314,7 @@
               {#if filteredFolder.length > 0}
                 {#each filteredFolder as exp}
                   <SearchTree
-                    {currentWorkspace}
+                    workspaceId={exp.workspaceId}
                     {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
@@ -320,7 +325,7 @@
               {#if filteredCollection.length > 0}
                 {#each filteredCollection as exp}
                   <SearchTree
-                    {currentWorkspace}
+                    workspaceId={exp.workspaceId}
                     {onItemOpened}
                     explorer={exp}
                     explorerData={exp.tree}
@@ -338,13 +343,11 @@
             >
               {#each filteredSelectedMethodsCollection as col}
                 <Collection
-                  {currentWorkspace}
                   {onItemCreated}
                   {onItemDeleted}
                   {onItemRenamed}
                   {onItemOpened}
                   {onBranchSwitched}
-                  {onOpenRequestOnTab}
                   {onRefetchCollection}
                   {userRoleInWorkspace}
                   {activeTab}
@@ -362,13 +365,11 @@
               {#if collectionListDocument}
                 {#each collectionListDocument as col}
                   <Collection
-                    {currentWorkspace}
                     {onItemCreated}
                     {onItemDeleted}
                     {onItemRenamed}
                     {onItemOpened}
                     {onBranchSwitched}
-                    {onOpenRequestOnTab}
                     {onRefetchCollection}
                     {userRoleInWorkspace}
                     {activeTab}
@@ -379,7 +380,6 @@
             </List>
           {:else}
             <EmptyCollection
-              {currentWorkspace}
               {userRoleInWorkspace}
               handleCreateApiRequest={() => onItemCreated("request", {})}
               onImportCollectionPopup={showImportCollectionPopup}

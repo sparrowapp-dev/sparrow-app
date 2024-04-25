@@ -2,13 +2,6 @@
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   // ---- Store
-  import {
-    collectionRightPanelWidth,
-    collectionLeftPanelWidth,
-    collapsibleState,
-    userWorkspaceLevelRole,
-    user,
-  } from "$lib/store";
 
   // ---- Animation
   import { Motion } from "svelte-motion";
@@ -17,10 +10,13 @@
   // ---- Components
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
   import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
+  import {
+    CollectionList,
+    ImportCollection,
+    ImportCurl,
+  } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import CollectionList from "$lib/components/collections/collections-list/CollectionList.svelte";
-  import ImportCollection from "$lib/components/collections/collections-list/import-collection/ImportCollection.svelte";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -34,18 +30,14 @@
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import type { TabDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  import { generateSampleRequest } from "$lib/utils/sample";
   import { onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums";
-  import { DashboardViewModel } from "../Dashboard/Dashboard.ViewModel.old";
 
   import type {
     CollectionDocument,
     EnvironmentDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
-  import ImportCurl from "$lib/components/collections/collections-list/import-curl/ImportCurl.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -55,23 +47,18 @@
     _viewModel.getCollectionList();
   let environmentList: Observable<EnvironmentDocument[]> =
     _viewModel.getEnvironmentList();
-  const tabList: Writable<NewTab[]> = _viewModel.tabs;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
-  const activeTab: Observable<TabDocument> = _viewModel.activeTab;
-  let loggedUserRoleInWorkspace: WorkspaceRole;
+  const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
   let removeTab: NewTab;
   let isPopupClosed: boolean = false;
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
-  let currentEnvironment: EnvironmentDocument;
-
-  // TODO: Shift this to other place for getting Teams and Workspaces
-  let n = new DashboardViewModel();
-  user.subscribe(async (value) => {
-    await n.refreshTeams(value._id);
-    await n.refreshWorkspaces(value._id);
-  });
+  let currentEnvironment: Observable<EnvironmentDocument>;
+  let leftPanelCollapse: boolean = false;
+  let leftPanelWidth: number = 20;
+  let rightPanelWidth: number = 80;
+  let splitter: any;
 
   /**
    * Handle close tab functionality in tab bar list
@@ -120,6 +107,11 @@
     }
   };
 
+  const handleCollapseCollectionList = () => {
+    leftPanelCollapse = !leftPanelCollapse;
+    splitter.style.display = leftPanelCollapse ? "none" : "unset";
+  };
+
   /**
    * Handles reloading collections and environment of workspace change
    */
@@ -129,15 +121,6 @@
         await _viewModel.syncCollectionsWithBackend(workspace);
     })
     .unsubscribe();
-
-  /**
-   * Fetch role of user in workspace
-   */
-  userWorkspaceLevelRole.subscribe((value: any) => {
-    if (value) {
-      loggedUserRoleInWorkspace = value;
-    }
-  });
 
   // Rerender animation on tab switch
   let isAnimation = true;
@@ -157,59 +140,59 @@
     // else tab = {};
   });
 
-  let splitter;
   onMount(() => {
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
     );
     splitter.style.width = "1px";
-
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
-    if (isNew) _collectionPageViewModel.createNewTab();
+    if (isNew) _viewModel.createNewTab();
   });
 
   $: {
-    if (splitter && $collapsibleState === true) {
-      splitter.style.display = "none";
-    }
-    if (splitter && $collapsibleState === false) {
-      splitter.style.display = "unset";
-    }
+    // if ( leftPanelCollapse === true) {
+    //   splitter.style.display = "none";
+    // }else (leftPanelCollapse === false) {
+    //   splitter.style.display = "unset";
+    // }
   }
 </script>
 
 <Splitpanes
   class="splitter-sidebar"
   on:resize={(e) => {
-    collectionLeftPanelWidth.set(e.detail[0].size);
-    collectionRightPanelWidth.set(e.detail[1].size);
+    leftPanelWidth = e.detail[0].size;
+    rightPanelWidth = e.detail[1].size;
   }}
 >
-  <Pane size={$collapsibleState ? 0 : $collectionLeftPanelWidth}>
-    <!-- TODO: Add new collection list component -->
+  <Pane size={leftPanelCollapse ? 0 : leftPanelWidth} minSize={20}>
     <CollectionList
       {collectionList}
       {environmentList}
       {currentEnvironment}
       {currentWorkspace}
+      leftPanelController={{
+        leftPanelCollapse,
+        handleCollapseCollectionList,
+      }}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
       activeTab={_viewModel.getActiveTab()}
       showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+      showImportCurlPopup={() => (isImportCurlPopup = true)}
       onItemCreated={_viewModel.handleCreateItem}
       onItemDeleted={_viewModel.handleDeleteItem}
       onItemRenamed={_viewModel.handleRenameItem}
-      onItemImported={_viewModel.handleImportItem}
       onItemOpened={_viewModel.handleOpenItem}
       onBranchSwitched={_viewModel.handleBranchSwitch}
       onRefetchCollection={_viewModel.handleRefetchCollection}
       onSearchCollection={_viewModel.handleSearchCollection}
     />
   </Pane>
-  <Pane size={$collapsibleState ? 100 : $collectionRightPanelWidth}>
+  <Pane size={leftPanelCollapse ? 100 : rightPanelWidth} minSize={30}>
     <TabBar
-      bind:tabList={$tabList}
+      tabList={$tabList}
       onNewTabRequested={_viewModel.createNewTab}
       onTabClosed={closeTab}
       onDropEvent={_viewModel.onDropEvent}
@@ -238,7 +221,7 @@
   onCancel={handleClosePopupBackdrop}
   onDiscard={handlePopupDiscard}
   isSaveDisabled={!hasWorkpaceLevelPermission(
-    loggedUserRoleInWorkspace,
+    _viewModel.getUserRoleInWorspace(),
     workspaceLevelPermissions.SAVE_REQUEST,
   )}
   {loader}
@@ -247,7 +230,7 @@
 {#if isImportCollectionPopup}
   <ImportCollection
     {collectionList}
-    {currentWorkspace}
+    workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
     onItemCreated={_viewModel.handleCreateItem}
     onItemImported={_viewModel.handleImportItem}
@@ -259,8 +242,8 @@
 
 {#if isImportCurlPopup}
   <ImportCurl
+    workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
-    {currentWorkspace}
     onItemImported={_viewModel.handleImportItem}
   />
 {/if}
@@ -268,5 +251,8 @@
 <style>
   :global(.splitter-sidebar.splitpanes) {
     width: calc(100vw - 72px) !important;
+  }
+  :global(.splitpanes__splitter) {
+    width: 1px;
   }
 </style>

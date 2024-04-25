@@ -4,17 +4,14 @@
   import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import { Select } from "$lib/components/inputs";
-  import { debounce } from "@common/utils";
   import Button from "$lib/components/buttons/Button.svelte";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
   import type { Observable } from "rxjs";
-  import type {
-    CollectionDocument,
-    WorkspaceDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument } from "$lib/database/app.database";
+  import { debounce } from "@common/utils";
 
   export let collectionList: Observable<CollectionDocument[]>;
-  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let workspaceId: string;
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemImported: (entityType: string, args: any) => void;
   export let onImportDataChange: (importData: string) => Promise<{
@@ -156,7 +153,7 @@
 
   const handleImport = async () => {
     onItemImported("collection", {
-      workspaceId: $currentWorkspace._id,
+      workspaceId,
       importData,
       currentBranch,
       getBranchList,
@@ -588,7 +585,7 @@
       class="btn-primary border-0 w-100 py-2 fs-6 rounded"
       on:click={() => {
         onItemCreated("collection", {
-          workspaceId: $currentWorkspace._id,
+          workspaceId,
           collection: collectionList,
         });
         closeImportCollectionPopup();

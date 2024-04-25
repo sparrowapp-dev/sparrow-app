@@ -31,6 +31,8 @@
   } from "$lib/database/app.database";
   import { UntrackedItems } from "$lib/utils/enums";
   import type { Observable } from "rxjs";
+  import AddEnvironment from "$lib/components/collections/req-res-section/sub-components/add-environment-popup/AddEnvironment.svelte";
+  import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
   let showPath = false;
 
   if (folder) {
@@ -41,12 +43,6 @@
   }
 
   let isDeletePopup: boolean = false;
-  let path: Path = {
-    workspaceId: $currentWorkspace._id,
-    collectionId: collection.id,
-    folderId: folder ? folder.id : "",
-    folderName: folder ? folder.name : "",
-  };
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -118,7 +114,7 @@
       onClick={() => {
         deleteLoader = true;
         onItemDeleted("request", {
-          workspaceId: $currentWorkspace._id,
+          workspaceId: collection.workspaceId,
           collection,
           request: api,
           folder,
@@ -138,7 +134,7 @@
       {
         onClick: () => {
           onItemOpened("request", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
             folder,
             request: api,
@@ -195,7 +191,7 @@
   <button
     on:click={() => {
       onItemOpened("request", {
-        workspaceId: $currentWorkspace._id,
+        workspaceId: collection.workspaceId,
         collection,
         folder,
         request: api,
@@ -235,7 +231,7 @@
         bind:this={inputField}
         on:blur={(e) => {
           onItemRenamed("request", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
             folder,
             request: api,
@@ -246,7 +242,7 @@
         on:keydown={(e) => {
           if (e.key === "Enter") {
             onItemRenamed("request", {
-              workspaceId: $currentWorkspace._id,
+              workspaceId: collection.workspaceId,
               collection,
               folder: folder ? folder : { id: "" },
               request: api,

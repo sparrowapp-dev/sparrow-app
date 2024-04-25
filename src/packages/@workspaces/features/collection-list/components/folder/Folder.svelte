@@ -4,7 +4,6 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onOpenRequestOnTab: (request: RequestType, path: Path) => void;
   export let collection: CollectionDocument;
   export let userRoleInWorkspace: WorkspaceRole;
   export let activeTab: Writable<{}>;
@@ -143,7 +142,7 @@
         onClick={() => {
           deleteLoader = true;
           onItemDeleted("folder", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
             folder: explorer,
             requestIds,
@@ -165,7 +164,7 @@
             expand = true;
             if (expand) {
               onItemOpened("folder", {
-                workspaceId: $currentWorkspace._id,
+                workspaceId: collection.workspaceId,
                 collection,
                 folder: explorer,
               });
@@ -192,7 +191,7 @@
           onClick: () => {
             expand = true;
             onItemCreated("requestFolder", {
-              workspaceId: $currentWorkspace._id,
+              workspaceId: collection.workspaceId,
               collection,
               folder: explorer,
             });
@@ -240,7 +239,7 @@
               expand = !expand;
               if (expand) {
                 onItemOpened("folder", {
-                  workspaceId: $currentWorkspace._id,
+                  workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
@@ -267,7 +266,7 @@
               value={explorer.name}
               on:blur={(e) => {
                 onItemRenamed("folder", {
-                  workspaceId: $currentWorkspace._id,
+                  workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                   newName: e?.target?.value,
@@ -277,7 +276,7 @@
               on:keydown={(e) => {
                 if (e.key === "Enter") {
                   onItemRenamed("folder", {
-                    workspaceId: $currentWorkspace._id,
+                    workspaceId: collection.workspaceId,
                     collection,
                     folder: explorer,
                     newName: e?.target?.value,
@@ -349,7 +348,6 @@
               {onItemDeleted}
               {onItemRenamed}
               {onItemOpened}
-              {onOpenRequestOnTab}
               {collection}
               {userRoleInWorkspace}
               {activeTab}
@@ -373,7 +371,7 @@
                   alt="+ API Request"
                   on:click={() => {
                     onItemCreated("requestFolder", {
-                      workspaceId: $currentWorkspace._id,
+                      workspaceId: collection.workspaceId,
                       collection,
                       folder: explorer,
                     });

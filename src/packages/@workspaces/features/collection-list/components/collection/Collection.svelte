@@ -1,10 +1,8 @@
 <script lang="ts">
-  export let currentWorkspace: Observable<WorkspaceDocument>;
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onOpenRequestOnTab: (request: any, path: Path) => void;
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -31,10 +29,7 @@
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
-  import type {
-    CollectionDocument,
-    WorkspaceDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument } from "$lib/database/app.database";
   import type { Writable } from "svelte/store";
   import Folder from "../folder/Folder.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -43,7 +38,6 @@
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import type { Observable } from "rxjs";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -51,7 +45,7 @@
   let showFolderAPIButtons: boolean = true;
   const commonService = new CommonService();
   let visibility = false;
-  let isActiveSyncEnabled = false;
+  let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
   let menuItems: [any];
   let isRenaming = false;
@@ -137,9 +131,9 @@
         activeSyncLoad = response.activeSyncLoad;
       }
     }
-    isActiveSyncEnabled = await commonService.isFeatureEnabled(
-      "isActiveSyncEnabled",
-    );
+    // isActiveSyncEnabled = await commonService.isFeatureEnabled(
+    //   "isActiveSyncEnabled",
+    // );
   });
 
   let prevCurrentBranch = "";
@@ -217,7 +211,7 @@
       loader={deleteLoader}
       onClick={() => {
         onItemDeleted("collection", {
-          workspaceId: $currentWorkspace._id,
+          workspaceId: collection.workspaceId,
           collection,
           deletedIds,
         });
@@ -235,7 +229,7 @@
       {
         onClick: () =>
           onItemOpened("collection", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
           }),
         displayText: "Open collection",
@@ -257,7 +251,7 @@
       {
         onClick: () =>
           onItemCreated("requestCollection", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
           }),
         displayText: "Add Request",
@@ -272,7 +266,7 @@
       {
         onClick: () =>
           onItemCreated("folder", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
           }),
         displayText: "Add Folder",
@@ -321,7 +315,7 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         onItemOpened("collection", {
-          workspaceId: $currentWorkspace._id,
+          workspaceId: collection.workspaceId,
           collection,
         });
       }
@@ -346,7 +340,7 @@
         bind:this={inputField}
         on:blur={(e) => {
           onItemRenamed("collection", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId: collection.workspaceId,
             collection,
             newName: e?.target?.value,
           });
@@ -355,7 +349,7 @@
         on:keydown={(e) => {
           if (e.key === "Enter") {
             onItemRenamed("collection", {
-              workspaceId: $currentWorkspace._id,
+              workspaceId: collection.workspaceId,
               collection,
               newName: e?.target?.value,
             });
@@ -395,7 +389,7 @@
     <Tooltip
       placement="bottom"
       title="More options"
-      styleProp="bottom: -8px; {isActiveSyncEnabled ? 'left: -50%' : ''}"
+      styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     >
       <button
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
@@ -413,7 +407,7 @@
         <button
           class="sync-button p-1 border-0 rounded"
           on:click={() => {
-            onRefetchCollection($currentWorkspace._id, collection);
+            onRefetchCollection(collection.workspaceId, collection);
           }}
           on:mouseenter={() => {
             isSyncBtnHovered = true;
@@ -451,7 +445,6 @@
             {onItemDeleted}
             {onItemRenamed}
             {onItemOpened}
-            {onOpenRequestOnTab}
             {collection}
             {userRoleInWorkspace}
             {activeTab}
@@ -474,7 +467,7 @@
                 class="bg-transparent border-0"
                 on:click={() =>
                   onItemCreated("folder", {
-                    workspaceId: $currentWorkspace._id,
+                    workspaceId: collection.workspaceId,
                     collection,
                   })}
               >
@@ -499,7 +492,7 @@
                 class="bg-transparent border-0"
                 on:click={() =>
                   onItemCreated("requestCollection", {
-                    workspaceId: $currentWorkspace._id,
+                    workspaceId: collection.workspaceId,
                     collection,
                   })}
               >

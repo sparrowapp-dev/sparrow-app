@@ -1,14 +1,12 @@
 <script lang="ts">
   import folder from "$lib/assets/folder.svg";
-  import Request from "$lib/components/collections/collections-list/searchTree/Request.svelte";
+  import Request from "./Request.svelte";
   import collectionIcon from "$lib/assets/collection-icon.svg";
-  import type { Observable } from "rxjs";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
   let folderExpand: boolean = false;
   let collectionExpand: boolean = false;
 
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let currentWorkspace: Observable<WorkspaceDocument>;
+  export let workspaceId: string;
   export let explorer: any;
   export let explorerData: any;
   export let searchData: string = "";
@@ -26,7 +24,7 @@
         on:click={() => {
           folderExpand = !folderExpand;
           onItemOpened("folder", {
-            workspaceId: $currentWorkspace._id,
+            workspaceId,
             collection: {
               id: explorer.collectionId,
               activeSync: explorer.activeSync,
@@ -72,11 +70,12 @@
     >
       <Request
         {explorer}
+        {workspaceId}
         {onItemOpened}
         request={explorerData}
         {searchData}
         {getIndex}
-        folderDetails={explorerData}
+        folderDetails={explorer}
       />
     </div>
   {:else}
@@ -85,7 +84,7 @@
       style="cursor:pointer;"
       on:click={() => {
         onItemOpened("collection", {
-          workspaceId: $currentWorkspace._id,
+          workspaceId,
           collection: explorerData,
         });
       }}

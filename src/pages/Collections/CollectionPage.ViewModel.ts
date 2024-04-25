@@ -22,6 +22,7 @@ import { EnvironmentRepository } from "$lib/repositories/environment.repository"
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 //-----
+import { v4 as uuidv4 } from "uuid";
 
 //-----
 // Services
@@ -30,7 +31,6 @@ import { EnvironmentService } from "$lib/services-v2/environment.service";
 import { CollectionService } from "$lib/services/collection.service";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { setContentTypeHeader } from "$lib/utils/helpers";
-import { moveNavigation } from "$lib/utils/helpers/navigation";
 
 //-----
 //External Imports
@@ -40,8 +40,8 @@ import { invoke } from "@tauri-apps/api/core";
 
 //-----
 //Utils
+import { debounce } from "@common/utils";
 import {
-  debounce,
   isUrlValid,
   validateClientJSON,
   validateClientURL,
@@ -72,7 +72,7 @@ import type {
 
 //-----
 //Emuns
-import { RequestDataType } from "$lib/utils/enums";
+import { RequestDataType, RequestDataset } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
   WorkspaceRole,
@@ -91,22 +91,13 @@ import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-<<<<<<< HEAD
-import type { Observable } from "rxjs";
-=======
-<<<<<<< HEAD
->>>>>>> feat/sparrow-refactoring
+import { sample, type Observable } from "rxjs";
+import { InitRequestTab } from "@common/utils";
 
 export default class CollectionsViewModel {
-=======
-import { InitRequestTab } from "@common/utils";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-export class CollectionPageViewModel {
->>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
-  private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
@@ -114,26 +105,6 @@ export class CollectionPageViewModel {
   movedTabEndIndex = 0;
 
   constructor() {}
-
-  /**
-<<<<<<< HEAD
-   * Wrapper function lets fucntion to be executed only one in a time period
-   * @param func :Function - the to be debounced
-   * @param delay :number - the time period limit for debouncing
-   */
-  public debounce = (func: Function, delay: number) => {
-    let timerId;
-
-    return function (...args) {
-      /* eslint-disable @typescript-eslint/no-this-alias */
-      const context = this;
-
-      clearTimeout(timerId);
-      timerId = setTimeout(() => {
-        func.apply(context, args);
-      }, delay);
-    };
-  };
 
   /**
    * Get role of the user in workspace
@@ -160,18 +131,15 @@ export class CollectionPageViewModel {
   /**
    * Prevent syncTabWithStore() to be called multiple times in 2 seconds
    */
-  debouncedTab = this.debounce(this.syncTabWithStore, 2000);
+  debouncedTab = debounce(this.syncTabWithStore, 2000);
 
   /**
-=======
->>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
    * Return current tabs list of top tab bar component
    */
   get tabs() {
     return this.tabRepository.getTabList();
   }
 
-<<<<<<< HEAD
   /**
    * Get list of all environments
    * @return Observable<Environments[]> - list of all environments
@@ -185,7 +153,7 @@ export class CollectionPageViewModel {
    * @returns :Observable<any> | undefined - active tab
    */
   public getActiveTab = () => {
-    return requestResponseStore.getTab();
+    return this.tabRepository.getTab();
   };
 
   /**
@@ -193,14 +161,9 @@ export class CollectionPageViewModel {
    * @param data :any - data of the tab i.e. collection, folder or request
    */
   public handleCreateTab = (data: NewTab) => {
-    requestResponseStore.createTab(data);
+    this.tabRepository.createTab(data);
     this.debouncedTab();
   };
-=======
-  get activeTab() {
-    return this.tabRepository.getTab();
-  }
->>>>>>> ed41c16b47b3390055f3e6b5e7b8e1fcb98ae86c
 
   /**
    * Remove the tab from tab list in store
@@ -476,7 +439,9 @@ export class CollectionPageViewModel {
    * @param ids :string[] - the ids of tab to be removed
    */
   private removeMultipleTabs = async (ids: string[]) => {
-    requestResponseStore.removeMultipleTabs(ids);
+    ids.forEach((id) => {
+      this.tabRepository.removeTab(id);
+    });
     this.debouncedTab();
   };
 
@@ -820,7 +785,7 @@ export class CollectionPageViewModel {
       Samplecollection.path = path;
       Samplecollection.name = response.data.data.name;
       Samplecollection.save = true;
-      this.handleCreateTab(Samplecollection);
+      // this.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
       this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
@@ -894,7 +859,7 @@ export class CollectionPageViewModel {
         });
         notifications.success("Collection Imported successfully.");
       }
-      this.handleCreateTab(Samplecollection);
+      // this.handleCreateTab(Samplecollection);
       moveNavigation("right");
 
       MixpanelEvent(Events.IMPORT_COLLECTION, {
@@ -914,7 +879,6 @@ export class CollectionPageViewModel {
    * @returns :void
    */
   private handleFileUpload = async (workspaceId: string, file: Request) => {
-    console.log("file, ", file);
     if (file) {
       const response = await this.importCollectionFromFile(workspaceId, file);
       if (response.isSuccessful) {
@@ -936,7 +900,7 @@ export class CollectionPageViewModel {
         Samplecollection.path = path;
         Samplecollection.name = response.data.data.name;
         Samplecollection.save = true;
-        this.handleCreateTab(Samplecollection);
+        // this.handleCreateTab(Samplecollection);
         moveNavigation("right");
 
         this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
@@ -1169,7 +1133,10 @@ export class CollectionPageViewModel {
    * Handle Import Api using Curl
    * @param importCurl: string - Curl string
    */
-  private handleImportCurl = async (importCurl: string) => {
+  private handleImportCurl = async (
+    workspaceId: string,
+    importCurl: string,
+  ) => {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
@@ -1207,7 +1174,16 @@ export class CollectionPageViewModel {
       sampleRequest.property.request.state.auth =
         response.data.data.request.selectedRequestAuthType;
 
-      this.handleCreateTab(sampleRequest);
+      const req = new InitRequestTab(sampleRequest.id, workspaceId);
+      req.updateName(sampleRequest.name);
+      req.updateAuth(sampleRequest.property.request?.auth);
+      req.updateMethod(sampleRequest.property.request?.method);
+      req.updateUrl(sampleRequest.property.request?.url);
+      req.updateBody(sampleRequest.property.request?.body);
+      req.updateHeaders(sampleRequest.property.request?.headers);
+      req.updateQueryParams(sampleRequest.property.request?.queryParams);
+
+      this.handleCreateTab(req.getValue());
       moveNavigation("right");
       notifications.success("API request is imported successfully.");
       return true;
@@ -1331,11 +1307,7 @@ export class CollectionPageViewModel {
    * @param name :string - name of new element
    * @returns :string - new proposed name of new collection, folder or request
    */
-  private getNextName: (
-    list: any[],
-    type: string,
-    name: string,
-  ) => string | undefined = (list, type, name) => {
+  private getNextName = (list, type, name) => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -1422,7 +1394,15 @@ export class CollectionPageViewModel {
       request.property.request.save.api = true;
       request.property.request.save.description = true;
 
-      this.handleCreateTab(request);
+      this.handleOpenRequest(
+        workspaceId,
+        collection,
+        {
+          id: "",
+          name: "",
+        },
+        request,
+      );
       moveNavigation("right");
       return;
     } else {
@@ -1516,7 +1496,8 @@ export class CollectionPageViewModel {
       sampleRequest.property.request.save.api = true;
       sampleRequest.property.request.save.description = true;
 
-      this.handleCreateTab(sampleRequest);
+      console.log(sampleRequest.path);
+      this.handleOpenRequest(workspaceId, collection, explorer, sampleRequest);
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
         source: "Side Panel Dropdown",
@@ -1591,7 +1572,7 @@ export class CollectionPageViewModel {
       SampleFolder.path = path;
       SampleFolder.name = response.data.data.name;
       SampleFolder.save = true;
-      this.handleCreateTab(SampleFolder);
+      // this.handleCreateTab(SampleFolder);
       moveNavigation("right");
 
       const folderObj = response.data.data;
@@ -1696,45 +1677,58 @@ export class CollectionPageViewModel {
     folder: Folder,
     request: Request,
   ) => {
-    let _request: any = generateSampleRequest(
-      request.id,
-      new Date().toString(),
-    );
+    const req = new InitRequestTab(request.id, workspaceId);
     const path: Path = {
       workspaceId: workspaceId,
       collectionId: collection.id ?? "",
       folderId: folder?.id,
-      folderName: folder.name,
+      folderName: folder?.name,
     };
-    _request.path = path;
-    _request.name = request.name;
-    if (request.description) _request.description = request.description;
-    if (request.request.url)
-      _request.property.request.url = request.request?.url;
-    if (request.request.body)
-      _request.property.request.body = request.request?.body;
-    if (request.request.method)
-      _request.property.request.method = request.request?.method;
-    if (request.request.queryParams)
-      _request.property.request.queryParams = request.request?.queryParams;
-    if (request.request.auth)
-      _request.property.request.auth = request.request?.auth;
-    if (request.request.headers)
-      _request.property.request.headers = request.request?.headers;
-    if (request.request.actSync) _request.activeSync = request.request?.actSync;
-    if (request.isDeleted) _request.isDeleted = request.isDeleted;
-    if (request.source === "SPEC") _request.source = request.source;
-    if (request.request.selectedRequestBodyType)
-      _request = setBodyType(
-        _request,
-        request.request?.selectedRequestBodyType,
-      );
-    if (request.request.selectedRequestAuthType)
-      _request = setAuthType(_request, request.request.selectedRequestAuthType);
-    _request.property.request.save.api = true;
-    _request.property.request.save.description = true;
-    this.handleCreateTab(_request);
+    req.updateName(request.name);
+    req.updateDescription(request.description);
+    req.updateBody(request.request?.body);
+    req.updateMethod(request.request?.method);
+    req.updateUrl(request.request?.url);
+    req.updateQueryParams(request.request?.queryParams);
+    req.updateAuth(request.request?.auth);
+    req.updateHeaders(request.request?.headers);
+    req.updatePath(path);
+
+    this.tabRepository.createTab(req.getValue());
     moveNavigation("right");
+    // let _request: any = generateSampleRequest(
+    //   request.id,
+    //   new Date().toString(),
+    // );
+    // _request.path = path;
+    // _request.name = request.name;
+    // if (request.description) _request.description = request.description;
+    // if (request.request.url)
+    //   _request.property.request.url = request.request?.url;
+    // if (request.request.body)
+    //   _request.property.request.body = request.request?.body;
+    // if (request.request.method)
+    //   _request.property.request.method = request.request?.method;
+    // if (request.request.queryParams)
+    //   _request.property.request.queryParams = request.request?.queryParams;
+    // if (request.request.auth)
+    //   _request.property.request.auth = request.request?.auth;
+    // if (request.request.headers)
+    //   _request.property.request.headers = request.request?.headers;
+    // if (request.request.actSync) _request.activeSync = request.request?.actSync;
+    // if (request.isDeleted) _request.isDeleted = request.isDeleted;
+    // if (request.source === "SPEC") _request.source = request.source;
+    // if (request.request.selectedRequestBodyType)
+    //   _request = setBodyType(
+    //     _request,
+    //     request.request?.selectedRequestBodyType,
+    //   );
+    // if (request.request.selectedRequestAuthType)
+    //   _request = setAuthType(_request, request.request.selectedRequestAuthType);
+    // _request.property.request.save.api = true;
+    // _request.property.request.save.description = true;
+    // this.handleCreateTab(_request);
+    // moveNavigation("right");
   };
 
   public handleOpenFolder = (
@@ -1742,60 +1736,54 @@ export class CollectionPageViewModel {
     collection: CollectionDocument,
     folder: Folder,
   ) => {
-    const path: Path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder.name,
-    };
-
-    const sampleFolder = generateSampleFolder(folder.id, new Date().toString());
-
-    sampleFolder.id = folder.id;
-    sampleFolder.path = path;
-    sampleFolder.name = folder.name;
-    sampleFolder.save = true;
-    sampleFolder.activeSync = collection.activeSync;
-    sampleFolder.source = !folder?.source ? "SPEC" : folder?.source;
-    sampleFolder.isDeleted = folder?.isDeleted;
-
-    this.handleCreateTab(sampleFolder);
-    moveNavigation("right");
+    // const path: Path = {
+    //   workspaceId: workspaceId,
+    //   collectionId: collection.id ?? "",
+    //   folderId: folder?.id,
+    //   folderName: folder.name,
+    // };
+    // const sampleFolder = generateSampleFolder(folder.id, new Date().toString());
+    // sampleFolder.id = folder.id;
+    // sampleFolder.path = path;
+    // sampleFolder.name = folder.name;
+    // sampleFolder.save = true;
+    // sampleFolder.activeSync = collection.activeSync;
+    // sampleFolder.source = !folder?.source ? "SPEC" : folder?.source;
+    // sampleFolder.isDeleted = folder?.isDeleted;
+    // this.handleCreateTab(sampleFolder);
+    // moveNavigation("right");
   };
 
   public handleOpenCollection = (
     workspaceId: string,
     collection: CollectionDocument,
   ) => {
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    collection.items.map((item) => {
-      if (item.type === ItemType.REQUEST) {
-        totalRequest++;
-      } else {
-        totalFolder++;
-        totalRequest += item.items.length;
-      }
-    });
-
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-    };
-
-    const sampleCollection = generateSampleCollection(
-      collection.id,
-      new Date().toString(),
-    );
-
-    sampleCollection.id = collection.id;
-    sampleCollection.path = path;
-    sampleCollection.name = collection.name;
-    sampleCollection.property.collection.requestCount = totalRequest;
-    sampleCollection.property.collection.folderCount = totalFolder;
-    sampleCollection.save = true;
-    this.handleCreateTab(sampleCollection);
-    moveNavigation("right");
+    // let totalFolder: number = 0;
+    // let totalRequest: number = 0;
+    // collection.items.map((item) => {
+    //   if (item.type === ItemType.REQUEST) {
+    //     totalRequest++;
+    //   } else {
+    //     totalFolder++;
+    //     totalRequest += item.items.length;
+    //   }
+    // });
+    // const path = {
+    //   workspaceId: workspaceId,
+    //   collectionId: collection.id ?? "",
+    // };
+    // const sampleCollection = generateSampleCollection(
+    //   collection.id,
+    //   new Date().toString(),
+    // );
+    // sampleCollection.id = collection.id;
+    // sampleCollection.path = path;
+    // sampleCollection.name = collection.name;
+    // sampleCollection.property.collection.requestCount = totalRequest;
+    // sampleCollection.property.collection.folderCount = totalFolder;
+    // sampleCollection.save = true;
+    // this.handleCreateTab(sampleCollection);
+    // moveNavigation("right");
   };
   /**
    * Handles renaming a request
@@ -2116,7 +2104,7 @@ export class CollectionPageViewModel {
         this.handleCreateFolderInCollection(args.workspaceId, args.collection);
         break;
       case "request":
-        this.handleCreateApiRequest();
+        this.createNewTab();
         break;
       case "requestCollection":
         this.handleCreateRequestInCollection(args.workspaceId, args.collection);
@@ -2216,7 +2204,7 @@ export class CollectionPageViewModel {
         );
         break;
       case "curl":
-        this.handleImportCurl(args.importCurl);
+        this.handleImportCurl(args.workspaceId, args.importCurl);
         break;
     }
   };
