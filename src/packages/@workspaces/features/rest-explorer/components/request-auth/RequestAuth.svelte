@@ -12,15 +12,15 @@
 
 <div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
   <div
-    class="col-12 d-flex align-items-center"
+    class="col-12 pb-2 d-flex align-items-center"
     style="font-size: 12px; font-weight:500;border-bottom:1px solid var(--border-color)"
   >
     <div class="col-2">
-      <p class="text-requestBodyColor ps-1">Auth Type</p>
+      <p class="text-requestBodyColor ps-1 mb-0">Auth Type</p>
     </div>
     <div class="col-10">
       <button class="d-flex bg-backgroundColor border-0">
-        <p>
+        <p class="mb-0">
           <Select
             id={"hash999"}
             data={[

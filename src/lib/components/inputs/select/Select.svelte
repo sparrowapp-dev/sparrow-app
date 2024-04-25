@@ -69,12 +69,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme: "dark" | "transparent" = "dark";
+  export let headerTheme: "dark" | "transparent" | "voilet" = "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" = "dark";
+  export let bodyTheme: "dark" | "blur" | "voilet" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -163,6 +163,9 @@
     case "dark":
       selectBackgroundClass = "select-background-dark";
       break;
+    case "voilet":
+      selectBackgroundClass = "select-background-voilet";
+      break;
   }
 
   let selectBodyBackgroundClass = "";
@@ -173,6 +176,8 @@
     case "dark":
       selectBodyBackgroundClass = "select-body-background-dark";
       break;
+    case "voilet":
+      selectBodyBackgroundClass = "select-body-background-voilet";
   }
 
   const toggleSelect = () => {
@@ -214,7 +219,19 @@
       (_headerHighlight === "active" && _isOpen) ||
       (_headerHighlight === "hover-active" && (_isOpen || isHover))
     ) {
-      return "select-btn-state-active";
+      let x;
+      switch (headerTheme) {
+        case "transparent":
+          x = "transparent";
+          break;
+        case "dark":
+          x = "dark";
+          break;
+        case "voilet":
+          x = "voilet";
+          break;
+      }
+      return `select-btn-state-active-${x}`;
     } else {
       return "";
     }
@@ -374,6 +391,7 @@
                 {list}
                 {selectedRequest}
                 {checkIcon}
+                {bodyTheme}
                 {getTextColor}
               />
             {/if}
@@ -417,8 +435,17 @@
   .select-background-dark {
     background-color: var(--blackColor);
   }
-  .select-btn-state-active {
+  .select-background-voilet {
+    background-color: #22232e;
+  }
+  .select-btn-state-active-transparent {
     background-color: var(--border-color);
+  }
+  .select-btn-state-active-dark {
+    background-color: var(--border-color);
+  }
+  .select-btn-state-active-voilet {
+    background-color: #1c1d27;
   }
   .select-data {
     color: white;
@@ -430,6 +457,9 @@
   }
   .select-body-background-dark {
     background-color: var(--background-dropdown);
+  }
+  .select-body-background-voilet {
+    background-color: #22232e;
   }
   .select-body-background-blur {
     background: var(--background-hover);

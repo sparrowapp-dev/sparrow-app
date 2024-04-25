@@ -61,14 +61,19 @@
         color: "patch",
       },
     ]}
+    borderRounded={false}
     titleId={httpMethod}
     onclick={handleDropdown}
-    headerTheme={"transparent"}
     borderHighlight={"active"}
     headerHighlight={"hover"}
+    minHeaderWidth={"100px"}
+    borderActiveType={"none"}
+    headerTheme={"voilet"}
     minBodyWidth={"150px"}
     zIndex={2}
+    borderType={"none"}
     menuItem={"v2"}
+    bodyTheme={"voilet"}
   />
 
   <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />

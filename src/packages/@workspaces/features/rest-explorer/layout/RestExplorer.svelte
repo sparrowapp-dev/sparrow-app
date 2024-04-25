@@ -85,12 +85,12 @@
 </script>
 
 {#if $tab.tabId}
-  <div class="d-flex">
-    <div class="w-100 d-flex flex-column h-100">
+  <div class="d-flex rest-explorer-layout">
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
-      <div class="d-flex justify-content-between w-100 p-3">
+      <!-- <div class="d-flex justify-content-between w-100 p-3">
         <RequestName name={$tab.name} {onUpdateRequestName} />
-        <!-- Save and Share Buttons -->
+        
         <div class="d-flex justify-content-between">
           <Button
             title="Save Request"
@@ -157,11 +157,11 @@
             onClick={() => {}}
           />
         </div>
-      </div>
+      </div> -->
 
       <!-- HTTP URL Section -->
       <HttpUrlSection
-        class="py-1 px-3"
+        class=""
         requestUrl={$tab.property.request?.url}
         httpMethod={$tab.property.request?.method}
         splitterDirection={$tab.property.request?.state
@@ -330,3 +330,12 @@
     />
   </ModalWrapperV1>
 {/if}
+
+<style>
+  .rest-explorer-layout {
+    background-color: #151515;
+  }
+  :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
+    background-color: #151515 !important;
+  }
+</style>

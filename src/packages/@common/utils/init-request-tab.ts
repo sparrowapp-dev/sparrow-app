@@ -1,6 +1,5 @@
 import type { TabDocument } from "$lib/database/app.database";
 import { ItemType, RequestDefault } from "$lib/utils/enums";
-import type {} from "$lib/utils/interfaces/request.interface";
 import {
   AuthSectionEnum,
   AuthTypeEnum,
