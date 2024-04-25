@@ -67,7 +67,7 @@
   export let onSendRequest: SendRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestParams: UpdateParamsType;
-  export let onUpdateRequestName: UpdateRequestNameType;
+  // export let onUpdateRequestName: UpdateRequestNameType;
   export let onUpdateRequestBody: UpdateRequestBodyType;
   export let onUpdateRequestAuth: UpdateRequestAuthType;
   export let onUpdateHeaders: UpdateHeadersType;
@@ -83,6 +83,27 @@
   export let onCreateFolder: CreateFolderType;
   export let onCreateCollection: CreateCollectionType;
   let isExposeSaveAsRequest = false;
+
+  const stylePanes = () => {
+    const splitter = document.querySelector(
+      ".splitter-request .splitpanes__splitter",
+    );
+    if (
+      splitter &&
+      $tab.property.request?.state?.requestSplitterDirection === "horizontal"
+    ) {
+      splitter.style.height = "1px";
+      splitter.style.width = "100%";
+    } else if (splitter) {
+      splitter.style.height = "100%";
+      splitter.style.width = "1px";
+    }
+  };
+  $: {
+    if ($tab?.property?.request?.state?.requestSplitterDirection) {
+      stylePanes();
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -174,7 +195,7 @@
       />
 
       <Splitpanes
-        class=""
+        class="splitter-request"
         id={"rest-splitter"}
         style="height: calc(100vh - 160px); margin-top:10px;"
         horizontal={$tab.property.request?.state?.requestSplitterDirection ===

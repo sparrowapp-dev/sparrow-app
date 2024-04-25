@@ -2,82 +2,64 @@
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
+  import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
 
   export let response;
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center justify-content-between pb-3 w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center justify-content-between p-2 w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex align-items-center gap-2">
       <!-- insert controller here -->
       <div class="d-flex gap-2">
         <button
-          class="statuscode position-relative cursor-pointer ps-1 pe-1 border-0 rounded d-flex align-items-center justify-content-center text-backgroundColor gap-1 {response.status ===
-            '200 OK' || response.status === '201 Created'
-            ? 'status-primary1'
-            : 'status-danger'} "
+          class="statuscode position-relative cursor-pointer border-0"
           style="font-size: 10px;"
         >
-          {#if response.status?.length > 12}
-            <div class="position-absolute tooltip-statuscode">
-              <span class="ellipsis">
-                <span class="me-1">
-                  {#if response.status === ResponseStatusCode.OK || response.status === ResponseStatusCode.CREATED}
-                    <StatusSuccess
-                      height={8}
-                      width={8}
-                      backgroundColor={"var(--success-color)"}
-                      textColor={"var(--background-color)"}
-                    />
-                  {:else}
-                    <StatusError
-                      height={8}
-                      width={8}
-                      backgroundColor={"var(--request-delete)"}
-                      textColor={"var(--background-color)"}
-                    />
-                  {/if}
-                </span>
-                {response.status}</span
-              >
-            </div>
-          {/if}
-          <span class="ellipsis">
+          <span
+            class="ellipsis"
+            style="color:{response.status === ResponseStatusCode.OK ||
+            response.status === ResponseStatusCode.CREATED
+              ? 'var(--success-color)'
+              : 'var(--request-delete)'};"
+          >
             <span class="me-1">
-              {#if response.status === ResponseStatusCode.OK || response.status === ResponseStatusCode.CREATED}
-                <StatusSuccess
-                  height={8}
-                  width={8}
-                  backgroundColor={"var(--success-color)"}
-                  textColor={"var(--background-color)"}
-                />
-              {:else}
-                <StatusError
-                  height={8}
-                  width={8}
-                  backgroundColor={"var(--request-delete)"}
-                  textColor={"var(--background-color)"}
-                />
-              {/if}
+              <DotIcon
+                color={response.status === ResponseStatusCode.OK ||
+                response.status === ResponseStatusCode.CREATED
+                  ? "var(--success-color)"
+                  : "var(--request-delete)"}
+              />
             </span>
-            {response.status}</span
+
+            {response.status.split(" ")[0]}</span
           >
         </button>
         <button
           class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
           style="font-size: 10px;"
         >
-          <span>{response.time}</span>
+          <span>
+            <span class="me-1">
+              <ClockIcon />
+            </span>
+            {response.time}
+          </span>
           <p class="mb-0">ms</p>
         </button>
         <button
           class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
           style="font-size: 10px;"
         >
-          <span>{response.size?.toFixed(2)}</span>
+          <span>
+            <span class="me-1">
+              <BoxIcon />
+            </span>
+            {response.size?.toFixed(2)}
+          </span>
           <p class="mb-0">KB</p>
         </button>
       </div>
@@ -105,17 +87,17 @@
     padding-bottom: 1px;
     max-width: 100px;
   }
-  .status-danger:hover,
+
   .status-primary1:hover {
     background-color: var(--background-light) !important;
   }
 
   .time-primary1 {
-    color: var(--send-button) !important;
+    color: var(--success-color) !important;
     background-color: transparent;
   }
   .size-primary1 {
-    color: var(--request-post) !important;
+    color: white !important;
     background-color: transparent;
   }
   .tooltip-statuscode {
@@ -130,6 +112,7 @@
   }
   .statuscode {
     padding: 4px 8px;
+    background-color: transparent;
   }
   .statuscode:hover .tooltip-statuscode {
     display: block;
