@@ -2,6 +2,11 @@
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   // ---- Store
+  import {
+    leftPanelWidth,
+    rightPanelWidth,
+    leftPanelCollapse,
+  } from "@workspaces/common/stores";
 
   // ---- Animation
   import { Motion } from "svelte-motion";
@@ -55,9 +60,6 @@
   let isImportCurlPopup: boolean = false;
   let loader = false;
   let currentEnvironment: Observable<EnvironmentDocument>;
-  let leftPanelCollapse: boolean = false;
-  let leftPanelWidth: number = 20;
-  let rightPanelWidth: number = 80;
   let splitter: any;
 
   /**
@@ -108,8 +110,8 @@
   };
 
   const handleCollapseCollectionList = () => {
-    leftPanelCollapse = !leftPanelCollapse;
-    splitter.style.display = leftPanelCollapse ? "none" : "unset";
+    leftPanelCollapse.set(!$leftPanelCollapse);
+    splitter.style.display = $leftPanelCollapse ? "none" : "unset";
   };
 
   /**
@@ -143,38 +145,29 @@
   onMount(() => {
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
-    );
-    splitter.style.width = "1px";
+    ).style.width = "1px";
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
     if (isNew) _viewModel.createNewTab();
   });
-
-  $: {
-    // if ( leftPanelCollapse === true) {
-    //   splitter.style.display = "none";
-    // }else (leftPanelCollapse === false) {
-    //   splitter.style.display = "unset";
-    // }
-  }
 </script>
 
 <Splitpanes
   class="splitter-sidebar"
   on:resize={(e) => {
-    leftPanelWidth = e.detail[0].size;
-    rightPanelWidth = e.detail[1].size;
+    leftPanelWidth.set(e.detail[0].size);
+    rightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane size={leftPanelCollapse ? 0 : leftPanelWidth} minSize={20}>
+  <Pane size={$leftPanelCollapse ? 0 : $leftPanelWidth} minSize={20}>
     <CollectionList
       {collectionList}
       {environmentList}
       {currentEnvironment}
       {currentWorkspace}
       leftPanelController={{
-        leftPanelCollapse,
+        leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
       }}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
@@ -190,7 +183,7 @@
       onSearchCollection={_viewModel.handleSearchCollection}
     />
   </Pane>
-  <Pane size={leftPanelCollapse ? 100 : rightPanelWidth} minSize={30}>
+  <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
     <TabBar
       tabList={$tabList}
       onNewTabRequested={_viewModel.createNewTab}

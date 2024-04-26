@@ -8,7 +8,7 @@
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "$lib/database/app.database";
-  import { debounce } from "@common/utils";
+  import { Debounce } from "@common/utils";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let workspaceId: string;
@@ -213,7 +213,7 @@
     isRepositoryBranchTouched = true;
     repositoryBranch = tabId;
   };
-  const debouncedImport = debounce(handleInputField, 1000);
+  const debouncedImport = new Debounce().debounce(handleInputField, 1000);
 </script>
 
 {#if progressBar.isLoading}

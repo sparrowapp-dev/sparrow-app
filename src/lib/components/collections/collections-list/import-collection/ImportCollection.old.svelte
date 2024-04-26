@@ -21,7 +21,7 @@
     validateClientJSON,
     validateClientURL,
     validateClientXML,
-  } from "../collection/collection-utils/utils";
+  } from "@package/common/utils/importCollectionValidations";
   import linkIcon from "$lib/assets/linkIcon.svg";
   import { invoke } from "@tauri-apps/api/core";
   import Button from "$lib/components/buttons/Button.svelte";

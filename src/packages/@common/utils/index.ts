@@ -1,2 +1,2 @@
 export { InitRequestTab } from "./init-request-tab";
-export { debounce } from "./debounce";
+export { Debounce } from "./debounce";

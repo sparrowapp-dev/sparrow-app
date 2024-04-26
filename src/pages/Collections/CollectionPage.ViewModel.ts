@@ -40,7 +40,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 //-----
 //Utils
-import { debounce } from "@common/utils";
+import { Debounce } from "@common/utils";
 import {
   validateClientJSON,
   validateClientURL,
@@ -129,7 +129,7 @@ export default class CollectionsViewModel {
   /**
    * Prevent syncTabWithStore() to be called multiple times in 2 seconds
    */
-  debouncedTab = debounce(this.syncTabWithStore, 2000);
+  debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
 
   /**
    * Return current tabs list of top tab bar component
@@ -594,9 +594,9 @@ export default class CollectionsViewModel {
       Samplecollection.name = response.data.data.name;
       Samplecollection.property.collection.requestCount = totalRequest;
       Samplecollection.property.collection.folderCount = totalFolder;
-      Samplecollection.save = true;
-      this.handleCreateTab(Samplecollection);
-      moveNavigation("right");
+      // Samplecollection.save = true;
+      // this.handleCreateTab(Samplecollection);
+      // moveNavigation("right");
 
       this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: Samplecollection.id,
@@ -642,17 +642,6 @@ export default class CollectionsViewModel {
       filteredFolder,
       filteredFile,
     };
-  };
-
-  /**
-   * Handle creating new empty api request
-   */
-  private handleCreateApiRequest = () => {
-    this.handleCreateTab(
-      generateSampleRequest("UNTRACKED-" + uuidv4(), new Date().toString()),
-    );
-    moveNavigation("right");
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "Side Panel TopBar" });
   };
 
   /**

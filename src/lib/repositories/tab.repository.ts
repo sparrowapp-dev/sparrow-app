@@ -19,16 +19,14 @@ export class TabRepository {
    * Creates a new tab and adds it to the tab bar.
    */
   public createTab = async (tab: any): Promise<void> => {
-    let isDuplicate = false;
-    this.getTabList().subscribe((tabs: any) => {
-      tabs.forEach((_tab: any) => {
-        if (_tab.id === tab.id) {
-          isDuplicate = true;
-          return;
-        }
-      });
-    });
-    if (isDuplicate) {
+    const _tab = await RxDB.getInstance()
+      .rxdb.tab.findOne({
+        selector: {
+          id: tab.id,
+        },
+      })
+      .exec();
+    if (_tab) {
       return;
     }
     const activeTab = await RxDB.getInstance()
