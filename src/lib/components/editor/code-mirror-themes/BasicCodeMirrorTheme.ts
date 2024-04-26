@@ -104,7 +104,7 @@ export const basicTheme = EditorView.theme({
   },
   div: {
     fontFamily: EditorFont,
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "var(--bg-primary-550)",
   },
 });
 

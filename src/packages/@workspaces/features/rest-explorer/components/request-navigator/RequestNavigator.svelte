@@ -45,10 +45,10 @@
 
 <div class="py-2">
   <!-- Tabs -->
-  <div class="d-flex mb-3">
+  <div class="d-flex mb-2">
     {#each tabs as tab}
       <button
-        class="team-menu__link border-0 me-2 sparrow-fs-12 request-tab me-4 {tab.id ===
+        class="team-menu__link px-1 border-0 me-2 sparrow-fs-12 request-tab me-3 {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -57,9 +57,10 @@
           onUpdateRequestState({ requestNavigation: tab.id });
         }}
       >
-        <span class=""
-          >{tab.name}
+        <span class="d-flex align-items-center"
+          ><span>{tab.name}</span>
           {#if tab.count}
+            <span class="ms-1"></span>
             <Label number={tab.count} />
           {/if}
         </span>
@@ -70,12 +71,17 @@
 
 <style>
   .team-menu__link {
-    color: #8a9299;
+    color: var(--text-secondary-300);
     background-color: transparent;
     border-bottom: 2px transparent;
   }
+  .team-menu__link:hover {
+    color: var(--text-secondary-100);
+  }
   .tab-active {
-    color: white;
-    border-bottom: 2px solid var(--send-button) !important;
+    color: var(--text-secondary-100);
+    border-color: var(--border-primary-200) !important;
+    border-bottom-width: 2px !important;
+    border-bottom-style: solid !important;
   }
 </style>

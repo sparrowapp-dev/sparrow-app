@@ -71,6 +71,36 @@ $deleted-api-method: #939699;
 $button-active: #1D3650;
 
 
+$theme-grey-ffffff:#ffffff;
+$theme-grey-8A9299:#8A9299;
+$theme-grey-45494D:#45494D;
+$theme-grey-313233:#313233;
+$theme-grey-272727:#272727;
+$theme-grey-212222:#212222;
+$theme-grey-1A1A1A:#1A1A1A;
+$theme-grey-161617:#161617;
+$theme-grey-151515:#151515;
+$theme-grey-000000:#000000;
+
+$theme-blue-9CDCFE:#9CDCFE;
+$theme-blue-1193F0:#1193F0;
+$theme-blue-3670F7:#3670F7;
+$theme-blue-0B5ED7:#0B5ED7;
+$theme-blue-22232E:#22232E;
+$theme-blue-272831:#272831;
+$theme-blue-2E2F3D:#2E2F3D;
+
+$theme-red-e5acb2:#e5acb2;
+$theme-red-fe8c98:#fe8c98;
+$theme-red-ff7878:#ff7878;
+$theme-red-f16674:#f16674;
+$theme-red-fc6574:#fc6574;
+$theme-red-ef5262:#ef5262;
+$theme-red-f34b5c:#f34b5c;
+$theme-red-f33346:#f33346;
+$theme-red-fe2e2e:#fe2e2e;
+
+
 :root {
   --blackColor: #{$sparrow-black};
   --defaultcolor: #{$sparrow-default};
@@ -129,6 +159,77 @@ $button-active: #1D3650;
   --active-sync-btn: #{$sparrow-active-sync};
   --deleted-api-method: #{$deleted-api-method};
   --button-active: #{$button-active};
+
+  //
+  //
+  // Sets text color 
+  //
+  //
+  --text-primary-100 : #{$theme-blue-9CDCFE};
+  --text-primary-200 : #{$theme-blue-1193F0};
+  --text-primary-300 : #{$theme-blue-3670F7};
+  --text-primary-400 : #{$theme-blue-0B5ED7};
+  --text-primary-500 : #{$theme-blue-22232E};
+  --text-primary-600 : #{$theme-blue-272831};
+  --text-primary-700 : #{$theme-blue-2E2F3D};
+  
+  --text-secondary-100 : #{$theme-grey-ffffff};
+  --text-secondary-200 : #{$theme-grey-8A9299};
+  --text-secondary-300 : #{$theme-grey-45494D};
+  --text-secondary-400 : #{$theme-grey-313233};
+  --text-secondary-500 : #{$theme-grey-272727};
+  --text-secondary-600 : #{$theme-grey-212222};
+  --text-secondary-700 : #{$theme-grey-161617};
+  --text-secondary-800 : #{$theme-grey-151515};
+  --text-secondary-900 : #{$theme-grey-000000};
+
+  //
+  //
+  // Sets background color
+  //
+  //
+  --bg-primary-100 : #{$theme-grey-ffffff};
+  --bg-primary-200 : #{$theme-grey-8A9299};
+  --bg-primary-300 : #{$theme-grey-45494D};
+  --bg-primary-400 : #{$theme-grey-313233};
+  --bg-primary-500 : #{$theme-grey-272727};
+  --bg-primary-550 : #{$theme-grey-1A1A1A};
+  --bg-primary-600 : #{$theme-grey-212222};
+  --bg-primary-700 : #{$theme-grey-161617};
+  --bg-primary-800 : #{$theme-grey-151515};
+  --bg-primary-900 : #{$theme-grey-000000};
+  
+
+  --bg-secondary-100 : #{$theme-blue-9CDCFE};
+  --bg-secondary-200 : #{$theme-blue-1193F0};
+  --bg-secondary-300 : #{$theme-blue-3670F7};
+  --bg-secondary-400 : #{$theme-blue-0B5ED7};
+  --bg-secondary-500 : #{$theme-blue-22232E};
+  --bg-secondary-600 : #{$theme-blue-272831};
+  --bg-secondary-700 : #{$theme-blue-2E2F3D};
+
+  //
+  //
+  // Sets border color
+  //
+  //
+  --border-primary-100 : #{$theme-blue-9CDCFE};
+  --border-primary-200 : #{$theme-blue-1193F0};
+  --border-primary-300 : #{$theme-blue-3670F7};
+  --border-primary-400 : #{$theme-blue-0B5ED7};
+  --border-primary-500 : #{$theme-blue-22232E};
+  --border-primary-600 : #{$theme-blue-272831};
+  --border-primary-700 : #{$theme-blue-2E2F3D};
+
+  --border-secondary-100 : #{$theme-grey-ffffff};
+  --border-secondary-200 : #{$theme-grey-8A9299};
+  --border-secondary-300 : #{$theme-grey-45494D};
+  --border-secondary-400 : #{$theme-grey-313233};
+  --border-secondary-500 : #{$theme-grey-272727};
+  --border-secondary-600 : #{$theme-grey-212222};
+  --border-secondary-700 : #{$theme-grey-161617};
+  --border-secondary-800 : #{$theme-grey-151515};
+  --border-secondary-900 : #{$theme-grey-000000};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -195,10 +296,91 @@ $sparrow-font-sizes: (
   36: 2.25rem // 36px in rem
 );
 
-// Generate utility classes for font sizes
+// Define a map for text colors
+$sparrow-text-colors: (
+  primary-100 : $theme-blue-9CDCFE,
+  primary-200 : $theme-blue-1193F0,
+  primary-300 : $theme-blue-3670F7,
+  primary-400 : $theme-blue-0B5ED7,
+  primary-500 : $theme-blue-22232E,
+  primary-600 : $theme-blue-272831,
+  primary-700 : $theme-blue-2E2F3D,
+  
+  secondary-100 : $theme-grey-ffffff,
+  secondary-200 : $theme-grey-8A9299,
+  secondary-300 : $theme-grey-45494D,
+  secondary-400 : $theme-grey-313233,
+  secondary-500 : $theme-grey-272727,
+  secondary-600 : $theme-grey-212222,
+  secondary-700 : $theme-grey-161617,
+  secondary-800 : $theme-grey-151515,
+  secondary-900 : $theme-grey-000000,
+);
+
+// Define a map for background colors
+$sparrow-bg-colors: (
+  primary-100 : $theme-grey-ffffff,
+  primary-200 : $theme-grey-8A9299,
+  primary-300 : $theme-grey-45494D,
+  primary-400 : $theme-grey-313233,
+  primary-500 : $theme-grey-272727,
+  primary-550 : $theme-grey-1A1A1A,
+  primary-600 : $theme-grey-212222,
+  primary-700 : $theme-grey-161617,
+  primary-800 : $theme-grey-151515,
+  primary-900 : $theme-grey-000000,
+  
+
+  secondary-100 : $theme-blue-9CDCFE,
+  secondary-200 : $theme-blue-1193F0,
+  secondary-300 : $theme-blue-3670F7,
+  secondary-400 : $theme-blue-0B5ED7,
+  secondary-500 : $theme-blue-22232E,
+  secondary-600 : $theme-blue-272831,
+  secondary-700 : $theme-blue-2E2F3D,
+);
+
+
+// Define a map for border colors
+$sparrow-border-colors: (
+  primary-100 : $theme-blue-9CDCFE,
+  primary-200 : $theme-blue-1193F0,
+  primary-300 : $theme-blue-3670F7,
+  primary-400 : $theme-blue-0B5ED7,
+  primary-500 : $theme-blue-22232E,
+  primary-600 : $theme-blue-272831,
+  primary-700 : $theme-blue-2E2F3D,
+
+  secondary-100 : $theme-grey-ffffff,
+  secondary-200 : $theme-grey-8A9299,
+  secondary-300 : $theme-grey-45494D,
+  secondary-400 : $theme-grey-313233,
+  secondary-500 : $theme-grey-272727,
+  secondary-600 : $theme-grey-212222,
+  secondary-700 : $theme-grey-161617,
+  secondary-800 : $theme-grey-151515,
+  secondary-900 : $theme-grey-000000,
+);
+
+// Generate utility classes
   @each $size, $value in $sparrow-font-sizes {
     .sparrow-fs-#{$size} {
       font-size: $value;
+    }
+  }
+  @each $color, $value in $sparrow-text-colors {
+    .text-#{$color} {
+      color: $value;
+    }
+  }
+  @each $background, $value in $sparrow-bg-colors {
+    .bg-#{$background} {
+      background-color: $value;
+    }
+  }
+  @each $border, $value in $sparrow-border-colors {
+    .border-#{$border} {
+      border-color: $value;
     }
   }
 

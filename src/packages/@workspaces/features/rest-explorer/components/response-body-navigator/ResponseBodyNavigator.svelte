@@ -176,7 +176,7 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: #1a1a1a;
+    background-color: var(--bg-primary-550);
   }
   .btn-formatter {
     outline: none;
@@ -189,27 +189,7 @@
     transform: translateY(-3px);
   }
 
-  .status-primary1 {
-    color: var(--success-color) !important;
-    background-color: transparent;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    max-width: 100px;
-  }
-  .status-danger {
-    color: var(--request-delete) !important;
-    background-color: transparent;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    max-width: 100px;
-  }
-  .status-danger:hover,
-  .status-primary1:hover {
-    background-color: var(--background-light) !important;
-  }
-
   .clear-button {
-    background: var(--border-color);
     color: var(--workspace-hover-color);
     font-family: Roboto;
     font-size: 12px;
@@ -218,31 +198,5 @@
     letter-spacing: 0em;
     text-align: center;
     padding: 4px 8px 4px 8px;
-  }
-
-  .time-primary1 {
-    color: var(--send-button) !important;
-    background-color: transparent;
-  }
-  .size-primary1 {
-    color: var(--request-post) !important;
-    background-color: transparent;
-  }
-  .tooltip-statuscode {
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--background-light) !important;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: none;
-    transition: 0.2s ease-in-out;
-  }
-  .statuscode {
-    padding: 4px 8px;
-  }
-  .statuscode:hover .tooltip-statuscode {
-    display: block;
-    transition: 0.2s ease-in-out;
   }
 </style>

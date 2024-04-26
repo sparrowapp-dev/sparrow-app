@@ -131,6 +131,6 @@
 <style>
   .save-disk {
     padding: 7px;
-    background-color: #313233;
+    background-color: var(--bg-primary-400);
   }
 </style>

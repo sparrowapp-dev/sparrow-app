@@ -70,26 +70,7 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: #22232e;
-  }
-
-  .status-primary1 {
-    color: var(--success-color) !important;
-    background-color: transparent;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    max-width: 100px;
-  }
-  .status-danger {
-    color: var(--request-delete) !important;
-    background-color: transparent;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    max-width: 100px;
-  }
-
-  .status-primary1:hover {
-    background-color: var(--background-light) !important;
+    background-color: var(--bg-secondary-500);
   }
 
   .time-primary1 {
@@ -97,25 +78,11 @@
     background-color: transparent;
   }
   .size-primary1 {
-    color: white !important;
+    color: var(--text-secondary-100) !important;
     background-color: transparent;
-  }
-  .tooltip-statuscode {
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--background-light) !important;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: none;
-    transition: 0.2s ease-in-out;
   }
   .statuscode {
     padding: 4px 8px;
     background-color: transparent;
-  }
-  .statuscode:hover .tooltip-statuscode {
-    display: block;
-    transition: 0.2s ease-in-out;
   }
 </style>

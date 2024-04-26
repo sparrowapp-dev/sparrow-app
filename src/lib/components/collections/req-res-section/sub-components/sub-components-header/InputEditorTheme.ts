@@ -13,7 +13,7 @@ export const InputTheme = EditorView.theme({
     caretColor: "var(--white-color)",
     height: "100%",
     paddingTop: "7px",
-    backgroundColor: "#212222",
+    backgroundColor: "var(--bg-primary-600)",
   },
   ".cm-panels": {
     backgroundColor: "var(--blackColor)",
