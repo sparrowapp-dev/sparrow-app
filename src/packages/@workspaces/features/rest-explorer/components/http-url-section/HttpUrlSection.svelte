@@ -13,6 +13,8 @@
     UpdateRequestStateType,
     UpdateRequestUrlType,
   } from "@workspaces/shared/type";
+  import { DiskIcon } from "@library/icons";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
   let componentClass = "";
   export { componentClass as class };
@@ -24,6 +26,8 @@
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestState: UpdateRequestStateType;
+  export let toggleSaveRequest;
+  export let onSaveRequest;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
@@ -81,13 +85,13 @@
   <!-- Send button -->
   <Button
     title="Send"
-    buttonClassProp="p-2"
+    buttonClassProp=" ms-2 p-2"
     type="primary"
     onClick={onSendButtonClicked}
   />
 
   <!-- Switch pane layout button -->
-  <ToggleButton
+  <!-- <ToggleButton
     selectedToggleId={splitterDirection}
     toggleButtons={[
       {
@@ -103,10 +107,30 @@
     ]}
     on:click={(e) => {
       onUpdateRequestState({ requestSplitterDirection: e.detail });
-      // restSplitterDirection.set(e.detail);
     }}
-  />
+  /> -->
+  <div
+    class="ms-2 save-disk d-flex align-items-center justify-content-center rounded"
+    type="button"
+    on:click={async () => {
+      const x = await onSaveRequest();
+      if (
+        x.status === "error" &&
+        x.message === "request is not a part of any workspace or collection"
+      ) {
+        toggleSaveRequest(true);
+      } else if (x.status === "success") {
+        notifications.success("API request saved");
+      }
+    }}
+  >
+    <DiskIcon height={20} width={20} />
+  </div>
 </div>
 
 <style>
+  .save-disk {
+    padding: 7px;
+    background-color: #313233;
+  }
 </style>

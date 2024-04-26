@@ -82,7 +82,11 @@
   export let onSaveAsRequest: SaveAsRequestType;
   export let onCreateFolder: CreateFolderType;
   export let onCreateCollection: CreateCollectionType;
+
   let isExposeSaveAsRequest = false;
+  const toggleSaveRequest = (flag: boolean) => {
+    isExposeSaveAsRequest = flag;
+  };
 
   const stylePanes = () => {
     const splitter = document.querySelector(
@@ -192,6 +196,8 @@
         {onUpdateRequestUrl}
         {onUpdateRequestMethod}
         {onUpdateRequestState}
+        {toggleSaveRequest}
+        {onSaveRequest}
       />
 
       <Splitpanes
