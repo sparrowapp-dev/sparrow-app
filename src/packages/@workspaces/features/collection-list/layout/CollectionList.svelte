@@ -20,7 +20,7 @@
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let activeTab: Observable<TabDocument>;
+  export let activeTabPath: Path;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let currentEnvironment: Observable<EnvironmentDocument>;
@@ -350,7 +350,7 @@
                   {onBranchSwitched}
                   {onRefetchCollection}
                   {userRoleInWorkspace}
-                  {activeTab}
+                  {activeTabPath}
                   collection={col._data}
                 />
               {/each}
@@ -372,7 +372,7 @@
                     {onBranchSwitched}
                     {onRefetchCollection}
                     {userRoleInWorkspace}
-                    {activeTab}
+                    {activeTabPath}
                     collection={col}
                   />
                 {/each}

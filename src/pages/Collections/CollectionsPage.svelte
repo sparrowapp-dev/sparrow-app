@@ -126,20 +126,20 @@
 
   // Rerender animation on tab switch
   let isAnimation = true;
-  let prevTabId = "";
-  let tab: TabDocument | {};
+  let prevTabId: string = "";
+  let tabPath: Path;
   activeTab.subscribe((value: TabDocument) => {
     if (value) {
       if (prevTabId !== value.tabId) {
-        tab = value;
+        tabPath = value.path;
+        tabPath["requestId"] = value.id;
         isAnimation = false;
         setTimeout(() => {
           isAnimation = true;
         }, 10);
       }
       prevTabId = value.tabId;
-    }
-    // else tab = {};
+    } else tabPath = {};
   });
 
   onMount(() => {
@@ -171,7 +171,7 @@
         handleCollapseCollectionList,
       }}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
-      activeTab={_viewModel.getActiveTab()}
+      activeTabPath={tabPath}
       showImportCollectionPopup={() => (isImportCollectionPopup = true)}
       showImportCurlPopup={() => (isImportCurlPopup = true)}
       onItemCreated={_viewModel.handleCreateItem}

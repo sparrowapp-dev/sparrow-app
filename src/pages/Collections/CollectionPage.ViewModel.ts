@@ -1483,7 +1483,6 @@ export default class CollectionsViewModel {
       sampleRequest.property.request.save.api = true;
       sampleRequest.property.request.save.description = true;
 
-      console.log(sampleRequest.path);
       this.handleOpenRequest(workspaceId, collection, explorer, sampleRequest);
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {

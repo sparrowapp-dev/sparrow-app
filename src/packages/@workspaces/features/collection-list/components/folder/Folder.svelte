@@ -1,12 +1,11 @@
 <script lang="ts">
-  export let currentWorkspace: Observable<WorkspaceDocument>;
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
   export let collection: CollectionDocument;
   export let userRoleInWorkspace: WorkspaceRole;
-  export let activeTab: Writable<{}>;
+  export let activeTabPath: Path;
   export let explorer: Folder;
   export let folder: Folder | null = null;
 
@@ -35,15 +34,9 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import type {
     CollectionDocument,
-    WorkspaceDocument,
+    TabDocument,
   } from "$lib/database/app.database";
-  import type { Writable } from "svelte/store";
-  import type {
-    Request as RequestType,
-    Folder,
-    Path,
-  } from "$lib/utils/interfaces/request.interface";
-  import type { Observable } from "rxjs";
+  import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -57,8 +50,8 @@
   let requestCount: number;
   let requestIds: [string] | [] = [];
   $: {
-    if ($activeTab?.activePath) {
-      if ($activeTab?.activePath?.folderId === explorer.id) {
+    if (activeTabPath) {
+      if (activeTabPath?.folderId === explorer.id) {
         expand = true;
       }
     }
@@ -350,7 +343,7 @@
               {onItemOpened}
               {collection}
               {userRoleInWorkspace}
-              {activeTab}
+              {activeTabPath}
               explorer={exp}
               folder={explorer}
             />
@@ -394,6 +387,7 @@
           {onItemOpened}
           {folder}
           {collection}
+          {activeTabPath}
         />
       </div>
     {/if}

@@ -8,7 +8,7 @@
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let activeTab: Writable<{}>;
+  export let activeTabPath: Path;
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
 
@@ -18,8 +18,6 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy, onMount } from "svelte";
-  import type { Path } from "$lib/utils/interfaces/request.interface";
-  import { handleCollectionClick } from "$lib/utils/helpers/handle-clicks.helper";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
@@ -29,8 +27,10 @@
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
-  import type { CollectionDocument } from "$lib/database/app.database";
-  import type { Writable } from "svelte/store";
+  import type {
+    CollectionDocument,
+    TabDocument,
+  } from "$lib/database/app.database";
   import Folder from "../folder/Folder.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
@@ -38,6 +38,7 @@
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
+  import type { Path } from "$lib/utils/interfaces/request.interface";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -97,8 +98,8 @@
   }
 
   $: {
-    if ($activeTab?.activePath) {
-      if ($activeTab?.activePath.collection.id === collection.id) {
+    if (activeTabPath) {
+      if (activeTabPath.collectionId === collection.id) {
         visibility = true;
       }
     }
@@ -447,7 +448,7 @@
             {onItemOpened}
             {collection}
             {userRoleInWorkspace}
-            {activeTab}
+            {activeTabPath}
             {explorer}
           />
         {/each}

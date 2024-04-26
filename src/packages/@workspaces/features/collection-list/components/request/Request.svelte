@@ -1,12 +1,11 @@
 <script lang="ts">
-  export let currentWorkspace: Observable<WorkspaceDocument>;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
-  export let onOpenRequestOnTab: (request: Request, path: Path) => void;
   export let collection: CollectionDocument;
   export let folder: Folder;
   export let api: Request;
+  export let activeTabPath: Path;
 
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
@@ -27,6 +26,7 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import type {
     CollectionDocument,
+    TabDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
   import { UntrackedItems } from "$lib/utils/enums";
@@ -183,7 +183,7 @@
 
 <div
   class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
-  'activeTabId'
+  activeTabPath?.requestId
     ? 'active-request-tab'
     : ''}"
   style="height:32px;"
