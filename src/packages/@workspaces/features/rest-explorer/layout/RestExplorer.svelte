@@ -301,12 +301,14 @@
                   ?.length || 0}
               />
               {#if $tab.property.request.state?.responseNavigation === ResponseSection.RESPONSE}
-                <ResponseBodyNavigator
-                  response={$tab.property.request.response}
-                  apiState={$tab.property.request.state}
-                  {onUpdateRequestState}
-                  {onClearResponse}
-                />
+                {#if $tab.property.request.state?.responseBodyLanguage !== "Image"}
+                  <ResponseBodyNavigator
+                    response={$tab.property.request.response}
+                    apiState={$tab.property.request.state}
+                    {onUpdateRequestState}
+                    {onClearResponse}
+                  />
+                {/if}
                 <ResponseBody
                   response={$tab.property.request.response}
                   apiState={$tab.property.request.state}

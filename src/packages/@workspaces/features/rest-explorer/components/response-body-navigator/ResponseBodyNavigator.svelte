@@ -16,6 +16,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import { Select } from "$lib/components/inputs";
+  import { ResponseFormatterEnum } from "@workspaces/shared/type";
 
   export let response;
   export let apiState;
@@ -75,36 +76,56 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center px-2 justify-content-between pb-3 w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center px-2 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-4 align-items-center justify-content-center">
-      <div class="bg-dullBackground rounded my-2" style="height: 22px;">
-        <button
+      <div class="d-flex rounded my-2">
+        <span
+          role="button"
           on:click={() => {
             onUpdateRequestState({
               responseBodyFormatter: ResponseFormatter.PRETTY,
             });
           }}
-          class="rounded btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded text-fs-12 px-2 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
-            ? 'bg-labelColor text-blackColor'
+            ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
         >
-          Pretty
-        </button>
-        <button
+          Text
+        </span>
+        <!--
+          --
+          -- Raw is set to display none
+          --
+          -->
+        <span
+          role="button"
           on:click={() => {
             onUpdateRequestState({
               responseBodyFormatter: ResponseFormatter.RAW,
             });
           }}
-          class="rounded btn-formatter {apiState.responseBodyFormatter ===
+          class="d-none rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.RAW
-            ? 'bg-labelColor text-blackColor'
-            : ''}">Raw</button
+            ? 'bg-tertiary-500 text-secondary-100'
+            : ''}">Raw</span
+        >
+        <span
+          role="button"
+          on:click={() => {
+            onUpdateRequestState({
+              responseBodyFormatter: ResponseFormatterEnum.PREVIEW,
+            });
+          }}
+          class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          ResponseFormatterEnum.PREVIEW
+            ? 'bg-tertiary-500 text-secondary-100'
+            : ''}">Preview</span
         >
       </div>
+
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
         <button
           class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
@@ -147,29 +168,34 @@
         </button>
       {/if}
     </div>
-    <div class="d-flex align-items-center gap-2">
-      <!-- insert controller here -->
-      <div class="d-flex gap-2">
+    {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}
+      <div class="d-flex align-items-center gap-2">
+        <!-- insert controller here -->
+        <div class="d-flex gap-2">
+          <button
+            class="clear-button d-flex align-items-center justify-content-center rounded border-0 gap-1 d-none"
+            style="font-size: 10px;"
+            on:click={() => {
+              onClearResponse();
+              notifications.success("Response Cleared");
+              MixpanelEvent(Events.CLEAR_API_RESPONSE);
+            }}
+          >
+            Clear
+          </button>
+        </div>
         <button
-          class="clear-button d-flex align-items-center justify-content-center rounded border-0 gap-1 d-none"
-          style="font-size: 10px;"
-          on:click={() => {
-            onClearResponse();
-            notifications.success("Response Cleared");
-            MixpanelEvent(Events.CLEAR_API_RESPONSE);
-          }}
+          on:click={handleDownloaded}
+          class=" bg-backgroundColor border-0"
         >
-          Clear
+          <img src={downloadIcon} alt="" />
+        </button>
+
+        <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
+          <img src={copyIcon} alt="" />
         </button>
       </div>
-      <button on:click={handleDownloaded} class=" bg-backgroundColor border-0">
-        <img src={downloadIcon} alt="" />
-      </button>
-
-      <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
-        <img src={copyIcon} alt="" />
-      </button>
-    </div>
+    {/if}
   </div>
 </div>
 
@@ -180,13 +206,7 @@
   }
   .btn-formatter {
     outline: none;
-    background-color: transparent;
     border: none;
-    font-size: 12px;
-    padding: 2px 4px;
-    width: 46px;
-    height: 22px;
-    transform: translateY(-3px);
   }
 
   .clear-button {

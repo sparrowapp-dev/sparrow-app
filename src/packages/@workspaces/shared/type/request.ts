@@ -25,6 +25,7 @@ export enum RequestDataTypeEnum {
   HTML = "HTML",
   TEXT = "Text",
   JAVASCRIPT = "JavaScript",
+  IMAGE = "Image",
 }
 export enum RequestSectionEnum {
   PARAMETERS = "Parameters",
@@ -35,6 +36,8 @@ export enum RequestSectionEnum {
 export enum ResponseFormatterEnum {
   PRETTY = "Pretty",
   RAW = "Raw",
+  PREVIEW = "Preview",
+  VISUALIZE = "Visualize",
 }
 export enum ResponseSectionEnum {
   RESPONSE = "Response",

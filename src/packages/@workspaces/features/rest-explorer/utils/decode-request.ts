@@ -51,6 +51,8 @@ class DecodeRequest {
           value.includes("application/javascript")
         ) {
           return RequestDataType.JAVASCRIPT;
+        } else if (key === "content-type" && value.startsWith("image/")) {
+          return RequestDataType.IMAGE;
         } else if (key === "content-type") {
           return RequestDataType.TEXT;
         }
