@@ -67,7 +67,7 @@
   export let onSendRequest: SendRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestParams: UpdateParamsType;
-  // export let onUpdateRequestName: UpdateRequestNameType;
+  export let onUpdateRequestName: UpdateRequestNameType;
   export let onUpdateRequestBody: UpdateRequestBodyType;
   export let onUpdateRequestAuth: UpdateRequestAuthType;
   export let onUpdateHeaders: UpdateHeadersType;
@@ -114,9 +114,14 @@
   <div class="d-flex rest-explorer-layout">
     <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
-      <!-- <div class="d-flex justify-content-between w-100 p-3">
+      <!-- 
+        --
+        -- Rest name header is set to display none 
+        --
+      -->
+      <div class="d-flex justify-content-between w-100 p-3 d-none">
         <RequestName name={$tab.name} {onUpdateRequestName} />
-        
+
         <div class="d-flex justify-content-between">
           <Button
             title="Save Request"
@@ -183,7 +188,7 @@
             onClick={() => {}}
           />
         </div>
-      </div> -->
+      </div>
 
       <!-- HTTP URL Section -->
       <HttpUrlSection
@@ -323,7 +328,12 @@
         >
       </Splitpanes>
     </div>
-    <div>
+    <!--
+      --
+       -- Rest extension panel is set to display none 
+      --
+    -->
+    <div class="d-none">
       <RestExtensionPanel
         state={$tab.property.request?.state}
         requestMethod={$tab.property.request?.method}
