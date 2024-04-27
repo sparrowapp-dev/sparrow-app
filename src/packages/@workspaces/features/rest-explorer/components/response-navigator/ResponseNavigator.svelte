@@ -1,25 +1,28 @@
 <script lang="ts">
-  import { ResponseSection } from "$lib/utils/enums";
   import { Label } from "@library/ui";
-  export let requestStateSection;
-  export let onUpdateRequestState;
+  import {
+    ResponseSectionEnum,
+    type UpdateRequestStateType,
+  } from "@workspaces/shared/type";
+  export let requestStateSection: string;
+  export let onUpdateRequestState: UpdateRequestStateType;
   export let responseHeadersLength = 0;
 
   let tabs: {
     name: string;
-    id: string;
+    id: ResponseSectionEnum;
     count: number;
   }[] = [
-    { name: "Body", id: ResponseSection.RESPONSE, count: 0 },
-    { name: "Headers", id: ResponseSection.HEADERS, count: 0 },
+    { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
+    { name: "Headers", id: ResponseSectionEnum.HEADERS, count: 0 },
   ];
   $: {
     if (responseHeadersLength) {
       tabs = [
-        { name: "Body", id: ResponseSection.RESPONSE, count: 0 },
+        { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
         {
           name: "Headers",
-          id: ResponseSection.HEADERS,
+          id: ResponseSectionEnum.HEADERS,
           count: responseHeadersLength,
         },
       ];
@@ -32,7 +35,7 @@
   <div class="d-flex mb-2">
     {#each tabs as tab}
       <button
-        class="team-menu__link px-1 border-0 me-2 sparrow-fs-12 me-3 request-tab {tab.id ===
+        class="navigation__link px-1 border-0 me-2 sparrow-fs-12 me-3 request-tab {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -54,18 +57,16 @@
 </div>
 
 <style>
-  .team-menu__link {
+  .navigation__link {
     color: var(--text-secondary-300);
     background-color: transparent;
     border-bottom: 2px transparent;
   }
-  .team-menu__link:hover {
+  .navigation__link:hover {
     color: var(--text-secondary-100);
   }
   .tab-active {
     color: var(--text-secondary-100);
-    border-color: var(--border-primary-200) !important;
-    border-bottom-width: 2px !important;
-    border-bottom-style: solid !important;
+    border-bottom: 2px solid var(--border-primary-200) !important;
   }
 </style>

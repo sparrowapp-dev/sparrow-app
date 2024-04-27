@@ -86,9 +86,11 @@ $theme-blue-9CDCFE:#9CDCFE;
 $theme-blue-1193F0:#1193F0;
 $theme-blue-3670F7:#3670F7;
 $theme-blue-0B5ED7:#0B5ED7;
-$theme-blue-22232E:#22232E;
-$theme-blue-272831:#272831;
-$theme-blue-2E2F3D:#2E2F3D;
+
+$theme-violet-22232E:#22232E;
+$theme-violet-272831:#272831;
+$theme-violet-2E2F3D:#2E2F3D;
+$theme-violet-1c1d27:#1c1d27;
 
 $theme-red-e5acb2:#e5acb2;
 $theme-red-fe8c98:#fe8c98;
@@ -169,9 +171,6 @@ $theme-red-fe2e2e:#fe2e2e;
   --text-primary-200 : #{$theme-blue-1193F0};
   --text-primary-300 : #{$theme-blue-3670F7};
   --text-primary-400 : #{$theme-blue-0B5ED7};
-  --text-primary-500 : #{$theme-blue-22232E};
-  --text-primary-600 : #{$theme-blue-272831};
-  --text-primary-700 : #{$theme-blue-2E2F3D};
   
   --text-secondary-100 : #{$theme-grey-ffffff};
   --text-secondary-200 : #{$theme-grey-8A9299};
@@ -182,6 +181,11 @@ $theme-red-fe2e2e:#fe2e2e;
   --text-secondary-700 : #{$theme-grey-161617};
   --text-secondary-800 : #{$theme-grey-151515};
   --text-secondary-900 : #{$theme-grey-000000};
+
+  --text-tertiary-400 : #{$theme-violet-22232E};
+  --text-tertiary-500 : #{$theme-violet-272831};
+  --text-tertiary-600 : #{$theme-violet-2E2F3D};
+  --text-tertiary-700 : #{$theme-violet-1c1d27};
 
   //
   //
@@ -199,14 +203,15 @@ $theme-red-fe2e2e:#fe2e2e;
   --bg-primary-800 : #{$theme-grey-151515};
   --bg-primary-900 : #{$theme-grey-000000};
   
-
   --bg-secondary-100 : #{$theme-blue-9CDCFE};
   --bg-secondary-200 : #{$theme-blue-1193F0};
   --bg-secondary-300 : #{$theme-blue-3670F7};
   --bg-secondary-400 : #{$theme-blue-0B5ED7};
-  --bg-secondary-500 : #{$theme-blue-22232E};
-  --bg-secondary-600 : #{$theme-blue-272831};
-  --bg-secondary-700 : #{$theme-blue-2E2F3D};
+
+  --bg-tertiary-400 : #{$theme-violet-22232E};
+  --bg-tertiary-500 : #{$theme-violet-272831};
+  --bg-tertiary-600 : #{$theme-violet-2E2F3D};
+  --bg-tertiary-700 : #{$theme-violet-1c1d27};
 
   //
   //
@@ -217,9 +222,6 @@ $theme-red-fe2e2e:#fe2e2e;
   --border-primary-200 : #{$theme-blue-1193F0};
   --border-primary-300 : #{$theme-blue-3670F7};
   --border-primary-400 : #{$theme-blue-0B5ED7};
-  --border-primary-500 : #{$theme-blue-22232E};
-  --border-primary-600 : #{$theme-blue-272831};
-  --border-primary-700 : #{$theme-blue-2E2F3D};
 
   --border-secondary-100 : #{$theme-grey-ffffff};
   --border-secondary-200 : #{$theme-grey-8A9299};
@@ -230,6 +232,11 @@ $theme-red-fe2e2e:#fe2e2e;
   --border-secondary-700 : #{$theme-grey-161617};
   --border-secondary-800 : #{$theme-grey-151515};
   --border-secondary-900 : #{$theme-grey-000000};
+
+  --border-tertiary-400 : #{$theme-violet-22232E};
+  --border-tertiary-500 : #{$theme-violet-272831};
+  --border-tertiary-600 : #{$theme-violet-2E2F3D};
+  --border-tertiary-700 : #{$theme-violet-1c1d27};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -296,15 +303,22 @@ $sparrow-font-sizes: (
   36: 2.25rem // 36px in rem
 );
 
+// Define a map for border radius in pixels
+$sparrow-border-radius: (
+  1: 1px, 
+  2: 2px, 
+  3: 3px, 
+  4: 4px, 
+  5: 5px, 
+  6: 6px, 
+);
+
 // Define a map for text colors
 $sparrow-text-colors: (
   primary-100 : $theme-blue-9CDCFE,
   primary-200 : $theme-blue-1193F0,
   primary-300 : $theme-blue-3670F7,
   primary-400 : $theme-blue-0B5ED7,
-  primary-500 : $theme-blue-22232E,
-  primary-600 : $theme-blue-272831,
-  primary-700 : $theme-blue-2E2F3D,
   
   secondary-100 : $theme-grey-ffffff,
   secondary-200 : $theme-grey-8A9299,
@@ -315,6 +329,11 @@ $sparrow-text-colors: (
   secondary-700 : $theme-grey-161617,
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
+
+  tertiary-400 : $theme-violet-22232E,
+  tertiary-500 : $theme-violet-272831,
+  tertiary-600 : $theme-violet-2E2F3D,
+  tertiary-700 : $theme-violet-1c1d27,
 );
 
 // Define a map for background colors
@@ -330,14 +349,15 @@ $sparrow-bg-colors: (
   primary-800 : $theme-grey-151515,
   primary-900 : $theme-grey-000000,
   
-
   secondary-100 : $theme-blue-9CDCFE,
   secondary-200 : $theme-blue-1193F0,
   secondary-300 : $theme-blue-3670F7,
   secondary-400 : $theme-blue-0B5ED7,
-  secondary-500 : $theme-blue-22232E,
-  secondary-600 : $theme-blue-272831,
-  secondary-700 : $theme-blue-2E2F3D,
+  
+  tertiary-400 : $theme-violet-22232E,
+  tertiary-500 : $theme-violet-272831,
+  tertiary-600 : $theme-violet-2E2F3D,
+  tertiary-700 : $theme-violet-1c1d27,
 );
 
 
@@ -347,9 +367,6 @@ $sparrow-border-colors: (
   primary-200 : $theme-blue-1193F0,
   primary-300 : $theme-blue-3670F7,
   primary-400 : $theme-blue-0B5ED7,
-  primary-500 : $theme-blue-22232E,
-  primary-600 : $theme-blue-272831,
-  primary-700 : $theme-blue-2E2F3D,
 
   secondary-100 : $theme-grey-ffffff,
   secondary-200 : $theme-grey-8A9299,
@@ -360,12 +377,25 @@ $sparrow-border-colors: (
   secondary-700 : $theme-grey-161617,
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
+
+  tertiary-400 : $theme-violet-22232E,
+  tertiary-500 : $theme-violet-272831,
+  tertiary-600 : $theme-violet-2E2F3D,
+  tertiary-700 : $theme-violet-1c1d27,
 );
 
 // Generate utility classes
   @each $size, $value in $sparrow-font-sizes {
     .sparrow-fs-#{$size} {
       font-size: $value;
+    }
+    .text-fs-#{$size} {
+      font-size: $value;
+    }
+  }
+  @each $radius, $value in $sparrow-border-radius {
+    .border-radius-#{$radius} {
+      border-radius: $value;
     }
   }
   @each $color, $value in $sparrow-text-colors {
@@ -421,18 +451,17 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.sparrow-thin-scrollbar::-webkit-scrollbar {
-  width: 2px;
-}
-.sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
-}
+//
+//
+// global scroll bar customization
+//
+//
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 2px;
 }
 ::-webkit-scrollbar-thumb {
   background: #888;
+  cursor: pointer;
 }
 
 .env-highlight {

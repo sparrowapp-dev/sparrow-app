@@ -25,6 +25,7 @@
       "Edit Body": altKey + " + B",
     };
   });
+  let isExpandShortcuts = false;
 </script>
 
 <div class="response-default">
@@ -33,40 +34,63 @@
       <div class="my-4">
         <SparrowLogo />
       </div>
-      <div><p>Click send to get a Response</p></div>
+      <div class="d-flex flex-column align-items-center">
+        <p class="text-secondary-200 text-fs-14">
+          Click send to get a Response
+        </p>
+      </div>
     </div>
   </div>
   <div class={"d-flex flex-wrap justify-content-center"}>
     {#each Object.entries(ctrlCommands) as [key, value]}
-      {#if key === "Save Request" || key === "New Request"}
+      {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
           comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
           {key}
           {value}
+          keyClassProp={"text-secondary-200"}
+          valueClassProp={"bg-primary-400 text-secondary-100"}
           type="combo"
         />
         <span class="me-3"></span>
       {/if}
     {/each}
     {#each Object.entries(altCommands) as [key, value]}
-      {#if key === "Edit link" || key === "Add Parameter"}
+      {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
           comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
           {key}
           {value}
+          keyClassProp={"text-secondary-200"}
+          valueClassProp={"bg-primary-400 text-secondary-100"}
           type="combo"
         />
         <span class="me-5"></span>
       {/if}
     {/each}
   </div>
+  {#if !isExpandShortcuts}
+    <div class="d-flex justify-content-center pt-3">
+      <p
+        class="text-primary-200 text-fs-12 cursor-pointer"
+        on:click={() => {
+          isExpandShortcuts = true;
+        }}
+      >
+        See All Shortcuts
+      </p>
+    </div>
+  {/if}
 </div>
 
 <style>
   .response-default {
     overflow-y: auto;
     overflow-x: hidden;
+  }
+  .cursor-pointer {
+    cursor: pointer;
   }
 </style>

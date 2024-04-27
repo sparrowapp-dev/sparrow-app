@@ -53,6 +53,11 @@
     await n.refreshWorkspaces(value._id);
   });
 
+  const handleKeyPress = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyN") {
+      _collectionPageViewModel.createNewTab();
+    }
+  };
   /**
    * Handle close tab functionality in tab bar list
    */
@@ -202,6 +207,8 @@
   )}
   {loader}
 />
+
+<svelte:window on:keydown={handleKeyPress} />
 
 <style>
   :global(.splitter-sidebar.splitpanes) {

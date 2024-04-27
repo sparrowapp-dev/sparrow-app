@@ -30,16 +30,16 @@
     _isMenuItemHover: boolean,
     _isMenuItemClicked: boolean,
   ) => {
-    if (_bodyTheme === "voilet" && _isMenuItemClicked && _isMenuItemHover) {
-      return `select-clicked-highlight-voilet-btn`;
+    if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
+      return `select-clicked-highlight-violet-btn`;
     } else if (
       _bodyTheme === "dark" &&
       _isMenuItemClicked &&
       _isMenuItemHover
     ) {
       return `select-clicked-highlight-dark-btn`;
-    } else if (_bodyTheme === "voilet" && _isMenuItemHover) {
-      return `select-hover-highlight-voilet-btn`;
+    } else if (_bodyTheme === "violet" && _isMenuItemHover) {
+      return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
     } else {
@@ -85,14 +85,14 @@
   .select-hover-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
-  .select-hover-highlight-voilet-btn {
-    background-color: #2e2f3d;
+  .select-hover-highlight-violet-btn {
+    background-color: var(--bg-tertiary-600);
   }
   .select-clicked-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
-  .select-clicked-highlight-voilet-btn {
-    background-color: #1c1d27;
+  .select-clicked-highlight-violet-btn {
+    background-color: var(--bg-tertiary-700);
   }
   .highlight {
     cursor: pointer;

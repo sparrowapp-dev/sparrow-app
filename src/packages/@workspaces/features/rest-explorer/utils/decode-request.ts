@@ -38,6 +38,11 @@ class DecodeRequest {
           return RequestDataType.JSON;
         } else if (
           key === "content-type" &&
+          value.includes("application/hal+json")
+        ) {
+          return RequestDataType.JSON;
+        } else if (
+          key === "content-type" &&
           value.includes("application/xml")
         ) {
           return RequestDataType.XML;

@@ -1,21 +1,20 @@
 <script lang="ts">
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
-  import StatusSuccess from "$lib/assets/status-success.svelte";
-  import StatusError from "$lib/assets/status-error.svelte";
   import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
+  import type { Response } from "@workspaces/shared/type";
 
-  export let response;
+  export let response: Response;
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center justify-content-between p-2 w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center justify-content-between p-2 w-100 z-1 position-sticky border-radius-2"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex align-items-center gap-2">
       <!-- insert controller here -->
       <div class="d-flex gap-2">
-        <button
+        <span
           class="statuscode position-relative cursor-pointer border-0"
           style="font-size: 10px;"
         >
@@ -37,8 +36,8 @@
 
             {response.status.split(" ")[0]}</span
           >
-        </button>
-        <button
+        </span>
+        <span
           class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
           style="font-size: 10px;"
         >
@@ -49,8 +48,8 @@
             {response.time}
           </span>
           <p class="mb-0">ms</p>
-        </button>
-        <button
+        </span>
+        <span
           class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
           style="font-size: 10px;"
         >
@@ -61,7 +60,7 @@
             {response.size?.toFixed(2)}
           </span>
           <p class="mb-0">KB</p>
-        </button>
+        </span>
       </div>
     </div>
   </div>
@@ -70,7 +69,7 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-tertiary-400);
   }
 
   .time-primary1 {

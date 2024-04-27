@@ -69,12 +69,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme: "dark" | "transparent" | "voilet" = "dark";
+  export let headerTheme: "dark" | "transparent" | "violet" = "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "voilet" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -163,8 +163,8 @@
     case "dark":
       selectBackgroundClass = "select-background-dark";
       break;
-    case "voilet":
-      selectBackgroundClass = "select-background-voilet";
+    case "violet":
+      selectBackgroundClass = "select-background-violet";
       break;
   }
 
@@ -176,8 +176,8 @@
     case "dark":
       selectBodyBackgroundClass = "select-body-background-dark";
       break;
-    case "voilet":
-      selectBodyBackgroundClass = "select-body-background-voilet";
+    case "violet":
+      selectBodyBackgroundClass = "select-body-background-violet";
   }
 
   const toggleSelect = () => {
@@ -227,8 +227,8 @@
         case "dark":
           x = "dark";
           break;
-        case "voilet":
-          x = "voilet";
+        case "violet":
+          x = "violet";
           break;
       }
       return `select-btn-state-active-${x}`;
@@ -331,7 +331,7 @@
 
   {#if isOpen}
     <div
-      class="d-none z-2 select-data {selectBodyBackgroundClass} p-1 rounded"
+      class="d-none z-2 select-data {selectBodyBackgroundClass} p-1 border-radius-2"
       class:select-active={isOpen}
       style="min-width:{minBodyWidth};"
       transition:slide={{ duration: 100 }}
@@ -435,8 +435,8 @@
   .select-background-dark {
     background-color: var(--blackColor);
   }
-  .select-background-voilet {
-    background-color: #22232e;
+  .select-background-violet {
+    background-color: var(--bg-tertiary-400);
   }
   .select-btn-state-active-transparent {
     background-color: var(--border-color);
@@ -444,8 +444,8 @@
   .select-btn-state-active-dark {
     background-color: var(--border-color);
   }
-  .select-btn-state-active-voilet {
-    background-color: #1c1d27;
+  .select-btn-state-active-violet {
+    background-color: var(--bg-tertiary-700);
   }
   .select-data {
     color: white;
@@ -458,8 +458,8 @@
   .select-body-background-dark {
     background-color: var(--background-dropdown);
   }
-  .select-body-background-voilet {
-    background-color: #22232e;
+  .select-body-background-violet {
+    background-color: var(--bg-tertiary-400);
   }
   .select-body-background-blur {
     background: var(--background-hover);

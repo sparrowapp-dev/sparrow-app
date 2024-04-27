@@ -3,11 +3,10 @@
   import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
-  import tableColumnIcon from "$lib/assets/tableColumn.svg";
-  import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestUrl } from "@workspaces/features/rest-explorer/components";
   import type {
+    SaveRequestType,
     SendRequestType,
     UpdateRequestMethodType,
     UpdateRequestStateType,
@@ -19,18 +18,38 @@
   let componentClass = "";
   export { componentClass as class };
 
-  export let requestUrl: string = "";
-  export let httpMethod: string = "";
-  export let splitterDirection: string = "";
+  export let requestUrl: string;
+  export let httpMethod: string;
+  export let splitterDirection: string;
   export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestState: UpdateRequestStateType;
-  export let toggleSaveRequest;
-  export let onSaveRequest;
+  export let toggleSaveRequest: (flag: boolean) => {};
+  export let onSaveRequest: SaveRequestType;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
+  };
+
+  const handleSaveRequest = async () => {
+    const x = await onSaveRequest();
+    if (
+      x.status === "error" &&
+      x.message === "request is not a part of any workspace or collection"
+    ) {
+      toggleSaveRequest(true);
+    } else if (x.status === "success") {
+      notifications.success("API request saved");
+    }
+  };
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+      handleSaveRequest();
+    } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      onSendButtonClicked();
+    }
   };
 </script>
 
@@ -72,12 +91,11 @@
     headerHighlight={"hover"}
     minHeaderWidth={"100px"}
     borderActiveType={"none"}
-    headerTheme={"voilet"}
-    minBodyWidth={"150px"}
+    headerTheme={"violet"}
     zIndex={2}
     borderType={"none"}
     menuItem={"v2"}
-    bodyTheme={"voilet"}
+    bodyTheme={"violet"}
   />
 
   <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
@@ -110,23 +128,14 @@
     }}
   /> -->
   <div
-    class="ms-2 save-disk d-flex align-items-center justify-content-center rounded"
-    type="button"
-    on:click={async () => {
-      const x = await onSaveRequest();
-      if (
-        x.status === "error" &&
-        x.message === "request is not a part of any workspace or collection"
-      ) {
-        toggleSaveRequest(true);
-      } else if (x.status === "success") {
-        notifications.success("API request saved");
-      }
-    }}
+    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2"
+    role="button"
+    on:click={handleSaveRequest}
   >
     <DiskIcon height={20} width={20} />
   </div>
 </div>
+<svelte:window on:keydown={handleKeyPress} />
 
 <style>
   .save-disk {

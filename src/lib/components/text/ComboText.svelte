@@ -27,7 +27,7 @@
     </p>
     <button
       disabled
-      class={`${valueClassProp} bg-buttonBackColor sparrow-fs-12 text-buttonColor border-0 py-1 px-4 shortcut-btn-api`}
+      class={`${valueClassProp} sparrow-fs-12  border-0 py-1 px-4 shortcut-btn-api`}
       style={`${valueStyleProp}`}
     >
       {value}

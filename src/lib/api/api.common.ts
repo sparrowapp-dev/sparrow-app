@@ -194,6 +194,7 @@ const makeHttpRequestV2 = async (
   request: string,
 ) => {
   // create a race condition between the timeout and the api call
+  console.table({ url, method, headers, body, request });
   return Promise.race([
     timeout(apiTimeOut),
     // Invoke communication
@@ -209,12 +210,15 @@ const makeHttpRequestV2 = async (
       try {
         const responseBody = JSON.parse(data);
         const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+        console.table(apiResponse);
         return success(apiResponse);
       } catch (e) {
+        console.error(e);
         return error("error");
       }
     })
-    .catch(() => {
+    .catch((e) => {
+      console.error(e);
       return error("error");
     });
 };

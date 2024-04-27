@@ -5,7 +5,7 @@ export const InputTheme = EditorView.theme({
     height: "100%",
     width: "100%",
     flex: "1",
-    border: "1px solid #272727",
+    border: "1px solid var(--bg-primary-600)",
     borderRadius: "0",
     fontSize: "80%",
   },
@@ -53,11 +53,11 @@ export const InputTheme = EditorView.theme({
   },
   ".cm-foldPlaceholder": {
     color: "#8A9299",
-    fontSize: "10px",
+    fontSize: "12px",
     fontWeight: "400",
   },
   "&.cm-editor.cm-focused": {
-    border: "1px solid var(--sparrow-blue)",
+    border: "1px solid var(--border-primary-200)",
     borderRadius: "0",
   },
   ".cm-scroller::-webkit-scrollbar": {
