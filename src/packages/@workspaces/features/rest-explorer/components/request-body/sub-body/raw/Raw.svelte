@@ -13,7 +13,6 @@
     bind:lang
     bind:value
     on:change={handleCodeMirrorChange}
-    codeMirrorStyle={"basic"}
     isEditable={true}
   />
 </div>

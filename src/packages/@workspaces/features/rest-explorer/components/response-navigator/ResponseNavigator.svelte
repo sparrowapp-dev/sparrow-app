@@ -12,20 +12,29 @@
     name: string;
     id: ResponseSectionEnum;
     count: number;
-  }[] = [
-    { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
-    { name: "Headers", id: ResponseSectionEnum.HEADERS, count: 0 },
-  ];
+  }[] = [];
+
+  /**
+   * @description - refresh tabs label count
+   * @param _responseHeadersLength - response headers length
+   */
+  const refreshTabs = (_responseHeadersLength: number) => {
+    return [
+      { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
+      {
+        name: "Headers",
+        id: ResponseSectionEnum.HEADERS,
+        count: _responseHeadersLength,
+      },
+    ];
+  };
+
+  /**
+   * @description - re-calculates value when dependency changes
+   */
   $: {
     if (responseHeadersLength) {
-      tabs = [
-        { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
-        {
-          name: "Headers",
-          id: ResponseSectionEnum.HEADERS,
-          count: responseHeadersLength,
-        },
-      ];
+      tabs = refreshTabs(responseHeadersLength);
     }
   }
 </script>

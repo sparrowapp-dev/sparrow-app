@@ -84,25 +84,34 @@
   export let onCreateCollection: CreateCollectionType;
 
   let isExposeSaveAsRequest = false;
-  const toggleSaveRequest = (flag: boolean) => {
+  const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
 
+  /**
+   * @description - sets styling to the splitpanes splitter (divider that shifts split panes)
+   */
   const stylePanes = () => {
-    const splitter = document.querySelector(
+    const splitter: HTMLElement | null = document.querySelector(
       ".splitter-request .splitpanes__splitter",
     );
     if (
       splitter &&
       $tab.property.request?.state?.requestSplitterDirection === "horizontal"
     ) {
+      // horizontal view
       splitter.style.height = "1px";
       splitter.style.width = "100%";
     } else if (splitter) {
+      // vertical view
       splitter.style.height = "100%";
       splitter.style.width = "1px";
     }
   };
+
+  /**
+   * @description - re-calculates value when dependency changes
+   */
   $: {
     if ($tab?.property?.request?.state?.requestSplitterDirection) {
       stylePanes();

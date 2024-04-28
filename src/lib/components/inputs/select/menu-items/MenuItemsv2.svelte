@@ -25,6 +25,12 @@
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
 
+  /**
+   * @description - adds CSS class to menu item when hovered or clicked according to the theme
+   * @param _bodyTheme - identifies body theme for example dark, light, or violet
+   * @param _isMenuItemHover - identifies if menu item is hovered
+   * @param _isMenuItemClicked - identifies if menu item is clicked
+   */
   const extractHeaderHighlight = (
     _bodyTheme: string,
     _isMenuItemHover: boolean,

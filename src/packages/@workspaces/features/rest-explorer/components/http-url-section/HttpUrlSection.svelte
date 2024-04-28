@@ -25,13 +25,16 @@
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
   export let onUpdateRequestState: UpdateRequestStateType;
-  export let toggleSaveRequest: (flag: boolean) => {};
+  export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveRequest: SaveRequestType;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
 
+  /**
+   * @description - save request handler
+   */
   const handleSaveRequest = async () => {
     const x = await onSaveRequest();
     if (
@@ -44,6 +47,10 @@
     }
   };
 
+  /**
+   * @description - handles different key press
+   * @param event - keyboard events
+   */
   const handleKeyPress = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       handleSaveRequest();

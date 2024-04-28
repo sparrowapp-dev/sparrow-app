@@ -53,7 +53,11 @@
     await n.refreshWorkspaces(value._id);
   });
 
-  const handleKeyPress = (event) => {
+  /**
+   * @description - handles different key press
+   * @param event - keyboard events
+   */
+  const handleKeyPress = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.code === "KeyN") {
       _collectionPageViewModel.createNewTab();
     }
