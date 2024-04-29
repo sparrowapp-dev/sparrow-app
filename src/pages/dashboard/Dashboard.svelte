@@ -21,7 +21,7 @@
       </Route>
 
       <!-- Route for Workspaces -->
-      <Route path="/workspaces/*"><Collections /></Route>
+      <!-- <Route path="/workspaces/*"><Collections /></Route> -->
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
@@ -30,7 +30,16 @@
       <Route path="/environment/*">Environment</Route>
 
       <!-- Route for Help -->
-      <Route path="/help">Help</Route>
+      <Route path="/help/*">Help</Route>
+
+      <!-- Route for More -->
+      <Route path="/more/*">More</Route>
+
+      <!-- Route for Setting -->
+      <Route path="/setting/*">Setting</Route>
+
+      <!-- Route for Profile -->
+      <Route path="/profile/*">Profile</Route>
 
       <!-- Default Route: Navigate to workspaces -->
       <Route path="/*"><Navigate to="workspaces" /></Route>
