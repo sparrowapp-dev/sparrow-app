@@ -1,4 +1,4 @@
-import type { KeyValueChecked } from "@workspaces/shared/type";
+import type { KeyValueChecked } from "@common/types/rest-explorer";
 
 class ReduceRequestURL {
   private queryParams: KeyValueChecked[];

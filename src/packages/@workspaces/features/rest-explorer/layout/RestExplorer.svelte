@@ -56,8 +56,8 @@
     UpdateRequestNameType,
     UpdateRequestStateType,
     UpdateRequestUrlType,
-  } from "@workspaces/shared/type";
-  import type { KeyValue } from "@workspaces/shared/type";
+  } from "@workspaces/common/type";
+  import type { KeyValue } from "@common/types/rest-explorer";
 
   export let tab: Observable<TabDocument>;
   export let collections: Observable<CollectionDocument[]>;

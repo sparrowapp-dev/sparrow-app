@@ -11,7 +11,7 @@
     UpdateRequestMethodType,
     UpdateRequestStateType,
     UpdateRequestUrlType,
-  } from "@workspaces/shared/type";
+  } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
 

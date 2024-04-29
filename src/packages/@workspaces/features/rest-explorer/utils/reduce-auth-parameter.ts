@@ -3,7 +3,7 @@ import {
   AuthTypeEnum,
   type Auth,
   type State,
-} from "@workspaces/shared/type";
+} from "@common/types/rest-explorer";
 
 class ReduceAuthParameter {
   private authParameter;

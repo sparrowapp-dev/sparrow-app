@@ -16,7 +16,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import { Select } from "$lib/components/inputs";
-  import { ResponseFormatterEnum } from "@workspaces/shared/type";
+  import { ResponseFormatterEnum } from "@common/types/rest-explorer";
 
   export let response;
   export let apiState;

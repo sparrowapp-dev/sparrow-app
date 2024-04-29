@@ -26,12 +26,7 @@ import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
-import {
-  Events,
-  ItemType,
-  RequestDataset,
-  UntrackedItems,
-} from "$lib/utils/enums";
+import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
@@ -70,6 +65,8 @@ import {
   type AddRequestInFolder,
   type SaveRequest,
   type SaveAsRequest,
+} from "@workspaces/common/type";
+import {
   type Auth,
   type Body,
   type KeyValueChecked,
@@ -93,7 +90,7 @@ import {
   type IsSaveRequestInProgressWrapper,
   type RequestTab,
   RequestDatasetEnum,
-} from "@workspaces/shared/type";
+} from "@common/types/rest-explorer";
 
 class RestExplorerViewModel
   implements

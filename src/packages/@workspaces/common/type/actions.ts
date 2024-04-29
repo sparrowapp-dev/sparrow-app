@@ -21,7 +21,7 @@ import type {
   ResponseBodyFormatterWrapper,
   ResponseBodyLanguageWrapper,
   ResponseNavigationWrapper,
-} from "@workspaces/shared/type";
+} from "@common/types/rest-explorer";
 
 export type UpdateRequestUrlType = (
   url: string,

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
   import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
-  import type { Response } from "@workspaces/shared/type";
+  import type { Response } from "@common/types/rest-explorer";
 
   export let response: Response;
 </script>

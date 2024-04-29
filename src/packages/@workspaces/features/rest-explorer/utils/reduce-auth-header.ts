@@ -4,7 +4,7 @@ import {
   type Auth,
   type KeyValue,
   type State,
-} from "@workspaces/shared/type";
+} from "@common/types/rest-explorer";
 
 class ReduceAuthHeader {
   private authHeader: KeyValue;
