@@ -10,7 +10,6 @@
 
 <div
   class={`list-container gap-2 sparrow-thin-scrollbar ${classProps}`}
-  transition:fade
   style={`min-height: ${minHeight}; max-height: ${height}; overflow-y: ${overflowY}; overflow-x: ${overflowX};`}
 >
   <div class="list-body">

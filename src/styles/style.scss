@@ -69,6 +69,7 @@ $sparrow-right-click-menu:#232527;
 $sparrow-active-sync:#8DC599;
 $deleted-api-method: #939699;
 $button-active: #1D3650;
+$right-border: #313233;
 
 
 :root {
@@ -129,6 +130,7 @@ $button-active: #1D3650;
   --active-sync-btn: #{$sparrow-active-sync};
   --deleted-api-method: #{$deleted-api-method};
   --button-active: #{$button-active};
+  --right-border: #{$right-border};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
