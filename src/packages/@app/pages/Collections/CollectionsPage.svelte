@@ -60,7 +60,7 @@
   let isImportCurlPopup: boolean = false;
   let loader = false;
   let currentEnvironment: Observable<EnvironmentDocument>;
-  let splitter: any;
+  let splitter: HTMLElement | null;
 
   /**
    * @description - handles different key press
@@ -68,7 +68,7 @@
    */
   const handleKeyPress = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.code === "KeyN") {
-      _collectionPageViewModel.createNewTab();
+      _viewModel.createNewTab();
     }
   };
   /**
@@ -100,7 +100,6 @@
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
-    console.log("on savee");
     if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
       const id = removeTab?.id;
       loader = true;
@@ -154,7 +153,8 @@
   onMount(() => {
     splitter = document.querySelector(
       ".splitter-sidebar .splitpanes__splitter",
-    ).style.width = "1px";
+    );
+    splitter.style.width = "1px";
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
