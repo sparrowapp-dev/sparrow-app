@@ -98,6 +98,9 @@ export interface RequestBodyLanguageWrapper {
   requestBodyLanguage: RequestDataTypeEnum;
 }
 export interface RequestBodyNavigationWrapper {
+  requestBodyNavigation: RequestDatasetEnum;
+}
+export interface RequestAuthNavigationWrapper {
   requestAuthNavigation: AuthTypeEnum;
 }
 export interface RequestNavigationWrapper {
@@ -198,8 +201,6 @@ export interface KeyValueCheckedWithBase
     CheckedWrapper,
     BaseWrapper {}
 
-export interface FormData extends KeyWrapper, ValueWrapper, CheckedWrapper {}
-
 export interface UrlEncodedWrapper {
   urlencoded: KeyValueChecked[];
 }
@@ -224,6 +225,7 @@ export interface State
   extends RequestBodyLanguageWrapper,
     RequestBodyNavigationWrapper,
     RequestNavigationWrapper,
+    RequestAuthNavigationWrapper,
     ResponseNavigationWrapper,
     ResponseBodyLanguageWrapper,
     ResponseBodyFormatterWrapper,
@@ -357,8 +359,87 @@ export interface Tab
     IsSavedWrapper,
     NameWrapper,
     PathWrapper,
-    PropertyWrapper,
     SourceWrapper,
     TabIdWrapper,
     TimestampWrapper,
-    TypeWrapper {}
+    TypeWrapper {
+  property: {
+    request?: Request;
+    folder?: Folder;
+    collection?: Collection;
+    workspace?: Workspace;
+  };
+}
+
+export interface RequestTab
+  extends ActiveSyncWrapper,
+    DescriptionWrapper,
+    IdWrapper,
+    IndexWrapper,
+    IsActiveWrapper,
+    IsDeletedWrapper,
+    IsSavedWrapper,
+    NameWrapper,
+    PathWrapper,
+    SourceWrapper,
+    TabIdWrapper,
+    TimestampWrapper,
+    TypeWrapper {
+  property: {
+    request: Request;
+  };
+}
+export interface FolderTab
+  extends ActiveSyncWrapper,
+    DescriptionWrapper,
+    IdWrapper,
+    IndexWrapper,
+    IsActiveWrapper,
+    IsDeletedWrapper,
+    IsSavedWrapper,
+    NameWrapper,
+    PathWrapper,
+    SourceWrapper,
+    TabIdWrapper,
+    TimestampWrapper,
+    TypeWrapper {
+  property: {
+    folder: Folder;
+  };
+}
+export interface CollectionTab
+  extends ActiveSyncWrapper,
+    DescriptionWrapper,
+    IdWrapper,
+    IndexWrapper,
+    IsActiveWrapper,
+    IsDeletedWrapper,
+    IsSavedWrapper,
+    NameWrapper,
+    PathWrapper,
+    SourceWrapper,
+    TabIdWrapper,
+    TimestampWrapper,
+    TypeWrapper {
+  property: {
+    collection: Collection;
+  };
+}
+export interface WorkspaceTab
+  extends ActiveSyncWrapper,
+    DescriptionWrapper,
+    IdWrapper,
+    IndexWrapper,
+    IsActiveWrapper,
+    IsDeletedWrapper,
+    IsSavedWrapper,
+    NameWrapper,
+    PathWrapper,
+    SourceWrapper,
+    TabIdWrapper,
+    TimestampWrapper,
+    TypeWrapper {
+  property: {
+    workspace: Workspace;
+  };
+}
