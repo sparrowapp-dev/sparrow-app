@@ -1,11 +1,11 @@
-<!-- <script lang="ts">
+<script lang="ts">
   import doubleangleLeft from "$lib/assets/doubleangleLeft.svg";
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import filterIcon from "$lib/assets/filter.svg";
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus.svg";
-  import Collection from "./collection/Collection.svelte";
+  import Collection from "./collection/Collection.old.svelte";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import {
@@ -22,7 +22,7 @@
     selectedMethodsCollectionStore,
   } from "$lib/store/methods";
 
-  import EmptyCollection from "./empty-collection/EmptyCollection.svelte";
+  import EmptyCollection from "./empty-collection/EmptyCollection.old.svelte";
   import {
     type CollectionDocument,
     type EnvironmentDocument,
@@ -62,7 +62,7 @@
   import { FolderDefault, type WorkspaceRole } from "$lib/utils/enums";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
   import { generateSampleRequest } from "$lib/utils/sample";
-  import ImportCollection from "../../collections/collections-list/import-collection/ImportCollection.svelte";
+  import ImportCollection from "./import-collection/ImportCollection.svelte";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers/common.helper";
   import List from "$lib/components/list/List.svelte";
@@ -459,10 +459,10 @@
   <div
     style="border-right: {collapsExpandToggle
       ? '0px'
-      : '1px solid #313233'};overflow:auto; width: {collapsExpandToggle
+      : '1px solid #313233'}; overflow: auto; width: {collapsExpandToggle
       ? '100%'
       : '100%'}"
-    class={`sidebar overflow-y-auto  ${
+    class={`sidebar  ${
       collapsExpandToggle && runAnimation
         ? "decrease-width"
         : runAnimation && " increase-width"
@@ -837,4 +837,4 @@
   .filter-active {
     background-color: var(--send-button) !important;
   }
-</style> -->
+</style>
