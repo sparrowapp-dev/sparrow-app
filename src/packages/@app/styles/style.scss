@@ -84,8 +84,11 @@ $theme-grey-000000:#000000;
 
 $theme-blue-9CDCFE:#9CDCFE;
 $theme-blue-1193F0:#1193F0;
+$theme-blue-5980DC:#5980DC;
 $theme-blue-3670F7:#3670F7;
 $theme-blue-0B5ED7:#0B5ED7;
+$theme-blue-2B5ED4:#2B5ED4;
+
 
 $theme-violet-22232E:#22232E;
 $theme-violet-272831:#272831;
@@ -205,8 +208,10 @@ $theme-red-fe2e2e:#fe2e2e;
   
   --bg-secondary-100 : #{$theme-blue-9CDCFE};
   --bg-secondary-200 : #{$theme-blue-1193F0};
+  --bg-secondary-250 : #{$theme-blue-5980DC};
   --bg-secondary-300 : #{$theme-blue-3670F7};
   --bg-secondary-400 : #{$theme-blue-0B5ED7};
+  --bg-secondary-500 : #{$theme-blue-2B5ED4};
 
   --bg-tertiary-400 : #{$theme-violet-22232E};
   --bg-tertiary-500 : #{$theme-violet-272831};
@@ -351,8 +356,10 @@ $sparrow-bg-colors: (
   
   secondary-100 : $theme-blue-9CDCFE,
   secondary-200 : $theme-blue-1193F0,
+  secondary-250 : $theme-blue-5980DC,
   secondary-300 : $theme-blue-3670F7,
   secondary-400 : $theme-blue-0B5ED7,
+  secondary-500 : $theme-blue-2B5ED4, 
   
   tertiary-400 : $theme-violet-22232E,
   tertiary-500 : $theme-violet-272831,

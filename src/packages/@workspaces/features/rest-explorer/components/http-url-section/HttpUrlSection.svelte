@@ -14,6 +14,7 @@
   } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import DropButton from "$lib/components/buttons/DropButton.svelte";
 
   let componentClass = "";
   export { componentClass as class };
@@ -21,6 +22,7 @@
   export let requestUrl: string;
   export let httpMethod: string;
   export let splitterDirection: string;
+  export let isSendRequestInProgress: string;
   export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
@@ -31,7 +33,6 @@
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
-
   /**
    * @description - save request handler
    */
@@ -108,10 +109,11 @@
   <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
 
   <!-- Send button -->
-  <Button
+  <span class="ps-2"></span>
+  <DropButton
     title="Send"
-    buttonClassProp=" ms-2 p-2"
-    type="primary"
+    type="default"
+    disable={isSendRequestInProgress ? true : false}
     onClick={onSendButtonClicked}
   />
 
