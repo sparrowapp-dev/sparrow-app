@@ -81,17 +81,23 @@
 
   .sidebar-item {
     position: relative;
-    transition: opacity 0.3s ease;
+    padding-left: 12px; /* Initial padding */
+    padding-right: 12px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    transition:
+      background-color 0.55s ease,
+      padding 0.55s ease;
   }
 
   .sidebar-item:hover {
-    padding-left: 12px; /* Adds padding on hover */
-    padding-right: 12px;
-    padding-top: 6px;
-    padding-bottom: 6px;
     background-color: var(--nav-bar-hover-background);
     border-radius: 8px;
     opacity: 0.9;
+    padding-left: 12px; /* Adds padding on hover */
+    padding-right: 12px;
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 
   .sidebar-item span {
@@ -116,10 +122,10 @@
 
   .sidebar-item.disabled:hover {
     /* Prevent hover styles on disabled items */
-    padding-left: 0;
+    /* padding-left: 0;
     padding-right: 0;
     padding-top: 0;
-    padding-bottom: 0;
+    padding-bottom: 0; */
     background-color: transparent;
     border: none;
   }
