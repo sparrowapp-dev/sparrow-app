@@ -54,17 +54,16 @@
     handleHighlightClass();
 
     if (inputWrapper) {
+      const dialogboxWidth = 400;
       const rightDistance = inputWrapper.getBoundingClientRect().right;
       const leftDistance = inputWrapper.getBoundingClientRect().left;
       const bottomDistance = inputWrapper.getBoundingClientRect().bottom;
       environmentAxisY = bottomDistance + 8;
       environmentAxisX =
         leftDistance + codeMirrorView.state.selection.ranges[0].from * 2;
-      if (
-        leftDistance + codeMirrorView.state.selection.ranges[0].from + 400 >
-        rightDistance
-      ) {
-        environmentAxisX = leftDistance + (rightDistance - leftDistance - 400);
+      if (environmentAxisX + dialogboxWidth > rightDistance) {
+        environmentAxisX =
+          leftDistance + (rightDistance - leftDistance - dialogboxWidth);
       }
     }
   });
