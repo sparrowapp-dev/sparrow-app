@@ -24,6 +24,7 @@ import type {
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
 import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
@@ -124,6 +125,8 @@ class RestExplorerViewModel
    */
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private tabRepository = new TabRepository();
   /**
    * Utils
    */
@@ -139,7 +142,6 @@ class RestExplorerViewModel
     key: "",
     value: "",
   });
-  private tabRepository = new TabRepository();
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
 
   public constructor(doc: TabDocument) {
@@ -158,6 +160,14 @@ class RestExplorerViewModel
         ).getValue();
       }, 0);
     }
+  }
+
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  get environments() {
+    return this.environmentRepository.getEnvironment();
   }
 
   public get tab(): Observable<RequestTab> {
@@ -411,13 +421,13 @@ class RestExplorerViewModel
   /**
    * @description send request
    */
-  public sendRequest = async () => {
+  public sendRequest = async (environmentVariables = []) => {
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      [],
+      environmentVariables,
     );
     makeHttpRequestV2(...decodeData)
       .then((response) => {

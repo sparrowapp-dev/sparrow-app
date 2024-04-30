@@ -5,7 +5,7 @@
   import type { EditorSelection } from "@codemirror/state";
   import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
-  import CodeMirrorInput from "$lib/components/collections/req-res-section/sub-components/sub-components-header/CodeMirrorInput.svelte";
+  import { CodeMirrorHandler } from "./sub-input";
   import AddEnvironment from "$lib/components/collections/req-res-section/sub-components/add-environment-popup/AddEnvironment.svelte";
   import EnvironmentPicker from "$lib/components/collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
 
@@ -14,7 +14,7 @@
   export let urlText: string = "";
   export let placeholder;
   export let theme;
-  export let disabled;
+  export let disabled = false;
 
   const environmentHelper = new EnvironmentHeper();
   let inputElement: HTMLInputElement;
@@ -106,7 +106,7 @@
   };
 </script>
 
-<CodeMirrorInput
+<CodeMirrorHandler
   rawValue={urlText}
   handleRawChange={handleInputValue}
   handleFocusChange={handleFocusValue}
@@ -137,17 +137,17 @@
   />
 {/if}
 <!-- {#if envMissing && trackParanthesis.length == 0}
-  <AddEnvironment
-    {environmentAxisX}
-    {environmentAxisY}
-    updateEnvironment={collectionsMethods.updateEnvironment}
-    {currentWorkspaceId}
-    {currentEnvironment}
-    {globalEnvironment}
-    {handleEnvironmentBox}
-    {localEnvKey}
-  />
-{/if} -->
+    <AddEnvironment
+      {environmentAxisX}
+      {environmentAxisY}
+      updateEnvironment={collectionsMethods.updateEnvironment}
+      {currentWorkspaceId}
+      {currentEnvironment}
+      {globalEnvironment}
+      {handleEnvironmentBox}
+      {localEnvKey}
+    />
+  {/if} -->
 
 <svelte:window on:keydown={handleKeyPress} />
 

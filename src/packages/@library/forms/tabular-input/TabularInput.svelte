@@ -7,8 +7,9 @@
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
-  import EnvironmentPicker from "../collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
   import close from "$lib/assets/close.svg";
+  import { TabularInputTheme } from "../../utils/TabularInputTheme";
+  import { CodeMirrorInput } from "@library/forms";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -27,10 +28,8 @@
   let trackParanthesis: unknown[] = [];
   let trackCursor: number;
   let tempText = "";
-  let focusedInput;
-  let focusedElement;
-  let environmentAxisY: number;
-  let environmentAxisX: number;
+
+  const theme = new TabularInputTheme().build();
 
   $: {
     if (keyValue) {
@@ -81,7 +80,7 @@
       }
     });
     pairs = pairs;
-    if (pairs.length - 1 === index) {
+    if (pairs.length - 1 === index && mode === "WRITE") {
       pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
     }
@@ -166,14 +165,10 @@
     pairs = filteredKeyValue;
     callback(pairs);
   };
-
-  let handleInputValue = () => {
-    trackParanthesis = environmentHelper.balanceParanthesis(tempText);
-  };
 </script>
 
-<div class="mb-3 me-0 w-100">
-  <div class="d-flex gap-3 pb-2 align-items-center">
+<div class="mb-0 me-0 w-100 bg-primary-550 ps-3 py-2 border-radius-2">
+  <div class="d-flex gap-3 pb-2 align-items-center w-100 ps-2">
     <div style="width:30px;">
       <input
         class="form-check-input"
@@ -183,11 +178,11 @@
       />
     </div>
     <div
-      class="d-flex text-requestBodyColor pair-title align-items-center"
-      style="font-size: 12px; font-weight: 500; width:100%;"
+      class="d-flex pair-title bg-primary-550 align-items-center w-100"
+      style="font-size: 12px; font-weight: 500;"
     >
-      <p class="flex-grow-1 mb-0 w-100 key-container">Key</p>
-      <p class="flex-grow-1 mb-0 w-100 value-container">Value</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Name</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
     </div>
     <div class="h-75 pe-1">
       <button class="border-0" style="width:40px;" />
@@ -204,7 +199,7 @@
       <div
         aria-label="Toggle Hover"
         class="sortable > div"
-        style="cursor:default; width:100%;"
+        style=" width:100%;"
       >
         <div
           style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
@@ -221,30 +216,30 @@
               />
             </div>
 
-            <div class="w-100 d-flex gap-0">
-              <div class="flex-grow-1 w-100">
+            <div class="d-flex gap-0" style="width:calc(100% - 120px)">
+              <div class="w-50 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Key"
-                  class="form-control keyValuePair py-1"
-                  style="font-size: 13px;"
+                  class=" keyValuePair py-1 w-100"
+                  style="font-size: 12px;"
                   disabled
                   bind:value={readable.key}
                 />
               </div>
-              <div class="flex-grow-1 w-100">
+              <div class="w-50 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class="form-control keyValuePair py-1"
-                  style="font-size: 13px;"
+                  class=" keyValuePair py-1 w-100"
+                  style="font-size: 12px;"
                   disabled
                   bind:value={readable.value}
                 />
               </div>
             </div>
             <div class="h-75 pe-1">
-              <button class="bg-backgroundColor border-0" style="width:40px;" />
+              <button class=" border-0" style="width:40px;" />
             </div>
           </div>
         </div>
@@ -254,7 +249,7 @@
       <div
         aria-label="Toggle Hover"
         class="sortable > div pair-container"
-        style="cursor:default; width:100%;"
+        style=" width:100%;"
         data-list-key={JSON.stringify({
           name: element.key,
           description: element.value,
@@ -262,10 +257,10 @@
         })}
       >
         <div
-          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+          style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
         >
           <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container pb-2"
           >
             <img
               src={dragIcon}
@@ -286,63 +281,18 @@
               {/if}
             </div>
 
-            <div class="w-100 d-flex gap-0">
-              <div class="flex-grow-1 w-100 position-relative">
-                <input
-                  type="text"
-                  placeholder="Enter Key"
-                  class="form-control keyValuePair py-1"
-                  style="font-size: 13px;"
-                  id={"pair-key" + index}
-                  disabled={mode == "READ" ? true : false}
-                  bind:value={element.key}
-                  on:input={() => {
+            <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
+              <div class="w-50 position-relative">
+                <CodeMirrorInput
+                  bind:urlText={element.key}
+                  onUpdateRequestUrl={() => {
                     updateParam(index);
-                    tempText = element.key;
-                    handleInputValue();
                   }}
-                  on:keyup={(e) => {
-                    trackCursor = e.target.selectionStart;
-                  }}
-                  on:blur={() => {
-                    setTimeout(() => {
-                      tempText = "";
-                      trackParanthesis = [];
-                      trackCursor = undefined;
-                      filterData = [];
-                    }, 300);
-                  }}
-                  on:focus={(e) => {
-                    tempText = element.key;
-                    focusedInput = index;
-                    focusedElement = "key";
-                    handleInputValue();
-                    const elem = document.getElementById("pair-key" + index);
-                    if (elem) {
-                      environmentAxisY = elem.getBoundingClientRect().top + 30;
-                      environmentAxisX = elem.getBoundingClientRect().left;
-                    }
-                  }}
+                  disabled={mode == "READ" ? true : false}
+                  placeholder={"Add Name"}
+                  {theme}
+                  {environmentVariables}
                 />
-                {#if focusedInput === index && focusedElement === "key" && trackParanthesis.length === 2 && filterData.length > 0}
-                  <EnvironmentPicker
-                    {environmentAxisX}
-                    {environmentAxisY}
-                    {filterData}
-                    inputText={element.key}
-                    {trackCursor}
-                    {trackParanthesis}
-                    updateText={(url) => {
-                      element.key = url;
-                    }}
-                    handleInputValue={() => {
-                      updateParam(index);
-                      trackParanthesis = [];
-                      trackCursor = undefined;
-                      filterData = [];
-                    }}
-                  />
-                {/if}
               </div>
               {#if type === "file"}
                 <div class="flex-grow-1 w-100">
@@ -417,71 +367,23 @@
                   </div>
                 </div>
               {:else}
-                <div class="flex-grow-1 w-100 position-relative">
-                  <input
-                    type="text"
-                    placeholder="Enter Value"
-                    class="form-control keyValuePair py-1"
-                    style="font-size: 13px;"
-                    id={"pair-value" + index}
-                    disabled={mode == "READ" ? true : false}
-                    bind:value={element.value}
-                    on:input={() => {
+                <div class="w-50 position-relative">
+                  <CodeMirrorInput
+                    bind:urlText={element.value}
+                    onUpdateRequestUrl={() => {
                       updateParam(index);
-                      tempText = element.value;
-                      handleInputValue();
                     }}
-                    on:keyup={(e) => {
-                      trackCursor = e.target.selectionStart;
-                    }}
-                    on:blur={() => {
-                      setTimeout(() => {
-                        tempText = "";
-                        trackParanthesis = [];
-                        trackCursor = undefined;
-                        filterData = [];
-                      }, 300);
-                    }}
-                    on:focus={(e) => {
-                      tempText = element.value;
-                      focusedInput = index;
-                      focusedElement = "value";
-                      handleInputValue();
-                      const elem = document.getElementById(
-                        "pair-value" + index,
-                      );
-                      if (elem) {
-                        environmentAxisY =
-                          elem.getBoundingClientRect().top + 30;
-                        environmentAxisX = elem.getBoundingClientRect().left;
-                      }
-                    }}
+                    placeholder={"Value"}
+                    disabled={mode == "READ" ? true : false}
+                    {theme}
+                    {environmentVariables}
                   />
-                  {#if focusedInput === index && focusedElement === "value" && trackParanthesis.length === 2 && filterData.length > 0}
-                    <EnvironmentPicker
-                      {environmentAxisX}
-                      {environmentAxisY}
-                      {filterData}
-                      inputText={element.value}
-                      {trackCursor}
-                      {trackParanthesis}
-                      updateText={(url) => {
-                        element.value = url;
-                      }}
-                      handleInputValue={() => {
-                        updateParam(index);
-                        trackParanthesis = [];
-                        trackCursor = undefined;
-                        filterData = [];
-                      }}
-                    />
-                  {/if}
                 </div>
               {/if}
             </div>
             {#if pairs.length - 1 != index}
               <div class="h-75 pe-1">
-                <button class="bg-backgroundColor border-0" style="width:40px;">
+                <button class="bg-primary-550 border-0" style="width:40px;">
                   {#if mode !== "READ"}
                     <img
                       src={trashIcon}
@@ -519,7 +421,7 @@
   }
 
   input[type="text"] {
-    padding: 4px 12px !important;
+    padding: 4px !important;
   }
 
   input:checked {
@@ -529,19 +431,9 @@
   .keyValuePair {
     background-color: transparent;
     border-radius: 0;
-    border: 1px solid var(--border-color);
+    border: 1px solid transparent;
   }
   .pair-container:nth-child(odd) {
     margin-top: -1px;
-  }
-  .pair-title {
-    background-color: var(--background-light);
-  }
-  .key-container {
-    padding: 4px 12px;
-  }
-  .value-container {
-    padding: 4px 12px;
-    border-left: 2px solid var(--border-color);
   }
 </style>

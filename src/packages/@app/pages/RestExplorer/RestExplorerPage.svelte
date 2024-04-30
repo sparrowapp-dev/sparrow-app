@@ -1,9 +1,77 @@
 <script lang="ts">
+  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import { environmentType } from "$lib/utils/enums";
+
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
   import { RestExplorer } from "@workspaces/features";
   export let tab;
   const _viewModel = new RestExplorerViewModel(tab);
+  const environments = _viewModel.environments;
+  const activeWorkspace = _viewModel.activeWorkspace;
+
+  let environmentVariables = [];
+  let environmentId: string;
+  let currentWorkspaceId = "";
+  let currentWorkspace;
+
+  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currentWorkspace = activeWorkspaceRxDoc;
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+        environmentId = activeWorkspaceRxDoc.get("environmentId");
+      }
+    },
+  );
+
+  const refreshEnvironment = () => {
+    if ($environments && currentWorkspaceId) {
+      if ($environments?.length > 0) {
+        const filteredEnv = $environments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
+        if (filteredEnv?.length > 0) {
+          environmentVariables.length = 0;
+          filteredEnv.forEach((elem) => {
+            const temp = elem.toMutableJSON();
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                environmentVariables.push({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
+              }
+            });
+          });
+        }
+      }
+    }
+  };
+
+  $: {
+    if (environmentId) {
+      refreshEnvironment();
+    }
+    if ($environments) {
+      refreshEnvironment();
+    }
+    if (currentWorkspaceId) {
+      refreshEnvironment();
+    }
+  }
 </script>
 
 <RestExplorer
@@ -11,6 +79,7 @@
   bind:tab={_viewModel.tab}
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
+  environmentVariables={environmentVariables.reverse()}
   onSendRequest={_viewModel.sendRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}

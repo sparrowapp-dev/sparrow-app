@@ -1,7 +1,6 @@
 <script lang="ts">
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { isHorizontal } from "$lib/store/request-response-section";
-  import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "../../assets/images";

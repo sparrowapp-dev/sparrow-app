@@ -1,5 +1,5 @@
 <script lang="ts">
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import { TabularInput } from "@library/forms";
 
   export let value;
   export let environmentVariables;
@@ -11,7 +11,7 @@
 </script>
 
 <section class="w-100" style="height: calc(100% - 100px); overflow-y: scroll;">
-  <KeyValue
+  <TabularInput
     keyValue={value}
     callback={handleUrlEncodeChange}
     {environmentVariables}

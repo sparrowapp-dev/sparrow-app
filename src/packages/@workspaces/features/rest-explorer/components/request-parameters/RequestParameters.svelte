@@ -1,5 +1,5 @@
 <script lang="ts">
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import { TabularInput } from "@library/forms";
   import { createDeepCopy } from "$lib/utils/helpers";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
 
@@ -14,7 +14,7 @@
 </script>
 
 <section class="w-100" style="height: calc(100% - 50px); overflow-y: scroll;">
-  <KeyValue
+  <TabularInput
     readable={authParameter}
     keyValue={createDeepCopy(params)}
     callback={handleParamsChange}

@@ -3,8 +3,7 @@
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
-  import Collections from "../Collections/CollectionsPage.svelte";
-  import { DashboardViewModel } from "./Dashboard.ViewModel.old.ts";
+  import { DashboardViewModel } from "./Dashboard.ViewModel.old";
   import { user } from "$lib/store";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -16,6 +15,7 @@
   });
   userUnsubscribe();
   import Mock from "../Mock/Mock.svelte";
+  import Environment from "../Environment/Environment.svelte";
 </script>
 
 <div class="dashboard vh-100">
@@ -38,7 +38,7 @@
       <Route path="/mock/*"><Mock /></Route>
 
       <!-- Route for Environment -->
-      <Route path="/environment/*">Environment</Route>
+      <Route path="/environment/*"><Environment /></Route>
 
       <!-- Route for Help -->
       <Route path="/help">Help</Route>

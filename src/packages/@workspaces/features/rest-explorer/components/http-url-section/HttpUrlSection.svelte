@@ -15,21 +15,23 @@
   import { DiskIcon } from "@library/icons";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
+  import { CodeMirrorInput } from "@library/forms";
+  import { BasicEditorTheme } from "../../utils/basic-editor-theme";
 
   let componentClass = "";
   export { componentClass as class };
 
   export let requestUrl: string;
   export let httpMethod: string;
-  export let splitterDirection: string;
-  export let isSendRequestInProgress: string;
+  export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
-  export let onUpdateRequestState: UpdateRequestStateType;
   export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveRequest: SaveRequestType;
+  export let environmentVariables;
 
+  const theme = new BasicEditorTheme().build();
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -56,9 +58,15 @@
     if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      onSendButtonClicked();
+      onSendButtonClicked(environmentVariables);
     }
   };
+
+  $: {
+    if (requestUrl) {
+      console.log(requestUrl);
+    }
+  }
 </script>
 
 <div class={`d-flex ${componentClass}`}>
@@ -106,7 +114,18 @@
     bodyTheme={"violet"}
   />
 
-  <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
+  <!-- <RequestUrl
+    bind:urlText={requestUrl}
+    {onUpdateRequestUrl}
+    {environmentVariables}
+  /> -->
+  <CodeMirrorInput
+    bind:urlText={requestUrl}
+    {onUpdateRequestUrl}
+    placeholder={"Enter an URL"}
+    {theme}
+    {environmentVariables}
+  />
 
   <!-- Send button -->
   <span class="ps-2"></span>
@@ -114,28 +133,11 @@
     title="Send"
     type="default"
     disable={isSendRequestInProgress ? true : false}
-    onClick={onSendButtonClicked}
+    onClick={() => {
+      onSendButtonClicked(environmentVariables);
+    }}
   />
 
-  <!-- Switch pane layout button -->
-  <!-- <ToggleButton
-    selectedToggleId={splitterDirection}
-    toggleButtons={[
-      {
-        name: "",
-        id: "vertical",
-        icon: tableColumnIcon,
-      },
-      {
-        name: "",
-        id: "horizontal",
-        icon: barIcon,
-      },
-    ]}
-    on:click={(e) => {
-      onUpdateRequestState({ requestSplitterDirection: e.detail });
-    }}
-  /> -->
   <div
     class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2"
     role="button"

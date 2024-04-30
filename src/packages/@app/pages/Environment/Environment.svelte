@@ -19,9 +19,11 @@
     environmentLeftPanelWidth,
     environmentRightPanelWidth,
   } from "$lib/store/environment";
+  import { user, userWorkspaceLevelRole } from "$lib/store";
   import { Pane, Splitpanes } from "svelte-splitpanes";
+
   const _viewModel = new EnvironmentViewModel();
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  // export let loggedUserRoleInWorkspace: WorkspaceRole;
   const environments = _viewModel.environments;
   let activeEnvironment = _viewModel.getactiveEnvironmentTab("");
   onMount(() => {
@@ -55,6 +57,11 @@
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
+        value._data.users.forEach((user) => {
+          if (user.id === $user._id) {
+            userWorkspaceLevelRole.set(user.role);
+          }
+        });
         const workspaceId = activeWorkspaceRxDoc.get("_id");
         if (trackWorkspaceId !== workspaceId) {
           isEnvLoading = true;
@@ -93,7 +100,7 @@
     size={$environmentLeftPanelWidth}
   >
     <EnvironmentList
-      {loggedUserRoleInWorkspace}
+      loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentWorkspace={$activeWorkspace}
@@ -107,7 +114,7 @@
     size={$environmentRightPanelWidth}
   >
     <EnvironmentPanel
-      {loggedUserRoleInWorkspace}
+      loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
       {environmentRepositoryMethods}
       {environmentServiceMethods}
       currentEnvironment={$activeEnvironment

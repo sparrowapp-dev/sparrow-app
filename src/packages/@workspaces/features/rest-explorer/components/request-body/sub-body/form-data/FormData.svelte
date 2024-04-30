@@ -1,5 +1,5 @@
 <script lang="ts">
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import { TabularInput } from "@library/forms";
 
   export let textValue;
   export let fileValue;
@@ -28,13 +28,13 @@
 
 <section class="w-100" style="height: calc(100% - 100px); overflow-y: scroll;">
   <p>Text</p>
-  <KeyValue
+  <TabularInput
     keyValue={textValue}
     callback={handleFormDataTextChange}
     {environmentVariables}
   />
   <p>File</p>
-  <KeyValue
+  <TabularInput
     keyValue={fileValue}
     callback={handleFormDataFileChange}
     {environmentVariables}

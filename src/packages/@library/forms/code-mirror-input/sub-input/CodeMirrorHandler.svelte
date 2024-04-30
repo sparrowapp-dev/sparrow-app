@@ -2,7 +2,6 @@
   import { afterUpdate, onMount } from "svelte";
   import { EditorView } from "codemirror";
   import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
-  import { InputTheme, type AggregateEnvironment } from "./InputEditorTheme";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
   import {
     keymap,
@@ -13,7 +12,10 @@
     hoverTooltip,
     type Tooltip,
   } from "@codemirror/view";
-  import { environmentHoverHighlightStyle } from "./EnvironmentHighlight";
+  import {
+    environmentHoverHighlightStyle,
+    type AggregateEnvironment,
+  } from "./CodeMirrorHandler";
   import { editLink } from "$lib/store/api-request";
   // export let currentTabId: string;
   export let rawValue: string;
