@@ -18,7 +18,7 @@
 
   export let item: SidebarItemObj;
   let isHovered = false;
-  let activeRoute = false;
+  let isRouteActive = false;
 
   onMount(() => {
     const handleMouseEnter = () => {
@@ -47,7 +47,7 @@
     <Link
       to={item.route}
       getProps={({ isCurrent, isPartiallyCurrent }) => {
-        activeRoute = isCurrent || isPartiallyCurrent;
+        isRouteActive = isCurrent || isPartiallyCurrent;
         return {
           class: `d-flex flex-column py-2 text-decoration-none align-items-center ${
             item.disabled ? "disabled" : ""
@@ -56,14 +56,14 @@
       }}
     >
       <div class="d-flex" style="align-items: center;">
-        {#if activeRoute && !isHovered}
+        {#if isRouteActive && !isHovered}
           <div
-            style="background-color: #4661FA; position:fixed; height: 16px; width: 2px; left:10px"
+            style="background-color: var(--nav-bar-active-slash); position:fixed; height: 16px; width: 2px; left:10px"
           ></div>
         {/if}
         {#if isHovered && item.hoveredLogo && !item.disabled}
           <img src={item.hoveredLogo} alt={item.heading} />
-        {:else if activeRoute && item.selectedLogo}
+        {:else if isRouteActive && item.selectedLogo}
           <img src={item.selectedLogo} alt={item.heading} />
         {:else}
           <img src={item.defaultLogo} alt={item.heading} />
@@ -81,6 +81,7 @@
 
   .sidebar-item {
     position: relative;
+    transition: opacity 0.3s ease;
   }
 
   .sidebar-item:hover {
@@ -88,9 +89,9 @@
     padding-right: 12px;
     padding-top: 6px;
     padding-bottom: 6px;
-    background-color: grey; /* Background color of the padding */
-    border: 1px solid #594ffd; /* Blue border around the item */
+    background-color: var(--nav-bar-hover-background);
     border-radius: 8px;
+    opacity: 0.9;
   }
 
   .sidebar-item span {
