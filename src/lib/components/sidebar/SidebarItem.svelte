@@ -12,10 +12,12 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-
   import { Link } from "svelte-navigator";
   import Tooltip from "../tooltip/Tooltip.svelte";
 
+  /**
+   * List of side bar Items
+   */
   export let item: SidebarItemObj;
   let isHovered = false;
   let isRouteActive = false;
@@ -100,16 +102,6 @@
     padding-bottom: 4px;
   }
 
-  .sidebar-item span {
-    font-family: Roboto;
-    font-size: 10px;
-    font-weight: 400;
-    line-height: 10px;
-    letter-spacing: 0em;
-    color: white;
-    text-decoration: none;
-  }
-
   .sidebar-item :global(.active-link) {
     filter: brightness(0) saturate(100%) invert(68%) sepia(50%) saturate(1710%)
       hue-rotate(186deg) brightness(108%) contrast(101%);
@@ -122,10 +114,6 @@
 
   .sidebar-item.disabled:hover {
     /* Prevent hover styles on disabled items */
-    /* padding-left: 0;
-    padding-right: 0;
-    padding-top: 0;
-    padding-bottom: 0; */
     background-color: transparent;
     border: none;
   }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  // ---- Icons ----
   import collections from "$lib/assets/collections.svg";
   import hoveredCollections from "$lib/assets/collections-hovered.svg";
   import selectedCollections from "$lib/assets/collections-selected.svg";
