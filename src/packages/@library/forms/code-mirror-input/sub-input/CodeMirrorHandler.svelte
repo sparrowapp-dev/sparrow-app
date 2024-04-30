@@ -28,9 +28,13 @@
   export let codeMirrorEditorDiv: HTMLDivElement;
   export let filterData: AggregateEnvironment[];
   export let handleEnvironmentBox: (change: boolean, envKey: string) => void;
-  export let placeholder;
-  export let theme;
-  export let disabled;
+  export let placeholder: string;
+  export let theme: object;
+  export let disabled: boolean = false;
+  export let environmentAxisY;
+  export let environmentAxisX;
+
+  let inputWrapper;
   let localEnvKey = "";
 
   const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
@@ -39,7 +43,6 @@
   const ENV_HIGHLIGHT_FOUND = "env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found";
   const HOVER_TIME = 3000;
-  // let selectedTabId = currentTabId;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
@@ -49,6 +52,21 @@
       handleRawChange();
     }
     handleHighlightClass();
+
+    if (inputWrapper) {
+      const rightDistance = inputWrapper.getBoundingClientRect().right;
+      const leftDistance = inputWrapper.getBoundingClientRect().left;
+      const bottomDistance = inputWrapper.getBoundingClientRect().bottom;
+      environmentAxisY = bottomDistance + 8;
+      environmentAxisX =
+        leftDistance + codeMirrorView.state.selection.ranges[0].from * 2;
+      if (
+        leftDistance + codeMirrorView.state.selection.ranges[0].from + 400 >
+        rightDistance
+      ) {
+        environmentAxisX = leftDistance + (rightDistance - leftDistance - 400);
+      }
+    }
   });
   const keyBinding = keymap.of([
     {
@@ -234,17 +252,6 @@
   });
 
   afterUpdate(() => {
-    // if (selectedTabId !== currentTabId) {
-    //   codeMirrorView.dispatch({
-    //     changes: {
-    //       from: 0,
-    //       to: codeMirrorView.state.doc.length,
-    //       insert: rawValue,
-    //     },
-    //   });
-    //   selectedTabId = currentTabId;
-    //   handleEnvironmentBox(false, localEnvKey);
-    // }
     handleEnvironmentBox(false, localEnvKey);
     if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
@@ -263,10 +270,12 @@
   });
 </script>
 
-<div id="input-request-url" bind:this={codeMirrorEditorDiv} />
+<div class="w-100 basic-code-mirror-input" bind:this={inputWrapper}>
+  <div class="" bind:this={codeMirrorEditorDiv} />
+</div>
 
 <style>
-  #input-request-url {
+  .basic-code-mirror-input {
     width: 100%;
     max-width: calc(100vw - 50px);
     min-width: 50%;

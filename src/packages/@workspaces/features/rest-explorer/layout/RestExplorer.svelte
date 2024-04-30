@@ -261,6 +261,7 @@
                 params={$tab.property.request.queryParams}
                 {onUpdateRequestParams}
                 authParameter={$requestAuthParameter}
+                {environmentVariables}
               />
             {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
               <RequestBody
@@ -269,6 +270,7 @@
                 requestState={$tab.property.request.state}
                 {onUpdateRequestBody}
                 {onUpdateRequestState}
+                {environmentVariables}
               />
             {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
               <RequestHeaders
@@ -287,6 +289,7 @@
                 {onUpdateRequestState}
                 auth={$tab.property.request.auth}
                 {onUpdateRequestAuth}
+                {environmentVariables}
               />
             {/if}
           </div>

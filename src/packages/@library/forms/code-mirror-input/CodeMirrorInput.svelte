@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { isHorizontal } from "$lib/store/request-response-section";
-  import { onDestroy } from "svelte";
   import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import type { EditorSelection } from "@codemirror/state";
   import { editLink } from "$lib/store/api-request";
@@ -54,11 +52,6 @@
 
   let handleFocusValue = () => {
     handleInputValue();
-    const elem = document.getElementById("input-request-url");
-    if (elem) {
-      environmentAxisY = elem.getBoundingClientRect().top + 40;
-      environmentAxisX = elem.getBoundingClientRect().left;
-    }
   };
   let handleBlurValue = () => {
     setTimeout(() => {
@@ -73,23 +66,6 @@
   let handleKeyUpValue = (e: EditorSelection) => {
     trackCursor = e.main.head;
   };
-
-  const handleResize = () => {
-    const windowWidth = window.innerWidth;
-
-    if (windowWidth <= 1300) {
-      document.querySelector<HTMLElement>("#barIcon").click();
-      isHorizontal.set(true);
-    } else {
-      document.querySelector<HTMLElement>("#lineIcon").click();
-      isHorizontal.set(false);
-    }
-  };
-  window.addEventListener("resize", handleResize);
-
-  onDestroy(() => {
-    window.removeEventListener("resize", handleResize);
-  });
 
   const handleKeyPress = (event) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -116,6 +92,8 @@
   handleKeyDownChange={handleKeyPress}
   codeMirrorEditorDiv={inputElement}
   filterData={environmentVariables}
+  bind:environmentAxisX
+  bind:environmentAxisY
   {handleEnvironmentBox}
   {theme}
   {placeholder}

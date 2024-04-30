@@ -80,7 +80,11 @@
       }
     });
     pairs = pairs;
-    if (pairs.length - 1 === index && mode === "WRITE") {
+    if (
+      pairs.length - 1 === index &&
+      mode === "WRITE" &&
+      (pairs[index].key !== "" || pairs[index].value !== "")
+    ) {
       pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
     }
