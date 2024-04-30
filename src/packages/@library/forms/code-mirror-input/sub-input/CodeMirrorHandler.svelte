@@ -62,6 +62,9 @@
       environmentAxisX =
         leftDistance + codeMirrorView.state.selection.ranges[0].from * 2;
       if (environmentAxisX + dialogboxWidth > rightDistance) {
+        /**
+         * Handle dialog overflow in x direction
+         */
         environmentAxisX =
           leftDistance + (rightDistance - leftDistance - dialogboxWidth);
       }
