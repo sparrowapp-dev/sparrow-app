@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   /**
    * @deprecated please do not use this file
    * Instead of this we can use src\lib\components\dropdown\Dropdown
@@ -149,4 +149,4 @@
   .drop-active {
     background-color: var(--send-button) !important;
   }
-</style>
+</style> -->

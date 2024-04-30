@@ -103,7 +103,7 @@
       style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
     >
       {#if tabList}
-        {#each tabList as tab, index (tab.id)}
+        {#each tabList as tab, index (tab.tabId)}
           <Tab
             {tab}
             {onTabSelected}

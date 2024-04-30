@@ -71,6 +71,7 @@ $deleted-api-method: #939699;
 $button-active: #1D3650;
 $sparrow-nav-bar-active-slash: #4661FA;
 $sparrow-nav-bar-hover-background: #29303c;
+$right-border: #313233;
 
 
 :root {
@@ -133,6 +134,7 @@ $sparrow-nav-bar-hover-background: #29303c;
   --button-active: #{$button-active};
   --nav-bar-active-slash: #{$sparrow-nav-bar-active-slash};
   --nav-bar-hover-background: #{$sparrow-nav-bar-hover-background};
+  --right-border: #{$right-border};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);

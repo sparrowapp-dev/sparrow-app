@@ -33,7 +33,6 @@
   const handleImport = async () => {
     progressBar.isLoading = true;
     const response = await _viewImportCurl.importCollectionFromCurl(importCurl);
-    console.log(response);
     if (response.isSuccessful) {
       const sampleRequest = generateSampleRequest(
         UntrackedItems.UNTRACKED + uuidv4(),

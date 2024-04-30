@@ -51,7 +51,7 @@
   <div class="d-flex flex-column align-items-center px-3 pt-3">
     <p
       style="font-size: 14px;
-font-weight: 300;"
+  font-weight: 300;"
     >
       Add Collections to your Workspace to group your requests or send an API
       request directly

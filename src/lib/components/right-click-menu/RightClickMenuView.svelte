@@ -5,6 +5,7 @@
     onClick: () => void;
     displayText: string;
     disabled: boolean;
+    hidden: boolean;
   }> = [];
   export let noOfRows = 0;
   export let noOfColumns = 0;
@@ -58,7 +59,7 @@
   >
     <ul class="p-2 w-100 mb-0">
       {#each menuItems as item}
-        <li class="align-items-center d-block">
+        <li class="align-items-center {item.hidden ? 'd-none' : 'd-block'}">
           <button
             disabled={item.disabled}
             class={`w-100 d-flex sparrow-fs-12 border-0 align-items-center px-2 py-2 ${

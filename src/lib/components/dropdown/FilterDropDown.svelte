@@ -6,8 +6,8 @@
   import { selectMethodsStore, showPathStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
-  export let handleSearch;
-  let newTabs = [];
+  export let handleSearch: () => void;
+  let newTabs: any = [];
   let showMethods = false;
 
   const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
