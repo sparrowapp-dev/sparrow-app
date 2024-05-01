@@ -27,6 +27,7 @@ export class TabRepository {
       })
       .exec();
     if (_tab) {
+      await this.activeTab(tab.id);
       return;
     }
     const activeTab = await RxDB.getInstance()

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Sidebar from "$lib/components/sidebar/Sidebar.svelte";
+  import { Sidebar } from "@common/components";
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import Collections from "../Collections/CollectionsPage.svelte";
-  import { DashboardViewModel } from "./Dashboard.ViewModel.old.ts";
+  import { DashboardViewModel } from "./Dashboard.ViewModel.old";
   import { user } from "$lib/store";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -32,7 +32,7 @@
       </Route>
 
       <!-- Route for Workspaces -->
-      <Route path="/workspaces/*">workspace</Route>
+      <!-- <Route path="/workspaces/*"><Collections /></Route> -->
 
       <!-- Route for Mock -->
       <Route path="/mock/*"><Mock /></Route>
@@ -41,10 +41,19 @@
       <Route path="/environment/*">Environment</Route>
 
       <!-- Route for Help -->
-      <Route path="/help">Help</Route>
+      <Route path="/help/*">Help</Route>
+
+      <!-- Route for More -->
+      <Route path="/more/*">More</Route>
+
+      <!-- Route for Setting -->
+      <Route path="/setting/*">Setting</Route>
+
+      <!-- Route for Profile -->
+      <Route path="/profile/*">Profile</Route>
 
       <!-- Default Route: Navigate to workspaces -->
-      <Route path="/*"><Navigate to="workspaces" /></Route>
+      <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
 </div>
