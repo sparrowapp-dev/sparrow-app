@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Sidebar from "@common/components/sidebar/Sidebar.svelte";
+  import { Sidebar } from "@common/components";
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
