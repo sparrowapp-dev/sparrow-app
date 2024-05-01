@@ -1,10 +1,10 @@
 import { EditorView } from "@codemirror/view";
-export class BasicEditorTheme {
+export class UrlInputTheme {
   private theme;
   constructor() {
     this.theme = EditorView.theme({
       "&": {
-        height: "100%",
+        height: "34px",
         width: "100%",
         flex: "1",
         border: "1px solid var(--bg-primary-600)",

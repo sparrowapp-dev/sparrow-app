@@ -8,8 +8,8 @@
   } from "$lib/utils/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import close from "$lib/assets/close.svg";
-  import { TabularInputTheme } from "../../utils/TabularInputTheme";
-  import { CodeMirrorInput } from "@library/forms";
+  import { TabularInputTheme } from "../../utils";
+  import { CodeMirrorInput } from "../";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];

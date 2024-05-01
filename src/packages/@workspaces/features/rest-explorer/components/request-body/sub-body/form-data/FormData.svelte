@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TabularInput } from "@library/forms";
+  import { TabularInput } from "@workspaces/common/components";
 
   export let textValue;
   export let fileValue;

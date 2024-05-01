@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TabularInput } from "@library/forms";
+  import { TabularInput } from "@workspaces/common/components";
   import { createDeepCopy } from "$lib/utils/helpers";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
 

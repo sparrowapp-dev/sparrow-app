@@ -34,7 +34,7 @@
   export let environmentAxisY;
   export let environmentAxisX;
 
-  let inputWrapper;
+  let inputWrapper: HTMLElement;
   let localEnvKey = "";
 
   const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;

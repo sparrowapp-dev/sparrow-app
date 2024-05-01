@@ -1,22 +1,18 @@
 <script lang="ts">
-  import Button from "$lib/components/buttons/Button.svelte";
-  import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
   import { Select } from "$lib/components/inputs";
-  import { RequestUrl } from "@workspaces/features/rest-explorer/components";
   import type {
     SaveRequestType,
     SendRequestType,
     UpdateRequestMethodType,
-    UpdateRequestStateType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
-  import { CodeMirrorInput } from "@library/forms";
-  import { BasicEditorTheme } from "../../utils/basic-editor-theme";
+  import { CodeMirrorInput } from "../../../../common/components";
+  import { UrlInputTheme } from "../../../../common/utils/";
 
   let componentClass = "";
   export { componentClass as class };
@@ -31,7 +27,7 @@
   export let onSaveRequest: SaveRequestType;
   export let environmentVariables;
 
-  const theme = new BasicEditorTheme().build();
+  const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -114,11 +110,6 @@
     bodyTheme={"violet"}
   />
 
-  <!-- <RequestUrl
-    bind:urlText={requestUrl}
-    {onUpdateRequestUrl}
-    {environmentVariables}
-  /> -->
   <CodeMirrorInput
     bind:urlText={requestUrl}
     {onUpdateRequestUrl}

@@ -1,2 +1,1 @@
-export { default as CodeMirrorInput } from "./code-mirror-input/CodeMirrorInput.svelte";
-export { default as TabularInput } from "./tabular-input/TabularInput.svelte";
+export { default as CodeMirrorEditor } from "./code-mirror-editor/CodeMirrorEditor.svelte";
