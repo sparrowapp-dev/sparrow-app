@@ -14,6 +14,7 @@
 
   // ---- Components
   import RestExplorer from "../RestExplorer/RestExplorer.svelte";
+  import CollectionExploererPage from "../CollectionExplorerPage/CollectionExplorerPage.svelte";
   import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
   import {
     CollectionList,
@@ -199,6 +200,12 @@
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <RestExplorer tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else if $activeTab && $activeTab?.type === ItemType.COLLECTION}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <CollectionExploererPage tab={$activeTab} />
             </div>
           </Motion>
         {/if}

@@ -5,6 +5,7 @@
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import Collections from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel.old.ts";
+  import Header from "../Header/Header.svelte";
   import { user } from "$lib/store";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -20,7 +21,8 @@
 
 <div class="dashboard vh-100">
   <!-- Application Header -->
-  <div style="height: 44px;">Header</div>
+  <!-- <div style="height: 44px;">Header</div> -->
+  <Header />
 
   <!-- Application Content -->
   <div class="d-flex">

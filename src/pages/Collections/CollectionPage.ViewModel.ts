@@ -40,7 +40,6 @@ import { invoke } from "@tauri-apps/api/core";
 
 //-----
 //Utils
-import { Debounce } from "@common/utils";
 import {
   validateClientJSON,
   validateClientURL,
@@ -91,6 +90,7 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { sample, type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
+import { InitCollectionTab } from "@common/utils";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -127,11 +127,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Prevent syncTabWithStore() to be called multiple times in 2 seconds
-   */
-  debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
-
-  /**
    * Return current tabs list of top tab bar component
    */
   get tabs() {
@@ -160,7 +155,6 @@ export default class CollectionsViewModel {
    */
   public handleCreateTab = (data: NewTab) => {
     this.tabRepository.createTab(data);
-    this.debouncedTab();
   };
 
   /**
@@ -413,7 +407,6 @@ export default class CollectionsViewModel {
    */
   public updateTab = async (data: any, route: string, _id: string) => {
     requestResponseStore.setTabProperty(data, route, _id);
-    this.debouncedTab();
   };
 
   /**
@@ -440,7 +433,6 @@ export default class CollectionsViewModel {
     ids.forEach((id) => {
       this.tabRepository.removeTab(id);
     });
-    this.debouncedTab();
   };
 
   /**
@@ -594,20 +586,20 @@ export default class CollectionsViewModel {
       Samplecollection.name = response.data.data.name;
       Samplecollection.property.collection.requestCount = totalRequest;
       Samplecollection.property.collection.folderCount = totalFolder;
-      // Samplecollection.save = true;
-      // this.handleCreateTab(Samplecollection);
-      // moveNavigation("right");
+
+      this.handleOpenCollection(workspaceId, Samplecollection);
+      moveNavigation("right");
 
       this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
-      // MixpanelEvent(Events.CREATE_COLLECTION, {
-      //   source: collectionSource,
-      //   collectionName: response.data.data.name,
-      //   collectionId: response.data.data._id,
-      // });
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "USER",
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+      });
       return;
     } else {
       this.collectionRepository.deleteCollection(newCollection.id);
@@ -1744,32 +1736,34 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDocument,
   ) => {
-    // let totalFolder: number = 0;
-    // let totalRequest: number = 0;
-    // collection.items.map((item) => {
-    //   if (item.type === ItemType.REQUEST) {
-    //     totalRequest++;
-    //   } else {
-    //     totalFolder++;
-    //     totalRequest += item.items.length;
-    //   }
-    // });
-    // const path = {
-    //   workspaceId: workspaceId,
-    //   collectionId: collection.id ?? "",
-    // };
-    // const sampleCollection = generateSampleCollection(
-    //   collection.id,
-    //   new Date().toString(),
-    // );
-    // sampleCollection.id = collection.id;
-    // sampleCollection.path = path;
-    // sampleCollection.name = collection.name;
-    // sampleCollection.property.collection.requestCount = totalRequest;
-    // sampleCollection.property.collection.folderCount = totalFolder;
-    // sampleCollection.save = true;
-    // this.handleCreateTab(sampleCollection);
-    // moveNavigation("right");
+    let totalFolder: number = 0;
+    let totalRequest: number = 0;
+    if (collection.items) {
+      collection.items.map((item) => {
+        if (item.type === ItemType.REQUEST) {
+          totalRequest++;
+        } else {
+          totalFolder++;
+          totalRequest += item.items.length;
+        }
+      });
+    }
+    const path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id ?? "",
+    };
+
+    const _collection = new InitCollectionTab(collection.id, workspaceId);
+    _collection.updateName(collection.name);
+    _collection.updateDescription(collection.description);
+    _collection.updatePath(path);
+    _collection.updateActiveSync(collection.activeSync);
+    _collection.updateTotalRequest(totalRequest);
+    _collection.updateTotalFolder(totalFolder);
+    _collection.updateIsSave(true);
+
+    this.tabRepository.createTab(_collection.getValue());
+    moveNavigation("right");
   };
   /**
    * Handles renaming a request
