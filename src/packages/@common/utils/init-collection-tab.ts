@@ -1,10 +1,10 @@
-import type { TabDocument } from "$lib/database/app.database";
 import type { Path } from "$lib/utils/interfaces/request.interface";
 import { v4 as uuidv4 } from "uuid";
 import { ItemType } from "$lib/utils/enums";
+import type { CollectionTab } from "@common/types/rest-explorer";
 
 class InitCollectionTab {
-  private _tab: TabDocument;
+  private _tab: CollectionTab;
   /**
    *
    * @param _id - Collection mongo id
@@ -23,8 +23,9 @@ class InitCollectionTab {
         source: "USER",
         activeSync: false,
         property: {
-          totalRequests: 0,
-          totalFolders: 0,
+          collection: {
+            id: "",
+          },
         },
         path: {
           workspaceId: _workspaceId,
@@ -48,7 +49,6 @@ class InitCollectionTab {
     this._tab.id = _id;
   }
   public updateName(_name: string) {
-    console.log(this._tab);
     this._tab.name = _name;
   }
   public updateDescription(_description: string) {

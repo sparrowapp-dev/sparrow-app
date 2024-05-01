@@ -22,13 +22,14 @@
   // Local variables
   let collection: CollectionDocument;
   let userRoleInWorkspace: boolean;
-  let collectionList: Observable<CollectionDocument[]>;
 
+  // Initialization of collection and userRoleInWorkspace
   onMount(async () => {
-    collectionList = await _viewModel.getCollectionList();
-    collectionList.subscribe(async (_collectionList) => {
-      collection = await _viewModel.getCollection(tab.id);
-    });
+    (await _viewModel.getCollectionList()).subscribe(
+      async (_collectionList) => {
+        collection = await _viewModel.getCollection(tab.id);
+      },
+    );
     userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();
   });
 </script>

@@ -91,6 +91,7 @@ import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { sample, type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
+import { InitFolderTab } from "@common/utils/init-folder-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -1541,16 +1542,17 @@ export default class CollectionsViewModel {
         folderName: response.data.data.name,
       };
 
-      const SampleFolder = generateSampleFolder(
+      const sampleFolder = new InitFolderTab(
         response.data.data.id,
-        new Date().toString(),
+        collection.workspaceId,
       );
 
-      SampleFolder.id = response.data.data.id;
-      SampleFolder.path = path;
-      SampleFolder.name = response.data.data.name;
-      SampleFolder.save = true;
-      // this.handleCreateTab(SampleFolder);
+      sampleFolder.updateName(response.data.data.name);
+      sampleFolder.updatePath(path);
+      sampleFolder.updateIsSave(true);
+      sampleFolder.updateTotalRequests(0);
+
+      this.handleCreateTab(sampleFolder.getValue());
       moveNavigation("right");
 
       const folderObj = response.data.data;
@@ -1714,22 +1716,23 @@ export default class CollectionsViewModel {
     collection: CollectionDocument,
     folder: Folder,
   ) => {
-    // const path: Path = {
-    //   workspaceId: workspaceId,
-    //   collectionId: collection.id ?? "",
-    //   folderId: folder?.id,
-    //   folderName: folder.name,
-    // };
-    // const sampleFolder = generateSampleFolder(folder.id, new Date().toString());
-    // sampleFolder.id = folder.id;
-    // sampleFolder.path = path;
-    // sampleFolder.name = folder.name;
-    // sampleFolder.save = true;
-    // sampleFolder.activeSync = collection.activeSync;
-    // sampleFolder.source = !folder?.source ? "SPEC" : folder?.source;
-    // sampleFolder.isDeleted = folder?.isDeleted;
-    // this.handleCreateTab(sampleFolder);
-    // moveNavigation("right");
+    const path: Path = {
+      workspaceId: workspaceId,
+      collectionId: collection.id ?? "",
+      folderId: folder?.id,
+      folderName: folder.name,
+    };
+
+    const sampleFolder = new InitFolderTab(folder.id, collection.workspaceId);
+    sampleFolder.updateName(folder.name);
+    sampleFolder.updatePath(path);
+    sampleFolder.updateIsSave(true);
+    sampleFolder.updateActiveSync(collection.activeSync);
+    sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
+    sampleFolder.updateIsDeleted(folder?.isDeleted);
+
+    this.handleCreateTab(sampleFolder.getValue());
+    moveNavigation("right");
   };
 
   public handleOpenCollection = (

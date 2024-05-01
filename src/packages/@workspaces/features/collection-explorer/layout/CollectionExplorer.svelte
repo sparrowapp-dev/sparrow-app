@@ -10,8 +10,12 @@
   ) => Promise<boolean>;
   export let getLastUpdatedAndCount: (
     collection: CollectionDocument,
-    tab: TabDocument,
-  ) => Promise<boolean>;
+  ) => Promise<{
+    isSynced: boolean;
+    totalFolders: number;
+    totalRequests: number;
+    lastUpdated: string;
+  }>;
   export let onCollectionRefetched: (collection: CollectionDocument) => void;
   export let onBranchChanged: (
     collection: CollectionDocument,
@@ -50,30 +54,19 @@
   let refreshCollectionLoader: boolean = false;
   let isSynced: boolean = false;
   let lastUpdated: string = "";
+  let totalFolders: number = 0;
+  let totalRequests: number = 0;
 
+  // Function to update isSynced, totalRequests and totalFolders, and lastUpdated
   const updateLastUpdateAndCount = async () => {
-    isSynced = await getLastUpdatedAndCount(collection, tab);
-    const monthNamesAbbreviated = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    lastUpdated = `${
-      monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
-    } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
-      collection?.updatedAt,
-    ).getFullYear()}`;
+    const res = await getLastUpdatedAndCount(collection);
+    isSynced = res.isSynced;
+    lastUpdated = res.lastUpdated;
+    totalFolders = res.totalFolders;
+    totalRequests = res.totalRequests;
   };
 
+  // Check if collection is changed from other components
   $: {
     if (collection) {
       updateLastUpdateAndCount();
@@ -331,11 +324,11 @@
     >
       <div class="d-flex gap-4 mb-4 ps-2">
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 text-plusButton">{tab.property.totalRequests}</span>
+          <span class="fs-4 text-plusButton">{totalRequests}</span>
           <p style="font-size: 12px;" class="mb-0">API Requests</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 text-plusButton">{tab.property.totalFolders}</span>
+          <span class="fs-4 text-plusButton">{totalFolders}</span>
           <p style="font-size: 12px;" class="mb-0">Folder</p>
         </div>
       </div>

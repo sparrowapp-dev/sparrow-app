@@ -48,18 +48,17 @@ class CollectionExplorerPage {
   }
 
   /**
-   * Handle updating tab
-   * @param data :any - tab data i.e. collection, folder or request
-   * @param route :string - path to collection, folder or request
-   * @param _id :string - if of the tab
+   * To update the tab
+   * @param _id - id of the tab
+   * @param data - data in the tab
    */
   private updateTab = async (_id: string, data: TabDocument) => {
     this.tabRepository.updateTab(_id, data);
   };
 
   /**
-   * Get role of the user in workspace
-   * @returns :UserRole - role of the user in workspace
+   *
+   * @returns {boolean} if user have permission to update
    */
   public getUserRoleInWorspace = async () => {
     let role: WorkspaceRole;
@@ -75,16 +74,26 @@ class CollectionExplorerPage {
     );
   };
 
+  /**
+   *
+   * @param collectionId - id of collection to fetch
+   * @returns return collection
+   */
   public getCollection = async (collectionId: string) => {
     return await this.collectionRepository.readCollection(collectionId);
   };
 
+  /**
+   *
+   * @returns Observable collection list
+   */
   public getCollectionList = async () => {
     return await this.collectionRepository.getCollection();
   };
 
   /**
    * Handles renaming a collection
+   * @param collection - collction to rename
    * @param newCollectionName :string - the new name of the collection
    */
   public handleRename = async (
@@ -113,6 +122,11 @@ class CollectionExplorerPage {
     newCollectionName = "";
   };
 
+  /**
+   *
+   * @param collection - Collection in which branch is going to change
+   * @param newBranch - New branch to be changed
+   */
   public handleBranchChanged = async (
     collection: CollectionDocument,
     newBranch: string,
@@ -137,9 +151,9 @@ class CollectionExplorerPage {
   };
 
   /**
-   * Handle refetching collection from local repository in active sync enabled collections
-   * @param workspaceId :string - the workspace ID
-   * @param collection :CollectionDocument - The collection going to be refetched
+   *
+   * @param collection Collection going to be refetched
+   * @returns
    */
   public handleRefetchCollection = async (collection: CollectionDocument) => {
     const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
@@ -206,6 +220,11 @@ class CollectionExplorerPage {
     }
   };
 
+  /**
+   *
+   * @param collection - Collection going to be synced
+   * @returns
+   */
   public handleSyncCollection = async (collection: CollectionDocument) => {
     const errMessage = `Failed to sync the collection. Local reposisitory branch is not set to ${collection?.currentBranch}.`;
     try {
@@ -271,12 +290,34 @@ class CollectionExplorerPage {
     }
   };
 
-  private updateCounts = async (
-    collection: CollectionDocument,
-    tab: TabDocument,
-  ) => {
-    let totalRequests = 0;
-    let totalFolders = 0;
+  /**
+   *
+   * @param collection Collection in which folder and request will be counted
+   * @returns isSynced, totalRequests, totalFolders, lastUpdated
+   */
+  public getLastUpdatedAndCount = async (collection: CollectionDocument) => {
+    let isSynced: boolean;
+    const monthNamesAbbreviated = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const lastUpdated: string = `${
+      monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
+    } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
+      collection?.updatedAt,
+    ).getFullYear()}`;
+    let totalRequests: number = 0;
+    let totalFolders: number = 0;
     collection?.items.forEach((collectionItem: CollectionDocument) => {
       if (collectionItem.type === ItemType.REQUEST) {
         totalRequests++;
@@ -285,29 +326,6 @@ class CollectionExplorerPage {
         totalRequests += collectionItem.items.length;
       }
     });
-    const newTab = {
-      property: {
-        totalRequests,
-        totalFolders,
-      },
-    };
-    this.tabRepository.updateTab(tab.tabId, newTab);
-    this.tabRepository
-      .getTab()
-      .subscribe((_tab) => {
-        if (_tab) {
-          this.tab = _tab;
-        }
-      })
-      .unsubscribe();
-  };
-
-  public getLastUpdatedAndCount = async (
-    collection: CollectionDocument,
-    tab: TabDocument,
-  ) => {
-    await this.updateCounts(collection, tab);
-    let isSynced: boolean;
     const response = await this.collectionService.switchCollectionBranch(
       collection?.id,
       collection?.currentBranch,
@@ -317,16 +335,21 @@ class CollectionExplorerPage {
     } else {
       isSynced = false;
     }
-    return isSynced;
+    return {
+      isSynced,
+      totalFolders,
+      totalRequests,
+      lastUpdated,
+    };
   };
 
   /**
-   * Handles opening a request on a tab
-   * @param request : - The request going to be opened on tab
-   * @param path : - The path to the request
+   *
+   * @param collection - Collection of the request
+   * @param folder - Folder of the request
+   * @param request - Request going to be opened
    */
   public handleOpenRequest = (
-    workspaceId: string,
     collection: CollectionDocument,
     folder: Folder,
     request: Request,
@@ -353,10 +376,9 @@ class CollectionExplorerPage {
   };
 
   /**
-   * Handle creating a new request in a collection
-   * @param workspaceId :string
-   * @param collection :CollectionDocument - the collection in which new request is going to be created
-   * @returns :void
+   *
+   * @param collection - Collection in which request is going to be created
+   * @returns
    */
   public handleCreateRequest = async (collection: CollectionDocument) => {
     if (!(await this.getUserRoleInWorspace())) {
@@ -430,6 +452,11 @@ class CollectionExplorerPage {
     }
   };
 
+  /**
+   *
+   * @param collection - Collection in which description going to be updated
+   * @param newDescription - New description
+   */
   public handleUpdateDescription = async (
     collection: CollectionDocument,
     newDescription: string,

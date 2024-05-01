@@ -13,7 +13,11 @@
   import { scaleMotionProps } from "$lib/utils/animations";
 
   // ---- Components
-  import { RestExplorerPage, CollectionExplorerPage } from "../";
+  import {
+    RestExplorerPage,
+    CollectionExplorerPage,
+    FolderExplorerPage,
+  } from "../";
   import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
   import {
     CollectionList,
@@ -214,6 +218,12 @@
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <CollectionExplorerPage tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else if $activeTab && $activeTab?.type === ItemType.FOLDER}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <FolderExplorerPage tab={$activeTab} />
             </div>
           </Motion>
         {/if}
