@@ -1,6 +1,6 @@
 <script lang="ts">
   import about from "$lib/assets/about.svg";
-  import collectionss from "$lib/assets/collections.svg";
+  import collectionss from "$lib/assets/collections-old.svg";
   import apiRequest from "$lib/assets/apiRequest.svg";
   import { v4 as uuidv4 } from "uuid";
   import { moveNavigation } from "$lib/utils/helpers/navigation";

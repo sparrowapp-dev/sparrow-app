@@ -53,6 +53,7 @@ export enum RequestDataType {
   HTML = "HTML",
   TEXT = "Text",
   JAVASCRIPT = "JavaScript",
+  IMAGE = "Image",
 }
 
 export enum RequestDataset {
@@ -76,6 +77,8 @@ export enum ResponseSection {
 export enum ResponseFormatter {
   PRETTY = "Pretty",
   RAW = "Raw",
+  PREVIEW = "Preview",
+  VISUALIZE = "Visualize",
 }
 
 /**

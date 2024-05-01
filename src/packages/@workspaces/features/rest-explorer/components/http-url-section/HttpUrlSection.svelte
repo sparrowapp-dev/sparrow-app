@@ -3,24 +3,61 @@
   import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
-  import tableColumnIcon from "$lib/assets/tableColumn.svg";
-  import barIcon from "$lib/assets/barIcon.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestUrl } from "@workspaces/features/rest-explorer/components";
+  import type {
+    SaveRequestType,
+    SendRequestType,
+    UpdateRequestMethodType,
+    UpdateRequestStateType,
+    UpdateRequestUrlType,
+  } from "@workspaces/common/type";
+  import { DiskIcon } from "@library/icons";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import DropButton from "$lib/components/buttons/DropButton.svelte";
 
   let componentClass = "";
   export { componentClass as class };
 
-  export let onSendButtonClicked = () => {};
-  export let onUpdateRequestUrl;
-  export let onUpdateRequestMethod;
-  export let requestUrl;
-  export let httpMethod;
-  export let onUpdateRequestState;
-  export let splitterDirection;
+  export let requestUrl: string;
+  export let httpMethod: string;
+  export let splitterDirection: string;
+  export let isSendRequestInProgress: string;
+  export let onSendButtonClicked: SendRequestType;
+  export let onUpdateRequestUrl: UpdateRequestUrlType;
+  export let onUpdateRequestMethod: UpdateRequestMethodType;
+  export let onUpdateRequestState: UpdateRequestStateType;
+  export let toggleSaveRequest: (flag: boolean) => void;
+  export let onSaveRequest: SaveRequestType;
 
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
+  };
+  /**
+   * @description - save request handler
+   */
+  const handleSaveRequest = async () => {
+    const x = await onSaveRequest();
+    if (
+      x.status === "error" &&
+      x.message === "request is not a part of any workspace or collection"
+    ) {
+      toggleSaveRequest(true);
+    } else if (x.status === "success") {
+      notifications.success("API request saved");
+    }
+  };
+
+  /**
+   * @description - handles different key press
+   * @param event - keyboard events
+   */
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+      handleSaveRequest();
+    } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      onSendButtonClicked();
+    }
   };
 </script>
 
@@ -55,28 +92,33 @@
         color: "patch",
       },
     ]}
+    borderRounded={false}
     titleId={httpMethod}
     onclick={handleDropdown}
-    headerTheme={"transparent"}
     borderHighlight={"active"}
     headerHighlight={"hover"}
-    minBodyWidth={"150px"}
+    minHeaderWidth={"100px"}
+    borderActiveType={"none"}
+    headerTheme={"violet"}
     zIndex={2}
+    borderType={"none"}
     menuItem={"v2"}
+    bodyTheme={"violet"}
   />
 
   <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
 
   <!-- Send button -->
-  <Button
+  <span class="ps-2"></span>
+  <DropButton
     title="Send"
-    buttonClassProp="p-2"
-    type="primary"
+    type="default"
+    disable={isSendRequestInProgress ? true : false}
     onClick={onSendButtonClicked}
   />
 
   <!-- Switch pane layout button -->
-  <ToggleButton
+  <!-- <ToggleButton
     selectedToggleId={splitterDirection}
     toggleButtons={[
       {
@@ -92,10 +134,21 @@
     ]}
     on:click={(e) => {
       onUpdateRequestState({ requestSplitterDirection: e.detail });
-      // restSplitterDirection.set(e.detail);
     }}
-  />
+  /> -->
+  <div
+    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2"
+    role="button"
+    on:click={handleSaveRequest}
+  >
+    <DiskIcon height={20} width={20} />
+  </div>
 </div>
+<svelte:window on:keydown={handleKeyPress} />
 
 <style>
+  .save-disk {
+    padding: 7px;
+    background-color: var(--bg-primary-400);
+  }
 </style>

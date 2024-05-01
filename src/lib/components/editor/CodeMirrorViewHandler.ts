@@ -7,18 +7,41 @@ import { jsonSetup } from "./code-mirror-themes/BasicCodeMirrorTheme";
 import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
 
+/**
+ * @description - remove indentation from the string
+ * @param code - text that should be shown on code mirror view
+ * @returns - plain text code without indentation
+ */
+const removeIndentation = (str: string) => {
+  // Split the code into lines
+  const lines = str.split("\n");
+  // Remove leading whitespace from each line
+  const unindentedLines = lines.map((line) => line.trim());
+  // Join the lines back together
+  return unindentedLines.join("\n");
+};
+
+/**
+ * @description - adds syntax highlighting and formatting to code mirror view
+ * @param codeMirrorView - code mirror constructor object
+ * @param languageConf - dynamic configuration for code mirror
+ * @param lang - language to check syntax and formatting
+ * @param isFormatted - insure code is formatted or not
+ * @param value - text that should be shown on code mirror view
+ * @returns
+ */
 const CodeMirrorViewHandler = (
   codeMirrorView: EditorView,
   languageConf: Compartment,
-  tab: RequestDataType,
-  isPretty: boolean,
+  lang: RequestDataType,
+  isFormatted: boolean,
   value: string,
 ) => {
-  switch (tab) {
+  switch (lang) {
     case RequestDataType.HTML:
       if (codeMirrorView) {
         let payload = {};
-        if (isPretty) {
+        if (isFormatted) {
           payload = {
             changes: {
               from: 0,
@@ -43,7 +66,7 @@ const CodeMirrorViewHandler = (
     case RequestDataType.JAVASCRIPT:
       if (codeMirrorView) {
         let payload = {};
-        if (isPretty) {
+        if (isFormatted) {
           payload = {
             changes: {
               from: 0,
@@ -63,7 +86,7 @@ const CodeMirrorViewHandler = (
     case RequestDataType.JSON:
       if (codeMirrorView) {
         let payload = {};
-        if (isPretty) {
+        if (isFormatted) {
           payload = {
             changes: {
               from: 0,
@@ -81,7 +104,7 @@ const CodeMirrorViewHandler = (
     case RequestDataType.XML:
       if (codeMirrorView) {
         let payload = {};
-        if (isPretty) {
+        if (isFormatted) {
           payload = {
             changes: {
               from: 0,
@@ -97,9 +120,22 @@ const CodeMirrorViewHandler = (
       }
       break;
     default:
-      codeMirrorView.dispatch({
-        effects: languageConf.reconfigure([]),
-      });
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: removeIndentation(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure([]),
+          ...payload,
+        });
+      }
       break;
   }
 };

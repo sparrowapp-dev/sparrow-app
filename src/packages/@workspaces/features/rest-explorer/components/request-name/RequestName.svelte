@@ -1,8 +1,9 @@
 <script lang="ts">
   import Input from "$lib/components/inputs/Input.svelte";
+  import type { UpdateRequestNameType } from "@workspaces/common/type";
 
-  export let name;
-  export let onUpdateRequestName;
+  export let name: string;
+  export let onUpdateRequestName: UpdateRequestNameType;
 </script>
 
 <Input
