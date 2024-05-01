@@ -1,8 +1,8 @@
 <script lang="ts">
-  import collections from "$lib/assets/collections.svg";
+  import collections from "$lib/assets/collections-old.svg";
   import collectionsFaded from "$lib/assets/collections-faded.svg";
   import mock from "$lib/assets/mock.svg";
-  import environment from "$lib/assets/environment.svg";
+  import environment from "$lib/assets/environment-old.svg";
   import environmentFaded from "$lib/assets/environment-faded.svg";
   import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
@@ -29,7 +29,10 @@
     {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
           return workspace.isActiveWorkspace === true;
         }, )}
-      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
+      <Tooltip
+        title="Select a workspace to activate this option"
+        placement={"right"}
+      >
         <Helper
           {activeSideBarTabMethods}
           route=""
@@ -63,7 +66,10 @@
     {#if $workspaces && $workspaces.length > 0 && !$workspaces.some( (workspace) => {
           return workspace.isActiveWorkspace === true;
         }, )}
-      <Tooltip title="Select a workspace to activate this option" placement={"right"}>
+      <Tooltip
+        title="Select a workspace to activate this option"
+        placement={"right"}
+      >
         <Helper
           {activeSideBarTabMethods}
           route=""

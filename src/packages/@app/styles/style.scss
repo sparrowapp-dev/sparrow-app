@@ -69,7 +69,14 @@ $sparrow-right-click-menu:#232527;
 $sparrow-active-sync:#8DC599;
 $deleted-api-method: #939699;
 $button-active: #1D3650;
+$sparrow-nav-bar-active-slash: #4661FA;
+$sparrow-nav-bar-hover-background: #29303c;
 $right-border: #313233;
+$sparrow-dropdown: #3670F7;
+$sparrow-dropdown-hover: #5980DC;
+$sparrow-dropdown-container: #22232E;
+$sparrow-dropdown-option-hover: #2E2F3D;
+$sparrow-dropdown-option-active: #1C1D27;
 
 
 $theme-grey-ffffff:#ffffff;
@@ -165,7 +172,14 @@ $theme-red-fe2e2e:#fe2e2e;
   --active-sync-btn: #{$sparrow-active-sync};
   --deleted-api-method: #{$deleted-api-method};
   --button-active: #{$button-active};
+  --nav-bar-active-slash: #{$sparrow-nav-bar-active-slash};
+  --nav-bar-hover-background: #{$sparrow-nav-bar-hover-background};
   --right-border: #{$right-border};
+  --dropdown-button: #{$sparrow-dropdown};
+  --dropdown-hover: #{$sparrow-dropdown-hover};
+  --dropdown-container: #{$sparrow-dropdown-container};
+  --dropdown-option-hover: #{$sparrow-dropdown-option-hover};
+  --dropdown-option-active: #{$sparrow-dropdown-option-active};
 
   //
   //
@@ -286,7 +300,12 @@ $theme-colors: map-merge(
     "sparrowBottomBorder": $sparrow-bottom-border,
     "emailInviteBackgroundColor":$sparrow-email-invite-bg-color,
     "dropdownBorderColor":$sparrow-dropdown-border-color,
-    "activeSyncBtn": $sparrow-active-sync
+    "activeSyncBtn": $sparrow-active-sync,
+    "dropdownButton": $sparrow-dropdown,
+    "dropdownHover": $sparrow-dropdown-hover,
+    "dropdownContainer": $sparrow-dropdown-container,
+    "dropdownOptionHover": $sparrow-dropdown-option-hover,
+    "dropdownOptionActive": $sparrow-dropdown-option-active,
   )
 );
 
