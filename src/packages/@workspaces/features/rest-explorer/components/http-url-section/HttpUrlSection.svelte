@@ -57,12 +57,6 @@
       onSendButtonClicked(environmentVariables);
     }
   };
-
-  $: {
-    if (requestUrl) {
-      console.log(requestUrl);
-    }
-  }
 </script>
 
 <div class={`d-flex ${componentClass}`}>

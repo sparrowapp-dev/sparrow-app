@@ -4,8 +4,7 @@
   import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
   import { CodeMirrorHandler } from "./sub-input";
-  import AddEnvironment from "$lib/components/collections/req-res-section/sub-components/add-environment-popup/AddEnvironment.svelte";
-  import EnvironmentPicker from "$lib/components/collections/req-res-section/sub-components/environment-picker/EnvironmentPicker.svelte";
+  import { EnvironmentPicker, MissedEnvironment } from "../";
 
   export let environmentVariables = [];
   export let onUpdateRequestUrl;
@@ -115,7 +114,7 @@
   />
 {/if}
 <!-- {#if envMissing && trackParanthesis.length == 0}
-    <AddEnvironment
+    <MissedEnvironment
       {environmentAxisX}
       {environmentAxisY}
       updateEnvironment={collectionsMethods.updateEnvironment}

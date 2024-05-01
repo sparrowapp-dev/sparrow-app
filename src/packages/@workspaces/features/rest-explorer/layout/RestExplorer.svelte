@@ -85,12 +85,6 @@
   export let onCreateCollection: CreateCollectionType;
   export let environmentVariables;
 
-  $: {
-    if (environmentVariables) {
-      console.log(environmentVariables);
-    }
-  }
-
   let isExposeSaveAsRequest = false;
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
