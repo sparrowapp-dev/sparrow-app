@@ -25,7 +25,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "$lib/database/app.database";
   import type { Observable } from "rxjs";
-  import SaveAsRequest from "../save-as-request/SaveAsRequest.svelte";
+  import { SaveAsRequest } from "../../../../features";
   /////////////////////////////////////////////////////////////////
   export let onSaveAsRequest;
   export let onSaveRequest;
@@ -41,7 +41,7 @@
   //   export let collectionsMethods: CollectionsMethods;
   export let loggedUserRoleInWorkspace: WorkspaceRole = "editor";
 
-  export let requestDescription: string;
+  export let requestDescription;
   ////state
   export let state;
   //////

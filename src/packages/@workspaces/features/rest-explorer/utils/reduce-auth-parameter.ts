@@ -1,15 +1,20 @@
-import { AuthSection, AuthType } from "$lib/utils/enums";
+import {
+  AuthSectionEnum,
+  AuthTypeEnum,
+  type Auth,
+  type State,
+} from "@common/types/rest-explorer";
 
 class ReduceAuthParameter {
   private authParameter;
-  constructor(_state, _auth) {
+  constructor(_state: State, _auth: Auth) {
     const authValue: { key: string; value: string } = {
       key: "",
       value: "",
     };
     if (
-      _state.requestAuthNavigation === AuthType.API_KEY &&
-      _auth.apiKey.addTo === AuthSection.QUERY_PARAMETER &&
+      _state.requestAuthNavigation === AuthTypeEnum.API_KEY &&
+      _auth.apiKey.addTo === AuthSectionEnum.QUERY_PARAMETER &&
       (_auth.apiKey.authKey || _auth.apiKey.authValue)
     ) {
       authValue.key = _auth.apiKey.authKey;

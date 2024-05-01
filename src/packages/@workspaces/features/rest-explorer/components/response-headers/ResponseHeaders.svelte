@@ -4,7 +4,7 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-center bg-backgroundColor pt-0 w-100 pe-2 h-100 response-header"
+  class="d-flex flex-column align-items-center pt-0 w-100 h-100 response-header"
 >
   {#each responseHeader as header}
     <div

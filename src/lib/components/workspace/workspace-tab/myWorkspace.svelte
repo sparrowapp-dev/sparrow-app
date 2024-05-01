@@ -22,7 +22,7 @@
     workspaceInviteMethods,
   } from "$lib/utils/interfaces";
   import { TeamRole, WorkspaceRole } from "$lib/utils/enums";
-  import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
+  import { TeamViewModel } from "@app/pages/Teams/team.viewModel";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
