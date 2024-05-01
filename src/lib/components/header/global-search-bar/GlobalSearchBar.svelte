@@ -1,6 +1,6 @@
 <script lang="ts">
   import tickMark from "$lib/assets/tickMark.svg";
-  import collectionsIcon from "$lib/assets/collections.svg";
+  import collectionsIcon from "$lib/assets/collections-old.svg";
   import workspacesIcon from "$lib/assets/workspaces.svg";
   import FolderIcon from "$lib/assets/folder.svg";
   import RequestIcon from "$lib/assets/apiRequest.svg";
