@@ -39,13 +39,16 @@
   import doubleangleRight from "$lib/assets/doubleangleRight.svg";
   import SearchIcon from "$lib/assets/search.svelte";
   import FilterIcon from "$lib/assets/filter.svelte";
-  import plusIcon from "$lib/assets/plus.svg";
+  import plusIcon from "$lib/assets/plus-white.svg";
+  import CreateFolder from "$lib/assets/create_folder.svg";
+  import CreateRequest from "$lib/assets/create_request.svg";
+  import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
   import Select from "$lib/components/inputs/select/Select.svelte";
-  import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
+  import { Dropdown } from "@common/components";
   import List from "$lib/components/list/List.svelte";
   import type { Observable } from "rxjs";
   import type {
@@ -63,7 +66,7 @@
     selectMethodsStore,
     selectedMethodsCollectionStore,
   } from "$lib/store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -73,6 +76,7 @@
   let filteredFolder: Folder[] = [];
   let filteredFile: RequestType[] = [];
   let selectedApiMethods: string[] = [];
+  let addButtonMenu: boolean = false;
 
   const selectedMethodsCollectionUnsubscribe =
     selectedMethodsCollectionStore.subscribe((value) => {
@@ -231,55 +235,40 @@
           {/if}
         </button>
       </div>
-      <div>
-        <Dropdown
-          dropdownId={"collectionDropdown"}
-          dropDownType={{ type: "img", title: plusIcon }}
-          staticCustomStyles={[
-            {
-              id: "collectionDropdown-options-container",
-              styleKey: "minWidth",
-              styleValue: "160px",
-            },
-          ]}
-          data={[
-            {
-              name: "Collection",
-              id: "collection",
-              dynamicClasses: "text-whiteColor",
-            },
-            {
-              name: "API Request",
-              id: "apiRequest",
-              dynamicClasses: "text-whiteColor mt-1",
-            },
-            {
-              name: "Import via cURL",
-              id: "importcURL",
-              dynamicClasses: "text-whiteColor mt-1",
-            },
-          ]}
-          onclick={(tab) => {
-            if (tab === "collection") {
-              showImportCollectionPopup();
-            } else if (tab === "importcURL") {
-              showImportCurlPopup();
-            } else if (tab === "apiRequest") {
-              onItemCreated("request", {});
-            }
+      <!--  
+        New dropdown button for adding new api, collection and import Curl
+      -->
+      <Dropdown
+        buttonId="addButton"
+        isMenuOpen={addButtonMenu}
+        options={[
+          {
+            name: "Add New API",
+            icon: CreateRequest,
+            onclick: () => onItemCreated("request", {}),
+          },
+          {
+            name: "Add Curl API",
+            icon: CreateRequest,
+            onclick: showImportCurlPopup,
+          },
+          {
+            name: "Add Collection",
+            icon: CreateCollection,
+            onclick: showImportCollectionPopup,
+          },
+        ]}
+      >
+        <button
+          id="addButton"
+          class="border-0 p-1 rounded add-button"
+          on:click={() => {
+            addButtonMenu = !addButtonMenu;
           }}
-          staticClasses={[
-            {
-              id: "collectionDropdown-img",
-              classToAdd: ["btn", "bg-backgroundDark", "p-1", "rounded"],
-            },
-            {
-              id: "collectionDropdown-options-container",
-              classToAdd: ["end-0", "mt-1"],
-            },
-          ]}
-        ></Dropdown>
-      </div>
+        >
+          <img src={plusIcon} alt="" />
+        </button>
+      </Dropdown>
     </div>
     <div
       class="d-flex flex-column collections-list"
@@ -395,6 +384,14 @@
 {/if}
 
 <style>
+  .add-button {
+    background-color: var(--dropdown-button);
+  }
+
+  .add-button:hover {
+    background-color: var(--dropdown-hover);
+  }
+
   .view-active {
     filter: invert(98%) sepia(99%) saturate(24%) hue-rotate(160deg)
       brightness(107%) contrast(100%);
