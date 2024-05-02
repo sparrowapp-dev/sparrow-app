@@ -2,6 +2,7 @@
   import { Select } from "$lib/components/inputs";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
+  import { WithSelect } from "@workspaces/common/hoc";
 
   export let auth;
   export let environmentVariables = [];
@@ -11,17 +12,12 @@
 </script>
 
 <div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
-  <div
-    class="col-12 pb-2 d-flex align-items-center"
-    style="font-size: 12px; font-weight:500;border-bottom:1px solid var(--border-color)"
-  >
-    <div class="col-2">
-      <p class="text-requestBodyColor ps-1 mb-0">Auth Type</p>
-    </div>
-    <div class="col-10">
+  <div class="pb-2" style="font-size: 12px; font-weight:500;">
+    <div class="">
       <button class="d-flex bg-backgroundColor border-0">
         <p class="mb-0">
-          <Select
+          <WithSelect
+            wrappedComponent={Select}
             id={"hash999"}
             data={[
               {
@@ -45,14 +41,6 @@
             onclick={(id) => {
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
-            headerTheme={"transparent"}
-            borderType={"none"}
-            borderActiveType={"bottom"}
-            borderHighlight={"hover-active"}
-            headerHighlight={"active"}
-            minBodyWidth={"150px"}
-            borderRounded={false}
-            menuItem={"v2"}
           />
         </p>
       </button>

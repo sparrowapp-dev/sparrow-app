@@ -104,6 +104,8 @@
   export let iconRequired = false;
   export let icon = GitBranchIcon;
 
+  let selectWrapper: HTMLElement;
+
   const Icon = icon;
   let searchData = "";
   let isOpen = false;
@@ -180,7 +182,13 @@
       selectBodyBackgroundClass = "select-body-background-violet";
   }
 
+  let leftDistance: number;
+  let bottomDistance: number;
+  let rightDistance: number;
   const toggleSelect = () => {
+    leftDistance = selectWrapper.getBoundingClientRect().left;
+    rightDistance = selectWrapper.getBoundingClientRect().right;
+    bottomDistance = selectWrapper.getBoundingClientRect().bottom;
     isOpen = !isOpen;
   };
 
@@ -277,6 +285,7 @@
 
 <div
   class="parent-select display-inline-block cursor-pointer"
+  bind:this={selectWrapper}
   style=" position: relative; z-index:{zIndex};"
   id={`color-select-${id}`}
 >
@@ -331,9 +340,11 @@
 
   {#if isOpen}
     <div
-      class="d-none z-2 select-data {selectBodyBackgroundClass} p-1 border-radius-2"
+      class="d-none z-2 select-data position-fixed {selectBodyBackgroundClass} p-1 border-radius-2"
       class:select-active={isOpen}
-      style="min-width:{minBodyWidth};"
+      style="min-width:{minBodyWidth}; left: {leftDistance}px; top: {5 +
+        bottomDistance}px; right: {window.innerWidth -
+        rightDistance}px; z-index:{zIndex};"
       transition:slide={{ duration: 100 }}
     >
       <div
@@ -449,10 +460,6 @@
   }
   .select-data {
     color: white;
-    position: absolute;
-    top: 40px;
-    left: 0;
-    right: 0;
     border: 1px solid rgb(44, 44, 44);
   }
   .select-body-background-dark {

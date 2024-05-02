@@ -98,7 +98,7 @@
     minHeaderWidth={"100px"}
     borderActiveType={"none"}
     headerTheme={"violet"}
-    zIndex={2}
+    zIndex={1001}
     borderType={"none"}
     menuItem={"v2"}
     bodyTheme={"violet"}

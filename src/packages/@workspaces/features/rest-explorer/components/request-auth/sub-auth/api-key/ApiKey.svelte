@@ -19,7 +19,13 @@
   };
 </script>
 
-<div class="pt-3 d-flex gap-3">
+<div>
+  <p class="text-secondary-300 text-fs-12 fw-normal">
+    The authorization header will be automatically generated when you send the
+    request.
+  </p>
+</div>
+<div class="pt-2 d-flex gap-3">
   <label class="text-fs-12 d-flex align-items-center">
     <input
       type="radio"
