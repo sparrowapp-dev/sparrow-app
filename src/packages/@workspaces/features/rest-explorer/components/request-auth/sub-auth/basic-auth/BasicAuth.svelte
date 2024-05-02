@@ -14,12 +14,9 @@
 </script>
 
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
-  <div
-    class="col-12 d-flex align-items-center justify-content-between mb-4"
-    style="font-size: 12px; font-weight:500"
-  >
-    <p class="col-2 mb-0 text-requestBodyColor">Username</p>
-    <div class="col-10 ps-2 position-relative">
+  <div class="mb-4" style="font-size: 12px; font-weight:500">
+    <p class="mb-2 text-requestBodyColor">Username</p>
+    <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:urlText={basicAuth.username}
         onUpdateRequestUrl={() => {
@@ -32,13 +29,10 @@
     </div>
   </div>
 
-  <div
-    class="col-12 d-flex align-items-center justify-content-between mb-3"
-    style="font-size: 12px; font-weight:500"
-  >
-    <p class="col-2 mb-0 text-requestBodyColor">Password</p>
+  <div class="mb-3" style="font-size: 12px; font-weight:500">
+    <p class="mb-2 text-requestBodyColor">Password</p>
 
-    <div class="col-10 ps-2 position-relative">
+    <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:urlText={basicAuth.password}
         onUpdateRequestUrl={() => {
@@ -51,3 +45,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  .auth-input-container {
+    max-width: 600px;
+  }
+</style>

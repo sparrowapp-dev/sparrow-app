@@ -439,7 +439,7 @@
     background-color: var(--bg-tertiary-400);
   }
   .select-btn-state-active-transparent {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-active-dark {
     background-color: var(--border-color);

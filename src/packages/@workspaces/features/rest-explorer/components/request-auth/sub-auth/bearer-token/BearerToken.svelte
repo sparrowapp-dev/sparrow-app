@@ -13,12 +13,9 @@
 </script>
 
 <div class="d-flex flex-column w-100 pt-4 pe-1">
-  <div
-    class="col-12 d-flex justify-content-between mb-3"
-    style="font-size: 12px; font-weight:500"
-  >
-    <p class="col-2 mb-0 text-requestBodyColor">Token</p>
-    <div class="col-10 ps-2 position-relative">
+  <div class="mb-3" style="font-size: 12px; font-weight:500">
+    <p class="mb-2 text-requestBodyColor">Token</p>
+    <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:urlText={bearerToken}
         onUpdateRequestUrl={() => {
@@ -31,3 +28,9 @@
     </div>
   </div>
 </div>
+
+<style>
+  .auth-input-container {
+    max-width: 600px;
+  }
+</style>
