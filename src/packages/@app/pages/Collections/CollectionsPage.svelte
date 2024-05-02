@@ -14,8 +14,8 @@
 
   // ---- Components
   import { RestExplorerPage } from "../";
-  import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
   import {
+    TabBar,
     CollectionList,
     ImportCollection,
     ImportCurl,

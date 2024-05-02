@@ -3,16 +3,17 @@
   import plusIcon from "$lib/assets/actionicon-normal.svg";
   import angleLeft from "$lib/assets/angleLeft.svg";
   import angleRight from "$lib/assets/angle-right.svg";
+  import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
+  import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
 
   // ---- Interface
   import type { TabDocument } from "$lib/database/app.database";
-  import type { NewTab } from "$lib/utils/interfaces/request.interface";
 
   // ---- Component
-  import Tab from "../req-res-section/sub-components/sub-components-header/Tab.svelte";
+  import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
 
   // ---- Helper
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -71,8 +72,9 @@
   let scrollerWidth: number;
 </script>
 
-<div
-  class="tab"
+<button
+  class="tab border-0 w-100 bg-blackColor d-flex"
+  style="cursor: default;"
   on:drop|preventDefault={(event) => {
     onDropEvent(event);
   }}
@@ -95,9 +97,9 @@
         />
       </div>
     {/if}
-    <div
+    <button
       on:dragover|preventDefault
-      class=" d-inline-block tab-scroller"
+      class=" d-inline-block tab-scroller border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
       style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
@@ -115,7 +117,7 @@
           />
         {/each}
       {/if}
-    </div>
+    </button>
     {#if scrollerParent <= scrollerWidth + 105}
       <div class="d-inline-block" style="height:35px; width:35px;">
         <Button
@@ -133,17 +135,26 @@
       <Button
         title=""
         onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
+        buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
+        buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
     </div>
   </div>
-</div>
+  <div class="d-flex my-auto me-2">
+    <button class="border-0 bg-transparent me-1">
+      <ViewGrid height={15} />
+    </button>
+    <button class="border-0 bg-transparent">
+      <MoreOptions height={15} />
+    </button>
+  </div>
+</button>
 
 <style>
   .tabbar {
     height: 36px;
-    background-color: var(--background-light);
+    background-color: var(--sparrow-black);
   }
 
   .tab-scroller::-webkit-scrollbar {
