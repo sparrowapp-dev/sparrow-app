@@ -1,13 +1,25 @@
 <script lang="ts">
   // Exports
+  /**
+   * Callback to update description
+   */
   export let onUpdateDescription: (
     collection: CollectionDocument,
     newDescription: string,
   ) => void;
+  /**
+   * Callback to create api request
+   */
   export let onCreateAPIRequest: (collection: CollectionDocument) => void;
+  /**
+   * Callback to sync collection from current branch
+   */
   export let onCollectionSynced: (
     collection: CollectionDocument,
   ) => Promise<boolean>;
+  /**
+   * Callback to get last updated and total number of folders and requests in collection
+   */
   export let getLastUpdatedAndCount: (
     collection: CollectionDocument,
   ) => Promise<{
@@ -16,38 +28,63 @@
     totalRequests: number;
     lastUpdated: string;
   }>;
+  /**
+   * Callback to refetch collection from local
+   */
   export let onCollectionRefetched: (collection: CollectionDocument) => void;
+  /**
+   * Callback to change the branch
+   */
   export let onBranchChanged: (
     collection: CollectionDocument,
     newBranch: string,
   ) => void;
+  /**
+   * Callback to rename collection
+   */
   export let onRename: (
     collection: CollectionDocument,
     newBranch: string,
   ) => void;
+  /**
+   * The tab of the collection explorer
+   */
   export let tab: TabDocument;
+  /**
+   * The collection
+   */
   export let collection: CollectionDocument;
+  /**
+   * User role in the workspace
+   */
   export let userRoleInWorkspace: boolean;
 
-  // Icons and images
+  /**
+   * Icons and images
+   */
   import { GitBranchIcon } from "$lib/assets/icons";
   import refreshIcon from "$lib/assets/refresh.svg";
 
-  // Components
+  /**
+   * Components
+   */
   import { ModalWrapperV1 } from "$lib/components";
   import Button from "$lib/components/buttons/Button.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { Select } from "$lib/components/inputs";
 
-  // Enum
+  /**
+   * Enums
+   */
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import type {
     CollectionDocument,
     TabDocument,
   } from "$lib/database/app.database";
-  import type { Observable } from "rxjs";
 
-  // Local variables
+  /**
+   * Local variables
+   */
   let isBranchSwitchPopupOpen: boolean = false;
   let branchSwitchLoader: boolean = false;
   let newBranch: string = "";
@@ -57,7 +94,9 @@
   let totalFolders: number = 0;
   let totalRequests: number = 0;
 
-  // Function to update isSynced, totalRequests and totalFolders, and lastUpdated
+  /**
+   * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
+   */
   const updateLastUpdateAndCount = async () => {
     const res = await getLastUpdatedAndCount(collection);
     isSynced = res.isSynced;
@@ -66,7 +105,9 @@
     totalRequests = res.totalRequests;
   };
 
-  // Check if collection is changed from other components
+  /**
+   * Check if collection is changed from other components
+   */
   $: {
     if (collection) {
       updateLastUpdateAndCount();

@@ -71,6 +71,7 @@
   let scrollerWidth: number;
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="tab"
   on:drop|preventDefault={(event) => {

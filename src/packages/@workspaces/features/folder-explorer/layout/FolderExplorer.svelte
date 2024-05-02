@@ -1,49 +1,85 @@
 <script lang="ts">
   // Exports
+  /**
+   * The tab of the folder
+   */
   export let tab: TabDocument;
+  /**
+   * The folder data from repository
+   */
   export let folder: Folder;
+  /**
+   * The collection of the folder
+   */
   export let collection: CollectionDocument;
+  /**
+   * The role of user in workspace, if have permission to update
+   */
   export let userRoleInWorkspace: boolean;
+  /**
+   * Callback to rename folder
+   */
   export let onRename: (
     collection: CollectionDocument,
     folder: Folder,
     newName: string,
   ) => Promise<void>;
+  /**
+   * Callback to create new api request
+   */
   export let onCreateAPIRequest: (
     collection: CollectionDocument,
     folder: Folder,
   ) => Promise<void>;
+  /**
+   * Callback to update description
+   */
   export let onUpdateDescription: (
     tab: TabDocument,
     newDescription: string,
   ) => Promise<void>;
+  /**
+   * Callback to get total number of requests in folder
+   */
   export let getTotalRequests: (
     collection: CollectionDocument,
     tab: TabDocument,
   ) => Promise<number>;
 
-  // Components
+  /**
+   * Components
+   */
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
-  // Types
+  /**
+   * Types
+   */
   import type {
     CollectionDocument,
     TabDocument,
   } from "$lib/database/app.database";
-
-  // Constant
-  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import type { Folder } from "@common/types/rest-explorer";
 
-  // Local Variables
+  /**
+   * Constants
+   */
+  import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
+
+  /**
+   * Local variables
+   */
   let totalRequests: number = 0;
 
-  // Funciton to update total requests
+  /**
+   * Funciton to update total requests
+   */
   const updateTotalRequests = async () => {
     totalRequests = await getTotalRequests(collection, tab);
   };
 
-  // Check if the tab or collection updates
+  /**
+   * Check if the tab or collection updates
+   */
   $: {
     if (tab && collection) {
       updateTotalRequests();

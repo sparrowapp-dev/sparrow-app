@@ -51,8 +51,17 @@ class FolderExplorerPage {
    * @param _id - Id of the tab going to be updated
    * @param data - Data to be updated on tab
    */
-  private updateTab = async (_id: string, data: TabDocument) => {
-    this.tabRepository.updateTab(_id, data);
+  private updateTab = async (_id: string, data: any) => {
+    this.tabRepository
+      .getTabList()
+      .subscribe((tabList) => {
+        tabList.forEach((tab) => {
+          if (tab.id === _id) {
+            this.tabRepository.updateTab(tab.tabId, data);
+          }
+        });
+      })
+      .unsubscribe();
   };
 
   /**
@@ -147,7 +156,9 @@ class FolderExplorerPage {
           folder.id,
           response.data.data,
         );
-        this.updateTab(folder.id, response.data.data);
+        this.updateTab(folder.id, {
+          name: newFolderName,
+        });
       }
     }
   };

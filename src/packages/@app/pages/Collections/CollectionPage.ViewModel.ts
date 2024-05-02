@@ -406,8 +406,17 @@ export default class CollectionsViewModel {
    * @param route :string - path to collection, folder or request
    * @param _id :string - if of the tab
    */
-  public updateTab = async (data: any, route: string, _id: string) => {
-    requestResponseStore.setTabProperty(data, route, _id);
+  public updateTab = async (_id: string, data: any) => {
+    this.tabRepository
+      .getTabList()
+      .subscribe((tabList) => {
+        tabList.forEach((tab) => {
+          if (tab.id === _id) {
+            this.tabRepository.updateTab(tab.tabId, data);
+          }
+        });
+      })
+      .unsubscribe();
   };
 
   /**
@@ -1592,7 +1601,9 @@ export default class CollectionsViewModel {
           collection.id,
           response.data.data,
         );
-        this.updateTab(newCollectionName, "name", collection.id);
+        this.updateTab(collection.id, {
+          name: newCollectionName,
+        });
         notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -1641,7 +1652,9 @@ export default class CollectionsViewModel {
           explorer.id,
           response.data.data,
         );
-        this.updateTab(newFolderName, "name", explorer.id);
+        this.updateTab(explorer.id, {
+          name: newFolderName,
+        });
       }
     }
   };
@@ -1676,39 +1689,6 @@ export default class CollectionsViewModel {
 
     this.tabRepository.createTab(req.getValue());
     moveNavigation("right");
-    // let _request: any = generateSampleRequest(
-    //   request.id,
-    //   new Date().toString(),
-    // );
-    // _request.path = path;
-    // _request.name = request.name;
-    // if (request.description) _request.description = request.description;
-    // if (request.request.url)
-    //   _request.property.request.url = request.request?.url;
-    // if (request.request.body)
-    //   _request.property.request.body = request.request?.body;
-    // if (request.request.method)
-    //   _request.property.request.method = request.request?.method;
-    // if (request.request.queryParams)
-    //   _request.property.request.queryParams = request.request?.queryParams;
-    // if (request.request.auth)
-    //   _request.property.request.auth = request.request?.auth;
-    // if (request.request.headers)
-    //   _request.property.request.headers = request.request?.headers;
-    // if (request.request.actSync) _request.activeSync = request.request?.actSync;
-    // if (request.isDeleted) _request.isDeleted = request.isDeleted;
-    // if (request.source === "SPEC") _request.source = request.source;
-    // if (request.request.selectedRequestBodyType)
-    //   _request = setBodyType(
-    //     _request,
-    //     request.request?.selectedRequestBodyType,
-    //   );
-    // if (request.request.selectedRequestAuthType)
-    //   _request = setAuthType(_request, request.request.selectedRequestAuthType);
-    // _request.property.request.save.api = true;
-    // _request.property.request.save.description = true;
-    // this.handleCreateTab(_request);
-    // moveNavigation("right");
   };
 
   public handleOpenFolder = (
@@ -1811,7 +1791,9 @@ export default class CollectionsViewModel {
             request.id,
             response.data.data,
           );
-          this.updateTab(newRequestName, "name", request.id);
+          this.updateTab(request.id, {
+            name: newRequestName,
+          });
         }
       } else if (collection.id && workspaceId && folder.id) {
         let storage = request;
@@ -1838,7 +1820,9 @@ export default class CollectionsViewModel {
             request.id,
             response.data.data,
           );
-          this.updateTab(newRequestName, "name", request.id);
+          this.updateTab(request.id, {
+            name: newRequestName,
+          });
         }
       }
     }
