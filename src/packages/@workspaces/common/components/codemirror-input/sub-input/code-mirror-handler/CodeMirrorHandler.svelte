@@ -33,6 +33,7 @@
   export let disabled: boolean = false;
   export let environmentAxisY;
   export let environmentAxisX;
+  export let id;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -40,8 +41,8 @@
   const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
 
   const ENV_HIGHLIGHT = "env-highlight";
-  const ENV_HIGHLIGHT_FOUND = "env-found";
-  const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found";
+  const ENV_HIGHLIGHT_FOUND = "env-found" + id + " env-found";
+  const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found" + id + " env-not-found";
   const HOVER_TIME = 3000;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
@@ -100,19 +101,33 @@
   });
 
   const handleHighlightClass = () => {
-    const boxes = document.getElementsByClassName("env-not-found");
+    const boxes = document.querySelectorAll(
+      `.${ENV_HIGHLIGHT_NOT_FOUND.split(" ")[0]}`,
+    );
     if (boxes.length > 0) {
       for (const box of boxes) {
         box.addEventListener("click", function handleClick(event) {
-          const envExist = filterData.find(
-            (k: { key: string }) => k.key === localEnvKey,
+          handleEnvironmentBox(
+            "env-not-found",
+            event.target.innerText.replace(/[{}]/g, ""),
           );
-          if (!envExist) {
-            handleEnvironmentBox(true, localEnvKey);
-          } else handleEnvironmentBox(false, localEnvKey);
         });
       }
-    } else handleEnvironmentBox(false, localEnvKey);
+    }
+
+    const es = document.querySelectorAll(
+      `.${ENV_HIGHLIGHT_FOUND.split(" ")[0]}`,
+    );
+    if (es.length > 0) {
+      for (const box of es) {
+        box.addEventListener("click", function handleClick(event) {
+          handleEnvironmentBox(
+            "env-found",
+            event.target.innerText.replace(/[{}]/g, ""),
+          );
+        });
+      }
+    }
   };
 
   const checkEnvExist = (
@@ -215,14 +230,79 @@
       }
     });
     if (!envExist) {
-      return null;
+      if (
+        text[start - from - 1] === "{" &&
+        text[start - from - 2] === "{" &&
+        text[end - from + 0] === "}" &&
+        text[end - from + 1] === "}"
+      ) {
+        /**
+         * environment doesn't exist
+         */
+        return;
+        return {
+          pos: start,
+          end,
+          top: 20,
+          above: true,
+          create(view) {
+            let dom = document.createElement("div");
+            const screen1 = `<div id="screen1">
+                <p>This variable is missing in your workspace. Try adding it as a global variable or under the active environment.</p>
+                <button id="add-variable">Add Variable</button>
+                </div>`;
+            const screen2 = `<div id="screen2">
+                <input type="text"/ disabled value="${envKey}">
+                <input type="text" placeholder = "Enter Value"/>
+
+                <button id="add-apply">Add & Apply</button>
+                </div>`;
+            dom.innerHTML = `<div>${screen1} ${screen2}</div>`;
+            dom.style.height = "200px";
+            dom.style.width = "400px";
+            dom.style.backgroundColor = "red";
+            // dom.textContent = `asifbhai`;
+
+            let addButton = dom.querySelector("button#add-variable");
+            let applyButton = dom.querySelector("button#add-apply");
+            dom.querySelector("#screen2").style.display = "none";
+
+            // Add event listener to the button
+            addButton.addEventListener("click", function () {
+              // Perform your action here, for example:
+              // alert("Button clicked!");
+              dom.querySelector("#screen1").style.display = "none";
+              dom.querySelector("#screen2").style.display = "block";
+
+              // You can replace the above line with any action you want to perform.
+            });
+            applyButton.addEventListener("click", function () {
+              // Perform your action here, for example:
+              // alert("Button clicked!");
+              alert("applied  ");
+
+              // You can replace the above line with any action you want to perform.
+            });
+            return { dom };
+          },
+        };
+      } else {
+        return;
+      }
     }
+    /**
+     * environment exist
+     */
+    return;
     return {
       pos: start,
       end,
       above: true,
       create(view) {
         let dom = document.createElement("div");
+        dom.style.height = "200px";
+        dom.style.width = "400px";
+        dom.style.backgroundColor = "green";
         dom.textContent = `${envKey} = ${envValue}`;
         return { dom };
       },
@@ -254,7 +334,6 @@
   });
 
   afterUpdate(() => {
-    handleEnvironmentBox(false, localEnvKey);
     if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
         changes: {

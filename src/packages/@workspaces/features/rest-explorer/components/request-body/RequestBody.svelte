@@ -9,6 +9,7 @@
   } from "./sub-body";
 
   export let environmentVariables = [];
+  export let onUpdateEnvironment;
   export let body;
   export let requestState;
   export let onUpdateRequestBody;
@@ -30,6 +31,7 @@
     <UrlEncoded
       value={body.urlencoded}
       {onUpdateRequestBody}
+      {onUpdateEnvironment}
       {environmentVariables}
     />
   {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
@@ -38,6 +40,7 @@
       fileValue={body.formdata.file}
       {onUpdateRequestBody}
       {environmentVariables}
+      {onUpdateEnvironment}
       formData={body.formdata}
     />
   {/if}

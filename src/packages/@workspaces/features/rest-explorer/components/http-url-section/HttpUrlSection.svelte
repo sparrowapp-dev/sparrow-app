@@ -26,6 +26,7 @@
   export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveRequest: SaveRequestType;
   export let environmentVariables;
+  export let onUpdateEnvironment;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -109,6 +110,7 @@
     {onUpdateRequestUrl}
     placeholder={"Enter an URL"}
     {theme}
+    {onUpdateEnvironment}
     {environmentVariables}
   />
 

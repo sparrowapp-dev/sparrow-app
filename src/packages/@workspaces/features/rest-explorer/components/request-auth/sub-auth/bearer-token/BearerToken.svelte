@@ -5,6 +5,7 @@
   export let bearerToken: string;
   export let callback;
   export let environmentVariables;
+  export let onUpdateEnvironment;
 
   const theme = new AuthInputTheme().build();
   const handleInput = () => {
@@ -30,6 +31,7 @@
         placeholder={"Enter Token"}
         {theme}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     </div>
   </div>

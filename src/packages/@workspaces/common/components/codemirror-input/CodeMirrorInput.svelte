@@ -4,9 +4,11 @@
   import { editLink } from "$lib/store/api-request";
   import { v4 as uuidv4 } from "uuid";
   import { CodeMirrorHandler } from "./sub-input";
-  import { EnvironmentPicker, MissedEnvironment } from "../";
+  import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
 
   export let environmentVariables = [];
+  // console.log(environmentVariables);
+  export let onUpdateEnvironment;
   export let onUpdateRequestUrl;
   export let urlText: string = "";
   export let placeholder;
@@ -19,15 +21,16 @@
   let trackCursor: number;
   let environmentAxisY: number;
   let environmentAxisX: number;
-  let envMissing = false;
+  let dialogType = false;
   let localEnvKey: string;
   let filterData = [];
+  let id = uuidv4();
 
   $: {
     if (trackCursor) {
       if (trackParanthesis.length === 2)
         filterData = environmentHelper.filterEnvironments(
-          environmentVariables,
+          environmentVariables.filtered,
           urlText,
           trackParanthesis,
           trackCursor,
@@ -36,7 +39,7 @@
     if (trackParanthesis) {
       if (trackParanthesis.length === 2 && trackCursor)
         filterData = environmentHelper.filterEnvironments(
-          environmentVariables,
+          environmentVariables.filtered,
           urlText,
           trackParanthesis,
           trackCursor,
@@ -75,12 +78,13 @@
     }
   };
 
-  const handleEnvironmentBox = (change: boolean, envKey: string) => {
-    envMissing = change;
+  const handleEnvironmentBox = (change: string, envKey: string) => {
+    dialogType = change;
     localEnvKey = envKey;
   };
 </script>
 
+<!-- <div {id} class="w-100"> -->
 <CodeMirrorHandler
   rawValue={urlText}
   handleRawChange={handleInputValue}
@@ -90,14 +94,16 @@
   handleKeyUpChange={handleKeyUpValue}
   handleKeyDownChange={handleKeyPress}
   codeMirrorEditorDiv={inputElement}
-  filterData={environmentVariables}
+  filterData={environmentVariables.filtered}
   bind:environmentAxisX
   bind:environmentAxisY
   {handleEnvironmentBox}
   {theme}
   {placeholder}
   {disabled}
+  {id}
 />
+<!-- </div> -->
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
   <EnvironmentPicker
@@ -112,19 +118,26 @@
     }}
     {handleInputValue}
   />
+{:else if dialogType === "env-not-found"}
+  <MissedEnvironment
+    {environmentAxisX}
+    {environmentAxisY}
+    {onUpdateEnvironment}
+    {handleEnvironmentBox}
+    {environmentvariables}
+    {localEnvKey}
+    {id}
+  />
+  <!-- {localEnvKey} -->
+{:else if dialogType === "env-found"}
+  <ReviewEnvironment
+    {environmentAxisX}
+    {environmentAxisY}
+    {localEnvKey}
+    {handleEnvironmentBox}
+    {id}
+  />
 {/if}
-<!-- {#if envMissing && trackParanthesis.length == 0}
-    <MissedEnvironment
-      {environmentAxisX}
-      {environmentAxisY}
-      updateEnvironment={collectionsMethods.updateEnvironment}
-      {currentWorkspaceId}
-      {currentEnvironment}
-      {globalEnvironment}
-      {handleEnvironmentBox}
-      {localEnvKey}
-    />
-  {/if} -->
 
 <svelte:window on:keydown={handleKeyPress} />
 

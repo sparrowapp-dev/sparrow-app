@@ -5,6 +5,7 @@
   export let fileValue;
   export let onUpdateRequestBody;
   export let environmentVariables;
+  export let onUpdateEnvironment;
   export let formData;
 
   const handleFormDataTextChange = (pairs) => {
@@ -32,12 +33,14 @@
     keyValue={textValue}
     callback={handleFormDataTextChange}
     {environmentVariables}
+    {onUpdateEnvironment}
   />
   <p>File</p>
   <TabularInput
     keyValue={fileValue}
     callback={handleFormDataFileChange}
     {environmentVariables}
+    {onUpdateEnvironment}
     type="file"
   />
 </section>

@@ -92,6 +92,7 @@ import {
   type RequestTab,
   RequestDatasetEnum,
 } from "@common/types/rest-explorer";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
 class RestExplorerViewModel
   implements
@@ -427,7 +428,7 @@ class RestExplorerViewModel
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      environmentVariables,
+      environmentVariables.filtered,
     );
     makeHttpRequestV2(...decodeData)
       .then((response) => {
@@ -1065,6 +1066,78 @@ class RestExplorerViewModel
         }
       }
       MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  public updateEnvironment = async (
+    isGlobalVariable,
+    environmentVariables,
+    newVariableObj,
+  ) => {
+    if (isGlobalVariable) {
+      let payload = {
+        name: environmentVariables.global.name,
+        variable: [
+          ...environmentVariables.global.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      const response = await updateEnvironment(
+        currentWorkspaceId,
+        environmentVariables.global.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        notifications.success("Environment Variable Added");
+      } else {
+        notifications.error("Failed to add Environment Variable");
+      }
+    } else {
+      const payload = {
+        name: environmentVariables.local.name,
+        variable: [
+          ...environmentVariables.local.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      const response = await updateEnvironment(
+        currentWorkspaceId,
+        environmentVariables.local.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        notifications.success("Environment Variable Added");
+      } else {
+        notifications.error("Failed to add Environment Variable");
+      }
     }
   };
 }

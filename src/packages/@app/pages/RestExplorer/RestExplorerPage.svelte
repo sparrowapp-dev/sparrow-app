@@ -29,6 +29,7 @@
   const refreshEnvironment = () => {
     if ($environments && currentWorkspaceId) {
       if ($environments?.length > 0) {
+        console.log("envs", $environments);
         const filteredEnv = $environments
           .filter((elem) => {
             return elem.workspaceId === currentWorkspaceId;
@@ -42,12 +43,18 @@
             }
           });
         if (filteredEnv?.length > 0) {
-          environmentVariables.length = 0;
+          let envs = [];
           filteredEnv.forEach((elem) => {
+            environmentVariables = {
+              local: filteredEnv[1],
+              global: filteredEnv[0],
+              filtered: [],
+            };
+
             const temp = elem.toMutableJSON();
             temp.variable.forEach((variable) => {
               if (variable.key && variable.checked) {
-                environmentVariables.push({
+                envs.unshift({
                   key: variable.key,
                   value: variable.value,
                   type: temp.type === environmentType.GLOBAL ? "G" : "E",
@@ -55,6 +62,7 @@
                 });
               }
             });
+            environmentVariables.filtered = envs;
           });
         }
       }
@@ -79,7 +87,7 @@
   bind:tab={_viewModel.tab}
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
-  environmentVariables={environmentVariables.reverse()}
+  {environmentVariables}
   onSendRequest={_viewModel.sendRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
@@ -99,4 +107,5 @@
   onSaveAsRequest={_viewModel.saveAsRequest}
   onCreateFolder={_viewModel.createFolder}
   onCreateCollection={_viewModel.createCollection}
+  onUpdateEnvironment={_viewModel.updateEnvironment}
 />

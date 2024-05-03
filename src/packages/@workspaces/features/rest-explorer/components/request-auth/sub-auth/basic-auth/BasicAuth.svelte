@@ -6,6 +6,7 @@
   export let callback;
   export let basicAuth: BasicAuth;
   export let environmentVariables;
+  export let onUpdateEnvironment;
 
   const theme = new AuthInputTheme().build();
   const handleInput = () => {
@@ -31,6 +32,7 @@
         placeholder={"Enter Username"}
         {theme}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     </div>
   </div>
@@ -47,6 +49,7 @@
         placeholder={"Enter Password"}
         {theme}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     </div>
   </div>

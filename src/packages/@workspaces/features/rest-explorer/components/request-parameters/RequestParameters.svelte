@@ -7,6 +7,7 @@
   export let onUpdateRequestParams;
   export let environmentVariables = [];
   export let authParameter;
+  export let onUpdateEnvironment;
 
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
     onUpdateRequestParams(pairs);
@@ -19,5 +20,6 @@
     keyValue={createDeepCopy(params)}
     callback={handleParamsChange}
     {environmentVariables}
+    {onUpdateEnvironment}
   />
 </section>

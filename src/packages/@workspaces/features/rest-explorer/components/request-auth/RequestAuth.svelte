@@ -9,6 +9,7 @@
   export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
+  export let onUpdateEnvironment;
 </script>
 
 <div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
@@ -54,18 +55,21 @@
         apiData={auth.apiKey}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {:else if requestStateAuth === AuthType.BEARER_TOKEN}
       <BearerToken
         bearerToken={auth.bearerToken}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {:else if requestStateAuth === AuthType.BASIC_AUTH}
       <BasicAuth
         basicAuth={auth.basicAuth}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {/if}
   </section>

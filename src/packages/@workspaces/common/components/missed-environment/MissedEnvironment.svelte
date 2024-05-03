@@ -1,318 +1,174 @@
 <script lang="ts">
-    import Warning from "$lib/assets/warning.svg";
-    import Cross from "$lib/assets/cross.svg";
-    import { slide } from "svelte/transition";
-    import type {
-      EnvironmentResponseDto,
-      UpdateEnvironmentPostBody,
-    } from "$lib/utils/dto";
-    import { notifications } from "$lib/components/toast-notification/ToastNotification";
-    import Button from "$lib/components/buttons/Button.svelte";
-    export let environmentAxisX;
-    export let environmentAxisY;
-    export let updateEnvironment: (
-      workspaceId: string,
-      environmentId: string,
-      environment: UpdateEnvironmentPostBody,
-    ) => Promise<EnvironmentResponseDto>;
-    export let currentWorkspaceId: string;
-    export let currentEnvironment;
-    export let globalEnvironment;
-    export let localEnvKey: string;
-    export let handleEnvironmentBox: (change: boolean) => void;
-    let addVariable = false;
-    let isGlobalVariable = false;
-    let variableData = localEnvKey;
-    let valueData = "";
-    let isAddDisable = true;
-    let environmentName = "Dev";
-    let checkedToggle = false;
-  
-    const changeVariableType = () => {
-      isGlobalVariable = !isGlobalVariable;
-    };
-    const modifiedGlobalEnvironment = globalEnvironment.toMutableJSON();
-  
-    const checkDataInput = () => {
-      if (variableData.length > 0 && valueData.length > 0) {
-        isAddDisable = false;
-      } else {
-        isAddDisable = true;
+  import { onDestroy, onMount } from "svelte";
+
+  //   export let filterData = [];
+  export let environmentAxisX;
+  export let environmentAxisY;
+  export let localEnvKey;
+  export let handleEnvironmentBox;
+  export let id;
+  export let onUpdateEnvironment;
+  export let environmentVariables;
+  let count = 0;
+  function handleSelectClicked(event: MouseEvent) {
+    const selectElement = document.getElementById(`env-not-found-${id}`);
+    if (count) {
+      if (JSON.stringify(event.target.className).includes("prevent-default")) {
+        return;
       }
-    };
-    if (currentEnvironment.id === "none") {
-      isGlobalVariable = true;
-      checkedToggle = true;
-    } else {
-      environmentName = currentEnvironment.name;
+      if (selectElement && !selectElement.contains(event.target as Node)) {
+        handleEnvironmentBox("", "");
+      }
     }
-    const applyVariable = async () => {
-      if (isGlobalVariable) {
-        let payload = {
-          name: modifiedGlobalEnvironment.name,
-          variable: [
-            ...modifiedGlobalEnvironment.variable,
-            {
-              key: variableData,
-              value: valueData,
-              checked: true,
-            },
-          ],
-        };
-        payload.variable = [
-          ...payload.variable.filter((variable) => {
-            return variable.key.length > 0 && variable.value.length > 0;
-          }),
-          {
-            key: "",
-            value: "",
-            checked: false,
-          },
-        ];
-        const response = await updateEnvironment(
-          currentWorkspaceId,
-          modifiedGlobalEnvironment.id,
-          payload,
-        );
-        if (response.isSuccessful) {
-          notifications.success("Environment Variable Added");
-        } else {
-          notifications.error("Failed to add Environment Variable");
-        }
-      } else {
-        const payload = {
-          name: currentEnvironment.name,
-          variable: [
-            ...currentEnvironment.variable,
-            {
-              key: variableData,
-              value: valueData,
-              checked: true,
-            },
-          ],
-        };
-        payload.variable = [
-          ...payload.variable.filter((variable) => {
-            return variable.key.length > 0 && variable.value.length > 0;
-          }),
-          {
-            key: "",
-            value: "",
-            checked: false,
-          },
-        ];
-        const response = await updateEnvironment(
-          currentWorkspaceId,
-          currentEnvironment.id,
-          payload,
-        );
-        if (response.isSuccessful) {
-          notifications.success("Environment Variable Added");
-        } else {
-          notifications.error("Failed to add Environment Variable");
-        }
-      }
-      handleEnvironmentBox(false);
-    };
-  </script>
-  
-  {#if !addVariable}
-    <div
-      class="select-environment-popup d-flex p-2 rounded"
-      style="
-  top:{environmentAxisY}px;
-  left:{environmentAxisX}px;
-  "
-    >
-      <div class="warning-message d-flex">
-        <div class="d-flex align-self-start">
-          <img src={Warning} alt="i" />
-          <p class="missing-title align-self-end">Missing Variable</p>
+    count = count + 1;
+  }
+
+  let addVariable = false;
+  const newVariableObj = {
+    key: localEnvKey,
+    value: "",
+  };
+  let checkedToggle = false;
+  let isGlobalVariable = false;
+  let environmentName = "";
+  onDestroy(() => {
+    window.removeEventListener("click", handleSelectClicked);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleSelectClicked);
+  });
+</script>
+
+<div
+  id={`env-not-found-${id}`}
+  class="select-environment-popup bg-tertiary-700 d-flex p-3 rounded"
+  style="
+      top:{environmentAxisY}px;
+      left:{environmentAxisX}px;
+      "
+>
+  <div class="left-panel pe-2 w-100">
+    {#if addVariable}
+      <!-- add variable form -->
+      <div>
+        <input
+          type="text"
+          bind:value={newVariableObj.key}
+          placeholder="Enter Key"
+          disabled
+          class="w-100"
+        />
+        <input
+          type="text"
+          bind:value={newVariableObj.value}
+          placeholder="Enter Value"
+          class="w-100"
+        />
+        <div class="global-variable d-flex">
+          <p class="variable-switch">Global variable</p>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="flexSwitchCheckDefault"
+              checked={checkedToggle}
+              disabled={checkedToggle}
+              on:change={() => {
+                isGlobalVariable = !isGlobalVariable;
+              }}
+            />
+          </div>
         </div>
-        <div>
-          <img
-            class="cross-icon"
-            src={Cross}
-            alt="x"
-            on:click={() => handleEnvironmentBox(false)}
-          />
+        {#if !isGlobalVariable}
+          <div class="variable-text">
+            Adding to <span class="variable-highlight">{environmentName}</span> environment.
+          </div>
+        {/if}
+        <div
+          class="prevent-default"
+          on:click={async (e) => {
+            onUpdateEnvironment();
+          }}
+        >
+          Add & Apply
         </div>
       </div>
-      <p class="missing-discription" style="margin-top: 2%;">
+    {:else}
+      <!-- Missed env -->
+      <p class="text-fs-12">Missing Variable</p>
+      <p class="text-fs-12">
         This variable is missing in your workspace. Try adding it as a global
         variable or under the active environment.
       </p>
-      <div class="w-100">
-        <Button
-          title={"Add Variable"}
-          type={"dark"}
-          buttonClassProp={`w-100`}
-          onClick={() => {
-            addVariable = true;
-          }}
-          buttonStyleProp={`align-items: center; justify-content: center; height: 30px;`}
-          textStyleProp={"font-size: var(--small-text)"}
-        />
+
+      <div
+        class="prevent-default"
+        on:click={(e) => {
+          e.preventDefault();
+          addVariable = true;
+        }}
+      >
+        Add Variable
       </div>
-    </div>
-  {:else if addVariable}
-    <div
-      class="add-environment-popup d-flex p-2 rounded"
-      style="
-  top:{environmentAxisY}px;
-  left:{environmentAxisX}px;
-  "
-      transition:slide
-    >
-      <div class="d-flex w-100 justify-content-end align-items-start mb-2">
-        <img src={Cross} alt="x" on:click={() => handleEnvironmentBox(false)} />
-      </div>
-      <div class="input-class">
-        <input
-          disabled
-          type="text"
-          placeholder="Enter Variable1"
-          class="variable-name"
-          bind:value={variableData}
-          on:input={checkDataInput}
-        />
-        <input
-          type="text"
-          placeholder="Enter Value1"
-          class="variable-name"
-          bind:value={valueData}
-          on:input={checkDataInput}
-        />
-      </div>
-      <div class="global-variable d-flex">
-        <p class="variable-switch">Global variable</p>
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            role="switch"
-            id="flexSwitchCheckDefault"
-            checked={checkedToggle}
-            disabled={checkedToggle}
-            on:change={() => {
-              changeVariableType();
-            }}
-          />
-        </div>
-      </div>
-      {#if !isGlobalVariable}
-        <div class="variable-text">
-          Adding to <span class="variable-highlight">{environmentName}</span> environment.
-        </div>
-      {:else}
-        <div class="variable-text">
-          Adding as <span class="variable-highlight">Global variable.</span>
-        </div>
-      {/if}
-      <div class="w-100">
-        <Button
-          title={"Add & Apply"}
-          type={"primary"}
-          buttonClassProp={`w-100 mt-1`}
-          disable={isAddDisable}
-          onClick={() => applyVariable()}
-          buttonStyleProp={isAddDisable
-            ? `align-items: center; justify-content: center; height: 30px; opacity: 35%;`
-            : `align-items: center; justify-content: center; height: 30px;`}
-          textStyleProp={"font-size: var(--small-text)"}
-        />
-      </div>
-    </div>
-  {/if}
-  
-  <svelte:window />
-  
-  <style>
-    .select-environment-popup {
-      width: 240px;
-      height: 160px;
-      position: fixed;
-      background-color: var(--background-dropdown);
-      z-index: 5;
-      flex-wrap: wrap;
-      border: 1px solid var(--border-color);
-    }
-    .add-environment-popup {
-      width: 260px;
-      height: 220px;
-      position: fixed;
-      background-color: var(--background-dropdown);
-      z-index: 5;
-      flex-wrap: wrap;
-      border: 1px solid var(--border-color);
-    }
-    .warning-message {
-      justify-content: space-between;
-      width: 100%;
-    }
-    .input-class {
-      align-items: center;
-    }
-    .cross-icon {
-      align-self: flex-end;
-    }
-    .form-check-input:checked {
-      background-color: #1d3650 !important;
-      color: #85c2ff !important;
-    }
-    .variable-switch {
-      padding-left: 2%;
-    }
-    .variable-name {
-      width: 100%;
-      height: 30px;
-      border: #000000;
-      border-radius: 4px;
-      margin-bottom: 4px;
-      padding-left: 4px;
-    }
-    input::placeholder {
-      color: var(--sparrow-text-color);
-      padding-left: 4%;
-      font-size: 12px;
-    }
-    .variable-text {
-      color: var(--sparrow-text-color);
-      font-size: 12px;
-      font-weight: 400;
-      padding-left: 2%;
-    }
-    .variable-highlight {
-      color: var(--white-color);
-      font-weight: 500;
-    }
-    .missing-title {
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 150%;
-      margin-top: 5px;
-      margin-left: 5px;
-      margin-bottom: 5px;
-    }
-    .missing-discription {
-      color: var(--colors-neutral-bg-4, #999);
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 150%;
-      align-self: stretch;
-    }
-    .form-check-input {
-      background-color: #45494d;
-    }
-    .form-check-input:checked {
-      background-color: #1d3650;
-    }
-    .global-variable {
-      width: 100%;
-      justify-content: space-between;
-      height: 12%;
-    }
-  </style>
-  
+    {/if}
+    <!-- <p>env not found</p>
+    {localEnvKey} -->
+  </div>
+</div>
+
+<style>
+  .select-environment-popup {
+    width: 400px;
+    height: 250px;
+    position: fixed;
+    z-index: 2000;
+    flex-wrap: wrap;
+  }
+  .select-environment-popup .left-panel {
+    height: 220px;
+    overflow-y: auto;
+  }
+  .select-environment-popup .right-panel {
+    height: 190px;
+  }
+  .variable-title {
+    font-size: 12px;
+    font-weight: 400;
+    color: white;
+  }
+  .global-environment {
+    background-color: #3670f7;
+  }
+  .local-environment {
+    background-color: #69d696;
+  }
+  .select-env-info {
+    font-size: 12px;
+    color: #999999;
+    margin-top: 10px;
+  }
+  .env-title {
+    color: #999999;
+    font-size: 12px;
+  }
+  .env-value {
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 3; /* Number of lines to show */
+    text-overflow: ellipsis;
+    white-space: normal; /* Use 'normal' instead of 'nowrap' */
+    color: white;
+  }
+  .default-environment {
+    font-size: 10px;
+    text-align: center;
+    color: #999999;
+  }
+  .env-item:hover {
+    background-color: var(--bg-tertiary-400);
+  }
+</style>

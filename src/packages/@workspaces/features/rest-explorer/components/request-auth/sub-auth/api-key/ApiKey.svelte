@@ -7,6 +7,7 @@
   export let apiData: ApiKey;
   export let callback;
   export let environmentVariables;
+  export let onUpdateEnvironment;
   const theme = new AuthInputTheme().build();
 
   const handleAuthChange = () => {
@@ -61,6 +62,7 @@
         placeholder={"Enter Auth Key"}
         {theme}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     </div>
   </div>
@@ -75,6 +77,7 @@
         placeholder={"Enter Auth Value"}
         {theme}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     </div>
   </div>

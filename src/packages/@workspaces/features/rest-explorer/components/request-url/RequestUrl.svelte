@@ -25,6 +25,7 @@
   let envMissing = false;
   let localEnvKey: string;
   let filterData = [];
+  let id = uuidv4();
 
   $: {
     if (trackCursor) {
@@ -106,21 +107,24 @@
   };
 </script>
 
-<CodeMirrorInput
-  rawValue={urlText}
-  handleRawChange={handleInputValue}
-  handleFocusChange={handleFocusValue}
-  handleBlurChange={handleBlurValue}
-  {handleInputChange}
-  handleKeyUpChange={handleKeyUpValue}
-  handleKeyDownChange={handleKeyPress}
-  codeMirrorEditorDiv={inputElement}
-  filterData={environmentVariables}
-  {handleEnvironmentBox}
-  {theme}
-  {placeholder}
-  {disabled}
-/>
+<div class={id}>
+  <CodeMirrorInput
+    {id}
+    rawValue={urlText}
+    handleRawChange={handleInputValue}
+    handleFocusChange={handleFocusValue}
+    handleBlurChange={handleBlurValue}
+    {handleInputChange}
+    handleKeyUpChange={handleKeyUpValue}
+    handleKeyDownChange={handleKeyPress}
+    codeMirrorEditorDiv={inputElement}
+    filterData={environmentVariables}
+    {handleEnvironmentBox}
+    {theme}
+    {placeholder}
+    {disabled}
+  />
+</div>
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
   <EnvironmentPicker

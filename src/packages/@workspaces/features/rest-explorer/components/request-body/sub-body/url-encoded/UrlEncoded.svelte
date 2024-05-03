@@ -4,6 +4,7 @@
   export let value;
   export let environmentVariables;
   export let onUpdateRequestBody;
+  export let onUpdateEnvironment;
 
   const handleUrlEncodeChange = (pairs) => {
     onUpdateRequestBody({ urlencoded: pairs });
@@ -15,5 +16,6 @@
     keyValue={value}
     callback={handleUrlEncodeChange}
     {environmentVariables}
+    {onUpdateEnvironment}
   />
 </section>

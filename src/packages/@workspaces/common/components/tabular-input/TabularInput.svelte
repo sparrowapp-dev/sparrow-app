@@ -21,6 +21,7 @@
   };
   export let environmentVariables;
   export let type: "file" | "text" = "text";
+  export let onUpdateEnvironment;
   const environmentHelper = new EnvironmentHeper();
   let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
@@ -296,6 +297,7 @@
                   placeholder={"Add Name"}
                   {theme}
                   {environmentVariables}
+                  {onUpdateEnvironment}
                 />
               </div>
               {#if type === "file"}
@@ -381,6 +383,7 @@
                     disabled={mode == "READ" ? true : false}
                     {theme}
                     {environmentVariables}
+                    {onUpdateEnvironment}
                   />
                 </div>
               {/if}
