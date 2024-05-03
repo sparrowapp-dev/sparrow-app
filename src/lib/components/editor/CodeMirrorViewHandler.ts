@@ -36,6 +36,7 @@ const CodeMirrorViewHandler = (
   lang: RequestDataType,
   isFormatted: boolean,
   value: string,
+  onUpdateBeautifiedState: (value: boolean) => void,
 ) => {
   switch (lang) {
     case RequestDataType.HTML:
@@ -60,6 +61,7 @@ const CodeMirrorViewHandler = (
           ),
           ...payload,
         });
+        onUpdateBeautifiedState(false);
         return;
       }
       break;
@@ -81,6 +83,7 @@ const CodeMirrorViewHandler = (
           ),
           ...payload,
         });
+        onUpdateBeautifiedState(false);
       }
       break;
     case RequestDataType.JSON:
@@ -99,6 +102,7 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure(jsonSetup),
           ...payload,
         });
+        onUpdateBeautifiedState(false);
       }
       break;
     case RequestDataType.XML:
@@ -117,6 +121,7 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure(xml()),
           ...payload,
         });
+        onUpdateBeautifiedState(false);
       }
       break;
     default:
@@ -135,6 +140,7 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure([]),
           ...payload,
         });
+        onUpdateBeautifiedState(false);
       }
       break;
   }

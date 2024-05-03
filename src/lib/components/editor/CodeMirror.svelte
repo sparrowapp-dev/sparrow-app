@@ -13,6 +13,8 @@
   export let value = "";
   export let isEditable = true;
   export let isFormatted = false;
+  export let isBodyBeautified = false;
+  export let onUpdateBeautifiedState: (value: boolean) => void;
   export { componentClass as class };
 
   const dispatch = createEventDispatcher();
@@ -65,8 +67,22 @@
       lang,
       isFormatted,
       value,
+      onUpdateBeautifiedState,
     );
   });
+
+  $: {
+    if (isBodyBeautified) {
+      CodeMirrorViewHandler(
+        codeMirrorView,
+        languageConf,
+        lang,
+        true,
+        value,
+        onUpdateBeautifiedState,
+      );
+    }
+  }
 
   onDestroy(() => {
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed

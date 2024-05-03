@@ -6,6 +6,7 @@
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
+  import { CheckIcon } from "@library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -69,12 +70,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme: "dark" | "transparent" | "violet" = "dark";
+  export let headerTheme: "dark" | "transparent" | "violet" | "grey" = "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" | "grey" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -103,6 +104,7 @@
    */
   export let iconRequired = false;
   export let icon = GitBranchIcon;
+  export let checkIconColor = "white";
 
   const Icon = icon;
   let searchData = "";
@@ -178,6 +180,8 @@
       break;
     case "violet":
       selectBodyBackgroundClass = "select-body-background-violet";
+    case "grey":
+      selectBodyBackgroundClass = "select-body-background-grey";
   }
 
   const toggleSelect = () => {
@@ -229,6 +233,9 @@
           break;
         case "violet":
           x = "violet";
+          break;
+        case "grey":
+          x = "grey";
           break;
       }
       return `select-btn-state-active-${x}`;
@@ -390,9 +397,10 @@
               <MenuItemsv2
                 {list}
                 {selectedRequest}
-                {checkIcon}
+                {CheckIcon}
                 {bodyTheme}
                 {getTextColor}
+                {checkIconColor}
               />
             {/if}
           </div>
@@ -447,6 +455,9 @@
   .select-btn-state-active-violet {
     background-color: var(--bg-tertiary-700);
   }
+  .select-btn-state-active-grey {
+    background-color: var(--dropdown-container);
+  }
   .select-data {
     color: white;
     position: absolute;
@@ -460,6 +471,9 @@
   }
   .select-body-background-violet {
     background-color: var(--bg-tertiary-400);
+  }
+  .select-body-background-grey {
+    background-color: var(--dropdown-container);
   }
   .select-body-background-blur {
     background: var(--background-hover);

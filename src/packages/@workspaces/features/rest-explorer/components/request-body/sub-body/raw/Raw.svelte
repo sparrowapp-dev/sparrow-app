@@ -2,7 +2,9 @@
   import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
+  export let isBodyBeautified = false;
   export let onUpdateRequestBody: (data: string) => void = () => {};
+  export let onUpdateBeautifiedState: (value: boolean) => void;
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
     onUpdateRequestBody({ raw: e.detail });
   };
@@ -14,6 +16,8 @@
     bind:value
     on:change={handleCodeMirrorChange}
     isEditable={true}
+    {isBodyBeautified}
+    {onUpdateBeautifiedState}
   />
 </div>
 

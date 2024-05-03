@@ -1,10 +1,12 @@
 <script lang="ts">
   import infoIcon from "$lib/assets/info-color-blue.svg";
+  import BeautifyIcon from "$lib/assets/beautify.svg";
   import crossIcon from "$lib/assets/cross.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
   export let method = "";
   export let onUpdateRequestState;
+  export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
   let handleDropdown = (tab: string) => {
     // collectionsMethods.updateRequestState(tab, "dataset");
@@ -70,42 +72,37 @@
   {/if}
 </div>
 <div class="mb-2 d-flex">
-  <p
-    class="team-menu__link pb-1 mb-0 d-flex align-items-center"
-    style="font-size: 12px; margin-top:4px;"
-  >
-    Data Types:
-  </p>
-  <span class="pe-3" />
   <Select
     id={"hash124"}
     data={[
       {
-        name: "Raw",
-        id: RequestDataset.RAW,
+        name: "None",
+        id: RequestDataset.NONE,
       },
       {
-        name: "Form data",
+        name: "Form Data",
         id: RequestDataset.FORMDATA,
       },
       {
-        name: "Form Encoded URL",
+        name: "Encoded URL",
         id: RequestDataset.URLENCODED,
       },
       {
-        name: "None",
-        id: RequestDataset.NONE,
+        name: "Raw",
+        id: RequestDataset.RAW,
       },
     ]}
     titleId={requestState.requestBodyNavigation}
     onclick={handleDropdown}
-    headerTheme={"transparent"}
+    headerTheme={"grey"}
     borderType={"none"}
-    borderActiveType={"bottom"}
+    borderActiveType={"none"}
     borderHighlight={"hover-active"}
-    headerHighlight={"active"}
+    headerHighlight={"hover-active"}
     minBodyWidth={"150px"}
-    borderRounded={false}
+    borderRounded={true}
+    bodyTheme={"grey"}
+    checkIconColor={"var(--text-primary-200)"}
     menuItem={"v2"}
   />
   <span class="pe-3" />
@@ -136,15 +133,24 @@
       ]}
       titleId={requestState.requestBodyLanguage}
       onclick={handleRawDropDown}
-      headerTheme={"transparent"}
+      headerTheme={"grey"}
       borderType={"none"}
-      borderActiveType={"bottom"}
+      borderActiveType={"none"}
       borderHighlight={"hover-active"}
-      headerHighlight={"active"}
+      headerHighlight={"hover-active"}
       minBodyWidth={"150px"}
-      borderRounded={false}
+      borderRounded={true}
+      bodyTheme={"grey"}
+      checkIconColor={"var(--text-primary-200)"}
       menuItem={"v2"}
     />
+    <div
+      style="margin-left: auto; cursor:pointer; width: 30px"
+      on:click={() => updateBeautifiedState(true)}
+      class="beauty-icon"
+    >
+      <img src={BeautifyIcon} alt="Beautify" class="beauty-img" />
+    </div>
   {/if}
 </div>
 
@@ -161,5 +167,22 @@
   }
   .cursor-ppinter {
     cursor: pointer;
+  }
+  .beauty-icon {
+    padding-left: 10px;
+    align-self: center;
+    border-radius: 4px;
+  }
+  .beauty-icon:hover {
+    background-color: var(--dropdown-container);
+    align-self: center;
+    border-radius: 4px;
+    padding-left: 10px;
+  }
+  .beauty-icon:active {
+    background-color: var(--bg-secondary-500);
+    align-self: center;
+    border-radius: 4px;
+    padding-left: 10px;
   }
 </style>
