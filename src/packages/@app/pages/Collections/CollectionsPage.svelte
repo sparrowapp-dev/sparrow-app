@@ -201,6 +201,7 @@
       onDragStart={_viewModel.handleDropOnStart}
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
+      onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
     />
     <Route>
       {#if isAnimation}

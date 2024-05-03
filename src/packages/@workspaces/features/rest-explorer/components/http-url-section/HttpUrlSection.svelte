@@ -63,48 +63,50 @@
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
-  <Select
-    id={"api-request"}
-    data={[
-      {
-        name: "GET",
-        id: RequestMethod.GET,
-        color: "success",
-      },
-      {
-        name: "POST",
-        id: RequestMethod.POST,
-        color: "warning",
-      },
-      {
-        name: "PUT",
-        id: RequestMethod.PUT,
-        color: "secondary",
-      },
-      {
-        name: "DELETE",
-        id: RequestMethod.DELETE,
-        color: "danger",
-      },
-      {
-        name: "PATCH",
-        id: RequestMethod.PATCH,
-        color: "patch",
-      },
-    ]}
-    borderRounded={false}
-    titleId={httpMethod}
-    onclick={handleDropdown}
-    borderHighlight={"active"}
-    headerHighlight={"hover"}
-    minHeaderWidth={"100px"}
-    borderActiveType={"none"}
-    headerTheme={"violet"}
-    zIndex={2}
-    borderType={"none"}
-    menuItem={"v2"}
-    bodyTheme={"violet"}
-  />
+  <div style="font-weight: 500;">
+    <Select
+      id={"api-request"}
+      data={[
+        {
+          name: "GET",
+          id: RequestMethod.GET,
+          color: "success",
+        },
+        {
+          name: "POST",
+          id: RequestMethod.POST,
+          color: "warning",
+        },
+        {
+          name: "PUT",
+          id: RequestMethod.PUT,
+          color: "secondary",
+        },
+        {
+          name: "DELETE",
+          id: RequestMethod.DELETE,
+          color: "danger",
+        },
+        {
+          name: "PATCH",
+          id: RequestMethod.PATCH,
+          color: "patch",
+        },
+      ]}
+      borderRounded={false}
+      titleId={httpMethod}
+      onclick={handleDropdown}
+      borderHighlight={"active"}
+      headerHighlight={"hover"}
+      minHeaderWidth={"100px"}
+      borderActiveType={"none"}
+      headerTheme={"violet"}
+      zIndex={2}
+      borderType={"none"}
+      menuItem={"v2"}
+      bodyTheme={"violet"}
+    />
+  </div>
 
   <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
 
@@ -136,13 +138,12 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <div
-    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2"
-    role="button"
+  <button
+    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
     on:click={handleSaveRequest}
   >
     <DiskIcon height={20} width={20} />
-  </div>
+  </button>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

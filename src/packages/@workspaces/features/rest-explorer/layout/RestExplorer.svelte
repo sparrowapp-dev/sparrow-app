@@ -2,6 +2,7 @@
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
+  import SplitterButton from "../assets/icons/SplitterButton.svelte";
 
   // ---- Components
   import {
@@ -58,6 +59,7 @@
     type KeyValue,
     type RequestTab,
   } from "@common/types/rest-explorer";
+  import { restSplitterDirection } from "../store";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -95,17 +97,14 @@
     const splitter: HTMLElement | null = document.querySelector(
       ".splitter-request .splitpanes__splitter",
     );
-    if (
-      splitter &&
-      $tab.property.request?.state?.requestSplitterDirection === "horizontal"
-    ) {
+    if (splitter && $restSplitterDirection === "horizontal") {
       // horizontal view
-      splitter.style.height = "1px";
+      splitter.style.height = "2px";
       splitter.style.width = "100%";
     } else if (splitter) {
       // vertical view
       splitter.style.height = "100%";
-      splitter.style.width = "1px";
+      splitter.style.width = "2px";
     }
   };
 
@@ -113,7 +112,7 @@
    * @description - re-calculates value when dependency changes
    */
   $: {
-    if ($tab?.property?.request?.state?.requestSplitterDirection) {
+    if ($restSplitterDirection) {
       stylePanes();
     }
   }
@@ -221,10 +220,7 @@
         id={"rest-splitter"}
         style="height: calc(100vh - 160px); margin-top:10px;"
         on:ready={stylePanes}
-        horizontal={$tab.property.request?.state?.requestSplitterDirection ===
-        "horizontal"
-          ? true
-          : false}
+        horizontal={$restSplitterDirection === "horizontal" ? true : false}
         dblClickSplitter={false}
         on:resize={(e) => {
           onUpdateRequestState({
@@ -292,7 +288,7 @@
           minSize={30}
           size={$tab.property.request?.state
             ?.requestRightSplitterWidthPercentage}
-          class="position-relative pt-3"
+          class="position-relative pt-3 "
         >
           <!-- Response Pane -->
           <div class="d-flex flex-column h-100">
@@ -399,5 +395,9 @@
   }
   :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
     background-color: var(--bg-primary-800) !important;
+  }
+
+  :global(.splitter_custom) {
+    background-color: var(--dropdown-button) !important;
   }
 </style>

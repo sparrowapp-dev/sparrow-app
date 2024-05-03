@@ -80,8 +80,10 @@
   on:mousedown={handleMouseDown}
 >
   <div
-    class="w-100 d-flex justify-content-between ps-2 border-upper-radius"
-    style="margin-left: -3px;"
+    class="w-100 d-flex justify-content-between px-2 border-upper-radius"
+    style="margin-left: -3px; background-color: {tab.isActive
+      ? 'var(--text-secondary-800)'
+      : 'transparent'};"
   >
     <button
       on:click={() => {
@@ -90,15 +92,17 @@
         }
       }}
       class="position-relative border-0 ellipsis"
-      style="    width: 80%;
-       text-align: left; background-color:transparent;"
+      style="width: 100%;
+        text-align: left; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
-        <span
-          class="text-{getMethodStyle(tab.property.request.method)}"
-          style="font-size: 10px; height: 31px; "
-          >{tab.property.request.method || ""}</span
-        >
+        <span class="text-{getMethodStyle(tab.property.request.method)}">
+          <span
+            class={!tab.isActive ? "request-icon" : ""}
+            style="font-size: 11px; height: 31px; font-weight: 500;"
+            >{tab.property.request.method || ""}</span
+          >
+        </span>
       {:else if tab.type === ItemType.FOLDER}
         <span>
           <img
@@ -121,7 +125,7 @@
         </span>
       {/if}
       <span
-        class="font-weight-normal"
+        class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
         style={`font-size: 12px; font-family: Roboto; color: ${
           tab.isActive ? "#fff;" : "#8A9299;"
         }`}
@@ -131,19 +135,21 @@
       {#if tab?.property?.request && !tab?.isSaved}
         {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
           <span
-            class="position-absolute"
-            style="right:0; top:6px; height:4px; width:4px; background-color:#FF7878; border-radius: 50%;"
+            class="position-absolute me-1"
+            style="right: 0; top: 40%; height: 6px; width: 6px; background-color: var(--tab-unsave-icon); border-radius: 50%;"
           />
         {/if}
       {/if}
     </button>
 
     <button
-      class="inactive-close-btn btn border-0 d-flex align-items-center"
+      class="{!(tab?.property?.request && !tab?.isSaved) && !tab.isActive
+        ? 'inactive-close-btn'
+        : ''} btn border-0 d-flex align-items-center px-1"
       on:click={() => {
         onTabClosed(tab.id, tab);
       }}
-      style="overflow:hidden; height:31px;"
+      style="overflow:hidden; height: 31px;"
     >
       <Crossicon />
     </button>
@@ -151,15 +157,18 @@
   {#if !tab.isActive}
     <div
       class="position-absolute"
-      style="height:23px; width: 0.5px; background-color: grey; top:7px; right: 0;"
+      style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
     />
   {/if}
 </button>
 
 <style>
+  * {
+    transition: all 200ms;
+  }
   .border-upper-radius {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     overflow: hidden;
   }
   .individual-tab:hover .inactive-close-btn {
@@ -167,5 +176,19 @@
   }
   .inactive-close-btn {
     opacity: 0 !important;
+  }
+
+  .request-icon {
+    color: var(--tab-request-default) !important;
+    font-weight: 400 !important;
+  }
+  .individual-tab:hover .request-icon {
+    color: inherit !important;
+  }
+  .request-text {
+    color: var(--tab-request-text-default) !important;
+  }
+  .individual-tab:hover .request-text {
+    color: initial !important;
   }
 </style>

@@ -5,6 +5,8 @@
   import angleRight from "$lib/assets/angle-right.svg";
   import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
   import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
+  import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
+  import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
@@ -14,6 +16,7 @@
 
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
+  import { Dropdown } from "@common/components";
 
   // ---- Helper
   import { moveNavigation } from "$lib/utils/helpers/navigation";
@@ -55,21 +58,20 @@
    */
   export let onTabSelected: (id: string) => void;
 
+  export let onChangeViewInRequest: (view: string) => void;
+
   $: {
     if (tabList) {
-      if (tabList.length >= 0 && tabList.length <= 5) {
-        tabWidth = 196;
-      } else if (tabList.length >= 6 && tabList.length <= 10) {
-        tabWidth = 140;
-      } else {
-        tabWidth = 100;
-      }
+      scrolable = tabList.length * 182 >= scrollerParent;
     }
   }
 
-  let tabWidth: number = 196;
+  let tabWidth: number = 182;
+  let scrolable: boolean = false;
   let scrollerParent: number;
   let scrollerWidth: number;
+  let moreOption: boolean = false;
+  let viewChange: boolean = false;
 </script>
 
 <button
@@ -80,11 +82,11 @@
   }}
 >
   <div
-    style="width:{$collapsibleState ? '100%' : '100%'}"
+    style="width: 100%;"
     class="tabbar d-flex"
     bind:offsetWidth={scrollerParent}
   >
-    {#if scrollerParent <= scrollerWidth + 105}
+    {#if scrolable}
       <div class="d-inline-block" style="height:35px; width:35px;">
         <Button
           onClick={() => {
@@ -92,7 +94,7 @@
           }}
           title={""}
           buttonStartIcon={angleLeft}
-          buttonStartIconStyle={"height: 13px; width: 7px"}
+          buttonStartIconStyle={"height: 12px !important; margin: 0 !important;"}
           buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         />
       </div>
@@ -102,7 +104,7 @@
       class=" d-inline-block tab-scroller border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px);"
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px); "
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -118,20 +120,41 @@
         {/each}
       {/if}
     </button>
-    {#if scrollerParent <= scrollerWidth + 105}
-      <div class="d-inline-block" style="height:35px; width:35px;">
+    {#if scrolable}
+      <div
+        class="d-inline-block position-relative"
+        style="height:35px; width:35px;"
+      >
+        <div
+          class="position-absolute"
+          style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
+        />
         <Button
           title=""
           onClick={() => {
             moveNavigation("right");
           }}
-          buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
-          buttonStartIconStyle={"height: 16px; width: 10px"}
-          buttonStartIcon={angleRight}
+          buttonClassProp={"btn border-0 ps-1 pe-1 py-auto h-100 w-100"}
+          buttonStartIconStyle={"height: 12px !important; transform: rotate(180deg); margin: 0 !important;"}
+          buttonStartIcon={angleLeft}
+        />
+        <div
+          class="position-absolute"
+          style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
         />
       </div>
     {/if}
-    <div class="d-inline-block" style="height:35px; width:35px;">
+    {#if tabList.length < 1}
+      <div class="d-inline-flex ms-2" style="height:35px;">
+        <Button
+          title="New Request"
+          onClick={onNewTabRequested}
+          buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
+          textStyleProp="font-size: 14px;"
+        />
+      </div>
+    {/if}
+    <div class="d-inline-flex" style="height:35px; width:35px;">
       <Button
         title=""
         onClick={onNewTabRequested}
@@ -140,18 +163,78 @@
         buttonStartIcon={plusIcon}
       />
     </div>
-  </div>
-  <div class="d-flex my-auto me-2">
-    <button class="border-0 bg-transparent me-1">
-      <ViewGrid height={15} />
-    </button>
-    <button class="border-0 bg-transparent">
-      <MoreOptions height={15} />
-    </button>
+    <div class="d-flex ms-auto my-auto me-2">
+      <Dropdown
+        buttonId="viewChange"
+        isMenuOpen={viewChange}
+        horizontalPosition="left"
+        minWidth={175}
+        options={[
+          {
+            name: "Split Vertically",
+            icon: SplitVerital,
+            onclick: () => onChangeViewInRequest("vertical"),
+          },
+          {
+            name: "Split Horizontally",
+            icon: SplitHorizontal,
+            onclick: () => onChangeViewInRequest("horizontal"),
+          },
+        ]}
+      >
+        <button
+          id="viewChange"
+          class="border-0 bg-transparent pt-1 rounded"
+          on:click={() => {
+            viewChange = !viewChange;
+          }}
+        >
+          <ViewGrid height={15} />
+        </button>
+      </Dropdown>
+      <Dropdown
+        buttonId="moreOptions"
+        isMenuOpen={moreOption}
+        horizontalPosition="left"
+        minWidth={150}
+        options={[
+          {
+            name: "Close all Tabs",
+            icon: "",
+            onclick: () => {
+              tabList.map((tab) => {
+                onTabClosed(tab.id, tab);
+              });
+            },
+          },
+          {
+            name: "Close Selected Tab",
+            icon: "",
+            onclick: () => {
+              let activeTab = tabList.filter((tab) => tab.isActive)[0];
+              onTabClosed(activeTab.id, activeTab);
+            },
+          },
+        ]}
+      >
+        <button
+          id="moreOptions"
+          class="border-0 bg-transparent pt-1 rounded"
+          on:click={() => {
+            moreOption = !moreOption;
+          }}
+        >
+          <MoreOptions height={15} />
+        </button>
+      </Dropdown>
+    </div>
   </div>
 </button>
 
 <style>
+  * {
+    transition: all 300ms;
+  }
   .tabbar {
     height: 36px;
     background-color: var(--sparrow-black);

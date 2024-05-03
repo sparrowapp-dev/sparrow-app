@@ -28,7 +28,7 @@
   let isExpandShortcuts = false;
 </script>
 
-<div class="response-default">
+<div class="response-default h-100 d-flex flex-column justify-between">
   <div class="">
     <div class="d-flex align-items-center flex-column justify-content-center">
       <div class="my-4">
@@ -36,21 +36,22 @@
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-secondary-200 text-fs-14">
-          Click send to get a Response
+          Click Send to get a Response
         </p>
       </div>
     </div>
   </div>
-  <div class={"d-flex flex-wrap justify-content-center"}>
+  <div class={"d-flex flex-wrap justify-content-center px-5 mt-auto"}>
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-3 mb-3"}
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
           valueClassProp={"bg-primary-400 text-secondary-100"}
+          valueStyleProp="font-family: Roboto Mono; font-weight: 600;"
           type="combo"
         />
         <span class="me-3"></span>
@@ -60,14 +61,15 @@
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-3 mb-3"}
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
-          valueClassProp={"bg-primary-400 text-secondary-100"}
+          valueClassProp={"bg-primary-400 text-secondary-100 px-2"}
+          valueStyleProp="font-family: Roboto Mono; font-weight: 600;"
           type="combo"
         />
-        <span class="me-5"></span>
+        <span class="me-3"></span>
       {/if}
     {/each}
   </div>

@@ -91,6 +91,7 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { sample, type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
+import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2212,5 +2213,10 @@ export default class CollectionsViewModel {
         );
         break;
     }
+  };
+
+  public handleOnChangeViewInRequest = async (view: string) => {
+    console.log(view);
+    restSplitterDirection.set(view);
   };
 }

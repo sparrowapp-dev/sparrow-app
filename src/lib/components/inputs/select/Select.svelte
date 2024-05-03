@@ -6,6 +6,7 @@
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
+  import { ArrowIcon } from "@library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -315,16 +316,13 @@
           class={selectedRequest?.default
             ? "text-textColor"
             : getTextColor(selectedRequest?.color)}
+          style="font-weight: 500; font-size: 14px;"
         >
           {selectedRequest?.name}
         </span>
       </p>
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
-        <DownArrowIcon
-          width={12}
-          height={14}
-          color={"var(--sparrow-text-color)"}
-        />
+        <ArrowIcon />
       </span>
     </div>
   </div>
