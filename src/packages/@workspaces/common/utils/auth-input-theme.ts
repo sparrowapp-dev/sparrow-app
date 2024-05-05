@@ -7,7 +7,7 @@ export class AuthInputTheme {
         height: "34px",
         width: "100%",
         flex: "1",
-        border: "1px solid var(--bg-primary-600)",
+        border: "1px solid var(--bg-secondary-600)",
         borderRadius: "4px",
         fontSize: "100%",
       },
@@ -16,7 +16,7 @@ export class AuthInputTheme {
         height: "100%",
         paddingTop: "8px",
         borderRadius: "4px",
-        backgroundColor: "var(--bg-primary-600)",
+        backgroundColor: "var(--bg-secondary-600)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",

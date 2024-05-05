@@ -110,6 +110,7 @@
   let searchData = "";
   let isOpen = false;
   let isHover = false;
+  let isClicked = false;
   let selectedRequest: {
     name: string;
     id: string;
@@ -221,7 +222,23 @@
     _headerHighlight: string,
     _isOpen: boolean,
     _isHover: boolean,
+    _isClicked: boolean,
   ) => {
+    if (_isClicked && _isHover) {
+      let x;
+      switch (headerTheme) {
+        case "transparent":
+          x = "transparent";
+          break;
+        case "dark":
+          x = "dark";
+          break;
+        case "violet":
+          x = "violet";
+          break;
+      }
+      return `select-btn-state-clicked-${x}`;
+    }
     if (
       (_headerHighlight === "hover" && isHover) ||
       (_headerHighlight === "active" && _isOpen) ||
@@ -300,9 +317,15 @@
       on:mouseleave={() => {
         isHover = false;
       }}
+      on:mousedown={() => {
+        isClicked = true;
+      }}
+      on:mouseup={() => {
+        isClicked = false;
+      }}
       class="select-btn
       {selectBackgroundClass} 
-      {extractHeaderHighlight(headerHighlight, isOpen, isHover)}  
+      {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
       {borderRounded ? 'rounded' : ''}  
       {selectBorderClass} 
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
@@ -440,6 +463,7 @@
     width: auto;
     padding: 0 10px;
   }
+  // default states
   .select-background-transparent {
     background-color: transparent;
   }
@@ -447,8 +471,10 @@
     background-color: var(--blackColor);
   }
   .select-background-violet {
-    background-color: var(--bg-tertiary-400);
+    background-color: var(--bg-secondary-600);
   }
+
+  // hover or open-body states
   .select-btn-state-active-transparent {
     background-color: var(--bg-tertiary-700);
   }
@@ -456,6 +482,17 @@
     background-color: var(--border-color);
   }
   .select-btn-state-active-violet {
+    background-color: var(--bg-tertiary-600);
+  }
+
+  // clicked states
+  .select-btn-state-clicked-transparent {
+    background-color: var(--bg-tertiary-700);
+  }
+  .select-btn-state-clicked-dark {
+    background-color: var(--border-color);
+  }
+  .select-btn-state-clicked-violet {
     background-color: var(--bg-tertiary-700);
   }
   .select-data {

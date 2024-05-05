@@ -7,7 +7,7 @@ export class UrlInputTheme {
         height: "34px",
         width: "100%",
         flex: "1",
-        border: "1px solid var(--bg-primary-600)",
+        border: "1px solid var(--bg-secondary-600)",
         borderRadius: "0",
         fontSize: "80%",
       },
@@ -15,7 +15,7 @@ export class UrlInputTheme {
         caretColor: "var(--white-color)",
         height: "100%",
         paddingTop: "7px",
-        backgroundColor: "var(--bg-primary-600)",
+        backgroundColor: "var(--bg-secondary-600)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",

@@ -1,7 +1,6 @@
 <script lang="ts">
   import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import { EnvironmentHeper } from "$lib/utils/helpers/environment.helper";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
@@ -22,13 +21,8 @@
   export let environmentVariables;
   export let type: "file" | "text" = "text";
   export let onUpdateEnvironment;
-  const environmentHelper = new EnvironmentHeper();
   let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
-
-  let trackParanthesis: unknown[] = [];
-  let trackCursor: number;
-  let tempText = "";
 
   const theme = new TabularInputTheme().build();
 
@@ -52,28 +46,6 @@
     }
   }
 
-  let filterData = [];
-  $: {
-    if (trackCursor) {
-      if (trackParanthesis.length === 2)
-        filterData = environmentHelper.filterEnvironments(
-          environmentVariables,
-          tempText,
-          trackParanthesis,
-          trackCursor,
-        );
-    }
-    if (trackParanthesis) {
-      if (trackParanthesis.length === 2 && trackCursor)
-        filterData = environmentHelper.filterEnvironments(
-          environmentVariables,
-          tempText,
-          trackParanthesis,
-          trackCursor,
-        );
-    }
-  }
-
   const updateParam = (index: number): void => {
     pairs.forEach((elem, i) => {
       if (i === index) {
@@ -91,7 +63,7 @@
     }
     callback(pairs);
   };
-
+  let loaded = true;
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
@@ -103,6 +75,10 @@
       pairs = filteredKeyValue;
     }
     callback(pairs);
+    loaded = false;
+    setTimeout(() => {
+      loaded = true;
+    }, 0);
   };
 
   const updateCheck = (index: number): void => {
@@ -172,161 +148,162 @@
   };
 </script>
 
-<div class="mb-0 me-0 w-100 bg-primary-550 ps-3 py-2 border-radius-2">
-  <div class="d-flex gap-3 pb-2 align-items-center w-100 ps-2">
-    <div style="width:30px;">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        bind:checked={controller}
-        on:input={handleCheckAll}
-      />
+{#if loaded}
+  <div class="mb-0 me-0 w-100 bg-secondary-550 ps-3 py-2 border-radius-2">
+    <div class="d-flex gap-3 pb-2 align-items-center w-100 ps-2">
+      <div style="width:30px;">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          bind:checked={controller}
+          on:input={handleCheckAll}
+        />
+      </div>
+      <div
+        class="d-flex pair-title bg-secondary-550 align-items-center w-100"
+        style="font-size: 12px; font-weight: 500;"
+      >
+        <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Name</p>
+        <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
+      </div>
+      <div class="h-75 pe-1">
+        <button class="border-0" style="width:40px;" />
+      </div>
     </div>
-    <div
-      class="d-flex pair-title bg-primary-550 align-items-center w-100"
-      style="font-size: 12px; font-weight: 500;"
-    >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Name</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
-    </div>
-    <div class="h-75 pe-1">
-      <button class="border-0" style="width:40px;" />
-    </div>
-  </div>
 
-  <div
-    class="w-100"
-    style="display:block; position:relative;
+    <div
+      class="w-100"
+      style="display:block; position:relative;
       width:200px;
       "
-  >
-    {#if readable.key || readable.value}
-      <div
-        aria-label="Toggle Hover"
-        class="sortable > div"
-        style=" width:100%;"
-      >
+    >
+      {#if readable.key || readable.value}
         <div
-          style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
+          aria-label="Toggle Hover"
+          class="sortable > div"
+          style=" width:100%;"
         >
           <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+            style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
           >
-            <div style="width:30px;">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                disabled
-                checked={true}
-              />
-            </div>
-
-            <div class="d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative">
-                <input
-                  type="text"
-                  placeholder="Enter Key"
-                  class=" keyValuePair py-1 w-100"
-                  style="font-size: 12px;"
-                  disabled
-                  bind:value={readable.key}
-                />
-              </div>
-              <div class="w-50 position-relative">
-                <input
-                  type="text"
-                  placeholder="Enter Value"
-                  class=" keyValuePair py-1 w-100"
-                  style="font-size: 12px;"
-                  disabled
-                  bind:value={readable.value}
-                />
-              </div>
-            </div>
-            <div class="h-75 pe-1">
-              <button class=" border-0" style="width:40px;" />
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if}
-    {#each pairs as element, index}
-      <div
-        aria-label="Toggle Hover"
-        class="sortable > div pair-container"
-        style=" width:100%;"
-        data-list-key={JSON.stringify({
-          name: element.key,
-          description: element.value,
-          checked: element.checked,
-        })}
-      >
-        <div
-          style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
-        >
-          <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container pb-2"
-          >
-            <img
-              src={dragIcon}
-              alt=""
-              class="d-none"
-              style="cursor:grabbing;"
-            />
-            <div style="width:30px;">
-              {#if pairs.length - 1 != index || mode === "READ"}
+            <div
+              class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+            >
+              <div style="width:30px;">
                 <input
                   class="form-check-input"
                   type="checkbox"
-                  bind:checked={element.checked}
-                  on:input={() => {
-                    updateCheck(index);
-                  }}
-                />
-              {/if}
-            </div>
-
-            <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative">
-                <CodeMirrorInput
-                  bind:urlText={element.key}
-                  onUpdateRequestUrl={() => {
-                    updateParam(index);
-                  }}
-                  disabled={mode == "READ" ? true : false}
-                  placeholder={"Add Name"}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
+                  disabled
+                  checked={true}
                 />
               </div>
-              {#if type === "file"}
-                <div class="flex-grow-1 w-100">
-                  <div
-                    class="position-relative rounded p-1 d-flex backgroundColor"
-                    style="height: 27px;"
-                  >
-                    {#if element.value === ""}
-                      <input
-                        type="text"
-                        class="form-control keyValuePair py-1"
-                        readonly
-                        style="z-index:4; font-size:13px;
+
+              <div class="d-flex gap-0" style="width:calc(100% - 120px)">
+                <div class="w-50 position-relative">
+                  <input
+                    type="text"
+                    placeholder="Enter Key"
+                    class=" keyValuePair py-1 w-100"
+                    style="font-size: 12px;"
+                    disabled
+                    bind:value={readable.key}
+                  />
+                </div>
+                <div class="w-50 position-relative">
+                  <input
+                    type="text"
+                    placeholder="Enter Value"
+                    class=" keyValuePair py-1 w-100"
+                    style="font-size: 12px;"
+                    disabled
+                    bind:value={readable.value}
+                  />
+                </div>
+              </div>
+              <div class="h-75 pe-1">
+                <button class=" border-0" style="width:40px;" />
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
+      {#each pairs as element, index}
+        <div
+          aria-label="Toggle Hover"
+          class="sortable > div pair-container"
+          style=" width:100%;"
+          data-list-key={JSON.stringify({
+            name: element.key,
+            description: element.value,
+            checked: element.checked,
+          })}
+        >
+          <div
+            style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
+          >
+            <div
+              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container pb-2"
+            >
+              <img
+                src={dragIcon}
+                alt=""
+                class="d-none"
+                style="cursor:grabbing;"
+              />
+              <div style="width:30px;">
+                {#if pairs.length - 1 != index || mode === "READ"}
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    bind:checked={element.checked}
+                    on:input={() => {
+                      updateCheck(index);
+                    }}
+                  />
+                {/if}
+              </div>
+
+              <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
+                <div class="w-50 position-relative">
+                  <CodeMirrorInput
+                    bind:urlText={element.key}
+                    onUpdateRequestUrl={() => {
+                      updateParam(index);
+                    }}
+                    disabled={mode == "READ" ? true : false}
+                    placeholder={"Add Name"}
+                    {theme}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
+                  />
+                </div>
+                {#if type === "file"}
+                  <div class="flex-grow-1 w-100">
+                    <div
+                      class="position-relative rounded p-1 d-flex backgroundColor"
+                      style="height: 27px;"
+                    >
+                      {#if element.value === ""}
+                        <input
+                          type="text"
+                          class="form-control keyValuePair py-1"
+                          readonly
+                          style="z-index:4; font-size:13px;
                     position: absolute;
                       top:0;
                       left:0;
                       right:0;
                       bottom:-1;"
-                        placeholder="Choose File"
-                      />
-                      <input
-                        class="form-input"
-                        type="text"
-                        id="formdata-file"
-                        on:click={() => {
-                          uploadFormFile(index);
-                        }}
-                        style="opacity: 0;
+                          placeholder="Choose File"
+                        />
+                        <input
+                          class="form-input"
+                          type="text"
+                          id="formdata-file"
+                          on:click={() => {
+                            uploadFormFile(index);
+                          }}
+                          style="opacity: 0;
                       position: absolute;
                       top:0;
                       left:0;
@@ -334,88 +311,89 @@
                       bottom:0;
                       z-index:10;
                       "
-                      />
-                    {:else}
-                      <input
-                        type="text"
-                        class="form-control keyValuePair py-1"
-                        readonly
-                        style="z-index:4; font-size:13px;
+                        />
+                      {:else}
+                        <input
+                          type="text"
+                          class="form-control keyValuePair py-1"
+                          readonly
+                          style="z-index:4; font-size:13px;
                     position: absolute;
                       top:0;
                       left:0;
                       right:0;
                       bottom:-1;"
-                        placeholder=""
-                      />
-                      <div
-                        class="position-absolute"
-                        style="height:18px;
+                          placeholder=""
+                        />
+                        <div
+                          class="position-absolute"
+                          style="height:18px;
                       
                       font-size:13px;
                     
                       top:0;
                       left:10px;"
-                      >
-                        <span style="font-size:10px;" class="m-1"
-                          >{element.value}</span
                         >
-                        <img
-                          src={close}
-                          alt=""
-                          style="cursor:pointer;"
-                          on:click={() => {
-                            removeFormFile(index);
-                          }}
-                        />
-                      </div>
-                    {/if}
+                          <span style="font-size:10px;" class="m-1"
+                            >{element.value}</span
+                          >
+                          <img
+                            src={close}
+                            alt=""
+                            style="cursor:pointer;"
+                            on:click={() => {
+                              removeFormFile(index);
+                            }}
+                          />
+                        </div>
+                      {/if}
+                    </div>
                   </div>
+                {:else}
+                  <div class="w-50 position-relative">
+                    <CodeMirrorInput
+                      bind:urlText={element.value}
+                      onUpdateRequestUrl={() => {
+                        updateParam(index);
+                      }}
+                      placeholder={"Value"}
+                      disabled={mode == "READ" ? true : false}
+                      {theme}
+                      {environmentVariables}
+                      {onUpdateEnvironment}
+                    />
+                  </div>
+                {/if}
+              </div>
+              {#if pairs.length - 1 != index}
+                <div class="h-75 pe-1">
+                  <button class="bg-secondary-550 border-0" style="width:40px;">
+                    {#if mode !== "READ"}
+                      <img
+                        src={trashIcon}
+                        on:click={() => {
+                          deleteParam(index);
+                        }}
+                        alt=""
+                      />
+                    {/if}
+                  </button>
                 </div>
               {:else}
-                <div class="w-50 position-relative">
-                  <CodeMirrorInput
-                    bind:urlText={element.value}
-                    onUpdateRequestUrl={() => {
-                      updateParam(index);
-                    }}
-                    placeholder={"Value"}
-                    disabled={mode == "READ" ? true : false}
-                    {theme}
-                    {environmentVariables}
-                    {onUpdateEnvironment}
+                <div class="h-75 pe-1">
+                  <button
+                    class="bg-backgroundColor border-0"
+                    style="width:40px;"
                   />
                 </div>
               {/if}
             </div>
-            {#if pairs.length - 1 != index}
-              <div class="h-75 pe-1">
-                <button class="bg-primary-550 border-0" style="width:40px;">
-                  {#if mode !== "READ"}
-                    <img
-                      src={trashIcon}
-                      on:click={() => {
-                        deleteParam(index);
-                      }}
-                      alt=""
-                    />
-                  {/if}
-                </button>
-              </div>
-            {:else}
-              <div class="h-75 pe-1">
-                <button
-                  class="bg-backgroundColor border-0"
-                  style="width:40px;"
-                />
-              </div>
-            {/if}
           </div>
         </div>
-      </div>
-    {/each}
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
   input[type="checkbox"] {

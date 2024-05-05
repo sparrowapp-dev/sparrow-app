@@ -49,7 +49,7 @@
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
-          valueClassProp={"bg-primary-400 text-secondary-100"}
+          valueClassProp={"bg-secondary-400 text-secondary-100"}
           type="combo"
         />
         <span class="me-3"></span>
@@ -63,7 +63,7 @@
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
-          valueClassProp={"bg-primary-400 text-secondary-100"}
+          valueClassProp={"bg-secondary-400 text-secondary-100"}
           type="combo"
         />
         <span class="me-5"></span>

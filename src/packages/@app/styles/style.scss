@@ -211,23 +211,23 @@ $theme-red-fe2e2e:#fe2e2e;
   // Sets background color
   //
   //
-  --bg-primary-100 : #{$theme-grey-ffffff};
-  --bg-primary-200 : #{$theme-grey-8A9299};
-  --bg-primary-300 : #{$theme-grey-45494D};
-  --bg-primary-400 : #{$theme-grey-313233};
-  --bg-primary-500 : #{$theme-grey-272727};
-  --bg-primary-550 : #{$theme-grey-1A1A1A};
-  --bg-primary-600 : #{$theme-grey-212222};
-  --bg-primary-700 : #{$theme-grey-161617};
-  --bg-primary-800 : #{$theme-grey-151515};
-  --bg-primary-900 : #{$theme-grey-000000};
+  --bg-primary-100 : #{$theme-blue-9CDCFE};
+  --bg-primary-200 : #{$theme-blue-1193F0};
+  --bg-primary-250 : #{$theme-blue-5980DC};
+  --bg-primary-300 : #{$theme-blue-3670F7};
+  --bg-primary-400 : #{$theme-blue-0B5ED7};
+  --bg-primary-500 : #{$theme-blue-2B5ED4};
   
-  --bg-secondary-100 : #{$theme-blue-9CDCFE};
-  --bg-secondary-200 : #{$theme-blue-1193F0};
-  --bg-secondary-250 : #{$theme-blue-5980DC};
-  --bg-secondary-300 : #{$theme-blue-3670F7};
-  --bg-secondary-400 : #{$theme-blue-0B5ED7};
-  --bg-secondary-500 : #{$theme-blue-2B5ED4};
+  --bg-secondary-100 : #{$theme-grey-ffffff};
+  --bg-secondary-200 : #{$theme-grey-8A9299};
+  --bg-secondary-300 : #{$theme-grey-45494D};
+  --bg-secondary-400 : #{$theme-grey-313233};
+  --bg-secondary-500 : #{$theme-grey-272727};
+  --bg-secondary-550 : #{$theme-grey-1A1A1A};
+  --bg-secondary-600 : #{$theme-grey-212222};
+  --bg-secondary-700 : #{$theme-grey-161617};
+  --bg-secondary-800 : #{$theme-grey-151515};
+  --bg-secondary-900 : #{$theme-grey-000000};
 
   --bg-tertiary-400 : #{$theme-violet-22232E};
   --bg-tertiary-500 : #{$theme-violet-272831};
@@ -243,7 +243,7 @@ $theme-red-fe2e2e:#fe2e2e;
   --border-primary-200 : #{$theme-blue-1193F0};
   --border-primary-300 : #{$theme-blue-3670F7};
   --border-primary-400 : #{$theme-blue-0B5ED7};
-
+  
   --border-secondary-100 : #{$theme-grey-ffffff};
   --border-secondary-200 : #{$theme-grey-8A9299};
   --border-secondary-300 : #{$theme-grey-45494D};
@@ -351,6 +351,7 @@ $sparrow-text-colors: (
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
   secondary-500 : $theme-grey-272727,
+  secondary-550 : $theme-grey-1A1A1A,
   secondary-600 : $theme-grey-212222,
   secondary-700 : $theme-grey-161617,
   secondary-800 : $theme-grey-151515,
@@ -364,24 +365,22 @@ $sparrow-text-colors: (
 
 // Define a map for background colors
 $sparrow-bg-colors: (
-  primary-100 : $theme-grey-ffffff,
-  primary-200 : $theme-grey-8A9299,
-  primary-300 : $theme-grey-45494D,
-  primary-400 : $theme-grey-313233,
-  primary-500 : $theme-grey-272727,
-  primary-550 : $theme-grey-1A1A1A,
-  primary-600 : $theme-grey-212222,
-  primary-700 : $theme-grey-161617,
-  primary-800 : $theme-grey-151515,
-  primary-900 : $theme-grey-000000,
+  primary-100 : $theme-blue-9CDCFE,
+  primary-200 : $theme-blue-1193F0,
+  primary-300 : $theme-blue-3670F7,
+  primary-400 : $theme-blue-0B5ED7,
   
-  secondary-100 : $theme-blue-9CDCFE,
-  secondary-200 : $theme-blue-1193F0,
-  secondary-250 : $theme-blue-5980DC,
-  secondary-300 : $theme-blue-3670F7,
-  secondary-400 : $theme-blue-0B5ED7,
-  secondary-500 : $theme-blue-2B5ED4, 
-  
+  secondary-100 : $theme-grey-ffffff,
+  secondary-200 : $theme-grey-8A9299,
+  secondary-300 : $theme-grey-45494D,
+  secondary-400 : $theme-grey-313233,
+  secondary-500 : $theme-grey-272727,
+  secondary-550 : $theme-grey-1A1A1A,
+  secondary-600 : $theme-grey-212222,
+  secondary-700 : $theme-grey-161617,
+  secondary-800 : $theme-grey-151515,
+  secondary-900 : $theme-grey-000000,
+
   tertiary-400 : $theme-violet-22232E,
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
@@ -395,12 +394,13 @@ $sparrow-border-colors: (
   primary-200 : $theme-blue-1193F0,
   primary-300 : $theme-blue-3670F7,
   primary-400 : $theme-blue-0B5ED7,
-
+  
   secondary-100 : $theme-grey-ffffff,
   secondary-200 : $theme-grey-8A9299,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
   secondary-500 : $theme-grey-272727,
+  secondary-550 : $theme-grey-1A1A1A,
   secondary-600 : $theme-grey-212222,
   secondary-700 : $theme-grey-161617,
   secondary-800 : $theme-grey-151515,

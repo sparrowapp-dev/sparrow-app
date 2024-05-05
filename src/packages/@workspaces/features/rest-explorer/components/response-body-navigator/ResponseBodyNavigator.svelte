@@ -202,7 +202,7 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: var(--bg-primary-550);
+    background-color: transparent;
   }
   .btn-formatter {
     outline: none;

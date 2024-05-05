@@ -159,7 +159,7 @@
     width: 400px;
     height: 250px;
     position: fixed;
-    z-index: 2000;
+    z-index: 900;
     flex-wrap: wrap;
   }
   .select-environment-popup .left-panel {
@@ -175,10 +175,10 @@
     color: white;
   }
   .global-environment {
-    background-color: #3670f7;
+    background-color: #69d696;
   }
   .local-environment {
-    background-color: #69d696;
+    background-color: #3670f7;
   }
   .select-env-info {
     font-size: 12px;

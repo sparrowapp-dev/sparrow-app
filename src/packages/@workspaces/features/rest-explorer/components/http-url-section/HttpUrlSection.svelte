@@ -99,7 +99,7 @@
     minHeaderWidth={"100px"}
     borderActiveType={"none"}
     headerTheme={"violet"}
-    zIndex={1001}
+    zIndex={500}
     borderType={"none"}
     menuItem={"v2"}
     bodyTheme={"violet"}
@@ -112,6 +112,7 @@
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
+    codeId={"url"}
   />
 
   <!-- Send button -->
@@ -138,6 +139,6 @@
 <style>
   .save-disk {
     padding: 7px;
-    background-color: var(--bg-primary-400);
+    background-color: var(--bg-secondary-400);
   }
 </style>

@@ -17,10 +17,10 @@
   borderRounded={true}
   menuItem={"v2"}
   borderHighlight={"active"}
-  headerHighlight={"hover"}
+  headerHighlight={"hover-active"}
   minHeaderWidth={"200px"}
   borderActiveType={"none"}
   headerTheme={"violet"}
-  zIndex={1000}
+  zIndex={499}
   bodyTheme={"violet"}
 />

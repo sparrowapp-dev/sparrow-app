@@ -6,14 +6,15 @@
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
 
-  export let environmentVariables = [];
-  // console.log(environmentVariables);
+  export let environmentVariables;
+  console.log(environmentVariables);
   export let onUpdateEnvironment;
   export let onUpdateRequestUrl;
   export let urlText: string = "";
   export let placeholder;
   export let theme;
   export let disabled = false;
+  export let codeId = "";
 
   const environmentHelper = new EnvironmentHeper();
   let inputElement: HTMLInputElement;
@@ -24,7 +25,7 @@
   let dialogType = false;
   let localEnvKey: string;
   let filterData = [];
-  let id = uuidv4();
+  let id = uuidv4() + codeId;
 
   $: {
     if (trackCursor) {
@@ -124,7 +125,7 @@
     {environmentAxisY}
     {onUpdateEnvironment}
     {handleEnvironmentBox}
-    {environmentvariables}
+    {environmentVariables}
     {localEnvKey}
     {id}
   />
@@ -134,6 +135,7 @@
     {environmentAxisX}
     {environmentAxisY}
     {localEnvKey}
+    {environmentVariables}
     {handleEnvironmentBox}
     {id}
   />
