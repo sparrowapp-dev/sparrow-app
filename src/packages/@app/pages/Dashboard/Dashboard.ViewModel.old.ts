@@ -23,10 +23,6 @@ export class DashboardViewModel {
     await this.teamRepository.setOpenTeam(teamId);
   };
 
-  public getActiveWorkspace = () => {
-    return this.workspaceRepository.getActiveWorkspace();
-  };
-
   // sync teams data with backend server
   public refreshTeams = async (userId: string): Promise<void> => {
     let openTeamId: string = "";
