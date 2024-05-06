@@ -278,7 +278,7 @@
                   />
                 </div>
                 {#if type === "file"}
-                  <div class="flex-grow-1 w-100">
+                  <div class="w-50">
                     <div
                       class="position-relative rounded p-1 d-flex backgroundColor"
                       style="height: 27px;"
@@ -315,7 +315,7 @@
                       {:else}
                         <input
                           type="text"
-                          class="form-control keyValuePair py-1"
+                          class="keyValuePair py-1"
                           readonly
                           style="z-index:4; font-size:13px;
                     position: absolute;
@@ -327,12 +327,12 @@
                         />
                         <div
                           class="position-absolute"
-                          style="height:18px;
+                          style="height:18px; z-index: 5;
                       
                       font-size:13px;
                     
                       top:0;
-                      left:10px;"
+                      left:0px;"
                         >
                           <span style="font-size:10px;" class="m-1"
                             >{element.value}</span
@@ -407,6 +407,7 @@
 
   input[type="text"] {
     padding: 4px !important;
+    outline: none !important;
   }
 
   input:checked {

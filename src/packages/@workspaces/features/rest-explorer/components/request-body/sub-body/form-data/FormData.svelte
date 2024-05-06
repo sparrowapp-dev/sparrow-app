@@ -27,7 +27,7 @@
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 100px); overflow-y: scroll;">
+<section class="w-100" style="height: calc(100% - 120px); overflow-y: scroll;">
   <p>Text</p>
   <TabularInput
     keyValue={textValue}
