@@ -29,7 +29,6 @@
   const refreshEnvironment = () => {
     if ($environments && currentWorkspaceId) {
       if ($environments?.length > 0) {
-        console.log("envs", $environments);
         const filteredEnv = $environments
           .filter((elem) => {
             return elem.workspaceId === currentWorkspaceId;

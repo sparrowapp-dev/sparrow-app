@@ -79,7 +79,6 @@
             class="prevent-default"
             on:click={async (e) => {
               e.preventDefault();
-              console.log("clicked");
               await copyToClipBoard(reviewEnv?.value);
               notifications.success("Copied to Clipboard");
             }}

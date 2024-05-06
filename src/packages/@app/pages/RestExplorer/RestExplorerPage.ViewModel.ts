@@ -1091,8 +1091,6 @@ class RestExplorerViewModel
     environmentVariables,
     newVariableObj: KeyValue,
   ) => {
-    console.log("its working");
-    // return;
     if (isGlobalVariable) {
       let payload = {
         name: environmentVariables.global.name,

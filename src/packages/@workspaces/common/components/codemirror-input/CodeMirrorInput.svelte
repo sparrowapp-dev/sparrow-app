@@ -7,7 +7,6 @@
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
 
   export let environmentVariables;
-  console.log(environmentVariables);
   export let onUpdateEnvironment;
   export let onUpdateRequestUrl;
   export let urlText: string = "";
