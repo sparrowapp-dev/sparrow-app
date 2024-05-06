@@ -90,17 +90,17 @@
               <div
                 class="h-100 w-100 d-flex align-items-center justify-content-center local-environment"
               >
-                <span class={"text-secondary-100 text-fs-12"}>{mock.type}</span>
+                <span class={"text-secondary-100 text-fs-16"}>{mock.type}</span>
               </div>
             </div>
             <div
               style="height: 33px;"
               class="p-0 d-flex flex-column w-100 ps-2"
             >
-              <span class="text-fs-11 text-secondary-100 m-0 p-0"
+              <span class="text-fs-11 text-secondary-100 m-0 p-0 env-value"
                 >{mock.key}</span
               >
-              <p class="text-fs-11 text-secondary-300 m-0 p-0">
+              <p class="text-fs-11 text-secondary-300 m-0 p-0 env-value">
                 {mock.value}
               </p>
             </div>
@@ -135,15 +135,14 @@
             <div
               class="h-100 w-100 d-flex align-items-center justify-content-center global-environment"
             >
-              <span class={"global-environment text-secondary-100 text-fs-12"}
-                >{mock.type}</span
-              >
+              <span class={"text-secondary-100 text-fs-16"}>{mock.type}</span>
             </div>
           </div>
           <div style="height: 33px;" class="p-0 d-flex flex-column w-100 ps-2">
-            <span class="text-fs-11 text-secondary-100 m-0 p-0">{mock.key}</span
+            <span class="text-fs-11 text-secondary-100 m-0 p-0 env-value"
+              >{mock.key}</span
             >
-            <p class="text-fs-11 text-secondary-300 m-0 p-0">
+            <p class="text-fs-11 text-secondary-300 m-0 p-0 env-value">
               {mock.value}
             </p>
           </div>
@@ -156,53 +155,29 @@
 
 <style>
   .select-environment-popup {
-    width: 400px;
-    height: 250px;
+    width: 394px;
+    height: 168px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
   }
   .select-environment-popup .left-panel {
-    height: 220px;
+    height: 138px;
     overflow-y: auto;
   }
-  .select-environment-popup .right-panel {
-    height: 190px;
-  }
-  .variable-title {
-    font-size: 12px;
-    font-weight: 400;
-    color: white;
-  }
   .global-environment {
-    background-color: #69d696;
-  }
-  .local-environment {
     background-color: #3670f7;
   }
-  .select-env-info {
-    font-size: 12px;
-    color: #999999;
-    margin-top: 10px;
-  }
-  .env-title {
-    color: #999999;
-    font-size: 12px;
+  .local-environment {
+    background-color: #69d696;
   }
   .env-value {
-    font-size: 12px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    -webkit-line-clamp: 3; /* Number of lines to show */
+    -webkit-line-clamp: 1; /* Number of lines to show */
     text-overflow: ellipsis;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
-    color: white;
-  }
-  .default-environment {
-    font-size: 10px;
-    text-align: center;
-    color: #999999;
   }
   .env-item:hover {
     background-color: var(--bg-tertiary-400);

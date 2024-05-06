@@ -20,7 +20,7 @@
   headerHighlight={"hover-active"}
   minHeaderWidth={"200px"}
   borderActiveType={"none"}
-  headerTheme={"violet"}
+  headerTheme={"dark-violet"}
   zIndex={499}
   bodyTheme={"violet"}
 />

@@ -409,9 +409,10 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-primary-800);
+    background-color: var(--bg-secondary-800);
+    height: calc(100vh - 80px);
   }
   :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
-    background-color: var(--bg-primary-800) !important;
+    background-color: var(--bg-secondary-800) !important;
   }
 </style>

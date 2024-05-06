@@ -112,6 +112,7 @@ $theme-red-ef5262:#ef5262;
 $theme-red-f34b5c:#f34b5c;
 $theme-red-f33346:#f33346;
 $theme-red-fe2e2e:#fe2e2e;
+$theme-red-312325:#312325;
 
 
 :root {
@@ -215,6 +216,7 @@ $theme-red-fe2e2e:#fe2e2e;
   --text-danger-700 : #{$theme-red-f34b5c};
   --text-danger-800 : #{$theme-red-f33346};
   --text-danger-900 : #{$theme-red-fe2e2e};
+  --text-danger-1000 : #{$theme-red-312325};
 
   //
   //
@@ -253,6 +255,7 @@ $theme-red-fe2e2e:#fe2e2e;
   --bg-danger-700 : #{$theme-red-f34b5c};
   --bg-danger-800 : #{$theme-red-f33346};
   --bg-danger-900 : #{$theme-red-fe2e2e};
+  --bg-danger-1000 : #{$theme-red-312325};
 
   //
   //
@@ -288,6 +291,7 @@ $theme-red-fe2e2e:#fe2e2e;
   --border-danger-700 : #{$theme-red-f34b5c};
   --border-danger-800 : #{$theme-red-f33346};
   --border-danger-900 : #{$theme-red-fe2e2e};
+  --border-danger-1000 : #{$theme-red-312325};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -401,6 +405,7 @@ $sparrow-text-colors: (
   danger-700 : $theme-red-f34b5c,
   danger-800 : $theme-red-f33346,
   danger-900 : $theme-red-fe2e2e,
+  danger-1000 : $theme-red-312325,
 );
 
 // Define a map for background colors
@@ -435,6 +440,7 @@ $sparrow-bg-colors: (
   danger-700 : $theme-red-f34b5c,
   danger-800 : $theme-red-f33346,
   danger-900 : $theme-red-fe2e2e,
+  danger-1000 : $theme-red-312325,
 );
 
 
@@ -470,6 +476,7 @@ $sparrow-border-colors: (
   danger-700 : $theme-red-f34b5c,
   danger-800 : $theme-red-f33346,
   danger-900 : $theme-red-fe2e2e,
+  danger-1000 : $theme-red-312325,
 );
 
 // Generate utility classes

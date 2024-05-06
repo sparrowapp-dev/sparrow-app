@@ -2,7 +2,6 @@
   import { DangerIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
 
-  //   export let filterData = [];
   export let environmentAxisX: number;
   export let environmentAxisY: number;
   export let localEnvKey: string;

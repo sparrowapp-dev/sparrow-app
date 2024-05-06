@@ -149,7 +149,7 @@
 </script>
 
 {#if loaded}
-  <div class="mb-0 me-0 w-100 bg-secondary-550 ps-3 py-2 border-radius-2">
+  <div class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-2 border-radius-2">
     <div class="d-flex gap-3 pb-2 align-items-center w-100 ps-2">
       <div style="width:30px;">
         <input
@@ -160,7 +160,7 @@
         />
       </div>
       <div
-        class="d-flex pair-title bg-secondary-550 align-items-center w-100"
+        class="d-flex pair-title bg-secondary-700 align-items-center w-100"
         style="font-size: 12px; font-weight: 500;"
       >
         <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Name</p>
@@ -367,7 +367,7 @@
               </div>
               {#if pairs.length - 1 != index}
                 <div class="h-75 pe-1">
-                  <button class="bg-secondary-550 border-0" style="width:40px;">
+                  <button class="bg-secondary-700 border-0" style="width:40px;">
                     {#if mode !== "READ"}
                       <img
                         src={trashIcon}

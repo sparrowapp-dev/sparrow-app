@@ -34,36 +34,27 @@
     {environmentVariables}
     {onUpdateEnvironment}
   />
-  {#if !showGeneratedHeader}
-    <div>
-      <small
-        on:click={() => {
-          showGeneratedHeader = true;
-        }}
-        class="text-labelColor generated-para"
-        >Show auto-generated headers <AngleDown
-          height={16}
-          width={16}
-          color={"var(--send-button)"}
-        /></small
-      >
-    </div>
-  {/if}
-  {#if showGeneratedHeader}
-    <div>
-      <small
-        on:click={() => {
-          showGeneratedHeader = false;
-        }}
-        class="text-labelColor generated-para"
-        >Hide auto-generated headers <AngleUp
-          height={16}
-          width={16}
-          color={"var(--send-button)"}
+  <div>
+    <div class="d-flex align-items-center">
+      <span class="text-labelColor generated-para me-2">
+        Show auto-generated headers
+      </span>
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckDefault"
+          checked={showGeneratedHeader}
+          on:change={() => {
+            showGeneratedHeader = !showGeneratedHeader;
+          }}
         />
-      </small>
+      </div>
     </div>
-    <hr class="mt-1" />
+  </div>
+
+  {#if showGeneratedHeader}
     <TabularInput
       mode={"READ"}
       readable={authHeader}
@@ -78,6 +69,5 @@
 <style>
   .generated-para {
     font-size: 12px;
-    cursor: pointer;
   }
 </style>
