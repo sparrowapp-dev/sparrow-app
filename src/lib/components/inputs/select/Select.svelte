@@ -6,6 +6,7 @@
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
+  import { CheckIcon } from "@library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -28,6 +29,7 @@
       | "patch";
     default?: boolean;
     hide?: boolean;
+    disabled?: boolean;
   }>;
 
   /**
@@ -69,12 +71,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme: "dark" | "transparent" | "violet" = "dark";
+  export let headerTheme: "dark" | "transparent" | "violet" | "grey" = "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" | "grey" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -103,6 +105,7 @@
    */
   export let iconRequired = false;
   export let icon = GitBranchIcon;
+  export let checkIconColor = "white";
 
   const Icon = icon;
   let searchData = "";
@@ -123,6 +126,7 @@
     default?: boolean;
     description?: string;
     hide?: boolean;
+    disabled?: boolean;
   };
 
   let selectBorderClass = "";
@@ -178,6 +182,8 @@
       break;
     case "violet":
       selectBodyBackgroundClass = "select-body-background-violet";
+    case "grey":
+      selectBodyBackgroundClass = "select-body-background-grey";
   }
 
   const toggleSelect = () => {
@@ -229,6 +235,9 @@
           break;
         case "violet":
           x = "violet";
+          break;
+        case "grey":
+          x = "grey";
           break;
       }
       return `select-btn-state-active-${x}`;
@@ -370,7 +379,9 @@
           return element.name.toLowerCase().includes(searchData.toLowerCase());
         }) as list}
           <div
-            class=" {list.hide ? 'd-none' : ''}"
+            class=" {list.hide ? 'd-none' : ''} {list?.disabled
+              ? 'disabled-option'
+              : ''}"
             on:click={() => {
               isOpen = false;
               onclick(list.id);
@@ -390,9 +401,10 @@
               <MenuItemsv2
                 {list}
                 {selectedRequest}
-                {checkIcon}
+                {CheckIcon}
                 {bodyTheme}
                 {getTextColor}
+                {checkIconColor}
               />
             {/if}
           </div>
@@ -447,6 +459,9 @@
   .select-btn-state-active-violet {
     background-color: var(--bg-tertiary-700);
   }
+  .select-btn-state-active-grey {
+    background-color: var(--dropdown-container);
+  }
   .select-data {
     color: white;
     position: absolute;
@@ -460,6 +475,9 @@
   }
   .select-body-background-violet {
     background-color: var(--bg-tertiary-400);
+  }
+  .select-body-background-grey {
+    background-color: var(--dropdown-container);
   }
   .select-body-background-blur {
     background: var(--background-hover);
@@ -528,5 +546,11 @@
   input:focus {
     border: 1px solid var(--send-button) !important;
     caret-color: var(--send-button) !important;
+  }
+  .disabled-option {
+    pointer-events: none; /* Disable pointer events */
+    opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
+    color: lightgray; /* Change background color for visual differentiation */
+    /* Add any other styles to indicate the disabled state */
   }
 </style>

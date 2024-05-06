@@ -5,7 +5,7 @@
     basicTheme,
   } from "./code-mirror-themes/BasicCodeMirrorTheme";
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
-  import CodeMirrorViewHandler from "./CodeMirrorViewHandler";
+  import handleCodeMirrorSyntaxFormat from "./CodeMirrorViewHandler";
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
 
@@ -13,6 +13,8 @@
   export let value = "";
   export let isEditable = true;
   export let isFormatted = false;
+  export let isBodyBeautified = false;
+  export let beautifySyntaxCallback: (value: boolean) => void;
   export { componentClass as class };
 
   const dispatch = createEventDispatcher();
@@ -22,6 +24,7 @@
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
+  // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     dispatch("change", userInput);
@@ -58,15 +61,31 @@
     initalizeCodeMirrorEditor(value);
   });
 
+  // Run whenever component state changes
   afterUpdate(() => {
-    CodeMirrorViewHandler(
+    handleCodeMirrorSyntaxFormat(
       codeMirrorView,
       languageConf,
       lang,
       isFormatted,
       value,
+      beautifySyntaxCallback,
     );
   });
+
+  // Run whenever isBodyBeautified changes to format request body syntax
+  $: {
+    if (isBodyBeautified) {
+      handleCodeMirrorSyntaxFormat(
+        codeMirrorView,
+        languageConf,
+        lang,
+        true,
+        value,
+        beautifySyntaxCallback,
+      );
+    }
+  }
 
   onDestroy(() => {
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
