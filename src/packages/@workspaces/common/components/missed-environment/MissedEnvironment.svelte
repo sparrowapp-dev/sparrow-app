@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { DangerIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
 
   //   export let filterData = [];
-  export let environmentAxisX;
-  export let environmentAxisY;
-  export let localEnvKey;
+  export let environmentAxisX: number;
+  export let environmentAxisY: number;
+  export let localEnvKey: string;
   export let handleEnvironmentBox;
-  export let id;
+  export let id: string;
   export let onUpdateEnvironment;
   export let environmentVariables;
   let count = 0;
@@ -56,7 +57,7 @@
       left:{environmentAxisX}px;
       "
 >
-  <div class="left-panel pe-2 w-100">
+  <div class="content-panel w-100">
     {#if addVariable}
       <!-- add variable form -->
       <div>
@@ -65,16 +66,19 @@
           bind:value={newVariableObj.key}
           placeholder="Enter Key"
           disabled
-          class="w-100"
+          class="w-100 border-0 text-fs-12 bg-tertiary-400 border-radius-2 mb-2 p-2"
         />
         <input
           type="text"
           bind:value={newVariableObj.value}
           placeholder="Enter Value"
-          class="w-100"
+          style={"outline:none;"}
+          class="w-100 border-0 outline-0 text-fs-12 bg-tertiary-400 border-radius-2 mb-2 p-2"
         />
-        <div class="global-variable d-flex">
-          <p class="variable-switch">Global variable</p>
+        <div
+          class="global-variable d-flex align-items-center justify-content-between pb-2"
+        >
+          <p class="variable-switch text-fs-12 mb-0">Global variable</p>
           <div class="form-check form-switch">
             <input
               class="form-check-input"
@@ -91,13 +95,15 @@
         </div>
         {#if !isGlobalVariable && environmentVariables.local}
           <div class="variable-text">
-            Adding to <span class="variable-highlight"
-              >{environmentVariables.local.name}</span
-            > environment.
+            <p class="text-fs-12 text-secondary-200">
+              Adding to <span class="variable-highlight"
+                >{environmentVariables.local.name}</span
+              > environment.
+            </p>
           </div>
         {/if}
         <div
-          class="prevent-default"
+          class="prevent-default text-fs-12 text-center border-radius-2 p-2 bg-primary-300"
           on:click={async (e) => {
             const response = await onUpdateEnvironment(
               isGlobalVariable,
@@ -114,14 +120,17 @@
       </div>
     {:else}
       <!-- Missed env -->
-      <p class="text-fs-12">Missing Variable</p>
+      <p class="text-fs-12 d-flex align-items-center">
+        <span><DangerIcon /></span><span class="ms-2">Missing Variable</span>
+      </p>
       <p class="text-fs-12">
         This variable is missing in your workspace. Try adding it as a global
         variable or under the active environment.
       </p>
 
       <div
-        class="prevent-default"
+        class="prevent-default text-fs-12 text-center add-variable-btn border-radius-2 p-2 bg-tertiary-400"
+        role="button"
         on:click={(e) => {
           e.preventDefault();
           addVariable = true;
@@ -130,21 +139,16 @@
         Add Variable
       </div>
     {/if}
-    <!-- <p>env not found</p>
-    {localEnvKey} -->
   </div>
 </div>
 
 <style>
   .select-environment-popup {
-    width: 400px;
-    height: 250px;
+    width: 251px;
+    height: auto;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
-  }
-  .select-environment-popup .left-panel {
-    height: 220px;
     overflow-y: auto;
   }
   .variable-highlight {

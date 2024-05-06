@@ -1,27 +1,38 @@
 <script>
-  import infoIcon from "$lib/assets/infoIcon.svg";
+  import { DangerIcon } from "@library/icons";
+  import { SparrowLogo } from "../../assets/images";
 </script>
 
-<div
-  class="api-error-container d-flex flex-column align-items-center justify-content-center"
->
-  <div class="d-flex align-items-center mb-3">
-    <img src={infoIcon} alt="" />
-    <h4 class="mb-0 heading text-dangerColor mx-2">
-      Could not send a request.
-    </h4>
+<div class="response-default">
+  <div class="">
+    <div class="d-flex align-items-center flex-column justify-content-center">
+      <div class="my-4">
+        <SparrowLogo />
+      </div>
+      <div class="d-flex flex-column align-items-center">
+        <p class="text-secondary-200 text-fs-14">Could not Send Request</p>
+      </div>
+      <div class="d-flex align-items-center error-message">
+        <div class="error-icon p-3">
+          <DangerIcon />
+        </div>
+        <div class="error-content">
+          <p class="mb-0 text-fs-12">
+            Cloud Agent error: Please check the URL .Try again. Make sure that
+            the domain is publicly accessible
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-  <small class="text-center text-requestBodyColor"
-    >Please check the request URL and try again. Make sure that the domain
-    exists. Please refer to your API provider documentation for further help.</small
-  >
 </div>
 
 <style>
-  .api-error-container {
-    height: calc(100vh - 400px);
+  .response-default {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
-  .api-error-container .heading {
-    font-size: 18px;
+  .error-message {
+    max-width: 480px;
   }
 </style>

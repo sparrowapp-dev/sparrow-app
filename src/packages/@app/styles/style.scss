@@ -206,6 +206,16 @@ $theme-red-fe2e2e:#fe2e2e;
   --text-tertiary-600 : #{$theme-violet-2E2F3D};
   --text-tertiary-700 : #{$theme-violet-1c1d27};
 
+  --text-danger-100 : #{$theme-red-e5acb2};
+  --text-danger-200 : #{$theme-red-fe8c98};
+  --text-danger-300 : #{$theme-red-ff7878};
+  --text-danger-400 : #{$theme-red-f16674};
+  --text-danger-500 : #{$theme-red-fc6574};
+  --text-danger-600 : #{$theme-red-ef5262};
+  --text-danger-700 : #{$theme-red-f34b5c};
+  --text-danger-800 : #{$theme-red-f33346};
+  --text-danger-900 : #{$theme-red-fe2e2e};
+
   //
   //
   // Sets background color
@@ -234,6 +244,16 @@ $theme-red-fe2e2e:#fe2e2e;
   --bg-tertiary-600 : #{$theme-violet-2E2F3D};
   --bg-tertiary-700 : #{$theme-violet-1c1d27};
 
+  --bg-danger-100 : #{$theme-red-e5acb2};
+  --bg-danger-200 : #{$theme-red-fe8c98};
+  --bg-danger-300 : #{$theme-red-ff7878};
+  --bg-danger-400 : #{$theme-red-f16674};
+  --bg-danger-500 : #{$theme-red-fc6574};
+  --bg-danger-600 : #{$theme-red-ef5262};
+  --bg-danger-700 : #{$theme-red-f34b5c};
+  --bg-danger-800 : #{$theme-red-f33346};
+  --bg-danger-900 : #{$theme-red-fe2e2e};
+
   //
   //
   // Sets border color
@@ -258,6 +278,16 @@ $theme-red-fe2e2e:#fe2e2e;
   --border-tertiary-500 : #{$theme-violet-272831};
   --border-tertiary-600 : #{$theme-violet-2E2F3D};
   --border-tertiary-700 : #{$theme-violet-1c1d27};
+
+  --border-danger-100 : #{$theme-red-e5acb2};
+  --border-danger-200 : #{$theme-red-fe8c98};
+  --border-danger-300 : #{$theme-red-ff7878};
+  --border-danger-400 : #{$theme-red-f16674};
+  --border-danger-500 : #{$theme-red-fc6574};
+  --border-danger-600 : #{$theme-red-ef5262};
+  --border-danger-700 : #{$theme-red-f34b5c};
+  --border-danger-800 : #{$theme-red-f33346};
+  --border-danger-900 : #{$theme-red-fe2e2e};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -361,6 +391,16 @@ $sparrow-text-colors: (
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-700 : $theme-violet-1c1d27,
+
+  danger-100 : $theme-red-e5acb2,
+  danger-200 : $theme-red-fe8c98,
+  danger-300 : $theme-red-ff7878,
+  danger-400 : $theme-red-f16674,
+  danger-500 : $theme-red-fc6574,
+  danger-600 : $theme-red-ef5262,
+  danger-700 : $theme-red-f34b5c,
+  danger-800 : $theme-red-f33346,
+  danger-900 : $theme-red-fe2e2e,
 );
 
 // Define a map for background colors
@@ -385,6 +425,16 @@ $sparrow-bg-colors: (
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-700 : $theme-violet-1c1d27,
+
+  danger-100 : $theme-red-e5acb2,
+  danger-200 : $theme-red-fe8c98,
+  danger-300 : $theme-red-ff7878,
+  danger-400 : $theme-red-f16674,
+  danger-500 : $theme-red-fc6574,
+  danger-600 : $theme-red-ef5262,
+  danger-700 : $theme-red-f34b5c,
+  danger-800 : $theme-red-f33346,
+  danger-900 : $theme-red-fe2e2e,
 );
 
 
@@ -410,6 +460,16 @@ $sparrow-border-colors: (
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-700 : $theme-violet-1c1d27,
+
+  danger-100 : $theme-red-e5acb2,
+  danger-200 : $theme-red-fe8c98,
+  danger-300 : $theme-red-ff7878,
+  danger-400 : $theme-red-f16674,
+  danger-500 : $theme-red-fc6574,
+  danger-600 : $theme-red-ef5262,
+  danger-700 : $theme-red-f34b5c,
+  danger-800 : $theme-red-f33346,
+  danger-900 : $theme-red-fe2e2e,
 );
 
 // Generate utility classes
@@ -494,20 +554,20 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
 .env-highlight {
   &.env-found {
-    color: #9CDCFE;
+    color: var(--text-primary-400);
   }
 
   &.env-not-found {
-    color: #FE8C98;
+    color: var(--text-danger-200);
     cursor: pointer;
   }
 
   &.hover-found {
-    color: #9CDCFE;
+    color: var(--text-primary-200);
   }
 
   &.hover-not-found {
-    color: #FE8C98;
+    color: var(--text-danger-200);
     background-color: #230408;
   }
 }
