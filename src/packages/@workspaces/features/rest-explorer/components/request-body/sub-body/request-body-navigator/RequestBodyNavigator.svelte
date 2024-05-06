@@ -91,6 +91,11 @@
         name: "Raw",
         id: RequestDataset.RAW,
       },
+      {
+        name: "Binary",
+        id: RequestDataset.BINARY,
+        disabled: true,
+      },
     ]}
     titleId={requestState.requestBodyNavigation}
     onclick={handleDropdown}

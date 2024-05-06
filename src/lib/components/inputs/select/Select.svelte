@@ -29,6 +29,7 @@
       | "patch";
     default?: boolean;
     hide?: boolean;
+    disabled?: boolean;
   }>;
 
   /**
@@ -125,6 +126,7 @@
     default?: boolean;
     description?: string;
     hide?: boolean;
+    disabled?: boolean;
   };
 
   let selectBorderClass = "";
@@ -377,7 +379,9 @@
           return element.name.toLowerCase().includes(searchData.toLowerCase());
         }) as list}
           <div
-            class=" {list.hide ? 'd-none' : ''}"
+            class=" {list.hide ? 'd-none' : ''} {list?.disabled
+              ? 'disabled-option'
+              : ''}"
             on:click={() => {
               isOpen = false;
               onclick(list.id);
@@ -542,5 +546,11 @@
   input:focus {
     border: 1px solid var(--send-button) !important;
     caret-color: var(--send-button) !important;
+  }
+  .disabled-option {
+    pointer-events: none; /* Disable pointer events */
+    opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
+    color: lightgray; /* Change background color for visual differentiation */
+    /* Add any other styles to indicate the disabled state */
   }
 </style>

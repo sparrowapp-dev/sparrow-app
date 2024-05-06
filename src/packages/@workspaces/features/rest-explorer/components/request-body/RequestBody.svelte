@@ -1,6 +1,7 @@
 <script lang="ts">
   import { RequestDataset } from "$lib/utils/enums/request.enum";
   import {
+    Binary,
     FormData,
     None,
     Raw,
@@ -51,5 +52,7 @@
       {environmentVariables}
       formData={body.formdata}
     />
+  {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
+    <Binary />
   {/if}
 </div>
