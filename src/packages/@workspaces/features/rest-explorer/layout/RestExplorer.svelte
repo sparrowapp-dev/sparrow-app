@@ -311,7 +311,7 @@
                 <div
                   style="top: 10px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
                 >
-                  <Loader loaderSize={"80px"} />
+                  <Loader loaderSize={"20px"} />
                 </div>
               {:else if !$tab.property.request?.response?.status}
                 <ResponseDefaultScreen />
@@ -350,7 +350,7 @@
         </Splitpanes>
       {:else}
         <!-- loading state -->
-        <ResponseDefaultScreen />
+        <ResponseDefaultScreen isMainScreen={true} />
       {/if}
     </div>
     <!--

@@ -93,7 +93,7 @@ export const basicTheme = EditorView.theme({
   },
   ".cm-activeLine": { backgroundColor: "transparent" },
   ".cm-gutters": {
-    backgroundColor: "var(--background-color)",
+    backgroundColor: "transparent",
     borderRight: "0",
   },
   ".cm-activeLineGutter": {

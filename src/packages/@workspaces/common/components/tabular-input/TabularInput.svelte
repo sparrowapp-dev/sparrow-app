@@ -149,8 +149,10 @@
 </script>
 
 {#if loaded}
-  <div class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-2 border-radius-2">
-    <div class="d-flex gap-3 pb-2 align-items-center w-100 ps-2">
+  <div
+    class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
+  >
+    <div class="d-flex gap-3 py-1 align-items-center w-100 ps-2">
       <div style="width:30px;">
         <input
           class="form-check-input"
@@ -163,7 +165,7 @@
         class="d-flex pair-title bg-secondary-700 align-items-center w-100"
         style="font-size: 12px; font-weight: 500;"
       >
-        <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Name</p>
+        <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
         <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
       </div>
       <div class="h-75 pe-1">
@@ -187,7 +189,7 @@
             style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+              class="d-flex w-100 align-items-center justify-content-center gap-3 my-1"
             >
               <div style="width:30px;">
                 <input
@@ -242,7 +244,7 @@
             style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container pb-2"
+              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container py-1"
             >
               <img
                 src={dragIcon}
@@ -271,7 +273,7 @@
                       updateParam(index);
                     }}
                     disabled={mode == "READ" ? true : false}
-                    placeholder={"Add Name"}
+                    placeholder={"Key"}
                     {theme}
                     {environmentVariables}
                     {onUpdateEnvironment}
@@ -421,5 +423,9 @@
   }
   .pair-container:nth-child(odd) {
     margin-top: -1px;
+  }
+  .section-layout {
+    border-top: 1px solid var(--border-secondary-500);
+    border-bottom: 1px solid var(--border-secondary-500);
   }
 </style>

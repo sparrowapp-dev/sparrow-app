@@ -35,8 +35,8 @@
     {onUpdateEnvironment}
   />
   <div>
-    <div class="d-flex align-items-center">
-      <span class="text-labelColor generated-para me-2">
+    <div class="d-flex align-items-center py-3">
+      <span class="text-primary-200 fw-bold generated-para me-2">
         Show auto-generated headers
       </span>
       <div class="form-check form-switch">

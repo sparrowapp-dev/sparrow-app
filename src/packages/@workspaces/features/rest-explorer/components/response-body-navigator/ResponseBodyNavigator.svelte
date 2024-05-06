@@ -76,7 +76,7 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center px-2 justify-content-between w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-4 align-items-center justify-content-center">
@@ -184,14 +184,11 @@
             Clear
           </button>
         </div>
-        <button
-          on:click={handleDownloaded}
-          class=" bg-backgroundColor border-0"
-        >
+        <button on:click={handleDownloaded} class=" bg-secondary-800 border-0">
           <img src={downloadIcon} alt="" />
         </button>
 
-        <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
+        <button class="bg-secondary-800 border-0" on:click={handleCopy}>
           <img src={copyIcon} alt="" />
         </button>
       </div>

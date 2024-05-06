@@ -65,7 +65,7 @@ export class TabularInputTheme {
       },
       "&.cm-editor.cm-focused": {
         // border: "1px solid var(--border-primary-200)",
-        backgroundColor: "black",
+        backgroundColor: "var(--bg-secondary-550)",
         borderRadius: "0",
       },
       ".cm-scroller::-webkit-scrollbar": {
