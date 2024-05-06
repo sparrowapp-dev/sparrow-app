@@ -21,7 +21,7 @@
   let trackCursor: number;
   let environmentAxisY: number;
   let environmentAxisX: number;
-  let dialogType = false;
+  let dialogType = "";
   let localEnvKey: string;
   let filterData = [];
   let id = uuidv4() + codeId;
@@ -84,7 +84,6 @@
   };
 </script>
 
-<!-- <div {id} class="w-100"> -->
 <CodeMirrorHandler
   rawValue={urlText}
   handleRawChange={handleInputValue}
@@ -103,7 +102,6 @@
   {disabled}
   {id}
 />
-<!-- </div> -->
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
   <EnvironmentPicker
@@ -128,7 +126,6 @@
     {localEnvKey}
     {id}
   />
-  <!-- {localEnvKey} -->
 {:else if dialogType === "env-found"}
   <ReviewEnvironment
     {environmentAxisX}
@@ -141,44 +138,3 @@
 {/if}
 
 <svelte:window on:keydown={handleKeyPress} />
-
-<style>
-  .btn-primary {
-    background: var(--sparrow-blue);
-  }
-
-  .view-active {
-    filter: invert(60%) sepia(99%) saturate(302%) hue-rotate(183deg)
-      brightness(102%) contrast(105%);
-  }
-
-  .btn-primary:hover {
-    background: var(--send1-hoverbutton);
-  }
-
-  .btn-primary1 {
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
-  }
-
-  .border-red:focus {
-    border: 5px solid black;
-  }
-
-  .btn-primary1:hover {
-    background: var(--border-color);
-  }
-
-  .input-outline {
-    border-radius: 0%;
-  }
-
-  .input-outline:focus {
-    outline: 2px solid var(--sparrow-blue);
-  }
-  .url-input {
-    background-color: var(--background-dark);
-    border: 1px solid #272727 !important;
-    font-size: 12px;
-  }
-</style>

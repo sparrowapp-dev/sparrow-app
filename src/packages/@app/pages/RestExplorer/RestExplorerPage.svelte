@@ -26,6 +26,9 @@
     },
   );
 
+  /**
+   * @description - refreshes the environment everytime workspace changes
+   */
   const refreshEnvironment = () => {
     if ($environments && currentWorkspaceId) {
       if ($environments?.length > 0) {
@@ -69,13 +72,7 @@
   };
 
   $: {
-    if (environmentId) {
-      refreshEnvironment();
-    }
-    if ($environments) {
-      refreshEnvironment();
-    }
-    if (currentWorkspaceId) {
+    if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
   }

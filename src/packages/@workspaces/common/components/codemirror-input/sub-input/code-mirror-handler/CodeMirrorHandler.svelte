@@ -10,7 +10,6 @@
     Decoration,
     placeholder as CreatePlaceHolder,
   } from "@codemirror/view";
-  import { editLink } from "$lib/store/api-request";
   export let rawValue: string;
   export let handleRawChange: () => void;
   export let handleFocusChange: () => void;
@@ -69,6 +68,10 @@
       }
     }
   });
+
+  /**
+   * Disable keys in codemirror
+   */
   const keyBinding = keymap.of([
     {
       key: "Enter",
@@ -106,8 +109,7 @@
     },
   });
 
-  editLink.subscribe((value) => {});
-  const handleKeyPress = (event) => {
+  const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
     } else if (event.altKey && event.code === "KeyL" && id.includes("url")) {
@@ -115,6 +117,9 @@
     }
   };
 
+  /**
+   * @description - triggers environemnt click on codemirror
+   */
   const handleHighlightClass = () => {
     const boxes = document.querySelectorAll(
       `.${ENV_HIGHLIGHT_NOT_FOUND.split(" ")[0]}`,
@@ -122,12 +127,10 @@
     if (boxes.length > 0) {
       for (const box of boxes) {
         box.addEventListener("click", function handleClick(event) {
-          // setTimeout(() => {
           handleEnvironmentBox(
             "env-not-found",
             event.target.innerText.replace(/[{}]/g, ""),
           );
-          // }, 100);
         });
       }
     }
@@ -138,17 +141,20 @@
     if (es.length > 0) {
       for (const box of es) {
         box.addEventListener("click", function handleClick(event) {
-          // setTimeout(() => {
           handleEnvironmentBox(
             "env-found",
             event.target.innerText.replace(/[{}]/g, ""),
           );
-          // }, 100);
         });
       }
     }
   };
 
+  /**
+   * @description - marks if the environment exist or not
+   * @param env - input environment
+   * @param aggregateEnvs - environment list
+   */
   const checkEnvExist = (
     env: string,
     aggregateEnvs: AggregateEnvironment[],
@@ -170,6 +176,10 @@
     });
   }
 
+  /**
+   * @description - Highlights codemirror data
+   * @param aggregateEnvs - environments
+   */
   const getMatchDecorator = (aggregateEnvs: AggregateEnvironment[]) =>
     new MatchDecorator({
       regexp: ENVIRONMENT_REGEX,
@@ -194,6 +204,10 @@
     );
   };
 
+  /**
+   * Initialize code mirror editor
+   * @param value - data that needs to be rendered on code mirror
+   */
   function initalizeCodeMirrorEditor(value: string) {
     let state = EditorState.create({
       doc: value,

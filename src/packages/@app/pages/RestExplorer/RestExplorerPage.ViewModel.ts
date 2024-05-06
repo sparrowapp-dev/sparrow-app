@@ -175,7 +175,7 @@ class RestExplorerViewModel
     return this.workspaceRepository.getActiveWorkspace();
   }
 
-  get environments() {
+  public get environments() {
     return this.environmentRepository.getEnvironment();
   }
 
@@ -1086,12 +1086,20 @@ class RestExplorerViewModel
     }
   };
 
+  /**
+   *
+   * @param isGlobalVariable - defines to save local or global
+   * @param environmentVariables - pre existing environment data
+   * @param newVariableObj - new entry to be extended
+   * @returns
+   */
   public updateEnvironment = async (
     isGlobalVariable: boolean,
     environmentVariables,
     newVariableObj: KeyValue,
   ) => {
     if (isGlobalVariable) {
+      // api payload
       let payload = {
         name: environmentVariables.global.name,
         variable: [
@@ -1103,6 +1111,7 @@ class RestExplorerViewModel
           },
         ],
       };
+      // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
           return variable.key.length > 0 && variable.value.length > 0;
@@ -1119,10 +1128,12 @@ class RestExplorerViewModel
         payload,
       );
       if (response.isSuccessful) {
+        // updates environment list
         this.environmentRepository.updateEnvironment(
           response.data.data._id,
           response.data.data,
         );
+        // updates environment tab
         await this.environmentTabRepository.setEnvironmentTabProperty(
           response.data.data.variable,
           "variable",
@@ -1139,6 +1150,7 @@ class RestExplorerViewModel
       }
       return response;
     } else {
+      // api payload
       const payload = {
         name: environmentVariables.local.name,
         variable: [
@@ -1150,6 +1162,7 @@ class RestExplorerViewModel
           },
         ],
       };
+      // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
           return variable.key.length > 0 && variable.value.length > 0;
@@ -1160,16 +1173,19 @@ class RestExplorerViewModel
           checked: false,
         },
       ];
+      // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
       );
       if (response.isSuccessful) {
+        // updates environment list
         this.environmentRepository.updateEnvironment(
           response.data.data._id,
           response.data.data,
         );
+        // updates environment tab
         await this.environmentTabRepository.setEnvironmentTabProperty(
           response.data.data.variable,
           "variable",
