@@ -35,7 +35,7 @@
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-secondary-200 text-fs-14">
-          Click send to get a Response
+          Click Send to get a Response
         </p>
       </div>
     </div>

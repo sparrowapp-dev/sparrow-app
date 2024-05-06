@@ -76,6 +76,18 @@
         return true;
       },
     },
+    {
+      key: "Shift-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Cmd-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
   ]);
 
   const handleEventsRegister = EditorView.domEventHandlers({
