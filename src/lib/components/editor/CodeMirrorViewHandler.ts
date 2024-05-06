@@ -30,13 +30,13 @@ const removeIndentation = (str: string) => {
  * @param value - text that should be shown on code mirror view
  * @returns
  */
-const CodeMirrorViewHandler = (
+const handleCodeMirrorSyntaxFormat = (
   codeMirrorView: EditorView,
   languageConf: Compartment,
   lang: RequestDataType,
   isFormatted: boolean,
   value: string,
-  onUpdateBeautifiedState: (value: boolean) => void,
+  beautifySyntaxCallback: (value: boolean) => void,
 ) => {
   switch (lang) {
     case RequestDataType.HTML:
@@ -61,7 +61,7 @@ const CodeMirrorViewHandler = (
           ),
           ...payload,
         });
-        onUpdateBeautifiedState(false);
+        beautifySyntaxCallback(false);
         return;
       }
       break;
@@ -83,7 +83,7 @@ const CodeMirrorViewHandler = (
           ),
           ...payload,
         });
-        onUpdateBeautifiedState(false);
+        beautifySyntaxCallback(false);
       }
       break;
     case RequestDataType.JSON:
@@ -102,7 +102,7 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure(jsonSetup),
           ...payload,
         });
-        onUpdateBeautifiedState(false);
+        beautifySyntaxCallback(false);
       }
       break;
     case RequestDataType.XML:
@@ -121,7 +121,7 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure(xml()),
           ...payload,
         });
-        onUpdateBeautifiedState(false);
+        beautifySyntaxCallback(false);
       }
       break;
     default:
@@ -140,10 +140,10 @@ const CodeMirrorViewHandler = (
           effects: languageConf.reconfigure([]),
           ...payload,
         });
-        onUpdateBeautifiedState(false);
+        beautifySyntaxCallback(false);
       }
       break;
   }
 };
 
-export default CodeMirrorViewHandler;
+export default handleCodeMirrorSyntaxFormat;

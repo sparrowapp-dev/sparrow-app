@@ -34,7 +34,7 @@
       lang={requestState.requestBodyLanguage}
       value={body.raw}
       {isBodyBeautified}
-      onUpdateBeautifiedState={updateBeautifiedState}
+      {updateBeautifiedState}
     />
   {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
     <None />
