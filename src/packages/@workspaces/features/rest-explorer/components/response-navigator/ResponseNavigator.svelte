@@ -42,7 +42,7 @@
   <div class="d-flex mb-2">
     {#each tabs as tab}
       <button
-        class="navigation__link px-1 border-0 me-2 sparrow-fs-12 me-3 request-tab {tab.id ===
+        class="navigation__link border-0 me-2 sparrow-fs-12 me-4 request-tab {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"

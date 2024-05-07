@@ -1,35 +1,34 @@
 <script lang="ts">
-  import Button from "$lib/components/buttons/Button.svelte";
-  import ToggleButton from "$lib/components/buttons/ToggleButton.svelte";
   import { RequestMethod } from "$lib/utils/enums";
 
   import { Select } from "$lib/components/inputs";
-  import { RequestUrl } from "@workspaces/features/rest-explorer/components";
   import type {
     SaveRequestType,
     SendRequestType,
     UpdateRequestMethodType,
-    UpdateRequestStateType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
+  import { CodeMirrorInput } from "../../../../common/components";
+  import { UrlInputTheme } from "../../../../common/utils/";
 
   let componentClass = "";
   export { componentClass as class };
 
   export let requestUrl: string;
   export let httpMethod: string;
-  export let splitterDirection: string;
-  export let isSendRequestInProgress: string;
+  export let isSendRequestInProgress: boolean;
   export let onSendButtonClicked: SendRequestType;
   export let onUpdateRequestUrl: UpdateRequestUrlType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
-  export let onUpdateRequestState: UpdateRequestStateType;
   export let toggleSaveRequest: (flag: boolean) => void;
   export let onSaveRequest: SaveRequestType;
+  export let environmentVariables;
+  export let onUpdateEnvironment;
 
+  const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -56,14 +55,17 @@
     if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      onSendButtonClicked();
+      onSendButtonClicked(environmentVariables);
     }
   };
 </script>
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
-  <div style="font-weight: 500;">
+  <div
+    class="overflow-hidden"
+    style="width: 130px; border-top-left-radius:4px; border-bottom-left-radius:4px;"
+  >
     <Select
       id={"api-request"}
       data={[
@@ -101,14 +103,23 @@
       minHeaderWidth={"100px"}
       borderActiveType={"none"}
       headerTheme={"violet"}
-      zIndex={2}
+      zIndex={500}
       borderType={"none"}
       menuItem={"v2"}
       bodyTheme={"violet"}
+      isDropIconFilled={true}
     />
   </div>
 
-  <RequestUrl urlText={requestUrl} {onUpdateRequestUrl} />
+  <CodeMirrorInput
+    bind:value={requestUrl}
+    onUpdateInput={onUpdateRequestUrl}
+    placeholder={"Enter an URL"}
+    {theme}
+    {onUpdateEnvironment}
+    {environmentVariables}
+    codeId={"url"}
+  />
 
   <!-- Send button -->
   <span class="ps-2"></span>
@@ -116,7 +127,9 @@
     title="Send"
     type="default"
     disable={isSendRequestInProgress ? true : false}
-    onClick={onSendButtonClicked}
+    onClick={() => {
+      onSendButtonClicked(environmentVariables);
+    }}
   />
 
   <!-- Switch pane layout button -->
@@ -150,6 +163,6 @@
 <style>
   .save-disk {
     padding: 7px;
-    background-color: var(--bg-primary-400);
+    background-color: var(--bg-secondary-400);
   }
 </style>

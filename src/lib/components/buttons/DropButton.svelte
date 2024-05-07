@@ -68,13 +68,13 @@
     border: 0px;
   }
   .main-body.custom-btn-default {
-    background-color: var(--bg-secondary-300);
+    background-color: var(--bg-primary-300);
     color: var(--white-color);
   }
   .main-body.custom-btn-default:hover {
-    background-color: var(--bg-secondary-250);
+    background-color: var(--bg-primary-250);
   }
   .main-body.custom-btn-default:active {
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-primary-500);
   }
 </style>

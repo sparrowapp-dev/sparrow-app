@@ -1,10 +1,11 @@
 <script lang="ts">
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import { TabularInput } from "@workspaces/common/components";
 
   export let textValue;
   export let fileValue;
   export let onUpdateRequestBody;
   export let environmentVariables;
+  export let onUpdateEnvironment;
   export let formData;
 
   const handleFormDataTextChange = (pairs) => {
@@ -26,18 +27,20 @@
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 100px); overflow-y: scroll;">
+<section class="w-100" style="height: calc(100% - 120px); overflow-y: scroll;">
   <p>Text</p>
-  <KeyValue
+  <TabularInput
     keyValue={textValue}
     callback={handleFormDataTextChange}
     {environmentVariables}
+    {onUpdateEnvironment}
   />
   <p>File</p>
-  <KeyValue
+  <TabularInput
     keyValue={fileValue}
     callback={handleFormDataFileChange}
     {environmentVariables}
+    {onUpdateEnvironment}
     type="file"
   />
 </section>

@@ -2,7 +2,7 @@
   export let number: number;
   export let size = "14px";
   export let textColor = "text-primary-200";
-  export let backgroundColor = "bg-primary-500";
+  export let backgroundColor = "bg-secondary-500";
 </script>
 
 <div class="label {backgroundColor}" style="height: {size}; width: {size};">

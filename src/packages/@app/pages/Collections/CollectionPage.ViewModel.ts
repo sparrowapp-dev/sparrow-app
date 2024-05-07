@@ -91,7 +91,7 @@ import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { sample, type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
-import { restSplitterDirection } from "@workspaces/features/rest-explorer/store";
+import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -143,7 +143,7 @@ export default class CollectionsViewModel {
   /**
    * Prevent syncTabWithStore() to be called multiple times in 2 seconds
    */
-  debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
+  // debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
 
   /**
    * Return current tabs list of top tab bar component
@@ -2489,7 +2489,6 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    console.log(view);
-    restSplitterDirection.set(view);
+    requestSplitterDirection.set(view);
   };
 }

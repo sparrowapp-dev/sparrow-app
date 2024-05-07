@@ -154,7 +154,11 @@ class DecodeRequest {
     if (authHeader.key || authHeader.value) {
       combinedHeaders.push(authHeader);
     }
-    return JSON.stringify(combinedHeaders);
+    return JSON.stringify(
+      combinedHeaders.filter((elem) => {
+        return elem.key !== "";
+      }),
+    );
   };
 
   /**

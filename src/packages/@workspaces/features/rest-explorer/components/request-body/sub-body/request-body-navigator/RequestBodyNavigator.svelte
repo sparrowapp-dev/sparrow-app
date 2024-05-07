@@ -1,10 +1,13 @@
 <script lang="ts">
   import infoIcon from "$lib/assets/info-color-blue.svg";
+  import BeautifyIcon from "$lib/assets/beautify.svg";
   import crossIcon from "$lib/assets/cross.svg";
   import { Select } from "$lib/components/inputs";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
+  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   export let method = "";
   export let onUpdateRequestState;
+  export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
   let handleDropdown = (tab: string) => {
     // collectionsMethods.updateRequestState(tab, "dataset");
@@ -69,83 +72,103 @@
     </div>
   {/if}
 </div>
-<div class="mb-2 d-flex">
-  <p
-    class="team-menu__link pb-1 mb-0 d-flex align-items-center"
-    style="font-size: 12px; margin-top:4px;"
-  >
-    Data Types:
-  </p>
-  <span class="pe-3" />
-  <Select
-    id={"hash124"}
-    data={[
-      {
-        name: "Raw",
-        id: RequestDataset.RAW,
-      },
-      {
-        name: "Form data",
-        id: RequestDataset.FORMDATA,
-      },
-      {
-        name: "Form Encoded URL",
-        id: RequestDataset.URLENCODED,
-      },
-      {
-        name: "None",
-        id: RequestDataset.NONE,
-      },
-    ]}
-    titleId={requestState.requestBodyNavigation}
-    onclick={handleDropdown}
-    headerTheme={"transparent"}
-    borderType={"none"}
-    borderActiveType={"bottom"}
-    borderHighlight={"hover-active"}
-    headerHighlight={"active"}
-    minBodyWidth={"150px"}
-    borderRounded={false}
-    menuItem={"v2"}
-  />
-  <span class="pe-3" />
-  {#if requestState.requestBodyNavigation === RequestDataset.RAW}
+<div class="mb-2 d-flex align-items-center justify-content-between">
+  <div class="d-flex">
     <Select
-      id={"hash987"}
+      id={"hash124"}
       data={[
         {
-          name: "HTML",
-          id: RequestDataType.HTML,
+          name: "None",
+          id: RequestDataset.NONE,
         },
         {
-          name: "JSON",
-          id: RequestDataType.JSON,
+          name: "Form Data",
+          id: RequestDataset.FORMDATA,
         },
         {
-          name: "JavaScript",
-          id: RequestDataType.JAVASCRIPT,
+          name: "Encoded URL",
+          id: RequestDataset.URLENCODED,
         },
         {
-          name: "Text",
-          id: RequestDataType.TEXT,
+          name: "Raw",
+          id: RequestDataset.RAW,
         },
         {
-          name: "XML",
-          id: RequestDataType.XML,
+          name: "Binary",
+          id: RequestDataset.BINARY,
+          disabled: true,
         },
       ]}
-      titleId={requestState.requestBodyLanguage}
-      onclick={handleRawDropDown}
-      headerTheme={"transparent"}
+      titleId={requestState.requestBodyNavigation}
+      onclick={handleDropdown}
+      headerTheme={"grey"}
       borderType={"none"}
-      borderActiveType={"bottom"}
+      borderActiveType={"none"}
       borderHighlight={"hover-active"}
-      headerHighlight={"active"}
+      headerHighlight={"hover-active"}
       minBodyWidth={"150px"}
-      borderRounded={false}
+      borderRounded={true}
+      bodyTheme={"grey"}
+      zIndex={200}
+      checkIconColor={"var(--text-primary-200)"}
       menuItem={"v2"}
     />
-  {/if}
+    <span class="pe-3" />
+    {#if requestState.requestBodyNavigation === RequestDataset.RAW}
+      <Select
+        id={"hash987"}
+        data={[
+          {
+            name: "HTML",
+            id: RequestDataType.HTML,
+          },
+          {
+            name: "JSON",
+            id: RequestDataType.JSON,
+          },
+          {
+            name: "JavaScript",
+            id: RequestDataType.JAVASCRIPT,
+          },
+          {
+            name: "Text",
+            id: RequestDataType.TEXT,
+          },
+          {
+            name: "XML",
+            id: RequestDataType.XML,
+          },
+        ]}
+        titleId={requestState.requestBodyLanguage}
+        onclick={handleRawDropDown}
+        headerTheme={"grey"}
+        borderType={"none"}
+        borderActiveType={"none"}
+        borderHighlight={"hover-active"}
+        headerHighlight={"hover-active"}
+        minBodyWidth={"150px"}
+        borderRounded={true}
+        bodyTheme={"grey"}
+        checkIconColor={"var(--text-primary-200)"}
+        menuItem={"v2"}
+        zIndex={200}
+      />
+    {/if}
+  </div>
+  <div>
+    {#if requestState.requestBodyNavigation === RequestDataset.RAW}
+      <div
+        on:click={() => {
+          updateBeautifiedState(true);
+          notifications.success("Code formatted successfully!");
+        }}
+        role="button"
+        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+      >
+        <img src={BeautifyIcon} style="height:10px; width:10px;" />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -159,7 +182,15 @@
   .cross-button {
     width: 36px;
   }
-  .cursor-ppinter {
-    cursor: pointer;
+
+  .icon-container {
+    height: 24px;
+    width: 24px;
+  }
+  .icon-container:hover {
+    background-color: var(--dropdown-container);
+  }
+  .icon-container:active {
+    background-color: var(--bg-secondary-500);
   }
 </style>

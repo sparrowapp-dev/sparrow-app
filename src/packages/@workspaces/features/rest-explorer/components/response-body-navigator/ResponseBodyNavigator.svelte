@@ -17,6 +17,7 @@
   import StatusError from "$lib/assets/status-error.svelte";
   import { Select } from "$lib/components/inputs";
   import { ResponseFormatterEnum } from "@common/types/rest-explorer";
+  import BeautifyIcon from "$lib/assets/beautify.svg";
 
   export let response;
   export let apiState;
@@ -76,11 +77,11 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center px-2 justify-content-between w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
-    <div class="d-flex gap-4 align-items-center justify-content-center">
-      <div class="d-flex rounded my-2">
+    <div class="d-flex gap-3 align-items-center justify-content-center">
+      <div class="d-flex align-items-center rounded mb-0 py-1">
         <span
           role="button"
           on:click={() => {
@@ -88,7 +89,7 @@
               responseBodyFormatter: ResponseFormatter.PRETTY,
             });
           }}
-          class="rounded text-fs-12 px-2 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
@@ -107,7 +108,7 @@
               responseBodyFormatter: ResponseFormatter.RAW,
             });
           }}
-          class="d-none rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.RAW
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}">Raw</span
@@ -127,9 +128,7 @@
       </div>
 
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
-        <button
-          class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
-        >
+        <span class="">
           <Select
             id={"hash565"}
             data={[
@@ -156,16 +155,19 @@
             ]}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
-            headerTheme={"transparent"}
+            headerTheme={"grey"}
             borderType={"none"}
-            borderActiveType={"bottom"}
+            borderActiveType={"none"}
             borderHighlight={"hover-active"}
-            headerHighlight={"active"}
+            headerHighlight={"hover-active"}
             minBodyWidth={"150px"}
-            borderRounded={false}
+            borderRounded={true}
+            bodyTheme={"grey"}
+            zIndex={200}
+            checkIconColor={"var(--text-primary-200)"}
             menuItem={"v2"}
           />
-        </button>
+        </span>
       {/if}
     </div>
     {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}
@@ -184,16 +186,30 @@
             Clear
           </button>
         </div>
-        <button
-          on:click={handleDownloaded}
-          class=" bg-backgroundColor border-0"
-        >
-          <img src={downloadIcon} alt="" />
-        </button>
 
-        <button class=" bg-backgroundColor border-0" on:click={handleCopy}>
-          <img src={copyIcon} alt="" />
-        </button>
+        <div
+          on:click={handleDownloaded}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={downloadIcon} style="height:12px; width:12px;" />
+        </div>
+        <div
+          on:click={handleCopy}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={copyIcon} style="height:12px; width:12px;" />
+        </div>
+        <div
+          on:click={() => {
+            notifications.success("Code formatted successfully!");
+          }}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={BeautifyIcon} style="height:10px; width:10px;" />
+        </div>
       </div>
     {/if}
   </div>
@@ -202,7 +218,7 @@
 <style>
   .response-container {
     flex-wrap: wrap;
-    background-color: var(--bg-primary-550);
+    background-color: transparent;
   }
   .btn-formatter {
     outline: none;
@@ -218,5 +234,15 @@
     letter-spacing: 0em;
     text-align: center;
     padding: 4px 8px 4px 8px;
+  }
+  .icon-container {
+    height: 24px;
+    width: 24px;
+  }
+  .icon-container:hover {
+    background-color: var(--dropdown-container);
+  }
+  .icon-container:active {
+    background-color: var(--bg-secondary-500);
   }
 </style>

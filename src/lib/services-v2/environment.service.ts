@@ -1,3 +1,6 @@
+/**
+ * @deprecated - please use enbironment service v1
+ */
 import { getAuthHeaders, makeRequest } from "$lib/api/api.common";
 import constants from "$lib/utils/constants";
 import type { UpdateEnvironmentPostBody } from "$lib/utils/dto";
@@ -24,23 +27,6 @@ export class EnvironmentService {
         headers: getAuthHeaders(),
       },
     );
-
-    if (response.isSuccessful) {
-      this.environmentRepository.updateEnvironment(
-        response.data.data._id,
-        response.data.data,
-      );
-      await this.environmentTabRepository.setEnvironmentTabProperty(
-        response.data.data.variable,
-        "variable",
-        response.data.data._id,
-      );
-      await this.environmentTabRepository.setEnvironmentTabProperty(
-        true,
-        "isSave",
-        response.data.data._id,
-      );
-    }
     return response;
   };
 }
