@@ -4,12 +4,26 @@
   import { CopyIcon, DotIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
 
-  //   export let filterData = [];
+  /**
+   * environment dialog box position
+   */
   export let environmentAxisX;
   export let environmentAxisY;
+  /**
+   * review environment
+   */
   export let localEnvKey;
+  /**
+   * handles environment dialog box
+   */
   export let handleEnvironmentBox;
+  /**
+   * unique environment dialog box id
+   */
   export let id;
+  /**
+   * environment data
+   */
   export let environmentVariables;
   let count = 0;
   function handleSelectClicked(event: MouseEvent) {

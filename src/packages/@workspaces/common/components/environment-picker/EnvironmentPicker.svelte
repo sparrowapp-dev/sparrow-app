@@ -1,14 +1,29 @@
-<script>
+<script lang="ts">
+  /**
+   * environemt variables filtered data
+   */
   export let filterData = [];
+  /**
+   * search text for environment variables
+   */
   export let inputText;
-  export let trackCursor;
+  /**
+   * track cursor and paranthesis position
+   */
+  export let trackCursor: number;
   export let trackParanthesis;
+  /**
+   * on change event for input
+   */
   export let handleInputValue = () => {};
   export let updateText;
-  export let environmentAxisX;
-  export let environmentAxisY;
-  let activeVariable;
+  /**
+   * tracks environment dialog box position
+   */
+  export let environmentAxisX: number;
+  export let environmentAxisY: number;
 
+  let activeVariable;
   let scrollPosition = 0;
   const scrollTo = (direction) => {
     const container = document.getElementById("left-panel-environment");

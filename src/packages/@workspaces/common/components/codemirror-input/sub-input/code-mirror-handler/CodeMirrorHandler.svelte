@@ -10,25 +10,58 @@
     Decoration,
     placeholder as CreatePlaceHolder,
   } from "@codemirror/view";
+  /**
+   * input value
+   */
   export let rawValue: string;
+  /**
+   * on change event
+   */
   export let handleRawChange: () => void;
+  /**
+   * on focus event
+   */
   export let handleFocusChange: () => void;
+  /**
+   * in blur event
+   */
   export let handleBlurChange: () => void;
+  /**
+   * on change event
+   */
   export let handleInputChange: (data: string) => void;
+  /**
+   * key press event
+   */
   export let handleKeyUpChange: (e: EditorSelection) => void;
   export let handleKeyDownChange: (e: KeyboardEvent) => void;
-  export let codeMirrorEditorDiv: HTMLDivElement;
+  /**
+   * Filtered environment data
+   */
   export let filterData: AggregateEnvironment[];
+  /**
+   * handles environment dialog box
+   */
   export let handleEnvironmentBox: (change: string, envKey: string) => void;
+  /**
+   * input states
+   */
   export let placeholder: string;
   export let theme: object;
   export let disabled: boolean = false;
+  /**
+   * environment dialog box positions
+   */
   export let environmentAxisY;
   export let environmentAxisX;
+  /**
+   * environment dialog box unique id
+   */
   export let id;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
+  let codeMirrorEditorDiv: HTMLDivElement;
 
   const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
 
@@ -93,6 +126,9 @@
     },
   ]);
 
+  /**
+   * @description - handles event listeners
+   */
   const handleEventsRegister = EditorView.domEventHandlers({
     blur: (event, view: EditorView) => {
       handleBlurChange();
@@ -109,6 +145,10 @@
     },
   });
 
+  /**
+   * @description - handles keyboard events
+   * @param event
+   */
   const handleKeyPress = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();

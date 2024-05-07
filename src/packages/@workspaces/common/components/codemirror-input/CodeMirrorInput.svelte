@@ -6,17 +6,28 @@
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
 
+  /**
+   * environment events
+   */
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let onUpdateInput;
+  /**
+   * input value to be rendered on codemirror
+   */
   export let value: string = "";
+  /**
+   * input codemirror states
+   */
   export let placeholder;
   export let theme;
   export let disabled = false;
+  /**
+   * unique id used to focus codemirror input
+   */
   export let codeId = "";
 
   const environmentHelper = new EnvironmentHeper();
-  let inputElement: HTMLInputElement;
   let trackParanthesis: unknown[] = [];
   let trackCursor: number;
   let environmentAxisY: number;
@@ -72,9 +83,6 @@
   const handleKeyPress = (event) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
-    } else if (event.altKey && event.code === "KeyL") {
-      inputElement?.focus();
-      editLink.set(uuidv4());
     }
   };
 
@@ -92,7 +100,6 @@
   {handleInputChange}
   handleKeyUpChange={handleKeyUpValue}
   handleKeyDownChange={handleKeyPress}
-  codeMirrorEditorDiv={inputElement}
   filterData={environmentVariables.filtered}
   bind:environmentAxisX
   bind:environmentAxisY

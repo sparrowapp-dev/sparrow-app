@@ -2,11 +2,26 @@
   import { DangerIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";
 
+  /**
+   * environment dialog box position
+   */
   export let environmentAxisX: number;
   export let environmentAxisY: number;
+  /**
+   * missed environment
+   */
   export let localEnvKey: string;
+  /**
+   * handles environment dialog box
+   */
   export let handleEnvironmentBox;
+  /**
+   * unique environment dialog box id
+   */
   export let id: string;
+  /**
+   * environment data
+   */
   export let onUpdateEnvironment;
   export let environmentVariables;
   let count = 0;

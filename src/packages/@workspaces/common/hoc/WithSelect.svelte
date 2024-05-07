@@ -1,8 +1,23 @@
 <script>
+  /**
+   * hoc component
+   */
   export let wrappedComponent;
+  /**
+   * unique Select component id
+   */
   export let id;
+  /**
+   * Select data
+   */
   export let data;
+  /**
+   * Select title id
+   */
   export let titleId;
+  /**
+   * on change event
+   */
   export let onclick;
   $: ({ wrappedComponent, id, data, titleId, onclick } = $$props);
 </script>
