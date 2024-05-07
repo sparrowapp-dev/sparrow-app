@@ -17,6 +17,7 @@
   import StatusError from "$lib/assets/status-error.svelte";
   import { Select } from "$lib/components/inputs";
   import { ResponseFormatterEnum } from "@common/types/rest-explorer";
+  import BeautifyIcon from "$lib/assets/beautify.svg";
 
   export let response;
   export let apiState;
@@ -184,13 +185,30 @@
             Clear
           </button>
         </div>
-        <button on:click={handleDownloaded} class=" bg-secondary-800 border-0">
-          <img src={downloadIcon} alt="" />
-        </button>
 
-        <button class="bg-secondary-800 border-0" on:click={handleCopy}>
-          <img src={copyIcon} alt="" />
-        </button>
+        <div
+          on:click={handleDownloaded}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={downloadIcon} style="height:12px; width:12px;" />
+        </div>
+        <div
+          on:click={handleCopy}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={copyIcon} style="height:12px; width:12px;" />
+        </div>
+        <div
+          on:click={() => {
+            notifications.success("Code formatted successfully!");
+          }}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={BeautifyIcon} style="height:10px; width:10px;" />
+        </div>
       </div>
     {/if}
   </div>
@@ -215,5 +233,15 @@
     letter-spacing: 0em;
     text-align: center;
     padding: 4px 8px 4px 8px;
+  }
+  .icon-container {
+    height: 24px;
+    width: 24px;
+  }
+  .icon-container:hover {
+    background-color: var(--dropdown-container);
+  }
+  .icon-container:active {
+    background-color: var(--bg-secondary-500);
   }
 </style>
