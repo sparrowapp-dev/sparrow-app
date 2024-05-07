@@ -8,8 +8,8 @@
 
   export let environmentVariables;
   export let onUpdateEnvironment;
-  export let onUpdateRequestUrl;
-  export let urlText: string = "";
+  export let onUpdateInput;
+  export let value: string = "";
   export let placeholder;
   export let theme;
   export let disabled = false;
@@ -31,7 +31,7 @@
       if (trackParanthesis.length === 2)
         filterData = environmentHelper.filterEnvironments(
           environmentVariables.filtered,
-          urlText,
+          value,
           trackParanthesis,
           trackCursor,
         );
@@ -40,7 +40,7 @@
       if (trackParanthesis.length === 2 && trackCursor)
         filterData = environmentHelper.filterEnvironments(
           environmentVariables.filtered,
-          urlText,
+          value,
           trackParanthesis,
           trackCursor,
         );
@@ -48,8 +48,8 @@
   }
 
   let handleInputValue = () => {
-    onUpdateRequestUrl(urlText);
-    trackParanthesis = environmentHelper.balanceParanthesis(urlText);
+    onUpdateInput(value);
+    trackParanthesis = environmentHelper.balanceParanthesis(value);
   };
 
   let handleFocusValue = () => {
@@ -63,7 +63,7 @@
     }, 300);
   };
   let handleInputChange = (text: string) => {
-    urlText = text;
+    value = text;
   };
   let handleKeyUpValue = (e: EditorSelection) => {
     trackCursor = e.main.head;
@@ -85,7 +85,7 @@
 </script>
 
 <CodeMirrorHandler
-  rawValue={urlText}
+  rawValue={value}
   handleRawChange={handleInputValue}
   handleFocusChange={handleFocusValue}
   handleBlurChange={handleBlurValue}
@@ -108,11 +108,11 @@
     {environmentAxisX}
     {environmentAxisY}
     {filterData}
-    inputText={urlText}
+    inputText={value}
     {trackCursor}
     {trackParanthesis}
     updateText={(txt) => {
-      urlText = txt;
+      value = txt;
     }}
     {handleInputValue}
   />

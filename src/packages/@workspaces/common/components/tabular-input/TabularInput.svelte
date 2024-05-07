@@ -268,8 +268,8 @@
               <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
                 <div class="w-50 position-relative">
                   <CodeMirrorInput
-                    bind:urlText={element.key}
-                    onUpdateRequestUrl={() => {
+                    bind:value={element.key}
+                    onUpdateInput={() => {
                       updateParam(index);
                     }}
                     disabled={mode == "READ" ? true : false}
@@ -354,8 +354,8 @@
                 {:else}
                   <div class="w-50 position-relative">
                     <CodeMirrorInput
-                      bind:urlText={element.value}
-                      onUpdateRequestUrl={() => {
+                      bind:value={element.value}
+                      onUpdateInput={() => {
                         updateParam(index);
                       }}
                       placeholder={"Value"}

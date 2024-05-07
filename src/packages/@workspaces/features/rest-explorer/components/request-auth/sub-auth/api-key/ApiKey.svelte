@@ -55,8 +55,8 @@
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
-        bind:urlText={apiData.authKey}
-        onUpdateRequestUrl={() => {
+        bind:value={apiData.authKey}
+        onUpdateInput={() => {
           handleAuthChange();
         }}
         placeholder={"Key"}
@@ -70,8 +70,8 @@
     <p class="mb-2 text-secondary-100">Auth Value</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
-        bind:urlText={apiData.authValue}
-        onUpdateRequestUrl={() => {
+        bind:value={apiData.authValue}
+        onUpdateInput={() => {
           handleAuthChange();
         }}
         placeholder={"Value"}

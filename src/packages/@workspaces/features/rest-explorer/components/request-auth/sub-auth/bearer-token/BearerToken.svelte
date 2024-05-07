@@ -24,8 +24,8 @@
     <p class="mb-2 text-secondary-100">Token</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
-        bind:urlText={bearerToken}
-        onUpdateRequestUrl={() => {
+        bind:value={bearerToken}
+        onUpdateInput={() => {
           handleInput();
         }}
         placeholder={"Token"}

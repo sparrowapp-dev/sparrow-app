@@ -25,8 +25,8 @@
     <p class="mb-2 text-secondary-100">Username</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
-        bind:urlText={basicAuth.username}
-        onUpdateRequestUrl={() => {
+        bind:value={basicAuth.username}
+        onUpdateInput={() => {
           handleInput();
         }}
         placeholder={"Username"}
@@ -42,8 +42,8 @@
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
-        bind:urlText={basicAuth.password}
-        onUpdateRequestUrl={() => {
+        bind:value={basicAuth.password}
+        onUpdateInput={() => {
           handleInput();
         }}
         placeholder={"Password"}

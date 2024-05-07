@@ -107,8 +107,8 @@
   />
 
   <CodeMirrorInput
-    bind:urlText={requestUrl}
-    {onUpdateRequestUrl}
+    bind:value={requestUrl}
+    onUpdateInput={onUpdateRequestUrl}
     placeholder={"Enter an URL"}
     {theme}
     {onUpdateEnvironment}
