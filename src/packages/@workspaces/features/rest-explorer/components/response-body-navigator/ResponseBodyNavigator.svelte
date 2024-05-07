@@ -77,11 +77,11 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center px-0 justify-content-between w-100 z-1 position-sticky"
+    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
-    <div class="d-flex gap-4 align-items-center justify-content-center">
-      <div class="d-flex rounded my-2">
+    <div class="d-flex gap-3 align-items-center justify-content-center">
+      <div class="d-flex align-items-center rounded mb-0 py-1">
         <span
           role="button"
           on:click={() => {
@@ -89,7 +89,7 @@
               responseBodyFormatter: ResponseFormatter.PRETTY,
             });
           }}
-          class="rounded text-fs-12 px-2 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
@@ -108,7 +108,7 @@
               responseBodyFormatter: ResponseFormatter.RAW,
             });
           }}
-          class="d-none rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.RAW
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}">Raw</span
@@ -128,9 +128,7 @@
       </div>
 
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
-        <button
-          class="d-flex align-items-center justify-content-center gap-2 bg-backgroundColor border-0"
-        >
+        <span class="">
           <Select
             id={"hash565"}
             data={[
@@ -157,16 +155,19 @@
             ]}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
-            headerTheme={"transparent"}
+            headerTheme={"grey"}
             borderType={"none"}
-            borderActiveType={"bottom"}
+            borderActiveType={"none"}
             borderHighlight={"hover-active"}
-            headerHighlight={"active"}
+            headerHighlight={"hover-active"}
             minBodyWidth={"150px"}
-            borderRounded={false}
+            borderRounded={true}
+            bodyTheme={"grey"}
+            zIndex={200}
+            checkIconColor={"var(--text-primary-200)"}
             menuItem={"v2"}
           />
-        </button>
+        </span>
       {/if}
     </div>
     {#if apiState.responseBodyFormatter !== ResponseFormatterEnum.PREVIEW}

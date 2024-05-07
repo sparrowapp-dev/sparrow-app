@@ -54,12 +54,13 @@ export class AuthInputTheme {
       ".cm-activeLineGutter": {
         backgroundColor: "transparent",
       },
-      ".cm-foldPlaceholder": {
-        color: "#8A9299",
-        fontSize: "12px",
-        fontWeight: "400",
-      },
+      // ".cm-foldPlaceholder": {
+      //   color: "red",
+      //   fontSize: "12px",
+      //   fontWeight: "400",
+      // },
       ".cm-placeholder": {
+        color: "var(--text-secondary-200)",
         fontSize: "12px",
       },
       "&.cm-editor.cm-focused": {

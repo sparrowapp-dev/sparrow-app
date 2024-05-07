@@ -8,7 +8,7 @@
 >
   {#each responseHeader as header}
     <div
-      class="d-flex align-items-center justify-content-center ps-1 gap-2 mb-2 w-100"
+      class="d-flex align-items-center justify-content-center ps-0 gap-2 mb-2 w-100"
     >
       <div class="flex-grow-1 w-100">
         <input

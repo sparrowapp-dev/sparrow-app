@@ -92,12 +92,12 @@
   };
 </script>
 
-<div class="py-2">
+<div class="pb-2">
   <!-- Tabs -->
   <div class="d-flex mb-2">
     {#each tabs as tab}
       <button
-        class="navigation__link px-1 border-0 me-2 sparrow-fs-12 request-tab me-3 {tab.id ===
+        class="navigation__link border-0 sparrow-fs-12 request-tab me-4 {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"

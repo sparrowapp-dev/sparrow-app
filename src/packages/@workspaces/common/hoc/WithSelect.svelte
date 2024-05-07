@@ -13,14 +13,15 @@
   {data}
   {titleId}
   {onclick}
+  headerTheme={"grey"}
   borderType={"none"}
-  borderRounded={true}
-  menuItem={"v2"}
-  borderHighlight={"active"}
-  headerHighlight={"hover-active"}
-  minHeaderWidth={"200px"}
   borderActiveType={"none"}
-  headerTheme={"dark-violet"}
+  borderHighlight={"hover-active"}
+  headerHighlight={"hover-active"}
+  minBodyWidth={"150px"}
+  borderRounded={true}
+  bodyTheme={"grey"}
   zIndex={499}
-  bodyTheme={"violet"}
+  checkIconColor={"var(--text-primary-200)"}
+  menuItem={"v2"}
 />

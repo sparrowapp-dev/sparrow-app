@@ -6,7 +6,7 @@
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
-  import { CheckIcon } from "@library/icons";
+  import { ArrowIcon, CheckIcon } from "@library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -67,6 +67,11 @@
    */
   export let borderType: "all" | "bottom" | "none" = "all"; // normal case
   export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
+
+  /**
+   * Determines the icon state for the Select header.
+   */
+  export let isDropIconFilled: boolean = false; // normal case
 
   /**
    * Determines the background state for the Select header.
@@ -377,11 +382,15 @@
         </span>
       </p>
       <span class="d-flex ps-2" class:select-logo-active={isOpen}>
-        <DownArrowIcon
-          width={12}
-          height={14}
-          color={"var(--sparrow-text-color)"}
-        />
+        {#if isDropIconFilled}
+          <ArrowIcon />
+        {:else}
+          <DownArrowIcon
+            width={12}
+            height={14}
+            color={"var(--sparrow-text-color)"}
+          />
+        {/if}
       </span>
     </div>
   </div>

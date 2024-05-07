@@ -22,14 +22,14 @@
 </div>
 <div class="w-100 ps-1 pt-2 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-requestBodyColor">Username</p>
+    <p class="mb-2 text-secondary-100">Username</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:urlText={basicAuth.username}
         onUpdateRequestUrl={() => {
           handleInput();
         }}
-        placeholder={"Enter Username"}
+        placeholder={"Username"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
@@ -46,7 +46,7 @@
         onUpdateRequestUrl={() => {
           handleInput();
         }}
-        placeholder={"Enter Password"}
+        placeholder={"Password"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}

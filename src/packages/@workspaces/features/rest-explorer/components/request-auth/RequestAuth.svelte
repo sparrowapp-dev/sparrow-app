@@ -12,10 +12,10 @@
   export let onUpdateEnvironment;
 </script>
 
-<div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
+<div class="pb-3 ps-1 pe-1 w-100 h-100">
   <div class="pb-2" style="font-size: 12px; font-weight:500;">
     <div class="">
-      <button class="d-flex bg-backgroundColor border-0">
+      <span class="d-flex">
         <p class="mb-0">
           <WithSelect
             wrappedComponent={Select}
@@ -44,10 +44,10 @@
             }}
           />
         </p>
-      </button>
+      </span>
     </div>
   </div>
-  <section class="w-100" style="height: calc(100% - 80px); overflow-y: scroll;">
+  <section class="w-100" style="height: calc(100% - 60px); overflow-y: scroll;">
     {#if requestStateAuth === AuthType.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === AuthType.API_KEY}

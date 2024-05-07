@@ -51,7 +51,7 @@
 </div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 text-requestBodyColor">Auth Key</p>
+    <p class=" mb-2 text-secondary-100">Auth Key</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
@@ -59,7 +59,7 @@
         onUpdateRequestUrl={() => {
           handleAuthChange();
         }}
-        placeholder={"Enter Auth Key"}
+        placeholder={"Key"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
@@ -67,14 +67,14 @@
     </div>
   </div>
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-requestBodyColor">Auth Value</p>
+    <p class="mb-2 text-secondary-100">Auth Value</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:urlText={apiData.authValue}
         onUpdateRequestUrl={() => {
           handleAuthChange();
         }}
-        placeholder={"Enter Auth Value"}
+        placeholder={"Value"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}

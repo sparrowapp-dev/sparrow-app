@@ -103,6 +103,7 @@
     borderType={"none"}
     menuItem={"v2"}
     bodyTheme={"violet"}
+    isDropIconFilled={true}
   />
 
   <CodeMirrorInput
