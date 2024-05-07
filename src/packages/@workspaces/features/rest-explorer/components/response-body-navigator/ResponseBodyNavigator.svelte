@@ -187,6 +187,7 @@
           </button>
         </div>
 
+        <!-- Download button -->
         <div
           on:click={handleDownloaded}
           role="button"
@@ -194,6 +195,7 @@
         >
           <img src={downloadIcon} style="height:12px; width:12px;" />
         </div>
+        <!-- Copy button -->
         <div
           on:click={handleCopy}
           role="button"
@@ -201,6 +203,7 @@
         >
           <img src={copyIcon} style="height:12px; width:12px;" />
         </div>
+        <!-- Prettier button -->
         <div
           on:click={() => {
             notifications.success("Code formatted successfully!");
@@ -240,9 +243,9 @@
     width: 24px;
   }
   .icon-container:hover {
-    background-color: var(--dropdown-container);
+    background-color: var(--bg-secondary-550);
   }
   .icon-container:active {
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-secondary-600);
   }
 </style>

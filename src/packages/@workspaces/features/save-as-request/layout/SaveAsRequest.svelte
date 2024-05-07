@@ -612,7 +612,7 @@
       <ComboText
         value={componentData?.property.request.method}
         comboContainerClassProp={"d-flex flex-start pb-2"}
-        singleTextClassProp={"rounded d-flex align-items-center justify-content-center"}
+        singleTextClassProp={"rounded d-flex align-items-center py-2 px-3 justify-content-center"}
         valueClassProp={`text-${getMethodStyle(
           componentData?.property.request.method,
         )}`}
