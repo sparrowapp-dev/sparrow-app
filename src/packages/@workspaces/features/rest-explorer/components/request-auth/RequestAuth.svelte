@@ -2,26 +2,23 @@
   import { Select } from "$lib/components/inputs";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
+  import { WithSelect } from "@workspaces/common/hoc";
 
   export let auth;
   export let environmentVariables = [];
   export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
+  export let onUpdateEnvironment;
 </script>
 
-<div class="pb-3 pt-3 ps-1 pe-1 w-100 h-100">
-  <div
-    class="col-12 pb-2 d-flex align-items-center"
-    style="font-size: 12px; font-weight:500;border-bottom:1px solid var(--border-color)"
-  >
-    <div class="col-2">
-      <p class="text-requestBodyColor ps-1 mb-0">Auth Type</p>
-    </div>
-    <div class="col-10">
-      <button class="d-flex bg-backgroundColor border-0">
+<div class="pb-3 ps-1 pe-1 w-100 h-100">
+  <div class="pb-2" style="font-size: 12px; font-weight:500;">
+    <div class="">
+      <span class="d-flex">
         <p class="mb-0">
-          <Select
+          <WithSelect
+            wrappedComponent={Select}
             id={"hash999"}
             data={[
               {
@@ -45,20 +42,12 @@
             onclick={(id) => {
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
-            headerTheme={"transparent"}
-            borderType={"none"}
-            borderActiveType={"bottom"}
-            borderHighlight={"hover-active"}
-            headerHighlight={"active"}
-            minBodyWidth={"150px"}
-            borderRounded={false}
-            menuItem={"v2"}
           />
         </p>
-      </button>
+      </span>
     </div>
   </div>
-  <section class="w-100" style="height: calc(100% - 80px); overflow-y: scroll;">
+  <section class="w-100" style="height: calc(100% - 60px); overflow-y: scroll;">
     {#if requestStateAuth === AuthType.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === AuthType.API_KEY}
@@ -66,18 +55,21 @@
         apiData={auth.apiKey}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {:else if requestStateAuth === AuthType.BEARER_TOKEN}
       <BearerToken
         bearerToken={auth.bearerToken}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {:else if requestStateAuth === AuthType.BASIC_AUTH}
       <BasicAuth
         basicAuth={auth.basicAuth}
         callback={onUpdateRequestAuth}
         {environmentVariables}
+        {onUpdateEnvironment}
       />
     {/if}
   </section>

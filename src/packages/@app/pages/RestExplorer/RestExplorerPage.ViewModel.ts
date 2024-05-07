@@ -24,6 +24,8 @@ import type {
 import { TabRepository } from "$lib/repositories/tab.repository";
 import { CollectionRepository } from "$lib/repositories/collection.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { EnvironmentRepository } from "$lib/repositories/environment.repository";
+import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
 import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
@@ -37,6 +39,7 @@ import {
   insertCollectionRequest,
   updateCollectionRequest,
 } from "$lib/services/collection";
+import { EnvironmentService } from "$lib/services/environment.service";
 
 // ---- Events
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -91,6 +94,7 @@ import {
   type RequestTab,
   RequestDatasetEnum,
 } from "@common/types/rest-explorer";
+import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
 class RestExplorerViewModel
   implements
@@ -124,6 +128,14 @@ class RestExplorerViewModel
    */
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private environmentRepository = new EnvironmentRepository();
+  private tabRepository = new TabRepository();
+  private environmentTabRepository = new EnvironmentTabRepository();
+
+  /**
+   * Service
+   */
+  private environmentService = new EnvironmentService();
   /**
    * Utils
    */
@@ -139,7 +151,6 @@ class RestExplorerViewModel
     key: "",
     value: "",
   });
-  private tabRepository = new TabRepository();
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
 
   public constructor(doc: TabDocument) {
@@ -158,6 +169,14 @@ class RestExplorerViewModel
         ).getValue();
       }, 0);
     }
+  }
+
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
   }
 
   public get tab(): Observable<RequestTab> {
@@ -196,7 +215,10 @@ class RestExplorerViewModel
     _url: string,
     _effectQueryParams: boolean = true,
   ) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    if (_url === progressiveTab.property.request.url) {
+      return;
+    }
     progressiveTab.property.request.url = _url;
     progressiveTab.isSaved = false;
     this.tab = progressiveTab;
@@ -288,7 +310,13 @@ class RestExplorerViewModel
     _params: KeyValueChecked[],
     _effectURL: boolean = true,
   ) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    if (
+      JSON.stringify(_params) ===
+      JSON.stringify(progressiveTab.property.request.queryParams)
+    ) {
+      return;
+    }
     progressiveTab.property.request.queryParams = _params;
     progressiveTab.isSaved = false;
     this.tab = progressiveTab;
@@ -411,13 +439,13 @@ class RestExplorerViewModel
   /**
    * @description send request
    */
-  public sendRequest = async () => {
+  public sendRequest = async (environmentVariables = []) => {
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      [],
+      environmentVariables.filtered,
     );
     makeHttpRequestV2(...decodeData)
       .then((response) => {
@@ -857,7 +885,7 @@ class RestExplorerViewModel
           _id,
         );
       }
-      const randomRequest: TabDocument = new InitRequestTab(
+      const randomRequest: RequestTab = new InitRequestTab(
         "UNTRACKED-",
         "UNTRACKED-",
       ).getValue();
@@ -1055,6 +1083,124 @@ class RestExplorerViewModel
         }
       }
       MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  /**
+   *
+   * @param isGlobalVariable - defines to save local or global
+   * @param environmentVariables - pre existing environment data
+   * @param newVariableObj - new entry to be extended
+   * @returns
+   */
+  public updateEnvironment = async (
+    isGlobalVariable: boolean,
+    environmentVariables,
+    newVariableObj: KeyValue,
+  ) => {
+    if (isGlobalVariable) {
+      // api payload
+      let payload = {
+        name: environmentVariables.global.name,
+        variable: [
+          ...environmentVariables.global.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.global.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+        // updates environment tab
+        await this.environmentTabRepository.setEnvironmentTabProperty(
+          response.data.data.variable,
+          "variable",
+          response.data.data._id,
+        );
+        await this.environmentTabRepository.setEnvironmentTabProperty(
+          true,
+          "isSave",
+          response.data.data._id,
+        );
+        notifications.success("Environment Variable Added");
+      } else {
+        notifications.error("Failed to add Environment Variable");
+      }
+      return response;
+    } else {
+      // api payload
+      const payload = {
+        name: environmentVariables.local.name,
+        variable: [
+          ...environmentVariables.local.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0 && variable.value.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      // api response
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.local.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+        // updates environment tab
+        await this.environmentTabRepository.setEnvironmentTabProperty(
+          response.data.data.variable,
+          "variable",
+          response.data.data._id,
+        );
+        await this.environmentTabRepository.setEnvironmentTabProperty(
+          true,
+          "isSave",
+          response.data.data._id,
+        );
+        notifications.success("Environment Variable Added");
+      } else {
+        notifications.error("Failed to add Environment Variable");
+      }
+      return response;
     }
   };
 }

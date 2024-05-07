@@ -14,7 +14,7 @@
   export let isEditable = true;
   export let isFormatted = false;
   export let isBodyBeautified = false;
-  export let beautifySyntaxCallback: (value: boolean) => void;
+  export let beautifySyntaxCallback: (value: boolean) => void = () => {};
   export { componentClass as class };
 
   const dispatch = createEventDispatcher();

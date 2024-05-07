@@ -1,19 +1,21 @@
 <script lang="ts">
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
+  import { TabularInput } from "@workspaces/common/components";
 
   export let value;
   export let environmentVariables;
   export let onUpdateRequestBody;
+  export let onUpdateEnvironment;
 
   const handleUrlEncodeChange = (pairs) => {
     onUpdateRequestBody({ urlencoded: pairs });
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 100px); overflow-y: scroll;">
-  <KeyValue
+<section class="w-100" style="height: calc(100% - 120px); overflow-y: scroll;">
+  <TabularInput
     keyValue={value}
     callback={handleUrlEncodeChange}
     {environmentVariables}
+    {onUpdateEnvironment}
   />
 </section>

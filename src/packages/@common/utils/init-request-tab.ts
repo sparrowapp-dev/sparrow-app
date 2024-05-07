@@ -100,7 +100,6 @@ class InitRequestTab {
             responseBodyLanguage: RequestDataTypeEnum.TEXT,
             responseBodyFormatter: ResponseFormatterEnum.PRETTY,
             requestExtensionNavigation: "",
-            requestSplitterDirection: "horizontal",
             requestLeftSplitterWidthPercentage: 50,
             requestRightSplitterWidthPercentage: 50,
             isExposeEditDescription: true,

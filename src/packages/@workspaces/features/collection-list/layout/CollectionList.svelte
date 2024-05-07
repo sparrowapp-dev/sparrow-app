@@ -166,7 +166,7 @@
         <img src={doubleangleLeft} alt="" class="filter-green" />
       </button>
     </div>
-    <div class="px-3 pt-2">
+    <div class="px-3 pt-2 d-none">
       <Select
         id="none"
         titleId={"none"}

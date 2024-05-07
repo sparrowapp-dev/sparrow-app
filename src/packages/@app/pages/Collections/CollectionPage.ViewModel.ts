@@ -120,18 +120,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Syncs tabs with repository
-   */
-  public syncTabWithStore = () => {
-    this.tabRepository.syncTabsWithStore(tabs);
-  };
-
-  /**
-   * Prevent syncTabWithStore() to be called multiple times in 2 seconds
-   */
-  debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
-
-  /**
    * Return current tabs list of top tab bar component
    */
   get tabs() {

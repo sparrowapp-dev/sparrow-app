@@ -11,7 +11,6 @@
     KeyValuePairWithBase,
     NewTab,
   } from "$lib/utils/interfaces/request.interface";
-  import KeyValue from "$lib/components/key-value/KeyValue.svelte";
   import type { TabDocument } from "$lib/database/app.database";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import type { Observable } from "rxjs";
@@ -223,25 +222,25 @@
       if you need to send body.
     </p>
   {:else if mainTab === RequestDataset.URLENCODED}
-    <KeyValue
+    <!-- <TabularInput
       keyValue={urlEncoded}
       callback={handleUrlEncodeChange}
       {environmentVariables}
-    />
+    /> -->
   {:else if mainTab === RequestDataset.FORMDATA}
     <p>Text</p>
-    <KeyValue
+    <!-- <TabularInput
       keyValue={formDataText}
       callback={handleFormDataTextChange}
       {environmentVariables}
-    />
+    /> -->
     <p>File</p>
-    <KeyValue
+    <!-- <TabularInput
       keyValue={formDataFile}
       callback={handleFormDataFileChange}
       {environmentVariables}
       type="file"
-    />
+    /> -->
   {/if}
 </div>
 

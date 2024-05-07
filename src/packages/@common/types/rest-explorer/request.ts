@@ -121,9 +121,6 @@ export interface RequestExtensionNavigationWrapper {
 export interface IsExposeEditDescriptionWrapper {
   isExposeEditDescription: boolean;
 }
-export interface RequestSplitterDirectionWrapper {
-  requestSplitterDirection: string;
-}
 export interface RequestLeftSplitterWidthPercentageWrapper {
   requestLeftSplitterWidthPercentage: number;
 }
@@ -231,7 +228,6 @@ export interface State
     ResponseBodyFormatterWrapper,
     RequestExtensionNavigationWrapper,
     IsExposeEditDescriptionWrapper,
-    RequestSplitterDirectionWrapper,
     RequestLeftSplitterWidthPercentageWrapper,
     RequestRightSplitterWidthPercentageWrapper,
     IsSendRequestInProgressWrapper,

@@ -220,9 +220,6 @@ export const tabSchemaLiteral = {
                 requestExtensionNavigation: {
                   type: "string",
                 },
-                requestSplitterDirection: {
-                  type: "string",
-                },
                 requestLeftSplitterWidthPercentage: {
                   type: "number",
                 },
