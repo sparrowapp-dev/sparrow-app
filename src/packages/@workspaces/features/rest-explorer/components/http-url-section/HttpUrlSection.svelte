@@ -62,49 +62,54 @@
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
-  <Select
-    id={"api-request"}
-    data={[
-      {
-        name: "GET",
-        id: RequestMethod.GET,
-        color: "success",
-      },
-      {
-        name: "POST",
-        id: RequestMethod.POST,
-        color: "warning",
-      },
-      {
-        name: "PUT",
-        id: RequestMethod.PUT,
-        color: "secondary",
-      },
-      {
-        name: "DELETE",
-        id: RequestMethod.DELETE,
-        color: "danger",
-      },
-      {
-        name: "PATCH",
-        id: RequestMethod.PATCH,
-        color: "patch",
-      },
-    ]}
-    borderRounded={false}
-    titleId={httpMethod}
-    onclick={handleDropdown}
-    borderHighlight={"active"}
-    headerHighlight={"hover"}
-    minHeaderWidth={"100px"}
-    borderActiveType={"none"}
-    headerTheme={"violet"}
-    zIndex={500}
-    borderType={"none"}
-    menuItem={"v2"}
-    bodyTheme={"violet"}
-    isDropIconFilled={true}
-  />
+  <div
+    class="overflow-hidden"
+    style="width: 130px; border-top-left-radius:4px; border-bottom-left-radius:4px;"
+  >
+    <Select
+      id={"api-request"}
+      data={[
+        {
+          name: "GET",
+          id: RequestMethod.GET,
+          color: "success",
+        },
+        {
+          name: "POST",
+          id: RequestMethod.POST,
+          color: "warning",
+        },
+        {
+          name: "PUT",
+          id: RequestMethod.PUT,
+          color: "secondary",
+        },
+        {
+          name: "DELETE",
+          id: RequestMethod.DELETE,
+          color: "danger",
+        },
+        {
+          name: "PATCH",
+          id: RequestMethod.PATCH,
+          color: "patch",
+        },
+      ]}
+      borderRounded={false}
+      titleId={httpMethod}
+      onclick={handleDropdown}
+      borderHighlight={"active"}
+      headerHighlight={"hover"}
+      minHeaderWidth={"100px"}
+      borderActiveType={"none"}
+      headerTheme={"violet"}
+      zIndex={500}
+      borderType={"none"}
+      menuItem={"v2"}
+      bodyTheme={"violet"}
+      isDropIconFilled={true}
+    />
+  </div>
 
   <CodeMirrorInput
     bind:value={requestUrl}
