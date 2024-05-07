@@ -132,15 +132,19 @@
       >
         {tab.name}
       </span>
-      {#if tab?.property?.request && !tab?.isSaved}
-        {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
-          <span
-            class="position-absolute me-1"
-            style="right: 0; top: 40%; height: 6px; width: 6px; background-color: var(--tab-unsave-icon); border-radius: 50%;"
-          />
-        {/if}
-      {/if}
     </button>
+    {#if tab?.property?.request && !tab?.isSaved}
+      {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+        <span
+          class="my-auto mx-1 opacity-{tab?.property?.request &&
+          !tab?.isSaved &&
+          (tab?.source !== 'SPEC' || !tab?.activeSync || tab?.isDeleted)
+            ? '1'
+            : '0'}"
+          style="height: 6px; aspect-ratio: 1; background-color: var(--tab-unsave-icon); border-radius: 50%;"
+        />
+      {/if}
+    {/if}
 
     <button
       class="{!(tab?.property?.request && !tab?.isSaved) && !tab.isActive

@@ -123,9 +123,9 @@ export default class CollectionsViewModel {
   /**
    * Syncs tabs with repository
    */
-  public syncTabWithStore = () => {
-    this.tabRepository.syncTabsWithStore(tabs);
-  };
+  // public syncTabWithStore = () => {
+  //   this.tabRepository.syncTabsWithStore(tabs);
+  // };
 
   /**
    * Prevent syncTabWithStore() to be called multiple times in 2 seconds
@@ -203,20 +203,22 @@ export default class CollectionsViewModel {
     const tabList = this.tabs;
     /////////////////////////////////////////////////////////////////////
     let updatedTabList: TabDocument[] = [];
-    tabList.subscribe((value) => {
-      updatedTabList = value;
-    });
+    tabList
+      .subscribe((value) => {
+        updatedTabList = value;
+      })
+      .unsubscribe();
     const element = updatedTabList.splice(this.movedTabStartIndex, 1);
     updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
     updatedTabList = updatedTabList.map((tab, index) => {
-      tab.index = index;
+      tab.patch({
+        index: index,
+      });
       return tab;
     });
-    const newTabList: NewTab[] = updatedTabList as NewTab[];
-
-    // TODO - Update RxDB REPO using bulk upsert HERE (Remove these code)
-    tabs.set(newTabList);
-    /////////////////////////////////////////////////////////////////////
+    updatedTabList.sort((a, b) => {
+      return b.index - a.index;
+    });
   };
 
   /**
@@ -412,8 +414,17 @@ export default class CollectionsViewModel {
    * @param route :string - path to collection, folder or request
    * @param _id :string - if of the tab
    */
-  public updateTab = async (data: any, route: string, _id: string) => {
-    requestResponseStore.setTabProperty(data, route, _id);
+  public updateTab = async (_id: string, data: any) => {
+    this.tabRepository
+      .getTabList()
+      .subscribe((tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id === _id) {
+            this.tabRepository.updateTab(tab.tabId, data);
+          }
+        });
+      })
+      .unsubscribe();
     this.debouncedTab();
   };
 
@@ -1599,7 +1610,9 @@ export default class CollectionsViewModel {
           collection.id,
           response.data.data,
         );
-        this.updateTab(newCollectionName, "name", collection.id);
+        this.updateTab(collection.id, {
+          name: newCollectionName,
+        });
         notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -1648,7 +1661,9 @@ export default class CollectionsViewModel {
           explorer.id,
           response.data.data,
         );
-        this.updateTab(newFolderName, "name", explorer.id);
+        this.updateTab(explorer.id, {
+          name: newFolderName,
+        });
       }
     }
   };
@@ -1797,6 +1812,9 @@ export default class CollectionsViewModel {
       };
     }
     if (newRequestName) {
+      if (!(folder && "id" in folder)) {
+        folder = { id: "" };
+      }
       if (!folder.id) {
         let storage: any = request;
         storage.name = newRequestName;
@@ -1815,7 +1833,9 @@ export default class CollectionsViewModel {
             request.id,
             response.data.data,
           );
-          this.updateTab(newRequestName, "name", request.id);
+          this.updateTab(request.id, {
+            name: newRequestName,
+          });
         }
       } else if (collection.id && workspaceId && folder.id) {
         let storage = request;
@@ -1842,7 +1862,9 @@ export default class CollectionsViewModel {
             request.id,
             response.data.data,
           );
-          this.updateTab(newRequestName, "name", request.id);
+          this.updateTab(request.id, {
+            name: newRequestName,
+          });
         }
       }
     }
