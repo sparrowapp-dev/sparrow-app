@@ -15,7 +15,7 @@
   });
   userUnsubscribe();
   import Mock from "../Mock/Mock.svelte";
-  import Environment from "../Environment/Environment.svelte";
+  import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
 </script>
 
 <div class="dashboard vh-100">

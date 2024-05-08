@@ -9,7 +9,7 @@
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel.old";
   import Mock from "../Mock/Mock.svelte";
-  import Environment from "../Environment/Environment.svelte";
+  import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Teams from "../Teams/Teams.svelte";
   import {
     type ActiveSideBarTabDocument,
