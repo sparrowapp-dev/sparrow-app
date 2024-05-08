@@ -73,28 +73,28 @@
   {/if}
 </div>
 <div class="mb-2 d-flex align-items-center justify-content-between">
-  <div class="d-flex">
+  <div class="d-flex" style="font-size: 12px;">
     <Select
       id={"hash124"}
       data={[
         {
-          name: "None",
+          name: "NONE",
           id: RequestDataset.NONE,
         },
         {
-          name: "Form Data",
+          name: "FORM DATA",
           id: RequestDataset.FORMDATA,
         },
         {
-          name: "Encoded URL",
+          name: "ENCODED URL",
           id: RequestDataset.URLENCODED,
         },
         {
-          name: "Raw",
+          name: "RAW",
           id: RequestDataset.RAW,
         },
         {
-          name: "Binary",
+          name: "BINARY",
           id: RequestDataset.BINARY,
           disabled: true,
         },
@@ -112,6 +112,8 @@
       zIndex={200}
       checkIconColor={"var(--text-primary-200)"}
       menuItem={"v2"}
+      headerFontSize="12px"
+      headerFontWeight="400"
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}

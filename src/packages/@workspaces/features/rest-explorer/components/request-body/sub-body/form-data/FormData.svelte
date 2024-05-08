@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { TabularInput } from "@workspaces/common/components";
+  import { TabularInputFormData } from "@workspaces/common/components";
 
-  export let textValue;
-  export let fileValue;
+  export let keyValue;
   export let onUpdateRequestBody;
   export let environmentVariables;
   export let onUpdateEnvironment;
@@ -25,22 +24,19 @@
       },
     });
   };
+
+  const handleFormDataChange = (pairs) => {
+    onUpdateRequestBody({
+      formdata: pairs,
+    });
+  };
 </script>
 
 <section class="w-100" style="height: calc(100% - 120px); overflow-y: scroll;">
-  <p>Text</p>
-  <TabularInput
-    keyValue={textValue}
-    callback={handleFormDataTextChange}
+  <TabularInputFormData
+    {keyValue}
+    callback={handleFormDataChange}
     {environmentVariables}
     {onUpdateEnvironment}
-  />
-  <p>File</p>
-  <TabularInput
-    keyValue={fileValue}
-    callback={handleFormDataFileChange}
-    {environmentVariables}
-    {onUpdateEnvironment}
-    type="file"
   />
 </section>
