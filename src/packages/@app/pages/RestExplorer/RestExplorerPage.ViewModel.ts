@@ -1114,7 +1114,7 @@ class RestExplorerViewModel
       // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
-          return variable.key.length > 0 && variable.value.length > 0;
+          return variable.key.length > 0;
         }),
         {
           key: "",
@@ -1165,7 +1165,7 @@ class RestExplorerViewModel
       // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
-          return variable.key.length > 0 && variable.value.length > 0;
+          return variable.key.length > 0;
         }),
         {
           key: "",
