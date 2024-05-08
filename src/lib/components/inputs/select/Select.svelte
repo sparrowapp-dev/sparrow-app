@@ -374,10 +374,10 @@
           >
         {/if}
         <span
-          class={selectedRequest?.default
-            ? "text-textColor"
-            : getTextColor(selectedRequest?.color)}
-          style="font-weight: 500; font-size: 14px;"
+          class="text-fs-12 {selectedRequest?.default
+            ? 'text-textColor'
+            : getTextColor(selectedRequest?.color)}"
+          style="font-weight: 500;"
         >
           {selectedRequest?.name}
         </span>

@@ -153,7 +153,9 @@
     class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
   >
     <div
-      class="d-flex gap-3 py-1 align-items-center w-100 ps-2"
+      class="d-flex gap-3 py-1 align-items-center w-100 ps-2 {mode === 'READ'
+        ? 'd-none'
+        : ''}"
       style="height:26px;"
     >
       <div style="width:30px;">
