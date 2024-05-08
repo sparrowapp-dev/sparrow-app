@@ -166,7 +166,7 @@
         <img src={doubleangleLeft} alt="" class="filter-green" />
       </button>
     </div>
-    <div class="px-3 pt-2">
+    <div class="px-3 pt-2 d-none">
       <Select
         id="none"
         titleId={"none"}
@@ -247,11 +247,11 @@
             icon: CreateRequest,
             onclick: () => onItemCreated("request", {}),
           },
-          {
-            name: "Add Curl API",
-            icon: CreateRequest,
-            onclick: showImportCurlPopup,
-          },
+          // {
+          //   name: "Add Curl API",
+          //   icon: CreateRequest,
+          //   onclick: showImportCurlPopup,
+          // },
           {
             name: "Add Collection",
             icon: CreateCollection,

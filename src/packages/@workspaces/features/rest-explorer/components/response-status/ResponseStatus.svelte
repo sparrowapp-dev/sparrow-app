@@ -33,7 +33,6 @@
                   : "var(--request-delete)"}
               />
             </span>
-
             {response.status.split(" ")[0]}</span
           >
         </span>

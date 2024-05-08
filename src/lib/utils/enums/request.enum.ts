@@ -61,6 +61,7 @@ export enum RequestDataset {
   URLENCODED = "URL Encoded",
   RAW = "Raw",
   NONE = "None",
+  BINARY = "Binary",
 }
 
 export enum RequestSection {

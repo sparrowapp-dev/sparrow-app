@@ -92,6 +92,11 @@ import { sample, type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
+import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
+import {
+  insertCollectionRequest,
+  updateCollectionRequest,
+} from "$lib/services/collection";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -121,11 +126,25 @@ export default class CollectionsViewModel {
   };
 
   /**
+   *
+   * @param uuid - workspace id
+   * @returns workspace document
+   */
+  public readWorkspace = (uuid: string): Promise<WorkspaceDocument> => {
+    return this.workspaceRepository.readWorkspace(uuid);
+  };
+
+  /**
    * Syncs tabs with repository
    */
-  public syncTabWithStore = () => {
-    this.tabRepository.syncTabsWithStore(tabs);
-  };
+  // public syncTabWithStore = () => {
+  //   this.tabRepository.syncTabsWithStore(tabs);
+  // };
+
+  /**
+   * Prevent syncTabWithStore() to be called multiple times in 2 seconds
+   */
+  // debouncedTab = new Debounce().debounce(this.syncTabWithStore, 2000);
 
   /**
    * Return current tabs list of top tab bar component
@@ -197,20 +216,22 @@ export default class CollectionsViewModel {
     const tabList = this.tabs;
     /////////////////////////////////////////////////////////////////////
     let updatedTabList: TabDocument[] = [];
-    tabList.subscribe((value) => {
-      updatedTabList = value;
-    });
+    tabList
+      .subscribe((value) => {
+        updatedTabList = value;
+      })
+      .unsubscribe();
     const element = updatedTabList.splice(this.movedTabStartIndex, 1);
     updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
     updatedTabList = updatedTabList.map((tab, index) => {
-      tab.index = index;
+      tab.patch({
+        index: index,
+      });
       return tab;
     });
-    const newTabList: NewTab[] = updatedTabList as NewTab[];
-
-    // TODO - Update RxDB REPO using bulk upsert HERE (Remove these code)
-    tabs.set(newTabList);
-    /////////////////////////////////////////////////////////////////////
+    updatedTabList.sort((a, b) => {
+      return b.index - a.index;
+    });
   };
 
   /**
@@ -269,8 +290,8 @@ export default class CollectionsViewModel {
    * @param uuid
    * @returns
    */
-  private readCollection = (uuid: string): Promise<CollectionDocument> => {
-    return this.collectionRepository.readCollection(uuid);
+  public readCollection = async (uuid: string): Promise<CollectionDocument> => {
+    return await this.collectionRepository.readCollection(uuid);
   };
 
   /**
@@ -409,8 +430,8 @@ export default class CollectionsViewModel {
   public updateTab = async (_id: string, data: any) => {
     this.tabRepository
       .getTabList()
-      .subscribe((tabList) => {
-        tabList.forEach((tab) => {
+      .subscribe((tabs) => {
+        tabs.forEach((tab) => {
           if (tab.id === _id) {
             this.tabRepository.updateTab(tab.tabId, data);
           }
@@ -541,7 +562,7 @@ export default class CollectionsViewModel {
    * Handle create empty collection
    * @param workspaceId :string
    */
-  private handleCreateCollection = async (
+  public handleCreateCollection = async (
     workspaceId: string,
     collection: Observable<CollectionDocument[]>,
   ) => {
@@ -1500,7 +1521,7 @@ export default class CollectionsViewModel {
    * @param collection :CollectionDocument - the collection in which new folder is going to be created
    * @returns :void
    */
-  private handleCreateFolderInCollection = async (
+  public handleCreateFolderInCollection = async (
     workspaceId: string,
     collection: CollectionDocument,
   ): Promise<void> => {
@@ -1773,6 +1794,9 @@ export default class CollectionsViewModel {
       };
     }
     if (newRequestName) {
+      if (!(folder && "id" in folder)) {
+        folder = { id: "" };
+      }
       if (!folder.id) {
         let storage: any = request;
         storage.name = newRequestName;
@@ -2058,6 +2082,244 @@ export default class CollectionsViewModel {
   };
 
   /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param path - request stack path
+   * @param tabName - request name
+   * @param description - request description
+   * @param type - save over all request or description only
+   * @param componentData - tab data
+   */
+  public saveAsRequest = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    path: {
+      name: string;
+      id: string;
+      type: string;
+    }[],
+    tabName: string,
+    description: string,
+    type: string,
+    componentData,
+  ) => {
+    const saveType = {
+      SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
+    };
+    let userSource = {};
+    const _id = componentData.id;
+    if (path.length > 0) {
+      let existingRequest;
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        existingRequest = await this.readRequestOrFolderInCollection(
+          path[path.length - 1].id,
+          _id,
+        );
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        existingRequest = await this.readRequestInFolder(
+          path[0].id,
+          path[path.length - 1].id,
+          _id,
+        );
+      }
+      const randomRequest: TabDocument = new InitRequestTab(
+        "UNTRACKED-",
+        "UNTRACKED-",
+      ).getValue();
+      const request = !existingRequest
+        ? randomRequest.property.request
+        : existingRequest.request;
+      const expectedRequest = {
+        method:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.method
+            : componentData.property.request.method,
+        url:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.url
+            : componentData.property.request.url,
+        body:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.body
+            : componentData.property.request.body,
+        headers:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.headers
+            : componentData.property.request.headers,
+        queryParams:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.queryParams
+            : componentData.property.request.queryParams,
+        auth:
+          type === saveType.SAVE_DESCRIPTION
+            ? request.auth
+            : componentData.property.request.auth,
+      };
+      if (path[path.length - 1].type === ItemType.COLLECTION) {
+        /**
+         * handle request at collection level
+         */
+        const _collection = await this.readCollection(path[path.length - 1].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const res = await insertCollectionRequest({
+          collectionId: path[path.length - 1].id,
+          workspaceId: _workspaceMeta.id,
+          ...userSource,
+          items: {
+            name: tabName,
+            description,
+            type: ItemType.REQUEST,
+            request: expectedRequest,
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestOrFolderInCollection(
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          const expectedPath = {
+            folderId: "",
+            folderName: "",
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            /**
+             * Update existing request
+             */
+            // this.updateRequestName(res.data.data.name);
+            // this.updateRequestDescription(res.data.data.description);
+            // this.updateRequestPath(expectedPath);
+            // this.updateRequestId(res.data.data.id);
+            const progressiveTab = componentData.toMutableJSON();
+            progressiveTab.isSaved = true;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            /**
+             * Create new copy of the existing request
+             */
+            const initRequestTab = new InitRequestTab(
+              res.data.data.id,
+              "UNTRACKED-",
+            );
+            initRequestTab.updateName(res.data.data.name);
+            initRequestTab.updateDescription(res.data.data.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(res.data.data.request.url);
+            initRequestTab.updateMethod(res.data.data.request.method);
+            initRequestTab.updateBody(res.data.data.request.body);
+            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
+            initRequestTab.updateAuth(res.data.data.request.auth);
+            initRequestTab.updateHeaders(res.data.data.request.headers);
+
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      } else if (path[path.length - 1].type === ItemType.FOLDER) {
+        /**
+         * handle request at folder level
+         */
+        const _collection = await this.readCollection(path[0].id);
+        if (_collection?.activeSync) {
+          userSource = {
+            currentBranch: _collection?.currentBranch,
+            source: "USER",
+          };
+        }
+        const res = await insertCollectionRequest({
+          collectionId: path[0].id,
+          workspaceId: _workspaceMeta.id,
+          folderId: path[path.length - 1].id,
+          ...userSource,
+          items: {
+            name: path[path.length - 1].name,
+            type: ItemType.FOLDER,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: expectedRequest,
+            },
+          },
+        });
+        if (res.isSuccessful) {
+          this.collectionRepository.addRequestInFolder(
+            path[0].id,
+            path[path.length - 1].id,
+            res.data.data,
+          );
+          const expectedPath = {
+            folderId: path[path.length - 1].id,
+            folderName: path[path.length - 1].name,
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+          };
+          if (
+            !componentData.path.workspaceId ||
+            !componentData.path.collectionId
+          ) {
+            const progressiveTab = componentData.toMutableJSON();
+            progressiveTab.isSaved = true;
+            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+          } else {
+            const initRequestTab = new InitRequestTab(
+              res.data.data.id,
+              "UNTRACKED-",
+            );
+            initRequestTab.updateName(res.data.data.name);
+            initRequestTab.updateDescription(res.data.data.description);
+            initRequestTab.updatePath(expectedPath);
+            initRequestTab.updateUrl(res.data.data.request.url);
+            initRequestTab.updateMethod(res.data.data.request.method);
+            initRequestTab.updateBody(res.data.data.request.body);
+            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
+            initRequestTab.updateAuth(res.data.data.request.auth);
+            initRequestTab.updateHeaders(res.data.data.request.headers);
+            this.tabRepository.createTab(initRequestTab.getValue());
+            moveNavigation("right");
+          }
+          return {
+            status: "success",
+            message: res.message,
+            data: {
+              id: res.data.data.id,
+            },
+          };
+        } else {
+          return {
+            status: "error",
+            message: res.message,
+          };
+        }
+      }
+      MixpanelEvent(Events.SAVE_API_REQUEST);
+    }
+  };
+
+  /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
@@ -2193,5 +2455,9 @@ export default class CollectionsViewModel {
         );
         break;
     }
+  };
+
+  public handleOnChangeViewInRequest = async (view: string) => {
+    requestSplitterDirection.set(view);
   };
 }

@@ -18,7 +18,8 @@
   export let selectedRequest: {
     id: string;
   };
-  export let checkIcon: string;
+  export let CheckIcon: any;
+  export let checkIconColor: string;
   export let getTextColor: (color: any) => {};
 
   export let bodyTheme: string;
@@ -48,8 +49,16 @@
       return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
+    } else if (_bodyTheme === "grey" && _isMenuItemHover) {
+      return `select-hover-highlight-grey-btn`;
     } else {
       return "";
+    }
+  };
+
+  const extractBodyTextHighlight = (_bodyTheme: string, id: string) => {
+    if (_bodyTheme === "grey" && id === selectedRequest?.id) {
+      return `select-clicked-highlight-grey-btn-text`;
     }
   };
 </script>
@@ -74,7 +83,9 @@
   )}"
 >
   <p
-    class="m-0 p-0 {getTextColor(list?.color)} ellipsis"
+    class="m-0 p-0 {getTextColor(
+      list?.color,
+    )} ellipsis {extractBodyTextHighlight(bodyTheme, list.id)}"
     style="font-size: 12px;"
   >
     {list.name}<br />
@@ -83,7 +94,7 @@
     {/if}
   </p>
   {#if selectedRequest?.id === list.id}
-    <img src={checkIcon} alt="" />
+    <CheckIcon color={checkIconColor} />
   {/if}
 </div>
 
@@ -94,11 +105,17 @@
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
   }
+  .select-hover-highlight-grey-btn {
+    background-color: var(--dropdown-option-hover);
+  }
   .select-clicked-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
   .select-clicked-highlight-violet-btn {
     background-color: var(--bg-tertiary-700);
+  }
+  .select-clicked-highlight-grey-btn-text {
+    color: var(--text-primary-200) !important;
   }
   .highlight {
     cursor: pointer;

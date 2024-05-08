@@ -9,7 +9,7 @@
     ViewPlugin,
     MatchDecorator,
     Decoration,
-    placeholder,
+    placeholder as CreatePlaceHolder,
     hoverTooltip,
     type Tooltip,
   } from "@codemirror/view";
@@ -26,6 +26,9 @@
   export let codeMirrorEditorDiv: HTMLDivElement;
   export let filterData: AggregateEnvironment[];
   export let handleEnvironmentBox: (change: boolean, envKey: string) => void;
+  export let placeholder;
+  export let theme;
+  export let disabled;
   let localEnvKey = "";
 
   const ENVIRONMENT_REGEX = /({{[a-zA-Z0-9-_\s]+}})/g;
@@ -208,12 +211,13 @@
     let state = EditorState.create({
       doc: value,
       extensions: [
-        InputTheme,
+        theme,
         updateExtensionView,
         keyBinding,
         languageConf.of(javascriptLanguage),
+        EditorState.readOnly.of(disabled ? true : false),
         handleEventsRegister,
-        placeholder("Enter an URL"),
+        CreatePlaceHolder(placeholder),
         cursorTooltipField(filterData),
         wordHover,
       ],

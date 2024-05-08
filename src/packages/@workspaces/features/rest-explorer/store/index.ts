@@ -1,5 +1,1 @@
-export {
-  restLeftPanelWidth,
-  restRightPanelWidth,
-  restSplitterDirection,
-} from "./splitpanes";
+export { requestSplitterDirection } from "./splitpanes";

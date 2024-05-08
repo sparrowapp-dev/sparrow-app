@@ -34,8 +34,8 @@
   <div
     class="d-flex justify-content-center h-100 border-radius-2 overflow-hidden"
   >
-    <div
-      class="main-body py-1 px-3 h-100 {btnClass}"
+    <button
+      class="main-body py-1 px-3 h-100 border-0 {btnClass}"
       on:click={(e) => {
         if (!disable) {
           onClick(e);
@@ -51,8 +51,12 @@
           {title}
         </span>
       {/if}
-    </div>
-    <div class="main-body py-1 px-3 h-100 {btnClass}">
+    </button>
+    <div class="main-body py-1 px-2 h-100 {btnClass} position-relative">
+      <div
+        class="position-absolute start-0"
+        style="width: 1px; height: 64%; top: 17%; background-color: var(--save-button-line);"
+      />
       <span class={textClassProp} style={textStyleProp}> <ArrowIcon /> </span>
     </div>
   </div>
@@ -64,13 +68,13 @@
     border: 0px;
   }
   .main-body.custom-btn-default {
-    background-color: var(--bg-secondary-300);
+    background-color: var(--bg-primary-300);
     color: var(--white-color);
   }
   .main-body.custom-btn-default:hover {
-    background-color: var(--bg-secondary-250);
+    background-color: var(--bg-primary-250);
   }
   .main-body.custom-btn-default:active {
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-primary-500);
   }
 </style>
