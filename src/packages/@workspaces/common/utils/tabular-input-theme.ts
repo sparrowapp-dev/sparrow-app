@@ -5,17 +5,17 @@ export class TabularInputTheme {
   constructor() {
     this.theme = EditorView.theme({
       "&": {
-        height: "100%",
+        height: "18px",
         width: "100%",
         flex: "1",
         border: "1px solid transparent",
         borderRadius: "0",
-        fontSize: "80%",
+        fontSize: "12px",
       },
       ".cm-content": {
         caretColor: "var(--white-color)",
         height: "100%",
-        paddingTop: "4px",
+        padding: "0",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",

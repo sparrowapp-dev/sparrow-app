@@ -190,9 +190,9 @@
     width: 24px;
   }
   .icon-container:hover {
-    background-color: var(--dropdown-container);
+    background-color: var(--bg-secondary-550);
   }
   .icon-container:active {
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-secondary-600);
   }
 </style>

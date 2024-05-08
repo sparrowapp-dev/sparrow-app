@@ -85,6 +85,6 @@
 
 <style>
   .auth-input-container {
-    max-width: 600px;
+    max-width: 615px;
   }
 </style>

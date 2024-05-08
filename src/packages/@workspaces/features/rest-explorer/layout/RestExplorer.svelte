@@ -244,7 +244,12 @@
             class="position-relative "
           >
             <!-- Request Pane -->
-            <div class="h-100 position-relative pb-3">
+            <div
+              class="h-100 position-relative {$requestSplitterDirection ===
+              'horizontal'
+                ? 'pb-3'
+                : 'pe-3'}"
+            >
               <RequestNavigator
                 requestStateSection={$tab.property.request?.state
                   ?.requestNavigation}
@@ -305,7 +310,12 @@
             class="position-relative"
           >
             <!-- Response Pane -->
-            <div class="d-flex flex-column h-100 pt-3">
+            <div
+              class="d-flex flex-column h-100 {$requestSplitterDirection ===
+              'horizontal'
+                ? 'pt-3'
+                : 'ps-3'}"
+            >
               {#if $tab.property.request?.state?.isSendRequestInProgress}
                 <ResponseDefaultScreen />
                 <div

@@ -9,19 +9,23 @@ export class AuthInputTheme {
         flex: "1",
         border: "1px solid var(--bg-secondary-600)",
         borderRadius: "4px",
-        fontSize: "100%",
+        fontSize: "12px",
       },
       ".cm-content": {
         caretColor: "var(--white-color)",
         height: "100%",
         paddingTop: "8px",
         borderRadius: "4px",
-        backgroundColor: "var(--bg-secondary-600)",
+        backgroundColor: "var(--bg-secondary-550)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
         color: "var(--white-color)",
         zIndex: "1",
+      },
+      ".cm-line": {
+        paddingLeft: "10px",
+        paddingRight: "14px",
       },
       ".cm-panels.cm-panels-top": {
         borderBottom: "none",
@@ -54,14 +58,10 @@ export class AuthInputTheme {
       ".cm-activeLineGutter": {
         backgroundColor: "transparent",
       },
-      // ".cm-foldPlaceholder": {
-      //   color: "red",
-      //   fontSize: "12px",
-      //   fontWeight: "400",
-      // },
       ".cm-placeholder": {
         color: "var(--text-secondary-200)",
         fontSize: "12px",
+        fontWeight: 400,
       },
       "&.cm-editor.cm-focused": {
         border: "1px solid var(--border-primary-900)",

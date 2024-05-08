@@ -360,7 +360,7 @@
       class="select-btn
       {selectBackgroundClass} 
       {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
-      {borderRounded ? 'rounded' : ''}  
+      {borderRounded ? 'border-radius-2' : ''}  
       {selectBorderClass} 
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
       {isError ? selectErrorBorderClass : ''}
@@ -423,7 +423,7 @@
         <div class="position-relative">
           <input
             type="text"
-            class="inputField searchField rounded border-0 p-2 w-100 bg-backgroundDark"
+            class="inputField searchField border-radius-2 border-0 p-2 w-100 bg-backgroundDark"
             style="font-size: 12px; font-weight:500; padding-left:35px !important;"
             placeholder={searchText}
             bind:value={searchData}
