@@ -18,7 +18,6 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy } from "svelte";
-  import { handleFolderClick } from "$lib/utils/helpers/handle-clicks.helper";
   import requestIcon from "$lib/assets/create_request.svg";
   import angleRight from "$lib/assets/angleRight.svg";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
