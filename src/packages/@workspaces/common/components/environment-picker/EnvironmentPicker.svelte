@@ -103,9 +103,11 @@
               style="height:33px; width:33px;"
             >
               <div
-                class="h-100 w-100 d-flex align-items-center justify-content-center local-environment"
+                class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center local-environment"
               >
-                <span class={"text-secondary-100 text-fs-16"}>{mock.type}</span>
+                <span class={"text-secondary-100 fw-bold text-fs-16"}
+                  >{mock.type}</span
+                >
               </div>
             </div>
             <div
@@ -115,7 +117,7 @@
               <span class="text-fs-11 text-secondary-100 m-0 p-0 env-value"
                 >{mock.key}</span
               >
-              <p class="text-fs-11 text-secondary-300 m-0 p-0 env-value">
+              <p class="text-fs-9 text-secondary-300 m-0 p-0 env-value">
                 {mock.value}
               </p>
             </div>
@@ -148,16 +150,18 @@
             style="height:33px; width:33px;"
           >
             <div
-              class="h-100 w-100 d-flex align-items-center justify-content-center global-environment"
+              class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center global-environment"
             >
-              <span class={"text-secondary-100 text-fs-16"}>{mock.type}</span>
+              <span class={"text-secondary-100 fw-bold text-fs-16"}
+                >{mock.type}</span
+              >
             </div>
           </div>
           <div style="height: 33px;" class="p-0 d-flex flex-column w-100 ps-2">
             <span class="text-fs-11 text-secondary-100 m-0 p-0 env-value"
               >{mock.key}</span
             >
-            <p class="text-fs-11 text-secondary-300 m-0 p-0 env-value">
+            <p class="text-fs-9 text-secondary-300 m-0 p-0 env-value">
               {mock.value}
             </p>
           </div>
