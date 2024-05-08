@@ -247,11 +247,11 @@
             icon: CreateRequest,
             onclick: () => onItemCreated("request", {}),
           },
-          {
-            name: "Add Curl API",
-            icon: CreateRequest,
-            onclick: showImportCurlPopup,
-          },
+          // {
+          //   name: "Add Curl API",
+          //   icon: CreateRequest,
+          //   onclick: showImportCurlPopup,
+          // },
           {
             name: "Add Collection",
             icon: CreateCollection,

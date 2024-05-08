@@ -14,8 +14,8 @@
 
   // ---- Components
   import { RestExplorerPage } from "../";
-  import TabBar from "$lib/components/collections/tab-bar/TabBar.svelte";
   import {
+    TabBar,
     CollectionList,
     ImportCollection,
     ImportCurl,
@@ -43,6 +43,8 @@
     EnvironmentDocument,
     WorkspaceDocument,
   } from "$lib/database/app.database";
+  import { ModalWrapperV1 } from "$lib/components";
+  import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -61,6 +63,7 @@
   let loader = false;
   let currentEnvironment: Observable<EnvironmentDocument>;
   let splitter: HTMLElement | null;
+  let isExposeSaveAsRequest: boolean = false;
 
   /**
    * @description - handles different key press
@@ -113,7 +116,7 @@
       loader = false;
     } else {
       isPopupClosed = false;
-      saveAsVisibility = true;
+      isExposeSaveAsRequest = true;
     }
   };
 
@@ -201,6 +204,7 @@
       onDragStart={_viewModel.handleDropOnStart}
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
+      onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
     />
     <Route>
       {#if isAnimation}
@@ -250,6 +254,52 @@
     onItemImported={_viewModel.handleImportItem}
   />
 {/if}
+
+<ModalWrapperV1
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsRequest
+    onClick={(flag = false) => {
+      isExposeSaveAsRequest = flag;
+    }}
+    requestMethod={removeTab.property.request?.method}
+    requestUrl={removeTab.property.request?.url}
+    requestName={removeTab.name}
+    requestDescription={removeTab.description}
+    requestPath={removeTab.path}
+    collections={$collectionList}
+    readWorkspace={_viewModel.readWorkspace}
+    onSaveAsRequest={async (
+      _workspaceMeta,
+      path,
+      tabName,
+      description,
+      type,
+    ) => {
+      const res = await _viewModel.saveAsRequest(
+        _workspaceMeta,
+        path,
+        tabName,
+        description,
+        type,
+        removeTab,
+      );
+      if (res.status === "success") {
+        _viewModel.handleRemoveTab(removeTab.id);
+      }
+      return res;
+    }}
+    onCreateFolder={_viewModel.handleCreateFolderInCollection}
+    onCreateCollection={_viewModel.handleCreateCollection}
+  />
+</ModalWrapperV1>
 
 <style>
   :global(.splitter-sidebar.splitpanes) {

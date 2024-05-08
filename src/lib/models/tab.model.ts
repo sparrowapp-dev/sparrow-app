@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 6,
+  version: 7,
   properties: {
     tabId: {
       // ---- RxDocumentId

@@ -2,6 +2,7 @@
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
+  import SplitterButton from "../assets/icons/SplitterButton.svelte";
 
   // ---- Components
   import {
@@ -106,12 +107,12 @@
     );
     if (splitter && $requestSplitterDirection === "horizontal") {
       // horizontal view
-      splitter.style.height = "1px";
+      splitter.style.height = "2px";
       splitter.style.width = "100%";
     } else if (splitter) {
       // vertical view
       splitter.style.height = "100%";
-      splitter.style.width = "1px";
+      splitter.style.width = "2px";
     }
   };
 
@@ -414,5 +415,9 @@
   }
   :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
     background-color: var(--bg-secondary-800) !important;
+  }
+
+  :global(.splitter_custom) {
+    background-color: var(--dropdown-button) !important;
   }
 </style>

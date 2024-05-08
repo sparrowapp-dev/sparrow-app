@@ -132,13 +132,31 @@
     }}
   />
 
-  <div
-    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2"
-    role="button"
+  <!-- Switch pane layout button -->
+  <!-- <ToggleButton
+    selectedToggleId={splitterDirection}
+    toggleButtons={[
+      {
+        name: "",
+        id: "vertical",
+        icon: tableColumnIcon,
+      },
+      {
+        name: "",
+        id: "horizontal",
+        icon: barIcon,
+      },
+    ]}
+    on:click={(e) => {
+      onUpdateRequestState({ requestSplitterDirection: e.detail });
+    }}
+  /> -->
+  <button
+    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
     on:click={handleSaveRequest}
   >
     <DiskIcon height={20} width={20} />
-  </div>
+  </button>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
