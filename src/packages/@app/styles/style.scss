@@ -77,6 +77,10 @@ $sparrow-dropdown-hover: #5980DC;
 $sparrow-dropdown-container: #22232E;
 $sparrow-dropdown-option-hover: #2E2F3D;
 $sparrow-dropdown-option-active: #1C1D27;
+$sparrow-send-button-line: #D3D1D154;
+$sparrow-tab-request-default: #324035;
+$sparrow-tab-request-text-default: #4A4D4F;
+$sparrow-tab-unsave-icon: #CB4A4A;
 
 $theme-grey-ffffff:#ffffff;
 $theme-grey-e5e5e5:#e5e5e5;
@@ -182,6 +186,11 @@ $theme-red-312325:#312325;
   --dropdown-container: #{$sparrow-dropdown-container};
   --dropdown-option-hover: #{$sparrow-dropdown-option-hover};
   --dropdown-option-active: #{$sparrow-dropdown-option-active};
+  --save-button-line: #{$sparrow-send-button-line};
+  --tab-request-default: #{$sparrow-tab-request-default};
+  --tab-request-text-default: #{$sparrow-tab-request-text-default};
+  --tab-request-divider-line: #{$sparrow-key-value-pair};
+  --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
 
   //
   //
@@ -345,6 +354,7 @@ $theme-colors: map-merge(
     "dropdownContainer": $sparrow-dropdown-container,
     "dropdownOptionHover": $sparrow-dropdown-option-hover,
     "dropdownOptionActive": $sparrow-dropdown-option-active,
+    "saveButtonLine": $sparrow-send-button-line
   )
 );
 
