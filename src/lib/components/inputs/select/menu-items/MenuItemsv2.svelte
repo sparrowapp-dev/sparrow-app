@@ -40,6 +40,12 @@
     if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
       return `select-clicked-highlight-violet-btn`;
     } else if (
+      _bodyTheme === "grey" &&
+      _isMenuItemClicked &&
+      _isMenuItemHover
+    ) {
+      return `select-clicked-highlight-violet-btn`;
+    } else if (
       _bodyTheme === "dark" &&
       _isMenuItemClicked &&
       _isMenuItemHover
@@ -76,7 +82,7 @@
   on:mouseup={() => {
     isMenuItemClicked = false;
   }}
-  class="d-flex px-2 py-2 justify-content-between highlight rounded {extractHeaderHighlight(
+  class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 {extractHeaderHighlight(
     bodyTheme,
     isMenuItemHover,
     isMenuItemClicked,

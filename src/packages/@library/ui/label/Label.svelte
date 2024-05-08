@@ -5,8 +5,11 @@
   export let backgroundColor = "bg-secondary-500";
 </script>
 
-<div class="label {backgroundColor}" style="height: {size}; width: {size};">
-  <p class="mb-0 {textColor} sparrow-fs-8">{number}</p>
+<div
+  class="label d-flex align-items-center justify-content-center {backgroundColor}"
+  style="height: {size}; width: {size};"
+>
+  <p class="mb-0 {textColor} fw-bold sparrow-fs-8">{number}</p>
 </div>
 
 <style>

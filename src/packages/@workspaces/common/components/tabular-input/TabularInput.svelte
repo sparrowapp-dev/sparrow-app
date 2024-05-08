@@ -152,7 +152,12 @@
   <div
     class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
   >
-    <div class="d-flex gap-3 py-1 align-items-center w-100 ps-2">
+    <div
+      class="d-flex gap-3 py-1 align-items-center w-100 ps-2 {mode === 'READ'
+        ? 'd-none'
+        : ''}"
+      style="height:26px;"
+    >
       <div style="width:30px;">
         <input
           class="form-check-input"
@@ -189,7 +194,8 @@
             style="padding-top: 1px; background-color:backgroundColor;display: flex;flex-direction: column;width:100%;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 my-1"
+              class="d-flex w-100 align-items-center justify-content-center gap-3"
+              style="padding-top:3px; padding-bottom:3px; height:24px;"
             >
               <div style="width:30px;">
                 <input
@@ -244,7 +250,8 @@
             style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
           >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container py-1"
+              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
+              style="padding-top:3px; padding-bottom:3px; height:24px;"
             >
               <img
                 src={dragIcon}
