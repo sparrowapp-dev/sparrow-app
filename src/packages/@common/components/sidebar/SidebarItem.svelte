@@ -51,22 +51,22 @@
       getProps={({ isCurrent, isPartiallyCurrent }) => {
         isRouteActive = isCurrent || isPartiallyCurrent;
         return {
-          class: `d-flex flex-column py-2 text-decoration-none align-items-center ${
+          class: `d-flex flex-column text-decoration-none align-items-center justify-content-center ${
             item.disabled ? "disabled" : ""
           }`,
         };
       }}
     >
       <div class="d-flex" style="align-items: center;">
-        {#if isRouteActive && !isHovered}
+        {#if isRouteActive}
           <div
-            style="background-color: var(--nav-bar-active-slash); position:fixed; height: 16px; width: 2px; left:10px"
+            style="background-color: var(--nav-bar-active-slash); position:fixed; height: 38px; width: 2px; left: 5px;"
           ></div>
         {/if}
-        {#if isHovered && item.hoveredLogo && !item.disabled}
-          <img src={item.hoveredLogo} alt={item.heading} />
-        {:else if isRouteActive && item.selectedLogo}
+        {#if isRouteActive && item.selectedLogo}
           <img src={item.selectedLogo} alt={item.heading} />
+        {:else if isHovered && item.hoveredLogo && !item.disabled}
+          <img src={item.hoveredLogo} alt={item.heading} />
         {:else}
           <img src={item.defaultLogo} alt={item.heading} />
         {/if}
@@ -83,10 +83,14 @@
 
   .sidebar-item {
     position: relative;
-    padding-left: 12px; /* Initial padding */
-    padding-right: 12px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    isolation: isolate;
     transition:
       background-color 0.55s ease,
       padding 0.55s ease;
@@ -94,12 +98,16 @@
 
   .sidebar-item:hover {
     background-color: var(--nav-bar-hover-background);
-    border-radius: 8px;
+    border-radius: 4px;
     opacity: 0.9;
-    padding-left: 12px; /* Adds padding on hover */
-    padding-right: 12px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    isolation: isolate;
   }
 
   .sidebar-item :global(.active-link) {

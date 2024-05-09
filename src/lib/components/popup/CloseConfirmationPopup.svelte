@@ -12,7 +12,7 @@
 </script>
 
 <ModalWrapperV1
-  title={"Save Changes"}
+  title={"Save Changes?"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
