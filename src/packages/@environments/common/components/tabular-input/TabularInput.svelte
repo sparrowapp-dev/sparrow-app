@@ -1,52 +1,30 @@
 <script lang="ts">
-  import { SearchIcon, EditIcon } from "$lib/assets/app.asset";
-  import Crossicon from "$lib/assets/crossicon.svelte";
+  import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
-  import {
-    PERMISSION_NOT_FOUND_TEXT,
-    workspaceLevelPermissions,
-  } from "$lib/utils/constants/permissions.constant";
-  import type { WorkspaceRole } from "$lib/utils/enums";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  type Mode = "READ" | "WRITE";
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let keyValue: EnvValuePair[];
-  export let callback: (pairs: EnvValuePair[]) => void;
-  export let mode: Mode = "WRITE";
-  export let readable: { key: string; value: string } = {
-    key: "",
-    value: "",
-  };
-  let filterText: string = "";
-  let pairs: EnvValuePair[] = keyValue;
-  let filteredKeyValuePairs: EnvValuePair[] = pairs;
-  const updateFilteredKeyValuePairs = (pairs: EnvValuePair[]) => {
-    return (filteredKeyValuePairs = pairs.filter((elem, index) => {
-      if (
-        elem.key.includes(filterText) ||
-        elem.value.includes(filterText) ||
-        filterText == ""
-      )
-        return true;
-    }));
-  };
+  import editIcon from "@workspaces/features/rest-explorer/assets/icons/edit.svg";
+  import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
+  import attachFile from "@workspaces/features/rest-explorer/assets/icons/attachFile.svg";
+  import type {
+    KeyValuePair,
+    KeyValuePairWithBase,
+  } from "$lib/utils/interfaces/request.interface";
+  import type { KeyValueChecked } from "@common/types/rest-explorer";
+
+  export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
+  export let callback: (pairs: KeyValuePair[]) => void;
+  let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
+
   $: {
     if (keyValue) {
+      pairs = [];
       pairs = keyValue;
-      updateFilteredKeyValuePairs(pairs);
-      let flag: boolean = false;
+
+      let flag: boolean = true;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === false) {
-          flag = true;
+        if (pairs[i].checked === true) {
+          flag = false;
         }
-      }
-      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = true;
       }
       if (flag) {
         controller = false;
@@ -63,17 +41,24 @@
       }
     });
     pairs = pairs;
-    if (pairs.length - 1 === index) {
-      pairs.push({ key: "", value: "", checked: false });
+    if (
+      pairs.length - 1 === index &&
+      (pairs[index].key !== "" || pairs[index].value !== "")
+    ) {
+      pairs.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
       pairs = pairs;
     }
     callback(pairs);
-    updateFilteredKeyValuePairs(pairs);
   };
+
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
-        if (i != index) {
+        if (i !== index) {
           return true;
         }
         return false;
@@ -81,8 +66,8 @@
       pairs = filteredKeyValue;
     }
     callback(pairs);
-    updateFilteredKeyValuePairs(pairs);
   };
+
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i === index) {
@@ -92,8 +77,8 @@
     });
     pairs = filteredKeyValue;
     callback(pairs);
-    updateFilteredKeyValuePairs(pairs);
   };
+
   const handleCheckAll = (): void => {
     let flag: boolean;
     if (controller === true) {
@@ -104,153 +89,126 @@
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i !== pairs.length - 1) {
         elem.checked = flag;
-      } else if (mode === "READ") {
-        elem.checked = flag;
       }
       return elem;
     });
     pairs = filteredKeyValue;
     callback(pairs);
-    updateFilteredKeyValuePairs(pairs);
-  };
-  const handleFilterTextChange = (e) => {
-    filterText = e.target.value;
-    updateFilteredKeyValuePairs(pairs);
-  };
-  const handleEraseSearch = () => {
-    filterText = "";
-    updateFilteredKeyValuePairs(pairs);
-    document.getElementById("search-input").focus();
   };
 </script>
 
-<div class="me-0">
-  <div class={`d-flex search-input-container rounded py-2 px-2 mb-4`}>
-    <SearchIcon width={14} height={14} classProp={`my-auto me-3`} />
-    <input
-      type="text"
-      id="search-input"
-      class={`bg-transparent w-100 border-0 my-auto`}
-      placeholder="Search environment variables"
-      bind:value={filterText}
-      on:input={(e) => handleFilterTextChange(e)}
-      on:click={() => MixpanelEvent(Events.SEARCH_ENVIRONMENT_VARIABLES)}
-    />
-    {#if filterText !== ""}
-      <button class="border-0 bg-transparent ms-2" on:click={handleEraseSearch}>
-        <Crossicon color="#45494D" />
-      </button>
-    {/if}
-  </div>
-  <div class="d-flex gap-4 py-1" style="height: 26px;">
-    <div
-      class="form-check-input-container"
-      style="width:27.5px; margin-top: -3px;"
-    >
-      <input
-        class="form-check-input"
-        type="checkbox"
-        on:input={handleCheckAll}
-        bind:checked={controller}
-      />
+<div
+  class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
+>
+  <div class="d-flex gap-3 align-items-center w-100" style="height: 26px;">
+    <div style="width:30px; margin-left: 0px;">
+      <label class="container">
+        <input
+          type="checkbox"
+          bind:checked={controller}
+          on:input={handleCheckAll}
+        />
+        <span class="checkmark"></span>
+      </label>
     </div>
     <div
-      class="d-flex pe-5 text-requestBodyColor align-items-center w-100"
-      style="font-size: 12px; font-weight: 500; "
+      class="d-flex pair-title bg-secondary-700 align-items-center w-100"
+      style="font-size: 12px; font-weight: 500;"
     >
-      <p class="flex-grow-1 w-100 text-fs-12 ps-2 mb-0">Variable</p>
-      <p class="flex-grow-1 w-100 text-fs-12 ps-2 mb-0">Value</p>
+      <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0"
+        style="margin-left: 7px;"
+      >
+        Variable
+      </p>
+      <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-3"
+        style="margin-left: 28px;"
+      >
+        Value
+      </p>
+    </div>
+    <div class="pe-1 d-flex gap-2">
+      <button class="bg-transparent border-0 d-flex" style="">
+        <p
+          class="text-nowrap text-primary-300 mb-0 me-2"
+          style="font-size: 10px;"
+        >
+          Bulk Edit
+        </p>
+        <img
+          class="my-auto"
+          src={editIcon}
+          alt="Edit Icon"
+          style="height: 10px; width: 10px;"
+        />
+      </button>
+      <button class="bg-transparent border-0 d-flex" style="">
+        <img
+          class="my-auto"
+          src={moreOptions}
+          alt="Edit Icon"
+          style="height: 10px; width: 10px;"
+        />
+      </button>
     </div>
   </div>
 
-  <div
-    class="w-100 env-var-container sparrow-thin-scrollbar"
-    style="display:block;
-          "
-  >
-    {#if filteredKeyValuePairs.length > 0}
-      {#each filteredKeyValuePairs as element, index}
-        <div
-          aria-label="Toggle Hover"
-          class="sortable > div"
-          style="cursor:default; "
-          data-list-key={JSON.stringify({
-            name: element.key,
-            description: element.value,
-            checked: element.checked,
-          })}
-        >
-          <div style="display: flex;flex-direction: column;width:100%;">
+  <div class="w-100" style="display:block; position:relative;">
+    {#if pairs}
+      {#each pairs as element, index}
+        <div aria-label="Toggle Hover" style=" width:100%;">
+          <div
+            style="padding-top: 1px;  display: flex;flex-direction: column;width:100%; height:24px;"
+          >
             <div
-              class="d-flex w-100 align-items-center justify-content-center gap-3 mb-2"
+              class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
             >
-              <div class="form-check-input-container" style="width:30px; ">
-                {#if filteredKeyValuePairs.length - 1 != index || mode === "READ"}
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    bind:checked={element.checked}
-                    on:input={() => {
-                      updateCheck(index);
-                    }}
-                  />
+              <div style="width:30px;">
+                {#if pairs.length - 1 != index}
+                  <label class="container">
+                    <input
+                      type="checkbox"
+                      bind:checked={element.checked}
+                      on:input={() => {
+                        updateCheck(index);
+                      }}
+                    />
+                    <span class="checkmark"></span>
+                  </label>
                 {/if}
               </div>
-              <div class="w-100 d-flex gap-2">
-                <div class="flex-grow-1 w-100">
-                  <div
-                    class="bg-keyValuePairColor input-container d-flex rounded"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Enter Variable"
-                      class="form-control py-1"
-                      style="font-size: 13px;"
-                      disabled={!hasWorkpaceLevelPermission(
-                        loggedUserRoleInWorkspace,
-                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                      )}
-                      bind:value={element.key}
-                      on:input={(e) => {
-                        updateParam(index);
-                      }}
-                    />
-                    <div class="me-2 my-auto edit-icon">
-                      <EditIcon />
-                    </div>
-                  </div>
+
+              <div class=" d-flex gap-0" style="width:calc(100%)">
+                <div class="w-50 position-relative">
+                  <input
+                    type="text"
+                    bind:value={element.key}
+                    on:input={() => {
+                      updateParam(index);
+                    }}
+                    placeholder="Variable"
+                    class="w-100 text-fs-12"
+                  />
                 </div>
-                <div class="flex-grow-1 w-100">
-                  <div class="bg-keyValuePairColor d-flex rounded">
-                    <input
-                      type="text"
-                      placeholder="Enter Value"
-                      class="form-control py-1"
-                      style="font-size: 13px;"
-                      disabled={!hasWorkpaceLevelPermission(
-                        loggedUserRoleInWorkspace,
-                        workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                      )}
-                      bind:value={element.value}
-                      on:input={() => {
-                        updateParam(index);
-                      }}
-                    />
-                    <div class="me-2 my-auto edit-icon">
-                      <EditIcon />
-                    </div>
-                  </div>
+
+                <div class="w-50 position-relative">
+                  <input
+                    type="text"
+                    bind:value={element.value}
+                    on:input={() => {
+                      updateParam(index);
+                    }}
+                    placeholder={"Value"}
+                    class="w-100 text-fs-12"
+                  />
                 </div>
               </div>
-              {#if filteredKeyValuePairs.length - 1 != index}
-                <div class="h-75 pe-1 d-flex">
+              {#if pairs.length - 1 != index}
+                <div class="h-75 pe-1">
                   <button
-                    class="border-0 delete-btn pb-1 rounded"
-                    style="width:30px;"
-                    disabled={!hasWorkpaceLevelPermission(
-                      loggedUserRoleInWorkspace,
-                      workspaceLevelPermissions.EDIT_ENVIRONMENT,
-                    )}
+                    class="bg-secondary-700 border-0"
+                    style="width:20px;"
                     on:click={() => {
                       deleteParam(index);
                     }}
@@ -259,10 +217,10 @@
                   </button>
                 </div>
               {:else}
-                <div class="h-75 pe-1 d-flex">
+                <div class="h-75 pe-1">
                   <button
                     class="bg-backgroundColor border-0"
-                    style="width:30px;"
+                    style="width:20px;"
                   />
                 </div>
               {/if}
@@ -270,87 +228,100 @@
           </div>
         </div>
       {/each}
-    {:else}
-      <span class="p-2" style="color: #8A9299; font-size: 12px;"
-        >No such variable found in this environment. Please check the spelling.</span
-      >
     {/if}
   </div>
 </div>
 
 <style>
-  .search-input-container {
-    border: 1px solid var(--border-color);
-    background: var(--background-color);
-    max-width: 400px;
-    font-size: 12px;
+  .pair-container:nth-child(odd) {
+    margin-top: -1px;
   }
-  .search-input-container > input:focus {
-    outline: none;
-    caret-color: var(--workspace-hover-color);
-  }
-  .search-input-container:focus-within {
-    border: 1px solid var(--workspace-hover-color);
-  }
-  .search-input-container:focus-within svg {
-    visibility: hidden;
-  }
-  .form-check-input {
-    border-radius: 2px;
-    margin: auto;
+  .section-layout {
+    border-top: 1px solid var(--border-secondary-500);
+    border-bottom: 1px solid var(--border-secondary-500);
   }
 
-  .form-check-input:checked {
-    background-color: #0982d7;
+  /* The container */
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
-  .env-var-container {
-    overflow-y: auto;
-    height: 68vh;
-  }
-
-  .delete-btn {
-    background: transparent;
-  }
-  .delete-btn:hover {
-    background: var(--border-color);
-  }
-  .delete-btn:active {
-    background: var(--workspace-hover-color);
-  }
-
-  .edit-icon {
+  /* Hide the browser's default checkbox */
+  .container input {
+    position: absolute;
     opacity: 0;
-  }
-  .bg-keyValuePairColor:hover .edit-icon {
-    opacity: 1;
-  }
-
-  .bg-keyValuePairColor > input:focus {
-    box-shadow: none;
-  }
-
-  .bg-keyValuePairColor,
-  .bg-keyValuePairColor > input {
-    caret-color: #85c2ff;
-    background-color: var(--keyvalue-pair);
-    border: 1px solid transparent;
-  }
-
-  .bg-keyValuePairColor:focus-within {
-    border: 1px solid var(--workspace-hover-color);
-  }
-  .form-check-input-container:hover {
-    background-color: var(--keyvalue-pair);
-  }
-  .form-check-input-container {
-    height: 25px;
+    cursor: pointer;
+    height: 0;
+    width: 0;
     background-color: transparent;
-    padding: 5px 0px;
+    border: 2px solid var(--text-secondary-500);
   }
-  .form-check-input {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 14px;
+    width: 14px;
+    border-radius: 3px;
+    background-color: transparent;
+    border: 2px solid var(--text-secondary-500);
+  }
+
+  /* On mouse-over, add a grey background color */
+  /* .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  } */
+
+  /* When the checkbox is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    border: none;
+    background-color: var(--text-primary-200);
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .container .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--text-secondary-800);
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  input[type="text"] {
+    background-color: transparent;
+    border: 0;
+    outline: none;
+    height: 18px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  input[type="text"]:focus {
+    background-color: var(--bg-secondary-550);
   }
 </style>

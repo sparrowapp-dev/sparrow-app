@@ -319,7 +319,7 @@
 
 <style>
   :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 72px) !important;
+    width: calc(100vw - 54px) !important;
   }
   :global(.splitpanes__splitter) {
     width: 1px;
