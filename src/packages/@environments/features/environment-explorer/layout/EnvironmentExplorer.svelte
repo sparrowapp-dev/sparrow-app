@@ -1,6 +1,5 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
-  import EnvValue from "$lib/components/env-value/EnvValue.svelte";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { QuickHelp } from "../components";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -16,6 +15,7 @@
   export let onUpdateVariable;
   export let onSaveEnvironment;
   import { userWorkspaceLevelRole } from "$lib/store";
+  import { TabularInput } from "@environments/common/components";
 
   let quickHelp: boolean = false;
 
@@ -90,7 +90,7 @@
         </div>
       </header>
       <section class={`var-value-container`}>
-        <EnvValue
+        <TabularInput
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
           keyValue={$currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
@@ -111,11 +111,11 @@
 
 <style lang="scss">
   .env-panel {
-    background-color: var(--background-color);
+    background-color: var(--bg-secondary-800);
     height: calc(100vh - 44px);
   }
   .env-header {
-    margin-bottom: 24px;
+    padding: 20px 0px 10px 6px;
   }
   .env-heading {
     font-size: 18px;
@@ -175,7 +175,7 @@
     overflow-y: auto;
   }
   .env-parent {
-    padding: 3vw;
+    padding: 10px;
   }
   .quick-help-active {
     width: calc(100% - 280px) !important;

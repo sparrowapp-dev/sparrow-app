@@ -3,9 +3,6 @@
   import { SelectIcon } from "$lib/assets/app.asset";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import type { EnvironmentRepositoryMethods } from "$lib/utils/interfaces/environment.interface";
-  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
@@ -194,7 +191,7 @@
 <div class="environment-tab">
   <button
     style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env?.id ===
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env?.id ===
     currentEnvironment?.id
       ? 'active-collection-tab'
       : ''}"
@@ -239,7 +236,7 @@
             }
           }}
         >
-          <p class="ellipsis w-100 mb-0" style="font-size: 12px;">
+          <p class="ellipsis w-100 mb-0 text-fs-14">
             {env.name}
           </p>
         </div>
@@ -252,6 +249,7 @@
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
+        style="transform: rotate(90deg);"
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -290,15 +288,13 @@
     }
 
     .btn-primary {
-      background-color: var(--background-color);
+      background-color: transparent;
       color: var(--white-color);
       padding-right: 5px;
-      border-radius: 8px;
     }
 
     .btn-primary:hover {
-      background-color: var(--border-color);
-      color: var(--white-color);
+      // background-color: var(--border-color);
     }
 
     .navbar {
@@ -345,7 +341,7 @@
       width: calc(100% - 24px);
     }
     .active-collection-tab {
-      background-color: var(--selected-active-sidebar) !important;
+      background-color: var(--bg-tertiary-600) !important;
     }
     .collection-title {
       width: calc(100% - 30px);

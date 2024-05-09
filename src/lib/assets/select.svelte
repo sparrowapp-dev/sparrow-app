@@ -2,8 +2,8 @@
   export let width: number = 24,
     height: number = 24,
     classProp: string = "",
-    color: string = "#85C2FF",
-    selectedColor: string = "#8A9299",
+    color: string = "#3670F7",
+    selectedColor: string = "#3670F7",
     selected: boolean = false;
 </script>
 
@@ -54,10 +54,5 @@
 <style>
   .select-icon {
     padding: 3px;
-  }
-  .select-icon:hover {
-    padding: 3px;
-    border-radius: 50%;
-    border: 2px solid #85c2ff;
   }
 </style>

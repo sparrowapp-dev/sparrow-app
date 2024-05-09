@@ -77,13 +77,13 @@
   });
 </script>
 
-<div class={`env-sidebar p-3`} style={``}>
+<div class={`env-sidebar bg-secondary-900 p-3`} style={``}>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
     <h1
-      class={`fw-normal lh-1 curr-workspace my-auto ellipsis`}
-      style={`font-size: 18px; text-color: #FFF;`}
+      class={`fw-normal text-fs-16 lh-1 curr-workspace my-auto ellipsis`}
+      style={`text-color: #FFF;`}
     >
       {currentWorkspace?.name || ""}
     </h1>
@@ -117,7 +117,8 @@
   {:else}
     {#if globalEnvironment && globalEnvironment.length > 0}
       <p
-        class={`fw-normal env-item rounded my-2 ${
+        role="button"
+        class={`fw-normal env-item text-fs-14 rounded my-2 ${
           globalEnvironment[0]?.id === currentEnvironment?.id && "active"
         }`}
         on:click={() => {
@@ -157,8 +158,9 @@
       </div>
     {/if}
     <ul class={`env-side-tab-list p-0`}>
+      <p class="fw-normal text-fs-14 rounded my-2">Environment Variables</p>
       {#if localEnvironment && localEnvironment.length > 0}
-        <List height={"calc(100vh - 180px)"} classProps={"py-2"}>
+        <List height={"calc(100vh - 180px)"} classProps={"pb-2"}>
           {#each localEnvironment as env}
             <ListItem
               {env}
@@ -170,6 +172,13 @@
               {onSelectEnvironment}
             />
           {/each}
+          <p
+            class="fw-normal text-fs-14 m-2"
+            role="button"
+            on:click={onCreateEnvironment(localEnvironment)}
+          >
+            + Add Environment
+          </p>
         </List>
       {/if}
     </ul>
@@ -200,7 +209,6 @@
     background-color: #232527;
   }
   .env-sidebar {
-    background-color: var(--background-color);
     height: calc(100vh - 44px);
   }
   .curr-workspace {
@@ -228,14 +236,12 @@
   }
   .env-item {
     padding: 6px 6px 6px 12px;
-    font-size: 14px;
-    cursor: pointer;
   }
   .env-item:hover {
-    background: var(--border-color);
+    // background: var(--border-color);
   }
   .env-item.active {
-    background: var(--selected-active-sidebar);
+    background-color: var(--bg-tertiary-600);
   }
   .env-side-tab-list {
     list-style: none;
