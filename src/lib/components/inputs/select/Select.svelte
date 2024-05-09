@@ -117,6 +117,10 @@
   export let icon = GitBranchIcon;
   export let checkIconColor = "white";
 
+  export let headerFontSize: string = "14px";
+
+  export let headerFontWeight: number = 500;
+
   let selectWrapper: HTMLElement;
 
   const Icon = icon;
@@ -374,10 +378,10 @@
           >
         {/if}
         <span
-          class="text-fs-12 {selectedRequest?.default
-            ? 'text-textColor'
-            : getTextColor(selectedRequest?.color)}"
-          style="font-weight: 500;"
+          class={selectedRequest?.default
+            ? "text-textColor"
+            : getTextColor(selectedRequest?.color)}
+          style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
         >
           {selectedRequest?.name}
         </span>

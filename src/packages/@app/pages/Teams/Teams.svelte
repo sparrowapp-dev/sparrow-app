@@ -616,7 +616,7 @@
     font-weight: 400;
     line-height: 150%;
   }
-  :global(.splitpanes) {
+  :global(.splitter-sidebar.splitpanes) {
     width: calc(100vw - 72px);
   }
 </style>

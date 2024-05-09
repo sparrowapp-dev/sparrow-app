@@ -46,23 +46,15 @@ class InitRequestTab {
                 checked: false,
               },
             ],
-            formdata: {
-              text: [
-                {
-                  key: "",
-                  value: "",
-                  checked: false,
-                },
-              ],
-              file: [
-                {
-                  key: "",
-                  value: "",
-                  checked: false,
-                  base: "",
-                },
-              ],
-            },
+            formdata: [
+              {
+                key: "",
+                value: "",
+                base: "",
+                checked: false,
+                type: "text",
+              },
+            ],
           },
           url: "",
           headers: [
