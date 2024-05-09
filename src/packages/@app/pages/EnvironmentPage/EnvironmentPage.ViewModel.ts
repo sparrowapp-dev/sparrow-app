@@ -297,7 +297,6 @@ export class EnvironmentViewModel {
   };
 
   public onSelectEnvironment = async (env) => {
-    // debugger;
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );

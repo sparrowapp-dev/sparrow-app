@@ -39,23 +39,6 @@ export class EnvironmentRepository {
     });
   };
 
-  /**
-   * @description
-   * updates existing environment.
-   */
-  public updateEnvironment2 = async (uuid: string, data) => {
-    const environment = await RxDB.getInstance()
-      .rxdb.environment.findOne({
-        selector: {
-          id: uuid,
-        },
-      })
-      .exec();
-    environment.incrementalModify((value) => {
-      return { ...value, ...data };
-    });
-  };
-
   public removeEnvironment = async (environentId: string) => {
     const environment = await RxDB.getInstance()
       .rxdb.environment.findOne({

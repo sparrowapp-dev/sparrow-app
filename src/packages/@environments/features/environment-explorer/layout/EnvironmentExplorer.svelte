@@ -1,18 +1,9 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import EnvValue from "$lib/components/env-value/EnvValue.svelte";
-  import type {
-    EnvironmentRepositoryMethods,
-    EnvironmentServiceMethods,
-  } from "$lib/utils/interfaces/environment.interface";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
   import { QuickHelp } from "../components";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
-  import type { WorkspaceRole } from "$lib/utils/enums";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -20,102 +11,35 @@
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
-  export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
-  export let environmentServiceMethods: EnvironmentServiceMethods;
   export let currentEnvironment;
-  export let activeWorkspace;
-  export let loggedUserRoleInWorkspace: WorkspaceRole;
+  export let onUpdateName;
+  export let onUpdateVariable;
+  export let onSaveEnvironment;
+  import { userWorkspaceLevelRole } from "$lib/store";
 
   let quickHelp: boolean = false;
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
-    environmentRepositoryMethods.setEnvironmentTabProperty(
-      e.target.value,
-      "name",
-      currentEnvironment.id,
-    );
+    onUpdateName(e.target.value);
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    environmentRepositoryMethods.setEnvironmentTabProperty(
-      pairs,
-      "variable",
-      currentEnvironment.id,
-    );
-  };
-
-  const handleSaveEnvironment = async () => {
-    await environmentRepositoryMethods.setEnvironmentTabProperty(
-      true,
-      "isSaveInProgress",
-      currentEnvironment.id,
-    );
-    const response = await environmentServiceMethods.updateEnvironment(
-      activeWorkspace._id,
-      currentEnvironment.id,
-      {
-        name: currentEnvironment.name,
-        variable: currentEnvironment.variable,
-      },
-    );
-    if (response.isSuccessful) {
-      environmentRepositoryMethods.updateEnvironment(
-        response.data.data._id,
-        response.data.data,
-      );
-      await environmentRepositoryMethods.setEnvironmentTabProperty(
-        false,
-        "isSaveInProgress",
-        currentEnvironment.id,
-      );
-      environmentRepositoryMethods.setEnvironmentTabProperty(
-        true,
-        "isSave",
-        currentEnvironment.id,
-      );
-      notifications.success(
-        `Changes saved for ${currentEnvironment.name} environment.`,
-      );
-    } else {
-      await environmentRepositoryMethods.setEnvironmentTabProperty(
-        false,
-        "isSaveInProgress",
-        currentEnvironment.id,
-      );
-      if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error(
-          `Failed to save changes for ${currentEnvironment.name} environment.`,
-        );
-      }
-    }
-    if (currentEnvironment.type === environmentType.GLOBAL) {
-      MixpanelEvent(Events.SAVE_GLOBAL_ENVIRONMENT_VARIABLES, {
-        environmentName: currentEnvironment.name,
-        environmanetId: currentEnvironment.id,
-      });
-    } else {
-      MixpanelEvent(Events.SAVE_LOCAL_ENVIRONMENT_VARIABLES, {
-        environmentName: currentEnvironment.name,
-        environmanetId: currentEnvironment.id,
-      });
-    }
+    onUpdateVariable(pairs);
   };
 </script>
 
-{#if currentEnvironment}
+{#if $currentEnvironment?.environmentId}
   <div class={`env-panel d-flex`}>
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
       <header class={`env-header justify-content-between d-flex`}>
         <input
           type="text"
           class={`env-heading ellipsis fw-normal px-2 border-0`}
-          value={currentEnvironment?.name}
-          on:change={(e) => handleCurrentEnvironmentNameChange(e)}
-          disabled={currentEnvironment?.type == "GLOBAL"}
+          value={$currentEnvironment?.name}
+          on:input={(e) => handleCurrentEnvironmentNameChange(e)}
+          disabled={$currentEnvironment?.type == "GLOBAL"}
         />
         <div class={`d-flex env-btn-container`}>
           <button
@@ -130,22 +54,22 @@
           <Tooltip
             title={PERMISSION_NOT_FOUND_TEXT}
             show={!hasWorkpaceLevelPermission(
-              loggedUserRoleInWorkspace,
+              $userWorkspaceLevelRole,
               workspaceLevelPermissions.ADD_ENVIRONMENT,
             )}
           >
             <button
-              disabled={currentEnvironment.isSaveInProgress ||
+              disabled={$currentEnvironment.isSaveInProgress ||
                 !hasWorkpaceLevelPermission(
-                  loggedUserRoleInWorkspace,
+                  $userWorkspaceLevelRole,
                   workspaceLevelPermissions.ADD_ENVIRONMENT,
                 )}
               class="d-flex border-0 rounded env-save-btn env-save-btn-enabled d-flex align-items-center"
-              on:click={handleSaveEnvironment}
+              on:click={onSaveEnvironment}
             >
               <div class="badge"></div>
 
-              {#if currentEnvironment.isSaveInProgress}
+              {#if $currentEnvironment.isSaveInProgress}
                 <span style="padding-right: 10px;">
                   <Spinner size={`${12}px`} />
                 </span>
@@ -158,7 +82,7 @@
               {/if}
 
               <span>Save</span>
-              <span class={`${!currentEnvironment.isSave && "badge"}`}
+              <span class={`${!$currentEnvironment.isSave && "badge"}`}
                 >{" "}</span
               >
             </button>
@@ -167,8 +91,8 @@
       </header>
       <section class={`var-value-container`}>
         <EnvValue
-          {loggedUserRoleInWorkspace}
-          keyValue={currentEnvironment.variable}
+          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          keyValue={$currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
         />
       </section>

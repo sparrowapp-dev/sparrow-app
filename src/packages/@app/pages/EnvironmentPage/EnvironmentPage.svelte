@@ -124,7 +124,7 @@
 </Splitpanes>
 
 <style>
-  :global(.splitpanes) {
+  :global(.splitter-sidebar.splitpanes) {
     width: calc(100vw - 72px);
   }
 </style>

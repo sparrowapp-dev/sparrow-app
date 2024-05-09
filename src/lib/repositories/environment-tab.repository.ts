@@ -99,6 +99,23 @@ export class EnvironmentTabRepository {
   };
 
   /**
+   * @description
+   * updates existing environment.
+   */
+  public updateEnvironmentTab = async (uuid: string, data) => {
+    const environment = await RxDB.getInstance()
+      .rxdb.environmenttab.findOne({
+        selector: {
+          id: uuid,
+        },
+      })
+      .exec();
+    environment.incrementalModify((value) => {
+      return { ...value, ...data };
+    });
+  };
+
+  /**
    * Extracts an active environment tab.
    */
   public getActiveEnvironmentTab = async (

@@ -5,6 +5,9 @@
   const _viewModel = new EnvironmentExplorerViewModel(tab);
 </script>
 
-{tab.name}
-
-<!-- <EnvironmentExplorer bind:tab={_viewModel.tab} /> -->
+<EnvironmentExplorer
+  bind:currentEnvironment={_viewModel.tab}
+  onUpdateName={_viewModel.updateName}
+  onUpdateVariable={_viewModel.updateVariables}
+  onSaveEnvironment={_viewModel.saveEnvironment}
+/>
