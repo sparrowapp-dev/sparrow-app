@@ -725,7 +725,7 @@ class RestExplorerViewModel
       expectedRequest = {
         method: componentData.property.request.method,
         url: componentData.property.request.url,
-        body: componentData.property.request.body.formdata,
+        body: componentData.property.request.body,
         headers: componentData.property.request.headers,
         queryParams: componentData.property.request.queryParams,
         auth: componentData.property.request.auth,
