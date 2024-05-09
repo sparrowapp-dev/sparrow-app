@@ -94,6 +94,9 @@ export interface BaseWrapper {
 export interface RawWrapper {
   raw: string;
 }
+export interface TypeWrapper {
+  type: string;
+}
 export interface RequestBodyLanguageWrapper {
   requestBodyLanguage: RequestDataTypeEnum;
 }
@@ -208,9 +211,14 @@ export interface TextWrapper {
 export interface FileWrapper {
   file: KeyValueCheckedWithBase[];
 }
-export interface FormData extends TextWrapper, FileWrapper {}
+export interface FormData
+  extends KeyWrapper,
+    ValueWrapper,
+    BaseWrapper,
+    CheckedWrapper,
+    TypeWrapper {}
 export interface FormDataWrapper {
-  formdata: FormData;
+  formdata: FormData[];
 }
 export interface Body extends RawWrapper, UrlEncodedWrapper, FormDataWrapper {}
 
