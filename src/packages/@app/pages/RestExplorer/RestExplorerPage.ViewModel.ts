@@ -445,7 +445,7 @@ class RestExplorerViewModel
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      environmentVariables.filtered,
+      environmentVariables.filtered || [],
     );
     makeHttpRequestV2(...decodeData)
       .then((response) => {

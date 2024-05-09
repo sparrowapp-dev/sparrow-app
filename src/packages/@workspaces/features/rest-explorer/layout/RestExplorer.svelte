@@ -225,7 +225,7 @@
         <Splitpanes
           class="splitter-request"
           id={"rest-splitter"}
-          style="height: calc(100vh - 160px); margin-top:10px;"
+          style="height: calc(100vh - 160px); width:100%; margin-top:10px;"
           on:ready={stylePanes}
           horizontal={$requestSplitterDirection === "horizontal" ? true : false}
           dblClickSplitter={false}
