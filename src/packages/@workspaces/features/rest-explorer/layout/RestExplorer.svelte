@@ -222,7 +222,7 @@
       />
       {#if !isLoading}
         <Splitpanes
-          class="splitter-request"
+          class="splitter-request w-100"
           id={"rest-splitter"}
           style="height: calc(100vh - 160px); margin-top:10px;"
           on:ready={stylePanes}

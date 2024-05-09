@@ -71,7 +71,7 @@
           valueClassProp={"bg-secondary-400 text-secondary-150"}
           type="combo"
         />
-        <span class="me-5"></span>
+        <span class="me-3"></span>
       {/if}
     {/each}
   </div>
