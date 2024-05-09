@@ -78,8 +78,10 @@ class DecodeRequest {
   private extractKeyValue = (pairs: KeyValueChecked[]): KeyValue[] => {
     const checkedPairs = [];
     for (const pair of pairs) {
-      if (pair.checked) {
-        checkedPairs.push(pair);
+      if (pair) {
+        if (pair.checked) {
+          checkedPairs.push(pair);
+        }
       }
     }
     return checkedPairs;
@@ -181,8 +183,33 @@ class DecodeRequest {
       return raw;
     } else if (datatype === RequestDatasetEnum.FORMDATA) {
       const bodyArray = [];
-      const textBodyArray = this.extractKeyValue(formdata.text);
-      const fileBodyArray = this.extractKeyValue(formdata.file);
+      const textBodyArray = this.extractKeyValue(
+        formdata.map((pair) => {
+          if (pair.type == "text") {
+            return {
+              key: pair.key,
+              value: pair.value,
+              checked: pair.checked,
+            };
+          }
+        }),
+      );
+      const fileBodyArray = this.extractKeyValue(
+        formdata.map((pair) => {
+          if (pair.type == "file") {
+            return {
+              key: pair.key,
+              value: pair.value,
+              checked: pair.checked,
+              base: pair.base,
+            };
+          }
+        }),
+      );
+
+      // const textBodyArray = this.extractKeyValue(formdata.text);
+      // const fileBodyArray = this.extractKeyValue(formdata.file);
+      // bodyArray.push(...this.extractKeyValue(formdata));
       bodyArray.push(...textBodyArray);
       bodyArray.push(...fileBodyArray);
       return JSON.stringify(bodyArray);

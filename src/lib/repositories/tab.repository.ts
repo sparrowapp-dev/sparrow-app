@@ -40,6 +40,8 @@ export class TabRepository {
     if (activeTab) {
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
+    const lastIndex = (await RxDB.getInstance().rxdb.tab.find().exec()).length;
+    tab.index = lastIndex;
     await RxDB.getInstance().rxdb.tab.insert(tab);
   };
 
@@ -65,6 +67,14 @@ export class TabRepository {
       })
       .exec();
     if (selectedTab) {
+      doc.forEach(async (tab) => {
+        if (tab.index > selectedTab.index) {
+          console.log(tab.index);
+          await tab.incrementalPatch({
+            index: tab.index - 1,
+          });
+        }
+      });
       await selectedTab.incrementalRemove();
     }
   };

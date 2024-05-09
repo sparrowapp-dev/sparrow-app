@@ -18,6 +18,7 @@
   import { Select } from "$lib/components/inputs";
   import { ResponseFormatterEnum } from "@common/types/rest-explorer";
   import BeautifyIcon from "$lib/assets/beautify.svg";
+  import js_beautify, { html_beautify } from "js-beautify";
 
   export let response;
   export let apiState;
@@ -54,6 +55,19 @@
       }
     }
   }
+  /**
+   * @description - remove indentation from the string
+   * @param code - text that should be shown on code mirror view
+   * @returns - plain text code without indentation
+   */
+  const removeIndentation = (str: string) => {
+    // Split the code into lines
+    const lines = str.split("\n");
+    // Remove leading whitespace from each line
+    const unindentedLines = lines.map((line) => line.trim());
+    // Join the lines back together
+    return unindentedLines.join("\n");
+  };
 
   const handleDownloaded = async () => {
     const newHandle = await window.showSaveFilePicker({
@@ -68,7 +82,13 @@
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(response?.body);
+    await writableStream.write(
+      fileExtension === "json" || fileExtension === "js"
+        ? js_beautify(response?.body)
+        : fileExtension === "xml" || fileExtension === "html"
+        ? html_beautify(response?.body)
+        : removeIndentation(response?.body),
+    );
     await writableStream.close();
     notifications.success("Response downloaded");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
@@ -187,6 +207,7 @@
           </button>
         </div>
 
+        <!-- Download button -->
         <div
           on:click={handleDownloaded}
           role="button"
@@ -194,6 +215,7 @@
         >
           <img src={downloadIcon} style="height:12px; width:12px;" />
         </div>
+        <!-- Copy button -->
         <div
           on:click={handleCopy}
           role="button"
@@ -201,6 +223,7 @@
         >
           <img src={copyIcon} style="height:12px; width:12px;" />
         </div>
+        <!-- Prettier button -->
         <div
           on:click={() => {
             notifications.success("Code formatted successfully!");
@@ -240,9 +263,9 @@
     width: 24px;
   }
   .icon-container:hover {
-    background-color: var(--dropdown-container);
+    background-color: var(--bg-secondary-550);
   }
   .icon-container:active {
-    background-color: var(--bg-secondary-500);
+    background-color: var(--bg-secondary-600);
   }
 </style>

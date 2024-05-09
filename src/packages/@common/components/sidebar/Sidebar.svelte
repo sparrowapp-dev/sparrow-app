@@ -115,9 +115,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 72px;
+    width: 54px;
     background-color: var(--sidebar-background);
     border: 1px solid var(--border-color);
-    padding: 12px 4px;
+    margin-right: 1px;
+    padding: 5px, 0px, 5px, 0px;
   }
 </style>

@@ -117,6 +117,10 @@
   export let icon = GitBranchIcon;
   export let checkIconColor = "white";
 
+  export let headerFontSize: string = "14px";
+
+  export let headerFontWeight: number = 500;
+
   let selectWrapper: HTMLElement;
 
   const Icon = icon;
@@ -356,7 +360,7 @@
       class="select-btn
       {selectBackgroundClass} 
       {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
-      {borderRounded ? 'rounded' : ''}  
+      {borderRounded ? 'border-radius-2' : ''}  
       {selectBorderClass} 
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
       {isError ? selectErrorBorderClass : ''}
@@ -377,7 +381,7 @@
           class={selectedRequest?.default
             ? "text-textColor"
             : getTextColor(selectedRequest?.color)}
-          style="font-weight: 500; font-size: 14px;"
+          style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
         >
           {selectedRequest?.name}
         </span>
@@ -419,7 +423,7 @@
         <div class="position-relative">
           <input
             type="text"
-            class="inputField searchField rounded border-0 p-2 w-100 bg-backgroundDark"
+            class="inputField searchField border-radius-2 border-0 p-2 w-100 bg-backgroundDark"
             style="font-size: 12px; font-weight:500; padding-left:35px !important;"
             placeholder={searchText}
             bind:value={searchData}

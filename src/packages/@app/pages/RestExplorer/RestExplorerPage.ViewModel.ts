@@ -445,7 +445,7 @@ class RestExplorerViewModel
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      environmentVariables.filtered,
+      environmentVariables.filtered || [],
     );
     makeHttpRequestV2(...decodeData)
       .then((response) => {
@@ -701,6 +701,27 @@ class RestExplorerViewModel
     let expectedMetaData;
     if (!saveDescriptionOnly) {
       // Save overall api
+      let requestBody = {
+        file: [],
+        text: [],
+      };
+      componentData.property.request.body.formdata.map((pair) => {
+        if (pair.type == "text") {
+          requestBody.text.push({
+            key: pair.key,
+            value: pair.value,
+            checked: pair.checked,
+          });
+        } else if (pair.type == "file") {
+          requestBody.file.push({
+            key: pair.key,
+            value: pair.value,
+            checked: pair.checked,
+            base: pair.base,
+          });
+        }
+      });
+      componentData.property.request.body.formdata = requestBody;
       expectedRequest = {
         method: componentData.property.request.method,
         url: componentData.property.request.url,
@@ -1114,7 +1135,7 @@ class RestExplorerViewModel
       // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
-          return variable.key.length > 0 && variable.value.length > 0;
+          return variable.key.length > 0;
         }),
         {
           key: "",
@@ -1165,7 +1186,7 @@ class RestExplorerViewModel
       // removes blank key value pairs
       payload.variable = [
         ...payload.variable.filter((variable) => {
-          return variable.key.length > 0 && variable.value.length > 0;
+          return variable.key.length > 0;
         }),
         {
           key: "",

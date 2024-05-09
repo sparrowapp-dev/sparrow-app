@@ -240,7 +240,7 @@
       -->
       <Dropdown
         buttonId="addButton"
-        isMenuOpen={addButtonMenu}
+        bind:isMenuOpen={addButtonMenu}
         options={[
           {
             name: "Add New API",

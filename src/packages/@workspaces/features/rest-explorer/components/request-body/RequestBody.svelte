@@ -48,8 +48,7 @@
     />
   {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
     <FormData
-      textValue={body.formdata.text}
-      fileValue={body.formdata.file}
+      keyValue={body.formdata}
       {onUpdateRequestBody}
       {environmentVariables}
       {onUpdateEnvironment}

@@ -166,7 +166,7 @@
     <div class="d-flex ms-auto my-auto me-2">
       <Dropdown
         buttonId="viewChange"
-        isMenuOpen={viewChange}
+        bind:isMenuOpen={viewChange}
         horizontalPosition="left"
         minWidth={175}
         options={[
@@ -194,7 +194,7 @@
       </Dropdown>
       <Dropdown
         buttonId="moreOptions"
-        isMenuOpen={moreOption}
+        bind:isMenuOpen={moreOption}
         horizontalPosition="left"
         minWidth={150}
         options={[

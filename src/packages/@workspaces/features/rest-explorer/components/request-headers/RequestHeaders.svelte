@@ -39,17 +39,15 @@
       <span class="text-primary-200 fw-bold generated-para me-2">
         Show auto-generated headers
       </span>
-      <div class="form-check form-switch">
+      <div class="form-check form-switch custom-switch">
         <input
           class="form-check-input"
           type="checkbox"
           role="switch"
           id="flexSwitchCheckDefault"
-          checked={showGeneratedHeader}
-          on:change={() => {
-            showGeneratedHeader = !showGeneratedHeader;
-          }}
+          bind:checked={showGeneratedHeader}
         />
+        <label class="slider" for="flexSwitchCheckDefault"></label>
       </div>
     </div>
   </div>
@@ -69,5 +67,53 @@
 <style>
   .generated-para {
     font-size: 12px;
+  }
+  .custom-switch {
+    position: relative;
+    margin-top: 10px;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .custom-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    border-radius: 100px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-secondary-400);
+    transition: 200ms;
+    width: 30px;
+    height: 14px;
+  }
+
+  .slider:before {
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    content: "";
+    height: 10px;
+    width: 10px;
+    background-color: var(--bg-secondary-100);
+    transition: 200ms;
+  }
+
+  input:checked + .slider {
+    background-color: var(--bg-primary-200);
+  }
+
+  input:checked + .slider:before {
+    background-color: var(--bg-secondary-100);
+    transform: translateX(16px);
   }
 </style>
