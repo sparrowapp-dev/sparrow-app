@@ -29,14 +29,14 @@
   $: {
     if (keyValue) {
       pairs = keyValue;
-      let flag: boolean = false;
+      let flag: boolean = true;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === false) {
-          flag = true;
+        if (pairs[i].checked === true) {
+          flag = false;
         }
       }
       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = true;
+        flag = false;
       }
       if (flag) {
         controller = false;
