@@ -34,25 +34,29 @@
       pairs = [];
       if (keyValue.constructor.name != "Array") {
         keyValue.text.forEach((pair) => {
-          if (pair.key != "" || pair.value != "") {
-            pairs.push({
-              key: pair.key,
-              value: pair.value,
-              checked: pair.checked,
-              type: "text",
-              base: "",
-            });
+          if (pair) {
+            if (pair.key != "" || pair.value != "") {
+              pairs.push({
+                key: pair.key,
+                value: pair.value,
+                checked: pair.checked,
+                type: "text",
+                base: "",
+              });
+            }
           }
         });
         keyValue.file.forEach((pair) => {
-          if (pair.key != "" || pair.value != "") {
-            pairs.push({
-              key: pair.key,
-              value: pair.value,
-              checked: pair.checked,
-              type: "file",
-              base: pair.base,
-            });
+          if (pair) {
+            if (pair.key != "" || pair.value != "") {
+              pairs.push({
+                key: pair.key,
+                value: pair.value,
+                checked: pair.checked,
+                type: "file",
+                base: pair.base,
+              });
+            }
           }
         });
         pairs.push({

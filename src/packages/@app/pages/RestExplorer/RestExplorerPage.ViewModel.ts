@@ -701,6 +701,26 @@ class RestExplorerViewModel
     let expectedMetaData;
     if (!saveDescriptionOnly) {
       // Save overall api
+      let requestBody = {
+        file: [],
+        text: [],
+      };
+      componentData.property.request.body.formdata.map((pair) => {
+        if (pair.type == "text") {
+          requestBody.text.push({
+            key: pair.key,
+            value: pair.value,
+            checked: pair.checked,
+          });
+        } else if (pair.type == "file") {
+          requestBody.file.push({
+            key: pair.key,
+            value: pair.value,
+            checked: pair.checked,
+            base: pair.base,
+          });
+        }
+      });
       expectedRequest = {
         method: componentData.property.request.method,
         url: componentData.property.request.url,
