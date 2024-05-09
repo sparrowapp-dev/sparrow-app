@@ -193,6 +193,6 @@
     color: var(--tab-request-text-default) !important;
   }
   .individual-tab:hover .request-text {
-    color: initial !important;
+    color: var(--text-secondary-100) !important;
   }
 </style>

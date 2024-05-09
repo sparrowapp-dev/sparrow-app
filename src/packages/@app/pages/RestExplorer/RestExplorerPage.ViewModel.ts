@@ -721,6 +721,7 @@ class RestExplorerViewModel
           });
         }
       });
+      componentData.property.request.body.formdata = requestBody;
       expectedRequest = {
         method: componentData.property.request.method,
         url: componentData.property.request.url,

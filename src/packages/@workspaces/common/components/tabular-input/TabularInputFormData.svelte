@@ -69,14 +69,14 @@
       } else {
         pairs = keyValue;
       }
-      let flag: boolean = false;
+      let flag: boolean = true;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === false) {
-          flag = true;
+        if (pairs[i].checked === true) {
+          flag = false;
         }
       }
       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = true;
+        flag = false;
       }
       if (flag) {
         controller = false;
@@ -203,12 +203,14 @@
   >
     <div class="d-flex gap-3 align-items-center w-100">
       <div style="width:30px; margin-left: 5px;">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          bind:checked={controller}
-          on:input={handleCheckAll}
-        />
+        <label class="container">
+          <input
+            type="checkbox"
+            bind:checked={controller}
+            on:input={handleCheckAll}
+          />
+          <span class="checkmark"></span>
+        </label>
       </div>
       <div
         class="d-flex pair-title bg-secondary-700 align-items-center w-100"
@@ -335,14 +337,16 @@
                 />
                 <div style="width:30px;">
                   {#if pairs.length - 1 != index || mode === "READ"}
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      bind:checked={element.checked}
-                      on:input={() => {
-                        updateCheck(index);
-                      }}
-                    />
+                    <label class="container">
+                      <input
+                        type="checkbox"
+                        bind:checked={element.checked}
+                        on:input={() => {
+                          updateCheck(index);
+                        }}
+                      />
+                      <span class="checkmark"></span>
+                    </label>
                   {/if}
                 </div>
 
@@ -485,24 +489,6 @@
 {/if}
 
 <style>
-  input[type="checkbox"] {
-    margin-top: 6px;
-    border-radius: 2px;
-    height: 12px;
-    width: 12px;
-    transform: scale(1.2);
-    cursor: pointer;
-  }
-
-  input[type="text"] {
-    padding: 4px !important;
-    outline: none !important;
-  }
-
-  input:checked {
-    background-color: var(--primary-btn-color) !important;
-    border: none;
-  }
   .keyValuePair {
     background-color: transparent;
     border-radius: 0;
@@ -514,5 +500,78 @@
   .section-layout {
     border-top: 1px solid var(--border-secondary-500);
     border-bottom: 1px solid var(--border-secondary-500);
+  }
+
+  /* The container */
+  .container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default checkbox */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+    background-color: transparent;
+    border: 2px solid var(--text-secondary-500);
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 14px;
+    width: 14px;
+    border-radius: 3px;
+    background-color: transparent;
+    border: 2px solid var(--text-secondary-500);
+  }
+
+  /* On mouse-over, add a grey background color */
+  /* .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  } */
+
+  /* When the checkbox is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    border: none;
+    background-color: var(--text-primary-200);
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .container .checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--text-secondary-800);
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
   }
 </style>

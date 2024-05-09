@@ -60,7 +60,7 @@ class InitCollectionTab {
   public updateActiveSync(_activeSync: boolean) {
     this._tab.activeSync = _activeSync;
   }
-  public updateTotalRequest(_totalRequest: number) {
+  public updateTotalRequests(_totalRequest: number) {
     this._tab.property.totalRequests = _totalRequest;
   }
   public updateTotalFolder(_totalFolder: number) {

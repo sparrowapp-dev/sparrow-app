@@ -27,7 +27,10 @@ import { v4 as uuidv4 } from "uuid";
 //-----
 // Services
 import { EnvironmentService } from "$lib/services-v2/environment.service";
-//-----
+import {
+  insertCollection,
+  insertCollectionDirectory,
+} from "$lib/services/collection";
 import { CollectionService } from "$lib/services/collection.service";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 import { setContentTypeHeader } from "$lib/utils/helpers";
@@ -52,6 +55,7 @@ import {
   workspaceLevelPermissions,
 } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
+import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 //-----
 
 //-----
@@ -1762,7 +1766,7 @@ export default class CollectionsViewModel {
     _collection.updateDescription(collection.description);
     _collection.updatePath(path);
     _collection.updateActiveSync(collection.activeSync);
-    _collection.updateTotalRequest(totalRequest);
+    _collection.updateTotalRequests(totalRequest);
     _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
 
@@ -2078,6 +2082,125 @@ export default class CollectionsViewModel {
       notifications.error(
         `Unable to detect ${collection.activeSyncUrl.replace("-json", "")}.`,
       );
+    }
+  };
+
+  /**
+   *
+   * @param collectionId - collection id
+   * @param items - request or folder item
+   */
+  public addRequestOrFolderInCollection = (
+    collectionId: string,
+    items: object,
+  ) => {
+    this.collectionRepository.addRequestOrFolderInCollection(
+      collectionId,
+      items,
+    );
+  };
+
+  /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param _collectionId - collection id
+   * @param _folderName - folder name
+   * @returns - folder status message
+   */
+  public createFolderFromSaveAs = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    _collectionId: string,
+    _folderName: string,
+  ) => {
+    let userSource = {};
+    const _collection: CollectionDocument =
+      await this.readCollection(_collectionId);
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+
+    const directory: CreateDirectoryPostBody = {
+      name: _folderName,
+      description: "",
+      ...userSource,
+    };
+    const res = await insertCollectionDirectory(
+      _workspaceMeta.id,
+      _collectionId,
+      directory,
+    );
+    if (res.isSuccessful) {
+      const latestRoute = {
+        id: res.data.data.id,
+      };
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          collectionId: _collectionId,
+          data: res.data.data,
+          addRequestOrFolderInCollection: this.addRequestOrFolderInCollection,
+        },
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
+    }
+  };
+
+  /**
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param _collectionName - collection name
+   * @returns - collection status message
+   */
+  public createCollectionFromSaveAs = async (
+    _workspaceMeta: {
+      id: string;
+      name: string;
+    },
+    _collectionName: string,
+  ) => {
+    const newCollection = {
+      name: _collectionName,
+      workspaceId: _workspaceMeta.id,
+    };
+    const res = await insertCollection(newCollection);
+    if (res.isSuccessful) {
+      const latestRoute = {
+        id: res.data.data._id,
+      };
+      const storage = res.data.data;
+      const _id = res.data.data._id;
+      delete storage._id;
+      storage.id = _id;
+      storage.workspaceId = _workspaceMeta.id;
+      MixpanelEvent(Events.CREATE_COLLECTION, {
+        source: "SaveRequest",
+        collectionName: res.data.data.name,
+        collectionId: res.data.data._id,
+      });
+      return {
+        status: "success",
+        data: {
+          latestRoute,
+          storage,
+          addCollection: this.addCollection,
+        },
+      };
+    } else {
+      return {
+        status: "error",
+        message: res.message,
+      };
     }
   };
 
