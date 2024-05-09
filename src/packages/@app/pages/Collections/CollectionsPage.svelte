@@ -312,8 +312,8 @@
       }
       return res;
     }}
-    onCreateFolder={_viewModel.handleCreateFolderInCollection}
-    onCreateCollection={_viewModel.handleCreateCollection}
+    onCreateFolder={_viewModel.createFolderFromSaveAs}
+    onCreateCollection={_viewModel.createCollectionFromSaveAs}
   />
 </ModalWrapperV1>
 
