@@ -443,6 +443,11 @@ class RestExplorerViewModel
     this.updateRequestState({ isSendRequestInProgress: true });
     const start = Date.now();
 
+    this._tab
+      .subscribe((tab) => {
+        tab.property.request.url = tab.property.request.url.trim();
+      })
+      .unsubscribe();
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
