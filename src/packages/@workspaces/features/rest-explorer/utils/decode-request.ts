@@ -201,6 +201,7 @@ class DecodeRequest {
               key: pair.key,
               value: pair.value,
               checked: pair.checked,
+              base: pair.base,
             };
           }
         }),
