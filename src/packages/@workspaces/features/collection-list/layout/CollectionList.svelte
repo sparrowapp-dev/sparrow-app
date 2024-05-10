@@ -120,7 +120,7 @@
       class="border-0 pb-5 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:54px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -146,12 +146,12 @@
       leftPanelController.leftPanelCollapse
         ? runAnimation && "decrease-width"
         : runAnimation && " increase-width"
-    } d-flex flex-column bg-backgroundColor scroll`}
+    } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
       class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
     >
-      <p class="mb-0 text-whiteColor ellipsis" style="font-size: 18px;">
+      <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
       </p>
       <button
@@ -274,7 +274,7 @@
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center">
+      <div class="d-flex flex-column justify-content-center px-3 pt-2">
         {#if false}
           <div class="spinner">
             <Spinner size={`32px`} />
@@ -286,7 +286,7 @@
           {#if searchData.length > 0}
             <List
               height={"calc(100vh - 180px)"}
-              classProps={"p-3"}
+              classProps={"pb-2 pe-2"}
               overflowX="hidden"
             >
               {#if filteredFile.length > 0}
@@ -327,7 +327,7 @@
             <List
               height={"calc(100vh - 180px)"}
               minHeight={"180px"}
-              classProps={"p-3"}
+              classProps={"pb-2 pe-2"}
               overflowX="hidden"
             >
               {#each filteredSelectedMethodsCollection as col}
@@ -348,7 +348,7 @@
             <List
               height={"calc(100vh - 180px)"}
               minHeight={"180px"}
-              classProps={"p-3"}
+              classProps={"pb-2 pe-2"}
               overflowX="hidden"
             >
               {#if collectionListDocument}

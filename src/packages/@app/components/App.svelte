@@ -96,7 +96,7 @@
       false,
     );
     setInterval(() => {
-      doOnlineCheck();
+      // doOnlineCheck();
     }, 5000);
   });
 </script>

@@ -350,7 +350,7 @@
   }
 
   .btn-primary {
-    background-color: var(--background-color);
+    background-color: transparent;
     color: var(--white-color);
     padding-left: 0 !important;
     padding-right: 5px;

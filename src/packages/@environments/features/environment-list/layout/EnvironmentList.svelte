@@ -20,6 +20,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { ListItem } from "../components";
+  import { WithIconButtonV2 } from "@environments/common/hoc";
 
   export let currentWorkspace;
   export let environments;
@@ -77,36 +78,31 @@
   });
 </script>
 
-<div class={`env-sidebar bg-secondary-900 p-3`} style={``}>
+<div class={`env-sidebar bg-secondary-900 px-3 py-3`} style={``}>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
-    <h1
-      class={`fw-normal text-fs-16 lh-1 curr-workspace my-auto ellipsis`}
+    <p
+      class={`mb-0 text-whiteColor ellipsis text-fs-16`}
       style={`text-color: #FFF;`}
     >
       {currentWorkspace?.name || ""}
-    </h1>
+    </p>
     <Tooltip
       title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
       placement={"left"}
     >
-      <button
-        disabled={!hasWorkpaceLevelPermission(
+      <WithIconButtonV2
+        icon={PlusIcon}
+        disable={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,
           workspaceLevelPermissions.ADD_ENVIRONMENT,
         )}
-        class={`border-0 rounded add-env-mini-btn  ${
-          !environmentUnderCreation ? "pb-2 py-1" : "py-2"
-        } px-2`}
-        on:click={onCreateEnvironment(localEnvironment)}
-      >
-        {#if environmentUnderCreation}
-          <Spinner size={"18px"} />
-        {:else}
-          <PlusIcon width={15} height={15} color={`#8A9299`} />
-        {/if}
-      </button>
+        onClick={() => {
+          onCreateEnvironment(localEnvironment);
+        }}
+        loader={false}
+      />
     </Tooltip>
   </div>
 
@@ -118,7 +114,7 @@
     {#if globalEnvironment && globalEnvironment.length > 0}
       <p
         role="button"
-        class={`fw-normal env-item text-fs-14 rounded my-2 ${
+        class={`fw-normal env-item text-fs-14 border-radius-2 my-2 ${
           globalEnvironment[0]?.id === currentEnvironment?.id && "active"
         }`}
         on:click={() => {
@@ -132,35 +128,21 @@
 
     {#if localEnvironment && localEnvironment.length === 0}
       <div class={`add-env-container py-3`}>
-        <p class={`add-env-desc-text fw-light text-center mb-3`}>
+        <p class={`add-env-desc-text text-fs-12 fw-light text-center mb-3`}>
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
-        <Tooltip
-          title={PERMISSION_NOT_FOUND_TEXT}
-          show={!hasWorkpaceLevelPermission(
-            loggedUserRoleInWorkspace,
-            workspaceLevelPermissions.ADD_COLLECTIONS,
-          )}
-        >
-          <button
-            disabled={!hasWorkpaceLevelPermission(
-              loggedUserRoleInWorkspace,
-              workspaceLevelPermissions.ADD_COLLECTIONS,
-            )}
-            class={`add-env-btn w-100 d-flex rounded justify-content-center py-1 px-4 border-0 mx-auto w-fit`}
-            on:click={handleCreateEnvironment}
-          >
-            <PlusIcon classProp={`my-auto`} />
-            <span class={`my-auto ps-2`}>Environment</span>
-          </button>
-        </Tooltip>
       </div>
     {/if}
     <ul class={`env-side-tab-list p-0`}>
-      <p class="fw-normal text-fs-14 rounded my-2">Environment Variables</p>
       {#if localEnvironment && localEnvironment.length > 0}
-        <List height={"calc(100vh - 180px)"} classProps={"pb-2"}>
+        <p
+          class="fw-normal text-fs-14 rounded my-2"
+          style="padding-left: 12px;"
+        >
+          Environment Variables
+        </p>
+        <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
           {#each localEnvironment as env}
             <ListItem
               {env}
@@ -173,9 +155,11 @@
             />
           {/each}
           <p
-            class="fw-normal text-fs-14 m-2"
+            class="fw-normal text-fs-14 m-2 ms-3"
             role="button"
-            on:click={onCreateEnvironment(localEnvironment)}
+            on:click={() => {
+              onCreateEnvironment(localEnvironment);
+            }}
           >
             + Add Environment
           </p>
@@ -229,7 +213,6 @@
   }
   .add-env-desc-text {
     color: #999;
-    font-size: 14px;
   }
   .add-env-btn {
     background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
@@ -238,7 +221,7 @@
     padding: 6px 6px 6px 12px;
   }
   .env-item:hover {
-    // background: var(--border-color);
+    background-color: var(--bg-secondary-800);
   }
   .env-item.active {
     background-color: var(--bg-tertiary-600);

@@ -16,9 +16,6 @@
   export let onOpenEnvironment;
   export let onSelectEnvironment;
 
-  let rightClickPanelHeight;
-
-  let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let isEnvironmentPopup: boolean = false;
   let newEnvironmentName: string = "";
@@ -29,9 +26,6 @@
   function rightClickContextMenu(e) {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
       showMenu = true;
     }, 100);
   }
@@ -89,6 +83,7 @@
   };
 
   let menuItems = [];
+  let environmentTabWrapper;
 
   $: {
     if (currentWorkspace) {
@@ -175,8 +170,8 @@
 
 {#if showMenu}
   <RightOption
-    xAxis={pos.x}
-    yAxis={pos.y}
+    xAxis={environmentTabWrapper.getBoundingClientRect().right - 180}
+    yAxis={environmentTabWrapper.getBoundingClientRect().bottom + 5}
     {menuItems}
     {noOfRows}
     {noOfColumns}
@@ -188,18 +183,15 @@
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 
-<div class="environment-tab">
+<div class="environment-tab" bind:this={environmentTabWrapper}>
   <button
     style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {env?.id ===
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-3 my-button {env?.id ===
     currentEnvironment?.id
       ? 'active-collection-tab'
       : ''}"
   >
-    <div
-      on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-      class="d-flex main-collection align-items-center"
-    >
+    <div class="d-flex main-collection align-items-center">
       <button
         class="p-0 m-0 me-2 border-0 bg-transparent"
         on:click={() => {
@@ -215,10 +207,9 @@
       </button>
       {#if isRenaming}
         <input
-          class="form-control py-0 renameInputFieldCollection"
+          class="py-0 renameInputFieldCollection text-fs-14 w-100"
           id="renameInputFieldEnvironment"
           type="text"
-          style="font-size: 12px;"
           value={env.name}
           autofocus
           maxlength={100}
@@ -281,10 +272,10 @@
 
     .threedot-active {
       visibility: visible;
-      background-color: var(--workspace-hover-color);
+      // background-color: var(--workspace-hover-color);
     }
     .threedot-icon-container:hover {
-      background-color: var(--workspace-hover-color);
+      // background-color: var(--workspace-hover-color);
     }
 
     .btn-primary {
@@ -294,7 +285,7 @@
     }
 
     .btn-primary:hover {
-      // background-color: var(--border-color);
+      background-color: var(--bg-secondary-800);
     }
 
     .navbar {
@@ -330,7 +321,7 @@
       border-radius: 0 !important;
     }
     .renameInputFieldCollection:focus {
-      background-color: #313233;
+      // background-color: #313233;
       outline: none !important;
       border-bottom: 1px solid #85c2ff;
     }

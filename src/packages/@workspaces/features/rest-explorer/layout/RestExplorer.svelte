@@ -222,7 +222,7 @@
       />
       {#if !isLoading}
         <Splitpanes
-          class="splitter-request w-100"
+          class="rest-splitter w-100"
           id={"rest-splitter"}
           style="height: calc(100vh - 160px); margin-top:10px;"
           on:ready={stylePanes}
@@ -241,7 +241,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative "
+            class="position-relative bg-secondary-800-important"
           >
             <!-- Request Pane -->
             <div
@@ -307,7 +307,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="position-relative"
+            class="position-relative bg-secondary-800-important"
           >
             <!-- Response Pane -->
             <div
@@ -422,11 +422,29 @@
     background-color: var(--bg-secondary-800);
     height: calc(100vh - 80px);
   }
-  :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
-    background-color: var(--bg-secondary-800) !important;
-  }
 
-  :global(.splitter_custom) {
-    background-color: var(--dropdown-button) !important;
+  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-800) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
+    height: 10.5px !important;
+    width: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-top: 5px solid var(--border-secondary-800) !important;
+    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+  :global(
+      .rest-splitter .splitpanes__splitter:active,
+      .rest-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>

@@ -520,6 +520,9 @@ $sparrow-border-colors: (
     .bg-#{$background} {
       background-color: $value;
     }
+    .bg-#{$background}-important {
+      background-color: $value !important;
+    }
   }
   @each $border, $value in $sparrow-border-colors {
     .border-#{$border} {
@@ -532,7 +535,7 @@ $sparrow-border-colors: (
 @import "bootstrap/scss/root";
 @import "bootstrap";
 
-body, .splitpanes.default-theme .splitpanes__pane {
+body{
   background-color: var(--background-color) !important;
 }
 
@@ -599,11 +602,4 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
 textarea {
   resize: none;
-}
-.splitpanes__splitter{
-  background-color: var(--border-color) !important;
-  border: none !important;
-}
-.splitpanes__splitter:active, .splitpanes__splitter:hover{
-  background-color: var(--primary-btn-color) !important;
 }

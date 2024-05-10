@@ -16,8 +16,11 @@
   export let onSaveEnvironment;
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInput } from "@environments/common/components";
+  import { WithIconButton } from "@environments/common/hoc";
+  import { SearchIcon } from "$lib/assets/icons";
 
   let quickHelp: boolean = false;
+  let search = "";
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
     onUpdateName(e.target.value);
@@ -42,15 +45,26 @@
           disabled={$currentEnvironment?.type == "GLOBAL"}
         />
         <div class={`d-flex env-btn-container`}>
-          <button
-            on:click={() => {
-              quickHelp = true;
-            }}
-            class={`d-flex env-help-btn border-0 p-1 pe-2 my-auto rounded`}
-          >
-            <HelpIcon width={19} height={19} classProp={`me-2`} />
-            <span class={``}>How to use variables</span>
-          </button>
+          <div class="position-relative">
+            <input
+              type="search"
+              class="searchField text-fs-12 rounded p-2 bg-secondary-600"
+              style="padding-left:35px !important; outline:none; width:300px;"
+              placeholder="Search Variables"
+              bind:value={search}
+            />
+            <span
+              class="position-absolute"
+              style="top:5px;
+                    left: 10px"
+            >
+              <SearchIcon
+                height={16}
+                width={16}
+                color={"var(--defaultcolor)"}
+              />
+            </span>
+          </div>
           <Tooltip
             title={PERMISSION_NOT_FOUND_TEXT}
             show={!hasWorkpaceLevelPermission(
@@ -58,35 +72,32 @@
               workspaceLevelPermissions.ADD_ENVIRONMENT,
             )}
           >
-            <button
-              disabled={$currentEnvironment.isSaveInProgress ||
-                !hasWorkpaceLevelPermission(
-                  $userWorkspaceLevelRole,
-                  workspaceLevelPermissions.ADD_ENVIRONMENT,
-                )}
-              class="d-flex border-0 rounded env-save-btn env-save-btn-enabled d-flex align-items-center"
-              on:click={onSaveEnvironment}
-            >
-              <div class="badge"></div>
-
-              {#if $currentEnvironment.isSaveInProgress}
-                <span style="padding-right: 10px;">
-                  <Spinner size={`${12}px`} />
-                </span>
-              {:else}
-                <SaveIcon
-                  width={16}
-                  height={16}
-                  classProp={`me-2 my-auto rounded `}
-                />
+            <div class="position-relative">
+              {#if !$currentEnvironment.isSave}
+                <div class="badge-data d-block"></div>
               {/if}
-
-              <span>Save</span>
-              <span class={`${!$currentEnvironment.isSave && "badge"}`}
-                >{" "}</span
-              >
-            </button>
+              <WithIconButton
+                icon={SaveIcon}
+                onClick={onSaveEnvironment}
+                disable={$currentEnvironment.isSaveInProgress ||
+                  !hasWorkpaceLevelPermission(
+                    $userWorkspaceLevelRole,
+                    workspaceLevelPermissions.ADD_ENVIRONMENT,
+                  )}
+                loader={$currentEnvironment.isSaveInProgress}
+              />
+            </div>
           </Tooltip>
+          <span>
+            <WithIconButton
+              icon={HelpIcon}
+              onClick={() => {
+                quickHelp = true;
+              }}
+              disable={false}
+              loader={false}
+            />
+          </span>
         </div>
       </header>
       <section class={`var-value-container`}>
@@ -94,6 +105,7 @@
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
           keyValue={$currentEnvironment.variable}
           callback={handleCurrentEnvironmentKeyValuePairChange}
+          {search}
         />
       </section>
     </div>
@@ -120,15 +132,14 @@
   .env-heading {
     font-size: 18px;
     background-color: transparent;
-    width: calc(100% - 300px);
+    width: calc(100% - 500px);
   }
   .env-heading:disabled {
     color: white;
   }
   .env-heading:focus {
     outline: none;
-    background-color: var(--border-color);
-    border-bottom: 1px solid #85c2ff !important;
+    border: 1px solid #85c2ff !important;
   }
 
   .env-help-btn {
@@ -143,32 +154,36 @@
   .env-save-btn {
     padding: 6px 16px;
     opacity: 0.3;
-    background-color: var(--border-color);
+    // background-color: var(--border-color);
   }
   .env-save-btn:disabled {
     color: white;
   }
   .env-save-btn-enabled {
-    padding: 6px 16px;
+    padding: 6px;
     opacity: 1;
-    background-color: var(--border-color);
+    // background-color: var(--border-color);
+    background-color: transparent;
     position: relative;
     color: white;
   }
-  .env-save-btn-enabled .badge {
+  .badge-data {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    padding: 4px 4px;
+    top: 3px;
+    right: 3px;
+    height: 3px;
+    width: 3px;
     border-radius: 50%;
     background-color: #ff7878;
     color: white;
   }
   .env-btn-container {
-    gap: 24px;
+    gap: 16px;
   }
   .var-value-container {
     width: 100%;
+    height: calc(100vh - 130px);
+    overflow-y: auto;
   }
   .quick-help {
     width: 280px;
@@ -182,5 +197,11 @@
   }
   .env-help-btn:active {
     background-color: var(--selected-active-sidebar);
+  }
+  .searchField {
+    border: 1px solid var(--border-secondary-400) !important;
+  }
+  .searchField:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
 </style>

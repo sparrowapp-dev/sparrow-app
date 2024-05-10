@@ -395,7 +395,7 @@
 
 <style>
   .btn-primary {
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
     color: var(--white-color);
     padding-right: 5px;
     border-radius: 8px;
@@ -455,11 +455,6 @@
 
   .threedot-icon-container:hover {
     background-color: var(--workspace-hover-color);
-  }
-
-  .btn-primary {
-    background-color: var(--background-color);
-    color: var(--white-color);
   }
 
   .btn-primary:hover {

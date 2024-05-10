@@ -159,9 +159,8 @@
 
   onMount(() => {
     splitter = document.querySelector(
-      ".splitter-sidebar .splitpanes__splitter",
+      ".collection-splitter .splitpanes__splitter",
     );
-    splitter.style.width = "1px";
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
@@ -170,13 +169,18 @@
 </script>
 
 <Splitpanes
-  class="splitter-sidebar"
+  class="collection-splitter"
+  style="width: calc(100vw - 54px)"
   on:resize={(e) => {
     leftPanelWidth.set(e.detail[0].size);
     rightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane size={$leftPanelCollapse ? 0 : $leftPanelWidth} minSize={20}>
+  <Pane
+    size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+    minSize={20}
+    class="bg-secondary-900-important"
+  >
     <CollectionList
       {collectionList}
       {environmentList}
@@ -199,7 +203,11 @@
       onSearchCollection={_viewModel.handleSearchCollection}
     />
   </Pane>
-  <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
+  <Pane
+    size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+    minSize={60}
+    class="bg-secondary-800-important"
+  >
     <TabBar
       tabList={$tabList}
       onNewTabRequested={_viewModel.createNewTab}
@@ -318,10 +326,19 @@
 </ModalWrapperV1>
 
 <style>
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 54px) !important;
+  :global(.collection-splitter .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-900) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
   }
-  :global(.splitpanes__splitter) {
-    width: 1px;
+  :global(
+      .collection-splitter .splitpanes__splitter:active,
+      .collection-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>

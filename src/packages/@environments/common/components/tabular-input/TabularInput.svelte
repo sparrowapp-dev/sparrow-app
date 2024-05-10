@@ -14,6 +14,7 @@
   export let callback: (pairs: KeyValuePair[]) => void;
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
+  export let search;
 
   $: {
     if (keyValue) {
@@ -100,9 +101,12 @@
 <div
   class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
 >
-  <div class="d-flex gap-3 align-items-center w-100" style="height: 26px;">
+  <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
     <div style="width:30px; margin-left: 0px;">
-      <label class="container">
+      <label
+        class="container"
+        style={search !== "" ? "opacity:0!important ;" : null}
+      >
         <input
           type="checkbox"
           bind:checked={controller}
@@ -123,7 +127,7 @@
       </p>
       <p
         class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-3"
-        style="margin-left: 28px;"
+        style="margin-left: 35px;"
       >
         Value
       </p>
@@ -157,7 +161,14 @@
   <div class="w-100" style="display:block; position:relative;">
     {#if pairs}
       {#each pairs as element, index}
-        <div aria-label="Toggle Hover" style=" width:100%;">
+        <div
+          aria-label="Toggle Hover"
+          style=" width:100%;"
+          class={element.key.toLowerCase().includes(search.toLowerCase()) ||
+          element.value.toLowerCase().includes(search.toLowerCase())
+            ? ""
+            : "d-none"}
+        >
           <div
             style="padding-top: 1px;  display: flex;flex-direction: column;width:100%; height:24px;"
           >
@@ -231,6 +242,18 @@
     {/if}
   </div>
 </div>
+{#if pairs?.filter((element) => {
+  if (element.key.toLowerCase().includes(search.toLowerCase()) || element.value
+      .toLowerCase()
+      .includes(search.toLowerCase())) {
+    return true;
+  }
+  return false;
+}).length === 0 && search !== ""}
+  <p class="text-fs-12 mt-3 ps-2">
+    No such variable found in this environment. Please check the spelling.
+  </p>
+{/if}
 
 <style>
   .pair-container:nth-child(odd) {

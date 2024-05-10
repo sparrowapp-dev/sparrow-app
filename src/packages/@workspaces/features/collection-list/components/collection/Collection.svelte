@@ -555,7 +555,7 @@
   }
 
   .btn-primary {
-    background-color: var(--background-color);
+    background-color: transparent;
     color: var(--white-color);
     padding-right: 5px;
     border-radius: 8px;

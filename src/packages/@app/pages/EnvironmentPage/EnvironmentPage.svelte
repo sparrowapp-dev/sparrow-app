@@ -52,12 +52,12 @@
   );
 
   let splitter;
-  onMount(() => {
-    splitter = document.querySelector(
-      ".splitter-sidebar .splitpanes__splitter",
-    );
-    splitter.style.width = "1px";
-  });
+  // onMount(() => {
+  //   splitter = document.querySelector(
+  //     ".splitter-sidebar .splitpanes__splitter",
+  //   );
+  //   splitter.style.width = "2px";
+  // });
 
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
@@ -80,16 +80,17 @@
 </script>
 
 <Splitpanes
-  class="splitter-sidebar"
+  class="environment-splitter"
+  style="width: calc(100vw - 54px);"
   on:resize={(e) => {
     environmentLeftPanelWidth.set(e.detail[0].size);
     environmentRightPanelWidth.set(e.detail[1].size);
   }}
 >
   <Pane
-    class="sidebar-left-panel"
     minSize={20}
     size={$environmentLeftPanelWidth}
+    class="bg-secondary-900-important"
   >
     <EnvironmentList
       loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
@@ -105,9 +106,9 @@
     />
   </Pane>
   <Pane
-    class="sidebar-right-panel"
     minSize={60}
     size={$environmentRightPanelWidth}
+    class="bg-secondary-800-important"
   >
     <Route>
       {#if isAnimation}
@@ -124,7 +125,19 @@
 </Splitpanes>
 
 <style>
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 54px);
+  :global(.environment-splitter .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-900) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+  :global(
+      .environment-splitter .splitpanes__splitter:active,
+      .environment-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>
