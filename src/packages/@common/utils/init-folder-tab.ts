@@ -28,6 +28,7 @@ class InitFolderTab {
         folder: {
           id: "",
         },
+        totalRequests: 0,
       },
       path: {
         workspaceId: _workspaceId,
@@ -72,6 +73,9 @@ class InitFolderTab {
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
+  }
+  public updateTotalRequests(_requests: number) {
+    this._tab.property.totalRequests = _requests;
   }
 }
 
