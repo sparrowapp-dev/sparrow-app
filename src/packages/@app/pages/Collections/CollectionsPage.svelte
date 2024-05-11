@@ -140,7 +140,6 @@
     .unsubscribe();
 
   // Rerender animation on tab switch
-  let isAnimation = true;
   let prevTabId: string = "";
   let tabPath: Path;
   activeTab.subscribe((value: TabDocument) => {
@@ -148,10 +147,6 @@
       if (prevTabId !== value.tabId) {
         tabPath = value.path;
         tabPath["requestId"] = value.id;
-        isAnimation = false;
-        setTimeout(() => {
-          isAnimation = true;
-        }, 10);
       }
       prevTabId = value.tabId;
     } else tabPath = {};
@@ -219,20 +214,20 @@
       onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
     />
     <Route>
-      {#if isAnimation}
-        {#if $activeTab && $activeTab?.type === ItemType.REQUEST}
+      {#if true}
+        {#if $activeTab?.type === ItemType.REQUEST}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <RestExplorerPage tab={$activeTab} />
             </div>
           </Motion>
-        {:else if $activeTab && $activeTab?.type === ItemType.COLLECTION}
+        {:else if $activeTab?.type === ItemType.COLLECTION}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <CollectionExplorerPage tab={$activeTab} />
             </div>
           </Motion>
-        {:else if $activeTab && $activeTab?.type === ItemType.FOLDER}
+        {:else if $activeTab?.type === ItemType.FOLDER}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <FolderExplorerPage tab={$activeTab} />

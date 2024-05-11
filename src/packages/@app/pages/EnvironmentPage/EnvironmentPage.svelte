@@ -51,31 +51,8 @@
     },
   );
 
-  let splitter;
-  // onMount(() => {
-  //   splitter = document.querySelector(
-  //     ".splitter-sidebar .splitpanes__splitter",
-  //   );
-  //   splitter.style.width = "2px";
-  // });
-
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
-  });
-
-  // Rerender animation on tab switch
-  let isAnimation = true;
-  let prevTabId: string = "";
-  activeEnvironment.subscribe((value) => {
-    if (value) {
-      if (prevTabId !== value.environmentId) {
-        isAnimation = false;
-        setTimeout(() => {
-          isAnimation = true;
-        }, 10);
-      }
-      prevTabId = value.environmentId;
-    }
   });
 </script>
 
@@ -111,7 +88,7 @@
     class="bg-secondary-800-important"
   >
     <Route>
-      {#if isAnimation}
+      {#if true}
         {#if $activeEnvironment}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>

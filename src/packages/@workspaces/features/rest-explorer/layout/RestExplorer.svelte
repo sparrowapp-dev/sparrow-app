@@ -96,33 +96,6 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
-
-  /**
-   * @description - sets styling to the splitpanes splitter (divider that shifts split panes)
-   */
-  const stylePanes = () => {
-    const splitter: HTMLElement | null = document.querySelector(
-      ".splitter-request .splitpanes__splitter",
-    );
-    if (splitter && $requestSplitterDirection === "horizontal") {
-      // horizontal view
-      splitter.style.height = "2px";
-      splitter.style.width = "100%";
-    } else if (splitter) {
-      // vertical view
-      splitter.style.height = "100%";
-      splitter.style.width = "2px";
-    }
-  };
-
-  /**
-   * @description - re-calculates value when dependency changes
-   */
-  $: {
-    if ($requestSplitterDirection) {
-      stylePanes();
-    }
-  }
 </script>
 
 {#if $tab.tabId}
@@ -225,7 +198,6 @@
           class="rest-splitter w-100"
           id={"rest-splitter"}
           style="height: calc(100vh - 160px); margin-top:10px;"
-          on:ready={stylePanes}
           horizontal={$requestSplitterDirection === "horizontal" ? true : false}
           dblClickSplitter={false}
           on:resize={(e) => {

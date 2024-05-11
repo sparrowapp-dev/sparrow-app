@@ -28,6 +28,7 @@ export class EnvironmentTabRepository {
       })
       .exec();
     if (activeTab) {
+      if (activeTab.id === environmentTab.id) return;
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     if (existedTab) {
