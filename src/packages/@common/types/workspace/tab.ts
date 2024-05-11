@@ -1,7 +1,7 @@
-import type { Collection } from "./collection";
-import type { Request } from "./request";
-import type { Folder } from "./folder";
-import type { Workspace } from "./workspace";
+import type { CollectionWrapper } from "./collection";
+import type { RequestWrapper } from "./request";
+import type { FolderWrapper } from "./folder";
+import type { WorkspaceWrapper } from "./workspace";
 
 import type {
   ActiveSyncWrapper,
@@ -20,10 +20,10 @@ import type {
 } from "./common";
 
 export interface Property
-  extends Partial<Request>,
-    Partial<Folder>,
-    Partial<Collection>,
-    Partial<Workspace> {}
+  extends Partial<RequestWrapper>,
+    Partial<FolderWrapper>,
+    Partial<CollectionWrapper>,
+    Partial<WorkspaceWrapper> {}
 
 export interface PropertyWrapper {
   property: Property;

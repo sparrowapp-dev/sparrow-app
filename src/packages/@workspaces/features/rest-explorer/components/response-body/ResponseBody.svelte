@@ -5,7 +5,7 @@
     ResponseFormatterEnum,
     type Response,
     type State,
-  } from "@common/types/rest-explorer";
+  } from "@common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
   export let response: Response;
   export let apiState: State;

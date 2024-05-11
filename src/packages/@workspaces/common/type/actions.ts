@@ -8,7 +8,7 @@ import type {
   KeyValueChecked,
   Response,
   StatePartial,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 
 export type UpdateRequestUrlType = (
   url: string,

@@ -15,7 +15,7 @@ import {
   type RequestTab,
   TabTypeEnum,
   FormDataTypeEnum,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitRequestTab {

@@ -16,7 +16,7 @@
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
   import { Select } from "$lib/components/inputs";
-  import { ResponseFormatterEnum } from "@common/types/rest-explorer";
+  import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
 

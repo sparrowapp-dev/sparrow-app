@@ -3,7 +3,7 @@ import {
   TabTypeEnum,
   type CollectionTab,
   type Path,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 
 class InitCollectionTab {
   private _tab: CollectionTab;

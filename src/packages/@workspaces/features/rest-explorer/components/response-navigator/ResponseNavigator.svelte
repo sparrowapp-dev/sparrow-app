@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Label } from "@library/ui";
   import { type UpdateRequestStateType } from "@workspaces/common/type";
-  import { ResponseSectionEnum } from "@common/types/rest-explorer";
+  import { ResponseSectionEnum } from "@common/types/workspace";
   export let requestStateSection: string;
   export let onUpdateRequestState: UpdateRequestStateType;
   export let responseHeadersLength = 0;

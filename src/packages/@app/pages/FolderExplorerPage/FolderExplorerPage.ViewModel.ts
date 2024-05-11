@@ -27,7 +27,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // Stores
 import { userWorkspaceLevelRole } from "$lib/store";
-import type { Folder } from "@common/types/rest-explorer";
+import type { Folder } from "@common/types/workspace";
 import { generateSampleRequest } from "$lib/utils/sample";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";

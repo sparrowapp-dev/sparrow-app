@@ -8,7 +8,7 @@
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
-  import type { KeyValueChecked } from "@common/types/rest-explorer";
+  import type { KeyValueChecked } from "@common/types/workspace";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
   export let callback: (pairs: KeyValuePair[]) => void;

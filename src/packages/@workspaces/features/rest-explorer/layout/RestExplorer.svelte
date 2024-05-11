@@ -57,7 +57,7 @@
     ResponseSectionEnum,
     type KeyValue,
     type RequestTab,
-  } from "@common/types/rest-explorer";
+  } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
 
   export let tab: Observable<RequestTab>;

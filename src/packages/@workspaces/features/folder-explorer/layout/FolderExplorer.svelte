@@ -58,7 +58,7 @@
     CollectionDocument,
     TabDocument,
   } from "$lib/database/app.database";
-  import type { Folder } from "@common/types/rest-explorer";
+  import type { Folder } from "@common/types/workspace";
 
   /**
    * Constants
@@ -100,7 +100,7 @@
           id="renameInputFieldFolder"
           value={tab?.name}
           disabled={tab?.source === "SPEC"}
-          class="bg-backgroundColor input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
+          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
           on:blur={(event) =>
             onRename(collection, folder, event?.target?.value)}
@@ -132,7 +132,7 @@
         disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="font-size: 12px; "
-        class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+        class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
         value={tab.description}
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
         on:blur={(event) => onUpdateDescription(tab, event.target.value)}
@@ -167,7 +167,7 @@
 <style>
   .main-container {
     height: calc(100vh - 80px);
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
   }
 
   .my-collection {

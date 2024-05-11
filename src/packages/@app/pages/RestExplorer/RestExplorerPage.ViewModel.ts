@@ -80,7 +80,7 @@ import {
   type RequestTab,
   RequestDatasetEnum,
   type StatePartial,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
 class RestExplorerViewModel
