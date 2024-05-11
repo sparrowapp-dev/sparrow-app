@@ -9,7 +9,7 @@
 <div class={"tooltip position-relative opacity-100 z-2"} style="">
   {#if show}
     <span
-      class={`tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-black text-lightGray position-absolute justify-content-center align-items-center gap-2 opacity-0 z-1
+      class={`tooltip-text invisible m-auto text-center rounded px-2 py-1 bg-tertiary-700 text-lightGray position-absolute justify-content-center align-items-center gap-2 opacity-0 z-1
     ${placement.toString()} ${classProp}  `}
       style={styleProp}
       >{title}

@@ -8,7 +8,6 @@
   import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { isWorkspaceLoaded } from "$lib/store/workspace.store";
-  import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
   import { environmentType } from "$lib/utils/enums/environment.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums/mixpanel-events.enum";

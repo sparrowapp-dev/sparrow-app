@@ -1,3 +1,19 @@
+import type {
+  ActiveSyncWrapper,
+  DescriptionWrapper,
+  IdWrapper,
+  IndexWrapper,
+  IsActiveWrapper,
+  IsDeletedWrapper,
+  IsSavedWrapper,
+  NameWrapper,
+  PathWrapper,
+  SourceWrapper,
+  TabIdWrapper,
+  TimestampWrapper,
+  TypeWrapper,
+} from "./common";
+
 export enum AuthTypeEnum {
   NO_AUTH = "No Auth",
   API_KEY = "API Key",
@@ -43,13 +59,6 @@ export enum ResponseSectionEnum {
   RESPONSE = "Response",
   HEADERS = "Headers",
 }
-export enum TabTypeEnum {
-  FOLDER = "FOLDER",
-  REQUEST = "REQUEST",
-  COLLECTION = "COLLECTION",
-  WORKSPACE = "WORKSPACE",
-  PERSONAL = "PERSONAL",
-}
 
 export enum RequestDatasetEnum {
   FORMDATA = "Form Data",
@@ -58,25 +67,13 @@ export enum RequestDatasetEnum {
   NONE = "None",
 }
 
-export enum UntrackedItemsEnum {
-  UNTRACKED = "UNTRACKED-",
+export enum FormDataTypeEnum {
+  TEXT = "text",
+  FILE = "file",
 }
 
-export interface WorkspaceIdWrapper {
-  workspaceId: string;
-}
-export interface CollectionIdWrapper {
-  collectionId: string;
-}
-export interface FolderIdWrapper {
-  folderId: string;
-}
-export interface Path
-  extends WorkspaceIdWrapper,
-    CollectionIdWrapper,
-    FolderIdWrapper {}
-export interface PathWrapper {
-  path: Path;
+export enum UntrackedItemsEnum {
+  UNTRACKED = "UNTRACKED-",
 }
 
 export interface KeyWrapper {
@@ -94,8 +91,8 @@ export interface BaseWrapper {
 export interface RawWrapper {
   raw: string;
 }
-export interface TypeWrapper {
-  type: string;
+export interface TypeWrapper2 {
+  type: FormDataTypeEnum;
 }
 export interface RequestBodyLanguageWrapper {
   requestBodyLanguage: RequestDataTypeEnum;
@@ -216,7 +213,7 @@ export interface FormData
     ValueWrapper,
     BaseWrapper,
     CheckedWrapper,
-    TypeWrapper {}
+    TypeWrapper2 {}
 export interface FormDataWrapper {
   formdata: FormData[];
 }
@@ -241,6 +238,22 @@ export interface State
     IsSendRequestInProgressWrapper,
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper {}
+
+export interface StatePartial
+  extends Partial<RequestBodyLanguageWrapper>,
+    Partial<RequestBodyNavigationWrapper>,
+    Partial<RequestNavigationWrapper>,
+    Partial<RequestAuthNavigationWrapper>,
+    Partial<ResponseNavigationWrapper>,
+    Partial<ResponseBodyLanguageWrapper>,
+    Partial<ResponseBodyFormatterWrapper>,
+    Partial<RequestExtensionNavigationWrapper>,
+    Partial<IsExposeEditDescriptionWrapper>,
+    Partial<RequestLeftSplitterWidthPercentageWrapper>,
+    Partial<RequestRightSplitterWidthPercentageWrapper>,
+    Partial<IsSendRequestInProgressWrapper>,
+    Partial<IsSaveDescriptionInProgressWrapper>,
+    Partial<IsSaveRequestInProgressWrapper> {}
 
 export interface StateWrapper {
   state: State;
@@ -293,88 +306,6 @@ export interface Request
     UrlWrapper,
     HeadersWrapper {}
 
-export interface Collection extends IdWrapper {}
-export interface Folder extends IdWrapper {}
-export interface Workspace extends IdWrapper {}
-export interface CollectionWrapper {
-  collection: Collection;
-}
-
-export interface WorkspaceWrapper {
-  workspace: Workspace;
-}
-
-export interface FolderWrapper {
-  folder: Folder;
-}
-//////////////////////////
-export interface DescriptionWrapper {
-  description: string;
-}
-export interface IdWrapper {
-  id: string;
-}
-export interface NameWrapper {
-  name: string;
-}
-export interface TypeWrapper {
-  type: TabTypeEnum;
-}
-export interface IsDeletedWrapper {
-  isDeleted: boolean;
-}
-export interface ActiveSyncWrapper {
-  activeSync: boolean;
-}
-
-export interface SourceWrapper {
-  source: string;
-}
-export interface IsActiveWrapper {
-  isActive: boolean;
-}
-export interface IsSavedWrapper {
-  isSaved: boolean;
-}
-export interface TimestampWrapper {
-  timestamp: string;
-}
-export interface IndexWrapper {
-  index: number;
-}
-export interface Property
-  extends RequestWrapper,
-    CollectionWrapper,
-    WorkspaceWrapper,
-    FolderWrapper {}
-export interface PropertyWrapper {
-  property: Property;
-}
-export interface TabIdWrapper {
-  tabId: string;
-}
-export interface Tab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    request?: Request;
-    folder?: Folder;
-    collection?: Collection;
-    workspace?: Workspace;
-  };
-}
-
 export interface RequestTab
   extends ActiveSyncWrapper,
     DescriptionWrapper,
@@ -391,59 +322,5 @@ export interface RequestTab
     TypeWrapper {
   property: {
     request: Request;
-  };
-}
-export interface FolderTab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    folder: Folder;
-  };
-}
-export interface CollectionTab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    collection: Collection;
-  };
-}
-export interface WorkspaceTab
-  extends ActiveSyncWrapper,
-    DescriptionWrapper,
-    IdWrapper,
-    IndexWrapper,
-    IsActiveWrapper,
-    IsDeletedWrapper,
-    IsSavedWrapper,
-    NameWrapper,
-    PathWrapper,
-    SourceWrapper,
-    TabIdWrapper,
-    TimestampWrapper,
-    TypeWrapper {
-  property: {
-    workspace: Workspace;
   };
 }

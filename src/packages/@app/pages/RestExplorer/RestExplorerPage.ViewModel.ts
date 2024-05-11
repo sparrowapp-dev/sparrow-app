@@ -77,22 +77,9 @@ import {
   type Request,
   type Response,
   type KeyValue,
-  type RequestNavigationWrapper,
-  type RequestBodyNavigationWrapper,
-  type RequestBodyLanguageWrapper,
-  type ResponseNavigationWrapper,
-  type ResponseBodyLanguageWrapper,
-  type ResponseBodyFormatterWrapper,
-  type RequestExtensionNavigationWrapper,
-  type IsExposeEditDescriptionWrapper,
-  type RequestSplitterDirectionWrapper,
-  type RequestLeftSplitterWidthPercentageWrapper,
-  type RequestRightSplitterWidthPercentageWrapper,
-  type IsSendRequestInProgressWrapper,
-  type IsSaveDescriptionInProgressWrapper,
-  type IsSaveRequestInProgressWrapper,
   type RequestTab,
   RequestDatasetEnum,
+  type StatePartial,
 } from "@common/types/rest-explorer";
 import { notifications } from "$lib/components/toast-notification/ToastNotification";
 
@@ -349,23 +336,7 @@ class RestExplorerViewModel
    *
    * @param _state - request state
    */
-  public updateRequestState = async (
-    _state:
-      | RequestBodyLanguageWrapper
-      | RequestBodyNavigationWrapper
-      | RequestNavigationWrapper
-      | ResponseNavigationWrapper
-      | ResponseBodyLanguageWrapper
-      | ResponseBodyFormatterWrapper
-      | RequestExtensionNavigationWrapper
-      | IsExposeEditDescriptionWrapper
-      | RequestSplitterDirectionWrapper
-      | RequestLeftSplitterWidthPercentageWrapper
-      | RequestRightSplitterWidthPercentageWrapper
-      | IsSendRequestInProgressWrapper
-      | IsSaveDescriptionInProgressWrapper
-      | IsSaveRequestInProgressWrapper,
-  ) => {
+  public updateRequestState = async (_state: StatePartial) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.state = {
       ...progressiveTab.property.request.state,
