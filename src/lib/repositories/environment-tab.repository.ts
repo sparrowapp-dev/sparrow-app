@@ -73,33 +73,6 @@ export class EnvironmentTabRepository {
   };
 
   /**
-   * Responsible to change environment tab property like :
-   * id, name, description, save.
-   */
-  public setEnvironmentTabProperty = async (
-    data: any,
-    route: string,
-    id: string,
-  ): Promise<void> => {
-    const query = await RxDB.getInstance()
-      .rxdb.environmenttab.findOne({
-        selector: {
-          id,
-        },
-      })
-      .exec();
-    if (query) {
-      query.incrementalModify((value: any) => {
-        value[route] = data;
-        if (route === "name" || route === "variable") {
-          value["isSave"] = false;
-        }
-        return value;
-      });
-    }
-  };
-
-  /**
    * @description
    * updates existing environment.
    */
@@ -111,9 +84,11 @@ export class EnvironmentTabRepository {
         },
       })
       .exec();
-    environment.incrementalModify((value) => {
-      return { ...value, ...data };
-    });
+    if (environment) {
+      environment.incrementalModify((value) => {
+        return { ...value, ...data };
+      });
+    }
   };
 
   /**

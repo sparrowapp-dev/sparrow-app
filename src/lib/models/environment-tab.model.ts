@@ -6,26 +6,24 @@ import {
 
 export const environmentTabSchemaLiteral = {
   title: "environment",
-  primaryKey: {
-    // where should the composed string be stored
-    key: "environmentId",
-    // fields that will be used to create the composed key
-    fields: ["createdAt"],
-    // separator which is used to concat the fields values.
-    separator: "|",
-  },
+  primaryKey: "environmentId",
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
-    id: {
-      type: "string",
-      maxLength: 100,
-    },
+    // ---- RxDocumentId
     environmentId: {
       type: "string",
       maxLength: 100,
     },
+    // ---- MongoDocumentId
+    id: {
+      type: "string",
+      maxLength: 100,
+    },
     name: {
+      type: "string",
+    },
+    description: {
       type: "string",
     },
     variable: {
@@ -61,7 +59,7 @@ export const environmentTabSchemaLiteral = {
     workspaceId: {
       type: "string",
     },
-    createdAt: {
+    timestamp: {
       type: "string",
     },
   },

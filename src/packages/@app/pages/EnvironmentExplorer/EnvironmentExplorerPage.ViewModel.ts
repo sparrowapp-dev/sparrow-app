@@ -91,8 +91,10 @@ export class EnvironmentExplorerViewModel {
         response.data.data._id,
         response.data.data,
       );
-      await this.setEnvironmentTabProperty({ isSaveInProgress: false });
-      this.setEnvironmentTabProperty({ isSave: true });
+      await this.setEnvironmentTabProperty({
+        isSaveInProgress: false,
+        isSave: true,
+      });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );

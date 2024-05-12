@@ -12,7 +12,6 @@ export interface EnvironmentRepositoryMethods {
   ) => void;
 
   createEnvironmentTab: (tab, workspaceId: string) => void;
-  setEnvironmentTabProperty: (data, route, environmentId) => void;
   deleteEnvironmentTab: (environmentId: string) => void;
 }
 

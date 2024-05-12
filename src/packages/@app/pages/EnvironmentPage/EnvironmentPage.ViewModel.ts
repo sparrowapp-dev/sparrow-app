@@ -3,11 +3,10 @@ import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repo
 import { EnvironmentRepository } from "$lib/repositories/environment.repository";
 import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
 import { EnvironmentService } from "$lib/services/environment.service";
-import type { CreateEnvironmentPostBody } from "$lib/utils/dto";
 import { Events, UntrackedItems } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { generateSampleEnvironment } from "$lib/utils/sample/environment.sample";
+import { InitEnvironmentTab } from "@common/utils";
 import { v4 as uuidv4 } from "uuid";
 
 export class EnvironmentViewModel {
@@ -30,37 +29,6 @@ export class EnvironmentViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   };
 
-  public createEnvironment = (environment) => {
-    this.environmentRepository.addEnvironment(environment);
-  };
-
-  public updateEnvironment = (uuid, data) => {
-    this.environmentRepository.updateEnvironment(uuid, data);
-  };
-
-  public deleteEnvironment = (id) => {
-    this.environmentRepository.removeEnvironment(id);
-  };
-
-  public initActiveEnvironmentToWorkspace = async (
-    workspaceId: string,
-    environmentId: string,
-  ) => {
-    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
-  };
-
-  public createEnvironmentTab = async (tab, workspaceId: string) => {
-    this.environmentTabRepository.createTab(tab, workspaceId);
-  };
-
-  public setEnvironmentTabProperty = async (data, route, environmentId) => {
-    this.environmentTabRepository.setEnvironmentTabProperty(
-      data,
-      route,
-      environmentId,
-    );
-  };
-
   public refreshEnvironment = async (workspaceId) => {
     const activeTab =
       await this.environmentTabRepository.getActiveEnvironmentTab(workspaceId);
@@ -72,17 +40,17 @@ export class EnvironmentViewModel {
       if (!activeTab) {
         environments.forEach((environment) => {
           if (environment.type === environmentType.GLOBAL) {
-            const sampleEnvironment = generateSampleEnvironment(
+            const initEnvironmentTab = new InitEnvironmentTab(
               environment.id,
               workspaceId,
-              new Date().toString(),
             );
-            sampleEnvironment.name = environment.name;
-            sampleEnvironment.isActive = true;
-            sampleEnvironment.type = environmentType.GLOBAL;
-            sampleEnvironment.variable = environment.variable;
+            initEnvironmentTab
+              .setName(environment.name)
+              .setIsActive(true)
+              .setType(environmentType.GLOBAL)
+              .setVariable(environment.variable);
             this.environmentTabRepository.createTab(
-              sampleEnvironment,
+              initEnvironmentTab.getValue(),
               workspaceId,
             );
           }
@@ -92,65 +60,34 @@ export class EnvironmentViewModel {
     return;
   };
 
-  public deleteEnvironmentTab = async (environmentId) => {
+  private deleteEnvironmentTab = async (environmentId) => {
     const flag =
       await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
     if (flag[0]) {
       const globalEnvironment =
         await this.environmentRepository.getGlobalEnvironment(flag[1]);
-      const sampleEnvironment = generateSampleEnvironment(
+
+      const initEnvironmentTab = new InitEnvironmentTab(
         globalEnvironment.id,
         globalEnvironment.workspaceId,
-        new Date().toString(),
       );
-      sampleEnvironment.name = globalEnvironment.name;
-      sampleEnvironment.isActive = true;
-      sampleEnvironment.type = environmentType.GLOBAL;
-      sampleEnvironment.variable = globalEnvironment.variable;
+      initEnvironmentTab
+        .setName(globalEnvironment.name)
+        .setIsActive(true)
+        .setType(environmentType.GLOBAL)
+        .setVariable(globalEnvironment.variable);
 
-      this.createEnvironmentTab(
-        sampleEnvironment,
-        sampleEnvironment.workspaceId,
+      this.environmentTabRepository.createTab(
+        initEnvironmentTab.getValue(),
+        initEnvironmentTab.getValue().workspaceId,
       );
     }
   };
 
-  // services -----------------------------------------------------------
-  public getServerEnvironments = async (workspaceId: string) => {
-    return await this.environmentService.fetchAllEnvironments(workspaceId);
-  };
-
-  public deleteServerEnvironment = (
-    environmentId: string,
-    workspaceId: string,
+  private getNextEnvironment: (list: any[], name: string) => any = (
+    list,
+    name,
   ) => {
-    return this.environmentService.deleteEnvironment(
-      workspaceId,
-      environmentId,
-    );
-  };
-
-  public createServerEnvironment = async (
-    environment: CreateEnvironmentPostBody,
-  ) => {
-    return await this.environmentService.addEnvironment(environment);
-  };
-
-  public updateServerEnvironment = async (
-    workspaceId: string,
-    environmentId: string,
-    data,
-  ) => {
-    return this.environmentService.updateEnvironment(
-      workspaceId,
-      environmentId,
-      data,
-    );
-  };
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  getNextEnvironment: (list: any[], name: string) => any = (list, name) => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
@@ -187,25 +124,27 @@ export class EnvironmentViewModel {
       createdAt: new Date().toISOString(),
     };
 
-    this.createEnvironment(newEnvironment);
-    const response = await this.createServerEnvironment({
+    this.environmentRepository.addEnvironment(newEnvironment);
+    const response = await this.environmentService.addEnvironment({
       name: newEnvironment.name,
       workspaceId: currentWorkspace._id,
       variable: newEnvironment.variable,
     });
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      let sampleEnvironment = generateSampleEnvironment(
+
+      const initEnvironmentTab = new InitEnvironmentTab(
         res._id,
         currentWorkspace._id,
-        new Date().toString(),
       );
-      sampleEnvironment.name = res.name;
-      sampleEnvironment.isActive = true;
-      this.createEnvironmentTab(sampleEnvironment, currentWorkspace._id);
-      this.deleteEnvironment(newEnvironment.id);
+      initEnvironmentTab.setName(res.name).setIsActive(true);
+      this.environmentTabRepository.createTab(
+        initEnvironmentTab.getValue(),
+        currentWorkspace._id,
+      );
+      this.environmentRepository.removeEnvironment(newEnvironment.id);
 
-      this.createEnvironment({
+      this.environmentRepository.addEnvironment({
         ...res,
         workspaceId: currentWorkspace._id,
         id: res._id,
@@ -214,7 +153,7 @@ export class EnvironmentViewModel {
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
     } else {
-      this.deleteEnvironment(newEnvironment.id);
+      this.environmentRepository.removeEnvironment(newEnvironment.id);
       notifications.error("Failed to create environment. Please try again.");
     }
     MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
@@ -222,28 +161,31 @@ export class EnvironmentViewModel {
   };
 
   public onOpenGlobalEnvironment = (environment) => {
-    let sampleEnvironment = generateSampleEnvironment(
+    const initEnvironmentTab = new InitEnvironmentTab(
       environment?.id,
       environment.workspaceId,
-      new Date().toString(),
     );
-    sampleEnvironment.name = environment?.name;
-    sampleEnvironment.isActive = true;
-    sampleEnvironment.type = environmentType.GLOBAL;
-    sampleEnvironment.variable = environment?.variable;
-    this.createEnvironmentTab(sampleEnvironment, environment.workspaceId);
+    initEnvironmentTab
+      .setName(environment?.name)
+      .setIsActive(true)
+      .setType(environmentType.GLOBAL)
+      .setVariable(environment?.variable);
+    this.environmentTabRepository.createTab(
+      initEnvironmentTab.getValue(),
+      environment.workspaceId,
+    );
   };
 
   public onDeleteEnvironment = async (env) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
-    const response = await this.deleteServerEnvironment(
-      env.id,
+    const response = await this.environmentService.deleteEnvironment(
       currentWorkspace._id,
+      env.id,
     );
     if (response.isSuccessful) {
-      this.deleteEnvironment(env.id);
+      this.environmentRepository.removeEnvironment(env.id);
       this.deleteEnvironmentTab(env.id);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,
@@ -262,7 +204,7 @@ export class EnvironmentViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
-    const response = await this.updateServerEnvironment(
+    const response = await this.environmentService.updateEnvironment(
       currentWorkspace._id,
       env.id,
       {
@@ -270,10 +212,12 @@ export class EnvironmentViewModel {
       },
     );
     if (response.isSuccessful) {
-      this.updateEnvironment(env.id, {
+      this.environmentRepository.updateEnvironment(env.id, {
         name: newEnvironmentName,
       });
-      this.setEnvironmentTabProperty(newEnvironmentName, "name", env.id);
+      this.environmentTabRepository.updateEnvironmentTab(env.id, {
+        name: newEnvironmentName,
+      });
     } else if (response.message === "Network Error") {
       notifications.error(response.message);
     } else {
@@ -285,15 +229,20 @@ export class EnvironmentViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
-    let sampleEnvironment = generateSampleEnvironment(
+
+    const initEnvironmentTab = new InitEnvironmentTab(
       env.id,
       currentWorkspace._id,
-      new Date().toString(),
     );
-    sampleEnvironment.name = env.name;
-    sampleEnvironment.isActive = true;
-    sampleEnvironment.variable = env.variable;
-    this.createEnvironmentTab(sampleEnvironment, currentWorkspace._id);
+    initEnvironmentTab
+      .setName(env.name)
+      .setIsActive(true)
+      .setVariable(env.variable);
+
+    this.environmentTabRepository.createTab(
+      initEnvironmentTab.getValue(),
+      currentWorkspace._id,
+    );
   };
 
   public onSelectEnvironment = async (env) => {
@@ -301,9 +250,13 @@ export class EnvironmentViewModel {
       env.workspaceId,
     );
     if (currentWorkspace?.environmentId === env.id) {
-      this.initActiveEnvironmentToWorkspace(currentWorkspace._id, "none");
+      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+        environmentId: "none",
+      });
     } else {
-      this.initActiveEnvironmentToWorkspace(currentWorkspace._id, env.id);
+      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+        environmentId: env.id,
+      });
     }
   };
 }

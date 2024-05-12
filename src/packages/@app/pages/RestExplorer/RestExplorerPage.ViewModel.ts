@@ -1126,15 +1126,9 @@ class RestExplorerViewModel
           response.data.data,
         );
         // updates environment tab
-        await this.environmentTabRepository.setEnvironmentTabProperty(
-          response.data.data.variable,
-          "variable",
+        await this.environmentTabRepository.updateEnvironmentTab(
           response.data.data._id,
-        );
-        await this.environmentTabRepository.setEnvironmentTabProperty(
-          true,
-          "isSave",
-          response.data.data._id,
+          { variable: response.data.data.variable, isSave: true },
         );
         notifications.success("Environment Variable Added");
       } else {
@@ -1178,15 +1172,9 @@ class RestExplorerViewModel
           response.data.data,
         );
         // updates environment tab
-        await this.environmentTabRepository.setEnvironmentTabProperty(
-          response.data.data.variable,
-          "variable",
+        await this.environmentTabRepository.updateEnvironmentTab(
           response.data.data._id,
-        );
-        await this.environmentTabRepository.setEnvironmentTabProperty(
-          true,
-          "isSave",
-          response.data.data._id,
+          { variable: response.data.data.variable, isSave: true },
         );
         notifications.success("Environment Variable Added");
       } else {

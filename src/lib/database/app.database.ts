@@ -103,25 +103,25 @@ export class RxDB {
         schema: workspaceSchema,
         migrationStrategies: {
           // database  migration functions
-          1: function (oldDoc: TabDocument) {
+          1: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          2: function (oldDoc: TabDocument) {
+          2: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          3: function (oldDoc: TabDocument) {
+          3: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          4: function (oldDoc: TabDocument) {
+          4: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          5: function (oldDoc: TabDocument) {
+          5: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          6: function (oldDoc: TabDocument) {
+          6: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
-          7: function (oldDoc: TabDocument) {
+          7: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
         },
@@ -202,13 +202,13 @@ export class RxDB {
         schema: environmentSchema,
         migrationStrategies: {
           //   // database  migration functions
-          1: function (oldDoc: TabDocument) {
+          1: function (oldDoc: EnvironmentDocument) {
             return oldDoc;
           },
-          2: function (oldDoc: TabDocument) {
+          2: function (oldDoc: EnvironmentDocument) {
             return oldDoc;
           },
-          3: function (oldDoc: TabDocument) {
+          3: function (oldDoc: EnvironmentDocument) {
             return oldDoc;
           },
         },
@@ -221,6 +221,9 @@ export class RxDB {
             return oldDoc;
           },
           2: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },
