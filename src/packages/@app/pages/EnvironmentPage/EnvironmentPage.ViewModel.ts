@@ -6,7 +6,7 @@ import { EnvironmentService } from "$lib/services/environment.service";
 import { Events, UntrackedItems } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { InitEnvironmentTab } from "@common/utils";
+import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
 
 export class EnvironmentViewModel {
@@ -14,6 +14,7 @@ export class EnvironmentViewModel {
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
+  private initTab = new InitTab();
 
   constructor() {}
 
@@ -40,7 +41,7 @@ export class EnvironmentViewModel {
       if (!activeTab) {
         environments.forEach((environment) => {
           if (environment.type === environmentType.GLOBAL) {
-            const initEnvironmentTab = new InitEnvironmentTab(
+            const initEnvironmentTab = this.initTab.environment(
               environment.id,
               workspaceId,
             );
@@ -49,6 +50,7 @@ export class EnvironmentViewModel {
               .setIsActive(true)
               .setType(environmentType.GLOBAL)
               .setVariable(environment.variable);
+
             this.environmentTabRepository.createTab(
               initEnvironmentTab.getValue(),
               workspaceId,
@@ -67,7 +69,7 @@ export class EnvironmentViewModel {
       const globalEnvironment =
         await this.environmentRepository.getGlobalEnvironment(flag[1]);
 
-      const initEnvironmentTab = new InitEnvironmentTab(
+      const initEnvironmentTab = this.initTab.environment(
         globalEnvironment.id,
         globalEnvironment.workspaceId,
       );
@@ -133,7 +135,7 @@ export class EnvironmentViewModel {
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
-      const initEnvironmentTab = new InitEnvironmentTab(
+      const initEnvironmentTab = this.initTab.environment(
         res._id,
         currentWorkspace._id,
       );
@@ -161,7 +163,7 @@ export class EnvironmentViewModel {
   };
 
   public onOpenGlobalEnvironment = (environment) => {
-    const initEnvironmentTab = new InitEnvironmentTab(
+    const initEnvironmentTab = this.initTab.environment(
       environment?.id,
       environment.workspaceId,
     );
@@ -230,7 +232,7 @@ export class EnvironmentViewModel {
       env.workspaceId,
     );
 
-    const initEnvironmentTab = new InitEnvironmentTab(
+    const initEnvironmentTab = this.initTab.environment(
       env.id,
       currentWorkspace._id,
     );
