@@ -41,8 +41,10 @@
     if (_isFocused) {
       return focusedBorderColor;
     } else if (_isHovered) {
+      if (disabled) return defaultBorderColor;
       return hoveredBorderColor;
     } else {
+      if (disabled) return defaultBorderColor;
       return defaultBorderColor;
     }
   };
@@ -85,7 +87,7 @@
       <SearchIcon height={14} width={14} color={"var(--defaultcolor)"} />
     </span>
   {/if}
-  {#if type === "text" && isHovered}
+  {#if type === "text" && isHovered && !disabled}
     <span class="position-absolute" style="top:2px; right: 10px">
       <PencilIcon height={"14px"} width={"14px"} color={"white"} />
     </span>
