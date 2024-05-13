@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlusIcon } from "$lib/assets/app.asset";
+  import { PlusIcon } from "@library/icons";
   import { Tooltip } from "$lib/components";
   import { v4 as uuidv4 } from "uuid";
   import { onDestroy } from "svelte";
@@ -123,25 +123,22 @@
         {globalEnvironment[0]?.name}
       </p>
     {/if}
-    <hr class="mb-0" />
+    <hr class="mb-0 mt-1" />
 
+    <p class="fw-normal text-fs-14 rounded my-2" style="padding-left: 12px;">
+      Environment Variables
+    </p>
     {#if localEnvironment && localEnvironment.length === 0}
-      <div class={`add-env-container py-3`}>
-        <p class={`add-env-desc-text text-fs-12 fw-light text-center mb-3`}>
+      <div class={`pt-3 pb-2`}>
+        <p class={`add-env-desc-text text-fs-12 mb-0 fw-normal text-center`}>
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
       </div>
     {/if}
     <ul class={`env-side-tab-list p-0`}>
-      {#if localEnvironment && localEnvironment.length > 0}
-        <p
-          class="fw-normal text-fs-14 rounded my-2"
-          style="padding-left: 12px;"
-        >
-          Environment Variables
-        </p>
-        <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
+      <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
+        {#if localEnvironment && localEnvironment.length > 0}
           {#each localEnvironment as env}
             <ListItem
               {env}
@@ -153,17 +150,18 @@
               {onSelectEnvironment}
             />
           {/each}
-          <p
-            class="fw-normal text-fs-14 m-2 ms-3"
-            role="button"
-            on:click={() => {
-              onCreateEnvironment(localEnvironment);
-            }}
-          >
-            + Add Environment
-          </p>
-        </List>
-      {/if}
+        {/if}
+        <p
+          class="fw-normal d-flex align-items-center text-fs-14 m-2 ms-3"
+          role="button"
+          on:click={() => {
+            onCreateEnvironment(localEnvironment);
+          }}
+        >
+          <PlusIcon />
+          <span>Add Environment</span>
+        </p>
+      </List>
     </ul>
   {/if}
 </div>
@@ -196,10 +194,6 @@
   }
   .curr-workspace {
     max-height: 20vw;
-  }
-  .add-env-container {
-    padding: 32px 0px;
-    gap: 4px;
   }
   .add-env-mini-btn {
     background-color: transparent;

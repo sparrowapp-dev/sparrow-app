@@ -18,12 +18,20 @@
   import { TabularInput } from "@environments/common/components";
   import { WithIconButton } from "@environments/common/hoc";
   import { SearchIcon } from "$lib/assets/icons";
+  import { Input } from "@library/forms";
 
   let quickHelp: boolean = false;
   let search = "";
+  let environmentName = "";
 
-  const handleCurrentEnvironmentNameChange = (e: any) => {
-    onUpdateName(e.target.value);
+  $: {
+    if ($currentEnvironment) {
+      environmentName = $currentEnvironment?.name;
+    }
+  }
+
+  const handleCurrentEnvironmentNameChange = (_name) => {
+    onUpdateName(_name);
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
@@ -37,33 +45,35 @@
   <div class={`env-panel d-flex`}>
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
       <header class={`env-header justify-content-between d-flex`}>
-        <input
+        <Input
+          width={"calc(100% - 500px)"}
           type="text"
-          class={`env-heading ellipsis fw-normal px-2 border-0`}
-          value={$currentEnvironment?.name}
-          on:input={(e) => handleCurrentEnvironmentNameChange(e)}
+          bind:value={environmentName}
+          on:input={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName);
+          }}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="{'var(--border-primary-300)'};"
+          focusedBorderColor="{'var(--border-primary-300)'};"
+          class="text-fs-18 bg-transparent ellipsis fw-normal border-1 px-2"
+          style="outline:none;"
           disabled={$currentEnvironment?.type == "GLOBAL"}
+          placeholder=""
         />
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">
-            <input
+            <Input
               type="search"
-              class="searchField text-fs-12 rounded p-2 bg-secondary-600"
-              style="padding-left:35px !important; outline:none; width:300px;"
-              placeholder="Search Variables"
               bind:value={search}
+              on:input={() => {}}
+              width={"300px"}
+              class="text-fs-12 rounded border-1 p-2 bg-secondary-600"
+              style="outline:none;"
+              placeholder="Search Variables"
+              defaultBorderColor="transparent"
+              hoveredBorderColor="{'var(--border-primary-300)'};"
+              focusedBorderColor="{'var(--border-primary-300)'};"
             />
-            <span
-              class="position-absolute"
-              style="top:5px;
-                    left: 10px"
-            >
-              <SearchIcon
-                height={16}
-                width={16}
-                color={"var(--defaultcolor)"}
-              />
-            </span>
           </div>
           <Tooltip
             title={PERMISSION_NOT_FOUND_TEXT}
@@ -197,11 +207,5 @@
   }
   .env-help-btn:active {
     background-color: var(--selected-active-sidebar);
-  }
-  .searchField {
-    border: 1px solid var(--border-secondary-400) !important;
-  }
-  .searchField:focus {
-    border: 1px solid var(--border-primary-300) !important;
   }
 </style>
