@@ -18,19 +18,36 @@ export class EnvironmentViewModel {
 
   constructor() {}
 
+  /**
+   * @description - fetches environment list
+   */
   public get environments() {
     return this.environmentRepository.getEnvironment();
   }
 
+  /**
+   * @description - fetches active environment
+   * @param workspaceId - workspace Id to which environment belongs
+   * @returns
+   */
   public getactiveEnvironmentTab = (workspaceId: string) => {
     return this.environmentTabRepository.getEnvironmentTab(workspaceId);
   };
 
+  /**
+   * @description - fetches active workspace
+   * @returns
+   */
   public getActiveWorkspace = () => {
     return this.workspaceRepository.getActiveWorkspace();
   };
 
-  public refreshEnvironment = async (workspaceId) => {
+  /**
+   * @description - refreshes environment data with sync to mongo server
+   * @param workspaceId - workspace Id to which environment belongs
+   * @returns
+   */
+  public refreshEnvironment = async (workspaceId: string) => {
     const activeTab =
       await this.environmentTabRepository.getActiveEnvironmentTab(workspaceId);
     const response =
@@ -62,7 +79,11 @@ export class EnvironmentViewModel {
     return;
   };
 
-  private deleteEnvironmentTab = async (environmentId) => {
+  /**
+   * @description - deletes environment tab
+   * @param environmentId - environment id needs to be deleted
+   */
+  private deleteEnvironmentTab = async (environmentId: string) => {
     const flag =
       await this.environmentTabRepository.deleteEnvironmentTab(environmentId);
     if (flag[0]) {
@@ -86,6 +107,12 @@ export class EnvironmentViewModel {
     }
   };
 
+  /**
+   * @description - finds next environment name to be created
+   * @param list - previous environment list
+   * @param name - sample environment name
+   * @returns
+   */
   private getNextEnvironment: (list: any[], name: string) => any = (
     list,
     name,
@@ -107,6 +134,11 @@ export class EnvironmentViewModel {
     return null;
   };
 
+  /**
+   * @description - creates new environment
+   * @param localEnvironment - new environment data
+   * @returns
+   */
   public onCreateEnvironment = async (localEnvironment) => {
     const currentWorkspace =
       await this.workspaceRepository.getActiveWorkspaceDoc();
@@ -162,6 +194,10 @@ export class EnvironmentViewModel {
     return;
   };
 
+  /**
+   * @description - create a global environment tab
+   * @param environment - environment data
+   */
   public onOpenGlobalEnvironment = (environment) => {
     const initEnvironmentTab = this.initTab.environment(
       environment?.id,
@@ -178,6 +214,11 @@ export class EnvironmentViewModel {
     );
   };
 
+  /**
+   * @description - deletes environment from mongo server
+   * @param env - environment needs to be deleted
+   * @returns
+   */
   public onDeleteEnvironment = async (env) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
@@ -202,7 +243,12 @@ export class EnvironmentViewModel {
     return response;
   };
 
-  public onUpdateEnvironment = async (env, newEnvironmentName) => {
+  /**
+   * @description - updates the environment
+   * @param env  - environment that need to be updated
+   * @param newEnvironmentName - new environment data
+   */
+  public onUpdateEnvironment = async (env, newEnvironmentName: string) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
@@ -227,6 +273,10 @@ export class EnvironmentViewModel {
     }
   };
 
+  /**
+   * @description - creates new local environment tab
+   * @param env - environment that needs to be opened
+   */
   public onOpenEnvironment = async (env) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
@@ -247,6 +297,10 @@ export class EnvironmentViewModel {
     );
   };
 
+  /**
+   * @description - selects the environment
+   * @param env  - environment that needs to be selected
+   */
   public onSelectEnvironment = async (env) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,

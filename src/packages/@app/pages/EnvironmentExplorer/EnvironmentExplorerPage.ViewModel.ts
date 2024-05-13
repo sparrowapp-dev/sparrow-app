@@ -15,7 +15,6 @@ export class EnvironmentExplorerViewModel {
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
 
-  ///////////////////////////////////////////////////////////////////
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
 
   public constructor(doc) {
@@ -36,6 +35,10 @@ export class EnvironmentExplorerViewModel {
     this._tab.next(value);
   }
 
+  /**
+   * @description - updates environment tab name
+   * @param _name - new environment name
+   */
   public updateName = async (_name: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.isSave = false;
@@ -47,6 +50,10 @@ export class EnvironmentExplorerViewModel {
     );
   };
 
+  /**
+   * @description - updates environment tab variables
+   * @param _variable - new environment variables
+   */
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.isSave = false;
@@ -58,6 +65,10 @@ export class EnvironmentExplorerViewModel {
     );
   };
 
+  /**
+   * @description - updates environment properties
+   * @param _data - new environment properties
+   */
   public setEnvironmentTabProperty = async (_data) => {
     let progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.isSave = false;
@@ -72,6 +83,9 @@ export class EnvironmentExplorerViewModel {
     );
   };
 
+  /**
+   * @description - saves environment to the mongo server
+   */
   public saveEnvironment = async () => {
     const currentEnvironment = this._tab.getValue();
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
