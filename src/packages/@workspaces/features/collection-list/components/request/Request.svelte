@@ -33,6 +33,7 @@
   import type { Observable } from "rxjs";
   import AddEnvironment from "$lib/components/collections/req-res-section/sub-components/add-environment-popup/AddEnvironment.svelte";
   import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
+  import MoreOptions from "../more-options/MoreOptions.svelte";
   let showPath = false;
 
   if (folder) {
@@ -127,7 +128,7 @@
 >
 
 {#if showMenu}
-  <RightOption
+  <MoreOptions
     xAxis={pos.x}
     yAxis={pos.y}
     menuItems={[
