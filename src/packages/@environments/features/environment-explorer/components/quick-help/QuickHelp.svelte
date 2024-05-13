@@ -1,9 +1,11 @@
 <script>
   import cross from "$lib/assets/close.svg";
-  import environment from "$lib/assets/environment.png";
-  import dropdown from "$lib/assets/environment-dropdown.png";
   import variables from "$lib/assets/variables.png";
   import { QuickHelp } from "$lib/utils/constants/environment.constant";
+  import {
+    environmentDropdown,
+    environmentPicker,
+  } from "@environments/common/images";
   export let closeQuickHelp;
 </script>
 
@@ -47,7 +49,7 @@
   <p class="heading-para text-textColor">
     {QuickHelp.usingVariables[0]}
   </p>
-  <p><img class="w-100" src={environment} alt="" /></p>
+  <p><img class="w-100" src={environmentPicker} alt="" /></p>
   <p class="heading-para text-textColor">
     {@html QuickHelp.usingVariables[1]}
   </p>
@@ -62,7 +64,7 @@
     </p>
   {/each}
 
-  <p><img class="w-100" src={dropdown} alt="" /></p>
+  <p><img class="w-60" src={environmentDropdown} alt="" /></p>
 
   <!-- <h6 class="heading-title">Protect Sensitive information</h6>
     <p class="heading-para text-textColor">
