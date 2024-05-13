@@ -53,7 +53,7 @@
             handleCurrentEnvironmentNameChange(environmentName);
           }}
           defaultBorderColor="transparent"
-          hoveredBorderColor="{'var(--border-primary-300)'};"
+          hoveredBorderColor="transparent"
           focusedBorderColor="{'var(--border-primary-300)'};"
           class="text-fs-18 bg-transparent ellipsis fw-normal border-1 px-2"
           style="outline:none;"
