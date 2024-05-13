@@ -72,7 +72,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--background-color);
+    background-color: var(--bg-tertiary-400);
     border-radius: 10px;
   }
   .sparrow-modal-heading {

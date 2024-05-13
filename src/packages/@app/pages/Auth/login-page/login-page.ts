@@ -72,7 +72,7 @@ export async function handleLoginV2(url: string) {
       Success: true,
     });
     notifications.success("Login successful!");
-    navigate("/dashboard/collections?first=true");
+    navigate("/app/collections?first=true");
     _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {

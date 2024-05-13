@@ -131,7 +131,7 @@
     <p>
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
-        class="text-whiteColor">"{env.name}"</span
+        class="">"{env.name}"</span
       >
       and all its variables will be removed and cannot be restored. It will also
       impact all the API requests that use the variables in this environment.
