@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Select } from "$lib/components/inputs";
   import { AuthType } from "$lib/utils/enums/authorization.enum";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@workspaces/common/hoc";
@@ -18,7 +17,6 @@
       <span class="d-flex">
         <p class="mb-0">
           <WithSelect
-            wrappedComponent={Select}
             id={"hash999"}
             data={[
               {
@@ -38,10 +36,12 @@
                 id: AuthType.BASIC_AUTH,
               },
             ]}
+            zIndex={499}
             titleId={requestStateAuth}
-            onclick={(id) => {
+            onclick={(id = "") => {
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
+            disabled={false}
           />
         </p>
       </span>

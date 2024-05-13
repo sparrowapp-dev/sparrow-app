@@ -1,8 +1,5 @@
 <script>
-  /**
-   * hoc component
-   */
-  export let wrappedComponent;
+  import { Select } from "$lib/components/inputs";
   /**
    * unique Select component id
    */
@@ -19,24 +16,27 @@
    * on change event
    */
   export let onclick;
-  $: ({ wrappedComponent, id, data, titleId, onclick } = $$props);
+  export let zIndex;
+  export let disabled;
+  $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
 
-<svelte:component
-  this={wrappedComponent}
+<Select
   {id}
   {data}
   {titleId}
   {onclick}
-  headerTheme={"grey"}
+  {zIndex}
+  {disabled}
   borderType={"none"}
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
   minBodyWidth={"150px"}
   borderRounded={true}
-  bodyTheme={"grey"}
-  zIndex={499}
-  checkIconColor={"var(--text-primary-200)"}
+  headerTheme={"dark-violet"}
+  bodyTheme={"violet"}
   menuItem={"v2"}
+  headerFontSize={"12px"}
+  isDropIconFilled={true}
 />

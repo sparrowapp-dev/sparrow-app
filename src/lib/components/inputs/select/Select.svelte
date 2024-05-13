@@ -76,17 +76,13 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme:
-    | "dark"
-    | "transparent"
-    | "violet"
-    | "dark-violet"
-    | "grey" = "dark";
+  export let headerTheme: "dark" | "transparent" | "violet" | "dark-violet" =
+    "dark";
 
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "violet" | "grey" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -115,11 +111,13 @@
    */
   export let iconRequired = false;
   export let icon = GitBranchIcon;
-  export let checkIconColor = "white";
 
   export let headerFontSize: string = "14px";
 
   export let headerFontWeight: number = 500;
+  export let highlightTickedItem = true;
+
+  export let disabled = false;
 
   let selectWrapper: HTMLElement;
 
@@ -202,8 +200,6 @@
       break;
     case "violet":
       selectBodyBackgroundClass = "select-body-background-violet";
-    case "grey":
-      selectBodyBackgroundClass = "select-body-background-grey";
   }
 
   let leftDistance: number;
@@ -247,7 +243,7 @@
     _isHover: boolean,
     _isClicked: boolean,
   ) => {
-    if (_isClicked && _isHover) {
+    if (_isClicked && _isHover && headerHighlight !== "") {
       let x;
       switch (headerTheme) {
         case "transparent":
@@ -261,9 +257,6 @@
           break;
         case "dark-violet":
           x = "dark-violet";
-          break;
-        case "grey":
-          x = "grey";
           break;
       }
       return `select-btn-state-clicked-${x}`;
@@ -286,9 +279,6 @@
           break;
         case "dark-violet":
           x = "dark-violet";
-        case "grey":
-          x = "grey";
-          break;
       }
       return `select-btn-state-active-${x}`;
     } else {
@@ -367,9 +357,11 @@
         d-flex align-items-center justify-content-between"
       style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth};"
     >
-      <p class=" mb-0 ellipsis text-{selectedRequest?.color}">
+      <p
+        class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
+      >
         {#if iconRequired}
-          <span
+          <span class="me-2" style="margin-top: -2px;"
             ><Icon
               height={12}
               width={12}
@@ -378,9 +370,9 @@
           >
         {/if}
         <span
-          class={selectedRequest?.default
-            ? "text-textColor"
-            : getTextColor(selectedRequest?.color)}
+          class="ellipsis me-3 {selectedRequest?.default
+            ? 'text-textColor'
+            : getTextColor(selectedRequest?.color)}"
           style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
         >
           {selectedRequest?.name}
@@ -468,7 +460,7 @@
                 {CheckIcon}
                 {bodyTheme}
                 {getTextColor}
-                {checkIconColor}
+                {highlightTickedItem}
               />
             {/if}
           </div>
@@ -524,7 +516,7 @@
     background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-active-dark {
-    background-color: var(--border-color);
+    background-color: var(--bg-secondary-600);
   }
   .select-btn-state-active-violet {
     background-color: var(--bg-tertiary-600);
@@ -532,24 +524,18 @@
   .select-btn-state-active-dark-violet {
     background-color: var(--bg-tertiary-600);
   }
-  .select-btn-state-active-grey {
-    background-color: var(--dropdown-container);
-  }
 
   // clicked states
   .select-btn-state-clicked-transparent {
     background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-clicked-dark {
-    background-color: var(--border-color);
+    background-color: var(--bg-secondary-400);
   }
   .select-btn-state-clicked-violet {
     background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-clicked-dark-violet {
-    background-color: var(--bg-tertiary-700);
-  }
-  .select-btn-state-clicked-grey {
     background-color: var(--bg-tertiary-700);
   }
   //////////////////////////
@@ -562,9 +548,6 @@
   }
   .select-body-background-violet {
     background-color: var(--bg-tertiary-400);
-  }
-  .select-body-background-grey {
-    background-color: var(--dropdown-container);
   }
   .select-body-background-blur {
     background: var(--background-hover);

@@ -527,7 +527,7 @@ export default class CollectionsViewModel {
    * Get the active workspace
    * @returns :Observable<WorkspaceDocument> - the active workspace
    */
-  public getActiveWorkspace = () => {
+  public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
     return this.workspaceRepository.getActiveWorkspace();
   };
 

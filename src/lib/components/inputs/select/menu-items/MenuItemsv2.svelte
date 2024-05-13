@@ -19,8 +19,8 @@
     id: string;
   };
   export let CheckIcon: any;
-  export let checkIconColor: string;
   export let getTextColor: (color: any) => {};
+  export let highlightTickedItem: boolean;
 
   export let bodyTheme: string;
   let isMenuItemHover = false;
@@ -40,12 +40,6 @@
     if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
       return `select-clicked-highlight-violet-btn`;
     } else if (
-      _bodyTheme === "grey" &&
-      _isMenuItemClicked &&
-      _isMenuItemHover
-    ) {
-      return `select-clicked-highlight-violet-btn`;
-    } else if (
       _bodyTheme === "dark" &&
       _isMenuItemClicked &&
       _isMenuItemHover
@@ -55,15 +49,13 @@
       return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
-    } else if (_bodyTheme === "grey" && _isMenuItemHover) {
-      return `select-hover-highlight-grey-btn`;
     } else {
       return "";
     }
   };
 
   const extractBodyTextHighlight = (_bodyTheme: string, id: string) => {
-    if (_bodyTheme === "grey" && id === selectedRequest?.id) {
+    if (id === selectedRequest?.id && highlightTickedItem) {
       return `select-clicked-highlight-grey-btn-text`;
     }
   };
@@ -100,29 +92,30 @@
     {/if}
   </p>
   {#if selectedRequest?.id === list.id}
-    <CheckIcon color={checkIconColor} />
+    <CheckIcon
+      color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
+    />
   {/if}
 </div>
 
 <style>
+  /* hover states */
   .select-hover-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
   }
-  .select-hover-highlight-grey-btn {
-    background-color: var(--dropdown-option-hover);
-  }
+
+  /* clicked states */
   .select-clicked-highlight-dark-btn {
-    background-color: var(--dull-background-color);
+    background-color: var(--bg-secondary-400);
   }
   .select-clicked-highlight-violet-btn {
     background-color: var(--bg-tertiary-700);
   }
-  .select-clicked-highlight-grey-btn-text {
-    color: var(--text-primary-200) !important;
-  }
+
+  /* others */
   .highlight {
     cursor: pointer;
   }
