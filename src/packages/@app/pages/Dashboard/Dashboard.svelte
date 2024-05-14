@@ -3,7 +3,7 @@
   import { Route } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
-  import { DashboardViewModel } from "./Dashboard.ViewModel.old";
+  import { DashboardViewModel } from "./Dashboard.ViewModel";
   import { user } from "$lib/store";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -24,7 +24,7 @@
 
   <!-- Application Content -->
   <div class="d-flex">
-    <Sidebar {user} />
+    <Sidebar {user} onLogout={_viewModel.handleLogout} />
     <section class="w-100">
       <!-- Route for Collections -->
       <Route path="/collections/*">

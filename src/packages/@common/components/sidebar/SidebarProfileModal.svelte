@@ -1,21 +1,27 @@
 <script lang="ts" context="module">
+  import type { Observable } from "rxjs";
+
   export type SidebarProfileObj = {
     heading: string;
     defaultLogo: any;
     hoveredLogo?: any;
     selectedLogo?: any;
     disabled: boolean;
+    user: Observable<{ name: string; email: string }>;
   };
 </script>
 
 <script lang="ts">
   import SignOutIcon from "./SignOutIcon.svelte";
   import { afterUpdate, onMount } from "svelte";
+  import ShowMore from "$lib/components/dropdown/ShowMore.svelte";
+  import Showmore from "$lib/assets/showmore.svelte";
 
   /**
    * List of side bar Items
    */
   export let item: SidebarProfileObj;
+  export let onLogout: () => void;
   let isHovered = false;
   let isRouteActive = false;
   let buttonElement: HTMLButtonElement;
@@ -43,11 +49,15 @@
 
     getbuttonPosition();
 
-    item.user
-      .subscribe((value) => {
-        user = { name: value.name, email: value.email };
-      })
-      .unsubscribe();
+    item.user.subscribe((value) => {
+      user = { name: value.name, email: value.email };
+    });
+
+    document.addEventListener("click", (e) => {
+      if (buttonElement && !buttonElement.contains(e.target as Node)) {
+        showModal = false;
+      }
+    });
 
     return () => {
       document.removeEventListener("mouseenter", handleMouseEnter);
@@ -87,34 +97,41 @@
   </div>
 </button>
 
-{#if showModal}
-  <div
-    bind:this={modalElement}
-    class="position-fixed d-flex flex-column modal-background ps-3 pe-4 pt-3 pb-2"
-    style="top: {buttonPosition.top -
-      modalPostion?.height +
-      25}px; left: {buttonPosition.left +
-      buttonPosition.width +
-      20}px; font-size: 14px; font-weight: 400;"
-  >
-    <div class="d-flex align-items-center mb-2">
-      <div
-        class="bg-white rounded-5 me-2 border-2 border-defaultColor"
-        style="height: 36px; width: 36px;"
-      ></div>
-      <div class="d-flex flex-column">
-        <div>{user?.name}</div>
-        <div class="text-secondary-200">{user?.email}</div>
-      </div>
-    </div>
-    <button
-      class="border-0 bg-transparent d-flex align-items-center px-2 py-1 sign-out-button"
-      ><SignOutIcon size={16} /> <span class="ms-2">Sign Out</span></button
+<div
+  bind:this={modalElement}
+  class="position-fixed d-flex flex-column modal-background ps-2 pe-2 pt-3 pb-2 {showModal
+    ? ''
+    : 'd-none'}"
+  style="top: {buttonPosition?.top -
+    modalPostion?.height +
+    20}px; left: {buttonPosition?.left +
+    buttonPosition?.width +
+    10}px; font-size: 12px; font-weight: 400; min-width: 200px;"
+>
+  <div class="d-flex align-items-center mb-2 px-1">
+    <div
+      class="rounded-5 me-2 border border-defaultColor d-flex justify-content-center align-items-center"
+      style="height: 32px; width: 32px;"
     >
+      {user?.name[0]}
+    </div>
+    <div class="d-flex flex-column ms-1">
+      <div>{user?.name}</div>
+      <div class="text-secondary-200">{user?.email}</div>
+    </div>
   </div>
-{/if}
+  <button
+    class="border-0 bg-transparent d-flex align-items-center px-2 py-1 sign-out-button"
+    style="border-radius: 3px;"
+    on:click={onLogout}
+    ><SignOutIcon size={16} /> <span class="ms-2">Sign Out</span></button
+  >
+</div>
 
 <style>
+  * {
+    transition: all 300ms ease;
+  }
   .sidebar-item img {
     height: 20px;
     width: 20px;
@@ -158,12 +175,12 @@
   }
 
   .modal-background {
-    background: #0b0b0b;
     backdrop-filter: blur(75px);
     border-radius: 5px;
+    background: rgba(137, 137, 137, 0.05);
   }
 
   .sign-out-button:hover {
     background-color: #22232e !important;
-  }
+  } /* CardBody+BlurEffects */
 </style>

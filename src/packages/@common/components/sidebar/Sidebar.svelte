@@ -32,6 +32,7 @@
   let componentClass = "";
   export { componentClass as class };
   export let user;
+  export let onLogout: () => void;
 
   let sidebarItems: SidebarItemObj[] = [
     {
@@ -108,7 +109,7 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
-    <SidebarProfileModal item={sidebarModalItem} />
+    <SidebarProfileModal item={sidebarModalItem} {onLogout} />
   </div>
 </div>
 
