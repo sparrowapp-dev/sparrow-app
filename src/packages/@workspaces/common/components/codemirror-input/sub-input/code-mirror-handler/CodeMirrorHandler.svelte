@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onMount } from "svelte";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
   import { EditorView } from "codemirror";
   import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
@@ -293,6 +293,15 @@
         environmentHighlightStyle(filterData),
       ]),
     });
+  });
+
+  const destroyCodeMirrorEditor = () => {
+    if (codeMirrorView) {
+      codeMirrorView.destroy(); // Destroy the editor view
+    }
+  };
+  onDestroy(() => {
+    destroyCodeMirrorEditor();
   });
 </script>
 

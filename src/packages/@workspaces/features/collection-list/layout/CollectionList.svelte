@@ -1,6 +1,5 @@
 <script lang="ts">
   export let collectionList: Observable<CollectionDocument[]>;
-  export let environmentList: Observable<EnvironmentDocument[]>;
   export let showImportCollectionPopup: () => void;
   export let showImportCurlPopup: () => void;
   export let onItemCreated: (entityType: string, args: any) => void;
@@ -23,7 +22,6 @@
   export let activeTabPath: Path;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let currentEnvironment: Observable<EnvironmentDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
@@ -40,14 +38,11 @@
   import SearchIcon from "$lib/assets/search.svelte";
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
-  import CreateFolder from "$lib/assets/create_folder.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-  import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-  import Select from "$lib/components/inputs/select/Select.svelte";
   import { Dropdown } from "@common/components";
   import List from "$lib/components/list/List.svelte";
   import type { Observable } from "rxjs";
@@ -165,39 +160,6 @@
       >
         <img src={doubleangleLeft} alt="" class="filter-green" />
       </button>
-    </div>
-    <div class="px-3 pt-2 d-none">
-      <Select
-        id="none"
-        titleId={"none"}
-        data={[
-          {
-            name: "none",
-            id: "none",
-            color: "light",
-            default: false,
-            hide: false,
-          },
-        ].concat(
-          $environmentList
-            ? $environmentList.map((env) => {
-                return {
-                  name: env?.name,
-                  id: env?.id,
-                  color: "light",
-                  default: false,
-                  hide: false,
-                };
-              })
-            : [],
-        )}
-        onclick={(env) => (currentEnvironment = env)}
-        headerTheme="transparent"
-        borderType="none"
-        borderActiveType="bottom"
-        borderRounded={false}
-        bodyTheme="dark"
-      />
     </div>
     <div
       class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"

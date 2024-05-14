@@ -178,8 +178,6 @@
   >
     <CollectionList
       {collectionList}
-      {environmentList}
-      {currentEnvironment}
       {currentWorkspace}
       leftPanelController={{
         leftPanelCollapse: $leftPanelCollapse,
