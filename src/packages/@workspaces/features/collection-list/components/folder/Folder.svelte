@@ -1,41 +1,83 @@
 <script lang="ts">
-  export let onItemCreated: (entityType: string, args: any) => void;
-  export let onItemDeleted: (entityType: string, args: any) => void;
-  export let onItemRenamed: (entityType: string, args: any) => void;
-  export let onItemOpened: (entityType: string, args: any) => void;
-  export let collection: CollectionDocument;
-  export let userRoleInWorkspace: WorkspaceRole;
-  export let activeTabPath: Path;
-  export let explorer: Folder;
-  export let folder: Folder | null = null;
+  import { onDestroy } from "svelte";
 
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  // ---- SVG
   import folderCloseIcon from "$lib/assets/folder.svg";
   import folderOpenIcon from "$lib/assets/open-folder.svg";
-  import Request from "../request/Request.svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import threedotIcon from "$lib/assets/3dot.svg";
-  import { selectMethodsStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
+  import AddIcon from "$lib/assets/add.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import angleRight from "$lib/assets/angleRight.svg";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
+  import angleRight from "$lib/assets/angle-right-v2.svg";
+
+  // ---- Components
+  import Request from "../request/Request.svelte";
+  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
-  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import MoreOptions from "../more-options/MoreOptions.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+
+  // ---- Enum, Constants and Interface
+  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import {
     workspaceLevelPermissions,
     PERMISSION_NOT_FOUND_TEXT,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
   import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
+
+  // ---- Store
+  import { selectMethodsStore } from "$lib/store/methods";
+
+  // ---- Helper Functions
+  import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+
+  // ---- DB
+  import type { CollectionDocument } from "$lib/database/app.database";
+
+  /**
+   * Callback for Item created
+   * @param entityType - type of item to create like request/folder
+   * @param args - Arguments to pass on create
+   */
+  export let onItemCreated: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Deleted
+   * @param entityType - type of item to delete like request/folder
+   * @param args - Arguments to pass on delete
+   */
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Rename
+   * @param entityType - type of item to rename like request/folder
+   * @param args - Arguments to pass on rename
+   */
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Open
+   * @param entityType - type of item to open like request/folder
+   * @param args - Arguments to pass on open
+   */
+  export let onItemOpened: (entityType: string, args: any) => void;
+  /**
+   * Whole Collection Document
+   */
+  export let collection: CollectionDocument;
+  /**
+   * Role of user in workspace
+   */
+  export let userRoleInWorkspace: WorkspaceRole;
+  /**
+   * Current Tab Path
+   */
+  export let activeTabPath: Path;
+  /**
+   * Selected folder details
+   */
+  export let explorer: Folder;
+  export let folder: Folder | null = null;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -147,7 +189,7 @@
   >
 
   {#if showMenu}
-    <RightOption
+    <MoreOptions
       xAxis={pos.x}
       yAxis={pos.y}
       menuItems={[
@@ -181,24 +223,6 @@
         },
         {
           onClick: () => {
-            expand = true;
-            onItemCreated("requestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: "Add Request",
-          disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
-        },
-
-        {
-          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -218,9 +242,9 @@
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
-        style="height:36px;"
+        style="height:32px;"
         class="d-flex align-items-center justify-content-between my-button btn-primary ps-2 {explorer.id ===
-        'activeTabId'
+        activeTabPath?.folderId
           ? 'active-folder-tab'
           : ''}"
       >
@@ -242,7 +266,7 @@
           <img
             src={angleRight}
             class=""
-            style="height:14px; width:14px; margin-right:8px; {expand
+            style="height:8px; width:4px; margin-right:8px; {expand
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
@@ -282,7 +306,8 @@
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
                       height: 36px;
-                      font-weight:400;"
+                      font-weight:400;
+                      margin-left:10px"
             >
               {#if expand}
                 <div
@@ -301,7 +326,7 @@
                   />
                 </div>
               {/if}
-              <p class="ellipsis mb-0">
+              <p class="ellipsis mb-0" style="font-size: 12px;">
                 {explorer.name}
               </p>
             </div>
@@ -311,6 +336,21 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else}
+          <Tooltip title="Add Request" styleProp="left: -50%">
+            <button
+              class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+              on:click|preventDefault={() => {
+                expand = true;
+                onItemCreated("requestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }}
+            >
+              <img src={AddIcon} alt="AddIcon" />
+            </button>
+          </Tooltip>
           <Tooltip title="More options" styleProp="left: -50%">
             <button
               class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
@@ -443,18 +483,36 @@
     visibility: visible;
   }
 
+  .my-button:hover .add-icon-container {
+    visibility: visible;
+  }
+
   .threedot-icon-container {
     visibility: hidden;
     background-color: transparent;
   }
 
+  .add-icon-container {
+    visibility: hidden;
+    background-color: transparent;
+    padding: 5px;
+  }
+
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-600);
+    border-radius: 4px;
   }
 
   .threedot-icon-container:hover {
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-600);
+    border-radius: 4px;
+  }
+
+  .add-icon-container:hover {
+    background-color: var(--bg-tertiary-600);
+    border-radius: 4px;
+    padding: 5px;
   }
 
   .btn-primary {
@@ -463,8 +521,8 @@
   }
 
   .btn-primary:hover {
-    border-radius: 8px;
-    background-color: var(--border-color);
+    border-radius: 2px;
+    background-color: var(--bg-tertiary-600);
     color: var(--white-color);
   }
   .renameInputFieldFolder {
@@ -481,7 +539,10 @@
     width: calc(100% - 24px);
   }
   .active-folder-tab {
-    background-color: var(--selected-active-sidebar) !important;
+    background-color: var(--bg-tertiary-400) !important;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
   }
   .folder-title {
     width: calc(100% - 30px);

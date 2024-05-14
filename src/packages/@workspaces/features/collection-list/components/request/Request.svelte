@@ -1,38 +1,71 @@
 <script lang="ts">
-  export let onItemDeleted: (entityType: string, args: any) => void;
-  export let onItemRenamed: (entityType: string, args: any) => void;
-  export let onItemOpened: (entityType: string, args: any) => void;
-  export let collection: CollectionDocument;
-  export let folder: Folder;
-  export let api: Request;
-  export let activeTabPath: Path;
+  import { onDestroy } from "svelte";
 
+  // ---- Components
   import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import Button from "$lib/components/buttons/Button.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import MoreOptions from "../more-options/MoreOptions.svelte";
+
+  // ---- Helper functions
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
+  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
+
+  // ---- Enum and Interfaces
   import type {
     Request,
     Folder,
     Path,
   } from "$lib/utils/interfaces/request.interface";
-  import { getPathFromUrl } from "$lib/utils/helpers/common.helper";
-  import { showPathStore } from "$lib/store/methods";
-  import { onDestroy } from "svelte";
-  import threedotIcon from "$lib/assets/3dot.svg";
-  import { currentFolderIdName } from "$lib/store/collection";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import type {
-    CollectionDocument,
-    TabDocument,
-    WorkspaceDocument,
-  } from "$lib/database/app.database";
   import { UntrackedItems } from "$lib/utils/enums";
-  import type { Observable } from "rxjs";
-  import AddEnvironment from "$lib/components/collections/req-res-section/sub-components/add-environment-popup/AddEnvironment.svelte";
-  import AllWorkspace from "$lib/components/dashboard/workspaces/AllWorkspace.svelte";
+
+  // ---- Store
+  import { showPathStore } from "$lib/store/methods";
+  import { currentFolderIdName } from "$lib/store/collection";
+
+  // --- SVG
+  import threedotIcon from "$lib/assets/3dot.svg";
+  import reloadSyncIcon from "$lib/assets/reload-sync.svg";
+
+  // ---- DB
+  import type { CollectionDocument } from "$lib/database/app.database";
+
+  /**
+   * Callback for Item Deleted
+   * @param entityType - type of item to delete like request/folder
+   * @param args - Arguments to pass on delete
+   */
+  export let onItemDeleted: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Rename
+   * @param entityType - type of item to rename like request/folder
+   * @param args - Arguments to pass on rename
+   */
+  export let onItemRenamed: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Open
+   * @param entityType - type of item to open like request/folder
+   * @param args - Arguments to pass on open
+   */
+  export let onItemOpened: (entityType: string, args: any) => void;
+  /**
+   * Whole Collection Document
+   */
+  export let collection: CollectionDocument;
+  /**
+   * Selected folder details
+   */
+  export let folder: Folder;
+  /**
+   * Selected API details
+   */
+  export let api: Request;
+  /**
+   * Current Tab Path
+   */
+  export let activeTabPath: Path;
+
   let showPath = false;
 
   if (folder) {
@@ -127,7 +160,7 @@
 >
 
 {#if showMenu}
-  <RightOption
+  <MoreOptions
     xAxis={pos.x}
     yAxis={pos.y}
     menuItems={[
@@ -217,13 +250,15 @@
       class="api-method text-{getMethodStyle(
         api.request.method,
       )} {api?.isDeleted && 'api-method-deleted'}"
+      style="font-size: 12px;"
     >
       {api.request.method?.toUpperCase()}
     </div>
 
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldFile sparrow-fs-12"
+        class="form-control py-0 renameInputFieldFile"
+        style="font-size: 12px;"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -253,7 +288,10 @@
         }}
       />
     {:else}
-      <div class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}">
+      <div
+        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
+        style="font-size: 12px;"
+      >
         {api.name}
         {#if showPath}
           <span class="path-name ellipsis"
@@ -343,10 +381,10 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-600);
   }
   .threedot-icon-container:hover {
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-600);
   }
 
   .btn-primary {
@@ -358,8 +396,9 @@
   }
 
   .btn-primary:hover {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-600);
     color: var(--white-color);
+    border-radius: 2px;
   }
 
   .btn-primary:hover {
@@ -405,7 +444,7 @@
     width: calc(100% - 24px);
   }
   .active-request-tab {
-    background-color: var(--selected-active-sidebar) !important;
+    background-color: var(--bg-tertiary-400) !important;
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }
