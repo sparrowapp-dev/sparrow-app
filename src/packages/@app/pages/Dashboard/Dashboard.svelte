@@ -24,7 +24,7 @@
 
   <!-- Application Content -->
   <div class="d-flex">
-    <Sidebar />
+    <Sidebar {user} />
     <section class="w-100">
       <!-- Route for Collections -->
       <Route path="/collections/*">

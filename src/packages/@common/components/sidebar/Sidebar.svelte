@@ -25,9 +25,13 @@
   import selectedProfile from "$lib/assets/profile-selected.svg";
 
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
+  import SidebarProfileModal, {
+    type SidebarProfileObj,
+  } from "./SidebarProfileModal.svelte";
 
   let componentClass = "";
   export { componentClass as class };
+  export let user;
 
   let sidebarItems: SidebarItemObj[] = [
     {
@@ -75,16 +79,15 @@
       disabled: true,
       position: "secondary",
     },
-    {
-      route: "/app/profile",
-      heading: "Profile",
-      defaultLogo: profile,
-      hoveredLogo: hoveredProfile,
-      selectedLogo: selectedProfile,
-      disabled: true,
-      position: "secondary",
-    },
   ];
+  let sidebarModalItem: SidebarProfileObj = {
+    heading: "Profile",
+    defaultLogo: profile,
+    hoveredLogo: hoveredProfile,
+    selectedLogo: selectedProfile,
+    disabled: false,
+    user,
+  };
 
   let primarySidebarItems = sidebarItems.filter(
     (item) => item.position === "primary",
@@ -105,6 +108,7 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
+    <SidebarProfileModal item={sidebarModalItem} />
   </div>
 </div>
 

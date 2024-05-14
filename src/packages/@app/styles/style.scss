@@ -81,6 +81,7 @@ $sparrow-send-button-line: #D3D1D154;
 $sparrow-tab-request-default: #324035;
 $sparrow-tab-request-text-default: #4A4D4F;
 $sparrow-tab-unsave-icon: #CB4A4A;
+$sparrow-profile-modal-bg: #8989890D;
 
 $theme-grey-ffffff:#ffffff;
 $theme-grey-e5e5e5:#e5e5e5;
@@ -191,6 +192,7 @@ $theme-red-312325:#312325;
   --tab-request-text-default: #{$sparrow-tab-request-text-default};
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
+  --sparrow-profile-modal-bg: #{$sparrow-profile-modal-bg};
 
   //
   //
@@ -354,7 +356,8 @@ $theme-colors: map-merge(
     "dropdownContainer": $sparrow-dropdown-container,
     "dropdownOptionHover": $sparrow-dropdown-option-hover,
     "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line
+    "saveButtonLine": $sparrow-send-button-line,
+    "sparrowProfileModalBg": $sparrow-profile-modal-bg
   )
 );
 
