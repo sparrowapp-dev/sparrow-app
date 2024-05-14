@@ -409,6 +409,7 @@ export interface FolderTab
     TypeWrapper {
   property: {
     folder: Folder;
+    totalRequests: number;
   };
 }
 export interface CollectionTab

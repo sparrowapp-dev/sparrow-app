@@ -120,7 +120,7 @@
       class="border-0 pb-5 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:52px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {

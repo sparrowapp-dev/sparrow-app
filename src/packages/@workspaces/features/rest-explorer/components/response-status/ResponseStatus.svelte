@@ -2,6 +2,7 @@
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
   import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
   import type { Response } from "@common/types/rest-explorer";
+  import { Tooltip } from "@library/ui";
 
   export let response: Response;
 </script>
@@ -14,31 +15,37 @@
     <div class="d-flex align-items-center gap-2">
       <!-- insert controller here -->
       <div class="d-flex gap-2">
-        <span
-          class="statuscode position-relative cursor-pointer border-0"
-          style="font-size: 10px;"
+        <Tooltip
+          title="HTTP Status - {response.status.split(' ')[1]}"
+          verticalOffset="- 42px"
+          horizontalArrowOffset="+ 20px"
         >
           <span
-            class="ellipsis"
-            style="color:{response.status === ResponseStatusCode.OK ||
-            response.status === ResponseStatusCode.CREATED
-              ? 'var(--success-color)'
-              : 'var(--request-delete)'};"
+            class="statuscode position-relative cursor-pointer border-0"
+            style="font-size: 12px;"
           >
-            <span class="me-1">
-              <DotIcon
-                color={response.status === ResponseStatusCode.OK ||
-                response.status === ResponseStatusCode.CREATED
-                  ? "var(--success-color)"
-                  : "var(--request-delete)"}
-              />
-            </span>
-            {response.status.split(" ")[0]}</span
-          >
-        </span>
+            <span
+              class="ellipsis"
+              style="color:{response.status === ResponseStatusCode.OK ||
+              response.status === ResponseStatusCode.CREATED
+                ? 'var(--success-color)'
+                : 'var(--request-delete)'};"
+            >
+              <span class="me-1">
+                <DotIcon
+                  color={response.status === ResponseStatusCode.OK ||
+                  response.status === ResponseStatusCode.CREATED
+                    ? "var(--success-color)"
+                    : "var(--request-delete)"}
+                />
+              </span>
+              {response.status.split(" ")[0]}</span
+            >
+          </span>
+        </Tooltip>
         <span
           class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
-          style="font-size: 10px;"
+          style="font-size: 12px;"
         >
           <span>
             <span class="me-1">
@@ -50,7 +57,7 @@
         </span>
         <span
           class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
-          style="font-size: 10px;"
+          style="font-size: 12px;"
         >
           <span>
             <span class="me-1">
