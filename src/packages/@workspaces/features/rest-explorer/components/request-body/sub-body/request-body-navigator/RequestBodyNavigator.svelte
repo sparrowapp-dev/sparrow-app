@@ -5,6 +5,7 @@
   import { Select } from "$lib/components/inputs";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
   import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { WithSelect } from "@workspaces/common/hoc";
   export let method = "";
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;
@@ -23,7 +24,7 @@
 </script>
 
 <div>
-  {#if method === "GET" && isGetMessage}
+  {#if method === "GET" && isGetMessage && false}
     <div class="d-flex error-message py-1 mb-2">
       <div class="info-button d-flex align-items-center justify-content-center">
         <img src={infoIcon} alt="info" />
@@ -46,7 +47,7 @@
         />
       </div>
     </div>
-  {:else if method === "DELETE" && isDeleteMessage}
+  {:else if method === "DELETE" && isDeleteMessage && false}
     <div class="d-flex error-message py-1 mb-2">
       <div class="info-button d-flex align-items-center justify-content-center">
         <img src={infoIcon} alt="info" />
@@ -74,7 +75,7 @@
 </div>
 <div class="mb-2 d-flex align-items-center justify-content-between">
   <div class="d-flex" style="font-size: 12px;">
-    <Select
+    <WithSelect
       id={"hash124"}
       data={[
         {
@@ -101,23 +102,12 @@
       ]}
       titleId={requestState.requestBodyNavigation}
       onclick={handleDropdown}
-      headerTheme={"grey"}
-      borderType={"none"}
-      borderActiveType={"none"}
-      borderHighlight={"hover-active"}
-      headerHighlight={"hover-active"}
-      minBodyWidth={"150px"}
-      borderRounded={true}
-      bodyTheme={"grey"}
-      zIndex={200}
-      checkIconColor={"var(--text-primary-200)"}
-      menuItem={"v2"}
-      headerFontSize="12px"
-      headerFontWeight="400"
+      zIndex={499}
+      disabled={false}
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
-      <Select
+      <WithSelect
         id={"hash987"}
         data={[
           {
@@ -143,17 +133,8 @@
         ]}
         titleId={requestState.requestBodyLanguage}
         onclick={handleRawDropDown}
-        headerTheme={"grey"}
-        borderType={"none"}
-        borderActiveType={"none"}
-        borderHighlight={"hover-active"}
-        headerHighlight={"hover-active"}
-        minBodyWidth={"150px"}
-        borderRounded={true}
-        bodyTheme={"grey"}
-        checkIconColor={"var(--text-primary-200)"}
-        menuItem={"v2"}
-        zIndex={200}
+        zIndex={499}
+        disabled={false}
       />
     {/if}
   </div>

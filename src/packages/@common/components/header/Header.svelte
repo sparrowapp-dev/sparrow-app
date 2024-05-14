@@ -12,14 +12,21 @@
 </script>
 
 <header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
-  <div>sparrow-app</div>
+  <div></div>
   <div>
     <Select
       id={"environment-selector"}
       data={[
         {
-          name: "No Environment",
+          name: "Select Environment",
           id: "none",
+          type: environmentType.LOCAL,
+          hide: true,
+        },
+        {
+          name: "None",
+          id: "none",
+          display: "none",
           type: environmentType.LOCAL,
         },
         ...environments,
@@ -28,7 +35,7 @@
       })}
       titleId={currentEnvironment?.id}
       onclick={handleDropdown}
-      minHeaderWidth={"200px"}
+      minHeaderWidth={"185px"}
       iconRequired={true}
       icon={StackIcon}
       isDropIconFilled={true}
@@ -38,9 +45,10 @@
       headerTheme={"transparent"}
       menuItem={"v2"}
       headerFontSize={"12px"}
-      maxHeaderWidth={"200px"}
+      maxHeaderWidth={"185px"}
       zIndex={200}
       bodyTheme={"violet"}
+      borderRounded={"2px"}
     />
   </div>
 </header>

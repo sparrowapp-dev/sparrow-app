@@ -54,10 +54,10 @@
     }
   };
 
-  const extractBodyTextHighlight = (_bodyTheme: string, id: string) => {
-    if (id === selectedRequest?.id && highlightTickedItem) {
-      return `select-clicked-highlight-grey-btn-text`;
-    }
+  const extractBodyTextHighlight = (_id: string, _selectedId: string) => {
+    if (_id === _selectedId && highlightTickedItem) {
+      return `select-ticked-highlight-text`;
+    } else return "";
   };
 </script>
 
@@ -83,7 +83,7 @@
   <p
     class="m-0 p-0 {getTextColor(
       list?.color,
-    )} ellipsis {extractBodyTextHighlight(bodyTheme, list.id)}"
+    )} ellipsis {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     style="font-size: 12px;"
   >
     {list.name}<br />
@@ -92,9 +92,14 @@
     {/if}
   </p>
   {#if selectedRequest?.id === list.id}
-    <CheckIcon
-      color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
-    />
+    <span
+      class="d-flex align-items-center justify-content-center"
+      style="height:16px; width:16px;"
+    >
+      <CheckIcon
+        color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
+      />
+    </span>
   {/if}
 </div>
 
@@ -113,6 +118,10 @@
   }
   .select-clicked-highlight-violet-btn {
     background-color: var(--bg-tertiary-700);
+  }
+
+  .select-ticked-highlight-text {
+    color: var(--text-primary-200) !important;
   }
 
   /* others */

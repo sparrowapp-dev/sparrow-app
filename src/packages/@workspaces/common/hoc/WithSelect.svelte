@@ -32,11 +32,12 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
+  headerHeight={"24px"}
   minBodyWidth={"150px"}
-  borderRounded={true}
+  borderRounded={"4px"}
   headerTheme={"dark-violet"}
   bodyTheme={"violet"}
   menuItem={"v2"}
-  headerFontSize={"12px"}
+  headerFontSize={"10px"}
   isDropIconFilled={true}
 />

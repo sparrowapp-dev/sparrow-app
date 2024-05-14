@@ -36,7 +36,7 @@
       const activeWorkspaceRxDoc = value;
       currentWorkspaceId = activeWorkspaceRxDoc._id;
       if (activeWorkspaceRxDoc) {
-        await refreshEnv(activeWorkspaceRxDoc?._id);
+        refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {

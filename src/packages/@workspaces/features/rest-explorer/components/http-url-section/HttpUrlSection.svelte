@@ -95,7 +95,7 @@
           color: "patch",
         },
       ]}
-      borderRounded={false}
+      borderRounded={"2px"}
       titleId={httpMethod}
       onclick={handleDropdown}
       borderHighlight={"active"}

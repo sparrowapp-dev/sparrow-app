@@ -30,6 +30,7 @@
     default?: boolean;
     hide?: boolean;
     disabled?: boolean;
+    display?: string;
   }>;
 
   /**
@@ -50,6 +51,7 @@
   /**
    * Determines the dimensions of a Select.
    */
+  export let headerHeight = "34px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
@@ -97,7 +99,7 @@
   /**
    * Determines the border radius of Select header.
    */
-  export let borderRounded = true;
+  export let borderRounded = "2px";
   /**
    * Determines the z-index of Select.
    */
@@ -112,14 +114,24 @@
   export let iconRequired = false;
   export let icon = GitBranchIcon;
 
+  /**
+   * typography
+   */
   export let headerFontSize: string = "14px";
-
   export let headerFontWeight: number = 500;
+
+  /**
+   * ticked state
+   */
   export let highlightTickedItem = true;
 
+  /**
+   * makes the dropdown unclickable
+   */
   export let disabled = false;
 
-  let selectWrapper: HTMLElement;
+  let selectHeaderWrapper: HTMLElement;
+  let selectBodyWrapper: HTMLElement;
 
   const Icon = icon;
   let searchData = "";
@@ -142,6 +154,7 @@
     description?: string;
     hide?: boolean;
     disabled?: boolean;
+    display?: string;
   };
 
   let selectBorderClass = "";
@@ -202,20 +215,29 @@
       selectBodyBackgroundClass = "select-body-background-violet";
   }
 
-  let leftDistance: number;
-  let bottomDistance: number;
-  let rightDistance: number;
+  let bodyLeftDistance: number;
+  let bodyRightDistance: number;
+  let bodyTopDistance: number;
   const toggleSelect = () => {
-    leftDistance = selectWrapper.getBoundingClientRect().left;
-    rightDistance = selectWrapper.getBoundingClientRect().right;
-    bottomDistance = selectWrapper.getBoundingClientRect().bottom;
+    const bodyHeight =
+      data.filter((element) => {
+        return !element.hide;
+      }).length * 36;
+    bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
+    bodyTopDistance =
+      bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
+      window.innerHeight
+        ? selectHeaderWrapper.getBoundingClientRect().top - 5 - bodyHeight
+        : 5 + selectHeaderWrapper.getBoundingClientRect().bottom;
+    bodyRightDistance =
+      window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
     isOpen = !isOpen;
   };
 
   $: {
     if (titleId) {
       data.forEach((element) => {
-        if (element.id === titleId) {
+        if (element.id === titleId && element.display !== "none") {
           selectedRequest = element;
         }
       });
@@ -326,11 +348,22 @@
 
 <div
   class="parent-select display-inline-block cursor-pointer"
-  bind:this={selectWrapper}
-  style=" position: relative; z-index:{zIndex};"
+  bind:this={selectHeaderWrapper}
+  style=" position: relative; z-index:{zIndex}; {disabled
+    ? 'pointer-events: none;'
+    : ''}"
   id={`color-select-${id}`}
 >
-  <div on:click={toggleSelect} role="button" tabindex="0" on:keydown={() => {}}>
+  <div
+    on:click={() => {
+      if (!disabled) {
+        toggleSelect();
+      }
+    }}
+    role="button"
+    tabindex="0"
+    on:keydown={() => {}}
+  >
     <div
       role="button"
       tabindex="0"
@@ -349,13 +382,12 @@
       }}
       class="select-btn
       {selectBackgroundClass} 
-      {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
-      {borderRounded ? 'border-radius-2' : ''}  
+      {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}   
       {selectBorderClass} 
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
       {isError ? selectErrorBorderClass : ''}
         d-flex align-items-center justify-content-between"
-      style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth};"
+      style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
     >
       <p
         class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
@@ -392,108 +424,101 @@
     </div>
   </div>
 
-  {#if isOpen}
+  <div
+    bind:this={selectBodyWrapper}
+    class="d-none z-2 select-data position-fixed {selectBodyBackgroundClass} p-1 border-radius-2"
+    class:select-active={isOpen}
+    style="
+      {isOpen ? 'opacity: 1;' : 'opacity: 0;'}
+      min-width:{minBodyWidth}; left: {bodyLeftDistance}px; top: {bodyTopDistance}px; right: {bodyRightDistance}px; z-index:{zIndex};"
+    transition:slide={{ duration: 100 }}
+  >
     <div
-      class="d-none z-2 select-data position-fixed {selectBodyBackgroundClass} p-1 border-radius-2"
-      class:select-active={isOpen}
-      style="min-width:{minBodyWidth}; left: {leftDistance}px; top: {5 +
-        bottomDistance}px; right: {window.innerWidth -
-        rightDistance}px; z-index:{zIndex};"
-      transition:slide={{ duration: 100 }}
+      on:click={() => {
+        isOpen = false;
+      }}
+      role="button"
+      tabindex="0"
+      on:keydown={() => {}}
     >
-      <div
-        on:click={() => {
-          isOpen = false;
-        }}
-        role="button"
-        tabindex="0"
-        on:keydown={() => {}}
-      >
-        <slot name="pre-select" />
-      </div>
-      {#if search}
-        <div class="position-relative">
-          <input
-            type="text"
-            class="inputField searchField border-radius-2 border-0 p-2 w-100 bg-backgroundDark"
-            style="font-size: 12px; font-weight:500; padding-left:35px !important;"
-            placeholder={searchText}
-            bind:value={searchData}
-          />
-          <span
-            class="position-absolute"
-            style="top:5px;
-                  left: 10px"
-          >
-            <SearchIcon height={16} width={16} color={"var(--defaultcolor)"} />
-          </span>
-          <hr class="my-2" />
-        </div>
-      {/if}
-      <div style="max-height:{maxBodyHeight}; overflow:auto;">
-        {#each data.filter((element) => {
-          return element.name.toLowerCase().includes(searchData.toLowerCase());
-        }) as list}
-          <div
-            class=" {list.hide ? 'd-none' : ''} {list?.disabled
-              ? 'disabled-option'
-              : ''}"
-            on:click={() => {
-              isOpen = false;
-              onclick(list.id);
-            }}
-            role="button"
-            tabindex="0"
-            on:keydown={() => {}}
-          >
-            {#if menuItem === "v1"}
-              <MenuItemsV1
-                {list}
-                {selectedRequest}
-                {checkIcon}
-                {getTextColor}
-              />
-            {:else if menuItem === "v2"}
-              <MenuItemsv2
-                {list}
-                {selectedRequest}
-                {CheckIcon}
-                {bodyTheme}
-                {getTextColor}
-                {highlightTickedItem}
-              />
-            {/if}
-          </div>
-        {/each}
-      </div>
-      {#if data.filter((element) => {
-        return element.name.toLowerCase().includes(searchData.toLowerCase());
-      }).length === 0 && search}
-        <div class="p-2">
-          <p class="sparrow-fs-12 mb-0 text-textColor text-center">
-            {searchErrorMessage}
-          </p>
-        </div>
-      {/if}
-      <div
-        on:click={() => {
-          isOpen = false;
-        }}
-        role="button"
-        tabindex="0"
-        on:keydown={() => {}}
-      >
-        <slot name="post-select" />
-      </div>
+      <slot name="pre-select" />
     </div>
-  {/if}
+    {#if search}
+      <div class="position-relative">
+        <input
+          type="text"
+          class="inputField searchField border-radius-2 border-0 p-2 w-100 bg-backgroundDark"
+          style="font-size: 12px; font-weight:500; padding-left:35px !important;"
+          placeholder={searchText}
+          bind:value={searchData}
+        />
+        <span
+          class="position-absolute"
+          style="top:5px;
+                  left: 10px"
+        >
+          <SearchIcon height={16} width={16} color={"var(--defaultcolor)"} />
+        </span>
+        <hr class="my-2" />
+      </div>
+    {/if}
+    <div style="max-height:{maxBodyHeight}; overflow:auto;">
+      {#each data.filter((element) => {
+        return element.name.toLowerCase().includes(searchData.toLowerCase());
+      }) as list}
+        <div
+          class=" {list.hide ? 'd-none' : ''} {list?.disabled
+            ? 'disabled-option'
+            : ''}"
+          on:click={() => {
+            isOpen = false;
+            onclick(list.id);
+          }}
+          role="button"
+          tabindex="0"
+          on:keydown={() => {}}
+        >
+          {#if menuItem === "v1"}
+            <MenuItemsV1 {list} {selectedRequest} {checkIcon} {getTextColor} />
+          {:else if menuItem === "v2"}
+            <MenuItemsv2
+              {list}
+              {selectedRequest}
+              {CheckIcon}
+              {bodyTheme}
+              {getTextColor}
+              {highlightTickedItem}
+            />
+          {/if}
+        </div>
+      {/each}
+    </div>
+    {#if data.filter((element) => {
+      return element.name.toLowerCase().includes(searchData.toLowerCase());
+    }).length === 0 && search}
+      <div class="p-2">
+        <p class="sparrow-fs-12 mb-0 text-textColor text-center">
+          {searchErrorMessage}
+        </p>
+      </div>
+    {/if}
+    <div
+      on:click={() => {
+        isOpen = false;
+      }}
+      role="button"
+      tabindex="0"
+      on:keydown={() => {}}
+    >
+      <slot name="post-select" />
+    </div>
+  </div>
 </div>
 
 <style lang="scss">
   .select-btn {
     outline: none;
     border: none;
-    height: 34px;
     width: auto;
     padding: 0 10px;
   }

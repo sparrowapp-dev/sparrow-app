@@ -19,6 +19,7 @@
   import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
+  import { WithSelect } from "@workspaces/common/hoc";
 
   export let response;
   export let apiState;
@@ -149,7 +150,7 @@
 
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <Select
+          <WithSelect
             id={"hash565"}
             data={[
               {
@@ -175,17 +176,8 @@
             ]}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
-            headerTheme={"grey"}
-            borderType={"none"}
-            borderActiveType={"none"}
-            borderHighlight={"hover-active"}
-            headerHighlight={"hover-active"}
-            minBodyWidth={"150px"}
-            borderRounded={true}
-            bodyTheme={"grey"}
-            zIndex={200}
-            checkIconColor={"var(--text-primary-200)"}
-            menuItem={"v2"}
+            zIndex={499}
+            disabled={false}
           />
         </span>
       {/if}
