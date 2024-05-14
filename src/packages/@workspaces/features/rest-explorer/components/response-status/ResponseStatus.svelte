@@ -2,7 +2,7 @@
   import { ResponseStatusCode } from "$lib/utils/enums/request.enum";
   import { BoxIcon, ClockIcon, DotIcon } from "@library/icons";
   import type { Response } from "@common/types/rest-explorer";
-  import Tooltip from "@common/components/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@library/ui";
 
   export let response: Response;
 </script>

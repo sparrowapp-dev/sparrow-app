@@ -74,9 +74,6 @@ class InitFolderTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
-  public updateTotalRequests(_requests: number) {
-    this._tab.property.totalRequests = _requests;
-  }
 }
 
 export { InitFolderTab };
