@@ -108,7 +108,7 @@
     modalPostion?.height +
     20}px; left: {buttonPosition?.left +
     buttonPosition?.width +
-    10}px; font-size: 12px; font-weight: 400; min-width: 200px;"
+    10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 10000;"
 >
   <div class="d-flex align-items-center mb-2 px-1">
     <div
