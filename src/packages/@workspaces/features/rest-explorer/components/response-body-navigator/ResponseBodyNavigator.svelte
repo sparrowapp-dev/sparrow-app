@@ -27,12 +27,24 @@
   export let onClearResponse;
 
   let fileExtension: string;
+
+  /**
+   * @description - formats the code
+   * @param _data - un-formatted data
+   */
+  const formatCode = (_data: string) => {
+    return fileExtension === "json" || fileExtension === "js"
+      ? js_beautify(_data)
+      : fileExtension === "xml" || fileExtension === "html"
+      ? html_beautify(_data)
+      : removeIndentation(_data);
+  };
   /**
    * @description Copy API response to users clipboard.
    */
+
   const handleCopy = async () => {
-    const jsonString = response?.body;
-    await copyToClipBoard(jsonString);
+    await copyToClipBoard(formatCode(response?.body));
     notifications.success("Copied to Clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
@@ -83,13 +95,7 @@
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(
-      fileExtension === "json" || fileExtension === "js"
-        ? js_beautify(response?.body)
-        : fileExtension === "xml" || fileExtension === "html"
-        ? html_beautify(response?.body)
-        : removeIndentation(response?.body),
-    );
+    await writableStream.write(formatCode(response?.body));
     await writableStream.close();
     notifications.success("Response downloaded");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
