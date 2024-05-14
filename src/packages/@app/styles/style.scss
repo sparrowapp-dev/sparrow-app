@@ -81,11 +81,11 @@ $sparrow-send-button-line: #D3D1D154;
 $sparrow-tab-request-default: #324035;
 $sparrow-tab-request-text-default: #4A4D4F;
 $sparrow-tab-unsave-icon: #CB4A4A;
-$sparrow-profile-modal-bg: #8989890D;
 
 $theme-grey-ffffff:#ffffff;
 $theme-grey-e5e5e5:#e5e5e5;
 $theme-grey-8A9299:#8A9299;
+$theme-grey-8989890D:#8989890D;
 $theme-grey-45494D:#45494D;
 $theme-grey-313233:#313233;
 $theme-grey-272727:#272727;
@@ -192,7 +192,6 @@ $theme-red-312325:#312325;
   --tab-request-text-default: #{$sparrow-tab-request-text-default};
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
-  --sparrow-profile-modal-bg: #{$sparrow-profile-modal-bg};
 
   //
   //
@@ -246,6 +245,7 @@ $theme-red-312325:#312325;
   --bg-secondary-100 : #{$theme-grey-ffffff};
   --bg-secondary-150 : #{$theme-grey-e5e5e5};
   --bg-secondary-200 : #{$theme-grey-8A9299};
+  --bg-secondary-250 : #{$theme-grey-8989890D};
   --bg-secondary-300 : #{$theme-grey-45494D};
   --bg-secondary-400 : #{$theme-grey-313233};
   --bg-secondary-500 : #{$theme-grey-272727};
@@ -356,8 +356,7 @@ $theme-colors: map-merge(
     "dropdownContainer": $sparrow-dropdown-container,
     "dropdownOptionHover": $sparrow-dropdown-option-hover,
     "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line,
-    "sparrowProfileModalBg": $sparrow-profile-modal-bg
+    "saveButtonLine": $sparrow-send-button-line
   )
 );
 
@@ -437,6 +436,7 @@ $sparrow-bg-colors: (
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-200 : $theme-grey-8A9299,
+  secondary-250 : $theme-grey-8989890D,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
   secondary-500 : $theme-grey-272727,

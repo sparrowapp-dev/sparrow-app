@@ -179,7 +179,7 @@
   .modal-background {
     backdrop-filter: blur(75px);
     border-radius: 5px;
-    background: rgba(137, 137, 137, 0.05);
+    background: var(--bg-secondary-250);
   }
 
   .sign-out-button:hover {
