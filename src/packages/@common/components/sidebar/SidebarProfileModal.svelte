@@ -49,10 +49,11 @@
 
     getbuttonPosition();
 
-    const userUnsubscriber = item.user.subscribe((value) => {
-      user = { name: value.name, email: value.email };
+    item.user.subscribe((value) => {
+      if (value) {
+        user = { name: value.name, email: value.email };
+      }
     });
-    userUnsubscriber.unsubscribe();
 
     document.addEventListener("click", (e) => {
       if (buttonElement && !buttonElement.contains(e.target as Node)) {
