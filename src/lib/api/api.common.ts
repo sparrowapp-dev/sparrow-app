@@ -195,6 +195,7 @@ const makeHttpRequestV2 = async (
 ) => {
   // create a race condition between the timeout and the api call
   console.table({ url, method, headers, body, request });
+
   return Promise.race([
     timeout(apiTimeOut),
     // Invoke communication

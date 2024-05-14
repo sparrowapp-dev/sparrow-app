@@ -1536,6 +1536,7 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDocument,
   ): Promise<void> => {
+    // Check if the user has permission to add a folder at the workspace level
     if (
       !hasWorkpaceLevelPermission(
         this.getUserRoleInWorspace(),
@@ -1544,6 +1545,8 @@ export default class CollectionsViewModel {
     ) {
       return;
     }
+
+    // Generate a new folder object with a unique ID, name, description, type, and an empty items array
     const folder = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextName(collection.items, ItemType.FOLDER, "New Folder"),
@@ -1552,10 +1555,13 @@ export default class CollectionsViewModel {
       items: [],
     };
 
+    // Add the new folder to the collection locally
     await this.collectionRepository.addRequestOrFolderInCollection(
       collection.id,
       folder,
     );
+
+    // Determine the user source based on collection's active synchronization
     let userSource = {};
     if (collection?.activeSync) {
       userSource = {
@@ -1565,6 +1571,8 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
+
+    // Add the folder in the collection on the Database
     const response = await this.collectionService.addFolderInCollection(
       workspaceId,
       collection.id,
@@ -1575,6 +1583,7 @@ export default class CollectionsViewModel {
       },
     );
 
+    // Update UI elements and handle navigation on success
     if (response) {
       const path: Path = {
         workspaceId: workspaceId,
@@ -1591,11 +1600,11 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
-      sampleFolder.updateTotalRequests(0);
 
       this.handleCreateTab(sampleFolder.getValue());
       moveNavigation("right");
 
+      // Update the locally added folder with server response
       const folderObj = response.data.data;
       await this.collectionRepository.updateRequestOrFolderInCollection(
         collection.id,
@@ -1603,6 +1612,7 @@ export default class CollectionsViewModel {
         folderObj,
       );
     } else {
+      // Show error notification and clean up by deleting the folder locally on failure.
       notifications.error("Failed to create folder!");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
