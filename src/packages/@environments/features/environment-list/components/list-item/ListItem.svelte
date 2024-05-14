@@ -183,7 +183,7 @@
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
 
-<div class="environment-tab" bind:this={environmentTabWrapper}>
+<div class="environment-tab mb-1" bind:this={environmentTabWrapper}>
   <button
     style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-3 my-button {env?.id ===
@@ -275,7 +275,7 @@
       // background-color: var(--workspace-hover-color);
     }
     .threedot-icon-container:hover {
-      // background-color: var(--workspace-hover-color);
+      background-color: var(--bg-secondary-400);
     }
 
     .btn-primary {
