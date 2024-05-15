@@ -88,6 +88,7 @@
   const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
     showPath = value;
   });
+  let requestTabWrapper: HTMLElement;
 
   // $: {
   //   if (api) {
@@ -161,8 +162,8 @@
 
 {#if showMenu}
   <MoreOptions
-    xAxis={pos.x}
-    yAxis={pos.y}
+    xAxis={requestTabWrapper.getBoundingClientRect().right - 180}
+    yAxis={requestTabWrapper.getBoundingClientRect().bottom + 5}
     menuItems={[
       {
         onClick: () => {
@@ -215,6 +216,7 @@
 />
 
 <div
+  bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
   activeTabPath?.requestId
     ? 'active-request-tab'
@@ -392,7 +394,7 @@
     color: var(--white-color);
     padding-left: 0 !important;
     padding-right: 5px;
-    border-radius: 8px;
+    border-radius: 2px;
   }
 
   .btn-primary:hover {

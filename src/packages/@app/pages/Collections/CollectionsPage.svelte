@@ -65,7 +65,6 @@
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
-  let currentEnvironment: Observable<EnvironmentDocument>;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
 
@@ -126,18 +125,7 @@
 
   const handleCollapseCollectionList = () => {
     leftPanelCollapse.set(!$leftPanelCollapse);
-    splitter.style.display = $leftPanelCollapse ? "none" : "unset";
   };
-
-  /**
-   * Handles reloading collections and environment of workspace change
-   */
-  currentWorkspace
-    .subscribe(async (workspace) => {
-      currentEnvironment =
-        await _viewModel.syncCollectionsWithBackend(workspace);
-    })
-    .unsubscribe();
 
   // Rerender animation on tab switch
   let prevTabId: string = "";
@@ -161,6 +149,15 @@
     const isNew = params.get("first");
     if (isNew) _viewModel.createNewTab();
   });
+
+  $: {
+    if (splitter && $leftPanelCollapse === true) {
+      splitter.style.display = "none";
+    }
+    if (splitter && $leftPanelCollapse === false) {
+      splitter.style.display = "unset";
+    }
+  }
 </script>
 
 <Splitpanes

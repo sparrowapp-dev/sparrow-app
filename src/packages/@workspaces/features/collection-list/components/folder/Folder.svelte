@@ -336,36 +336,33 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else}
-          <Tooltip title="Add Request" styleProp="left: -50%">
-            <button
-              class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-              on:click|preventDefault={() => {
-                expand = true;
-                onItemCreated("requestFolder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }}
-            >
-              <img src={AddIcon} alt="AddIcon" />
-            </button>
-          </Tooltip>
-          <Tooltip title="More options" styleProp="left: -50%">
-            <button
-              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-                ? 'threedot-active'
-                : ''}"
-              on:click|preventDefault={(e) => {
-                pos = { x: e.clientX, y: e.clientY };
-                setTimeout(() => {
-                  showMenu = true;
-                }, 100);
-              }}
-            >
-              <img src={threedotIcon} alt="threedotIcon" />
-            </button>
-          </Tooltip>
+          <button
+            class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+            on:click|preventDefault={() => {
+              expand = true;
+              onItemCreated("requestFolder", {
+                workspaceId: collection.workspaceId,
+                collection,
+                folder: explorer,
+              });
+            }}
+          >
+            <img src={AddIcon} alt="AddIcon" />
+          </button>
+
+          <button
+            class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+              ? 'threedot-active'
+              : ''}"
+            on:click|preventDefault={(e) => {
+              pos = { x: e.clientX, y: e.clientY };
+              setTimeout(() => {
+                showMenu = true;
+              }, 100);
+            }}
+          >
+            <img src={threedotIcon} alt="threedotIcon" />
+          </button>
         {/if}
       </div>
       <div
@@ -389,7 +386,7 @@
           {/each}
           {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
-              <Tooltip
+              <!-- <Tooltip
                 classProp="mt-2 mb-2 ms-0"
                 title={PERMISSION_NOT_FOUND_TEXT}
                 show={!hasWorkpaceLevelPermission(
@@ -412,7 +409,7 @@
                     });
                   }}
                 />
-              </Tooltip>
+              </Tooltip> -->
             </div>
           {/if}
         </div>

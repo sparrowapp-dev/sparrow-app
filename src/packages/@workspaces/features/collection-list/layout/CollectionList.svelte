@@ -246,11 +246,7 @@
             <FilterDropDown {handleSearch} />
           {/if}
           {#if searchData.length > 0}
-            <List
-              height={"calc(100vh - 180px)"}
-              classProps={"pb-2 pe-2"}
-              overflowX="hidden"
-            >
+            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
@@ -307,12 +303,7 @@
               {/each}
             </List>
           {:else if collectionListDocument && collectionListDocument.length > 0}
-            <List
-              height={"calc(100vh - 180px)"}
-              minHeight={"180px"}
-              classProps={"pb-2 pe-2"}
-              overflowX="hidden"
-            >
+            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
               {#if collectionListDocument}
                 {#each collectionListDocument as col}
                   <Collection

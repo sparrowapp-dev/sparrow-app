@@ -304,7 +304,7 @@ class FolderExplorerPage {
         tab.path.folderId,
         { ...updateObj, ...userSource },
       );
-    await collectionsMethods.updateRequestOrFolderInCollection(
+    await this.collectionRepository.updateRequestOrFolderInCollection(
       tab.path.collectionId,
       tab.path.folderId,
       updateFolderElement.data.data,
