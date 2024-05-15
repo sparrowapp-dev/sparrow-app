@@ -54,8 +54,8 @@
           }}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
-          focusedBorderColor="{'var(--border-primary-300)'};"
-          class="text-fs-18 bg-transparent ellipsis fw-normal border-1 px-2"
+          focusedBorderColor={"var(--border-primary-300)"}
+          class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
           disabled={$currentEnvironment?.type == "GLOBAL"}
           placeholder=""
@@ -67,12 +67,12 @@
               bind:value={search}
               on:input={() => {}}
               width={"300px"}
-              class="text-fs-12 rounded border-1 p-2 bg-secondary-600"
+              class="text-fs-12 rounded p-2 bg-secondary-600"
               style="outline:none;"
               placeholder="Search Variables"
               defaultBorderColor="transparent"
-              hoveredBorderColor="{'var(--border-primary-300)'};"
-              focusedBorderColor="{'var(--border-primary-300)'};"
+              hoveredBorderColor={"var(--border-primary-300)"}
+              focusedBorderColor={"var(--border-primary-300)"}
             />
           </div>
           <Tooltip

@@ -97,5 +97,6 @@
 <style>
   input {
     caret-color: var(--border-primary-300);
+    border: 1px solid transparent;
   }
 </style>

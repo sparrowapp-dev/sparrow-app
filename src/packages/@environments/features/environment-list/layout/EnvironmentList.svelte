@@ -25,7 +25,6 @@
   export let environments;
   export let currentEnvironment;
   export let loggedUserRoleInWorkspace: WorkspaceRole;
-  export let isEnvLoading = false;
 
   export let onCreateEnvironment;
   export let onOpenGlobalEnvironment;
@@ -36,8 +35,6 @@
 
   let localEnvironment;
   let globalEnvironment;
-  let isLoading: boolean = false;
-  let environmentUnderCreation: boolean = false;
   let addEnvDisabled = false;
 
   const mapEnvironmentToWorkspace = (_env, _workspaceId) => {
@@ -67,14 +64,6 @@
       workspaceLevelPermissions.ADD_ENVIRONMENT,
     );
   }
-
-  const workspaceLoadingSubscribe = isWorkspaceLoaded.subscribe((value) => {
-    isLoading = !value;
-  });
-
-  onDestroy(() => {
-    workspaceLoadingSubscribe();
-  });
 </script>
 
 <div class={`env-sidebar bg-secondary-900 px-3 py-3`} style={``}>
@@ -106,7 +95,7 @@
   </div>
 
   {#if false}
-    <div class="spinner">
+    <div>
       <Spinner size={`32px`} />
     </div>
   {:else}
@@ -167,28 +156,6 @@
 </div>
 
 <style lang="scss">
-  .navbar {
-    height: auto;
-    overflow: hidden;
-  }
-  ul li {
-    display: block;
-  }
-
-  ul li button {
-    font-size: 12px;
-    display: flex;
-    width: 100%;
-    border: 0px;
-    background-color: var(--blackColor);
-  }
-
-  ul li button:hover {
-    width: 100%;
-    color: var(--white-color);
-    border-radius: 8px;
-    background-color: #232527;
-  }
   .env-sidebar {
     height: calc(100vh - 44px);
   }
@@ -206,9 +173,6 @@
   }
   .add-env-desc-text {
     color: #999;
-  }
-  .add-env-btn {
-    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
   }
   .env-item {
     padding: 6px 6px 6px 12px;
@@ -243,13 +207,5 @@
     outline: none;
     background-color: var(--border-color);
     border-bottom: 1px solid #85c2ff !important;
-  }
-  .spinner {
-    width: 100%;
-    height: 70vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
   }
 </style>
