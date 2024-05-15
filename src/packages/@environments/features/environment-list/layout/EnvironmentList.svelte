@@ -19,7 +19,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { ListItem } from "../components";
-  import { WithIconButtonV2 } from "@environments/common/hoc";
+  import { WithButtonV2 } from "@environments/common/hoc";
 
   export let currentWorkspace;
   export let environments;
@@ -80,7 +80,7 @@
       title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
       placement={"left"}
     >
-      <WithIconButtonV2
+      <WithButtonV2
         icon={PlusIcon}
         disable={!hasWorkpaceLevelPermission(
           loggedUserRoleInWorkspace,

@@ -1,2 +1,2 @@
-export { default as WithIconButton } from "./WithIconButton.svelte";
-export { default as WithIconButtonV2 } from "./WithIconButtonV2.svelte";
+export { default as WithButton } from "./WithButton.svelte";
+export { default as WithButtonV2 } from "./WithButtonV2.svelte";

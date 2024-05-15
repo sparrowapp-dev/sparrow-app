@@ -2,7 +2,6 @@
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { QuickHelp } from "../components";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -16,8 +15,7 @@
   export let onSaveEnvironment;
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInput } from "@environments/common/components";
-  import { WithIconButton } from "@environments/common/hoc";
-  import { SearchIcon } from "$lib/assets/icons";
+  import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
 
   let quickHelp: boolean = false;
@@ -86,7 +84,7 @@
               {#if !$currentEnvironment.isSave}
                 <div class="badge-data d-block"></div>
               {/if}
-              <WithIconButton
+              <WithButton
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
@@ -99,7 +97,7 @@
             </div>
           </Tooltip>
           <span>
-            <WithIconButton
+            <WithButton
               icon={HelpIcon}
               onClick={() => {
                 quickHelp = true;
