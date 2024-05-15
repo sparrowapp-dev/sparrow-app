@@ -100,6 +100,7 @@ class DecodeRequest {
     environmentVariables,
   ): string => {
     // Get authentication header
+    url = url.trim();
     const authHeader: {
       key: string;
       value: string;

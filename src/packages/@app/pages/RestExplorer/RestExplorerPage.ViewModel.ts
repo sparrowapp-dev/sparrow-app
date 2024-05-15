@@ -313,10 +313,14 @@ class RestExplorerViewModel
       const reducedURL = new ReduceRequestURL(
         progressiveTab.property.request?.url,
       );
-      this.updateRequestUrl(
-        reducedURL.getHost() + "?" + reducedQueryParams.getValue(),
-        false,
-      );
+      if (/^(\$|=)&?(=&?)*$/.test(reducedQueryParams.getValue())) {
+        this.updateRequestUrl(reducedURL.getHost(), false);
+      } else {
+        this.updateRequestUrl(
+          reducedURL.getHost() + "?" + reducedQueryParams.getValue(),
+          false,
+        );
+      }
     }
   };
 

@@ -132,6 +132,12 @@
         return true;
       },
     },
+    {
+      key: "Option-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
   ]);
 
   /**

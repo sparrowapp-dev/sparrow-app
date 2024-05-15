@@ -27,6 +27,7 @@ class InitFolderTab {
         folder: {
           id: "",
         },
+        totalRequests: 0,
       },
       path: {
         workspaceId: _workspaceId,
