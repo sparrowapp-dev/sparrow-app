@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-  import SignOutIcon from "./SignOutIcon.svelte";
+  import { SignOutIcon } from "@library/icons";
   import { afterUpdate, onMount } from "svelte";
   import ShowMore from "$lib/components/dropdown/ShowMore.svelte";
   import Showmore from "$lib/assets/showmore.svelte";

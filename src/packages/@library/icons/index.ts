@@ -6,3 +6,4 @@ export { default as ArrowIcon } from "./Arrow.svelte";
 export { default as DangerIcon } from "./Danger.svelte";
 export { default as CopyIcon } from "./Copy.svelte";
 export { default as CheckIcon } from "./check.svelte";
+export { default as SignOutIcon } from "./SignOutIcon.svelte";
