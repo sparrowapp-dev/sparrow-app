@@ -104,7 +104,7 @@
   <div class="d-flex gap-3 align-items-center w-100 pe-2" style="height: 26px;">
     <div style="width:30px; margin-left: 0px;">
       <label
-        class="container"
+        class="container d-block position-relative"
         style={search !== "" ? "opacity:0!important ;" : null}
       >
         <input
