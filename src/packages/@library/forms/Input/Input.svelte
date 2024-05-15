@@ -73,9 +73,9 @@
       dispatch("input", event?.target?.value);
     }}
     {type}
-    class={componentClass}
+    class="w-100 {componentClass}"
     {placeholder}
-    style=" {componentStyle} height: 100%; width:100%; {type === 'search'
+    style=" {componentStyle} height: 100%; {type === 'search'
       ? 'padding-left:35px !important;'
       : ''} {type === 'text' && isHovered
       ? 'padding-right:35px !important;'

@@ -158,26 +158,28 @@
     </div>
   </div>
 
-  <div class="w-100" style="display:block; position:relative;">
+  <div class="w-100 d-block position-relative">
     {#if pairs}
       {#each pairs as element, index}
         <div
           aria-label="Toggle Hover"
-          style=" width:100%;"
-          class={element.key.toLowerCase().includes(search.toLowerCase()) ||
+          class="w-100 {element.key
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
           element.value.toLowerCase().includes(search.toLowerCase())
-            ? ""
-            : "d-none"}
+            ? ''
+            : 'd-none'}"
         >
           <div
-            style="padding-top: 1px;  display: flex;flex-direction: column;width:100%; height:24px;"
+            class="d-flex flex-column w-100"
+            style="padding-top: 1px; height:24px;"
           >
             <div
               class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
             >
               <div style="width:30px;">
                 {#if pairs.length - 1 != index}
-                  <label class="container">
+                  <label class="container d-block position-relative">
                     <input
                       type="checkbox"
                       bind:checked={element.checked}
@@ -190,7 +192,7 @@
                 {/if}
               </div>
 
-              <div class=" d-flex gap-0" style="width:calc(100%)">
+              <div class=" d-flex gap-0 w-100">
                 <div class="w-50 position-relative">
                   <input
                     type="text"
@@ -266,8 +268,6 @@
 
   /* The container */
   .container {
-    display: block;
-    position: relative;
     padding-left: 35px;
     margin-bottom: 12px;
     cursor: pointer;

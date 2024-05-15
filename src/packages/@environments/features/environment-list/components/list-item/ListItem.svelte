@@ -288,31 +288,6 @@
       background-color: var(--bg-secondary-800);
     }
 
-    .navbar {
-      width: 180px;
-      height: auto;
-      overflow: hidden;
-    }
-
-    ul li {
-      display: block;
-    }
-
-    ul li button {
-      font-size: 12px;
-      display: flex;
-      width: 100%;
-      border: 0px;
-      background-color: var(--blackColor);
-    }
-
-    ul li button:hover {
-      width: 100%;
-      color: var(--white-color);
-      border-radius: 8px;
-      background-color: #232527;
-    }
-
     .renameInputFieldCollection {
       border: none;
       color: var(--white-color);
