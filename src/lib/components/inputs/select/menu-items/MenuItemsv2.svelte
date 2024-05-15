@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * select option list
+   */
   export let list: {
     name: string;
     id: string;
@@ -15,14 +18,27 @@
     default?: boolean;
     hide?: boolean;
   };
+  /**
+   * selected option
+   */
   export let selectedRequest: {
     id: string;
   };
+  /**
+   * Ticked mark icon
+   */
   export let CheckIcon: any;
   export let getTextColor: (color: any) => {};
+  /**
+   * marks the tickmark is highlighted
+   */
   export let highlightTickedItem: boolean;
 
+  /**
+   * body theme - background
+   */
   export let bodyTheme: string;
+
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
 
@@ -54,6 +70,11 @@
     }
   };
 
+  /**
+   * @description - add classes to ticked options
+   * @param _id - item id (rows iteration)
+   * @param _selectedId - selected item id
+   */
   const extractBodyTextHighlight = (_id: string, _selectedId: string) => {
     if (_id === _selectedId && highlightTickedItem) {
       return `select-ticked-highlight-text`;

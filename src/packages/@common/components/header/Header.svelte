@@ -2,10 +2,26 @@
   import { Select } from "$lib/components/inputs";
   import { StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
+  /**
+   * environment list
+   */
   export let environments;
+  /**
+   * selected environment
+   */
   export let currentEnvironment;
+  /**
+   * updates the selected environment
+   */
   export let onInitActiveEnvironmentToWorkspace;
+  /**
+   * current workspace id
+   */
   export let currentWorkspaceId;
+  /**
+   * callback for Select component
+   * @param tabId - selected option id
+   */
   let handleDropdown = (tabId: string) => {
     onInitActiveEnvironmentToWorkspace(currentWorkspaceId, tabId);
   };

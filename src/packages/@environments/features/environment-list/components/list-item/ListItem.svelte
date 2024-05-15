@@ -7,13 +7,36 @@
   import Button from "$lib/components/buttons/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
+  /**
+   * current workspace to identify the selected environment
+   */
   export let currentWorkspace;
+
+  /**
+   * individual environment
+   */
   export let env;
+
+  /**
+   * openend environment
+   */
   export let currentEnvironment;
 
+  /**
+   * deletes the environment
+   */
   export let onDeleteEnvironment;
+  /**
+   * updates the environment
+   */
   export let onUpdateEnvironment;
+  /**
+   * opens the environment
+   */
   export let onOpenEnvironment;
+  /**
+   * selects the environment
+   */
   export let onSelectEnvironment;
 
   let showMenu: boolean = false;

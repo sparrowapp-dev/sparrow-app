@@ -1,11 +1,29 @@
 <script lang="ts">
   import Spinner from "$lib/components/Transition/Spinner.svelte";
 
+  /**
+   * performs operation on button click
+   */
   export let onClick: (e) => void = () => {};
+  /**
+   * button size
+   * */
   export let buttonSize = "20px";
+  /**
+   * icon size
+   */
   export let iconSize = "18px";
+  /**
+   * identifies button disabled or not
+   */
   export let disable = false;
+  /**
+   * shows loading state of the button
+   */
   export let loader = false;
+  /**
+   * shows curve behaviour of the button
+   */
   export let borderRadius = "4px";
 
   //   background color

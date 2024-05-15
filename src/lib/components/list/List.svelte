@@ -1,10 +1,19 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
-
+  /**
+   * list height
+   */
   export let height = "100%";
-  export let minHeight = "default";
+  /**
+   * handles overflow vertically
+   */
   export let overflowY = "scroll";
+  /**
+   * handles overflow horizontally
+   */
   export let overflowX = "hidden";
+  /**
+   * additional classes
+   */
   export let classProps = "";
 </script>
 

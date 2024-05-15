@@ -16,7 +16,13 @@
    * on change event
    */
   export let onclick;
+  /**
+   * sets opacity for overlapping containers
+   */
   export let zIndex;
+  /**
+   * identifies Select disabled or not
+   */
   export let disabled;
   $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>

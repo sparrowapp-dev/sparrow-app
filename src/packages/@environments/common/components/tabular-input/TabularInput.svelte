@@ -1,20 +1,27 @@
 <script lang="ts">
-  import dragIcon from "$lib/assets/drag.svg";
   import trashIcon from "$lib/assets/trash-icon.svg";
   import editIcon from "@workspaces/features/rest-explorer/assets/icons/edit.svg";
   import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
-  import attachFile from "@workspaces/features/rest-explorer/assets/icons/attachFile.svg";
   import type {
     KeyValuePair,
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import type { KeyValueChecked } from "@common/types/workspace";
 
+  /**
+   * tabular pair entries
+   */
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
+  /**
+   * callback to update entries
+   */
   export let callback: (pairs: KeyValuePair[]) => void;
+  /**
+   * search text to filter the pairs 
+   */
+  export let search: string;
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
-  export let search;
 
   $: {
     if (keyValue) {
@@ -35,7 +42,11 @@
     }
   }
 
-  const updateParam = (index: number): void => {
+  /**
+   * @description - updates pair values
+   * @param index - index of the pairs that needs to be updated
+   */
+  const updatePairs = (index: number): void => {
     pairs.forEach((elem, i) => {
       if (i === index) {
         elem.checked = true;
@@ -56,7 +67,11 @@
     callback(pairs);
   };
 
-  const deleteParam = (index: number): void => {
+  /**
+   * @description - delete pairs
+   * @param index - index of the pairs that needs to be deleted
+   */
+  const deletePairs = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
         if (i !== index) {
@@ -69,6 +84,10 @@
     callback(pairs);
   };
 
+  /**
+   * @description - updates check mark
+   * @param index - index of the pairs that needs to be checked or unchecked
+   */
   const updateCheck = (index: number): void => {
     let filteredKeyValue = pairs.map((elem, i) => {
       if (i === index) {
@@ -80,6 +99,9 @@
     callback(pairs);
   };
 
+  /**
+   * @description - updates all the checkbox to checked or unchecked
+   */
   const handleCheckAll = (): void => {
     let flag: boolean;
     if (controller === true) {
@@ -198,9 +220,9 @@
                     type="text"
                     bind:value={element.key}
                     on:input={() => {
-                      updateParam(index);
+                      updatePairs(index);
                     }}
-                    placeholder="Variable"
+                    placeholder="Add Variable"
                     class="w-100 text-fs-12"
                   />
                 </div>
@@ -210,9 +232,9 @@
                     type="text"
                     bind:value={element.value}
                     on:input={() => {
-                      updateParam(index);
+                      updatePairs(index);
                     }}
-                    placeholder={"Value"}
+                    placeholder={"Add Value"}
                     class="w-100 text-fs-12"
                   />
                 </div>
@@ -223,7 +245,7 @@
                     class="bg-secondary-700 border-0"
                     style="width:20px;"
                     on:click={() => {
-                      deleteParam(index);
+                      deletePairs(index);
                     }}
                   >
                     <img src={trashIcon} alt="" />

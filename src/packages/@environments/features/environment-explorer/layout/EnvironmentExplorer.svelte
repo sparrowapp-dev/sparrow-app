@@ -8,15 +8,27 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-
-  export let currentEnvironment;
-  export let onUpdateName;
-  export let onUpdateVariable;
-  export let onSaveEnvironment;
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
+
+  /**
+   * selected environmet to be shown on API
+   */
+  export let currentEnvironment;
+  /**
+   * updates the environment name
+   */
+  export let onUpdateName;
+  /**
+   * updates the environment variables
+   */
+  export let onUpdateVariable;
+  /**
+   * saves the environment
+   */
+  export let onSaveEnvironment;
 
   let quickHelp: boolean = false;
   let search = "";

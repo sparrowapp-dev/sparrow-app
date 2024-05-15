@@ -1,21 +1,38 @@
 <script lang="ts">
-  import Edit from "$lib/assets/edit.svelte";
   import { SearchIcon } from "$lib/assets/icons";
   import { PencilIcon } from "@library/icons";
   import { createEventDispatcher } from "svelte";
 
+  /**
+   * input type
+   */
   export let type: "text" | "password" | "search" = "text";
+  /**
+   * placeholder - dummy text
+   */
   export let placeholder = "placeholder";
+  /**
+   * height
+   */
   export let height = "30px";
+  /**
+   * width
+   */
   export let width = "auto";
 
   /**
-   * input class
+   * identifies input is disabled or not
    */
   export let disabled = false;
+  /**
+   * input class
+   */
   let componentClass = "";
   export { componentClass as class };
 
+  /**
+   * input style
+   */
   let componentStyle = "";
   export { componentStyle as style };
   /**

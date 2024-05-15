@@ -1,16 +1,7 @@
 <script lang="ts">
   import { PlusIcon } from "@library/icons";
   import { Tooltip } from "$lib/components";
-  import { v4 as uuidv4 } from "uuid";
-  import { onDestroy } from "svelte";
-  import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
-  import { isEnvironmentCreatedFirstTime } from "$lib/store/environment";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import { isWorkspaceLoaded } from "$lib/store/workspace.store";
-  import { environmentType } from "$lib/utils/enums/environment.enum";
-  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   import List from "$lib/components/list/List.svelte";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import {
@@ -21,16 +12,46 @@
   import { ListItem } from "../components";
   import { WithButtonV2 } from "@environments/common/hoc";
 
+  /**
+   * current workspace
+   */
   export let currentWorkspace;
+  /**
+   * environment list
+   */
   export let environments;
+  /**
+   * opened environment
+   */
   export let currentEnvironment;
+  /**
+   * workspace access permission
+   */
   export let loggedUserRoleInWorkspace: WorkspaceRole;
 
+  /**
+   * creates the environment
+   */
   export let onCreateEnvironment;
+  /**
+   * opens the global environment
+   */
   export let onOpenGlobalEnvironment;
+  /**
+   * deletes the environment
+   */
   export let onDeleteEnvironment;
+  /**
+   * updates the environment
+   */
   export let onUpdateEnvironment;
+  /**
+   * opens the local environment
+   */
   export let onOpenEnvironment;
+  /**
+   * selects the environment
+   */
   export let onSelectEnvironment;
 
   let localEnvironment;

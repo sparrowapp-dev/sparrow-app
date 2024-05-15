@@ -1,11 +1,13 @@
 <script>
   import cross from "$lib/assets/close.svg";
-  import variables from "$lib/assets/variables.png";
   import { QuickHelp } from "$lib/utils/constants/environment.constant";
   import {
     environmentDropdown,
     environmentPicker,
   } from "@environments/common/images";
+  /**
+   * callback which closes the quick help dialog
+   */
   export let closeQuickHelp;
 </script>
 
@@ -17,6 +19,7 @@
     <div class="icon">
       <img
         src={cross}
+        role="button"
         on:click={() => {
           closeQuickHelp();
         }}

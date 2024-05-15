@@ -1,6 +1,9 @@
 <script>
   import { EnvironmentExplorer } from "@environments/features";
   import { EnvironmentExplorerViewModel } from "./EnvironmentExplorerPage.ViewModel";
+  /**
+   * environment opened tab object
+   */
   export let tab;
   const _viewModel = new EnvironmentExplorerViewModel(tab);
 </script>
