@@ -15,6 +15,25 @@ export class DashboardViewModel {
   private environmentService = new EnvironmentService();
   private environmentRepository = new EnvironmentRepository();
 
+  /**
+   * Get the active workspace
+   * @returns - the active workspace
+   */
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
+  };
+
+  get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
+  };
+
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
   };
@@ -105,7 +124,7 @@ export class DashboardViewModel {
   };
 
   // sync workspace data with backend server
-  public refreshWorkspaces = async (userId: string): Promise<void> => {
+  private refreshWorkspaces = async (userId: string): Promise<void> => {
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
     workspaces.forEach((element) => {

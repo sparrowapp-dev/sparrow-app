@@ -31,29 +31,29 @@
   let quickHelp: boolean = false;
 
   const handleCurrentEnvironmentNameChange = (e: any) => {
-    environmentRepositoryMethods.setEnvironmentTabProperty(
-      e.target.value,
-      "name",
-      currentEnvironment.id,
-    );
+    // environmentRepositoryMethods.setEnvironmentTabProperty(
+    //   e.target.value,
+    //   "name",
+    //   currentEnvironment.id,
+    // );
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
-    environmentRepositoryMethods.setEnvironmentTabProperty(
-      pairs,
-      "variable",
-      currentEnvironment.id,
-    );
+    // environmentRepositoryMethods.setEnvironmentTabProperty(
+    //   pairs,
+    //   "variable",
+    //   currentEnvironment.id,
+    // );
   };
 
   const handleSaveEnvironment = async () => {
-    await environmentRepositoryMethods.setEnvironmentTabProperty(
-      true,
-      "isSaveInProgress",
-      currentEnvironment.id,
-    );
+    // await environmentRepositoryMethods.setEnvironmentTabProperty(
+    //   true,
+    //   "isSaveInProgress",
+    //   currentEnvironment.id,
+    // );
     const response = await environmentServiceMethods.updateEnvironment(
       activeWorkspace._id,
       currentEnvironment.id,
@@ -67,25 +67,25 @@
         response.data.data._id,
         response.data.data,
       );
-      await environmentRepositoryMethods.setEnvironmentTabProperty(
-        false,
-        "isSaveInProgress",
-        currentEnvironment.id,
-      );
-      environmentRepositoryMethods.setEnvironmentTabProperty(
-        true,
-        "isSave",
-        currentEnvironment.id,
-      );
+      // await environmentRepositoryMethods.setEnvironmentTabProperty(
+      //   false,
+      //   "isSaveInProgress",
+      //   currentEnvironment.id,
+      // );
+      // environmentRepositoryMethods.setEnvironmentTabProperty(
+      //   true,
+      //   "isSave",
+      //   currentEnvironment.id,
+      // );
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
     } else {
-      await environmentRepositoryMethods.setEnvironmentTabProperty(
-        false,
-        "isSaveInProgress",
-        currentEnvironment.id,
-      );
+      // await environmentRepositoryMethods.setEnvironmentTabProperty(
+      //   false,
+      //   "isSaveInProgress",
+      //   currentEnvironment.id,
+      // );
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {

@@ -90,8 +90,8 @@ export class TabRepository {
         },
       })
       .exec();
-    // if (deselectedTab && deselectedTab.get("id") === id) return;
     if (deselectedTab) {
+      if (deselectedTab.id === id) return;
       await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
     }
     const selectedTab = await RxDB.getInstance()

@@ -28,6 +28,7 @@ export class EnvironmentTabRepository {
       })
       .exec();
     if (activeTab) {
+      if (activeTab.id === environmentTab.id) return;
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     if (existedTab) {
@@ -72,28 +73,20 @@ export class EnvironmentTabRepository {
   };
 
   /**
-   * Responsible to change environment tab property like :
-   * id, name, description, save.
+   * @description
+   * updates existing environment.
    */
-  public setEnvironmentTabProperty = async (
-    data: any,
-    route: string,
-    id: string,
-  ): Promise<void> => {
-    const query = await RxDB.getInstance()
+  public updateEnvironmentTab = async (uuid: string, data) => {
+    const environment = await RxDB.getInstance()
       .rxdb.environmenttab.findOne({
         selector: {
-          id,
+          id: uuid,
         },
       })
       .exec();
-    if (query) {
-      query.incrementalModify((value: any) => {
-        value[route] = data;
-        if (route === "name" || route === "variable") {
-          value["isSave"] = false;
-        }
-        return value;
+    if (environment) {
+      environment.incrementalModify((value) => {
+        return { ...value, ...data };
       });
     }
   };

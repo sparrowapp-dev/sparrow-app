@@ -454,7 +454,7 @@
         {/each}
         {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
-            <Tooltip
+            <!-- <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
@@ -503,7 +503,7 @@
                   alt="+ API Request"
                 />
               </button>
-            </Tooltip>
+            </Tooltip> -->
           </div>
         {/if}
       </div>
@@ -555,10 +555,10 @@
   }
 
   .btn-primary {
-    background-color: var(--background-color);
+    background-color: transparent;
     color: var(--white-color);
     padding-right: 5px;
-    border-radius: 8px;
+    border-radius: 2px;
   }
 
   .btn-primary:hover {

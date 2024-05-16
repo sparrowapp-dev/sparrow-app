@@ -1,16 +1,25 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
-
+  /**
+   * list height
+   */
   export let height = "100%";
-  export let minHeight = "default";
+  /**
+   * handles overflow vertically
+   */
   export let overflowY = "scroll";
-  export let overflowX = "auto";
+  /**
+   * handles overflow horizontally
+   */
+  export let overflowX = "hidden";
+  /**
+   * additional classes
+   */
   export let classProps = "";
 </script>
 
 <div
   class={`list-container gap-2 sparrow-thin-scrollbar ${classProps}`}
-  style={`min-height: ${minHeight}; max-height: ${height}; overflow-y: ${overflowY}; overflow-x: ${overflowX};`}
+  style={`height: ${height}; overflow-y: ${overflowY}; overflow-x: ${overflowX};`}
 >
   <div class="list-body">
     <slot />

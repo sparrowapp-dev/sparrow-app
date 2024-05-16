@@ -1,4 +1,7 @@
 <script lang="ts">
+  /**
+   * select option list
+   */
   export let list: {
     name: string;
     id: string;
@@ -15,14 +18,27 @@
     default?: boolean;
     hide?: boolean;
   };
+  /**
+   * selected option
+   */
   export let selectedRequest: {
     id: string;
   };
+  /**
+   * Ticked mark icon
+   */
   export let CheckIcon: any;
-  export let checkIconColor: string;
   export let getTextColor: (color: any) => {};
+  /**
+   * marks the tickmark is highlighted
+   */
+  export let highlightTickedItem: boolean;
 
+  /**
+   * body theme - background
+   */
   export let bodyTheme: string;
+
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
 
@@ -40,12 +56,6 @@
     if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
       return `select-clicked-highlight-violet-btn`;
     } else if (
-      _bodyTheme === "grey" &&
-      _isMenuItemClicked &&
-      _isMenuItemHover
-    ) {
-      return `select-clicked-highlight-violet-btn`;
-    } else if (
       _bodyTheme === "dark" &&
       _isMenuItemClicked &&
       _isMenuItemHover
@@ -55,17 +65,20 @@
       return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
-    } else if (_bodyTheme === "grey" && _isMenuItemHover) {
-      return `select-hover-highlight-grey-btn`;
     } else {
       return "";
     }
   };
 
-  const extractBodyTextHighlight = (_bodyTheme: string, id: string) => {
-    if (_bodyTheme === "grey" && id === selectedRequest?.id) {
-      return `select-clicked-highlight-grey-btn-text`;
-    }
+  /**
+   * @description - add classes to ticked options
+   * @param _id - item id (rows iteration)
+   * @param _selectedId - selected item id
+   */
+  const extractBodyTextHighlight = (_id: string, _selectedId: string) => {
+    if (_id === _selectedId && highlightTickedItem) {
+      return `select-ticked-highlight-text`;
+    } else return "";
   };
 </script>
 
@@ -91,7 +104,7 @@
   <p
     class="m-0 p-0 {getTextColor(
       list?.color,
-    )} ellipsis {extractBodyTextHighlight(bodyTheme, list.id)}"
+    )} ellipsis {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     style="font-size: 12px;"
   >
     {list.name}<br />
@@ -100,29 +113,39 @@
     {/if}
   </p>
   {#if selectedRequest?.id === list.id}
-    <CheckIcon color={checkIconColor} />
+    <span
+      class="d-flex align-items-center justify-content-center"
+      style="height:16px; width:16px;"
+    >
+      <CheckIcon
+        color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
+      />
+    </span>
   {/if}
 </div>
 
 <style>
+  /* hover states */
   .select-hover-highlight-dark-btn {
     background-color: var(--dull-background-color);
   }
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
   }
-  .select-hover-highlight-grey-btn {
-    background-color: var(--dropdown-option-hover);
-  }
+
+  /* clicked states */
   .select-clicked-highlight-dark-btn {
-    background-color: var(--dull-background-color);
+    background-color: var(--bg-secondary-400);
   }
   .select-clicked-highlight-violet-btn {
     background-color: var(--bg-tertiary-700);
   }
-  .select-clicked-highlight-grey-btn-text {
+
+  .select-ticked-highlight-text {
     color: var(--text-primary-200) !important;
   }
+
+  /* others */
   .highlight {
     cursor: pointer;
   }

@@ -11,9 +11,11 @@
 
   // Component
   import { FolderExplorer } from "@workspaces/features";
-  import type { Folder } from "@common/types/rest-explorer";
+  import type { Folder } from "@common/types/workspace";
 
-  // Exports
+  /**
+   * folder tab document
+   */
   export let tab: TabDocument;
 
   // ViewModel initialization

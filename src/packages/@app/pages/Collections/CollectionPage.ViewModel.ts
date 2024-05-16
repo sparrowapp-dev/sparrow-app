@@ -192,14 +192,21 @@ export default class CollectionsViewModel {
   /**
    * Create new tab with untracked id
    */
-  public createNewTab = async () => {
+  public createNewTab = async (_limit = 5) => {
+    if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
-    this.tabRepository.createTab(
-      new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
-    );
-    moveNavigation("right");
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    if (ws) {
+      this.tabRepository.createTab(
+        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+      MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    } else {
+      setTimeout(() => {
+        this.createNewTab(_limit - 1);
+      }, 2000);
+    }
   };
 
   /**
@@ -520,7 +527,7 @@ export default class CollectionsViewModel {
    * Get the active workspace
    * @returns :Observable<WorkspaceDocument> - the active workspace
    */
-  public getActiveWorkspace = () => {
+  public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
     return this.workspaceRepository.getActiveWorkspace();
   };
 

@@ -35,8 +35,7 @@ All the global variables are marked with <span class="global-env-G">G</span>
 request body or anywhere else while testing a REST API request.`,
 ];
 const SwitchingEnvironments: string[] = [
-  `To switch an environment for API testing, select the dropdown present in the
-collections list side panel in the REST API tool.`,
+  `To switch an environment for API testing, select the dropdown present in the Top right corner.`,
 ];
 const ProtectSensitiveinformation: string[] = [
   `In scenarios where confidentiality is key, you can safeguard variable values

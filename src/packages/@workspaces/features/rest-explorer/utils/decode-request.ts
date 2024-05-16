@@ -7,7 +7,7 @@ import {
   type Request,
   RequestDataTypeEnum,
   RequestMethodEnum,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 import { ReduceAuthHeader, ReduceAuthParameter } from ".";
 
 class DecodeRequest {

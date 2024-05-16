@@ -23,7 +23,7 @@
 
 <style>
   .request-body {
-    max-height: calc(100% - 150px);
+    max-height: calc(100% - 65px);
     overflow-y: scroll;
     overflow-x: hidden;
   }

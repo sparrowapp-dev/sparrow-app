@@ -7,8 +7,8 @@ export interface CreateEnvironmentPostBody {
 }
 
 export interface UpdateEnvironmentPostBody {
-  name: string;
-  variable: EnvValuePair[];
+  name?: string;
+  variable?: EnvValuePair[];
 }
 
 export interface EnvironmentDto {

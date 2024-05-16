@@ -10,7 +10,9 @@
         <SparrowLogo />
       </div>
       <div class="d-flex flex-column align-items-center">
-        <p class="text-secondary-200 text-fs-14">Could not Send Request</p>
+        <p class="text-secondary-200 text-fs-14 fw-bold">
+          Could not Send Request
+        </p>
       </div>
       <div
         class="d-flex align-items-center error-message bg-danger-1000 border-radius-2"

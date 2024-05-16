@@ -102,11 +102,11 @@
         environmentRepositoryMethods.updateEnvironment(env.id, {
           name: newEnvironmentName,
         });
-        environmentRepositoryMethods.setEnvironmentTabProperty(
-          newEnvironmentName,
-          "name",
-          env.id,
-        );
+        // environmentRepositoryMethods.setEnvironmentTabProperty(
+        //   newEnvironmentName,
+        //   "name",
+        //   env.id,
+        // );
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {

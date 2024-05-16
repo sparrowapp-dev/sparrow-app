@@ -1,18 +1,11 @@
 <script lang="ts">
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "$lib/utils/animations";
-  import { EnvironmentList, EnvironmentPanel } from "$lib/components";
-  import type {
-    EnvironmentRepositoryMethods,
-    EnvironmentServiceMethods,
-  } from "$lib/utils/interfaces/environment.interface";
-  import { EnvironmentViewModel } from "./Environment.ViewModel";
+  import { EnvironmentList } from "@environments/features";
+  import { EnvironmentViewModel } from "./EnvironmentPage.ViewModel";
   import type { Observable } from "rxjs";
   import type { WorkspaceDocument } from "$lib/database/app.database";
-
-  import { createDeepCopy } from "$lib/utils/helpers/conversion.helper";
   import { onDestroy, onMount } from "svelte";
-  import type { WorkspaceRole } from "$lib/utils/enums/team.enum";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";
   import {
@@ -21,6 +14,8 @@
   } from "$lib/store/environment";
   import { user, userWorkspaceLevelRole } from "$lib/store";
   import { Pane, Splitpanes } from "svelte-splitpanes";
+  import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
+  import { Route } from "svelte-navigator";
 
   const _viewModel = new EnvironmentViewModel();
   // export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -30,28 +25,10 @@
     MixpanelEvent(Events.ENVIRONMENT_SIDE_PANEL);
   });
 
-  const environmentRepositoryMethods: EnvironmentRepositoryMethods = {
-    createEnvironment: _viewModel.createEnvironment,
-    getActiveWorkspace: _viewModel.getActiveWorkspace,
-    removeEnvironment: _viewModel.deleteEnvironment,
-    updateEnvironment: _viewModel.updateEnvironment,
-    initActiveEnvironmentToWorkspace:
-      _viewModel.initActiveEnvironmentToWorkspace,
-    createEnvironmentTab: _viewModel.createEnvironmentTab,
-    setEnvironmentTabProperty: _viewModel.setEnvironmentTabProperty,
-    deleteEnvironmentTab: _viewModel.deleteEnvironmentTab,
-  };
-
-  const environmentServiceMethods: EnvironmentServiceMethods = {
-    getEnvironments: _viewModel.getServerEnvironments,
-    createEnvironment: _viewModel.createServerEnvironment,
-    deleteEnvironment: _viewModel.deleteServerEnvironment,
-    updateEnvironment: _viewModel.updateServerEnvironment,
-  };
   let trackWorkspaceId;
   let isEnvLoading = false;
   const activeWorkspace: Observable<WorkspaceDocument> =
-    environmentRepositoryMethods.getActiveWorkspace();
+    _viewModel.getActiveWorkspace();
 
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -74,59 +51,70 @@
     },
   );
 
-  let splitter;
-  onMount(() => {
-    splitter = document.querySelector(
-      ".splitter-sidebar .splitpanes__splitter",
-    );
-    splitter.style.width = "1px";
-  });
-
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
 </script>
 
 <Splitpanes
-  class="splitter-sidebar"
+  class="environment-splitter"
+  style="width: calc(100vw - 54px);"
   on:resize={(e) => {
     environmentLeftPanelWidth.set(e.detail[0].size);
     environmentRightPanelWidth.set(e.detail[1].size);
   }}
 >
   <Pane
-    class="sidebar-left-panel"
     minSize={20}
     size={$environmentLeftPanelWidth}
+    class="bg-secondary-900-important"
   >
     <EnvironmentList
       loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
-      {environmentRepositoryMethods}
-      {environmentServiceMethods}
+      onCreateEnvironment={_viewModel.onCreateEnvironment}
+      onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
+      onDeleteEnvironment={_viewModel.onDeleteEnvironment}
+      onUpdateEnvironment={_viewModel.onUpdateEnvironment}
+      onOpenEnvironment={_viewModel.onOpenEnvironment}
+      onSelectEnvironment={_viewModel.onSelectEnvironment}
       currentWorkspace={$activeWorkspace}
       environments={$environments}
       currentEnvironment={$activeEnvironment}
     />
   </Pane>
   <Pane
-    class="sidebar-right-panel"
     minSize={60}
     size={$environmentRightPanelWidth}
+    class="bg-secondary-800-important"
   >
-    <EnvironmentPanel
-      loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
-      {environmentRepositoryMethods}
-      {environmentServiceMethods}
-      currentEnvironment={$activeEnvironment
-        ? createDeepCopy($activeEnvironment)
-        : $activeEnvironment}
-      activeWorkspace={$activeWorkspace}
-    />
+    <Route>
+      {#if true}
+        {#if $activeEnvironment}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <EnvironmentExplorerPage tab={$activeEnvironment} />
+            </div>
+          </Motion>
+        {/if}
+      {/if}
+    </Route>
   </Pane>
 </Splitpanes>
 
 <style>
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 72px);
+  :global(.environment-splitter .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-900) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+  :global(
+      .environment-splitter .splitpanes__splitter:active,
+      .environment-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>

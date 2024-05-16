@@ -39,23 +39,23 @@
 </script>
 
 <Tooltip placement="right" title={item.disabled ? "Coming Soon" : item.heading}>
-  <div
-    class="sidebar-item"
-    class:disabled={item.disabled}
-    class:hover={!item.disabled && isHovered}
-    on:mouseenter={() => (isHovered = true)}
-    on:mouseleave={() => (isHovered = false)}
+  <Link
+    to={item.route}
+    getProps={({ isCurrent, isPartiallyCurrent }) => {
+      isRouteActive = isCurrent || isPartiallyCurrent;
+      return {
+        class: `d-flex flex-column text-decoration-none align-items-center justify-content-center ${
+          item.disabled ? "disabled" : ""
+        }`,
+      };
+    }}
   >
-    <Link
-      to={item.route}
-      getProps={({ isCurrent, isPartiallyCurrent }) => {
-        isRouteActive = isCurrent || isPartiallyCurrent;
-        return {
-          class: `d-flex flex-column text-decoration-none align-items-center justify-content-center ${
-            item.disabled ? "disabled" : ""
-          }`,
-        };
-      }}
+    <div
+      class="sidebar-item"
+      class:disabled={item.disabled}
+      class:hover={!item.disabled && isHovered}
+      on:mouseenter={() => (isHovered = true)}
+      on:mouseleave={() => (isHovered = false)}
     >
       <div class="d-flex" style="align-items: center;">
         {#if isRouteActive}
@@ -71,8 +71,8 @@
           <img src={item.defaultLogo} alt={item.heading} />
         {/if}
       </div>
-    </Link>
-  </div>
+    </div>
+  </Link>
 </Tooltip>
 
 <style>
@@ -94,11 +94,11 @@
     transition:
       background-color 0.55s ease,
       padding 0.55s ease;
+    border-radius: 4px;
   }
 
   .sidebar-item:hover {
     background-color: var(--nav-bar-hover-background);
-    border-radius: 4px;
     opacity: 0.9;
     display: flex;
     flex-direction: row;

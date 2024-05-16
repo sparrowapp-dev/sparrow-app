@@ -35,7 +35,7 @@
     const [yHeight, yTranslate] = calculateRightOptionHeight();
     const [xWidth, xTranslate] = calculateRightOptionWidth();
     if (windowHeight < yAxis + yHeight) {
-      mouseY = yAxis - yTranslate;
+      mouseY = yAxis - yTranslate - 50;
     }
     if (windowWidth < xAxis + xWidth) {
       mouseX = xAxis - xTranslate;
@@ -55,7 +55,7 @@
 <nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
   <div
     style={`width: ${noOfColumns}px`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column rounded align-items-start justify-content-start text-whiteColor bg-blackColor"
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
   >
     <ul class="p-2 w-100 mb-0">
       {#each menuItems as item}
@@ -82,12 +82,12 @@
   }
 
   ul li button {
-    background-color: var(--blackColor);
+    background-color: transparent;
+    border-radius: 2px;
+    color: var(--white-color);
   }
 
   ul li button:hover {
-    color: var(--white-color);
-    border-radius: 8px;
-    background-color: var(--right-click-menu);
+    background-color: var(--bg-tertiary-600);
   }
 </style>

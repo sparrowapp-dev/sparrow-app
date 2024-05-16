@@ -168,7 +168,7 @@
             maxlength={100}
             id="renameInputFieldCollection"
             value={collection?.name}
-            class="bg-backgroundColor input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
+            class="bg-transparent input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
             disabled={!userRoleInWorkspace || tab?.activeSync}
             on:blur={(event) => onRename(collection, event?.target?.value)}
             on:keydown={(event) => {
@@ -379,7 +379,7 @@
           id="updateCollectionDescField"
           style="font-size: 12px;"
           value={tab?.description ? tab.description : ""}
-          class="form-control bg-backgroundColor border-0 text-textColor fs-6 h-50 input-outline"
+          class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) =>
             onUpdateDescription(collection, event.target.value)}
@@ -415,7 +415,7 @@
 <style>
   .main-container {
     height: calc(100vh - 80px);
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
   }
 
   .my-collection {
