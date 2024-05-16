@@ -78,6 +78,7 @@
    */
   export let explorer: Folder;
   export let folder: Folder | null = null;
+  export let activeTabId: string;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -90,6 +91,8 @@
   let isRenaming = false;
   let requestCount: number;
   let requestIds: [string] | [] = [];
+  let folderTabWrapper: HTMLElement;
+
   $: {
     if (activeTabPath) {
       if (activeTabPath?.folderId === explorer.id) {
@@ -190,8 +193,11 @@
 
   {#if showMenu}
     <MoreOptions
-      xAxis={pos.x}
-      yAxis={pos.y}
+      xAxis={folderTabWrapper.getBoundingClientRect().right - 180}
+      yAxis={[
+        folderTabWrapper.getBoundingClientRect().top - 0,
+        folderTabWrapper.getBoundingClientRect().bottom + 5,
+      ]}
       menuItems={[
         {
           onClick: () => {
@@ -242,9 +248,10 @@
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
+        bind:this={folderTabWrapper}
         style="height:32px;"
         class="d-flex align-items-center justify-content-between my-button btn-primary ps-2 {explorer.id ===
-        activeTabPath?.folderId
+        activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
@@ -423,7 +430,7 @@
           {onItemOpened}
           {folder}
           {collection}
-          {activeTabPath}
+          {activeTabId}
         />
       </div>
     {/if}
@@ -502,12 +509,12 @@
   }
 
   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
   }
 
   .add-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
     padding: 5px;
   }

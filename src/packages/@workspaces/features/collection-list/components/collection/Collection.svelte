@@ -9,10 +9,11 @@
     collection: CollectionDocument,
   ) => void;
   export let activeTabPath: Path;
+  export let activeTabId: string;
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
 
-  import angleRight from "$lib/assets/angleRight.svg";
+  import angleRight from "$lib/assets/angle-right-v2.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "$lib/components/Transition/Spinner.svelte";
@@ -39,6 +40,8 @@
   import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
+  import AddIcon from "$lib/assets/add.svg";
+  import MoreOptions from "../more-options/MoreOptions.svelte";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -55,9 +58,11 @@
   let pos = { x: 0, y: 0 };
   let isCollectionPopup: boolean = false;
   let showMenu: boolean = false;
+  let showAddItemMenu = false;
   let noOfColumns = 180;
   let noOfRows = 5;
   let inputField: HTMLInputElement;
+  let collectionTabWrapper: HTMLElement;
 
   /**
    * Handle position of the context menu
@@ -66,10 +71,14 @@
   function rightClickContextMenu(e: Event) {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
       showMenu = true;
+    }, 100);
+  }
+
+  function rightClickContextMenu2(e: Event) {
+    e.preventDefault();
+    setTimeout(() => {
+      showAddItemMenu = true;
     }, 100);
   }
 
@@ -95,6 +104,9 @@
    */
   function closeRightClickContextMenu() {
     showMenu = false;
+  }
+  function closeRightClickContextMenu2() {
+    showAddItemMenu = false;
   }
 
   $: {
@@ -223,9 +235,12 @@
 >
 
 {#if showMenu}
-  <RightOption
-    xAxis={pos.x}
-    yAxis={pos.y}
+  <MoreOptions
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 180}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 5,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
     menuItems={[
       {
         onClick: () =>
@@ -288,7 +303,41 @@
         hidden: false,
       },
     ]}
-    {noOfRows}
+    {noOfColumns}
+  />
+{/if}
+
+{#if showAddItemMenu}
+  <MoreOptions
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 180}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    menuItems={[
+      {
+        onClick: () => {
+          onItemCreated("folder", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add Folder",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          onItemCreated("requestCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add New API",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
     {noOfColumns}
   />
 {/if}
@@ -296,20 +345,22 @@
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
+  on:click={closeRightClickContextMenu2}
+  on:contextmenu|preventDefault={closeRightClickContextMenu2}
   on:load={() => {
     getFeatures();
   }}
 />
 
 <button
-  style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+  bind:this={collectionTabWrapper}
+  style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
-  'activeTabId'
+  activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center bg-transparent border-0"
     on:click={() => {
       isCollectionCreatedFirstTime.set(false);
@@ -325,7 +376,7 @@
     <img
       src={angleRight}
       class=""
-      style="height:14px; width:14px; margin-right:8px; {visibility
+      style="height:8px; width:8px; margin-right:8px; {visibility
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
@@ -361,9 +412,9 @@
     {:else}
       <div
         class="collection-collection.name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
-        style="height: 36px; text-align: left;"
+        style="height: 32px; text-align: left;"
       >
-        <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
+        <p class="ellipsis w-100 mb-0 text-fs-12">
           {collection.name}
         </p>
         {#if collection.activeSync}
@@ -387,22 +438,32 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip
+    <!-- <Tooltip
       placement="bottom"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
+    > -->
+    <button
+      class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
+        ? 'add-item-active'
+        : ''}"
+      on:click={(e) => {
+        rightClickContextMenu2(e);
+      }}
     >
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </Tooltip>
+      <img src={AddIcon} alt="AddIcon" />
+    </button>
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
+      on:click={(e) => {
+        rightClickContextMenu(e);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
+    <!-- </Tooltip> -->
     {#if isActiveSyncEnabled && collection?.activeSync}
       <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
         <button
@@ -450,6 +511,7 @@
             {userRoleInWorkspace}
             {activeTabPath}
             {explorer}
+            {activeTabId}
           />
         {/each}
         {#if showFolderAPIButtons}
@@ -529,6 +591,9 @@
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }
+  .my-button:hover .add-icon-container {
+    visibility: visible;
+  }
   .list-icons {
     width: 16px;
     height: 16px;
@@ -545,13 +610,29 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    /* background-color: var(--workspace-hover-color); */
+    background-color: var(--bg-tertiary-600);
+  }
+  .add-icon-container {
+    visibility: hidden;
+    background-color: transparent;
+    padding: 5px;
+  }
+  .add-icon-container:hover {
+    background-color: var(--bg-tertiary-500) !important;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  .add-item-active {
+    visibility: visible;
+    background-color: var(--bg-tertiary-600);
   }
   .refresh-collection-loader-active {
     visibility: visible;
   }
   .threedot-icon-container:hover {
-    background-color: var(--workspace-hover-color);
+    /* background-color: var(--workspace-hover-color); */
+    background-color: var(--bg-tertiary-500);
   }
 
   .btn-primary {
@@ -562,7 +643,7 @@
   }
 
   .btn-primary:hover {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-600);
     color: var(--white-color);
   }
 
@@ -579,7 +660,8 @@
     width: calc(100% - 48px);
   }
   .active-collection-tab {
-    background-color: var(--selected-active-sidebar) !important;
+    /* background-color: var(--selected-active-sidebar) !important; */
+    background-color: var(--bg-tertiary-400) !important;
   }
   .collection-collection.name {
     width: calc(100% - 30px);

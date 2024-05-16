@@ -5,7 +5,6 @@
   import Spinner from "$lib/components/Transition/Spinner.svelte";
   import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
   import Button from "$lib/components/buttons/Button.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import MoreOptions from "../more-options/MoreOptions.svelte";
 
   // ---- Helper functions
@@ -64,7 +63,7 @@
   /**
    * Current Tab Path
    */
-  export let activeTabPath: Path;
+  export let activeTabId: string;
 
   let showPath = false;
 
@@ -163,7 +162,10 @@
 {#if showMenu}
   <MoreOptions
     xAxis={requestTabWrapper.getBoundingClientRect().right - 180}
-    yAxis={requestTabWrapper.getBoundingClientRect().bottom + 5}
+    yAxis={[
+      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
     menuItems={[
       {
         onClick: () => {
@@ -174,7 +176,7 @@
             request: api,
           });
         },
-        displayText: "Open Request",
+        displayText: "Open API",
         disabled: false,
         hidden: false,
       },
@@ -183,7 +185,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename Request",
+        displayText: "Rename API",
         disabled: false,
         hidden:
           !collection.activeSync ||
@@ -205,7 +207,6 @@
             : true,
       },
     ]}
-    {noOfRows}
     {noOfColumns}
   />
 {/if}
@@ -218,7 +219,7 @@
 <div
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
-  activeTabPath?.requestId
+  activeTabId
     ? 'active-request-tab'
     : ''}"
   style="height:32px;"
@@ -309,20 +310,18 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip title="More options" styleProp="left: -50%">
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click|preventDefault={(e) => {
-          pos.x = e.clientX;
-          pos.y = e.clientY;
-          setTimeout(() => (showMenu = true), 100);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </Tooltip>
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
+      on:click|preventDefault={(e) => {
+        pos.x = e.clientX;
+        pos.y = e.clientY;
+        setTimeout(() => (showMenu = true), 100);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
   {/if}
 </div>
 
@@ -386,7 +385,7 @@
     background-color: var(--bg-tertiary-600);
   }
   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500);
   }
 
   .btn-primary {

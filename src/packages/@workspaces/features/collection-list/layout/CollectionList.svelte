@@ -19,7 +19,8 @@
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let activeTabPath: Path;
+  export let activeTabPath;
+  export let activeTabId;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
@@ -144,7 +145,7 @@
     } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
+      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3 d-none"
     >
       <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
@@ -162,28 +163,29 @@
       </button>
     </div>
     <div
-      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
+      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-1"
     >
       <div
         style="height:32px; "
-        class="inputField w-100 bg-backgroundDark ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
+        class="inputField w-100 bg-tertiary-400 ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center border-radius-2"
       >
         <SearchIcon />
         <input
           type="search"
           style="font-size: 12px; font-weight: 500;"
-          class="inputField searchField border-0 w-100 h-100 bg-backgroundDark"
-          placeholder="Search APIs in {$currentWorkspace?.name || ''}"
+          class="inputField searchField border-0 w-100 h-100 bg-tertiary-400"
+          placeholder="Search"
           bind:value={searchData}
           on:input={() => {
             handleSearch();
           }}
+          disabled
         />
       </div>
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
-          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2
+          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2 d-none
           {showfilterDropdown ? 'filter-active' : ''}"
           style="width: 32px; height:32px; position:relative"
           on:click={() => (showfilterDropdown = !showfilterDropdown)}
@@ -223,7 +225,7 @@
       >
         <button
           id="addButton"
-          class="border-0 p-1 rounded add-button"
+          class="border-0 p-1 border-radius-2 add-button"
           on:click={() => {
             addButtonMenu = !addButtonMenu;
           }}
@@ -284,7 +286,6 @@
           {:else if selectedApiMethods.length > 0}
             <List
               height={"calc(100vh - 180px)"}
-              minHeight={"180px"}
               classProps={"pb-2 pe-2"}
               overflowX="hidden"
             >
@@ -299,6 +300,7 @@
                   {userRoleInWorkspace}
                   {activeTabPath}
                   collection={col._data}
+                  {activeTabId}
                 />
               {/each}
             </List>
@@ -316,6 +318,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     collection={col}
+                    {activeTabId}
                   />
                 {/each}
               {/if}

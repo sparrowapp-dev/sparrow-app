@@ -181,7 +181,8 @@
         handleCollapseCollectionList,
       }}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
-      activeTabPath={tabPath}
+      activeTabPath={$activeTab?.path}
+      activeTabId={$activeTab?.id}
       showImportCollectionPopup={() => (isImportCollectionPopup = true)}
       showImportCurlPopup={() => (isImportCurlPopup = true)}
       onItemCreated={_viewModel.handleCreateItem}
