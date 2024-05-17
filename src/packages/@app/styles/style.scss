@@ -127,6 +127,9 @@ $theme-red-f34b5c:#f34b5c;
 $theme-red-f33346:#f33346;
 $theme-red-fe2e2e:#fe2e2e;
 $theme-red-312325:#312325;
+$theme-red-230408:#230408;
+
+
 
 
 :root {
@@ -285,6 +288,8 @@ $theme-red-312325:#312325;
   --bg-danger-800 : #{$theme-red-f33346};
   --bg-danger-900 : #{$theme-red-fe2e2e};
   --bg-danger-1000 : #{$theme-red-312325};
+  --bg-danger-1100 : #{$theme-red-230408};
+
 
   //
   //
@@ -608,14 +613,14 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
 .env-highlight {
 
-  
+
   &.env-found {
     color: var(--text-primary-400);
+    cursor: pointer;
   }
   &.env-found:hover {
     color: var(--primary-btn-color);
     background-color:var( --selected-active-sidebar) ;
-    cursor: pointer;
   }
 
   &.env-not-found {
@@ -625,8 +630,7 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
   &.env-not-found:hover {
     color: var(--dangerColor);
-   background-color: #230408;
-    cursor: pointer;
+   background-color: var(--bg-danger-1100);
   }
 
   &.hover-found {
@@ -635,7 +639,6 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
   &.hover-not-found {
     color: var(--text-danger-200);
-    background-color: #230408;
   }
 
 }

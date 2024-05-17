@@ -373,7 +373,7 @@
   }
 
   .placeholder-color::placeholder {
-    color: #333333;
+    color: var(--text-secondary-400);
 }
   
 </style>
