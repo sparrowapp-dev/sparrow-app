@@ -607,12 +607,25 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 }
 
 .env-highlight {
+
+  
   &.env-found {
     color: var(--text-primary-400);
+  }
+  &.env-found:hover {
+    color: var(--primary-btn-color);
+    background-color:var( --selected-active-sidebar) ;
+    cursor: pointer;
   }
 
   &.env-not-found {
     color: var(--text-danger-200);
+    cursor: pointer;
+  }
+
+  &.env-not-found:hover {
+    color: var(--dangerColor);
+   background-color: #230408;
     cursor: pointer;
   }
 
@@ -624,6 +637,7 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
     color: var(--text-danger-200);
     background-color: #230408;
   }
+
 }
 
 textarea {
