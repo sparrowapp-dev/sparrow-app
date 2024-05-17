@@ -257,6 +257,11 @@
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
+          on:contextmenu|preventDefault={(e) => {
+            setTimeout(() => {
+              showMenu = true;
+            }, 100);
+          }}
           on:click={() => {
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;

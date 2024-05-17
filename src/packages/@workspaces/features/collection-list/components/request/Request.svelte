@@ -228,6 +228,11 @@
     : 'padding-left: 30px;'}"
 >
   <button
+    on:contextmenu|preventDefault={(e) => {
+      setTimeout(() => {
+        showMenu = true;
+      }, 100);
+    }}
     on:click={() => {
       onItemOpened("request", {
         workspaceId: collection.workspaceId,

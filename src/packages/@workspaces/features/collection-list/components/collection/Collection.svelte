@@ -273,12 +273,7 @@
           }),
         displayText: "Add Request",
         disabled: false,
-        hidden:
-          (collection?.activeSync && isBranchSynced) ||
-          (!(collection?.activeSync && isBranchSynced) &&
-            !(collection?.activeSync && !isBranchSynced))
-            ? false
-            : true,
+        hidden: true,
       },
       {
         onClick: () =>
@@ -288,12 +283,7 @@
           }),
         displayText: "Add Folder",
         disabled: false,
-        hidden:
-          (collection?.activeSync && isBranchSynced) ||
-          (!(collection?.activeSync && isBranchSynced) &&
-            !(collection?.activeSync && !isBranchSynced))
-            ? false
-            : true,
+        hidden: true,
       },
       {
         onClick: () => {
@@ -365,6 +355,7 @@
 >
   <button
     class="d-flex main-collection align-items-center bg-transparent border-0"
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
       isCollectionCreatedFirstTime.set(false);
       visibility = !visibility;
