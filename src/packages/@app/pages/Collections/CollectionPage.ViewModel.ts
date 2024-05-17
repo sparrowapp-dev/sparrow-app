@@ -101,14 +101,15 @@ import {
   insertCollectionRequest,
   updateCollectionRequest,
 } from "$lib/services/collection";
+import { GithubService } from "$lib/services/github.service";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
+  private githubService = new GithubService();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
@@ -539,6 +540,9 @@ export default class CollectionsViewModel {
     this.collectionRepository.addCollection(collection);
   };
 
+  public getGithubRepo = () => {
+    // const response = this.githubService.getRepoMetaData("sparrowapp-dev/sparrow-app");
+  };
   /**
    * Generate available name of new collection like New collection 2 if New collection is already taken
    * @param list :any[] - list of collections

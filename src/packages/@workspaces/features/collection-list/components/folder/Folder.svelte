@@ -193,7 +193,7 @@
 
   {#if showMenu}
     <MoreOptions
-      xAxis={folderTabWrapper.getBoundingClientRect().right - 180}
+      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
         folderTabWrapper.getBoundingClientRect().top - 0,
         folderTabWrapper.getBoundingClientRect().bottom + 5,
@@ -249,8 +249,8 @@
     {#if explorer.type === "FOLDER"}
       <div
         bind:this={folderTabWrapper}
-        style="height:32px;"
-        class="d-flex align-items-center justify-content-between my-button btn-primary ps-2 {explorer.id ===
+        style="height:32px; padding-left: 36px;"
+        class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
@@ -373,11 +373,11 @@
         {/if}
       </div>
       <div
-        style="padding-left: 12px; cursor:pointer; display: {expand
+        style="padding-left: 0; cursor:pointer; display: {expand
           ? 'block'
           : 'none'};"
       >
-        <div class="sub-files ps-3">
+        <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self
               {onItemCreated}
@@ -431,6 +431,7 @@
           {folder}
           {collection}
           {activeTabId}
+          {activeTabPath}
         />
       </div>
     {/if}
@@ -531,7 +532,7 @@
     padding-left: 0;
   }
   .sub-files {
-    border-left: 1px solid var(--border-color);
+    /* border-left: 1px solid var(--border-color); */
   }
 
   .main-folder {

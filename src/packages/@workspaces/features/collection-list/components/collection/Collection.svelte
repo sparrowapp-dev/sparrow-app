@@ -37,11 +37,12 @@
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import folderIcon from "$lib/assets/create_folder.svg";
+  // import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
   import MoreOptions from "../more-options/MoreOptions.svelte";
+  import { FolderIcon, SyncIcon } from "@library/icons";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -236,7 +237,7 @@
 
 {#if showMenu}
   <MoreOptions
-    xAxis={collectionTabWrapper.getBoundingClientRect().right - 180}
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
@@ -309,7 +310,7 @@
 
 {#if showAddItemMenu}
   <MoreOptions
-    xAxis={collectionTabWrapper.getBoundingClientRect().right - 180}
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 55}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top - 0,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
@@ -325,6 +326,7 @@
         displayText: "Add Folder",
         disabled: false,
         hidden: false,
+        icon: FolderIcon,
       },
       {
         onClick: () => {
@@ -336,6 +338,7 @@
         displayText: "Add New API",
         disabled: false,
         hidden: false,
+        icon: SyncIcon,
       },
     ]}
     {noOfColumns}
@@ -496,11 +499,11 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-3">
+      <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
             {onItemCreated}
@@ -572,7 +575,7 @@
     </div>
   {:else}
     <div
-      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
         ? 'block'
         : 'none'};"
     >
@@ -654,7 +657,7 @@
     padding-left: 0;
   }
   .sub-folders {
-    border-left: 1px solid var(--border-color);
+    /* border-left: 1px solid var(--border-color); */
   }
   .main-collection {
     width: calc(100% - 48px);

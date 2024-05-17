@@ -6,6 +6,7 @@
     displayText: string;
     disabled: boolean;
     hidden: boolean;
+    icon?: any;
   }> = [];
   export let noOfColumns = 0;
   let mouseX = 0;
@@ -60,14 +61,21 @@
         <li class="align-items-center {item.hidden ? 'd-none' : 'd-block'}">
           <button
             disabled={item.disabled}
-            class={`w-100 d-flex sparrow-fs-12 border-0 align-items-center px-2 py-2 ${
+            class={`w-100 d-flex align-items-center sparrow-fs-12 border-0 align-items-center px-2 py-2 ${
               item.disabled && "text-requestBodyColor"
             }`}
             on:click={item.onClick}
             style={item.displayText === "Delete"
               ? "color: var(--request-delete)"
-              : ""}>{item.displayText}</button
+              : ""}
           >
+            <span class="me-2">
+              <svelte:component this={item.icon} />
+            </span>
+            <span>
+              {item.displayText}
+            </span>
+          </button>
         </li>
       {/each}
     </ul>

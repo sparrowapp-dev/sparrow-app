@@ -64,6 +64,7 @@
    * Current Tab Path
    */
   export let activeTabId: string;
+  export let activeTabPath;
 
   let showPath = false;
 
@@ -161,7 +162,7 @@
 
 {#if showMenu}
   <MoreOptions
-    xAxis={requestTabWrapper.getBoundingClientRect().right - 180}
+    xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       requestTabWrapper.getBoundingClientRect().top - 0,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
@@ -218,11 +219,13 @@
 
 <div
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''}"
-  style="height:32px;"
+    : ''} "
+  style="height:32px; {folder?.id
+    ? 'padding-left: 46px;'
+    : 'padding-left: 30px;'}"
 >
   <button
     on:click={() => {
@@ -296,13 +299,13 @@
         style="font-size: 12px;"
       >
         {api.name}
-        {#if showPath}
+        <!-- {#if showPath}
           <span class="path-name ellipsis"
             >{`${
               api?.request?.url ? getPathFromUrl(api?.request?.url) : ""
             }`}</span
           >
-        {/if}
+        {/if} -->
       </div>
     {/if}
   </button>
@@ -391,7 +394,6 @@
   .btn-primary {
     background-color: transparent;
     color: var(--white-color);
-    padding-left: 0 !important;
     padding-right: 5px;
     border-radius: 2px;
   }
