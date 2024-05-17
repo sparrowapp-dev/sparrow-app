@@ -160,6 +160,7 @@
       impact all the API requests that use the variables in this environment.
     </p>
   </div>
+
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
@@ -250,9 +251,11 @@
             }
           }}
         >
-          <p class="ellipsis w-100 mb-0 text-fs-14">
+          <p class="ellipsis w-100 mb-0 text-fs-14"  on:contextmenu={(e) => {
+            rightClickContextMenu(e);
+        }}>
             {env.name}
-          </p>
+        </p>
         </div>
       {/if}
     </div>
