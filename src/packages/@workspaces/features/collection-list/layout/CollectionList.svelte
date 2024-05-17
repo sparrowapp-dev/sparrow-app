@@ -27,6 +27,7 @@
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
   };
+  export let githubRepo;
 
   import {
     Collection,
@@ -341,7 +342,9 @@
       <div class="p-3 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
           <GithubIcon />
-          <span class="ps-2 text-fs-14"> 120 </span>
+          <span class="ps-2 text-fs-14">
+            {githubRepo?.stargazers_count || ""}
+          </span>
         </div>
         <div class="d-flex align-items-center">
           <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>

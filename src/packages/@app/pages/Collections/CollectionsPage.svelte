@@ -60,6 +60,7 @@
     _viewModel.getEnvironmentList();
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
+
   let removeTab: NewTab;
   let isPopupClosed: boolean = false;
   let isImportCollectionPopup: boolean = false;
@@ -77,6 +78,12 @@
       _viewModel.createNewTab();
     }
   };
+
+  // $: {
+  //   if (githubRepo) {
+  //     console.log(githubRepo);
+  //   }
+  // }
   /**
    * Handle close tab functionality in tab bar list
    */
@@ -140,7 +147,11 @@
     } else tabPath = {};
   });
 
-  onMount(() => {
+  let githubRepoData;
+  onMount(async () => {
+    _viewModel.fetchGithubRepo();
+    const githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo.getLatest().toMutableJSON();
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
     );
@@ -180,6 +191,7 @@
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
       }}
+      githubRepo={githubRepoData}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
       activeTabPath={$activeTab?.path}
       activeTabId={$activeTab?.id}
