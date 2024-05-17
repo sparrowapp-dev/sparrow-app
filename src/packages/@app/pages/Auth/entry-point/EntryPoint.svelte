@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import sparrowicon from "@library/icons/logoSparrowSquare.svg";
   import Redirect from "../redirect/Redirect.svelte";
   import constants from "$lib/utils/constants";

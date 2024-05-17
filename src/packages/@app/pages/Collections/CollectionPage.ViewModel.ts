@@ -3,7 +3,7 @@ import type {
   EnvironmentDocument,
   TabDocument,
   WorkspaceDocument,
-} from "$lib/database/app.database";
+} from "@app/database/database";
 
 //-----
 // Stores
@@ -17,10 +17,10 @@ import {
 
 //-----
 // Repositories
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { TabRepository } from "$lib/repositories/tab.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 //-----
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,9 +30,9 @@ import { EnvironmentService } from "$lib/services-v2/environment.service";
 import {
   insertCollection,
   insertCollectionDirectory,
-} from "$lib/services/collection";
-import { CollectionService } from "$lib/services/collection.service";
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+} from "@app/services/collection";
+import { CollectionService } from "@app/services/collection.service";
+import { notifications } from "@library/ui/toast/Toast";
 import { setContentTypeHeader } from "$lib/utils/helpers";
 
 //-----
@@ -100,7 +100,7 @@ import { requestSplitterDirection } from "@workspaces/features/rest-explorer/sto
 import {
   insertCollectionRequest,
   updateCollectionRequest,
-} from "$lib/services/collection";
+} from "@app/services/collection";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();

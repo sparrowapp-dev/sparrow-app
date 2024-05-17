@@ -1,3 +1,11 @@
-export { default as Label } from "./label/Label.svelte";
-export { default as ButtonV2 } from "./button/ButtonV2.svelte";
-export { default as Tooltip } from "./tooltip/Tooltip.svelte";
+export * from "./button";
+export * from "./dragdrop";
+export * from "./list";
+export * from "./loader";
+export * from "./progress";
+export * from "./dropdown";
+export * from "./spinner";
+export * from "./options";
+export * from "./label";
+export * from "./tooltip";
+export * from "./modal";

@@ -12,7 +12,7 @@
   import type {
     EnvironmentDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {

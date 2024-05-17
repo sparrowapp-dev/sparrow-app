@@ -1,5 +1,5 @@
 <script>
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
   /**
    * unique Select component id
    */

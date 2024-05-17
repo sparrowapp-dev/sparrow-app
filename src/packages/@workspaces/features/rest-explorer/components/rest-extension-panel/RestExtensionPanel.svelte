@@ -6,24 +6,24 @@
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
-  import { updateCollectionRequest } from "$lib/services/collection";
+  import { updateCollectionRequest } from "@app/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   //   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";
   import EditIcon from "$lib/assets/edit-desc.svg";
 
   import { Events, type WorkspaceRole } from "$lib/utils/enums";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
 
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import {
     getMethodStyle,
     hasWorkpaceLevelPermission,
   } from "$lib/utils/helpers";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { SaveAsRequest } from "../../../../features";
   /////////////////////////////////////////////////////////////////

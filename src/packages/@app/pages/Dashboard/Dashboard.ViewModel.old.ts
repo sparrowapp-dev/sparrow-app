@@ -1,9 +1,9 @@
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { TeamRepository } from "$lib/repositories/team.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { EnvironmentService } from "$lib/services/environment.service";
-import { TeamService } from "$lib/services/team.service";
-import { WorkspaceService } from "$lib/services/workspace.service";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { EnvironmentService } from "@app/services/environment.service";
+import { TeamService } from "@app/services/team.service";
+import { WorkspaceService } from "@app/services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
 
 export class DashboardViewModel {

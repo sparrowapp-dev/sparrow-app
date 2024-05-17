@@ -21,14 +21,14 @@
     RequestParameters,
     ResponseStatus,
   } from "@workspaces/features/rest-explorer/components";
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
-  import { ModalWrapperV1 } from "$lib/components";
+  import Loader from "@library/ui/loader/Loader.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Button from "@library/ui/button/Button.svelte";
 
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { SaveAsRequest } from "@workspaces/features";
   import type {

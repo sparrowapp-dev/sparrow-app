@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Select from "$lib/components/inputs/select/Select.svelte";
+  import { Select } from "@library/forms";
   import { AuthSection } from "$lib/utils/enums/authorization.enum";
   import type { ApiKey } from "$lib/utils/interfaces/request.interface";
   import { CodeMirrorInput } from "@workspaces/common/components";

@@ -6,14 +6,14 @@
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
   import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import type { Observable } from "rxjs";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
   import tickIcon from "$lib/assets/tick-grey.svg";
   import crossIcon from "$lib/assets/cross-grey.svg";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   import QuestionIcon from "$lib/assets/question.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import FileType from "$lib/components/file-types/FileType.svelte";
   import ComboText from "$lib/components/text/ComboText.svelte";
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";

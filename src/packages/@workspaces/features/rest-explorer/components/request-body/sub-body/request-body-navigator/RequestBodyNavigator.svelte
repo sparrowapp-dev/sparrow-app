@@ -2,9 +2,9 @@
   import infoIcon from "$lib/assets/info-color-blue.svg";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import crossIcon from "$lib/assets/cross.svg";
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
   import { RequestDataType, RequestDataset } from "$lib/utils/enums";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import { WithSelect } from "@workspaces/common/hoc";
   export let method = "";
   export let onUpdateRequestState;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { RequestMethod } from "$lib/utils/enums";
 
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
   import type {
     SaveRequestType,
     SendRequestType,
@@ -9,7 +9,7 @@
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";

@@ -12,15 +12,15 @@
   import { collapsibleState } from "$lib/store/request-response-section";
 
   // ---- Interface
-  import type { TabDocument } from "$lib/database/app.database";
+  import type { TabDocument } from "@app/database/database";
 
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
-  import { Dropdown } from "@common/components";
+  import { Dropdown } from "@library/ui";
 
   // ---- Helper
   import { moveNavigation } from "$lib/utils/helpers/navigation";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Button from "@library/ui/button/Button.svelte";
 
   // ------ Props ------
   /**
