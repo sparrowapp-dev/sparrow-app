@@ -223,7 +223,7 @@
                       updatePairs(index);
                     }}
                     placeholder="Add Variable"
-                    class="w-100 text-fs-12"
+                    class="w-100 text-fs-12 placeholder-color "
                   />
                 </div>
 
@@ -235,7 +235,7 @@
                       updatePairs(index);
                     }}
                     placeholder={"Add Value"}
-                    class="w-100 text-fs-12"
+                    class="w-100 text-fs-12 placeholder-color"
                   />
                 </div>
               </div>
@@ -365,8 +365,15 @@
     height: 18px;
     padding-left: 8px;
     padding-right: 8px;
+    
   }
   input[type="text"]:focus {
     background-color: var(--bg-secondary-550);
+
   }
+
+  .placeholder-color::placeholder {
+    color: var(--text-secondary-400);
+}
+  
 </style>
