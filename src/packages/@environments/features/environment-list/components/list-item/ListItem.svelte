@@ -2,9 +2,9 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { SelectIcon } from "$lib/assets/app.asset";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   /**

@@ -1,20 +1,20 @@
-import { WorkspaceService } from "$lib/services/workspace.service";
+import { WorkspaceService } from "@app/services/workspace.service";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 import {
   requestResponseStore,
   tabs,
 } from "$lib/store/request-response-section";
-import { TabRepository } from "$lib/repositories/tab.repository";
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { TeamService } from "$lib/services/team.service";
-import { TeamRepository } from "$lib/repositories/team.repository";
-import type { TeamDocument } from "$lib/database/app.database";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { TeamService } from "@app/services/team.service";
+import { TeamRepository } from "@app/repositories/team.repository";
+import type { TeamDocument } from "@app/database/database";
 import type { Observable } from "rxjs";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
 import type { TeamRole, WorkspaceRole } from "$lib/utils/enums";
-import { UserService } from "$lib/services/user.service";
+import { UserService } from "@app/services/user.service";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
 import type { Team } from "$lib/utils/interfaces";
 

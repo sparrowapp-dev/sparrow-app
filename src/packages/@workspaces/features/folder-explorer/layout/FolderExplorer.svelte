@@ -54,10 +54,7 @@
   /**
    * Types
    */
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument, TabDocument } from "@app/database/database";
   import type { Folder } from "@common/types/workspace";
 
   /**

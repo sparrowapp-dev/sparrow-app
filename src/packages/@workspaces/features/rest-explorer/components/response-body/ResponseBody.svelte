@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
+  import { Editor } from "@library/forms";
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
@@ -54,7 +54,7 @@
         -- Reponse content-type set to HTML, JSON, XML, Javascript, Text,
         -- 
       -->
-      <CodeMirror
+      <Editor
         bind:lang={language}
         bind:value={response.body}
         on:change={() => {}}

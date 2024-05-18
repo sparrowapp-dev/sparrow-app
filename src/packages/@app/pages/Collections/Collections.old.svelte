@@ -22,10 +22,10 @@
   import type {
     EnvironmentDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { environmentType } from "$lib/utils/enums/environment.enum";
-  import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+  import { ActiveSideBarTabReposistory } from "@app/repositories/active-sidebar-tab.repository";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { collectionLeftPanelWidth } from "$lib/store";

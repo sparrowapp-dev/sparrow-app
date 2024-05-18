@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ProgressBar from "$lib/components/Transition/progress-bar/ProgressBar.svelte";
-  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import { Select } from "$lib/components/inputs";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import { Select } from "@library/forms";
+  import Button from "@library/ui/button/Button.svelte";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
   import type { Observable } from "rxjs";
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
   import { Debounce } from "@common/utils";
 
   export let collectionList: Observable<CollectionDocument[]>;

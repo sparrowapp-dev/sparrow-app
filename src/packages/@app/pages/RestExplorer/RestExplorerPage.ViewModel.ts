@@ -18,14 +18,14 @@ import type {
   CollectionDocument,
   TabDocument,
   WorkspaceDocument,
-} from "$lib/database/app.database";
+} from "@app/database/database";
 
 // ---- Repo
-import { TabRepository } from "$lib/repositories/tab.repository";
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
 
 import { BehaviorSubject, Observable } from "rxjs";
 import { Events, ItemType, UntrackedItems } from "$lib/utils/enums";
@@ -38,8 +38,8 @@ import {
   insertCollectionDirectory,
   insertCollectionRequest,
   updateCollectionRequest,
-} from "$lib/services/collection";
-import { EnvironmentService } from "$lib/services/environment.service";
+} from "@app/services/collection";
+import { EnvironmentService } from "@app/services/environment.service";
 
 // ---- Events
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
@@ -81,7 +81,7 @@ import {
   RequestDatasetEnum,
   type StatePartial,
 } from "@common/types/workspace";
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+import { notifications } from "@library/ui/toast/Toast";
 
 class RestExplorerViewModel
   implements

@@ -6,7 +6,7 @@
   import { handleForgotPasswordValidation } from "./forgot-password";
   import { isLoading, username } from "$lib/store/auth.store";
   import { Link } from "svelte-navigator";
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
 
   let validationErrors: any = {};
 

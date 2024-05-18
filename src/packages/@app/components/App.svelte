@@ -1,11 +1,11 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import Toast from "$lib/components/toast-notification/ToastNotification.svelte";
+  import Toast from "@library/ui/toast/Toast.svelte";
   import Authguard from "@app/routing/Authguard.svelte";
   import Navigate from "@app/routing/Navigate.svelte";
   import Dashboard from "@app/pages/Dashboard/Dashboard.svelte";
-  import { TabRepository } from "$lib/repositories/tab.repository";
+  import { TabRepository } from "@app/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
   import EntryPoint from "@app/pages/Auth/entry-point/EntryPoint.svelte";
   import {
@@ -20,7 +20,7 @@
   import { handleShortcuts } from "$lib/utils/shortcuts";
   import AutoUpdateDialog from "$lib/components/Modal/AutoUpdateDialog.svelte";
   import { getCurrent } from "@tauri-apps/api/window";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import LoginPage from "@app/pages/Auth/login-page/LoginPage.svelte";
   import RegisterPage from "@app/pages/Auth/register-page/RegisterPage.svelte";
   import { singleInstanceHandler } from "$lib/utils/singleinstance/app.singleinstance";

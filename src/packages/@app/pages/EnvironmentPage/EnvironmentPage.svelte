@@ -4,7 +4,7 @@
   import { EnvironmentList } from "@environments/features";
   import { EnvironmentViewModel } from "./EnvironmentPage.ViewModel";
   import type { Observable } from "rxjs";
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { WorkspaceDocument } from "@app/database/database";
   import { onDestroy, onMount } from "svelte";
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   import { Events } from "$lib/utils/enums";

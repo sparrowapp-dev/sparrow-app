@@ -68,19 +68,16 @@
   /**
    * Components
    */
-  import { ModalWrapperV1 } from "$lib/components";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
 
   /**
    * Enums
    */
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument, TabDocument } from "@app/database/database";
 
   /**
    * Local variables

@@ -9,7 +9,7 @@
   import { writable } from "svelte/store";
   import { onDestroy } from "svelte";
   import { Link, navigate } from "svelte-navigator";
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
 
   const seconds = writable(59);
   const verifyString = writable("");
