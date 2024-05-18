@@ -68,6 +68,9 @@
   import { WithButton } from "@workspaces/common/hoc";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
   import { createDeepCopy } from "$lib/utils/helpers";
+  import { Input } from "@library/forms";
+  import { open } from "@tauri-apps/plugin-shell";
+  import constants from "$lib/utils/constants";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -78,6 +81,7 @@
   let filteredFile: RequestType[] = [];
   let selectedApiMethods: string[] = [];
   let addButtonMenu: boolean = false;
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   const selectedMethodsCollectionUnsubscribe =
     selectedMethodsCollectionStore.subscribe((value) => {
@@ -149,6 +153,7 @@
     }
   }
 
+  let isGithubStarHover = false;
   onDestroy(() => {
     selectedMethodUnsubscibe();
     selectedMethodsCollectionUnsubscribe();
@@ -213,22 +218,21 @@
     <div
       class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-1"
     >
-      <div
-        style="height:32px; "
-        class="inputField w-100 bg-tertiary-400 ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <SearchIcon />
-        <input
-          type="search"
-          style="font-size: 12px; font-weight: 500;"
-          class="inputField searchField border-0 w-100 h-100 bg-tertiary-400"
-          placeholder="Search"
-          bind:value={searchData}
-          on:input={() => {
-            handleSearch();
-          }}
-        />
-      </div>
+      <Input
+        width={"100%"}
+        height={"33px"}
+        type="search"
+        bind:value={searchData}
+        on:input={(e) => {
+          handleSearch();
+        }}
+        defaultBorderColor="transparent"
+        hoveredBorderColor="transparent"
+        focusedBorderColor={"var(--border-primary-300)"}
+        class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+        style="outline:none;"
+        placeholder="Search"
+      />
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
@@ -286,7 +290,7 @@
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center px-3 pt-2">
+      <div class="d-flex flex-column justify-content-center ps-3 pe-2 pt-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
@@ -309,9 +313,11 @@
               </List>
             {:else}
               <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
-                <span class="not-found-text text-fs-12 mx-auto ellipsis"
-                  >No results found</span
+                <p
+                  class="not-found-text text-fs-12 text-center mx-auto ellipsis"
                 >
+                  No results found
+                </p>
               </List>
             {/if}
           {:else}
@@ -341,9 +347,33 @@
         {/if}
       </div>
       <div class="p-3 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
-          <GithubIcon />
-          <span class="ps-2 text-fs-14">
+        <div
+          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+            ? 'bg-secondary-600'
+            : ''}"
+          role="button"
+          on:mouseenter={() => {
+            isGithubStarHover = true;
+          }}
+          on:mouseleave={() => {
+            isGithubStarHover = false;
+          }}
+          on:click={async () => {
+            await open(externalSparrowGithub);
+          }}
+        >
+          <GithubIcon
+            height={"18px"}
+            width={"18px"}
+            color={isGithubStarHover
+              ? "var(--bg-secondary-100)"
+              : "var(--bg-secondary-200)"}
+          />
+          <span
+            class="ps-2 text-fs-14 {isGithubStarHover
+              ? 'text-secondary-100'
+              : 'text-secondary-200'}"
+          >
             {githubRepo?.stargazers_count || ""}
           </span>
         </div>
@@ -418,9 +448,10 @@
     outline: none;
     border: 1px solid transparent;
   }
-  .inputField:hover {
-    border: 1px solid var(--workspace-hover-color);
-  }
+  /* .inputField:hover,
+  .inputField:focus {
+    border: 1px solid var(--workspace-hover-color) !important;
+  } */
   /* 
   @keyframes increaseWidth {
     0% {

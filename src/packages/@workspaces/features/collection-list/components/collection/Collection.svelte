@@ -39,6 +39,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
   import { FolderIcon, SyncIcon } from "@library/icons";
+  import { Options } from "@library/ui";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -347,7 +348,7 @@
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
+  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
@@ -376,7 +377,7 @@
     />
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldCollection"
+        class="py-0 renameInputFieldCollection w-100"
         id="renameInputFieldCollection"
         type="text"
         style="font-size: 12px;"
@@ -508,9 +509,14 @@
             {searchData}
           />
         {/each}
-        {#if showFolderAPIButtons}
+        {#if !collection?.items?.length}
+          <p class="text-fs-10 ps-4 my-2 text-secondary-300">
+            This collection is empty
+          </p>
+        {/if}
+        <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
-            <!-- <Tooltip
+            <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
@@ -559,9 +565,9 @@
                   alt="+ API Request"
                 />
               </button>
-            </Tooltip> -->
+            </Tooltip>
           </div>
-        {/if}
+        {/if} -->
       </div>
     </div>
   {:else}
@@ -646,6 +652,10 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldCollection:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .sub-folders {
     /* border-left: 1px solid var(--border-color); */

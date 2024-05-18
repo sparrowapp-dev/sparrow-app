@@ -254,7 +254,7 @@
       <div
         bind:this={folderTabWrapper}
         style="height:32px; padding-left: 36px;"
-        class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
+        class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
@@ -287,9 +287,26 @@
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
           />
+          {#if expand}
+            <div
+              style="height:16px; width:16px;"
+              class="d-flex align-items-center justify-content-center me-2"
+            >
+              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+            </div>
+          {:else}
+            <div class="d-flex me-2" style="height:16px; width:16px;">
+              <img
+                src={folderCloseIcon}
+                alt=""
+                style="height:16px; width:16px;"
+                class="folder-icon"
+              />
+            </div>
+          {/if}
           {#if isRenaming}
             <input
-              class="form-control py-0 renameInputFieldFolder"
+              class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
               style="font-size: 12px;"
@@ -323,25 +340,8 @@
               style="cursor:pointer; font-size:12px;
                       height: 36px;
                       font-weight:400;
-                      margin-left:10px"
+                      margin-left:0px"
             >
-              {#if expand}
-                <div
-                  style="height:16px; width:16px;"
-                  class="d-flex align-items-center justify-content-center me-2"
-                >
-                  <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
-                </div>
-              {:else}
-                <div class="d-flex me-2" style="height:16px; width:16px;">
-                  <img
-                    src={folderCloseIcon}
-                    alt=""
-                    style="height:16px; width:16px;"
-                    class="folder-icon"
-                  />
-                </div>
-              {/if}
               <p class="ellipsis mb-0" style="font-size: 12px;">
                 {explorer.name}
               </p>
@@ -398,11 +398,17 @@
               {activeTabPath}
               explorer={exp}
               folder={explorer}
+              {activeTabId}
             />
           {/each}
-          {#if showFolderAPIButtons && explorer?.source === "USER"}
+          {#if !explorer?.items?.length}
+            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+              This folder is empty
+            </p>
+          {/if}
+          <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
-              <!-- <Tooltip
+              <Tooltip
                 classProp="mt-2 mb-2 ms-0"
                 title={PERMISSION_NOT_FOUND_TEXT}
                 show={!hasWorkpaceLevelPermission(
@@ -425,9 +431,9 @@
                     });
                   }}
                 />
-              </Tooltip> -->
+              </Tooltip>
             </div>
-          {/if}
+          {/if} -->
         </div>
       </div>
     {:else if explorer.type === "REQUEST"}
@@ -539,6 +545,10 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldFolder:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .sub-files {
     /* border-left: 1px solid var(--border-color); */

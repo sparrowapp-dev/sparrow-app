@@ -269,8 +269,8 @@
 
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldFile"
-        style="font-size: 12px;"
+        class="py-0 renameInputFieldFile"
+        style="font-size: 12px; width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -342,7 +342,7 @@
   .api-method {
     font-size: 10px;
     font-weight: 500;
-    width: 48px;
+    width: 48px !important;
     height: 30px;
     padding-left: 6px;
     padding-right: 4px;
@@ -351,7 +351,6 @@
     align-items: center;
   }
   .api-name {
-    font-size: 12px;
     font-weight: 400;
     width: calc(100% - 48px);
     text-align: left;
@@ -448,6 +447,10 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldFile:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .main-file {
     width: calc(100% - 24px);
