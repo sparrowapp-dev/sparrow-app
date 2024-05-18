@@ -8,7 +8,7 @@ export const githubRepoSchemaLiteral = {
   title: "Github repository details",
   primaryKey: "id",
   type: "object",
-  version: 1,
+  version: 0,
   properties: {
     id: {
       type: "string",

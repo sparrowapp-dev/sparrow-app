@@ -161,7 +161,7 @@ export default class CollectionsViewModel {
   }
 
   /**
-   * Return current tabs list of top tab bar component
+   * @description - Fetches github repository data
    */
   public getGithubRepo = async () => {
     const githubRepoId = "sparrow-github";
@@ -553,6 +553,9 @@ export default class CollectionsViewModel {
     this.collectionRepository.addCollection(collection);
   };
 
+  /**
+   * @description - refreshes github respository data
+   */
   public fetchGithubRepo = async () => {
     const githubRepoId = "sparrow-github";
     const response = await this.githubService.getRepoMetaData(

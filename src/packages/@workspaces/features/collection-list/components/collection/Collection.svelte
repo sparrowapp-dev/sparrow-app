@@ -23,7 +23,6 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
@@ -34,7 +33,6 @@
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  // import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
@@ -610,7 +608,6 @@
 
   .threedot-active {
     visibility: visible;
-    /* background-color: var(--workspace-hover-color); */
     background-color: var(--bg-tertiary-600);
   }
   .add-icon-container {
@@ -631,7 +628,6 @@
     visibility: visible;
   }
   .threedot-icon-container:hover {
-    /* background-color: var(--workspace-hover-color); */
     background-color: var(--bg-tertiary-500);
   }
 
@@ -658,13 +654,11 @@
     border: 1px solid var(--border-primary-300) !important;
   }
   .sub-folders {
-    /* border-left: 1px solid var(--border-color); */
   }
   .main-collection {
     width: calc(100% - 48px);
   }
   .active-collection-tab {
-    /* background-color: var(--selected-active-sidebar) !important; */
     background-color: var(--bg-tertiary-400) !important;
   }
   .collection-collection.name {

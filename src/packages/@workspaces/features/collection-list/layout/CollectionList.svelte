@@ -19,7 +19,13 @@
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
+  /**
+   * path of the active tab - collection id, folder id, workspace id
+   */
   export let activeTabPath;
+  /**
+   * id of the active tab
+   */
   export let activeTabId;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
@@ -75,29 +81,16 @@
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let filteredSelectedMethodsCollection: any = [];
   let filteredCollection: CollectionDocument[] = [];
   let filteredFolder: Folder[] = [];
   let filteredFile: RequestType[] = [];
-  let selectedApiMethods: string[] = [];
   let addButtonMenu: boolean = false;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-  const selectedMethodsCollectionUnsubscribe =
-    selectedMethodsCollectionStore.subscribe((value) => {
-      if (value) {
-        filteredSelectedMethodsCollection = value;
-      }
-    });
-
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      selectedApiMethods = value;
-    }
-  });
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   let collectionFilter: any = [];
+  /**
+   * @description - performs searching on a single collection
+   */
   const searchCollectionHelper: (searchText: string, tree: any) => any = (
     searchText,
     tree,
@@ -106,7 +99,7 @@
       return tree;
     }
 
-    // Recursively search through the tree structure
+    // Recursively search through the collection
     if (tree && tree?.items?.length) {
       let response = [];
       for (let j = 0; j < tree.items.length; j++) {
@@ -125,6 +118,9 @@
     }
     return 0;
   };
+  /**
+   * @description - searches data from the list of collections
+   */
   const searchCollection: (
     searchText: string,
     collectionData: any[],
@@ -154,10 +150,7 @@
   }
 
   let isGithubStarHover = false;
-  onDestroy(() => {
-    selectedMethodUnsubscibe();
-    selectedMethodsCollectionUnsubscribe();
-  });
+  onDestroy(() => {});
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -444,14 +437,7 @@
     height: calc(100vh - 44px);
     overflow-y: auto;
   }
-  .inputField {
-    outline: none;
-    border: 1px solid transparent;
-  }
-  /* .inputField:hover,
-  .inputField:focus {
-    border: 1px solid var(--workspace-hover-color) !important;
-  } */
+
   /* 
   @keyframes increaseWidth {
     0% {

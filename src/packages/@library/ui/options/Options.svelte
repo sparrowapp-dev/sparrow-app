@@ -18,7 +18,12 @@
     return [firstOptionWidth, secondOptionWidth];
   };
 
+  /**
+   * @description - recalculates positions for element that overflows window
+   */
   const calculateAdjustedAxis = () => {
+    const itemHeight = 38;
+    const containerPadding = 16;
     const dialogHeight =
       menuItems.filter((elem) => {
         if (elem?.hide) {
@@ -26,8 +31,8 @@
         }
         return true;
       }).length *
-        38 +
-      16;
+        itemHeight +
+      containerPadding;
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     mouseX = xAxis;

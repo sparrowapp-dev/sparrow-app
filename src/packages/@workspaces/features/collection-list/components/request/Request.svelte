@@ -77,7 +77,6 @@
   }
 
   let isDeletePopup: boolean = false;
-  let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let noOfColumns = 180;
   let noOfRows = 3;
@@ -324,8 +323,6 @@
         ? 'threedot-active'
         : ''}"
       on:click|preventDefault={(e) => {
-        pos.x = e.clientX;
-        pos.y = e.clientY;
         setTimeout(() => (showMenu = true), 100);
       }}
     >

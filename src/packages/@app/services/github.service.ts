@@ -6,6 +6,11 @@ export class GithubService {
 
   private apiUrl: string = constants.GITHUB_API;
 
+  /**
+   * @description - fetches github repo data from github server
+   * @param repoPath  - github repo path
+   * @returns - github repository data
+   */
   public getRepoMetaData = async (repoPath: string) => {
     const response = await makeRequest(
       "GET",

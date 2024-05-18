@@ -455,7 +455,6 @@
 
 <style>
   .btn-primary {
-    /* background-color: var(--background-color); */
     color: var(--white-color);
     padding-right: 5px;
     border-radius: 8px;
@@ -551,7 +550,6 @@
     border: 1px solid var(--border-primary-300) !important;
   }
   .sub-files {
-    /* border-left: 1px solid var(--border-color); */
   }
 
   .main-folder {

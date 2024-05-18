@@ -80,11 +80,6 @@
     }
   };
 
-  // $: {
-  //   if (githubRepo) {
-  //     console.log(githubRepo);
-  //   }
-  // }
   /**
    * Handle close tab functionality in tab bar list
    */
@@ -151,7 +146,7 @@
   let githubRepoData: GithubRepoDocType;
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();
-    githubRepoData = githubRepo.getLatest().toMutableJSON();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
     );
@@ -161,7 +156,7 @@
     if (isNew) _viewModel.createNewTab();
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
-    githubRepoData = githubRepo.getLatest().toMutableJSON();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
   });
 
   $: {

@@ -39,10 +39,18 @@ export class DashboardViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   };
 
+  /**
+   * @description - get environment list from local db
+   */
   get environments() {
     return this.environmentRepository.getEnvironment();
   }
 
+  /**
+   * @description - link environment to particular workspace
+   * @param workspaceId  - workspace id
+   * @param environmentId - environment id
+   */
   public initActiveEnvironmentToWorkspace = async (
     workspaceId: string,
     environmentId: string,
