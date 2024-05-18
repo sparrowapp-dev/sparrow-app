@@ -1,4 +1,4 @@
-import { RxDB } from "$lib/database/app.database";
+import { RxDB } from "@app/database/database";
 
 export class GithubRepoReposistory {
   constructor() {}

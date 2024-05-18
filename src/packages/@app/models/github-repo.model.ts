@@ -22,9 +22,9 @@ export const githubRepoSchemaLiteral = {
 
 const schemaTyped = toTypedRxJsonSchema(githubRepoSchemaLiteral);
 
-export type GithubDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type GithubRepoDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >;
 
-export const githubRepoSchema: RxJsonSchema<GithubDocType> =
+export const githubRepoSchema: RxJsonSchema<GithubRepoDocType> =
   githubRepoSchemaLiteral;

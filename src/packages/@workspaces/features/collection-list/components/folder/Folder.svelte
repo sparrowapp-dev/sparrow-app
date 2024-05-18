@@ -79,6 +79,7 @@
   export let explorer: Folder;
   export let folder: Folder | null = null;
   export let activeTabId: string;
+  export let searchData: string;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -94,6 +95,9 @@
   let folderTabWrapper: HTMLElement;
 
   $: {
+    if (searchData) {
+      expand = true;
+    }
     if (activeTabPath) {
       if (activeTabPath?.folderId === explorer.id) {
         expand = true;

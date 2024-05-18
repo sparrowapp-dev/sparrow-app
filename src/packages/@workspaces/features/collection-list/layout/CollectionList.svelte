@@ -303,6 +303,7 @@
                     {activeTabPath}
                     collection={col}
                     {activeTabId}
+                    {searchData}
                   />
                 {/each}
               </List>

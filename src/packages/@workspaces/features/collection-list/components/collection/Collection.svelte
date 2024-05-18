@@ -12,7 +12,7 @@
   export let activeTabId: string;
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
-
+  export let searchData = "";
   import angleRight from "$lib/assets/angle-right-v2.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -38,7 +38,6 @@
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
-  import MoreOptions from "../more-options/MoreOptions.svelte";
   import { FolderIcon, SyncIcon } from "@library/icons";
 
   let deletedIds: [string] | [] = [];
@@ -108,6 +107,9 @@
   }
 
   $: {
+    if (searchData) {
+      visibility = true;
+    }
     if (activeTabPath) {
       if (activeTabPath.collectionId === collection.id) {
         visibility = true;
@@ -233,7 +235,7 @@
 >
 
 {#if showMenu}
-  <MoreOptions
+  <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top - 5,
@@ -296,7 +298,7 @@
 {/if}
 
 {#if showAddItemMenu}
-  <MoreOptions
+  <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 55}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top - 0,
@@ -503,6 +505,7 @@
             {activeTabPath}
             {explorer}
             {activeTabId}
+            {searchData}
           />
         {/each}
         {#if showFolderAPIButtons}

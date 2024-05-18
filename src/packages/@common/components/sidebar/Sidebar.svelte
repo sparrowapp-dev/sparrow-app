@@ -113,7 +113,7 @@
   </div>
 </div>
 
-<style global>
+<style>
   .sidebar {
     height: calc(100vh - 44px);
     display: flex;
@@ -124,6 +124,6 @@
     background-color: var(--sidebar-background);
     border: 1px solid var(--border-color);
     margin-right: 1px;
-    padding: 5px, 0px, 5px, 0px;
+    padding: 5px 0px 10px 0px;
   }
 </style>

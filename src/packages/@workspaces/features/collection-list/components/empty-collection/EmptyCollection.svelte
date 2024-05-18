@@ -7,7 +7,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
-  import List from "$lib/components/list/List.svelte";
+  import List from "@library/ui/list/List.svelte";
   import { PlusIcon } from "@library/icons";
 
   export let userRoleInWorkspace: WorkspaceRole;

@@ -27,8 +27,8 @@ import constants from "$lib/utils/constants";
 import { teamSchema, type TeamDocType } from "@app/models/team.model";
 import {
   githubRepoSchema,
-  type GithubDocType,
-} from "$lib/models/github-repo.model";
+  type GithubRepoDocType,
+} from "@app/models/github-repo.model";
 import {
   environmentSchema,
   type EnvironmentDocType,
@@ -57,7 +57,7 @@ export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
 export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
-export type GithubDocument = RxDocument<GithubDocType>;
+export type GithubDocument = RxDocument<GithubRepoDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;

@@ -47,6 +47,7 @@
     EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
+  import type { GithubRepoDocType } from "@app/models/github-repo.model";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
 
@@ -147,10 +148,9 @@
     } else tabPath = {};
   });
 
-  let githubRepoData;
+  let githubRepoData: GithubRepoDocType;
   onMount(async () => {
-    _viewModel.fetchGithubRepo();
-    const githubRepo = await _viewModel.getGithubRepo();
+    let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo.getLatest().toMutableJSON();
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
@@ -159,6 +159,9 @@
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
     if (isNew) _viewModel.createNewTab();
+    await _viewModel.fetchGithubRepo();
+    githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo.getLatest().toMutableJSON();
   });
 
   $: {
