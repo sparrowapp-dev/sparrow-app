@@ -1,8 +1,8 @@
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
-import { EnvironmentTabRepository } from "$lib/repositories/environment-tab.repository";
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { EnvironmentService } from "$lib/services/environment.service";
+import { notifications } from "@library/ui/toast/Toast";
+import { EnvironmentTabRepository } from "@app/repositories/environment-tab.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { EnvironmentService } from "@app/services/environment.service";
 import { Events } from "$lib/utils/enums";
 import { environmentType } from "$lib/utils/enums/environment.enum";
 import { createDeepCopy } from "$lib/utils/helpers";

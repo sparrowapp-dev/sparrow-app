@@ -1,19 +1,16 @@
 // Repositories
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { TabRepository } from "$lib/repositories/tab.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
 
 // Servises
-import { CollectionService } from "$lib/services/collection.service";
+import { CollectionService } from "@app/services/collection.service";
 
 // Types
-import type {
-  CollectionDocument,
-  TabDocument,
-} from "$lib/database/app.database";
+import type { CollectionDocument, TabDocument } from "@app/database/database";
 import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Notification
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+import { notifications } from "@library/ui/toast/Toast";
 
 // Utils
 import { hasWorkpaceLevelPermission, moveNavigation } from "$lib/utils/helpers";

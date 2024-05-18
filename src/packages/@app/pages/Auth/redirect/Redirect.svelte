@@ -1,6 +1,6 @@
 <script lang="ts">
   import sparrowicon from "@library/icons/logoSparrowSquare.svg";
-  import Spinner from "$lib/components/transition/Spinner.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   import leftIcon from "$lib/assets/left.svg";
   import constants from "$lib/utils/constants";
   import { fly, fade } from "svelte/transition";

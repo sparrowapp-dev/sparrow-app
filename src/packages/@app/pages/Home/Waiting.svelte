@@ -1,9 +1,9 @@
 <script>
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
   import { setUser } from "$lib/store/auth.store";
   import constants from "$lib/utils/constants";
   import { jwtDecode, setAuthJwt } from "$lib/utils/jwt";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import { onMount } from "svelte";
   import { navigate } from "svelte-navigator";
 

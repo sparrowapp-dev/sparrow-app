@@ -11,10 +11,10 @@
 
   // ---- Components
   import Request from "../request/Request.svelte";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
-  import MoreOptions from "../more-options/MoreOptions.svelte";
+  import { Spinner } from "@library/ui";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
+  import { Options } from "@library/ui";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
 
   // ---- Enum, Constants and Interface
@@ -35,7 +35,7 @@
   import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 
   // ---- DB
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
 
   /**
    * Callback for Item created
@@ -192,7 +192,7 @@
   >
 
   {#if showMenu}
-    <MoreOptions
+    <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
         folderTabWrapper.getBoundingClientRect().top - 0,

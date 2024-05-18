@@ -25,7 +25,7 @@
     ImportCurl,
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -37,7 +37,7 @@
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import type { TabDocument } from "$lib/database/app.database";
+  import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums";
@@ -46,8 +46,8 @@
     CollectionDocument,
     EnvironmentDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
-  import { ModalWrapperV1 } from "$lib/components";
+  } from "@app/database/database";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
 
   const _viewModel = new CollectionsViewModel();

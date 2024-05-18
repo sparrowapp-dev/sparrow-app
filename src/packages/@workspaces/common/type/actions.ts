@@ -1,7 +1,7 @@
 import type {
   CollectionDocument,
   WorkspaceDocument,
-} from "$lib/database/app.database";
+} from "@app/database/database";
 import type {
   Auth,
   Body,

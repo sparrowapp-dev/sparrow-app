@@ -2,10 +2,11 @@
   import { onDestroy } from "svelte";
 
   // ---- Components
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
-  import MoreOptions from "../more-options/MoreOptions.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { Options } from "@library/ui";
 
   // ---- Helper functions
   import { getMethodStyle } from "$lib/utils/helpers/conversion.helper";
@@ -28,7 +29,7 @@
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
 
   // ---- DB
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
 
   /**
    * Callback for Item Deleted
@@ -161,7 +162,7 @@
 >
 
 {#if showMenu}
-  <MoreOptions
+  <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       requestTabWrapper.getBoundingClientRect().top - 0,

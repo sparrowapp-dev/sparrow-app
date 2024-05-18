@@ -45,15 +45,15 @@
 
   import { WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-  import { Dropdown } from "@common/components";
-  import List from "$lib/components/list/List.svelte";
+  import { Dropdown } from "@library/ui";
+  import List from "@library/ui/list/List.svelte";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     EnvironmentDocument,
     TabDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
+  } from "@app/database/database";
   import type {
     Folder,
     Path,

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { PlusIcon } from "@library/icons";
   import { Tooltip } from "$lib/components";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import List from "$lib/components/list/List.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import List from "@library/ui/list/List.svelte";
   import type { WorkspaceRole } from "$lib/utils/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,

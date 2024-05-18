@@ -1,9 +1,6 @@
 <script lang="ts">
   // Document
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { onMount } from "svelte";
 
   // ---- View Model

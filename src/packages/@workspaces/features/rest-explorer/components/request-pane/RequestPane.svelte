@@ -1,6 +1,6 @@
 <script lang="ts">
   import RequestBody from "$lib/components/collections/req-res-section/sub-components/request-body-section/RequestBody.svelte";
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
+  import CodeMirror from "@library/forms/editor/Editor.svelte";
   import TabularInput, {
     type TableRow,
   } from "$lib/components/inputs/TabularInput.svelte";

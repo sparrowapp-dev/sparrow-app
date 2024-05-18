@@ -2,9 +2,9 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import { SelectIcon } from "$lib/assets/app.asset";
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
 
   /**
@@ -160,6 +160,7 @@
       impact all the API requests that use the variables in this environment.
     </p>
   </div>
+
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
     style="font-size: 16px;"
@@ -250,9 +251,11 @@
             }
           }}
         >
-          <p class="ellipsis w-100 mb-0 text-fs-14">
+          <p class="ellipsis w-100 mb-0 text-fs-14"  on:contextmenu={(e) => {
+            rightClickContextMenu(e);
+        }}>
             {env.name}
-          </p>
+        </p>
         </div>
       {/if}
     </div>

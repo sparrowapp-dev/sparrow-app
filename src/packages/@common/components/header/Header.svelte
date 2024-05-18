@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
   import { StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
   /**

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
 
   /**
    * performs operation on button click
