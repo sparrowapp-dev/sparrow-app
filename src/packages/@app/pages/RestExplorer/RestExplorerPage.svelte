@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { WorkspaceDocument } from "@app/database/database";
   import { environmentType } from "$lib/utils/enums";
 
   // ---- View Model

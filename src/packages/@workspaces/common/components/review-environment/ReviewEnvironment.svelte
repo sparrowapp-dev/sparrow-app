@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { CopyIcon, DotIcon } from "@library/icons";
   import { onDestroy, onMount } from "svelte";

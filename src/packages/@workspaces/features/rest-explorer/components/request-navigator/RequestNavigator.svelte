@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@workspaces/common/type";
-  import { RequestSectionEnum } from "@common/types/rest-explorer";
+  import { RequestSectionEnum } from "@common/types/workspace";
   import { Label } from "@library/ui";
   export let requestStateSection: string;
   export let authParameterLength = 0;

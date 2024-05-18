@@ -2,7 +2,7 @@
   import type { WorkspaceMethods } from "$lib/utils/interfaces/workspace.interface";
 
   import type { Observable } from "rxjs";
-  import type { TeamDocument } from "$lib/database/app.database";
+  import type { TeamDocument } from "@app/database/database";
   import type {
     CollectionsMethods,
     CurrentTeam,
@@ -17,7 +17,7 @@
   import { Motion } from "svelte-motion";
   import { user } from "$lib/store/auth.store";
 
-  import type { WorkspaceDocument } from "$lib/database/app.database";
+  import type { WorkspaceDocument } from "@app/database/database";
   /**
    * @deprecated referes to teams store
    * import { openedTeam, setOpenedTeam } from "$lib/store/team.store";
@@ -37,13 +37,13 @@
   import { generateSamepleTeam } from "$lib/utils/sample";
   import { moveNavigation } from "$lib/utils/helpers";
   import { navigate } from "svelte-navigator";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { v4 as uuidv4 } from "uuid";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import Input from "$lib/components/inputs/Input.svelte";
-  import DragDrop from "$lib/components/dragdrop/DragDrop.svelte";
+  import DragDrop from "@library/ui/dragdrop/DragDrop.svelte";
   import { Pane, Splitpanes } from "svelte-splitpanes";
 
   export let data: any;

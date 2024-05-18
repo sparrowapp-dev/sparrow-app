@@ -1,4 +1,4 @@
-import { ActiveSideBarTabReposistory } from "$lib/repositories/active-sidebar-tab.repository";
+import { ActiveSideBarTabReposistory } from "@app/repositories/active-sidebar-tab.repository";
 
 export default class ActiveSideBarTabViewModel {
   private activeSideTabRepository = new ActiveSideBarTabReposistory();

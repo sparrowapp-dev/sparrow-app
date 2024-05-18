@@ -15,22 +15,19 @@
   import angleRight from "$lib/assets/angleRight.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   import { selectMethodsStore } from "$lib/store/methods";
   import { onDestroy, onMount } from "svelte";
   import { isCollectionCreatedFirstTime } from "$lib/store/collection";
-  import ModalWrapperV1 from "$lib/components/Modal/Modal.svelte";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument, TabDocument } from "@app/database/database";
   import Folder from "../folder/Folder.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
@@ -454,7 +451,7 @@
         {/each}
         {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
-            <Tooltip
+            <!-- <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
@@ -503,7 +500,7 @@
                   alt="+ API Request"
                 />
               </button>
-            </Tooltip>
+            </Tooltip> -->
           </div>
         {/if}
       </div>
@@ -555,10 +552,10 @@
   }
 
   .btn-primary {
-    background-color: var(--background-color);
+    background-color: transparent;
     color: var(--white-color);
     padding-right: 5px;
-    border-radius: 8px;
+    border-radius: 2px;
   }
 
   .btn-primary:hover {

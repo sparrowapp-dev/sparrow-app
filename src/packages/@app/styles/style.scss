@@ -82,10 +82,18 @@ $sparrow-tab-request-default: #324035;
 $sparrow-tab-request-text-default: #4A4D4F;
 $sparrow-tab-unsave-icon: #CB4A4A;
 
+$sparrow-bg-container: #8989890D;
+$sparrow-bg-container-border: #313233;
+$sparrow-bg-container-one: #1392F0;
+$sparrow-bg-container-two: #4165F9;
+$sparrow-bg-container-three: #5652FD;
+$sparrow-bg-container-four: #376FF7;
+
 $theme-grey-ffffff:#ffffff;
 $theme-grey-e5e5e5:#e5e5e5;
 $theme-grey-8A9299:#8A9299;
 $theme-grey-8989890D:#8989890D;
+$theme-grey-636566:#636566;
 $theme-grey-45494D:#45494D;
 $theme-grey-313233:#313233;
 $theme-grey-272727:#272727;
@@ -96,6 +104,7 @@ $theme-grey-151515:#151515;
 $theme-grey-000000:#000000;
 
 $theme-blue-9CDCFE:#9CDCFE;
+$theme-blue-85C2FF:#85C2FF;
 $theme-blue-1193F0:#1193F0;
 $theme-blue-5980DC:#5980DC;
 $theme-blue-3670F7:#3670F7;
@@ -119,6 +128,9 @@ $theme-red-f34b5c:#f34b5c;
 $theme-red-f33346:#f33346;
 $theme-red-fe2e2e:#fe2e2e;
 $theme-red-312325:#312325;
+$theme-red-230408:#230408;
+
+
 
 
 :root {
@@ -193,20 +205,28 @@ $theme-red-312325:#312325;
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
 
+  --bg-conatiner: #{$sparrow-bg-container};
+  --bg-container-border: #{$sparrow-bg-container-border};
+  --bg-container-one: #{$sparrow-bg-container-one};
+  --bg-container-two: #{$sparrow-bg-container-two};
+  --bg-container-three: #{$sparrow-bg-container-three};
+  --bg-container-four: #{$sparrow-bg-container-four};
+
   //
   //
   // Sets text color 
   //
   //
   --text-primary-100 : #{$theme-blue-9CDCFE};
+  --text-primary-150 : #{$theme-blue-85C2FF};
   --text-primary-200 : #{$theme-blue-1193F0};
   --text-primary-300 : #{$theme-blue-3670F7};
   --text-primary-400 : #{$theme-blue-0B5ED7};
-  
   --text-secondary-100 : #{$theme-grey-ffffff};
   --text-secondary-150 : #{$theme-grey-e5e5e5};
   --text-secondary-200 : #{$theme-grey-8A9299};
   --text-secondary-300 : #{$theme-grey-45494D};
+  --text-secondary-350 : #{$theme-grey-636566};
   --text-secondary-400 : #{$theme-grey-313233};
   --text-secondary-500 : #{$theme-grey-272727};
   --text-secondary-600 : #{$theme-grey-212222};
@@ -270,6 +290,8 @@ $theme-red-312325:#312325;
   --bg-danger-800 : #{$theme-red-f33346};
   --bg-danger-900 : #{$theme-red-fe2e2e};
   --bg-danger-1000 : #{$theme-red-312325};
+  --bg-danger-1100 : #{$theme-red-230408};
+
 
   //
   //
@@ -356,7 +378,14 @@ $theme-colors: map-merge(
     "dropdownContainer": $sparrow-dropdown-container,
     "dropdownOptionHover": $sparrow-dropdown-option-hover,
     "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line
+    "saveButtonLine": $sparrow-send-button-line,
+    
+    "sparrowBgContainer": $sparrow-bg-container,
+    "sparrowBgContainerBorder": $sparrow-bg-container-border,
+    "sparrowBgContainerOne": $sparrow-bg-container-one,
+    "sparrowBgContainerTwo": $sparrow-bg-container-two,
+    "sparrowBgContainerThree": $sparrow-bg-container-three,
+    "sparrowBgContainerFour": $sparrow-bg-container-four
   )
 );
 
@@ -393,6 +422,7 @@ $sparrow-border-radius: (
 // Define a map for text colors
 $sparrow-text-colors: (
   primary-100 : $theme-blue-9CDCFE,
+  primary-150 : $theme-blue-85C2FF,
   primary-200 : $theme-blue-1193F0,
   primary-300 : $theme-blue-3670F7,
   primary-400 : $theme-blue-0B5ED7,
@@ -400,6 +430,7 @@ $sparrow-text-colors: (
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-200 : $theme-grey-8A9299,
+  secondary-250 : $theme-grey-636566,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
   secondary-500 : $theme-grey-272727,
@@ -523,6 +554,9 @@ $sparrow-border-colors: (
     .bg-#{$background} {
       background-color: $value;
     }
+    .bg-#{$background}-important {
+      background-color: $value !important;
+    }
   }
   @each $border, $value in $sparrow-border-colors {
     .border-#{$border} {
@@ -535,7 +569,7 @@ $sparrow-border-colors: (
 @import "bootstrap/scss/root";
 @import "bootstrap";
 
-body, .splitpanes.default-theme .splitpanes__pane {
+body{
   background-color: var(--background-color) !important;
 }
 
@@ -581,13 +615,25 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 }
 
 .env-highlight {
+
+
   &.env-found {
     color: var(--text-primary-400);
+    cursor: pointer;
+  }
+  &.env-found:hover {
+    color: var(--primary-btn-color);
+    background-color:var( --selected-active-sidebar) ;
   }
 
   &.env-not-found {
     color: var(--text-danger-200);
     cursor: pointer;
+  }
+
+  &.env-not-found:hover {
+    color: var(--dangerColor);
+   background-color: var(--bg-danger-1100);
   }
 
   &.hover-found {
@@ -596,17 +642,10 @@ p, h1, h2, h3, h4, h5, h6, a, li, span{
 
   &.hover-not-found {
     color: var(--text-danger-200);
-    background-color: #230408;
   }
+
 }
 
 textarea {
   resize: none;
-}
-.splitpanes__splitter{
-  background-color: var(--border-color) !important;
-  border: none !important;
-}
-.splitpanes__splitter:active, .splitpanes__splitter:hover{
-  background-color: var(--primary-btn-color) !important;
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
+  import { Editor } from "@library/forms";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
   export let isBodyBeautified = false;
@@ -11,7 +11,7 @@
 </script>
 
 <div class="request-body position-relative">
-  <CodeMirror
+  <Editor
     bind:lang
     bind:value
     on:change={handleCodeMirrorChange}
@@ -23,7 +23,7 @@
 
 <style>
   .request-body {
-    max-height: calc(100% - 150px);
+    max-height: calc(100% - 65px);
     overflow-y: scroll;
     overflow-x: hidden;
   }

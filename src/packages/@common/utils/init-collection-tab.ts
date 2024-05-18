@@ -1,7 +1,9 @@
-import type { Path } from "$lib/utils/interfaces/request.interface";
 import { v4 as uuidv4 } from "uuid";
-import { ItemType } from "$lib/utils/enums";
-import type { CollectionTab } from "@common/types/rest-explorer";
+import {
+  TabTypeEnum,
+  type CollectionTab,
+  type Path,
+} from "@common/types/workspace";
 
 class InitCollectionTab {
   private _tab: CollectionTab;
@@ -18,7 +20,7 @@ class InitCollectionTab {
         id: _id,
         tabId: uuidv4(),
         name: "New Collection",
-        type: ItemType.COLLECTION,
+        type: TabTypeEnum.COLLECTION,
         description: "",
         source: "USER",
         activeSync: false,
@@ -35,11 +37,12 @@ class InitCollectionTab {
         isSaved: true,
         index: 0,
         isActive: true,
+        isDeleted: false,
         timestamp: new Date().toString(),
       };
     }
   }
-  public getValue(): TabDocument {
+  public getValue(): CollectionTab {
     return this._tab;
   }
   public getSpacificValue(_value: string) {

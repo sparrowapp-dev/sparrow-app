@@ -1,7 +1,7 @@
 <script lang="ts">
   import { RequestMethod } from "$lib/utils/enums";
 
-  import { Select } from "$lib/components/inputs";
+  import { Select } from "@library/forms";
   import type {
     SaveRequestType,
     SendRequestType,
@@ -9,7 +9,7 @@
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
   import { DiskIcon } from "@library/icons";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
@@ -95,7 +95,7 @@
           color: "patch",
         },
       ]}
-      borderRounded={false}
+      borderRounded={"2px"}
       titleId={httpMethod}
       onclick={handleDropdown}
       borderHighlight={"active"}
@@ -108,6 +108,7 @@
       menuItem={"v2"}
       bodyTheme={"violet"}
       isDropIconFilled={true}
+      highlightTickedItem={false}
     />
   </div>
 
@@ -152,7 +153,7 @@
     }}
   /> -->
   <button
-    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
+    class="ms-2 save-disk d-flex z-1 align-items-center justify-content-center border-radius-2 border-0"
     on:click={handleSaveRequest}
   >
     <DiskIcon height={20} width={20} />

@@ -3,7 +3,7 @@ import type {
   EnvironmentDocument,
   TabDocument,
   WorkspaceDocument,
-} from "$lib/database/app.database";
+} from "@app/database/database";
 
 //-----
 // Stores
@@ -17,10 +17,10 @@ import {
 
 //-----
 // Repositories
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { TabRepository } from "$lib/repositories/tab.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 //-----
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,9 +30,9 @@ import { EnvironmentService } from "$lib/services-v2/environment.service";
 import {
   insertCollection,
   insertCollectionDirectory,
-} from "$lib/services/collection";
-import { CollectionService } from "$lib/services/collection.service";
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+} from "@app/services/collection";
+import { CollectionService } from "@app/services/collection.service";
+import { notifications } from "@library/ui/toast/Toast";
 import { setContentTypeHeader } from "$lib/utils/helpers";
 
 //-----
@@ -100,7 +100,7 @@ import { requestSplitterDirection } from "@workspaces/features/rest-explorer/sto
 import {
   insertCollectionRequest,
   updateCollectionRequest,
-} from "$lib/services/collection";
+} from "@app/services/collection";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -192,14 +192,21 @@ export default class CollectionsViewModel {
   /**
    * Create new tab with untracked id
    */
-  public createNewTab = async () => {
+  public createNewTab = async (_limit = 5) => {
+    if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     isApiCreatedFirstTime.set(true);
-    this.tabRepository.createTab(
-      new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
-    );
-    moveNavigation("right");
-    MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    if (ws) {
+      this.tabRepository.createTab(
+        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+      MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+    } else {
+      setTimeout(() => {
+        this.createNewTab(_limit - 1);
+      }, 2000);
+    }
   };
 
   /**
@@ -520,7 +527,7 @@ export default class CollectionsViewModel {
    * Get the active workspace
    * @returns :Observable<WorkspaceDocument> - the active workspace
    */
-  public getActiveWorkspace = () => {
+  public getActiveWorkspace = (): Observable<WorkspaceDocument> => {
     return this.workspaceRepository.getActiveWorkspace();
   };
 
@@ -1529,6 +1536,7 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDocument,
   ): Promise<void> => {
+    // Check if the user has permission to add a folder at the workspace level
     if (
       !hasWorkpaceLevelPermission(
         this.getUserRoleInWorspace(),
@@ -1537,6 +1545,8 @@ export default class CollectionsViewModel {
     ) {
       return;
     }
+
+    // Generate a new folder object with a unique ID, name, description, type, and an empty items array
     const folder = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextName(collection.items, ItemType.FOLDER, "New Folder"),
@@ -1545,10 +1555,13 @@ export default class CollectionsViewModel {
       items: [],
     };
 
+    // Add the new folder to the collection locally
     await this.collectionRepository.addRequestOrFolderInCollection(
       collection.id,
       folder,
     );
+
+    // Determine the user source based on collection's active synchronization
     let userSource = {};
     if (collection?.activeSync) {
       userSource = {
@@ -1558,6 +1571,8 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
+
+    // Add the folder in the collection on the Database
     const response = await this.collectionService.addFolderInCollection(
       workspaceId,
       collection.id,
@@ -1568,6 +1583,7 @@ export default class CollectionsViewModel {
       },
     );
 
+    // Update UI elements and handle navigation on success
     if (response) {
       const path: Path = {
         workspaceId: workspaceId,
@@ -1584,11 +1600,11 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
-      sampleFolder.updateTotalRequests(0);
 
       this.handleCreateTab(sampleFolder.getValue());
       moveNavigation("right");
 
+      // Update the locally added folder with server response
       const folderObj = response.data.data;
       await this.collectionRepository.updateRequestOrFolderInCollection(
         collection.id,
@@ -1596,6 +1612,7 @@ export default class CollectionsViewModel {
         folderObj,
       );
     } else {
+      // Show error notification and clean up by deleting the folder locally on failure.
       notifications.error("Failed to create folder!");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,

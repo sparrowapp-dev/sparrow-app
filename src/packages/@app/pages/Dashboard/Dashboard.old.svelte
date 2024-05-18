@@ -9,13 +9,13 @@
   import ActiveSideBarTabViewModel from "./ActiveSideBarTab.ViewModel";
   import { CollectionsViewModel } from "../Collections/Collections.ViewModel.old";
   import Mock from "../Mock/Mock.svelte";
-  import Environment from "../Environment/Environment.svelte";
+  import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Teams from "../Teams/Teams.svelte";
   import {
     type ActiveSideBarTabDocument,
     type TeamDocument,
     type WorkspaceDocument,
-  } from "$lib/database/app.database";
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import { generateSampleWorkspace } from "$lib/utils/sample/workspace.sample";
@@ -28,7 +28,7 @@
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import type { CurrentTeam, CurrentWorkspace } from "$lib/utils/interfaces";
   import { user, userWorkspaceLevelRole } from "$lib/store";
-  import { TeamRepository } from "$lib/repositories/team.repository";
+  import { TeamRepository } from "@app/repositories/team.repository";
   import { DashboardViewModel } from "./Dashboard.ViewModel.old";
   import type { WorkspaceRole } from "$lib/utils/enums";
 

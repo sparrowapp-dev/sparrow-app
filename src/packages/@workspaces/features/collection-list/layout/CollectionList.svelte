@@ -1,6 +1,5 @@
 <script lang="ts">
   export let collectionList: Observable<CollectionDocument[]>;
-  export let environmentList: Observable<EnvironmentDocument[]>;
   export let showImportCollectionPopup: () => void;
   export let showImportCurlPopup: () => void;
   export let onItemCreated: (entityType: string, args: any) => void;
@@ -23,7 +22,6 @@
   export let activeTabPath: Path;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
-  export let currentEnvironment: Observable<EnvironmentDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
@@ -40,23 +38,20 @@
   import SearchIcon from "$lib/assets/search.svelte";
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
-  import CreateFolder from "$lib/assets/create_folder.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
-  import RequestDropdown from "$lib/components/dropdown/RequestDropdown.svelte";
-  import Select from "$lib/components/inputs/select/Select.svelte";
-  import { Dropdown } from "@common/components";
-  import List from "$lib/components/list/List.svelte";
+  import { Dropdown } from "@library/ui";
+  import List from "@library/ui/list/List.svelte";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
     EnvironmentDocument,
     TabDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
+  } from "@app/database/database";
   import type {
     Folder,
     Path,
@@ -120,7 +115,7 @@
       class="border-0 pb-5 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:72px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:52px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -146,12 +141,12 @@
       leftPanelController.leftPanelCollapse
         ? runAnimation && "decrease-width"
         : runAnimation && " increase-width"
-    } d-flex flex-column bg-backgroundColor scroll`}
+    } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
       class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
     >
-      <p class="mb-0 text-whiteColor ellipsis" style="font-size: 18px;">
+      <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
       </p>
       <button
@@ -165,39 +160,6 @@
       >
         <img src={doubleangleLeft} alt="" class="filter-green" />
       </button>
-    </div>
-    <div class="px-3 pt-2 d-none">
-      <Select
-        id="none"
-        titleId={"none"}
-        data={[
-          {
-            name: "none",
-            id: "none",
-            color: "light",
-            default: false,
-            hide: false,
-          },
-        ].concat(
-          $environmentList
-            ? $environmentList.map((env) => {
-                return {
-                  name: env?.name,
-                  id: env?.id,
-                  color: "light",
-                  default: false,
-                  hide: false,
-                };
-              })
-            : [],
-        )}
-        onclick={(env) => (currentEnvironment = env)}
-        headerTheme="transparent"
-        borderType="none"
-        borderActiveType="bottom"
-        borderRounded={false}
-        bodyTheme="dark"
-      />
     </div>
     <div
       class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
@@ -274,7 +236,7 @@
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center">
+      <div class="d-flex flex-column justify-content-center px-3 pt-2">
         {#if false}
           <div class="spinner">
             <Spinner size={`32px`} />
@@ -284,11 +246,7 @@
             <FilterDropDown {handleSearch} />
           {/if}
           {#if searchData.length > 0}
-            <List
-              height={"calc(100vh - 180px)"}
-              classProps={"p-3"}
-              overflowX="hidden"
-            >
+            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
               {#if filteredFile.length > 0}
                 {#each filteredFile as exp}
                   <SearchTree
@@ -327,7 +285,7 @@
             <List
               height={"calc(100vh - 180px)"}
               minHeight={"180px"}
-              classProps={"p-3"}
+              classProps={"pb-2 pe-2"}
               overflowX="hidden"
             >
               {#each filteredSelectedMethodsCollection as col}
@@ -345,12 +303,7 @@
               {/each}
             </List>
           {:else if collectionListDocument && collectionListDocument.length > 0}
-            <List
-              height={"calc(100vh - 180px)"}
-              minHeight={"180px"}
-              classProps={"p-3"}
-              overflowX="hidden"
-            >
+            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
               {#if collectionListDocument}
                 {#each collectionListDocument as col}
                   <Collection

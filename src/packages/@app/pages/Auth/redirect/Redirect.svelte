@@ -1,6 +1,6 @@
 <script lang="ts">
-  import sparrowIcon from "$lib/assets/sparrow-icon-bg.svg";
-  import Spinner from "$lib/components/transition/Spinner.svelte";
+  import sparrowicon from "@library/icons/logoSparrowSquare.svg";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   import leftIcon from "$lib/assets/left.svg";
   import constants from "$lib/utils/constants";
   import { fly, fade } from "svelte/transition";
@@ -17,7 +17,8 @@
 
 <!-- <Header /> -->
 <div
-  class="background-overlay d-flex align-items-center justify-content-center z-2"
+  class="d-flex align-items-center justify-content-center z-2"
+  style="height: 100vh;"
   transition:fade={{ delay: 0, duration: 100 }}
 >
   <div
@@ -26,16 +27,19 @@
     on:introstart
     on:outroend
   >
-    <div class="w-100">
+    <div class="w-100 mb-3">
       <span
-        class="cursor-pointer"
+        class="cursor-pointer text-lightGray"
         on:click={() => {
           callback(false);
         }}><img src={leftIcon} class="me-2" /> Go Back</span
       >
     </div>
-    <div class="text-white d-flex justify-content-center align-items-center">
-      <img src={sparrowIcon} width="60px" alt="" class="" />
+    <div
+      class="text-white d-flex justify-content-center align-items-center bg-primary-300"
+      style="height: 60px; width: 60px; border-radius: 6px;"
+    >
+      <img src={sparrowicon} alt="" class="" />
     </div>
     <p
       class="container-header pt-4 pb-0 sparrow-fs-28 text-whiteColor text-center ms-2 me-2 fw-bold"
@@ -43,7 +47,7 @@
       {title}
     </p>
 
-    <div class="text-center sparrow-fs-14 text-lightGray">
+    <div class="text-center text-lightGray">
       <p>{description}</p>
     </div>
 
@@ -53,9 +57,9 @@
 
     {#if isSpinner}
       <div
-        class="text-lightGray text-center sparrow-fs-14 d-flex align-items-center justify-content-center mt-3"
+        class="text-lightGray text-center sparrow-fs-14 d-flex align-items-center justify-content-center mt-4"
       >
-        <Spinner size={"80px"} />
+        <Spinner size={"45px"} />
       </div>
     {:else}
       <div
@@ -72,25 +76,29 @@
 
     {#if loadingMessage}
       <div
-        class="welcome-spinner text-lightGray mt-4 sparrow-fs-12 text-center"
+        class="welcome-spinner text-lightGray mt-4 sparrow-fs-14 text-center"
+        style="font-weight: 300;"
       >
         <p>{loadingMessage}</p>
       </div>
     {/if}
     <div
-      class="w-100 mt-3 mb-3 d-flex align-items-center justify-content-center"
+      class="w-100 mt-4 mb-3 d-flex align-items-center justify-content-center"
     >
       <a
         href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12">Need Help?</a
+        class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
       >
-      <span class="px-2 text-textColor fw-bold">|</span>
+      <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
         href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12">Report Issue</a
+        class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     </div>
-    <p class="text-center sparrow-fs-14 mt-3">Version {version}</p>
+    <p class="text-center text-secondary-250 sparrow-fs-12 mt-3">
+      Version {version}
+    </p>
+    <p class="check-for-update text-center sparrow-fs-12">Check for Update</p>
   </div>
 </div>
 
@@ -107,7 +115,12 @@
     padding: 48px 48px 64px 48px !important;
   }
   .container-header {
-    background: linear-gradient(45deg, #b4a9fd, #eef8ff);
+    background: linear-gradient(
+      270deg,
+      #584ffd -0.08%,
+      #a1d8ff 25.35%,
+      #1193f0 97.06%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -124,5 +137,15 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+
+  .check-for-update {
+    background: linear-gradient(
+      90deg,
+      var(--bg-primary-250) 0%,
+      var(--bg-primary-300) 100%
+    );
+    background-clip: text;
+    color: transparent;
   }
 </style>

@@ -2,7 +2,7 @@
   import downloadIcon from "$lib/assets/download.svg";
   import copyIcon from "$lib/assets/copy.svg";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -15,10 +15,11 @@
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import StatusSuccess from "$lib/assets/status-success.svelte";
   import StatusError from "$lib/assets/status-error.svelte";
-  import { Select } from "$lib/components/inputs";
-  import { ResponseFormatterEnum } from "@common/types/rest-explorer";
+  import { Select } from "@library/forms";
+  import { ResponseFormatterEnum } from "@common/types/workspace";
   import BeautifyIcon from "$lib/assets/beautify.svg";
   import js_beautify, { html_beautify } from "js-beautify";
+  import { WithSelect } from "@workspaces/common/hoc";
 
   export let response;
   export let apiState;
@@ -26,12 +27,24 @@
   export let onClearResponse;
 
   let fileExtension: string;
+
+  /**
+   * @description - formats the code
+   * @param _data - un-formatted data
+   */
+  const formatCode = (_data: string) => {
+    return fileExtension === "json" || fileExtension === "js"
+      ? js_beautify(_data)
+      : fileExtension === "xml" || fileExtension === "html"
+      ? html_beautify(_data)
+      : removeIndentation(_data);
+  };
   /**
    * @description Copy API response to users clipboard.
    */
+
   const handleCopy = async () => {
-    const jsonString = response?.body;
-    await copyToClipBoard(jsonString);
+    await copyToClipBoard(formatCode(response?.body));
     notifications.success("Copied to Clipboard");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
@@ -82,13 +95,7 @@
     });
     const writableStream = await newHandle.createWritable();
     // write our file
-    await writableStream.write(
-      fileExtension === "json" || fileExtension === "js"
-        ? js_beautify(response?.body)
-        : fileExtension === "xml" || fileExtension === "html"
-        ? html_beautify(response?.body)
-        : removeIndentation(response?.body),
-    );
+    await writableStream.write(formatCode(response?.body));
     await writableStream.close();
     notifications.success("Response downloaded");
     MixpanelEvent(Events.DOWNLOAD_API_RESPONSE);
@@ -149,7 +156,7 @@
 
       {#if apiState.responseBodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <Select
+          <WithSelect
             id={"hash565"}
             data={[
               {
@@ -175,17 +182,8 @@
             ]}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
-            headerTheme={"grey"}
-            borderType={"none"}
-            borderActiveType={"none"}
-            borderHighlight={"hover-active"}
-            headerHighlight={"hover-active"}
-            minBodyWidth={"150px"}
-            borderRounded={true}
-            bodyTheme={"grey"}
-            zIndex={200}
-            checkIconColor={"var(--text-primary-200)"}
-            menuItem={"v2"}
+            zIndex={499}
+            disabled={false}
           />
         </span>
       {/if}

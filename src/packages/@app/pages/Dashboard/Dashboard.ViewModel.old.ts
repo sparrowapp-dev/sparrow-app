@@ -1,9 +1,9 @@
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { TeamRepository } from "$lib/repositories/team.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { EnvironmentService } from "$lib/services/environment.service";
-import { TeamService } from "$lib/services/team.service";
-import { WorkspaceService } from "$lib/services/workspace.service";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { EnvironmentService } from "@app/services/environment.service";
+import { TeamService } from "@app/services/team.service";
+import { WorkspaceService } from "@app/services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
 
 export class DashboardViewModel {
@@ -14,6 +14,25 @@ export class DashboardViewModel {
   private workspaceService = new WorkspaceService();
   private environmentService = new EnvironmentService();
   private environmentRepository = new EnvironmentRepository();
+
+  /**
+   * Get the active workspace
+   * @returns - the active workspace
+   */
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
+  };
+
+  get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
+  };
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -105,7 +124,7 @@ export class DashboardViewModel {
   };
 
   // sync workspace data with backend server
-  public refreshWorkspaces = async (userId: string): Promise<void> => {
+  private refreshWorkspaces = async (userId: string): Promise<void> => {
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
     workspaces.forEach((element) => {

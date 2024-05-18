@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onMount } from "svelte";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
   import { EditorView } from "codemirror";
   import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
@@ -86,9 +86,11 @@
 
     if (inputWrapper) {
       const dialogboxWidth = 400;
+      const dialogboxHeight = 170;
       const rightDistance = inputWrapper.getBoundingClientRect().right;
       const leftDistance = inputWrapper.getBoundingClientRect().left;
       const bottomDistance = inputWrapper.getBoundingClientRect().bottom;
+      const topDistance = inputWrapper.getBoundingClientRect().top;
       environmentAxisY = bottomDistance + 8;
       environmentAxisX =
         leftDistance + codeMirrorView.state.selection.ranges[0].from * 2;
@@ -98,6 +100,12 @@
          */
         environmentAxisX =
           leftDistance + (rightDistance - leftDistance - dialogboxWidth);
+      }
+      if (environmentAxisY + dialogboxHeight > window.innerHeight) {
+        /**
+         * Handle dialog overflow in y direction
+         */
+        environmentAxisY = topDistance - dialogboxHeight - 8;
       }
     }
   });
@@ -120,6 +128,12 @@
     },
     {
       key: "Cmd-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Option-Enter",
       run: (view) => {
         return true;
       },
@@ -285,6 +299,15 @@
         environmentHighlightStyle(filterData),
       ]),
     });
+  });
+
+  const destroyCodeMirrorEditor = () => {
+    if (codeMirrorView) {
+      codeMirrorView.destroy(); // Destroy the editor view
+    }
+  };
+  onDestroy(() => {
+    destroyCodeMirrorEditor();
   });
 </script>
 

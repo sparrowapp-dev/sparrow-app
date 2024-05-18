@@ -11,7 +11,7 @@
   import angleLeft from "$lib/assets/angleLeft.svg";
   import eyeHide from "$lib/assets/eye-hide.svg";
   import eyeShow from "$lib/assets/eye-show.svg";
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
+  import Loader from "@library/ui/loader/Loader.svelte";
 
   let passwordText: string = "";
 

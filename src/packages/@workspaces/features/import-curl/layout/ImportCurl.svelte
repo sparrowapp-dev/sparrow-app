@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ModalWrapperV1 } from "$lib/components";
-  import Spinner from "$lib/components/Transition/Spinner.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
+  import Spinner from "@library/ui/spinner/Spinner.svelte";
   let importCurl = "";
   let progressBar = {
     isLoading: false,

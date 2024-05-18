@@ -1,6 +1,6 @@
-import { forgotPassword } from "$lib/services/auth.service";
+import { forgotPassword } from "@app/services/auth.service";
 import type { EmailPostBody } from "$lib/utils/dto";
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+import { notifications } from "@library/ui/toast/Toast";
 import { checkValidation, forgotPasswordSchema } from "$lib/utils/validation";
 import { navigate } from "svelte-navigator";
 

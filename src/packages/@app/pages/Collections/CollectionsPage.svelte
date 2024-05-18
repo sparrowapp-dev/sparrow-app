@@ -25,7 +25,7 @@
     ImportCurl,
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
 
   // ---- Interface, enum & constants
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
@@ -37,7 +37,7 @@
 
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import type { TabDocument } from "$lib/database/app.database";
+  import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
   import { ItemType } from "$lib/utils/enums";
@@ -46,8 +46,8 @@
     CollectionDocument,
     EnvironmentDocument,
     WorkspaceDocument,
-  } from "$lib/database/app.database";
-  import { ModalWrapperV1 } from "$lib/components";
+  } from "@app/database/database";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
 
   const _viewModel = new CollectionsViewModel();
@@ -65,7 +65,6 @@
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
-  let currentEnvironment: Observable<EnvironmentDocument>;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
 
@@ -126,21 +125,9 @@
 
   const handleCollapseCollectionList = () => {
     leftPanelCollapse.set(!$leftPanelCollapse);
-    splitter.style.display = $leftPanelCollapse ? "none" : "unset";
   };
 
-  /**
-   * Handles reloading collections and environment of workspace change
-   */
-  currentWorkspace
-    .subscribe(async (workspace) => {
-      currentEnvironment =
-        await _viewModel.syncCollectionsWithBackend(workspace);
-    })
-    .unsubscribe();
-
   // Rerender animation on tab switch
-  let isAnimation = true;
   let prevTabId: string = "";
   let tabPath: Path;
   activeTab.subscribe((value: TabDocument) => {
@@ -148,10 +135,6 @@
       if (prevTabId !== value.tabId) {
         tabPath = value.path;
         tabPath["requestId"] = value.id;
-        isAnimation = false;
-        setTimeout(() => {
-          isAnimation = true;
-        }, 10);
       }
       prevTabId = value.tabId;
     } else tabPath = {};
@@ -159,28 +142,39 @@
 
   onMount(() => {
     splitter = document.querySelector(
-      ".splitter-sidebar .splitpanes__splitter",
+      ".collection-splitter .splitpanes__splitter",
     );
-    splitter.style.width = "1px";
     let url = window.location.href;
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
     if (isNew) _viewModel.createNewTab();
   });
+
+  $: {
+    if (splitter && $leftPanelCollapse === true) {
+      splitter.style.display = "none";
+    }
+    if (splitter && $leftPanelCollapse === false) {
+      splitter.style.display = "unset";
+    }
+  }
 </script>
 
 <Splitpanes
-  class="splitter-sidebar"
+  class="collection-splitter"
+  style="width: calc(100vw - 54px)"
   on:resize={(e) => {
     leftPanelWidth.set(e.detail[0].size);
     rightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane size={$leftPanelCollapse ? 0 : $leftPanelWidth} minSize={20}>
+  <Pane
+    size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+    minSize={20}
+    class="bg-secondary-900-important"
+  >
     <CollectionList
       {collectionList}
-      {environmentList}
-      {currentEnvironment}
       {currentWorkspace}
       leftPanelController={{
         leftPanelCollapse: $leftPanelCollapse,
@@ -199,7 +193,11 @@
       onSearchCollection={_viewModel.handleSearchCollection}
     />
   </Pane>
-  <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
+  <Pane
+    size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+    minSize={60}
+    class="bg-secondary-800-important"
+  >
     <TabBar
       tabList={$tabList}
       onNewTabRequested={_viewModel.createNewTab}
@@ -211,20 +209,20 @@
       onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
     />
     <Route>
-      {#if isAnimation}
-        {#if $activeTab && $activeTab?.type === ItemType.REQUEST}
+      {#if true}
+        {#if $activeTab?.type === ItemType.REQUEST}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <RestExplorerPage tab={$activeTab} />
             </div>
           </Motion>
-        {:else if $activeTab && $activeTab?.type === ItemType.COLLECTION}
+        {:else if $activeTab?.type === ItemType.COLLECTION}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <CollectionExplorerPage tab={$activeTab} />
             </div>
           </Motion>
-        {:else if $activeTab && $activeTab?.type === ItemType.FOLDER}
+        {:else if $activeTab?.type === ItemType.FOLDER}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <FolderExplorerPage tab={$activeTab} />
@@ -318,10 +316,19 @@
 </ModalWrapperV1>
 
 <style>
-  :global(.splitter-sidebar.splitpanes) {
-    width: calc(100vw - 72px) !important;
+  :global(.collection-splitter .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-900) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
   }
-  :global(.splitpanes__splitter) {
-    width: 1px;
+  :global(
+      .collection-splitter .splitpanes__splitter:active,
+      .collection-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>

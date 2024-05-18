@@ -1,9 +1,6 @@
 <script lang="ts">
   // Document
-  import type {
-    CollectionDocument,
-    TabDocument,
-  } from "$lib/database/app.database";
+  import type { CollectionDocument, TabDocument } from "@app/database/database";
   import { onMount } from "svelte";
 
   // ---- View Model
@@ -11,9 +8,11 @@
 
   // Component
   import { FolderExplorer } from "@workspaces/features";
-  import type { Folder } from "@common/types/rest-explorer";
+  import type { Folder } from "@common/types/workspace";
 
-  // Exports
+  /**
+   * folder tab document
+   */
   export let tab: TabDocument;
 
   // ViewModel initialization

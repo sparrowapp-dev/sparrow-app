@@ -1,16 +1,16 @@
 // Repositories
-import { CollectionRepository } from "$lib/repositories/collection.repository";
-import { TabRepository } from "$lib/repositories/tab.repository";
+import { CollectionRepository } from "@app/repositories/collection.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
 
 // Servises
-import { CollectionService } from "$lib/services/collection.service";
+import { CollectionService } from "@app/services/collection.service";
 
 // Types
 import type {
   CollectionDocument,
   // CollectionDocument,
   TabDocument,
-} from "$lib/database/app.database";
+} from "@app/database/database";
 import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 
 // Utils
@@ -27,7 +27,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // Stores
 import { userWorkspaceLevelRole } from "$lib/store";
-import type { Folder } from "@common/types/rest-explorer";
+import type { Folder } from "@common/types/workspace";
 import { generateSampleRequest } from "$lib/utils/sample";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
@@ -304,7 +304,7 @@ class FolderExplorerPage {
         tab.path.folderId,
         { ...updateObj, ...userSource },
       );
-    await collectionsMethods.updateRequestOrFolderInCollection(
+    await this.collectionRepository.updateRequestOrFolderInCollection(
       tab.path.collectionId,
       tab.path.folderId,
       updateFolderElement.data.data,

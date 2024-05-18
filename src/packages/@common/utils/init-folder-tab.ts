@@ -1,10 +1,9 @@
 import { FolderDefault } from "$lib/utils/enums";
 import {
   type Path,
-  type RequestTab,
   TabTypeEnum,
   type FolderTab,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitFolderTab {
@@ -28,6 +27,7 @@ class InitFolderTab {
         folder: {
           id: "",
         },
+        totalRequests: 0,
       },
       path: {
         workspaceId: _workspaceId,

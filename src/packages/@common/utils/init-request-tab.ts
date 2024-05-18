@@ -14,7 +14,8 @@ import {
   type KeyValueChecked,
   type RequestTab,
   TabTypeEnum,
-} from "@common/types/rest-explorer";
+  FormDataTypeEnum,
+} from "@common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
 class InitRequestTab {
@@ -52,7 +53,7 @@ class InitRequestTab {
                 value: "",
                 base: "",
                 checked: false,
-                type: "text",
+                type: FormDataTypeEnum.TEXT,
               },
             ],
           },

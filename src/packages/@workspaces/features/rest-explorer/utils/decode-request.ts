@@ -7,7 +7,7 @@ import {
   type Request,
   RequestDataTypeEnum,
   RequestMethodEnum,
-} from "@common/types/rest-explorer";
+} from "@common/types/workspace";
 import { ReduceAuthHeader, ReduceAuthParameter } from ".";
 
 class DecodeRequest {
@@ -100,10 +100,12 @@ class DecodeRequest {
     environmentVariables,
   ): string => {
     // Get authentication header
+    url = url.trim();
     const authHeader: {
       key: string;
       value: string;
     } = new ReduceAuthParameter(request.state, request.auth).getValue();
+    url = url.trim();
     // Check if authentication header exists
     if (authHeader.key || authHeader.value) {
       let flag: boolean = false;

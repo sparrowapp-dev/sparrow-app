@@ -1,11 +1,11 @@
 <script lang="ts">
-  import CodeMirror from "$lib/components/editor/CodeMirror.svelte";
+  import { Editor } from "@library/forms";
   import {
     RequestDataTypeEnum,
     ResponseFormatterEnum,
     type Response,
     type State,
-  } from "@common/types/rest-explorer";
+  } from "@common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
   export let response: Response;
   export let apiState: State;
@@ -54,7 +54,7 @@
         -- Reponse content-type set to HTML, JSON, XML, Javascript, Text,
         -- 
       -->
-      <CodeMirror
+      <Editor
         bind:lang={language}
         bind:value={response.body}
         on:change={() => {}}

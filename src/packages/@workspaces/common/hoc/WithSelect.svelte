@@ -1,8 +1,5 @@
 <script>
-  /**
-   * hoc component
-   */
-  export let wrappedComponent;
+  import { Select } from "@library/forms";
   /**
    * unique Select component id
    */
@@ -19,24 +16,34 @@
    * on change event
    */
   export let onclick;
-  $: ({ wrappedComponent, id, data, titleId, onclick } = $$props);
+  /**
+   * sets opacity for overlapping containers
+   */
+  export let zIndex;
+  /**
+   * identifies Select disabled or not
+   */
+  export let disabled;
+  $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
 
-<svelte:component
-  this={wrappedComponent}
+<Select
   {id}
   {data}
   {titleId}
   {onclick}
-  headerTheme={"grey"}
+  {zIndex}
+  {disabled}
   borderType={"none"}
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
+  headerHeight={"24px"}
   minBodyWidth={"150px"}
-  borderRounded={true}
-  bodyTheme={"grey"}
-  zIndex={499}
-  checkIconColor={"var(--text-primary-200)"}
+  borderRounded={"4px"}
+  headerTheme={"dark-violet"}
+  bodyTheme={"violet"}
   menuItem={"v2"}
+  headerFontSize={"10px"}
+  isDropIconFilled={true}
 />

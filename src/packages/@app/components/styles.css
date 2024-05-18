@@ -7,7 +7,9 @@
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  /* overflow: hidden; */
-  /* background: #313233; */
+}
+img,
+a {
+  user-drag: none; /* Standard syntax */
+  -webkit-user-drag: none; /* Safari and older versions of Chrome */
 }

@@ -21,14 +21,14 @@
     RequestParameters,
     ResponseStatus,
   } from "@workspaces/features/rest-explorer/components";
-  import Loader from "$lib/components/Transition/loader/Loader.svelte";
-  import { ModalWrapperV1 } from "$lib/components";
+  import Loader from "@library/ui/loader/Loader.svelte";
+  import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Dropdown from "$lib/components/dropdown/Dropdown.svelte";
-  import { notifications } from "$lib/components/toast-notification/ToastNotification";
+  import { notifications } from "@library/ui/toast/Toast";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import Button from "$lib/components/buttons/Button.svelte";
+  import Button from "@library/ui/button/Button.svelte";
 
-  import type { CollectionDocument } from "$lib/database/app.database";
+  import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { SaveAsRequest } from "@workspaces/features";
   import type {
@@ -57,7 +57,7 @@
     ResponseSectionEnum,
     type KeyValue,
     type RequestTab,
-  } from "@common/types/rest-explorer";
+  } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
 
   export let tab: Observable<RequestTab>;
@@ -96,33 +96,6 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
-
-  /**
-   * @description - sets styling to the splitpanes splitter (divider that shifts split panes)
-   */
-  const stylePanes = () => {
-    const splitter: HTMLElement | null = document.querySelector(
-      ".splitter-request .splitpanes__splitter",
-    );
-    if (splitter && $requestSplitterDirection === "horizontal") {
-      // horizontal view
-      splitter.style.height = "2px";
-      splitter.style.width = "100%";
-    } else if (splitter) {
-      // vertical view
-      splitter.style.height = "100%";
-      splitter.style.width = "2px";
-    }
-  };
-
-  /**
-   * @description - re-calculates value when dependency changes
-   */
-  $: {
-    if ($requestSplitterDirection) {
-      stylePanes();
-    }
-  }
 </script>
 
 {#if $tab.tabId}
@@ -222,10 +195,9 @@
       />
       {#if !isLoading}
         <Splitpanes
-          class="splitter-request w-100"
+          class="rest-splitter w-100"
           id={"rest-splitter"}
           style="height: calc(100vh - 160px); margin-top:10px;"
-          on:ready={stylePanes}
           horizontal={$requestSplitterDirection === "horizontal" ? true : false}
           dblClickSplitter={false}
           on:resize={(e) => {
@@ -241,7 +213,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative "
+            class="position-relative bg-secondary-800-important"
           >
             <!-- Request Pane -->
             <div
@@ -307,7 +279,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="position-relative"
+            class="position-relative bg-secondary-800-important"
           >
             <!-- Response Pane -->
             <div
@@ -422,11 +394,29 @@
     background-color: var(--bg-secondary-800);
     height: calc(100vh - 80px);
   }
-  :global(.rest-explorer-layout .splitpanes.default-theme .splitpanes__pane) {
-    background-color: var(--bg-secondary-800) !important;
-  }
 
-  :global(.splitter_custom) {
-    background-color: var(--dropdown-button) !important;
+  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
+    width: 10.5px !important;
+    height: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-left: 5px solid var(--border-secondary-800) !important;
+    border-right: 5px solid var(--border-secondary-800) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+  }
+  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
+    height: 10.5px !important;
+    width: 100% !important;
+    background-color: var(--bg-secondary-500) !important;
+    border-top: 5px solid var(--border-secondary-800) !important;
+    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+  :global(
+      .rest-splitter .splitpanes__splitter:active,
+      .rest-splitter .splitpanes__splitter:hover
+    ) {
+    background-color: var(--bg-primary-200) !important;
   }
 </style>
