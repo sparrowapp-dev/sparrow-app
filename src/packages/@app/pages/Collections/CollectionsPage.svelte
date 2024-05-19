@@ -47,6 +47,7 @@
     EnvironmentDocument,
     WorkspaceDocument,
   } from "@app/database/database";
+  import type { GithubRepoDocType } from "@app/models/github-repo.model";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
 
@@ -60,6 +61,7 @@
     _viewModel.getEnvironmentList();
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
+
   let removeTab: NewTab;
   let isPopupClosed: boolean = false;
   let isImportCollectionPopup: boolean = false;
@@ -77,6 +79,7 @@
       _viewModel.createNewTab();
     }
   };
+
   /**
    * Handle close tab functionality in tab bar list
    */
@@ -140,7 +143,10 @@
     } else tabPath = {};
   });
 
-  onMount(() => {
+  let githubRepoData: GithubRepoDocType;
+  onMount(async () => {
+    let githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
     );
@@ -148,6 +154,9 @@
     const params = new URLSearchParams(url.split("?")[1]);
     const isNew = params.get("first");
     if (isNew) _viewModel.createNewTab();
+    await _viewModel.fetchGithubRepo();
+    githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
   });
 
   $: {
@@ -180,8 +189,10 @@
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
       }}
+      githubRepo={githubRepoData}
       userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
-      activeTabPath={tabPath}
+      activeTabPath={$activeTab?.path}
+      activeTabId={$activeTab?.id}
       showImportCollectionPopup={() => (isImportCollectionPopup = true)}
       showImportCurlPopup={() => (isImportCurlPopup = true)}
       onItemCreated={_viewModel.handleCreateItem}

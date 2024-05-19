@@ -64,7 +64,8 @@
   /**
    * Current Tab Path
    */
-  export let activeTabPath: Path;
+  export let activeTabId: string;
+  export let activeTabPath;
 
   let showPath = false;
 
@@ -76,7 +77,6 @@
   }
 
   let isDeletePopup: boolean = false;
-  let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let noOfColumns = 180;
   let noOfRows = 3;
@@ -162,8 +162,11 @@
 
 {#if showMenu}
   <Options
-    xAxis={requestTabWrapper.getBoundingClientRect().right - 180}
-    yAxis={requestTabWrapper.getBoundingClientRect().bottom + 5}
+    xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
+    yAxis={[
+      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
     menuItems={[
       {
         onClick: () => {
@@ -174,7 +177,7 @@
             request: api,
           });
         },
-        displayText: "Open Request",
+        displayText: "Open API",
         disabled: false,
         hidden: false,
       },
@@ -183,7 +186,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: "Rename Request",
+        displayText: "Rename API",
         disabled: false,
         hidden:
           !collection.activeSync ||
@@ -205,7 +208,6 @@
             : true,
       },
     ]}
-    {noOfRows}
     {noOfColumns}
   />
 {/if}
@@ -217,13 +219,20 @@
 
 <div
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 ps-0 justify-content-between my-button btn-primary {api.id ===
-  activeTabPath?.requestId
+  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  activeTabId
     ? 'active-request-tab'
-    : ''}"
-  style="height:32px;"
+    : ''} "
+  style="height:32px; {folder?.id
+    ? 'padding-left: 46px;'
+    : 'padding-left: 30px;'}"
 >
   <button
+    on:contextmenu|preventDefault={(e) => {
+      setTimeout(() => {
+        showMenu = true;
+      }, 100);
+    }}
     on:click={() => {
       onItemOpened("request", {
         workspaceId: collection.workspaceId,
@@ -259,8 +268,8 @@
 
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldFile"
-        style="font-size: 12px;"
+        class="py-0 renameInputFieldFile"
+        style="font-size: 12px; width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -295,13 +304,13 @@
         style="font-size: 12px;"
       >
         {api.name}
-        {#if showPath}
+        <!-- {#if showPath}
           <span class="path-name ellipsis"
             >{`${
               api?.request?.url ? getPathFromUrl(api?.request?.url) : ""
             }`}</span
           >
-        {/if}
+        {/if} -->
       </div>
     {/if}
   </button>
@@ -309,20 +318,16 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip title="More options" styleProp="left: -50%">
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click|preventDefault={(e) => {
-          pos.x = e.clientX;
-          pos.y = e.clientY;
-          setTimeout(() => (showMenu = true), 100);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </Tooltip>
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
+      on:click|preventDefault={(e) => {
+        setTimeout(() => (showMenu = true), 100);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
   {/if}
 </div>
 
@@ -334,7 +339,7 @@
   .api-method {
     font-size: 10px;
     font-weight: 500;
-    width: 48px;
+    width: 48px !important;
     height: 30px;
     padding-left: 6px;
     padding-right: 4px;
@@ -343,7 +348,6 @@
     align-items: center;
   }
   .api-name {
-    font-size: 12px;
     font-weight: 400;
     width: calc(100% - 48px);
     text-align: left;
@@ -386,13 +390,12 @@
     background-color: var(--bg-tertiary-600);
   }
   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500);
   }
 
   .btn-primary {
     background-color: transparent;
     color: var(--white-color);
-    padding-left: 0 !important;
     padding-right: 5px;
     border-radius: 2px;
   }
@@ -441,6 +444,10 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldFile:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .main-file {
     width: calc(100% - 24px);

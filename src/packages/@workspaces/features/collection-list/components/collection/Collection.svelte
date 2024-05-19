@@ -9,10 +9,11 @@
     collection: CollectionDocument,
   ) => void;
   export let activeTabPath: Path;
+  export let activeTabId: string;
   export let userRoleInWorkspace: WorkspaceRole;
   export let collection: CollectionDocument;
-
-  import angleRight from "$lib/assets/angleRight.svg";
+  export let searchData = "";
+  import angleRight from "$lib/assets/angle-right-v2.svg";
   import threedotIcon from "$lib/assets/3dot.svg";
   import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
@@ -22,7 +23,6 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
@@ -33,9 +33,11 @@
   import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
   import { PERMISSION_NOT_FOUND_TEXT } from "$lib/utils/constants/permissions.constant";
   import { CollectionMessage } from "$lib/utils/constants/request.constant";
-  import folderIcon from "$lib/assets/create_folder.svg";
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
+  import AddIcon from "$lib/assets/add.svg";
+  import { FolderIcon, SyncIcon } from "@library/icons";
+  import { Options } from "@library/ui";
 
   let deletedIds: [string] | [] = [];
   let requestCount = 0;
@@ -52,9 +54,11 @@
   let pos = { x: 0, y: 0 };
   let isCollectionPopup: boolean = false;
   let showMenu: boolean = false;
+  let showAddItemMenu = false;
   let noOfColumns = 180;
   let noOfRows = 5;
   let inputField: HTMLInputElement;
+  let collectionTabWrapper: HTMLElement;
 
   /**
    * Handle position of the context menu
@@ -63,10 +67,14 @@
   function rightClickContextMenu(e: Event) {
     e.preventDefault();
     setTimeout(() => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      pos = { x: mouseX, y: mouseY };
       showMenu = true;
+    }, 100);
+  }
+
+  function rightClickContextMenu2(e: Event) {
+    e.preventDefault();
+    setTimeout(() => {
+      showAddItemMenu = true;
     }, 100);
   }
 
@@ -93,8 +101,14 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
+  function closeRightClickContextMenu2() {
+    showAddItemMenu = false;
+  }
 
   $: {
+    if (searchData) {
+      visibility = true;
+    }
     if (activeTabPath) {
       if (activeTabPath.collectionId === collection.id) {
         visibility = true;
@@ -220,9 +234,12 @@
 >
 
 {#if showMenu}
-  <RightOption
-    xAxis={pos.x}
-    yAxis={pos.y}
+  <Options
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 5,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
     menuItems={[
       {
         onClick: () =>
@@ -254,12 +271,7 @@
           }),
         displayText: "Add Request",
         disabled: false,
-        hidden:
-          (collection?.activeSync && isBranchSynced) ||
-          (!(collection?.activeSync && isBranchSynced) &&
-            !(collection?.activeSync && !isBranchSynced))
-            ? false
-            : true,
+        hidden: true,
       },
       {
         onClick: () =>
@@ -269,12 +281,7 @@
           }),
         displayText: "Add Folder",
         disabled: false,
-        hidden:
-          (collection?.activeSync && isBranchSynced) ||
-          (!(collection?.activeSync && isBranchSynced) &&
-            !(collection?.activeSync && !isBranchSynced))
-            ? false
-            : true,
+        hidden: true,
       },
       {
         onClick: () => {
@@ -285,7 +292,43 @@
         hidden: false,
       },
     ]}
-    {noOfRows}
+    {noOfColumns}
+  />
+{/if}
+
+{#if showAddItemMenu}
+  <Options
+    xAxis={collectionTabWrapper.getBoundingClientRect().right - 55}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    menuItems={[
+      {
+        onClick: () => {
+          onItemCreated("folder", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add Folder",
+        disabled: false,
+        hidden: false,
+        icon: FolderIcon,
+      },
+      {
+        onClick: () => {
+          onItemCreated("requestCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add New API",
+        disabled: false,
+        hidden: false,
+        icon: SyncIcon,
+      },
+    ]}
     {noOfColumns}
   />
 {/if}
@@ -293,21 +336,24 @@
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
+  on:click={closeRightClickContextMenu2}
+  on:contextmenu|preventDefault={closeRightClickContextMenu2}
   on:load={() => {
     getFeatures();
   }}
 />
 
 <button
-  style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
-  'activeTabId'
+  bind:this={collectionTabWrapper}
+  style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
+  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
+  activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     class="d-flex main-collection align-items-center bg-transparent border-0"
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
       isCollectionCreatedFirstTime.set(false);
       visibility = !visibility;
@@ -322,14 +368,14 @@
     <img
       src={angleRight}
       class=""
-      style="height:14px; width:14px; margin-right:8px; {visibility
+      style="height:8px; width:8px; margin-right:8px; {visibility
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
     />
     {#if isRenaming}
       <input
-        class="form-control py-0 renameInputFieldCollection"
+        class="py-0 renameInputFieldCollection w-100"
         id="renameInputFieldCollection"
         type="text"
         style="font-size: 12px;"
@@ -358,9 +404,9 @@
     {:else}
       <div
         class="collection-collection.name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
-        style="height: 36px; text-align: left;"
+        style="height: 32px; text-align: left;"
       >
-        <p class="ellipsis w-100 mb-0" style="font-size: 0.75rem;">
+        <p class="ellipsis w-100 mb-0 text-fs-12">
           {collection.name}
         </p>
         {#if collection.activeSync}
@@ -384,22 +430,32 @@
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip
+    <!-- <Tooltip
       placement="bottom"
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
+    > -->
+    <button
+      class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
+        ? 'add-item-active'
+        : ''}"
+      on:click={(e) => {
+        rightClickContextMenu2(e);
+      }}
     >
-      <button
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </Tooltip>
+      <img src={AddIcon} alt="AddIcon" />
+    </button>
+    <button
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
+      on:click={(e) => {
+        rightClickContextMenu(e);
+      }}
+    >
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
+    <!-- </Tooltip> -->
     {#if isActiveSyncEnabled && collection?.activeSync}
       <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
         <button
@@ -432,11 +488,11 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-3">
+      <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
             {onItemCreated}
@@ -447,11 +503,18 @@
             {userRoleInWorkspace}
             {activeTabPath}
             {explorer}
+            {activeTabId}
+            {searchData}
           />
         {/each}
-        {#if showFolderAPIButtons}
+        {#if !collection?.items?.length}
+          <p class="text-fs-10 ps-4 my-2 text-secondary-300">
+            This collection is empty
+          </p>
+        {/if}
+        <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
-            <!-- <Tooltip
+            <Tooltip
               placement="bottom"
               title={!hasWorkpaceLevelPermission(
                 userRoleInWorkspace,
@@ -500,14 +563,14 @@
                   alt="+ API Request"
                 />
               </button>
-            </Tooltip> -->
+            </Tooltip>
           </div>
-        {/if}
+        {/if} -->
       </div>
     </div>
   {:else}
     <div
-      style="padding-left: 15px; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
         ? 'block'
         : 'none'};"
     >
@@ -526,6 +589,9 @@
   .my-button:hover .threedot-icon-container {
     visibility: visible;
   }
+  .my-button:hover .add-icon-container {
+    visibility: visible;
+  }
   .list-icons {
     width: 16px;
     height: 16px;
@@ -542,13 +608,27 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-600);
+  }
+  .add-icon-container {
+    visibility: hidden;
+    background-color: transparent;
+    padding: 5px;
+  }
+  .add-icon-container:hover {
+    background-color: var(--bg-tertiary-500) !important;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  .add-item-active {
+    visibility: visible;
+    background-color: var(--bg-tertiary-600);
   }
   .refresh-collection-loader-active {
     visibility: visible;
   }
   .threedot-icon-container:hover {
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-500);
   }
 
   .btn-primary {
@@ -559,7 +639,7 @@
   }
 
   .btn-primary:hover {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-600);
     color: var(--white-color);
   }
 
@@ -568,15 +648,18 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldCollection:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .sub-folders {
-    border-left: 1px solid var(--border-color);
   }
   .main-collection {
     width: calc(100% - 48px);
   }
   .active-collection-tab {
-    background-color: var(--selected-active-sidebar) !important;
+    background-color: var(--bg-tertiary-400) !important;
   }
   .collection-collection.name {
     width: calc(100% - 30px);

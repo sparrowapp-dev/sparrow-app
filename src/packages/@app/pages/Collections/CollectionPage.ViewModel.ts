@@ -101,14 +101,17 @@ import {
   insertCollectionRequest,
   updateCollectionRequest,
 } from "@app/services/collection";
+import { GithubService } from "@app/services/github.service";
+import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
-  private environmentService = new EnvironmentService();
+  private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
+  private githubService = new GithubService();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
@@ -156,6 +159,17 @@ export default class CollectionsViewModel {
   get tabs() {
     return this.tabRepository.getTabList();
   }
+
+  /**
+   * @description - Fetches github repository data
+   */
+  public getGithubRepo = async () => {
+    const githubRepoId = "sparrow-github";
+    const document = await this.githhubRepoRepository.findOne({
+      id: githubRepoId,
+    });
+    return document;
+  };
 
   /**
    * Get list of all environments
@@ -539,6 +553,36 @@ export default class CollectionsViewModel {
     this.collectionRepository.addCollection(collection);
   };
 
+  /**
+   * @description - refreshes github respository data
+   */
+  public fetchGithubRepo = async () => {
+    const githubRepoId = "sparrow-github";
+    const response = await this.githubService.getRepoMetaData(
+      "sparrowapp-dev/sparrow-app",
+    );
+    if (response.isSuccessful) {
+      const githubDocument = await this.githhubRepoRepository.findOne({
+        id: githubRepoId,
+      });
+      if (!githubDocument) {
+        await this.githhubRepoRepository.insert({
+          id: githubRepoId,
+          stargazers_count: response.data.stargazers_count,
+        });
+      } else {
+        await this.githhubRepoRepository.update(
+          {
+            id: githubRepoId,
+          },
+          {
+            stargazers_count: response.data.stargazers_count,
+          },
+        );
+      }
+      return response.data;
+    }
+  };
   /**
    * Generate available name of new collection like New collection 2 if New collection is already taken
    * @param list :any[] - list of collections

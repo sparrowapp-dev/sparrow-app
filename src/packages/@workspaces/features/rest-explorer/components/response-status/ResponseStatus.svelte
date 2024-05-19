@@ -15,7 +15,7 @@
       <!-- insert controller here -->
       <div class="d-flex gap-2">
         <Tooltip
-          title="HTTP Status - {response.status.split(' ')[1]}"
+          title="HTTP Status - {response.status}"
           verticalOffset="- 42px"
           horizontalArrowOffset="+ 20px"
         >

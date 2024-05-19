@@ -26,6 +26,10 @@ import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import constants from "$lib/utils/constants";
 import { teamSchema, type TeamDocType } from "@app/models/team.model";
 import {
+  githubRepoSchema,
+  type GithubRepoDocType,
+} from "@app/models/github-repo.model";
+import {
   environmentSchema,
   type EnvironmentDocType,
 } from "@app/models/environment.model";
@@ -53,6 +57,7 @@ export type EnvironmentContainer = RxCollection<EnvironmentDocType>;
 export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
+export type GithubDocument = RxDocument<GithubRepoDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -227,6 +232,9 @@ export class RxDB {
             return oldDoc;
           },
         },
+      },
+      githubrepo: {
+        schema: githubRepoSchema,
       },
     });
     return { rxdb: this.rxdb };

@@ -106,7 +106,7 @@
     : 'd-none'}"
   style="top: {buttonPosition?.top -
     modalPostion?.height +
-    20}px; left: {buttonPosition?.left +
+    26}px; left: {buttonPosition?.left +
     buttonPosition?.width +
     10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 10000;"
 >
@@ -118,8 +118,8 @@
       {user?.name[0]}
     </div>
     <div class="d-flex flex-column ms-1">
-      <div>{user?.name}</div>
-      <div class="text-secondary-200">{user?.email}</div>
+      <div class="ellipsis">{user?.name}</div>
+      <div class="text-secondary-200 ellipsis">{user?.email}</div>
     </div>
   </div>
   <button
@@ -131,9 +131,6 @@
 </div>
 
 <style>
-  * {
-    transition: all 300ms ease;
-  }
   .sidebar-item img {
     height: 20px;
     width: 20px;
@@ -145,9 +142,6 @@
     padding-right: 12px;
     padding-top: 4px;
     padding-bottom: 4px;
-    transition:
-      background-color 0.55s ease,
-      padding 0.55s ease;
   }
 
   .sidebar-item:hover {
@@ -179,10 +173,10 @@
   .modal-background {
     backdrop-filter: blur(75px);
     border-radius: 5px;
-    background: var(--bg-secondary-250);
+    background-color: var(--bg-tertiary-700);
   }
 
   .sign-out-button:hover {
-    background-color: #22232e !important;
+    background-color: var(--bg-tertiary-500) !important;
   } /* CardBody+BlurEffects */
 </style>

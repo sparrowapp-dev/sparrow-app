@@ -100,7 +100,10 @@
     {disabled}
   />
   {#if type === "search"}
-    <span class="position-absolute" style="top:2px; left: 10px">
+    <span
+      class="position-absolute"
+      style="top: 50%; left: 10px; transform: translateY(-50%);"
+    >
       <SearchIcon height={14} width={14} color={"var(--defaultcolor)"} />
     </span>
   {/if}

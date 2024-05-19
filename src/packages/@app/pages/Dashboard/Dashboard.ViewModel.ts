@@ -1,17 +1,17 @@
-import { EnvironmentRepository } from "$lib/repositories/environment.repository";
-import { TeamRepository } from "$lib/repositories/team.repository";
-import { WorkspaceRepository } from "$lib/repositories/workspace.repository";
-import { EnvironmentService } from "$lib/services/environment.service";
-import { TeamService } from "$lib/services/team.service";
-import { WorkspaceService } from "$lib/services/workspace.service";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
+import { EnvironmentService } from "@app/services/environment.service";
+import { TeamService } from "@app/services/team.service";
+import { WorkspaceService } from "@app/services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
-import { notifications } from "$lib/components/toast-notification/ToastNotification";
+import { notifications } from "@library/ui/toast/Toast";
 import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
-import { TabRepository } from "$lib/repositories/tab.repository";
-import { RxDB } from "$lib/database/app.database";
+import { TabRepository } from "@app/repositories/tab.repository";
+import { RxDB } from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
-import { userLogout } from "$lib/services/auth.service";
+import { userLogout } from "@app/services/auth.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -29,6 +29,33 @@ export class DashboardViewModel {
 
   public setOpenTeam = async (teamId) => {
     await this.teamRepository.setOpenTeam(teamId);
+  };
+
+  /**
+   * Get the active workspace
+   * @returns - the active workspace
+   */
+  public getActiveWorkspace = () => {
+    return this.workspaceRepository.getActiveWorkspace();
+  };
+
+  /**
+   * @description - get environment list from local db
+   */
+  get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
+  /**
+   * @description - link environment to particular workspace
+   * @param workspaceId  - workspace id
+   * @param environmentId - environment id
+   */
+  public initActiveEnvironmentToWorkspace = async (
+    workspaceId: string,
+    environmentId: string,
+  ) => {
+    this.workspaceRepository.updateWorkspace(workspaceId, { environmentId });
   };
 
   // sync teams data with backend server

@@ -89,11 +89,11 @@
   )};"
 >
   {#if loader}
-    <span class="mx-2 d-flex justify-content-center">
+    <span class="mx-2 d-flex justify-content-center align-items-center">
       <Spinner size={`${iconSize}`} />
     </span>
   {:else if !loader}
-    <span>
+    <span class="d-flex align-items-center justify-content-center">
       <Icon
         height={iconSize}
         width={iconSize}

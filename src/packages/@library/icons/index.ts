@@ -10,3 +10,7 @@ export { default as SignOutIcon } from "./SignOutIcon.svelte";
 export { default as PencilIcon } from "./Pencil.svelte";
 export { default as PlusIcon } from "./Plus.svelte";
 export { default as StackIcon } from "./Stack.svelte";
+export { default as FolderIcon } from "./Folder.svelte";
+export { default as SyncIcon } from "./Sync.svelte";
+export { default as GithubIcon } from "./Github.svelte";
+export { default as DoubleArrowIcon } from "./DoubleArrow.svelte";

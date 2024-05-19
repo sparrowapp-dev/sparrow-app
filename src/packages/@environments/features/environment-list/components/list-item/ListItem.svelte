@@ -5,7 +5,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
+  import { Options } from "@library/ui";
 
   /**
    * current workspace to identify the selected environment
@@ -193,9 +193,12 @@
 >
 
 {#if showMenu}
-  <RightOption
-    xAxis={environmentTabWrapper.getBoundingClientRect().right - 180}
-    yAxis={environmentTabWrapper.getBoundingClientRect().bottom + 5}
+  <Options
+    xAxis={environmentTabWrapper.getBoundingClientRect().right - 30}
+    yAxis={[
+      environmentTabWrapper.getBoundingClientRect().top - 5,
+      environmentTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
     {menuItems}
     {noOfRows}
     {noOfColumns}
@@ -251,11 +254,14 @@
             }
           }}
         >
-          <p class="ellipsis w-100 mb-0 text-fs-14"  on:contextmenu={(e) => {
-            rightClickContextMenu(e);
-        }}>
+          <p
+            class="ellipsis w-100 mb-0 text-fs-14"
+            on:contextmenu={(e) => {
+              rightClickContextMenu(e);
+            }}
+          >
             {env.name}
-        </p>
+          </p>
         </div>
       {/if}
     </div>
@@ -320,11 +326,10 @@
       background-color: transparent;
       padding-left: 0;
       border-radius: 0 !important;
+      outline: none !important;
     }
     .renameInputFieldCollection:focus {
-      // background-color: #313233;
-      outline: none !important;
-      border-bottom: 1px solid #85c2ff;
+      border: 1px solid var(--border-primary-300);
     }
     .sub-folders {
       border-left: 1px solid var(--border-color);

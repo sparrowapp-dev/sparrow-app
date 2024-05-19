@@ -78,6 +78,8 @@
    */
   export let explorer: Folder;
   export let folder: Folder | null = null;
+  export let activeTabId: string;
+  export let searchData: string;
 
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
@@ -90,7 +92,12 @@
   let isRenaming = false;
   let requestCount: number;
   let requestIds: [string] | [] = [];
+  let folderTabWrapper: HTMLElement;
+
   $: {
+    if (searchData) {
+      expand = true;
+    }
     if (activeTabPath) {
       if (activeTabPath?.folderId === explorer.id) {
         expand = true;
@@ -190,8 +197,11 @@
 
   {#if showMenu}
     <Options
-      xAxis={pos.x}
-      yAxis={pos.y}
+      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
+      yAxis={[
+        folderTabWrapper.getBoundingClientRect().top - 0,
+        folderTabWrapper.getBoundingClientRect().bottom + 5,
+      ]}
       menuItems={[
         {
           onClick: () => {
@@ -242,14 +252,20 @@
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
-        style="height:32px;"
-        class="d-flex align-items-center justify-content-between my-button btn-primary ps-2 {explorer.id ===
-        activeTabPath?.folderId
+        bind:this={folderTabWrapper}
+        style="height:32px; padding-left: 36px;"
+        class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
+          on:contextmenu|preventDefault={(e) => {
+            setTimeout(() => {
+              showMenu = true;
+            }, 100);
+          }}
           on:click={() => {
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
@@ -271,9 +287,26 @@
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
           />
+          {#if expand}
+            <div
+              style="height:16px; width:16px;"
+              class="d-flex align-items-center justify-content-center me-2"
+            >
+              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+            </div>
+          {:else}
+            <div class="d-flex me-2" style="height:16px; width:16px;">
+              <img
+                src={folderCloseIcon}
+                alt=""
+                style="height:16px; width:16px;"
+                class="folder-icon"
+              />
+            </div>
+          {/if}
           {#if isRenaming}
             <input
-              class="form-control py-0 renameInputFieldFolder"
+              class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
               style="font-size: 12px;"
@@ -307,25 +340,8 @@
               style="cursor:pointer; font-size:12px;
                       height: 36px;
                       font-weight:400;
-                      margin-left:10px"
+                      margin-left:0px"
             >
-              {#if expand}
-                <div
-                  style="height:16px; width:16px;"
-                  class="d-flex align-items-center justify-content-center me-2"
-                >
-                  <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
-                </div>
-              {:else}
-                <div class="d-flex me-2" style="height:16px; width:16px;">
-                  <img
-                    src={folderCloseIcon}
-                    alt=""
-                    style="height:16px; width:16px;"
-                    class="folder-icon"
-                  />
-                </div>
-              {/if}
               <p class="ellipsis mb-0" style="font-size: 12px;">
                 {explorer.name}
               </p>
@@ -366,11 +382,11 @@
         {/if}
       </div>
       <div
-        style="padding-left: 12px; cursor:pointer; display: {expand
+        style="padding-left: 0; cursor:pointer; display: {expand
           ? 'block'
           : 'none'};"
       >
-        <div class="sub-files ps-3">
+        <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self
               {onItemCreated}
@@ -382,11 +398,17 @@
               {activeTabPath}
               explorer={exp}
               folder={explorer}
+              {activeTabId}
             />
           {/each}
-          {#if showFolderAPIButtons && explorer?.source === "USER"}
+          {#if !explorer?.items?.length}
+            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+              This folder is empty
+            </p>
+          {/if}
+          <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
-              <!-- <Tooltip
+              <Tooltip
                 classProp="mt-2 mb-2 ms-0"
                 title={PERMISSION_NOT_FOUND_TEXT}
                 show={!hasWorkpaceLevelPermission(
@@ -409,9 +431,9 @@
                     });
                   }}
                 />
-              </Tooltip> -->
+              </Tooltip>
             </div>
-          {/if}
+          {/if} -->
         </div>
       </div>
     {:else if explorer.type === "REQUEST"}
@@ -423,6 +445,7 @@
           {onItemOpened}
           {folder}
           {collection}
+          {activeTabId}
           {activeTabPath}
         />
       </div>
@@ -432,7 +455,6 @@
 
 <style>
   .btn-primary {
-    /* background-color: var(--background-color); */
     color: var(--white-color);
     padding-right: 5px;
     border-radius: 8px;
@@ -502,12 +524,12 @@
   }
 
   .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
   }
 
   .add-icon-container:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
     padding: 5px;
   }
@@ -522,9 +544,12 @@
     background-color: transparent;
     color: var(--white-color);
     padding-left: 0;
+    outline: none;
+  }
+  .renameInputFieldFolder:focus {
+    border: 1px solid var(--border-primary-300) !important;
   }
   .sub-files {
-    border-left: 1px solid var(--border-color);
   }
 
   .main-folder {

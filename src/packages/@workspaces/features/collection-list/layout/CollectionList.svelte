@@ -19,13 +19,21 @@
     workspaceId: string,
     collection: CollectionDocument,
   ) => void;
-  export let activeTabPath: Path;
+  /**
+   * path of the active tab - collection id, folder id, workspace id
+   */
+  export let activeTabPath;
+  /**
+   * id of the active tab
+   */
+  export let activeTabId;
   export let userRoleInWorkspace: WorkspaceRole;
   export let currentWorkspace: Observable<WorkspaceDocument>;
   export let leftPanelController: {
     leftPanelCollapse: boolean;
     handleCollapseCollectionList: () => void;
   };
+  export let githubRepo;
 
   import {
     Collection,
@@ -61,61 +69,97 @@
     selectMethodsStore,
     selectedMethodsCollectionStore,
   } from "$lib/store";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
+  import { DoubleArrowIcon, GithubIcon } from "@library/icons";
+  import { WithButton } from "@workspaces/common/hoc";
+  import { version } from "../../../../../../src-tauri/tauri.conf.json";
+  import { createDeepCopy } from "$lib/utils/helpers";
+  import { Input } from "@library/forms";
+  import { open } from "@tauri-apps/plugin-shell";
+  import constants from "$lib/utils/constants";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let filteredSelectedMethodsCollection: any = [];
   let filteredCollection: CollectionDocument[] = [];
   let filteredFolder: Folder[] = [];
   let filteredFile: RequestType[] = [];
-  let selectedApiMethods: string[] = [];
   let addButtonMenu: boolean = false;
+  const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-  const selectedMethodsCollectionUnsubscribe =
-    selectedMethodsCollectionStore.subscribe((value) => {
-      if (value) {
-        filteredSelectedMethodsCollection = value;
-      }
-    });
-
-  const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
-    if (value && value.length > 0) {
-      selectedApiMethods = value;
+  let collectionFilter: any = [];
+  /**
+   * @description - performs searching on a single collection
+   */
+  const searchCollectionHelper: (searchText: string, tree: any) => any = (
+    searchText,
+    tree,
+  ) => {
+    if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
+      return tree;
     }
-  });
 
+    // Recursively search through the collection
+    if (tree && tree?.items?.length) {
+      let response = [];
+      for (let j = 0; j < tree.items.length; j++) {
+        const res = searchCollectionHelper(searchText, tree.items[j]);
+        if (res) {
+          response.push(res);
+        }
+      }
+      if (response.length) {
+        let item = createDeepCopy(tree);
+        item.items = response;
+        return item;
+      } else {
+        return 0;
+      }
+    }
+    return 0;
+  };
+  /**
+   * @description - searches data from the list of collections
+   */
+  const searchCollection: (
+    searchText: string,
+    collectionData: any[],
+  ) => void = (searchText, collectionData) => {
+    let response = [];
+    for (let i = 0; i < collectionData.length; i++) {
+      const res = searchCollectionHelper(searchText, collectionData[i]);
+      if (res) {
+        response.push(res);
+      }
+    }
+    return response;
+  };
   /**
    * Handle searching and filtering
    */
   const handleSearch = () => {
-    let filteredData = onSearchCollection(collectionListDocument, searchData);
-    filteredCollection = filteredData.filteredCollection ?? [];
-    filteredFolder = filteredData.filteredFolder ?? [];
-    filteredFile = filteredData.filteredFile ?? [];
+    collectionFilter = searchCollection(searchData, collectionListDocument);
   };
   $: {
     if (collectionList) {
       collectionList.subscribe((value) => {
         collectionListDocument = value;
+        collectionFilter = searchCollection(searchData, collectionListDocument);
       });
     }
   }
 
-  onDestroy(() => {
-    selectedMethodUnsubscibe();
-    selectedMethodsCollectionUnsubscribe();
-  });
+  let isGithubStarHover = false;
+  onDestroy(() => {});
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
   <div>
     <button
-      class="border-0 pb-5 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
+      class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:52px; top: 95px; width: 16px; height:92px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:52px; bottom: 20px; width: 20px; height:20px; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -124,13 +168,16 @@
         leftPanelController.handleCollapseCollectionList();
       }}
     >
-      <img src={doubleangleRight} alt="Expand" class="mb-4 mt-2" />
-      <div
-        style="transform: rotate(270deg); font-size: 10px; color: var(--sparrow-text-color)"
-        class="mt-3 ml-2"
+      <span
+        style="transform: rotate(180deg);"
+        class="position-relative d-flex align-items-center justify-content-center"
       >
-        Collections
-      </div>
+        <DoubleArrowIcon
+          height={"10px"}
+          width={"10px"}
+          color={"var(--text-primary-200)"}
+        />
+      </span>
     </button>
   </div>
 {/if}
@@ -144,7 +191,7 @@
     } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3"
+      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3 d-none"
     >
       <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
@@ -162,28 +209,27 @@
       </button>
     </div>
     <div
-      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-2"
+      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-1"
     >
-      <div
-        style="height:32px; "
-        class="inputField w-100 bg-backgroundDark ps-2 pe-1 gap-2 d-flex align-items-center justify-content-center rounded"
-      >
-        <SearchIcon />
-        <input
-          type="search"
-          style="font-size: 12px; font-weight: 500;"
-          class="inputField searchField border-0 w-100 h-100 bg-backgroundDark"
-          placeholder="Search APIs in {$currentWorkspace?.name || ''}"
-          bind:value={searchData}
-          on:input={() => {
-            handleSearch();
-          }}
-        />
-      </div>
+      <Input
+        width={"100%"}
+        height={"33px"}
+        type="search"
+        bind:value={searchData}
+        on:input={(e) => {
+          handleSearch();
+        }}
+        defaultBorderColor="transparent"
+        hoveredBorderColor="transparent"
+        focusedBorderColor={"var(--border-primary-300)"}
+        class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
+        style="outline:none;"
+        placeholder="Search"
+      />
       <div class="d-flex align-items-center justify-content-center">
         <button
           id="filter-btn"
-          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2
+          class="filter-btn btn bg-backgroundDark d-flex align-items-center justify-content-center p-2 d-none
           {showfilterDropdown ? 'filter-active' : ''}"
           style="width: 32px; height:32px; position:relative"
           on:click={() => (showfilterDropdown = !showfilterDropdown)}
@@ -201,6 +247,7 @@
         New dropdown button for adding new api, collection and import Curl
       -->
       <Dropdown
+        zIndex={600}
         buttonId="addButton"
         bind:isMenuOpen={addButtonMenu}
         options={[
@@ -223,7 +270,7 @@
       >
         <button
           id="addButton"
-          class="border-0 p-1 rounded add-button"
+          class="border-0 p-1 border-radius-2 add-button"
           on:click={() => {
             addButtonMenu = !addButtonMenu;
           }}
@@ -236,76 +283,12 @@
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center px-3 pt-2">
-        {#if false}
-          <div class="spinner">
-            <Spinner size={`32px`} />
-          </div>
-        {:else}
-          {#if showfilterDropdown}
-            <FilterDropDown {handleSearch} />
-          {/if}
+      <div class="d-flex flex-column justify-content-center ps-3 pe-2 pt-2">
+        {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
-              {#if filteredFile.length > 0}
-                {#each filteredFile as exp}
-                  <SearchTree
-                    workspaceId={exp.workspaceId}
-                    {onItemOpened}
-                    explorer={exp}
-                    explorerData={exp.tree}
-                    {searchData}
-                  />
-                {/each}
-              {/if}
-              {#if filteredFolder.length > 0}
-                {#each filteredFolder as exp}
-                  <SearchTree
-                    workspaceId={exp.workspaceId}
-                    {onItemOpened}
-                    explorer={exp}
-                    explorerData={exp.tree}
-                    {searchData}
-                  />
-                {/each}
-              {/if}
-              {#if filteredCollection.length > 0}
-                {#each filteredCollection as exp}
-                  <SearchTree
-                    workspaceId={exp.workspaceId}
-                    {onItemOpened}
-                    explorer={exp}
-                    explorerData={exp.tree}
-                    {searchData}
-                  />
-                {/each}
-              {/if}
-            </List>
-          {:else if selectedApiMethods.length > 0}
-            <List
-              height={"calc(100vh - 180px)"}
-              minHeight={"180px"}
-              classProps={"pb-2 pe-2"}
-              overflowX="hidden"
-            >
-              {#each filteredSelectedMethodsCollection as col}
-                <Collection
-                  {onItemCreated}
-                  {onItemDeleted}
-                  {onItemRenamed}
-                  {onItemOpened}
-                  {onBranchSwitched}
-                  {onRefetchCollection}
-                  {userRoleInWorkspace}
-                  {activeTabPath}
-                  collection={col._data}
-                />
-              {/each}
-            </List>
-          {:else if collectionListDocument && collectionListDocument.length > 0}
-            <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
-              {#if collectionListDocument}
-                {#each collectionListDocument as col}
+            {#if collectionFilter.length > 0}
+              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+                {#each collectionFilter as col}
                   <Collection
                     {onItemCreated}
                     {onItemDeleted}
@@ -316,21 +299,90 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     collection={col}
+                    {activeTabId}
+                    {searchData}
                   />
                 {/each}
-              {/if}
-            </List>
+              </List>
+            {:else}
+              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+                <p
+                  class="not-found-text text-fs-12 text-center mx-auto ellipsis"
+                >
+                  No results found
+                </p>
+              </List>
+            {/if}
           {:else}
-            <EmptyCollection
-              {userRoleInWorkspace}
-              handleCreateApiRequest={() => onItemCreated("request", {})}
-              onImportCollectionPopup={showImportCollectionPopup}
-            />
+            <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+              {#each collectionListDocument as col}
+                <Collection
+                  {onItemCreated}
+                  {onItemDeleted}
+                  {onItemRenamed}
+                  {onItemOpened}
+                  {onBranchSwitched}
+                  {onRefetchCollection}
+                  {userRoleInWorkspace}
+                  {activeTabPath}
+                  collection={col}
+                  {activeTabId}
+                />
+              {/each}
+            </List>
           {/if}
+        {:else}
+          <EmptyCollection
+            {userRoleInWorkspace}
+            handleCreateApiRequest={() => onItemCreated("request", {})}
+            onImportCollectionPopup={showImportCollectionPopup}
+          />
         {/if}
-        {#if searchData !== "" && !filteredCollection.length && !filteredFolder.length && !filteredFile.length}
-          <span class="not-found-text mx-auto ellipsis">No results found</span>
-        {/if}
+      </div>
+      <div class="p-3 d-flex align-items-center justify-content-between">
+        <div
+          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+            ? 'bg-secondary-600'
+            : ''}"
+          role="button"
+          on:mouseenter={() => {
+            isGithubStarHover = true;
+          }}
+          on:mouseleave={() => {
+            isGithubStarHover = false;
+          }}
+          on:click={async () => {
+            await open(externalSparrowGithub);
+          }}
+        >
+          <GithubIcon
+            height={"18px"}
+            width={"18px"}
+            color={isGithubStarHover
+              ? "var(--bg-secondary-100)"
+              : "var(--bg-secondary-200)"}
+          />
+          <span
+            class="ps-2 text-fs-14 {isGithubStarHover
+              ? 'text-secondary-100'
+              : 'text-secondary-200'}"
+          >
+            {githubRepo?.stargazers_count || ""}
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          <WithButton
+            icon={DoubleArrowIcon}
+            onClick={() => {
+              leftPanelController.leftPanelCollapse =
+                !leftPanelController.leftPanelCollapse;
+              leftPanelController.handleCollapseCollectionList();
+            }}
+            disable={false}
+            loader={false}
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -363,12 +415,11 @@
   .angleRight:hover {
     color: var(--blackColor);
     font-weight: 600;
-    background-color: var(--workspace-hover-color);
   }
 
   .angleRight:active {
     color: var(--white-color);
-    background-color: var(--button-pressed);
+    /* background-color: var(--button-pressed); */
   }
   .angleButton {
     background-color: var(--background-color);
@@ -386,13 +437,7 @@
     height: calc(100vh - 44px);
     overflow-y: auto;
   }
-  .inputField {
-    outline: none;
-    border: 1px solid transparent;
-  }
-  .inputField:hover {
-    border: 1px solid var(--workspace-hover-color);
-  }
+
   /* 
   @keyframes increaseWidth {
     0% {
