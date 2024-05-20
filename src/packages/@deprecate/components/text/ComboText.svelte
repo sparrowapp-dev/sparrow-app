@@ -28,7 +28,7 @@
     <button
       disabled
       class={`${valueClassProp} sparrow-fs-12  border-0 py-1 px-2 shortcut-btn-api`}
-      style={`${valueStyleProp}`}
+      style={`${valueStyleProp} ; font-family: "Roboto Mono"; font-weight: 600;`}
     >
       {value}
     </button>

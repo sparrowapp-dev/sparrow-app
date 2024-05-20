@@ -29,10 +29,11 @@
   $: {
     if (keyValue) {
       pairs = keyValue;
-      let flag: boolean = true;
+      let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === true) {
-          flag = false;
+        if (pairs[i].checked === false) {
+          flag = true;
+          break;
         }
       }
       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
@@ -47,17 +48,13 @@
   }
 
   const updateParam = (index: number): void => {
-    pairs.forEach((elem, i) => {
-      if (i === index) {
-        elem.checked = true;
-      }
-    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
       mode === "WRITE" &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
+      pairs[pairs.length - 1].checked = true;
       pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
     }
@@ -184,7 +181,6 @@
       <button class="border-0" style="width:40px;" />
     </div>
   </div>
-
   <div
     class="w-100"
     style="display:block; position:relative;
