@@ -246,6 +246,7 @@
     )
       ? 'unclickable'
       : ''}"
+   
   >
     {#if api?.isDeleted && "activeSync"}
       <span
@@ -301,7 +302,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style="font-size: 12px; padding:10px;"
       >
         {api.name}
         <!-- {#if showPath}

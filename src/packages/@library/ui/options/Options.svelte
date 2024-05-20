@@ -56,10 +56,10 @@
   }
 </script>
 
-<nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
+<nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:500;">
   <div
     style={`width: ${noOfColumns}px`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400 z-in"
   >
     <ul class="p-2 w-100 mb-0">
       {#each menuItems as item}

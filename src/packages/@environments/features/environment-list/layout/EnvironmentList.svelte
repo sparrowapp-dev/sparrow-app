@@ -87,7 +87,10 @@
   }
 </script>
 
-<div class={`env-sidebar bg-secondary-900 px-3 py-3`} style={``}>
+<div
+  class={` env-sidebar bg-secondary-900 px-2 py-3`}
+  style="font-weight: 500;"
+>
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
@@ -123,7 +126,7 @@
     {#if globalEnvironment && globalEnvironment.length > 0}
       <p
         role="button"
-        class={`fw-normal env-item text-fs-14 border-radius-2 my-2 ${
+        class={`fw-normal env-item text-fs-12 border-radius-2 my-2 ${
           globalEnvironment[0]?.id === currentEnvironment?.id && "active"
         }`}
         on:click={() => {
@@ -135,12 +138,12 @@
     {/if}
     <hr class="mb-0 mt-1" />
 
-    <p class="fw-normal text-fs-14 rounded my-2" style="padding-left: 12px;">
+    <p class="fw-normal text-fs-12 rounded my-2" style="padding-left: 12px;">
       Environment Variables
     </p>
     {#if localEnvironment && localEnvironment.length === 0}
       <div class={`pt-3 pb-2`}>
-        <p class={`add-env-desc-text text-fs-12 mb-0 fw-normal text-center`}>
+        <p class={`add-env-desc-text text-fs-12 mb-0 fw-light text-center`}>
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
@@ -162,14 +165,15 @@
           {/each}
         {/if}
         <p
-          class="fw-normal d-flex align-items-center text-fs-14 m-2 ms-3"
+          class=" d-flex align-items-center text-fs-12 m-2 ms-3"
           role="button"
           on:click={() => {
             onCreateEnvironment(localEnvironment);
           }}
+          style="font-weight: {500};"
         >
           <PlusIcon />
-          <span>Add Environment</span>
+          <span class="text-secondary-100">Add Environment</span>
         </p>
       </List>
     </ul>
