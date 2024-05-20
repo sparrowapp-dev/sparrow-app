@@ -33,7 +33,7 @@ import {
 } from "@app/services/collection";
 import { CollectionService } from "@app/services/collection.service";
 import { notifications } from "@library/ui/toast/Toast";
-import { setContentTypeHeader } from "$lib/utils/helpers";
+// import { setContentTypeHeader } from "$lib/utils/helpers";
 
 //-----
 //External Imports
@@ -103,6 +103,7 @@ import {
 } from "@app/services/collection";
 import { GithubService } from "@app/services/github.service";
 import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
+import { RequestTabAdapter } from "@app/adapter/request-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -372,7 +373,7 @@ export default class CollectionsViewModel {
         headers: componentData.property.request.headers,
         queryParams: componentData.property.request.queryParams,
         auth: componentData.property.request.auth,
-        selectedRequestBodyType: setContentTypeHeader(bodyType),
+        // selectedRequestBodyType: setContentTypeHeader(bodyType),
         selectedRequestAuthType: componentData.property.request.state?.auth,
       };
       // create meta data
@@ -1753,27 +1754,17 @@ export default class CollectionsViewModel {
   public handleOpenRequest = (
     workspaceId: string,
     collection: CollectionDocument,
-    folder: Folder,
+    folder: any,
     request: Request,
   ) => {
-    const req = new InitRequestTab(request.id, workspaceId);
-    const path: Path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder?.name,
-    };
-    req.updateName(request.name);
-    req.updateDescription(request.description);
-    req.updateBody(request.request?.body);
-    req.updateMethod(request.request?.method);
-    req.updateUrl(request.request?.url);
-    req.updateQueryParams(request.request?.queryParams);
-    req.updateAuth(request.request?.auth);
-    req.updateHeaders(request.request?.headers);
-    req.updatePath(path);
-
-    this.tabRepository.createTab(req.getValue());
+    const requestTabAdapter = new RequestTabAdapter();
+    const adaptedRequest = requestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      request,
+    );
+    this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
 

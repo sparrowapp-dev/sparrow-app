@@ -6,11 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@workspaces/features/rest-explorer/utils";
-import {
-  createDeepCopy,
-  moveNavigation,
-  setContentTypeHeader,
-} from "$lib/utils/helpers";
+import { createDeepCopy, moveNavigation } from "$lib/utils/helpers";
 import { InitRequestTab } from "@common/utils";
 
 // ---- DB
@@ -74,14 +70,13 @@ import {
   type Body,
   type KeyValueChecked,
   type Path,
-  type Request,
   type Response,
   type KeyValue,
   type RequestTab,
-  RequestDatasetEnum,
   type StatePartial,
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
+import { RequestTabAdapter } from "@app/adapter/request-tab";
 
 class RestExplorerViewModel
   implements
@@ -471,7 +466,6 @@ class RestExplorerViewModel
         }
       })
       .catch((error) => {
-        console.error(error);
         this.updateRequestState({ isSendRequestInProgress: false });
 
         this.updateResponse({
@@ -636,7 +630,7 @@ class RestExplorerViewModel
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
-  public saveRequest = async (saveDescriptionOnly = false) => {
+  public saveRequest = async () => {
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     if (!workspaceId || !collectionId) {
@@ -654,87 +648,11 @@ class RestExplorerViewModel
       };
     }
     const _id = componentData.id;
-    let existingRequest;
-    if (!folderId) {
-      existingRequest = await this.readRequestOrFolderInCollection(
-        collectionId,
-        _id,
-      );
-    } else {
-      existingRequest = await this.readRequestInFolder(
-        collectionId,
-        folderId,
-        _id,
-      );
-    }
-    const bodyType =
-      componentData.property.request.state.requestBodyNavigation ===
-      RequestDatasetEnum.RAW
-        ? componentData.property.request.state.requestBodyLanguage
-        : componentData.property.request.state.requestBodyNavigation;
-    let expectedRequest: Request;
-    let expectedMetaData;
-    if (!saveDescriptionOnly) {
-      // Save overall api
-      let requestBody = {
-        file: [],
-        text: [],
-      };
-      componentData.property.request.body.formdata.map((pair) => {
-        if (pair.type == "text") {
-          requestBody.text.push({
-            key: pair.key,
-            value: pair.value,
-            checked: pair.checked,
-          });
-        } else if (pair.type == "file") {
-          requestBody.file.push({
-            key: pair.key,
-            value: pair.value,
-            checked: pair.checked,
-            base: pair.base,
-          });
-        }
-      });
-      componentData.property.request.body.formdata = requestBody;
-      expectedRequest = {
-        method: componentData.property.request.method,
-        url: componentData.property.request.url,
-        body: componentData.property.request.body,
-        headers: componentData.property.request.headers,
-        queryParams: componentData.property.request.queryParams,
-        auth: componentData.property.request.auth,
-        selectedRequestBodyType: setContentTypeHeader(bodyType),
-        selectedRequestAuthType:
-          componentData.property.request.state?.requestAuthNavigation,
-      };
-      expectedMetaData = {
-        id: _id,
-        name: componentData?.name,
-        description: componentData?.description,
-        type: ItemType.REQUEST,
-      };
-    } else {
-      // Save api description only
-      expectedRequest = {
-        method: existingRequest?.request.method,
-        url: existingRequest?.request.url,
-        body: existingRequest?.request.body,
-        headers: existingRequest?.request.headers,
-        queryParams: existingRequest?.request.queryParams,
-        auth: existingRequest?.request.auth,
-        selectedRequestBodyType:
-          existingRequest?.request?.selectedRequestBodyType,
-        selectedRequestAuthType:
-          existingRequest?.request?.selectedRequestAuthType,
-      };
-      expectedMetaData = {
-        id: _id,
-        name: existingRequest?.name,
-        description: componentData?.description,
-        type: ItemType.REQUEST,
-      };
-    }
+
+    const requestTabAdapter = new RequestTabAdapter();
+    const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+    // Save overall api
+
     let folderSource;
     if (folderId) {
       folderSource = {
@@ -742,14 +660,21 @@ class RestExplorerViewModel
       };
     }
 
+    const requestMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.REQUEST,
+    };
+
     const res = await updateCollectionRequest(_id, folderId, collectionId, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
       items: {
-        ...expectedMetaData,
-        request: expectedRequest,
+        ...requestMetaData,
+        request: unadaptedRequest,
       },
     });
     if (res.isSuccessful) {
@@ -859,61 +784,13 @@ class RestExplorerViewModel
     }[],
     tabName: string,
     description: string,
-    type: string,
   ) => {
-    const saveType = {
-      SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
-    };
     const componentData = this._tab.getValue();
     let userSource = {};
     const _id = componentData.id;
     if (path.length > 0) {
-      let existingRequest;
-      if (path[path.length - 1].type === ItemType.COLLECTION) {
-        existingRequest = await this.readRequestOrFolderInCollection(
-          path[path.length - 1].id,
-          _id,
-        );
-      } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        existingRequest = await this.readRequestInFolder(
-          path[0].id,
-          path[path.length - 1].id,
-          _id,
-        );
-      }
-      const randomRequest: RequestTab = new InitRequestTab(
-        "UNTRACKED-",
-        "UNTRACKED-",
-      ).getValue();
-      const request = !existingRequest
-        ? randomRequest.property.request
-        : existingRequest.request;
-      const expectedRequest = {
-        method:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.method
-            : componentData.property.request.method,
-        url:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.url
-            : componentData.property.request.url,
-        body:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.body
-            : componentData.property.request.body,
-        headers:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.headers
-            : componentData.property.request.headers,
-        queryParams:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.queryParams
-            : componentData.property.request.queryParams,
-        auth:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.auth
-            : componentData.property.request.auth,
-      };
+      const requestTabAdapter = new RequestTabAdapter();
+      const unadaptedRequest = requestTabAdapter.unadapt(componentData);
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         /**
          * handle request at collection level
@@ -933,7 +810,7 @@ class RestExplorerViewModel
             name: tabName,
             description,
             type: ItemType.REQUEST,
-            request: expectedRequest,
+            request: unadaptedRequest,
           },
         });
         if (res.isSuccessful) {
