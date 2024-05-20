@@ -326,13 +326,14 @@ export default class CollectionsViewModel {
    * @param saveDescriptionOnly
    * @returns
    */
-  public saveAPIRequest = async (
-    componentData: NewTab,
-    saveDescriptionOnly = false,
-  ) => {
-    const { folderId, folderName, collectionId, workspaceId } =
-      componentData.path;
-    // Retrieve collection data
+  public saveAPIRequest = async (componentData: NewTab) => {
+    const { folderId, collectionId, workspaceId } = componentData.path;
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "request is not a part of any workspace or collection",
+      };
+    }
     const _collection = await this.readCollection(collectionId);
     let userSource = {};
     if (_collection?.activeSync && componentData?.source === "USER") {
@@ -342,108 +343,53 @@ export default class CollectionsViewModel {
       };
     }
     const _id = componentData.id;
-    let existingRequest;
-    // Get already existing request details
-    if (!folderId) {
-      existingRequest = await this.readRequestOrFolderInCollection(
-        collectionId,
-        _id,
-      );
-    } else {
-      existingRequest = await this.readRequestInFolder(
-        collectionId,
-        folderId,
-        _id,
-      );
-    }
-    // Get Bodytype in request
-    const bodyType =
-      componentData.property.request.state.dataset === RequestDataset.RAW
-        ? componentData.property.request.state.raw
-        : componentData.property.request.state.dataset;
-    let expectedRequest: RequestBody;
-    let expectedMetaData;
-    // Create request details for updating request inside collection
-    if (!saveDescriptionOnly) {
-      // Request details when overall API needs to be updated
-      expectedRequest = {
-        method: componentData.property.request.method,
-        url: componentData.property.request.url,
-        body: componentData.property.request.body,
-        headers: componentData.property.request.headers,
-        queryParams: componentData.property.request.queryParams,
-        auth: componentData.property.request.auth,
-        // selectedRequestBodyType: setContentTypeHeader(bodyType),
-        selectedRequestAuthType: componentData.property.request.state?.auth,
-      };
-      // create meta data
-      expectedMetaData = {
-        id: _id,
-        name: componentData?.name,
-        description: componentData?.description,
-        type: ItemType.REQUEST,
-      };
-    } else {
-      // Request details when only API description needs to be updated
-      expectedRequest = {
-        method: existingRequest?.request.method,
-        url: existingRequest?.request.url,
-        body: existingRequest?.request.body,
-        headers: existingRequest?.request.headers,
-        queryParams: existingRequest?.request.queryParams,
-        auth: existingRequest?.request.auth,
-        selectedRequestBodyType:
-          existingRequest?.request?.selectedRequestBodyType,
-        selectedRequestAuthType:
-          existingRequest?.request?.selectedRequestAuthType,
-      };
-      // create meta data
-      expectedMetaData = {
-        id: _id,
-        name: existingRequest?.name,
-        description: componentData?.description,
-        type: ItemType.REQUEST,
+
+    const requestTabAdapter = new RequestTabAdapter();
+    const unadaptedRequest = requestTabAdapter.unadapt(componentData);
+    // Save overall api
+
+    let folderSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
       };
     }
 
-    // Update the request in particular Collection
-    if (!folderId) {
-      // Update Request when not inside folder
-      const res = await updateCollectionRequest(_id, folderId, collectionId, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        ...userSource,
-        items: {
-          ...expectedMetaData,
-          request: expectedRequest,
-        },
-      });
-      if (res.isSuccessful) {
-        return true;
+    const requestMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.REQUEST,
+    };
+
+    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: {
+        ...requestMetaData,
+        request: unadaptedRequest,
+      },
+    });
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
       } else {
-        return false;
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
       }
+      return true;
     } else {
-      // Update Request when inside folder
-      const res = await updateCollectionRequest(_id, folderId, collectionId, {
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: folderName,
-          type: ItemType.FOLDER,
-          items: {
-            ...expectedMetaData,
-            request: expectedRequest,
-          },
-        },
-      });
-      if (res.isSuccessful) {
-        return true;
-      } else {
-        return false;
-      }
+      return false;
     }
   };
 
@@ -2280,58 +2226,11 @@ export default class CollectionsViewModel {
     type: string,
     componentData,
   ) => {
-    const saveType = {
-      SAVE_DESCRIPTION: "SAVE_DESCRIPTION",
-    };
+    debugger;
     let userSource = {};
-    const _id = componentData.id;
     if (path.length > 0) {
-      let existingRequest;
-      if (path[path.length - 1].type === ItemType.COLLECTION) {
-        existingRequest = await this.readRequestOrFolderInCollection(
-          path[path.length - 1].id,
-          _id,
-        );
-      } else if (path[path.length - 1].type === ItemType.FOLDER) {
-        existingRequest = await this.readRequestInFolder(
-          path[0].id,
-          path[path.length - 1].id,
-          _id,
-        );
-      }
-      const randomRequest: TabDocument = new InitRequestTab(
-        "UNTRACKED-",
-        "UNTRACKED-",
-      ).getValue();
-      const request = !existingRequest
-        ? randomRequest.property.request
-        : existingRequest.request;
-      const expectedRequest = {
-        method:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.method
-            : componentData.property.request.method,
-        url:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.url
-            : componentData.property.request.url,
-        body:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.body
-            : componentData.property.request.body,
-        headers:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.headers
-            : componentData.property.request.headers,
-        queryParams:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.queryParams
-            : componentData.property.request.queryParams,
-        auth:
-          type === saveType.SAVE_DESCRIPTION
-            ? request.auth
-            : componentData.property.request.auth,
-      };
+      const requestTabAdapter = new RequestTabAdapter();
+      const unadaptedRequest = requestTabAdapter.unadapt(componentData);
       if (path[path.length - 1].type === ItemType.COLLECTION) {
         /**
          * handle request at collection level
@@ -2351,55 +2250,14 @@ export default class CollectionsViewModel {
             name: tabName,
             description,
             type: ItemType.REQUEST,
-            request: expectedRequest,
+            request: unadaptedRequest,
           },
         });
         if (res.isSuccessful) {
-          this.collectionRepository.addRequestOrFolderInCollection(
+          this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
             res.data.data,
           );
-          const expectedPath = {
-            folderId: "",
-            folderName: "",
-            collectionId: path[path.length - 1].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
-            /**
-             * Update existing request
-             */
-            // this.updateRequestName(res.data.data.name);
-            // this.updateRequestDescription(res.data.data.description);
-            // this.updateRequestPath(expectedPath);
-            // this.updateRequestId(res.data.data.id);
-            const progressiveTab = componentData.toMutableJSON();
-            progressiveTab.isSaved = true;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-          } else {
-            /**
-             * Create new copy of the existing request
-             */
-            const initRequestTab = new InitRequestTab(
-              res.data.data.id,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.request.url);
-            initRequestTab.updateMethod(res.data.data.request.method);
-            initRequestTab.updateBody(res.data.data.request.body);
-            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
-            initRequestTab.updateAuth(res.data.data.request.auth);
-            initRequestTab.updateHeaders(res.data.data.request.headers);
-
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
           return {
             status: "success",
             message: res.message,
@@ -2436,7 +2294,7 @@ export default class CollectionsViewModel {
               name: tabName,
               description,
               type: ItemType.REQUEST,
-              request: expectedRequest,
+              request: unadaptedRequest,
             },
           },
         });
@@ -2446,36 +2304,6 @@ export default class CollectionsViewModel {
             path[path.length - 1].id,
             res.data.data,
           );
-          const expectedPath = {
-            folderId: path[path.length - 1].id,
-            folderName: path[path.length - 1].name,
-            collectionId: path[0].id,
-            workspaceId: _workspaceMeta.id,
-          };
-          if (
-            !componentData.path.workspaceId ||
-            !componentData.path.collectionId
-          ) {
-            const progressiveTab = componentData.toMutableJSON();
-            progressiveTab.isSaved = true;
-            this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-          } else {
-            const initRequestTab = new InitRequestTab(
-              res.data.data.id,
-              "UNTRACKED-",
-            );
-            initRequestTab.updateName(res.data.data.name);
-            initRequestTab.updateDescription(res.data.data.description);
-            initRequestTab.updatePath(expectedPath);
-            initRequestTab.updateUrl(res.data.data.request.url);
-            initRequestTab.updateMethod(res.data.data.request.method);
-            initRequestTab.updateBody(res.data.data.request.body);
-            initRequestTab.updateQueryParams(res.data.data.request.queryParams);
-            initRequestTab.updateAuth(res.data.data.request.auth);
-            initRequestTab.updateHeaders(res.data.data.request.headers);
-            this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
-          }
           return {
             status: "success",
             message: res.message,

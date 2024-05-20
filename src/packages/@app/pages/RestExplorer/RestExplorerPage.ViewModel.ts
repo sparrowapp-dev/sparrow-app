@@ -896,7 +896,7 @@ class RestExplorerViewModel
               name: tabName,
               description,
               type: ItemType.REQUEST,
-              request: expectedRequest,
+              request: unadaptedRequest,
             },
           },
         });
