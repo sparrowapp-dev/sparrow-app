@@ -34,7 +34,7 @@
     transform: translateX(-100%) translateY(-50%);
   }
   .right {
-    right: -5px;
+    right: -8px;
     top: 50%;
     transform: translateX(100%) translateY(-50%);
   }
