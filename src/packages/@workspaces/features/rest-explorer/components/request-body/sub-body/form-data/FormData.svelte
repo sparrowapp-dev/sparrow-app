@@ -5,30 +5,12 @@
   export let onUpdateRequestBody;
   export let environmentVariables;
   export let onUpdateEnvironment;
-  export let formData;
-
-  const handleFormDataTextChange = (pairs) => {
-    onUpdateRequestBody({
-      formdata: {
-        file: formData.file,
-        text: pairs,
-      },
-    });
-  };
-
-  const handleFormDataFileChange = (pairs) => {
-    onUpdateRequestBody({
-      formdata: {
-        file: pairs,
-        text: formData.text,
-      },
-    });
-  };
 
   const handleFormDataChange = (pairs) => {
     onUpdateRequestBody({
       formdata: pairs,
     });
+    console.log(pairs);
   };
 </script>
 
