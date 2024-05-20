@@ -7,7 +7,13 @@ export default defineConfig(async () => ({
   plugins: [svelte()],
   resolve: {
     alias: {
-      $lib: path.resolve("./src/lib"),
+      $lib: path.resolve("./src/packages/@deprecate"),
+      "@library": path.resolve("./src/packages/@library"),
+      "@app": path.resolve("./src/packages/@app"),
+      "@common": path.resolve("./src/packages/@common"),
+      "@teams": path.resolve("./src/packages/@teams"),
+      "@workspaces": path.resolve("./src/packages/@workspaces"),
+      "@environments": path.resolve("./src/packages/@environments"),
     },
   },
 

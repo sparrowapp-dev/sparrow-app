@@ -6,9 +6,9 @@ pub async fn make_www_form_urlencoded_request(
     body: &str,
 ) -> Result<Response, std::io::Error> {
     let body_map: HashMap<_, _> = body
-        .split('&')
+        .split("[SPARROW_AMPERSAND]")
         .map(|s| {
-            let mut parts = s.split('=');
+            let mut parts = s.split("[SPARROW_EQUALS]");
             (
                 parts.next().unwrap().to_owned(),
                 parts.next().unwrap_or("").to_owned(),

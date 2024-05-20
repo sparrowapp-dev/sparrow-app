@@ -1,27 +1,64 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![windows_subsystem = "windows"]
-
+//! # Module: HTTP Request Handlers & Sparrow RPC Logic
+//!
+//! This module provides handlers for various types of HTTP requests, related operations and RPC Logic of Sparrow App.
+//!
+//! ## Submodules
+//!
+//! - `config`: Configuration handling.
+//! - `formdata_handler`: Multipart/form-data request handling.
+//! - `json_handler`: JSON request handling.
+//! - `raw_handler`: Raw text request handling.
+//! - `request_handler`: General request handling utilities.
+//! - `url_fetch_handler`: URL fetching utilities.
+//! - `urlencoded_handler`: URL-encoded request handling.
+//!
+//! ## External Imports
+//!
+//! - `formdata_handler::make_formdata_request`: Function for making multipart/form-data requests.
+//! - `json_handler::make_json_request`: Function for making JSON requests.
+//! - `nfd::Response`: Represents a response from native file dialogs.
+//! - `raw_handler::make_text_request`: Function for making raw text requests.
+//! - `request_handler::formdata_handler_v2::make_formdata_request_v2`: Updated function for multipart/form-data requests.
+//! - `request_handler::http_requests::make_without_body_request`: Function for making HTTP requests without a body.
+//! - `request_handler::json_handler_v2::make_json_request_v2`: Updated function for JSON requests.
+//! - `request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2`: Updated function for URL-encoded requests.
+//! - `reqwest::Client`: HTTP client provided by Reqwest.
+//! - `serde::{Deserialize, Serialize}`: Serialization and deserialization support with Serde.
+//! - `serde_json::{json, Value}`: JSON serialization and deserialization support with Serde JSON.
+//! - `std::collections::HashMap`: Represents a hash map for key-value data storage.
+//! - `std::process::Command`: Represents an external command to be executed.
+//! - `tauri::Manager`: Tauri application manager.
+//! - `tauri::Window`: Represents a window in a Tauri application.
+//! - `url_fetch_handler::import_swagger_url`: Function for importing Swagger URLs.
+//! - `urlencoded_handler::make_www_form_urlencoded_request`: Function for making URL-encoded requests.
+// Submodules
 mod config;
 mod formdata_handler;
 mod json_handler;
 mod raw_handler;
+mod request_handler;
 mod url_fetch_handler;
 mod urlencoded_handler;
+
+// External Imports
 use formdata_handler::make_formdata_request;
 use json_handler::make_json_request;
-
-use std::path::PathBuf;
-use std::process::Command;
-use tauri::Window;
-
 use nfd::Response;
 use raw_handler::make_text_request;
+use request_handler::formdata_handler_v2::make_formdata_request_v2;
+use request_handler::http_requests::make_without_body_request;
+use request_handler::json_handler_v2::make_json_request_v2;
+use request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::process::Command;
 use tauri::Manager;
+use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 
@@ -167,7 +204,6 @@ async fn make_http_request(
     headers: &str,
     body: &str,
     request: &str,
-    tab_id: &str,
 ) -> Result<String, String> {
     let result = make_request(url, method, headers, body, request).await;
 
@@ -178,12 +214,149 @@ async fn make_http_request(
 
     let response = json!({
         "body": result_value,
-        "tabId": tab_id
     });
+
     return match serde_json::to_string(&response) {
         Ok(value) => Ok(value.to_string()),
         Err(err) => Err(err.to_string()),
     };
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct KeyValue {
+    key: String,
+    value: String,
+    checked: Option<bool>,
+}
+
+#[tauri::command]
+async fn make_http_request_v2(
+    url: &str,
+    method: &str,
+    headers: &str,
+    body: &str,
+    request: &str,
+) -> Result<String, String> {
+    let result = make_request_v2(url, method, headers, body, request).await;
+
+    // Convert the result to a string for response formatting
+    let result_value = match result {
+        Ok(value) => value.to_string(), // Convert successful result to string
+        Err(err) => err.to_string(),    // Convert error to string
+    };
+
+    // Create a JSON response with the result and tab ID
+    let response = json!({
+        "body": result_value,
+    });
+
+    return match serde_json::to_string(&response) {
+        Ok(value) => Ok(value.to_string()),
+        Err(err) => Err(err.to_string()),
+    };
+}
+
+/// Makes an asynchronous HTTP request with various options.
+///
+/// # Arguments
+///
+/// * `url` - The URL to send the request to.
+/// * `method` - The HTTP method to use (e.g., "GET", "POST").
+/// * `headers` - A JSON string representing the headers to include in the request.
+/// * `body` - The body of the request.
+/// * `request` - The type of request to make, such as "application/json", "application/x-www-form-urlencoded", etc.
+///
+/// # Returns
+///
+/// A `Result` containing a JSON string representing the combined response data, or an `std::io::Error` if the request fails.
+async fn make_request_v2(
+    url: &str,
+    method: &str,
+    headers: &str,
+    body: &str,
+    request: &str,
+) -> Result<String, std::io::Error> {
+    // Create a client
+    let client = Client::new();
+
+    // Convert method string to reqwest::Method
+    let reqwest_method = match method {
+        "GET" => reqwest::Method::GET,
+        "POST" => reqwest::Method::POST,
+        "PUT" => reqwest::Method::PUT,
+        "DELETE" => reqwest::Method::DELETE,
+        "PATCH" => reqwest::Method::PATCH,
+        // Add other HTTP methods as needed
+        _ => reqwest::Method::GET,
+    };
+
+    // Deserialize the JSON string into a Vec<KeyValue>
+    let headers_key_values: Vec<KeyValue> = serde_json::from_str(headers).unwrap();
+
+    // Create a HashMap to store key-value pairs
+    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
+
+    // Iterate over key_values and add key-value pairs to the map
+    for kv in headers_key_values {
+        headers_key_value_map.insert(kv.key, kv.value);
+    }
+
+    // Create request builder with request method and url
+    let mut request_builder = client.request(reqwest_method, url);
+
+    // Add all headers in request builder
+    for (key, value) in headers_key_value_map.iter() {
+        request_builder = request_builder.header(key, value);
+    }
+
+    // Make request call as per Body type
+    let check = match request {
+        "application/json" => make_json_request_v2(request_builder, body).await,
+        "application/x-www-form-urlencoded" => {
+            make_www_form_urlencoded_request_v2(request_builder, body).await
+        }
+        "multipart/form-data" => make_formdata_request_v2(request_builder, body).await,
+        "text/plain" => make_text_request(request_builder, body).await,
+        _ => make_without_body_request(request_builder).await,
+    };
+
+    // check response is successful or not
+    let response_value = match check {
+        Ok(value) => value,
+        Err(err) => {
+            // converting `reqwest::Error` to `std::io::Error
+            return Err(err);
+        }
+    };
+
+    // Extract headers from response
+    let response_headers = response_value.headers().clone();
+
+    // Extract status code from response
+    let response_status = response_value.status().clone();
+
+    // Extract response value from response
+    let response_text_result = response_value.text().await;
+
+    // Map headers into json
+    let response_headers_json: serde_json::Value = response_headers
+        .iter()
+        .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
+        .collect();
+
+    let response_text = match response_text_result {
+        Ok(value) => value,
+        Err(err) => format!("Error: {}", err),
+    };
+
+    // Combining all the parameters
+    let combined_json = json!({
+        "headers": response_headers_json,
+        "status": response_status.to_string(),
+        "body": response_text,
+    });
+
+    return Ok(combined_json.to_string());
 }
 
 async fn make_request(
@@ -208,9 +381,9 @@ async fn make_request(
 
     // Convert header string into hashmap
     let header_map: HashMap<_, _> = headers
-        .split('&')
+        .split("[SPARROW_AMPERSAND]")
         .map(|s| {
-            let mut parts = s.split('=');
+            let mut parts = s.split("[SPARROW_EQUALS]");
             (
                 parts.next().unwrap().to_owned(),
                 parts.next().unwrap_or("").to_owned(),
@@ -279,7 +452,11 @@ struct MyResponse {
     tab_id: String,
     response: Result<String, String>,
 }
-
+#[derive(Clone, serde::Serialize)]
+struct SingleInstancePayload {
+    args: Vec<String>,
+    cwd: String,
+}
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -290,12 +467,25 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             app.emit(
-                "deep-link-urls",
-                Payload {
-                    url: argv[1].to_string(),
+                "single-instance",
+                SingleInstancePayload {
+                    args: argv.clone(),
+                    cwd: _cwd,
                 },
             )
             .unwrap();
+            if argv.len() > 1 {
+                app.emit(
+                    "deep-link-urls",
+                    Payload {
+                        url: argv[1].to_string(),
+                    },
+                )
+                .unwrap();
+            } else {
+                // Handle the case where argv is empty or doesn't have enough elements
+                println!("No URL provided in command line arguments.");
+            }
         }))
         .setup(|app| {
             #[cfg(desktop)]
@@ -311,7 +501,8 @@ fn main() {
             fetch_folder_command,
             close_oauth_window,
             make_http_request,
-            zoom_window
+            zoom_window,
+            make_http_request_v2,
         ])
         .on_page_load(|wry_window, _payload| {
             if wry_window.url().host_str() == Some("www.google.com") {
