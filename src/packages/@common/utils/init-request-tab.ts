@@ -189,6 +189,12 @@ class InitRequestTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
+  public updateState(_state) {
+    this._tab.property.request.state = {
+      ...this._tab.property.request.state,
+      ..._state,
+    };
+  }
 }
 
 export { InitRequestTab };

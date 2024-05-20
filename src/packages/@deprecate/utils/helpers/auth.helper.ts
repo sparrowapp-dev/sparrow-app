@@ -65,8 +65,8 @@ const findAuthParameter = (
   return authValue;
 };
 
-const setContentTypeHeader = (bodyType: string) => {
-  let contentType: ContentTypeEnum;
+const unsetBodyType = (bodyType: string) => {
+  let contentType: ContentTypeEnum = ContentTypeEnum["text/plain"];
   switch (bodyType) {
     case RequestDataType.JSON:
       contentType = ContentTypeEnum["application/json"];
@@ -93,57 +93,76 @@ const setContentTypeHeader = (bodyType: string) => {
   return contentType;
 };
 
-const setBodyType = (request: NewTab, header: string) => {
+const setBodyType = (header: string) => {
+  let requestBodyNavigation = RequestDataset.RAW;
+  let requestBodyLanguage = RequestDataType.TEXT;
   switch (header) {
     case ContentTypeEnum["application/json"]:
-      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
-      request.property.request.state.requestBodyLanguage = RequestDataType.JSON;
+      requestBodyNavigation = RequestDataset.RAW;
+      requestBodyLanguage = RequestDataType.JSON;
       break;
     case ContentTypeEnum["application/xml"]:
-      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
-      request.property.request.state.requestBodyLanguage = RequestDataType.XML;
+      requestBodyNavigation = RequestDataset.RAW;
+      requestBodyLanguage = RequestDataType.XML;
       break;
     case ContentTypeEnum["application/javascript"]:
-      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
-      request.property.request.state.requestBodyLanguage =
-        RequestDataType.JAVASCRIPT;
+      requestBodyNavigation = RequestDataset.RAW;
+      requestBodyLanguage = RequestDataType.JAVASCRIPT;
       break;
     case ContentTypeEnum["text/plain"]:
-      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
-      request.property.request.state.requestBodyLanguage = RequestDataType.TEXT;
+      requestBodyNavigation = RequestDataset.RAW;
+      requestBodyLanguage = RequestDataType.TEXT;
       break;
     case ContentTypeEnum["text/html"]:
-      request.property.request.state.requestBodyNavigation = RequestDataset.RAW;
-      request.property.request.state.requestBodyLanguage = RequestDataType.HTML;
+      requestBodyNavigation = RequestDataset.RAW;
+      requestBodyLanguage = RequestDataType.HTML;
       break;
     case ContentTypeEnum["application/x-www-form-urlencoded"]:
-      request.property.request.state.requestBodyNavigation =
-        RequestDataset.URLENCODED;
+      requestBodyNavigation = RequestDataset.URLENCODED;
       break;
     case ContentTypeEnum["multipart/form-data"]:
-      request.property.request.state.requestBodyNavigation =
-        RequestDataset.FORMDATA;
+      requestBodyNavigation = RequestDataset.FORMDATA;
       break;
   }
-  return request;
+  return { requestBodyLanguage, requestBodyNavigation };
 };
 
-const setAuthType = (request: NewTab, auth: string) => {
+const setAuthType = (auth: string) => {
+  let requestAuthNavigation = AuthType.NO_AUTH;
   switch (auth) {
     case AuthType.NO_AUTH:
-      request.property.request.state.auth = AuthType.NO_AUTH;
+      requestAuthNavigation = AuthType.NO_AUTH;
       break;
     case AuthType.API_KEY:
-      request.property.request.state.auth = AuthType.API_KEY;
+      requestAuthNavigation = AuthType.API_KEY;
       break;
     case AuthType.BASIC_AUTH:
-      request.property.request.state.auth = AuthType.BASIC_AUTH;
+      requestAuthNavigation = AuthType.BASIC_AUTH;
       break;
     case AuthType.BEARER_TOKEN:
-      request.property.request.state.auth = AuthType.BEARER_TOKEN;
+      requestAuthNavigation = AuthType.BEARER_TOKEN;
       break;
   }
-  return request;
+  return { requestAuthNavigation };
+};
+
+const unsetAuthType = (auth: string) => {
+  let authType = AuthType.NO_AUTH;
+  switch (auth) {
+    case AuthType.NO_AUTH:
+      authType = AuthType.NO_AUTH;
+      break;
+    case AuthType.API_KEY:
+      authType = AuthType.API_KEY;
+      break;
+    case AuthType.BASIC_AUTH:
+      authType = AuthType.BASIC_AUTH;
+      break;
+    case AuthType.BEARER_TOKEN:
+      authType = AuthType.BEARER_TOKEN;
+      break;
+  }
+  return authType;
 };
 
 const validateEmail = (email: string) => {
@@ -154,7 +173,8 @@ const validateEmail = (email: string) => {
 export {
   findAuthHeader,
   findAuthParameter,
-  setContentTypeHeader,
+  unsetBodyType,
+  unsetAuthType,
   setBodyType,
   setAuthType,
   validateEmail,
