@@ -34,7 +34,7 @@
       pairs = [];
       pairs = keyValue;
 
-      let flag: boolean = true;
+      let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
           flag = true;
@@ -52,13 +52,18 @@
   }
 
   const updateParam = (index: number): void => {
+    // enables checkbox on new entry
+    pairs.forEach((elem, i) => {
+      if (i === index) {
+        elem.checked = true;
+      }
+    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
       mode === "WRITE" &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
-      pairs[pairs.length - 1].checked = true;
       pairs.push({
         key: "",
         value: "",
@@ -121,6 +126,7 @@
       callback(pairs);
       updateParam(index);
     }
+    console.log(pairs);
   };
 
   const removeFormFile = (index) => {
@@ -293,7 +299,7 @@
                 class="d-none"
                 style="cursor:grabbing;"
               />
-              <div style="width:30px;">
+              <div style="width:30px; height: 14px;">
                 {#if pairs.length - 1 != index || mode === "READ"}
                   <label class="container">
                     <input
@@ -309,7 +315,7 @@
               </div>
 
               <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
-                <div class="w-50 position-relative">
+                <div class="w-50 position-relative d-flex align-items-center">
                   <CodeMirrorInput
                     bind:value={element.key}
                     onUpdateInput={() => {
@@ -370,7 +376,8 @@
                             placeholder=""
                           /> -->
                         <div
-                          class="bg-keyValuePairColor d-flex h-fit p-1 rounded"
+                          class="bg-keyValuePairColor d-flex h-fit rounded"
+                          style="padding: 1px 4px;"
                         >
                           <p style="font-size:10px;" class="mb-0 me-1">
                             {element.value}

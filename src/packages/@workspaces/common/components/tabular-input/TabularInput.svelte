@@ -48,6 +48,11 @@
   }
 
   const updateParam = (index: number): void => {
+    pairs.forEach((elem, i) => {
+      if (i === index) {
+        elem.checked = true;
+      }
+    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -211,16 +216,20 @@
 
             <div class="d-flex gap-0" style="width:calc(100% - 120px)">
               <div class="w-50 position-relative">
-                <label class="container">
-                  <input disabled type="checkbox" bind:value={readable.key} />
-                  <span class="checkmark"></span>
-                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Value"
+                  class=" keyValuePair ps-1 py-1 w-100"
+                  style="font-size: 12px;"
+                  disabled
+                  bind:value={readable.key}
+                />
               </div>
               <div class="w-50 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class=" keyValuePair py-1 w-100"
+                  class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
                   bind:value={readable.value}
