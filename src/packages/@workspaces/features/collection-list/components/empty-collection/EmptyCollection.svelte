@@ -23,7 +23,7 @@
     </p>
     <div class="w-100 mt-3">
       <p
-        class="fw-normal d-flex align-items-center text-fs-14 ps-3"
+        class=" d-flex fw-bold align-items-center text-fs-14 ps-3"
         role="button"
         on:click={() => {
           onImportCollectionPopup();
