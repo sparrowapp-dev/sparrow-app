@@ -117,6 +117,15 @@ export default class CollectionsViewModel {
 
   constructor() {}
 
+  public fetchCollections = async (workspaceId: string) => {
+    const res = await this.collectionService.fetchCollection(workspaceId);
+    if (res.status) {
+      this.collectionRepository.bulkInsertData(res.data.data);
+    } else {
+      notifications.error("Failed to fetch collections!")
+    }
+  }
+
   /**
    * Get role of the user in workspace
    * @returns :UserRole - role of the user in workspace
