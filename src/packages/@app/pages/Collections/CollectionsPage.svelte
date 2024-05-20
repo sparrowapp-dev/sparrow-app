@@ -166,6 +166,9 @@
     if (splitter && $leftPanelCollapse === false) {
       splitter.style.display = "unset";
     }
+    if (currentWorkspace) {
+      _viewModel.fetchCollections($currentWorkspace?._id);
+    }
   }
 </script>
 

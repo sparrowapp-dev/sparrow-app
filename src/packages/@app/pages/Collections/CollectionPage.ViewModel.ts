@@ -116,6 +116,15 @@ export default class CollectionsViewModel {
   movedTabEndIndex = 0;
 
   constructor() {}
+  
+  public fetchCollections = async (workspaceId: string) => {
+    const res = await this.collectionService.fetchCollection(workspaceId);
+    if (res.status) {
+      this.collectionRepository.bulkInsertData(res.data.data);
+    } else {
+      notifications.error("Failed to fetch collections!")
+    }
+  }
 
   /**
    * Get role of the user in workspace
