@@ -17,7 +17,7 @@
    */
   export let callback: (pairs: KeyValuePair[]) => void;
   /**
-   * search text to filter the pairs 
+   * search text to filter the pairs
    */
   export let search: string;
   let pairs: KeyValueChecked[] = keyValue;
@@ -28,10 +28,10 @@
       pairs = [];
       pairs = keyValue;
 
-      let flag: boolean = true;
+      let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === true) {
-          flag = false;
+        if (pairs[i].checked === false) {
+          flag = true;
         }
       }
       if (flag) {
@@ -57,6 +57,7 @@
       pairs.length - 1 === index &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
+      pairs[pairs.length - 1].checked = true;
       pairs.push({
         key: "",
         value: "",
@@ -223,7 +224,7 @@
                       updatePairs(index);
                     }}
                     placeholder="Add Variable"
-                    class="w-100 text-fs-12 placeholder-color "
+                    class="w-100 text-fs-12 placeholder-color"
                   />
                 </div>
 
@@ -365,15 +366,12 @@
     height: 18px;
     padding-left: 8px;
     padding-right: 8px;
-    
   }
   input[type="text"]:focus {
     background-color: var(--bg-secondary-550);
-
   }
 
   .placeholder-color::placeholder {
     color: var(--text-secondary-400);
-}
-  
+  }
 </style>
