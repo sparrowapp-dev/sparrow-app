@@ -83,7 +83,7 @@
     class="bg-dropdownContainer p-1 rounded-1 {isMenuOpen
       ? 'position-fixed'
       : 'd-none'}"
-    style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: {zIndex};"
+    style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
   >
     <!-- 
       Menu item
