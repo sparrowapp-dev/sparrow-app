@@ -2226,7 +2226,6 @@ export default class CollectionsViewModel {
     type: string,
     componentData,
   ) => {
-    debugger;
     let userSource = {};
     if (path.length > 0) {
       const requestTabAdapter = new RequestTabAdapter();

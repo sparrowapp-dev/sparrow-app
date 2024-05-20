@@ -13,11 +13,14 @@ import {
 } from "@common/types/workspace";
 import { InitRequestTab } from "@common/utils";
 
+/**
+ * @class - this class makes request tab compatible with backend server
+ */
 export class RequestTabAdapter {
   constructor() {}
 
-  // Method to adapt an OriginalObject to an AdaptedObject
-  adapt(
+  // parse backend data to frontend compatible
+  public adapt(
     workspaceId: string,
     collectionId: string,
     folderId: string,
@@ -39,6 +42,7 @@ export class RequestTabAdapter {
     adaptedRequest.updateHeaders(request.request?.headers);
     adaptedRequest.updatePath(path);
 
+    // parsing body type
     const selectedRequestBodyType = request.request?.selectedRequestBodyType;
     if (selectedRequestBodyType) {
       const bodyType = setBodyType(request.request?.selectedRequestBodyType);
@@ -48,6 +52,7 @@ export class RequestTabAdapter {
       });
     }
 
+    // parsing request auth
     const selectedRequestAuthType = request.request?.selectedRequestAuthType;
     if (selectedRequestAuthType) {
       const AuthType = setAuthType(request.request?.selectedRequestAuthType);
@@ -56,6 +61,7 @@ export class RequestTabAdapter {
       });
     }
 
+    // parsing form data
     const body = request?.request?.body;
     if (body) {
       const textData = body.formdata.text
@@ -107,15 +113,15 @@ export class RequestTabAdapter {
     return adaptedRequest.getValue();
   }
 
-  // Method to unadapt an AdaptedObject back to an OriginalObject
-  unadapt(requestTab: RequestTab) {
+  // parse frontend data to backend compatible
+  public unadapt(requestTab: RequestTab) {
     requestTab = createDeepCopy(requestTab);
     const bodyType =
       requestTab.property.request.state.requestBodyNavigation ===
       RequestDatasetEnum.RAW
         ? requestTab.property.request.state.requestBodyLanguage
         : requestTab.property.request.state.requestBodyNavigation;
-    // compute form data
+    // parsing form data
     const textFormData = [];
     const fileFormData = [];
     requestTab.property.request.body.formdata.map((pair) => {

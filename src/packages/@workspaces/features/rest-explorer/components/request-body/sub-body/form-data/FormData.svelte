@@ -10,7 +10,6 @@
     onUpdateRequestBody({
       formdata: pairs,
     });
-    console.log(pairs);
   };
 </script>
 

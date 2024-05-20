@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 7,
+  version: 8,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -76,43 +76,24 @@ export const tabSchemaLiteral = {
                   },
                 },
                 formdata: {
-                  type: "object",
-                  properties: {
-                    text: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          key: {
-                            type: "string",
-                          },
-                          value: {
-                            type: "string",
-                          },
-                          checked: {
-                            type: "boolean",
-                          },
-                        },
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      key: {
+                        type: "string",
                       },
-                    },
-                    file: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          key: {
-                            type: "string",
-                          },
-                          value: {
-                            type: "string",
-                          },
-                          base: {
-                            type: "string",
-                          },
-                          checked: {
-                            type: "boolean",
-                          },
-                        },
+                      value: {
+                        type: "string",
+                      },
+                      checked: {
+                        type: "boolean",
+                      },
+                      base: {
+                        type: "string",
+                      },
+                      type: {
+                        type: "string",
                       },
                     },
                   },
