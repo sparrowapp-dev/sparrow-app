@@ -19,7 +19,14 @@ import { InitRequestTab } from "@common/utils";
 export class RequestTabAdapter {
   constructor() {}
 
-  // parse backend data to frontend compatible
+  /**
+   * @description - parse backend data to frontend compatible
+   * @param workspaceId - workspace id
+   * @param collectionId - collection id
+   * @param folderId - folder id
+   * @param request - request tab frontend data
+   * @returns
+   */
   public adapt(
     workspaceId: string,
     collectionId: string,
@@ -113,7 +120,11 @@ export class RequestTabAdapter {
     return adaptedRequest.getValue();
   }
 
-  // parse frontend data to backend compatible
+  /**
+   * @description - parse frontend data to backend compatible
+   * @param requestTab - request backend data
+   * @returns
+   */
   public unadapt(requestTab: RequestTab) {
     requestTab = createDeepCopy(requestTab);
     const bodyType =
