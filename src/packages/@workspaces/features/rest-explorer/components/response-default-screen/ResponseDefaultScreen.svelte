@@ -50,7 +50,7 @@
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-2"}
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
@@ -64,7 +64,7 @@
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <span class="me-3"></span>
         <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-5 mb-2"}
+          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-2"}
           {key}
           {value}
           keyClassProp={"text-secondary-200"}
