@@ -199,6 +199,7 @@
       environmentTabWrapper.getBoundingClientRect().top - 5,
       environmentTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     {menuItems}
     {noOfRows}
     {noOfColumns}
