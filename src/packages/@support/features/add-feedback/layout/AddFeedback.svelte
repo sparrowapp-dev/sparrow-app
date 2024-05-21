@@ -7,7 +7,7 @@
   let isExposeFeedbackForm = false;
 </script>
 
-<div>
+<div class="pb-3">
   <button
     on:click={() => {
       isExposeFeedbackForm = true;
