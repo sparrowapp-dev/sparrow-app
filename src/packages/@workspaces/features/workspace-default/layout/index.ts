@@ -1,1 +1,1 @@
-export { default as WorkspaceDefaultPage } from "./WorkspaceDefault.svelte";
+export { default as WorkspaceDefault } from "./WorkspaceDefault.svelte";

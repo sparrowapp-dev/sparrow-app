@@ -23,7 +23,7 @@
     CollectionList,
     ImportCollection,
     ImportCurl,
-    WorkspaceDefaultPage
+    WorkspaceDefault
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "@library/ui/toast/Toast";
