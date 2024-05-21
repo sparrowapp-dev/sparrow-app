@@ -302,8 +302,8 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; padding:10px;"
+        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'} ps-2"
+        style="font-size: 12px;"
       >
         {api.name}
         <!-- {#if showPath}

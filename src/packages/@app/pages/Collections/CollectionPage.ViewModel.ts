@@ -73,7 +73,7 @@ import type {
 
 //-----
 //Emuns
-import { RequestDataType, RequestDataset } from "$lib/utils/enums";
+import { RequestDataType, RequestDataset, WorkspaceDefault } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
   WorkspaceRole,
@@ -123,11 +123,16 @@ export default class CollectionsViewModel {
    * @param workspaceId - id of current workspace
    */
   public fetchCollections = async (workspaceId: string) => {
-    const res = await this.collectionService.fetchCollection(workspaceId);
-    if (res.isSuccessful) {
-      this.collectionRepository.bulkInsertData(res.data.data);
-    } else {
-      notifications.error("Failed to fetch collections!")
+    if (workspaceId) {
+      const res = await this.collectionService.fetchCollection(workspaceId);
+      if (res.isSuccessful) {
+        this.collectionRepository.bulkInsertData(res.data.data.map(collection => {
+          collection["workspaceId"] = workspaceId
+          return collection
+        }));
+      } else {
+        notifications.error("Failed to fetch collections!")
+      }
     }
   }
 
