@@ -39,10 +39,17 @@ export class EnvironmentExplorerViewModel {
    * @description - updates environment tab name
    * @param _name - new environment name
    */
-  public updateName = async (_name: any) => {
+  public updateName = async (_name: any, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.isSave = false;
-    progressiveTab.name = _name;
+    if (event === "blur" && _name === "") {
+      const data = await this.environmentRepository.readEnvironment(
+        progressiveTab.id,
+      );
+      progressiveTab.name = data.name;
+    } else {
+      progressiveTab.name = _name;
+    }
     this.tab = progressiveTab;
     this.environmentTabRepository.updateEnvironmentTab(
       progressiveTab.id,
