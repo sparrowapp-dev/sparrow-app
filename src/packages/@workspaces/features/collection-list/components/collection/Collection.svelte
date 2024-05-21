@@ -240,6 +240,7 @@
       collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     menuItems={[
       {
         onClick: () =>
@@ -303,6 +304,7 @@
       collectionTabWrapper.getBoundingClientRect().top - 0,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     menuItems={[
       {
         onClick: () => {
