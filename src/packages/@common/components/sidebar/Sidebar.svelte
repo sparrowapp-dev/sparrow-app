@@ -60,7 +60,7 @@
       hoveredLogo: hoveredHelp,
       selectedLogo: selectedHelp,
       disabled: false,
-      position: "primary",
+      position: "secondary",
     },
     {
       route: "/app/more",

@@ -29,10 +29,11 @@
   $: {
     if (keyValue) {
       pairs = keyValue;
-      let flag: boolean = true;
+      let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
-        if (pairs[i].checked === true) {
-          flag = false;
+        if (pairs[i].checked === false) {
+          flag = true;
+          break;
         }
       }
       if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
@@ -58,6 +59,7 @@
       mode === "WRITE" &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
+      pairs[pairs.length - 1].checked = true;
       pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
     }
@@ -184,7 +186,6 @@
       <button class="border-0" style="width:40px;" />
     </div>
   </div>
-
   <div
     class="w-100"
     style="display:block; position:relative;
@@ -215,16 +216,20 @@
 
             <div class="d-flex gap-0" style="width:calc(100% - 120px)">
               <div class="w-50 position-relative">
-                <label class="container">
-                  <input disabled type="checkbox" bind:value={readable.key} />
-                  <span class="checkmark"></span>
-                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Value"
+                  class=" keyValuePair ps-1 py-1 w-100"
+                  style="font-size: 12px;"
+                  disabled
+                  bind:value={readable.key}
+                />
               </div>
               <div class="w-50 position-relative">
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class=" keyValuePair py-1 w-100"
+                  class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
                   bind:value={readable.value}

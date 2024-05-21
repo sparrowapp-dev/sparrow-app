@@ -83,14 +83,7 @@
 
   .sidebar-item {
     position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     padding: 12px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    isolation: isolate;
     transition:
       background-color 0.55s ease,
       padding 0.55s ease;
@@ -100,14 +93,6 @@
   .sidebar-item:hover {
     background-color: var(--nav-bar-hover-background);
     opacity: 0.9;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    isolation: isolate;
   }
 
   .sidebar-item :global(.active-link) {

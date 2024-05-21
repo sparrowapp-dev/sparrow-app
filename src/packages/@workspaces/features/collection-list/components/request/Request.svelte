@@ -167,6 +167,7 @@
       requestTabWrapper.getBoundingClientRect().top - 0,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     menuItems={[
       {
         onClick: () => {
@@ -246,6 +247,7 @@
     )
       ? 'unclickable'
       : ''}"
+   
   >
     {#if api?.isDeleted && "activeSync"}
       <span
@@ -300,7 +302,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
+        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'} ps-2"
         style="font-size: 12px;"
       >
         {api.name}

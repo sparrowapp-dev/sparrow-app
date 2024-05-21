@@ -202,6 +202,7 @@
         folderTabWrapper.getBoundingClientRect().top - 0,
         folderTabWrapper.getBoundingClientRect().bottom + 5,
       ]}
+      zIndex={500}
       menuItems={[
         {
           onClick: () => {

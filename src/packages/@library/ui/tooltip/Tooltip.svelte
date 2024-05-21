@@ -47,7 +47,7 @@
       class={`tooltip-arrow invisible bg-tertiary-400 opacity-0
     ${classProp}`}
       style="{styleProp} position: fixed; top: calc({tooltipPosition?.top}px {verticalOffset} {verticalArrowOffset} + {tooltipPosition?.height -
-        1}px); left: calc({tooltipPosition?.left}px {horizontalOffset} {horizontalArrowOffset});"
+        1}px); left: calc({tooltipPosition?.left}px {horizontalOffset} {horizontalArrowOffset}); z-index: 100000;"
     >
     </span>
   {/if}
