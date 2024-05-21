@@ -92,6 +92,7 @@ $sparrow-bg-container-four: #376FF7;
 $theme-grey-ffffff: #ffffff;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-8A9299: #8A9299;
+$theme-grey-83899F: #83899F;
 $theme-grey-636566: #636566;
 $theme-grey-45494D: #45494D;
 $theme-grey-313233: #313233;
@@ -102,6 +103,8 @@ $theme-grey-161617: #161617;
 $theme-grey-151515: #151515;
 $theme-grey-000000: #000000;
 
+
+$theme-blue-F5F6F8: #F5F6F8;
 $theme-blue-9CDCFE: #9CDCFE;
 $theme-blue-85C2FF: #85C2FF;
 $theme-blue-1193F0: #1193F0;
@@ -226,6 +229,7 @@ $theme-red-230408: #230408;
   --text-secondary-100 : #{$theme-grey-ffffff};
   --text-secondary-150 : #{$theme-grey-e5e5e5};
   --text-secondary-200 : #{$theme-grey-8A9299};
+  --text-secondary-250 : #{$theme-grey-83899F};
   --text-secondary-300 : #{$theme-grey-45494D};
   --text-secondary-350 : #{$theme-grey-636566};
   --text-secondary-400 : #{$theme-grey-313233};
@@ -257,6 +261,7 @@ $theme-red-230408: #230408;
   //
   //
   --bg-primary-100 : #{$theme-blue-9CDCFE};
+  --bg-primary-150 : #{$theme-blue-F5F6F8};
   --bg-primary-200 : #{$theme-blue-1193F0};
   --bg-primary-250 : #{$theme-blue-5980DC};
   --bg-primary-300 : #{$theme-blue-3670F7};
