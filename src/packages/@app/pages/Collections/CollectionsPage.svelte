@@ -23,6 +23,7 @@
     CollectionList,
     ImportCollection,
     ImportCurl,
+    WorkspaceDefault
   } from "@workspaces/features";
   import CloseConfirmationPopup from "$lib/components/popup/CloseConfirmationPopup.svelte";
   import { notifications } from "@library/ui/toast/Toast";
@@ -242,6 +243,13 @@
               <FolderExplorerPage tab={$activeTab} />
             </div>
           </Motion>
+      
+        {:else}
+        <Motion {...scaleMotionProps} let:motion>
+          <WorkspaceDefaultPage 
+            showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+            onItemCreated={_viewModel.handleCreateItem} />
+        </Motion>
         {/if}
       {/if}
     </Route>
