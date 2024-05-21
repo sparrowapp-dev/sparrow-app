@@ -40,8 +40,8 @@
     }
   }
 
-  const handleCurrentEnvironmentNameChange = (_name) => {
-    onUpdateName(_name);
+  const handleCurrentEnvironmentNameChange = (_name, event) => {
+    onUpdateName(_name, event);
   };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
@@ -60,7 +60,10 @@
           type="text"
           bind:value={environmentName}
           on:input={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName);
+            handleCurrentEnvironmentNameChange(environmentName, "");
+          }}
+          on:blur={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
