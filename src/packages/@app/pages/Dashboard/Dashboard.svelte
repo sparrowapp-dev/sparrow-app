@@ -14,6 +14,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
+  import HelpPage from "../Help/HelpPage.svelte";
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -89,7 +90,7 @@
       <Route path="/environment/*"><Environment /></Route>
 
       <!-- Route for Help -->
-      <Route path="/help/*">Help</Route>
+      <Route path="/help/*"><HelpPage /></Route>
 
       <!-- Route for More -->
       <Route path="/more/*">More</Route>
