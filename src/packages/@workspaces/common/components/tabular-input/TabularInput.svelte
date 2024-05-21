@@ -206,24 +206,21 @@
             style="padding-top:3px; padding-bottom:3px; height:24px;"
           >
             <div style="width:30px;">
-              <label class="container">
-                <input
-                  class="form-check-input disabled"
-                  type="checkbox"
-                  disabled
-                  checked={true}
-                />
-                <span class="checkmark"></span>
-              </label>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                disabled
+                checked={true}
+              />
             </div>
 
             <div class="d-flex gap-0" style="width:calc(100% - 120px)">
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Key"
-                  class=" keyValuePair py-1 w-100 text-secondary-100"
-                  style="font-size: 12px; padding-left: 6px;"
+                  placeholder="Enter Value"
+                  class=" keyValuePair ps-1 py-1 w-100"
+                  style="font-size: 12px;"
                   disabled
                   bind:value={readable.key}
                 />
@@ -232,8 +229,8 @@
                 <input
                   type="text"
                   placeholder="Enter Value"
-                  class=" keyValuePair py-1 w-100 text-secondary-100"
-                  style="font-size: 12px; padding-left: 6px;"
+                  class=" keyValuePair ps-1 py-1 w-100"
+                  style="font-size: 12px;"
                   disabled
                   bind:value={readable.value}
                 />
@@ -476,10 +473,6 @@
   .container input:checked ~ .checkmark {
     border: none;
     background-color: var(--text-primary-200);
-  }
-
-  .container input:disabled ~ .checkmark {
-    background-color: var(--bg-primary-600) !important;
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
