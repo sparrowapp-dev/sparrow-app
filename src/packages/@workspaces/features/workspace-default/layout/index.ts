@@ -1,0 +1,1 @@
+export { default as WorkspaceDefaultPage } from "./WorkspaceDefault.svelte";

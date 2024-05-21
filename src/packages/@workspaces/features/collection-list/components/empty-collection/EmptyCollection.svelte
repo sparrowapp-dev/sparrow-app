@@ -23,7 +23,7 @@
     </p>
     <div class="w-100 mt-3">
       <p
-        class="fw-bold d-flex align-items-center text-fs-14 ps-3" style="color: white;"
+        class="fw-bold d-flex align-items-center text-fs-14 ps-3" style="color: var(--text-secondary-100);"
         role="button"
         on:click={() => {
           onImportCollectionPopup();

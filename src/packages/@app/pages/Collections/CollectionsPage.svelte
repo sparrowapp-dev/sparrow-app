@@ -246,9 +246,9 @@
       
         {:else}
         <Motion {...scaleMotionProps} let:motion>
-      <WorkspaceDefaultPage 
-      showImportCollectionPopup={() => (isImportCollectionPopup = true)}
-      onItemCreated={_viewModel.handleCreateItem} />
+          <WorkspaceDefaultPage 
+            showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+            onItemCreated={_viewModel.handleCreateItem} />
         </Motion>
         {/if}
       {/if}
