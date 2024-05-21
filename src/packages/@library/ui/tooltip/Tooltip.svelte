@@ -87,7 +87,6 @@
     border-radius: 2px;
     font-size: 12px;
     font-weight: 500;
-    gap: 100px;
   }
   .tooltip-arrow {
     width: 10px;

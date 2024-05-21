@@ -83,6 +83,7 @@
     }}
     on:blur={() => {
       isFocused = false;
+      dispatch("blur", event?.target?.value);
     }}
     {value}
     on:input={(event) => {
