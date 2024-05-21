@@ -45,33 +45,37 @@
       </div>
     </div>
   </div>
-  <div class={"d-flex flex-wrap justify-content-center px-5 mt-auto"}>
+  <div class={"d-flex flex-wrap  justify-content-center px-5 mt-auto"}>
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
-        <span class="me-3"></span>
-        <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-2"}
-          {key}
-          {value}
-          keyClassProp={"text-secondary-200"}
-          valueClassProp={"bg-secondary-400 text-secondary-150"}
-          type="combo"
-        />
-        <span class="me-3"></span>
+        <!-- <span class="me-3"></span> -->
+     <div class="px-4">
+      <ComboText
+      comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-3"}
+      {key}
+      {value}
+      keyClassProp={"text-secondary-200"}
+      valueClassProp={"bg-secondary-400 text-secondary-150"}
+      type="combo"
+    />
+     </div>
+        <!-- <span class="me-3"></span> -->
       {/if}
     {/each}
     {#each Object.entries(altCommands) as [key, value]}
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
-        <span class="me-3"></span>
-        <ComboText
-          comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-2"}
-          {key}
-          {value}
-          keyClassProp={"text-secondary-200"}
-          valueClassProp={"bg-secondary-400 text-secondary-150"}
-          type="combo"
-        />
-        <span class="me-3"></span>
+        <!-- <span class="me-3"></span> -->
+     <div class="px-4">
+      <ComboText
+      comboContainerClassProp={"d-flex align-items-center justify-content-between gap-4 mb-3"}
+      {key}
+      {value}
+      keyClassProp={"text-secondary-200"}
+      valueClassProp={"bg-secondary-400 text-secondary-150"}
+      type="combo"
+    />
+     </div>
+        <!-- <span class="me-3"></span> -->
       {/if}
     {/each}
   </div>
