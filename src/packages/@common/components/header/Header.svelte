@@ -65,6 +65,7 @@
       zIndex={200}
       bodyTheme={"violet"}
       borderRounded={"2px"}
+      position={"absolute"}
     />
   </div>
 </header>

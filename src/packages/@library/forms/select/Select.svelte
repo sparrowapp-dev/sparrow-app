@@ -129,6 +129,7 @@
    * makes the dropdown unclickable
    */
   export let disabled = false;
+  export let position: "absolute" | "fixed" = "fixed";
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -426,11 +427,21 @@
 
   <div
     bind:this={selectBodyWrapper}
-    class="d-none z-2 select-data position-fixed {selectBodyBackgroundClass} p-1 border-radius-2"
+    class="d-none z-2 select-data {position === 'fixed'
+      ? 'position-fixed'
+      : 'position-absolute'}  {selectBodyBackgroundClass} p-1 border-radius-2"
     class:select-active={isOpen}
     style="
       {isOpen ? 'opacity: 1;' : 'opacity: 0;'}
-      min-width:{minBodyWidth}; left: {bodyLeftDistance}px; top: {bodyTopDistance}px; right: {bodyRightDistance}px; z-index:{zIndex};"
+      min-width:{minBodyWidth}; left: {position === 'fixed'
+      ? `${bodyLeftDistance}px;`
+      : `0px;`} top: {position === 'fixed'
+      ? `${bodyTopDistance}px;`
+      : `${
+          Number(headerHeight.replace(/\D/g, '')) + 5
+        }px;`}  right: {position === 'fixed'
+      ? `${bodyRightDistance}px;`
+      : `0px;`} z-index:{zIndex};"
     transition:slide={{ duration: 100 }}
   >
     <div
