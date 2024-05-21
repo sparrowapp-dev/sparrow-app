@@ -199,6 +199,7 @@
       environmentTabWrapper.getBoundingClientRect().top - 5,
       environmentTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     {menuItems}
     {noOfRows}
     {noOfColumns}
@@ -212,7 +213,7 @@
 
 <div class="environment-tab mb-1" bind:this={environmentTabWrapper}>
   <button
-    style="height:36px; border-color: {showMenu ? '#ff7878' : ''}"
+    style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-3 my-button {env?.id ===
     currentEnvironment?.id
       ? 'active-collection-tab'
@@ -255,7 +256,7 @@
           }}
         >
           <p
-            class="ellipsis w-100 mb-0 text-fs-14"
+            class="ellipsis w-100 mb-0 text-fs-12"
             on:contextmenu={(e) => {
               rightClickContextMenu(e);
             }}
