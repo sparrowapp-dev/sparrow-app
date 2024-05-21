@@ -167,6 +167,7 @@
       requestTabWrapper.getBoundingClientRect().top - 0,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
+    zIndex={500}
     menuItems={[
       {
         onClick: () => {
@@ -246,6 +247,7 @@
     )
       ? 'unclickable'
       : ''}"
+   
   >
     {#if api?.isDeleted && "activeSync"}
       <span
