@@ -62,10 +62,7 @@
 
 <div class={`d-flex ${componentClass}`}>
   <!-- Http Method Dropdown -->
-  <div
-    class="overflow-hidden"
-    style="width: 130px; border-top-left-radius:4px; border-bottom-left-radius:4px;"
-  >
+  <div class="" style="">
     <Select
       id={"api-request"}
       data={[
@@ -95,7 +92,7 @@
           color: "patch",
         },
       ]}
-      borderRounded={"2px"}
+      borderRounded={"0px"}
       titleId={httpMethod}
       onclick={handleDropdown}
       borderHighlight={"active"}
@@ -109,6 +106,7 @@
       bodyTheme={"violet"}
       isDropIconFilled={true}
       highlightTickedItem={false}
+      headerFontSize={"12px"}
     />
   </div>
 

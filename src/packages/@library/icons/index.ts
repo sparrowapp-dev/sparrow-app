@@ -14,15 +14,6 @@ export { default as FolderIcon } from "./Folder.svelte";
 export { default as SyncIcon } from "./Sync.svelte";
 export { default as GithubIcon } from "./Github.svelte";
 export { default as DoubleArrowIcon } from "./DoubleArrow.svelte";
-<<<<<<< HEAD
-<<<<<<< HEAD
 export { default as DiscordIcon } from "./Discord.svelte";
-
-=======
 export { default as LibraryIcon} from "./Library.svelte";
 export { default as VectorIcon} from "./Vector.svelte";
->>>>>>> a59a5d388ed598833e2786d34c7eebbafd424620
-=======
-export { default as LibraryIcon} from "./Library.svelte";
-export { default as VectorIcon} from "./Vector.svelte";
->>>>>>> a59a5d388ed598833e2786d34c7eebbafd424620
