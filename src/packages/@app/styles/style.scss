@@ -683,3 +683,7 @@ span {
 textarea {
   resize: none;
 }
+
+.toast-container {
+  z-index: 1000000 !important; /* Increase the z-index as needed */
+}

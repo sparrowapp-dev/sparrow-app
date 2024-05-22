@@ -1,6 +1,8 @@
 <script>
   import { AddFeedback, DiscordCard, FeedbackToast } from "@support/features";
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
+  import HelpPageViewModel from "./HelpPage.ViewModel";
+  const _viewModel = new HelpPageViewModel();
 </script>
 
 <div class="w-100 d-flex align-items-center jutify-content-center">
@@ -14,7 +16,7 @@
   </div>
   <div style="width: 30%;">
     <div>
-      <AddFeedback />
+      <AddFeedback onSendFeedback={_viewModel.sendFeedback} />
     </div>
     <div>
       <DiscordCard />
