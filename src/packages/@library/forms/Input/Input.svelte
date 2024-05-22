@@ -111,7 +111,6 @@
   {#if type === "text" && isHovered && !disabled}
     <span class="position-fixed" style="top:76px; right: 525px">
       <PencilIcon height={"14px"} width={"14px"} color={"white"} 
-     
       />
     </span>
   {/if}

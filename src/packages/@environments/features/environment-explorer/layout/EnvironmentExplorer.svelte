@@ -59,7 +59,7 @@
           width={"calc(100% - 500px)"}
           type="text"
           bind:value={environmentName}
-          on:input|preventDefault={(e) => {
+          on:input={(e) => {
             handleCurrentEnvironmentNameChange(environmentName, "");
           }}
           on:blur={(e) => {
