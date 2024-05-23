@@ -294,7 +294,7 @@
     showMenu = false;
   };
 
-  const onRenameInputKeyPress = (event) => {han
+  const onRenameInputKeyPress = (event) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
         "renameInputFieldCollection",
