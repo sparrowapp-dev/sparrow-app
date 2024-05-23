@@ -12,6 +12,7 @@
   let subCategory = "Usability";
   let feedbackSubject = "";
   let isExposeFeedbackForm = false;
+  let isLoading = false;
   let uploadFeedback = {
     file: {
       value: [],
@@ -366,17 +367,20 @@
         <Button
           type={"primary"}
           title={"Add"}
+          loader={isLoading}
           onClick={async () => {
-            const files = Array.from(uploadFeedback.file.value);
-            const formData = new FormData();
-            files.forEach((file) => formData.append("files", file));
-            formData.append("type", type);
-            if (type === "Feedback" || type === "Bug") {
-              formData.append("subCategory", subCategory);
+            isLoading = true;
+            const res = await onSendFeedback(
+              uploadFeedback,
+              type,
+              feedbackSubject,
+              feedbackDescription,
+              subCategory,
+            );
+            isLoading = false;
+            if (res.isSuccessful) {
+              isExposeFeedbackForm = false;
             }
-            formData.append("subject", feedbackSubject);
-            formData.append("description", feedbackDescription);
-            await onSendFeedback(formData);
           }}
         />
       </div>

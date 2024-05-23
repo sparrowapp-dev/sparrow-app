@@ -70,14 +70,14 @@
 <div
   class="position-relative"
   style="height:{height}; width: {width}; !important"
+  on:mouseenter={() => {
+    isHovered = true;
+  }}
+  on:mouseleave={() => {
+    isHovered = false;
+  }}
 >
   <input
-    on:mouseenter={() => {
-      isHovered = true;
-    }}
-    on:mouseleave={() => {
-      isHovered = false;
-    }}
     on:focus={() => {
       isFocused = true;
     }}
@@ -91,7 +91,7 @@
       dispatch("input", event?.target?.value);
     }}
     {type}
-    class="w-100 {componentClass}"
+    class=" w-100 {componentClass}"
     {placeholder}
     style=" {componentStyle} height: 100%; {type === 'search'
       ? 'padding-left:35px !important;'
@@ -109,7 +109,7 @@
     </span>
   {/if}
   {#if type === "text" && isHovered && !disabled}
-    <span class="position-absolute" style="top:2px; right: 10px">
+    <span class="position-fixed" style="top:76px; right: 525px">
       <PencilIcon height={"14px"} width={"14px"} color={"white"} />
     </span>
   {/if}
