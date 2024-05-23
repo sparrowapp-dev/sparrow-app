@@ -109,12 +109,12 @@
   };
 </script>
 
-<div class="pb-3" style="width:240px ;">
+<div class="pb-3 w-100">
   <button
     on:click={() => {
       isExposeFeedbackForm = true;
     }}
-    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-bold"
+    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
   >
     +Add Feedback
   </button>
