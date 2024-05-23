@@ -7,9 +7,25 @@
 
   export let onSendFeedback;
 
-  let type = "Feedback";
+  enum FeedbackType {
+    FEEDBACK = "Feedback",
+    BUG = "Bug",
+    FEATURE_REQUEST = "Feature Request",
+  }
+
+  enum FeedbackSubCategory {
+    USABILITY = "Usability",
+    DOCUMENTATION = "Documentation",
+    PERFORMANCE = "Performance",
+    LOW = "Low",
+    MEDIUM = "Medium",
+    HIGH = "High",
+    CRITICAL = "Critical",
+  }
+
+  let type: FeedbackType = FeedbackType.FEEDBACK;
   let feedbackDescription = "";
-  let subCategory = "Usability";
+  let subCategory: FeedbackSubCategory = FeedbackSubCategory.USABILITY;
   let feedbackSubject = "";
   let isExposeFeedbackForm = false;
   let isLoading = false;
@@ -81,7 +97,7 @@
     }
     uploadFeedback.file.value = targetFile || dataTransferFile;
   };
-  const removeFile = (index) => {
+  const removeFile = (index: number) => {
     const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {
       if (i !== index) {
         return true;
@@ -124,25 +140,25 @@
         data={[
           {
             name: "Feedback",
-            id: "Feedback",
+            id: FeedbackType.FEEDBACK,
           },
           {
-            name: "Bugs",
-            id: "Bug",
+            name: "Bug",
+            id: FeedbackType.BUG,
           },
           {
             name: "Feature Request",
-            id: "Feature Request",
+            id: FeedbackType.FEATURE_REQUEST,
           },
         ]}
         zIndex={499}
         titleId={type}
         onclick={(id = "") => {
           type = id;
-          if (type === "Feedback") {
-            subCategory = "Usability";
-          } else if (type === "Bug") {
-            subCategory = "Low";
+          if (type === FeedbackType.FEEDBACK) {
+            subCategory = FeedbackSubCategory.USABILITY;
+          } else if (type === FeedbackType.BUG) {
+            subCategory = FeedbackSubCategory.LOW;
           } else {
             subCategory = "";
           }
@@ -172,40 +188,43 @@
         {#if type === "Feedback"}
           <input
             type="radio"
-            id="Usability"
+            id={FeedbackSubCategory.USABILITY}
             name="option"
-            value="Usability"
+            value={FeedbackSubCategory.USABILITY}
             bind:group={subCategory}
           />
           <label
-            for="Usability"
-            class="text-fs-12 border-radius-4 {subCategory === 'Usability'
+            for={FeedbackSubCategory.USABILITY}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.USABILITY
               ? 'label-active'
               : ''}">Usability</label
           ><br />
           <input
             type="radio"
-            id="Documentation"
+            id={FeedbackSubCategory.DOCUMENTATION}
             name="option"
-            value="Documentation"
+            value={FeedbackSubCategory.DOCUMENTATION}
             bind:group={subCategory}
           />
           <label
-            for="Documentation"
-            class="text-fs-12 border-radius-4 {subCategory === 'Documentation'
+            for={FeedbackSubCategory.DOCUMENTATION}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.DOCUMENTATION
               ? 'label-active'
               : ''}">Documentation</label
           ><br />
           <input
             type="radio"
-            id="Performance"
+            id={FeedbackSubCategory.PERFORMANCE}
             name="option"
-            value="Performance"
+            value={FeedbackSubCategory.PERFORMANCE}
             bind:group={subCategory}
           />
           <label
-            for="Performance"
-            class="text-fs-12 border-radius-4 {subCategory === 'Performance'
+            for={FeedbackSubCategory.PERFORMANCE}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.PERFORMANCE
               ? 'label-active'
               : ''}">Performance</label
           ><br />
@@ -214,53 +233,57 @@
         {#if type === "Bug"}
           <input
             type="radio"
-            id="Low"
+            id={FeedbackSubCategory.LOW}
             name="option"
-            value="Low"
+            value={FeedbackSubCategory.LOW}
             bind:group={subCategory}
           />
           <label
-            for="Low"
-            class="text-fs-12 border-radius-4 {subCategory === 'Low'
+            for={FeedbackSubCategory.LOW}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.LOW
               ? 'label-active'
               : ''}">Low</label
           ><br />
           <input
             type="radio"
-            id="Medium"
+            id={FeedbackSubCategory.MEDIUM}
             name="option"
-            value="Medium"
+            value={FeedbackSubCategory.MEDIUM}
             bind:group={subCategory}
           />
           <label
-            for="Medium"
-            class="text-fs-12 border-radius-4 {subCategory === 'Medium'
+            for={FeedbackSubCategory.MEDIUM}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.MEDIUM
               ? 'label-active'
               : ''}">Medium</label
           ><br />
           <input
             type="radio"
-            id="High"
+            id={FeedbackSubCategory.HIGH}
             name="option"
-            value="High"
+            value={FeedbackSubCategory.HIGH}
             bind:group={subCategory}
           />
           <label
-            for="High"
-            class="text-fs-12 border-radius-4 {subCategory === 'High'
+            for={FeedbackSubCategory.HIGH}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.HIGH
               ? 'label-active'
               : ''}">High</label
           ><br />
           <input
             type="radio"
-            id="Critical"
+            id={FeedbackSubCategory.CRITICAL}
             name="option"
-            value="Critical"
+            value={FeedbackSubCategory.CRITICAL}
             bind:group={subCategory}
           />
           <label
-            for="Critical"
-            class="text-fs-12 border-radius-4 {subCategory === 'Critical'
+            for={FeedbackSubCategory.CRITICAL}
+            class="text-fs-12 border-radius-4 {subCategory ===
+            FeedbackSubCategory.CRITICAL
               ? 'label-active'
               : ''}">Critical</label
           ><br />
