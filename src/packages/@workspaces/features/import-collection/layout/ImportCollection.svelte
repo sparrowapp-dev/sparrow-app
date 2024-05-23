@@ -152,8 +152,14 @@
   };
 
   const handleImport = async () => {
-    if (importData === "") {
+    if (importData === "" && importType === "text") {
       isTextEmpty = true;
+      isInputDataTouched = true;
+    } else if (
+      uploadCollection.file.value.length === 0 &&
+      importType === "file"
+    ) {
+      isFileEmpty = true;
       isInputDataTouched = true;
     } else {
       onItemImported("collection", {
