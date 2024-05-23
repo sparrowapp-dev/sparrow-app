@@ -239,10 +239,10 @@ export class CollectionRepository {
       }
       return element;
     });
-    await collection.incrementalModify((value) => {
+    console.log(await collection.incrementalModify((value) => {
       value.items = [...updatedItems];
       return value;
-    });
+    }));
   };
 
   /**
