@@ -96,7 +96,7 @@
           <InfoIcon
             height={"17px"}
             width={"17px"}
-            color={"var(--text-primary-300)"}
+            color={"var(--text-secondary-250)"}
           />
         </span>
         <input
