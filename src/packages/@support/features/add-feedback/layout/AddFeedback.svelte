@@ -109,18 +109,14 @@
   };
 </script>
 
-<div class="pb-3">
+<div class="pb-3" style="width:240px ;">
   <button
     on:click={() => {
       isExposeFeedbackForm = true;
     }}
-    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14"
+    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-bold"
   >
-    <PlusIcon
-      height={"18px"}
-      width={"18px"}
-      color={"var(--bg-secondary-100)"}
-    /> Add Feedback
+    +Add Feedback
   </button>
 </div>
 <div class="position-relative">

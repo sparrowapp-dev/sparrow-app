@@ -5,20 +5,16 @@
   const _viewModel = new HelpPageViewModel();
 </script>
 
-<div class="w-100 d-flex align-items-center jutify-content-center">
-  <div style="width: 70%;">
-    <div>
+<div class="w-100 d-flex  jutify-content-center" style="background-color: black ;" >
+  <div style="height:94vh ; width: 77%; background-color: black ; overflow-y:scroll">
       <FeedbackToast />
-    </div>
-    <div>
       <DiscordPost />
-    </div>
   </div>
   <div style="width: 30%;">
     <div>
       <AddFeedback onSendFeedback={_viewModel.sendFeedback} />
     </div>
-    <div>
+    <div style="padding-left:10px;">
       <DiscordCard />
     </div>
   </div>

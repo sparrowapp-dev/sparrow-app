@@ -27,7 +27,7 @@
     if (keyValue) {
       pairs = [];
       pairs = keyValue;
-
+      let controller: boolean = false;
       let flag: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
