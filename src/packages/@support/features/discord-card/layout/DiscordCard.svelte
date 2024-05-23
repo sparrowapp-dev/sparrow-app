@@ -1,30 +1,31 @@
 <script lang="ts">
+  import Setting from "$lib/assets/setting.svelte";
   import { DiscordIcon } from "@library/icons";
+  import HelpCenter from "@library/icons/HelpCenter.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+    import { DiscordIDs } from "@support/common/constants/discord.constants";
 </script>
 
 <div
   class="d-flex flex-column align-items-center gap-2"
-  style="height: 236px ; background-color: var(--text-tertiary-400) ; border-radius:4px;"
->
-  <div style="padding-top:22px;">
+  style="  width: 240px;  height: 236px ; background-color: var(--text-tertiary-400) ; border-radius:4px;">
+  <div style="padding-top:22px; ">
     <div
       class="d-flex justify-content-center align-items-center"
-      style="width:56px; height:56px; border-radius:15.56px ; background-color: var(--bg-primary-150 ); "
-    >
+      style="width:56px; height:56px; border-radius:15.56px ; background-color: var(--bg-primary-150 ); ">
       <DiscordIcon width="49px" height="49px" />
     </div>
   </div>
-
   <div class="fw-bold align-self-center" style="font-size: 14px;">
     Join our Discord Channel
   </div>
   <div
     class="fw-light text-center"
-    style="color: var(--text-secondary-250); font-size: 14px; "
+    style="color: var(--text-secondary-250); font-size: 14px;  "
   >
-    Join our Discord channel to connect with the community.
+  <span>  Join our Discord channel to </span>
+  <span><br>  connect with the community.</span>
   </div>
-
   <div
     class="w-100"
     style="padding-top:10px; padding-left:19px; padding-right:19px;"
@@ -34,9 +35,40 @@
       role="button"
       style=" height:40px; background-color: var(--dropdown-button); border-radius:4px; "
     >
-      <div class="fw-normal" style="font-size: 14px;">Join</div>
+      <div class="fw-normal" style="font-size: 14px;" on:click={ async() => {
+        await open(DiscordIDs.SparrowDiscordURL);
+      }}>Join</div>
     </div>
   </div>
+</div>
+<div class="d-flex flex-column" style="padding-top:17px; padding-left:10px;">
+  <Tooltip
+    placement="left"
+    title="coming soon"
+    verticalOffset="+ 9px"
+    horizontalOffset="+ 110px"
+    showArrow={false}>
+    <div
+      class="d-flex p-2 gap-2 align-items-center pt-2"
+      style=" height: 44px; font-size:16px; color:var(--text-secondary-50);  "
+    >
+      <span style=""> <Setting /> </span> <span>Support</span>
+    </div>
+  </Tooltip>
+  <Tooltip
+    placement="left"
+    title="coming soon"
+    verticalOffset="+ 9px"
+    horizontalOffset="+ 120px"
+    showArrow={false}
+  >
+    <div
+      class="d-flex p-2 gap-2 align-items-center"
+      style="height: 44px; color:var(--text-secondary-50)"
+    >
+      <span> <HelpCenter /> </span> Help Center
+    </div>
+  </Tooltip>
 </div>
 
 <style>
