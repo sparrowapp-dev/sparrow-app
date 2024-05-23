@@ -3,16 +3,18 @@
   import { DiscordIcon } from "@library/icons";
   import HelpCenter from "@library/icons/HelpCenter.svelte";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-    import { DiscordIDs } from "@support/common/constants/discord.constants";
+  import { DiscordIDs } from "@support/common/constants/discord.constants";
 </script>
 
 <div
   class="d-flex flex-column align-items-center gap-2"
-  style="  width: 240px;  height: 236px ; background-color: var(--text-tertiary-400) ; border-radius:4px;">
+  style="height: 236px ; background-color: var(--text-tertiary-400) ; border-radius:4px;"
+>
   <div style="padding-top:22px; ">
     <div
       class="d-flex justify-content-center align-items-center"
-      style="width:56px; height:56px; border-radius:15.56px ; background-color: var(--bg-primary-150 ); ">
+      style="width:56px; height:56px; border-radius:15.56px ; background-color: var(--bg-primary-150 ); "
+    >
       <DiscordIcon width="49px" height="49px" />
     </div>
   </div>
@@ -23,8 +25,8 @@
     class="fw-light text-center"
     style="color: var(--text-secondary-250); font-size: 14px;  "
   >
-  <span>  Join our Discord channel to </span>
-  <span><br>  connect with the community.</span>
+    <span> Join our Discord channel to </span>
+    <span><br /> connect with the community.</span>
   </div>
   <div
     class="w-100"
@@ -35,9 +37,15 @@
       role="button"
       style=" height:40px; background-color: var(--dropdown-button); border-radius:4px; "
     >
-      <div class="fw-normal" style="font-size: 14px;" on:click={ async() => {
-        await open(DiscordIDs.SparrowDiscordURL);
-      }}>Join</div>
+      <div
+        class="fw-normal"
+        style="font-size: 14px;"
+        on:click={async () => {
+          await open(DiscordIDs.SparrowDiscordURL);
+        }}
+      >
+        Join
+      </div>
     </div>
   </div>
 </div>
@@ -47,7 +55,8 @@
     title="coming soon"
     verticalOffset="+ 9px"
     horizontalOffset="+ 110px"
-    showArrow={false}>
+    showArrow={false}
+  >
     <div
       class="d-flex p-2 gap-2 align-items-center pt-2"
       style=" height: 44px; font-size:16px; color:var(--text-secondary-50);  "
