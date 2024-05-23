@@ -352,20 +352,22 @@
   activeTabId
     ? 'active-collection-tab'
     : ''}"
->
-  <button
-    class="d-flex main-collection align-items-center bg-transparent border-0"
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click={() => {
-      isCollectionCreatedFirstTime.set(false);
-      visibility = !visibility;
-      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+  on:click={() => {
+    isCollectionCreatedFirstTime.set(false);
+    visibility = !visibility;
+    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+      if (visibility) {
         onItemOpened("collection", {
           workspaceId: collection.workspaceId,
           collection,
         });
       }
-    }}
+    }
+  }}
+>
+  <button
+    class="d-flex main-collection align-items-center bg-transparent border-0"
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
   >
     <img
       src={angleRight}
@@ -441,7 +443,7 @@
       class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
         ? 'add-item-active'
         : ''}"
-      on:click={(e) => {
+      on:click|stopPropagation={(e) => {
         rightClickContextMenu2(e);
       }}
     >
@@ -451,7 +453,7 @@
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
         : ''}"
-      on:click={(e) => {
+      on:click|stopPropagation={(e) => {
         rightClickContextMenu(e);
       }}
     >
@@ -490,7 +492,7 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; display: {visibility
         ? 'block'
         : 'none'};"
     >

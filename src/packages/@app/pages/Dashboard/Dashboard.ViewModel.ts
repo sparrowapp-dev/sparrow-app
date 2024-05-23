@@ -218,42 +218,11 @@ export class DashboardViewModel {
     return;
   };
 
-  private resizeWindowOnLogOut = async () => {
-    const isMaximized = await getCurrent().isMaximized();
-    if (isMaximized) {
-      const monitor = await currentMonitor();
-      const monitorPhysicalSize = await getCurrent().innerSize();
-      const scaleFactor = monitor!.scaleFactor;
-      const logicalSize = monitorPhysicalSize.toLogical(scaleFactor);
-
-      const minWidth = 570;
-      const maxWidth = 570;
-      const minHeight = 700;
-      const maxHeight = 700;
-
-      if (logicalSize.width < minWidth) {
-        logicalSize.width = minWidth;
-      }
-      if (logicalSize.width > maxWidth) {
-        logicalSize.width = maxWidth;
-      }
-      if (logicalSize.height < minHeight) {
-        logicalSize.height = minHeight;
-      }
-      if (logicalSize.height > maxHeight) {
-        logicalSize.height = maxHeight;
-      }
-      await getCurrent().setSize(logicalSize);
-      await getCurrent().center();
-    }
-  };
-
   private clientLogout = async (): Promise<void> => {
     setUser(null);
     await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
-    this.resizeWindowOnLogOut();
     isLoggout.set(true);
     isResponseError.set(false);
     clearAuthJwt();

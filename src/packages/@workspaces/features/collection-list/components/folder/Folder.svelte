@@ -252,13 +252,25 @@
 
   {#if explorer}
     {#if explorer.type === "FOLDER"}
-      <div
+      <button
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left: 36px;"
-        class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        style="height:32px; margin-left: 28px;"
+        class="border-0 bg-transparent d-flex align-items-center px-2 mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
+        on:click={() => {
+          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+            expand = !expand;
+            if (expand) {
+              onItemOpened("folder", {
+                workspaceId: collection.workspaceId,
+                collection,
+                folder: explorer,
+              });
+            }
+          }
+        }}
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
@@ -266,18 +278,6 @@
             setTimeout(() => {
               showMenu = true;
             }, 100);
-          }}
-          on:click={() => {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }
-            }
           }}
         >
           <img
@@ -381,12 +381,8 @@
             <img src={threedotIcon} alt="threedotIcon" />
           </button>
         {/if}
-      </div>
-      <div
-        style="padding-left: 0; cursor:pointer; display: {expand
-          ? 'block'
-          : 'none'};"
-      >
+      </button>
+      <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self
@@ -438,7 +434,7 @@
         </div>
       </div>
     {:else if explorer.type === "REQUEST"}
-      <div style="cursor:pointer;">
+      <div style="margin-left: 56px;">
         <Request
           api={explorer}
           {onItemRenamed}
