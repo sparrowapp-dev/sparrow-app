@@ -20,3 +20,4 @@ export { default as VectorIcon } from "./Vector.svelte";
 export { default as CrossIcon } from "./Cross.svelte";
 export { default as AttachmentIcon } from "./Attachment.svelte";
 export { default as UploadIcon } from "./Upload.svelte";
+export { default as InfoIcon } from "./Info.svelte";

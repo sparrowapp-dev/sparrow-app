@@ -337,6 +337,7 @@
           inputPlaceholder="Drag and Drop or"
           supportedFileTypes={[".png", ".jpg", ".jpeg", ".mp4"]}
           height={"80px"}
+          infoMessage={"Images: PNG, JPEG (Max 2 MB each). Video: MP4 (Max 10 MB, only 1 video allowed)"}
         />
         <div class="d-flex justify-content-between">
           <div></div>

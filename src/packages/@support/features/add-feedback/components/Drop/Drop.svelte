@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { UploadIcon } from "@library/icons";
+  import { InfoIcon, UploadIcon } from "@library/icons";
+  import { onDestroy, onMount } from "svelte";
 
   export let labelDescription = "";
   export let inputId: string;
   export let inputPlaceholder: string;
   export let maxFileSize: number;
   export let supportedFileTypes: string[] = [];
+  export let infoMessage = "";
 
   export let onChange: (
     e: any,
@@ -27,6 +29,22 @@
   ) => {
     onChange(event, maxFileSize, supportedFileTypes);
   };
+  let isInfoTooltipOpen = false;
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(`tooltip-select`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      isInfoTooltipOpen = false;
+    }
+  }
+
+  onDestroy(() => {
+    window.removeEventListener("click", handleSelectClick);
+  });
+
+  onMount(() => {
+    window.addEventListener("click", handleSelectClick);
+  });
 </script>
 
 <div class="sparrow-text-input-container mb-2">
@@ -49,7 +67,9 @@
         handleDrop(e, maxFileSize, supportedFileTypes);
       }}
     >
-      <div class="sparrow-choose-file-input-button d-flex align-items-stretch">
+      <div
+        class="sparrow-choose-file-input-button d-flex align-items-stretch position-relative"
+      >
         <label
           for={inputId}
           style="padding-left: 15px; padding-top: 15px; padding-bottom: 15px;"
@@ -66,6 +86,19 @@
         >
           {labelDescription}
         </label>
+        <span
+          style="width: 50px; padding-left: 15px; padding-top: 13px;"
+          id={`tooltip-select`}
+          on:click={() => {
+            isInfoTooltipOpen = true;
+          }}
+        >
+          <InfoIcon
+            height={"17px"}
+            width={"17px"}
+            color={"var(--text-primary-300)"}
+          />
+        </span>
         <input
           class="sparrow-choose-file-input visually-hidden"
           type="file"
@@ -78,6 +111,26 @@
           }}
           accept={generateAcceptString()}
         />
+        {#if isInfoTooltipOpen}
+          <div
+            class="p-2 position-absolute text-fs-12 bg-tertiary-650 border-radius-2"
+            style="top:10px; right: 0; width: 243px; transform: translateY(-100%);"
+          >
+            <div class="pb-2">
+              <span
+                ><InfoIcon
+                  height={"17px"}
+                  width={"17px"}
+                  color={"var(--text-primary-300)"}
+                /></span
+              >
+              <span class="ps-2 text-fs-12 text-primary-300">Information</span>
+            </div>
+            <p class="mb-0">
+              {infoMessage}
+            </p>
+          </div>
+        {/if}
       </div>
     </div>
     <!-- {/if} -->
