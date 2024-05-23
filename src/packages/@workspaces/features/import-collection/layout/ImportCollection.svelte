@@ -154,6 +154,7 @@
   const handleImport = async () => {
     if (importData === "") {
       isTextEmpty = true;
+      isInputDataTouched = true;
     } else {
       onItemImported("collection", {
         workspaceId,
