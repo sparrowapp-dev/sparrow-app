@@ -110,8 +110,7 @@
   {/if}
   {#if type === "text" && isHovered && !disabled}
     <span class="position-fixed" style="top:76px; right: 525px">
-      <PencilIcon height={"14px"} width={"14px"} color={"white"} 
-      />
+      <PencilIcon height={"14px"} width={"14px"} color={"white"} />
     </span>
   {/if}
 </div>
@@ -120,7 +119,5 @@
   input {
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
-    cursor:pointer; 
   }
-
 </style>

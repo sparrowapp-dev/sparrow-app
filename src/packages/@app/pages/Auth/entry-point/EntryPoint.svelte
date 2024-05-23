@@ -87,7 +87,7 @@
           openDefaultBrowser();
         }}
       >
-        Create Account or Sign In</button
+        Create an Account or Sign In</button
       >
     </div>
     <div class="w-100 mb-3 d-flex align-items-center justify-content-center">

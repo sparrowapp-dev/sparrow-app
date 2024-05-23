@@ -17,6 +17,7 @@
     | "primary"
     | "dark"
     | "danger"
+    | "violet"
     | "transparent"
     | "other"
     | "icon" = "other";
@@ -24,6 +25,7 @@
     PRIMARY = "primary",
     DARK = "dark",
     DANGER = "danger",
+    VIOLET = "violet",
     TRANSPARENT = "transparent",
     OTHER = "other",
     ICON = "icon",
@@ -40,6 +42,9 @@
       break;
     case BtnType.DANGER:
       btnClass = "custom-btn-danger";
+      break;
+    case BtnType.VIOLET:
+      btnClass = "custom-btn-violet";
       break;
     case BtnType.TRANSPARENT:
       btnClass = "custom-btn-transparent";
@@ -99,11 +104,15 @@
     background-color: var(--blackColor);
   }
   .custom-btn-primary {
-    background-color: var(--primary-btn-color);
+    background-color: var(--bg-primary-300);
     color: var(--white-color);
   }
   .custom-btn-dark {
     background-color: var(--border-color);
+    color: var(--white-color);
+  }
+  .custom-btn-violet {
+    background-color: var(--bg-tertiary-300);
     color: var(--white-color);
   }
   .custom-btn-dark:hover {

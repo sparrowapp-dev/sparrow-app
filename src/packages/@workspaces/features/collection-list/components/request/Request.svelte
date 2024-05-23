@@ -90,16 +90,11 @@
   });
   let requestTabWrapper: HTMLElement;
 
-  // $: {
-  //   if (api) {
-  //     path = {
-  //       workspaceId: $currentWorkspace._id,
-  //       collectionId: collection.id,
-  //       folderId: folder ? folder.id : "",
-  //       folderName: folder ? folder.name : "",
-  //     };
-  //   }
-  // }
+  $: {
+    if (isRenaming) {
+      newRequestName = api.name;
+    }
+  }
 
   onDestroy(() => {
     selectedMethodUnsubscibe();
@@ -217,16 +212,13 @@
   on:click={() => (showMenu = false)}
   on:contextmenu|preventDefault={() => (showMenu = false)}
 />
-
 <div
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; {folder?.id
-    ? 'padding-left: 46px;'
-    : 'padding-left: 30px;'}"
+  style="height:32px;"
 >
   <button
     on:contextmenu|preventDefault={(e) => {
@@ -247,7 +239,6 @@
     )
       ? 'unclickable'
       : ''}"
-   
   >
     {#if api?.isDeleted && "activeSync"}
       <span
