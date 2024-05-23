@@ -8,8 +8,13 @@ class HelpPageViewModel {
   constructor() {}
 
   /**
-   * @description - uploads users feedback
-   * @param feedback - feedback payload
+   * @description - uploads user feedback
+   * @param uploadFeedback - includes file
+   * @param type - feedback type
+   * @param feedbackSubject - feedback subject
+   * @param feedbackDescription - feedback description
+   * @param subCategory - feedback subcategory
+   * @returns
    */
   public sendFeedback = async (
     uploadFeedback,

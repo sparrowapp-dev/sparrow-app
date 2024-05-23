@@ -49,7 +49,7 @@
     }
     if (targetFile?.length > 5 || dataTransferFile?.length > 5) {
       uploadFeedback.file.value = [];
-      // notifications.error("too much files");
+      // no of files exceeds
       notifications.error(errorMessage);
       return;
     }
@@ -68,7 +68,7 @@
         (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png")
       ) {
         uploadFeedback.file.value = [];
-        // alert("image size exceeded");
+        // image size exceeded
         notifications.error(errorMessage);
         return;
       } else if (
@@ -77,12 +77,13 @@
         fileType === ".mp4"
       ) {
         uploadFeedback.file.value = [];
-        // alert("vedio size exceeded");
+        // vedio size exceeded
         notifications.error(errorMessage);
         return;
       } else if (!supportedFileTypes.includes(fileType)) {
         uploadFeedback.file.value = [];
-        alert("wrong format file upload");
+        // wrong format file upload
+        notifications.error(errorMessage);
         return;
       }
       if (fileType === ".mp4") {
