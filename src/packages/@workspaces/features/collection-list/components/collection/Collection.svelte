@@ -270,9 +270,9 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add Request",
+        displayText: "Add API Request",
         disabled: false,
-        hidden: true,
+        hidden: false,
       },
       {
         onClick: () =>
@@ -282,7 +282,7 @@
           }),
         displayText: "Add Folder",
         disabled: false,
-        hidden: true,
+        hidden: false,
       },
       {
         onClick: () => {
