@@ -133,6 +133,7 @@
         {tab.name}
       </span>
     </button>
+    <!-- {console.log(tab?.property?.request, !tab?.isSaved)} -->
     {#if tab?.property?.request && !tab?.isSaved}
       {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
         <span
