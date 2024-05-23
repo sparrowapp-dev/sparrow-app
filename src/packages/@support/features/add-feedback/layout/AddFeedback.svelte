@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { Select } from "@library/forms";
-  import { PlusIcon } from "@library/icons";
+  import { Input, Select, Textarea } from "@library/forms";
+  import { AttachmentIcon, CrossIcon, PlusIcon } from "@library/icons";
   import { Button, Modal } from "@library/ui";
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
 
   export let onSendFeedback;
 
-  let dropdownTitle = "Feedback";
+  let type = "Feedback";
   let feedbackDescription = "";
+  let subCategory = "Usability";
+  let feedbackSubject = "";
   let isExposeFeedbackForm = false;
   let uploadFeedback = {
     file: {
@@ -23,20 +25,19 @@
   ) => {
     const errorMessage =
       "Failed to upload the file. Please check the file size or the format";
-    console.log(e);
     const targetFile = e?.target?.files;
     const dataTransferFile = e?.dataTransfer?.files;
-    if (targetFile.length === 0) {
+    if (targetFile?.length === 0 || dataTransferFile?.length === 0) {
       return;
     }
-    if (targetFile.length > 5) {
+    if (targetFile?.length > 5 || dataTransferFile?.length > 5) {
       uploadFeedback.file.value = [];
       // notifications.error("too much files");
       notifications.error(errorMessage);
       return;
     }
     let vedioCount = 0;
-    for (let i = 0; i < targetFile.length; i++) {
+    for (let i = 0; i < (targetFile?.length || dataTransferFile?.length); i++) {
       const fileType = `.${(
         (targetFile && targetFile[i]?.name) ||
         (dataTransferFile && dataTransferFile[i]?.name)
@@ -45,12 +46,9 @@
         .pop()
         .toLowerCase()}`;
       if (
-        (((targetFile && targetFile[i].size > maxSize * 2048) ||
+        ((targetFile && targetFile[i].size > maxSize * 2048) ||
           (dataTransferFile && dataTransferFile[i].size > maxSize * 2048)) &&
-          fileType === ".jpg") ||
-        fileType === ".jpeg" ||
-        fileType === ".png" ||
-        fileType === ".pdf"
+        (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png")
       ) {
         uploadFeedback.file.value = [];
         // alert("image size exceeded");
@@ -82,22 +80,14 @@
     }
     uploadFeedback.file.value = targetFile || dataTransferFile;
   };
-
-  const handleLogoReset = (e: any) => {
-    uploadFeedback.file = {
-      value: [],
-      invalid: false,
-      showFileSizeError: false,
-      showFileTypeError: false,
-    };
-    // handleUpdateTeam(TeamProperty.IMAGE);
-  };
-
-  const handleLogoEdit = (e: any) => {
-    const uploadFileInput = document.getElementById(
-      "upload-team-icon-file-input2",
-    );
-    uploadFileInput.click();
+  const removeFile = (index) => {
+    const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {
+      if (i !== index) {
+        return true;
+      }
+      return false;
+    });
+    uploadFeedback.file.value = files;
   };
 </script>
 
@@ -119,16 +109,17 @@
   <Modal
     title={"Add Feedback"}
     type={"dark"}
-    width={"55%"}
+    width={"40%"}
     zIndex={10000}
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
     }}
   >
-    <div class="d-flex">
+    <div class="pt-2"></div>
+    <div class="d-flex pb-2">
       <Select
-        id={"hash999"}
+        id={"feeds"}
         data={[
           {
             name: "Feedback",
@@ -144,10 +135,16 @@
           },
         ]}
         zIndex={499}
-        titleId={dropdownTitle}
+        titleId={type}
         onclick={(id = "") => {
-          dropdownTitle = id;
-          //   onUpdateRequestState({ requestAuthNavigation: id });
+          type = id;
+          if (type === "Feedback") {
+            subCategory = "Usability";
+          } else if (type === "Bug") {
+            subCategory = "Low";
+          } else {
+            subCategory = "";
+          }
         }}
         disabled={false}
         borderType={"none"}
@@ -159,7 +156,7 @@
         minHeaderWidth={"128px"}
         maxHeaderWidth={"150px"}
         borderRounded={"4px"}
-        headerTheme={"violet"}
+        headerTheme={"violet2"}
         bodyTheme={"violet"}
         menuItem={"v2"}
         headerFontSize={"10px"}
@@ -167,45 +164,199 @@
         position={"absolute"}
       />
     </div>
+    {#if type === "Feedback" || type === "Bug"}
+      <p class="text-fs-14">Category</p>
+      <div class="d-flex gap-1 pb-4">
+        <!-- subCategory  starts-->
+        {#if type === "Feedback"}
+          <input
+            type="radio"
+            id="Usability"
+            name="option"
+            value="Usability"
+            bind:group={subCategory}
+          />
+          <label
+            for="Usability"
+            class="text-fs-12 border-radius-4 {subCategory === 'Usability'
+              ? 'label-active'
+              : ''}">Usability</label
+          ><br />
+          <input
+            type="radio"
+            id="Documentation"
+            name="option"
+            value="Documentation"
+            bind:group={subCategory}
+          />
+          <label
+            for="Documentation"
+            class="text-fs-12 border-radius-4 {subCategory === 'Documentation'
+              ? 'label-active'
+              : ''}">Documentation</label
+          ><br />
+          <input
+            type="radio"
+            id="Performance"
+            name="option"
+            value="Performance"
+            bind:group={subCategory}
+          />
+          <label
+            for="Performance"
+            class="text-fs-12 border-radius-4 {subCategory === 'Performance'
+              ? 'label-active'
+              : ''}">Performance</label
+          ><br />
+        {/if}
+
+        {#if type === "Bug"}
+          <input
+            type="radio"
+            id="Low"
+            name="option"
+            value="Low"
+            bind:group={subCategory}
+          />
+          <label
+            for="Low"
+            class="text-fs-12 border-radius-4 {subCategory === 'Low'
+              ? 'label-active'
+              : ''}">Low</label
+          ><br />
+          <input
+            type="radio"
+            id="Medium"
+            name="option"
+            value="Medium"
+            bind:group={subCategory}
+          />
+          <label
+            for="Medium"
+            class="text-fs-12 border-radius-4 {subCategory === 'Medium'
+              ? 'label-active'
+              : ''}">Medium</label
+          ><br />
+          <input
+            type="radio"
+            id="High"
+            name="option"
+            value="High"
+            bind:group={subCategory}
+          />
+          <label
+            for="High"
+            class="text-fs-12 border-radius-4 {subCategory === 'High'
+              ? 'label-active'
+              : ''}">High</label
+          ><br />
+          <input
+            type="radio"
+            id="Critical"
+            name="option"
+            value="Critical"
+            bind:group={subCategory}
+          />
+          <label
+            for="Critical"
+            class="text-fs-12 border-radius-4 {subCategory === 'Critical'
+              ? 'label-active'
+              : ''}">Critical</label
+          ><br />
+        {/if}
+
+        <!-- subCategory ends -->
+      </div>
+    {/if}
     <div>
-      <p>Category</p>
-      <p>Description</p>
-      <p>12 characters left</p>
-      <textarea class="w-100" bind:value={feedbackDescription} />
-      <Drop
-        value={uploadFeedback.file.value}
-        maxFileSize={2048}
-        onChange={handleLogoInputChange}
-        iconHeight={30}
-        iconWidth={30}
-        resetValue={handleLogoReset}
-        editValue={handleLogoEdit}
-        labelText=""
-        labelDescription="Drag and drop your image. We recommend that you upload an image with square aspect ratio.The image size should not be more than 2 MB. Supported formats are .jpg, .jpeg, .png"
-        labelDescriptionSize={"14px"}
-        inputId="upload-team-icon-file-input2"
-        inputPlaceholder="Drag and Drop or"
-        isRequired={false}
-        supportedFileTypes={[".png", ".jpg", ".jpeg", ".pdf", ".mp4"]}
-        showFileSizeError={uploadFeedback.file.showFileSizeError}
-        showFileTypeError={uploadFeedback.file.showFileTypeError}
-        fileTypeError="This file type is not supported. Please reupload in any of the following file formats."
-        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
-        width={"80px"}
-        height={"80px"}
-      />
+      <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
+      <p class="text-fs-12 text-secondary-200">
+        {500 - feedbackDescription.length} characters left
+      </p>
+
+      <div class="p-2 bg-tertiary-300 mb-3">
+        <Input
+          width={"100%"}
+          type="text"
+          bind:value={feedbackSubject}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;"
+          disabled={false}
+          placeholder="Subject"
+        />
+        <hr class="mt-1 mb-2" />
+        <Textarea
+          width={"100%"}
+          height={"120px"}
+          bind:value={feedbackDescription}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
+          class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
+          style="outline:none;"
+          disabled={false}
+          placeholder="Add description..."
+          maxlength={500}
+        />
+      </div>
+
+      <div class="drop-box mb-2">
+        <Drop
+          maxFileSize={2048}
+          onChange={handleLogoInputChange}
+          labelDescription="Choose an image or video, or drag and drop it here."
+          inputId="upload--feedback-file-input"
+          inputPlaceholder="Drag and Drop or"
+          supportedFileTypes={[".png", ".jpg", ".jpeg", ".mp4"]}
+          height={"80px"}
+        />
+        <div class="d-flex justify-content-between">
+          <div></div>
+          <div>
+            <span class="text-fs-12 text-tertiary-100"
+              >{uploadFeedback.file.value.length || 0}/5</span
+            >
+          </div>
+        </div>
+      </div>
     </div>
     {#if uploadFeedback?.file?.value?.length > 0}
-      {#each uploadFeedback.file.value as file}
-        <p>{file.name}</p>
-      {/each}
+      <div class="d-flex gap-1">
+        {#each uploadFeedback.file.value as file, index}
+          <div
+            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+          >
+            <span>
+              <AttachmentIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--text-secondary-200)"}
+              />
+            </span>
+            <span class="mb-0 text-fs-12 px-2">{file.name}</span>
+            <span
+              on:click={() => {
+                removeFile(index);
+              }}
+              ><CrossIcon
+                height={"12px"}
+                width={"9px"}
+                color={"var(--text-secondary-200)"}
+              /></span
+            >
+          </div>
+        {/each}
+      </div>
     {/if}
 
     <div class="d-flex align-items-center justify-content-between">
       <div></div>
       <div class="d-flex">
         <Button
-          type={"dark"}
+          type={"violet"}
           title={"Cancel"}
           buttonClassProp={"me-2"}
           onClick={async () => {
@@ -216,12 +367,16 @@
           type={"primary"}
           title={"Add"}
           onClick={async () => {
-            await onSendFeedback({
-              files: [...uploadFeedback.file.value],
-              type: dropdownTitle,
-              description: feedbackDescription,
-              subCategory: "High",
-            });
+            const files = Array.from(uploadFeedback.file.value);
+            const formData = new FormData();
+            files.forEach((file) => formData.append("files", file));
+            formData.append("type", type);
+            if (type === "Feedback" || type === "Bug") {
+              formData.append("subCategory", subCategory);
+            }
+            formData.append("subject", feedbackSubject);
+            formData.append("description", feedbackDescription);
+            await onSendFeedback(formData);
           }}
         />
       </div>
@@ -239,5 +394,18 @@
   }
   .add-feedback:active {
     background-color: var(--bg-primary-500);
+  }
+  input[type="radio"] {
+    display: none;
+  }
+  label {
+    border: 1px solid var(--border-primary-300);
+    padding: 2px 8px 2px 8px;
+    color: var(--text-secondary-200);
+    cursor: pointer;
+  }
+  .label-active {
+    background-color: var(--bg-primary-300);
+    color: var(--text-secondary-100);
   }
 </style>

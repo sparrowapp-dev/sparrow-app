@@ -78,8 +78,12 @@
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme: "dark" | "transparent" | "violet" | "dark-violet" =
-    "dark";
+  export let headerTheme:
+    | "dark"
+    | "transparent"
+    | "violet"
+    | "violet2"
+    | "dark-violet" = "dark";
 
   /**
    * Determines the background state for the Select body.
@@ -199,6 +203,9 @@
     case "violet":
       selectBackgroundClass = "select-background-violet";
       break;
+    case "violet2":
+      selectBackgroundClass = "select-background-violet2";
+      break;
     case "dark-violet":
       selectBackgroundClass = "select-background-dark-violet";
       break;
@@ -278,6 +285,9 @@
         case "violet":
           x = "violet";
           break;
+        case "violet2":
+          x = "violet2";
+          break;
         case "dark-violet":
           x = "dark-violet";
           break;
@@ -299,6 +309,9 @@
           break;
         case "violet":
           x = "violet";
+          break;
+        case "violet2":
+          x = "violet2";
           break;
         case "dark-violet":
           x = "dark-violet";
@@ -543,6 +556,9 @@
   .select-background-violet {
     background-color: var(--bg-tertiary-400);
   }
+  .select-background-violet2 {
+    background-color: var(--bg-tertiary-300);
+  }
   .select-background-dark-violet {
     background-color: var(--bg-secondary-600);
   }
@@ -557,6 +573,9 @@
   .select-btn-state-active-violet {
     background-color: var(--bg-tertiary-600);
   }
+  .select-btn-state-active-violet2 {
+    background-color: var(--bg-tertiary-600);
+  }
   .select-btn-state-active-dark-violet {
     background-color: var(--bg-tertiary-600);
   }
@@ -569,6 +588,9 @@
     background-color: var(--bg-secondary-400);
   }
   .select-btn-state-clicked-violet {
+    background-color: var(--bg-tertiary-700);
+  }
+  .select-btn-state-clicked-violet2 {
     background-color: var(--bg-tertiary-700);
   }
   .select-btn-state-clicked-dark-violet {

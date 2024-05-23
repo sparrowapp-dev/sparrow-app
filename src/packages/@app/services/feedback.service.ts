@@ -5,7 +5,6 @@ export class FeedbackService {
   constructor() {}
 
   public createFeedback = async (feedback) => {
-    console.log(feedback);
     const response = await makeRequest("POST", `${apiUrl}/api/feedback`, {
       body: feedback,
       headers: getMultipartAuthHeaders(),
