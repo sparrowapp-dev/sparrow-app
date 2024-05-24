@@ -243,7 +243,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Key"
+                  placeholder=""
                   class=" keyValuePair py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -253,7 +253,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Value"
+                  placeholder=""
                   class=" keyValuePair py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -315,7 +315,7 @@
                       updateParam(index);
                     }}
                     disabled={mode == "READ" ? true : false}
-                    placeholder={"Key"}
+                    placeholder={"Add Key"}
                     {theme}
                     {environmentVariables}
                     {onUpdateEnvironment}
@@ -395,7 +395,7 @@
                       onUpdateInput={() => {
                         updateParam(index);
                       }}
-                      placeholder={"Value"}
+                      placeholder={"Add Value"}
                       disabled={mode == "READ" ? true : false}
                       {theme}
                       {environmentVariables}
