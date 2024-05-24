@@ -179,8 +179,8 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Key</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0">Value</p>
     </div>
     <div class="h-75 pe-1">
       <button class="border-0" style="width:40px;" />
@@ -218,7 +218,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Value"
+                  placeholder=""
                   class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -228,7 +228,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Value"
+                  placeholder=""
                   class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -290,7 +290,7 @@
                     updateParam(index);
                   }}
                   disabled={mode == "READ" ? true : false}
-                  placeholder={"Key"}
+                  placeholder={"Add Key"}
                   {theme}
                   {environmentVariables}
                   {onUpdateEnvironment}
@@ -375,7 +375,7 @@
                     onUpdateInput={() => {
                       updateParam(index);
                     }}
-                    placeholder={"Value"}
+                    placeholder={"Add Value"}
                     disabled={mode == "READ" ? true : false}
                     {theme}
                     {environmentVariables}
