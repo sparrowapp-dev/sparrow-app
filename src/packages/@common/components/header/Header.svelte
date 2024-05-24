@@ -28,10 +28,7 @@
 </script>
 
 <header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
-  <div style="padding-left: 12px ;">
-    <div class="d-flex align-items-center justify-content-center gap-2" >
-  </div>
-</div>
+  <div></div>
   <div>
     <Select
       id={"environment-selector"}
