@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class="container"
+  class="container1"
   style="background-color: black ;  overflow-y: scroll !important;"
 >
   <div class="tabs">
@@ -130,13 +130,12 @@
 </div>
 
 <style>
-  .container {
+  .container1 {
     background-color: var(--text-danger-850);
     color: var(--text-secondary-100);
     padding: 20px;
     padding-top: 0px;
     border-radius: 10px;
-    width: "90%";
     margin: 0 auto;
   }
 

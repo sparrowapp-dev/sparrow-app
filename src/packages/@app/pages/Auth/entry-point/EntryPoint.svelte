@@ -112,10 +112,15 @@
         <span>Star us on GitHub</span>
       </p>
       <div class="divider-line my-4" />
-      <p class="text-center text-secondary-250 sparrow-fs-14">
-        Version {version}
-      </p>
-      <p class="check-for-update text-center sparrow-fs-12">Check for Update</p>
+
+      <div>
+        <p class="text-center text-secondary-250 sparrow-fs-14 m-1">
+          Version {version}
+        </p>
+        <p class="check-for-update text-center sparrow-fs-12 mb-5">
+          Check for Update
+        </p>
+      </div>
     </div>
   </BgContainer>
 {/if}
@@ -132,8 +137,19 @@
   .btn-primary {
     background: var(--bg-primary-300);
   }
+  .btn-primary:hover {
+    background: var(--text-primary-400);
+  }
+  .btn-primary:active {
+    background: var(--button-active);
+  }
+
   a {
     text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+    color: var(--primary-btn-color);
   }
   .cursor-pointer {
     cursor: pointer;
