@@ -150,7 +150,7 @@
     opacity: 0.9;
     padding-left: 12px; /* Adds padding on hover */
     padding-right: 12px;
-    padding-top: 4px;
+    padding-top: 14px;
     padding-bottom: 4px;
   }
 

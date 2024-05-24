@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Setting from "$lib/assets/setting.svelte";
   import { DiscordIcon } from "@library/icons";
   import HelpCenter from "@library/icons/HelpCenter.svelte";
+  import Setting2 from "@library/icons/Setting(2).svelte";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiscordIDs } from "@support/common/constants/discord.constants";
 </script>
@@ -61,7 +61,7 @@
       class="d-flex p-2 gap-2 align-items-center pt-2"
       style=" height: 44px; font-size:16px; color:var(--text-secondary-50);  "
     >
-      <span style=""> <Setting /> </span> <span>Support</span>
+      <span style=""> <Setting2/> </span> <span>Support</span>
     </div>
   </Tooltip>
   <Tooltip
