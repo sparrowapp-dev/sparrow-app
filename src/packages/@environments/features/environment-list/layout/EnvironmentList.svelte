@@ -94,28 +94,21 @@
   <div
     class={`d-flex justify-content-between curr-workspace-heading-container mb-2 `}
   >
-    <p
-      class={`mb-0 text-whiteColor ellipsis text-fs-16`}
-      style={`text-color: #FFF;`}
-    >
+    <p class={`mb-0 text-secondary-170 ellipsis text-fs-16`}>
       {currentWorkspace?.name || ""}
     </p>
-    <Tooltip
-      title={!addEnvDisabled ? `Add Environment` : PERMISSION_NOT_FOUND_TEXT}
-      placement={"left"}
-    >
-      <WithButtonV2
-        icon={PlusIcon}
-        disable={!hasWorkpaceLevelPermission(
-          loggedUserRoleInWorkspace,
-          workspaceLevelPermissions.ADD_ENVIRONMENT,
-        )}
-        onClick={() => {
-          onCreateEnvironment(localEnvironment);
-        }}
-        loader={false}
-      />
-    </Tooltip>
+
+    <WithButtonV2
+      icon={PlusIcon}
+      disable={!hasWorkpaceLevelPermission(
+        loggedUserRoleInWorkspace,
+        workspaceLevelPermissions.ADD_ENVIRONMENT,
+      )}
+      onClick={() => {
+        onCreateEnvironment(localEnvironment);
+      }}
+      loader={false}
+    />
   </div>
 
   {#if false}
@@ -138,20 +131,41 @@
     {/if}
     <hr class="mb-0 mt-1" />
 
-    <p class="fw-normal text-fs-12 rounded my-2" style="padding-left: 12px;">
+    <p class="fw-normal text-fs-12 rounded my-3" style="padding-left: 12px;">
       Environment Variables
     </p>
     {#if localEnvironment && localEnvironment.length === 0}
-      <div class={`pt-3 pb-2`}>
-        <p class={`add-env-desc-text text-fs-12 mb-0 fw-light text-center`}>
+      <div class={`pb-2`}>
+        <p
+          class={`mx-4 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
+          style="color: var(--text-secondary-50)"
+        >
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
+        <p
+          class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
+          style="color: var(--text-secondary-100);"
+          role="button"
+          on:click={() => {
+            onCreateEnvironment(localEnvironment);
+          }}
+        >
+          <PlusIcon
+            height={"22px"}
+            width={"22px"}
+            color={"var(--text-secondary-200)"}
+          />
+          <span
+            style="color: var(--text-secondary-200)"
+            class="ps-2 fw-bold text-fs-12">Add Environment</span
+          >
+        </p>
       </div>
     {/if}
-    <ul class={`env-side-tab-list p-0`}>
-      <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
-        {#if localEnvironment && localEnvironment.length > 0}
+    {#if localEnvironment && localEnvironment.length > 0}
+      <ul class={`env-side-tab-list p-0`}>
+        <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
           {#each localEnvironment as env}
             <ListItem
               {env}
@@ -163,20 +177,9 @@
               {onSelectEnvironment}
             />
           {/each}
-        {/if}
-        <p
-          class=" d-flex align-items-center text-fs-12 m-2 ms-3"
-          role="button"
-          on:click={() => {
-            onCreateEnvironment(localEnvironment);
-          }}
-          style="font-weight: {500};"
-        >
-          <PlusIcon />
-          <span class="text-secondary-100">Add Environment</span>
-        </p>
-      </List>
-    </ul>
+        </List>
+      </ul>
+    {/if}
   {/if}
 </div>
 
@@ -195,9 +198,6 @@
   }
   .add-env-mini-btn:active {
     background: var(--workspace-hover-color);
-  }
-  .add-env-desc-text {
-    color: #999;
   }
   .env-item {
     padding: 6px 6px 6px 12px;
@@ -232,5 +232,9 @@
     outline: none;
     background-color: var(--border-color);
     border-bottom: 1px solid #85c2ff !important;
+  }
+  .add-environment {
+    border: 1px solid var(--text-secondary-300);
+    height: 32px;
   }
 </style>

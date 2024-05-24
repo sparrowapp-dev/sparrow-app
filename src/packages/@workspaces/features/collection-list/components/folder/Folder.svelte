@@ -234,6 +234,22 @@
         },
         {
           onClick: () => {
+            onItemCreated("requestFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: "Add New API",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -259,18 +275,6 @@
         activeTabId
           ? 'active-folder-tab'
           : ''}"
-        on:click={() => {
-          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-            expand = !expand;
-            if (expand) {
-              onItemOpened("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }
-          }
-        }}
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
@@ -278,6 +282,18 @@
             setTimeout(() => {
               showMenu = true;
             }, 100);
+          }}
+          on:click={() => {
+            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+              expand = !expand;
+              if (expand) {
+                onItemOpened("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }
+            }
           }}
         >
           <img

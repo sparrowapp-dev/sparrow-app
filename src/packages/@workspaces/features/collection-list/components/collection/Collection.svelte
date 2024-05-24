@@ -270,7 +270,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add API Request",
+        displayText: "Add New API",
         disabled: false,
         hidden: false,
       },

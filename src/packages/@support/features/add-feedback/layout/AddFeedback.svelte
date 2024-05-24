@@ -292,7 +292,9 @@
     <div>
       <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
       <p class="text-fs-12 text-secondary-200">
-        {500 - feedbackDescription.length} characters left
+        {500 - feedbackDescription.length < 0
+          ? 0
+          : 500 - feedbackDescription.length} characters left
       </p>
 
       <div class="p-2 bg-tertiary-300 mb-3">
