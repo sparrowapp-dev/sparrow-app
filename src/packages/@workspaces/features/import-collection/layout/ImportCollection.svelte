@@ -152,31 +152,43 @@
   };
 
   const handleImport = async () => {
-    onItemImported("collection", {
-      workspaceId,
-      importData,
-      currentBranch,
-      getBranchList,
-      uploadCollection,
-      validations: {
-        activeSync,
-        isRepositoryPath,
-        isRepositoryPathTouched,
-        isRepositoryBranchTouched,
-        importType,
-        isTextEmpty,
-        isValidClientJSON,
-        isValidServerJSON,
-        isValidClientXML,
-        isValidServerXML,
-        isValidClientDeployedURL,
-        isValidServerDeployedURL,
-        isValidClientURL,
-        isValidServerURL,
-        repositoryBranch,
-        repositoryPath,
-      },
-    });
+    if (importData === "" && importType === "text") {
+      isTextEmpty = true;
+      isInputDataTouched = true;
+    } else if (
+      uploadCollection.file.value.length === 0 &&
+      importType === "file"
+    ) {
+      isFileEmpty = true;
+      isInputDataTouched = true;
+    } else {
+      onItemImported("collection", {
+        workspaceId,
+        importData,
+        currentBranch,
+        getBranchList,
+        uploadCollection,
+        validations: {
+          activeSync,
+          isRepositoryPath,
+          isRepositoryPathTouched,
+          isRepositoryBranchTouched,
+          importType,
+          isTextEmpty,
+          isValidClientJSON,
+          isValidServerJSON,
+          isValidClientXML,
+          isValidServerXML,
+          isValidClientDeployedURL,
+          isValidServerDeployedURL,
+          isValidClientURL,
+          isValidServerURL,
+          repositoryBranch,
+          repositoryPath,
+        },
+      });
+      closeImportCollectionPopup();
+    }
   };
 
   const extractGitBranch = async (filePathResponse: string) => {
@@ -267,7 +279,7 @@
   width={"35%"}
   zIndex={1000}
   isOpen={!progressBar.isLoading && !isSyntaxError}
-  handleModalState={(flag) => closeImportCollectionPopup()}
+  handleModalState={() => closeImportCollectionPopup()}
 >
   <div class="d-flex">
     <div class="form-check import-type-inp">
@@ -408,7 +420,11 @@
       </p>
     {/if}
   {/if}
-  {#if importType === "text" && isValidClientURL && isValidServerURL}
+
+  <!-- Disabling the Active Sync functionality for now 
+  Uncomment the commented code to enable it again. 
+  -->
+  <!--{#if importType === "text" && isValidClientURL && isValidServerURL}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"
@@ -438,7 +454,7 @@
       </div>
 
       {#if activeSync}
-        <!-- Local repository path -->
+         Local repository path
         <div>
           <p class="sparrow-fs-14 mb-1">
             Paste or browse local repository path <span class="asterik">*</span>
@@ -558,7 +574,7 @@
         {/if}
       {/if}
     </div>
-  {/if}
+  {/if} -->
 
   <div
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
@@ -570,7 +586,7 @@
         : 'btn-primary'} "
       on:click={() => {
         handleImport();
-        closeImportCollectionPopup();
+        // closeImportCollectionPopup();
       }}
       disabled={uploadCollection?.file?.showFileTypeError}
     >

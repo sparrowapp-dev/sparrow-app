@@ -8,10 +8,7 @@
   import { TabRepository } from "@app/repositories/tab.repository";
   import { syncTabs } from "$lib/store/request-response-section";
   import EntryPoint from "@app/pages/Auth/entry-point/EntryPoint.svelte";
-  import {
-    resizeWindowOnLogOut,
-    resizeWindowOnLogin,
-  } from "$lib/components/header/window-resize";
+  import { resizeWindowOnLogin } from "$lib/components/header/window-resize";
   import { registerDeepLinkHandler } from "$lib/utils/deeplink/app.deeplink";
   import { onMount } from "svelte";
   import { user } from "$lib/store/auth.store";
@@ -74,11 +71,7 @@
       isloggedIn = value;
     });
 
-    if (!isloggedIn) {
-      resizeWindowOnLogOut();
-    } else {
-      resizeWindowOnLogin();
-    }
+    resizeWindowOnLogin();
     window.addEventListener(
       "dragover",
       function (e) {

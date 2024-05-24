@@ -259,6 +259,18 @@
         activeTabId
           ? 'active-folder-tab'
           : ''}"
+        on:click={() => {
+          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+            expand = !expand;
+            if (expand) {
+              onItemOpened("folder", {
+                workspaceId: collection.workspaceId,
+                collection,
+                folder: explorer,
+              });
+            }
+          }
+        }}
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
@@ -266,18 +278,6 @@
             setTimeout(() => {
               showMenu = true;
             }, 100);
-          }}
-          on:click={() => {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }
-            }
           }}
         >
           <img
@@ -382,11 +382,7 @@
           </button>
         {/if}
       </div>
-      <div
-        style="padding-left: 0; cursor:pointer; display: {expand
-          ? 'block'
-          : 'none'};"
-      >
+      <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files">
           {#each explorer.items as exp}
             <svelte:self

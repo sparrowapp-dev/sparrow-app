@@ -79,7 +79,7 @@
   };
 
   const onRenameBlur = async () => {
-    if (newEnvironmentName) {
+    if (newEnvironmentName.trim()) {
       const response = await onUpdateEnvironment(env, newEnvironmentName);
     }
     isRenaming = false;

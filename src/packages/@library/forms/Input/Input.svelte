@@ -47,6 +47,8 @@
   export let hoveredBorderColor = "red";
   export let focusedBorderColor = "green";
 
+  export let isEditIconRequired = true;
+
   /**
    * input states
    */
@@ -70,14 +72,14 @@
 <div
   class="position-relative"
   style="height:{height}; width: {width}; !important"
+  on:mouseenter={() => {
+    isHovered = true;
+  }}
+  on:mouseleave={() => {
+    isHovered = false;
+  }}
 >
   <input
-    on:mouseenter={() => {
-      isHovered = true;
-    }}
-    on:mouseleave={() => {
-      isHovered = false;
-    }}
     on:focus={() => {
       isFocused = true;
     }}
@@ -91,11 +93,11 @@
       dispatch("input", event?.target?.value);
     }}
     {type}
-    class="w-100 {componentClass}"
+    class=" w-100 {componentClass}"
     {placeholder}
     style=" {componentStyle} height: 100%; {type === 'search'
       ? 'padding-left:35px !important;'
-      : ''} {type === 'text' && isHovered
+      : ''} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'
       : ''} border-color:{extractBorderHighlight(isHovered, isFocused)};"
     {disabled}
@@ -108,7 +110,7 @@
       <SearchIcon height={14} width={14} color={"var(--defaultcolor)"} />
     </span>
   {/if}
-  {#if type === "text" && isHovered && !disabled}
+  {#if type === "text" && isHovered && isEditIconRequired && !disabled}
     <span class="position-absolute" style="top:2px; right: 10px">
       <PencilIcon height={"14px"} width={"14px"} color={"white"} />
     </span>

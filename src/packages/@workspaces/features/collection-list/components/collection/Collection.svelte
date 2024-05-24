@@ -270,9 +270,9 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add Request",
+        displayText: "Add API Request",
         disabled: false,
-        hidden: true,
+        hidden: false,
       },
       {
         onClick: () =>
@@ -282,7 +282,7 @@
           }),
         displayText: "Add Folder",
         disabled: false,
-        hidden: true,
+        hidden: false,
       },
       {
         onClick: () => {
@@ -360,10 +360,12 @@
       isCollectionCreatedFirstTime.set(false);
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        onItemOpened("collection", {
-          workspaceId: collection.workspaceId,
-          collection,
-        });
+        if (visibility) {
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        }
       }
     }}
   >
@@ -490,7 +492,7 @@
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
     <div
-      style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
+      style="padding-left: 0; padding-right:0; display: {visibility
         ? 'block'
         : 'none'};"
     >

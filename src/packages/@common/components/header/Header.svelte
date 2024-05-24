@@ -2,7 +2,6 @@
   import { Select } from "@library/forms";
   import { StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
-  import icons from "$lib/assets/app.asset";
   /**
    * environment list
    */
@@ -32,8 +31,6 @@
   <div style="padding-left: 12px ;">
     <div class="d-flex align-items-center justify-content-center gap-2" >
   </div>
-  <img src={icons.appIcon} class="app-icon" alt="sparrowLogo"  style="width: 16.9px;
-  height: 17.5px; "/>
 </div>
   <div>
     <Select
