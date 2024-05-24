@@ -27,13 +27,13 @@
   let feedbackDescription = "";
   let subCategory: FeedbackSubCategory = FeedbackSubCategory.USABILITY;
   let feedbackSubject = "";
-  let isExposeFeedbackForm = false;
-  let isLoading = false;
   let uploadFeedback = {
     file: {
       value: [],
     },
   };
+  let isExposeFeedbackForm = false;
+  let isLoading = false;
 
   const handleLogoInputChange = (
     e: any,
@@ -402,6 +402,15 @@
             isLoading = false;
             if (res.isSuccessful) {
               isExposeFeedbackForm = false;
+              type = FeedbackType.FEEDBACK;
+              feedbackDescription = "";
+              subCategory = FeedbackSubCategory.USABILITY;
+              feedbackSubject = "";
+              uploadFeedback = {
+                file: {
+                  value: [],
+                },
+              };
             }
           }}
         />
