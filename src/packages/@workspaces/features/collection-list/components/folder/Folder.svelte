@@ -252,10 +252,10 @@
 
   {#if explorer}
     {#if explorer.type === "FOLDER"}
-      <button
+      <div
         bind:this={folderTabWrapper}
-        style="height:32px; margin-left: 28px;"
-        class="border-0 bg-transparent d-flex align-items-center px-2 mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        style="height:32px; padding-left: 36px;"
+        class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
@@ -381,7 +381,7 @@
             <img src={threedotIcon} alt="threedotIcon" />
           </button>
         {/if}
-      </button>
+      </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files">
           {#each explorer.items as exp}
@@ -434,7 +434,7 @@
         </div>
       </div>
     {:else if explorer.type === "REQUEST"}
-      <div style="margin-left: 56px;">
+      <div style="cursor:pointer;">
         <Request
           api={explorer}
           {onItemRenamed}

@@ -218,7 +218,9 @@
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; {folder?.id
+    ? 'padding-left: 46px;'
+    : 'padding-left: 30px;'}"
 >
   <button
     on:contextmenu|preventDefault={(e) => {
