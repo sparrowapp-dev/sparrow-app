@@ -137,17 +137,35 @@
     {#if localEnvironment && localEnvironment.length === 0}
       <div class={`pb-2`}>
         <p
-          class={`mx-4 add-env-desc-text text-fs-12 mb-0 fw-normal text-center`}
+          class={`mx-4 add-env-desc-text mb-3 text-fs-12 mb-0 fw-normal text-center`}
           style="color: var(--text-secondary-50)"
         >
           Add Environments to your Workspace to test your APIs with the relevant
           set of resources and constraints.
         </p>
+        <p
+          class="mx-4 add-environment d-flex justify-content-center align-items-center border-radius-2"
+          style="color: var(--text-secondary-100);"
+          role="button"
+          on:click={() => {
+            onCreateEnvironment(localEnvironment);
+          }}
+        >
+          <PlusIcon
+            height={"22px"}
+            width={"22px"}
+            color={"var(--text-secondary-200)"}
+          />
+          <span
+            style="color: var(--text-secondary-200)"
+            class="ps-2 fw-bold text-fs-12">Add Environment</span
+          >
+        </p>
       </div>
     {/if}
-    <ul class={`env-side-tab-list p-0`}>
-      <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
-        {#if localEnvironment && localEnvironment.length > 0}
+    {#if localEnvironment && localEnvironment.length > 0}
+      <ul class={`env-side-tab-list p-0`}>
+        <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
           {#each localEnvironment as env}
             <ListItem
               {env}
@@ -159,29 +177,9 @@
               {onSelectEnvironment}
             />
           {/each}
-        {/if}
-        <div class="px-4 pt-2">
-          <p
-            class="add-environment d-flex justify-content-center align-items-center border-radius-2"
-            style="color: var(--text-secondary-100);"
-            role="button"
-            on:click={() => {
-              onCreateEnvironment(localEnvironment);
-            }}
-          >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--text-secondary-200)"}
-            />
-            <span
-              style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add Environment</span
-            >
-          </p>
-        </div>
-      </List>
-    </ul>
+        </List>
+      </ul>
+    {/if}
   {/if}
 </div>
 
