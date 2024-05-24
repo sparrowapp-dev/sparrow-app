@@ -36,7 +36,12 @@
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
-  import { FolderIcon, SyncIcon } from "@library/icons";
+  import {
+    FolderIcon,
+    SyncIcon,
+    FolderPlusIcon,
+    RequestIcon,
+  } from "@library/icons";
   import { Options } from "@library/ui";
 
   let deletedIds: [string] | [] = [];
@@ -516,6 +521,40 @@
             This collection is empty
           </p>
         {/if}
+
+        <div
+          class="d-flex gap-2 {!collection?.items?.length
+            ? 'ms-4'
+            : 'collection-sub-btn'}"
+        >
+          <div
+          class="folderIcon d-flex justify-content-center align-items-center rounded-1"
+          style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              onItemCreated("folder", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            }}
+          >
+            <FolderPlusIcon />
+          </div>
+
+          <div
+          class="requestIcon d-flex justify-content-center align-items-center  rounded-1 "
+          style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              onItemCreated("requestCollection", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            }}
+          >
+            <RequestIcon height="16px" width="16px" />
+          </div>
+        </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
@@ -679,5 +718,15 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+
+  .collection-sub-btn {
+    margin-left: 24px;
+  }
+  .folderIcon:hover{
+    background: var(--right-border);
+  }
+  .requestIcon:hover{
+    background: var(--right-border);
   }
 </style>

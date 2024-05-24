@@ -254,7 +254,7 @@
     {#if explorer.type === "FOLDER"}
       <div
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left: 36px;"
+        style="height:32px; padding-left: 30px;"
         class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -282,7 +282,7 @@
         >
           <img
             src={angleRight}
-            class=""
+            class="me-3"
             style="height:8px; width:4px; margin-right:8px; {expand
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
