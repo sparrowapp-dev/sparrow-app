@@ -14,7 +14,6 @@
     maxFileSize: number,
     supportedFileTypes: string[],
   ) => void;
-  export let height = "auto";
   let isDragOver = false;
 
   const generateAcceptString = (): string => {
@@ -29,22 +28,8 @@
   ) => {
     onChange(event, maxFileSize, supportedFileTypes);
   };
-  let isInfoTooltipOpen = false;
 
-  function handleSelectClick(event: MouseEvent) {
-    const selectElement = document.getElementById(`tooltip-select`);
-    if (selectElement && !selectElement.contains(event.target as Node)) {
-      isInfoTooltipOpen = false;
-    }
-  }
-
-  onDestroy(() => {
-    window.removeEventListener("click", handleSelectClick);
-  });
-
-  onMount(() => {
-    window.addEventListener("click", handleSelectClick);
-  });
+  let isInfoTooltipHovered = false;
 </script>
 
 <div class="sparrow-text-input-container mb-2">
@@ -88,9 +73,11 @@
         </label>
         <span
           style="width: 50px; padding-left: 15px; padding-top: 13px;"
-          id={`tooltip-select`}
-          on:click={() => {
-            isInfoTooltipOpen = true;
+          on:mouseenter={() => {
+            isInfoTooltipHovered = true;
+          }}
+          on:mouseleave={() => {
+            isInfoTooltipHovered = false;
           }}
         >
           <InfoIcon
@@ -111,7 +98,7 @@
           }}
           accept={generateAcceptString()}
         />
-        {#if isInfoTooltipOpen}
+        {#if isInfoTooltipHovered}
           <div
             class="p-2 position-absolute text-fs-12 bg-tertiary-650 border-radius-2"
             style="top:10px; right: 0; width: 243px; transform: translateY(-100%);"

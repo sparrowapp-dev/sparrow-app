@@ -192,7 +192,7 @@
     } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3 d-none"
+      class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
     >
       <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
@@ -210,7 +210,7 @@
       </button>
     </div>
     <div
-      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-1"
+      class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
     >
       <Input
         width={"100%"}

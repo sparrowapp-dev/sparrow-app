@@ -299,6 +299,7 @@
         <Input
           width={"100%"}
           type="text"
+          isEditIconRequired={false}
           bind:value={feedbackSubject}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"

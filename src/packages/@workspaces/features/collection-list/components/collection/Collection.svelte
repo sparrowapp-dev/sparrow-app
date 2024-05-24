@@ -352,22 +352,22 @@
   activeTabId
     ? 'active-collection-tab'
     : ''}"
-  on:click={() => {
-    isCollectionCreatedFirstTime.set(false);
-    visibility = !visibility;
-    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-      if (visibility) {
-        onItemOpened("collection", {
-          workspaceId: collection.workspaceId,
-          collection,
-        });
-      }
-    }
-  }}
 >
   <button
     class="d-flex main-collection align-items-center bg-transparent border-0"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click={() => {
+      isCollectionCreatedFirstTime.set(false);
+      visibility = !visibility;
+      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (visibility) {
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        }
+      }
+    }}
   >
     <img
       src={angleRight}
@@ -443,7 +443,7 @@
       class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
         ? 'add-item-active'
         : ''}"
-      on:click|stopPropagation={(e) => {
+      on:click={(e) => {
         rightClickContextMenu2(e);
       }}
     >
@@ -453,7 +453,7 @@
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
         : ''}"
-      on:click|stopPropagation={(e) => {
+      on:click={(e) => {
         rightClickContextMenu(e);
       }}
     >

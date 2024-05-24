@@ -341,7 +341,7 @@ class RestExplorerViewModel
       ...progressiveTab.property.request.state,
       ..._state,
     };
-    progressiveTab.isSaved = true;
+    progressiveTab.isSaved = false;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
