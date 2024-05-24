@@ -69,7 +69,7 @@
 </script>
 
 <div
-  class="select-environment-popup bg-tertiary-700 d-flex p-3 rounded"
+  class="select-environment-popup bg-tertiary-700 d-flex  p-3 rounded"
   style="
     top:{environmentAxisY}px;
     left:{environmentAxisX}px;
@@ -97,7 +97,7 @@
             handleInputValue();
           }}
         >
-          <div class="d-flex align-items-center border-radius-2">
+          <div class="d-flex mb-1 align-items-center border-radius-2">
             <div
               class="ms-1 d-flex align-items-center justify-content-center"
               style="height:22px; width:22px;"
@@ -122,6 +122,7 @@
               </p>
             </div>
           </div>
+
         </div>
       {/if}
     {/each}
@@ -144,7 +145,7 @@
           handleInputValue();
         }}
       >
-        <div class="d-flex align-items-center border-radius-2">
+        <div class="d-flex mb-1 align-items-center border-radius-2">
           <div
             class="ms-1 d-flex align-items-center justify-content-center"
             style="height:22px; width:22px;"
