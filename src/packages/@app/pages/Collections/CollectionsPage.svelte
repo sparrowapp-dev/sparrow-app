@@ -143,6 +143,7 @@
       prevTabId = value.tabId;
     } else tabPath = {};
   });
+  let scrollList;
 
   let githubRepoData: GithubRepoDocType;
   onMount(async () => {
@@ -187,6 +188,7 @@
     class="bg-secondary-900-important"
   >
     <CollectionList
+      bind:scrollList
       {collectionList}
       {currentWorkspace}
       leftPanelController={{
@@ -275,8 +277,18 @@
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={_viewModel.handleCreateItem}
-    onItemImported={_viewModel.handleImportItem}
+    onItemCreated={async (entityType, args) => {
+      const response = await _viewModel.handleCreateItem(entityType, args);
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+    }}
+    onItemImported={async (entityType, args) => {
+      await _viewModel.handleImportItem(entityType, args);
+      scrollList("bottom");
+    }}
     onImportDataChange={_viewModel.handleImportDataChange}
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}

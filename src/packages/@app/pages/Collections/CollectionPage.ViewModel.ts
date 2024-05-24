@@ -73,7 +73,11 @@ import type {
 
 //-----
 //Emuns
-import { RequestDataType, RequestDataset, WorkspaceDefault } from "$lib/utils/enums";
+import {
+  RequestDataType,
+  RequestDataset,
+  WorkspaceDefault,
+} from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
   WorkspaceRole,
@@ -117,7 +121,7 @@ export default class CollectionsViewModel {
   movedTabEndIndex = 0;
 
   constructor() {}
-  
+
   /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
@@ -126,15 +130,17 @@ export default class CollectionsViewModel {
     if (workspaceId) {
       const res = await this.collectionService.fetchCollection(workspaceId);
       if (res.isSuccessful) {
-        this.collectionRepository.bulkInsertData(res.data.data.map(collection => {
-          collection["workspaceId"] = workspaceId
-          return collection
-        }));
+        this.collectionRepository.bulkInsertData(
+          res.data.data.map((collection) => {
+            collection["workspaceId"] = workspaceId;
+            return collection;
+          }),
+        );
       } else {
-        notifications.error("Failed to fetch collections!")
+        notifications.error("Failed to fetch collections!");
       }
     }
-  }
+  };
 
   /**
    * Get role of the user in workspace
@@ -609,7 +615,7 @@ export default class CollectionsViewModel {
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      this.addCollection({
+      await this.addCollection({
         ...res,
         id: res._id,
         workspaceId: workspaceId,
@@ -641,7 +647,7 @@ export default class CollectionsViewModel {
       this.handleOpenCollection(workspaceId, Samplecollection);
       moveNavigation("right");
 
-      this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
+      await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
       });
@@ -651,12 +657,10 @@ export default class CollectionsViewModel {
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
       });
-      return;
     } else {
-      this.collectionRepository.deleteCollection(newCollection.id);
       notifications.error(response.message ?? "Failed to create collection!");
     }
-    return;
+    return response;
   };
 
   /**
@@ -2345,27 +2349,38 @@ export default class CollectionsViewModel {
    * @param args :object - arguments depending on entity type
    */
   public handleCreateItem = async (entityType: string, args: any) => {
+    let response;
     switch (entityType) {
       case "collection":
-        this.handleCreateCollection(args.workspaceId, args.collection);
+        response = await this.handleCreateCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "folder":
-        this.handleCreateFolderInCollection(args.workspaceId, args.collection);
+        await this.handleCreateFolderInCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "request":
-        this.createNewTab();
+        await this.createNewTab();
         break;
       case "requestCollection":
-        this.handleCreateRequestInCollection(args.workspaceId, args.collection);
+        await this.handleCreateRequestInCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "requestFolder":
-        this.handleCreateRequestInFolder(
+        await this.handleCreateRequestInFolder(
           args.workspaceId,
           args.collection,
           args.folder,
         );
         break;
     }
+    return response;
   };
 
   /**

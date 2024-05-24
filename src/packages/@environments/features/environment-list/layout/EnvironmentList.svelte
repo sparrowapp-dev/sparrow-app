@@ -54,6 +54,7 @@
    */
   export let onSelectEnvironment;
 
+  let scrollList;
   let localEnvironment;
   let globalEnvironment;
   let addEnvDisabled = false;
@@ -104,8 +105,9 @@
         loggedUserRoleInWorkspace,
         workspaceLevelPermissions.ADD_ENVIRONMENT,
       )}
-      onClick={() => {
-        onCreateEnvironment(localEnvironment);
+      onClick={async () => {
+        await onCreateEnvironment(localEnvironment);
+        scrollList("bottom");
       }}
       loader={false}
     />
@@ -165,7 +167,11 @@
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
       <ul class={`env-side-tab-list p-0`}>
-        <List height={"calc(100vh - 180px)"} classProps={"pb-2 pe-2"}>
+        <List
+          bind:scrollList
+          height={"calc(100vh - 195px)"}
+          classProps={"pb-2 pe-2"}
+        >
           {#each localEnvironment as env}
             <ListItem
               {env}
