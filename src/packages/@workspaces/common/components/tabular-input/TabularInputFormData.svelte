@@ -180,21 +180,11 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
-        style="margin-left: 7px;"
-      >
-        Key
-      </p>
-      <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
-        style="margin-left: 28px;"
-      >
-        Value
-      </p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Value</p>
     </div>
-    <div class="pe-1 d-flex gap-2">
-      <button class="bg-transparent border-0 d-flex" style="">
+    <div class="pe-1 d-flex">
+      <button class="bg-transparent border-0 d-flex d-none" style="">
         <p
           class="text-nowrap text-primary-300 mb-0 me-2"
           style="font-size: 10px;"
@@ -202,13 +192,13 @@
           Bulk Edit
         </p>
         <img
-          class="my-auto"
+          class="my-auto d-none"
           src={editIcon}
           alt="Edit Icon"
           style="height: 10px; width: 10px;"
         />
       </button>
-      <button class="bg-transparent border-0 d-flex" style="">
+      <button class="bg-transparent border-0 d-flex d-none" style="">
         <img
           class="my-auto"
           src={moreOptions}
@@ -216,6 +206,9 @@
           style="height: 10px; width: 10px;"
         />
       </button>
+      <div class="h-75 pe-1">
+        <button class="border-0" style="width:40px;" />
+      </div>
     </div>
   </div>
 
