@@ -192,7 +192,7 @@
           }}
         >
           {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"#0B5ED7"} height={15} />
+            <ViewGrid color={"var(--text-primary-400)"} height={15} />
           {:else}
             <VerticalGrid height={15} />
           {/if}
