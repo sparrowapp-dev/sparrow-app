@@ -36,17 +36,12 @@
     <div
       class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
       role="button"
-      style=" height:40px; background-color: var(--dropdown-button); border-radius:4px; "
+      style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
+      on:click={async () => {
+        await open(DiscordIDs.SparrowDiscordURL);
+      }}
     >
-      <div
-        class="fw-normal"
-        style="font-size: 14px;"
-        on:click={async () => {
-          await open(DiscordIDs.SparrowDiscordURL);
-        }}
-      >
-        Join
-      </div>
+      <div class="fw-normal" style="font-size: 14px;">Join</div>
     </div>
   </div>
 </div>

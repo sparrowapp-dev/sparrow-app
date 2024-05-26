@@ -2,6 +2,7 @@
   import Ellipse from "@library/icons/Ellipse.svelte";
   import LogoSymbol from "@library/icons/LogoSymbol.svelte";
   import { Tooltip } from "@library/ui/tooltip";
+  import { ArrowUnfilledIcon } from "@library/icons";
 
   let activeTab = "feedback";
 
@@ -11,6 +12,7 @@
       activeTab = tab;
     }
   }
+  let isReadMore = false;
 </script>
 
 <div
@@ -31,7 +33,8 @@
       horizontalOffset="+ 200px"
       showArrow={false}
     >
-      <div style="padding-top: 11px;"
+      <div
+        style="padding-top: 11px;"
         class="tab {activeTab === 'faq' ? 'active' : ''}"
         on:click={() => setActiveTab("faq")}
       >
@@ -60,7 +63,7 @@
     </div>
 
     {#if activeTab === "feedback"}
-      <div class="content-section " style="padding-left: 17px;">
+      <div class="content-section" style="padding-left: 17px;">
         <h2 class="" style="padding: 16px, 10px, 10px, 10px;">
           <LogoSymbol height="25px" width="25px" />
           <div
@@ -85,45 +88,71 @@
           Your messages will appear instantly in our Discord channel, ensuring
           you get quick responses and can engage in real-time discussions.
         </p>
-        <div class="key-features">
-          <h3>Key Features</h3>
+        <div class="d-flex justify-content-center">
           <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px; color:var(--text-secondary-50);"
+            role="button"
+            class="d-flex align-items-center"
+            on:click={() => {
+              isReadMore = !isReadMore;
+            }}
           >
-            <span><Ellipse /> </span><span class="fw-bold"
-              >Switchable Channel:</span
-            ><span class="fw-light"
-              >Easily navigate between different feedback and support channels.</span
+            <span class="me-2 text-primary-300 text-fs-14"
+              >{!isReadMore ? "More" : "Less"}</span
             >
-          </p>
-          <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px;  color:var(--text-secondary-50);"
-          >
-            <span><Ellipse /> </span><span class="fw-bold"
-              >Rich media sharing:</span
-            ><span class="fw-light">
-              Share screenshots , videos and other files to provide
-              comprehensive feedback.</span
+            <span
+              class="position-relative d-inline-block"
+              style={!isReadMore ? "" : "transform: rotate(180deg) !important;"}
+              ><ArrowUnfilledIcon
+                height={"14px"}
+                width={"14px"}
+                color={"var(--text-primary-300)"}
+              /></span
             >
-          </p>
-          <p
-            class="d-flex gap-2 align-items-center"
-            style="margin: 0px;  color:var(--text-secondary-50);"
-          >
-            <span><Ellipse /> </span><span class="fw-bold">Tagging: </span><span
-              class="fw-light"
-              >Tag your feedback for easy categorization and searchability.</span
-            >
-          </p>
-          <p
-            class="fw-light"
-            style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
-          >
-            Join our community and start contributing to Sparrow.
           </p>
         </div>
+        {#if isReadMore}
+          <div class="key-features">
+            <h3>Key Features</h3>
+            <p
+              class="d-flex gap-2 align-items-center"
+              style="margin: 0px; color:var(--text-secondary-50);"
+            >
+              <span><Ellipse /> </span><span class="fw-bold"
+                >Switchable Channel:</span
+              ><span class="fw-light"
+                >Easily navigate between different feedback and support
+                channels.</span
+              >
+            </p>
+            <p
+              class="d-flex gap-2 align-items-center"
+              style="margin: 0px;  color:var(--text-secondary-50);"
+            >
+              <span><Ellipse /> </span><span class="fw-bold"
+                >Rich media sharing:</span
+              ><span class="fw-light">
+                Share screenshots , videos and other files to provide
+                comprehensive feedback.</span
+              >
+            </p>
+            <p
+              class="d-flex gap-2 align-items-center"
+              style="margin: 0px;  color:var(--text-secondary-50);"
+            >
+              <span><Ellipse /> </span><span class="fw-bold"
+                >Tagging:
+              </span><span class="fw-light"
+                >Tag your feedback for easy categorization and searchability.</span
+              >
+            </p>
+            <p
+              class="fw-light"
+              style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
+            >
+              Join our community and start contributing to Sparrow.
+            </p>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>
@@ -146,7 +175,6 @@
   }
 
   .tab {
-   
     width: 260px;
     display: flex;
     padding: 10px 20px;
@@ -167,7 +195,7 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--text-primary-300 );
+    border-bottom: 4px solid var(--text-primary-300);
   }
 
   .feedback {
@@ -175,13 +203,13 @@
   }
   .feedback-section,
   .faq-section {
-    background:rgba(54, 112, 247, 0.2);
-  
+    background: rgba(54, 112, 247, 0.2);
+
     border: 1px solid;
     padding: 15px;
     margin-top: 10px;
     border-radius: 4px;
-    border-color: var( --bg-primary-600);
+    border-color: var(--bg-primary-600);
     display: none;
   }
 
