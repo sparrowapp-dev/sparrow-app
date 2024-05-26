@@ -79,7 +79,6 @@
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
-  let noOfRows = 3;
   let newRequestName: string = api.name;
   let inputField: HTMLInputElement;
   let isRenaming = false;
@@ -95,11 +94,28 @@
       newRequestName = api.name;
     }
   }
+  function rightClickContextMenu(e: Event) {
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(`show-more-api-${api.id}`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
 
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu={handleSelectClick}
+/>
 
 <ModalWrapperV1
   title={"Delete Request?"}
@@ -208,10 +224,6 @@
   />
 {/if}
 
-<svelte:window
-  on:click={() => (showMenu = false)}
-  on:contextmenu|preventDefault={() => (showMenu = false)}
-/>
 <div
   bind:this={requestTabWrapper}
   class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
@@ -223,11 +235,7 @@
     : 'padding-left: 30px;'}"
 >
   <button
-    on:contextmenu|preventDefault={(e) => {
-      setTimeout(() => {
-        showMenu = true;
-      }, 100);
-    }}
+    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click={() => {
       onItemOpened("request", {
         workspaceId: collection.workspaceId,
@@ -314,11 +322,12 @@
     <Spinner size={"15px"} />
   {:else}
     <button
+      id={`show-more-api-${api.id}`}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
         : ''}"
-      on:click|preventDefault={(e) => {
-        setTimeout(() => (showMenu = true), 100);
+      on:click={(e) => {
+        rightClickContextMenu(e);
       }}
     >
       <img src={threedotIcon} alt="threedotIcon" />

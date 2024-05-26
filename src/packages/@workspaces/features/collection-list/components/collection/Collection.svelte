@@ -65,17 +65,32 @@
    * @param e: Event
    */
   function rightClickContextMenu(e: Event) {
-    e.preventDefault();
     setTimeout(() => {
-      showMenu = true;
+      showMenu = !showMenu;
     }, 100);
   }
 
   function rightClickContextMenu2(e: Event) {
-    e.preventDefault();
     setTimeout(() => {
-      showAddItemMenu = true;
+      showAddItemMenu = !showAddItemMenu;
     }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+  function handleSelectClick2(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
   }
 
   /**
@@ -94,16 +109,6 @@
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
-
-  /**
-   * Handle toggling context menu
-   */
-  function closeRightClickContextMenu() {
-    showMenu = false;
-  }
-  function closeRightClickContextMenu2() {
-    showAddItemMenu = false;
-  }
 
   $: {
     if (searchData) {
@@ -173,6 +178,16 @@
   };
   let refreshCollectionLoader = false;
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu={handleSelectClick}
+  on:click={handleSelectClick2}
+  on:contextmenu={handleSelectClick2}
+  on:load={() => {
+    getFeatures();
+  }}
+/>
 
 <ModalWrapperV1
   title={"Delete Collection?"}
@@ -335,16 +350,6 @@
   />
 {/if}
 
-<svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
-  on:click={closeRightClickContextMenu2}
-  on:contextmenu|preventDefault={closeRightClickContextMenu2}
-  on:load={() => {
-    getFeatures();
-  }}
-/>
-
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
@@ -439,7 +444,9 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
+
     <button
+      id={`add-item-collection-${collection.id}`}
       class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
         ? 'add-item-active'
         : ''}"
@@ -449,7 +456,9 @@
     >
       <img src={AddIcon} alt="AddIcon" />
     </button>
+
     <button
+      id={`show-more-collection-${collection.id}`}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
         : ''}"

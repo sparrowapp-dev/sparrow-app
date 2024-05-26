@@ -47,10 +47,18 @@
   let noOfColumns = 180;
   let noOfRows = 4;
   function rightClickContextMenu(e) {
-    e.preventDefault();
     setTimeout(() => {
-      showMenu = true;
+      showMenu = !showMenu;
     }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-environment-${env?.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
   }
 
   const handleEnvironmentPopUpCancel = (flag) => {
@@ -63,10 +71,6 @@
       handleEnvironmentPopUpCancel(false);
     }
   };
-
-  function closeRightClickContextMenu() {
-    showMenu = false;
-  }
 
   //open environment
   function openEnvironment() {
@@ -207,8 +211,8 @@
 {/if}
 
 <svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
+  on:click={handleSelectClick}
+  on:contextmenu={handleSelectClick}
 />
 
 <div class="environment-tab mb-1" bind:this={environmentTabWrapper}>
@@ -257,7 +261,7 @@
         >
           <p
             class="ellipsis w-100 mb-0 text-fs-12"
-            on:contextmenu={(e) => {
+            on:contextmenu|preventDefault={(e) => {
               rightClickContextMenu(e);
             }}
           >
@@ -270,6 +274,7 @@
       <Spinner size={"15px"} />
     {:else}
       <button
+        id={`show-more-environment-${env?.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"

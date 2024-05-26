@@ -84,11 +84,9 @@
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
   let deleteLoader: boolean = false;
-  let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
-  let noOfRows = 4;
   let isRenaming = false;
   let requestCount: number;
   let requestIds: [string] | [] = [];
@@ -126,16 +124,30 @@
     }
   });
 
+  function rightClickContextMenu(e: Event) {
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-folder-${explorer.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
 </script>
 
 <svelte:window
-  on:click={() => (showMenu = false)}
-  on:contextmenu|preventDefault={() => (showMenu = false)}
+  on:click={handleSelectClick}
+  on:contextmenu={handleSelectClick}
 />
-
 <div>
   <ModalWrapperV1
     title={"Delete Folder?"}
@@ -261,7 +273,6 @@
               : true,
         },
       ]}
-      {noOfRows}
       {noOfColumns}
     />
   {/if}
@@ -278,11 +289,7 @@
       >
         <button
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
-          on:contextmenu|preventDefault={(e) => {
-            setTimeout(() => {
-              showMenu = true;
-            }, 100);
-          }}
+          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click={() => {
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
@@ -384,14 +391,12 @@
           </button>
 
           <button
+            id={`show-more-folder-${explorer.id}`}
             class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
               ? 'threedot-active'
               : ''}"
-            on:click|preventDefault={(e) => {
-              pos = { x: e.clientX, y: e.clientY };
-              setTimeout(() => {
-                showMenu = true;
-              }, 100);
+            on:click={(e) => {
+              rightClickContextMenu(e);
             }}
           >
             <img src={threedotIcon} alt="threedotIcon" />
