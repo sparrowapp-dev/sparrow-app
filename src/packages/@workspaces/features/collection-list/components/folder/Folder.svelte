@@ -146,7 +146,7 @@
 
 <svelte:window
   on:click={handleSelectClick}
-  on:contextmenu={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
 />
 <div>
   <ModalWrapperV1
@@ -281,13 +281,14 @@
     {#if explorer.type === "FOLDER"}
       <div
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left: 36px;"
+        style="height:32px;"
         class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
+          style="padding-left: 36px;"
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click={() => {
@@ -337,6 +338,7 @@
               autofocus
               maxlength={100}
               value={explorer.name}
+              on:click|stopPropagation={() => {}}
               on:blur={(e) => {
                 onItemRenamed("folder", {
                   workspaceId: collection.workspaceId,

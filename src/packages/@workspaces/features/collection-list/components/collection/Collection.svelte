@@ -177,13 +177,41 @@
     );
   };
   let refreshCollectionLoader = false;
+  let inputFocused = false;
+  let newCollectionName: string = "";
+
+  const handleRenameInput = (event) => {
+    newCollectionName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    inputFocused = false;
+    if (newCollectionName) {
+      await onItemRenamed("collection", {
+        workspaceId: collection.workspaceId,
+        collection,
+        newName: newCollectionName,
+      });
+    }
+    isRenaming = false;
+    newCollectionName = "";
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldCollection",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <svelte:window
   on:click={handleSelectClick}
-  on:contextmenu={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
   on:click={handleSelectClick2}
-  on:contextmenu={handleSelectClick2}
+  on:contextmenu|preventDefault={handleSelectClick2}
   on:load={() => {
     getFeatures();
   }}
@@ -353,23 +381,25 @@
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
+  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
 >
   <button
-    class="d-flex main-collection align-items-center bg-transparent border-0"
+    class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click={() => {
-      isCollectionCreatedFirstTime.set(false);
-      visibility = !visibility;
-      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        if (visibility) {
-          onItemOpened("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          });
+    on:click|preventDefault={() => {
+      if (!inputFocused) {
+        isCollectionCreatedFirstTime.set(false);
+        visibility = !visibility;
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          if (visibility) {
+            onItemOpened("collection", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          }
         }
       }
     }}
@@ -391,28 +421,17 @@
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
-        on:blur={(e) => {
-          onItemRenamed("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-            newName: e?.target?.value,
-          });
-          isRenaming = false;
+        on:click|stopPropagation={() => {}}
+        on:focus={() => {
+          inputFocused = true;
         }}
-        on:keydown={(e) => {
-          if (e.key === "Enter") {
-            onItemRenamed("collection", {
-              workspaceId: collection.workspaceId,
-              collection,
-              newName: e?.target?.value,
-            });
-            isRenaming = false;
-          }
-        }}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
       />
     {:else}
       <div
-        class="collection-collection.name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
+        class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 32px; text-align: left;"
       >
         <p class="ellipsis w-100 mb-0 text-fs-12">
@@ -674,8 +693,8 @@
   .active-collection-tab {
     background-color: var(--bg-tertiary-400) !important;
   }
-  .collection-collection.name {
-    width: calc(100% - 30px);
+  .collection-collection-name {
+    width: calc(100% - 10px);
     text-align: left;
   }
   .refresh-collection-loader {

@@ -114,7 +114,7 @@
 
 <svelte:window
   on:click={handleSelectClick}
-  on:contextmenu={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
 />
 
 <ModalWrapperV1
@@ -230,9 +230,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; {folder?.id
-    ? 'padding-left: 46px;'
-    : 'padding-left: 30px;'}"
+  style="height:32px;"
 >
   <button
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
@@ -244,6 +242,7 @@
         request: api,
       });
     }}
+    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -277,6 +276,7 @@
         type="text"
         maxlength={100}
         value={newRequestName}
+        on:click|stopPropagation={() => {}}
         bind:this={inputField}
         on:blur={(e) => {
           onItemRenamed("request", {

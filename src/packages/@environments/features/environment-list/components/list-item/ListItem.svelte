@@ -110,7 +110,7 @@
   };
 
   let menuItems = [];
-  let environmentTabWrapper;
+  let environmentTabWrapper: HTMLElement;
 
   $: {
     if (currentWorkspace) {
@@ -205,28 +205,37 @@
     ]}
     zIndex={500}
     {menuItems}
-    {noOfRows}
     {noOfColumns}
   />
 {/if}
 
 <svelte:window
   on:click={handleSelectClick}
-  on:contextmenu={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
 />
 
 <div class="environment-tab mb-1" bind:this={environmentTabWrapper}>
   <button
     style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 ps-3 my-button {env?.id ===
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
     currentEnvironment?.id
       ? 'active-collection-tab'
       : ''}"
   >
-    <div class="d-flex main-collection align-items-center">
+    <div
+      class="d-flex main-collection align-items-center ps-3"
+      on:contextmenu|preventDefault={(e) => {
+        rightClickContextMenu(e);
+      }}
+      on:click={() => {
+        if (!env.id.includes(UntrackedItems.UNTRACKED)) {
+          openEnvironment();
+        }
+      }}
+    >
       <button
         class="p-0 m-0 me-2 border-0 bg-transparent"
-        on:click={() => {
+        on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
@@ -245,6 +254,7 @@
           value={env.name}
           autofocus
           maxlength={100}
+          on:click|stopPropagation={() => {}}
           on:input={handleRenameInput}
           on:blur={onRenameBlur}
           on:keydown={onRenameInputKeyPress}
@@ -253,18 +263,8 @@
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
           style="height: 36px;"
-          on:click={() => {
-            if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-              openEnvironment();
-            }
-          }}
         >
-          <p
-            class="ellipsis w-100 mb-0 text-fs-12"
-            on:contextmenu|preventDefault={(e) => {
-              rightClickContextMenu(e);
-            }}
-          >
+          <p class="ellipsis w-100 mb-0 text-fs-12">
             {env.name}
           </p>
         </div>
