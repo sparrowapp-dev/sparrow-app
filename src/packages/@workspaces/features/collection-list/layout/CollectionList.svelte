@@ -82,10 +82,9 @@
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let filteredCollection: CollectionDocument[] = [];
-  let filteredFolder: Folder[] = [];
-  let filteredFile: RequestType[] = [];
   let addButtonMenu: boolean = false;
+
+  export let scrollList;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
@@ -288,7 +287,11 @@
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
-              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+              <List
+                bind:scrollList
+                height={"calc(100vh - 160px)"}
+                classProps={"pb-2 pe-1"}
+              >
                 {#each collectionFilter as col}
                   <Collection
                     {onItemCreated}
@@ -306,7 +309,11 @@
                 {/each}
               </List>
             {:else}
-              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+              <List
+                bind:scrollList
+                height={"calc(100vh - 160px)"}
+                classProps={"pb-2 pe-1"}
+              >
                 <p
                   class="not-found-text text-fs-12 text-center mx-auto ellipsis"
                 >
@@ -315,7 +322,11 @@
               </List>
             {/if}
           {:else}
-            <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+            <List
+              bind:scrollList
+              height={"calc(100vh - 160px)"}
+              classProps={"pb-2 pe-1"}
+            >
               {#each collectionListDocument as col}
                 <Collection
                   {onItemCreated}
