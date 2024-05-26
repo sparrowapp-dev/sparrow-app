@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-
   // ---- Components
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
@@ -19,10 +17,6 @@
     Path,
   } from "$lib/utils/interfaces/request.interface";
   import { UntrackedItems } from "$lib/utils/enums";
-
-  // ---- Store
-  import { showPathStore } from "$lib/store/methods";
-  import { currentFolderIdName } from "$lib/store/collection";
 
   // --- SVG
   import threedotIcon from "$lib/assets/3dot.svg";
@@ -65,35 +59,16 @@
    * Current Tab Path
    */
   export let activeTabId: string;
-  export let activeTabPath;
-
-  let showPath = false;
-
-  if (folder) {
-    currentFolderIdName.set({
-      folderId: folder.id,
-      folderName: folder.name,
-    });
-  }
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
-  let newRequestName: string = api.name;
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
 
-  const selectedMethodUnsubscibe = showPathStore.subscribe((value) => {
-    showPath = value;
-  });
   let requestTabWrapper: HTMLElement;
 
-  $: {
-    if (isRenaming) {
-      newRequestName = api.name;
-    }
-  }
   function rightClickContextMenu(e: Event) {
     setTimeout(() => {
       showMenu = !showMenu;
@@ -107,9 +82,34 @@
     }
   }
 
-  onDestroy(() => {
-    selectedMethodUnsubscibe();
-  });
+  let newRequestName: string = "";
+
+  const handleRenameInput = (event) => {
+    newRequestName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newRequestName) {
+      await onItemRenamed("request", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder: folder ? folder : { id: "" },
+        request: api,
+        newName: newRequestName,
+      });
+    }
+    isRenaming = false;
+    newRequestName = "";
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFile",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <svelte:window
@@ -234,13 +234,15 @@
 >
   <button
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click={() => {
-      onItemOpened("request", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        request: api,
-      });
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("request", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+      }
     }}
     style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
@@ -275,31 +277,12 @@
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
-        value={newRequestName}
+        value={api.name}
         on:click|stopPropagation={() => {}}
         bind:this={inputField}
-        on:blur={(e) => {
-          onItemRenamed("request", {
-            workspaceId: collection.workspaceId,
-            collection,
-            folder,
-            request: api,
-            newName: e?.target?.value,
-          });
-          isRenaming = false;
-        }}
-        on:keydown={(e) => {
-          if (e.key === "Enter") {
-            onItemRenamed("request", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: folder ? folder : { id: "" },
-              request: api,
-              newName: e?.target?.value,
-            });
-            isRenaming = false;
-          }
-        }}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
       />
     {:else}
       <div
@@ -307,13 +290,6 @@
         style="font-size: 12px;"
       >
         {api.name}
-        <!-- {#if showPath}
-          <span class="path-name ellipsis"
-            >{`${
-              api?.request?.url ? getPathFromUrl(api?.request?.url) : ""
-            }`}</span
-          >
-        {/if} -->
       </div>
     {/if}
   </button>

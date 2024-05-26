@@ -73,7 +73,11 @@ import type {
 
 //-----
 //Emuns
-import { RequestDataType, RequestDataset, WorkspaceDefault } from "$lib/utils/enums";
+import {
+  RequestDataType,
+  RequestDataset,
+  WorkspaceDefault,
+} from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
   WorkspaceRole,
@@ -117,7 +121,7 @@ export default class CollectionsViewModel {
   movedTabEndIndex = 0;
 
   constructor() {}
-  
+
   /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
@@ -126,15 +130,17 @@ export default class CollectionsViewModel {
     if (workspaceId) {
       const res = await this.collectionService.fetchCollection(workspaceId);
       if (res.isSuccessful) {
-        this.collectionRepository.bulkInsertData(res.data.data.map(collection => {
-          collection["workspaceId"] = workspaceId
-          return collection
-        }));
+        this.collectionRepository.bulkInsertData(
+          res.data.data.map((collection) => {
+            collection["workspaceId"] = workspaceId;
+            return collection;
+          }),
+        );
       } else {
-        notifications.error("Failed to fetch collections!")
+        notifications.error("Failed to fetch collections!");
       }
     }
-  }
+  };
 
   /**
    * Get role of the user in workspace
@@ -1814,10 +1820,7 @@ export default class CollectionsViewModel {
       };
     }
     if (newRequestName) {
-      if (!(folder && "id" in folder)) {
-        folder = { id: "" };
-      }
-      if (!folder.id) {
+      if (collection.id && workspaceId && !folder.id) {
         let storage: any = request;
         storage.name = newRequestName;
         const response = await this.collectionService.updateRequestInCollection(

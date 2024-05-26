@@ -227,9 +227,11 @@
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
-      on:click={() => {
-        if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-          openEnvironment();
+      on:click|preventDefault={() => {
+        if (!isRenaming) {
+          if (!env.id.includes(UntrackedItems.UNTRACKED)) {
+            openEnvironment();
+          }
         }
       }}
     >
@@ -248,7 +250,7 @@
       </button>
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection text-fs-14 w-100"
+          class="py-0 renameInputFieldCollection text-fs-12 w-100"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -310,7 +312,7 @@
 
     .threedot-active {
       visibility: visible;
-      // background-color: var(--workspace-hover-color);
+      background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
       background-color: var(--bg-secondary-400);

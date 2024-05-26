@@ -36,6 +36,7 @@
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
+  import { of } from "rxjs";
 
   /**
    * Callback for Item created
@@ -138,6 +139,33 @@
       showMenu = false;
     }
   }
+
+  let newFolderName: string = "";
+  const handleRenameInput = (event) => {
+    newFolderName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newFolderName) {
+      await onItemRenamed("folder", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder: explorer,
+        newName: newFolderName,
+      });
+    }
+    isRenaming = false;
+    newFolderName = "";
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFolder",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 
   onDestroy(() => {
     selectedMethodUnsubscibe();
@@ -291,15 +319,17 @@
           style="padding-left: 36px;"
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-          on:click={() => {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
+          on:click|preventDefault={() => {
+            if (!isRenaming) {
+              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                expand = !expand;
+                if (expand) {
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                }
               }
             }
           }}
@@ -339,26 +369,9 @@
               maxlength={100}
               value={explorer.name}
               on:click|stopPropagation={() => {}}
-              on:blur={(e) => {
-                onItemRenamed("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                  newName: e?.target?.value,
-                });
-                isRenaming = false;
-              }}
-              on:keydown={(e) => {
-                if (e.key === "Enter") {
-                  onItemRenamed("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                    newName: e?.target?.value,
-                  });
-                  isRenaming = false;
-                }
-              }}
+              on:input={handleRenameInput}
+              on:blur={onRenameBlur}
+              on:keydown={onRenameInputKeyPress}
             />
           {:else}
             <div
@@ -573,7 +586,7 @@
   }
 
   .main-folder {
-    width: calc(100% - 24px);
+    width: calc(100% - 48px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;

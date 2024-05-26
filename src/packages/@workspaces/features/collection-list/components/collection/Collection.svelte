@@ -177,7 +177,6 @@
     );
   };
   let refreshCollectionLoader = false;
-  let inputFocused = false;
   let newCollectionName: string = "";
 
   const handleRenameInput = (event) => {
@@ -185,7 +184,6 @@
   };
 
   const onRenameBlur = async () => {
-    inputFocused = false;
     if (newCollectionName) {
       await onItemRenamed("collection", {
         workspaceId: collection.workspaceId,
@@ -390,7 +388,7 @@
     class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
-      if (!inputFocused) {
+      if (!isRenaming) {
         isCollectionCreatedFirstTime.set(false);
         visibility = !visibility;
         if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
@@ -422,9 +420,6 @@
         maxlength={100}
         bind:this={inputField}
         on:click|stopPropagation={() => {}}
-        on:focus={() => {
-          inputFocused = true;
-        }}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}
         on:keydown={onRenameInputKeyPress}
