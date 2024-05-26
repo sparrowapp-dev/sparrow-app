@@ -31,39 +31,41 @@
 
   $: {
     if (keyValue) {
-      pairs = [];
-      pairs = keyValue;
+      identifySelectAllState();
+    }
+  }
 
-      let flag: boolean = false;
+  /**
+   * @description - calculates the select all checkbox state - weather checked or not
+   */
+  const identifySelectAllState = () => {
+    pairs = [];
+    pairs = keyValue;
+    controller = false;
+    if (pairs.length > 1) {
+      let isUncheckedExist: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
-          flag = true;
+          isUncheckedExist = true;
+          break;
         }
       }
-      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = false;
-      }
-      if (flag) {
+      if (isUncheckedExist) {
         controller = false;
       } else {
         controller = true;
       }
     }
-  }
+  };
 
   const updateParam = (index: number): void => {
-    // enables checkbox on new entry
-    pairs.forEach((elem, i) => {
-      if (i === index) {
-        elem.checked = true;
-      }
-    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
       mode === "WRITE" &&
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
+      pairs[pairs.length - 1].checked = true;
       pairs.push({
         key: "",
         value: "",
@@ -170,6 +172,7 @@
       <label class="container">
         <input
           type="checkbox"
+          disabled={pairs.length === 1}
           bind:checked={controller}
           on:input={handleCheckAll}
         />

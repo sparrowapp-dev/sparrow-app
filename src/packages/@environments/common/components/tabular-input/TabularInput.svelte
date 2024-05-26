@@ -7,6 +7,7 @@
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import type { KeyValueChecked } from "@common/types/workspace";
+  import { partition } from "rxjs";
 
   /**
    * tabular pair entries
@@ -25,33 +26,38 @@
 
   $: {
     if (keyValue) {
-      pairs = [];
-      pairs = keyValue;
-      let controller: boolean = false;
-      let flag: boolean = false;
+      identifySelectAllState();
+    }
+  }
+
+  /**
+   * @description - calculates the select all checkbox state - weather checked or not
+   */
+  const identifySelectAllState = () => {
+    pairs = [];
+    pairs = keyValue;
+    controller = false;
+    if (pairs.length > 1) {
+      let isUncheckedExist: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
-          flag = true;
+          isUncheckedExist = true;
+          break;
         }
       }
-      if (flag) {
+      if (isUncheckedExist) {
         controller = false;
       } else {
         controller = true;
       }
     }
-  }
+  };
 
   /**
    * @description - updates pair values
    * @param index - index of the pairs that needs to be updated
    */
   const updatePairs = (index: number): void => {
-    pairs.forEach((elem, i) => {
-      if (i === index) {
-        elem.checked = true;
-      }
-    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -132,6 +138,7 @@
       >
         <input
           type="checkbox"
+          disabled={pairs.length === 1}
           bind:checked={controller}
           on:input={handleCheckAll}
         />
