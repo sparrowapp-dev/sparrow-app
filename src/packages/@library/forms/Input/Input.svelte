@@ -49,6 +49,8 @@
 
   export let isEditIconRequired = true;
 
+  export let maxlength = 500;
+
   /**
    * input states
    */
@@ -93,6 +95,7 @@
       dispatch("input", event?.target?.value);
     }}
     {type}
+    {maxlength}
     class=" w-100 {componentClass}"
     {placeholder}
     style=" {componentStyle} height: 100%; {type === 'search'

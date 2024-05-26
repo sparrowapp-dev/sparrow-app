@@ -7,12 +7,8 @@ import type {
 
 //-----
 // Stores
-import { user, userWorkspaceLevelRole } from "$lib/store";
-import {
-  isApiCreatedFirstTime,
-  tabs,
-  progressiveTab,
-} from "$lib/store/request-response-section";
+import { userWorkspaceLevelRole } from "$lib/store";
+import { isApiCreatedFirstTime } from "$lib/store/request-response-section";
 //-----
 
 //-----
@@ -26,7 +22,6 @@ import { v4 as uuidv4 } from "uuid";
 
 //-----
 // Services
-import { EnvironmentService } from "$lib/services-v2/environment.service";
 import {
   insertCollection,
   insertCollectionDirectory,
@@ -50,10 +45,7 @@ import {
   useTree,
 } from "@common/utils/importCollectionValidations";
 import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-import {
-  PERMISSION_NOT_FOUND_TEXT,
-  workspaceLevelPermissions,
-} from "$lib/utils/constants/permissions.constant";
+import { workspaceLevelPermissions } from "$lib/utils/constants/permissions.constant";
 import { type CreateApiRequestPostBody } from "$lib/utils/dto";
 import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 //-----
@@ -62,8 +54,6 @@ import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 //Interfaces
 import type { CollectionItem } from "$lib/utils/interfaces/collection.interface";
 import type {
-  Collection,
-  RequestBody,
   Path,
   Request,
   Folder,
@@ -73,11 +63,8 @@ import type {
 
 //-----
 //Emuns
-import {
-  RequestDataType,
-  RequestDataset,
-  WorkspaceDefault,
-} from "$lib/utils/enums";
+
+import { RequestDataType, RequestDataset } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
   WorkspaceRole,
@@ -90,13 +77,12 @@ import {
 //Samples
 import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
 import { generateSampleRequest } from "$lib/utils/sample";
-import { generateSampleFolder } from "$lib/utils/sample/folder.sample";
 //-----
 
 import { moveNavigation } from "$lib/utils/helpers/navigation";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
-import { sample, type Observable } from "rxjs";
+import { type Observable } from "rxjs";
 import { InitRequestTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
@@ -615,7 +601,7 @@ export default class CollectionsViewModel {
 
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      this.addCollection({
+      await this.addCollection({
         ...res,
         id: res._id,
         workspaceId: workspaceId,
@@ -647,7 +633,7 @@ export default class CollectionsViewModel {
       this.handleOpenCollection(workspaceId, Samplecollection);
       moveNavigation("right");
 
-      this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
+      await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: Samplecollection.id,
         name: newCollection.name,
       });
@@ -657,12 +643,10 @@ export default class CollectionsViewModel {
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
       });
-      return;
     } else {
-      this.collectionRepository.deleteCollection(newCollection.id);
       notifications.error(response.message ?? "Failed to create collection!");
     }
-    return;
+    return response;
   };
 
   /**
@@ -1532,12 +1516,23 @@ export default class CollectionsViewModel {
       sampleRequest.property.request.save.api = true;
       sampleRequest.property.request.save.description = true;
 
-      this.handleOpenRequest(workspaceId, collection, explorer, sampleRequest);
+      this.handleOpenRequest(
+        workspaceId,
+        collection,
+        explorer,
+        sampleRequest.id,
+      );
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
         source: "Side Panel Dropdown",
       });
       return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.id,
+      );
     }
   };
 
@@ -1599,7 +1594,7 @@ export default class CollectionsViewModel {
     );
 
     // Update UI elements and handle navigation on success
-    if (response) {
+    if (response.isSuccessful) {
       const path: Path = {
         workspaceId: workspaceId,
         collectionId: collection.id,
@@ -1661,7 +1656,6 @@ export default class CollectionsViewModel {
         this.updateTab(collection.id, {
           name: newCollectionName,
         });
-        notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
@@ -2348,27 +2342,38 @@ export default class CollectionsViewModel {
    * @param args :object - arguments depending on entity type
    */
   public handleCreateItem = async (entityType: string, args: any) => {
+    let response;
     switch (entityType) {
       case "collection":
-        this.handleCreateCollection(args.workspaceId, args.collection);
+        response = await this.handleCreateCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "folder":
-        this.handleCreateFolderInCollection(args.workspaceId, args.collection);
+        await this.handleCreateFolderInCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "request":
-        this.createNewTab();
+        await this.createNewTab();
         break;
       case "requestCollection":
-        this.handleCreateRequestInCollection(args.workspaceId, args.collection);
+        await this.handleCreateRequestInCollection(
+          args.workspaceId,
+          args.collection,
+        );
         break;
       case "requestFolder":
-        this.handleCreateRequestInFolder(
+        await this.handleCreateRequestInFolder(
           args.workspaceId,
           args.collection,
           args.folder,
         );
         break;
     }
+    return response;
   };
 
   /**

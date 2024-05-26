@@ -58,8 +58,6 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
-  let environmentList: Observable<EnvironmentDocument[]> =
-    _viewModel.getEnvironmentList();
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
   const activeTab: Observable<TabDocument> = _viewModel.getActiveTab();
 
@@ -143,6 +141,7 @@
       prevTabId = value.tabId;
     } else tabPath = {};
   });
+  let scrollList;
 
   let githubRepoData: GithubRepoDocType;
   onMount(async () => {
@@ -160,15 +159,25 @@
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
   });
 
+  /**
+   * Refreshing collection whenever workspace switches
+   */
+  let prevWorkspaceId = "";
+  currentWorkspace.subscribe((value) => {
+    if (value) {
+      if (prevWorkspaceId !== value._id) {
+        _viewModel.fetchCollections($currentWorkspace?._id);
+      }
+      prevWorkspaceId = value._id;
+    }
+  });
+
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
     }
     if (splitter && $leftPanelCollapse === false) {
       splitter.style.display = "unset";
-    }
-    if (currentWorkspace) {
-      _viewModel.fetchCollections($currentWorkspace?._id);
     }
   }
 </script>
@@ -187,6 +196,7 @@
     class="bg-secondary-900-important"
   >
     <CollectionList
+      bind:scrollList
       {collectionList}
       {currentWorkspace}
       leftPanelController={{
@@ -275,8 +285,18 @@
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={_viewModel.handleCreateItem}
-    onItemImported={_viewModel.handleImportItem}
+    onItemCreated={async (entityType, args) => {
+      const response = await _viewModel.handleCreateItem(entityType, args);
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+    }}
+    onItemImported={async (entityType, args) => {
+      await _viewModel.handleImportItem(entityType, args);
+      scrollList("bottom");
+    }}
     onImportDataChange={_viewModel.handleImportDataChange}
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
