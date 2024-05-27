@@ -5,10 +5,25 @@
   // ---- View Model
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
   import { RestExplorer } from "@workspaces/features";
+  import { Debounce } from "@common/utils";
   export let tab;
   const _viewModel = new RestExplorerViewModel(tab);
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
+
+  const renameWithCollectionList = new Debounce().debounce(
+    _viewModel.updateNameWithCollectionList,
+    1000,
+  );
+  let prevTabName = "";
+  $: {
+    if (tab) {
+      if (tab?.name && prevTabName !== tab.name) {
+        renameWithCollectionList(tab.name);
+      }
+      prevTabName = tab.name;
+    }
+  }
 
   let environmentVariables = [];
   let environmentId: string;
