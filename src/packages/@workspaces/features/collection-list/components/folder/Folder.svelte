@@ -318,6 +318,7 @@
         <button
           style="padding-left: 30px;"
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
+          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click|preventDefault={() => {
             if (!isRenaming) {
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
@@ -340,6 +341,9 @@
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
+            on:click|stopPropagation={ ()=> {
+              expand = !expand;
+            }}
           />
           {#if expand}
             <div
