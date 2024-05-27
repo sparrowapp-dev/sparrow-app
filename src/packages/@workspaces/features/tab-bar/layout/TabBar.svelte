@@ -223,15 +223,15 @@
           },
         ]}
       >
-        <!-- <button
+        <button
           id="moreOptions"
-          class="border-0 bg-transparent pt-1 rounded"
+          class="border-0 bg-transparent pt-1 rounded d-none"
           on:click={() => {
             moreOption = !moreOption;
           }}
         >
           <MoreOptions height={15} />
-        </button> -->
+        </button>
       </Dropdown>
     </div>
   </div>
