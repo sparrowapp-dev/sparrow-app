@@ -78,6 +78,7 @@
   let codeMirrorView: EditorView;
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
+    handleEnvironmentBox("", "");
     handleInputChange(userInput);
     if (rawValue?.length > 0) {
       handleRawChange();
