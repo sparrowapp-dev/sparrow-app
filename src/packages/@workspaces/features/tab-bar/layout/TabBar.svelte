@@ -194,7 +194,7 @@
           {#if $requestSplitterDirection === "horizontal"}
             <ViewGrid color={"var(--text-primary-400)"} height={15} />
           {:else}
-            <VerticalGrid height={15} />
+            <VerticalGrid height={15} color="var(--blackColor)" />
           {/if}
         </button>
       </Dropdown>
