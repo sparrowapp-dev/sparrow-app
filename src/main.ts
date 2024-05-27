@@ -1,6 +1,6 @@
-import "./styles/style.scss";
-import App from "./App.svelte";
-import { RxDB } from "$lib/database/app.database";
+import "@app/styles/style.scss";
+import App from "@app/components/App.svelte";
+import { RxDB } from "@app/database/database";
 import mixpanel from "mixpanel-browser";
 import constants from "$lib/utils/constants";
 async function init() {
