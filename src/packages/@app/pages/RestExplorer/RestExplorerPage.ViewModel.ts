@@ -248,7 +248,7 @@ class RestExplorerViewModel
   };
 
   /**
-   * @description - updates environment tab name
+   * @description - updates request tab name
    * @param _name - new request name
    */
   public updateNameWithCollectionList = async (_name: string) => {
