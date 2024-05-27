@@ -74,7 +74,7 @@
 
 <button
   bind:this={buttonElement}
-  class="sidebar-item bg-transparent border-0"
+  class="sidebar-item d-flex align-items-center justify-content-center border-radius-4 bg-transparent border-0"
   class:disabled={item.disabled}
   class:hover={!item.disabled && isHovered}
   on:mouseenter={() => (isHovered = true)}
@@ -83,12 +83,7 @@
     showModal = !showModal;
   }}
 >
-  <div class="d-flex" style="align-items: center;">
-    {#if isRouteActive && !isHovered}
-      <div
-        style="background-color: var(--nav-bar-active-slash); position:fixed; height: 16px; width: 2px; left:10px"
-      ></div>
-    {/if}
+  <div class="d-flex align-iems-center justify-content-center">
     {#if isHovered && item.hoveredLogo && !item.disabled}
       <img src={item.hoveredLogo} alt={item.heading} />
     {:else if isRouteActive && item.selectedLogo}
@@ -106,7 +101,7 @@
     : 'd-none'}"
   style="top: {buttonPosition?.top -
     modalPostion?.height +
-    26}px; left: {buttonPosition?.left +
+    45}px; left: {buttonPosition?.left +
     buttonPosition?.width +
     10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 10000;"
 >
@@ -138,36 +133,13 @@
 
   .sidebar-item {
     position: relative;
-    padding-left: 12px; /* Initial padding */
-    padding-right: 12px;
-    padding-top: 14px;
-    padding-bottom: 4px;
+    height: 44px;
+    width: 44px;
   }
 
   .sidebar-item:hover {
-    background-color: var(--nav-bar-hover-background);
-    border-radius: 8px;
+    background-color: var(--nav-bar-hover-background) !important;
     opacity: 0.9;
-    padding-left: 12px; /* Adds padding on hover */
-    padding-right: 12px;
-    padding-top: 14px;
-    padding-bottom: 4px;
-  }
-
-  .sidebar-item :global(.active-link) {
-    filter: brightness(0) saturate(100%) invert(68%) sepia(50%) saturate(1710%)
-      hue-rotate(186deg) brightness(108%) contrast(101%);
-  }
-
-  .sidebar-item :global(.disabled) {
-    pointer-events: none; /* Disable pointer events */
-    opacity: 0.3; /* Optionally reduce opacity for visual indication */
-  }
-
-  .sidebar-item.disabled:hover {
-    /* Prevent hover styles on disabled items */
-    background-color: transparent;
-    border: none;
   }
 
   .modal-background {
