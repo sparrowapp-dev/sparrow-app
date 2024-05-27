@@ -528,7 +528,7 @@
             : 'collection-sub-btn'}"
         >
           <div
-          class="folderIcon d-flex justify-content-center align-items-center rounded-1"
+          class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
           style="height: 24px; width: 24px;"
             role="button"
             on:click={() => {
@@ -538,11 +538,11 @@
               });
             }}
           >
-            <FolderPlusIcon />
+            <FolderPlusIcon height="16px" width="16px" color="var(--request-arc)"/>
           </div>
 
           <div
-          class="requestIcon d-flex justify-content-center align-items-center  rounded-1 "
+          class="shortcutIcon d-flex justify-content-center align-items-center  rounded-1 "
           style="height: 24px; width: 24px;"
             role="button"
             on:click={() => {
@@ -552,7 +552,7 @@
               });
             }}
           >
-            <RequestIcon height="16px" width="16px" />
+            <RequestIcon height="16px" width="16px"  color="var(--request-arc)" />
           </div>
         </div>
         <!-- {#if showFolderAPIButtons}
@@ -723,10 +723,7 @@
   .collection-sub-btn {
     margin-left: 24px;
   }
-  .folderIcon:hover{
-    background: var(--right-border);
-  }
-  .requestIcon:hover{
+  .shortcutIcon:hover{
     background: var(--right-border);
   }
 </style>
