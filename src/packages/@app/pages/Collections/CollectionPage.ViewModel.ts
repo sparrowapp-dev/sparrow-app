@@ -63,6 +63,7 @@ import type {
 
 //-----
 //Emuns
+
 import { RequestDataType, RequestDataset } from "$lib/utils/enums";
 import { ItemType, UntrackedItems } from "$lib/utils/enums/item-type.enum";
 import {
@@ -1813,10 +1814,7 @@ export default class CollectionsViewModel {
       };
     }
     if (newRequestName) {
-      if (!(folder && "id" in folder)) {
-        folder = { id: "" };
-      }
-      if (!folder.id) {
+      if (collection.id && workspaceId && !folder.id) {
         let storage: any = request;
         storage.name = newRequestName;
         const response = await this.collectionService.updateRequestInCollection(
