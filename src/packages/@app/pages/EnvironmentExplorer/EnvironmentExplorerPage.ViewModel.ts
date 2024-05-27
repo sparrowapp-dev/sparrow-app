@@ -39,6 +39,18 @@ export class EnvironmentExplorerViewModel {
    * @description - updates environment tab name
    * @param _name - new environment name
    */
+  public updateNameWithEnvironmentList = async (_name: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (_name !== progressiveTab.name) {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+  };
+
+  /**
+   * @description - updates environment tab name
+   * @param _name - new environment name
+   */
   public updateName = async (_name: any, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.isSave = false;
