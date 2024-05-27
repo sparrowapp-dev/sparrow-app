@@ -7,6 +7,7 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import AddIcon from "$lib/assets/add.svg";
   import requestIcon from "$lib/assets/create_request.svg";
+  import { RequestIcon } from "@library/icons";
   import angleRight from "$lib/assets/angle-right-v2.svg";
 
   // ---- Components
@@ -402,7 +403,11 @@
               });
             }}
           >
-            <img src={AddIcon} alt="AddIcon" />
+            <RequestIcon
+              height="16px"
+              width="16px"
+              color="var(--white-color)"
+            />
           </button>
 
           <button
@@ -439,6 +444,13 @@
               This folder is empty
             </p>
           {/if}
+
+          <div
+            class="d-flex gap-2 {!collection?.items?.length
+              ? 'ms-4'
+              : 'collection-sub-btn'}"
+          ></div>
+
           <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
@@ -599,5 +611,8 @@
   }
   .folder-icon {
     width: 16px;
+  }
+  .shortcutIcon:hover {
+    background: var(--right-border);
   }
 </style>
