@@ -444,13 +444,6 @@
               This folder is empty
             </p>
           {/if}
-
-          <div
-            class="d-flex gap-2 {!collection?.items?.length
-              ? 'ms-4'
-              : 'collection-sub-btn'}"
-          ></div>
-
           <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
