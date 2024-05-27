@@ -32,6 +32,7 @@ import { generateSampleRequest } from "$lib/utils/sample";
 import type { CreateApiRequestPostBody } from "$lib/utils/dto";
 import { InitRequestTab } from "@common/utils";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { notifications } from "@library/ui/toast/Toast";
 // import { generateSampleRequest } from "$lib/utils/sample";
 // import type { Folder, Path } from "$lib/utils/interfaces/request.interface";
 // import { InitRequestTab } from "@common/utils";
@@ -159,6 +160,7 @@ class FolderExplorerPage {
         this.updateTab(folder.id, {
           name: newFolderName,
         });
+        notifications.success("Folder renamed successfully!");
       }
     }
   };
