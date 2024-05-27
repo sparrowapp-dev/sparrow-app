@@ -316,7 +316,7 @@
           : ''}"
       >
         <button
-          style="padding-left: 36px;"
+          style="padding-left: 30px;"
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
           on:click|preventDefault={() => {
@@ -336,7 +336,7 @@
         >
           <img
             src={angleRight}
-            class=""
+            class="me-3"
             style="height:8px; width:4px; margin-right:8px; {expand
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
