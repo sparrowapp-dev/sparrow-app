@@ -391,7 +391,6 @@
 >
   <button
     class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
-    on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         isCollectionCreatedFirstTime.set(false);
