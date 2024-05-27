@@ -524,6 +524,7 @@
         ? 'block'
         : 'none'};"
     >
+    
       <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
@@ -577,6 +578,7 @@
           >
             <RequestIcon height="16px" width="16px"  color="var(--request-arc)" />
           </div>
+          
         </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
