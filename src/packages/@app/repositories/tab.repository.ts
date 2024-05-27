@@ -69,7 +69,6 @@ export class TabRepository {
     if (selectedTab) {
       doc.forEach(async (tab) => {
         if (tab.index > selectedTab.index) {
-          console.log(tab.index);
           await tab.incrementalPatch({
             index: tab.index - 1,
           });

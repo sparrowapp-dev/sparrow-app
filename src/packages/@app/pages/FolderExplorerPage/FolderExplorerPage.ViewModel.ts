@@ -304,17 +304,19 @@ class FolderExplorerPage {
         tab.path.folderId,
         { ...updateObj, ...userSource },
       );
-    await this.collectionRepository.updateRequestOrFolderInCollection(
-      tab.path.collectionId,
-      tab.path.folderId,
-      updateFolderElement.data.data,
-    );
+    if (updateFolderElement.isSuccessful) {
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        tab.path.collectionId,
+        tab.path.folderId,
+        updateFolderElement.data.data,
+      );
 
-    await this.updateTab(tab.tabId, {
-      description: newDescription,
-      save: true,
-    });
-    moveNavigation("right");
+      await this.updateTab(tab.tabId, {
+        description: newDescription,
+        save: true,
+      });
+      moveNavigation("right");
+    }
   };
 
   /**

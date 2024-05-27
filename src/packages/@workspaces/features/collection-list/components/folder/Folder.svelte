@@ -36,6 +36,7 @@
 
   // ---- DB
   import type { CollectionDocument } from "@app/database/database";
+  import { of } from "rxjs";
 
   /**
    * Callback for Item created
@@ -84,11 +85,9 @@
   let expand: boolean = false;
   let showFolderAPIButtons: boolean = true;
   let deleteLoader: boolean = false;
-  let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
-  let noOfRows = 4;
   let isRenaming = false;
   let requestCount: number;
   let requestIds: [string] | [] = [];
@@ -126,16 +125,57 @@
     }
   });
 
+  function rightClickContextMenu(e: Event) {
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-folder-${explorer.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+
+  let newFolderName: string = "";
+  const handleRenameInput = (event) => {
+    newFolderName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newFolderName) {
+      await onItemRenamed("folder", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder: explorer,
+        newName: newFolderName,
+      });
+    }
+    isRenaming = false;
+    newFolderName = "";
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFolder",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
+
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
 </script>
 
 <svelte:window
-  on:click={() => (showMenu = false)}
-  on:contextmenu|preventDefault={() => (showMenu = false)}
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
 />
-
 <div>
   <ModalWrapperV1
     title={"Delete Folder?"}
@@ -234,6 +274,22 @@
         },
         {
           onClick: () => {
+            onItemCreated("requestFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: "Add New API",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -245,7 +301,6 @@
               : true,
         },
       ]}
-      {noOfRows}
       {noOfColumns}
     />
   {/if}
@@ -254,30 +309,29 @@
     {#if explorer.type === "FOLDER"}
       <div
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left: 30px;"
+        style="height:32px;"
         class="d-flex align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
-        on:click={() => {
-          if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-            expand = !expand;
-            if (expand) {
-              onItemOpened("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }
-          }
-        }}
       >
         <button
+          style="padding-left: 30px;"
           class="main-folder d-flex align-items-center pe-0 border-0 bg-transparent"
-          on:contextmenu|preventDefault={(e) => {
-            setTimeout(() => {
-              showMenu = true;
-            }, 100);
+          on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+          on:click|preventDefault={() => {
+            if (!isRenaming) {
+              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                expand = !expand;
+                if (expand) {
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                }
+              }
+            }
           }}
         >
           <img
@@ -314,26 +368,10 @@
               autofocus
               maxlength={100}
               value={explorer.name}
-              on:blur={(e) => {
-                onItemRenamed("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                  newName: e?.target?.value,
-                });
-                isRenaming = false;
-              }}
-              on:keydown={(e) => {
-                if (e.key === "Enter") {
-                  onItemRenamed("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                    newName: e?.target?.value,
-                  });
-                  isRenaming = false;
-                }
-              }}
+              on:click|stopPropagation={() => {}}
+              on:input={handleRenameInput}
+              on:blur={onRenameBlur}
+              on:keydown={onRenameInputKeyPress}
             />
           {:else}
             <div
@@ -368,14 +406,12 @@
           </button>
 
           <button
+            id={`show-more-folder-${explorer.id}`}
             class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
               ? 'threedot-active'
               : ''}"
-            on:click|preventDefault={(e) => {
-              pos = { x: e.clientX, y: e.clientY };
-              setTimeout(() => {
-                showMenu = true;
-              }, 100);
+            on:click={(e) => {
+              rightClickContextMenu(e);
             }}
           >
             <img src={threedotIcon} alt="threedotIcon" />
@@ -550,7 +586,7 @@
   }
 
   .main-folder {
-    width: calc(100% - 24px);
+    width: calc(100% - 48px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;

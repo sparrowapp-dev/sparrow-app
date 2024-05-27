@@ -1,19 +1,13 @@
 <script lang="ts">
   import { InfoIcon, UploadIcon } from "@library/icons";
-  import { onDestroy, onMount } from "svelte";
 
   export let labelDescription = "";
   export let inputId: string;
   export let inputPlaceholder: string;
-  export let maxFileSize: number;
   export let supportedFileTypes: string[] = [];
   export let infoMessage = "";
 
-  export let onChange: (
-    e: any,
-    maxFileSize: number,
-    supportedFileTypes: string[],
-  ) => void;
+  export let onChange: (e: any) => void;
   let isDragOver = false;
 
   const generateAcceptString = (): string => {
@@ -21,12 +15,8 @@
     return acceptString;
   };
 
-  const handleDrop = (
-    event: DragEvent,
-    maxFileSize: number,
-    supportedFileTypes: string[],
-  ) => {
-    onChange(event, maxFileSize, supportedFileTypes);
+  const handleDrop = (event: DragEvent) => {
+    onChange(event);
   };
 
   let isInfoTooltipHovered = false;
@@ -49,7 +39,7 @@
       on:drop={(e) => {
         e.preventDefault();
         isDragOver = false;
-        handleDrop(e, maxFileSize, supportedFileTypes);
+        handleDrop(e);
       }}
     >
       <div
@@ -94,7 +84,7 @@
           id={inputId}
           placeholder={inputPlaceholder}
           on:change={(e) => {
-            onChange(e, maxFileSize, supportedFileTypes);
+            onChange(e);
           }}
           accept={generateAcceptString()}
         />

@@ -23,3 +23,4 @@ export { default as UploadIcon } from "./Upload.svelte";
 export { default as InfoIcon } from "./Info.svelte";
 export { default as FolderPlusIcon } from "./FolderPlus.svelte";
 export { default as RequestIcon } from "./Request.svelte";
+export { default as ArrowUnfilledIcon} from "./ArrowUnfilled.svelte";

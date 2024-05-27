@@ -91,6 +91,7 @@ $sparrow-bg-container-four: #376FF7;
 
 $theme-grey-ffffff: #FFFFFF;
 $theme-grey-e5e5e5: #e5e5e5;
+$theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
 $theme-grey-999999: #999999;
 $theme-grey-83899F: #83899F;
@@ -459,6 +460,7 @@ $sparrow-text-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-250 : $theme-grey-636566,
   secondary-300 : $theme-grey-45494D,
@@ -498,6 +500,7 @@ $sparrow-bg-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
@@ -538,6 +541,7 @@ $sparrow-border-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
@@ -661,6 +665,7 @@ span {
 //
 ::-webkit-scrollbar {
   width: 2px;
+  height: 2px;
 }
 
 ::-webkit-scrollbar-thumb {

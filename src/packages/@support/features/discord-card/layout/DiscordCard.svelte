@@ -4,6 +4,7 @@
   import Setting2 from "@library/icons/Setting(2).svelte";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { DiscordIDs } from "@support/common/constants/discord.constants";
+  import { open } from "@tauri-apps/plugin-shell";
 </script>
 
 <div
@@ -35,17 +36,12 @@
     <div
       class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
       role="button"
-      style=" height:40px; background-color: var(--dropdown-button); border-radius:4px; "
+      style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
+      on:click={async () => {
+        await open(DiscordIDs.SparrowDiscordURL);
+      }}
     >
-      <div
-        class="fw-normal"
-        style="font-size: 14px;"
-        on:click={async () => {
-          await open(DiscordIDs.SparrowDiscordURL);
-        }}
-      >
-        Join
-      </div>
+      <div class="fw-normal" style="font-size: 14px;">Join</div>
     </div>
   </div>
 </div>
@@ -59,9 +55,10 @@
   >
     <div
       class="d-flex p-2 gap-2 align-items-center pt-2"
-      style=" height: 44px; font-size:16px; color:var(--text-secondary-50);  "
+      style=" height: 44px;  color:var(--text-secondary-50);  "
     >
-      <span style=""> <Setting2/> </span> <span>Support</span>
+      <span style=""> <Setting2 color={"var(--text-secondary-50)"} /> </span>
+      <span class="text-fs-14">Support</span>
     </div>
   </Tooltip>
   <Tooltip
@@ -75,7 +72,8 @@
       class="d-flex p-2 gap-2 align-items-center"
       style="height: 44px; color:var(--text-secondary-50)"
     >
-      <span> <HelpCenter /> </span> Help Center
+      <span> <HelpCenter color={"var(--text-secondary-50)"} /> </span>
+      <span class="text-fs-14">Help Center</span>
     </div>
   </Tooltip>
 </div>
