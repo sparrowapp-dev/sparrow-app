@@ -7,7 +7,7 @@
   import threedotIcon from "$lib/assets/3dot.svg";
   import AddIcon from "$lib/assets/add.svg";
   import requestIcon from "$lib/assets/create_request.svg";
-  import { RequestIcon} from "@library/icons";
+  import { RequestIcon } from "@library/icons";
   import angleRight from "$lib/assets/angle-right-v2.svg";
 
   // ---- Components
@@ -403,7 +403,11 @@
               });
             }}
           >
-            <img src={AddIcon} alt="AddIcon" />
+            <RequestIcon
+              height="16px"
+              width="16px"
+              color="var(--white-color)"
+            />
           </button>
 
           <button
@@ -437,37 +441,16 @@
           {/each}
           {#if !explorer?.items?.length}
             <p class="text-fs-10 ps-5 my-2 text-secondary-300">
-              This folder is empty 
+              This folder is empty
             </p>
           {/if}
 
-            
-        <div
-        class="d-flex gap-2 {!collection?.items?.length
-          ? 'ms-4'
-          : 'collection-sub-btn'}"
-      >
-        
-        
-      </div>
-      <div
-        class="shortcutIcon d-flex justify-content-center align-items-center  rounded-1  "
-        style="height: 24px; width: 24px;"
-          role="button"
-          on:click|preventDefault={() => {
-            expand = true;
-            onItemCreated("requestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          }}
-        >
-          <RequestIcon height="16px" width="16px"  color="var(--request-arc)" />
-        </div>
+          <div
+            class="d-flex gap-2 {!collection?.items?.length
+              ? 'ms-4'
+              : 'collection-sub-btn'}"
+          ></div>
 
-
-        
           <!-- {#if showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
@@ -629,7 +612,7 @@
   .folder-icon {
     width: 16px;
   }
-  .shortcutIcon:hover{
+  .shortcutIcon:hover {
     background: var(--right-border);
   }
 </style>
