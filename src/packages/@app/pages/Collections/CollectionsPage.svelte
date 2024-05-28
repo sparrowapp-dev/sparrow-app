@@ -281,7 +281,7 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 {#if isImportCollectionPopup}
-  <ImportCollection
+  <!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
@@ -300,6 +300,63 @@
     onImportDataChange={_viewModel.handleImportDataChange}
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
+  /> -->
+  <ImportCollection
+    onClick={() => {
+      isImportCollectionPopup = false;
+    }}
+    {collectionList}
+    onItemCreated={async (entityType, args) => {
+      const response = await _viewModel.handleCreateItem(entityType, args);
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+    }}
+    currentWorkspaceId={$currentWorkspace?._id}
+    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+      const response = await _viewModel.importJSONObject(
+        currentWorkspaceId,
+        importJSON,
+        contentType,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onCollectionFileUpload={async (currentWorkspaceId, file) => {
+      const response = await _viewModel.collectionFileUpload(
+        currentWorkspaceId,
+        file,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onImportCollectionURL={async (
+      currentWorkspaceId,
+      requestBody,
+      activeSync,
+    ) => {
+      const response = await _viewModel.importCollectionURL(
+        currentWorkspaceId,
+        requestBody,
+        activeSync,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
   />
 {/if}
 
