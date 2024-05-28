@@ -253,13 +253,13 @@
   >
     {#if api?.isDeleted && "activeSync"}
       <span
-        class="delete-ticker position-absolute sparrow-fs-10 px-2"
+        class="delete-ticker position-absolute sparrow-fs-10 px-2 d-none"
         style="right: 0; background-color: var(--background-color); "
         >DELETED</span
       >
     {/if}
     {#if "actSync" && api?.source === "SPEC"}
-      <img src={reloadSyncIcon} class="ms-2" alt="" />
+      <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
     {/if}
     <div
       class="api-method text-{getMethodStyle(
