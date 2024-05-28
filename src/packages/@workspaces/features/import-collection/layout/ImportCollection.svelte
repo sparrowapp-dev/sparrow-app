@@ -601,7 +601,7 @@
       </p>
     {/if}
   {/if}
-  {#if importType === "text" && isValidClientURL && isValidServerURL}
+  {#if importType === "text" && isValidClientURL && isValidServerURL && false}
     <div>
       <div>
         <small class="text-textColor sparrow-fs-12"
