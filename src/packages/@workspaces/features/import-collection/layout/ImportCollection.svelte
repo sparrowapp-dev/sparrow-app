@@ -313,6 +313,7 @@
       uploadCollection?.file?.value?.length !== 0
     ) {
       handleFileUpload(uploadCollection?.file?.value);
+      isLoading = false;
       return;
     } else if (
       importType === "file" &&
@@ -769,7 +770,7 @@
       on:click={() => {
         handleImport();
       }}
-      disabled={uploadCollection?.file?.showFileTypeError || isLoading}
+      disabled={isLoading}
     >
       <span class="me-3">
         {#if progressBar.isLoading || isLoading}
