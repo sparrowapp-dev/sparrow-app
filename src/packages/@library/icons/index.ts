@@ -25,3 +25,4 @@ export { default as FolderPlusIcon } from "./FolderPlus.svelte";
 export { default as RequestIcon } from "./Request.svelte";
 export { default as ArrowUnfilledIcon } from "./ArrowUnfilled.svelte";
 export { default as StarIcon } from "./Star.svelte";
+export { default as StarFilledIcon } from "./StarFilled.svelte";

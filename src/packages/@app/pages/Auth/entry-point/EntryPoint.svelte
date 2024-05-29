@@ -6,6 +6,7 @@
   import Header from "$lib/components/header/Header.svelte";
   import star from "$lib/assets/star.svg";
   import StarIcon from "../../../../@library/icons/Star.svelte";
+  import StarFilled from "@library/icons/StarFilled.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -16,11 +17,6 @@
   let isEntry = false;
 
   let isHover = false;
-
-  function toggleHover() {
-    isHover = !isHover;
-  }
-
   let redirectRules = {
     title: "Opening Web Browser...",
     description: "",
@@ -116,21 +112,28 @@
         }}
       >
         <div
-          class="d-flex star-div"
-          on:mouseenter={toggleHover}
-          on:mouseleave={toggleHover}
+          class="d-flex"
+          on:mouseenter={() => {
+            isHover = true;
+          }}
+          on:mouseleave={() => {
+            isHover = false;
+          }}
         >
           <div class="me-1">
-            <StarIcon
-              height="24px"
-              width="24px"
-              color={isHover
-                ? "var(--primary-btn-color)"
-                : "var(--white-color)"}
-            />
+            {#if isHover}
+              <StarFilled />
+            {:else}
+              <StarIcon />
+            {/if}
           </div>
 
-          <p class="star-text mb-0">Star us on GitHub</p>
+          <p
+            class="{isHover ? 'star-text-hover' : ''} mb-0"
+            style="margin-top:3px; "
+          >
+            Star us on GitHub
+          </p>
         </div>
       </div>
       <div class="divider-line my-4" />
@@ -201,15 +204,8 @@
     background-clip: text;
     color: transparent;
   }
-
-  .star-text {
-    margin-top: 3px;
-  }
-  .star-div {
-    border-bottom: 1px solid transparent;
-  }
-  .star-div:hover {
+  .star-text-hover {
     color: var(--primary-btn-color);
-    border-bottom: 1px solid var(--primary-btn-color);
+    text-decoration: underline;
   }
 </style>
