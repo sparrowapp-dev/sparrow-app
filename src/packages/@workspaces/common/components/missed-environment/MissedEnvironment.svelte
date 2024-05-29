@@ -141,9 +141,8 @@
         This variable is missing in your workspace. Try adding it as a global
         variable or under the active environment.
       </p>
-
       <div
-        class="prevent-default text-fs-12 text-center add-variable-btn border-radius-2 p-2 bg-tertiary-400"
+        class="add-btn prevent-default text-fs-12 text-center add-variable-btn border-radius-2 p-2 bg-tertiary-400"
         role="button"
         on:click={(e) => {
           e.preventDefault();
@@ -167,5 +166,12 @@
   }
   .variable-highlight {
     color: white;
+  }
+
+  .add-btn:hover{
+    background: var(--button-active);
+  }
+  .add-btn:active{
+    background: var( --bg-primary-300);
   }
 </style>
