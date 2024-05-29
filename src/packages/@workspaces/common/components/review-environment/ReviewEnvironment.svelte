@@ -138,6 +138,6 @@
     border-radius: 3px;
   }
   .copyIcon:hover{
-    background: var(--right-border);
+    background: var(--bg-tertiary-300);
   }
 </style>
