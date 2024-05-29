@@ -3,6 +3,8 @@
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   const _viewModel = new HelpPageViewModel();
+  
+  document.addEventListener('contextmenu', event => event.preventDefault());
 </script>
 
 <div class="w-100 d-flex pt-4 jutify-content-center bg-secondary-900">
