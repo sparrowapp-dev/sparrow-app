@@ -19,6 +19,7 @@ import {
   selectMethodsStore,
   selectedMethodsCollectionStore,
 } from "$lib/store/methods";
+import { ContentTypeEnum } from "../enums";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let tree: any[];
 const filterTree: Collection[] = [];
@@ -69,6 +70,25 @@ export const validateClientXML = (yamlString = "") => {
     );
   } catch (error) {
     return false;
+  }
+};
+
+export const validateImportBody = (data: string) => {
+  let contentType;
+  try {
+    JSON.parse(data);
+    return (contentType = ContentTypeEnum["application/json"]);
+  } catch (jsonError) {
+    if (jsonError instanceof SyntaxError) {
+      try {
+        yaml.load(data);
+        return (contentType = ContentTypeEnum["text/plain"]);
+      } catch (yamlError) {
+        return contentType;
+      }
+    } else {
+      return contentType;
+    }
   }
 };
 /**

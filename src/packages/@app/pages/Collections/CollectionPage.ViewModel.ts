@@ -2488,4 +2488,180 @@ export default class CollectionsViewModel {
   public handleOnChangeViewInRequest = async (view: string) => {
     requestSplitterDirection.set(view);
   };
+
+  public importJSONObject = async (
+    currentWorkspaceId,
+    importJSON,
+    contentType,
+  ) => {
+    const response =
+      await this.collectionService.importCollectionFromJsonObject(
+        currentWorkspaceId,
+        importJSON,
+        contentType,
+      );
+
+    if (response.isSuccessful) {
+      const path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data._id,
+      };
+      this.collectionRepository.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+        workspaceId: currentWorkspaceId,
+      });
+      const initCollectionTab = new InitCollectionTab(
+        response.data.data._id,
+        currentWorkspaceId,
+      );
+      initCollectionTab.updatePath(path);
+      initCollectionTab.updateName(response.data.data.name);
+      initCollectionTab.updateIsSave(true);
+
+      this.tabRepository.createTab(initCollectionTab.getValue());
+      moveNavigation("right");
+
+      this.workspaceRepository.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: initCollectionTab.getValue().id,
+        name: initCollectionTab.getValue().name,
+      });
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+        importThrough: "ByObject",
+      });
+      notifications.success("Collection Imported successfully.");
+    } else {
+      notifications.error("Failed to import collection. Please try again.");
+    }
+    return response;
+  };
+
+  public collectionFileUpload = async (currentWorkspaceId, file) => {
+    const response = await this.collectionService.importCollectionFromFile(
+      currentWorkspaceId,
+      file,
+    );
+    if (response.isSuccessful) {
+      let path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data._id,
+      };
+
+      this.collectionRepository.addCollection({
+        ...response.data.data,
+        id: response.data.data._id,
+        workspaceId: currentWorkspaceId,
+      });
+
+      const initCollectionTab = new InitCollectionTab(
+        response.data.data._id,
+        currentWorkspaceId,
+      );
+
+      initCollectionTab.updatePath(path);
+      initCollectionTab.updateName(response.data.data.name);
+      initCollectionTab.updateIsSave(true);
+      // Samplecollection.id = response.data.data._id;
+      // Samplecollection.path = path;
+      // Samplecollection.name = response.data.data.name;
+      // Samplecollection.save = true;
+      // collectionsMethods.handleCreateTab(Samplecollection);
+      // moveNavigation("right");
+      this.tabRepository.createTab(initCollectionTab.getValue());
+      moveNavigation("right");
+
+      this.workspaceRepository.updateCollectionInWorkspace(currentWorkspaceId, {
+        id: initCollectionTab.getValue().id,
+        name: initCollectionTab.getValue().name,
+      });
+      notifications.success("Collection Imported successfully.");
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.name,
+        collectionId: response.data.data._id,
+        importThrough: "ByFile",
+      });
+    } else {
+      notifications.error("Failed to import collection. Please try again.");
+    }
+    return response;
+  };
+
+  public importCollectionURL = async (
+    currentWorkspaceId,
+    requestBody,
+    activeSync,
+  ) => {
+    const response = await this.collectionService.importCollection(
+      currentWorkspaceId,
+      requestBody,
+      activeSync,
+    );
+
+    if (response.isSuccessful) {
+      let path: Path = {
+        workspaceId: currentWorkspaceId,
+        collectionId: response.data.data.collection._id,
+      };
+
+      const initCollectionTab = new InitCollectionTab(
+        response.data.data._id,
+        currentWorkspaceId,
+      );
+
+      // const Samplecollection = generateSampleCollection(
+      //   response.data.data._id,
+      //   new Date().toString(),
+      // );
+
+      // Samplecollection.id = response.data.data.collection._id;
+      initCollectionTab.updatePath(path);
+      // Samplecollection.path = path;
+      initCollectionTab.updateName(response.data.data.collection.name);
+      // Samplecollection.name = response.data.data.collection.name;
+      initCollectionTab.updateIsSave(true);
+      // Samplecollection.save = true;
+      if (response.data.data.existingCollection) {
+        this.collectionRepository.updateCollection(
+          response.data.data.collection._id,
+          {
+            ...response.data.data.collection,
+            id: response.data.data.collection._id,
+            currentBranch: requestBody.currentBranch,
+          },
+        );
+        notifications.error("Collection already exists.");
+      } else {
+        this.collectionRepository.addCollection({
+          ...response.data.data.collection,
+          id: response.data.data.collection._id,
+          currentBranch: requestBody.currentBranch,
+          workspaceId: currentWorkspaceId,
+        });
+        this.workspaceRepository.updateCollectionInWorkspace(
+          currentWorkspaceId,
+          {
+            id: initCollectionTab.getValue().id,
+            name: initCollectionTab.getValue().name,
+          },
+        );
+        notifications.success("Collection Imported successfully.");
+      }
+      // collectionsMethods.handleCreateTab(Samplecollection);
+      // moveNavigation("right");
+
+      this.tabRepository.createTab(initCollectionTab.getValue());
+      moveNavigation("right");
+
+      MixpanelEvent(Events.IMPORT_COLLECTION, {
+        collectionName: response.data.data.collection.name,
+        collectionId: response.data.data.collection._id,
+        importThrough: "ByObject",
+      });
+    } else {
+      notifications.error("Failed to import collection. Please try again.");
+    }
+    return response;
+  };
 }
