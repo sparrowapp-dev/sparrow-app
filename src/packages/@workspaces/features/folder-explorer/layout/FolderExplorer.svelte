@@ -82,6 +82,13 @@
       updateTotalRequests();
     }
   }
+
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldFolder",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -100,7 +107,7 @@
             onRename(collection, folder, event?.target?.value)}
           on:keydown={(event) => {
             if (event.key === "Enter") {
-              onRename(collection, folder, event?.target?.value);
+              onRenameInputKeyPress();
             }
           }}
         />

@@ -110,6 +110,13 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldCollection",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -170,7 +177,7 @@
             on:blur={(event) => onRename(collection, event?.target?.value)}
             on:keydown={(event) => {
               if (event.key === "Enter") {
-                onRename(collection, event?.target?.value);
+                onRenameInputKeyPress();
               }
             }}
           />
