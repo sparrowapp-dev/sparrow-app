@@ -69,7 +69,7 @@
 </script>
 
 <div
-  class="select-environment-popup bg-tertiary-700 d-flex  p-3 rounded"
+  class="select-environment-popup bg-tertiary-700 d-flex p-3 rounded"
   style="
     top:{environmentAxisY}px;
     left:{environmentAxisX}px;
@@ -115,19 +115,20 @@
               class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
             >
               <p
-                class="text-fs-11 text-secondary-100 m-0 p-0 env-value"
-                style="margin-bottom:2px;"
+                class="text-fs-11 text-secondary-100 m-0 p-0 env-value word-break"
+                style="margin-bottom:2px; "
               >
                 {mock.key}
               </p>
               {#if mock.value}
-                <p class="text-fs-9 text-secondary-300 m-0 p-0 env-value">
+                <p
+                  class="text-fs-9 text-secondary-300 m-0 p-0 env-value word-break"
+                >
                   {mock.value}
                 </p>
               {/if}
             </div>
           </div>
-
         </div>
       {/if}
     {/each}
@@ -167,11 +168,15 @@
             style="height: 33px;"
             class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
           >
-            <p class="text-fs-11 text-secondary-100 m-0 p-0 env-value">
+            <p
+              class="text-fs-11 text-secondary-100 m-0 p-0 env-value word-break"
+            >
               {mock.key}
             </p>
             {#if mock.value}
-              <p class="text-fs-9 text-secondary-300 m-0 p-0 env-value">
+              <p
+                class="text-fs-9 text-secondary-300 m-0 p-0 env-value word-break"
+              >
                 {mock.value}
               </p>
             {/if}
@@ -211,5 +216,8 @@
   }
   .env-item:hover {
     background-color: var(--bg-tertiary-400);
+  }
+  .word-break {
+    word-break: break-all;
   }
 </style>

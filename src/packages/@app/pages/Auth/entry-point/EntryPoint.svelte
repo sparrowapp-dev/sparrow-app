@@ -5,6 +5,8 @@
   import constants from "$lib/utils/constants";
   import Header from "$lib/components/header/Header.svelte";
   import star from "$lib/assets/star.svg";
+  import StarIcon from "../../../../@library/icons/Star.svelte";
+  import StarFilled from "@library/icons/StarFilled.svelte";
   import copyToClipBoard from "$lib/utils/copyToClipboard";
   import { open } from "@tauri-apps/plugin-shell";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
@@ -14,6 +16,7 @@
   import BgContainer from "./BgContainer.svelte";
   let isEntry = false;
 
+  let isHover = false;
   let redirectRules = {
     title: "Opening Web Browser...",
     description: "",
@@ -102,22 +105,48 @@
       >
     </div>
     <div slot="outside">
-      <p
-        class="text-center sparrow-fs-16 d-flex cursor-pointer mt-5 d-flex justify-content-center align-items-center mb-5"
+      <div
+        class="mb button-text text-center sparrow-fs-16 gap-1 d-flex cursor-pointer mt-5 d-flex justify-content-center align-items-center mb-5 object-fit-cover"
         on:click={async () => {
           await open(externalSparrowGithub);
         }}
       >
-        <img src={star} class="me-2" alt="" />
-        <span>Star us on GitHub</span>
-      </p>
+        <div
+          class="d-flex"
+          on:mouseenter={() => {
+            isHover = true;
+          }}
+          on:mouseleave={() => {
+            isHover = false;
+          }}
+        >
+          <div class="me-1">
+            {#if isHover}
+              <StarFilled />
+            {:else}
+              <StarIcon />
+            {/if}
+          </div>
+
+          <p
+            class="{isHover ? 'star-text-hover' : ''} mb-0"
+            style="margin-top:3px; "
+          >
+            Star us on GitHub
+          </p>
+        </div>
+      </div>
       <div class="divider-line my-4" />
 
       <div>
-        <p class="text-center text-secondary-250 sparrow-fs-14 m-1">
+        <p
+          class=" cursor-pointer text-center text-secondary-250 sparrow-fs-14 m-1"
+        >
           Version {version}
         </p>
-        <p class="check-for-update text-center sparrow-fs-12 mb-5">
+        <p
+          class=" cursor-pointer check-for-update text-center sparrow-fs-12 mb-5"
+        >
           Check for Update
         </p>
       </div>
@@ -174,5 +203,9 @@
     );
     background-clip: text;
     color: transparent;
+  }
+  .star-text-hover {
+    color: var(--primary-btn-color);
+    text-decoration: underline;
   }
 </style>
