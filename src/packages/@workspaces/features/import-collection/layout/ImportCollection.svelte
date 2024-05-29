@@ -439,7 +439,7 @@
 {/if}
 
 <ModalWrapperV1
-  title={"Incorrect File format"}
+  title={"Incorrect Format"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -449,14 +449,14 @@
   <div class="invalid-type-content">
     <div>
       <p class="format-info fw-normal text-start sparrow-fs-12">
-        We have identified that text you pasted is not the right file format.
-        Please ensure that you paste the following file formats only.
+        We have identified that the file you uploaded is not in the right
+        format.
       </p>
     </div>
-    <div class="format-types-container">
+    <!-- <div class="format-types-container">
       <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.YAML</p>
       <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.JSON</p>
-    </div>
+    </div> -->
     <div class="format-btns">
       <button
         class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
@@ -596,11 +596,6 @@
         fileSizeError="The size of the file you are trying to upload is more than 100 KB."
       />
     </div>
-    {#if isFileEmpty && isInputDataTouched}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Please upload your file in order to import collections.
-      </p>
-    {/if}
   {/if}
   {#if importType === "text" && isValidClientURL && isValidServerURL && false}
     <div>
@@ -763,10 +758,8 @@
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
   >
     <button
-      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded {uploadCollection
-        ?.file?.showFileTypeError
-        ? 'btn-disabled'
-        : 'btn-primary'} "
+      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded
+       btn-primary"
       on:click={() => {
         handleImport();
       }}

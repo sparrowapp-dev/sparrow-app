@@ -1460,9 +1460,9 @@ export default class CollectionsViewModel {
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
-    sampleFolder.updateActiveSync(collection.activeSync);
-    sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
-    sampleFolder.updateIsDeleted(folder?.isDeleted);
+    // sampleFolder.updateActiveSync(collection.activeSync);
+    // sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
+    // sampleFolder.updateIsDeleted(folder?.isDeleted);
 
     this.handleCreateTab(sampleFolder.getValue());
     moveNavigation("right");
@@ -1493,7 +1493,7 @@ export default class CollectionsViewModel {
     _collection.updateName(collection.name);
     _collection.updateDescription(collection.description);
     _collection.updatePath(path);
-    _collection.updateActiveSync(collection.activeSync);
+    // _collection.updateActiveSync(collection.activeSync);
     _collection.updateTotalRequests(totalRequest);
     _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
