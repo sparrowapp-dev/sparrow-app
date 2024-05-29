@@ -342,6 +342,9 @@
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
+            on:click|stopPropagation={ ()=> {
+              expand = !expand;
+            }}
           />
           {#if expand}
             <div

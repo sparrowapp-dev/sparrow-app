@@ -414,6 +414,9 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
+      on:click|stopPropagation={ ()=> {
+        visibility = !visibility;
+      }}
     />
     {#if isRenaming}
       <input
