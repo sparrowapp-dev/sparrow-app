@@ -9,6 +9,7 @@
   export let horizontalOffset: string = "";
   export let verticalArrowOffset: string = "";
   export let horizontalArrowOffset: string = "";
+  export let showArrow: boolean = true;
 
   let tooltipElement: HTMLDivElement;
   let tooltipPosition: DOMRect;
@@ -38,18 +39,20 @@
 <div bind:this={tooltipElement} class={"tooltip opacity-100"} style="">
   {#if show}
     <span
-      class={`tooltip-text invisible m-auto text-center px-2 py-1 bg-tertiary-400 text-lightGray justify-content-center align-items-center gap-2 opacity-0
+      class={`tooltip-text invisible m-auto text-center px-2 py-1 bg-tertiary-400 text-lightGray justify-content-center align-items-center gap-2 opacity-0 
     ${classProp}`}
-      style="{styleProp} position: fixed; top: calc({tooltipPosition?.top}px {verticalOffset}); left: calc({tooltipPosition?.left}px {horizontalOffset});"
+      style="{styleProp} position: fixed; top: calc({tooltipPosition?.top}px {verticalOffset}); left: calc({tooltipPosition?.left}px {horizontalOffset}); "
       >{title}
     </span>
-    <span
-      class={`tooltip-arrow invisible bg-tertiary-400 opacity-0
-    ${classProp}`}
-      style="{styleProp} position: fixed; top: calc({tooltipPosition?.top}px {verticalOffset} {verticalArrowOffset} + {tooltipPosition?.height -
-        1}px); left: calc({tooltipPosition?.left}px {horizontalOffset} {horizontalArrowOffset}); z-index: 100000;"
-    >
-    </span>
+    {#if showArrow}
+      <span
+        class={`tooltip-arrow invisible bg-tertiary-400 opacity-0
+      ${classProp}`}
+        style="{styleProp} position: fixed; top: calc({tooltipPosition?.top}px {verticalOffset} {verticalArrowOffset} + {tooltipPosition?.height -
+          1}px); left: calc({tooltipPosition?.left}px {horizontalOffset} {horizontalArrowOffset}); z-index: 100000;"
+      >
+      </span>
+    {/if}
   {/if}
 
   <slot />
@@ -84,7 +87,7 @@
     font-family: Roboto;
     transition: opacity 0.3s;
     width: max-content;
-    border-radius: 2px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
   }

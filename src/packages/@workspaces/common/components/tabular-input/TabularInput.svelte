@@ -28,31 +28,34 @@
 
   $: {
     if (keyValue) {
-      pairs = keyValue;
-      let flag: boolean = false;
+      identifySelectAllState();
+    }
+  }
+
+  /**
+   * @description - calculates the select all checkbox state - weather checked or not
+   */
+  const identifySelectAllState = () => {
+    pairs = [];
+    pairs = keyValue;
+    controller = false;
+    if (pairs.length > 1) {
+      let isUncheckedExist: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
-          flag = true;
+          isUncheckedExist = true;
           break;
         }
       }
-      if (mode === "READ" && pairs[pairs.length - 1].checked === false) {
-        flag = false;
-      }
-      if (flag) {
+      if (isUncheckedExist) {
         controller = false;
       } else {
         controller = true;
       }
     }
-  }
+  };
 
   const updateParam = (index: number): void => {
-    pairs.forEach((elem, i) => {
-      if (i === index) {
-        elem.checked = true;
-      }
-    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -169,6 +172,7 @@
       <label class="container">
         <input
           type="checkbox"
+          disabled={pairs.length === 1}
           bind:checked={controller}
           on:input={handleCheckAll}
         />
@@ -179,8 +183,8 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-2">Key</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Value</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Key</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0">Value</p>
     </div>
     <div class="h-75 pe-1">
       <button class="border-0" style="width:40px;" />
@@ -218,7 +222,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Value"
+                  placeholder=""
                   class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -228,7 +232,7 @@
               <div class="w-50 position-relative">
                 <input
                   type="text"
-                  placeholder="Enter Value"
+                  placeholder=""
                   class=" keyValuePair ps-1 py-1 w-100"
                   style="font-size: 12px;"
                   disabled
@@ -290,7 +294,7 @@
                     updateParam(index);
                   }}
                   disabled={mode == "READ" ? true : false}
-                  placeholder={"Key"}
+                  placeholder={"Add Key"}
                   {theme}
                   {environmentVariables}
                   {onUpdateEnvironment}
@@ -375,7 +379,7 @@
                     onUpdateInput={() => {
                       updateParam(index);
                     }}
-                    placeholder={"Value"}
+                    placeholder={"Add Value"}
                     disabled={mode == "READ" ? true : false}
                     {theme}
                     {environmentVariables}

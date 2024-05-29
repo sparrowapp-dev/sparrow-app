@@ -13,14 +13,13 @@
   });
 </script>
 
-<main>
-  <widgetbot
-    server={DiscordIDs.ServerID}
-    channel={DiscordIDs.ChannelID}
-    width="96%"
-    height="100%"
-  ></widgetbot>
-</main>
+<widgetbot
+  server={DiscordIDs.ServerID}
+  channel={DiscordIDs.ChannelID}
+  width="96%"
+  height="100%"
+  style=" margin-left:2%; margin-bottom:24px; "
+></widgetbot>
 
 <style>
   main {

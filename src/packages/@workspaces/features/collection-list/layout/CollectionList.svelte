@@ -77,14 +77,14 @@
   import { Input } from "@library/forms";
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
-  let filteredCollection: CollectionDocument[] = [];
-  let filteredFolder: Folder[] = [];
-  let filteredFile: RequestType[] = [];
   let addButtonMenu: boolean = false;
+
+  export let scrollList;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let collectionFilter: any = [];
@@ -191,7 +191,7 @@
     } d-flex flex-column bg-secondary-900 scroll`}
   >
     <div
-      class="d-flex justify-content-between align-items-center align-self-stretch ps-3 pe-3 pt-3 d-none"
+      class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
     >
       <p class="mb-0 text-whiteColor ellipsis text-fs-16">
         {$currentWorkspace?.name || ""}
@@ -209,7 +209,7 @@
       </button>
     </div>
     <div
-      class="d-flex align-items-center justify-content-between ps-3 pe-3 pt-3 gap-1"
+      class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
     >
       <Input
         width={"100%"}
@@ -287,7 +287,11 @@
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
-              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+              <List
+                bind:scrollList
+                height={"calc(100vh - 160px)"}
+                classProps={"pb-2 pe-1"}
+              >
                 {#each collectionFilter as col}
                   <Collection
                     {onItemCreated}
@@ -305,7 +309,11 @@
                 {/each}
               </List>
             {:else}
-              <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+              <List
+                bind:scrollList
+                height={"calc(100vh - 160px)"}
+                classProps={"pb-2 pe-1"}
+              >
                 <p
                   class="not-found-text text-fs-12 text-center mx-auto ellipsis"
                 >
@@ -314,7 +322,11 @@
               </List>
             {/if}
           {:else}
-            <List height={"calc(100vh - 160px)"} classProps={"pb-2 pe-1"}>
+            <List
+              bind:scrollList
+              height={"calc(100vh - 160px)"}
+              classProps={"pb-2 pe-1"}
+            >
               {#each collectionListDocument as col}
                 <Collection
                   {onItemCreated}
@@ -340,36 +352,39 @@
         {/if}
       </div>
       <div class="p-3 d-flex align-items-center justify-content-between">
-        <div
-          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-            ? 'bg-secondary-600'
-            : ''}"
-          role="button"
-          on:mouseenter={() => {
-            isGithubStarHover = true;
-          }}
-          on:mouseleave={() => {
-            isGithubStarHover = false;
-          }}
-          on:click={async () => {
-            await open(externalSparrowGithub);
-          }}
-        >
-          <GithubIcon
-            height={"18px"}
-            width={"18px"}
-            color={isGithubStarHover
-              ? "var(--bg-secondary-100)"
-              : "var(--bg-secondary-200)"}
-          />
-          <span
-            class="ps-2 text-fs-14 {isGithubStarHover
-              ? 'text-secondary-100'
-              : 'text-secondary-200'}"
+        <Tooltip title={"Star Us On GitHub"} placement={"right"}>
+          <div
+            class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
+              ? 'bg-secondary-600'
+              : ''}"
+            role="button"
+            on:mouseenter={() => {
+              isGithubStarHover = true;
+            }}
+            on:mouseleave={() => {
+              isGithubStarHover = false;
+            }}
+            on:click={async () => {
+              await open(externalSparrowGithub);
+            }}
           >
-            {githubRepo?.stargazers_count || ""}
-          </span>
-        </div>
+            <GithubIcon
+              height={"18px"}
+              width={"18px"}
+              color={isGithubStarHover
+                ? "var(--bg-secondary-100)"
+                : "var(--bg-secondary-200)"}
+            />
+            <span
+              class="ps-2 text-fs-14 {isGithubStarHover
+                ? 'text-secondary-100'
+                : 'text-secondary-200'}"
+            >
+              {githubRepo?.stargazers_count || ""}
+            </span>
+          </div>
+        </Tooltip>
+
         <div class="d-flex align-items-center">
           <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
           <WithButton

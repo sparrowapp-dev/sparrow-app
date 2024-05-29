@@ -89,9 +89,11 @@ $sparrow-bg-container-two: #4165F9;
 $sparrow-bg-container-three: #5652FD;
 $sparrow-bg-container-four: #376FF7;
 
-$theme-grey-ffffff: #ffffff;
+$theme-grey-ffffff: #FFFFFF;
 $theme-grey-e5e5e5: #e5e5e5;
+$theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
+$theme-grey-999999: #999999;
 $theme-grey-83899F: #83899F;
 $theme-grey-636566: #636566;
 $theme-grey-45494D: #45494D;
@@ -105,6 +107,7 @@ $theme-grey-000000: #000000;
 
 
 $theme-blue-F5F6F8: #F5F6F8;
+$theme-blue-B0B0B0: #b0b0b0;
 $theme-blue-9CDCFE: #9CDCFE;
 $theme-blue-85C2FF: #85C2FF;
 $theme-blue-1193F0: #1193F0;
@@ -132,6 +135,7 @@ $theme-red-ef5262: #ef5262;
 $theme-red-f34b5c: #f34b5c;
 $theme-red-f33346: #f33346;
 $theme-red-fe2e2e: #fe2e2e;
+$theme-red-6f2828: #6f2828;
 $theme-red-312325: #312325;
 $theme-red-230408: #230408;
 
@@ -225,9 +229,11 @@ $theme-red-230408: #230408;
   --text-primary-100 : #{$theme-blue-9CDCFE};
   --text-primary-150 : #{$theme-blue-85C2FF};
   --text-primary-200 : #{$theme-blue-1193F0};
+  --text-primary-250 : #{$theme-blue-B0B0B0};
   --text-primary-300 : #{$theme-blue-3670F7};
   --text-primary-400 : #{$theme-blue-0B5ED7};
 
+  --text-secondary-50 : #{$theme-grey-999999};
   --text-secondary-100 : #{$theme-grey-ffffff};
   --text-secondary-150 : #{$theme-grey-e5e5e5};
   --text-secondary-200 : #{$theme-grey-8A9299};
@@ -256,6 +262,7 @@ $theme-red-230408: #230408;
   --text-danger-600 : #{$theme-red-ef5262};
   --text-danger-700 : #{$theme-red-f34b5c};
   --text-danger-800 : #{$theme-red-f33346};
+  --text-danger-850 : #{$theme-red-6f2828};
   --text-danger-900 : #{$theme-red-fe2e2e};
   --text-danger-1000 : #{$theme-red-312325};
 
@@ -453,6 +460,7 @@ $sparrow-text-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-250 : $theme-grey-636566,
   secondary-300 : $theme-grey-45494D,
@@ -492,6 +500,7 @@ $sparrow-bg-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
@@ -532,6 +541,7 @@ $sparrow-border-colors: (
 
   secondary-100 : $theme-grey-ffffff,
   secondary-150 : $theme-grey-e5e5e5,
+  secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
   secondary-300 : $theme-grey-45494D,
   secondary-400 : $theme-grey-313233,
@@ -655,6 +665,7 @@ span {
 //
 ::-webkit-scrollbar {
   width: 2px;
+  height: 2px;
 }
 
 ::-webkit-scrollbar-thumb {

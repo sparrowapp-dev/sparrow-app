@@ -27,76 +27,65 @@
   let feedbackDescription = "";
   let subCategory: FeedbackSubCategory = FeedbackSubCategory.USABILITY;
   let feedbackSubject = "";
-  let isExposeFeedbackForm = false;
-  let isLoading = false;
   let uploadFeedback = {
     file: {
       value: [],
     },
   };
+  let isExposeFeedbackForm = false;
+  let isLoading = false;
 
-  const handleLogoInputChange = (
-    e: any,
-    maxSize: number,
-    supportedFileTypes: string[],
-  ) => {
+  const handleLogoInputChange = (e: any) => {
     const errorMessage =
       "Failed to upload the file. Please check the file size or the format";
-    const targetFile = e?.target?.files;
-    const dataTransferFile = e?.dataTransfer?.files;
-    if (targetFile?.length === 0 || dataTransferFile?.length === 0) {
-      return;
-    }
-    if (targetFile?.length > 5 || dataTransferFile?.length > 5) {
-      uploadFeedback.file.value = [];
-      // no of files exceeds
-      notifications.error(errorMessage);
+
+    let targetFile = [
+      ...uploadFeedback.file.value,
+      ...(e?.target?.files || e?.dataTransfer?.files),
+    ];
+    const maxVedioSize = 10485760; // 10 MB
+    const maxImageSize = 2097152; // 2 MB
+    if (targetFile?.length === 0) {
       return;
     }
     let vedioCount = 0;
-    for (let i = 0; i < (targetFile?.length || dataTransferFile?.length); i++) {
-      const fileType = `.${(
-        (targetFile && targetFile[i]?.name) ||
-        (dataTransferFile && dataTransferFile[i]?.name)
-      )
-        .split(".")
-        .pop()
-        .toLowerCase()}`;
-      if (
-        ((targetFile && targetFile[i].size > maxSize * 2048) ||
-          (dataTransferFile && dataTransferFile[i].size > maxSize * 2048)) &&
-        (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png")
-      ) {
-        uploadFeedback.file.value = [];
-        // image size exceeded
-        notifications.error(errorMessage);
-        return;
-      } else if (
-        ((targetFile && targetFile[i].size > maxSize * 10000) ||
-          (dataTransferFile && dataTransferFile[i].size > maxSize * 1000)) &&
-        fileType === ".mp4"
-      ) {
-        uploadFeedback.file.value = [];
-        // vedio size exceeded
-        notifications.error(errorMessage);
-        return;
-      } else if (!supportedFileTypes.includes(fileType)) {
-        uploadFeedback.file.value = [];
-        // wrong format file upload
-        notifications.error(errorMessage);
-        return;
-      }
-      if (fileType === ".mp4") {
+    let isErrorThrown = false;
+    const selectedFiles = targetFile.filter((file) => {
+      const fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
+
+      if (fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png") {
+        if (file.size > maxImageSize) {
+          // image size exceeded
+          isErrorThrown = true;
+          return false;
+        }
+        return true;
+      } else if (fileType === ".mp4") {
         vedioCount = vedioCount + 1;
+        if (vedioCount >= 2) {
+          // vedio limit exceeded
+          isErrorThrown = true;
+          return false;
+        }
+        if (file.size > maxVedioSize) {
+          // vedio size exceeded
+          isErrorThrown = true;
+          return false;
+        }
+        return true;
+      } else {
+        isErrorThrown = true;
+        return false;
       }
+    });
+    if (selectedFiles.length > 5) {
+      selectedFiles.length = 5;
+      isErrorThrown = true;
     }
-    if (vedioCount > 1) {
-      uploadFeedback.file.value = [];
-      // alert("only accepts 1 vedio at a time");
+    if (isErrorThrown) {
       notifications.error(errorMessage);
-      return;
     }
-    uploadFeedback.file.value = targetFile || dataTransferFile;
+    uploadFeedback.file.value = selectedFiles;
   };
   const removeFile = (index: number) => {
     const files = Array.from(uploadFeedback.file.value).filter((elem, i) => {
@@ -109,18 +98,14 @@
   };
 </script>
 
-<div class="pb-3">
+<div class="pb-3 w-100">
   <button
     on:click={() => {
       isExposeFeedbackForm = true;
     }}
-    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14"
+    class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
   >
-    <PlusIcon
-      height={"18px"}
-      width={"18px"}
-      color={"var(--bg-secondary-100)"}
-    /> Add Feedback
+    +Add Feedback
   </button>
 </div>
 <div class="position-relative">
@@ -296,13 +281,16 @@
     <div>
       <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
       <p class="text-fs-12 text-secondary-200">
-        {500 - feedbackDescription.length} characters left
+        {500 - feedbackDescription.length < 0
+          ? 0
+          : 500 - feedbackDescription.length} characters left
       </p>
 
       <div class="p-2 bg-tertiary-300 mb-3">
         <Input
           width={"100%"}
           type="text"
+          isEditIconRequired={false}
           bind:value={feedbackSubject}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
@@ -311,6 +299,7 @@
           style="outline:none;"
           disabled={false}
           placeholder="Subject"
+          maxlength={500}
         />
         <hr class="mt-1 mb-2" />
         <Textarea
@@ -350,7 +339,7 @@
       </div>
     </div>
     {#if uploadFeedback?.file?.value?.length > 0}
-      <div class="d-flex gap-1">
+      <div class="file-scroller mb-2 d-flex gap-1 overflow-auto">
         {#each uploadFeedback.file.value as file, index}
           <div
             class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
@@ -362,7 +351,7 @@
                 color={"var(--text-secondary-200)"}
               />
             </span>
-            <span class="mb-0 text-fs-12 px-2">{file.name}</span>
+            <span class="mb-0 text-fs-12 px-2 ellipsis">{file.name}</span>
             <span
               on:click={() => {
                 removeFile(index);
@@ -405,6 +394,15 @@
             isLoading = false;
             if (res.isSuccessful) {
               isExposeFeedbackForm = false;
+              type = FeedbackType.FEEDBACK;
+              feedbackDescription = "";
+              subCategory = FeedbackSubCategory.USABILITY;
+              feedbackSubject = "";
+              uploadFeedback = {
+                file: {
+                  value: [],
+                },
+              };
             }
           }}
         />
@@ -436,5 +434,8 @@
   .label-active {
     background-color: var(--bg-primary-300);
     color: var(--text-secondary-100);
+  }
+  .file-scroller::-webkit-scrollbar {
+    display: none;
   }
 </style>

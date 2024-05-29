@@ -110,6 +110,13 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldCollection",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -153,8 +160,8 @@
     </div>
   </ModalWrapperV1>
   <div
-    class="my-collection d-flex flex-column"
-    style="width:calc(100% - 280px); margin-top: 15px; min-width: 450px"
+    class="my-collection d-flex flex-column w-100"
+    style="margin-top: 15px; min-width: 450px"
   >
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
       <div class="d-flex aling-items-center gap-2 mb-4">
@@ -170,7 +177,7 @@
             on:blur={(event) => onRename(collection, event?.target?.value)}
             on:keydown={(event) => {
               if (event.key === "Enter") {
-                onRename(collection, event?.target?.value);
+                onRenameInputKeyPress();
               }
             }}
           />
@@ -305,7 +312,7 @@
               <button
                 disabled={!userRoleInWorkspace}
                 class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
-                style="max-height:60px"
+                style="max-height:60px; width:200px;"
                 on:click={() => onCreateAPIRequest(collection)}
                 >New Request</button
               >
@@ -390,7 +397,7 @@
     </div>
   </div>
   <div
-    class="d-flex flex-column align-items-left justify-content-start"
+    class="d-flex flex-column align-items-left justify-content-start d-none"
     style="width: 280px;border-left:2px solid #313233"
   >
     <div

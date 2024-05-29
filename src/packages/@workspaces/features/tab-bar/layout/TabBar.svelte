@@ -5,6 +5,7 @@
   import angleRight from "$lib/assets/angle-right.svg";
   import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
   import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
+  import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
   import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
 
@@ -21,6 +22,7 @@
   // ---- Helper
   import { moveNavigation } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
+  import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
   // ------ Props ------
   /**
@@ -189,7 +191,11 @@
             viewChange = !viewChange;
           }}
         >
-          <ViewGrid height={15} />
+          {#if $requestSplitterDirection === "horizontal"}
+            <ViewGrid color={"var(--text-primary-400)"} height={15} />
+          {:else}
+            <VerticalGrid height={15} color="var(--blackColor)" />
+          {/if}
         </button>
       </Dropdown>
       <Dropdown
@@ -236,7 +242,7 @@
     transition: all 300ms;
   }
   .tabbar {
-    height: 36px;
+    height: 35px;
     background-color: var(--sparrow-black);
   }
 

@@ -7,6 +7,7 @@
     KeyValuePairWithBase,
   } from "$lib/utils/interfaces/request.interface";
   import type { KeyValueChecked } from "@common/types/workspace";
+  import { partition } from "rxjs";
 
   /**
    * tabular pair entries
@@ -25,33 +26,38 @@
 
   $: {
     if (keyValue) {
-      pairs = [];
-      pairs = keyValue;
+      identifySelectAllState();
+    }
+  }
 
-      let flag: boolean = false;
+  /**
+   * @description - calculates the select all checkbox state - weather checked or not
+   */
+  const identifySelectAllState = () => {
+    pairs = [];
+    pairs = keyValue;
+    controller = false;
+    if (pairs.length > 1) {
+      let isUncheckedExist: boolean = false;
       for (let i = 0; i < pairs.length - 1; i++) {
         if (pairs[i].checked === false) {
-          flag = true;
+          isUncheckedExist = true;
+          break;
         }
       }
-      if (flag) {
+      if (isUncheckedExist) {
         controller = false;
       } else {
         controller = true;
       }
     }
-  }
+  };
 
   /**
    * @description - updates pair values
    * @param index - index of the pairs that needs to be updated
    */
   const updatePairs = (index: number): void => {
-    pairs.forEach((elem, i) => {
-      if (i === index) {
-        elem.checked = true;
-      }
-    });
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -132,6 +138,7 @@
       >
         <input
           type="checkbox"
+          disabled={pairs.length === 1}
           bind:checked={controller}
           on:input={handleCheckAll}
         />
@@ -142,21 +149,11 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0"
-        style="margin-left: 7px;"
-      >
-        Variable
-      </p>
-      <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-3"
-        style="margin-left: 35px;"
-      >
-        Value
-      </p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1">Variable</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-4">Value</p>
     </div>
-    <div class="pe-1 d-flex gap-2">
-      <button class="bg-transparent border-0 d-flex" style="">
+    <div class="pe-1 d-flex">
+      <button class="bg-transparent border-0 d-flex d-none" style="">
         <p
           class="text-nowrap text-primary-300 mb-0 me-2"
           style="font-size: 10px;"
@@ -164,13 +161,13 @@
           Bulk Edit
         </p>
         <img
-          class="my-auto"
+          class="my-auto d-none"
           src={editIcon}
           alt="Edit Icon"
           style="height: 10px; width: 10px;"
         />
       </button>
-      <button class="bg-transparent border-0 d-flex" style="">
+      <button class="bg-transparent border-0 d-flex d-none" style="">
         <img
           class="my-auto"
           src={moreOptions}
@@ -178,6 +175,9 @@
           style="height: 10px; width: 10px;"
         />
       </button>
+      <div class="h-75 pe-1">
+        <button class="border-0" style="width:40px;" />
+      </div>
     </div>
   </div>
 

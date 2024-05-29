@@ -36,7 +36,12 @@
   import requestIcon from "$lib/assets/create_request.svg";
   import type { Path } from "$lib/utils/interfaces/request.interface";
   import AddIcon from "$lib/assets/add.svg";
-  import { FolderIcon, SyncIcon } from "@library/icons";
+  import {
+    FolderIcon,
+    SyncIcon,
+    FolderPlusIcon,
+    RequestIcon,
+  } from "@library/icons";
   import { Options } from "@library/ui";
 
   let deletedIds: [string] | [] = [];
@@ -65,17 +70,32 @@
    * @param e: Event
    */
   function rightClickContextMenu(e: Event) {
-    e.preventDefault();
     setTimeout(() => {
-      showMenu = true;
+      showMenu = !showMenu;
     }, 100);
   }
 
   function rightClickContextMenu2(e: Event) {
-    e.preventDefault();
     setTimeout(() => {
-      showAddItemMenu = true;
+      showAddItemMenu = !showAddItemMenu;
     }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+  function handleSelectClick2(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
   }
 
   /**
@@ -94,16 +114,6 @@
   onDestroy(() => {
     selectedMethodUnsubscibe();
   });
-
-  /**
-   * Handle toggling context menu
-   */
-  function closeRightClickContextMenu() {
-    showMenu = false;
-  }
-  function closeRightClickContextMenu2() {
-    showAddItemMenu = false;
-  }
 
   $: {
     if (searchData) {
@@ -172,7 +182,43 @@
     );
   };
   let refreshCollectionLoader = false;
+  let newCollectionName: string = "";
+
+  const handleRenameInput = (event) => {
+    newCollectionName = event.target.value;
+  };
+
+  const onRenameBlur = async () => {
+    if (newCollectionName) {
+      await onItemRenamed("collection", {
+        workspaceId: collection.workspaceId,
+        collection,
+        newName: newCollectionName,
+      });
+    }
+    isRenaming = false;
+    newCollectionName = "";
+  };
+
+  const onRenameInputKeyPress = (event) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldCollection",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+  on:click={handleSelectClick2}
+  on:contextmenu|preventDefault={handleSelectClick2}
+  on:load={() => {
+    getFeatures();
+  }}
+/>
 
 <ModalWrapperV1
   title={"Delete Collection?"}
@@ -270,7 +316,7 @@
             workspaceId: collection.workspaceId,
             collection,
           }),
-        displayText: "Add API Request",
+        displayText: "Add New API",
         disabled: false,
         hidden: false,
       },
@@ -335,39 +381,31 @@
   />
 {/if}
 
-<svelte:window
-  on:click={closeRightClickContextMenu}
-  on:contextmenu|preventDefault={closeRightClickContextMenu}
-  on:click={closeRightClickContextMenu2}
-  on:contextmenu|preventDefault={closeRightClickContextMenu2}
-  on:load={() => {
-    getFeatures();
-  }}
-/>
-
 <button
   bind:this={collectionTabWrapper}
   style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 ps-2 my-button {collection.id ===
+  class="btn-primary mb-1 d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
     : ''}"
-  on:click={() => {
-    isCollectionCreatedFirstTime.set(false);
-    visibility = !visibility;
-    if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-      if (visibility) {
-        onItemOpened("collection", {
-          workspaceId: collection.workspaceId,
-          collection,
-        });
-      }
-    }
-  }}
 >
   <button
-    class="d-flex main-collection align-items-center bg-transparent border-0"
+    class="d-flex ps-2 main-collection align-items-center bg-transparent border-0"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        isCollectionCreatedFirstTime.set(false);
+        visibility = !visibility;
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          if (visibility) {
+            onItemOpened("collection", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          }
+        }
+      }
+    }}
   >
     <img
       src={angleRight}
@@ -376,6 +414,9 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
+      on:click|stopPropagation={ ()=> {
+        visibility = !visibility;
+      }}
     />
     {#if isRenaming}
       <input
@@ -386,28 +427,14 @@
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
-        on:blur={(e) => {
-          onItemRenamed("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-            newName: e?.target?.value,
-          });
-          isRenaming = false;
-        }}
-        on:keydown={(e) => {
-          if (e.key === "Enter") {
-            onItemRenamed("collection", {
-              workspaceId: collection.workspaceId,
-              collection,
-              newName: e?.target?.value,
-            });
-            isRenaming = false;
-          }
-        }}
+        on:click|stopPropagation={() => {}}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
       />
     {:else}
       <div
-        class="collection-collection.name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
+        class="collection-collection-name justify-content-center d-flex align-items-center py-1 mb-0 flex-column"
         style="height: 32px; text-align: left;"
       >
         <p class="ellipsis w-100 mb-0 text-fs-12">
@@ -439,21 +466,25 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
+
     <button
+      id={`add-item-collection-${collection.id}`}
       class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
         ? 'add-item-active'
         : ''}"
-      on:click|stopPropagation={(e) => {
+      on:click={(e) => {
         rightClickContextMenu2(e);
       }}
     >
       <img src={AddIcon} alt="AddIcon" />
     </button>
+
     <button
+      id={`show-more-collection-${collection.id}`}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
         ? 'threedot-active'
         : ''}"
-      on:click|stopPropagation={(e) => {
+      on:click={(e) => {
         rightClickContextMenu(e);
       }}
     >
@@ -516,6 +547,48 @@
             This collection is empty
           </p>
         {/if}
+
+        <div
+          class="d-flex gap-2 {!collection?.items?.length
+            ? 'ms-4'
+            : 'collection-sub-btn'}"
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              onItemCreated("folder", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            }}
+          >
+            <FolderPlusIcon
+              height="16px"
+              width="16px"
+              color="var(--request-arc)"
+            />
+          </div>
+
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              onItemCreated("requestCollection", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            }}
+          >
+            <RequestIcon
+              height="16px"
+              width="16px"
+              color="var(--request-arc)"
+            />
+          </div>
+        </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
@@ -665,8 +738,8 @@
   .active-collection-tab {
     background-color: var(--bg-tertiary-400) !important;
   }
-  .collection-collection.name {
-    width: calc(100% - 30px);
+  .collection-collection-name {
+    width: calc(100% - 10px);
     text-align: left;
   }
   .refresh-collection-loader {
@@ -679,5 +752,9 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+
+  .shortcutIcon:hover {
+    background: var(--right-border);
   }
 </style>

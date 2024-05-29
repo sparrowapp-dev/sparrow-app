@@ -82,13 +82,17 @@
       updateTotalRequests();
     }
   }
+
+  const onRenameInputKeyPress = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldFolder",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
 </script>
 
 <div class="main-container d-flex">
-  <div
-    class="my-collection d-flex flex-column"
-    style="width:calc(100% - 280px); margin-top: 15px;"
-  >
+  <div class="my-collection d-flex flex-column w-100" style="margin-top: 15px;">
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
       <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
         <input
@@ -103,14 +107,15 @@
             onRename(collection, folder, event?.target?.value)}
           on:keydown={(event) => {
             if (event.key === "Enter") {
-              onRename(collection, folder, event?.target?.value);
+              onRenameInputKeyPress();
             }
           }}
         />
 
         <button
           disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
-          class="btn w-25 btn-primary rounded border-0 text-align-right py-1"
+          class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+          style="width:200px;"
           on:click={() => {
             onCreateAPIRequest(collection, folder);
           }}>New Request</button
@@ -142,7 +147,7 @@
     </div>
   </div>
   <div
-    class="d-flex flex-column align-items-left justify-content-start"
+    class="d-flex flex-column align-items-left justify-content-start d-none"
     style="width: 280px;border-left:2px solid #313233"
   >
     <div
