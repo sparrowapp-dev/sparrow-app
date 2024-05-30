@@ -180,7 +180,7 @@
 
 <style>
   * {
-    transition: all 200ms;
+    transition: all 100ms;
   }
   .border-upper-radius {
     border-top-left-radius: 5px;
@@ -213,17 +213,21 @@
     right: -3px;
     border-radius: 70px;
     bottom: -20px;
-    z-index: 10000;
+    z-index: 500;
     background-color: var(--text-secondary-800);
+    transition-delay:2s
   }
   .box1 {
+    transition-delay:  2s;
     position: absolute;
     left: -9px;
     border-radius: 70px;
     bottom: -20px;
+    z-index: 500;
     background-color: var(--text-secondary-800);
   }
   .btn-global {
     position: relative;
+    transition-delay: 2s;
   }
 </style>
