@@ -167,7 +167,7 @@
     on:mouseleave={handleMouseLeave}
 
   >
-  <DiskIcon height={22} width={22} color={isHovered ? "white" : "grey"} /> 
+  <DiskIcon height={22} width={22} color={isHovered ? "var( --text-primary-150)" : "var(--text-secondary-200)"} /> 
   </button>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
