@@ -150,10 +150,7 @@
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
     );
-    let url = window.location.href;
-    const params = new URLSearchParams(url.split("?")[1]);
-    const isNew = params.get("first");
-    if (isNew) _viewModel.createNewTab();
+
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
@@ -163,12 +160,20 @@
    * Refreshing collection whenever workspace switches
    */
   let prevWorkspaceId = "";
+  let count = 0;
   currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections($currentWorkspace?._id);
       }
       prevWorkspaceId = value._id;
+      if (count == 0) {
+        let url = window.location.href;
+        const params = new URLSearchParams(url.split("?")[1]);
+        const isNew = params.get("first");
+        if (isNew === "true") _viewModel.createNewTab();
+        count = count + 1;
+      }
     }
   });
 
