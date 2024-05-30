@@ -87,17 +87,17 @@
         <div class="text-fs-9 env-value" style="width: calc(100% - 20px);">
           {reviewEnv?.value}
         </div>
-        <div style="width: 20px;" class="ps-2 d-flex align-items-end">
+        <div style="width: 30px;" class="ps-2 d-flex align-items-end">
           <div
             role="button"
-            class="prevent-default"
+            class="copyIcon prevent-default"
             on:click={async (e) => {
               e.preventDefault();
               await copyToClipBoard(reviewEnv?.value);
               notifications.success("Copied to Clipboard");
             }}
           >
-            <CopyIcon />
+            <CopyIcon height="12px" width="12px"   />
           </div>
         </div>
       </div>
@@ -128,5 +128,16 @@
     -webkit-line-clamp: 3; /* Number of lines to show */
     text-overflow: ellipsis;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
+  }
+  .copyIcon{
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    border-radius: 3px;
+  }
+  .copyIcon:hover{
+    background: var(--bg-tertiary-300);
   }
 </style>

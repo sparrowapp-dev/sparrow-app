@@ -150,10 +150,7 @@
     splitter = document.querySelector(
       ".collection-splitter .splitpanes__splitter",
     );
-    let url = window.location.href;
-    const params = new URLSearchParams(url.split("?")[1]);
-    const isNew = params.get("first");
-    if (isNew) _viewModel.createNewTab();
+
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
@@ -163,12 +160,20 @@
    * Refreshing collection whenever workspace switches
    */
   let prevWorkspaceId = "";
+  let count = 0;
   currentWorkspace.subscribe((value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
         _viewModel.fetchCollections($currentWorkspace?._id);
       }
       prevWorkspaceId = value._id;
+      if (count == 0) {
+        let url = window.location.href;
+        const params = new URLSearchParams(url.split("?")[1]);
+        const isNew = params.get("first");
+        if (isNew === "true") _viewModel.createNewTab();
+        count = count + 1;
+      }
     }
   });
 
@@ -281,7 +286,7 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 {#if isImportCollectionPopup}
-  <ImportCollection
+  <!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
@@ -300,6 +305,63 @@
     onImportDataChange={_viewModel.handleImportDataChange}
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
+  /> -->
+  <ImportCollection
+    onClick={() => {
+      isImportCollectionPopup = false;
+    }}
+    {collectionList}
+    onItemCreated={async (entityType, args) => {
+      const response = await _viewModel.handleCreateItem(entityType, args);
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+    }}
+    currentWorkspaceId={$currentWorkspace?._id}
+    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+      const response = await _viewModel.importJSONObject(
+        currentWorkspaceId,
+        importJSON,
+        contentType,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onCollectionFileUpload={async (currentWorkspaceId, file) => {
+      const response = await _viewModel.collectionFileUpload(
+        currentWorkspaceId,
+        file,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onImportCollectionURL={async (
+      currentWorkspaceId,
+      requestBody,
+      activeSync,
+    ) => {
+      const response = await _viewModel.importCollectionURL(
+        currentWorkspaceId,
+        requestBody,
+        activeSync,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
   />
 {/if}
 

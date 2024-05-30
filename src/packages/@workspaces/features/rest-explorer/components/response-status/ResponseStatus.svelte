@@ -18,9 +18,10 @@
           title="HTTP Status - {response.status}"
           verticalOffset="- 42px"
           horizontalArrowOffset="+ 20px"
+          showArrow={false}
         >
           <span
-            class="statuscode position-relative cursor-pointer border-0"
+            class="statuscode gap-1  d-flex align-items-center position-relative cursor-pointer border-0"
             style="font-size: 12px;"
           >
             <span
@@ -52,7 +53,7 @@
             </span>
             {response.time}
           </span>
-          <p class="mb-0">ms</p>
+          <p class="mb-0"  style="font-size: 12px;" >ms</p>
         </span>
         <span
           class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
@@ -64,7 +65,7 @@
             </span>
             {response.size?.toFixed(2)}
           </span>
-          <p class="mb-0">KB</p>
+          <p class="mb-0"  style="font-size: 12px;" >KB</p>
         </span>
       </div>
     </div>
