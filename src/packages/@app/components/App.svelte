@@ -102,7 +102,7 @@
       <Route path="/*"><Navigate to="/app/" /></Route>
     </section>
     <section slot="unauthorized">
-      {#if 0}
+      {#if 1}
         <Route path="/init" component={EntryPoint} />
         <Route path="/*"><Navigate to="/init" /></Route>
       {:else}
