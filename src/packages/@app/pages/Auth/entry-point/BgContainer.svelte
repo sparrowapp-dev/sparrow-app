@@ -1,5 +1,5 @@
 <script>
-  import BlurEffect from './Card Mid.png'
+  import BlurEffect from "./Card Large.png";
 </script>
 
 <div
@@ -9,8 +9,17 @@
     class="position-relative overflow-hidden m-4 rounded-4 container d-flex flex-column align-items-center justify-content-center w-100"
     style="border: 1px solid var(--bg-container-border); max-width: 404px; padding: 80px 48px;"
   >
-   <img class="position-absolute" src={BlurEffect} alt=""
-   style="top: 0; right:0; left:0; bottom:0; ">
+    <div
+      style="position:absolute; top:0;
+    left:0; right:0; bottom:0;"
+    >
+      <img
+        class="position-absolute"
+        src={BlurEffect}
+        alt=""
+        style="width: 100%; height:100%; "
+      />
+    </div>
     <div
       class=" d-flex flex-column align-items-center justify-content-center w-100"
       style="z-index: 100;"
