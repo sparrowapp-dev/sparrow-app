@@ -61,7 +61,7 @@ export async function handleLoginV2(url: string) {
   const params = new URLSearchParams(url.split("?")[1]);
   const accessToken = params.get("accessToken");
   const refreshToken = params.get("refreshToken");
-  const event = params.get("event")
+  const event = params.get("event");
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
     setAuthJwt(constants.AUTH_TOKEN, accessToken);
