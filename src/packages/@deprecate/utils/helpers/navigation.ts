@@ -1,3 +1,11 @@
+export const tabBarScroller = (direction: string) => {
+  const navigation = document.getElementById("tab-scroller");
+  if (direction === "left") {
+    sideScroll(navigation, "left", 25, 100, 50);
+  } else {
+    sideScroll(navigation, "right", 25, 100, 10);
+  }
+};
 export const moveNavigation = (direction: string) => {
   const navigation = document.getElementById("tab-scroller");
   if (direction === "left") {
