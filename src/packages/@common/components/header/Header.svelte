@@ -2,6 +2,11 @@
   import { Select } from "@library/forms";
   import { StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
+  import { ArrowIcon } from "@library/icons";
+  import { DownArrowIcon } from "$lib/assets/icons";
+  import ArrowUnfilled from "@library/icons/ArrowUnfilled.svelte";
+  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+ import {SparrowIcon} from "@library/icons";
   /**
    * environment list
    */
@@ -28,7 +33,26 @@
 </script>
 
 <header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
-  <div></div>
+  <div class="d-flex ms-3 justify-content-center align-items-center">
+   
+    <div>
+      <!-- <img src={SparrowLogo} alt="Logo"> -->
+      <SparrowIcon height="17px" width="17px" color="#1193F0" />
+    </div>
+    <Tooltip title={"Coming Soon"} placement={"right"}>
+    <div class="ms-5 d-flex gap-3">
+      Workspace
+      <div>
+        <DownArrowIcon
+          width={12}
+          height={14}
+          color={"var(--sparrow-text-color)"}
+        />
+      </div>
+    </div>
+    </Tooltip>
+  </div>
+
   <div>
     <Select
       id={"environment-selector"}
@@ -67,7 +91,6 @@
       borderRounded={"2px"}
       position={"absolute"}
     />
-    
   </div>
 </header>
 
