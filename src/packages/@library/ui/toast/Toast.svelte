@@ -11,7 +11,7 @@
 
 <ToastContainer let:data>
   <div
-    class="w-100 d-flex position-relati custom-toast custom-toast-{data.type}"
+    class="w-100 d-flex border-radius-4 position-relati custom-toast custom-toast-{data.type}"
   >
     <div class="w-100" style="">
       <span class="p-1">
