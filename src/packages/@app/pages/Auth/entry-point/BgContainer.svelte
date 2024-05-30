@@ -1,5 +1,5 @@
 <script>
-  import BlurEffect from "./Card Large.png";
+  import BlurEffect from "./BgCard.png";
 </script>
 
 <div
