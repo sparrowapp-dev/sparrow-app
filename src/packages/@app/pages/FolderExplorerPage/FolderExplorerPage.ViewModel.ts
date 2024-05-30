@@ -210,9 +210,13 @@ class FolderExplorerPage {
     if (!(await this.getUserRoleInWorspace())) {
       return;
     }
-    const sampleRequest = generateSampleRequest(
+    // const sampleRequest = generateSampleRequest(
+    //   UntrackedItems.UNTRACKED + uuidv4(),
+    //   new Date().toString(),
+    // );
+    const initRequestTab = new InitRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
+      collection.workspaceId,
     );
 
     let userSource = {};
@@ -234,50 +238,57 @@ class FolderExplorerPage {
         name: folder.name,
         type: ItemType.FOLDER,
         items: {
-          name: sampleRequest.name,
-          type: sampleRequest.type,
+          name: initRequestTab.getValue().name,
+          type: initRequestTab.getValue().type,
           description: "",
           request: {
-            method: sampleRequest.property.request.method,
+            method: initRequestTab?.getValue()?.property.request.method,
           },
         },
       },
     };
 
-    this.collectionRepository.addRequestInFolder(
-      requestObj.collectionId,
-      requestObj.folderId,
-      {
-        ...requestObj.items.items,
-        id: sampleRequest.id,
-      },
-    );
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
-      this.collectionRepository.updateRequestInFolder(
+      this.collectionRepository.addRequestInFolder(
         requestObj.collectionId,
         requestObj.folderId,
-        sampleRequest.id,
         request,
       );
+      // this.collectionRepository.updateRequestInFolder(
+      //   requestObj.collectionId,
+      //   requestObj.folderId,
+      //   sampleRequest.id,
+      //   request,
+      // );
 
-      sampleRequest.id = request.id;
-      sampleRequest.path.workspaceId = collection.workspaceId;
-      sampleRequest.path.collectionId = collection.id;
-      sampleRequest.path.folderId = folder.id;
-      sampleRequest.path.folderName = folder.name;
-      sampleRequest.property.request.save.api = true;
-      sampleRequest.property.request.save.description = true;
+      // sampleRequest.id = request.id;
+      // sampleRequest.path.workspaceId = collection.workspaceId;
+      // sampleRequest.path.collectionId = collection.id;
+      // sampleRequest.path.folderId = folder.id;
+      // sampleRequest.path.folderName = folder.name;
+      // sampleRequest.property.request.save.api = true;
+      // sampleRequest.property.request.save.description = true;
 
-      this.handleOpenRequest(collection, folder, sampleRequest);
+      initRequestTab.updateId(request.id);
+      initRequestTab.updatePath({
+        workspaceId: collection.workspaceId,
+        collectionId: collection.id,
+        folderId: folder.id,
+      });
+      initRequestTab.updateIsSave(true);
+      // this.handleOpenRequest(collection, folder, sampleRequest);
+      this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
         source: "Side Panel Dropdown",
       });
       return;
+    } else {
+      notifications.error("Failed to create API");
     }
   };
 
