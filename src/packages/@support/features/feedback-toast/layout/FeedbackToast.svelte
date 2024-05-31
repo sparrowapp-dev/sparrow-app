@@ -26,21 +26,13 @@
     >
       Feedback
     </div>
-    <Tooltip
-      placement="left"
-      title="coming soon"
-      verticalOffset="+ 9px"
-      horizontalOffset="+ 200px"
-      showArrow={false}
+    <div
+      style="padding-top: 11px;"
+      class="tab {activeTab === 'faq' ? 'active' : ''}"
+      on:click={() => setActiveTab("faq")}
     >
-      <div
-        style="padding-top: 11px;"
-        class="tab {activeTab === 'faq' ? 'active' : ''}"
-        on:click={() => setActiveTab("faq")}
-      >
-        FAQs
-      </div>
-    </Tooltip>
+      <Tooltip placement="right" title="coming soon">FAQs</Tooltip>
+    </div>
   </div>
   <div style="overflow-y :scroll;">
     <div class="feedback-section {activeTab === 'feedback' ? 'active' : ''}">
