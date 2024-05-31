@@ -146,7 +146,7 @@
         />
       </div>
     {/if}
-    {#if tabList.length < 1}
+    <!-- {#if tabList.length < 1}
       <div class="d-inline-flex ms-2" style="height:35px;">
         <Button
           title="New Request"
@@ -155,12 +155,12 @@
           textStyleProp="font-size: 14px;"
         />
       </div>
-    {/if}
+    {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
       <Button
         title=""
         onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
+        buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
