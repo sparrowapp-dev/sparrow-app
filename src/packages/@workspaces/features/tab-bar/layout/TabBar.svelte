@@ -89,7 +89,8 @@
     bind:offsetWidth={scrollerParent}
   >
     {#if scrolable}
-      <div class="d-inline-block" style="height:35px; width:35px;">
+      <div class="d-inline-block m-1" style="height:35px; width:35px;">
+        <div class="right-btn mt-1 ">
         <Button
           onClick={() => {
             moveNavigation("left");
@@ -99,6 +100,7 @@
           buttonStartIconStyle={"height: 12px !important; margin: 0 !important;"}
           buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         />
+      </div>
       </div>
     {/if}
     <button
@@ -124,22 +126,24 @@
     </button>
     {#if scrolable}
       <div
-        class="d-inline-block position-relative"
+        class="d-inline-block position-relative p-1"
         style="height:35px; width:35px;"
       >
         <div
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
         />
+        <div class="left-btn  mt-1" >
         <Button
           title=""
           onClick={() => {
             moveNavigation("right");
           }}
-          buttonClassProp={"btn border-0 ps-1 pe-1 py-auto h-100 w-100"}
+          buttonClassProp={"btn border-0  ps-1 pe-1 py-0 "}
           buttonStartIconStyle={"height: 12px !important; transform: rotate(180deg); margin: 0 !important;"}
           buttonStartIcon={angleLeft}
         />
+      </div>
         <div
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
@@ -156,16 +160,18 @@
         />
       </div>
     {/if}
-    <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Button
+    <div class="" style="height:35px; width:35px;">
+      <div class="plus-button-tab d-flex justify-content-center align-items-center ">
+        <Button
         title=""
         onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
+        buttonClassProp={"btn border-0 mb-1 ps-0 py-0 h-100 w-100"}
         buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
+      </div>
     </div>
-    <div class="d-flex ms-auto my-auto me-2">
+    <div class="d-flex ms-auto my-auto me-2 ">
       <Dropdown
         buttonId="viewChange"
         bind:isMenuOpen={viewChange}
@@ -184,19 +190,21 @@
           },
         ]}
       >
+      <div class="btn-div">
         <button
-          id="viewChange"
-          class="border-0 bg-transparent pt-1 rounded"
-          on:click={() => {
-            viewChange = !viewChange;
-          }}
-        >
-          {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={15} />
-          {:else}
-            <VerticalGrid height={15} color="var(--blackColor)" />
-          {/if}
-        </button>
+        id="viewChange"
+        class="view-Change border-0 bg-transparent  rounded"
+        on:click={() => {
+          viewChange = !viewChange;
+        }}
+      >
+        {#if $requestSplitterDirection === "horizontal"}
+          <ViewGrid color={"var(--text-primary-400)"} height={14} />
+        {:else}
+          <VerticalGrid height={15} color="var(--blackColor)" />
+        {/if}
+      </button>
+      </div>
       </Dropdown>
       <Dropdown
         buttonId="moreOptions"
@@ -248,5 +256,41 @@
 
   .tab-scroller::-webkit-scrollbar {
     display: none;
+  }
+  .btn-div{
+    margin-top: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2px;
+  }
+  .btn-div:hover{  
+    background-color: var(--text-tertiary-300 ) !important;
+  }
+  .plus-button-tab:hover{ 
+    background-color: var(--text-tertiary-300 ) !important;
+  }
+  .plus-button-tab{
+    height: 21px;
+    width: 77%;
+    margin-top: 9.5px;
+    margin-left: 6px;
+    border-radius: 2px;
+  }
+  .view-Change{
+    padding: 1px;
+  }
+  .right-btn:hover{
+    background-color: var(--text-tertiary-300 ) !important;
+    border-radius: 2px;
+  }
+  .left-btn{
+    height: 24px;
+    width: 24px;
+  }
+  .left-btn:hover{
+   
+    background-color: var(--text-tertiary-300 ) !important;
+    border-radius: 2px;
   }
 </style>
