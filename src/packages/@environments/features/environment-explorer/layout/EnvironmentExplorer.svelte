@@ -103,6 +103,7 @@
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
+                  $currentEnvironment.isSave ||
                   !hasWorkpaceLevelPermission(
                     $userWorkspaceLevelRole,
                     workspaceLevelPermissions.ADD_ENVIRONMENT,
