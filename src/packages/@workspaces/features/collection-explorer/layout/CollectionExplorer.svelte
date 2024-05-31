@@ -164,7 +164,7 @@
     style="margin-top: 15px; min-width: 450px"
   >
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
-      <div class="d-flex aling-items-center gap-2 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-4">
         <div class="d-flex flex-column flex-grow-1">
           <input
             type="text"
@@ -174,7 +174,13 @@
             value={collection?.name}
             class="bg-transparent input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
             disabled={!userRoleInWorkspace || tab?.activeSync}
-            on:blur={(event) => onRename(collection, event?.target?.value)}
+            on:blur={(event) => {
+              const newValue = event?.target?.value;
+              const previousValue = tab.name;
+              if (newValue !== previousValue) {
+                onRename(collection, newValue);
+              }
+            }}
             on:keydown={(event) => {
               if (event.key === "Enter") {
                 onRenameInputKeyPress();
@@ -285,6 +291,7 @@
             </div>
           {/if}
         </div>
+
         <div class="d-flex flex-row">
           {#if collection?.activeSync}
             <div class="d-flex flex-column justify-content-center">

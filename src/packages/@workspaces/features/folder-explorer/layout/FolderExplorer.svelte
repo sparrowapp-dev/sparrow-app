@@ -103,8 +103,13 @@
           disabled={tab?.source === "SPEC"}
           class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
-          on:blur={(event) =>
-            onRename(collection, folder, event?.target?.value)}
+          on:blur={(event) => {
+            const newValue = event.target.value;
+            const previousValue = tab.name;
+            if (newValue !== previousValue) {
+              onRename(collection, folder, newValue);
+            }
+          }}
           on:keydown={(event) => {
             if (event.key === "Enter") {
               onRenameInputKeyPress();
