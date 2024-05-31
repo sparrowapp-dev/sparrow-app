@@ -107,6 +107,7 @@
       isDropIconFilled={true}
       highlightTickedItem={false}
       headerFontSize={"12px"}
+      headerHeight={"36px"}
     />
   </div>
 

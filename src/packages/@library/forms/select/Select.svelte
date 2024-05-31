@@ -51,7 +51,7 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let headerHeight = "36px";
+  export let headerHeight = "34px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
