@@ -68,7 +68,7 @@
       defaultLogo: more,
       hoveredLogo: hoveredMore,
       selectedLogo: selectedMore,
-      disabled: false,
+      disabled: true,
       position: "primary",
     },
     {
