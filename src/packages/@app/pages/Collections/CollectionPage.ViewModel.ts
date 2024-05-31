@@ -75,7 +75,6 @@ import {
 
 //-----
 //Samples
-import { generateSampleCollection } from "$lib/utils/sample/collection.sample";
 import { generateSampleRequest } from "$lib/utils/sample";
 //-----
 
@@ -606,13 +605,17 @@ export default class CollectionsViewModel {
         id: res._id,
         workspaceId: workspaceId,
       });
-      let path: Path = {
+      let path = {
         workspaceId: workspaceId,
         collectionId: response.data.data._id,
       };
-      const Samplecollection = generateSampleCollection(
+      // const Samplecollection = generateSampleCollection(
+      //   response.data.data._id,
+      //   new Date().toString(),
+      // );
+      const initCollectionTab = new InitCollectionTab(
         response.data.data._id,
-        new Date().toString(),
+        workspaceId,
       );
 
       response.data.data.items.map((item) => {
@@ -624,17 +627,22 @@ export default class CollectionsViewModel {
         }
       });
 
-      Samplecollection.id = response.data.data._id;
-      Samplecollection.path = path;
-      Samplecollection.name = response.data.data.name;
-      Samplecollection.property.collection.requestCount = totalRequest;
-      Samplecollection.property.collection.folderCount = totalFolder;
+      // Samplecollection.id = response.data.data._id;
+      // Samplecollection.path = path;
+      // Samplecollection.name = response.data.data.name;
+      // Samplecollection.property.collection.requestCount = totalRequest;
+      // Samplecollection.property.collection.folderCount = totalFolder;
 
-      this.handleOpenCollection(workspaceId, Samplecollection);
+      initCollectionTab.updateId(response.data.data._id);
+      initCollectionTab.updatePath(path);
+      initCollectionTab.updateName(response.data.data.name);
+
+      // this.handleOpenCollection(workspaceId, Samplecollection);
+      this.tabRepository.createTab(initCollectionTab.getValue());
       moveNavigation("right");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-        id: Samplecollection.id,
+        id: initCollectionTab.getValue().id,
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
@@ -766,183 +774,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Handle importing collction from Json Object
-   * @param workspaceId :string
-   * @param contentType: string - type of content in Json object
-   * @param importJSON: string - Json object to import
-   * @returns
-   */
-  private handleImportJsonObject = async (
-    workspaceId: string,
-    contentType: string,
-    importJSON: string,
-  ) => {
-    if (!contentType) {
-      return;
-    }
-    const response = await this.importCollectionFromJsonObject(
-      workspaceId,
-      importJSON,
-      contentType,
-    );
-
-    if (response.isSuccessful) {
-      const path: Path = {
-        workspaceId: workspaceId,
-        collectionId: response.data.data._id,
-      };
-      this.collectionService.addCollection({
-        ...response.data.data,
-        id: response.data.data._id,
-        workspaceId: workspaceId,
-      });
-      const Samplecollection = generateSampleCollection(
-        response.data.data._id,
-        new Date().toString(),
-      );
-
-      Samplecollection.id = response.data.data._id;
-      Samplecollection.path = path;
-      Samplecollection.name = response.data.data.name;
-      Samplecollection.save = true;
-      // this.handleCreateTab(Samplecollection);
-      moveNavigation("right");
-
-      this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-        id: Samplecollection.id,
-        name: Samplecollection.name,
-      });
-      MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-        importThrough: "ByObject",
-      });
-      notifications.success("Collection Imported successfully.");
-      return;
-    } else {
-      notifications.error("Failed to import collection. Please try again.");
-    }
-  };
-
-  /**
-   * Handle importing collection from swagger url
-   * @param workspaceId :string
-   * @param requestBody :string - the url for swagger
-   * @param validations : - the validations
-   * @returns :void
-   */
-  private handleImportUrl = async (
-    workspaceId: string,
-    requestBody: string,
-    validations: any,
-  ) => {
-    const response = await this.importCollectionData(
-      workspaceId,
-      requestBody,
-      validations.activeSync,
-    );
-
-    if (response.isSuccessful) {
-      const path: Path = {
-        workspaceId: workspaceId,
-        collectionId: response.data.data.collection._id,
-      };
-      const Samplecollection = generateSampleCollection(
-        response.data.data._id,
-        new Date().toString(),
-      );
-
-      Samplecollection.id = response.data.data.collection._id;
-      Samplecollection.path = path;
-      Samplecollection.name = response.data.data.collection.name;
-      Samplecollection.save = true;
-      if (response.data.data.existingCollection) {
-        this.collectionRepository.updateCollection(
-          response.data.data.collection._id,
-          {
-            ...response.data.data.collection,
-            id: response.data.data.collection._id,
-            currentBranch: requestBody.currentBranch,
-          },
-        );
-        notifications.error("Collection already exists.");
-      } else {
-        this.collectionRepository.addCollection({
-          ...response.data.data.collection,
-          id: response.data.data.collection._id,
-          currentBranch: requestBody.currentBranch,
-          workspaceId: workspaceId,
-        });
-        this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-          id: Samplecollection.id,
-          name: Samplecollection.name,
-        });
-        notifications.success("Collection Imported successfully.");
-      }
-      // this.handleCreateTab(Samplecollection);
-      moveNavigation("right");
-
-      MixpanelEvent(Events.IMPORT_COLLECTION, {
-        collectionName: response.data.data.collection.name,
-        collectionId: response.data.data.collection._id,
-        importThrough: "ByObject",
-      });
-      return;
-    } else {
-      notifications.error("Failed to import collection. Please try again.");
-    }
-  };
-
-  /**
-   * Handle file upload
-   * @param file :Request - the file(JSON or YAML) to be uploaded to extract data
-   * @returns :void
-   */
-  private handleFileUpload = async (workspaceId: string, file: Request) => {
-    if (file) {
-      const response = await this.importCollectionFromFile(workspaceId, file);
-      if (response.isSuccessful) {
-        const path: Path = {
-          workspaceId: workspaceId,
-          collectionId: response.data.data._id,
-        };
-
-        this.addCollection({
-          ...response.data.data,
-          id: response.data.data._id,
-          workspaceId: workspaceId,
-        });
-        const Samplecollection = generateSampleCollection(
-          response.data.data._id,
-          new Date().toString(),
-        );
-        Samplecollection.id = response.data.data._id;
-        Samplecollection.path = path;
-        Samplecollection.name = response.data.data.name;
-        Samplecollection.save = true;
-        // this.handleCreateTab(Samplecollection);
-        moveNavigation("right");
-
-        this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-          id: Samplecollection.id,
-          name: Samplecollection.name,
-        });
-        notifications.success("Collection Imported successfully.");
-        MixpanelEvent(Events.IMPORT_COLLECTION, {
-          collectionName: response.data.data.name,
-          collectionId: response.data.data._id,
-          importThrough: "ByFile",
-        });
-        return;
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to import collection. Please try again.");
-      }
-    }
-  };
-
-  /**
    * Extracts git branches from file path
    * @param filePathResponse :string - the path to folder of local repository
    * @returns :{repositoryPath: string, repositoryBranch: string, getBranchList: string[], isRepositoryPath: boolean}
@@ -994,140 +825,6 @@ export default class CollectionsViewModel {
         }
       }
     } catch (e) {}
-  };
-
-  /**
-   * Handles the collection import with validations
-   * @param importData
-   * @param currentBranch
-   * @param getBranchList
-   * @param uploadCollection
-   * @param validations
-   * @returns
-   */
-  private handleImportCollection = async (
-    workspaceId: string,
-    importData: string,
-    currentBranch: string,
-    getBranchList: string[],
-    uploadCollection: any,
-    validations: {
-      activeSync: boolean;
-      isRepositoryPath: boolean;
-      isRepositoryPathTouched: boolean;
-      isRepositoryBranchTouched: boolean;
-      importType: "file" | "text";
-      isTextEmpty: boolean;
-      isValidClientJSON: boolean;
-      isValidServerJSON: boolean;
-      isValidClientXML: boolean;
-      isValidServerXML: boolean;
-      isValidClientDeployedURL: boolean;
-      isValidServerDeployedURL: boolean;
-      isValidClientURL: boolean;
-      isValidServerURL: boolean;
-      repositoryBranch: string;
-      repositoryPath: string;
-    },
-  ) => {
-    if (validations.activeSync) {
-      validations.isRepositoryPathTouched = true;
-    }
-    if (validations.isRepositoryPath) {
-      validations.isRepositoryBranchTouched = true;
-    }
-    if (validations.importType === "text" && importData === "") {
-      validations.isTextEmpty = true;
-    }
-    if (
-      validations.importType === "text" &&
-      importData &&
-      ((validations.isValidClientJSON && validations.isValidServerJSON) ||
-        (validations.isValidClientXML && validations.isValidServerXML))
-    ) {
-      const contentType = this.validateImportBody(importData);
-      this.handleImportJsonObject(workspaceId, contentType, importData);
-    } else if (
-      validations.importType === "text" &&
-      importData &&
-      validations.isValidClientDeployedURL &&
-      validations.isValidServerDeployedURL
-    ) {
-      const response =
-        await this.collectionService.validateImportCollectionURL(importData);
-      if (response?.data?.status === ResponseStatusCode.OK) {
-        this.handleImportJsonObject(
-          workspaceId,
-          ContentTypeEnum["application/json"],
-          response.data.response,
-        );
-      }
-    } else if (
-      validations.importType === "text" &&
-      importData &&
-      validations.isValidClientURL &&
-      validations.isValidServerURL
-    ) {
-      const importUrl = importData.replace("localhost", "127.0.0.1") + "-json";
-      const response =
-        await this.collectionService.validateImportCollectionURL(importUrl);
-      if (
-        !validations.activeSync &&
-        response?.data?.status === ResponseStatusCode.OK
-      ) {
-        const requestBody = {
-          urlData: {
-            data: JSON.parse(response.data.response),
-            headers: response.data.headers,
-          },
-          url: importUrl,
-        };
-        this.handleImportUrl(workspaceId, requestBody, validations);
-      } else if (
-        validations.activeSync &&
-        response?.data?.status === ResponseStatusCode.OK &&
-        validations.isRepositoryPath &&
-        validations.repositoryBranch &&
-        validations.repositoryPath &&
-        validations.repositoryBranch !== "not exist" &&
-        currentBranch
-      ) {
-        if (
-          getBranchList
-            .map((elem) => {
-              return elem.name;
-            })
-            .includes(currentBranch)
-        ) {
-          const requestBody = {
-            urlData: {
-              data: JSON.parse(response.data.response),
-              headers: response.data.headers,
-            },
-            url: importUrl,
-            primaryBranch: validations.repositoryBranch,
-            currentBranch: currentBranch,
-            localRepositoryPath: validations.repositoryPath,
-          };
-          this.handleImportUrl(workspaceId, requestBody, validations);
-        } else {
-          notifications.error(
-            `Can't import local branch. Please push ${currentBranch} to remote first.`,
-          );
-        }
-      }
-    } else if (
-      validations.importType === "file" &&
-      uploadCollection?.file?.value?.length !== 0
-    ) {
-      this.handleFileUpload(workspaceId, uploadCollection?.file?.value);
-      return;
-    } else if (
-      validations.importType === "file" &&
-      uploadCollection?.file?.value?.length === 0
-    ) {
-      return;
-    }
   };
 
   /**
@@ -1366,9 +1063,13 @@ export default class CollectionsViewModel {
     ) {
       return;
     }
-    const request = generateSampleRequest(
+    // const request = generateSampleRequest(
+    //   UntrackedItems.UNTRACKED + uuidv4(),
+    //   new Date().toString(),
+    // );
+    const request = new InitRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
+      workspaceId,
     );
 
     let userSource = {};
@@ -1385,17 +1086,17 @@ export default class CollectionsViewModel {
       workspaceId: workspaceId,
       ...userSource,
       items: {
-        name: request.name,
-        type: request.type,
+        name: request.getValue().name,
+        type: request.getValue().type,
         description: "",
         request: {
-          method: request?.property?.request?.method,
+          method: request?.getValue().property?.request?.method,
         },
       },
     };
     this.collectionRepository.addRequestOrFolderInCollection(collection.id, {
       ...requestObj.items,
-      id: request.id,
+      id: request.getValue().id,
     });
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
@@ -1404,31 +1105,37 @@ export default class CollectionsViewModel {
 
       this.collectionRepository.updateRequestOrFolderInCollection(
         collection.id,
-        request.id,
+        request.getValue().id,
         res,
       );
 
-      request.id = res.id;
-      request.path.workspaceId = workspaceId;
-      request.path.collectionId = collection.id;
-      request.property.request.save.api = true;
-      request.property.request.save.description = true;
-
-      this.handleOpenRequest(
-        workspaceId,
-        collection,
-        {
-          id: "",
-          name: "",
-        },
-        request,
-      );
+      // request.id = res.id;
+      // request.path.workspaceId = workspaceId;
+      // request.path.collectionId = collection.id;
+      // request.property.request.save.api = true;
+      // request.property.request.save.description = true;
+      request.updateId(res.id);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+      });
+      request.updateIsSave(true);
+      // this.handleOpenRequest(
+      //   workspaceId,
+      //   collection,
+      //   {
+      //     id: "",
+      //     name: "",
+      //   },
+      //   request,
+      // );
+      this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
-        request.id,
+        request.getValue().id,
       );
       notifications.error(response.message);
     }
@@ -1454,10 +1161,14 @@ export default class CollectionsViewModel {
     ) {
       return;
     }
-    const sampleRequest = generateSampleRequest(
+    const sampleRequest = new InitRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
+      workspaceId,
     );
+    // generateSampleRequest(
+    //   UntrackedItems.UNTRACKED + uuidv4(),
+    //   new Date().toString(),
+    // );
 
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
@@ -1468,7 +1179,6 @@ export default class CollectionsViewModel {
         source: "USER",
       };
     }
-
     const requestObj: CreateApiRequestPostBody = {
       collectionId: collection.id,
       workspaceId: workspaceId,
@@ -1478,11 +1188,11 @@ export default class CollectionsViewModel {
         name: explorer.name,
         type: ItemType.FOLDER,
         items: {
-          name: sampleRequest.name,
-          type: sampleRequest.type,
+          name: sampleRequest.getValue().name,
+          type: sampleRequest.getValue().type,
           description: "",
           request: {
-            method: sampleRequest.property.request.method,
+            method: sampleRequest.getValue().property.request.method,
           },
         },
       },
@@ -1493,7 +1203,7 @@ export default class CollectionsViewModel {
       requestObj.folderId,
       {
         ...requestObj.items.items,
-        id: sampleRequest.id,
+        id: sampleRequest.getValue().id,
       },
     );
     const response =
@@ -1504,24 +1214,26 @@ export default class CollectionsViewModel {
       this.collectionRepository.updateRequestInFolder(
         requestObj.collectionId,
         requestObj.folderId,
-        sampleRequest.id,
+        sampleRequest.getValue().id,
         request,
       );
 
-      sampleRequest.id = request.id;
-      sampleRequest.path.workspaceId = workspaceId;
-      sampleRequest.path.collectionId = collection.id;
-      sampleRequest.path.folderId = explorer.id;
-      sampleRequest.path.folderName = explorer.name;
-      sampleRequest.property.request.save.api = true;
-      sampleRequest.property.request.save.description = true;
-
-      this.handleOpenRequest(
-        workspaceId,
-        collection,
-        explorer,
-        sampleRequest.id,
-      );
+      // sampleRequest.id = request.id;
+      // sampleRequest.path.workspaceId = workspaceId;
+      // sampleRequest.path.collectionId = collection.id;
+      // sampleRequest.path.folderId = explorer.id;
+      // sampleRequest.path.folderName = explorer.name;
+      // sampleRequest.property.request.save.api = true;
+      // sampleRequest.property.request.save.description = true;
+      sampleRequest.updateId(request.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      this.tabRepository.createTab(sampleRequest.getValue());
+      // this.handleOpenRequest(workspaceId, collection, explorer, request);
       moveNavigation("right");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
         source: "Side Panel Dropdown",
@@ -1531,7 +1243,7 @@ export default class CollectionsViewModel {
       this.collectionRepository.deleteRequestInFolder(
         requestObj.collectionId,
         requestObj.folderId,
-        sampleRequest.id,
+        sampleRequest.getValue().id,
       );
     }
   };
@@ -1748,9 +1460,9 @@ export default class CollectionsViewModel {
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
-    sampleFolder.updateActiveSync(collection.activeSync);
-    sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
-    sampleFolder.updateIsDeleted(folder?.isDeleted);
+    // sampleFolder.updateActiveSync(collection.activeSync);
+    // sampleFolder.updateSource(!folder?.source ? "SPEC" : folder.source);
+    // sampleFolder.updateIsDeleted(folder?.isDeleted);
 
     this.handleCreateTab(sampleFolder.getValue());
     moveNavigation("right");
@@ -1781,7 +1493,7 @@ export default class CollectionsViewModel {
     _collection.updateName(collection.name);
     _collection.updateDescription(collection.description);
     _collection.updatePath(path);
-    _collection.updateActiveSync(collection.activeSync);
+    // _collection.updateActiveSync(collection.activeSync);
     _collection.updateTotalRequests(totalRequest);
     _collection.updateTotalFolder(totalFolder);
     _collection.updateIsSave(true);
@@ -2450,16 +2162,6 @@ export default class CollectionsViewModel {
    */
   public handleImportItem = async (entityType: string, args: any) => {
     switch (entityType) {
-      case "collection":
-        this.handleImportCollection(
-          args.workspaceId,
-          args.importData,
-          args.currentBranch,
-          args.getBranchList,
-          args.uploadCollection,
-          args.validations,
-        );
-        break;
       case "curl":
         this.handleImportCurl(args.workspaceId, args.importCurl);
         break;
