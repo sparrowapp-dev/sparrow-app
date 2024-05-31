@@ -30,18 +30,21 @@
   let handleDropdown = (tabId: string) => {
     onInitActiveEnvironmentToWorkspace(currentWorkspaceId, tabId);
   };
+
+
+  export let currentWorkspaceName;
+
 </script>
 
 <header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
   <div class="d-flex ms-3 justify-content-center align-items-center">
    
     <div>
-      <!-- <img src={SparrowLogo} alt="Logo"> -->
       <SparrowIcon height="17px" width="17px" color="#1193F0" />
     </div>
     <Tooltip title={"Coming Soon"} placement={"right"}>
-    <div class="ms-5 d-flex gap-3">
-      Workspace
+    <div class="ms-4 d-flex gap-2 mt-1">
+      {currentWorkspaceName || ""}
       <div>
         <DownArrowIcon
           width={12}
