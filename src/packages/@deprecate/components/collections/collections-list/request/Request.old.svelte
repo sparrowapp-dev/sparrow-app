@@ -19,7 +19,7 @@
   import Button from "@library/ui/button/Button.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import reloadSyncIcon from "$lib/assets/reload-sync.svg";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   export let name: string;
   export let id: string;

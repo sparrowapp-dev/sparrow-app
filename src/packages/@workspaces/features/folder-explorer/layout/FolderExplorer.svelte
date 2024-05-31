@@ -49,7 +49,7 @@
   /**
    * Components
    */
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   /**
    * Types

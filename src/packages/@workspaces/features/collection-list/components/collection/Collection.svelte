@@ -23,7 +23,7 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import gitBranchIcon from "$lib/assets/git-branch.svg";
   import { ReloadCollectionIcon } from "$lib/assets/icons";

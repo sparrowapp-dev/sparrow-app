@@ -13,7 +13,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { Link } from "svelte-navigator";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@library/ui";
 
   /**
    * List of side bar Items

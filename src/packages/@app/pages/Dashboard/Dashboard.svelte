@@ -36,9 +36,9 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
-      currentWorkspaceId = activeWorkspaceRxDoc._id;
-      currentWorkspaceName = activeWorkspaceRxDoc.name;
       if (activeWorkspaceRxDoc) {
+        currentWorkspaceId = activeWorkspaceRxDoc._id;
+        currentWorkspaceName = activeWorkspaceRxDoc.name;
         refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");

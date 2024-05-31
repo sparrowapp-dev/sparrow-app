@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PlusIcon } from "$lib/assets/app.asset";
-  import { Tooltip } from "$lib/components";
+  import { Tooltip } from "@library/ui";
   import { v4 as uuidv4 } from "uuid";
   import type {
     EnvironmentRepositoryMethods,
