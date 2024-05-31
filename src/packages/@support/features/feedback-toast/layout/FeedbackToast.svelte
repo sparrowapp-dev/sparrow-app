@@ -97,17 +97,20 @@
             }}
           >
             <span class="me-2 text-primary-300 text-fs-14"
-              >{!isReadMore ? "More" : "Less"}</span
+              >{!isReadMore ? "More" : ""}</span
             >
             <span
               class="position-relative d-inline-block"
               style={!isReadMore ? "" : "transform: rotate(180deg) !important;"}
-              ><ArrowUnfilledIcon
-                height={"14px"}
-                width={"14px"}
-                color={"var(--text-primary-300)"}
-              /></span
             >
+              {#if !isReadMore}
+                <ArrowUnfilledIcon
+                  height={"14px"}
+                  width={"14px"}
+                  color={"var(--text-primary-300)"}
+                />
+              {/if}
+            </span>
           </p>
         </div>
         {#if isReadMore}
@@ -153,6 +156,32 @@
             </p>
           </div>
         {/if}
+
+        <div class="d-flex justify-content-center">
+          <p
+            role="button"
+            class="d-flex align-items-center"
+            on:click={() => {
+              isReadMore = !isReadMore;
+            }}
+          >
+            <span class="me-2 text-primary-300 text-fs-14"
+              >{!isReadMore ? "" : "Less"}</span
+            >
+            <span
+              class="position-relative d-inline-block"
+              style={!isReadMore ? "" : "transform: rotate(180deg) !important;"}
+            >
+              {#if isReadMore}
+                <ArrowUnfilledIcon
+                  height={"14px"}
+                  width={"14px"}
+                  color={"var(--text-primary-300)"}
+                />
+              {/if}</span
+            >
+          </p>
+        </div>
       </div>
     {/if}
   </div>
