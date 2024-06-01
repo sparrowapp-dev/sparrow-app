@@ -1,5 +1,6 @@
 import { RxDB, type TabDocument } from "@app/database/database";
 import type { TabDocType } from "@app/models/tab.model";
+import type { Tab } from "@common/types/workspace";
 import { TaskQueue } from "@common/utils";
 import type { Observable } from "rxjs";
 
@@ -8,6 +9,11 @@ export class TabRepository {
   private taskQueue = new TaskQueue();
   private db = RxDB?.getInstance()?.rxdb?.tab;
 
+  /**
+   * Finds a single tab based on the provided query.
+   * @param query - The query to search for a tab.
+   * @returns - The found tab document.
+   */
   private findOne = async (query: unknown) => {
     return await this.db
       .findOne({
@@ -16,21 +22,36 @@ export class TabRepository {
       .exec();
   };
 
+  /**
+   * Bulk upserts (updates or inserts) multiple tab documents.
+   * @param data - The array of tab documents to upsert.
+   */
   private bulkUpsert = async (data: TabDocType[]): Promise<void> => {
     await this.db.bulkUpsert(data);
   };
 
-  private insert = async (data: TabDocType) => {
+  /**
+   * Inserts a new tab document.
+   * @param data - The tab document to insert.
+   */
+  private insert = async (data: TabDocType): Promise<void> => {
     await this.db.insert(data);
   };
 
+  /**
+   * Retrieves sorted tab documents based on the provided query.
+   * @param query - The query to sort the tabs.
+   * @returns - The sorted array of tab documents.
+   */
   private getSortedTabs = async (query: unknown) => {
     return await this.db.find().sort(query).exec();
   };
+
   /**
    * Creates a new tab and adds it to the tab bar.
+   * @param tab - The tab document to create.
    */
-  public createTab = async (tab: TabDocType): Promise<void> => {
+  public createTab = async (tab: Tab): Promise<void> => {
     this.taskQueue.enqueue(async () => {
       // checks if tab already exists with same id
       const _tab = await this.findOne({
@@ -52,13 +73,19 @@ export class TabRepository {
         return res;
       });
       await this.bulkUpsert(response);
-      // inseting new tab
+      // inserting new tab
       tab.index = index;
       tab.isActive = true;
       await this.insert(tab);
     });
   };
 
+  /**
+   * Gets the ID of the next active tab.
+   * @param doc - The array of tab documents.
+   * @param id - The ID of the current tab.
+   * @returns - The ID of the next active tab.
+   */
   private getNextActiveTabId = (doc: TabDocument[], id: string): string => {
     let nextActiveTabId: string = "";
     for (let i = 0; i < doc.length; i++) {
@@ -74,8 +101,8 @@ export class TabRepository {
   };
 
   /**
-   * @description Removes an existing tab from the tab bar.
-   * @param id tab id to be removed
+   * Removes an existing tab from the tab bar.
+   * @param id - The ID of the tab to be removed.
    */
   public removeTab = async (id: string): Promise<void> => {
     this.taskQueue.enqueue(async () => {
@@ -116,8 +143,8 @@ export class TabRepository {
   };
 
   /**
-   * @description Activates an existing tab in the tab bar.
-   * @param id
+   * Activates an existing tab in the tab bar.
+   * @param id - The ID of the tab to be activated.
    */
   public activeTab = async (id: string): Promise<void> => {
     this.taskQueue.enqueue(async () => {
@@ -147,7 +174,26 @@ export class TabRepository {
   };
 
   /**
+   * reorder the tabs on drag and drop
+   * @param startIndex - denotes index from which element removed
+   * @param endIndex - denotes index at which element pushed
+   */
+  public reorderTabs = async (startIndex: number, endIndex: number) => {
+    const tabDocuments = [...(await this.getSortedTabs({ index: "asc" }))];
+    const element = tabDocuments.splice(startIndex, 1)[0]; // removes the elemnt
+    tabDocuments.splice(endIndex, 0, element); // pushes the element
+    const response = tabDocuments.map((tab, index) => {
+      tab.patch({
+        index: index, // fixing indexes
+      });
+      return tab;
+    });
+    await this.bulkUpsert(response);
+  };
+
+  /**
    * Extracts all data of the active tab.
+   * @returns - An observable of the active tab document.
    */
   public getTab = (): Observable<TabDocument> => {
     return this.db.findOne({
@@ -158,14 +204,15 @@ export class TabRepository {
   };
 
   /**
-   * @description fetches all the tabs as an observable.
+   * Fetches all the tabs as an observable.
+   * @returns - An observable array of tab documents.
    */
   public getTabList = (): Observable<TabDocument[]> => {
     return this.db.find().sort({ index: "asc" }).$;
   };
 
   /**
-   * @description Clear all the  tabs
+   * Clears all the tabs.
    */
   public clearTabs = async (): Promise<void> => {
     this.taskQueue.enqueue(async () => {
@@ -174,11 +221,11 @@ export class TabRepository {
   };
 
   /**
-   * @description updates tab document
-   * @param tabId tab id to be updated
-   * @param tab new tab document
+   * Updates a tab document.
+   * @param tabId - The ID of the tab to be updated.
+   * @param tab - The new tab document data.
    */
-  public updateTab = async (tabId: string, tab: TabDocType) => {
+  public updateTab = async (tabId: string, tab: TabDocType): Promise<void> => {
     const d = await this.findOne({
       tabId,
     });

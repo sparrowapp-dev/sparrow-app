@@ -247,26 +247,10 @@ export default class CollectionsViewModel {
    */
   public onDropEvent = (event: Event) => {
     event.preventDefault();
-    // TODO - Parse this.tabs observable to RxDoc (Remove these code)
-    const tabList = this.tabs;
-    /////////////////////////////////////////////////////////////////////
-    let updatedTabList: TabDocument[] = [];
-    tabList
-      .subscribe((value) => {
-        updatedTabList = value;
-      })
-      .unsubscribe();
-    const element = updatedTabList.splice(this.movedTabStartIndex, 1);
-    updatedTabList.splice(this.movedTabEndIndex, 0, element[0]);
-    updatedTabList = updatedTabList.map((tab, index) => {
-      tab.patch({
-        index: index,
-      });
-      return tab;
-    });
-    updatedTabList.sort((a, b) => {
-      return b.index - a.index;
-    });
+    this.tabRepository.reorderTabs(
+      this.movedTabStartIndex,
+      this.movedTabEndIndex,
+    );
   };
 
   /**
