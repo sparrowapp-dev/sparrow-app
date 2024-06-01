@@ -179,16 +179,20 @@ export class TabRepository {
    * @param endIndex - denotes index at which element pushed
    */
   public reorderTabs = async (startIndex: number, endIndex: number) => {
-    const tabDocuments = [...(await this.getSortedTabs({ index: "asc" }))];
-    const element = tabDocuments.splice(startIndex, 1)[0]; // removes the elemnt
-    tabDocuments.splice(endIndex, 0, element); // pushes the element
-    const response = tabDocuments.map((tab, index) => {
-      tab.patch({
-        index: index, // fixing indexes
+    this.taskQueue.enqueue(async () => {
+      const tabDocuments = [...(await this.getSortedTabs({ index: "asc" }))];
+      // removes the elemnt
+      const element = tabDocuments.splice(startIndex, 1)[0];
+      // pushes the element
+      tabDocuments.splice(endIndex, 0, element);
+      const response = tabDocuments.map((tab, index) => {
+        const res = tab.toMutableJSON();
+        // refreshing indexes
+        res.index = index;
+        return res;
       });
-      return tab;
+      await this.bulkUpsert(response);
     });
-    await this.bulkUpsert(response);
   };
 
   /**
