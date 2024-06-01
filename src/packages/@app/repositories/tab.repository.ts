@@ -1,115 +1,156 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "@app/database/database";
+import type { TabDocType } from "@app/models/tab.model";
+import { TaskQueue } from "@common/utils";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
   constructor() {}
+  private taskQueue = new TaskQueue();
+  private db = RxDB?.getInstance()?.rxdb?.tab;
 
-  /**
-   * Return all the RxDocument refers to this collection in ascending order with respect to createdAt.
-   */
-  public getDocuments = async (): Promise<TabDocument[]> => {
-    return await RxDB.getInstance()
-      .rxdb.tab.find()
-      .sort({ index: "asc" })
+  private findOne = async (query: unknown) => {
+    return await this.db
+      .findOne({
+        selector: query,
+      })
       .exec();
   };
 
+  private bulkUpsert = async (data: TabDocType[]): Promise<void> => {
+    await this.db.bulkUpsert(data);
+  };
+
+  private insert = async (data: TabDocType) => {
+    await this.db.insert(data);
+  };
+
+  private getSortedTabs = async (query: unknown) => {
+    return await this.db.find().sort(query).exec();
+  };
   /**
    * Creates a new tab and adds it to the tab bar.
    */
-  public createTab = async (tab: any): Promise<void> => {
-    const _tab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          id: tab.id,
-        },
-      })
-      .exec();
-    if (_tab) {
-      await this.activeTab(tab.id);
-      return;
-    }
-    const activeTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    if (activeTab) {
-      await activeTab.incrementalUpdate({ $set: { isActive: false } });
-    }
-    const lastIndex = (await RxDB.getInstance().rxdb.tab.find().exec()).length;
-    tab.index = lastIndex;
-    await RxDB.getInstance().rxdb.tab.insert(tab);
+  public createTab = async (tab: TabDocType): Promise<void> => {
+    this.taskQueue.enqueue(async () => {
+      // checks if tab already exists with same id
+      const _tab = await this.findOne({
+        id: tab.id,
+      });
+      if (_tab) {
+        await this.activeTab(tab.id);
+        return;
+      }
+
+      // recalculate the index of existing tabs
+      const allTabs = await this.getSortedTabs({ index: "asc" });
+      let index = 0;
+      const response = allTabs.map((elem: TabDocument) => {
+        const res = elem.toMutableJSON();
+        res.index = index;
+        res.isActive = false;
+        index = index + 1;
+        return res;
+      });
+      await this.bulkUpsert(response);
+      // inseting new tab
+      tab.index = index;
+      tab.isActive = true;
+      await this.insert(tab);
+    });
   };
 
-  /**
-   * Removes an existing tab from the tab bar.
-   */
-  public removeTab = async (id: string): Promise<void> => {
-    const doc = await this.getDocuments();
+  private getNextActiveTabId = (doc: TabDocument[], id: string): string => {
+    let nextActiveTabId: string = "";
     for (let i = 0; i < doc.length; i++) {
       if (doc[i].get("id") === id) {
         if (doc[i + 1]) {
-          await this.activeTab(doc[i + 1].get("id"));
+          nextActiveTabId = doc[i + 1].get("id");
         } else if (doc[i - 1]) {
-          await this.activeTab(doc[i - 1].get("id"));
+          nextActiveTabId = doc[i - 1].get("id");
         }
       }
     }
-    const selectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          id,
-        },
-      })
-      .exec();
-    if (selectedTab) {
-      doc.forEach(async (tab) => {
-        if (tab.index > selectedTab.index) {
-          await tab.incrementalPatch({
-            index: tab.index - 1,
-          });
-        }
-      });
-      await selectedTab.incrementalRemove();
-    }
+    return nextActiveTabId;
   };
 
   /**
-   * Activates an existing tab in the tab bar.
+   * @description Removes an existing tab from the tab bar.
+   * @param id tab id to be removed
+   */
+  public removeTab = async (id: string): Promise<void> => {
+    this.taskQueue.enqueue(async () => {
+      const doc = await this.getSortedTabs({ index: "asc" });
+      // electing the next active tab before removing the existing one
+      const nextActiveTabId = this.getNextActiveTabId(doc, id);
+      // removes the requested tab
+      const selectedTab = await this.findOne({
+        id,
+      });
+      await selectedTab?.incrementalRemove();
+
+      // recalculate index of rest of the tabs
+      let index: number = 0;
+      const response = doc
+        .filter((elem: TabDocument) => {
+          const res = elem.toJSON();
+          if (res.id === id) return false;
+          return true;
+        })
+        .map((elem: TabDocument) => {
+          const res = elem.toMutableJSON();
+          res.isActive = false;
+          res.index = index;
+          index = index + 1;
+          return res;
+        });
+      await this.bulkUpsert(response);
+
+      // activating the next elected tab
+      const d = await this.findOne({
+        id: nextActiveTabId,
+      });
+      d?.incrementalModify((value: TabDocument) => {
+        return { ...value, isActive: true };
+      });
+    });
+  };
+
+  /**
+   * @description Activates an existing tab in the tab bar.
+   * @param id
    */
   public activeTab = async (id: string): Promise<void> => {
-    const deselectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    if (deselectedTab) {
-      if (deselectedTab.id === id) return;
-      await deselectedTab.incrementalUpdate({ $set: { isActive: false } });
-    }
-    const selectedTab = await RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          id,
-        },
-      })
-      .exec();
-    if (selectedTab) {
-      await selectedTab.incrementalUpdate({ $set: { isActive: true } });
-    }
+    this.taskQueue.enqueue(async () => {
+      // checks if tab is already active or not
+      const deselectedTab = await this.findOne({
+        isActive: true,
+      });
+      if (deselectedTab?.id === id) return;
+
+      // marking all the tabs as inactive
+      const allTabs = await this.db.find().exec();
+      const response = allTabs.map((elem: TabDocument) => {
+        const res = elem.toMutableJSON();
+        res.isActive = false;
+        return res;
+      });
+      await this.bulkUpsert(response);
+
+      // activating the next elected tab
+      const d = await this.findOne({
+        id,
+      });
+      d?.incrementalModify((value: TabDocument) => {
+        return { ...value, isActive: true };
+      });
+    });
   };
 
   /**
    * Extracts all data of the active tab.
    */
   public getTab = (): Observable<TabDocument> => {
-    return RxDB.getInstance().rxdb.tab.findOne({
+    return this.db.findOne({
       selector: {
         isActive: true,
       },
@@ -117,148 +158,31 @@ export class TabRepository {
   };
 
   /**
-   * Return all the RxDocument observable refers to this collection in ascending order with respect to createdAt.
+   * @description fetches all the tabs as an observable.
    */
   public getTabList = (): Observable<TabDocument[]> => {
-    return RxDB.getInstance().rxdb.tab.find().sort({ index: "asc" }).$;
+    return this.db.find().sort({ index: "asc" }).$;
   };
 
-  public getTabLs = async (): TabDocument[] => {
-    return await RxDB.getInstance()
-      .rxdb.tab.find()
-      .sort({ index: "asc" })
-      .exec();
-  };
   /**
-   * Configures the request with properties such as URL, method, body, query parameters, headers, authentication, and response handling.
+   * @description Clear all the  tabs
    */
-  public setRequestProperty = async (
-    data: any,
-    route: string,
-  ): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request[route] = data;
-      return value;
+  public clearTabs = async (): Promise<void> => {
+    this.taskQueue.enqueue(async () => {
+      this.db.find()?.remove();
     });
   };
 
   /**
-   * Configures the request with state such as raw, dataset, auth, section.
+   * @description updates tab document
+   * @param tabId tab id to be updated
+   * @param tab new tab document
    */
-  public setRequestState = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.state[route] = data;
-      return value;
+  public updateTab = async (tabId: string, tab: TabDocType) => {
+    const d = await this.findOne({
+      tabId,
     });
-  };
-  /**
-   * Configures the request with Auth such as API key, bearer token, basic auth.
-   */
-  public setRequestAuth = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.auth[route] = data;
-      return value;
-    });
-  };
-  /**
-   * Configures the request body such as form data, url encoded, raw.
-   */
-  public setRequestBody = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.body[route] = data;
-      return value;
-    });
-  };
-  /**
-   * Configures the request body form data such as text and file.
-   */
-  public setRequestBodyFormData = async (
-    data: any,
-    route: string,
-  ): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value.property.request.body.formdata[route] = data;
-      return value;
-    });
-  };
-
-  /**
-   * Responsible to change tab property like :
-   * id, name, description, save.
-   */
-  public setTabProperty = async (data: any, route: string): Promise<void> => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          isActive: true,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
-      value[route] = data;
-      return value;
-    });
-  };
-
-  /**
-   * Clear tabs
-   */
-  public clearTabs = async (): Promise<any> => {
-    return RxDB.getInstance().rxdb.tab.find().remove();
-  };
-
-  public syncTabsWithStore = async (data) => {
-    await this.clearTabs();
-    const sub = data.subscribe((docs) => {
-      RxDB.getInstance().rxdb.tab.bulkUpsert(docs);
-    });
-    sub();
-  };
-
-  public updateTab = async (tabId, tab) => {
-    const query = RxDB.getInstance()
-      .rxdb.tab.findOne({
-        selector: {
-          tabId,
-        },
-      })
-      .exec();
-    (await query).incrementalModify((value) => {
+    d?.incrementalModify((value: TabDocument) => {
       return { ...value, ...tab };
     });
   };

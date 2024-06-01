@@ -137,6 +137,7 @@
   .tooltip:hover .tooltip-text {
     visibility: visible !important;
     opacity: 1 !important;
+    transition-delay: 0.3s !important;
   }
   .tooltip-square {
     height: 10px;

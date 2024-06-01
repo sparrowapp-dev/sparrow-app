@@ -220,7 +220,6 @@ export class DashboardViewModel {
 
   private clientLogout = async (): Promise<void> => {
     setUser(null);
-    await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
     isLoggout.set(true);
