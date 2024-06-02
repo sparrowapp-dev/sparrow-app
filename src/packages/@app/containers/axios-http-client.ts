@@ -1,7 +1,8 @@
-import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
+import { isLoggout, isResponseError, setUser } from "$lib/store";
 import constants from "$lib/utils/constants";
 import { ErrorMessages } from "$lib/utils/enums";
-import { setAuthJwt } from "$lib/utils/jwt";
+import { clearAuthJwt, setAuthJwt } from "$lib/utils/jwt";
+import { RxDB } from "@app/database/database";
 import type {
   AccessToken,
   BearerToken,
@@ -9,6 +10,7 @@ import type {
   RequestData,
   ResponseData,
 } from "@app/types";
+import { notifications } from "@library/ui/toast/Toast";
 import axios from "axios";
 
 export class AxiosHttpClient {
@@ -28,6 +30,26 @@ export class AxiosHttpClient {
       isSuccessful: type === "success" ? true : false,
       data: response,
     };
+  };
+
+  private logout = async (): Promise<void> => {
+    const response = await this.makeRequest({
+      method: "GET",
+      url: `${this.apiUrl}/api/user/logout`,
+      headers: {
+        ...this.bearerToken.getBearerToken(this.refreshToken.getValue()),
+      },
+    });
+    if (response.isSuccessful) {
+      setUser(null);
+      await RxDB.getInstance().destroyDb();
+      await RxDB.getInstance().getDb();
+      isLoggout.set(true);
+      isResponseError.set(false);
+      clearAuthJwt();
+    } else {
+      notifications.error(response.message);
+    }
   };
 
   private regenerateAuthToken = async (
@@ -75,8 +97,7 @@ export class AxiosHttpClient {
         e.response?.data?.statusCode === 401 &&
         e.response.data.message === ErrorMessages.Unauthorized
       ) {
-        const _viewModel = new HeaderDashboardViewModel();
-        await _viewModel.clientLogout();
+        await this.logout();
         return this.createResponse("error", "Unauthorized");
       }
       if (e.code === "ERR_NETWORK") {
