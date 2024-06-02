@@ -8,12 +8,30 @@ import { environmentType } from "$lib/utils/enums/environment.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
+import { AxiosHttpClient } from "@app/containers";
+import {
+  AccessTokenClient,
+  BearerTokenClient,
+  RefreshTokenClient,
+} from "@app/utils";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
-  private environmentService = new EnvironmentService();
+  private bearerTokenClient = new BearerTokenClient();
+  private accessTokenClient = new AccessTokenClient();
+  private httpClient = new AxiosHttpClient(
+    new BearerTokenClient(),
+    new AccessTokenClient(),
+    new RefreshTokenClient(),
+  );
+  private environmentService = new EnvironmentService(
+    this.httpClient,
+    this.bearerTokenClient,
+    this.accessTokenClient,
+  );
+
   private initTab = new InitTab();
 
   constructor() {}
