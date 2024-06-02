@@ -12,6 +12,12 @@ import { RxDB } from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
+import {
+  AccessTokenClient,
+  BearerTokenClient,
+  RefreshTokenClient,
+} from "@app/utils";
+import { AxiosHttpClient } from "@app/containers";
 
 export class DashboardViewModel {
   constructor() {}
@@ -19,7 +25,19 @@ export class DashboardViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private teamService = new TeamService();
   private workspaceService = new WorkspaceService();
-  private environmentService = new EnvironmentService();
+  private bearerTokenClient = new BearerTokenClient();
+  private accessTokenClient = new AccessTokenClient();
+  private httpClient = new AxiosHttpClient(
+    new BearerTokenClient(),
+    new AccessTokenClient(),
+    new RefreshTokenClient(),
+  );
+  private environmentService = new EnvironmentService(
+    this.httpClient,
+    this.bearerTokenClient,
+    this.accessTokenClient,
+  );
+
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
 

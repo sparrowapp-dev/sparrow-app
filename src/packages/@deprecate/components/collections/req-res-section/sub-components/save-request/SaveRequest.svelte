@@ -5,11 +5,6 @@
   import workspaceAsset from "$lib/assets/workspace.svg";
   import folderAsset from "$lib/assets/folder.svg";
   import leftArrowAsset from "$lib/assets/angleLeft.svg";
-  import {
-    insertCollection,
-    insertCollectionDirectory,
-    insertCollectionRequest,
-  } from "@app/services/collection";
   import { searchTreeDocument } from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest";
   import type {
     CreateCollectionPostBody,

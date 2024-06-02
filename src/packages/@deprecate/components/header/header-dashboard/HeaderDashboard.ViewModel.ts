@@ -26,6 +26,12 @@ import type {
 } from "$lib/utils/dto/workspace-dto";
 import { type WorkspaceRole } from "$lib/utils/enums";
 import type { MakeRequestResponse } from "$lib/utils/interfaces/common.interface";
+import {
+  AccessTokenClient,
+  BearerTokenClient,
+  RefreshTokenClient,
+} from "@app/utils";
+import { AxiosHttpClient } from "@app/containers";
 
 export class HeaderDashboardViewModel {
   constructor() {}
@@ -33,7 +39,18 @@ export class HeaderDashboardViewModel {
   private teamRepository = new TeamRepository();
   private workspaceService = new WorkspaceService();
   private environmentRepository = new EnvironmentRepository();
-  private environmentService = new EnvironmentService();
+  private bearerTokenClient = new BearerTokenClient();
+  private accessTokenClient = new AccessTokenClient();
+  private httpClient = new AxiosHttpClient(
+    new BearerTokenClient(),
+    new AccessTokenClient(),
+    new RefreshTokenClient(),
+  );
+  private environmentService = new EnvironmentService(
+    this.httpClient,
+    this.bearerTokenClient,
+    this.accessTokenClient,
+  );
   private environmentTabRepository = new EnvironmentTabRepository();
 
   public getWorkspaceDocument = (elem: WorkspaceDocument) => {

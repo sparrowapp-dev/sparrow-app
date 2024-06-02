@@ -8,12 +8,29 @@ import { environmentType } from "$lib/utils/enums/environment.enum";
 import { createDeepCopy } from "$lib/utils/helpers";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
+import {
+  AccessTokenClient,
+  BearerTokenClient,
+  RefreshTokenClient,
+} from "@app/utils";
+import { AxiosHttpClient } from "@app/containers";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
-  private environmentService = new EnvironmentService();
+  private bearerTokenClient = new BearerTokenClient();
+  private accessTokenClient = new AccessTokenClient();
+  private httpClient = new AxiosHttpClient(
+    new BearerTokenClient(),
+    new AccessTokenClient(),
+    new RefreshTokenClient(),
+  );
+  private environmentService = new EnvironmentService(
+    this.httpClient,
+    this.bearerTokenClient,
+    this.accessTokenClient,
+  );
 
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
 

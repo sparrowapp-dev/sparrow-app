@@ -8,7 +8,6 @@
   import SaveRequest from "$lib/components/collections/req-res-section/sub-components/save-request/SaveRequest.svelte";
   import { onDestroy, onMount } from "svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import { updateCollectionRequest } from "@app/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";

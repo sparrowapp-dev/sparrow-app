@@ -29,12 +29,6 @@ import type { CreateDirectoryPostBody } from "$lib/utils/dto";
 
 // ---- Service
 import { makeHttpRequestV2 } from "$lib/api/api.common";
-import {
-  insertCollection,
-  insertCollectionDirectory,
-  insertCollectionRequest,
-  updateCollectionRequest,
-} from "@app/services/collection";
 import { EnvironmentService } from "@app/services/environment.service";
 
 // ---- Events
@@ -77,6 +71,13 @@ import {
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import {
+  AccessTokenClient,
+  BearerTokenClient,
+  RefreshTokenClient,
+} from "@app/utils";
+import { AxiosHttpClient } from "@app/containers";
+import { CollectionService } from "@app/services/collection.service";
 
 class RestExplorerViewModel
   implements
@@ -117,7 +118,19 @@ class RestExplorerViewModel
   /**
    * Service
    */
-  private environmentService = new EnvironmentService();
+  private bearerTokenClient = new BearerTokenClient();
+  private accessTokenClient = new AccessTokenClient();
+  private httpClient = new AxiosHttpClient(
+    new BearerTokenClient(),
+    new AccessTokenClient(),
+    new RefreshTokenClient(),
+  );
+  private environmentService = new EnvironmentService(
+    this.httpClient,
+    this.bearerTokenClient,
+    this.accessTokenClient,
+  );
+  private collectionService = new CollectionService();
   /**
    * Utils
    */
@@ -562,7 +575,7 @@ class RestExplorerViewModel
       description: "",
       ...userSource,
     };
-    const res = await insertCollectionDirectory(
+    const res = await this.collectionService.addFolderInCollection(
       _workspaceMeta.id,
       _collectionId,
       directory,
@@ -605,7 +618,7 @@ class RestExplorerViewModel
       name: _collectionName,
       workspaceId: _workspaceMeta.id,
     };
-    const res = await insertCollection(newCollection);
+    const res = await this.collectionService.addCollection(newCollection);
     if (res.isSuccessful) {
       const latestRoute = {
         id: res.data.data._id,
@@ -678,7 +691,7 @@ class RestExplorerViewModel
       type: ItemType.REQUEST,
     };
 
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    const res = await this.collectionService.updateRequestInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
@@ -813,7 +826,7 @@ class RestExplorerViewModel
             source: "USER",
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addRequestInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
           ...userSource,
@@ -895,7 +908,7 @@ class RestExplorerViewModel
             source: "USER",
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addRequestInCollection({
           collectionId: path[0].id,
           workspaceId: _workspaceMeta.id,
           folderId: path[path.length - 1].id,

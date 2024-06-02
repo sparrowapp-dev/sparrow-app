@@ -7,7 +7,6 @@
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";
-  import { updateCollectionRequest } from "@app/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import SaveIcon from "$lib/assets/save-desc.svg";

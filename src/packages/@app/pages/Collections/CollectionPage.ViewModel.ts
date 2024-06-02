@@ -22,10 +22,6 @@ import { v4 as uuidv4 } from "uuid";
 
 //-----
 // Services
-import {
-  insertCollection,
-  insertCollectionDirectory,
-} from "@app/services/collection";
 import { CollectionService } from "@app/services/collection.service";
 import { notifications } from "@library/ui/toast/Toast";
 // import { setContentTypeHeader } from "$lib/utils/helpers";
@@ -86,10 +82,6 @@ import { InitRequestTab } from "@common/utils";
 import { InitCollectionTab } from "@common/utils";
 import { InitFolderTab } from "@common/utils/init-folder-tab";
 import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
-import {
-  insertCollectionRequest,
-  updateCollectionRequest,
-} from "@app/services/collection";
 import { GithubService } from "@app/services/github.service";
 import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
@@ -371,7 +363,7 @@ export default class CollectionsViewModel {
       type: ItemType.REQUEST,
     };
 
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+    const res = await this.collectionService.updateRequestInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
@@ -1855,7 +1847,7 @@ export default class CollectionsViewModel {
       description: "",
       ...userSource,
     };
-    const res = await insertCollectionDirectory(
+    const res = await this.collectionService.addFolderInCollection(
       _workspaceMeta.id,
       _collectionId,
       directory,
@@ -1898,7 +1890,7 @@ export default class CollectionsViewModel {
       name: _collectionName,
       workspaceId: _workspaceMeta.id,
     };
-    const res = await insertCollection(newCollection);
+    const res = await this.collectionService.addCollection(newCollection);
     if (res.isSuccessful) {
       const latestRoute = {
         id: res.data.data._id,
@@ -1968,7 +1960,7 @@ export default class CollectionsViewModel {
             source: "USER",
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addRequestInCollection({
           collectionId: path[path.length - 1].id,
           workspaceId: _workspaceMeta.id,
           ...userSource,
@@ -2008,7 +2000,7 @@ export default class CollectionsViewModel {
             source: "USER",
           };
         }
-        const res = await insertCollectionRequest({
+        const res = await this.collectionService.addRequestInCollection({
           collectionId: path[0].id,
           workspaceId: _workspaceMeta.id,
           folderId: path[path.length - 1].id,

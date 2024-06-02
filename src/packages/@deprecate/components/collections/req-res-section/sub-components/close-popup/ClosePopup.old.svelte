@@ -1,6 +1,5 @@
 <script lang="ts">
   import crossAsset from "$lib/assets/close.svg";
-  import { updateCollectionRequest } from "@app/services/collection";
   import { ItemType } from "$lib/utils/enums/item-type.enum";
   import { fade, fly } from "svelte/transition";
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";

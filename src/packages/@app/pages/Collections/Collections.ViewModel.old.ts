@@ -24,7 +24,6 @@
 // import { notifications } from "$lib/components/toast-notification/ToastNotification";
 // import { setContentTypeHeader } from "$lib/utils/helpers";
 // import { RequestDataset } from "$lib/utils/enums";
-// import { updateCollectionRequest } from "$lib/services/collection";
 // export class CollectionsViewModel {
 //   private tabRepository = new TabRepository();
 //   private collectionRepository = new CollectionRepository();

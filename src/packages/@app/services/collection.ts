@@ -1,237 +1,237 @@
-import constants from "$lib/utils/constants";
-import {
-  makeRequest,
-  getAuthHeaders,
-  makeHttpRequest,
-} from "$lib/api/api.common";
+// import constants from "$lib/utils/constants";
+// import {
+//   makeRequest,
+//   getAuthHeaders,
+//   makeHttpRequest,
+// } from "$lib/api/api.common";
 
-import type {
-  CreateApiRequestPostBody,
-  CreateCollectionPostBody,
-  CreateDirectoryPostBody,
-} from "$lib/utils/dto";
+// import type {
+//   CreateApiRequestPostBody,
+//   CreateCollectionPostBody,
+//   CreateDirectoryPostBody,
+// } from "$lib/utils/dto";
 
-import {
-  apiEndPoint,
-  bodyText,
-  methodText,
-  requestType,
-  responseText,
-} from "$lib/store/api-request";
-import { keyStore, valueStore } from "$lib/store/parameter";
+// import {
+//   apiEndPoint,
+//   bodyText,
+//   methodText,
+//   requestType,
+//   responseText,
+// } from "$lib/store/api-request";
+// import { keyStore, valueStore } from "$lib/store/parameter";
 
-const apiUrl: string = constants.API_URL;
+// const apiUrl: string = constants.API_URL;
 
-const fetchCollection = async (workspaceId: string) => {
-  const response = await makeRequest(
-    "GET",
-    `${apiUrl}/api/collection/${workspaceId}`,
-    {
-      headers: getAuthHeaders(),
-    },
-  );
-  return response;
-};
-
-const insertCollectionDirectory = async (
-  workspaceId: string,
-  collectionId: string,
-  directory: CreateDirectoryPostBody,
-) => {
-  const response = await makeRequest(
-    "POST",
-    `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
-    {
-      body: directory,
-      headers: getAuthHeaders(),
-    },
-  );
-  return response;
-};
-
-const insertCollectionRequest = async (
-  apiRequest: CreateApiRequestPostBody,
-) => {
-  const response = await makeRequest(
-    "POST",
-    `${apiUrl}/api/collection/request`,
-    {
-      body: apiRequest,
-      headers: getAuthHeaders(),
-    },
-  );
-  return response;
-};
-
-const updateCollectionRequest = async (
-  id: string,
-  folderId: string,
-  collectionId: string,
-  apiRequest: CreateApiRequestPostBody,
-) => {
-  const response = await makeRequest(
-    "PUT",
-    `${apiUrl}/api/collection/request/${id}`,
-    {
-      body: apiRequest,
-      headers: getAuthHeaders(),
-    },
-  );
-  return response;
-};
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const insertCollection: (
-  collection: CreateCollectionPostBody,
-) => Promise<any> = async (collection) => {
-  const response = await makeRequest("POST", `${apiUrl}/api/collection`, {
-    body: collection,
-    headers: getAuthHeaders(),
-  });
-  return response;
-};
-
-// collection  to create files and folder
-// const createCollectionEntry = async (collectionId :string, workspaceId: string) =>{
-//   const response = await post(
-//     `${apiUrl}/api/collection/${collectionId}`,
+// const fetchCollection = async (workspaceId: string) => {
+//   const response = await makeRequest(
+//     "GET",
+//     `${apiUrl}/api/collection/${workspaceId}`,
 //     {
-//       collectionId, workspaceId
+//       headers: getAuthHeaders(),
 //     },
-//     getUserToken()
 //   );
 //   return response;
-// }
+// };
 
-// const updateWorkspace = async (
+// const insertCollectionDirectory = async (
 //   workspaceId: string,
-//   data: WorkspacePostBody,
+//   collectionId: string,
+//   directory: CreateDirectoryPostBody,
 // ) => {
-//   const response = await put(
-//     `${apiUrl}/api/workspace/${workspaceId}`,
-//     data,
-//     getUserToken,
+//   const response = await makeRequest(
+//     "POST",
+//     `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
+//     {
+//       body: directory,
+//       headers: getAuthHeaders(),
+//     },
 //   );
 //   return response;
 // };
 
-// const deleteWorkspace = async (workspaceId: string) => {
-//   const response = await del(
-//     `${apiUrl}/api/workspace/${workspaceId}`,
-//     getUserToken,
+// const insertCollectionRequest = async (
+//   apiRequest: CreateApiRequestPostBody,
+// ) => {
+//   const response = await makeRequest(
+//     "POST",
+//     `${apiUrl}/api/collection/request`,
+//     {
+//       body: apiRequest,
+//       headers: getAuthHeaders(),
+//     },
 //   );
 //   return response;
 // };
 
-// const createWorkspace = async (data: WorkspacePostBody) => {
-//   const response = await post(`${apiUrl}/api/workspace`, data, getUserToken);
+// const updateCollectionRequest = async (
+//   id: string,
+//   folderId: string,
+//   collectionId: string,
+//   apiRequest: CreateApiRequestPostBody,
+// ) => {
+//   const response = await makeRequest(
+//     "PUT",
+//     `${apiUrl}/api/collection/request/${id}`,
+//     {
+//       body: apiRequest,
+//       headers: getAuthHeaders(),
+//     },
+//   );
 //   return response;
 // };
 
-export const crudMethod = async () => {
-  try {
-    let keyText: string;
-    let valueText: string;
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+// // const insertCollection: (
+// //   collection: CreateCollectionPostBody,
+// // ) => Promise<any> = async (collection) => {
+// //   const response = await makeRequest("POST", `${apiUrl}/api/collection`, {
+// //     body: collection,
+// //     headers: getAuthHeaders(),
+// //   });
+// //   return response;
+// // };
 
-    keyStore.subscribe((value) => {
-      if (value) {
-        keyText = value;
-      }
-    });
+// // collection  to create files and folder
+// // const createCollectionEntry = async (collectionId :string, workspaceId: string) =>{
+// //   const response = await post(
+// //     `${apiUrl}/api/collection/${collectionId}`,
+// //     {
+// //       collectionId, workspaceId
+// //     },
+// //     getUserToken()
+// //   );
+// //   return response;
+// // }
 
-    valueStore.subscribe((value) => {
-      if (value) {
-        valueText = value;
-      }
-    });
+// // const updateWorkspace = async (
+// //   workspaceId: string,
+// //   data: WorkspacePostBody,
+// // ) => {
+// //   const response = await put(
+// //     `${apiUrl}/api/workspace/${workspaceId}`,
+// //     data,
+// //     getUserToken,
+// //   );
+// //   return response;
+// // };
 
-    let url: string = "";
-    const unsubscribeUrl = apiEndPoint.subscribe((value) => {
-      if (value) {
-        url = value;
-      }
-    });
+// // const deleteWorkspace = async (workspaceId: string) => {
+// //   const response = await del(
+// //     `${apiUrl}/api/workspace/${workspaceId}`,
+// //     getUserToken,
+// //   );
+// //   return response;
+// // };
 
-    if (url.length === 0) {
-      url = keyText + valueText;
-    }
+// // const createWorkspace = async (data: WorkspacePostBody) => {
+// //   const response = await post(`${apiUrl}/api/workspace`, data, getUserToken);
+// //   return response;
+// // };
 
-    let method: string = "";
-    const unsubscribeMethod = methodText.subscribe((value) => {
-      if (value) {
-        method = value;
-      }
-    });
+// export const crudMethod = async () => {
+//   try {
+//     let keyText: string;
+//     let valueText: string;
 
-    let bodyTextValue: string;
-    const unsubscribeBody = bodyText.subscribe((value) => {
-      if (value) {
-        bodyTextValue = value;
-      }
-    });
+//     keyStore.subscribe((value) => {
+//       if (value) {
+//         keyText = value;
+//       }
+//     });
 
-    if (bodyTextValue === "") {
-      bodyTextValue = "{}";
-    }
+//     valueStore.subscribe((value) => {
+//       if (value) {
+//         valueText = value;
+//       }
+//     });
 
-    let request: string = "";
-    const unsubscribeRequest = requestType.subscribe((value) => {
-      if (value) {
-        request = value;
-      }
-    });
+//     let url: string = "";
+//     const unsubscribeUrl = apiEndPoint.subscribe((value) => {
+//       if (value) {
+//         url = value;
+//       }
+//     });
 
-    // Unsubscribe from the stores after we're done
-    unsubscribeUrl();
-    unsubscribeMethod();
-    unsubscribeBody();
-    unsubscribeRequest();
+//     if (url.length === 0) {
+//       url = keyText + valueText;
+//     }
 
-    const headers =
-      "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
+//     let method: string = "";
+//     const unsubscribeMethod = methodText.subscribe((value) => {
+//       if (value) {
+//         method = value;
+//       }
+//     });
 
-    const response = await makeHttpRequest(
-      url,
-      method,
-      headers,
-      bodyTextValue,
-      request,
-    );
-    let responseData: any;
+//     let bodyTextValue: string;
+//     const unsubscribeBody = bodyText.subscribe((value) => {
+//       if (value) {
+//         bodyTextValue = value;
+//       }
+//     });
 
-    if (response?.data) {
-      try {
-        responseData = response?.data;
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-        responseData = null;
-      }
-    }
+//     if (bodyTextValue === "") {
+//       bodyTextValue = "{}";
+//     }
 
-    responseText.set(responseData);
-  } catch (error) {
-    console.error("Error:", error);
-    // return error.message;
-    // Handle the error gracefully, you can show an error message to the user or take other appropriate actions.
-  }
-};
+//     let request: string = "";
+//     const unsubscribeRequest = requestType.subscribe((value) => {
+//       if (value) {
+//         request = value;
+//       }
+//     });
 
-// const newRequest = {
-//   url: "https://example.com/api/resource",
-//   headers: {
-//     "Content-Type": "application/json",
-//     // Add other headers as needed
-//   },
-//   body: JSON.stringify({ key: "value" }),
-//   requestType: "POST",
-// };
+//     // Unsubscribe from the stores after we're done
+//     unsubscribeUrl();
+//     unsubscribeMethod();
+//     unsubscribeBody();
+//     unsubscribeRequest();
 
-// apiRequests.update((requests) => [...requests, newRequest]);
+//     const headers =
+//       "Content-Type=application/json&User-Agent=PostmanRuntime/7.33.0&Accept=*/*&Connection=keep-alive"; // Add your headers if needed
 
-export {
-  fetchCollection,
-  insertCollectionDirectory,
-  insertCollectionRequest,
-  insertCollection,
-  updateCollectionRequest,
-};
+//     const response = await makeHttpRequest(
+//       url,
+//       method,
+//       headers,
+//       bodyTextValue,
+//       request,
+//     );
+//     let responseData: any;
+
+//     if (response?.data) {
+//       try {
+//         responseData = response?.data;
+//       } catch (error) {
+//         console.error("Error parsing JSON:", error);
+//         responseData = null;
+//       }
+//     }
+
+//     responseText.set(responseData);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     // return error.message;
+//     // Handle the error gracefully, you can show an error message to the user or take other appropriate actions.
+// //   }
+// // };
+
+// // const newRequest = {
+// //   url: "https://example.com/api/resource",
+// //   headers: {
+// //     "Content-Type": "application/json",
+// //     // Add other headers as needed
+// //   },
+// //   body: JSON.stringify({ key: "value" }),
+// //   requestType: "POST",
+// // };
+
+// // apiRequests.update((requests) => [...requests, newRequest]);
+
+// // export {
+// //   fetchCollection,
+// //   insertCollectionDirectory,
+// //   insertCollectionRequest,
+// //   // insertCollection,
+// //   updateCollectionRequest,
+// // };
