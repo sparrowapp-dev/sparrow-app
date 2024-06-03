@@ -549,9 +549,7 @@
         {/if}
 
         <div
-          class="d-flex gap-2 {!collection?.items?.length
-            ? 'ms-4'
-            : 'collection-sub-btn'}"
+          class="d-flex gap-2 ms-1"
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
