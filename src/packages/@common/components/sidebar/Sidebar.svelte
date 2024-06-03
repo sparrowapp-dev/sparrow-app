@@ -105,7 +105,7 @@
         <SidebarItem {item} />
       {/each}
     </div>
-  
+
     <div class="secondary-sidebar-items">
       {#each secondarySidebarItems as item (item.route)}
         <SidebarItem {item} />
@@ -113,14 +113,12 @@
       <SidebarProfileModal item={sidebarModalItem} {onLogout} />
     </div>
   </div>
-  
 </div>
-<style>
 
-  .sidebar-global{
-   padding-top: 2px;
-   background-color: black;
-    
+<style>
+  .sidebar-global {
+    padding-top: 2px;
+    background-color: var(--blackColor);
   }
   .sidebar {
     height: calc(100vh - 44px);
