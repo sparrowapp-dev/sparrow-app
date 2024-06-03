@@ -239,11 +239,13 @@
 
 <style>
   * {
-    transition: all 300ms;
+    transition: all 300ms;   
   }
   .tabbar {
     height: 35px;
     background-color: var(--sparrow-black);
+  
+    
   }
 
   .tab-scroller::-webkit-scrollbar {

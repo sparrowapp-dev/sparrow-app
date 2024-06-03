@@ -285,7 +285,7 @@
             </div>
           {/if}
         </div>
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-row ">
           {#if collection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
               <Button
@@ -424,6 +424,7 @@
 
   .my-collection {
     padding: 10px;
+    z-index: 500;
   }
 
   .input-outline {
