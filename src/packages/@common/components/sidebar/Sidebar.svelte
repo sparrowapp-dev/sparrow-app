@@ -125,5 +125,6 @@
     border: 1px solid var(--border-color);
     margin-right: 1px;
     padding: 5px 0px 10px 0px;
+    z-index: 500;
   }
 </style>

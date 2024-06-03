@@ -92,7 +92,7 @@
 </script>
 
 <div class="main-container d-flex">
-  <div class="my-collection d-flex flex-column w-100" style="margin-top: 15px;">
+  <div class="my-collection d-flex flex-column w-100 z-3" style="margin-top: 15px;">
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
       <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
         <input
@@ -103,8 +103,13 @@
           disabled={tab?.source === "SPEC"}
           class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
-          on:blur={(event) =>
-            onRename(collection, folder, event?.target?.value)}
+          on:blur={(event) => {
+            const newValue = event.target.value;
+            const previousValue = tab.name;
+            if (newValue !== previousValue) {
+              onRename(collection, folder, newValue);
+            }
+          }}
           on:keydown={(event) => {
             if (event.key === "Enter") {
               onRenameInputKeyPress();
