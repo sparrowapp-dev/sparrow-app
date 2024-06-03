@@ -285,7 +285,7 @@
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center ps-3 pe-2 pt-2">
+      <div class="d-flex flex-column justify-content-center ps-2 pe-1 pt-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}

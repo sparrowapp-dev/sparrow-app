@@ -466,7 +466,7 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
-    <Tooltip title={"Add folder"} placement={"bottom"} distance={9} zIndex={10}>
+    <Tooltip title={"Add folder"} placement={"bottom"} distance={13} zIndex={10}>
 
     <button
       id={`add-item-collection-${collection.id}`}
@@ -557,7 +557,7 @@
             ? 'ms-4'
             : 'collection-sub-btn'}"
         >
-        <Tooltip title={"Add Folder"} placement={"top"}>
+        <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
@@ -578,7 +578,7 @@
           </div>
         </Tooltip>
 
-        <Tooltip title={"Add request"} placement={"right"}>
+        <Tooltip title={"Add request"} placement={"right"} distance={12}>
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
