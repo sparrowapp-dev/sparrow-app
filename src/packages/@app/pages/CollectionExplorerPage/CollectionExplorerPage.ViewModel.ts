@@ -427,10 +427,6 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newDescription: string,
   ) => {
-    await this.collectionRepository.updateCollection(collection.id, {
-      description: newDescription,
-    });
-
     if (newDescription) {
       const response = await this.collectionService.updateCollectionData(
         collection.id,
