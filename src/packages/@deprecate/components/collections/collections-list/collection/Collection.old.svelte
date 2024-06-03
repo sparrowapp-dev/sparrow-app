@@ -35,7 +35,7 @@
   } from "$lib/utils/constants/permissions.constant";
   import { ResponseStatusCode, WorkspaceRole } from "$lib/utils/enums";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { CommonService } from "$lib/services-v2/common.service";
   import { ImportCollectionViewModel } from "../import-collection/ImportCollection.viewModel";
   import { invoke } from "@tauri-apps/api/core";

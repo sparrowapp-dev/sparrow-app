@@ -1,6 +1,6 @@
 <script lang="ts">
   import plus from "$lib/assets/plus.svg";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   /**
    * @deprecated referes to teams store
    * import { openedTeam } from "$lib/store/team.store";

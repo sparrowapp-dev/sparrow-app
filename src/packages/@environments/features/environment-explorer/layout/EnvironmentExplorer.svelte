@@ -7,7 +7,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
@@ -103,6 +103,7 @@
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
+                  $currentEnvironment.isSave ||
                   !hasWorkpaceLevelPermission(
                     $userWorkspaceLevelRole,
                     workspaceLevelPermissions.ADD_ENVIRONMENT,

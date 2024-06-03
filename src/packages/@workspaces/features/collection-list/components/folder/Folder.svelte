@@ -16,7 +16,7 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { Options } from "@library/ui";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   // ---- Enum, Constants and Interface
   import { UntrackedItems } from "$lib/utils/enums/item-type.enum";
@@ -342,7 +342,7 @@
               ? 'transform:rotate(90deg);'
               : 'transform:rotate(0deg);'}"
             alt="angleRight"
-            on:click|stopPropagation={ ()=> {
+            on:click|stopPropagation={() => {
               expand = !expand;
             }}
           />

@@ -13,6 +13,7 @@
 //! - `request_handler`: General request handling utilities.
 //! - `url_fetch_handler`: URL fetching utilities.
 //! - `urlencoded_handler`: URL-encoded request handling.
+//! - `utils`: General utility functions
 //!
 //! ## External Imports
 //!
@@ -33,6 +34,7 @@
 //! - `tauri::Window`: Represents a window in a Tauri application.
 //! - `url_fetch_handler::import_swagger_url`: Function for importing Swagger URLs.
 //! - `urlencoded_handler::make_www_form_urlencoded_request`: Function for making URL-encoded requests.
+//! - `utils::response_decoder::decode_response_body`: Function for decoding response body as per encoded type.
 // Submodules
 mod config;
 mod formdata_handler;
@@ -41,6 +43,7 @@ mod raw_handler;
 mod request_handler;
 mod url_fetch_handler;
 mod urlencoded_handler;
+mod utils;
 
 // External Imports
 use formdata_handler::make_formdata_request;
@@ -61,7 +64,7 @@ use tauri::Manager;
 use tauri::Window;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
-
+use utils::response_decoder::decode_response_body;
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
@@ -336,7 +339,7 @@ async fn make_request_v2(
     let response_status = response_value.status().clone();
 
     // Extract response value from response
-    let response_text_result = response_value.text().await;
+    let response_text_result = decode_response_body(response_value).await;
 
     // Map headers into json
     let response_headers_json: serde_json::Value = response_headers

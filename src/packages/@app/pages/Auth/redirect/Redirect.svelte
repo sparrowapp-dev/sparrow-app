@@ -95,10 +95,16 @@
         class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     </div>
-    <p class="text-center text-secondary-250 sparrow-fs-12 mt-3">
-      Version {version}
-    </p>
-    <p class="check-for-update text-center sparrow-fs-12">Check for Update</p>
+    <div class="mt-5">
+      <p
+        class="cursor-pointer text-center text-secondary-250 sparrow-fs-12 mt-3 mb-1"
+      >
+        Version {version}
+      </p>
+      <p class="cursor-pointer check-for-update text-center sparrow-fs-12 0">
+        Check for Update
+      </p>
+    </div>
   </div>
 </div>
 
@@ -134,6 +140,10 @@
 
   a {
     text-decoration: none;
+  }
+  a:hover {
+    color: var(--primary-btn-color);
+    text-decoration: underline;
   }
   .cursor-pointer {
     cursor: pointer;

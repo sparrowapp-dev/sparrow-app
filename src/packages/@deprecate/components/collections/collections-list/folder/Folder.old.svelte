@@ -34,7 +34,7 @@
     PERMISSION_NOT_FOUND_TEXT,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   let expand: boolean = false;
   export let explorer;

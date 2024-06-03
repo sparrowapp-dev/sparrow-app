@@ -20,7 +20,7 @@
   import { Dropdown } from "@library/ui";
 
   // ---- Helper
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { moveNavigation, tabBarScroller } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
@@ -92,7 +92,7 @@
       <div class="d-inline-block" style="height:35px; width:35px;">
         <Button
           onClick={() => {
-            moveNavigation("left");
+            tabBarScroller("left");
           }}
           title={""}
           buttonStartIcon={angleLeft}
@@ -134,7 +134,7 @@
         <Button
           title=""
           onClick={() => {
-            moveNavigation("right");
+            tabBarScroller("right");
           }}
           buttonClassProp={"btn border-0 ps-1 pe-1 py-auto h-100 w-100"}
           buttonStartIconStyle={"height: 12px !important; transform: rotate(180deg); margin: 0 !important;"}
@@ -146,7 +146,7 @@
         />
       </div>
     {/if}
-    {#if tabList.length < 1}
+    <!-- {#if tabList.length < 1}
       <div class="d-inline-flex ms-2" style="height:35px;">
         <Button
           title="New Request"
@@ -155,12 +155,12 @@
           textStyleProp="font-size: 14px;"
         />
       </div>
-    {/if}
+    {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
       <Button
         title=""
         onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
+        buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
@@ -225,7 +225,7 @@
       >
         <button
           id="moreOptions"
-          class="border-0 bg-transparent pt-1 rounded"
+          class="border-0 bg-transparent pt-1 rounded d-none"
           on:click={() => {
             moreOption = !moreOption;
           }}

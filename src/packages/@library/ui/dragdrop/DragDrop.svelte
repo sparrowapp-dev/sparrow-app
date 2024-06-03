@@ -172,7 +172,7 @@
     </p>
   {/if}
 
-  {#if showFileTypeError}
+  <!-- {#if showFileTypeError}
     <div class="d-flex gap-2 justify-content-center">
       {#each supportedFileTypes as fileType}
         <span class="px-2 py-1 sparrow-input-file-type rounded">
@@ -180,7 +180,7 @@
         </span>
       {/each}
     </div>
-  {/if}
+  {/if} -->
   {#if !Array.isArray(value) && value.size > 0}
     {#if type === "image"}
       <div class="sparrow-input-image-preview rounded d-flex gap-2">

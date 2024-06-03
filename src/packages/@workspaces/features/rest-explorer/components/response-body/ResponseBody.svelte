@@ -70,4 +70,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
   }
+  iframe {
+    pointer-events: none;
+  }
 </style>
