@@ -92,7 +92,7 @@
 </script>
 
 <div class="main-container d-flex">
-  <div class="my-collection d-flex flex-column w-100" style="margin-top: 15px;">
+  <div class="my-collection d-flex flex-column w-100 z-3" style="margin-top: 15px;">
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
       <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
         <input
