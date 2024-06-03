@@ -27,6 +27,7 @@
   export let onSaveRequest: SaveRequestType;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isSave;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -62,11 +63,11 @@
   let isHovered = false;
 
   function handleMouseEnter() {
-  isHovered = true;
+    isHovered = true;
   }
 
   function handleMouseLeave() {
-  isHovered = false;
+    isHovered = false;
   }
 </script>
 
@@ -166,9 +167,15 @@
     on:click={handleSaveRequest}
     on:mouseenter={handleMouseEnter}
     on:mouseleave={handleMouseLeave}
-
+    disabled={isSave ? true : false}
   >
-  <DiskIcon height={22} width={22} color={isHovered ? "var( --text-primary-150)" : "var(--text-secondary-200)"} /> 
+    <DiskIcon
+      height={22}
+      width={22}
+      color={isHovered && !isSave
+        ? "var(--text-primary-200)"
+        : "var(--text-secondary-200)"}
+    />
   </button>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

@@ -181,6 +181,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSave={$tab.isSaved}
         requestUrl={$tab.property.request.url}
         httpMethod={$tab.property.request.method}
         isSendRequestInProgress={$tab.property.request?.state
