@@ -280,11 +280,11 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="position-relative bg-secondary-800-important"
+            class="bg-secondary-800-important"
           >
             <!-- Response Pane -->
             <div
-              class="d-flex flex-column h-100 {$requestSplitterDirection ===
+              class="d-flex position-relative flex-column h-100 {$requestSplitterDirection ===
               'horizontal'
                 ? 'pt-3'
                 : 'ps-3'}"

@@ -132,6 +132,44 @@
         return true;
       },
     },
+
+    {
+      key: "Ctrl-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+
+    {
+      key: "Alt-l",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-p",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-h",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-b",
+      run: (view) => {
+        return true;
+      },
+    },
   ]);
 
   /**
