@@ -14,7 +14,7 @@
   import type { CollectionsMethods } from "$lib/utils/interfaces/collections.interface";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import lockicon from "$lib/assets/lock-icon.svg";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { generateSampleRequest } from "$lib/utils/sample/request.sample";
   import { setContentTypeHeader } from "$lib/utils/helpers/auth.helper";
   import { RequestDataset } from "$lib/utils/enums/request.enum";

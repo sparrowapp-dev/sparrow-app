@@ -132,6 +132,7 @@
       );
       if (response.isSuccessful) {
         isValidServerJSON = true;
+        importData = JSON.stringify(JSON.parse(importData), null, 3);
       }
     } else if (validateClientXML(importData)) {
       const response = await _collectionService.validateImportCollectionInput(

@@ -26,21 +26,13 @@
     >
       Feedback
     </div>
-    <Tooltip
-      placement="left"
-      title="coming soon"
-      verticalOffset="+ 9px"
-      horizontalOffset="+ 200px"
-      showArrow={false}
+    <div
+      style="padding-top: 11px;"
+      class="tab {activeTab === 'faq' ? 'active' : ''}"
+      on:click={() => setActiveTab("faq")}
     >
-      <div
-        style="padding-top: 11px;"
-        class="tab {activeTab === 'faq' ? 'active' : ''}"
-        on:click={() => setActiveTab("faq")}
-      >
-        FAQs
-      </div>
-    </Tooltip>
+      <Tooltip placement="right" title="coming soon">FAQs</Tooltip>
+    </div>
   </div>
   <div style="overflow-y :scroll;">
     <div class="feedback-section {activeTab === 'feedback' ? 'active' : ''}">
@@ -97,17 +89,20 @@
             }}
           >
             <span class="me-2 text-primary-300 text-fs-14"
-              >{!isReadMore ? "More" : "Less"}</span
+              >{!isReadMore ? "More" : ""}</span
             >
             <span
               class="position-relative d-inline-block"
               style={!isReadMore ? "" : "transform: rotate(180deg) !important;"}
-              ><ArrowUnfilledIcon
-                height={"14px"}
-                width={"14px"}
-                color={"var(--text-primary-300)"}
-              /></span
             >
+              {#if !isReadMore}
+                <ArrowUnfilledIcon
+                  height={"14px"}
+                  width={"14px"}
+                  color={"var(--text-primary-300)"}
+                />
+              {/if}
+            </span>
           </p>
         </div>
         {#if isReadMore}
@@ -153,6 +148,32 @@
             </p>
           </div>
         {/if}
+
+        <div class="d-flex justify-content-center">
+          <p
+            role="button"
+            class="d-flex align-items-center"
+            on:click={() => {
+              isReadMore = !isReadMore;
+            }}
+          >
+            <span class="me-2 text-primary-300 text-fs-14"
+              >{!isReadMore ? "" : "Less"}</span
+            >
+            <span
+              class="position-relative d-inline-block"
+              style={!isReadMore ? "" : "transform: rotate(180deg) !important;"}
+            >
+              {#if isReadMore}
+                <ArrowUnfilledIcon
+                  height={"14px"}
+                  width={"14px"}
+                  color={"var(--text-primary-300)"}
+                />
+              {/if}</span
+            >
+          </p>
+        </div>
       </div>
     {/if}
   </div>

@@ -70,7 +70,7 @@
    */
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { Select } from "@library/forms";
 
   /**
@@ -291,7 +291,6 @@
             </div>
           {/if}
         </div>
-
         <div class="d-flex flex-row">
           {#if collection?.activeSync}
             <div class="d-flex flex-column justify-content-center">
@@ -318,7 +317,7 @@
             {#if !collection?.activeSync || isSynced}
               <button
                 disabled={!userRoleInWorkspace}
-                class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+                class="btn add-button rounded m-1 border-0 text-align-right py-1"
                 style="max-height:60px; width:200px;"
                 on:click={() => onCreateAPIRequest(collection)}
                 >New Request</button
@@ -431,6 +430,7 @@
 
   .my-collection {
     padding: 10px;
+    z-index: 500;
   }
 
   .input-outline {
@@ -443,5 +443,13 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+
+  .add-button {
+    background-color: var(--dropdown-button);
+  }
+
+  .add-button:hover {
+    background-color: var(--dropdown-hover);
   }
 </style>

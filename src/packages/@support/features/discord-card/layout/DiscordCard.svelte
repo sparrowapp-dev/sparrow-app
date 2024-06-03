@@ -2,7 +2,7 @@
   import { DiscordIcon } from "@library/icons";
   import HelpCenter from "@library/icons/HelpCenter.svelte";
   import Setting2 from "@library/icons/Setting(2).svelte";
-  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@library/ui";
   import { DiscordIDs } from "@support/common/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
 </script>
@@ -46,36 +46,24 @@
   </div>
 </div>
 <div class="d-flex flex-column" style="padding-top:17px; padding-left:10px;">
-  <Tooltip
-    placement="left"
-    title="coming soon"
-    verticalOffset="+ 9px"
-    horizontalOffset="+ 110px"
-    showArrow={false}
+  <div
+    class="d-flex p-2 gap-2 align-items-center pt-2"
+    style=" height: 44px;  color:var(--text-secondary-50);  "
   >
-    <div
-      class="d-flex p-2 gap-2 align-items-center pt-2"
-      style=" height: 44px;  color:var(--text-secondary-50);  "
-    >
+    <Tooltip placement="right" title="coming soon">
       <span style=""> <Setting2 color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Support</span>
-    </div>
-  </Tooltip>
-  <Tooltip
-    placement="left"
-    title="coming soon"
-    verticalOffset="+ 9px"
-    horizontalOffset="+ 120px"
-    showArrow={false}
+    </Tooltip>
+  </div>
+  <div
+    class="d-flex p-2 gap-2 align-items-center"
+    style="height: 44px; color:var(--text-secondary-50)"
   >
-    <div
-      class="d-flex p-2 gap-2 align-items-center"
-      style="height: 44px; color:var(--text-secondary-50)"
-    >
+    <Tooltip placement="right" title="coming soon">
       <span> <HelpCenter color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Help Center</span>
-    </div>
-  </Tooltip>
+    </Tooltip>
+  </div>
 </div>
 
 <style>

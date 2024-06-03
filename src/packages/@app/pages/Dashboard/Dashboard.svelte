@@ -32,11 +32,13 @@
   };
 
   let currentWorkspaceId = "";
+  let currentWorkspaceName="";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
-      currentWorkspaceId = activeWorkspaceRxDoc._id;
       if (activeWorkspaceRxDoc) {
+        currentWorkspaceId = activeWorkspaceRxDoc._id;
+        currentWorkspaceName = activeWorkspaceRxDoc.name;
         refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
@@ -69,6 +71,7 @@
     {currentEnvironment}
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
+    {currentWorkspaceName}
   />
 
   <!-- Application Content -->
