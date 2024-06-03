@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PlusIcon } from "@library/icons";
-  import { Tooltip } from "$lib/components";
+  import { Tooltip } from "@library/ui";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import List from "@library/ui/list/List.svelte";
   import type { WorkspaceRole } from "$lib/utils/enums";

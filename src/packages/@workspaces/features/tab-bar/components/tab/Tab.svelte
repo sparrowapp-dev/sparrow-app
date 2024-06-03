@@ -73,7 +73,7 @@
   on:dragstart={() => {
     onDragStart(index);
   }}
-  class=" btn-global d-inline-block position-relative pt-1 individual-tab bg-transparent border-0"
+  class="d-inline-block position-relative pt-1 individual-tab bg-transparent border-0"
   style="width: {tabWidth}px; height:35px; margin-left:{index === 0
     ? '10px'
     : ''}"
@@ -85,11 +85,6 @@
       ? 'var(--text-secondary-800)'
       : 'transparent'};"
   >
-    {#if tab.isActive}
-      <div style="height: 25px; width: 25px;" class="box1">
-        <div>1</div>
-      </div>
-    {/if}
     <button
       on:click={() => {
         if (!tab.isActive) {
@@ -163,20 +158,14 @@
     >
       <Crossicon />
     </button>
-
-    {#if tab.isActive}
-      <div style=" height: 25px; width: 25px; " class="box2">
-        <div style="">2</div>
-      </div>
-    {/if}
-  </div>
   {#if !tab.isActive}
     <div
       class="position-absolute"
       style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
     />
   {/if}
-</button>
+  </div></button
+>
 
 <style>
   * {
@@ -185,7 +174,6 @@
   .border-upper-radius {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    overflow: hidden;
   }
   .individual-tab:hover .inactive-close-btn {
     opacity: 1 !important;
@@ -208,28 +196,6 @@
     color: var(--text-secondary-100) !important;
   }
 
-  .box2 {
-    position: absolute;
-    right: -3px;
-    border-radius: 70px;
-    bottom: -20px;
-    z-index: 500;
-    background-color: var(--text-secondary-800);
-    transition-delay:2s
-  }
-  .box1 {
-    transition-delay:  2s;
-    position: absolute;
-    left: -9px;
-    border-radius: 70px;
-    bottom: -20px;
-    z-index: 500;
-    background-color: var(--text-secondary-800);
-  }
-  .btn-global {
-    position: relative;
-    transition-delay: 2s;
-  }
   .cross-icon-btn:hover{
     background-color: var(--text-tertiary-300);
     border-radius: 2px;

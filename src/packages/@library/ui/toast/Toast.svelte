@@ -46,6 +46,7 @@
   :global(.toast-container) {
     z-index: 1000000 !important; /* Increase the z-index as needed */
     pointer-events: unset !important;
+    padding: 0 !important;
   }
 
   .custom-toast {

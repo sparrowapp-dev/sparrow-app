@@ -6,7 +6,7 @@
   import environmentFaded from "$lib/assets/environment-faded.svg";
   import home from "$lib/assets/home.svg";
   import Helper from "./Helper.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { HelpIcon } from "$lib/assets/app.asset";
   import SettingsIcon from "$lib/assets/setting.svelte";
   import type { WorkspaceDocument } from "@app/database/database";

@@ -8,22 +8,22 @@
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
   import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
-
+ 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
-
+ 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
-
+ 
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
   import { Dropdown } from "@library/ui";
-
+ 
   // ---- Helper
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import { moveNavigation, tabBarScroller } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
-
+ 
   // ------ Props ------
   /**
    * List of tabs
@@ -59,15 +59,15 @@
    * @param id - Tab ID
    */
   export let onTabSelected: (id: string) => void;
-
+ 
   export let onChangeViewInRequest: (view: string) => void;
-
+ 
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
     }
   }
-
+ 
   let tabWidth: number = 182;
   let scrolable: boolean = false;
   let scrollerParent: number;
@@ -75,7 +75,7 @@
   let moreOption: boolean = false;
   let viewChange: boolean = false;
 </script>
-
+ 
 <button
   class="tab border-0 w-100 bg-blackColor d-flex"
   style="cursor: default;"
@@ -89,18 +89,16 @@
     bind:offsetWidth={scrollerParent}
   >
     {#if scrolable}
-      <div class="d-inline-block m-1" style="height:35px; width:35px;">
-        <div class="right-btn mt-1 ">
+      <div class="d-inline-block" style="height:35px; width:35px;">
         <Button
           onClick={() => {
-            moveNavigation("left");
+            tabBarScroller("left");
           }}
           title={""}
           buttonStartIcon={angleLeft}
           buttonStartIconStyle={"height: 12px !important; margin: 0 !important;"}
           buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         />
-      </div>
       </div>
     {/if}
     <button
@@ -126,31 +124,29 @@
     </button>
     {#if scrolable}
       <div
-        class="d-inline-block position-relative p-1"
+        class="d-inline-block position-relative"
         style="height:35px; width:35px;"
       >
         <div
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
         />
-        <div class="left-btn  mt-1" >
         <Button
           title=""
           onClick={() => {
-            moveNavigation("right");
+            tabBarScroller("right");
           }}
-          buttonClassProp={"btn border-0  ps-1 pe-1 py-0 "}
+          buttonClassProp={"btn border-0 ps-1 pe-1 py-auto h-100 w-100"}
           buttonStartIconStyle={"height: 12px !important; transform: rotate(180deg); margin: 0 !important;"}
           buttonStartIcon={angleLeft}
         />
-      </div>
         <div
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
         />
       </div>
     {/if}
-    {#if tabList.length < 1}
+    <!-- {#if tabList.length < 1}
       <div class="d-inline-flex ms-2" style="height:35px;">
         <Button
           title="New Request"
@@ -159,19 +155,17 @@
           textStyleProp="font-size: 14px;"
         />
       </div>
-    {/if}
-    <div class="" style="height:35px; width:35px;">
-      <div class="plus-button-tab d-flex justify-content-center align-items-center ">
-        <Button
+    {/if} -->
+    <div class="d-inline-flex" style="height:35px; width:35px;">
+      <Button
         title=""
         onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 mb-1 ps-0 py-0 h-100 w-100"}
+        buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
         buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
-      </div>
     </div>
-    <div class="d-flex ms-auto my-auto me-2 ">
+    <div class="d-flex ms-auto my-auto me-2">
       <Dropdown
         buttonId="viewChange"
         bind:isMenuOpen={viewChange}
@@ -190,21 +184,19 @@
           },
         ]}
       >
-      <div class="btn-div">
         <button
-        id="viewChange"
-        class="view-Change border-0 bg-transparent  rounded"
-        on:click={() => {
-          viewChange = !viewChange;
-        }}
-      >
-        {#if $requestSplitterDirection === "horizontal"}
-          <ViewGrid color={"var(--text-primary-400)"} height={14} />
-        {:else}
-          <VerticalGrid height={15} color="var(--blackColor)" />
-        {/if}
-      </button>
-      </div>
+          id="viewChange"
+          class="border-0 bg-transparent pt-1 rounded"
+          on:click={() => {
+            viewChange = !viewChange;
+          }}
+        >
+          {#if $requestSplitterDirection === "horizontal"}
+            <ViewGrid color={"var(--text-primary-400)"} height={15} />
+          {:else}
+            <VerticalGrid height={15} color="var(--blackColor)" />
+          {/if}
+        </button>
       </Dropdown>
       <Dropdown
         buttonId="moreOptions"
@@ -244,53 +236,20 @@
     </div>
   </div>
 </button>
-
+ 
 <style>
   * {
-    transition: all 300ms;
+    transition: all 300ms;  
   }
   .tabbar {
     height: 35px;
     background-color: var(--sparrow-black);
+ 
+   
   }
-
+ 
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }
-  .btn-div{
-    margin-top: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 2px;
-  }
-  .btn-div:hover{  
-    background-color: var(--text-tertiary-300 ) !important;
-  }
-  .plus-button-tab:hover{ 
-    background-color: var(--text-tertiary-300 ) !important;
-  }
-  .plus-button-tab{
-    height: 21px;
-    width: 77%;
-    margin-top: 9.5px;
-    margin-left: 6px;
-    border-radius: 2px;
-  }
-  .view-Change{
-    padding: 1px;
-  }
-  .right-btn:hover{
-    background-color: var(--text-tertiary-300 ) !important;
-    border-radius: 2px;
-  }
-  .left-btn{
-    height: 24px;
-    width: 24px;
-  }
-  .left-btn:hover{
-   
-    background-color: var(--text-tertiary-300 ) !important;
-    border-radius: 2px;
-  }
 </style>
+ 

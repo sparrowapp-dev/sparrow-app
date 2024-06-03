@@ -108,7 +108,7 @@ class CollectionExplorerPage {
           collection.id,
           response.data.data,
         );
-        this.updateTab(this.tab.tabId, response.data.data);
+        this.updateTab(this.tab.tabId, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -116,7 +116,6 @@ class CollectionExplorerPage {
         notifications.error("Failed to rename collection!");
       }
     }
-    newCollectionName = "";
   };
 
   /**
@@ -342,38 +341,6 @@ class CollectionExplorerPage {
 
   /**
    *
-   * @param collection - Collection of the request
-   * @param folder - Folder of the request
-   * @param request - Request going to be opened
-   */
-  public handleOpenRequest = (
-    collection: CollectionDocument,
-    folder: Folder,
-    request: Request,
-  ) => {
-    const req = new InitRequestTab(request.id, collection.workspaceId);
-    const path: Path = {
-      workspaceId: collection.workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder?.name,
-    };
-    req.updateName(request.name);
-    req.updateDescription(request.description);
-    req.updateBody(request.request?.body);
-    req.updateMethod(request.request?.method);
-    req.updateUrl(request.request?.url);
-    req.updateQueryParams(request.request?.queryParams);
-    req.updateAuth(request.request?.auth);
-    req.updateHeaders(request.request?.headers);
-    req.updatePath(path);
-
-    this.tabRepository.createTab(req.getValue());
-    moveNavigation("right");
-  };
-
-  /**
-   *
    * @param collection - Collection in which request is going to be created
    * @returns
    */
@@ -381,9 +348,13 @@ class CollectionExplorerPage {
     if (!(await this.getUserRoleInWorspace())) {
       return;
     }
-    const request = generateSampleRequest(
+    // const request = generateSampleRequest(
+    //   UntrackedItems.UNTRACKED + uuidv4(),
+    //   new Date().toString(),
+    // );
+    const initRequestTab = new InitRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
-      new Date().toString(),
+      collection.workspaceId,
     );
 
     let userSource = {};
@@ -400,51 +371,49 @@ class CollectionExplorerPage {
       workspaceId: collection.workspaceId,
       ...userSource,
       items: {
-        name: request.name,
-        type: request.type,
+        name: initRequestTab.getValue().name,
+        type: initRequestTab.getValue().type,
         description: "",
         request: {
-          method: request?.property?.request?.method,
+          method: initRequestTab.getValue().property?.request?.method,
         },
       },
     };
-    this.collectionRepository.addRequestOrFolderInCollection(collection.id, {
-      ...requestObj.items,
-      id: request.id,
-    });
+
     const response =
       await this.collectionService.addRequestInCollection(requestObj);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-
-      this.collectionRepository.updateRequestOrFolderInCollection(
+      this.collectionRepository.addRequestOrFolderInCollection(
         collection.id,
-        request.id,
         res,
       );
 
-      request.id = res.id;
-      request.path.workspaceId = collection.workspaceId;
-      request.path.collectionId = collection.id;
-      request.property.request.save.api = true;
-      request.property.request.save.description = true;
+      // request.id = res.id;
+      // request.path.workspaceId = collection.workspaceId;
+      // request.path.collectionId = collection.id;
+      // request.property.request.save.api = true;
+      // request.property.request.save.description = true;
 
-      this.handleOpenRequest(
-        collection.workspaceId,
-        collection,
-        {
-          id: "",
-          name: "",
-        },
-        request,
-      );
+      initRequestTab.updateId(res.id);
+      initRequestTab.updatePath({
+        workspaceId: collection.workspaceId,
+        collectionId: collection.id,
+      });
+      initRequestTab.updateIsSave(true);
+      // this.handleOpenRequest(
+      //   collection.workspaceId,
+      //   collection,
+      //   {
+      //     id: "",
+      //     name: "",
+      //   },
+      //   request,
+      // );
+      this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       return;
     } else {
-      this.collectionRepository.deleteRequestOrFolderInCollection(
-        collection.id,
-        request.id,
-      );
       notifications.error(response.message);
     }
   };
@@ -458,9 +427,22 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newDescription: string,
   ) => {
-    await this.collectionRepository.updateCollection(collection.id, {
-      description: newDescription,
-    });
+    const response = await this.collectionService.updateCollectionData(
+      collection.id,
+      collection.workspaceId,
+      { description: newDescription },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
+        collection.id,
+        response.data.data,
+      );
+      notifications.success("Description updated successfully!");
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update description!");
+    }
   };
 }
 

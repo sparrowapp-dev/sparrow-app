@@ -4,7 +4,7 @@ export class UrlInputTheme {
   constructor() {
     this.theme = EditorView.theme({
       "&": {
-        height: "34px",
+        height: "36px",
         width: "100%",
         flex: "1",
         border: "1px solid var(--bg-secondary-600)",

@@ -3,7 +3,7 @@
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import { Tooltip } from "@library/ui";
   import { Options } from "@library/ui";
 
   // ---- Helper functions

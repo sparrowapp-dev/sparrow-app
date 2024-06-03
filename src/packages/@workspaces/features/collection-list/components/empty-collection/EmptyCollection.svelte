@@ -6,7 +6,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import List from "@library/ui/list/List.svelte";
   import { PlusIcon } from "@library/icons";
 

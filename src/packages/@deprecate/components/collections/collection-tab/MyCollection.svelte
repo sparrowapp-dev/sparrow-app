@@ -18,7 +18,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { CollectionService } from "@app/services/collection.service";
   import { ImportCollectionViewModel } from "../collections-list/import-collection/ImportCollection.viewModel";
   import { notifications } from "@library/ui/toast/Toast";

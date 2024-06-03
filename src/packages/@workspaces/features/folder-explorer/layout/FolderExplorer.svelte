@@ -49,7 +49,7 @@
   /**
    * Components
    */
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   /**
    * Types
@@ -89,22 +89,44 @@
     ) as HTMLInputElement;
     inputField.blur();
   };
+  const onRenameTextareaKeyPress = () => {
+    const inputField = document.getElementById(
+      "updateFolderDescField",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldFolder",
+    ) as HTMLInputElement;
+    inputField.value = folder?.name;
+  };
 </script>
 
 <div class="main-container d-flex">
-  <div class="my-collection d-flex flex-column w-100" style="margin-top: 15px;">
+  <div
+    class="my-collection d-flex flex-column w-100 z-3"
+    style="margin-top: 15px;"
+  >
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
       <div class="d-flex aling-items-center justify-content-between gap-2 mb-4">
         <input
           type="text"
           required
           id="renameInputFieldFolder"
-          value={tab?.name}
+          value={folder?.name}
           disabled={tab?.source === "SPEC"}
           class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 fs-5"
           maxlength={100}
-          on:blur={(event) =>
-            onRename(collection, folder, event?.target?.value)}
+          on:blur={(event) => {
+            const newValue = event.target.value;
+            const previousValue = folder.name;
+            if (event.target.value === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
+              onRename(collection, folder, newValue);
+            }
+          }}
           on:keydown={(event) => {
             if (event.key === "Enter") {
               onRenameInputKeyPress();
@@ -134,13 +156,17 @@
         disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="font-size: 12px; "
-        class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
-        value={tab.description}
+        class="form-control bg-transparent border-0 text-textColor fs-6 folder-area input-outline"
+        value={folder?.description || ""}
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
-        on:blur={(event) => onUpdateDescription(tab, event.target.value)}
+        on:blur={(event) => {
+          if (folder?.description !== event.target.value) {
+            onUpdateDescription(tab, event.target.value);
+          }
+        }}
         on:keydown={(event) => {
           if (event.key === "Enter") {
-            onUpdateDescription(tab, event.target.value);
+            onRenameTextareaKeyPress();
           }
         }}
       />
@@ -186,5 +212,8 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .folder-area {
+    height: 300px;
   }
 </style>
