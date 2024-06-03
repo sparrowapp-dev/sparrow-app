@@ -160,7 +160,7 @@
     </div>
   </ModalWrapperV1>
   <div
-    class="my-collection d-flex flex-column w-100"
+    class="my-collection d-flex flex-column w-100 z-3"
     style="margin-top: 15px; min-width: 450px"
   >
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
@@ -430,7 +430,6 @@
 
   .my-collection {
     padding: 10px;
-    z-index: 500;
   }
 
   .input-outline {
