@@ -8,6 +8,7 @@
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
   import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
@@ -157,6 +158,7 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
+      <Tooltip title={"Add Request"} placement={"left"} distance={2}>
       <Button
         title=""
         onClick={onNewTabRequested}
@@ -164,6 +166,7 @@
         buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
         buttonStartIcon={plusIcon}
       />
+      </Tooltip>
     </div>
     <div class="d-flex ms-auto my-auto me-2">
       <Dropdown
@@ -184,6 +187,7 @@
           },
         ]}
       >
+      <Tooltip title={"Layout"} placement={"left"} distance={10}>
         <button
           id="viewChange"
           class="border-0 bg-transparent pt-1 rounded"
@@ -197,6 +201,7 @@
             <VerticalGrid height={15} color="var(--blackColor)" />
           {/if}
         </button>
+      </Tooltip>
       </Dropdown>
       <Dropdown
         buttonId="moreOptions"

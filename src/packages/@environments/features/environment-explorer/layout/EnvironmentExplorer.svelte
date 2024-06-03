@@ -12,6 +12,7 @@
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
+    import { platform } from "@tauri-apps/plugin-os";
 
   /**
    * selected environmet to be shown on API
@@ -66,7 +67,7 @@
             handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
           defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
+          hoveredBorderColor={"var(--border-primary-300)"}
           focusedBorderColor={"var(--border-primary-300)"}
           class="text-fs-18 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
@@ -88,17 +89,12 @@
               focusedBorderColor={"var(--border-primary-300)"}
             />
           </div>
-          <Tooltip
-            title={PERMISSION_NOT_FOUND_TEXT}
-            show={!hasWorkpaceLevelPermission(
-              $userWorkspaceLevelRole,
-              workspaceLevelPermissions.ADD_ENVIRONMENT,
-            )}
-          >
+       
             <div class="position-relative">
               {#if !$currentEnvironment.isSave}
                 <div class="badge-data d-block"></div>
               {/if}
+              <Tooltip title="Save" placement="bottom" distance={10} >
               <WithButton
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
@@ -110,9 +106,11 @@
                   )}
                 loader={$currentEnvironment.isSaveInProgress}
               />
+            </Tooltip>
             </div>
-          </Tooltip>
           <span>
+            <Tooltip title="Help" placement="bottom"  distance={10} >
+
             <WithButton
               icon={HelpIcon}
               onClick={() => {
@@ -121,6 +119,8 @@
               disable={false}
               loader={false}
             />
+          </Tooltip>
+
           </span>
         </div>
       </header>
@@ -216,6 +216,7 @@
   .env-parent {
     padding: 10px;
   }
+
   .quick-help-active {
     width: calc(100% - 280px) !important;
   }

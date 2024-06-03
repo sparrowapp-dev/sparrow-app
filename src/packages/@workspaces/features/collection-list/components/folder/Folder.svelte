@@ -395,6 +395,7 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else}
+        <Tooltip title={"Add request"} placement={"bottom"} zIndex={5} distance={13}>
           <button
             class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
             on:click|preventDefault={() => {
@@ -412,7 +413,9 @@
               color="var(--white-color)"
             />
           </button>
+        </Tooltip>
 
+          <Tooltip title={"more"} placement={"right"} zIndex={5} distance={17}>
           <button
             id={`show-more-folder-${explorer.id}`}
             class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
@@ -424,6 +427,7 @@
           >
             <img src={threedotIcon} alt="threedotIcon" />
           </button>
+          </Tooltip>
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">

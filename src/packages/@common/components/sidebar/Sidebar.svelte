@@ -15,6 +15,7 @@
   import help from "$lib/assets/help.svg";
   import hoveredHelp from "$lib/assets/help-hovered.svg";
   import selectedHelp from "$lib/assets/help-selected.svg";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   import settings from "$lib/assets/settings.svg";
   import hoveredSettings from "$lib/assets/settings-hovered.svg";
@@ -109,7 +110,9 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
+    <Tooltip title="User Profile" placement="right" distance={20} >
     <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+    </Tooltip>
   </div>
 </div>
 

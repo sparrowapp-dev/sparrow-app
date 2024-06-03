@@ -268,6 +268,7 @@
           },
         ]}
       >
+    <Tooltip title={"Add Collection"} placement={"right"} distance={12}>
         <button
           id="addButton"
           class="border-0 p-1 border-radius-2 add-button"
@@ -277,6 +278,7 @@
         >
           <img src={plusIcon} alt="" />
         </button>
+        </Tooltip>
       </Dropdown>
     </div>
     <div

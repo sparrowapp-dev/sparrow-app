@@ -466,6 +466,7 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
+    <Tooltip title={"Add folder"} placement={"bottom"} distance={9} zIndex={10}>
 
     <button
       id={`add-item-collection-${collection.id}`}
@@ -478,19 +479,22 @@
     >
       <img src={AddIcon} alt="AddIcon" />
     </button>
+</Tooltip>
 
-    <button
-      id={`show-more-collection-${collection.id}`}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu(e);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
-    <!-- </Tooltip> -->
+    <Tooltip title={"more"} placement={"right"} distance={17}>
+      <button
+        id={`show-more-collection-${collection.id}`}
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu(e);
+        }}
+      >
+        <img src={threedotIcon} alt="threedotIcon" />
+      </button>
+      <!-- </Tooltip> -->
+    </Tooltip>
     {#if isActiveSyncEnabled && collection?.activeSync}
       <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
         <button
@@ -553,6 +557,7 @@
             ? 'ms-4'
             : 'collection-sub-btn'}"
         >
+        <Tooltip title={"Add Folder"} placement={"top"}>
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
@@ -563,14 +568,17 @@
                 collection,
               });
             }}
-          >
+          > 
+
             <FolderPlusIcon
               height="16px"
               width="16px"
               color="var(--request-arc)"
             />
           </div>
+        </Tooltip>
 
+        <Tooltip title={"Add request"} placement={"right"}>
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
@@ -582,13 +590,14 @@
               });
             }}
           >
-            <RequestIcon
-              height="16px"
-              width="16px"
-              color="var(--request-arc)"
-            />
-          </div>
+          <RequestIcon
+          height="16px"
+          width="16px"
+          color="var(--request-arc)"
+          />
         </div>
+      </Tooltip>
+      </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip

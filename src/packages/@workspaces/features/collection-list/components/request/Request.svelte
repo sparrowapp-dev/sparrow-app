@@ -297,6 +297,7 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
+  <Tooltip title={"more"} placement={"right"} zIndex={10} distance={17}>
     <button
       id={`show-more-api-${api.id}`}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
@@ -308,6 +309,7 @@
     >
       <img src={threedotIcon} alt="threedotIcon" />
     </button>
+  </Tooltip>
   {/if}
 </div>
 
