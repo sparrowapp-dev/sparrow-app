@@ -220,7 +220,7 @@
           handleSearch();
         }}
         defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
+        hoveredBorderColor="var(--border-primary-300)"
         focusedBorderColor={"var(--border-primary-300)"}
         class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
         style="outline:none;"

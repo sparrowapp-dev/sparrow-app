@@ -8,22 +8,22 @@
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
   import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
-
+ 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
-
+ 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
-
+ 
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
   import { Dropdown } from "@library/ui";
-
+ 
   // ---- Helper
   import { moveNavigation, tabBarScroller } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
-
+ 
   // ------ Props ------
   /**
    * List of tabs
@@ -59,15 +59,15 @@
    * @param id - Tab ID
    */
   export let onTabSelected: (id: string) => void;
-
+ 
   export let onChangeViewInRequest: (view: string) => void;
-
+ 
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
     }
   }
-
+ 
   let tabWidth: number = 182;
   let scrolable: boolean = false;
   let scrollerParent: number;
@@ -75,7 +75,7 @@
   let moreOption: boolean = false;
   let viewChange: boolean = false;
 </script>
-
+ 
 <button
   class="tab border-0 w-100 bg-blackColor d-flex"
   style="cursor: default;"
@@ -236,19 +236,20 @@
     </div>
   </div>
 </button>
-
+ 
 <style>
   * {
-    transition: all 300ms;   
+    transition: all 300ms;  
   }
   .tabbar {
     height: 35px;
     background-color: var(--sparrow-black);
-  
-    
+ 
+   
   }
-
+ 
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }
 </style>
+ 

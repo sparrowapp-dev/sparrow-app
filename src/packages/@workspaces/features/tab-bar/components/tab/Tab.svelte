@@ -148,13 +148,13 @@
     {/if}
 
     <button
-      class="{!(tab?.property?.request && !tab?.isSaved) && !tab.isActive
+      class="cross-icon-btn {!(tab?.property?.request && !tab?.isSaved) && !tab.isActive
         ? 'inactive-close-btn'
-        : ''} btn border-0 d-flex align-items-center px-1"
+        : ''} btn  d-flex align-items-center px-1"
       on:click={() => {
         onTabClosed(tab.id, tab);
       }}
-      style="overflow:hidden; height: 31px;"
+      style="overflow:hidden; height: 18px; width:22px; margin-top:7px; margin-bottom:6px;"
     >
       <Crossicon />
     </button>
@@ -164,7 +164,8 @@
       style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
     />
   {/if}
-</button>
+  </div></button
+>
 
 <style>
   * {
@@ -194,5 +195,9 @@
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;
   }
-  
+
+  .cross-icon-btn:hover{
+    background-color: var(--text-tertiary-300);
+    border-radius: 2px;
+  }
 </style>
