@@ -394,8 +394,8 @@
           disabled={!userRoleInWorkspace || collection?.activeSync}
           id="updateCollectionDescField"
           style="font-size: 12px;"
-          value={collection?.description}
-          class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
+          value={collection?.description || ""}
+          class="form-control bg-transparent border-0 text-textColor fs-6 collection-area input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) => {
             if (collection?.description !== event.target.value) {
@@ -459,5 +459,8 @@
 
   .add-button:hover {
     background-color: var(--dropdown-hover);
+  }
+  .collection-area {
+    height: 300px;
   }
 </style>

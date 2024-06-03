@@ -152,6 +152,7 @@ class FolderExplorerPage {
         },
       );
       if (response.isSuccessful) {
+        this.updateTab(folder.id, { name: newFolderName });
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           folder.id,

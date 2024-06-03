@@ -148,8 +148,8 @@
         disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="font-size: 12px; "
-        class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
-        value={folder?.description}
+        class="form-control bg-transparent border-0 text-textColor fs-6 folder-area input-outline"
+        value={folder?.description || ""}
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
         on:blur={(event) => {
           if (folder?.description !== event.target.value) {
@@ -204,5 +204,8 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+  .folder-area {
+    height: 300px;
   }
 </style>

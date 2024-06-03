@@ -108,7 +108,7 @@ class CollectionExplorerPage {
           collection.id,
           response.data.data,
         );
-        // this.updateTab(this.tab.tabId, response.data.data);
+        this.updateTab(this.tab.tabId, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
