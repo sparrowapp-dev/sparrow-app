@@ -152,14 +152,12 @@ class FolderExplorerPage {
         },
       );
       if (response.isSuccessful) {
+        this.updateTab(folder.id, { name: newFolderName });
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           folder.id,
           response.data.data,
         );
-        this.updateTab(folder.id, {
-          name: newFolderName,
-        });
         notifications.success("Folder renamed successfully!");
       }
     }
@@ -323,12 +321,7 @@ class FolderExplorerPage {
         tab.path.folderId,
         updateFolderElement.data.data,
       );
-
-      await this.updateTab(tab.tabId, {
-        description: newDescription,
-        save: true,
-      });
-      moveNavigation("right");
+      notifications.success("Description updated successfully!");
     }
   };
 

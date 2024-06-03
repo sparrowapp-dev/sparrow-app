@@ -2219,6 +2219,7 @@ export default class CollectionsViewModel {
       );
       initCollectionTab.updatePath(path);
       initCollectionTab.updateName(response.data.data.name);
+      initCollectionTab.updateDescription(response.data.data.description);
       initCollectionTab.updateIsSave(true);
 
       this.tabRepository.createTab(initCollectionTab.getValue());
@@ -2264,6 +2265,7 @@ export default class CollectionsViewModel {
 
       initCollectionTab.updatePath(path);
       initCollectionTab.updateName(response.data.data.name);
+      initCollectionTab.updateDescription(response.data.data.description);
       initCollectionTab.updateIsSave(true);
       // Samplecollection.id = response.data.data._id;
       // Samplecollection.path = path;
@@ -2321,6 +2323,9 @@ export default class CollectionsViewModel {
       initCollectionTab.updatePath(path);
       // Samplecollection.path = path;
       initCollectionTab.updateName(response.data.data.collection.name);
+      initCollectionTab.updateDescription(
+        response.data.data.collection.description,
+      );
       // Samplecollection.name = response.data.data.collection.name;
       initCollectionTab.updateIsSave(true);
       // Samplecollection.save = true;
