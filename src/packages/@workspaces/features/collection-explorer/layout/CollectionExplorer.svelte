@@ -123,6 +123,13 @@
     ) as HTMLInputElement;
     inputField.blur();
   };
+
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldCollection",
+    ) as HTMLInputElement;
+    inputField.value = collection?.name;
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -183,7 +190,9 @@
             on:blur={(event) => {
               const newValue = event?.target?.value;
               const previousValue = tab.name;
-              if (newValue !== previousValue) {
+              if (event.target.value === "") {
+                resetInputField();
+              } else if (newValue !== previousValue) {
                 onRename(collection, newValue);
               }
             }}

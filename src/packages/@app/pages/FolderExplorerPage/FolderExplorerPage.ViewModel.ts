@@ -322,6 +322,8 @@ class FolderExplorerPage {
         updateFolderElement.data.data,
       );
       notifications.success("Description updated successfully!");
+    } else {
+      notifications.error("Failed to update description!");
     }
   };
 

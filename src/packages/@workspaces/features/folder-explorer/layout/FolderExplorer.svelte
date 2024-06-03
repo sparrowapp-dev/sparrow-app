@@ -95,6 +95,12 @@
     ) as HTMLInputElement;
     inputField.blur();
   };
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldFolder",
+    ) as HTMLInputElement;
+    inputField.value = folder?.name;
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -115,7 +121,9 @@
           on:blur={(event) => {
             const newValue = event.target.value;
             const previousValue = folder.name;
-            if (newValue !== previousValue) {
+            if (event.target.value === "") {
+              resetInputField();
+            } else if (newValue !== previousValue) {
               onRename(collection, folder, newValue);
             }
           }}
