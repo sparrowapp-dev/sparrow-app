@@ -397,8 +397,11 @@
           value={collection?.description}
           class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) =>
-            onUpdateDescription(collection, event.target.value)}
+          on:blur={(event) => {
+            if (collection?.description !== event.target.value) {
+              onUpdateDescription(collection, event.target.value);
+            }
+          }}
           on:keydown={(event) => {
             if (event.key === "Enter") {
               onRenameTextareaKeyPress();
