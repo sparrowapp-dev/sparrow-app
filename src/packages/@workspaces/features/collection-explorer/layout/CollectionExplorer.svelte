@@ -117,6 +117,12 @@
     ) as HTMLInputElement;
     inputField.blur();
   };
+  const onRenameTextareaKeyPress = () => {
+    const inputField = document.getElementById(
+      "updateCollectionDescField",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -382,14 +388,14 @@
           disabled={!userRoleInWorkspace || collection?.activeSync}
           id="updateCollectionDescField"
           style="font-size: 12px;"
-          value={tab?.description ? tab.description : ""}
+          value={collection?.description}
           class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
           on:blur={(event) =>
             onUpdateDescription(collection, event.target.value)}
           on:keydown={(event) => {
             if (event.key === "Enter") {
-              onUpdateDescription(collection, event?.target?.value);
+              onRenameTextareaKeyPress();
             }
           }}
         />
