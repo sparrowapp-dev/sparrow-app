@@ -427,23 +427,21 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newDescription: string,
   ) => {
-    if (newDescription) {
-      const response = await this.collectionService.updateCollectionData(
+    const response = await this.collectionService.updateCollectionData(
+      collection.id,
+      collection.workspaceId,
+      { description: newDescription },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
         collection.id,
-        collection.workspaceId,
-        { description: newDescription },
+        response.data.data,
       );
-      if (response.isSuccessful) {
-        this.collectionRepository.updateCollection(
-          collection.id,
-          response.data.data,
-        );
-        notifications.success("Description updated successfully!");
-      } else if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to update description!");
-      }
+      notifications.success("Description updated successfully!");
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update description!");
     }
   };
 }
