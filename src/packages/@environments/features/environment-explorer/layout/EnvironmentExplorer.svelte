@@ -63,9 +63,7 @@
             handleCurrentEnvironmentNameChange(environmentName, "");
           }}
           on:blur={(e) => {
-            if (e.target.value !== environmentName) {
-              handleCurrentEnvironmentNameChange(newValue, "blur");
-            }
+            handleCurrentEnvironmentNameChange(environmentName, "blur");
           }}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
