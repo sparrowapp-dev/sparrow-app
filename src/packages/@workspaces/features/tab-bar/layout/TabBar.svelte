@@ -98,7 +98,7 @@
         style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:2px; ">
           <div class="left-btn d-flex justify-content-center align-items-center " 
           style="height: 22px; width:22px;">
-            <AngleRight height={"22px"} width={"24px"} />  
+          <AngleLeft height={"12px"} width={"24px"} />  
           </div>
         </button>
       </div>
@@ -139,7 +139,7 @@
         style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;">
           <div class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"  
           style="height: 22px; width:22px;">
-            <AngleLeft height={"12px"} width={"24px"} />  
+            <AngleRight height={"12px"} width={"24px"} />  
           </div>
         </button>
         <div
