@@ -351,7 +351,10 @@
           />
         {/if}
       </div>
-      <div class="p-3 d-flex align-items-center justify-content-between z-3">
+      <div
+        class="p-3 d-flex align-items-center justify-content-between"
+        style="z-index: 4;"
+      >
         <Tooltip title={"Star Us On GitHub"} placement={"top"}>
           <div
             class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover

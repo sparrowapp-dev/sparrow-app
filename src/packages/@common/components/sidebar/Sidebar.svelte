@@ -100,13 +100,13 @@
 
 <div class="sidebar-global">
   <div class={`sidebar ${componentClass}`}>
-    <div class="primary-sidebar-items">
+    <div class="primary-sidebar-items z-4">
       {#each primarySidebarItems as item (item.route)}
         <SidebarItem {item} />
       {/each}
     </div>
 
-    <div class="secondary-sidebar-items">
+    <div class="secondary-sidebar-items z-4">
       {#each secondarySidebarItems as item (item.route)}
         <SidebarItem {item} />
       {/each}
@@ -130,6 +130,5 @@
     background-color: var(--bg-secondary-800);
     margin-right: 1px;
     padding: 5px 0px 10px 0px;
-    z-index: 500;
   }
 </style>

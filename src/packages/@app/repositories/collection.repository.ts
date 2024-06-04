@@ -32,7 +32,7 @@ export class CollectionRepository {
       if (data.name) value.name = data.name;
       if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
-      if (data.description) value.description = data.description;
+      if (data.description !== undefined && data.description !== null) value.description = data.description;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
       if (data.totalRequests) value.totalRequests = data.totalRequests;
       if (data.activeSyncUrl) value.activeSyncUrl = data.activeSyncUrl;
