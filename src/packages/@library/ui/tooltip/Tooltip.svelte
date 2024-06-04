@@ -81,7 +81,7 @@
     toggleTooltip();
   }}
   bind:this={tooltipWrapper}
-  class={"tooltip position-relative opacity-100"}
+  class={"tooltip opacity-100"}
   style=""
 >
   {#if show}
