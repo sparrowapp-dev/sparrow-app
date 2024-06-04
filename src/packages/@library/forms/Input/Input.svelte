@@ -75,6 +75,10 @@
     }
   };
 
+  /**
+   * blur input on Enter key press
+   * @param event - keyboard event
+   */
   const onKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(id) as HTMLInputElement;
