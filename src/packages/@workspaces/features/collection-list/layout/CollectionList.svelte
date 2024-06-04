@@ -212,6 +212,7 @@
       class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
     >
       <Input
+        id="collection-list-search"
         width={"100%"}
         height={"33px"}
         type="search"
