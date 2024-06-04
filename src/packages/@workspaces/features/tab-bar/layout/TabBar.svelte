@@ -9,22 +9,24 @@
   import AngleLeft from "@library/icons/AngleLeft.svelte";
   import PlusIcon from "@library/icons/PlusIcon.svelte";
 
- 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
- 
+
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
- 
+
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
   import { Dropdown } from "@library/ui";
- 
+
   // ---- Helper
-  import { moveNavigation, tabBarScroller } from "$lib/utils/helpers/navigation";
+  import {
+    moveNavigation,
+    tabBarScroller,
+  } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
- 
+
   // ------ Props ------
   /**
    * List of tabs
@@ -60,15 +62,15 @@
    * @param id - Tab ID
    */
   export let onTabSelected: (id: string) => void;
- 
+
   export let onChangeViewInRequest: (view: string) => void;
- 
+
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
     }
   }
- 
+
   let tabWidth: number = 182;
   let scrolable: boolean = false;
   let scrollerParent: number;
@@ -76,7 +78,7 @@
   let moreOption: boolean = false;
   let viewChange: boolean = false;
 </script>
- 
+
 <button
   class="tab border-0 w-100 bg-blackColor d-flex"
   style="cursor: default;"
@@ -91,14 +93,19 @@
   >
     {#if scrolable}
       <div class="d-inline-block" style="height:35px; width:35px;">
-        <button on:click={() => {
-          tabBarScroller("left");
-        }} role="button" 
-        class=" btn border-0 ps-0 pe-2 py-auto h-100 w-100"  
-        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:2px; ">
-          <div class="left-btn d-flex justify-content-center align-items-center " 
-          style="height: 22px; width:22px;">
-          <AngleLeft height={"12px"} width={"24px"} />  
+        <button
+          on:click={() => {
+            tabBarScroller("left");
+          }}
+          role="button"
+          class=" btn border-0 ps-0 pe-2 py-auto h-100 w-100"
+          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:2px; "
+        >
+          <div
+            class="left-btn d-flex justify-content-center align-items-center"
+            style="height: 22px; width:22px;"
+          >
+            <AngleLeft height={"12px"} width={"24px"} color="var(--text-secondary-200)" />
           </div>
         </button>
       </div>
@@ -127,19 +134,25 @@
     {#if scrolable}
       <div
         class="d-inline-block position-relative"
-        style="height:35px; width:35px;">
-      <div
-      class="position-absolute"
-      style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
-    />
-        <button on:click={() => {
-          tabBarScroller("right");
-        }} role="button" 
-        class=" btn border-0  ps-1 pe-1 py-auto h-100 w-100"  
-        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;">
-          <div class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"  
-          style="height: 22px; width:22px;">
-            <AngleRight height={"12px"} width={"24px"} />  
+        style="height:35px; width:35px;"
+      >
+        <div
+          class="position-absolute"
+          style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
+        />
+        <button
+          on:click={() => {
+            tabBarScroller("right");
+          }}
+          role="button"
+          class=" btn border-0 ps-1 pe-1 py-auto h-100 w-100"
+          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+        >
+          <div
+            class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+            style="height: 22px; width:22px;"
+          >
+            <AngleRight height={"12px"} width={"24px"} color="var(--text-secondary-200)" />
           </div>
         </button>
         <div
@@ -159,15 +172,19 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <button on:click={onNewTabRequested} 
-      role="button" 
-      class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"  
-      style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;">
-        <div class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"  
-        style="height: 22px; width:22px;">
-          <PlusIcon height={"24px"} width={"24px"} />  
+      <button
+        on:click={onNewTabRequested}
+        role="button"
+        class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+      >
+        <div
+          class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+          style="height: 22px; width:22px;"
+        >
+          <PlusIcon height={"24px"} width={"24px"}  color="var(--text-secondary-200)"/>
         </div>
-    </button>
+      </button>
     </div>
     <div class="layout d-flex ms-0 my-auto me-2">
       <Dropdown
@@ -241,36 +258,33 @@
     </div>
   </div>
 </button>
- 
+
 <style>
   * {
-    transition: all 300ms;  
+    transition: all 300ms;
   }
   .tabbar {
     height: 35px;
     background-color: var(--sparrow-black);
- 
-   
   }
- 
+
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }
-  .right-btn:hover{
-    background-color: #1E1E1E;
+  .right-btn:hover {
+    background-color: var(--tab-bar-hover);
     border-radius: 2px;
   }
-  .left-btn:hover{
-    background-color: #1E1E1E;
+  .left-btn:hover {
+    background-color: var(--tab-bar-hover);
     border-radius: 2px;
   }
-  .plus-btn:hover{
-    background-color: #1E1E1E;
+  .plus-btn:hover {
+    background-color: var(--tab-bar-hover);
     border-radius: 2px;
   }
-  .layout:hover{
-    background-color: #1E1E1E;
+  .layout:hover {
+    background-color: var(--tab-bar-hover);
     border-radius: 2px;
   }
 </style>
- 
