@@ -41,7 +41,7 @@ export class EnvironmentExplorerViewModel {
    */
   public updateNameWithEnvironmentList = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    if (_name !== progressiveTab.name) {
+    if (progressiveTab?.name && _name !== progressiveTab.name) {
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
@@ -53,13 +53,13 @@ export class EnvironmentExplorerViewModel {
    */
   public updateName = async (_name: any, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.isSave = false;
     if (event === "blur" && _name === "") {
       const data = await this.environmentRepository.readEnvironment(
         progressiveTab.id,
       );
       progressiveTab.name = data.name;
-    } else {
+    } else if (event === "") {
+      progressiveTab.isSave = false;
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
