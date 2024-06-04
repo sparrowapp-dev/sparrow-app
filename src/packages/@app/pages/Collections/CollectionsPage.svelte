@@ -421,11 +421,11 @@
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 5.5px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-right: 0px solid var(--blackColor) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
