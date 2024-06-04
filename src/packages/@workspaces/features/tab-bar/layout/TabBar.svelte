@@ -105,7 +105,11 @@
             class="left-btn d-flex justify-content-center align-items-center"
             style="height: 22px; width:22px;"
           >
-            <AngleLeft height={"12px"} width={"24px"} color="var(--text-secondary-200)" />
+            <AngleLeft
+              height={"12px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
           </div>
         </button>
       </div>
@@ -115,7 +119,7 @@
       class=" d-inline-block tab-scroller border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px); "
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -152,7 +156,11 @@
             class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
             style="height: 22px; width:22px;"
           >
-            <AngleRight height={"12px"} width={"24px"} color="var(--text-secondary-200)" />
+            <AngleRight
+              height={"12px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
           </div>
         </button>
         <div
@@ -182,11 +190,15 @@
           class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
           style="height: 22px; width:22px;"
         >
-          <PlusIcon height={"24px"} width={"24px"}  color="var(--text-secondary-200)"/>
+          <PlusIcon
+            height={"24px"}
+            width={"24px"}
+            color="var(--text-secondary-200)"
+          />
         </div>
       </button>
     </div>
-    <div class="layout d-flex ms-0 my-auto me-2">
+    <div class="layout d-flex ms-auto my-auto me-2">
       <Dropdown
         buttonId="viewChange"
         bind:isMenuOpen={viewChange}
