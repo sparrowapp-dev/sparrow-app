@@ -220,8 +220,8 @@
             <div
               class="h-100 position-relative {$requestSplitterDirection ===
               'horizontal'
-                ? 'pb-3'
-                : 'pe-3'}"
+                ? 'pb-4'
+                : 'pe-4'}"
             >
               <RequestNavigator
                 requestStateSection={$tab.property.request?.state
