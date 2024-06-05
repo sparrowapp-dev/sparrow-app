@@ -130,6 +130,7 @@
     {onUpdateEnvironment}
     {environmentVariables}
     codeId={"url"}
+    class={"input-url"}
   />
 
   <!-- Send button -->
@@ -139,7 +140,16 @@
     type="default"
     disable={isSendRequestInProgress ? true : false}
     onClick={() => {
-      onSendButtonClicked(environmentVariables);
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
+        }
+      } else {
+        onSendButtonClicked(environmentVariables);
+      }
     }}
   />
 
@@ -184,5 +194,8 @@
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);
+  }
+  :global(.url-red-border) {
+    border: 1px solid var(--border-danger-200) !important;
   }
 </style>

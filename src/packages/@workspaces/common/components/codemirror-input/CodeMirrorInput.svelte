@@ -26,6 +26,8 @@
    * unique id used to focus codemirror input
    */
   export let codeId = "";
+  let componentClass = "";
+  export { componentClass as class };
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -108,6 +110,7 @@
   {placeholder}
   {disabled}
   {id}
+  {componentClass}
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
