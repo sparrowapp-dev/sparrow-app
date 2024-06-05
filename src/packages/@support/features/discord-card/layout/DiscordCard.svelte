@@ -41,7 +41,7 @@
         await open(DiscordIDs.SparrowDiscordURL);
       }}
     >
-      <div class="fw-normal" style="font-size: 14px;">Join</div>
+      <div class="fw-normal" style="font-size: 14px; color:var(--white-color);">Join</div>
     </div>
   </div>
 </div>

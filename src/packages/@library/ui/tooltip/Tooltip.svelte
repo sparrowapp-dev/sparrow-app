@@ -81,14 +81,14 @@
     toggleTooltip();
   }}
   bind:this={tooltipWrapper}
-  class={"tooltip opacity-100"}
-  style=""
+  class={"tooltip position-relative opacity-100"}
+  style="z-index : {zIndex} ; "
 >
   {#if show}
     <span
       class={`tooltip-text invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center gap-2 opacity-0
      ${placement.toString()} `}
-      style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; z-index : {zIndex} ; transition:  {transitionTime}; padding:{spacing}; font-size:{fontSize}; border-radius: {borderRadius}; {styleProp}"
+      style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition:  {transitionTime}; padding:{spacing}; font-size:{fontSize}; border-radius: {borderRadius}; {styleProp}"
       >{title}
       {#if placement === "left"}
         <span
