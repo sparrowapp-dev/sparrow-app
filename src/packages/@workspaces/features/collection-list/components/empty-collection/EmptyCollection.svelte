@@ -49,4 +49,7 @@
     border: 1px solid var(--text-secondary-300);
     height: 32px;
   }
+  .add-collection:hover{
+    border: 1px solid var(--text-primary-300);
+  }
 </style>

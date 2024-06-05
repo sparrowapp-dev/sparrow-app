@@ -242,6 +242,11 @@
   }
   .add-environment {
     border: 1px solid var(--text-secondary-300);
+    border-radius: 2px;
     height: 32px;
+  }
+  .add-environment:hover{
+    border: 1px solid var(--border-primary-300);
+    border-radius: 2px;
   }
 </style>

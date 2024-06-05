@@ -108,7 +108,7 @@ class CollectionExplorerPage {
           collection.id,
           response.data.data,
         );
-        this.updateTab(this.tab.tabId, response.data.data);
+        this.updateTab(this.tab.tabId, { name: newCollectionName });
         notifications.success("Collection renamed successfully!");
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -116,7 +116,6 @@ class CollectionExplorerPage {
         notifications.error("Failed to rename collection!");
       }
     }
-    newCollectionName = "";
   };
 
   /**
@@ -428,9 +427,22 @@ class CollectionExplorerPage {
     collection: CollectionDocument,
     newDescription: string,
   ) => {
-    await this.collectionRepository.updateCollection(collection.id, {
-      description: newDescription,
-    });
+    const response = await this.collectionService.updateCollectionData(
+      collection.id,
+      collection.workspaceId,
+      { description: newDescription },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
+        collection.id,
+        response.data.data,
+      );
+      notifications.success("Description updated successfully!");
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update description!");
+    }
   };
 }
 

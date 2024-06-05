@@ -57,6 +57,7 @@
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
       <header class={`env-header justify-content-between d-flex`}>
         <Input
+          id={"environment-name"}
           width={"calc(100% - 500px)"}
           type="text"
           bind:value={environmentName}
@@ -77,6 +78,7 @@
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">
             <Input
+              id={"environment-search"}
               type="search"
               bind:value={search}
               on:input={() => {}}

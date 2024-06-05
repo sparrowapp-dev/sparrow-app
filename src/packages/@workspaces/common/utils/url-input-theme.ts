@@ -58,6 +58,10 @@ export class UrlInputTheme {
         fontSize: "12px",
         fontWeight: "400",
       },
+      "&.cm-editor:hover": {
+        border: "1px solid var(--border-primary-200)",
+        borderRadius: "0",
+      },
       "&.cm-editor.cm-focused": {
         border: "1px solid var(--border-primary-200)",
         borderRadius: "0",

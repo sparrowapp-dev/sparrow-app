@@ -318,7 +318,7 @@
       background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
-      background-color: var(--bg-secondary-400);
+      background-color: var( --text-tertiary-600);
     }
 
     .btn-primary {

@@ -460,13 +460,13 @@
     </div> -->
     <div class="format-btns">
       <button
-        class="format-btn fw-normal sparrow-fs-16 p-1 text-center"
+        class="format-btn px-2 fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           onClick(false);
         }}>Close</button
       >
       <button
-        class="format-btn collection-btn fw-normal sparrow-fs-16 p-1 text-center"
+        class="format-btn px-2 collection-btn fw-normal sparrow-fs-16 p-1 text-center"
         on:click={() => {
           handleError();
         }}>+ Collection</button
@@ -923,7 +923,6 @@
     .format-btn {
       background-color: var(--border-color);
       border: none;
-      width: 20%;
       border-radius: 4px;
       font-family: Roboto;
       line-height: 24px;

@@ -52,6 +52,11 @@
   export let maxlength = 500;
 
   /**
+   * Unique id for input
+   */
+  export let id = "";
+
+  /**
    * input states
    */
   let isHovered = false;
@@ -69,6 +74,17 @@
       return defaultBorderColor;
     }
   };
+
+  /**
+   * blur input on Enter key press
+   * @param event - keyboard event
+   */
+  const onKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(id) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <div
@@ -82,6 +98,7 @@
   }}
 >
   <input
+    {id}
     on:focus={() => {
       isFocused = true;
     }}
@@ -94,6 +111,7 @@
       value = event?.target?.value;
       dispatch("input", event?.target?.value);
     }}
+    on:keydown={onKeyPress}
     {type}
     {maxlength}
     class=" w-100 {componentClass}"

@@ -212,6 +212,7 @@
       class="d-flex align-items-center justify-content-between px-2 pt-3 gap-1"
     >
       <Input
+        id="collection-list-search"
         width={"100%"}
         height={"33px"}
         type="search"
@@ -220,7 +221,7 @@
           handleSearch();
         }}
         defaultBorderColor="transparent"
-        hoveredBorderColor="transparent"
+        hoveredBorderColor="var(--border-primary-300)"
         focusedBorderColor={"var(--border-primary-300)"}
         class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
         style="outline:none;"
@@ -353,7 +354,10 @@
           />
         {/if}
       </div>
-      <div class="p-3 d-flex align-items-center justify-content-between">
+      <div
+        class="p-3 d-flex align-items-center justify-content-between"
+        style="z-index: 4;"
+      >
         <Tooltip title={"Star Us On GitHub"} placement={"top"}>
           <div
             class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover

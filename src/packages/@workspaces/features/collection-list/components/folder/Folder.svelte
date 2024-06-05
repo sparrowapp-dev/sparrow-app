@@ -385,7 +385,7 @@
                       font-weight:400;
                       margin-left:0px"
             >
-              <p class="ellipsis mb-0" style="font-size: 12px;">
+              <p class="ellipsis  mb-0" style="font-size: 12px;">
                 {explorer.name}
               </p>
             </div>
@@ -607,7 +607,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 30px);
+    width: calc(100% - 40px);
   }
   .folder-icon {
     width: 16px;

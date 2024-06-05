@@ -52,13 +52,13 @@
         </span>
       {/if}
     </button>
-    <div class="main-body py-1 px-2 h-100 {btnClass} position-relative">
+    <!-- <div class="main-body py-1 px-2 h-100 {btnClass} position-relative">
       <div
         class="position-absolute start-0"
         style="width: 1px; height: 64%; top: 17%; background-color: var(--save-button-line);"
       />
       <span class={textClassProp} style={textStyleProp}> <ArrowIcon /> </span>
-    </div>
+    </div> -->
   </div>
 </button>
 

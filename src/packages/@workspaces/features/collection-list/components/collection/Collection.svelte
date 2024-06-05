@@ -526,12 +526,12 @@
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
-    <div
-      style="padding-left: 0; padding-right:0; display: {visibility
+    <div class="z-1"
+      style=" padding-left: 0; padding-right:0; display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-0">
+      <div class="sub-folders ps-0 " >
         {#each collection.items as explorer}
           <Folder
             {onItemCreated}
@@ -553,14 +553,12 @@
         {/if}
 
         <div
-          class="d-flex gap-2 {!collection?.items?.length
-            ? 'ms-4'
-            : 'collection-sub-btn'}"
+          class="d-flex gap-2 ms-1" 
         >
         <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
           <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1 "
+            style="height: 24px; width: 24px; "
             role="button"
             on:click={() => {
               onItemCreated("folder", {
@@ -578,7 +576,7 @@
           </div>
         </Tooltip>
 
-        <Tooltip title={"Add request"} placement={"right"} distance={12}>
+        <Tooltip title={"Add request"} placement={"right"} distance={12} >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
@@ -738,8 +736,6 @@
   }
   .renameInputFieldCollection:focus {
     border: 1px solid var(--border-primary-300) !important;
-  }
-  .sub-folders {
   }
   .main-collection {
     width: calc(100% - 48px);

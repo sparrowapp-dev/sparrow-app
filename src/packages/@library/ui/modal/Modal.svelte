@@ -21,7 +21,7 @@
 {#if isOpen}
   <div
     class="sparrow-modal-bg-overlay"
-    style={`z-index: ${zIndex}`}
+    style={`z-index: ${zIndex} !important`}
     on:click={canClose ? handleModalState(false) : null}
     transition:fade={{ delay: 0, duration: 100 }}
   />
