@@ -5,6 +5,8 @@
   import { Tooltip } from "@library/ui";
   import { DiscordIDs } from "@support/common/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
+
+  export let onJoin;
 </script>
 
 <div
@@ -38,7 +40,7 @@
       role="button"
       style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
       on:click={async () => {
-        await open(DiscordIDs.SparrowDiscordURL);
+        onJoin();
       }}
     >
       <div class="fw-normal" style="font-size: 14px; color:var(--white-color);">Join</div>

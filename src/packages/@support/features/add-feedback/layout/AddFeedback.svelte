@@ -6,7 +6,7 @@
   import { notifications } from "@library/ui/toast/Toast";
 
   export let onSendFeedback;
-
+  export let onAddFeedback;
   enum FeedbackType {
     FEEDBACK = "Feedback",
     BUG = "Bug",
@@ -101,7 +101,8 @@
 <div class="pb-3 w-100">
   <button
     on:click={() => {
-      isExposeFeedbackForm = true;
+      const res = onAddFeedback();
+      isExposeFeedbackForm = res;
     }}
     class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
   >
