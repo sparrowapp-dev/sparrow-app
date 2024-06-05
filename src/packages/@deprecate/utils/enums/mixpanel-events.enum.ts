@@ -18,4 +18,7 @@ export enum Events {
   CREATE_LOCAL_ENVIRONMENT = "Create_Local_Environment",
   SAVE_LOCAL_ENVIRONMENT_VARIABLES = "Save_Local_Environment_Variables",
   SEARCH_ENVIRONMENT_VARIABLES = "Search_Environment_Variables",
+  USER_FEEDBACK = "User_Feedback",
+  JOIN_DISCORD = "Join_Discord",
+  ADD_FEEDBACK = "Add_Feedback",
 }
