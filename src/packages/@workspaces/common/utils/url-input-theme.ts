@@ -4,7 +4,7 @@ export class UrlInputTheme {
   constructor() {
     this.theme = EditorView.theme({
       "&": {
-        height: "34px",
+        height: "36px",
         width: "100%",
         flex: "1",
         border: "1px solid var(--bg-secondary-600)",
@@ -57,6 +57,10 @@ export class UrlInputTheme {
         color: "#8A9299",
         fontSize: "12px",
         fontWeight: "400",
+      },
+      "&.cm-editor:hover": {
+        border: "1px solid var(--border-primary-200)",
+        borderRadius: "0",
       },
       "&.cm-editor.cm-focused": {
         border: "1px solid var(--border-primary-200)",

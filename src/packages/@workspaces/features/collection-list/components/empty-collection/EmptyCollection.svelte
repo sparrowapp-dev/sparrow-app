@@ -6,7 +6,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import List from "@library/ui/list/List.svelte";
   import { PlusIcon } from "@library/icons";
 
@@ -48,5 +48,8 @@
   .add-collection {
     border: 1px solid var(--text-secondary-300);
     height: 32px;
+  }
+  .add-collection:hover{
+    border: 1px solid var(--text-primary-300);
   }
 </style>

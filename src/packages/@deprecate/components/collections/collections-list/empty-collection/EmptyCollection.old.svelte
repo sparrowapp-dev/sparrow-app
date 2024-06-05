@@ -14,7 +14,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import { WorkspaceRole } from "$lib/utils/enums";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   export let handleCreateCollection: any;
   export let collectionsMethods: CollectionsMethods;
   export let currentWorkspaceId: string;

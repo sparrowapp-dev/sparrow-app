@@ -70,7 +70,7 @@
    */
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { Select } from "@library/forms";
 
   /**
@@ -117,6 +117,19 @@
     ) as HTMLInputElement;
     inputField.blur();
   };
+  const onRenameTextareaKeyPress = () => {
+    const inputField = document.getElementById(
+      "updateCollectionDescField",
+    ) as HTMLInputElement;
+    inputField.blur();
+  };
+
+  const resetInputField = () => {
+    const inputField = document.getElementById(
+      "renameInputFieldCollection",
+    ) as HTMLInputElement;
+    inputField.value = collection?.name;
+  };
 </script>
 
 <div class="main-container d-flex">
@@ -160,11 +173,11 @@
     </div>
   </ModalWrapperV1>
   <div
-    class="my-collection d-flex flex-column w-100"
+    class="my-collection d-flex flex-column w-100 z-3"
     style="margin-top: 15px; min-width: 450px"
   >
     <Tooltip title={PERMISSION_NOT_FOUND_TEXT} show={!userRoleInWorkspace}>
-      <div class="d-flex aling-items-center gap-2 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-4">
         <div class="d-flex flex-column flex-grow-1">
           <input
             type="text"
@@ -174,7 +187,15 @@
             value={collection?.name}
             class="bg-transparent input-outline form-control border-0 text-left w-100 ps-2 py-0 fs-5"
             disabled={!userRoleInWorkspace || tab?.activeSync}
-            on:blur={(event) => onRename(collection, event?.target?.value)}
+            on:blur={(event) => {
+              const newValue = event?.target?.value;
+              const previousValue = tab.name;
+              if (event.target.value === "") {
+                resetInputField();
+              } else if (newValue !== previousValue) {
+                onRename(collection, newValue);
+              }
+            }}
             on:keydown={(event) => {
               if (event.key === "Enter") {
                 onRenameInputKeyPress();
@@ -311,7 +332,7 @@
             {#if !collection?.activeSync || isSynced}
               <button
                 disabled={!userRoleInWorkspace}
-                class="btn btn-primary rounded m-1 border-0 text-align-right py-1"
+                class="btn add-button rounded m-1 border-0 text-align-right py-1"
                 style="max-height:60px; width:200px;"
                 on:click={() => onCreateAPIRequest(collection)}
                 >New Request</button
@@ -382,14 +403,17 @@
           disabled={!userRoleInWorkspace || collection?.activeSync}
           id="updateCollectionDescField"
           style="font-size: 12px;"
-          value={tab?.description ? tab.description : ""}
-          class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline"
+          value={collection?.description || ""}
+          class="form-control bg-transparent border-0 text-textColor fs-6 collection-area input-outline"
           placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) =>
-            onUpdateDescription(collection, event.target.value)}
+          on:blur={(event) => {
+            if (collection?.description !== event.target.value) {
+              onUpdateDescription(collection, event.target.value);
+            }
+          }}
           on:keydown={(event) => {
             if (event.key === "Enter") {
-              onUpdateDescription(collection, event?.target?.value);
+              onRenameTextareaKeyPress();
             }
           }}
         />
@@ -436,5 +460,16 @@
 
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
+  }
+
+  .add-button {
+    background-color: var(--dropdown-button);
+  }
+
+  .add-button:hover {
+    background-color: var(--dropdown-hover);
+  }
+  .collection-area {
+    height: 300px;
   }
 </style>

@@ -288,6 +288,7 @@
 
       <div class="p-2 bg-tertiary-300 mb-3">
         <Input
+          id="feedback-subject"
           width={"100%"}
           type="text"
           isEditIconRequired={false}

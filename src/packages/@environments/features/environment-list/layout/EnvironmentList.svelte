@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PlusIcon } from "@library/icons";
-  import { Tooltip } from "$lib/components";
+  import { Tooltip } from "@library/ui";
   import Spinner from "@library/ui/spinner/Spinner.svelte";
   import List from "@library/ui/list/List.svelte";
   import type { WorkspaceRole } from "$lib/utils/enums";
@@ -241,6 +241,11 @@
   }
   .add-environment {
     border: 1px solid var(--text-secondary-300);
+    border-radius: 2px;
     height: 32px;
+  }
+  .add-environment:hover{
+    border: 1px solid var(--border-primary-300);
+    border-radius: 2px;
   }
 </style>

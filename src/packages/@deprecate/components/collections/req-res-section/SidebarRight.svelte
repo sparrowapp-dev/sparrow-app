@@ -3,7 +3,7 @@
   import codeIcon from "$lib/assets/code.svg";
   import BookIcon from "$lib/assets/book.svelte";
   import type { NewTab } from "$lib/utils/interfaces/request.interface";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { onDestroy } from "svelte";
   import SaveRequest from "./sub-components/save-request/SaveRequest.svelte";
   import type { RequestBody } from "$lib/utils/interfaces/request.interface";

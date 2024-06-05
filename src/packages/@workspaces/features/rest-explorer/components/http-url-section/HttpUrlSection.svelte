@@ -27,6 +27,7 @@
   export let onSaveRequest: SaveRequestType;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isSave;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -58,6 +59,16 @@
       onSendButtonClicked(environmentVariables);
     }
   };
+
+  let isHovered = false;
+
+  function handleMouseEnter() {
+    isHovered = true;
+  }
+
+  function handleMouseLeave() {
+    isHovered = false;
+  }
 </script>
 
 <div class={`d-flex ${componentClass}`}>
@@ -107,6 +118,7 @@
       isDropIconFilled={true}
       highlightTickedItem={false}
       headerFontSize={"12px"}
+      headerHeight={"36px"}
     />
   </div>
 
@@ -153,8 +165,17 @@
   <button
     class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
     on:click={handleSaveRequest}
+    on:mouseenter={handleMouseEnter}
+    on:mouseleave={handleMouseLeave}
+    disabled={isSave ? true : false}
   >
-    <DiskIcon height={22} width={22} />
+    <DiskIcon
+      height={22}
+      width={22}
+      color={isHovered && !isSave
+        ? "var(--text-primary-200)"
+        : "var(--text-secondary-200)"}
+    />
   </button>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

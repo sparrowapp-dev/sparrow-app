@@ -7,7 +7,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
-  import Tooltip from "$lib/components/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { userWorkspaceLevelRole } from "$lib/store";
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
@@ -56,6 +56,7 @@
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
       <header class={`env-header justify-content-between d-flex`}>
         <Input
+          id={"environment-name"}
           width={"calc(100% - 500px)"}
           type="text"
           bind:value={environmentName}
@@ -76,6 +77,7 @@
         <div class={`d-flex env-btn-container`}>
           <div class="position-relative">
             <Input
+              id={"environment-search"}
               type="search"
               bind:value={search}
               on:input={() => {}}
@@ -103,6 +105,7 @@
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
                 disable={$currentEnvironment.isSaveInProgress ||
+                  $currentEnvironment.isSave ||
                   !hasWorkpaceLevelPermission(
                     $userWorkspaceLevelRole,
                     workspaceLevelPermissions.ADD_ENVIRONMENT,

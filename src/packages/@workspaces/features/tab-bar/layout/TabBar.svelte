@@ -1,13 +1,13 @@
 <script lang="ts">
   // ---- SVG
-  import plusIcon from "$lib/assets/actionicon-normal.svg";
-  import angleLeft from "$lib/assets/angleLeft.svg";
-  import angleRight from "$lib/assets/angle-right.svg";
   import MoreOptions from "@workspaces/features/tab-bar/assets/MoreOptions.svelte";
   import ViewGrid from "@workspaces/features/tab-bar/assets/ViewGrid.svelte";
   import VerticalGrid from "@library/icons/VerticalGrid.svelte";
   import SplitVerital from "@workspaces/features/tab-bar/assets/SplitVertical.svg";
   import SplitHorizontal from "@workspaces/features/tab-bar/assets/SplitHorizontal.svg";
+  import AngleRight from "@library/icons/AngleRight.svelte";
+  import AngleLeft from "@library/icons/AngleLeft.svelte";
+  import PlusIcon from "@library/icons/PlusIcon.svelte";
 
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
@@ -20,7 +20,10 @@
   import { Dropdown } from "@library/ui";
 
   // ---- Helper
-  import { moveNavigation } from "$lib/utils/helpers/navigation";
+  import {
+    moveNavigation,
+    tabBarScroller,
+  } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
 
@@ -90,15 +93,25 @@
   >
     {#if scrolable}
       <div class="d-inline-block" style="height:35px; width:35px;">
-        <Button
-          onClick={() => {
-            moveNavigation("left");
+        <button
+          on:click={() => {
+            tabBarScroller("left");
           }}
-          title={""}
-          buttonStartIcon={angleLeft}
-          buttonStartIconStyle={"height: 12px !important; margin: 0 !important;"}
-          buttonClassProp={"btn border-0 ps-1 pe-1 py-0 h-100 w-100"}
-        />
+          role="button"
+          class=" btn border-0 ps-0 pe-2 py-auto h-100 w-100"
+          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:2px; "
+        >
+          <div
+            class="left-btn d-flex justify-content-center align-items-center"
+            style="height: 22px; width:22px;"
+          >
+            <AngleLeft
+              height={"12px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
+          </div>
+        </button>
       </div>
     {/if}
     <button
@@ -106,7 +119,7 @@
       class=" d-inline-block tab-scroller border-0 bg-transparent"
       bind:offsetWidth={scrollerWidth}
       id="tab-scroller"
-      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 105px); "
+      style="overflow-x: auto; white-space: nowrap; max-width: calc(100% - 75px); "
     >
       {#if tabList}
         {#each tabList as tab, index (tab.tabId)}
@@ -131,22 +144,32 @@
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; left: 0;"
         />
-        <Button
-          title=""
-          onClick={() => {
-            moveNavigation("right");
+        <button
+          on:click={() => {
+            tabBarScroller("right");
           }}
-          buttonClassProp={"btn border-0 ps-1 pe-1 py-auto h-100 w-100"}
-          buttonStartIconStyle={"height: 12px !important; transform: rotate(180deg); margin: 0 !important;"}
-          buttonStartIcon={angleLeft}
-        />
+          role="button"
+          class=" btn border-0 ps-1 pe-1 py-auto h-100 w-100"
+          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+        >
+          <div
+            class="right-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+            style="height: 22px; width:22px;"
+          >
+            <AngleRight
+              height={"12px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
+          </div>
+        </button>
         <div
           class="position-absolute"
           style="height: 18px; width: 1px; background-color: var(--tab-request-divider-line) ; top: 10px; right: 0;"
         />
       </div>
     {/if}
-    {#if tabList.length < 1}
+    <!-- {#if tabList.length < 1}
       <div class="d-inline-flex ms-2" style="height:35px;">
         <Button
           title="New Request"
@@ -155,17 +178,27 @@
           textStyleProp="font-size: 14px;"
         />
       </div>
-    {/if}
+    {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Button
-        title=""
-        onClick={onNewTabRequested}
-        buttonClassProp={"btn border-0 ps-1 pe-1 pt-1 py-0 h-100 w-100"}
-        buttonStartIconStyle={"height: 25px !important; width: 25px !important; margin: auto 0;"}
-        buttonStartIcon={plusIcon}
-      />
+      <button
+        on:click={onNewTabRequested}
+        role="button"
+        class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+      >
+        <div
+          class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+          style="height: 22px; width:22px;"
+        >
+          <PlusIcon
+            height={"24px"}
+            width={"24px"}
+            color="var(--text-secondary-200)"
+          />
+        </div>
+      </button>
     </div>
-    <div class="d-flex ms-auto my-auto me-2">
+    <div class="layout d-flex ms-auto my-auto me-2">
       <Dropdown
         buttonId="viewChange"
         bind:isMenuOpen={viewChange}
@@ -186,15 +219,16 @@
       >
         <button
           id="viewChange"
-          class="border-0 bg-transparent pt-1 rounded"
+          class="border-0 bg-transparent pt-0 rounded"
+          style="height: 22px; width:24px;"
           on:click={() => {
             viewChange = !viewChange;
           }}
         >
           {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={15} />
+            <ViewGrid color={"var(--text-primary-400)"} height={13} />
           {:else}
-            <VerticalGrid height={15} color="var(--blackColor)" />
+            <VerticalGrid height={13} color="var(--blackColor)" />
           {/if}
         </button>
       </Dropdown>
@@ -248,5 +282,21 @@
 
   .tab-scroller::-webkit-scrollbar {
     display: none;
+  }
+  .right-btn:hover {
+    background-color: var(--tab-bar-hover);
+    border-radius: 2px;
+  }
+  .left-btn:hover {
+    background-color: var(--tab-bar-hover);
+    border-radius: 2px;
+  }
+  .plus-btn:hover {
+    background-color: var(--tab-bar-hover);
+    border-radius: 2px;
+  }
+  .layout:hover {
+    background-color: var(--tab-bar-hover);
+    border-radius: 2px;
   }
 </style>

@@ -68,7 +68,7 @@
       defaultLogo: more,
       hoveredLogo: hoveredMore,
       selectedLogo: selectedMore,
-      disabled: false,
+      disabled: true,
       position: "primary",
     },
     {
@@ -98,22 +98,28 @@
   );
 </script>
 
-<div class={`sidebar ${componentClass}`}>
-  <div class="primary-sidebar-items">
-    {#each primarySidebarItems as item (item.route)}
-      <SidebarItem {item} />
-    {/each}
-  </div>
+<div class="sidebar-global">
+  <div class={`sidebar ${componentClass}`}>
+    <div class="primary-sidebar-items z-4">
+      {#each primarySidebarItems as item (item.route)}
+        <SidebarItem {item} />
+      {/each}
+    </div>
 
-  <div class="secondary-sidebar-items">
-    {#each secondarySidebarItems as item (item.route)}
-      <SidebarItem {item} />
-    {/each}
-    <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+    <div class="secondary-sidebar-items z-4">
+      {#each secondarySidebarItems as item (item.route)}
+        <SidebarItem {item} />
+      {/each}
+      <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+    </div>
   </div>
 </div>
 
 <style>
+  .sidebar-global {
+    padding-top: 2px;
+    background-color: var(--blackColor);
+  }
   .sidebar {
     height: calc(100vh - 44px);
     display: flex;
@@ -121,8 +127,7 @@
     align-items: center;
     justify-content: space-between;
     width: 54px;
-    background-color: var(--sidebar-background);
-    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary-800);
     margin-right: 1px;
     padding: 5px 0px 10px 0px;
   }

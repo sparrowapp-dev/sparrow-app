@@ -24,7 +24,10 @@
   onMount(async () => {
     (await _viewModel.getCollectionList()).subscribe(
       async (_collectionList) => {
-        collection = await _viewModel.getCollection(tab.id);
+        const response = await _viewModel.getCollection(tab.id);
+        if (response) {
+          collection = response?.toMutableJSON();
+        }
       },
     );
     userRoleInWorkspace = await _viewModel.getUserRoleInWorspace();

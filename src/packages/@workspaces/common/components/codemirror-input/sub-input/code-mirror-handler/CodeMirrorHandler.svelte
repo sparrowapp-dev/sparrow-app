@@ -76,9 +76,14 @@
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found" + id + " env-not-found";
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
+  let prevValue = "";
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     handleInputChange(userInput);
+    if (prevValue !== userInput) {
+      handleEnvironmentBox("", "");
+    }
+    prevValue = userInput;
     if (rawValue?.length > 0) {
       handleRawChange();
     }
@@ -128,6 +133,44 @@
     },
     {
       key: "Cmd-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+
+    {
+      key: "Ctrl-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-Enter",
+      run: (view) => {
+        return true;
+      },
+    },
+
+    {
+      key: "Alt-l",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-p",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-h",
+      run: (view) => {
+        return true;
+      },
+    },
+    {
+      key: "Alt-b",
       run: (view) => {
         return true;
       },

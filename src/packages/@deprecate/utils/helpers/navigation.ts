@@ -1,9 +1,27 @@
+export const tabBarScroller = (direction: string) => {
+  const navigation = document.getElementById("tab-scroller");
+  if (direction === "left") {
+    sideScroll(navigation, "left", 25, 100, 50);
+  } else {
+    sideScroll(navigation, "right", 25, 100, 10);
+  }
+};
 export const moveNavigation = (direction: string) => {
   const navigation = document.getElementById("tab-scroller");
   if (direction === "left") {
-    sideScroll(navigation, "left", 25, 100, 10);
+    sideScroll(navigation, "left", 25, 100, 50);
   } else {
-    sideScroll(navigation, "right", 25, 100, 10);
+    let count = 0;
+    let scroll = setInterval(() => {
+      count++;
+      if (count === 5){
+        clearInterval(scroll)
+      } 
+      navigation?.scrollTo({
+        left : navigation.scrollWidth,
+        behavior : "smooth",
+      })
+    }, 50)
   }
 };
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -29,3 +47,4 @@ const sideScroll = (
     }
   }, speed);
 };
+

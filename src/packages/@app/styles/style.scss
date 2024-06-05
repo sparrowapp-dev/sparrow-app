@@ -143,6 +143,7 @@ $theme-red-230408: #230408;
 
 
 :root {
+  --tab-bar-hover: #{$sparrow-email-invite-bg-color};
   --blackColor: #{$sparrow-black};
   --defaultcolor: #{$sparrow-default};
   --recentApiText: #{$sparrow-recentApiText};
