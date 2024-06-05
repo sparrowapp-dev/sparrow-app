@@ -42,7 +42,9 @@ class HelpPageViewModel {
     } else {
       notifications.error("Feedback submission failed. Please try again.");
     }
-    MixpanelEvent(Events.USER_FEEDBACK);
+    MixpanelEvent(Events.USER_FEEDBACK, {
+      source: "Feedback",
+    });
     return response;
   };
 
@@ -52,7 +54,9 @@ class HelpPageViewModel {
    */
   public joinDiscord = async () => {
     await open(DiscordIDs.SparrowDiscordURL);
-    MixpanelEvent(Events.JOIN_DISCORD);
+    MixpanelEvent(Events.JOIN_DISCORD, {
+      source: "Feedback",
+    });
     return;
   };
 
@@ -61,7 +65,9 @@ class HelpPageViewModel {
    * @returns void
    */
   public addFeedback = async () => {
-    MixpanelEvent(Events.ADD_FEEDBACK);
+    MixpanelEvent(Events.ADD_FEEDBACK, {
+      source: "Feedback",
+    });
     return true;
   };
 }
