@@ -588,7 +588,7 @@ export default class CollectionsViewModel {
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionList, "New collection"),
+      name: this.getNextCollection(collectionList, "New Collection "),
       items: [],
       createdAt: new Date().toISOString(),
     };
