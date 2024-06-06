@@ -5,6 +5,9 @@
   import constants from "$lib/utils/constants";
   import { fly, fade } from "svelte/transition";
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
+  import { onMount } from "svelte";
+  import { platform } from "@tauri-apps/plugin-os";
+  import { open } from "@tauri-apps/plugin-shell";
   export let title = "Title";
   export let description = "Description";
   export let message = "Detailed Message";
@@ -13,6 +16,12 @@
   export let buttonClick = () => {};
   export let loadingMessage = "";
   export let callback;
+
+  let os = "";
+  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  onMount(async () => {
+    os = await platform();
+  });
 </script>
 
 <!-- <Header /> -->
@@ -85,15 +94,33 @@
     <div
       class="w-100 mt-4 mb-3 d-flex align-items-center justify-content-center"
     >
-      <a
-        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
-      >
-      <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
-      <a
-        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
-      >
+      {#if os === "windows"}
+        <a
+          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+        >
+        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+        <a
+          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+        >
+      {:else}
+        <a
+          on:click={async () => {
+            await open(externalSparrowLink + "/support");
+          }}
+          role="button"
+          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+        >
+        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+        <a
+          role="button"
+          on:click={async () => {
+            await open(externalSparrowLink + "/support");
+          }}
+          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+        >
+      {/if}
     </div>
     <div class="mt-5">
       <p

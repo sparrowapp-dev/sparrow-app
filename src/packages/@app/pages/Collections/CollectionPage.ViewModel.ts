@@ -588,7 +588,7 @@ export default class CollectionsViewModel {
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionList, "New collection"),
+      name: this.getNextCollection(collectionList, "New Collection "),
       items: [],
       createdAt: new Date().toISOString(),
     };
@@ -1131,6 +1131,9 @@ export default class CollectionsViewModel {
       // );
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1235,8 +1238,8 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(sampleRequest.getValue());
       // this.handleOpenRequest(workspaceId, collection, explorer, request);
       moveNavigation("right");
-      MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-        source: "Side Panel Dropdown",
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
       });
       return;
     } else {
@@ -1333,6 +1336,10 @@ export default class CollectionsViewModel {
         folder.id,
         folderObj,
       );
+
+      MixpanelEvent(Events.CREATE_FOLDER, {
+        source: "Collection list",
+      });
     } else {
       // Show error notification and clean up by deleting the folder locally on failure.
       notifications.error("Failed to create folder!");
@@ -1367,6 +1374,9 @@ export default class CollectionsViewModel {
         );
         this.updateTab(collection.id, {
           name: newCollectionName,
+        });
+        MixpanelEvent(Events.RENAME_COLLECTION, {
+          source: "Collection list",
         });
       } else if (response.message === "Network Error") {
         notifications.error(response.message);
@@ -1417,6 +1427,9 @@ export default class CollectionsViewModel {
         );
         this.updateTab(explorer.id, {
           name: newFolderName,
+        });
+        MixpanelEvent(Events.RENAME_FOLDER, {
+          source: "Collection list",
         });
       }
     }
@@ -1547,6 +1560,9 @@ export default class CollectionsViewModel {
           this.updateTab(request.id, {
             name: newRequestName,
           });
+          MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
+          });
         }
       } else if (collection.id && workspaceId && folder.id) {
         let storage = request;
@@ -1575,6 +1591,9 @@ export default class CollectionsViewModel {
           );
           this.updateTab(request.id, {
             name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
           });
         }
       }
@@ -1639,6 +1658,9 @@ export default class CollectionsViewModel {
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
       notifications.success(`"${collection.name}" Collection deleted.`);
       this.removeMultipleTabs(deletedIds);
+      MixpanelEvent(Events.DELETE_COLLECTION, {
+        source: "Collection list",
+      });
     } else {
       notifications.error(
         response.message ?? "Failed to delete the Collection.",
@@ -1684,6 +1706,9 @@ export default class CollectionsViewModel {
 
       notifications.success(`"${explorer.name}" Folder deleted.`);
       this.removeMultipleTabs(requestIds);
+      MixpanelEvent(Events.DELETE_FOLDER, {
+        source: "Collection list",
+      });
     } else {
       notifications.error("Failed to delete the Folder.");
     }
@@ -1730,6 +1755,9 @@ export default class CollectionsViewModel {
     if (response.isSuccessful) {
       notifications.success(`"${request.name}" Request deleted.`);
       this.removeMultipleTabs([request.id]);
+      MixpanelEvent(Events.DELETE_REQUEST, {
+        source: "Collection list",
+      });
       return true;
     } else {
       notifications.error("Failed to delete the Request.");
