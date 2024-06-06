@@ -13,6 +13,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
     import { platform } from "@tauri-apps/plugin-os";
+    import WelcomeBox from "../components/welcome-box/WelcomeBox.svelte";
 
   /**
    * selected environmet to be shown on API
@@ -126,6 +127,9 @@
           </span>
         </div>
       </header>
+      <div>
+        <WelcomeBox/>
+      </div>
       <section class={`var-value-container`}>
         <TabularInput
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}

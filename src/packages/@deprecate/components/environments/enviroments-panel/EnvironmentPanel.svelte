@@ -20,6 +20,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+    import WelcomeBox from "@environments/features/environment-explorer/components/welcome-box/WelcomeBox.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;
@@ -186,6 +187,9 @@
     {/if}
   </div>
 {/if}
+<div>
+  <WelcomeBox/>
+</div>
 
 <style lang="scss">
   .env-panel {
