@@ -3,6 +3,8 @@
   export { handleClose };
   export let onClose;
   export let text = " ";
+  export let heading = " ";
+
 
   function handleClose() {
     onClose();
@@ -20,7 +22,7 @@
   >
     <Crossicon />
   </button>
-  <div class="heading">Welcome to Environments!</div>
+  <div class="heading"> {heading}</div>
   <p class="description">
    {text} <span class="link"
       >See how it works.</span

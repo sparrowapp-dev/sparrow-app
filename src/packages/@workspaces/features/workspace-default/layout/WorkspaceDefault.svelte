@@ -1,54 +1,83 @@
 <script>
-  import {VectorIcon , LibraryIcon} from "@library/icons";
-    import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
-    import WelcomeBox from "@environments/features/environment-explorer/components/welcome-box/WelcomeBox.svelte";
+  import { VectorIcon, LibraryIcon } from "@library/icons";
+  import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+  import WelcomeBox from "@library/ui/popover/WelcomeBox.svelte";
   export let showImportCollectionPopup;
   export let onItemCreated;
-</script>  
+  export let showContainer = true;
+
+</script>
 
 <div class="m-2">
-  <WelcomeBox/>
+  {#if showContainer}
+  <WelcomeBox
+    onClose={() => {
+      showContainer = false;
+    }}
+    heading={`Welcome to Sparrow!`}
+    text={`Your one-stop solution for API testing and management. Start organizing your API requests into collections, utilize environment variables, and streamline your 
+    development process. Get started now by creating your first collection or exploring our features`}
+  />
+  {/if}
 </div>
-<div class=" d-flex flex-column justify-content-center align-items-center" 
-     style=" padding-top: 102px; padding-right:325px;  padding-left:325px; padding-bottom: 24px; gap: 89px;">
-
-      <div style="height: 176px; width: 175px;">
-        <SparrowLogo/>
+<div
+  class=" d-flex flex-column justify-content-center align-items-center"
+  style=" padding-top: 70px; padding-right:325px;  padding-left:325px; padding-bottom: 24px; gap: 89px;"
+>
+  <div style="height: 176px; width: 175px;">
+    <SparrowLogo />
+  </div>
+  <div class="d-flex" style="gap: 19px;">
+    <div
+      class=" "
+      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 ); border-radius : 4px;"
+      role="button"
+      on:click={() => {
+        showImportCollectionPopup();
+      }}
+    >
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 79px"
+      >
+        <LibraryIcon
+          width="24px"
+          height="24px"
+          color=" var( --text-primary-300)"
+        />
       </div>
-      <div class="d-flex " style="gap: 19px;">
-          <div class=" " style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 ); border-radius : 4px;" role="button"
-            on:click={() => {
-            showImportCollectionPopup();
-            }}>
-         
-            <div class="d-flex justify-content-center align-items-center" style="height: 79px"> 
-              <LibraryIcon width="24px" height="24px" color=" var( --text-primary-300)"/>
-            </div>  
-            <div class="d-flex justify-content-center align-items-center" style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px; " >
-              Add Collection
-            </div>
-          </div>
-    
-          <div class=" " style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "  role="button" 
-            on:click={() => {
-              onItemCreated("request" , {});
-              }}>
-            <div class="d-flex justify-content-center align-items-center" style="height: 79px"> 
-              <VectorIcon width="24px" height="24px"  color=" var( --text-primary-300)" />    
-            </div>  
-            <div class="d-flex justify-content-center align-items-center" style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  " >
-              Add Request
-            </div> 
-          </div>
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px; "
+      >
+        Add Collection
       </div>
-</div> 
+    </div>
 
-
-
-
-
-  
-
-
-
-
+    <div
+      class=" "
+      style="height: 120px; width:120px; border: 0.5px solid var(--text-tertiary-400 );  border-radius : 4px; "
+      role="button"
+      on:click={() => {
+        onItemCreated("request", {});
+      }}
+    >
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 79px"
+      >
+        <VectorIcon
+          width="24px"
+          height="24px"
+          color=" var( --text-primary-300)"
+        />
+      </div>
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 41px; background-color:var(--text-tertiary-400 ); padding:10px; font-size:14px;  "
+      >
+        Add Request
+      </div>
+    </div>
+  </div>
+</div>

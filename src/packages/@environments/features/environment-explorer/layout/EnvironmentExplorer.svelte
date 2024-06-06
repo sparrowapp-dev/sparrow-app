@@ -2,7 +2,6 @@
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { QuickHelp } from "../components";
-  import handleClose from "../components/welcome-box/WelcomeBox.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -14,7 +13,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { platform } from "@tauri-apps/plugin-os";
-  import WelcomeBox from "../components/welcome-box/WelcomeBox.svelte";
+  import WelcomeBox from "../../../../@library/ui/popover/WelcomeBox.svelte";
 
 
   /**
@@ -38,9 +37,6 @@
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
-  function handleHelpClick() {
-    showContainer = true;
-  }
 
   $: {
     if ($currentEnvironment) {
@@ -149,6 +145,7 @@
       <div>
         {#if showContainer}
           <WelcomeBox
+          heading={`Welcome to Environments!`}
             text={` Environments allow you to manage different sets of confirguration variables
             for various stages of your application (e.g., Development, Staging,
             Production). This helps in organizing and isolating settings, making testing
