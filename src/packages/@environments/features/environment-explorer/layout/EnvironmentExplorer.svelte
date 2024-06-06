@@ -13,7 +13,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { platform } from "@tauri-apps/plugin-os";
-  import WelcomeBox from "../../../../@library/ui/popover/WelcomeBox.svelte";
+    import { Popover } from "@library/ui";
 
 
   /**
@@ -144,7 +144,7 @@
       </header>
       <div>
         {#if showContainer}
-          <WelcomeBox
+          <Popover
           heading={`Welcome to Environments!`}
             text={` Environments allow you to manage different sets of confirguration variables
             for various stages of your application (e.g., Development, Staging,

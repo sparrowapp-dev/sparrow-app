@@ -20,7 +20,7 @@
     workspaceLevelPermissions,
   } from "$lib/utils/constants/permissions.constant";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
-    import WelcomeBox from "@library/ui/popover/WelcomeBox.svelte";
+    import WelcomeBox from "@library/ui/popover/Popover.svelte";
 
   export let environmentRepositoryMethods: EnvironmentRepositoryMethods;
   export let environmentServiceMethods: EnvironmentServiceMethods;

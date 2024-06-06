@@ -1,7 +1,8 @@
 <script>
   import { VectorIcon, LibraryIcon } from "@library/icons";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
-  import WelcomeBox from "@library/ui/popover/WelcomeBox.svelte";
+  import WelcomeBox from "@library/ui/popover/Popover.svelte";
+    import { Popover } from "@library/ui";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let showContainer = true;
@@ -10,7 +11,7 @@
 
 <div class="m-2">
   {#if showContainer}
-  <WelcomeBox
+  <Popover
     onClose={() => {
       showContainer = false;
     }}
