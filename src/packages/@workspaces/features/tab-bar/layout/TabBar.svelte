@@ -179,17 +179,25 @@
         />
       </div>
     {/if} -->
-    <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip title={"Add Request"} placement={"bottom"} distance={2} zIndex={5}>
+    <div
+      class="d-inline-flex align-items-center"
+      style="height:35px; padding :3px"
+    >
+      <Tooltip
+        title={"Add Request"}
+        placement={"bottom"}
+        distance={10}
+        zIndex={5}
+      >
         <button
           on:click={onNewTabRequested}
           role="button"
-          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+          class=" btn border-0"
+          style="margin: 0 !important; padding : 0 !important "
         >
           <div
-            class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-            style="height: 22px; width:22px;"
+            class="plus-btn d-flex justify-content-center align-items-center"
+            style="height: 22px"
           >
             <PlusIcon
               height={"24px"}
@@ -219,7 +227,7 @@
           },
         ]}
       >
-        <Tooltip title={"Layout"} placement={"left"} distance={12}>
+        <Tooltip title={"Layout"} placement={"left"} distance={12} zIndex={6}>
           <button
             id="viewChange"
             class="border-0 bg-transparent pt-0 rounded"

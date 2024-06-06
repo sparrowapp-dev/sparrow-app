@@ -560,7 +560,7 @@ export default class CollectionsViewModel {
       }
 
       for (let i = 2; i < list.length + 10; i++) {
-        const proposedName: string = `${name}${i}`;
+        const proposedName: string = `${name} ${i}`;
         if (!isNameAvailable(proposedName)) {
           return proposedName;
         }
@@ -588,7 +588,7 @@ export default class CollectionsViewModel {
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionList, "New Collection "),
+      name: this.getNextCollection(collectionList, "New Collection"),
       items: [],
       createdAt: new Date().toISOString(),
     };
@@ -1038,7 +1038,7 @@ export default class CollectionsViewModel {
     }
 
     for (let i = 2; i < list.length + 10; i++) {
-      const proposedName: string = `${name}${i}`;
+      const proposedName: string = `${name} ${i}`;
       if (!isNameAvailable(proposedName)) {
         return proposedName;
       }
