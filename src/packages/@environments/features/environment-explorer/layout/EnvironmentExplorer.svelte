@@ -12,7 +12,6 @@
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
-    import { platform } from "@tauri-apps/plugin-os";
 
   /**
    * selected environmet to be shown on API
