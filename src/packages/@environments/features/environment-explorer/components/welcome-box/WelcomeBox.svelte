@@ -1,23 +1,28 @@
 <script lang="ts">
   import Crossicon from "$lib/assets/crossicon.svelte";
+  export { handleClose };
+  export let onClose;
+  export let text = " ";
+
+  function handleClose() {
+    onClose();
+  }
 </script>
 
 <div
   class="container d-flex flex-column"
-  style="  background-color:#1C1D2B; border-radius:4px; "
+  style="position:relative; background-color:#1C1D2B; border-radius:4px; "
 >
   <button
-    class="b-0 border-0"
-    style="position:absolute; right:20px; top:120px; background-color:transparent "
+    class="cross-btn b-0 border-0"
+    style="position:absolute; right:10px; top:2px; background-color:transparent "
+    on:click={handleClose}
   >
     <Crossicon />
   </button>
   <div class="heading">Welcome to Environments!</div>
   <p class="description">
-    Environments allow you to manage different sets of confirguration variables
-    for various stages of your application (e.g., Development, Staging,
-    Production). This helps in organizing and isolating settings, making testing
-    and deployment easier and more efficient. <span class="link"
+   {text} <span class="link"
       >See how it works.</span
     >
   </p>

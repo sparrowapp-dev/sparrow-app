@@ -2,6 +2,7 @@
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { QuickHelp } from "../components";
+  import handleClose from "../components/welcome-box/WelcomeBox.svelte";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -12,8 +13,9 @@
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
-    import { platform } from "@tauri-apps/plugin-os";
-    import WelcomeBox from "../components/welcome-box/WelcomeBox.svelte";
+  import { platform } from "@tauri-apps/plugin-os";
+  import WelcomeBox from "../components/welcome-box/WelcomeBox.svelte";
+
 
   /**
    * selected environmet to be shown on API
@@ -32,9 +34,13 @@
    */
   export let onSaveEnvironment;
 
+  let showContainer = true;
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
+  function handleHelpClick() {
+    showContainer = true;
+  }
 
   $: {
     if ($currentEnvironment) {
@@ -56,7 +62,22 @@
 {#if $currentEnvironment?.environmentId}
   <div class={`env-panel d-flex`}>
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
-      <header class={`env-header justify-content-between d-flex`}>
+      <header
+        class={`env-header justify-content-between d-flex`}
+        style="position: relative ;"
+      >
+        {#if $currentEnvironment?.type == "GLOBAL"}
+          <button
+            class="btn p-0"
+            style="position: absolute; left:150px;  top:18px; border:none; z-index:5; curser:pointer;"
+            on:click={() => {
+              showContainer = !showContainer;
+            }}
+          >
+            <HelpIcon height={"12.67px"} width={"12.67px"} />
+          </button>
+        {/if}
+
         <Input
           id={"environment-name"}
           width={"calc(100% - 500px)"}
@@ -92,12 +113,12 @@
               focusedBorderColor={"var(--border-primary-300)"}
             />
           </div>
-       
-            <div class="position-relative">
-              {#if !$currentEnvironment.isSave}
-                <div class="badge-data d-block"></div>
-              {/if}
-              <Tooltip title="Save" placement="bottom" distance={10} >
+
+          <div class="position-relative">
+            {#if !$currentEnvironment.isSave}
+              <div class="badge-data d-block"></div>
+            {/if}
+            <Tooltip title="Save" placement="bottom" distance={10}>
               <WithButton
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
@@ -110,25 +131,33 @@
                 loader={$currentEnvironment.isSaveInProgress}
               />
             </Tooltip>
-            </div>
+          </div>
           <span>
-            <Tooltip title="Help" placement="bottom"  distance={10} >
-
-            <WithButton
-              icon={HelpIcon}
-              onClick={() => {
-                quickHelp = true;
-              }}
-              disable={false}
-              loader={false}
-            />
-          </Tooltip>
-
+            <Tooltip title="Help" placement="bottom" distance={10}>
+              <WithButton
+                icon={HelpIcon}
+                onClick={() => {
+                  quickHelp = true;
+                }}
+                disable={false}
+                loader={false}
+              />
+            </Tooltip>
           </span>
         </div>
       </header>
       <div>
-        <WelcomeBox/>
+        {#if showContainer}
+          <WelcomeBox
+            text={` Environments allow you to manage different sets of confirguration variables
+            for various stages of your application (e.g., Development, Staging,
+            Production). This helps in organizing and isolating settings, making testing
+            and deployment easier and more efficient.`}
+            onClose={() => {
+              showContainer = false;
+            }}
+          />
+        {/if}
       </div>
       <section class={`var-value-container`}>
         <TabularInput

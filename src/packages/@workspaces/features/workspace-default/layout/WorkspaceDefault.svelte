@@ -1,13 +1,17 @@
 <script>
   import {VectorIcon , LibraryIcon} from "@library/icons";
     import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
+    import WelcomeBox from "@environments/features/environment-explorer/components/welcome-box/WelcomeBox.svelte";
   export let showImportCollectionPopup;
   export let onItemCreated;
 </script>  
 
-
+<div class="m-2">
+  <WelcomeBox/>
+</div>
 <div class=" d-flex flex-column justify-content-center align-items-center" 
      style=" padding-top: 102px; padding-right:325px;  padding-left:325px; padding-bottom: 24px; gap: 89px;">
+
       <div style="height: 176px; width: 175px;">
         <SparrowLogo/>
       </div>
