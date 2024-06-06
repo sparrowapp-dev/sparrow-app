@@ -7,7 +7,7 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   export let onSendFeedback;
-
+  export let onAddFeedback;
   enum FeedbackType {
     FEEDBACK = "Feedback",
     BUG = "Bug",
@@ -103,7 +103,8 @@
   <Tooltip title="Feedback" placement="top" distance={13} >
   <button
     on:click={() => {
-      isExposeFeedbackForm = true;
+      const res = onAddFeedback();
+      isExposeFeedbackForm = res;
     }}
     class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
   >

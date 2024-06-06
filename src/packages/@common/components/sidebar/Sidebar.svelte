@@ -111,7 +111,7 @@
     {#each secondarySidebarItems as item (item.route)}
       <SidebarItem {item} />
     {/each}
-    <Tooltip title="User Profile" placement="right" distance={20} >
+    <Tooltip title="User Profile" placement="right" distance={20} zIndex={5} >
     <SidebarProfileModal item={sidebarModalItem} {onLogout} />
     </Tooltip>
   </div>

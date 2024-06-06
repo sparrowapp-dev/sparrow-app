@@ -14,6 +14,8 @@
   import copyIcon from "$lib/assets/copy_icon.svg";
   import bg from "@library/icons/sparrowLogoBackground.svg";
   import BgContainer from "./BgContainer.svelte";
+  import { platform } from "@tauri-apps/plugin-os";
+  import { onMount } from "svelte";
   let isEntry = false;
 
   let isHover = false;
@@ -34,6 +36,10 @@
   const handleRedirect = (value) => {
     isEntry = value;
   };
+  let os = "";
+  onMount(async () => {
+    os = await platform();
+  });
 </script>
 
 {#if isEntry}
@@ -94,15 +100,33 @@
       >
     </div>
     <div class="w-100 mb-3 d-flex align-items-center justify-content-center">
-      <a
-        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
-      >
-      <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
-      <a
-        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
-      >
+      {#if os === "windows"}
+        <a
+          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+        >
+        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+        <a
+          href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+        >
+      {:else}
+        <a
+          on:click={async () => {
+            await open(externalSparrowLink + "/support");
+          }}
+          role="button"
+          class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+        >
+        <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
+        <a
+          role="button"
+          on:click={async () => {
+            await open(externalSparrowLink + "/support");
+          }}
+          class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+        >
+      {/if}
     </div>
     <div slot="outside">
       <div

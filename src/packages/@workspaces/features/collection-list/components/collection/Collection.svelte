@@ -481,7 +481,7 @@
     </button>
 </Tooltip>
 
-    <Tooltip title={"more"} placement={"right"} distance={17}>
+    <Tooltip title={"more"} placement={"right"} distance={17} zIndex={5}>
       <button
         id={`show-more-collection-${collection.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu

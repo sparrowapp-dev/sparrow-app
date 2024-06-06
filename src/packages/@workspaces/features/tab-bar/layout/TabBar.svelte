@@ -11,14 +11,14 @@
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
- 
+
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
- 
+
   // ---- Component
   import Tab from "@workspaces/features/tab-bar/components/tab/Tab.svelte";
   import { Dropdown } from "@library/ui";
- 
+
   // ---- Helper
   import {
     moveNavigation,
@@ -26,7 +26,7 @@
   } from "$lib/utils/helpers/navigation";
   import Button from "@library/ui/button/Button.svelte";
   import { requestSplitterDirection } from "@workspaces/features/rest-explorer/store";
- 
+
   // ------ Props ------
   /**
    * List of tabs
@@ -62,15 +62,15 @@
    * @param id - Tab ID
    */
   export let onTabSelected: (id: string) => void;
- 
+
   export let onChangeViewInRequest: (view: string) => void;
- 
+
   $: {
     if (tabList) {
       scrolable = tabList.length * 182 >= scrollerParent;
     }
   }
- 
+
   let tabWidth: number = 182;
   let scrolable: boolean = false;
   let scrollerParent: number;
@@ -78,7 +78,7 @@
   let moreOption: boolean = false;
   let viewChange: boolean = false;
 </script>
- 
+
 <button
   class="tab border-0 w-100 bg-blackColor d-flex"
   style="cursor: default;"
@@ -180,25 +180,25 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip title={"Add Request"} placement={"top"} distance={2} >
-      <button
-        on:click={onNewTabRequested}
-        role="button"
-        class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
-      >
-        <div
-          class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-          style="height: 22px; width:22px;"
+      <Tooltip title={"Add Request"} placement={"bottom"} distance={2} zIndex={5}>
+        <button
+          on:click={onNewTabRequested}
+          role="button"
+          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+          style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
         >
-          <PlusIcon
-            height={"24px"}
-            width={"24px"}
-            color="var(--text-secondary-200)"
-          />
-        </div>
-      </button>
-    </Tooltip>
+          <div
+            class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+            style="height: 22px; width:22px;"
+          >
+            <PlusIcon
+              height={"24px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
+          </div>
+        </button>
+      </Tooltip>
     </div>
     <div class="layout d-flex ms-auto my-auto me-2">
       <Dropdown
@@ -219,21 +219,21 @@
           },
         ]}
       >
-      <Tooltip title={"Layout"} placement={"left"} distance={12}>
-        <button
-          id="viewChange"
-          class="border-0 bg-transparent pt-0 rounded"
-          style="height: 22px; width:24px;"
-          on:click={() => {
-            viewChange = !viewChange;
-          }}
-        >
-          {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={13} />
-          {:else}
-            <VerticalGrid height={13} color="var(--blackColor)" />
-          {/if}
-        </button>
+        <Tooltip title={"Layout"} placement={"left"} distance={12}>
+          <button
+            id="viewChange"
+            class="border-0 bg-transparent pt-0 rounded"
+            style="height: 22px; width:24px;"
+            on:click={() => {
+              viewChange = !viewChange;
+            }}
+          >
+            {#if $requestSplitterDirection === "horizontal"}
+              <ViewGrid color={"var(--text-primary-400)"} height={13} />
+            {:else}
+              <VerticalGrid height={13} color="var(--blackColor)" />
+            {/if}
+          </button>
         </Tooltip>
       </Dropdown>
       <Dropdown
@@ -274,7 +274,7 @@
     </div>
   </div>
 </button>
- 
+
 <style>
   * {
     transition: all 300ms;
@@ -283,7 +283,7 @@
     height: 35px;
     background-color: var(--sparrow-black);
   }
- 
+
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }

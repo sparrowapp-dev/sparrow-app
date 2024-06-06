@@ -58,6 +58,7 @@
    * environment dialog box unique id
    */
   export let id;
+  export let componentClass;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -349,7 +350,7 @@
 </script>
 
 <div class="w-100 basic-code-mirror-input" bind:this={inputWrapper}>
-  <div class="" bind:this={codeMirrorEditorDiv} />
+  <div class={componentClass} bind:this={codeMirrorEditorDiv} />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
