@@ -94,7 +94,7 @@
   });
 </script>
 
-<AutoUpdateDialog />
+<!-- <AutoUpdateDialog /> -->
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
