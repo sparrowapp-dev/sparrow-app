@@ -79,23 +79,23 @@
       id={"hash124"}
       data={[
         {
-          name: "NONE",
+          name: "none",
           id: RequestDataset.NONE,
         },
         {
-          name: "FORM DATA",
+          name: "form-data",
           id: RequestDataset.FORMDATA,
         },
         {
-          name: "ENCODED URL",
+          name: "x-www-form-urlencoded",
           id: RequestDataset.URLENCODED,
         },
         {
-          name: "RAW",
+          name: "raw",
           id: RequestDataset.RAW,
         },
         {
-          name: "BINARY",
+          name: "binary",
           id: RequestDataset.BINARY,
           disabled: true,
         },

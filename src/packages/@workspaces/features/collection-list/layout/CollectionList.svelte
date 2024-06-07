@@ -269,6 +269,7 @@
           },
         ]}
       >
+    <Tooltip title={"Add Collection"} placement={"right"} distance={12} zIndex={10} >
         <button
           id="addButton"
           class="border-0 p-1 border-radius-2 add-button"
@@ -278,13 +279,14 @@
         >
           <img src={plusIcon} alt="" />
         </button>
+        </Tooltip>
       </Dropdown>
     </div>
     <div
       class="d-flex flex-column collections-list"
       style="overflow:hidden; margin-top:5px;"
     >
-      <div class="d-flex flex-column justify-content-center ps-3 pe-2 pt-2">
+      <div class="d-flex flex-column justify-content-center ps-2 pe-1 pt-2">
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}

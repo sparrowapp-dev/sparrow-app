@@ -35,6 +35,7 @@
     class="w-100"
     style="padding-top:10px; padding-left:19px; padding-right:19px;"
   >
+  <Tooltip title="Join Community" placement="bottom" distance={15} >
     <div
       class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
       role="button"
@@ -45,6 +46,7 @@
     >
       <div class="fw-normal" style="font-size: 14px; color:var(--white-color);">Join</div>
     </div>
+  </Tooltip>
   </div>
 </div>
 <div class="d-flex flex-column" style="padding-top:17px; padding-left:10px;">

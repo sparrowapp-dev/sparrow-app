@@ -4,6 +4,7 @@
   import { Button, Modal } from "@library/ui";
   import Drop from "../components/Drop/Drop.svelte";
   import { notifications } from "@library/ui/toast/Toast";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   export let onSendFeedback;
   export let onAddFeedback;
@@ -99,6 +100,7 @@
 </script>
 
 <div class="pb-3 w-100">
+  <Tooltip title="Feedback" placement="top" distance={13} >
   <button
     on:click={() => {
       const res = onAddFeedback();
@@ -108,6 +110,7 @@
   >
     +Add Feedback
   </button>
+  </Tooltip>
 </div>
 <div class="position-relative">
   <Modal

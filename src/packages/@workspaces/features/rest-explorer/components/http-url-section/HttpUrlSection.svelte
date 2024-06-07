@@ -13,7 +13,7 @@
   import DropButton from "$lib/components/buttons/DropButton.svelte";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
-
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   let componentClass = "";
   export { componentClass as class };
 
@@ -172,6 +172,7 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
+  <Tooltip title={"Save"} placement={"bottom"} distance={12} >
   <button
     class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
     on:click={handleSaveRequest}
@@ -187,6 +188,7 @@
         : "var(--text-secondary-200)"}
     />
   </button>
+</Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
