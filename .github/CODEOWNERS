@@ -1,5 +1,7 @@
 # Review for all pull requests
-*      @gc-codes
+
+-      @gc-codes
 
 # Github configs PR Reviwer
-.github/*    @gc-codes
+
+.github/\* @gc-codes
