@@ -29,9 +29,9 @@ pub async fn make_formdata_request(
 ) -> Result<Response, std::io::Error> {
     let mut form = reqwest::multipart::Form::new();
     let body_map: HashMap<_, _> = body
-        .split('&')
+        .split("[SPARROW_AMPERSAND]")
         .map(|s| {
-            let mut parts = s.split('=');
+            let mut parts = s.split("[SPARROW_EQUALS]");
             (
                 parts.next().unwrap().to_owned(),
                 parts.next().unwrap_or("").to_owned(),
