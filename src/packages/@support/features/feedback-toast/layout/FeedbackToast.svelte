@@ -31,7 +31,7 @@
       class="tab {activeTab === 'faq' ? 'active' : ''}"
       on:click={() => setActiveTab("faq")}
     >
-      <Tooltip placement="right" title="coming soon">FAQs</Tooltip>
+      <Tooltip placement="right" title="Coming Soon">FAQs</Tooltip>
     </div>
   </div>
   <div style="overflow-y :scroll;">

@@ -269,7 +269,7 @@
           },
         ]}
       >
-    <Tooltip title={"Add Collection"} placement={"right"} distance={12} zIndex={10} >
+    <Tooltip title={"Add Options"} placement={"right"} distance={12} zIndex={10} >
         <button
           id="addButton"
           class="border-0 p-1 border-radius-2 add-button"

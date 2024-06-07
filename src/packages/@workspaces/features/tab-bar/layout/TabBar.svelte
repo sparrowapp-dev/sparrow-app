@@ -187,7 +187,7 @@
         title={"Add Request"}
         placement={"bottom"}
         distance={10}
-        zIndex={5}
+        zIndex={10}
       >
         <button
           on:click={onNewTabRequested}

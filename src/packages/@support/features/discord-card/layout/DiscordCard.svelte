@@ -54,7 +54,7 @@
     class="d-flex p-2 gap-2 align-items-center pt-2"
     style=" height: 44px;  color:var(--text-secondary-50);  "
   >
-    <Tooltip placement="right" title="coming soon">
+    <Tooltip placement="right" title="Coming Soon">
       <span style=""> <Setting2 color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Support</span>
     </Tooltip>
@@ -63,7 +63,7 @@
     class="d-flex p-2 gap-2 align-items-center"
     style="height: 44px; color:var(--text-secondary-50)"
   >
-    <Tooltip placement="right" title="coming soon">
+    <Tooltip placement="right" title="Coming Soon">
       <span> <HelpCenter color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Help Center</span>
     </Tooltip>

@@ -286,7 +286,7 @@
       collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
-    zIndex={500}
+    zIndex={700}
     menuItems={[
       {
         onClick: () =>
@@ -350,7 +350,7 @@
       collectionTabWrapper.getBoundingClientRect().top - 0,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
-    zIndex={500}
+    zIndex={700}
     menuItems={[
       {
         onClick: () => {
@@ -414,7 +414,7 @@
         ? 'transform:rotate(90deg);'
         : 'transform:rotate(0deg);'}"
       alt="angleRight"
-      on:click|stopPropagation={ ()=> {
+      on:click|stopPropagation={() => {
         visibility = !visibility;
       }}
     />
@@ -466,27 +466,32 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
-    <Tooltip title={"Add folder"} placement={"bottom"} distance={13} zIndex={10}>
-
-    <button
-      id={`add-item-collection-${collection.id}`}
-      class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
-        ? 'add-item-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu2(e);
-      }}
+    <Tooltip
+      title={"Add Options"}
+      placement={"bottom"}
+      distance={13}
+      zIndex={10}
     >
-      <img src={AddIcon} alt="AddIcon" />
-    </button>
-</Tooltip>
+      <button
+        id={`add-item-collection-${collection.id}`}
+        class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center {showAddItemMenu
+          ? 'add-item-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu2(e);
+        }}
+      >
+        <img src={AddIcon} alt="AddIcon" />
+      </button>
+    </Tooltip>
 
-    <Tooltip title={"more"} placement={"right"} distance={17} zIndex={600}>
+    <Tooltip title={"More"} placement={"right"} distance={17} zIndex={600}>
       <button
         id={`show-more-collection-${collection.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
+          style=""
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -526,12 +531,13 @@
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
-    <div class="z-1"
+    <div
+      class="z-1"
       style=" padding-left: 0; padding-right:0; display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-0 " >
+      <div class="sub-folders ps-0">
         {#each collection.items as explorer}
           <Folder
             {onItemCreated}
@@ -552,50 +558,47 @@
           </p>
         {/if}
 
-        <div
-          class="d-flex gap-2 ms-1" 
-        >
-        <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
-          <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1 "
-            style="height: 24px; width: 24px; "
-            role="button"
-            on:click={() => {
-              onItemCreated("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-              });
-            }}
-          > 
+        <div class="d-flex gap-2 ms-1">
+          <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px; "
+              role="button"
+              on:click={() => {
+                onItemCreated("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              }}
+            >
+              <FolderPlusIcon
+                height="16px"
+                width="16px"
+                color="var(--request-arc)"
+              />
+            </div>
+          </Tooltip>
 
-            <FolderPlusIcon
-              height="16px"
-              width="16px"
-              color="var(--request-arc)"
-            />
-          </div>
-        </Tooltip>
-
-        <Tooltip title={"Add request"} placement={"right"} distance={12} >
-          <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
-            role="button"
-            on:click={() => {
-              onItemCreated("requestCollection", {
-                workspaceId: collection.workspaceId,
-                collection,
-              });
-            }}
-          >
-          <RequestIcon
-          height="16px"
-          width="16px"
-          color="var(--request-arc)"
-          />
+          <Tooltip title={"Add Request"} placement={"right"} distance={12}>
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                onItemCreated("requestCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              }}
+            >
+              <RequestIcon
+                height="16px"
+                width="16px"
+                color="var(--request-arc)"
+              />
+            </div>
+          </Tooltip>
         </div>
-      </Tooltip>
-      </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
