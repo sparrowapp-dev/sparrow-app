@@ -1,12 +1,27 @@
 <script lang="ts">
   import Crossicon from "$lib/assets/crossicon.svelte";
+  import { Route, Router } from "svelte-navigator";
+  import Ellipse from "@library/icons/Ellipse.svelte";
   import Modal from "../modal/Modal.svelte";
+  import Step1 from "./Step1.svelte";
+  import Step2 from "./Step2.svelte";
+  import { writable } from "svelte/store";
+  import Step3 from "./Step3.svelte";
+    import Header from "./Header.svelte";
   export { handleClose };
   export let onClose;
   export let text = " ";
   export let heading = " ";
-  let isExposeFeedbackForm = false;
-  export let onAddFeedback;
+  let isGuidePopup = false;
+
+  const currentStep = writable(1);
+  function nextStep() {
+    currentStep.update(n => (n < 3 ? n + 1 : n));
+  }
+
+  function previousStep() {
+    currentStep.update(n => (n > 1 ? n - 1 : n));
+  }
 
   function handleClose() {
     onClose();
@@ -29,7 +44,7 @@
     {text}
     <span
       on:click={() => {
-        isExposeFeedbackForm = true;
+        isGuidePopup = true;
       }}
       class="link btn p-0 border-0"
       style="font-size: 12px;">See how it works.</span
@@ -40,23 +55,23 @@
       title={""}
       type={"dark"}
       width={"474px"}
-    
       zIndex={10000}
-      isOpen={isExposeFeedbackForm}
+      isOpen={isGuidePopup}
       handleModalState={(flag = false) => {
-        isExposeFeedbackForm = flag;
+        isGuidePopup = flag;
       }}
     >
-  <div class="d-flex flex-column" style="height:452.35px; margin:auto; border-radius:4.85px;" >
-    <div style="height: 276px;  padding:170px;"> Video</div>
-    <div class="d-flex flex-column" style="border:1px solid;">
-      <div></div>
-      <div></div>
-      <div></div>
+    <div>
+      <Header {nextStep} {previousStep} />
+      {#if $currentStep === 1}
+        <Step1 />
+      {:else if $currentStep === 2}
+        <Step2 />
+      {:else if $currentStep === 3}
+        <Step3 />
+      {/if}
     </div>
-  </div>
-
-    </Modal>
+  </Modal>
   </div>
 </div>
 
