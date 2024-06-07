@@ -276,7 +276,7 @@
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
       {:else}
-      <Tooltip placement="right" title="more" distance={17} >
+      <Tooltip placement="right" title="More" distance={17} >
       <button
         id={`show-more-environment-${env?.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
