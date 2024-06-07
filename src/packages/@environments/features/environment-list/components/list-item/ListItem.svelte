@@ -6,6 +6,7 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { Options } from "@library/ui";
+    import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   /**
    * current workspace to identify the selected environment
@@ -274,7 +275,8 @@
     </div>
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
-    {:else}
+      {:else}
+      <Tooltip placement="right" title="more" distance={17} >
       <button
         id={`show-more-environment-${env?.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
@@ -287,6 +289,7 @@
       >
         <img src={threedotIcon} alt="threedotIcon" />
       </button>
+      </Tooltip>
     {/if}
   </button>
 </div>

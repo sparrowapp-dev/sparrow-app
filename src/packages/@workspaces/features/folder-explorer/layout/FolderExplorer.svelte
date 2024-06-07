@@ -155,8 +155,8 @@
       <textarea
         disabled={!userRoleInWorkspace || tab?.source === "SPEC"}
         id="updateFolderDescField"
-        style="font-size: 12px; "
-        class="form-control bg-transparent border-0 text-textColor fs-6 folder-area input-outline"
+        style="font-size: 14px; "
+        class="form-control bg-transparent border-0 text-textColor fs-6 h-50 input-outline shadow-none"
         value={folder?.description || ""}
         placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
         on:blur={(event) => {
@@ -206,10 +206,12 @@
     border-radius: 0%;
   }
   textarea::placeholder {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-color);
   }
-
+  .input-outline:hover {
+    outline: 2px solid var(--sparrow-blue);
+  }
   .input-outline:focus {
     outline: 2px solid var(--sparrow-blue);
   }

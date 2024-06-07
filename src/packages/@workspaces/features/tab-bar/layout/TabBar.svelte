@@ -8,7 +8,7 @@
   import AngleRight from "@library/icons/AngleRight.svelte";
   import AngleLeft from "@library/icons/AngleLeft.svelte";
   import PlusIcon from "@library/icons/PlusIcon.svelte";
-
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   // ---- Store
   import { collapsibleState } from "$lib/store/request-response-section";
 
@@ -179,24 +179,34 @@
         />
       </div>
     {/if} -->
-    <div class="d-inline-flex" style="height:35px; width:35px;">
-      <button
-        on:click={onNewTabRequested}
-        role="button"
-        class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-        style=" width:20px; transform: rotate(180deg); margin: 0 !important; height:22px;"
+    <div
+      class="d-inline-flex align-items-center"
+      style="height:35px; padding :3px"
+    >
+      <Tooltip
+        title={"Add Request"}
+        placement={"bottom"}
+        distance={10}
+        zIndex={5}
       >
-        <div
-          class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-          style="height: 22px; width:22px;"
+        <button
+          on:click={onNewTabRequested}
+          role="button"
+          class=" btn border-0"
+          style="margin: 0 !important; padding : 0 !important "
         >
-          <PlusIcon
-            height={"24px"}
-            width={"24px"}
-            color="var(--text-secondary-200)"
-          />
-        </div>
-      </button>
+          <div
+            class="plus-btn d-flex justify-content-center align-items-center"
+            style="height: 22px"
+          >
+            <PlusIcon
+              height={"24px"}
+              width={"24px"}
+              color="var(--text-secondary-200)"
+            />
+          </div>
+        </button>
+      </Tooltip>
     </div>
     <div class="layout d-flex ms-auto my-auto me-2">
       <Dropdown
@@ -217,20 +227,22 @@
           },
         ]}
       >
-        <button
-          id="viewChange"
-          class="border-0 bg-transparent pt-0 rounded"
-          style="height: 22px; width:24px;"
-          on:click={() => {
-            viewChange = !viewChange;
-          }}
-        >
-          {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={13} />
-          {:else}
-            <VerticalGrid height={13} color="var(--blackColor)" />
-          {/if}
-        </button>
+        <Tooltip title={"Layout"} placement={"left"} distance={12} zIndex={6}>
+          <button
+            id="viewChange"
+            class="border-0 bg-transparent pt-0 rounded"
+            style="height: 22px; width:24px;"
+            on:click={() => {
+              viewChange = !viewChange;
+            }}
+          >
+            {#if $requestSplitterDirection === "horizontal"}
+              <ViewGrid color={"var(--text-primary-400)"} height={13} />
+            {:else}
+              <VerticalGrid height={13} color="var(--blackColor)" />
+            {/if}
+          </button>
+        </Tooltip>
       </Dropdown>
       <Dropdown
         buttonId="moreOptions"

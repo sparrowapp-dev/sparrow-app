@@ -98,7 +98,7 @@
     <p class={`mb-0 text-secondary-170 ellipsis text-fs-16`}>
       {currentWorkspace?.name || ""}
     </p>
-
+    <Tooltip placement="right" title="Add Environment" distance={13}>
     <WithButtonV2
       icon={PlusIcon}
       disable={!hasWorkpaceLevelPermission(
@@ -111,6 +111,7 @@
       }}
       loader={false}
     />
+    </Tooltip>
   </div>
 
   {#if false}

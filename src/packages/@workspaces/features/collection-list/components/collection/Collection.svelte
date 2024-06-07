@@ -466,6 +466,7 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
     > -->
+    <Tooltip title={"Add folder"} placement={"bottom"} distance={13} zIndex={10}>
 
     <button
       id={`add-item-collection-${collection.id}`}
@@ -478,19 +479,22 @@
     >
       <img src={AddIcon} alt="AddIcon" />
     </button>
+</Tooltip>
 
-    <button
-      id={`show-more-collection-${collection.id}`}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-        ? 'threedot-active'
-        : ''}"
-      on:click={(e) => {
-        rightClickContextMenu(e);
-      }}
-    >
-      <img src={threedotIcon} alt="threedotIcon" />
-    </button>
-    <!-- </Tooltip> -->
+    <Tooltip title={"more"} placement={"right"} distance={17} zIndex={600}>
+      <button
+        id={`show-more-collection-${collection.id}`}
+        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+          ? 'threedot-active'
+          : ''}"
+        on:click={(e) => {
+          rightClickContextMenu(e);
+        }}
+      >
+        <img src={threedotIcon} alt="threedotIcon" />
+      </button>
+      <!-- </Tooltip> -->
+    </Tooltip>
     {#if isActiveSyncEnabled && collection?.activeSync}
       <Tooltip placement="bottom" title="Sync" styleProp="left: 25%;">
         <button
@@ -522,12 +526,12 @@
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
 {#if !collection?.activeSync || activeSyncLoad}
   {#if !collection?.activeSync || isBranchSynced}
-    <div
-      style="padding-left: 0; padding-right:0; display: {visibility
+    <div class="z-1"
+      style=" padding-left: 0; padding-right:0; display: {visibility
         ? 'block'
         : 'none'};"
     >
-      <div class="sub-folders ps-0">
+      <div class="sub-folders ps-0 " >
         {#each collection.items as explorer}
           <Folder
             {onItemCreated}
@@ -549,11 +553,12 @@
         {/if}
 
         <div
-          class="d-flex gap-2 ms-1"
+          class="d-flex gap-2 ms-1" 
         >
+        <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
           <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1 "
+            style="height: 24px; width: 24px; "
             role="button"
             on:click={() => {
               onItemCreated("folder", {
@@ -561,14 +566,17 @@
                 collection,
               });
             }}
-          >
+          > 
+
             <FolderPlusIcon
               height="16px"
               width="16px"
               color="var(--request-arc)"
             />
           </div>
+        </Tooltip>
 
+        <Tooltip title={"Add request"} placement={"right"} distance={12} >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
             style="height: 24px; width: 24px;"
@@ -580,13 +588,14 @@
               });
             }}
           >
-            <RequestIcon
-              height="16px"
-              width="16px"
-              color="var(--request-arc)"
-            />
-          </div>
+          <RequestIcon
+          height="16px"
+          width="16px"
+          color="var(--request-arc)"
+          />
         </div>
+      </Tooltip>
+      </div>
         <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
@@ -727,8 +736,6 @@
   }
   .renameInputFieldCollection:focus {
     border: 1px solid var(--border-primary-300) !important;
-  }
-  .sub-folders {
   }
   .main-collection {
     width: calc(100% - 48px);
