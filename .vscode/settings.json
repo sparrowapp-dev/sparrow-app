@@ -29,5 +29,6 @@
   },
   "[svelte]": {
     "editor.defaultFormatter": "svelte.svelte-vscode"
-  }
+  },
+  "git.mergeEditor": false
 }

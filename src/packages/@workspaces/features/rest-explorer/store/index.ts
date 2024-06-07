@@ -1,0 +1,1 @@
+export { requestSplitterDirection } from "./splitpanes";

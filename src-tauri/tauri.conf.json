@@ -6,7 +6,7 @@
     "windows": [
       {
         "center": true,
-        "decorations": false,
+        "decorations": true,
         "fileDropEnabled": false,
         "fullscreen": false,
         "label": "main",
@@ -27,6 +27,7 @@
     "frontendDist": "../dist"
   },
   "bundle": {
+    "licenseFile": "agpl-3.0.txt",
     "active": true,
     "icon": [
       "icons/32x32.png",
@@ -38,14 +39,20 @@
     "targets": "all",
     "windows": {
       "wix": {
-        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs"],
-        "componentRefs": ["DeepLinkRegistryEntries"]
+        "fragmentPaths": [
+          "./assets/DeepLinkRegistryEntries.wxs",
+          "./assets/CleanupOnUninstall.wxs"
+        ],
+        "componentRefs": ["DeepLinkRegistryEntries", "CleanupAppFolder"]
       }
     }
   },
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
     "updater": {
+      "windows": {
+        "installMode": "passive"
+      },
       "active": true,
       "endpoints": [
         "https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"
@@ -58,5 +65,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "1.0.0"
+  "version": "2.0.0"
 }
