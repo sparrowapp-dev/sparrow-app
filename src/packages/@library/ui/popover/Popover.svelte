@@ -1,10 +1,12 @@
 <script lang="ts">
   import Crossicon from "$lib/assets/crossicon.svelte";
+  import Modal from "../modal/Modal.svelte";
   export { handleClose };
   export let onClose;
   export let text = " ";
   export let heading = " ";
-
+  let isExposeFeedbackForm = false;
+  export let onAddFeedback;
 
   function handleClose() {
     onClose();
@@ -22,12 +24,40 @@
   >
     <Crossicon />
   </button>
-  <div class="heading"> {heading}</div>
+  <div class="heading">{heading}</div>
   <p class="description">
-   {text} <span class="link"
-      >See how it works.</span
+    {text}
+    <span
+      on:click={() => {
+        isExposeFeedbackForm = true;
+      }}
+      class="link btn p-0 border-0"
+      style="font-size: 12px;">See how it works.</span
     >
   </p>
+  <div style="position: relative;">
+    <Modal
+      title={""}
+      type={"dark"}
+      width={"474px"}
+    
+      zIndex={10000}
+      isOpen={isExposeFeedbackForm}
+      handleModalState={(flag = false) => {
+        isExposeFeedbackForm = flag;
+      }}
+    >
+  <div class="d-flex flex-column" style="height:452.35px; margin:auto; border-radius:4.85px;" >
+    <div style="height: 276px;  padding:170px;"> Video</div>
+    <div class="d-flex flex-column" style="border:1px solid;">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
+    </Modal>
+  </div>
 </div>
 
 <style>
