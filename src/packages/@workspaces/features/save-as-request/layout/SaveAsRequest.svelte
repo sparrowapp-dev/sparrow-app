@@ -732,7 +732,7 @@
         }}
         title={"+ Collection"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
       />
     {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
       <Button
@@ -741,7 +741,7 @@
         }}
         title={"+ Folder"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
       />
     {/if}
   </div>
