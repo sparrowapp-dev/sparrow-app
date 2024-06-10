@@ -27,3 +27,6 @@ export { default as ArrowUnfilledIcon } from "./ArrowUnfilled.svelte";
 export { default as StarIcon } from "./Star.svelte";
 export { default as StarFilledIcon } from "./StarFilled.svelte";
 export { default as SparrowIcon } from "./SparrowLogo.svelte";
+export { default as CollectionIcon } from "./Collection.svelte";
+export { default as FolderIcon2 } from "./Folder2.svelte";
+export { default as WorkspaceIcon } from "./Workspace.svelte";
