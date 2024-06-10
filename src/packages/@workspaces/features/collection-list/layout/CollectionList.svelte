@@ -269,16 +269,21 @@
           },
         ]}
       >
-    <Tooltip title={"Add Options"} placement={"right"} distance={12} zIndex={10} >
-        <button
-          id="addButton"
-          class="border-0 p-1 border-radius-2 add-button"
-          on:click={() => {
-            addButtonMenu = !addButtonMenu;
-          }}
+        <Tooltip
+          title={"Add Options"}
+          placement={"right"}
+          distance={12}
+          zIndex={10}
         >
-          <img src={plusIcon} alt="" />
-        </button>
+          <button
+            id="addButton"
+            class="border-0 p-1 border-radius-2 add-button"
+            on:click={() => {
+              addButtonMenu = !addButtonMenu;
+            }}
+          >
+            <img src={plusIcon} alt="" />
+          </button>
         </Tooltip>
       </Dropdown>
     </div>

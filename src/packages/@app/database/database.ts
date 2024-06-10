@@ -41,6 +41,10 @@ import {
   windowSettingsSchema,
   type WindowSettingsDocType,
 } from "@app/models/window-settings-model";
+import {
+  featureSwitchSchema,
+  type FeatureSwitchDocType,
+} from "@app/models/feature-switch.model";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -58,6 +62,7 @@ export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
+export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -238,6 +243,9 @@ export class RxDB {
       },
       githubrepo: {
         schema: githubRepoSchema,
+      },
+      featureswitch: {
+        schema: featureSwitchSchema,
       },
     });
     return { rxdb: this.rxdb };

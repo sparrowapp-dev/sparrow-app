@@ -8,7 +8,7 @@
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Header from "@common/components/header/Header.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type {
     EnvironmentDocument,
     WorkspaceDocument,
@@ -32,7 +32,7 @@
   };
 
   let currentWorkspaceId = "";
-  let currentWorkspaceName="";
+  let currentWorkspaceName = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
@@ -54,6 +54,10 @@
       }
     },
   );
+
+  onMount(() => {
+    _viewModel.getAllFeatures();
+  });
 
   onDestroy(() => {
     userUnsubscribe();
