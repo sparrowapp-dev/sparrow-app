@@ -201,11 +201,11 @@
   let isSaveTouched = false;
 </script>
 
-<div class="url d-flex align-items-center pb-3">
-  <p class="ellipsis mb-0">
+<div class="url d-flex align-items-center pt-3">
+  <p class="ellipsis mb-3 ps-3">
     {#if path.length > 0}
       <span
-        class="cursor-pointer"
+        class="cursor-pointer pe-3"
         style="height:24px; width:24px;"
         on:click={navigateToLastRoute}><img src={leftArrowAsset} alt="" /></span
       >
@@ -224,12 +224,14 @@
             ? "var(--text-secondary-100)"
             : "var(--text-secondary-200)"}
         />
-        {workspaceMeta.name}</span
-      >
+        <span style="padding-left: 6px; padding-right:6px;">
+          {workspaceMeta.name}
+        </span>
+      </span>
     {/if}
     {#if path.length > 0}
       {#each path as elem, index}
-        <span>/</span>
+        <span class="text-secondary-200">/</span>
         <span
           on:click={() => {
             navigateToDirectory(elem);
@@ -255,15 +257,22 @@
                 : "var(--text-secondary-200)"}
             />
           {/if}
-          {elem.name}</span
-        >
+          <span style="padding-left: 6px; padding-right:6px;">
+            {elem.name}
+          </span>
+        </span>
       {/each}
     {/if}
   </p>
 </div>
 <div class="row">
   <div class="col-6" style="border-right: 1px solid var(--border-color);">
-    <div style="height: 460px; overflow:auto;">
+    <!--
+    -- 
+    --  left panel
+    --
+    -->
+    <div class="ps-3" style="height: 430px; overflow:auto;">
       <!-- 
               --
               shows current directory 
