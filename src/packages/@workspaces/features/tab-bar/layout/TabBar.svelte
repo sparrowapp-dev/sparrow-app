@@ -229,9 +229,9 @@
           }}
         >
           {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={13} />
+            <ViewGrid color={"var(--deleted-api-method)"} height={13} />
           {:else}
-            <VerticalGrid height={13} color="var(--blackColor)" />
+            <VerticalGrid height={13} color="var(--deleted-api-method)" />
           {/if}
         </button>
         </Tooltip>

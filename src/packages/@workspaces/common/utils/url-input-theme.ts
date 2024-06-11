@@ -15,7 +15,7 @@ export class UrlInputTheme {
         caretColor: "var(--white-color)",
         height: "100%",
         paddingTop: "7px",
-        backgroundColor: "var(--bg-secondary-600)",
+        backgroundColor: "var( --text-tertiary-250 )",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",

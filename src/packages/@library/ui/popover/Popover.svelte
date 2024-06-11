@@ -13,7 +13,7 @@
 
 <div
   class="container d-flex flex-column"
-  style="position:relative; background-color:#1C1D2B; border-radius:4px; "
+  style="position:relative; background-color: var( --text-tertiary-250 ) ; border-radius:4px; "
 >
   <button
     class="cross-btn b-0 border-0"
