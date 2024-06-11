@@ -73,10 +73,13 @@ export async function handleLoginV2(url: string) {
       Success: true,
     });
     notifications.success("Login successful!");
-    if(event === "register"){
-    navigate("/app/collections?first=true");}
-    else {
-    navigate("/app/collections?first=false");}
+    if (event === "register") {
+      navigate("/app/collections?first=true");
+      localStorage.setItem("event", "true");
+    } else {
+      navigate("/app/collections?first=false");
+      localStorage.setItem("event", "false");
+    }
     _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {
