@@ -14,7 +14,11 @@ import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
+import { GuideRepository } from "@app/repositories/guide.repository";
+
 //------------------------------MixPanel-------------------------------//
+
+
 export const sendUserDataToMixpanel = (userDetails) => {
   if (constants.ENABLE_MIX_PANEL === "true") {
     mixpanel.identify(userDetails._id);
@@ -29,6 +33,7 @@ export const navigateToRegister = () => {
 
 export const authNavigate = async () => {};
 const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
+const _guideModel  = new GuideRepository() ;
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
