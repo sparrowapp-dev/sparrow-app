@@ -34,6 +34,10 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  /**
+   * Flag to show app version
+   */
+  export let isAppVersionVisible = true;
 
   import {
     Collection,
@@ -397,7 +401,9 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
-          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {#if isAppVersionVisible}
+            <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {/if}
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {
