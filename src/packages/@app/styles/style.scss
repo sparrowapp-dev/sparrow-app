@@ -694,7 +694,9 @@ span {
   width: 1px;
 }
 
+
 .ellipsis {
+  color: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
