@@ -298,6 +298,7 @@ $theme-red-230408: #230408;
   --bg-tertiary-400 : #{$theme-violet-22232E};
   --bg-tertiary-500 : #{$theme-violet-272831};
   --bg-tertiary-600 : #{$theme-violet-2E2F3D};
+  --bg-tertiary-650 : #{$theme-violet-323548};
   --bg-tertiary-700 : #{$theme-violet-1c1d27};
 
   --bg-danger-100 : #{$theme-red-e5acb2};
@@ -352,6 +353,46 @@ $theme-red-230408: #230408;
   --border-danger-800 : #{$theme-red-f33346};
   --border-danger-900 : #{$theme-red-fe2e2e};
   --border-danger-1000 : #{$theme-red-312325};
+  
+  //
+  //
+  // Sets icon color
+  //
+  //
+  --icon-primary-100 : #{$theme-blue-9CDCFE};
+  --icon-primary-200 : #{$theme-blue-1193F0};
+  --icon-primary-300 : #{$theme-blue-3670F7};
+  --icon-primary-400 : #{$theme-blue-0B5ED7};
+  --icon-primary-900 : #{$theme-blue-303F4F};
+
+  --icon-secondary-100 : #{$theme-grey-ffffff};
+  --icon-secondary-150 : #{$theme-grey-e5e5e5};
+  --icon-secondary-200 : #{$theme-grey-8A9299};
+  --icon-secondary-300 : #{$theme-grey-45494D};
+  --icon-secondary-400 : #{$theme-grey-313233};
+  --icon-secondary-500 : #{$theme-grey-272727};
+  --icon-secondary-600 : #{$theme-grey-212222};
+  --icon-secondary-700 : #{$theme-grey-161617};
+  --icon-secondary-800 : #{$theme-grey-151515};
+  --icon-secondary-900 : #{$theme-grey-000000};
+
+  --icon-tertiary-100 : #{$theme-violet-676A80};
+  --icon-tertiary-300 : #{$theme-violet-2A2C3C};
+  --icon-tertiary-400 : #{$theme-violet-22232E};
+  --icon-tertiary-500 : #{$theme-violet-272831};
+  --icon-tertiary-600 : #{$theme-violet-2E2F3D};
+  --icon-tertiary-700 : #{$theme-violet-1c1d27};
+
+  --icon-danger-100 : #{$theme-red-e5acb2};
+  --icon-danger-200 : #{$theme-red-fe8c98};
+  --icon-danger-300 : #{$theme-red-ff7878};
+  --icon-danger-400 : #{$theme-red-f16674};
+  --icon-danger-500 : #{$theme-red-fc6574};
+  --icon-danger-600 : #{$theme-red-ef5262};
+  --icon-danger-700 : #{$theme-red-f34b5c};
+  --icon-danger-800 : #{$theme-red-f33346};
+  --icon-danger-900 : #{$theme-red-fe2e2e};
+  --icon-danger-1000 : #{$theme-red-312325};
 }
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
