@@ -8,6 +8,7 @@ export { default as CopyIcon } from "./Copy.svelte";
 export { default as CheckIcon } from "./check.svelte";
 export { default as SignOutIcon } from "./SignOutIcon.svelte";
 export { default as PencilIcon } from "./Pencil.svelte";
+export { default as PencilIcon2 } from "./Pencil2.svelte";
 export { default as PlusIcon } from "./Plus.svelte";
 export { default as StackIcon } from "./Stack.svelte";
 export { default as FolderIcon } from "./Folder.svelte";

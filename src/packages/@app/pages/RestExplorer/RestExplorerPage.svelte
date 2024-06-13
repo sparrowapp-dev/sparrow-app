@@ -119,4 +119,6 @@
   onCreateFolder={_viewModel.createFolder}
   onCreateCollection={_viewModel.createCollection}
   onUpdateEnvironment={_viewModel.updateEnvironment}
+  onRenameCollection={_viewModel.handleRenameCollection}
+  onRenameFolder={_viewModel.handleRenameFolder}
 />

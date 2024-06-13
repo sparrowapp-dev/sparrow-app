@@ -77,6 +77,7 @@ import {
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { CollectionService } from "@app/services/collection.service";
 
 class RestExplorerViewModel
   implements
@@ -118,6 +119,7 @@ class RestExplorerViewModel
    * Service
    */
   private environmentService = new EnvironmentService();
+  private collectionService = new CollectionService();
   /**
    * Utils
    */
@@ -1071,6 +1073,80 @@ class RestExplorerViewModel
         notifications.success("Environment Variable Added");
       } else {
         notifications.error("Failed to add Environment Variable");
+      }
+      return response;
+    }
+  };
+
+  /**
+   * Handles renaming a collection
+   * @param collection - collction to rename
+   * @param newCollectionName :string - the new name of the collection
+   */
+  public handleRenameCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    newCollectionName: string,
+  ) => {
+    if (newCollectionName) {
+      const response = await this.collectionService.updateCollectionData(
+        collectionId,
+        workspaceId,
+        { name: newCollectionName },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collectionId,
+          response.data.data,
+        );
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
+      return response;
+    }
+  };
+
+  public handleRenameFolder = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    newFolderName: string,
+  ) => {
+    const collection =
+      await this.collectionRepository.readCollection(collectionId);
+    const explorer =
+      await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        folderId,
+      );
+    if (newFolderName) {
+      let userSource = {};
+      if (collection.activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: collection.currentBranch
+            ? collection.currentBranch
+            : collection.primaryBranch,
+          source: "USER",
+        };
+      }
+      const response = await this.collectionService.updateFolderInCollection(
+        workspaceId,
+        collectionId,
+        folderId,
+        {
+          ...userSource,
+          name: newFolderName,
+        },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          response.data.data,
+        );
       }
       return response;
     }
