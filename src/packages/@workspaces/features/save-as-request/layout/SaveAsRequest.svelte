@@ -237,7 +237,7 @@
             ? "var(--text-secondary-100)"
             : "var(--text-secondary-200)"}
         />
-        <span style="padding-left: 6px; padding-right:6px;">
+        <span style="padding-left: 6px; padding-right:2px;">
           {workspaceMeta.name}
         </span>
       </span>
@@ -270,7 +270,7 @@
                 : "var(--text-secondary-200)"}
             />
           {/if}
-          <span style="padding-left: 6px; padding-right:6px;">
+          <span style="padding-left: 6px; padding-right:2px;">
             {elem.name}
           </span>
         </span>
@@ -315,6 +315,7 @@
             <input
               type="text"
               class="edit-input fw-bold"
+              style="width: calc(100% - 130px);"
               bind:value={editCollectionName}
               autofocus
             />
@@ -350,7 +351,7 @@
           {/if}
         </p>
         <small class="save-text-clr sparrow-fs-12"
-          >Select a folder or save directly in the collection.</small
+          >Save your request in this collection or select a folder to save it.</small
         >
       {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
         <p class="mb-0 ellipsis">
@@ -376,6 +377,7 @@
             <input
               type="text"
               class="edit-input fw-bold"
+              style="width: calc(100% - 110px);"
               bind:value={editFolderName}
               autofocus
             />
@@ -797,7 +799,7 @@
                 width={"12px"}
                 color={"var(--icon-secondary-200)"}
               />
-              <span style="padding-left: 6px; padding-right: 6px; ">
+              <span style="padding-left: 6px; padding-right: 2px; ">
                 {workspaceMeta.name}
               </span>
             </span>
@@ -819,7 +821,7 @@
                     color={"var(--icon-secondary-200)"}
                   />
                 {/if}
-                <span style="padding-left: 6px; padding-right: 6px; "
+                <span style="padding-left: 6px; padding-right: 2px; "
                   >{elem.name}</span
                 ></span
               >
@@ -971,7 +973,6 @@
     background-color: var(--bg-tertiary-650) !important;
   }
   .edit-input {
-    width: calc(100% - 150px);
     padding: 0 8px !important;
     font-size: 14px;
     background-color: transparent;
