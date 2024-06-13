@@ -99,6 +99,17 @@
         Create an Account or Sign In</button
       >
     </div>
+    <div class="mb-1">
+      <button
+        class="btn btn-primary mb-3 w-100 text-whiteColor border-0"
+        on:click={() => {
+          // handleRedirect(true);
+          // openDefaultBrowser();
+        }}
+      >
+        Skip login</button
+      >
+    </div>
     <div class="w-100 mb-3 d-flex align-items-center justify-content-center">
       {#if os === "windows"}
         <a
