@@ -2399,4 +2399,89 @@ export default class CollectionsViewModel {
     }
     return response;
   };
+
+  /**
+   * Handles collection rename
+   * @param collection - collction to rename
+   * @param newCollectionName :string - the new name of the collection
+   */
+  public handleSaveAsRenameCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    newCollectionName: string,
+  ) => {
+    if (newCollectionName) {
+      const response = await this.collectionService.updateCollectionData(
+        collectionId,
+        workspaceId,
+        { name: newCollectionName },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collectionId,
+          response.data.data,
+        );
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
+      return response;
+    }
+  };
+
+  /**
+   * Handle folder rename
+   * @param workspaceId - workspace id of the folder
+   * @param collectionId - collection id of the folder
+   * @param folderId  - folder id to be targetted
+   * @param newFolderName - new folder name
+   * @returns
+   */
+  public handleSaveAsRenameFolder = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    newFolderName: string,
+  ) => {
+    const collection =
+      await this.collectionRepository.readCollection(collectionId);
+    const explorer =
+      await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        folderId,
+      );
+    if (newFolderName) {
+      let userSource = {};
+      if (collection.activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: collection.currentBranch
+            ? collection.currentBranch
+            : collection.primaryBranch,
+          source: "USER",
+        };
+      }
+      const response = await this.collectionService.updateFolderInCollection(
+        workspaceId,
+        collectionId,
+        folderId,
+        {
+          ...userSource,
+          name: newFolderName,
+        },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          response.data.data,
+        );
+        notifications.success("Folder renamed successfully!");
+      } else {
+        notifications.error("Failed to rename folder!");
+      }
+      return response;
+    }
+  };
 }

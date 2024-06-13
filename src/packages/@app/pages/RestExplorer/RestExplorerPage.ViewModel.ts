@@ -1079,7 +1079,7 @@ class RestExplorerViewModel
   };
 
   /**
-   * Handles renaming a collection
+   * Handles collection rename
    * @param collection - collction to rename
    * @param newCollectionName :string - the new name of the collection
    */
@@ -1109,6 +1109,14 @@ class RestExplorerViewModel
     }
   };
 
+  /**
+   * Handle folder rename
+   * @param workspaceId - workspace id of the folder
+   * @param collectionId - collection id of the folder
+   * @param folderId  - folder id to be targetted
+   * @param newFolderName - new folder name
+   * @returns
+   */
   public handleRenameFolder = async (
     workspaceId: string,
     collectionId: string,
@@ -1147,6 +1155,10 @@ class RestExplorerViewModel
           folderId,
           response.data.data,
         );
+        notifications.success("Folder renamed successfully!");
+      }
+      else{
+        notifications.error("Failed to rename folder!");
       }
       return response;
     }
