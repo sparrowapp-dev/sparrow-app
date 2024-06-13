@@ -886,12 +886,14 @@
               onFinish(res.data.id);
               onClick(false);
               if (type !== saveType.SAVE_DESCRIPTION) {
-                notifications.success("API request saved");
+                notifications.success("API request is saved successfully");
               } else {
                 notifications.success("API documentation saved");
               }
             } else {
-              notifications.error(res.message);
+              notifications.error(
+                "Failed to save the API request. Please try again",
+              );
             }
             isLoading = false;
           }
