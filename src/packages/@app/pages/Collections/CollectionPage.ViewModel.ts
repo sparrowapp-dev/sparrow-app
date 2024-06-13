@@ -93,6 +93,7 @@ import {
 import { GithubService } from "@app/services/github.service";
 import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -102,6 +103,7 @@ export default class CollectionsViewModel {
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
   private githubService = new GithubService();
+  private featureSwitchRepository = new FeatureSwitchRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
@@ -2398,5 +2400,12 @@ export default class CollectionsViewModel {
       notifications.error("Failed to import collection. Please try again.");
     }
     return response;
+  };
+
+  /**
+   * Fetch a specific feature data
+   */
+  public getFeatureStatus = async (query) => {
+    return await this.featureSwitchRepository.findOne(query);
   };
 }
