@@ -79,6 +79,7 @@ import { generateSampleRequest } from "$lib/utils/sample";
 //-----
 
 import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
@@ -102,6 +103,8 @@ export default class CollectionsViewModel {
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
   private githubService = new GithubService();
+  private guideRepository = new GuideRepository();
+
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
@@ -2398,5 +2401,23 @@ export default class CollectionsViewModel {
       notifications.error("Failed to import collection. Please try again.");
     }
     return response;
+  };
+  /**
+   * fetchCollectiohGuide
+   */
+  public fetchCollectionGuide = async () => {
+    return this.guideRepository.findOne({
+      id: "collection-guide",
+    });
+  };
+  public updateCollectionGuide = async (isActive: boolean) => {
+    await this.guideRepository.update(
+      {
+        id: "collection-guide",
+      },
+      {
+        isActive: isActive,
+      },
+    );
   };
 }

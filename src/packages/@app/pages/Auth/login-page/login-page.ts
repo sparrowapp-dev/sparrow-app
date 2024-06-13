@@ -18,7 +18,6 @@ import { GuideRepository } from "@app/repositories/guide.repository";
 
 //------------------------------MixPanel-------------------------------//
 
-
 export const sendUserDataToMixpanel = (userDetails) => {
   if (constants.ENABLE_MIX_PANEL === "true") {
     mixpanel.identify(userDetails._id);
@@ -33,7 +32,7 @@ export const navigateToRegister = () => {
 
 export const authNavigate = async () => {};
 const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
-const _guideModel  = new GuideRepository() ;
+const _guideRepository = new GuideRepository();
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
@@ -80,10 +79,12 @@ export async function handleLoginV2(url: string) {
     notifications.success("Login successful!");
     if (event === "register") {
       navigate("/app/collections?first=true");
-      localStorage.setItem("event", "true");
+      _guideRepository.insert({ isActive: true, id: "environment-guide" });
     } else {
       navigate("/app/collections?first=false");
-      localStorage.setItem("event", "false");
+
+      _guideRepository.insert({ isActive: false, id: "environment-guide" });
+      _guideRepository.insert({ isActive: false, id: "collection-guide" });
     }
     _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();

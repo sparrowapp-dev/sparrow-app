@@ -2,10 +2,25 @@
   import { VectorIcon, LibraryIcon } from "@library/icons";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
   import { Popover, Modal, Carousel } from "@library/ui";
+  import { onMount } from "svelte";
+  import CollectionsViewModel from "@app/pages/Collections/CollectionPage.ViewModel";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let showContainer = true;
   export let isGuidePopup = false;
+  export let onFetchCollectionGuide;
+  export let onUpdateCollectionGuide;
+
+  onMount(async () => {
+    console.log(onFetchCollectionGuide);
+    const event = await onFetchCollectionGuide();
+    console.log(event);
+    if (event.isActive === true) {
+      showContainer = true;
+    } else {
+      showContainer = false;
+    }
+  });
 </script>
 
 <div class="m-2">
@@ -13,6 +28,7 @@
     <Popover
       onClose={() => {
         showContainer = false;
+        onUpdateCollectionGuide(false);
       }}
       heading={`Welcome to Sparrow!`}
       text={` `}
@@ -106,9 +122,10 @@
   }}
 >
   <div style="position: relative;">
-    <Carousel  handleClosePopup={(flag = false) => {
-      isGuidePopup = flag;
-    }}
+    <Carousel
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
       data={[
         {
           id: 1,

@@ -14,6 +14,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
+  import { EnvironmentExplorerViewModel } from "@app/pages/EnvironmentExplorer/EnvironmentExplorerPage.ViewModel";
 
   /**
    * selected environmet to be shown on API
@@ -31,6 +32,9 @@
    * saves the environment
    */
   export let onSaveEnvironment;
+
+  export let onFetchEnvironmentGuide;
+  export let onUpdateEnvironmentGuide;
   let showContainer = false;
 
   let quickHelp: boolean = false;
@@ -53,9 +57,10 @@
   };
   let isGuidePopup = false;
 
-  onMount(() => {
-    const event = localStorage.getItem("event");
-    if (event === "true") {
+  onMount(async () => {
+    const event = await onFetchEnvironmentGuide();
+    console.log(event);
+    if (event.isActive === true) {
       showContainer = true;
     } else {
       showContainer = false;
@@ -77,9 +82,9 @@
             on:click={() => {
               showContainer = !showContainer;
               if (showContainer === true) {
-                localStorage.setItem("event", "true");
+                onUpdateEnvironmentGuide(true)
               } else {
-                localStorage.setItem("event", "false");
+                onUpdateEnvironmentGuide(false)
               }
             }}
           >
@@ -162,7 +167,7 @@
             text={` `}
             onClose={() => {
               showContainer = false;
-              localStorage.setItem("event", "false");
+             onUpdateEnvironmentGuide(false);
             }}
             ><p>
               Environments allow you to manage different sets of confirguration
@@ -319,7 +324,7 @@
     background-color: var(--selected-active-sidebar);
   }
   .link {
-    color: var(  --bg-primary-300);
+    color: var(--bg-primary-300);
     text-decoration: underline;
   }
 </style>

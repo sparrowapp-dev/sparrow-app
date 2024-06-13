@@ -8,12 +8,15 @@ import { environmentType } from "$lib/utils/enums/environment.enum";
 import { createDeepCopy } from "$lib/utils/helpers";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
+import { GuideRepository } from "@app/repositories/guide.repository";
+import Parameters from "$lib/components/collections/req-res-section/sub-components/request-parameter-section/Parameters.svelte";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
+  private guideRepository = new GuideRepository();
 
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
 
@@ -152,5 +155,23 @@ export class EnvironmentExplorerViewModel {
         environmanetId: currentEnvironment.id,
       });
     }
+  };
+  /**
+   * fetchEnvironmentGuide
+   */
+  public fetchEnvironmentGuide = async () => {
+    return this.guideRepository.findOne({
+      id: "environment-guide",
+    });
+  };
+  public updateEnvironmentGuide = async (isActive: boolean) => {
+    await this.guideRepository.update(
+      {
+        id: "environment-guide",
+      },
+      {
+        isActive: isActive,
+      },
+    );
   };
 }
