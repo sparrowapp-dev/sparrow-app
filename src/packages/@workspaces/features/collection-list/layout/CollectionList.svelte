@@ -34,6 +34,10 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  /**
+   * Flag to show app version
+   */
+  export let isAppVersionVisible = true;
 
   import {
     Collection,
@@ -269,16 +273,21 @@
           },
         ]}
       >
-    <Tooltip title={"Add Options"} placement={"right"} distance={12} zIndex={10} >
-        <button
-          id="addButton"
-          class="border-0 p-1 border-radius-2 add-button"
-          on:click={() => {
-            addButtonMenu = !addButtonMenu;
-          }}
+        <Tooltip
+          title={"Add Options"}
+          placement={"right"}
+          distance={12}
+          zIndex={10}
         >
-          <img src={plusIcon} alt="" />
-        </button>
+          <button
+            id="addButton"
+            class="border-0 p-1 border-radius-2 add-button"
+            on:click={() => {
+              addButtonMenu = !addButtonMenu;
+            }}
+          >
+            <img src={plusIcon} alt="" />
+          </button>
         </Tooltip>
       </Dropdown>
     </div>
@@ -392,7 +401,9 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
-          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {#if isAppVersionVisible}
+            <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {/if}
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {

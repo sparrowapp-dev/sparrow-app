@@ -68,6 +68,7 @@
   let loader = false;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
+  let isAppVersionVisible = true;
 
   /**
    * @description - handles different key press
@@ -154,6 +155,10 @@
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    const feature = await _viewModel.getFeatureStatus({ name: "appVersion" });
+    if (feature) {
+      isAppVersionVisible = feature.getLatest().toMutableJSON().isEnabled;
+    }
   });
 
   /**
@@ -204,6 +209,7 @@
       bind:scrollList
       {collectionList}
       {currentWorkspace}
+      {isAppVersionVisible}
       leftPanelController={{
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
