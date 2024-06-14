@@ -77,6 +77,7 @@ import {
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { GuideRepository } from "@app/repositories/guide.repository";
 
 class RestExplorerViewModel
   implements
@@ -113,6 +114,8 @@ class RestExplorerViewModel
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
+  private guideRepository = new GuideRepository();
+
 
   /**
    * Service
@@ -1075,6 +1078,21 @@ class RestExplorerViewModel
       return response;
     }
   };
+  public fetchCollectionGuide = async () => {
+    return await this.guideRepository.findOne({
+     id: "collection-guide",
+   });
+ };
+ public updateCollectionGuide = async (isActive: boolean) => {
+   await this.guideRepository.update(
+     {
+       id: "collection-guide",
+     },
+     {
+       isActive: isActive,
+     },
+   );
+ };
 }
 
 export default RestExplorerViewModel;

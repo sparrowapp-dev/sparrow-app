@@ -29,6 +29,6 @@
   onUpdateName={_viewModel.updateName}
   onUpdateVariable={_viewModel.updateVariables}
   onSaveEnvironment={_viewModel.saveEnvironment}
-  onFetchEnvironmentGuide = {_viewModel.fetchEnvironmentGuide}
-  onUpdateEnvironmentGuide = {_viewModel.updateEnvironmentGuide}
+  onFetchEnvironmentGuide={_viewModel.fetchEnvironmentGuide}
+  onUpdateEnvironmentGuide={_viewModel.updateEnvironmentGuide}
 />

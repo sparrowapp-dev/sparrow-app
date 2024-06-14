@@ -2406,7 +2406,7 @@ export default class CollectionsViewModel {
    * fetchCollectiohGuide
    */
   public fetchCollectionGuide = async () => {
-    return this.guideRepository.findOne({
+    return await this.guideRepository.findOne({
       id: "collection-guide",
     });
   };
@@ -2419,5 +2419,6 @@ export default class CollectionsViewModel {
         isActive: isActive,
       },
     );
+    console.log(isActive);
   };
 }

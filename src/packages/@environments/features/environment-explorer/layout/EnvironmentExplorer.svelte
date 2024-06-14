@@ -14,7 +14,11 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-  import { EnvironmentExplorerViewModel } from "@app/pages/EnvironmentExplorer/EnvironmentExplorerPage.ViewModel";
+  import {
+    CreateENV,
+    IntroToEnvironment,
+    SearchVariable,
+  } from "@environments/features";
 
   /**
    * selected environmet to be shown on API
@@ -82,9 +86,9 @@
             on:click={() => {
               showContainer = !showContainer;
               if (showContainer === true) {
-                onUpdateEnvironmentGuide(true)
+                onUpdateEnvironmentGuide(true);
               } else {
-                onUpdateEnvironmentGuide(false)
+                onUpdateEnvironmentGuide(false);
               }
             }}
           >
@@ -167,7 +171,7 @@
             text={` `}
             onClose={() => {
               showContainer = false;
-             onUpdateEnvironmentGuide(false);
+              onUpdateEnvironmentGuide(false);
             }}
             ><p>
               Environments allow you to manage different sets of confirguration
@@ -228,18 +232,21 @@
           heading: "Step  1: Introduction to Environment",
           subheading:
             "Environments allow you to manage configuration variables for different stages of your application, such as development, staging, and production.",
+          gif: `${IntroToEnvironment}`,
         },
         {
           id: 2,
           heading: "Step  2: Creating a New Environment",
           subheading:
             "Creating a new environment is simple. Follow these steps to set up an environment tailored to your needs.",
+          gif: `${CreateENV}`,
         },
         {
           id: 3,
           heading: "Step 3: Search and apply Environment Variables",
           subheading:
             "Easily search and apply variables from global or selected environment in the REST API tool, to streamline your API testing process.",
+          gif: `${SearchVariable}`,
         },
       ]}
     />

@@ -25,9 +25,15 @@
   }
 </script>
 
-<div>
-  <div class="d-flex flex-column" style="gap:19.72px;">
-    <div style="height: 276px; padding:auto;">Video</div>
+<div style="max-height: 509px;">
+  <div class=" d-flex flex-column" style="gap:19.72px;">
+    <div style="height: 276px; padding:auto; padding-top:4px;">
+      <img
+    style="height: 276px; width:100%; border-radius:4px;" 
+        src="{stepData?.gif}"
+        alt="Description of the GIF"
+      />
+    </div>
     <div class="d-flex flex-column" style=" gap:19.72px;">
       <div class="d-flex flex-row justify-content-center" style="gap:5.48px;">
         {#each data as element, index}
@@ -38,11 +44,13 @@
           />
         {/each}
       </div>
-      <div style="height:137px; padding-left: 12.88px; padding-right: 12.88px;">
+      <div style=" padding-left: 12.88px; padding-right: 12.88px;">
         <h4 style="font-size: 15.75px; font-weight:600;">
           {stepData?.heading}
         </h4>
-        <p style="font-size: 13.1px; color:var(--bg-secondary-1000); font-weight:500; ">
+        <p
+          style="font-size: 13.1px; color:var(--bg-secondary-1000); font-weight:500; "
+        >
           {stepData?.subheading}
         </p>
       </div>
