@@ -854,45 +854,18 @@ export default class CollectionsViewModel {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
-      const initRequestTab = new InitRequestTab(
-        UntrackedItems.UNTRACKED + uuidv4(),
-        workspaceId,
+      const requestTabAdapter = new RequestTabAdapter();
+      const adaptedRequest = requestTabAdapter.adapt(
+        workspaceId || "",
+        "",
+        "",
+        {
+          ...response.data.data,
+          id: UntrackedItems.UNTRACKED + uuidv4(),
+        },
       );
-      // const sampleRequest = generateSampleRequest(
-      //   UntrackedItems.UNTRACKED + uuidv4(),
-      //   new Date().toString(),
-      // );
-      // if (response.data.data.request.selectedRequestBodyType) {
-      //   const bodyType = this.checkBodyType(
-      //     response.data.data.request.selectedRequestBodyType,
-      //   );
-      //   if (bodyType === RequestDataset.NONE) {
-      //     initRequestTab.updateState({
-      //       requestBodyNavigation: bodyType,
-      //     });
-      //     // sampleRequest.property.request.state.dataset = bodyType;
-      //   } else if (
-      //     bodyType !== RequestDataset.URLENCODED &&
-      //     bodyType !== RequestDataset.FORMDATA
-      //   ) {
-      //     initRequestTab.updateState({
-      //       requestBodyNavigation: bodyType,
-      //     });
-      //     sampleRequest.property.request.state.dataset = RequestDataset.RAW;
-      //     sampleRequest.property.request.state.raw = bodyType;
-      //   } else {
-      //     sampleRequest.property.request.state.dataset = bodyType;
-      //   }
-      // }
-      initRequestTab.updateName(response.data.data.name ?? "");
-      initRequestTab.updateDescription(response.data.data.description ?? "");
-      initRequestTab.updateMethod(response.data.data.request.method);
-      initRequestTab.updateUrl(response.data.data.request.url);
-      initRequestTab.updateBody(response.data.data.request.body);
-      initRequestTab.updateHeaders(response.data.data.request.headers);
-      initRequestTab.updateQueryParams(response.data.data.request.queryParams);
-      initRequestTab.updateAuth(response.data.data.request.auth);
-      this.tabRepository.createTab(initRequestTab.getValue());
+
+      this.tabRepository.createTab(adaptedRequest);
       moveNavigation("right");
       notifications.success("cURL imported successfully.");
     } else {
