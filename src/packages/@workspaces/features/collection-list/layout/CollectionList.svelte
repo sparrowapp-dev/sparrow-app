@@ -51,6 +51,7 @@
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
+  import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
   import { WorkspaceRole } from "$lib/utils/enums";
@@ -261,15 +262,15 @@
             icon: CreateRequest,
             onclick: () => onItemCreated("request", {}),
           },
-          // {
-          //   name: "Add Curl API",
-          //   icon: CreateRequest,
-          //   onclick: showImportCurlPopup,
-          // },
           {
             name: "Add Collection",
             icon: CreateCollection,
             onclick: showImportCollectionPopup,
+          },
+          {
+            name: "Import cURL",
+            icon: BubbleIcon,
+            onclick: showImportCurlPopup,
           },
         ]}
       >
