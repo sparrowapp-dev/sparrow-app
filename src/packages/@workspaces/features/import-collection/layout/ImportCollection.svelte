@@ -607,7 +607,7 @@
     <div>
       <Drop
         value={uploadCollection.file.value}
-        maxFileSize={100}
+        maxFileSize={10000}
         onChange={handleFileInputChange}
         resetValue={handleLogoReset}
         inputId="upload-collection-file-input"
