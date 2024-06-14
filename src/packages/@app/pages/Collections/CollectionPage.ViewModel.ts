@@ -885,36 +885,13 @@ export default class CollectionsViewModel {
       //   }
       // }
       initRequestTab.updateName(response.data.data.name ?? "");
-      // sampleRequest.name = response.data.data.name ?? "";
       initRequestTab.updateDescription(response.data.data.description ?? "");
-      // sampleRequest.description = response.data.data.description ?? "";
       initRequestTab.updateMethod(response.data.data.request.method);
-      // sampleRequest.property.request.method = response.data.data.request.method;
       initRequestTab.updateUrl(response.data.data.request.url);
-      // sampleRequest.property.request.url = response.data.data.request.url;
       initRequestTab.updateBody(response.data.data.request.body);
-      // sampleRequest.property.request.body = response.data.data.request.body;
       initRequestTab.updateHeaders(response.data.data.request.headers);
-      // sampleRequest.property.request.headers =
-      //   response.data.data.request.headers;
       initRequestTab.updateQueryParams(response.data.data.request.queryParams);
-      // sampleRequest.property.request.queryParams =
-      //   response.data.data.request.queryParams;
       initRequestTab.updateAuth(response.data.data.request.auth);
-      // sampleRequest.property.request.auth = response.data.data.request.auth;
-      // sampleRequest.property.request.state.auth =
-      //   response.data.data.request.selectedRequestAuthType;
-
-      // const req = new InitRequestTab(sampleRequest.id, workspaceId);
-      // req.updateName(sampleRequest.name);
-      // req.updateAuth(sampleRequest.property.request?.auth);
-      // req.updateMethod(sampleRequest.property.request?.method);
-      // req.updateUrl(sampleRequest.property.request?.url);
-      // req.updateBody(sampleRequest.property.request?.body);
-      // req.updateHeaders(sampleRequest.property.request?.headers);
-      // req.updateQueryParams(sampleRequest.property.request?.queryParams);
-
-      // this.handleCreateTab(initRequestTab.getValue());
       this.tabRepository.createTab(initRequestTab.getValue());
       moveNavigation("right");
       notifications.success("cURL imported successfully.");
@@ -925,6 +902,9 @@ export default class CollectionsViewModel {
         notifications.error("Failed to import cURL. Please try again");
       }
     }
+    MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+      source: "curl import popup",
+    });
     return response;
   };
 

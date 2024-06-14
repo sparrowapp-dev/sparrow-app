@@ -54,7 +54,7 @@
   import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { Events, WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import { Dropdown } from "@library/ui";
   import List from "@library/ui/list/List.svelte";
@@ -83,6 +83,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -270,7 +271,12 @@
           {
             name: "Import cURL",
             icon: BubbleIcon,
-            onclick: showImportCurlPopup,
+            onclick: () => {
+              MixpanelEvent(Events.IMPORT_CURL, {
+                source: "curl import popup",
+              });
+              showImportCurlPopup();
+            },
           },
         ]}
       >
