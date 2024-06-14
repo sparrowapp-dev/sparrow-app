@@ -2262,7 +2262,7 @@ export default class CollectionsViewModel {
         collectionId: response.data.data._id,
         importThrough: "ByObject",
       });
-      notifications.success("Collection Imported successfully.");
+      notifications.success("Collection imported successfully.");
     } else {
       notifications.error("Failed to import collection. Please try again.");
     }
@@ -2308,7 +2308,7 @@ export default class CollectionsViewModel {
         id: initCollectionTab.getValue().id,
         name: initCollectionTab.getValue().name,
       });
-      notifications.success("Collection Imported successfully.");
+      notifications.success("Collection imported successfully.");
       MixpanelEvent(Events.IMPORT_COLLECTION, {
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
@@ -2381,7 +2381,7 @@ export default class CollectionsViewModel {
             name: initCollectionTab.getValue().name,
           },
         );
-        notifications.success("Collection Imported successfully.");
+        notifications.success("Collection imported successfully.");
       }
       // collectionsMethods.handleCreateTab(Samplecollection);
       // moveNavigation("right");
