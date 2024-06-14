@@ -33,8 +33,9 @@
         color={"var(--icon-secondary-100)"}
       />
     {/if}
-    <span class="ellipsis sparrow-fs-12 fw-normal ps-3" style="cursor:pointer;"
-      >{name}</span
+    <span
+      class="ellipsis sparrow-fs-12 fw-normal ps-3"
+      style="cursor:pointer; width: calc(100% - 20px);">{name}</span
     >
   </div>
 {/if}

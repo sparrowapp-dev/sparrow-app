@@ -422,6 +422,8 @@
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}
+    onRenameCollection={_viewModel.handleSaveAsRenameCollection}
+    onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
 </ModalWrapperV1>
 
