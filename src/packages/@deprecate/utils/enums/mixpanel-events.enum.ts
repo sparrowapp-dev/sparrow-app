@@ -29,4 +29,6 @@ export enum Events {
   USER_FEEDBACK = "User_Feedback",
   JOIN_DISCORD = "Join_Discord",
   ADD_FEEDBACK = "Add_Feedback",
+  IMPORT_CURL = "Import_cURL ",
+  IMPORT_API_VIA_CURL = "Import_API_Via_cURL",
 }
