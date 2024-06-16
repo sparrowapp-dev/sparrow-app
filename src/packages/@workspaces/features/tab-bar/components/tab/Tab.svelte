@@ -200,4 +200,10 @@
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
   }
+  .ellipsis{
+    color: var( --deleted-api-method) ;
+  }
+  .ellipsis:hover{
+    color: var( --text-secondary-100) ;
+  }
 </style>
