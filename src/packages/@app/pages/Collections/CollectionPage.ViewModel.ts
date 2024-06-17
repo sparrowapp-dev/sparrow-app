@@ -2386,26 +2386,27 @@ export default class CollectionsViewModel {
     }
     return response;
   };
+
   /**
-   * fetchCollectiohGuide
+   * Fetches the collection guide document.
+   *
+   * @returns {Promise<Object>} - A promise that resolves to the collection guide document.
    */
-  public fetchCollectionGuide = async () => {
-    const data = await this.guideRepository.findOne({
-      id: "collection-guide",
-    });
-    console.log("inside view model", data);
+  public fetchCollectionGuide = async (query) => {
+    const data = await this.guideRepository.findOne(query);
     return data;
   };
-  public updateCollectionGuide = async (isActive: boolean) => {
-    await this.guideRepository.update(
-      {
-        id: "collection-guide",
-      },
-      {
-        isActive: isActive,
-      },
-    );
-    console.log(isActive, "true set");
+
+  /**
+   * Updates the collection guide document's active status.
+   *
+   * @param {boolean} isActive - The new active status to set for the collection guide.
+   * @returns {Promise<void>} - A promise that resolves when the update is complete.
+   */
+  public updateCollectionGuide = async (query, isActive: boolean) => {
+    await this.guideRepository.update(query, {
+      isActive: isActive,
+    });
   };
 
   /**

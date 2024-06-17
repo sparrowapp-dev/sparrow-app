@@ -117,7 +117,6 @@ class RestExplorerViewModel
   private environmentTabRepository = new EnvironmentTabRepository();
   private guideRepository = new GuideRepository();
 
-
   /**
    * Service
    */
@@ -1080,21 +1079,14 @@ class RestExplorerViewModel
       return response;
     }
   };
-  public fetchCollectionGuide = async () => {
-    return await this.guideRepository.findOne({
-     id: "collection-guide",
-   });
- };
- public updateCollectionGuide = async (isActive: boolean) => {
-   await this.guideRepository.update(
-     {
-       id: "collection-guide",
-     },
-     {
-       isActive: isActive,
-     },
-   );
- };
+  public fetchCollectionGuide = async (query) => {
+    return await this.guideRepository.findOne(query);
+  };
+  public updateCollectionGuide = async (query, isActive: boolean) => {
+    await this.guideRepository.update(query, {
+      isActive: isActive,
+    });
+  };
 
   /**
    * Handles collection rename
@@ -1174,8 +1166,7 @@ class RestExplorerViewModel
           response.data.data,
         );
         notifications.success("Folder renamed successfully!");
-      }
-      else{
+      } else {
         notifications.error("Failed to rename folder!");
       }
       return response;

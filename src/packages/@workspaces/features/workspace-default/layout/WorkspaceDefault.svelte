@@ -8,48 +8,9 @@
   export let onItemCreated;
   export let showContainer = true;
   export let isGuidePopup = false;
-  export let onFetchCollectionGuide;
-  export let onUpdateCollectionGuide;
-
-  // onMount(async () => {
-  //   // console.log(onFetchCollectionGuide)
-  //   const event = await onFetchCollectionGuide();
-  //   console.log(event);
-  //   if (event.isActive === true) {
-  //     showContainer = true;
-  //   } else {
-  //     showContainer = false;
-  //   }
-  // });
 </script>
 
-<div class="m-2">
-  {#if showContainer}
-    <Popover
-      onClose={() => {
-        showContainer = false;
-        onUpdateCollectionGuide(false);
-      }}
-      heading={`Welcome to Sparrow!`}
-      text={` `}
-    >
-      <p>
-        Your one-stop solution for API testing and management. Start organizing
-        your API requests into collections, utilize environment variables, and
-        streamline your development process. Get started now by creating your
-        first collection or exploring our features
-        <span
-          on:click={() => {
-            isGuidePopup = true;
-          }}
-          class="link btn p-0 border-0"
-          style="font-size: 12px;"
-          >See how it works.
-        </span>
-      </p>
-    </Popover>
-  {/if}
-</div>
+
 <div
   class=" d-flex flex-column justify-content-center align-items-center"
   style=" padding-top: 70px; padding-right:325px;  padding-left:325px; padding-bottom: 24px; gap: 89px;"
@@ -111,47 +72,3 @@
     </div>
   </div>
 </div>
-<Modal
-  title={""}
-  type={"dark"}
-  width={"474px"}
-  zIndex={10000}
-  isOpen={isGuidePopup}
-  handleModalState={(flag = false) => {
-    isGuidePopup = flag;
-  }}
->
-  <div style="position: relative;">
-    <Carousel
-      handleClosePopup={(flag = false) => {
-        isGuidePopup = flag;
-      }}
-      data={[
-        {
-          id: 1,
-          heading: "Creating a Collection: Import existing or Start a new one",
-          subheading: `Organize your APIs efficiently within "Collections" for streamlined API management and testing. Click the + Add Collection button in the side panel to create a collection. Choose 'Import Collection' to bring in existing API collections or create an empty Collection. `,
-        },
-        {
-          id: 2,
-          heading: "Sending an API Request",
-          subheading:
-            "In the request builder, input your API endpoint URL in the URL field. Click the 'Send' button to dispatch the request. Instantly see the server's response, which includes status codes, response time, and data.",
-        },
-        {
-          id: 3,
-          heading: "Advanced API Request with Detailed Inputs",
-          subheading:
-            "Enter the endpoint URL in the URL field. Utilize 'Parameters' tab for parameters, 'Body' tab to input data payloads, 'Headers' tab for custom headers, and 'Auth' tab to manage access credentials. After filling in the required fields, click 'Send' to execute the request and view the detailed server response.",
-        },
-      ]}
-    />
-  </div>
-</Modal>
-
-<style>
-  .link {
-    color: #3670f7;
-    text-decoration: underline;
-  }
-</style>

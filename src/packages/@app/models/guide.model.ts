@@ -18,7 +18,7 @@ export const guideSchemaLiteral = {
       type: "boolean",
     },
   },
-  required: ["id"],
+  required: ["id", "isActive"],
 } as const;
 const schemaTyped = toTypedRxJsonSchema(guideSchemaLiteral);
 

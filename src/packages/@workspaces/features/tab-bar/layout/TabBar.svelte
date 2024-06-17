@@ -72,8 +72,8 @@
     }
   }
 
-  export let onUpdateCollectionGuide;
-  export let onFetchCollectionGuide;
+  export let onUpdateCollectionGuide: (query, isActive) => void;
+  export let onFetchCollectionGuide: (query) => void;
 
   let tabWidth: number = 182;
   let scrolable: boolean = false;
@@ -211,16 +211,33 @@
           role="button"
           class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
           on:click={async () => {
-            const event = await onFetchCollectionGuide();
+            const event = await onFetchCollectionGuide({
+              id: "collection-guide",
+            });
             const guideData = event?.getLatest().toMutableJSON();
             if (guideData?.isActive === false) {
-              onUpdateCollectionGuide(true);
+              onUpdateCollectionGuide(
+                {
+                  id: "collection-guide",
+                },
+                true,
+              );
             } else {
-              onUpdateCollectionGuide(false);
+              onUpdateCollectionGuide(
+                {
+                  id: "collection-guide",
+                },
+                false,
+              );
             }
           }}
         >
-          <Tooltip title={"Quick Help"} distance={10} placement={"bottom"} zIndex={10}>
+          <Tooltip
+            title={"Quick Help"}
+            distance={10}
+            placement={"bottom"}
+            zIndex={10}
+          >
             <div
               class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
               style="height: 24px; width:24px;"
@@ -257,7 +274,6 @@
             <button
               id="viewChange"
               class="border-0 bg-transparent pt-0 rounded"
-      
               on:click={() => {
                 viewChange = !viewChange;
               }}
@@ -270,22 +286,22 @@
             </button>
           </Tooltip>
         </Dropdown>
-      <Dropdown
-        buttonId="moreOptions"
-        bind:isMenuOpen={moreOption}
-        horizontalPosition="left"
-        minWidth={150}
-        options={[
-          {
-            name: "Close all Tabs",
-            icon: "",
-            onclick: () => {
-              tabList.map((tab) => {
-                onTabClosed(tab.id, tab);
-              });
-            },
+        <Dropdown
+          buttonId="moreOptions"
+          bind:isMenuOpen={moreOption}
+          horizontalPosition="left"
+          minWidth={150}
+          options={[
+            {
+              name: "Close all Tabs",
+              icon: "",
+              onclick: () => {
+                tabList.map((tab) => {
+                  onTabClosed(tab.id, tab);
+                });
               },
-            
+            },
+
             {
               name: "Close Selected Tab",
               icon: "",

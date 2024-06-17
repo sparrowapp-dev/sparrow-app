@@ -93,17 +93,19 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
-  export let showContainer = true;
-  export let onFetchCollectionGuide;
-  export let onUpdateCollectionGuide;
+  export let isPopoverContainer = true;
+  export let onFetchCollectionGuide: (query) => void;
+  export let onUpdateCollectionGuide: (query, isActive) => void;
 
   onMount(async () => {
-    const event = await onFetchCollectionGuide();
+    const event = await onFetchCollectionGuide({
+      id: "collection-guide",
+    });
     event.$.subscribe((e) => {
       if (e.isActive === false) {
-        showContainer = false;
+        isPopoverContainer = false;
       } else {
-        showContainer = true;
+        isPopoverContainer = true;
       }
     });
   });
@@ -203,11 +205,16 @@
         </div>
       </div>
       <div class="">
-        {#if showContainer}
+        {#if isPopoverContainer}
           <Popover
             onClose={() => {
-              showContainer = false;
-              onUpdateCollectionGuide(false);
+              isPopoverContainer = false;
+              onUpdateCollectionGuide(
+                {
+                  id: "collection-guide",
+                },
+                false,
+              );
             }}
             heading={`Welcome to Sparrow!`}
             text={` `}

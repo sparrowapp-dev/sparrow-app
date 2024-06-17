@@ -14,11 +14,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-  import {
-    CreateENV,
-    IntroToEnvironment,
-    SearchVariable,
-  } from "@environments/features";
+  import { CreateENV, IntroToEnvironment, SearchVariable } from "../videos";
 
   /**
    * selected environmet to be shown on API
@@ -37,9 +33,9 @@
    */
   export let onSaveEnvironment;
 
-  export let onFetchEnvironmentGuide;
-  export let onUpdateEnvironmentGuide;
-  let showContainer = false;
+  export let onFetchEnvironmentGuide: (query) => void;
+  export let onUpdateEnvironmentGuide: (query, isActive) => void;
+  let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
   let search = "";
@@ -62,12 +58,13 @@
   let isGuidePopup = false;
 
   onMount(async () => {
-    const event = await onFetchEnvironmentGuide();
-    console.log(event);
+    const event = await onFetchEnvironmentGuide({
+      id: "environment-guide",
+    });
     if (event.isActive === true) {
-      showContainer = true;
+      isPopoverContainer = true;
     } else {
-      showContainer = false;
+      isPopoverContainer = false;
     }
   });
 </script>
@@ -84,11 +81,21 @@
             class="btn p-0"
             style="position: absolute; left:150px;  top:18px; border:none; z-index:5; curser:pointer;"
             on:click={() => {
-              showContainer = !showContainer;
-              if (showContainer === true) {
-                onUpdateEnvironmentGuide(true);
+              isPopoverContainer = !isPopoverContainer;
+              if (isPopoverContainer === true) {
+                onUpdateEnvironmentGuide(
+                  {
+                    id: "environment-guide",
+                  },
+                  true,
+                );
               } else {
-                onUpdateEnvironmentGuide(false);
+                onUpdateEnvironmentGuide(
+                  {
+                    id: "environment-guide",
+                  },
+                  false,
+                );
               }
             }}
           >
@@ -165,12 +172,12 @@
         </div>
       </header>
       <div>
-        {#if showContainer}
+        {#if isPopoverContainer}
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
             onClose={() => {
-              showContainer = false;
+              isPopoverContainer = false;
               onUpdateEnvironmentGuide(false);
             }}
             ><p>

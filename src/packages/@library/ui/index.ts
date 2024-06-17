@@ -10,3 +10,4 @@ export * from "./label";
 export * from "./tooltip";
 export * from "./modal";
 export * from "./popover";
+export * from "./carousel";

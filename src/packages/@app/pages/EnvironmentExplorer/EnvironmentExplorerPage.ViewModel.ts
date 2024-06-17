@@ -159,19 +159,12 @@ export class EnvironmentExplorerViewModel {
   /**
    * fetchEnvironmentGuide
    */
-  public fetchEnvironmentGuide = async () => {
-    return this.guideRepository.findOne({
-      id: "environment-guide",
-    });
+  public fetchEnvironmentGuide = async (query) => {
+    return this.guideRepository.findOne(query);
   };
-  public updateEnvironmentGuide = async (isActive: boolean) => {
-    await this.guideRepository.update(
-      {
-        id: "environment-guide",
-      },
-      {
-        isActive: isActive,
-      },
-    );
+  public updateEnvironmentGuide = async (query, isActive: boolean) => {
+    await this.guideRepository.update(query, {
+      isActive: isActive,
+    });
   };
 }
