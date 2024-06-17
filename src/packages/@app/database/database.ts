@@ -41,8 +41,10 @@ import {
   windowSettingsSchema,
   type WindowSettingsDocType,
 } from "@app/models/window-settings-model";
-// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-// addRxPlugin(RxDBDevModePlugin);
+
+import { releaseSchema, type ReleaseDocType } from "@app/models/release.model";
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -58,6 +60,7 @@ export type EnvironmentDocument = RxDocument<EnvironmentDocType>;
 export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
+export type ReleaseDocument = RxDocument<ReleaseDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -238,6 +241,9 @@ export class RxDB {
       },
       githubrepo: {
         schema: githubRepoSchema,
+      },
+      releaseupdate: {
+        schema: releaseSchema,
       },
     });
     return { rxdb: this.rxdb };
