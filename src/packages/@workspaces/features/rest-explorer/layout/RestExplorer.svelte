@@ -85,6 +85,8 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let onRenameCollection;
+  export let onRenameFolder;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -386,6 +388,8 @@
       {onSaveAsRequest}
       {onCreateFolder}
       {onCreateCollection}
+      {onRenameCollection}
+      {onRenameFolder}
     />
   </ModalWrapperV1>
 {/if}

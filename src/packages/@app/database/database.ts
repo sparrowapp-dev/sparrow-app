@@ -43,8 +43,12 @@ import {
 } from "@app/models/window-settings-model";
 
 import { releaseSchema, type ReleaseDocType } from "@app/models/release.model";
-import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-addRxPlugin(RxDBDevModePlugin);
+import {
+  featureSwitchSchema,
+  type FeatureSwitchDocType,
+} from "@app/models/feature-switch.model";
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+// addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -61,6 +65,7 @@ export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
 export type ReleaseDocument = RxDocument<ReleaseDocType>;
+export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -244,6 +249,9 @@ export class RxDB {
       },
       releaseupdate: {
         schema: releaseSchema,
+      },
+      featureswitch: {
+        schema: featureSwitchSchema,
       },
     });
     return { rxdb: this.rxdb };

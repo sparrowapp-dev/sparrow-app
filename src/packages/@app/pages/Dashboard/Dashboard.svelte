@@ -8,7 +8,7 @@
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Header from "@common/components/header/Header.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type {
     EnvironmentDocument,
     WorkspaceDocument,
@@ -16,6 +16,10 @@
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
   import Ticker from "../../../@common/components/ticker/Ticker.svelte";
+  import { Update, check } from "@tauri-apps/plugin-updater";
+  import { notifications } from "@library/ui/toast/Toast";
+  import { relaunch } from "@tauri-apps/plugin-process";
+  import ProgressBar from "@library/ui/progress/Progress.svelte";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -57,6 +61,10 @@
     },
   );
 
+  onMount(() => {
+    _viewModel.getAllFeatures();
+  });
+
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
@@ -71,11 +79,7 @@
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
-  import { Update, check } from "@tauri-apps/plugin-updater";
-  import { onMount } from "svelte";
-  import { notifications } from "@library/ui/toast/Toast";
-  import { relaunch } from "@tauri-apps/plugin-process";
-  import ProgressBar from "@library/ui/progress/Progress.svelte";
+
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 

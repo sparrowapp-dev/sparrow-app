@@ -183,14 +183,14 @@
   }
 
   .request-icon {
-    color: var(--tab-request-default) !important;
     font-weight: 400 !important;
   }
   .individual-tab:hover .request-icon {
     color: inherit !important;
   }
   .request-text {
-    color: var(--tab-request-text-default) !important;
+    font-weight: 400;
+    color: var(  --deleted-api-method) !important;
   }
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;
@@ -199,5 +199,11 @@
   .cross-icon-btn:hover{
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
+  }
+  .ellipsis{
+    color: var( --deleted-api-method) ;
+  }
+  .ellipsis:hover{
+    color: var( --text-secondary-100) ;
   }
 </style>

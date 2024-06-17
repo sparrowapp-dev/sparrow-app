@@ -12,6 +12,8 @@ import { RxDB } from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
 import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
+import { FeatureSwitchService } from "@app/services/feature-switch.service";
+import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
 
 export class DashboardViewModel {
   constructor() {}
@@ -22,6 +24,8 @@ export class DashboardViewModel {
   private environmentService = new EnvironmentService();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
+  private featureSwitchService = new FeatureSwitchService();
+  private featureSwitchRepository = new FeatureSwitchRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -237,6 +241,16 @@ export class DashboardViewModel {
     } else {
       notifications.error(response.message);
       return false;
+    }
+  };
+
+  /**
+   * Fetch all features from server and save in DB
+   */
+  public getAllFeatures = async () => {
+    const features = await this.featureSwitchService.getAllFeatures();
+    if (features.isSuccessful) {
+      await this.featureSwitchRepository.bulkInsertData(features.data.data);
     }
   };
 }

@@ -3,6 +3,7 @@
   import folder from "$lib/assets/folder.svg";
   import collection from "$lib/assets/collection.svg";
   import { ItemType, RequestMethod } from "$lib/utils/enums";
+  import { CollectionIcon } from "@library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";
   export let method = RequestMethod.GET;
@@ -23,16 +24,18 @@
   </div>
 {:else if type === ItemType.FOLDER || type === ItemType.COLLECTION}
   <div style="height:36px;" class="d-flex align-items-center">
-    <img
-      src={type === ItemType.FOLDER
-        ? folder
-        : type === ItemType.COLLECTION
-        ? collection
-        : null}
-      alt=""
-    />
-    <span class="ellipsis sparrow-fs-12 fw-normal ps-2" style="cursor:pointer;"
-      >{name}</span
+    {#if type === ItemType.FOLDER}
+      <img src={folder} alt="" />
+    {:else if type === ItemType.COLLECTION}
+      <CollectionIcon
+        height={"15px"}
+        width={"15px"}
+        color={"var(--icon-secondary-100)"}
+      />
+    {/if}
+    <span
+      class="ellipsis sparrow-fs-12 fw-normal ps-3"
+      style="cursor:pointer; width: calc(100% - 20px);">{name}</span
     >
   </div>
 {/if}
