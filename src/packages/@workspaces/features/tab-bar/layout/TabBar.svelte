@@ -185,7 +185,7 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip title={"Add Request"} placement={"top"} distance={2} >
+      <Tooltip title={"Add Request"} placement={"top"} distance={2}>
         <button
           on:click={onNewTabRequested}
           role="button"
@@ -206,104 +206,107 @@
       </Tooltip>
     </div>
     <div class=" d-flex ms-auto my-auto me-2">
-    <div >
-      <button
-      role="button"
-      class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
-      on:click={async () => {
-        const event = await onFetchCollectionGuide();
-        console.log(event);
-        if (event.isActive === false) {
-          onUpdateCollectionGuide(true);
-        } else {
-          onUpdateCollectionGuide(false);
-        }
-      }}
-    >
-    <Tooltip title={"Quick Help"} distance={10} placement={"bottom"} >
-      <div
-        class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
-        style="height: 24px; width:24px;"
-      >
-        <HelpIcon
-          height={"16px"}
-          width={"16px"}
-          color={"var(--text-secondary-200)"}
-        />
-      </div>
-    </Tooltip>
-    </button>
-    </div>
-     <div class="layout ms-auto mt-1" style="height: 24px; "> <Dropdown
-      buttonId="viewChange"
-      bind:isMenuOpen={viewChange}
-      horizontalPosition="left"
-      minWidth={175}
-      options={[
-        {
-          name: "Split Vertically",
-          icon: SplitVerital,
-          onclick: () => onChangeViewInRequest("vertical"),
-        },
-        {
-          name: "Split Horizontally",
-          icon: SplitHorizontal,
-          onclick: () => onChangeViewInRequest("horizontal"),
-        },
-      ]}
-    >
-      <Tooltip title={"Layout"} placement={"left"} distance={12}>
+      <div>
         <button
-          id="viewChange"
-          class="border-0 bg-transparent pt-0 rounded"
-          
-          on:click={() => {
-            viewChange = !viewChange;
+          role="button"
+          class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
+          on:click={async () => {
+            const event = await onFetchCollectionGuide();
+            const guideData = event?.getLatest().toMutableJSON();
+            if (guideData?.isActive === false) {
+              onUpdateCollectionGuide(true);
+            } else {
+              onUpdateCollectionGuide(false);
+            }
           }}
         >
-          {#if $requestSplitterDirection === "horizontal"}
-            <ViewGrid color={"var(--text-primary-400)"} height={13} />
-          {:else}
-            <VerticalGrid height={13} color="var(--blackColor)" />
-          {/if}
+          <Tooltip title={"Quick Help"} distance={10} placement={"bottom"} zIndex={10}>
+            <div
+              class="plus-btn d-flex pt-1 pb-1 justify-content-center align-items-center"
+              style="height: 24px; width:24px;"
+            >
+              <HelpIcon
+                height={"16px"}
+                width={"16px"}
+                color={"var(--text-secondary-200)"}
+              />
+            </div>
+          </Tooltip>
         </button>
-      </Tooltip>
-    </Dropdown>
-    <Dropdown
-      buttonId="moreOptions"
-      bind:isMenuOpen={moreOption}
-      horizontalPosition="left"
-      minWidth={150}
-      options={[
-        {
-          name: "Close all Tabs",
-          icon: "",
-          onclick: () => {
-            tabList.map((tab) => {
-              onTabClosed(tab.id, tab);
-            });
-          },
-        },
-        {
-          name: "Close Selected Tab",
-          icon: "",
-          onclick: () => {
-            let activeTab = tabList.filter((tab) => tab.isActive)[0];
-            onTabClosed(activeTab.id, activeTab);
-          },
-        },
-      ]}
-    >
-      <button
-        id="moreOptions"
-        class="border-0 bg-transparent pt-1 rounded d-none"
-        on:click={() => {
-          moreOption = !moreOption;
-        }}
-      >
-        <MoreOptions height={15} />
-      </button>
-    </Dropdown></div>
+      </div>
+      <div class="layout ms-auto mt-1" style="height: 24px; ">
+        <Dropdown
+          buttonId="viewChange"
+          bind:isMenuOpen={viewChange}
+          horizontalPosition="left"
+          minWidth={175}
+          options={[
+            {
+              name: "Split Vertically",
+              icon: SplitVerital,
+              onclick: () => onChangeViewInRequest("vertical"),
+            },
+            {
+              name: "Split Horizontally",
+              icon: SplitHorizontal,
+              onclick: () => onChangeViewInRequest("horizontal"),
+            },
+          ]}
+        >
+          <Tooltip title={"Layout"} placement={"left"} distance={12}>
+            <button
+              id="viewChange"
+              class="border-0 bg-transparent pt-0 rounded"
+      
+              on:click={() => {
+                viewChange = !viewChange;
+              }}
+            >
+              {#if $requestSplitterDirection === "horizontal"}
+                <ViewGrid color={"var(--text-primary-400)"} height={13} />
+              {:else}
+                <VerticalGrid height={13} color="var(--text-primary-400)" />
+              {/if}
+            </button>
+          </Tooltip>
+        </Dropdown>
+      <Dropdown
+        buttonId="moreOptions"
+        bind:isMenuOpen={moreOption}
+        horizontalPosition="left"
+        minWidth={150}
+        options={[
+          {
+            name: "Close all Tabs",
+            icon: "",
+            onclick: () => {
+              tabList.map((tab) => {
+                onTabClosed(tab.id, tab);
+              });
+            },
+              },
+            
+            {
+              name: "Close Selected Tab",
+              icon: "",
+              onclick: () => {
+                let activeTab = tabList.filter((tab) => tab.isActive)[0];
+                onTabClosed(activeTab.id, activeTab);
+              },
+            },
+          ]}
+        >
+          <button
+            id="moreOptions"
+            class="border-0 bg-transparent pt-1 rounded d-none"
+            on:click={() => {
+              moreOption = !moreOption;
+            }}
+          >
+            <MoreOptions height={15} />
+          </button>
+        </Dropdown>
+      </div>
     </div>
   </div>
 </button>

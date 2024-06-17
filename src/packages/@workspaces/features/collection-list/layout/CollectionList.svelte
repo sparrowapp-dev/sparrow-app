@@ -34,6 +34,10 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  /**
+   * Flag to show app version
+   */
+  export let isAppVersionVisible = true;
 
   import {
     Collection,
@@ -47,9 +51,10 @@
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
+  import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { Events, WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import { Dropdown } from "@library/ui";
   import List from "@library/ui/list/List.svelte";
@@ -78,6 +83,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -257,28 +263,38 @@
             icon: CreateRequest,
             onclick: () => onItemCreated("request", {}),
           },
-          // {
-          //   name: "Add Curl API",
-          //   icon: CreateRequest,
-          //   onclick: showImportCurlPopup,
-          // },
           {
             name: "Add Collection",
             icon: CreateCollection,
             onclick: showImportCollectionPopup,
           },
+          {
+            name: "Import cURL",
+            icon: BubbleIcon,
+            onclick: () => {
+              MixpanelEvent(Events.IMPORT_CURL, {
+                source: "curl import popup",
+              });
+              showImportCurlPopup();
+            },
+          },
         ]}
       >
-    <Tooltip title={"Add Collection"} placement={"right"} distance={12}>
-        <button
-          id="addButton"
-          class="border-0 p-1 border-radius-2 add-button"
-          on:click={() => {
-            addButtonMenu = !addButtonMenu;
-          }}
+        <Tooltip
+          title={"Add Options"}
+          placement={"right"}
+          distance={12}
+          zIndex={10}
         >
-          <img src={plusIcon} alt="" />
-        </button>
+          <button
+            id="addButton"
+            class="border-0 p-1 border-radius-2 add-button"
+            on:click={() => {
+              addButtonMenu = !addButtonMenu;
+            }}
+          >
+            <img src={plusIcon} alt="" />
+          </button>
         </Tooltip>
       </Dropdown>
     </div>
@@ -392,7 +408,9 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
-          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {#if isAppVersionVisible}
+            <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          {/if}
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {

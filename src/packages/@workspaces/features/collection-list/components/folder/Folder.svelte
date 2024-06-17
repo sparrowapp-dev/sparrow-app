@@ -395,7 +395,7 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else}
-        <Tooltip title={"Add request"} placement={"bottom"} zIndex={5} distance={13}>
+        <Tooltip title={"Add Request"} placement={"bottom"} zIndex={5} distance={13}>
           <button
             class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
             on:click|preventDefault={() => {
@@ -415,7 +415,7 @@
           </button>
         </Tooltip>
 
-          <Tooltip title={"more"} placement={"right"} zIndex={5} distance={17}>
+          <Tooltip title={"More"} placement={"right"} zIndex={5} distance={17}>
           <button
             id={`show-more-folder-${explorer.id}`}
             class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu

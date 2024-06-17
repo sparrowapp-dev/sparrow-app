@@ -11,16 +11,16 @@
   export let onFetchCollectionGuide;
   export let onUpdateCollectionGuide;
 
-  onMount(async () => {
-    console.log(onFetchCollectionGuide);
-    const event = await onFetchCollectionGuide();
-    console.log(event);
-    if (event.isActive === true) {
-      showContainer = true;
-    } else {
-      showContainer = false;
-    }
-  });
+  // onMount(async () => {
+  //   // console.log(onFetchCollectionGuide)
+  //   const event = await onFetchCollectionGuide();
+  //   console.log(event);
+  //   if (event.isActive === true) {
+  //     showContainer = true;
+  //   } else {
+  //     showContainer = false;
+  //   }
+  // });
 </script>
 
 <div class="m-2">

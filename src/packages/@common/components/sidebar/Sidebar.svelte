@@ -107,15 +107,15 @@
       {/each}
     </div>
 
-  <div class="secondary-sidebar-items z-4">
-    {#each secondarySidebarItems as item (item.route)}
-      <SidebarItem {item} />
-    {/each}
-    <Tooltip title="User Profile" placement="right" distance={20} >
-    <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-    </Tooltip>
+    <div class="secondary-sidebar-items z-4">
+      {#each secondarySidebarItems as item (item.route)}
+        <SidebarItem {item} />
+      {/each}
+      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5}>
+        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+      </Tooltip>
+    </div>
   </div>
-</div>
 </div>
 
 <style>

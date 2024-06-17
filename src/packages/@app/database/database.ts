@@ -44,6 +44,12 @@ import {
 import { guideSchema, type GuideDocType } from "@app/models/guide.model";
 import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 addRxPlugin(RxDBDevModePlugin);
+import {
+  featureSwitchSchema,
+  type FeatureSwitchDocType,
+} from "@app/models/feature-switch.model";
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+// addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -60,6 +66,7 @@ export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
 export type GuideDocumnet = RxDocument<GuideDocType>;
+export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -243,7 +250,10 @@ export class RxDB {
       },
       guide: {
         schema: guideSchema,
+      featureswitch: {
+        schema: featureSwitchSchema,
       },
+    }
     });
     return { rxdb: this.rxdb };
   }
