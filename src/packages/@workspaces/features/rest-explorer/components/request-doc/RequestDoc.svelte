@@ -5,9 +5,9 @@
 <div class="d-flex flex-column " style="height: 234px; gap:8px; font-size:14px;">
   <div class="d-flex" style="justify-content: space-between;">
     <div style="font-weight:600; ">Documentation</div>
-    <div class="d-flex align-items-center " style="gap: 6.78px; " >
+    <div class="edit-btn d-flex align-items-center  " style="gap: 3px; padding-left: 4px; padding-right:4px; border-radius:2px;" >
         <div class="mb-1"> <EditIcon height={"10.56px"} width={"10.56px"} color={"#3670F7"} /> </div>
-        <p class="mb-0" style="font-size: 12px; color:#3670F7; " >Edit</p>
+        <p class="edit-txt mb-0" style="font-size: 12px; " >Edit</p>
     </div>
   </div>
   <div style="height:200px;">
@@ -18,3 +18,15 @@
     />
   </div>
 </div>
+
+<style>
+  .edit-btn:hover{
+    background-color: #11253A;
+    color: white !important;
+
+  }
+  .edit-txt{
+    color:#3670F7 ; 
+
+  }
+</style>
