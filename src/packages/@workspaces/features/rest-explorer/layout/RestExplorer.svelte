@@ -59,6 +59,7 @@
     type RequestTab,
   } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
+    import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -275,6 +276,8 @@
                   {onUpdateEnvironment}
                   {environmentVariables}
                 />
+              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                    <RequestDoc/>
               {/if}
             </div>
           </Pane>
