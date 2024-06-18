@@ -249,6 +249,8 @@ export class DashboardViewModel {
    */
   public getAllFeatures = async () => {
     const features = await this.featureSwitchService.getAllFeatures();
-    await this.featureSwitchRepository.bulkInsertData(features.data.data);
+    if (features.isSuccessful) {
+      await this.featureSwitchRepository.bulkInsertData(features.data.data);
+    }
   };
 }

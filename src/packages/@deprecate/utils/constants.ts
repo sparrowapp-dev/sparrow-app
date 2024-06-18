@@ -13,6 +13,8 @@ const constants = {
   SPARROW_GITHUB: import.meta.env.VITE_SPARROW_GITHUB,
   SPARROW_DOWNLOAD_LINK: import.meta.env.VITE_SPARROW_DOWNLOAD_LINK,
   GITHUB_API: "https://api.github.com",
+  RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_RELEASE_NOTES_PAT_TOKEN,
+  RELEASE_NOTES_API: import.meta.env.VITE_RELEASE_NOTES_API,
 };
 
 export default constants;
