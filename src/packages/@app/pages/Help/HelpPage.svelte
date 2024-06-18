@@ -8,7 +8,6 @@
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
-  import { Route, Router } from "svelte-navigator";
 
   const _viewModel = new HelpPageViewModel();
 

@@ -34,7 +34,7 @@
 
       <button class="update-btn" on:click={onUpdate}> Update </button>
 
-      <button class="cross-btn" on:click={hideUpdater} on:click={onUpdate}>
+      <button class="cross-btn" on:click={hideUpdater}>
         <Cross height={"16px"} width={"12px"} color={"var(--cross-icon)"} />
       </button>
     </div>
