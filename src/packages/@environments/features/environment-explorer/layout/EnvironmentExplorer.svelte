@@ -1,5 +1,6 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
+  import { onMount } from "svelte";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
   import { QuickHelp } from "../components";
   import { hasWorkpaceLevelPermission } from "$lib/utils/helpers";
@@ -12,6 +13,8 @@
   import { TabularInput } from "@environments/common/components";
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
+  import { Carousel, Modal, Popover } from "@library/ui";
+  import { CreateENV, IntroToEnvironment, SearchVariable } from "../videos";
 
   /**
    * selected environmet to be shown on API
@@ -30,10 +33,13 @@
    */
   export let onSaveEnvironment;
 
+  export let onFetchEnvironmentGuide: (query) => void;
+  export let onUpdateEnvironmentGuide: (query, isActive) => void;
+  let isPopoverContainer = false;
+
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
-
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name;
@@ -49,12 +55,54 @@
   ) => {
     onUpdateVariable(pairs);
   };
+  let isGuidePopup = false;
+
+  onMount(async () => {
+    const event = await onFetchEnvironmentGuide({
+      id: "environment-guide",
+    });
+    if (event.isActive === true) {
+      isPopoverContainer = true;
+    } else {
+      isPopoverContainer = false;
+    }
+  });
 </script>
 
 {#if $currentEnvironment?.environmentId}
   <div class={`env-panel d-flex`}>
     <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
-      <header class={`env-header justify-content-between d-flex`}>
+      <header
+        class={`env-header justify-content-between d-flex`}
+        style="position: relative ;"
+      >
+        {#if $currentEnvironment?.type == "GLOBAL"}
+          <button
+            class="btn p-0"
+            style="position: absolute; left:150px;  top:18px; border:none; z-index:5; curser:pointer;"
+            on:click={() => {
+              isPopoverContainer = !isPopoverContainer;
+              if (isPopoverContainer === true) {
+                onUpdateEnvironmentGuide(
+                  {
+                    id: "environment-guide",
+                  },
+                  true,
+                );
+              } else {
+                onUpdateEnvironmentGuide(
+                  {
+                    id: "environment-guide",
+                  },
+                  false,
+                );
+              }
+            }}
+          >
+            <HelpIcon height={"12.67px"} width={"12.67px"} />
+          </button>
+        {/if}
+
         <Input
           id={"environment-name"}
           width={"calc(100% - 500px)"}
@@ -90,12 +138,12 @@
               focusedBorderColor={"var(--border-primary-300)"}
             />
           </div>
-       
-            <div class="position-relative">
-              {#if !$currentEnvironment.isSave}
-                <div class="badge-data d-block"></div>
-              {/if}
-              <Tooltip title="Save" placement="bottom" distance={10} >
+
+          <div class="position-relative">
+            {#if !$currentEnvironment.isSave}
+              <div class="badge-data d-block"></div>
+            {/if}
+            <Tooltip title="Save" placement="bottom" distance={10}>
               <WithButton
                 icon={SaveIcon}
                 onClick={onSaveEnvironment}
@@ -108,23 +156,48 @@
                 loader={$currentEnvironment.isSaveInProgress}
               />
             </Tooltip>
-            </div>
+          </div>
           <span>
-            <Tooltip title="Help" placement="bottom"  distance={10} >
-
-            <WithButton
-              icon={HelpIcon}
-              onClick={() => {
-                quickHelp = true;
-              }}
-              disable={false}
-              loader={false}
-            />
-          </Tooltip>
-
+            <Tooltip title="Help" placement="bottom" distance={10}>
+              <WithButton
+                icon={HelpIcon}
+                onClick={() => {
+                  quickHelp = true;
+                }}
+                disable={false}
+                loader={false}
+              />
+            </Tooltip>
           </span>
         </div>
       </header>
+      <div>
+        {#if isPopoverContainer}
+          <Popover
+            heading={`Welcome to Environments!`}
+            text={` `}
+            onClose={() => {
+              isPopoverContainer = false;
+              onUpdateEnvironmentGuide(false);
+            }}
+            ><p>
+              Environments allow you to manage different sets of confirguration
+              variables for various stages of your application (e.g.,
+              Development, Staging, Production). This helps in organizing and
+              isolating settings, making testing and deployment easier and more
+              efficient.
+              <span
+                on:click={() => {
+                  isGuidePopup = true;
+                }}
+                class="link btn p-0 border-0"
+                style="font-size: 12px;"
+                >See how it works.
+              </span>
+            </p></Popover
+          >
+        {/if}
+      </div>
       <section class={`var-value-container`}>
         <TabularInput
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
@@ -145,6 +218,47 @@
     {/if}
   </div>
 {/if}
+<Modal
+  title={""}
+  type={"dark"}
+  width={"474px"}
+  zIndex={10000}
+  isOpen={isGuidePopup}
+  handleModalState={(flag = false) => {
+    isGuidePopup = flag;
+  }}
+>
+  <div style="position: relative;">
+    <Carousel
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
+      data={[
+        {
+          id: 1,
+          heading: "Step  1: Introduction to Environment",
+          subheading:
+            "Environments allow you to manage configuration variables for different stages of your application, such as development, staging, and production.",
+          gif: `${IntroToEnvironment}`,
+        },
+        {
+          id: 2,
+          heading: "Step  2: Creating a New Environment",
+          subheading:
+            "Creating a new environment is simple. Follow these steps to set up an environment tailored to your needs.",
+          gif: `${CreateENV}`,
+        },
+        {
+          id: 3,
+          heading: "Step 3: Search and apply Environment Variables",
+          subheading:
+            "Easily search and apply variables from global or selected environment in the REST API tool, to streamline your API testing process.",
+          gif: `${SearchVariable}`,
+        },
+      ]}
+    />
+  </div>
+</Modal>
 
 <style lang="scss">
   .env-panel {
@@ -217,11 +331,14 @@
   .env-parent {
     padding: 10px;
   }
-
   .quick-help-active {
     width: calc(100% - 280px) !important;
   }
   .env-help-btn:active {
     background-color: var(--selected-active-sidebar);
+  }
+  .link {
+    color: var(--bg-primary-300);
+    text-decoration: underline;
   }
 </style>

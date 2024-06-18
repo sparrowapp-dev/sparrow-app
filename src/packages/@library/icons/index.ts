@@ -31,3 +31,5 @@ export { default as SparrowIcon } from "./SparrowLogo.svelte";
 export { default as CollectionIcon } from "./Collection.svelte";
 export { default as FolderIcon2 } from "./Folder2.svelte";
 export { default as WorkspaceIcon } from "./Workspace.svelte";
+export { default as Ellipse } from "./Ellipse.svelte";
+
