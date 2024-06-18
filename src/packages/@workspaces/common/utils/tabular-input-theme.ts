@@ -64,8 +64,8 @@ export class TabularInputTheme {
         fontWeight: "400",
       },
       "&.cm-editor.cm-focused": {
-        // border: "1px solid var(--border-primary-200)",
-        backgroundColor: "var(--bg-secondary-550)",
+        border: "1px solid var(--border-primary-200)",
+        backgroundColor: "#272727",
         borderRadius: "0",
       },
       ".cm-scroller::-webkit-scrollbar": {

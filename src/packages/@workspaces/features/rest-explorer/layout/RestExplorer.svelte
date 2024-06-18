@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { AdvanceAPI, CreateCollection, SendingApiRequest } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
-
   // ---- Components
   import {
     HttpUrlSection,
@@ -59,6 +59,9 @@
     type RequestTab,
   } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
+  import Popover from "@library/ui/popover/Popover.svelte";
+  import { onMount } from "svelte";
+  import { Carousel, Modal } from "@library/ui";
     import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
@@ -86,6 +89,22 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isPopoverContainer = true;
+  export let onFetchCollectionGuide: (query) => void;
+  export let onUpdateCollectionGuide: (query, isActive) => void;
+
+  onMount(async () => {
+    const event = await onFetchCollectionGuide({
+      id: "collection-guide",
+    });
+    event.$.subscribe((e) => {
+      if (e.isActive === false) {
+        isPopoverContainer = false;
+      } else {
+        isPopoverContainer = true;
+      }
+    });
+  });
   export let onRenameCollection;
   export let onRenameFolder;
 
@@ -99,6 +118,7 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+  let isGuidePopup = false;
 </script>
 
 {#if $tab.tabId}
@@ -179,6 +199,38 @@
             onClick={() => {}}
           />
         </div>
+      </div>
+      <div class="">
+        {#if isPopoverContainer}
+          <Popover
+            onClose={() => {
+              isPopoverContainer = false;
+              onUpdateCollectionGuide(
+                {
+                  id: "collection-guide",
+                },
+                false,
+              );
+            }}
+            heading={`Welcome to Sparrow!`}
+            text={` `}
+          >
+            <p>
+              Your one-stop solution for API testing and management. Start
+              organizing your API requests into collections, utilize environment
+              variables, and streamline your development process. Get started
+              now by creating your first collection or exploring our features
+              <span
+                on:click={() => {
+                  isGuidePopup = true;
+                }}
+                class="link btn p-0 border-0"
+                style="font-size: 12px;"
+                >See how it works.
+              </span>
+            </p>
+          </Popover>
+        {/if}
       </div>
 
       <!-- HTTP URL Section -->
@@ -276,8 +328,8 @@
                   {onUpdateEnvironment}
                   {environmentVariables}
                 />
-              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                    <RequestDoc/>
+                {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                <RequestDoc/>
               {/if}
             </div>
           </Pane>
@@ -396,6 +448,46 @@
     />
   </ModalWrapperV1>
 {/if}
+<Modal
+  title={""}
+  type={"dark"}
+  width={"474px"}
+  zIndex={10000}
+  isOpen={isGuidePopup}
+  handleModalState={(flag = false) => {
+    isGuidePopup = flag;
+  }}
+>
+  <div style="position: relative;">
+    <Carousel
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
+      data={[
+        {
+          id: 1,
+          heading: "Creating a Collection: Import existing or Start a new one",
+          subheading: `Organize your APIs efficiently within "Collections" for streamlined API management and testing. Click the + Add Collection button in the side panel to create a collection. Choose 'Import Collection' to bring in existing API collections or create an empty Collection. `,
+          gif: `${CreateCollection}`,
+        },
+        {
+          id: 2,
+          heading: "Sending an API Request",
+          subheading:
+            "In the request builder, input your API endpoint URL in the URL field. Click the 'Send' button to dispatch the request. Instantly see the server's response, which includes status codes, response time, and data.",
+          gif: `${SendingApiRequest}`,
+        },
+        {
+          id: 3,
+          heading: "Advanced API Request with Detailed Inputs",
+          subheading:
+            "Enter the endpoint URL in the URL field. Utilize 'Parameters' tab for parameters, 'Body' tab to input data payloads, 'Headers' tab for custom headers, and 'Auth' tab to manage access credentials. After filling in the required fields, click 'Send' to execute the request and view the detailed server response.",
+          gif: `${AdvanceAPI}`,
+        },
+      ]}
+    />
+  </div>
+</Modal>
 
 <style>
   .rest-explorer-layout {
@@ -426,5 +518,9 @@
       .rest-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+  .link {
+    color: var(--bg-primary-300);
+    text-decoration: underline;
   }
 </style>

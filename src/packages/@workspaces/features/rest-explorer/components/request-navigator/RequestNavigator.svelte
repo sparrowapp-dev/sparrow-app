@@ -124,7 +124,7 @@
 
 <style>
   .navigation__link {
-    color: var(--text-secondary-300);
+    color: var(--text-secondary-100);
     background-color: transparent;
     border-bottom: 2px transparent;
   }

@@ -8,7 +8,6 @@
     UpdateRequestMethodType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
-  import { DiskIcon } from "@library/icons";
   import { notifications } from "@library/ui/toast/Toast";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
   import { CodeMirrorInput } from "../../../../common/components";

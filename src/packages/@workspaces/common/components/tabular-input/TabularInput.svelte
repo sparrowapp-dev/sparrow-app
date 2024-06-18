@@ -157,7 +157,7 @@
   class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
 >
   <div
-    class="d-flex gap-3 py-1 align-items-center w-100 ps-2 {mode === 'READ'
+    class="d-flex gap-3 mb-1 py-1 align-items-center w-100 ps-2 {mode === 'READ'
       ? 'd-none'
       : ''}"
     style="height:26px;"
@@ -183,8 +183,8 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Key</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0">Value</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1" style="font-weight: 1000;">Key</p>
+      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0" style="font-weight: 1000;">Value</p>
     </div>
     <div class="h-75 pe-1">
       <button class="border-0" style="width:40px;" />
@@ -210,7 +210,7 @@
             style="padding-top:3px; padding-bottom:3px; height:24px;"
           >
             <div style="width:30px;">
-              <input
+              <input 
                 class="form-check-input"
                 type="checkbox"
                 disabled
@@ -219,7 +219,7 @@
             </div>
 
             <div class="d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative">
+              <div class="w-50 position-relative ">
                 <input
                   type="text"
                   placeholder=""
@@ -262,8 +262,8 @@
           style="padding-top: 1px;  display: flex;flex-direction: column;width:100%;"
         >
           <div
-            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-            style="padding-top:3px; padding-bottom:3px; height:24px;"
+            class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container "
+            style="padding-top:3px; padding-bottom:3px; height:24px; margin-bottom:4px;"
           >
             <img
               src={dragIcon}
@@ -286,8 +286,8 @@
               {/if}
             </div>
 
-            <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative">
+            <div class=" d-flex gap-0 " style="width:calc(100% - 120px); ">
+              <div class="w-50 position-relative   ">
                 <CodeMirrorInput
                   bind:value={element.key}
                   onUpdateInput={() => {
@@ -303,13 +303,13 @@
               {#if type === "file"}
                 <div class="w-50">
                   <div
-                    class="position-relative rounded p-1 d-flex backgroundColor"
+                    class="position-relative rounded  p-1 d-flex "
                     style="height: 27px;"
                   >
                     {#if element.value === ""}
                       <input
                         type="text"
-                        class="form-control keyValuePair py-1"
+                        class="form-control  keyValuePair py-1"
                         readonly
                         style="z-index:4; font-size:13px;
                     position: absolute;
@@ -320,7 +320,7 @@
                         placeholder="Choose File"
                       />
                       <input
-                        class="form-input"
+                        class="form-input "
                         type="text"
                         id="formdata-file"
                         on:click={() => {
@@ -373,7 +373,7 @@
                   </div>
                 </div>
               {:else}
-                <div class="w-50 position-relative">
+                <div class="w-50  position-relative  ">
                   <CodeMirrorInput
                     bind:value={element.value}
                     onUpdateInput={() => {

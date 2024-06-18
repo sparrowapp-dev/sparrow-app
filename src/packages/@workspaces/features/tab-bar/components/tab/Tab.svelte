@@ -126,9 +126,7 @@
       {/if}
       <span
         class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-size: 12px; font-family: Roboto; color: ${
-          tab.isActive ? "#fff;" : "#8A9299;"
-        }`}
+        style={`font-size: 12px; font-family: Roboto; color: white`}
       >
         {tab.name}
       </span>
@@ -190,7 +188,7 @@
   }
   .request-text {
     font-weight: 400;
-    color: var(  --deleted-api-method) !important;
+    color: var(--text-secondary-100) !important;
   }
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;
