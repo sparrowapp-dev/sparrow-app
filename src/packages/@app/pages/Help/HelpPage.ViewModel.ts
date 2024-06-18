@@ -130,4 +130,5 @@ class HelpPageViewModel {
   
 }
 
+
 export default HelpPageViewModel;

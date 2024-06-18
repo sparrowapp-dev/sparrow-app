@@ -77,6 +77,7 @@ import {
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { CollectionService } from "@app/services/collection.service";
 
 class RestExplorerViewModel
@@ -114,6 +115,7 @@ class RestExplorerViewModel
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
+  private guideRepository = new GuideRepository();
 
   /**
    * Service
@@ -1077,6 +1079,29 @@ class RestExplorerViewModel
       return response;
     }
   };
+/**
+ * Fetches a collection guide based on the provided query.
+ * 
+ * @param query - The query object used to find the collection guide.
+ * @returns - A promise that resolves to the collection guide found by the query.
+ */
+ public fetchCollectionGuide = async (query) => {
+  return await this.guideRepository.findOne(query);
+};
+
+/**
+* Updates the collection guide to set its active status.
+* 
+* @param  query - The query object used to find the collection guide to update.
+* @param  isActive - The new active status to set for the collection guide.
+* @returns - A promise that resolves when the update operation is complete.
+*/
+public updateCollectionGuide = async (query, isActive) => {
+  await this.guideRepository.update(query, {
+      isActive: isActive,
+  });
+};
+
 
   /**
    * Handles collection rename
@@ -1156,8 +1181,7 @@ class RestExplorerViewModel
           response.data.data,
         );
         notifications.success("Folder renamed successfully!");
-      }
-      else{
+      } else {
         notifications.error("Failed to rename folder!");
       }
       return response;
