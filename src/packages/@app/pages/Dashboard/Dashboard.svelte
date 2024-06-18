@@ -15,11 +15,11 @@
   } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
-  import Ticker from "../../../@common/components/ticker/Ticker.svelte";
   import { Update, check } from "@tauri-apps/plugin-updater";
   import { notifications } from "@library/ui/toast/Toast";
   import { relaunch } from "@tauri-apps/plugin-process";
   import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import Updater from "../../../@common/components/updater/Updater.svelte";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -70,16 +70,15 @@
     activeWorkspaceSubscribe.unsubscribe();
   });
 
-  let tickerVisible = true;
-  const hideTicker = () => {
-    tickerVisible = false;
+  let updaterVisible = true;
+  const hideUpdater = () => {
+    updaterVisible = false;
   };
 
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
-
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 
@@ -101,7 +100,6 @@
   };
 
   const initiateUpdate = async () => {
-    console.log("Inside inital update");
     try {
       updateAvailable = false;
       showProgressBar = true;
@@ -114,7 +112,6 @@
           await relaunch();
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
-      console.log("Done with  inital update");
     } catch (e) {
       notifications.error("Update Failed!");
       console.error(e);
@@ -138,10 +135,11 @@
     {currentWorkspaceName}
   />
   {#if showProgressBar === true}
-  <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
-  <Ticker
-    show={tickerVisible && updateAvailable}
-    {hideTicker}
+    <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
+
+  <Updater
+    show={updaterVisible && updateAvailable}
+    {hideUpdater}
     onUpdate={initiateUpdate}
   />
 

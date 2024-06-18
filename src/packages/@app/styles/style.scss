@@ -81,6 +81,7 @@ $sparrow-send-button-line: #D3D1D154;
 $sparrow-tab-request-default: #324035;
 $sparrow-tab-request-text-default: #4A4D4F;
 $sparrow-tab-unsave-icon: #CB4A4A;
+$sparrow-cross-icon: #F5F5F5;
 
 $sparrow-bg-container: #8989890D;
 $sparrow-bg-container-border: #313233;
@@ -217,6 +218,7 @@ $theme-red-230408: #230408;
   --tab-request-text-default: #{$sparrow-tab-request-text-default};
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
+  --cross-icon: #{$sparrow-cross-icon};
 
   --bg-conatiner: #{$sparrow-bg-container};
   --bg-container-border: #{$sparrow-bg-container-border};

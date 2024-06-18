@@ -19,7 +19,6 @@ export { default as DiscordIcon } from "./Discord.svelte";
 export { default as LibraryIcon } from "./Library.svelte";
 export { default as VectorIcon } from "./Vector.svelte";
 export { default as CrossIcon } from "./Cross.svelte";
-export { default as CrossIconWhite } from "./CrossIconWhite.svelte";
 export { default as AttachmentIcon } from "./Attachment.svelte";
 export { default as UploadIcon } from "./Upload.svelte";
 export { default as InfoIcon } from "./Info.svelte";

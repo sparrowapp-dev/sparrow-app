@@ -31,10 +31,6 @@ export class ReleaseRepository {
    * @param data - document to be inserted
    * @returns - inserted data
    */
-  //   public insert = async (data: ReleaseDocType): Promise<ReleaseDocType> => {
-  //     const document = await RxDB.getInstance().rxdb.release.insert(data);
-  //     return document;
-  //   };
 
   public bulkInsertData = async (data: any): Promise<void> => {
     await RxDB.getInstance().rxdb.releaseupdate.bulkUpsert(data);
@@ -58,7 +54,7 @@ export class ReleaseRepository {
       const res = await document.incrementalPatch(data);
       return res;
     } else {
-      throw new Error("Document not found");
+      console.error("Document not found");
     }
   };
 }

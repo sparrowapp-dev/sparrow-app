@@ -1,11 +1,10 @@
 <script>
-  import P from "@library/typography/p/P.svelte";
-  import CrossIconWhite from "../../../@library/icons/CrossIconWhite.svelte";
+  import Cross from "@library/icons/Cross.svelte";
   import RocketIcon from "../../../@library/icons/RocketIcon.svelte";
   import { Link } from "svelte-navigator";
 
   export let show = true;
-  export let hideTicker;
+  export let hideUpdater;
   export let onUpdate;
 </script>
 
@@ -35,8 +34,8 @@
 
       <button class="update-btn" on:click={onUpdate}> Update </button>
 
-      <button class="cross-btn" on:click={hideTicker} on:click={onUpdate}>
-        <CrossIconWhite />
+      <button class="cross-btn" on:click={hideUpdater} on:click={onUpdate}>
+        <Cross height={"16px"} width={"12px"} color={"var(--cross-icon)"} />
       </button>
     </div>
   </div>
