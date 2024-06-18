@@ -1,13 +1,8 @@
 <script lang="ts">
+  import { AdvanceAPI, CreateCollection, SendingApiRequest } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
-  import {
-    AdvanceAPI,
-    CreateCollection,
-    SendingApiRequest,
-  } from "@workspaces/features/videos";
-
   // ---- Components
   import {
     HttpUrlSection,

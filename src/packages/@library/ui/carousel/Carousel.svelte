@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Ellipse from "@library/icons/Ellipse.svelte";
+    import { Ellipse } from "@library/icons";
   export let data = [];
   let stepData = data[0];
   let currentStep = 0;

@@ -2390,7 +2390,7 @@ export default class CollectionsViewModel {
   /**
    * Fetches the collection guide document.
    *
-   * @returns {Promise<Object>} - A promise that resolves to the collection guide document.
+   * @returns - A promise that resolves to the collection guide document.
    */
   public fetchCollectionGuide = async (query) => {
     const data = await this.guideRepository.findOne(query);
@@ -2400,8 +2400,8 @@ export default class CollectionsViewModel {
   /**
    * Updates the collection guide document's active status.
    *
-   * @param {boolean} isActive - The new active status to set for the collection guide.
-   * @returns {Promise<void>} - A promise that resolves when the update is complete.
+   * @param isActive - The new active status to set for the collection guide.
+   * @returns - A promise that resolves when the update is complete.
    */
   public updateCollectionGuide = async (query, isActive: boolean) => {
     await this.guideRepository.update(query, {

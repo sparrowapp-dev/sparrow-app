@@ -1,9 +1,6 @@
 <script>
   import { VectorIcon, LibraryIcon } from "@library/icons";
   import SparrowLogo from "@workspaces/features/rest-explorer/assets/images/sparrow-logo.svelte";
-  import { Popover, Modal, Carousel } from "@library/ui";
-  import { onMount } from "svelte";
-  import CollectionsViewModel from "@app/pages/Collections/CollectionPage.ViewModel";
   export let showImportCollectionPopup;
   export let onItemCreated;
   export let showContainer = true;

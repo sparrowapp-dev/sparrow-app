@@ -156,15 +156,27 @@ export class EnvironmentExplorerViewModel {
       });
     }
   };
-  /**
-   * fetchEnvironmentGuide
-   */
-  public fetchEnvironmentGuide = async (query) => {
-    return this.guideRepository.findOne(query);
-  };
-  public updateEnvironmentGuide = async (query, isActive: boolean) => {
-    await this.guideRepository.update(query, {
+/**
+ * Fetches an environment guide based on the provided query.
+ * 
+ * @param query - The query object used to find the environment guide.
+ * @returns - A promise that resolves to the environment guide found by the query.
+ */
+ public fetchEnvironmentGuide = async (query) => {
+  return this.guideRepository.findOne(query);
+};
+
+/**
+* Updates the environment guide to set its active status.
+* 
+* @param query - The query object used to find the environment guide to update.
+* @param isActive - The new active status to set for the environment guide.
+* @returns - A promise that resolves when the update operation is complete.
+*/
+public updateEnvironmentGuide = async (query, isActive) => {
+  await this.guideRepository.update(query, {
       isActive: isActive,
-    });
-  };
+  });
+};
+
 }
