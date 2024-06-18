@@ -42,8 +42,8 @@ import {
   type WindowSettingsDocType,
 } from "@app/models/window-settings-model";
 import { guideSchema, type GuideDocType } from "@app/models/guide.model";
-import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-addRxPlugin(RxDBDevModePlugin);
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+// addRxPlugin(RxDBDevModePlugin);
 import {
   featureSwitchSchema,
   type FeatureSwitchDocType,
