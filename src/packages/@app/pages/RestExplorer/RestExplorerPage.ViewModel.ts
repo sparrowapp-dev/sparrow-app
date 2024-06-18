@@ -203,6 +203,7 @@ class RestExplorerViewModel
   ) => {
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.request.url) {
+      progressiveTab.
       return;
     }
     progressiveTab.property.request.url = _url;

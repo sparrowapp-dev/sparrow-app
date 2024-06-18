@@ -13,6 +13,7 @@
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+    import { DiskIcon } from "@library/icons";
   let componentClass = "";
   export { componentClass as class };
 

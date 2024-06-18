@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { AdvanceAPI, CreateCollection, SendingApiRequest } from "../../../common/videos";
+  import {
+    AdvanceAPI,
+    CreateCollection,
+    SendingApiRequest,
+  } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
@@ -62,7 +66,7 @@
   import Popover from "@library/ui/popover/Popover.svelte";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@library/ui";
-    import RequestDoc from "../components/request-doc/RequestDoc.svelte";
+  import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -328,8 +332,8 @@
                   {onUpdateEnvironment}
                   {environmentVariables}
                 />
-                {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                <RequestDoc/>
+              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                <RequestDoc />
               {/if}
             </div>
           </Pane>
