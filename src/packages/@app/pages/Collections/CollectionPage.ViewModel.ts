@@ -74,6 +74,7 @@ import {
 //-----
 
 import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
@@ -98,6 +99,8 @@ export default class CollectionsViewModel {
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
   private githubService = new GithubService();
+  private guideRepository = new GuideRepository();
+
   private featureSwitchRepository = new FeatureSwitchRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
@@ -2382,6 +2385,28 @@ export default class CollectionsViewModel {
       notifications.error("Failed to import collection. Please try again.");
     }
     return response;
+  };
+
+  /**
+   * Fetches the collection guide document.
+   *
+   * @returns - A promise that resolves to the collection guide document.
+   */
+  public fetchCollectionGuide = async (query) => {
+    const data = await this.guideRepository.findOne(query);
+    return data;
+  };
+
+  /**
+   * Updates the collection guide document's active status.
+   *
+   * @param isActive - The new active status to set for the collection guide.
+   * @returns - A promise that resolves when the update is complete.
+   */
+  public updateCollectionGuide = async (query, isActive: boolean) => {
+    await this.guideRepository.update(query, {
+      isActive: isActive,
+    });
   };
 
   /**
