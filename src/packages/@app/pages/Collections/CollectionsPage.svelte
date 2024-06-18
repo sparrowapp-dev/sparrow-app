@@ -243,6 +243,8 @@
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
       onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+      onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+      onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
     />
     <Route>
       {#if true}
@@ -269,6 +271,7 @@
             <WorkspaceDefault
               showImportCollectionPopup={() => (isImportCollectionPopup = true)}
               onItemCreated={_viewModel.handleCreateItem}
+              
             />
           </Motion>
         {/if}

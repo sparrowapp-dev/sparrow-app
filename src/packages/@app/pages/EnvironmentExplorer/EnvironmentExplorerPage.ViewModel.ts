@@ -8,12 +8,15 @@ import { environmentType } from "$lib/utils/enums/environment.enum";
 import { createDeepCopy } from "$lib/utils/helpers";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
+import { GuideRepository } from "@app/repositories/guide.repository";
+import Parameters from "$lib/components/collections/req-res-section/sub-components/request-parameter-section/Parameters.svelte";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
+  private guideRepository = new GuideRepository();
 
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
 
@@ -153,4 +156,27 @@ export class EnvironmentExplorerViewModel {
       });
     }
   };
+/**
+ * Fetches an environment guide based on the provided query.
+ * 
+ * @param query - The query object used to find the environment guide.
+ * @returns - A promise that resolves to the environment guide found by the query.
+ */
+ public fetchEnvironmentGuide = async (query) => {
+  return this.guideRepository.findOne(query);
+};
+
+/**
+* Updates the environment guide to set its active status.
+* 
+* @param query - The query object used to find the environment guide to update.
+* @param isActive - The new active status to set for the environment guide.
+* @returns - A promise that resolves when the update operation is complete.
+*/
+public updateEnvironmentGuide = async (query, isActive) => {
+  await this.guideRepository.update(query, {
+      isActive: isActive,
+  });
+};
+
 }

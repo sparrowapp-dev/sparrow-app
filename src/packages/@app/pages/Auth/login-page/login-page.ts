@@ -14,7 +14,10 @@ import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import ActiveSideBarTabViewModel from "../../Dashboard/ActiveSideBarTab.ViewModel";
+import { GuideRepository } from "@app/repositories/guide.repository";
+
 //------------------------------MixPanel-------------------------------//
+
 export const sendUserDataToMixpanel = (userDetails) => {
   if (constants.ENABLE_MIX_PANEL === "true") {
     mixpanel.identify(userDetails._id);
@@ -29,6 +32,7 @@ export const navigateToRegister = () => {
 
 export const authNavigate = async () => {};
 const _activeSidebarTabViewModel = new ActiveSideBarTabViewModel();
+const _guideRepository = new GuideRepository();
 
 //---------------- Handle Login ------------------//
 const handleLogin = async (loginCredentials: loginUserPostBody) => {
@@ -73,10 +77,17 @@ export async function handleLoginV2(url: string) {
       Success: true,
     });
     notifications.success("Login successful!");
-    if(event === "register"){
-    navigate("/app/collections?first=true");}
-    else {
-    navigate("/app/collections?first=false");}
+    if (event === "register") {
+      navigate("/app/collections?first=true");
+      _guideRepository.insert({ isActive: true, id: "environment-guide" });
+      _guideRepository.insert({ isActive: false, id: "collection-guide" });
+        
+    } else {
+      navigate("/app/collections?first=false");
+
+      _guideRepository.insert({ isActive: false, id: "environment-guide" });
+      _guideRepository.insert({ isActive: false, id: "collection-guide" });
+    }
     _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {
