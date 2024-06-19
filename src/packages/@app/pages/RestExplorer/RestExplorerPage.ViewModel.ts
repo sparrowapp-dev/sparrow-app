@@ -203,7 +203,6 @@ class RestExplorerViewModel
   ) => {
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.request.url) {
-      progressiveTab.
       return;
     }
     progressiveTab.property.request.url = _url;
@@ -245,11 +244,9 @@ class RestExplorerViewModel
    * @param _description - request description
    */
   public updateRequestDescription = async (_description: string) => {
-   
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _description;
     progressiveTab.isSaved = false;
-    
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       notifications.success("Documentation updated");
