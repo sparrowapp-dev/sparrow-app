@@ -14,7 +14,6 @@
   let prevTabName = "";
   $: {
     if (tab) {
-      console.log(tab.name);
       if (tab?.name && prevTabName !== tab.name) {
         // _viewModel.updateNameWithEnvironmentList(tab.name);
         renameWithEnvironmentList(tab.name);

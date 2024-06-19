@@ -92,6 +92,15 @@
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
 
+   const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide(
+                {
+                  id: "collection-guide",
+                },
+                false,
+              );
+   }
+
   onMount(async () => {
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
@@ -220,6 +229,7 @@
       <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
+          handleClose={closeCollectionHelpText}
             onClose={() => {
               isPopoverContainer = false;
               onUpdateCollectionGuide(
@@ -458,9 +468,6 @@
 >
   <div style="position: relative;">
     <Carousel
-      handleClosePopup={(flag = false) => {
-        isGuidePopup = flag;
-      }}
       data={[
         {
           id: 1,

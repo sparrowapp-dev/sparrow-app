@@ -1,14 +1,10 @@
 <script lang="ts">
   import Crossicon from "$lib/assets/crossicon.svelte";
-  export { handleClose };
   export let onClose;
   export let text = " ";
   export let heading = " ";
   let isGuidePopup = false;
 
-  function handleClose() {
-    onClose();
-  }
 </script>
 
 <div
@@ -18,7 +14,7 @@
   <button
     class="cross-btn b-0 border-0"
     style="position:absolute; right:10px; top:2px; background-color:transparent "
-    on:click={handleClose}
+    on:click={onClose}
   >
     <Crossicon />
   </button>

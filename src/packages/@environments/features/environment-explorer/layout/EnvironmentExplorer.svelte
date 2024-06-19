@@ -50,6 +50,12 @@
     onUpdateName(_name, event);
   };
 
+  const closeEnvHelpText = () => {
+    onUpdateEnvironmentGuide({id:"environment-guide"} , false)
+    console.log("isha");
+    
+  }
+
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
@@ -174,6 +180,7 @@
       <div>
         {#if isPopoverContainer}
           <Popover
+          handleClose={closeEnvHelpText}
             heading={`Welcome to Environments!`}
             text={` `}
             onClose={() => {
@@ -230,7 +237,7 @@
 >
   <div style="position: relative;">
     <Carousel
-      data={[
+    data={[
         {
           id: 1,
           heading: "Step  1: Introduction to Environment",
