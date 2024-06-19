@@ -74,9 +74,14 @@ export class DashboardViewModel {
    * @returns guest user state
    */
   public updateGuestBannerState = async () => {
-    await this.guestUserRepository.updateBannerState({
-      name: "guestUser",
-    });
+    await this.guestUserRepository.updateBannerState(
+      {
+        name: "guestUser",
+      },
+      {
+        isBannerActive: false,
+      },
+    );
   };
 
   /**

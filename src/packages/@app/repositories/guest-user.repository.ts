@@ -44,7 +44,7 @@ export class GuestUserRepository {
   /**
    * Update banner state
    */
-  public updateBannerState = async (query): Promise<any> => {
+  public updateBannerState = async (query, updatedData): Promise<any> => {
     const doc = await RxDB.getInstance()
       .rxdb.guestuser.findOne({
         selector: query,
@@ -53,9 +53,7 @@ export class GuestUserRepository {
     if (doc) {
       // Update the isBannerActive field
       await doc.update({
-        $set: {
-          isBannerActive: false,
-        },
+        $set: updatedData,
       });
     }
   };

@@ -81,7 +81,11 @@
   <div class="d-flex align-items-center">
     {#if isGuestUser && isLoginBannerActive === false}
       <Tooltip title={"Reconnect to explore more features!"} placement="bottom">
-        <CloudOffIcon height="19px" width="23px" />
+        <CloudOffIcon
+          height="19px"
+          width="23px"
+          color="var(--icon-secondary-290)"
+        />
       </Tooltip>
       <div
         style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"

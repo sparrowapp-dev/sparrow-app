@@ -75,7 +75,6 @@ export type ReleaseDocument = RxDocument<ReleaseDocType>;
 export type GuideDocumnet = RxDocument<GuideDocType>;
 export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
 export type GuestDocument = RxDocument<GuestUserDocType>;
-export type GuestContainer = RxDocument<GuestUserDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -93,7 +92,6 @@ export type DatabaseCollections = {
   activesidebartab: ActiveSideBarTabContainer;
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
-  guest: GuestContainer;
 };
 
 // define the Rx database type
