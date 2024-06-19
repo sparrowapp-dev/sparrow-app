@@ -1,6 +1,6 @@
 <script>
   import Cross from "@library/icons/Cross.svelte";
-  //   import RocketIcon from "../../../@library/icons/RocketIcon.svelte";
+  import RocketIcon from "@library/icons/RocketIcon.svelte";
   import { Link } from "svelte-navigator";
   export let isVisible = true;
   export let onClose;
@@ -10,8 +10,8 @@
 {#if isVisible}
   <div class="ticker-container">
     <div class="ticker-container-div">
-      <div>
-        <!-- <RocketIcon /> -->
+      <div style="margin-right: 10px;">
+        <RocketIcon />
       </div>
 
       <div>
@@ -42,7 +42,7 @@
 <style>
   .ticker-container {
     width: 100%;
-    height: 56px;
+    height: 46px;
     background-color: var(--bg-primary-300);
     display: flex;
     justify-content: space-between;
