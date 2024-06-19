@@ -23,6 +23,8 @@
   import { relaunch } from "@tauri-apps/plugin-process";
   import ProgressBar from "@library/ui/progress/Progress.svelte";
   import Updater from "../../../@common/components/updater/Updater.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -82,6 +84,9 @@
     navigationState.set("guestUser");
     openDefaultBrowser();
     navigate("/init");
+    MixpanelEvent(Events.LOCAL_SIGNUP, {
+      source: "Dashboard",
+    });
   };
 
   const handleGuestLogin = () => {

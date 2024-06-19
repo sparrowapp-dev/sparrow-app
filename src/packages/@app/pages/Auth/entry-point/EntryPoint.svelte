@@ -19,6 +19,8 @@
   import { navigate } from "svelte-navigator";
   import { AuthViewModel } from "../Auth.ViewModel";
   import { isGuestUserActive, navigationState } from "$lib/store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   let isEntry = false;
 
   let isHover = false;
@@ -60,6 +62,9 @@
     await _viewModel.createGuestUserTeamWorkspace();
     isGuestUserActive.set(true);
     navigate("/init/collections");
+    MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
+      source: "Entry Page",
+    });
   };
 </script>
 
