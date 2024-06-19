@@ -1,24 +1,36 @@
 <script lang="ts">
   import { DiskIcon, EditIcon } from "@library/icons";
-  // Import any necessary dependencies or components if needed
-
-  let editing = false; // State to track if in edit mode
-
+  import { onMount } from "svelte";
+  let description: string = "";
+  let editing = false;
+  export let onUpdateRequestDescription;
+  export let requestStateDoc;
   let textareaRef: HTMLTextAreaElement | null = null;
+  let docValue = "";
 
   function toggleEditMode() {
-    editing = !editing; // Toggle the editing state
-
-    if (!editing && textareaRef) {
-      // Logic to handle save functionality if needed
-      // For example, you can save the content of the textarea
-      console.log("Save changes:", textareaRef.value);
+    editing = !editing;
+    if (editing && textareaRef) {
+      focusTextarea();
+      setTimeout(() => {
+        textareaRef.focus();
+      }, 0);
     }
   }
+  onMount(() => {
+    docValue = requestStateDoc;
+  });
 
   function focusTextarea() {
     if (textareaRef) {
       textareaRef.focus();
+    }
+  }
+
+  function handleSaveChanges() {
+    if (textareaRef) {
+      description = textareaRef.value;
+      onUpdateRequestDescription(description);
     }
   }
 </script>
@@ -33,12 +45,17 @@
       <div
         class="edit-btn d-flex align-items-center"
         style="gap: 3px; padding-left: 4px; padding-right: 4px; border-radius: 2px; cursor: pointer;"
-        on:click= {()=> {focusTextarea()
-          toggleEditMode()
+        on:click={() => {
+          toggleEditMode();
+          focusTextarea();
         }}
       >
         <div class="mb-1">
-          <EditIcon height="10.56px" width="10.56px" color="#3670F7" />
+          <EditIcon
+            height="10.56px"
+            width="10.56px"
+            color="var(--text-primary-300)"
+          />
         </div>
         <p class="edit-txt mb-0" style="font-size: 12px;">Edit</p>
       </div>
@@ -46,9 +63,15 @@
       <div
         class="edit-btn d-flex align-items-center"
         style="gap: 3px; padding-left: 4px; padding-right: 4px; border-radius: 2px; cursor: pointer;"
-        on:click={toggleEditMode}
+        on:click={handleSaveChanges}
       >
-        <div class="mb-1">  <DiskIcon height={15} width={15} color={"#3670f7"}/>  </div>
+        <div class="mb-1">
+          <DiskIcon
+            height={15}
+            width={15}
+            color={"var(  --text-primary-300)"}
+          />
+        </div>
         <p class="edit-txt mb-0" style="font-size: 12px;">Save Changes</p>
       </div>
     {/if}
@@ -56,20 +79,21 @@
   <div style="height: 200px;">
     <textarea
       bind:this={textareaRef}
+      value={docValue}
       class="h-100 w-100 border-0"
-      style="background-color: #191919; outline: none; border-radius: 2px; padding-top: 8px; padding-left: 12px;"
+      style="background-color: var(--text-secondary-450); outline: none; border-radius: 2px; padding-top: 8px; padding-left: 12px;"
       placeholder="Add Documentation"
+      disabled={!editing}
     ></textarea>
   </div>
 </div>
 
 <style>
   .edit-btn:hover {
-    background-color: #11253a;
+    background-color: var(--selected-active-sidebar);
     color: white !important;
   }
-
-  .edit-txt {
-    color: #3670f7;
+  .edit-btn {
+    color: var(--text-primary-300);
   }
 </style>

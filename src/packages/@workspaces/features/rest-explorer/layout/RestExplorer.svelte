@@ -333,7 +333,10 @@
                   {environmentVariables}
                 />
               {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                <RequestDoc />
+                <RequestDoc
+                  {onUpdateRequestDescription}
+                  requestStateDoc={$tab.description}
+                />
               {/if}
             </div>
           </Pane>
