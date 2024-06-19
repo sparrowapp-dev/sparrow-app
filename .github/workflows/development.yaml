@@ -22,6 +22,7 @@ env:
 jobs:
   release_win:
     runs-on: windows-latest
+    environment: development
 
     
     steps:
@@ -93,6 +94,7 @@ jobs:
 
   release_macos:
     runs-on: macos-latest
+    environment: development
     needs: release_win
     
     steps:
