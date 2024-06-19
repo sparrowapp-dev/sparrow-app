@@ -30,7 +30,7 @@ export class TabularInputTheme {
         alignItems: "center",
       },
       ".cm-textfield": {
-        backgroundColor: "var(--background-color)",
+        backgroundColor: "var(--background-color)",      
       },
       ".cm-button": {
         backgroundColor: "var(--background-color)",
@@ -65,7 +65,7 @@ export class TabularInputTheme {
       },
       "&.cm-editor.cm-focused": {
         border: "1px solid var(--border-primary-200)",
-        backgroundColor: "#272727",
+        backgroundColor: "var(--text-secondary-500)",
         borderRadius: "0",
       },
       ".cm-scroller::-webkit-scrollbar": {

@@ -81,7 +81,7 @@
 >
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
-    style="margin-left: -3px; background-color: {tab.isActive
+    style="margin-left: -3px;  background-color: {tab.isActive
       ? 'var(--text-secondary-800)'
       : 'transparent'};"
   >
@@ -126,7 +126,7 @@
       {/if}
       <span
         class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-size: 12px; font-family: Roboto; color: white`}
+        style={`font-size: 12px; font-family: Roboto; color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>

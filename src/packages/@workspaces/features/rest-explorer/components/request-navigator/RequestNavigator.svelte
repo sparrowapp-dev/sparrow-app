@@ -95,10 +95,10 @@
 
 <div class="pb-2">
   <!-- Tabs -->
-  <div class="d-flex mb-2">
+  <div class="d-flex mb-2 ">
     {#each tabs as tab}
       <button
-        class="navigation__link border-0 sparrow-fs-12 request-tab me-4 {tab.id ===
+        class="navigation__link  border-0 sparrow-fs-12 request-tab me-4 {tab.id ===
         requestStateSection
           ? 'tab-active'
           : ''}"
@@ -107,7 +107,7 @@
           onUpdateRequestState({ requestNavigation: tab.id });
         }}
       >
-        <span class="d-flex align-items-center"
+        <span class="d-flex align-items-center ps-1 pe-1"
           ><span>{tab.name}</span>
           {#if tab.count}
             <span class="ms-1"></span>
@@ -128,8 +128,10 @@
     background-color: transparent;
     border-bottom: 2px transparent;
   }
+
   .navigation__link:hover {
-    color: var(--text-secondary-100);
+  background-color: var(--text-secondary-500);
+  border-radius: 2px;
   }
   .tab-active {
     color: var(--text-secondary-100);

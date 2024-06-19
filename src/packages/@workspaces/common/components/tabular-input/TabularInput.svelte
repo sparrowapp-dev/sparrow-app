@@ -210,7 +210,7 @@
             style="padding-top:3px; padding-bottom:3px; height:24px;"
           >
             <div style="width:30px;">
-              <input 
+              <input
                 class="form-check-input"
                 type="checkbox"
                 disabled
@@ -219,7 +219,7 @@
             </div>
 
             <div class="d-flex gap-0" style="width:calc(100% - 120px)">
-              <div class="w-50 position-relative ">
+              <div class="w-50 position-relative">
                 <input
                   type="text"
                   placeholder=""
@@ -286,8 +286,8 @@
               {/if}
             </div>
 
-            <div class=" d-flex gap-0 " style="width:calc(100% - 120px); ">
-              <div class="w-50 position-relative   ">
+            <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
+              <div class="w-50 position-relative ">
                 <CodeMirrorInput
                   bind:value={element.key}
                   onUpdateInput={() => {
@@ -303,13 +303,13 @@
               {#if type === "file"}
                 <div class="w-50">
                   <div
-                    class="position-relative rounded  p-1 d-flex "
+                    class="position-relative rounded  p-1 d-flex backgroundColor"
                     style="height: 27px;"
                   >
                     {#if element.value === ""}
                       <input
                         type="text"
-                        class="form-control  keyValuePair py-1"
+                        class="form-control keyValuePair py-1"
                         readonly
                         style="z-index:4; font-size:13px;
                     position: absolute;
@@ -320,7 +320,7 @@
                         placeholder="Choose File"
                       />
                       <input
-                        class="form-input "
+                        class="form-input"
                         type="text"
                         id="formdata-file"
                         on:click={() => {
@@ -373,7 +373,7 @@
                   </div>
                 </div>
               {:else}
-                <div class="w-50  position-relative  ">
+                <div class="w-50 position-relative">
                   <CodeMirrorInput
                     bind:value={element.value}
                     onUpdateInput={() => {

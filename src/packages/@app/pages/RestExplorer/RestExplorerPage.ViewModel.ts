@@ -245,11 +245,18 @@ class RestExplorerViewModel
    * @param _description - request description
    */
   public updateRequestDescription = async (_description: string) => {
+   
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _description;
     progressiveTab.isSaved = false;
+    
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      notifications.success("Documentation updated");
+    } catch (error) {
+      notifications.error("Failed to update the documentation. Please try again");
+    } 
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
   /**
