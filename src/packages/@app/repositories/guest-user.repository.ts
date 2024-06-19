@@ -42,9 +42,9 @@ export class GuestUserRepository {
   };
 
   /**
-   * Update banner state
+   * Update guest user state
    */
-  public updateBannerState = async (query, updatedData): Promise<any> => {
+  public updateGuestUserState = async (query, updatedData): Promise<any> => {
     const doc = await RxDB.getInstance()
       .rxdb.guestuser.findOne({
         selector: query,
