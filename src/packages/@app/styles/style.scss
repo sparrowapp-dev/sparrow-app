@@ -81,6 +81,7 @@ $sparrow-send-button-line: #D3D1D154;
 $sparrow-tab-request-default: #324035;
 $sparrow-tab-request-text-default: #4A4D4F;
 $sparrow-tab-unsave-icon: #CB4A4A;
+$sparrow-cross-icon: #F5F5F5;
 
 $sparrow-bg-container: #8989890D;
 $sparrow-bg-container-border: #313233;
@@ -94,7 +95,9 @@ $theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
+$theme-grey-CCCCCC : #CCCCCC;
 $theme-grey-999999: #999999;
+$theme-grey-CCCCCC : #CCCCCC;
 $theme-grey-83899F: #83899F;
 $theme-grey-636566: #636566;
 $theme-grey-45494D: #45494D;
@@ -118,6 +121,7 @@ $theme-blue-0B5ED7: #0B5ED7;
 $theme-blue-2B5ED4: #2B5ED4;
 $theme-blue-303F4F: #303F4F;
 $theme-blue-1D3650: #1D3650;
+$theme-blue-74AEF6: #74AEF6;
 
 $theme-violet-676A80: #676A80;
 $theme-violet-2A2C3C: #2A2C3C;
@@ -126,6 +130,7 @@ $theme-violet-272831: #272831;
 $theme-violet-2E2F3D: #2E2F3D;
 $theme-violet-323548: #323548;
 $theme-violet-1c1d27: #1c1d27;
+$theme-violet-1C1D2B: #1C1D2B;
 
 $theme-red-e5acb2: #e5acb2;
 $theme-red-fe8c98: #fe8c98;
@@ -215,6 +220,7 @@ $theme-red-230408: #230408;
   --tab-request-text-default: #{$sparrow-tab-request-text-default};
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
+  --cross-icon: #{$sparrow-cross-icon};
 
   --bg-conatiner: #{$sparrow-bg-container};
   --bg-container-border: #{$sparrow-bg-container-border};
@@ -233,6 +239,7 @@ $theme-red-230408: #230408;
   --text-primary-200 : #{$theme-blue-1193F0};
   --text-primary-250 : #{$theme-blue-B0B0B0};
   --text-primary-300 : #{$theme-blue-3670F7};
+  --text-primary-350 : #{$theme-blue-74AEF6};
   --text-primary-400 : #{$theme-blue-0B5ED7};
 
   --text-secondary-50 : #{$theme-grey-999999};
@@ -251,6 +258,8 @@ $theme-red-230408: #230408;
   --text-secondary-900 : #{$theme-grey-000000};
 
   --text-tertiary-100 : #{$theme-violet-676A80};
+  --text-tertiary-200 : #{$theme-violet-323548};
+  --text-tertiary-250 : #{$theme-violet-1C1D2B};
   --text-tertiary-300 : #{$theme-violet-2A2C3C};
   --text-tertiary-400 : #{$theme-violet-22232E};
   --text-tertiary-500 : #{$theme-violet-272831};
@@ -295,6 +304,7 @@ $theme-red-230408: #230408;
   --bg-secondary-700 : #{$theme-grey-161617};
   --bg-secondary-800 : #{$theme-grey-151515};
   --bg-secondary-900 : #{$theme-grey-000000};
+  --bg-secondary-1000 : #{$theme-grey-CCCCCC};
 
   --bg-tertiary-100 : #{$theme-violet-676A80};
   --bg-tertiary-300 : #{$theme-violet-2A2C3C};
@@ -702,7 +712,9 @@ span {
   width: 1px;
 }
 
+
 .ellipsis {
+  color: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

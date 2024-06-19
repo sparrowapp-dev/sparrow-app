@@ -18,6 +18,11 @@
   import constants from "$lib/utils/constants";
   import { open } from "@tauri-apps/plugin-shell";
   import LoginPopup from "@common/components/popup/login-popup.svelte";
+  import { Update, check } from "@tauri-apps/plugin-updater";
+  import { notifications } from "@library/ui/toast/Toast";
+  import { relaunch } from "@tauri-apps/plugin-process";
+  import ProgressBar from "@library/ui/progress/Progress.svelte";
+  import Updater from "../../../@common/components/updater/Updater.svelte";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -101,6 +106,57 @@
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
   });
+
+  let updaterVisible = true;
+  const hideUpdater = () => {
+    updaterVisible = false;
+  };
+
+  let showProgressBar = false;
+  let updateAvailable = false;
+  let newAppVersion: string | undefined = "";
+  let updater: Update | null;
+
+  const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
+
+  onMount(async () => {
+    try {
+      updater = await check();
+      if (updater?.available) {
+        notifications.info("Update Available");
+        newAppVersion = updater.version;
+        updateAvailable = true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  const handleUpdatePopUp = (flag: boolean) => {
+    updateAvailable = flag;
+  };
+
+  const initiateUpdate = async () => {
+    try {
+      updateAvailable = false;
+      showProgressBar = true;
+      if (updater) {
+        await updater.downloadAndInstall();
+        notifications.success(
+          "Update Completed. Application will restart automatically.",
+        );
+        setTimeout(async () => {
+          await relaunch();
+        }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
+      }
+    } catch (e) {
+      notifications.error("Update Failed!");
+      console.error(e);
+    } finally {
+      showProgressBar = false;
+      updateAvailable = false;
+    }
+  };
 </script>
 
 <div class="dashboard vh-100">
@@ -125,6 +181,14 @@
     isVisible={isLoginBannerActive}
     onClick={handleGuestLogin}
     onClose={handleBannerClose}
+  />
+  {#if showProgressBar === true}
+    <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
+
+  <Updater
+    show={updaterVisible && updateAvailable}
+    {hideUpdater}
+    onUpdate={initiateUpdate}
   />
 
   <!-- Application Content -->

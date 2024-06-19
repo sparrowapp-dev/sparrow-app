@@ -250,6 +250,8 @@
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
       onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+      onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+      onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
     />
     <Route>
       {#if true}
@@ -385,6 +387,7 @@
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
+    onValidateCurl={_viewModel.handleValidateCurl}
   />
 {/if}
 
@@ -431,6 +434,8 @@
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}
+    onRenameCollection={_viewModel.handleSaveAsRenameCollection}
+    onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
 </ModalWrapperV1>
 

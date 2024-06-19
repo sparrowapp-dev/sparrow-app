@@ -26,6 +26,7 @@
   import Button from "@library/ui/button/Button.svelte";
   import { ContentTypeEnum, ResponseStatusCode } from "$lib/utils/enums";
   import TickMark from "$lib/assets/tick-mark-rounded.svelte";
+  import { Drop } from "../components";
 
   export let currentWorkspaceId;
   export let isurl = false;
@@ -155,25 +156,42 @@
       showFileTypeError: false,
     },
   };
-  const handleLogoInputChange = (
+
+  const validateFileUpload = async (_fileUploadData: string): boolean => {
+    if (validateClientJSON(_fileUploadData)) {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        _fileUploadData,
+      );
+      if (response.isSuccessful) {
+        return true;
+      }
+    } else if (validateClientXML(_fileUploadData)) {
+      const response = await _collectionService.validateImportCollectionInput(
+        "",
+        _fileUploadData,
+      );
+      if (response.isSuccessful) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleFileInputChange = async (
     e: any,
     maxSize: number,
     supportedFileTypes: string[],
   ) => {
-    const targetFile = e?.target?.files;
-    const dataTransferFile = e?.dataTransfer?.files;
-    if (
-      (targetFile && targetFile[0].size > maxSize * 1024) ||
-      (dataTransferFile && dataTransferFile[0].size > maxSize * 1024)
-    ) {
+    isInputDataTouched = true;
+    const targetFile = e?.target?.files || e?.dataTransfer?.files;
+
+    if (targetFile && targetFile[0].size > maxSize * 1024) {
       uploadCollection.file.showFileSizeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
-    const fileType = `.${(
-      (targetFile && targetFile[0]?.name) ||
-      (dataTransferFile && dataTransferFile[0]?.name)
-    )
+    const fileType = `.${(targetFile && targetFile[0]?.name)
       .split(".")
       .pop()
       .toLowerCase()}`;
@@ -185,21 +203,26 @@
     uploadCollection.file.showFileSizeError = false;
     uploadCollection.file.showFileTypeError = false;
     uploadCollection.file.invalid = false;
-    uploadCollection.file.value =
-      (targetFile && targetFile[0]) ||
-      (dataTransferFile && dataTransferFile[0]);
+    uploadCollection.file.value = targetFile && targetFile[0];
     isFileEmpty = false;
+
+    // Read the file content
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const fileContent = event.target?.result;
+      const res = await validateFileUpload(fileContent);
+      if (res) {
+        uploadCollection.file.invalid = false;
+      } else {
+        uploadCollection.file.invalid = true;
+        uploadCollection.file.value = [];
+      }
+    };
+    reader.readAsText(targetFile ? targetFile[0] : "");
   };
 
   const handleLogoReset = (e: any) => {
     uploadCollection.file.value = [];
-  };
-
-  const handleLogoEdit = (e: any) => {
-    const uploadFileInput = document.getElementById(
-      "upload-collection-file-input",
-    );
-    uploadFileInput.click();
   };
 
   async function handleFileUpload(file: Request) {
@@ -321,6 +344,7 @@
       uploadCollection?.file?.value?.length === 0
     ) {
       isFileEmpty = true;
+      uploadCollection.file.invalid = true;
     }
     isLoading = false;
   };
@@ -483,7 +507,7 @@
   isOpen={!progressBar.isLoading && !isSyntaxError}
   handleModalState={onClick}
 >
-  <div class="d-flex">
+  <div class="d-flex pt-3">
     <div class="form-check import-type-inp">
       <input
         class="form-check-input"
@@ -496,7 +520,7 @@
           isInputDataTouched = false;
         }}
       />
-      <label class="form-check-label" for="flexRadioDefault1">
+      <label class="form-check-label text-fs-14" for="flexRadioDefault1">
         Paste Text
       </label>
     </div>
@@ -512,15 +536,17 @@
           isInputDataTouched = false;
         }}
       />
-      <label class="form-check-label" for="flexRadioDefault2">
+      <label class="form-check-label text-fs-14" for="flexRadioDefault2">
         Upload File
       </label>
     </div>
   </div>
   <br />
   {#if importType === "text"}
-    <div class="importData-lightGray sparrow-fs-14 text-muted">
-      <p>Paste your OAS text or Swagger/Localhost Link</p>
+    <div>
+      <p class="sparrow-fs-12 text-secondary-200">
+        Paste your OAS text or Swagger/Localhost Link
+      </p>
     </div>
     <div class="textarea-div rounded border-0 position-relative">
       <textarea
@@ -533,8 +559,9 @@
         on:blur={() => {
           isInputDataTouched = true;
         }}
+        placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
         bind:value={importData}
-        class="mb-1 border-0 rounded bg-blackColor pe-4 ps-2 pb-2 pt-2"
+        class="mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
         style={!isValidServerDeployedURL &&
         !isValidServerJSON &&
         !isValidServerURL &&
@@ -554,7 +581,7 @@
         </div>
       {/if}
     </div>
-    {#if isTextEmpty && isInputDataTouched && !isimportDataLoading}
+    {#if !importData && isInputDataTouched && !isimportDataLoading}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please paste your OpenAPI specification text or Swagger/localhost link.
       </p>
@@ -574,28 +601,32 @@
   {/if}
 
   {#if importType === "file"}
-    <div class="importData-lightGray sparrow-fs-14">
-      <p class="mb-1">Upload YAML/JSON file</p>
+    <div>
+      <p class="sparrow-fs-12 text-secondary-200">Upload YAML/JSON file</p>
     </div>
     <div>
-      <DragDrop
+      <Drop
         value={uploadCollection.file.value}
-        maxFileSize={100}
-        onChange={handleLogoInputChange}
+        maxFileSize={10000}
+        onChange={handleFileInputChange}
         resetValue={handleLogoReset}
-        editValue={handleLogoEdit}
-        labelText=""
-        labelDescription="Drag and drop your YAML/JSON file"
         inputId="upload-collection-file-input"
         inputPlaceholder="Drag and Drop or"
-        isRequired={false}
         supportedFileTypes={[".yaml", ".json"]}
-        showFileSizeError={uploadCollection.file.showFileSizeError}
-        showFileTypeError={uploadCollection.file.showFileTypeError}
-        type={"file"}
-        fileTypeError="The file type you are trying to upload is not supported. Please re-upload in any of the following file formats."
-        fileSizeError="The size of the file you are trying to upload is more than 100 KB."
+        isError={uploadCollection.file.invalid && isInputDataTouched}
+        title={"Drag and Drop your YAML/JSON file or"}
       />
+    </div>
+    <div>
+      {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
+        <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+          Invalid file format. Please upload an OAS file in YAML or JSON format.
+        </p>
+      {:else if isInputDataTouched && isFileEmpty}
+        <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+          Please upload a file to import collection.
+        </p>
+      {/if}
     </div>
   {/if}
   {#if importType === "text" && isValidClientURL && isValidServerURL && false}
@@ -759,7 +790,7 @@
     class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
   >
     <button
-      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 rounded
+      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 border-radius-2
        btn-primary"
       on:click={() => {
         handleImport();
@@ -774,9 +805,9 @@
         {/if}</span
       >
     </button>
-    <p class="importData-whiteColor my-2 sparrow-fs-14 fw-normal">OR</p>
+    <p class="importData-whiteColor my-3 sparrow-fs-14 fw-light">OR</p>
     <button
-      class="btn-primary border-0 w-100 py-2 fs-6 rounded"
+      class="btn-primary border-0 w-100 py-2 fs-6 border-radius-2"
       on:click={() => {
         onItemCreated("collection", {
           workspaceId: currentWorkspaceId,
@@ -802,14 +833,6 @@
     margin-right: 5px;
     border-width: 2px;
   }
-  .import-type-inp:hover {
-    background-color: var(--keyvalue-pair);
-    color: var(--send-button);
-  }
-  .import-type-inp:hover .import-type-inp input {
-    border-width: 2px;
-    border-color: var(--send-button);
-  }
 
   .enable-active-sync {
     margin: 1% 0;
@@ -827,7 +850,6 @@
     width: 100%;
     resize: vertical;
     height: calc(100px) !important;
-    background-color: var(--blackColor);
     margin-bottom: 5%;
   }
   .background-overlay {
@@ -880,7 +902,7 @@
     background-color: var(--background-dropdown);
   }
   .btn-primary {
-    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+    background-color: var(--bg-primary-300);
   }
   .btn-disabled {
     background-color: var(--button-disabled);

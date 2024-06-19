@@ -111,7 +111,6 @@
         <SidebarItem {item} />
       {/each}
     </div>
-
     <div class="secondary-sidebar-items z-4">
       {#each secondarySidebarItems as item (item.route)}
         <SidebarItem {item} />

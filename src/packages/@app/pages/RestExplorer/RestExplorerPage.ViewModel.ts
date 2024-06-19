@@ -77,6 +77,8 @@ import {
 } from "@common/types/workspace";
 import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { GuideRepository } from "@app/repositories/guide.repository";
+import { CollectionService } from "@app/services/collection.service";
 
 class RestExplorerViewModel
   implements
@@ -113,11 +115,13 @@ class RestExplorerViewModel
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
+  private guideRepository = new GuideRepository();
 
   /**
    * Service
    */
   private environmentService = new EnvironmentService();
+  private collectionService = new CollectionService();
   /**
    * Utils
    */
@@ -1071,6 +1075,114 @@ class RestExplorerViewModel
         notifications.success("Environment Variable Added");
       } else {
         notifications.error("Failed to add Environment Variable");
+      }
+      return response;
+    }
+  };
+/**
+ * Fetches a collection guide based on the provided query.
+ * 
+ * @param query - The query object used to find the collection guide.
+ * @returns - A promise that resolves to the collection guide found by the query.
+ */
+ public fetchCollectionGuide = async (query) => {
+  return await this.guideRepository.findOne(query);
+};
+
+/**
+* Updates the collection guide to set its active status.
+* 
+* @param  query - The query object used to find the collection guide to update.
+* @param  isActive - The new active status to set for the collection guide.
+* @returns - A promise that resolves when the update operation is complete.
+*/
+public updateCollectionGuide = async (query, isActive) => {
+  await this.guideRepository.update(query, {
+      isActive: isActive,
+  });
+};
+
+
+  /**
+   * Handles collection rename
+   * @param collection - collction to rename
+   * @param newCollectionName :string - the new name of the collection
+   */
+  public handleRenameCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    newCollectionName: string,
+  ) => {
+    if (newCollectionName) {
+      const response = await this.collectionService.updateCollectionData(
+        collectionId,
+        workspaceId,
+        { name: newCollectionName },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collectionId,
+          response.data.data,
+        );
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
+      return response;
+    }
+  };
+
+  /**
+   * Handle folder rename
+   * @param workspaceId - workspace id of the folder
+   * @param collectionId - collection id of the folder
+   * @param folderId  - folder id to be targetted
+   * @param newFolderName - new folder name
+   * @returns
+   */
+  public handleRenameFolder = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    newFolderName: string,
+  ) => {
+    const collection =
+      await this.collectionRepository.readCollection(collectionId);
+    const explorer =
+      await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        folderId,
+      );
+    if (newFolderName) {
+      let userSource = {};
+      if (collection.activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: collection.currentBranch
+            ? collection.currentBranch
+            : collection.primaryBranch,
+          source: "USER",
+        };
+      }
+      const response = await this.collectionService.updateFolderInCollection(
+        workspaceId,
+        collectionId,
+        folderId,
+        {
+          ...userSource,
+          name: newFolderName,
+        },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          response.data.data,
+        );
+        notifications.success("Folder renamed successfully!");
+      } else {
+        notifications.error("Failed to rename folder!");
       }
       return response;
     }
