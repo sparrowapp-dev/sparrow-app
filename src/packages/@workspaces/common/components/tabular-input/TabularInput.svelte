@@ -9,6 +9,7 @@
   import close from "$lib/assets/close.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
+    import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -263,7 +264,7 @@
         >
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container "
-            style="padding-top:3px; padding-bottom:3px; height:24px; margin-bottom:4px;"
+            style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
           >
             <img
               src={dragIcon}
@@ -392,13 +393,15 @@
               <div class="h-75 pe-1">
                 <button class="bg-secondary-700 border-0" style="width:40px;">
                   {#if mode !== "READ"}
-                    <img
+                  <Tooltip title={"Delete"} placement={"left"} distance={10}>
+                    <img class="trash-icon"
                       src={trashIcon}
                       on:click={() => {
                         deleteParam(index);
                       }}
                       alt=""
                     />
+                  </Tooltip>
                   {/if}
                 </button>
               </div>
@@ -502,5 +505,8 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+  .trash-icon:hover{
+    background-color: var(--text-secondary-500);
   }
 </style>

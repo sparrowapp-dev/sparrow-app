@@ -93,7 +93,7 @@
       }}
       class="position-relative border-0 ellipsis"
       style="width: 100%;
-        text-align: left; background-color:transparent;"
+        text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span class="text-{getMethodStyle(tab.property.request.method)}">
