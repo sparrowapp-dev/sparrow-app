@@ -199,7 +199,25 @@
           />
         </div>
       </div>
-      <div class="">
+     
+
+      <!-- HTTP URL Section -->
+      <HttpUrlSection
+        class=""
+        isSave={$tab.isSaved}
+        requestUrl={$tab.property.request.url}
+        httpMethod={$tab.property.request.method}
+        isSendRequestInProgress={$tab.property.request?.state
+          ?.isSendRequestInProgress}
+        onSendButtonClicked={onSendRequest}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        {onUpdateRequestUrl}
+        {onUpdateRequestMethod}
+        {toggleSaveRequest}
+        {onSaveRequest}
+      />
+      <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
             onClose={() => {
@@ -230,24 +248,7 @@
             </p>
           </Popover>
         {/if}
-      </div>
-
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSave={$tab.isSaved}
-        requestUrl={$tab.property.request.url}
-        httpMethod={$tab.property.request.method}
-        isSendRequestInProgress={$tab.property.request?.state
-          ?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-      />
+      </div>  
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
