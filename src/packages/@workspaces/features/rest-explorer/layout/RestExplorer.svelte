@@ -85,6 +85,7 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isGuestUser = false;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -193,6 +194,7 @@
         {onUpdateRequestMethod}
         {toggleSaveRequest}
         {onSaveRequest}
+        {isGuestUser}
       />
       {#if !isLoading}
         <Splitpanes

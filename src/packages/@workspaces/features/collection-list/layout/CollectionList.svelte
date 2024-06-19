@@ -39,6 +39,11 @@
    */
   export let isAppVersionVisible = true;
 
+  /**
+   * Flag to check is user iu guest user
+   */
+  export let isGuestUser = false;
+
   import {
     Collection,
     EmptyCollection,
@@ -360,6 +365,7 @@
             {userRoleInWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
+            isAddCollectionDisabled={isGuestUser}
           />
         {/if}
       </div>

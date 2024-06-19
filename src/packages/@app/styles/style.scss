@@ -90,6 +90,7 @@ $sparrow-bg-container-three: #5652FD;
 $sparrow-bg-container-four: #376FF7;
 
 $theme-grey-ffffff: #FFFFFF;
+$theme-grey-F5F5F5: #F5F5F5;
 $theme-grey-e5e5e5: #e5e5e5;
 $theme-grey-C4CBDA: #C4CBDA;
 $theme-grey-8A9299: #8A9299;
@@ -236,6 +237,7 @@ $theme-red-230408: #230408;
 
   --text-secondary-50 : #{$theme-grey-999999};
   --text-secondary-100 : #{$theme-grey-ffffff};
+  --text-secondary-110 : #{$theme-grey-F5F5F5};
   --text-secondary-150 : #{$theme-grey-e5e5e5};
   --text-secondary-200 : #{$theme-grey-8A9299};
   --text-secondary-250 : #{$theme-grey-83899F};
@@ -282,6 +284,7 @@ $theme-red-230408: #230408;
   --bg-primary-600 : #{$theme-blue-1D3650};
 
   --bg-secondary-100 : #{$theme-grey-ffffff};
+  --bg-secondary-110 : #{$theme-grey-F5F5F5};
   --bg-secondary-150 : #{$theme-grey-e5e5e5};
   --bg-secondary-200 : #{$theme-grey-8A9299};
   --bg-secondary-300 : #{$theme-grey-45494D};
@@ -326,6 +329,7 @@ $theme-red-230408: #230408;
   --border-primary-900 : #{$theme-blue-303F4F};
 
   --border-secondary-100 : #{$theme-grey-ffffff};
+  --border-secondary-110 : #{$theme-grey-F5F5F5};
   --border-secondary-150 : #{$theme-grey-e5e5e5};
   --border-secondary-200 : #{$theme-grey-8A9299};
   --border-secondary-300 : #{$theme-grey-45494D};
@@ -366,6 +370,7 @@ $theme-red-230408: #230408;
   --icon-primary-900 : #{$theme-blue-303F4F};
 
   --icon-secondary-100 : #{$theme-grey-ffffff};
+  --icon-secondary-110 : #{$theme-grey-F5F5F5};
   --icon-secondary-150 : #{$theme-grey-e5e5e5};
   --icon-secondary-200 : #{$theme-grey-8A9299};
   --icon-secondary-300 : #{$theme-grey-45494D};
@@ -501,6 +506,7 @@ $sparrow-text-colors: (
   primary-400 : $theme-blue-0B5ED7,
 
   secondary-100 : $theme-grey-ffffff,
+  secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
@@ -541,6 +547,7 @@ $sparrow-bg-colors: (
   primary-400 : $theme-blue-0B5ED7,
 
   secondary-100 : $theme-grey-ffffff,
+  secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,
@@ -582,6 +589,7 @@ $sparrow-border-colors: (
   primary-400 : $theme-blue-0B5ED7,
 
   secondary-100 : $theme-grey-ffffff,
+  secondary-110 : $theme-grey-F5F5F5,
   secondary-150 : $theme-grey-e5e5e5,
   secondary-170 : $theme-grey-C4CBDA,
   secondary-200 : $theme-grey-8A9299,

@@ -13,6 +13,7 @@
   export let userRoleInWorkspace: WorkspaceRole;
   export let onImportCollectionPopup: () => void;
   export let handleCreateApiRequest: () => void;
+  export let isAddCollectionDisabled = false;
 </script>
 
 <div class="d-flex flex-column align-items-center px-3">
@@ -22,24 +23,33 @@
       request directly
     </p>
     <div class="w-100 mt-3">
-      <p
-        class="add-collection d-flex justify-content-center align-items-center border-radius-2"
-        style="color: var(--text-secondary-100);"
-        role="button"
-        on:click={() => {
-          onImportCollectionPopup();
-        }}
+      <Tooltip
+        placement="bottom"
+        title={isAddCollectionDisabled ? "Please Login to Use" : ""}
       >
-        <PlusIcon
-          height={"22px"}
-          width={"22px"}
-          color={"var(--text-secondary-200)"}
-        />
-        <span
-          style="color: var(--text-secondary-200)"
-          class="ps-2 fw-bold text-fs-12">Add Collection</span
+        <p
+          class="add-collection d-flex justify-content-center align-items-center border-radius-2 {isAddCollectionDisabled
+            ? 'disabled'
+            : ''}"
+          style="color: var(--text-secondary-100);"
+          role="button"
+          on:click={() => {
+            if (!isAddCollectionDisabled) {
+              onImportCollectionPopup();
+            }
+          }}
         >
-      </p>
+          <PlusIcon
+            height={"22px"}
+            width={"22px"}
+            color={"var(--text-secondary-200)"}
+          />
+          <span
+            style="color: var(--text-secondary-200)"
+            class="ps-2 fw-bold text-fs-12">Add Collection</span
+          >
+        </p>
+      </Tooltip>
     </div>
   </List>
 </div>
@@ -49,7 +59,15 @@
     border: 1px solid var(--text-secondary-300);
     height: 32px;
   }
-  .add-collection:hover{
+  .add-collection:hover {
     border: 1px solid var(--text-primary-300);
+  }
+  .add-collection:disabled {
+    border: 1px solid var(--button-disabled);
+    color: var(--button-disabled);
+    cursor: not-allowed;
+  }
+  .add-collection.disabled:hover {
+    border: 1px solid var(--text-secondary-300);
   }
 </style>

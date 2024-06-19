@@ -62,6 +62,7 @@ export async function handleLoginV2(url: string) {
   const accessToken = params.get("accessToken");
   const refreshToken = params.get("refreshToken");
   const event = params.get("event");
+
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
     setAuthJwt(constants.AUTH_TOKEN, accessToken);
@@ -73,10 +74,11 @@ export async function handleLoginV2(url: string) {
       Success: true,
     });
     notifications.success("Login successful!");
-    if(event === "register"){
-    navigate("/app/collections?first=true");}
-    else {
-    navigate("/app/collections?first=false");}
+    if (event === "register") {
+      navigate("/app/collections?first=true");
+    } else {
+      navigate("/app/collections?first=false");
+    }
     _activeSidebarTabViewModel.addActiveTab("collections");
     await resizeWindowOnLogin();
   } else {

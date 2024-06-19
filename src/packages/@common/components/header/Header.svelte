@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Select } from "@library/forms";
-  import { StackIcon } from "@library/icons";
+  import { CloudOffIcon, StackIcon } from "@library/icons";
   import { environmentType } from "$lib/utils/enums";
   import { ArrowIcon } from "@library/icons";
   import { DownArrowIcon } from "$lib/assets/icons";
@@ -32,6 +32,11 @@
   };
 
   export let currentWorkspaceName;
+
+  export let isGuestUser = false;
+  export let isLoginBannerActive = false;
+
+  export let onLoginUser;
 </script>
 
 <header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
@@ -73,7 +78,20 @@
     </div>
   </div>
 
-  <div>
+  <div class="d-flex align-items-center">
+    {#if isGuestUser && isLoginBannerActive === false}
+      <Tooltip title={"Reconnect to explore more features!"} placement="bottom">
+        <CloudOffIcon height="19px" width="23px" />
+      </Tooltip>
+      <div
+        style="background-color:#313233; justify-content:center; align-items:center; margin-right:10px; margin-left:10px; border-radius:2px"
+        class="join-container"
+        on:click={onLoginUser}
+      >
+        <span class="join-txt"> Join the Experience </span>
+      </div>
+    {/if}
+
     <Select
       id={"environment-selector"}
       data={[
@@ -117,5 +135,15 @@
 <style>
   header {
     height: 44px;
+  }
+  .join-txt {
+    font-size: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .join-container {
+    cursor: pointer;
   }
 </style>

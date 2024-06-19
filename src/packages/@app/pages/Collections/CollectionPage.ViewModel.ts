@@ -94,6 +94,7 @@ import { GithubService } from "@app/services/github.service";
 import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -104,17 +105,29 @@ export default class CollectionsViewModel {
   private collectionService = new CollectionService();
   private githubService = new GithubService();
   private featureSwitchRepository = new FeatureSwitchRepository();
+  private guestUserRepository = new GuestUserRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
   constructor() {}
 
   /**
+   * Get the guest user state
+   */
+  private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
   public fetchCollections = async (workspaceId: string) => {
-    if (workspaceId) {
+    const isGuestUser = await this.getGuestUserState();
+    if (workspaceId && !isGuestUser) {
       const res = await this.collectionService.fetchCollection(workspaceId);
       if (res.isSuccessful) {
         this.collectionRepository.bulkInsertData(
@@ -594,52 +607,95 @@ export default class CollectionsViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-
-    const response = await this.collectionService.addCollection({
-      name: newCollection.name,
-      workspaceId: workspaceId,
-    });
-
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
-      await this.addCollection({
-        ...res,
-        id: res._id,
+    const isGuestUser = await this.getGuestUserState();
+    let response;
+    if (isGuestUser !== true) {
+      response = await this.collectionService.addCollection({
+        name: newCollection.name,
         workspaceId: workspaceId,
+      });
+
+      if (response.isSuccessful && response.data.data) {
+        const res = response.data.data;
+        await this.addCollection({
+          ...res,
+          id: res._id,
+          workspaceId: workspaceId,
+        });
+        let path = {
+          workspaceId: workspaceId,
+          collectionId: response.data.data._id,
+        };
+        // const Samplecollection = generateSampleCollection(
+        //   response.data.data._id,
+        //   new Date().toString(),
+        // );
+        const initCollectionTab = new InitCollectionTab(
+          response.data.data._id,
+          workspaceId,
+        );
+
+        response.data.data.items.map((item) => {
+          if (item.type === ItemType.REQUEST) {
+            totalRequest++;
+          } else {
+            totalFolder++;
+            totalRequest += item.items.length;
+          }
+        });
+
+        // Samplecollection.id = response.data.data._id;
+        // Samplecollection.path = path;
+        // Samplecollection.name = response.data.data.name;
+        // Samplecollection.property.collection.requestCount = totalRequest;
+        // Samplecollection.property.collection.folderCount = totalFolder;
+
+        initCollectionTab.updateId(response.data.data._id);
+        initCollectionTab.updatePath(path);
+        initCollectionTab.updateName(response.data.data.name);
+
+        // this.handleOpenCollection(workspaceId, Samplecollection);
+        this.tabRepository.createTab(initCollectionTab.getValue());
+        moveNavigation("right");
+
+        await this.workspaceRepository.updateCollectionInWorkspace(
+          workspaceId,
+          {
+            id: initCollectionTab.getValue().id,
+            name: newCollection.name,
+          },
+        );
+        notifications.success("New Collection Created");
+        MixpanelEvent(Events.CREATE_COLLECTION, {
+          source: "USER",
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+        });
+      } else {
+        notifications.error(response.message ?? "Failed to create collection!");
+      }
+    } else {
+      await this.addCollection({
+        id: newCollection.id,
+        workspaceId: workspaceId,
+        items: [],
+        createdAt: newCollection.createdAt,
+        createdBy: "guestUser",
+        totalRequests: 0,
+        updatedAt: newCollection.createdAt,
+        updatedBy: "guestUser",
       });
       let path = {
         workspaceId: workspaceId,
-        collectionId: response.data.data._id,
+        collectionId: newCollection.id,
       };
-      // const Samplecollection = generateSampleCollection(
-      //   response.data.data._id,
-      //   new Date().toString(),
-      // );
       const initCollectionTab = new InitCollectionTab(
-        response.data.data._id,
+        newCollection.id,
         workspaceId,
       );
-
-      response.data.data.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item.items.length;
-        }
-      });
-
-      // Samplecollection.id = response.data.data._id;
-      // Samplecollection.path = path;
-      // Samplecollection.name = response.data.data.name;
-      // Samplecollection.property.collection.requestCount = totalRequest;
-      // Samplecollection.property.collection.folderCount = totalFolder;
-
-      initCollectionTab.updateId(response.data.data._id);
+      initCollectionTab.updateId(newCollection.id);
       initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(response.data.data.name);
-
-      // this.handleOpenCollection(workspaceId, Samplecollection);
+      initCollectionTab.updateName(newCollection.name);
       this.tabRepository.createTab(initCollectionTab.getValue());
       moveNavigation("right");
 
@@ -648,13 +704,6 @@ export default class CollectionsViewModel {
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
-      MixpanelEvent(Events.CREATE_COLLECTION, {
-        source: "USER",
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-      });
-    } else {
-      notifications.error(response.message ?? "Failed to create collection!");
     }
     return response;
   };

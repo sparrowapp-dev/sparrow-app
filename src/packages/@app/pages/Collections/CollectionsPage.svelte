@@ -51,6 +51,7 @@
   import type { GithubRepoDocType } from "@app/models/github-repo.model";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
+  import { isGuestUserActive } from "$lib/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -69,6 +70,11 @@
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
   let isAppVersionVisible = true;
+  let isGuestUser = false;
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   /**
    * @description - handles different key press
@@ -210,6 +216,7 @@
       {collectionList}
       {currentWorkspace}
       {isAppVersionVisible}
+      {isGuestUser}
       leftPanelController={{
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
@@ -269,6 +276,7 @@
             <WorkspaceDefault
               showImportCollectionPopup={() => (isImportCollectionPopup = true)}
               onItemCreated={_viewModel.handleCreateItem}
+              {isGuestUser}
             />
           </Motion>
         {/if}
@@ -288,6 +296,7 @@
     workspaceLevelPermissions.SAVE_REQUEST,
   )}
   {loader}
+  {isGuestUser}
 />
 
 <svelte:window on:keydown={handleKeyPress} />

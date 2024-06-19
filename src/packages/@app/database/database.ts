@@ -45,8 +45,12 @@ import {
   featureSwitchSchema,
   type FeatureSwitchDocType,
 } from "@app/models/feature-switch.model";
-// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-// addRxPlugin(RxDBDevModePlugin);
+import {
+  guestUserSchema,
+  type GuestUserDocType,
+} from "@app/models/guest-user.model";
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -63,6 +67,8 @@ export type EnvironmentTabContainer = RxCollection<EnvironmentTabDocType>;
 export type EnvironmentTabDocument = RxDocument<EnvironmentTabDocType>;
 export type GithubDocument = RxDocument<GithubRepoDocType>;
 export type FeatureDocument = RxDocument<FeatureSwitchDocType>;
+export type GuestDocument = RxDocument<GuestUserDocType>;
+export type GuestContainer = RxDocument<GuestUserDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -80,6 +86,7 @@ export type DatabaseCollections = {
   activesidebartab: ActiveSideBarTabContainer;
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
+  guest: GuestContainer;
 };
 
 // define the Rx database type
@@ -246,6 +253,9 @@ export class RxDB {
       },
       featureswitch: {
         schema: featureSwitchSchema,
+      },
+      guestuser: {
+        schema: guestUserSchema,
       },
     });
     return { rxdb: this.rxdb };

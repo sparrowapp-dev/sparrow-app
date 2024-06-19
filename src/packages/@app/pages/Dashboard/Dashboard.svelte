@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Sidebar } from "@common/components";
-  import { Route } from "svelte-navigator";
+  import { Sidebar, LoginBanner } from "@common/components";
+  import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
-  import { user } from "$lib/store";
+  import { navigationState, user } from "$lib/store";
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Header from "@common/components/header/Header.svelte";
@@ -15,6 +15,10 @@
   } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
+  import constants from "$lib/utils/constants";
+  import { open } from "@tauri-apps/plugin-shell";
+  import LoginPopup from "@common/components/popup/login-popup.svelte";
+
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -29,6 +33,15 @@
 
   let currentEnvironment = {
     id: "none",
+  };
+
+  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  let isPopupOpen = false;
+  let isLoginBannerActive = false;
+  let isGuestUser = false;
+
+  const openDefaultBrowser = async () => {
+    await open(externalSparrowLink);
   };
 
   let currentWorkspaceId = "";
@@ -55,8 +68,33 @@
     },
   );
 
-  onMount(() => {
+  const onModalStateChanged = (flag: boolean) => {
+    isPopupOpen = flag;
+  };
+
+  const handleLogin = () => {
+    _viewModel.clearLocalDB();
+    navigationState.set("guestUser");
+    openDefaultBrowser();
+    navigate("/init");
+  };
+
+  const handleGuestLogin = () => {
+    isPopupOpen = true;
+  };
+
+  const handleBannerClose = async () => {
+    await _viewModel.updateGuestBannerState();
+    isLoginBannerActive = false;
+  };
+
+  onMount(async () => {
     _viewModel.getAllFeatures();
+    const guestUser = await _viewModel.getGuestUser();
+    isGuestUser = guestUser?.isGuestUser;
+    if (guestUser?.isBannerActive) {
+      isLoginBannerActive = guestUser?.isBannerActive;
+    }
   });
 
   onDestroy(() => {
@@ -76,6 +114,17 @@
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
     {currentWorkspaceName}
+    {isGuestUser}
+    {isLoginBannerActive}
+    onLoginUser={handleGuestLogin}
+  />
+
+  <!-- <LoginBanner
+    -->
+  <LoginBanner
+    isVisible={isLoginBannerActive}
+    onClick={handleGuestLogin}
+    onClose={handleBannerClose}
   />
 
   <!-- Application Content -->
@@ -112,4 +161,15 @@
       <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
+
+  <LoginPopup
+    isOpen={isPopupOpen}
+    {onModalStateChanged}
+    onCancel={() => {
+      isPopupOpen = false;
+    }}
+    onContinue={handleLogin}
+    title={"Confirm Login?"}
+    description={"After continuing your data will be lost, do you want to continue?"}
+  />
 </div>
