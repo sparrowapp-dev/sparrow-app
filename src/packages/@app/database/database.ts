@@ -54,8 +54,8 @@ import {
   guestUserSchema,
   type GuestUserDocType,
 } from "@app/models/guest-user.model";
-import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
-addRxPlugin(RxDBDevModePlugin);
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+// addRxPlugin(RxDBDevModePlugin);
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
