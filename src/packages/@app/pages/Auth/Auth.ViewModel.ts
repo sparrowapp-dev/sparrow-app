@@ -9,6 +9,9 @@ export class AuthViewModel {
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
 
+  /**
+   * Insert the guestr user in local DB
+   */
   public addGuestUser = async () => {
     await this.guestUserRepository.insert({
       id: uuidv4(),
@@ -18,11 +21,19 @@ export class AuthViewModel {
     });
   };
 
+  /**
+   *
+   * @param data query to find details
+   * @returns data from guest user repository
+   */
   public findUser = async (data) => {
     const res = await this.guestUserRepository.findOne(data);
     return res;
   };
 
+  /**
+   * create dummy team and workspace for guest user
+   */
   public createGuestUserTeamWorkspace = async () => {
     const response = await this.findUser({ name: "guestUser" });
     const user = response?.getLatest().toMutableJSON();

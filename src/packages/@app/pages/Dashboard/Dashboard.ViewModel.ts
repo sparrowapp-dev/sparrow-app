@@ -254,6 +254,9 @@ export class DashboardViewModel {
     return;
   };
 
+  /**
+   * clear local DB and clear guest user details from store
+   */
   public clearLocalDB = async (): Promise<void> => {
     setUser(null);
     isGuestUserActive.set(false);
@@ -309,14 +312,23 @@ export class DashboardViewModel {
     }
   };
 
+  /**
+   * add guest user in local db
+   */
   public addGuestUser = async () => {
     const data = await this.guestUserRepository.insert({
       id: uuidv4(),
       name: "guestUser",
       isGuestUser: true,
+      isBannerActive: true,
     });
   };
 
+  /**
+   *
+   * @param data query to find details
+   * @returns data from guest user repository
+   */
   public findUser = async (data) => {
     const res = await this.guestUserRepository.findOne(data);
     return res;
