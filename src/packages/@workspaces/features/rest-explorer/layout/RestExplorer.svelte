@@ -459,6 +459,9 @@
 >
   <div style="position: relative;">
     <Carousel
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
       data={[
         {
           id: 1,
