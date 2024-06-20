@@ -43,16 +43,13 @@
   }
 </script>
 
-<div
-  class="d-flex flex-column"
-  style="height: 234px; gap: 8px; font-size: 14px;"
->
+<div class="d-flex flex-column text-fs-14" style="height: 234px; gap: 8px;">
   <div class="d-flex" style="justify-content: space-between;">
     <div style="font-weight: 600;">Documentation</div>
     {#if !editing}
       <div
-        class="edit-btn d-flex align-items-center"
-        style="gap: 3px; padding-left: 4px; padding-right: 4px; border-radius: 2px; cursor: pointer;"
+        class="edit-btn d-flex align-items-center pe-4 ps-4"
+        style="gap: 3px; border-radius: 2px; cursor: pointer;"
         on:click={() => {
           toggleEditMode();
           focusTextarea();
@@ -62,10 +59,10 @@
           <EditIcon
             height="10.56px"
             width="10.56px"
-            color="var(--text-primary-300)"
+            color="var(--icon-primary-300)"
           />
         </div>
-        <p class="edit-txt mb-0" style="font-size: 12px;">Edit</p>
+        <p class="edit-txt mb-0 text-fs-12">Edit</p>
       </div>
     {:else}
       <div
@@ -83,7 +80,7 @@
             color={"var(  --text-primary-300)"}
           />
         </div>
-        <p class="edit-txt mb-0" style="font-size: 12px;">Save Changes</p>
+        <p class="edit-txt mb-0 text-fs-12">Save Changes</p>
       </div>
     {/if}
   </div>
@@ -91,8 +88,8 @@
     <textarea
       bind:this={textareaRef}
       value={docValue}
-      class="text-area h-100 w-100 border-0"
-      style="font-weight:400; font-size:12px; background-color:transparent; outline: none; border-radius: 2px; padding-bottom:20px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
+      class="text-area text-fs-12 h-100 w-100 border-0"
+      style="font-weight:400; background-color:transparent; outline: none; border-radius: 2px; padding-bottom:20px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
       placeholder="Add Documentation"
     ></textarea>
   </div>
@@ -100,8 +97,8 @@
 
 <style>
   .edit-btn:hover {
-    background-color: var(--selected-active-sidebar);
-    color: white !important;
+    background-color: var(--bg-primary-700);
+    color: var(--text-secondary-100) !important;
   }
   .edit-btn {
     color: var(--text-primary-300);

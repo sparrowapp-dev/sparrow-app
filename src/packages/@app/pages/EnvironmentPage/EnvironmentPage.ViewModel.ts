@@ -81,16 +81,16 @@ export class EnvironmentViewModel {
     return;
   };
 
-public closeHelpText = async () => {
-  onFetchCollectionGuide({ id: "collection-guide" });
-              onFetchEnvironmentGuide({ id: "environment-guide" });
- 
-              if (id === "collection-guide") {
-                onUpdateCollectionGuide({ id: "collection-guide" }, false);
-              } else if (id === "environment-guide") {
-                onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
-              }
-}
+  public closeHelpText = async () => {
+    onFetchCollectionGuide({ id: "collection-guide" });
+    onFetchEnvironmentGuide({ id: "environment-guide" });
+
+    if (id === "collection-guide") {
+      onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    } else if (id === "environment-guide") {
+      onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
+    }
+  }
 
   /**
    * @description - deletes environment tab
@@ -329,11 +329,10 @@ public closeHelpText = async () => {
     }
   };
 }
-function onFetchEnvironmentGuide(arg0: { id: string; }) {
-  throw new Error("Function not implemented.");
+function onFetchEnvironmentGuide(arg0: { id: string }) {
+  console.error("Function not implemented.");
 }
 
-function onFetchCollectionGuide(arg0: { id: string; }) {
-  throw new Error("Function not implemented.");
+function onFetchCollectionGuide(arg0: { id: string }) {
+  console.error("Function not implemented.");
 }
-

@@ -125,8 +125,8 @@
         </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-size: 12px; font-family: Roboto; color:  var(--text-secondary-100)`}
+        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        style={`color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>
