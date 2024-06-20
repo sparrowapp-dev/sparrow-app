@@ -82,7 +82,7 @@
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
       >
-        {#if $currentEnvironment?.type == environmentType.GLOBAL}
+        {#if $currentEnvironment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22px; border:none; z-index:5; curser:pointer;"
@@ -178,7 +178,7 @@
         </div>
       </header>
       <div>
-        {#if isPopoverContainer && $currentEnvironment?.type == environmentType.GLOBAL }
+        {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL }
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
