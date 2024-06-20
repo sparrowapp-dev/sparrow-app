@@ -93,9 +93,15 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isGuestUser = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
+
+  const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -204,18 +210,28 @@
           />
         </div>
       </div>
-      <div class="">
+
+      <!-- HTTP URL Section -->
+      <HttpUrlSection
+        class=""
+        isSave={$tab.isSaved}
+        requestUrl={$tab.property.request.url}
+        httpMethod={$tab.property.request.method}
+        isSendRequestInProgress={$tab.property.request?.state
+          ?.isSendRequestInProgress}
+        onSendButtonClicked={onSendRequest}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        {onUpdateRequestUrl}
+        {onUpdateRequestMethod}
+        {toggleSaveRequest}
+        {onSaveRequest}
+        {isGuestUser}
+      />
+      <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }}
+            onClose={closeCollectionHelpText}
             heading={`Welcome to Sparrow!`}
             text={` `}
           >
@@ -236,23 +252,6 @@
           </Popover>
         {/if}
       </div>
-
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSave={$tab.isSaved}
-        requestUrl={$tab.property.request.url}
-        httpMethod={$tab.property.request.method}
-        isSendRequestInProgress={$tab.property.request?.state
-          ?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-      />
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"

@@ -6,7 +6,12 @@ import { TeamService } from "@app/services/team.service";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { throttle } from "$lib/utils/throttle";
 import { notifications } from "@library/ui/toast/Toast";
-import { isLoggout, isResponseError, setUser } from "$lib/store/auth.store";
+import {
+  isGuestUserActive,
+  isLoggout,
+  isResponseError,
+  setUser,
+} from "$lib/store/auth.store";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { RxDB } from "@app/database/database";
 import { currentMonitor, getCurrent } from "@tauri-apps/api/window";
@@ -14,6 +19,8 @@ import { clearAuthJwt } from "$lib/utils/jwt";
 import { userLogout } from "@app/services/auth.service";
 import { FeatureSwitchService } from "@app/services/feature-switch.service";
 import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+import { v4 as uuidv4 } from "uuid";
 
 export class DashboardViewModel {
   constructor() {}
@@ -26,6 +33,7 @@ export class DashboardViewModel {
   private tabRepository = new TabRepository();
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
+  private guestUserRepository = new GuestUserRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -49,6 +57,32 @@ export class DashboardViewModel {
   get environments() {
     return this.environmentRepository.getEnvironment();
   }
+
+  /**
+   *
+   * @returns guest user state
+   */
+  public getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  /**
+   *
+   * @returns guest user state
+   */
+  public updateGuestBannerState = async () => {
+    await this.guestUserRepository.updateGuestUserState(
+      {
+        name: "guestUser",
+      },
+      {
+        isBannerActive: false,
+      },
+    );
+  };
 
   /**
    * @description - link environment to particular workspace
@@ -210,16 +244,45 @@ export class DashboardViewModel {
   };
 
   public refreshEnvironment = async (workspaceId) => {
-    const response =
-      await this.environmentService.fetchAllEnvironments(workspaceId);
-    if (response.isSuccessful && response.data.data) {
-      const environments = response.data.data;
-      await this.environmentRepository.refreshEnvironment(
-        environments,
-        workspaceId,
-      );
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser !== true) {
+      const response =
+        await this.environmentService.fetchAllEnvironments(workspaceId);
+      if (response.isSuccessful && response.data.data) {
+        const environments = response.data.data;
+        await this.environmentRepository.refreshEnvironment(
+          environments,
+          workspaceId,
+        );
+      }
     }
     return;
+  };
+
+  /**
+   * clear local DB and clear guest user details from store
+   */
+  public clearLocalDB = async (): Promise<void> => {
+    setUser(null);
+    isGuestUserActive.set(false);
+    await this.tabRepository.clearTabs();
+    await this.guestUserRepository.clearTabs();
+    await RxDB.getInstance().destroyDb();
+    await RxDB.getInstance().getDb();
+    isLoggout.set(true);
+    isResponseError.set(false);
+    clearAuthJwt();
+  };
+
+  /**
+   *
+   * @returns guest user
+   */
+  public getGuestUser = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON();
   };
 
   private clientLogout = async (): Promise<void> => {
@@ -252,5 +315,27 @@ export class DashboardViewModel {
     if (features.isSuccessful) {
       await this.featureSwitchRepository.bulkInsertData(features.data.data);
     }
+  };
+
+  /**
+   * add guest user in local db
+   */
+  public addGuestUser = async () => {
+    const data = await this.guestUserRepository.insert({
+      id: uuidv4(),
+      name: "guestUser",
+      isGuestUser: true,
+      isBannerActive: true,
+    });
+  };
+
+  /**
+   *
+   * @param data query to find details
+   * @returns data from guest user repository
+   */
+  public findUser = async (data) => {
+    const res = await this.guestUserRepository.findOne(data);
+    return res;
   };
 }

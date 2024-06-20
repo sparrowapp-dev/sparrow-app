@@ -4,7 +4,7 @@
   let stepData = data[0];
   let currentStep = 0;
   let n = data.length;
-  export let handleClosePopup: (flag: boolean) => void;
+ export let handleClosePopup: (flag: boolean) => void;
 
   function navigateStep(direction) {
   if (direction === 'next' && currentStep < n - 1) {
@@ -52,7 +52,7 @@
         <div>
           {#if currentStep > 0}
             <button
-              class="border-0"
+              class="btn border-0"
               style=" background-color: var(--bg-primary-300) ; padding:3px 19px 3px 20px; border-radius:4.78px; outline:none; "
               on:click={()=>{navigateStep('prev')}}>Previous</button
             >
@@ -60,7 +60,7 @@
         </div>
         {#if currentStep === n - 1}
           <button
-            class="border-0"
+            class="btn border-0"
             style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
             on:click={() => {
               handleClosePopup(false);
@@ -70,7 +70,7 @@
           </button>
         {:else}
           <button
-            class="border-0"
+            class=" btn border-0"
             style="background-color: var(--bg-primary-300); padding:3px 19px 3px 20px; border-radius:4.78px; outline:none;"
             on:click={()=>{navigateStep('next')}}
           >
@@ -81,3 +81,11 @@
     </div>
   </div>
 </div>
+<style>
+  .btn:hover{
+    background-color: var(--bg-primary-250) !important;
+  }
+  .btn:active{
+    background-color: var(  --bg-primary-500) !important;
+  }
+</style>

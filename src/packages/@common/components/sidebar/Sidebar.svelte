@@ -29,11 +29,16 @@
   import SidebarProfileModal, {
     type SidebarProfileObj,
   } from "./SidebarProfileModal.svelte";
+  import { isGuestUserActive } from "$lib/store";
 
   let componentClass = "";
   export { componentClass as class };
   export let user;
   export let onLogout: () => void;
+  let isGuestUser = false;
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   let sidebarItems: SidebarItemObj[] = [
     {
@@ -42,7 +47,7 @@
       defaultLogo: collections,
       hoveredLogo: hoveredCollections,
       selectedLogo: selectedCollections,
-      disabled: false,
+      disabled: isGuestUser ?? false,
       position: "primary",
     },
     {
@@ -51,7 +56,7 @@
       defaultLogo: environment,
       hoveredLogo: hoveredEnvironment,
       selectedLogo: selectedEnvironment,
-      disabled: false,
+      disabled: isGuestUser ?? false,
       position: "primary",
     },
     {
@@ -60,7 +65,7 @@
       defaultLogo: help,
       hoveredLogo: hoveredHelp,
       selectedLogo: selectedHelp,
-      disabled: false,
+      disabled: isGuestUser ?? false,
       position: "secondary",
     },
     {
@@ -87,7 +92,7 @@
     defaultLogo: profile,
     hoveredLogo: hoveredProfile,
     selectedLogo: selectedProfile,
-    disabled: false,
+    disabled: isGuestUser ?? false,
     user,
   };
 
@@ -110,9 +115,16 @@
       {#each secondarySidebarItems as item (item.route)}
         <SidebarItem {item} />
       {/each}
-      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5} >
-        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-      </Tooltip>
+      {#if !isGuestUser}
+        <Tooltip
+          title="User Profile"
+          placement="right"
+          distance={20}
+          zIndex={5}
+        >
+          <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+        </Tooltip>
+      {/if}
     </div>
   </div>
 </div>
