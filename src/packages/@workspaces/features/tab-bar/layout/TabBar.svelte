@@ -272,7 +272,7 @@
         >
           <Tooltip title={"Layout"} placement={"left"} distance={12}>
             <button
-              id="viewChange"
+              id="viewChange"   
               class="border-0 bg-transparent pt-0 rounded"
               on:click={() => {
                 viewChange = !viewChange;
