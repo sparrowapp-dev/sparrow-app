@@ -81,7 +81,7 @@
 >
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
-    style="margin-left: -3px; background-color: {tab.isActive
+    style="margin-left: -3px;  background-color: {tab.isActive
       ? 'var(--text-secondary-800)'
       : 'transparent'};"
   >
@@ -93,7 +93,7 @@
       }}
       class="position-relative border-0 ellipsis"
       style="width: 100%;
-        text-align: left; background-color:transparent;"
+        text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span class="text-{getMethodStyle(tab.property.request.method)}">
@@ -125,10 +125,8 @@
         </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-size: 12px; font-family: Roboto; color: ${
-          tab.isActive ? "#fff;" : "#8A9299;"
-        }`}
+        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        style={`color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>
@@ -190,7 +188,7 @@
   }
   .request-text {
     font-weight: 400;
-    color: var(  --deleted-api-method) !important;
+    color: var(--text-secondary-100) !important;
   }
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;

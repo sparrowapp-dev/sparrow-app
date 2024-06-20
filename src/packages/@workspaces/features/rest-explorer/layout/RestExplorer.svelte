@@ -66,6 +66,7 @@
   import Popover from "@library/ui/popover/Popover.svelte";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@library/ui";
+  import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -329,6 +330,11 @@
                   {onUpdateRequestAuth}
                   {onUpdateEnvironment}
                   {environmentVariables}
+                />
+              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                <RequestDoc
+                  {onUpdateRequestDescription}
+                  requestStateDoc={$tab.description}
                 />
               {/if}
             </div>
