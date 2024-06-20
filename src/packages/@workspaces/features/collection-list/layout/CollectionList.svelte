@@ -367,6 +367,7 @@
             {userRoleInWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
+            onImportCurlPopup={showImportCurlPopup}
           />
         {/if}
       </div>
