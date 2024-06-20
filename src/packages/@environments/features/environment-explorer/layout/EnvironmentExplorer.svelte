@@ -15,6 +15,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
+    import { environmentType } from "$lib/utils/enums";
 
   /**
    * selected environmet to be shown on API
@@ -51,11 +52,9 @@
   };
 
   const closeEnvHelpText = () => {
-    onUpdateEnvironmentGuide({id:"environment-guide"} , false)
-    console.log("isha");
-    isPopoverContainer = !isPopoverContainer
-    
-  }
+    onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
@@ -83,7 +82,7 @@
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
       >
-        {#if $currentEnvironment?.type == "GLOBAL"}
+        {#if $currentEnvironment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22px; border:none; z-index:5; curser:pointer;"
@@ -179,11 +178,11 @@
         </div>
       </header>
       <div>
-        {#if isPopoverContainer}
+        {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL }
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
-            onClose={closeEnvHelpText }
+            onClose={closeEnvHelpText}
             ><p>
               Environments allow you to manage different sets of confirguration
               variables for various stages of your application (e.g.,
@@ -234,7 +233,7 @@
 >
   <div style="position: relative;">
     <Carousel
-    data={[
+      data={[
         {
           id: 1,
           heading: "Step  1: Introduction to Environment",
@@ -257,9 +256,9 @@
           gif: `${SearchVariable}`,
         },
       ]}
-        handleClosePopup={(flag = false) => {
-          isGuidePopup = flag;
-        }}
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
     />
   </div>
 </Modal>
