@@ -367,6 +367,7 @@ class RestExplorerViewModel
    */
   public updateRequestAuth = async (_auth: Auth) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+   
     progressiveTab.property.request.auth = {
       ...progressiveTab.property.request.auth,
       ..._auth,
@@ -409,6 +410,120 @@ class RestExplorerViewModel
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
+
+  /**
+   *
+   * @param _bulkedit - bulk edit toggle
+   */
+  public updateBulkEditToggle = async (tab) => {
+    try {
+      // Log the initial value of this._tab.getValue()
+      const initialValue = tab
+      console.log("Initial value ", initialValue);
+
+      // Create a deep copy of the tab
+      const progressiveTab = createDeepCopy(initialValue);
+      console.log("Deep copy of tab:", progressiveTab);
+
+      // Ensure the bulkEditToggle property exists
+      if (
+        progressiveTab?.property?.request?.bulkEdit?.bulkEditToggle ===
+        undefined
+      ) {
+        console.log("bulkEditToggle is undefined, initializing to false.");
+        progressiveTab.property.request.bulkEdit.bulkEditToggle = false; // Initialize if undefined
+      } else {
+        console.log(
+          "bulkEditToggle exists:",
+          progressiveTab.property.request.bulkEdit.bulkEditToggle,
+        );
+      }
+
+      // Log before toggling
+      console.log(
+        "Before toggle:",
+        progressiveTab.property.request.bulkEdit.bulkEditToggle,
+      );
+
+      // Toggle the bulkEditToggle property
+      progressiveTab.property.request.bulkEdit.bulkEditToggle =
+        !progressiveTab.property.request.bulkEdit.bulkEditToggle;
+
+      // Log after toggling
+      console.log(
+        "After toggle:",
+        progressiveTab.property.request.bulkEdit.bulkEditToggle,
+      );
+
+      // Mark the tab as not saved
+      progressiveTab.isSaved = false;
+
+      // Update the class property
+      this.tab = progressiveTab;
+
+      // Update the tab in the repository
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+      console.log("BulkEdit toggled successfully.");
+    } catch (error) {
+      console.error("Failed to toggle BulkEdit:", error);
+    }
+  };
+
+  public getBulkEditToggle = async (tab) => {
+    try {
+     //inital value insider the getbulkEdit
+      const initialValue = tab
+     
+      const progressiveTab = createDeepCopy(initialValue);
+      
+
+      // Ensure the bulkEditToggle property exists
+      if (
+        progressiveTab?.property?.request?.bulkEdit?.bulkEditToggle ===
+        undefined
+      ) {
+        console.log("bulkEditToggle is undefined, initializing to false.");
+        progressiveTab.property.request.bulkEdit.bulkEditToggle = false; // Initialize if undefined
+      } else {
+        console.log(
+          "bulkEditToggle exists:",
+          progressiveTab.property.request.bulkEdit.bulkEditToggle,
+        );
+      }
+
+      // Log before toggling
+      console.log(
+        "Before toggle:",
+        progressiveTab.property.request.bulkEdit.bulkEditToggle,
+      );
+       let val= progressiveTab.property.request.bulkEdit.bulkEditToggle;
+
+      return  val
+
+      console.log("BulkEdit toggled successfully.");
+    } catch (error) {
+      console.error("Failed to toggle BulkEdit:", error);
+    }
+  };
+
+
+
+
+  //   /**
+  //  *
+  //  * @param _body - request body
+  //  */
+  //   public updateBulkEditToggle = async () => {
+  //     const progressiveTab = createDeepCopy(this._tab.getValue());
+  //     progressiveTab.property.request.body = {
+  //       ...progressiveTab.property.request.body,
+  //       ..._body,
+  //     };
+  //     progressiveTab.isSaved = false;
+  //     this.tab = progressiveTab;
+  //     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  //   };
 
   /**
    * @description clear response of a request
@@ -1079,29 +1194,28 @@ class RestExplorerViewModel
       return response;
     }
   };
-/**
- * Fetches a collection guide based on the provided query.
- * 
- * @param query - The query object used to find the collection guide.
- * @returns - A promise that resolves to the collection guide found by the query.
- */
- public fetchCollectionGuide = async (query) => {
-  return await this.guideRepository.findOne(query);
-};
+  /**
+   * Fetches a collection guide based on the provided query.
+   *
+   * @param query - The query object used to find the collection guide.
+   * @returns - A promise that resolves to the collection guide found by the query.
+   */
+  public fetchCollectionGuide = async (query) => {
+    return await this.guideRepository.findOne(query);
+  };
 
-/**
-* Updates the collection guide to set its active status.
-* 
-* @param  query - The query object used to find the collection guide to update.
-* @param  isActive - The new active status to set for the collection guide.
-* @returns - A promise that resolves when the update operation is complete.
-*/
-public updateCollectionGuide = async (query, isActive) => {
-  await this.guideRepository.update(query, {
+  /**
+   * Updates the collection guide to set its active status.
+   *
+   * @param  query - The query object used to find the collection guide to update.
+   * @param  isActive - The new active status to set for the collection guide.
+   * @returns - A promise that resolves when the update operation is complete.
+   */
+  public updateCollectionGuide = async (query, isActive) => {
+    await this.guideRepository.update(query, {
       isActive: isActive,
-  });
-};
-
+    });
+  };
 
   /**
    * Handles collection rename

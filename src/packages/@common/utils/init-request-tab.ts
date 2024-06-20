@@ -124,6 +124,10 @@ class InitRequestTab {
               addTo: AuthSectionEnum.HEADER,
             },
           },
+          bulkEdit: {
+            bulkEditToggle: false,
+            bulkEditBody: "",
+          },
           response: {
             headers: [],
             status: "",

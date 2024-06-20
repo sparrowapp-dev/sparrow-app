@@ -295,6 +295,7 @@
                   authParameter={$requestAuthParameter}
                   {onUpdateEnvironment}
                   {environmentVariables}
+                  tab={$tab}
                 />
               {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
                 <RequestBody

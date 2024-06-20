@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 8,
+  version: 9,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -154,6 +154,18 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            bulkEdit:{
+              type:"object",
+              properties:{
+                  bulkEditToggle:{
+                    type:"boolean",
+                  },
+                  bulkEditBody:{
+                    type:"string",
+                  },
+            },
+          },
+           
             response: {
               type: "object",
               properties: {
