@@ -51,11 +51,9 @@
   };
 
   const closeEnvHelpText = () => {
-    onUpdateEnvironmentGuide({id:"environment-guide"} , false)
-    console.log("isha");
-    isPopoverContainer = !isPopoverContainer
-    
-  }
+    onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
@@ -183,7 +181,7 @@
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
-            onClose={closeEnvHelpText }
+            onClose={closeEnvHelpText}
             ><p>
               Environments allow you to manage different sets of confirguration
               variables for various stages of your application (e.g.,
@@ -234,7 +232,7 @@
 >
   <div style="position: relative;">
     <Carousel
-    data={[
+      data={[
         {
           id: 1,
           heading: "Step  1: Introduction to Environment",
@@ -257,9 +255,9 @@
           gif: `${SearchVariable}`,
         },
       ]}
-        handleClosePopup={(flag = false) => {
-          isGuidePopup = flag;
-        }}
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
     />
   </div>
 </Modal>

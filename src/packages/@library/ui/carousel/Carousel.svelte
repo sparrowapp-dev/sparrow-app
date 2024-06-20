@@ -4,7 +4,7 @@
   let stepData = data[0];
   let currentStep = 0;
   let n = data.length;
-  let handleClosePopup: (flag: boolean) => void;
+ export let handleClosePopup: (flag: boolean) => void;
 
   function navigateStep(direction) {
   if (direction === 'next' && currentStep < n - 1) {
