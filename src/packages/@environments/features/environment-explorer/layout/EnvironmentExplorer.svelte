@@ -177,7 +177,7 @@
         </div>
       </header>
       <div>
-        {#if isPopoverContainer}
+        {#if isPopoverContainer && $currentEnvironment?.type == "GLOBAL" }
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
