@@ -272,16 +272,16 @@
         >
           <Tooltip title={"Layout"} placement={"left"} distance={12}>
             <button
-              id="viewChange"
+              id="viewChange"   
               class="border-0 bg-transparent pt-0 rounded"
               on:click={() => {
                 viewChange = !viewChange;
               }}
             >
               {#if $requestSplitterDirection === "horizontal"}
-                <ViewGrid color={"var(--text-primary-400)"} height={13} />
+                <ViewGrid color={"var(--icon-secondary-200)"} height={13} />
               {:else}
-                <VerticalGrid height={13} color="var(--text-primary-400)" />
+                <VerticalGrid height={13} color="var(--icon-secondary-200)" />
               {/if}
             </button>
           </Tooltip>

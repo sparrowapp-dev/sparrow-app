@@ -248,7 +248,14 @@ class RestExplorerViewModel
     progressiveTab.description = _description;
     progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      notifications.success("Documentation updated");
+    } catch (error) {
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
   };
 
   /**
@@ -1079,29 +1086,28 @@ class RestExplorerViewModel
       return response;
     }
   };
-/**
- * Fetches a collection guide based on the provided query.
- * 
- * @param query - The query object used to find the collection guide.
- * @returns - A promise that resolves to the collection guide found by the query.
- */
- public fetchCollectionGuide = async (query) => {
-  return await this.guideRepository.findOne(query);
-};
+  /**
+   * Fetches a collection guide based on the provided query.
+   *
+   * @param query - The query object used to find the collection guide.
+   * @returns - A promise that resolves to the collection guide found by the query.
+   */
+  public fetchCollectionGuide = async (query) => {
+    return await this.guideRepository.findOne(query);
+  };
 
-/**
-* Updates the collection guide to set its active status.
-* 
-* @param  query - The query object used to find the collection guide to update.
-* @param  isActive - The new active status to set for the collection guide.
-* @returns - A promise that resolves when the update operation is complete.
-*/
-public updateCollectionGuide = async (query, isActive) => {
-  await this.guideRepository.update(query, {
+  /**
+   * Updates the collection guide to set its active status.
+   *
+   * @param  query - The query object used to find the collection guide to update.
+   * @param  isActive - The new active status to set for the collection guide.
+   * @returns - A promise that resolves when the update operation is complete.
+   */
+  public updateCollectionGuide = async (query, isActive) => {
+    await this.guideRepository.update(query, {
       isActive: isActive,
-  });
-};
-
+    });
+  };
 
   /**
    * Handles collection rename
