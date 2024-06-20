@@ -14,6 +14,7 @@
   export let onImportCollectionPopup: () => void;
   export let handleCreateApiRequest: () => void;
   export let isAddCollectionDisabled = false;
+  export let onImportCurlPopup: () => void;
 </script>
 
 <div class="d-flex flex-column align-items-center px-3">
@@ -50,6 +51,18 @@
           >
         </p>
       </Tooltip>
+      <p
+        class="import-curl d-flex justify-content-center align-items-center border-radius-2"
+        style="color: var(--text-secondary-100);"
+        role="button"
+        on:click={() => {
+          onImportCurlPopup();
+        }}
+      >
+        <span style="color: var(--text-secondary-100)" class="ps-2 text-fs-12"
+          >Import cURL</span
+        >
+      </p>
     </div>
   </List>
 </div>
@@ -69,5 +82,12 @@
   }
   .add-collection.disabled:hover {
     border: 1px solid var(--text-secondary-300);
+  }
+  .import-curl {
+    background-color: var(--bg-primary-300);
+    height: 32px;
+  }
+  .import-curl:hover {
+    background-color: var(--bg-primary-250);
   }
 </style>

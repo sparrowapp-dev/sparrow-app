@@ -393,6 +393,7 @@
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
             isAddCollectionDisabled={isGuestUser}
+            onImportCurlPopup={showImportCurlPopup}
           />
         {/if}
       </div>
