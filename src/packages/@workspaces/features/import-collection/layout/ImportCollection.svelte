@@ -904,6 +904,12 @@
   .btn-primary {
     background-color: var(--bg-primary-300);
   }
+  .btn-primary:hover {
+    background-color: var(--bg-primary-400);
+  }
+  .btn-primary:active {
+    background-color: var(--bg-primary-600);
+  }
   .btn-disabled {
     background-color: var(--button-disabled);
   }
