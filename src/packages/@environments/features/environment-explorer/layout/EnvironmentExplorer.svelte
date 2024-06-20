@@ -15,6 +15,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
+    import { environmentType } from "$lib/utils/enums";
 
   /**
    * selected environmet to be shown on API
@@ -81,7 +82,7 @@
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
       >
-        {#if $currentEnvironment?.type == "GLOBAL"}
+        {#if $currentEnvironment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22px; border:none; z-index:5; curser:pointer;"
@@ -177,7 +178,7 @@
         </div>
       </header>
       <div>
-        {#if isPopoverContainer}
+        {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL }
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
