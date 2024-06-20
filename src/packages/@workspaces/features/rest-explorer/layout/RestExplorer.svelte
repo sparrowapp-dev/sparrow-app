@@ -225,6 +225,7 @@
         {onUpdateRequestMethod}
         {toggleSaveRequest}
         {onSaveRequest}
+        {isGuestUser}
       />
       <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
