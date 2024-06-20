@@ -544,7 +544,8 @@
   <br />
   {#if importType === "text"}
     <div>
-      <p class="sparrow-fs-12 text-secondary-200">
+      <p class="sparrow-fs-12 mb-1"
+      style="color:var(--text-secondary-1000)">
         Paste your OAS text or Swagger/Localhost Link
       </p>
     </div>
@@ -602,7 +603,8 @@
 
   {#if importType === "file"}
     <div>
-      <p class="sparrow-fs-12 text-secondary-200">Upload YAML/JSON file</p>
+      <p class="sparrow-fs-12 mb-1"
+      style="color:var(--text-secondary-1000)">Upload YAML/JSON file</p>
     </div>
     <div>
       <Drop
