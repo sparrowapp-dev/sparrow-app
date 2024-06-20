@@ -907,17 +907,24 @@ export default class CollectionsViewModel {
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
       const requestTabAdapter = new RequestTabAdapter();
+      const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
         workspaceId || "",
         "",
         "",
         {
           ...response.data.data,
-          id: UntrackedItems.UNTRACKED + uuidv4(),
+          id: tabId,
         },
       );
-
-      this.tabRepository.createTab(adaptedRequest);
+      await this.tabRepository.createTab(adaptedRequest);
+      // Tab is taking a little time to save in DB, that's why we are calling update after 1 sec,
+      // This needs to be revisit in future.
+      setTimeout(() => {
+        this.updateTab(tabId, {
+          isSaved: false,
+        });
+      }, 500);
       moveNavigation("right");
       notifications.success("cURL imported successfully.");
     } else {

@@ -25,6 +25,7 @@
     </p>
     <div class="w-100 mt-3">
       <Tooltip
+        show={isAddCollectionDisabled}
         placement="bottom"
         title={isAddCollectionDisabled ? "Please Login to Use" : ""}
       >

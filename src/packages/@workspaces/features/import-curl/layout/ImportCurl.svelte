@@ -40,7 +40,7 @@
   <div class="mt-3">
     <p class="sparrow-fs-14 mb-1 text-secondary-200">Paste cURL here</p>
   </div>
-  <div class="pb-1 rounded border-0 position-relative">
+  <div class="rounded border-0 position-relative">
     <textarea
       bind:value={importCurl}
       on:input={() => {

@@ -190,11 +190,13 @@
   {#if showProgressBar === true}
     <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
 
-  <Updater
-    show={updaterVisible && updateAvailable}
-    {hideUpdater}
-    onUpdate={initiateUpdate}
-  />
+  {#if isGuestUser !== true}
+    <Updater
+      show={updaterVisible && updateAvailable}
+      {hideUpdater}
+      onUpdate={initiateUpdate}
+    />
+  {/if}
 
   <!-- Application Content -->
   <div class="d-flex">

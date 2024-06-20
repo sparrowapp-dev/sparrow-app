@@ -15,6 +15,7 @@
       class="api-method text-start sparrow-fs-12 fw-normal me-2 text-{getMethodStyle(
         method,
       )}"
+      style="width: 40px;"
     >
       {method.toUpperCase()}
     </div>
@@ -25,7 +26,9 @@
 {:else if type === ItemType.FOLDER || type === ItemType.COLLECTION}
   <div style="height:36px;" class="d-flex align-items-center">
     {#if type === ItemType.FOLDER}
-      <img src={folder} alt="" />
+      <div style="width: 40px;">
+        <img src={folder} alt="" />
+      </div>
     {:else if type === ItemType.COLLECTION}
       <CollectionIcon
         height={"15px"}
@@ -34,7 +37,7 @@
       />
     {/if}
     <span
-      class="ellipsis sparrow-fs-12 fw-normal ps-3"
+      class="ellipsis sparrow-fs-12 fw-normal ps-2"
       style="cursor:pointer; width: calc(100% - 20px);">{name}</span
     >
   </div>

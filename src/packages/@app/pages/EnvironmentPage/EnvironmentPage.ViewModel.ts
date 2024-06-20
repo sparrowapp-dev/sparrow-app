@@ -84,16 +84,13 @@ export class EnvironmentViewModel {
   public closeHelpText = async () => {
     onFetchCollectionGuide({ id: "collection-guide" });
     onFetchEnvironmentGuide({ id: "environment-guide" });
-
     if (id === "collection-guide") {
       onUpdateCollectionGuide({ id: "collection-guide" }, false);
     } else if (id === "environment-guide") {
       onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
     }
-  }
+  };
 
-  };  
-  
   /**
    * @description - deletes environment tab
    * @param environmentId - environment id needs to be deleted

@@ -435,9 +435,10 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
-          {#if isAppVersionVisible}
-            <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
-          {/if}
+          <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
+          <!-- {#if isAppVersionVisible} -->
+          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          <!-- {/if} -->
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {

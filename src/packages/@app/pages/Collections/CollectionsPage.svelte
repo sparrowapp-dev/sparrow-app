@@ -161,10 +161,11 @@
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
-    const feature = await _viewModel.getFeatureStatus({ name: "appVersion" });
-    if (feature) {
-      isAppVersionVisible = feature.getLatest().toMutableJSON().isEnabled;
-    }
+    //Disabling the version feature switch as it was just for testing purpose, can be used for implementation example
+    // const feature = await _viewModel.getFeatureStatus({ name: "appVersion" });
+    // if (feature) {
+    //   isAppVersionVisible = feature.getLatest().toMutableJSON().isEnabled;
+    // }
   });
 
   /**

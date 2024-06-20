@@ -686,7 +686,7 @@
           ? `outline: 1px solid #FE8C98`
           : ``}"
         placeholder="Enter request name"
-        class="py-2 ps-3 pe-4 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
+        class="py-2 ps-3 pe-5 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
         bind:value={tabName}
         autofocus
       />
@@ -914,6 +914,9 @@
     color: #999999;
     font-family: monospace;
     align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   input:focus,
   textarea:focus {
