@@ -135,6 +135,6 @@
   }
   .tab-active {
     color: var(--text-secondary-100);
-    border-bottom: 2px solid var(--border-primary-200) !important;
+    border-bottom: 2px solid var(--border-primary-300) !important;
   }
 </style>
