@@ -258,6 +258,7 @@ $theme-red-230408: #230408;
   --text-secondary-700 : #{$theme-grey-161617};
   --text-secondary-800 : #{$theme-grey-151515};
   --text-secondary-900 : #{$theme-grey-000000};
+  --text-secondary-1000 : #{$theme-grey-CCCCCC};
 
   --text-tertiary-100 : #{$theme-violet-676A80};
   --text-tertiary-200 : #{$theme-violet-323548};
@@ -734,7 +735,7 @@ span {
 //
 //
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 5px;
   height: 2px;
 }
 
