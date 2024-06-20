@@ -1,13 +1,18 @@
 import { Events } from "$lib/utils/enums";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+import { ReleaseRepository } from "@app/repositories/release.repository";
 import { FeedbackService } from "@app/services/feedback.service";
+import { ReleaseService } from "@app/services/release.service";
 import { notifications } from "@library/ui/toast/Toast";
 import { DiscordIDs } from "@support/common/constants/discord.constants";
+import { LearnMoreURL } from "@support/common/constants/learnMore.constant";
 import { open } from "@tauri-apps/plugin-shell";
 
 class HelpPageViewModel {
   // Private Services
   private feedbackService = new FeedbackService();
+  private releaseService = new ReleaseService();
+  private releaseRepository = new ReleaseRepository();
 
   constructor() {}
 
@@ -60,6 +65,17 @@ class HelpPageViewModel {
     return;
   };
 
+   /**
+   * Navigates to web flow to git hub release of sparrow
+   * @returns void
+   */
+   public learnMore = async () => {
+    await open(LearnMoreURL);
+    return;
+  };
+
+
+
   /**
    * opens 'add feedback' modal to fill the form
    * @returns void
@@ -70,6 +86,48 @@ class HelpPageViewModel {
     });
     return true;
   };
+
+  
+  /**
+   * Fetch release notes data from the backend
+   * @returns Promise<any> - Promise resolving to the fetched release notes data
+   */
+
+  public fetchReleaseNotes = async (): Promise<any> => {
+    const response = await this.releaseService.getReleaseData();
+    if (response.isSuccessful && response.data) {
+      const releaseNotes = response.data;
+      const data = [];
+      for (const note of releaseNotes) {
+        const releaseObject = {
+          id: note.id.toString(),
+          versionName: note.name,
+          dateCreated: note.published_at,
+          features: note.body,
+        };
+
+        // Push the created object into the data array
+        data.push(releaseObject);
+      }
+      this.releaseRepository.bulkInsertData(data);
+    }
+  };
+
+  /**
+   * Fetches all release notes from the database
+   * @returns Promise<any[]> - Promise resolving to an array of release notes
+   */
+  public getAllReleaseNotes = async () => {
+    const releaseNotes = await this.releaseRepository.findAll();
+    let response = releaseNotes
+      .map((value) => {
+        return value.toMutableJSON();
+      })
+      .reverse();
+    return response;
+  };
+ 
+  
 }
 
 
