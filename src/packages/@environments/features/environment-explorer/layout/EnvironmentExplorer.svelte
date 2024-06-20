@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { CreateENV, IntroToEnvironment, SearchVariable } from "../videos";
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import { onMount } from "svelte";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
@@ -14,7 +15,6 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-  import { CreateENV, IntroToEnvironment, SearchVariable } from "../videos";
 
   /**
    * selected environmet to be shown on API
@@ -50,6 +50,13 @@
     onUpdateName(_name, event);
   };
 
+  const closeEnvHelpText = () => {
+    onUpdateEnvironmentGuide({id:"environment-guide"} , false)
+    console.log("isha");
+    isPopoverContainer = !isPopoverContainer
+    
+  }
+
   const handleCurrentEnvironmentKeyValuePairChange = (
     pairs: EnvValuePair[],
   ) => {
@@ -79,7 +86,7 @@
         {#if $currentEnvironment?.type == "GLOBAL"}
           <button
             class="btn p-0"
-            style="position: absolute; left:150px;  top:18px; border:none; z-index:5; curser:pointer;"
+            style="position: absolute; left:150px;  top:22px; border:none; z-index:5; curser:pointer;"
             on:click={() => {
               isPopoverContainer = !isPopoverContainer;
               if (isPopoverContainer === true) {
@@ -176,10 +183,7 @@
           <Popover
             heading={`Welcome to Environments!`}
             text={` `}
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateEnvironmentGuide(false);
-            }}
+            onClose={closeEnvHelpText }
             ><p>
               Environments allow you to manage different sets of confirguration
               variables for various stages of your application (e.g.,
@@ -230,10 +234,7 @@
 >
   <div style="position: relative;">
     <Carousel
-      handleClosePopup={(flag = false) => {
-        isGuidePopup = flag;
-      }}
-      data={[
+    data={[
         {
           id: 1,
           heading: "Step  1: Introduction to Environment",
@@ -256,6 +257,9 @@
           gif: `${SearchVariable}`,
         },
       ]}
+        handleClosePopup={(flag = false) => {
+          isGuidePopup = flag;
+        }}
     />
   </div>
 </Modal>

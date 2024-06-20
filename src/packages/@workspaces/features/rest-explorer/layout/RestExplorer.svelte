@@ -92,6 +92,10 @@
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
 
+   const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide( {id: "collection-guide",}, false,);
+     isPopoverContainer= !isPopoverContainer}
+
   onMount(async () => {
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
@@ -199,18 +203,28 @@
           />
         </div>
       </div>
-      <div class="">
+     
+
+      <!-- HTTP URL Section -->
+      <HttpUrlSection
+        class=""
+        isSave={$tab.isSaved}
+        requestUrl={$tab.property.request.url}
+        httpMethod={$tab.property.request.method}
+        isSendRequestInProgress={$tab.property.request?.state
+          ?.isSendRequestInProgress}
+        onSendButtonClicked={onSendRequest}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        {onUpdateRequestUrl}
+        {onUpdateRequestMethod}
+        {toggleSaveRequest}
+        {onSaveRequest}
+      />
+      <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }}
+            onClose={closeCollectionHelpText}
             heading={`Welcome to Sparrow!`}
             text={` `}
           >
@@ -230,24 +244,7 @@
             </p>
           </Popover>
         {/if}
-      </div>
-
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSave={$tab.isSaved}
-        requestUrl={$tab.property.request.url}
-        httpMethod={$tab.property.request.method}
-        isSendRequestInProgress={$tab.property.request?.state
-          ?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-      />
+      </div>  
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -457,9 +454,6 @@
 >
   <div style="position: relative;">
     <Carousel
-      handleClosePopup={(flag = false) => {
-        isGuidePopup = flag;
-      }}
       data={[
         {
           id: 1,

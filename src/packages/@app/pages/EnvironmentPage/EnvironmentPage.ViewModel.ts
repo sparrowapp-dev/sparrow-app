@@ -77,8 +77,8 @@ export class EnvironmentViewModel {
       }
     }
     return;
-  };
-
+  };  
+  
   /**
    * @description - deletes environment tab
    * @param environmentId - environment id needs to be deleted
