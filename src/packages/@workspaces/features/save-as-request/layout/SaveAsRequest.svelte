@@ -723,7 +723,7 @@
               </p>
               <div class="d-flex">
                 <div class="w-50">
-                  <p class="save-as-instructions">Do's:</p>
+                  <p class="save-as-instructions m-0">Do's:</p>
                   <ol class="save-as-instructions">
                     {#each dos as para}
                       <li>{para}</li>
@@ -731,7 +731,7 @@
                   </ol>
                 </div>
                 <div class="w-50">
-                  <p class="save-as-instructions">Don'ts:</p>
+                  <p class="save-as-instructions m-0">Don'ts:</p>
                   <ol class="save-as-instructions">
                     {#each donts as para}
                       <li>{para}</li>

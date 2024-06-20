@@ -91,4 +91,7 @@
   .import-curl:hover {
     background-color: var(--bg-primary-250);
   }
+  .import-curl:active {
+    background-color: var( --bg-primary-500);
+  }
 </style>

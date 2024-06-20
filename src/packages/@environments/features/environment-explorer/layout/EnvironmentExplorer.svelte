@@ -85,7 +85,7 @@
         {#if $currentEnvironment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
-            style="position: absolute; left:150px;  top:22px; border:none; z-index:5; curser:pointer;"
+            style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
             on:click={() => {
               isPopoverContainer = !isPopoverContainer;
               if (isPopoverContainer === true) {

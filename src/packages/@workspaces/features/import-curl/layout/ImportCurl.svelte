@@ -117,7 +117,13 @@
     outline: none;
   }
   .btn-primary {
-    background: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
+    background-color: var(--bg-primary-300);
+  }
+  .btn-primary:hover {
+    background-color: var(--bg-primary-250);
+  }
+  .btn-primary:active{
+    background-color: var( --bg-primary-500);
   }
   .empty-data-error {
     color: var(--error--color);
