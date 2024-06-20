@@ -53,6 +53,7 @@
   const closeEnvHelpText = () => {
     onUpdateEnvironmentGuide({id:"environment-guide"} , false)
     console.log("isha");
+    isPopoverContainer = !isPopoverContainer
     
   }
 
@@ -180,13 +181,9 @@
       <div>
         {#if isPopoverContainer}
           <Popover
-          handleClose={closeEnvHelpText}
             heading={`Welcome to Environments!`}
             text={` `}
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateEnvironmentGuide(false);
-            }}
+            onClose={closeEnvHelpText }
             ><p>
               Environments allow you to manage different sets of confirguration
               variables for various stages of your application (e.g.,

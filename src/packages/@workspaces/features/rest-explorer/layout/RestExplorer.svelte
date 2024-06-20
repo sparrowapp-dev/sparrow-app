@@ -93,13 +93,8 @@
   export let onUpdateCollectionGuide: (query, isActive) => void;
 
    const closeCollectionHelpText = () => {
-    onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-   }
+    onUpdateCollectionGuide( {id: "collection-guide",}, false,);
+     isPopoverContainer= !isPopoverContainer}
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -229,16 +224,7 @@
       <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
-          handleClose={closeCollectionHelpText}
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }}
+            onClose={closeCollectionHelpText}
             heading={`Welcome to Sparrow!`}
             text={` `}
           >

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Crossicon from "$lib/assets/crossicon.svelte";
-  export let onClose;
+  export let onClose ;
   export let text = " ";
   export let heading = " ";
   let isGuidePopup = false;
