@@ -66,6 +66,7 @@ export async function handleLoginV2(url: string) {
   const accessToken = params.get("accessToken");
   const refreshToken = params.get("refreshToken");
   const event = params.get("event");
+
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
     setAuthJwt(constants.AUTH_TOKEN, accessToken);
@@ -81,7 +82,6 @@ export async function handleLoginV2(url: string) {
       navigate("/app/collections?first=true");
       _guideRepository.insert({ isActive: true, id: "environment-guide" });
       _guideRepository.insert({ isActive: false, id: "collection-guide" });
-        
     } else {
       navigate("/app/collections?first=false");
 

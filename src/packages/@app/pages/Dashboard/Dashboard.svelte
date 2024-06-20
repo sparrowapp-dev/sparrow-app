@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Sidebar } from "@common/components";
-  import { Route } from "svelte-navigator";
+  import { Sidebar, LoginBanner } from "@common/components";
+  import { Route, navigate } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../Collections/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
-  import { user } from "$lib/store";
+  import { navigationState, user } from "$lib/store";
   import Mock from "../Mock/Mock.svelte";
   import Environment from "../EnvironmentPage/EnvironmentPage.svelte";
   import Header from "@common/components/header/Header.svelte";
@@ -15,11 +15,16 @@
   } from "@app/database/database";
   import type { Observable } from "rxjs";
   import HelpPage from "../Help/HelpPage.svelte";
+  import constants from "$lib/utils/constants";
+  import { open } from "@tauri-apps/plugin-shell";
+  import LoginPopup from "@common/components/popup/login-popup.svelte";
   import { Update, check } from "@tauri-apps/plugin-updater";
   import { notifications } from "@library/ui/toast/Toast";
   import { relaunch } from "@tauri-apps/plugin-process";
   import ProgressBar from "@library/ui/progress/Progress.svelte";
   import Updater from "../../../@common/components/updater/Updater.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 
   const _viewModel = new DashboardViewModel();
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -35,6 +40,15 @@
 
   let currentEnvironment = {
     id: "none",
+  };
+
+  let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
+  let isPopupOpen = false;
+  let isLoginBannerActive = false;
+  let isGuestUser = false;
+
+  const openDefaultBrowser = async () => {
+    await open(externalSparrowLink);
   };
 
   let currentWorkspaceId = "";
@@ -61,8 +75,36 @@
     },
   );
 
-  onMount(() => {
+  const onModalStateChanged = (flag: boolean) => {
+    isPopupOpen = flag;
+  };
+
+  const handleLogin = () => {
+    _viewModel.clearLocalDB();
+    navigationState.set("guestUser");
+    openDefaultBrowser();
+    navigate("/init");
+    MixpanelEvent(Events.LOCAL_SIGNUP, {
+      source: "Dashboard",
+    });
+  };
+
+  const handleGuestLogin = () => {
+    isPopupOpen = true;
+  };
+
+  const handleBannerClose = async () => {
+    await _viewModel.updateGuestBannerState();
+    isLoginBannerActive = false;
+  };
+
+  onMount(async () => {
     _viewModel.getAllFeatures();
+    const guestUser = await _viewModel.getGuestUser();
+    isGuestUser = guestUser?.isGuestUser;
+    if (guestUser?.isBannerActive) {
+      isLoginBannerActive = guestUser?.isBannerActive;
+    }
   });
 
   onDestroy(() => {
@@ -133,6 +175,17 @@
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
     {currentWorkspaceName}
+    {isGuestUser}
+    {isLoginBannerActive}
+    onLoginUser={handleGuestLogin}
+  />
+
+  <!-- <LoginBanner
+    -->
+  <LoginBanner
+    isVisible={isLoginBannerActive}
+    onClick={handleGuestLogin}
+    onClose={handleBannerClose}
   />
   {#if showProgressBar === true}
     <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
@@ -177,4 +230,15 @@
       <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
+
+  <LoginPopup
+    isOpen={isPopupOpen}
+    {onModalStateChanged}
+    onCancel={() => {
+      isPopupOpen = false;
+    }}
+    onContinue={handleLogin}
+    title={"Confirm Login?"}
+    description={"After continuing your data will be lost, do you want to continue?"}
+  />
 </div>

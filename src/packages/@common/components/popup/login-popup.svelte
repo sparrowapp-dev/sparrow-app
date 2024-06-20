@@ -1,19 +1,17 @@
 <script lang="ts">
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
-  import Button from "../../../@library/ui/button/Button.svelte";
+  import Button from "@library/ui/button/Button.svelte";
 
   export let isOpen = false;
-  export let isSaveDisabled = false;
   export let onModalStateChanged: (flag: boolean) => void;
-  export let onCancel: (data: boolean) => void;
-  export let onSave: () => void;
-  export let onDiscard: () => void;
-  export let loader: boolean = false;
-  export let isGuestUser = false;
+  export let onCancel: () => void;
+  export let onContinue: () => void;
+  export let title = "";
+  export let description = "";
 </script>
 
 <ModalWrapperV1
-  title={"Save Changes?"}
+  {title}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -22,8 +20,7 @@
 >
   <div class="pt-2 pb-4">
     <small class="">
-      You have unsaved changes. Do you want to save them before closing the
-      file?
+      {description}
     </small>
   </div>
   <div class="d-flex justify-content-between">
@@ -33,32 +30,21 @@
         textClassProp={"fs-6"}
         type={"dark"}
         onClick={() => {
-          onCancel(false);
+          onCancel();
         }}
       />
     </div>
     <div class="d-flex">
       <span style="margin-right: 15px;">
         <Button
-          title={"Discard Changes"}
+          title={"Continue"}
           textClassProp={"fs-6"}
-          type={"dark"}
+          type={"primary"}
           onClick={() => {
-            onDiscard();
+            onContinue();
           }}
         />
       </span>
-      <Button
-        disable={isSaveDisabled || isGuestUser}
-        title={"Save Changes"}
-        textClassProp={"fs-6"}
-        type={"primary"}
-        loaderSize={18}
-        {loader}
-        onClick={() => {
-          onSave();
-        }}
-      />
     </div>
   </div>
 </ModalWrapperV1>

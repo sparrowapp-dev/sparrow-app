@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { AdvanceAPI, CreateCollection, SendingApiRequest } from "../../../common/videos";
+  import {
+    AdvanceAPI,
+    CreateCollection,
+    SendingApiRequest,
+  } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
@@ -88,13 +92,15 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isGuestUser = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
 
-   const closeCollectionHelpText = () => {
-    onUpdateCollectionGuide( {id: "collection-guide",}, false,);
-     isPopoverContainer= !isPopoverContainer}
+  const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -203,7 +209,6 @@
           />
         </div>
       </div>
-     
 
       <!-- HTTP URL Section -->
       <HttpUrlSection
@@ -244,7 +249,7 @@
             </p>
           </Popover>
         {/if}
-      </div>  
+      </div>
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
