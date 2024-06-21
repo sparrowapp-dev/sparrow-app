@@ -22,6 +22,13 @@
     dos,
     donts,
   } from "$lib/utils/constants/request.constant";
+  import {
+    CollectionIcon,
+    FolderIcon,
+    FolderIcon2,
+    PencilIcon2,
+    WorkspaceIcon,
+  } from "@library/icons";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -36,6 +43,8 @@
   export let requestName;
   export let requestDescription;
   export let requestPath;
+  export let onRenameCollection;
+  export let onRenameFolder;
 
   interface Path {
     name: string;
@@ -128,6 +137,9 @@
     }
   }
 
+  let editCollectionName = "";
+  let editFolderName = "";
+
   const navigateToWorkspace = () => {
     directory = JSON.parse(JSON.stringify(collection));
     path = [];
@@ -138,8 +150,12 @@
       collection,
       elem._id ? elem._id : elem.id,
     );
+    isCollectionNameEditable = false;
+    isFolderNameEditable = false;
     directory = response.items;
     path = response.path;
+    editCollectionName = path[0]?.name ?? "";
+    editFolderName = path[1]?.name ?? "";
     createFolderNameVisibility = false;
     createCollectionNameVisibility = false;
   };
@@ -159,6 +175,7 @@
   const handleCreateFolder = async (folderName: string): Promise<void> => {
     createDirectoryLoader = true;
     const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
+    console.log("res", res);
     if (res.status === "success") {
       latestRoute = res.data.latestRoute;
       res.data.addRequestOrFolderInCollection(
@@ -191,13 +208,17 @@
     // collectionListUnsubscribe.unsubscribe();
     window.removeEventListener("click", handleDropdownClick);
   });
+
+  let isSaveTouched = false;
+  let isCollectionNameEditable = false;
+  let isFolderNameEditable = false;
 </script>
 
-<div class="url d-flex align-items-center pb-3">
-  <p class="ellipsis mb-0">
+<div class="url d-flex align-items-center pt-3">
+  <p class="ellipsis mb-3 ps-3">
     {#if path.length > 0}
       <span
-        class="cursor-pointer"
+        class="cursor-pointer pe-3"
         style="height:24px; width:24px;"
         on:click={navigateToLastRoute}><img src={leftArrowAsset} alt="" /></span
       >
@@ -206,50 +227,65 @@
       <span
         on:click={navigateToWorkspace}
         class="sparrow-fs-12 {path.length === 0
-          ? 'text-whiteColor'
-          : ''} cursor-pointer px-1"
+          ? 'text-secondary-100'
+          : 'text-secondary-200'} cursor-pointer px-1"
       >
-        <img
-          style="height:10.67px; width: 10.67px;"
-          src={workspaceAsset}
-          alt=""
+        <WorkspaceIcon
+          height={"10px"}
+          width={"10px"}
+          color={path.length === 0
+            ? "var(--text-secondary-100)"
+            : "var(--text-secondary-200)"}
         />
-        {workspaceMeta.name}</span
-      >
+        <span style="padding-left: 6px; padding-right:2px;">
+          {workspaceMeta.name}
+        </span>
+      </span>
     {/if}
     {#if path.length > 0}
       {#each path as elem, index}
-        <span>/</span>
+        <span class="text-secondary-200">/</span>
         <span
           on:click={() => {
             navigateToDirectory(elem);
           }}
           class="{path.length - 1 === index
-            ? 'text-whiteColor'
-            : ''} cursor-pointer px-1 sparrow-fs-12"
+            ? 'text-secondary-100'
+            : 'text-secondary-200'} cursor-pointer px-1 sparrow-fs-12"
         >
           {#if elem.type === ItemType.COLLECTION}
-            <img
-              src={collectionAsset}
-              style="height:10.67px; width: 10.67px;"
-              alt=""
+            <CollectionIcon
+              height={"10px"}
+              width={"10px"}
+              color={path.length - 1 === index
+                ? "var(--text-secondary-100)"
+                : "var(--text-secondary-200)"}
             />
           {:else if elem.type === ItemType.FOLDER}
-            <img
-              src={folderAsset}
-              style="height:10.67px; width: 10.67px;"
-              alt=""
+            <FolderIcon2
+              height={"10px"}
+              width={"10px"}
+              color={path.length - 1 === index
+                ? "var(--text-secondary-100)"
+                : "var(--text-secondary-200)"}
             />
           {/if}
-          {elem.name}</span
-        >
+          <span style="padding-left: 6px; padding-right:2px;">
+            {elem.name}
+          </span>
+        </span>
       {/each}
     {/if}
   </p>
 </div>
 <div class="row">
   <div class="col-6" style="border-right: 1px solid var(--border-color);">
-    <div style="height: 460px; overflow:auto;">
+    <!--
+    -- 
+    --  left panel
+    --
+    -->
+    <div class="ps-3" style="height: 430px; overflow:auto;">
       <!-- 
               --
               shows current directory 
@@ -258,21 +294,133 @@
       {#if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
         <p class="mb-0 ellipsis">
           <small class="save-text-clr">Collection: </small>
-          <small class="text-whiteColor"> {path[path.length - 1].name}</small>
+          {#if !isCollectionNameEditable}
+            <small
+              class="text-whiteColor item-header"
+              style="font-weight: 700;"
+              on:click={() => {
+                isCollectionNameEditable = true;
+              }}
+            >
+              {path[path.length - 1].name}
+              <span class="edit-pencil ms-2" style="display: none;">
+                <PencilIcon2
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-secondary-200)"}
+                />
+              </span>
+            </small>
+          {:else}
+            <input
+              type="text"
+              class="edit-input fw-bold"
+              style="width: calc(100% - 130px);"
+              bind:value={editCollectionName}
+              autofocus
+            />
+            <button
+              class="icon-btn"
+              on:click={async (e) => {
+                if (editCollectionName === "") {
+                  isCollectionNameEditable = false;
+                } else {
+                  const response = await onRenameCollection(
+                    workspaceMeta.id,
+                    path[path.length - 1].id,
+                    editCollectionName,
+                  );
+                  latestRoute = {
+                    id: path[path.length - 1].id,
+                  };
+                  if (response.isSuccessful) {
+                    isCollectionNameEditable = false;
+                  }
+                }
+              }}
+            >
+              <img src={tickIcon} alt="" /></button
+            >
+            <button
+              class="icon-btn"
+              on:click={() => {
+                editCollectionName = path[path.length - 1].name;
+                isCollectionNameEditable = false;
+              }}><img src={crossIcon} alt="" /></button
+            >
+          {/if}
         </p>
         <small class="save-text-clr sparrow-fs-12"
-          >Save your request in this collection or any of its folders.</small
+          >Save your request in this collection or select a folder to save it.</small
         >
       {:else if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
         <p class="mb-0 ellipsis">
           <small class="save-text-clr">Folder: </small>
-          <small class="text-whiteColor"> {path[path.length - 1].name}</small>
+          {#if !isFolderNameEditable}
+            <small
+              class="text-whiteColor item-header"
+              style="font-weight: 700;"
+              on:click={() => {
+                isFolderNameEditable = true;
+              }}
+            >
+              {path[path.length - 1].name}
+              <span class="edit-pencil ms-2" style="display: none;">
+                <PencilIcon2
+                  height={"12px"}
+                  width={"12px"}
+                  color={"var(--icon-secondary-200)"}
+                />
+              </span>
+            </small>
+          {:else}
+            <input
+              type="text"
+              class="edit-input fw-bold"
+              style="width: calc(100% - 110px);"
+              bind:value={editFolderName}
+              autofocus
+            />
+            <button
+              class="icon-btn"
+              on:click={async (e) => {
+                if (editFolderName === "") {
+                  isFolderNameEditable = false;
+                } else {
+                  const response = await onRenameFolder(
+                    workspaceMeta.id,
+                    path[path.length - 2]?.id,
+                    path[path.length - 1].id,
+                    editFolderName,
+                  );
+                  latestRoute = {
+                    id: path[path.length - 1].id,
+                  };
+                  if (response.isSuccessful) {
+                    isFolderNameEditable = false;
+                  }
+                }
+              }}
+            >
+              <img src={tickIcon} alt="" /></button
+            >
+            <button
+              class="icon-btn"
+              on:click={() => {
+                editFolderName = path[path.length - 1].name;
+                isFolderNameEditable = false;
+              }}><img src={crossIcon} alt="" /></button
+            >
+          {/if}
         </p>
+        <small class="save-text-clr sparrow-fs-12"
+          >Save your request in this folder.</small
+        >
       {:else}
         <p class="mb-0 ellipsis">
           <small class="save-text-clr">Workspace: </small>
           {#if workspaceMeta}
-            <small class="text-whiteColor">
+            <small class="text-whiteColor" style="font-weight: 700;">
               {workspaceMeta.name}
             </small>
           {/if}
@@ -387,15 +535,15 @@
             --
             -->
           {#if col.type === ItemType.FOLDER}
-            {#if col.source === "USER"}
-              <div
-                on:click={() => {
-                  navigateToDirectory(col);
-                }}
-              >
-                <FileType name={col.name} type={ItemType.FOLDER} />
-              </div>
-            {/if}
+            <!-- {#if col.source === "USER"} -->
+            <div
+              on:click={() => {
+                navigateToDirectory(col);
+              }}
+            >
+              <FileType name={col.name} type={ItemType.FOLDER} />
+            </div>
+            <!-- {/if} -->
           {:else if col.type === ItemType.REQUEST}
             <FileType
               name={col.name}
@@ -506,24 +654,17 @@
           style="height: 300px;"
         >
           {#if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
-            <p class="save-text-clr text-center">This Folder is empty</p>
+            <p class="save-text-clr-empty text-center">This folder is empty</p>
           {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
-            <p class="save-text-clr text-center">This Collection is empty</p>
+            <p class="save-text-clr-empty text-center">
+              This collection is empty
+            </p>
           {:else if path.length === 0}
             <div>
-              <p class="w-100 save-text-clr text-center sparrow-fs-12">
-                {bestPractice}
+              <p class="save-text-clr-empty text-center text-fs-12">
+                You do not have any collections in this workspace. Create a
+                collection to easily organize and manage your APIs.
               </p>
-              <div class="w-100 d-flex justify-content-center">
-                <Button
-                  title={"+ Collection"}
-                  buttonClassProp={"fs-6"}
-                  type={"primary"}
-                  onClick={() => {
-                    createCollectionNameVisibility = true;
-                  }}
-                />
-              </div>
             </div>
           {/if}
         </div>
@@ -536,104 +677,112 @@
       <p class="save-text-clr mb-1 sparrow-fs-12">
         Request Name <span class="text-dangerColor">*</span>
       </p>
-      <span
-        id="3456-dropdown900"
-        class="instruction-btn {instructionEnabled
-          ? 'bg-sparrowBottomBorder'
-          : ''} rounded d-flex align-items-center justify-content-center position-relative"
-      >
-        <span
-          on:click={() => {
-            instructionEnabled = !instructionEnabled;
-          }}
-        >
-          <QuestionIcon
-            color={instructionEnabled
-              ? "var(--blackColor)"
-              : "var(--sparrow-text-color)"}
-          />
-        </span>
-        {#if instructionEnabled}
-          <div class="bg-blackColor api-name-usage p-3">
-            <div class="d-flex justify-content-between">
-              <p class="text-whiteColor">Best Practices</p>
-              <img
-                src={crossIcon}
-                on:click={() => {
-                  instructionEnabled = !instructionEnabled;
-                }}
-                class="mb-4 cursor-pointer"
-                alt=""
-              />
-            </div>
-            <p class="save-as-instructions">
-              {bestPractice}
-            </p>
-            <div class="d-flex">
-              <div class="w-50">
-                <p class="save-as-instructions">Do's:</p>
-                <ol class="save-as-instructions">
-                  {#each dos as para}
-                    <li>{para}</li>
-                  {/each}
-                </ol>
-              </div>
-              <div class="w-50">
-                <p class="save-as-instructions">Don'ts:</p>
-                <ol class="save-as-instructions">
-                  {#each donts as para}
-                    <li>{para}</li>
-                  {/each}
-                </ol>
-              </div>
-            </div>
-          </div>
-        {/if}
-      </span>
     </div>
-    <div class="pb-2 pt-1">
+    <div class="pb-2 pt-1 position-relative">
       <input
         type="text"
-        style="width: 100%; {tabName?.length === 0
+        style="width: 100%; border: 1px solid var(--border-secondary-400); {tabName?.length ===
+        0
           ? `outline: 1px solid #FE8C98`
           : ``}"
-        placeholder="Enter request name."
-        class="p-1 bg-black outline-0 rounded border-0 sparrow-fs-12"
+        placeholder="Enter request name"
+        class="py-2 ps-3 pe-5 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
         bind:value={tabName}
         autofocus
       />
+      <div class="position-absolute" style="top:9px; right: 10px;">
+        <span
+          id="3456-dropdown900"
+          style=""
+          class="instruction-btn {instructionEnabled
+            ? 'bg-tertiary-650'
+            : ''} rounded d-flex align-items-center justify-content-center position-relative"
+        >
+          <span
+            on:click={() => {
+              instructionEnabled = !instructionEnabled;
+            }}
+          >
+            <QuestionIcon color={"var(--sparrow-text-color)"} />
+          </span>
+          {#if instructionEnabled}
+            <div class="bg-tertiary-300 api-name-usage p-3">
+              <div class="d-flex justify-content-between">
+                <p class="text-whiteColor">Best Practices</p>
+                <img
+                  src={crossIcon}
+                  on:click={() => {
+                    instructionEnabled = !instructionEnabled;
+                  }}
+                  class="mb-4 cursor-pointer"
+                  alt=""
+                />
+              </div>
+              <p class="save-as-instructions">
+                {bestPractice}
+              </p>
+              <div class="d-flex">
+                <div class="w-50">
+                  <p class="save-as-instructions m-0">Do's:</p>
+                  <ol class="save-as-instructions">
+                    {#each dos as para}
+                      <li>{para}</li>
+                    {/each}
+                  </ol>
+                </div>
+                <div class="w-50">
+                  <p class="save-as-instructions m-0">Don'ts:</p>
+                  <ol class="save-as-instructions">
+                    {#each donts as para}
+                      <li>{para}</li>
+                    {/each}
+                  </ol>
+                </div>
+              </div>
+            </div>
+          {/if}
+        </span>
+      </div>
     </div>
     {#if tabName?.length === 0}
       <p class="tabname-error-text text-dangerColor">
-        Please add the Request Name to save the request.
+        Please add the request name to save the request.
       </p>
     {/if}
-    <div class="d-flex">
-      <ComboText
+    <div class="d-flex pt-3">
+      <!-- <ComboText
         value={componentData?.property.request.method}
         comboContainerClassProp={"d-flex flex-start pb-2"}
         singleTextClassProp={"rounded d-flex align-items-center py-2 px-3 justify-content-center"}
-        valueClassProp={`text-${getMethodStyle(
+        valueClassProp=
+        
+      /> -->
+      <span
+        class={`text-fs-12 me-3 fw-bold text-${getMethodStyle(
           componentData?.property.request.method,
-        )}`}
-      />
+        )}`}>{componentData?.property.request.method}</span
+      >
       <p class="api-url">{componentData?.property.request.url}</p>
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
     <div class="pb-1">
       <textarea
-        style="width: 100%; resize:none;"
-        class="p-1 bg-black rounded border-0 sparrow-fs-12"
+        style="width: 100%; resize:none; border: 1px solid var(--border-secondary-400);"
+        class="py-2 px-3 bg-tertiary-300 border-radius-2 sparrow-fs-12"
         rows="5"
         maxlength="1024"
-        placeholder="Give a description to help people know about this request."
+        placeholder="Give a description to help people know about this request"
         bind:value={description}
       />
     </div>
     <p class="save-text-clr mb-1 sparrow-fs-12">Saving to</p>
     {#if path.length === 0}
-      <p class="save-text-clr text-dangerColor sparrow-fs-12">
-        Select a Collection or Folder.
+      <p
+        class=" {isSaveTouched
+          ? 'text-dangerColor'
+          : 'save-text-clr'}  sparrow-fs-12"
+      >
+        Select a collection or folder.
       </p>
     {:else}
       <!-- 
@@ -645,32 +794,36 @@
         <p class="ellipsis mb-0">
           {#if workspaceMeta}
             <span class="px-1 sparrow-fs-12">
-              <img
-                style="height:10.67px; width: 10.67px;"
-                src={workspaceAsset}
-                alt=""
+              <WorkspaceIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-200)"}
               />
-              {workspaceMeta.name}</span
-            >
+              <span style="padding-left: 6px; padding-right: 2px; ">
+                {workspaceMeta.name}
+              </span>
+            </span>
           {/if}
           {#if path.length > 0}
             {#each path as elem}
-              <span>/</span>
+              <span class="text-secondary-200">/</span>
               <span class="px-1 sparrow-fs-12">
                 {#if elem.type === ItemType.COLLECTION}
-                  <img
-                    src={collectionAsset}
-                    style="height:10.67px; width: 10.67px;"
-                    alt=""
+                  <CollectionIcon
+                    height={"10px"}
+                    width={"10px"}
+                    color={"var(--icon-secondary-200)"}
                   />
                 {:else if elem.type === ItemType.FOLDER}
-                  <img
-                    src={folderAsset}
-                    style="height:10.67px; width: 10.67px;"
-                    alt=""
+                  <FolderIcon2
+                    height={"12px"}
+                    width={"12px"}
+                    color={"var(--icon-secondary-200)"}
                   />
                 {/if}
-                {elem.name}</span
+                <span style="padding-left: 6px; padding-right: 2px; "
+                  >{elem.name}</span
+                ></span
               >
             {/each}
           {/if}
@@ -688,7 +841,7 @@
         }}
         title={"+ Collection"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
       />
     {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
       <Button
@@ -697,7 +850,7 @@
         }}
         title={"+ Folder"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--send-button); font-size: var(--base-text); border: 1px solid var(--send-button);"}
+        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
       />
     {/if}
   </div>
@@ -714,32 +867,36 @@
     </span>
     <span class="mx-1">
       <Button
-        disable={path.length > 0 ? (tabName.length > 0 ? false : true) : true}
         title={"Save"}
         textClassProp={"fs-6"}
         type={"primary"}
         loader={isLoading}
         onClick={async () => {
-          isLoading = true;
-          const res = await onSaveAsRequest(
-            workspaceMeta,
-            path,
-            tabName,
-            description,
-            type,
-          );
-          if (res.status === "success") {
-            onFinish(res.data.id);
-            onClick(false);
-            if (type !== saveType.SAVE_DESCRIPTION) {
-              notifications.success("API request saved");
+          isSaveTouched = true;
+          if (path.length > 0 && tabName.length > 0) {
+            isLoading = true;
+            const res = await onSaveAsRequest(
+              workspaceMeta,
+              path,
+              tabName,
+              description,
+              type,
+            );
+            if (res.status === "success") {
+              onFinish(res.data.id);
+              onClick(false);
+              if (type !== saveType.SAVE_DESCRIPTION) {
+                notifications.success("API request is saved successfully");
+              } else {
+                notifications.success("API documentation saved");
+              }
             } else {
-              notifications.success("API documentation saved");
+              notifications.error(
+                "Failed to save the API request. Please try again",
+              );
             }
-          } else {
-            notifications.error(res.message);
+            isLoading = false;
           }
-          isLoading = false;
         }}
         loaderSize={18}
       />
@@ -757,6 +914,9 @@
     color: #999999;
     font-family: monospace;
     align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   input:focus,
   textarea:focus {
@@ -786,17 +946,21 @@
     border-bottom: 1px solid var(--sparrow-bottom-border);
   }
   .save-input:focus {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-300);
   }
   .save-text-clr {
-    color: #8a9299;
+    color: var(--text-secondary-200);
+  }
+  .save-text-clr-empty {
+    color: var(--text-secondary-350);
   }
   .api-name-usage {
     position: absolute;
-    top: 29px;
-    right: 0;
+    top: -5px;
+    right: 30px;
     width: 2000%;
     border-radius: 8px;
+    box-shadow: 0px 16px 48px 0px #0000002d;
   }
   .save-as-instructions {
     font-size: 12px;
@@ -808,5 +972,31 @@
   .instruction-btn {
     width: 24px;
     height: 24px;
+    cursor: pointer;
+  }
+  .instruction-btn:hover {
+    background-color: var(--bg-tertiary-650) !important;
+  }
+  .edit-input {
+    padding: 0 8px !important;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--sparrow-bottom-border);
+  }
+  .edit-input:focus {
+    background-color: var(--bg-tertiary-300);
+  }
+  .item-header {
+    padding: 2px;
+    padding-left: 6px;
+    border-bottom: 1px solid transparent;
+  }
+  .item-header:hover {
+    background-color: var(--bg-tertiary-300);
+    border-bottom: 1px solid var(--sparrow-bottom-border);
+  }
+  .item-header:hover .edit-pencil {
+    display: inline-block !important;
   }
 </style>

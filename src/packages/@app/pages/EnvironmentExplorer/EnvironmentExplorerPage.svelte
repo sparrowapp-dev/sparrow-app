@@ -14,7 +14,6 @@
   let prevTabName = "";
   $: {
     if (tab) {
-      console.log(tab.name);
       if (tab?.name && prevTabName !== tab.name) {
         // _viewModel.updateNameWithEnvironmentList(tab.name);
         renameWithEnvironmentList(tab.name);
@@ -29,4 +28,6 @@
   onUpdateName={_viewModel.updateName}
   onUpdateVariable={_viewModel.updateVariables}
   onSaveEnvironment={_viewModel.saveEnvironment}
+  onFetchEnvironmentGuide={_viewModel.fetchEnvironmentGuide}
+  onUpdateEnvironmentGuide={_viewModel.updateEnvironmentGuide}
 />

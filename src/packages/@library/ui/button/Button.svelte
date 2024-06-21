@@ -108,15 +108,19 @@
     color: var(--white-color);
   }
   .custom-btn-dark {
-    background-color: var(--border-color);
+    background-color: var(--bg-tertiary-300);
     color: var(--white-color);
   }
   .custom-btn-violet {
     background-color: var(--bg-tertiary-300);
     color: var(--white-color);
   }
+  .custom-btn-primary:hover {
+    background-color: var(--bg-primary-250);
+    color: var(--white-color);
+  }
   .custom-btn-dark:hover {
-    background-color: var(--sparrow-button-background);
+    background-color: var(--bg-tertiary-500);
   }
   .custom-btn-danger {
     background-color: var(--dangerColor);

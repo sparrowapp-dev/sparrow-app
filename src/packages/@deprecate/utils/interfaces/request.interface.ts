@@ -117,6 +117,9 @@ export interface Save {
 }
 
 export interface Request {
+  source: string;
+  id(id: any, arg1: { items: any; collectionId: any; workspaceId: string });
+  name: string;
   method?: RequestMethodType;
   body?: Body;
   url?: string;
@@ -139,6 +142,9 @@ export interface WorkSpace {
 }
 
 export interface Folder {
+  source: string;
+  id: any;
+  name: any;
   requestCount?: number;
   folderCount?: number;
 }

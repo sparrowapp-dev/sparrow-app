@@ -9,6 +9,7 @@
   export let onSave: () => void;
   export let onDiscard: () => void;
   export let loader: boolean = false;
+  export let isGuestUser = false;
 </script>
 
 <ModalWrapperV1
@@ -48,7 +49,7 @@
         />
       </span>
       <Button
-        disable={isSaveDisabled}
+        disable={isSaveDisabled || isGuestUser}
         title={"Save Changes"}
         textClassProp={"fs-6"}
         type={"primary"}

@@ -51,6 +51,7 @@
   import type { GithubRepoDocType } from "@app/models/github-repo.model";
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
+  import { isGuestUserActive } from "$lib/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -68,6 +69,12 @@
   let loader = false;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
+  let isAppVersionVisible = true;
+  let isGuestUser = false;
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   /**
    * @description - handles different key press
@@ -154,6 +161,11 @@
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    //Disabling the version feature switch as it was just for testing purpose, can be used for implementation example
+    // const feature = await _viewModel.getFeatureStatus({ name: "appVersion" });
+    // if (feature) {
+    //   isAppVersionVisible = feature.getLatest().toMutableJSON().isEnabled;
+    // }
   });
 
   /**
@@ -204,6 +216,8 @@
       bind:scrollList
       {collectionList}
       {currentWorkspace}
+      {isAppVersionVisible}
+      {isGuestUser}
       leftPanelController={{
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
@@ -237,6 +251,8 @@
       onDropOver={_viewModel.handleDropOnEnd}
       onTabSelected={_viewModel.handleActiveTab}
       onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+      onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+      onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
     />
     <Route>
       {#if true}
@@ -263,6 +279,7 @@
             <WorkspaceDefault
               showImportCollectionPopup={() => (isImportCollectionPopup = true)}
               onItemCreated={_viewModel.handleCreateItem}
+              {isGuestUser}
             />
           </Motion>
         {/if}
@@ -282,6 +299,7 @@
     workspaceLevelPermissions.SAVE_REQUEST,
   )}
   {loader}
+  {isGuestUser}
 />
 
 <svelte:window on:keydown={handleKeyPress} />
@@ -370,6 +388,7 @@
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
+    onValidateCurl={_viewModel.handleValidateCurl}
   />
 {/if}
 
@@ -416,6 +435,8 @@
     }}
     onCreateFolder={_viewModel.createFolderFromSaveAs}
     onCreateCollection={_viewModel.createCollectionFromSaveAs}
+    onRenameCollection={_viewModel.handleSaveAsRenameCollection}
+    onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
 </ModalWrapperV1>
 

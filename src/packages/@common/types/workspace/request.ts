@@ -48,6 +48,7 @@ export enum RequestSectionEnum {
   AUTHORIZATION = "Authorization",
   HEADERS = "Headers",
   REQUEST_BODY = "Request Body",
+  DOCUMENTATION = "Description",
 }
 export enum ResponseFormatterEnum {
   PRETTY = "Pretty",

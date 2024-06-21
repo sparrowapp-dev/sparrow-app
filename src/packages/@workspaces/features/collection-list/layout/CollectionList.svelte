@@ -34,6 +34,15 @@
     handleCollapseCollectionList: () => void;
   };
   export let githubRepo;
+  /**
+   * Flag to show app version
+   */
+  export let isAppVersionVisible = true;
+
+  /**
+   * Flag to check is user iu guest user
+   */
+  export let isGuestUser = false;
 
   import {
     Collection,
@@ -47,9 +56,10 @@
   import FilterIcon from "$lib/assets/filter.svelte";
   import plusIcon from "$lib/assets/plus-white.svg";
   import CreateRequest from "$lib/assets/create_request.svg";
+  import BubbleIcon from "@library/icons/Bubble.svg";
   import CreateCollection from "$lib/assets/collections-faded.svg";
 
-  import { WorkspaceRole } from "$lib/utils/enums";
+  import { Events, WorkspaceRole } from "$lib/utils/enums";
   import FilterDropDown from "$lib/components/dropdown/FilterDropDown.svelte";
   import { Dropdown } from "@library/ui";
   import List from "@library/ui/list/List.svelte";
@@ -78,6 +88,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "$lib/utils/constants";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
   let collectionListDocument: CollectionDocument[];
@@ -151,6 +162,47 @@
 
   let isGithubStarHover = false;
   onDestroy(() => {});
+
+  const addButtonData = isGuestUser
+    ? [
+        {
+          name: "Add New API",
+          icon: CreateRequest,
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+      ]
+    : [
+        {
+          name: "Add New API",
+          icon: CreateRequest,
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Add Collection",
+          icon: CreateCollection,
+          onclick: showImportCollectionPopup,
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+      ];
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -251,34 +303,23 @@
         zIndex={600}
         buttonId="addButton"
         bind:isMenuOpen={addButtonMenu}
-        options={[
-          {
-            name: "Add New API",
-            icon: CreateRequest,
-            onclick: () => onItemCreated("request", {}),
-          },
-          // {
-          //   name: "Add Curl API",
-          //   icon: CreateRequest,
-          //   onclick: showImportCurlPopup,
-          // },
-          {
-            name: "Add Collection",
-            icon: CreateCollection,
-            onclick: showImportCollectionPopup,
-          },
-        ]}
+        options={addButtonData}
       >
-    <Tooltip title={"Add Options"} placement={"right"} distance={12} zIndex={10} >
-        <button
-          id="addButton"
-          class="border-0 p-1 border-radius-2 add-button"
-          on:click={() => {
-            addButtonMenu = !addButtonMenu;
-          }}
+        <Tooltip
+          title={"Add Options"}
+          placement={"right"}
+          distance={12}
+          zIndex={10}
         >
-          <img src={plusIcon} alt="" />
-        </button>
+          <button
+            id="addButton"
+            class="border-0 p-1 border-radius-2 add-button"
+            on:click={() => {
+              addButtonMenu = !addButtonMenu;
+            }}
+          >
+            <img src={plusIcon} alt="" />
+          </button>
         </Tooltip>
       </Dropdown>
     </div>
@@ -351,6 +392,8 @@
             {userRoleInWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
+            isAddCollectionDisabled={isGuestUser}
+            onImportCurlPopup={showImportCurlPopup}
           />
         {/if}
       </div>
@@ -392,7 +435,10 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
+          <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
+          <!-- {#if isAppVersionVisible} -->
           <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          <!-- {/if} -->
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {

@@ -15,6 +15,7 @@ import {
   type RequestTab,
   TabTypeEnum,
   FormDataTypeEnum,
+  type StatePartial,
 } from "@common/types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
@@ -85,7 +86,8 @@ class InitRequestTab {
             },
             {
               key: "User-Agent",
-              value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+              value:
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
               checked: true,
             },
             {
@@ -199,7 +201,7 @@ class InitRequestTab {
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
-  public updateState(_state) {
+  public updateState(_state: StatePartial) {
     this._tab.property.request.state = {
       ...this._tab.property.request.state,
       ..._state,

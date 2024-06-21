@@ -19,21 +19,6 @@
   class="container1"
   style="background-color: black ;  overflow-y: scroll !important;"
 >
-  <div class="tabs">
-    <div
-      class="tab {activeTab === 'feedback' ? 'active' : ''}"
-      on:click={() => setActiveTab("feedback")}
-    >
-      Feedback
-    </div>
-    <div
-      style="padding-top: 11px;"
-      class="tab {activeTab === 'faq' ? 'active' : ''}"
-      on:click={() => setActiveTab("faq")}
-    >
-      <Tooltip placement="right" title="Coming Soon">FAQs</Tooltip>
-    </div>
-  </div>
   <div style="overflow-y :scroll;">
     <div class="feedback-section {activeTab === 'feedback' ? 'active' : ''}">
       <h3
