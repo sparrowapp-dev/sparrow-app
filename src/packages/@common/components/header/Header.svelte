@@ -39,7 +39,9 @@
   export let onLoginUser;
 </script>
 
-<header class="ps-1 pe-3 d-flex align-items-center justify-content-between">
+<header
+  class="app-header ps-1 pe-3 d-flex align-items-center justify-content-between"
+>
   <div class="d-flex ms-3 justify-content-center align-items-center">
     <div>
       <SparrowIcon
@@ -150,5 +152,8 @@
   }
   .join-container {
     cursor: pointer;
+  }
+  .app-header {
+    border-bottom: 2px solid var(--border-secondary-900);
   }
 </style>

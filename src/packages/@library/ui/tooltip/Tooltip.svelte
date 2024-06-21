@@ -8,7 +8,6 @@
   export let spacing = "4px 10px";
   export let borderRadius = "2px";
   export let distance = 10;
-  export let delay = 500; // delay time in millisecond
   export let fontSize = "12px";
 
   let top = "unset";
@@ -16,8 +15,7 @@
   let right = "unset";
   let bottom = "unset";
   let tooltipWrapper: HTMLElement;
-  let isHoverDelayed = false;
-  let isHoverSynced = false;
+  let isHover = false;
 
   const toggleTooltip = () => {
     if (placement === "right") {
@@ -82,7 +80,7 @@
 
 {#if show}
   <span
-    class="{isHoverDelayed
+    class="{isHover
       ? 'tooltip-text'
       : ''}  invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center gap-2 opacity-0
  {placement.toString()} "
@@ -118,15 +116,12 @@
 
 <div
   on:mouseenter={() => {
-    isHoverSynced = true;
-    setTimeout(() => {
-      if (isHoverSynced) isHoverDelayed = true;
-    }, delay);
+    isHover = true;
     toggleTooltip();
   }}
   on:mouseleave={() => {
-    isHoverDelayed = false;
-    isHoverSynced = false;
+    isHover = false;
+    toggleTooltip();
   }}
   bind:this={tooltipWrapper}
   class={""}
@@ -148,7 +143,6 @@
     transform: translateX(-50%);
   }
   .tooltip-text {
-    animation-delay: 2s;
     visibility: visible !important;
     opacity: 1 !important;
   }

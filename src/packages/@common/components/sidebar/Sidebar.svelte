@@ -130,10 +130,6 @@
 </div>
 
 <style>
-  .sidebar-global {
-    padding-top: 2px;
-    background-color: var(--blackColor);
-  }
   .sidebar {
     height: calc(100vh - 44px);
     display: flex;
