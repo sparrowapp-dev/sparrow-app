@@ -328,7 +328,7 @@
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-secondary-800);
+      background-color: var(--bg-secondary-850);
     }
 
     .renameInputFieldCollection {

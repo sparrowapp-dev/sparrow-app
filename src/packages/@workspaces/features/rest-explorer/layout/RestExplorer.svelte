@@ -268,7 +268,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative bg-secondary-800-important"
+            class="position-relative bg-secondary-850-important"
           >
             <!-- Request Pane -->
             <div
@@ -339,7 +339,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="bg-secondary-800-important"
+            class="bg-secondary-850-important"
           >
             <!-- Response Pane -->
             <div
@@ -495,7 +495,7 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     height: calc(100vh - 80px);
   }
 

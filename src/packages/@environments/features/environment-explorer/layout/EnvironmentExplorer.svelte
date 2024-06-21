@@ -268,7 +268,7 @@
 
 <style lang="scss">
   .env-panel {
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     height: calc(100vh - 44px);
   }
   .env-header {
