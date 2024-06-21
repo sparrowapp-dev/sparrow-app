@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { CreateENV, IntroToEnvironment, SearchVariable } from "../videos";
   import { HelpIcon, SaveIcon } from "$lib/assets/app.asset";
   import { onMount } from "svelte";
   import type { EnvValuePair } from "$lib/utils/interfaces/request.interface";
@@ -15,7 +14,7 @@
   import { WithButton } from "@environments/common/hoc";
   import { Input } from "@library/forms";
   import { Carousel, Modal, Popover } from "@library/ui";
-    import { environmentType } from "$lib/utils/enums";
+  import { environmentType } from "$lib/utils/enums";
 
   /**
    * selected environmet to be shown on API
@@ -82,7 +81,8 @@
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
       >
-        {#if $currentEnvironment?.type === environmentType.GLOBAL}
+        <!--Disabling the Quick Help feature, will be taken up in next release-->
+        <!-- {#if $currentEnvironment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
@@ -107,7 +107,7 @@
           >
             <HelpIcon height={"12.67px"} width={"12.67px"} />
           </button>
-        {/if}
+        {/if} -->
 
         <Input
           id={"environment-name"}
@@ -177,7 +177,8 @@
           </span>
         </div>
       </header>
-      <div>
+      <!--Disabling the Quick Help feature, will be taken up in next release-->
+      <!-- <div>
         {#if isPopoverContainer && $currentEnvironment?.type === environmentType.GLOBAL }
           <Popover
             heading={`Welcome to Environments!`}
@@ -200,7 +201,7 @@
             </p></Popover
           >
         {/if}
-      </div>
+      </div> -->
       <section class={`var-value-container`}>
         <TabularInput
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
@@ -221,7 +222,9 @@
     {/if}
   </div>
 {/if}
-<Modal
+
+<!--Disabling the Quick Help feature, will be taken up in next release-->
+<!-- <Modal
   title={""}
   type={"dark"}
   width={"474px"}
@@ -261,7 +264,7 @@
       }}
     />
   </div>
-</Modal>
+</Modal> -->
 
 <style lang="scss">
   .env-panel {
