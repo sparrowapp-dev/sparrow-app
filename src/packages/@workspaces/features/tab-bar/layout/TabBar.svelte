@@ -211,7 +211,8 @@
       </Tooltip>
     </div>
     <div class=" d-flex ms-auto my-auto me-2">
-      <div>
+      <!--Disabling the Quick Help feature, will be taken up in next release-->
+      <!-- <div>
         <button
           role="button"
           class=" btn border-0 pt-1 ps-1 pe-2 py-auto h-100 w-100"
@@ -255,7 +256,7 @@
             </div>
           </Tooltip>
         </button>
-      </div>
+      </div> -->
       <div class="layout ms-auto mt-1" style="height: 24px; ">
         <Dropdown
           buttonId="viewChange"
