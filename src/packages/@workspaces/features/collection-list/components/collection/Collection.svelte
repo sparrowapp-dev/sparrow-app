@@ -470,6 +470,7 @@
       title={"Add Options"}
       placement={"bottom"}
       distance={13}
+      show={!showAddItemMenu}
       zIndex={10}
     >
       <button
@@ -485,13 +486,19 @@
       </button>
     </Tooltip>
 
-    <Tooltip title={"More"} placement={"right"} distance={17} zIndex={600}>
+    <Tooltip
+      title={"More"}
+      placement={"bottom"}
+      distance={17}
+      zIndex={600}
+      show={!showMenu}
+    >
       <button
         id={`show-more-collection-${collection.id}`}
         class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
           ? 'threedot-active'
           : ''}"
-          style=""
+        style=""
         on:click={(e) => {
           rightClickContextMenu(e);
         }}
@@ -559,7 +566,7 @@
         {/if}
 
         <div class="d-flex gap-2 ms-1">
-          <Tooltip title={"Add Folder"} placement={"top"} distance={12}>
+          <Tooltip title={"Add Folder"} placement={"bottom"} distance={12}>
             <div
               class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
               style="height: 24px; width: 24px; "
@@ -579,7 +586,7 @@
             </div>
           </Tooltip>
 
-          <Tooltip title={"Add Request"} placement={"right"} distance={12}>
+          <Tooltip title={"Add Request"} placement={"bottom"} distance={12}>
             <div
               class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
               style="height: 24px; width: 24px;"

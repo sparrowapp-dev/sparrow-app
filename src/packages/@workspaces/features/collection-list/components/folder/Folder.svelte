@@ -385,7 +385,7 @@
                       font-weight:400;
                       margin-left:0px"
             >
-              <p class="ellipsis  mb-0" style="font-size: 12px;">
+              <p class="ellipsis mb-0" style="font-size: 12px;">
                 {explorer.name}
               </p>
             </div>
@@ -395,38 +395,49 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else}
-        <Tooltip title={"Add Request"} placement={"bottom"} zIndex={5} distance={13}>
-          <button
-            class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-            on:click|preventDefault={() => {
-              expand = true;
-              onItemCreated("requestFolder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }}
+          <Tooltip
+            title={"Add Request"}
+            placement={"bottom"}
+            zIndex={5}
+            distance={13}
           >
-            <RequestIcon
-              height="16px"
-              width="16px"
-              color="var(--white-color)"
-            />
-          </button>
-        </Tooltip>
+            <button
+              class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
+              on:click|preventDefault={() => {
+                expand = true;
+                onItemCreated("requestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }}
+            >
+              <RequestIcon
+                height="16px"
+                width="16px"
+                color="var(--white-color)"
+              />
+            </button>
+          </Tooltip>
 
-          <Tooltip title={"More"} placement={"right"} zIndex={5} distance={17}>
-          <button
-            id={`show-more-folder-${explorer.id}`}
-            class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-              ? 'threedot-active'
-              : ''}"
-            on:click={(e) => {
-              rightClickContextMenu(e);
-            }}
+          <Tooltip
+            title={"More"}
+            placement={"bottom"}
+            zIndex={5}
+            distance={17}
+            show={!showMenu}
           >
-            <img src={threedotIcon} alt="threedotIcon" />
-          </button>
+            <button
+              id={`show-more-folder-${explorer.id}`}
+              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+                ? 'threedot-active'
+                : ''}"
+              on:click={(e) => {
+                rightClickContextMenu(e);
+              }}
+            >
+              <img src={threedotIcon} alt="threedotIcon" />
+            </button>
           </Tooltip>
         {/if}
       </div>

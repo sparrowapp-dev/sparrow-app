@@ -307,7 +307,7 @@
       >
         <Tooltip
           title={"Add Options"}
-          placement={"right"}
+          placement={"bottom"}
           distance={12}
           zIndex={10}
         >

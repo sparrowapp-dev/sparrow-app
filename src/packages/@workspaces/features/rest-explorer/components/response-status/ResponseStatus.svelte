@@ -8,16 +8,17 @@
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">
   <div
-    class="response-container d-flex align-items-center justify-content-between p-2 w-100 z-1 position-sticky border-radius-2"
+    class="response-container d-flex align-items-center justify-content-between z-1 p-2 w-100 position-sticky border-radius-2"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex align-items-center gap-2">
       <!-- insert controller here -->
-      <div class="d-flex gap-2">
+      <div class="d-flex align-items-center gap-2">
         <Tooltip
           title="HTTP Status - {response.status}"
-          placement={"top"}
+          placement={"bottom"}
           zIndex={500}
+          distance={20}
           spacing={"8px 10px"}
         >
           <span
@@ -43,30 +44,46 @@
             >
           </span>
         </Tooltip>
-        <span
-          class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
-          style="font-size: 12px;"
+        <Tooltip
+          title="Response Time"
+          placement={"bottom"}
+          zIndex={500}
+          distance={20}
+          spacing={"8px 10px"}
         >
-          <span>
-            <span class="me-1">
-              <ClockIcon />
+          <span
+            class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
+            style="font-size: 12px;"
+          >
+            <span>
+              <span class="me-1">
+                <ClockIcon />
+              </span>
+              {response.time}
             </span>
-            {response.time}
+            <p class="mb-0" style="font-size: 12px;">ms</p>
           </span>
-          <p class="mb-0" style="font-size: 12px;">ms</p>
-        </span>
-        <span
-          class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
-          style="font-size: 12px;"
+        </Tooltip>
+        <Tooltip
+          title="Response Size"
+          placement={"bottom"}
+          zIndex={500}
+          distance={20}
+          spacing={"8px 10px"}
         >
-          <span>
-            <span class="me-1">
-              <BoxIcon />
+          <span
+            class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
+            style="font-size: 12px;"
+          >
+            <span>
+              <span class="me-1">
+                <BoxIcon />
+              </span>
+              {response.size?.toFixed(2)}
             </span>
-            {response.size?.toFixed(2)}
+            <p class="mb-0" style="font-size: 12px;">KB</p>
           </span>
-          <p class="mb-0" style="font-size: 12px;">KB</p>
-        </span>
+        </Tooltip>
       </div>
     </div>
   </div>
