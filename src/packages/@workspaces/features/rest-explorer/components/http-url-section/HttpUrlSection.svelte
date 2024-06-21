@@ -189,8 +189,8 @@
         height={22}
         width={22}
         color={isHovered && !isSave && !isGuestUser
-          ? "var(--text-primary-200)"
-          : "var(--text-secondary-200)"}
+          ? "var(--icon-primary-200)"
+          : "var(--icon-secondary-100)"}
       />
     </button>
   </Tooltip>

@@ -141,7 +141,7 @@
     align-items: center;
     justify-content: space-between;
     width: 54px;
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     margin-right: 1px;
     padding: 5px 0px 10px 0px;
   }
