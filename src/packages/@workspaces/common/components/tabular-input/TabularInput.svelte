@@ -401,7 +401,7 @@
             </div>
             {#if pairs.length - 1 != index}
               <div class="h-75 pe-1">
-                <button class="bg-secondary-700 border-0" style="width:40px;">
+                <button class=" bg-secondary-700 border-0" style="width:40px;">
                   {#if mode !== "READ"}
                     <Tooltip title={"Delete"} placement={"left"} distance={10}>
                       <img
