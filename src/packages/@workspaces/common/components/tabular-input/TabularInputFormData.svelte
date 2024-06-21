@@ -528,7 +528,7 @@
     top: 2px;
     width: 4px;
     height: 8px;
-    border: solid var(--text-secondary-800);
+    border: solid var(--text-secondary-850);
     border-width: 0 2px 2px 0;
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);

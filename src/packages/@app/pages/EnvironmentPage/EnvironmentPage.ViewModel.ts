@@ -81,16 +81,6 @@ export class EnvironmentViewModel {
     return;
   };
 
-  public closeHelpText = async () => {
-    onFetchCollectionGuide({ id: "collection-guide" });
-    onFetchEnvironmentGuide({ id: "environment-guide" });
-    if (id === "collection-guide") {
-      onUpdateCollectionGuide({ id: "collection-guide" }, false);
-    } else if (id === "environment-guide") {
-      onUpdateEnvironmentGuide({ id: "environment-guide" }, false);
-    }
-  };
-
   /**
    * @description - deletes environment tab
    * @param environmentId - environment id needs to be deleted
@@ -327,11 +317,4 @@ export class EnvironmentViewModel {
       });
     }
   };
-}
-function onFetchEnvironmentGuide(arg0: { id: string }) {
-  console.error("Function not implemented.");
-}
-
-function onFetchCollectionGuide(arg0: { id: string }) {
-  console.error("Function not implemented.");
 }

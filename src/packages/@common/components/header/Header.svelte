@@ -139,6 +139,7 @@
 <style>
   header {
     height: 44px;
+    background-color: var(--bg-secondary-850);
   }
   .join-txt {
     font-size: 12px;

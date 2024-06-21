@@ -1,9 +1,4 @@
 <script lang="ts">
-  import {
-    AdvanceAPI,
-    CreateCollection,
-    SendingApiRequest,
-  } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
@@ -228,7 +223,8 @@
         {onSaveRequest}
         {isGuestUser}
       />
-      <div class="" style="margin-top: 10px;">
+      <!--Disabling the Quick Help feature, will be taken up in next release-->
+      <!-- <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
@@ -251,7 +247,7 @@
             </p>
           </Popover>
         {/if}
-      </div>
+      </div> -->
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -272,7 +268,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative bg-secondary-800-important"
+            class="position-relative bg-secondary-850-important"
           >
             <!-- Request Pane -->
             <div
@@ -343,7 +339,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="bg-secondary-800-important"
+            class="bg-secondary-850-important"
           >
             <!-- Response Pane -->
             <div
@@ -454,7 +450,9 @@
     />
   </ModalWrapperV1>
 {/if}
-<Modal
+
+<!--Disabling the Quick Help feature, will be taken up in next release-->
+<!-- <Modal
   title={""}
   type={"dark"}
   width={"474px"}
@@ -493,11 +491,11 @@
       ]}
     />
   </div>
-</Modal>
+</Modal> -->
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     height: calc(100vh - 80px);
   }
 

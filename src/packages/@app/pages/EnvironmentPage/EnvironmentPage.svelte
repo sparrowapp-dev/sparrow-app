@@ -85,7 +85,7 @@
   <Pane
     minSize={60}
     size={$environmentRightPanelWidth}
-    class="bg-secondary-800-important"
+    class="bg-secondary-850-important"
   >
     <Route>
       {#if true}

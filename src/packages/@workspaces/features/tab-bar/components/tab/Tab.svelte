@@ -82,7 +82,7 @@
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
     style="margin-left: -3px;  background-color: {tab.isActive
-      ? 'var(--text-secondary-800)'
+      ? 'var(--bg-secondary-850)'
       : 'transparent'};"
   >
     <button
