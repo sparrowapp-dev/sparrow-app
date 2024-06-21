@@ -8,12 +8,12 @@
     UpdateRequestMethodType,
     UpdateRequestUrlType,
   } from "@workspaces/common/type";
-  import { DiskIcon } from "@library/icons";
   import { notifications } from "@library/ui/toast/Toast";
   import DropButton from "$lib/components/buttons/DropButton.svelte";
   import { CodeMirrorInput } from "../../../../common/components";
   import { UrlInputTheme } from "../../../../common/utils/";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import { DiskIcon } from "@library/icons";
   let componentClass = "";
   export { componentClass as class };
 
@@ -28,6 +28,7 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSave;
+  export let isGuestUser = false;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -172,23 +173,27 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip title={"Save"} placement={"bottom"} distance={12} >
-  <button
-    class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-    on:click={handleSaveRequest}
-    on:mouseenter={handleMouseEnter}
-    on:mouseleave={handleMouseLeave}
-    disabled={isSave ? true : false}
+  <Tooltip
+    title={isGuestUser ? "Login to Save" : "Save"}
+    placement={"bottom"}
+    distance={12}
   >
-    <DiskIcon
-      height={22}
-      width={22}
-      color={isHovered && !isSave
-        ? "var(--text-primary-200)"
-        : "var(--text-secondary-200)"}
-    />
-  </button>
-</Tooltip>
+    <button
+      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
+      on:click={handleSaveRequest}
+      on:mouseenter={handleMouseEnter}
+      on:mouseleave={handleMouseLeave}
+      disabled={isSave || isGuestUser ? true : false}
+    >
+      <DiskIcon
+        height={22}
+        width={22}
+        color={isHovered && !isSave && !isGuestUser
+          ? "var(--icon-primary-200)"
+          : "var(--icon-secondary-100)"}
+      />
+    </button>
+  </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

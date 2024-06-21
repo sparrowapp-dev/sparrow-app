@@ -81,8 +81,8 @@
 >
   <div
     class=" w-100 d-flex justify-content-between px-2 border-upper-radius"
-    style="margin-left: -3px; background-color: {tab.isActive
-      ? 'var(--text-secondary-800)'
+    style="margin-left: -3px;  background-color: {tab.isActive
+      ? 'var(--bg-secondary-850)'
       : 'transparent'};"
   >
     <button
@@ -93,7 +93,7 @@
       }}
       class="position-relative border-0 ellipsis"
       style="width: 100%;
-        text-align: left; background-color:transparent;"
+        text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if tab.type === ItemType.REQUEST}
         <span class="text-{getMethodStyle(tab.property.request.method)}">
@@ -125,10 +125,8 @@
         </span>
       {/if}
       <span
-        class="font-weight-normal ms-1 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-size: 12px; font-family: Roboto; color: ${
-          tab.isActive ? "#fff;" : "#8A9299;"
-        }`}
+        class="font-weight-normal ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
+        style={`color:  var(--text-secondary-100)`}
       >
         {tab.name}
       </span>
@@ -183,14 +181,14 @@
   }
 
   .request-icon {
-    color: var(--tab-request-default) !important;
     font-weight: 400 !important;
   }
   .individual-tab:hover .request-icon {
     color: inherit !important;
   }
   .request-text {
-    color: var(--tab-request-text-default) !important;
+    font-weight: 400;
+    color: var(--text-secondary-100) !important;
   }
   .individual-tab:hover .request-text {
     color: var(--text-secondary-100) !important;
@@ -199,5 +197,11 @@
   .cross-icon-btn:hover{
     background-color: var(--text-tertiary-300);
     border-radius: 2px;
+  }
+  .ellipsis{
+    color: var( --deleted-api-method) ;
+  }
+  .ellipsis:hover{
+    color: var( --text-secondary-100) ;
   }
 </style>

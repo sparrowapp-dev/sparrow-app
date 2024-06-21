@@ -8,12 +8,14 @@ import { environmentType } from "$lib/utils/enums/environment.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@common/factory";
 import { v4 as uuidv4 } from "uuid";
+import { GuideRepository } from "@app/repositories/guide.repository";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private environmentService = new EnvironmentService();
+  private guideRepository = new GuideRepository();
   private initTab = new InitTab();
 
   constructor() {}

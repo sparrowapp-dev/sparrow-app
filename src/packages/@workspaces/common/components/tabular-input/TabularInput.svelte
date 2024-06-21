@@ -9,6 +9,7 @@
   import close from "$lib/assets/close.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
+  import {Tooltip} from "@library/ui";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -157,7 +158,7 @@
   class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
 >
   <div
-    class="d-flex gap-3 py-1 align-items-center w-100 ps-2 {mode === 'READ'
+    class="d-flex gap-3 mb-1 py-1 align-items-center w-100 ps-2 {mode === 'READ'
       ? 'd-none'
       : ''}"
     style="height:26px;"
@@ -183,8 +184,18 @@
       class="d-flex pair-title bg-secondary-700 align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Key</p>
-      <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0">Value</p>
+      <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
+        style="font-weight: 1000;"
+      >
+        Key
+      </p>
+      <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0"
+        style="font-weight: 1000;"
+      >
+        Value
+      </p>
     </div>
     <div class="h-75 pe-1">
       <button class="border-0" style="width:40px;" />
@@ -263,7 +274,7 @@
         >
           <div
             class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-            style="padding-top:3px; padding-bottom:3px; height:24px;"
+            style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
           >
             <img
               src={dragIcon}
@@ -286,7 +297,7 @@
               {/if}
             </div>
 
-            <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
+            <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
               <div class="w-50 position-relative">
                 <CodeMirrorInput
                   bind:value={element.key}
@@ -390,15 +401,18 @@
             </div>
             {#if pairs.length - 1 != index}
               <div class="h-75 pe-1">
-                <button class="bg-secondary-700 border-0" style="width:40px;">
+                <button class=" bg-secondary-700 border-0" style="width:40px;">
                   {#if mode !== "READ"}
-                    <img
-                      src={trashIcon}
-                      on:click={() => {
-                        deleteParam(index);
-                      }}
-                      alt=""
-                    />
+                    <Tooltip title={"Delete"} placement={"left"} distance={10}>
+                      <img
+                        class="trash-icon"
+                        src={trashIcon}
+                        on:click={() => {
+                          deleteParam(index);
+                        }}
+                        alt=""
+                      />
+                    </Tooltip>
                   {/if}
                 </button>
               </div>
@@ -476,7 +490,7 @@
   /* When the checkbox is checked, add a blue background */
   .container input:checked ~ .checkmark {
     border: none;
-    background-color: var(--text-primary-200);
+    background-color: var(--bg-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
@@ -502,5 +516,8 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-secondary-500);
   }
 </style>

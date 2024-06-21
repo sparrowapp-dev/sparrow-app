@@ -6,10 +6,16 @@
   import RestExplorerViewModel from "./RestExplorerPage.ViewModel";
   import { RestExplorer } from "@workspaces/features";
   import { Debounce } from "@common/utils";
+  import { isGuestUserActive } from "$lib/store";
   export let tab;
   const _viewModel = new RestExplorerViewModel(tab);
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
+  let isGuestUser = false;
+
+  isGuestUserActive.subscribe((value) => {
+    isGuestUser = value;
+  });
 
   const renameWithCollectionList = new Debounce().debounce(
     _viewModel.updateNameWithCollectionList,
@@ -99,6 +105,7 @@
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
   {environmentVariables}
+  {isGuestUser}
   onSendRequest={_viewModel.sendRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
@@ -119,4 +126,8 @@
   onCreateFolder={_viewModel.createFolder}
   onCreateCollection={_viewModel.createCollection}
   onUpdateEnvironment={_viewModel.updateEnvironment}
+  onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+  onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+  onRenameCollection={_viewModel.handleRenameCollection}
+  onRenameFolder={_viewModel.handleRenameFolder}
 />

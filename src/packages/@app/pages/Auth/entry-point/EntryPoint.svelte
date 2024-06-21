@@ -16,6 +16,11 @@
   import BgContainer from "./BgContainer.svelte";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import { navigate } from "svelte-navigator";
+  import { AuthViewModel } from "../Auth.ViewModel";
+  import { isGuestUserActive, navigationState } from "$lib/store";
+  import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
+  import { Events } from "$lib/utils/enums/mixpanel-events.enum";
   let isEntry = false;
 
   let isHover = false;
@@ -30,6 +35,7 @@
   };
   let externalSparrowLink = `${constants.SPARROW_AUTH_URL}`;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+  const _viewModel = new AuthViewModel();
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
@@ -39,7 +45,27 @@
   let os = "";
   onMount(async () => {
     os = await platform();
+    let navigationPath = "";
+    navigationState.subscribe((value) => {
+      navigationPath = value;
+    });
+    if (navigationPath === "guestUser") {
+      isEntry = true;
+      navigationState.set("");
+    }
   });
+
+  const skipLoginHandler = async () => {
+    // Save Guest User in local DB
+    await _viewModel.addGuestUser();
+    const response = await _viewModel.findUser({ name: "guestUser" });
+    await _viewModel.createGuestUserTeamWorkspace();
+    isGuestUserActive.set(true);
+    navigate("/init/collections");
+    MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
+      source: "Entry Page",
+    });
+  };
 </script>
 
 {#if isEntry}
@@ -85,9 +111,6 @@
     >
       Welcome to <span class="text-primary-300">Sparrow!</span>
     </p>
-    <!-- <p class="card-subtitle sparrow-fs-20 mb-3 text-center">
-      Create an account or sign In
-    </p> -->
     <div class="mb-1">
       <button
         class="btn btn-primary mb-3 w-100 text-whiteColor border-0"
@@ -97,6 +120,16 @@
         }}
       >
         Create an Account or Sign In</button
+      >
+    </div>
+    <div class="mb-1">
+      <span
+        class="btn-guest"
+        on:click={() => {
+          skipLoginHandler();
+        }}
+      >
+        Continue without Registration</span
       >
     </div>
     <div class="w-100 mb-3 d-flex align-items-center justify-content-center">
@@ -231,5 +264,11 @@
   .star-text-hover {
     color: var(--primary-btn-color);
     text-decoration: underline;
+  }
+  .btn-guest {
+    color: var(--text-primary-300);
+    text-decoration: underline;
+    font-size: 13px;
+    cursor: pointer;
   }
 </style>

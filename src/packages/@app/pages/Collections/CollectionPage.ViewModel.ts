@@ -73,12 +73,8 @@ import {
 } from "$lib/utils/enums";
 //-----
 
-//-----
-//Samples
-import { generateSampleRequest } from "$lib/utils/sample";
-//-----
-
 import { moveNavigation } from "$lib/utils/helpers/navigation";
+import { GuideRepository } from "@app/repositories/guide.repository";
 import { Events } from "$lib/utils/enums/mixpanel-events.enum";
 import MixpanelEvent from "$lib/utils/mixpanel/MixpanelEvent";
 import { type Observable } from "rxjs";
@@ -93,6 +89,8 @@ import {
 import { GithubService } from "@app/services/github.service";
 import { GithubRepoReposistory } from "@app/repositories/github-repo.repository";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
+import { FeatureSwitchRepository } from "@app/repositories/feature-switch.repository";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -102,17 +100,32 @@ export default class CollectionsViewModel {
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
   private githubService = new GithubService();
+  private guideRepository = new GuideRepository();
+
+  private featureSwitchRepository = new FeatureSwitchRepository();
+  private guestUserRepository = new GuestUserRepository();
   movedTabStartIndex = 0;
   movedTabEndIndex = 0;
 
   constructor() {}
 
   /**
+   * Get the guest user state
+   */
+  private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
   public fetchCollections = async (workspaceId: string) => {
-    if (workspaceId) {
+    const isGuestUser = await this.getGuestUserState();
+    if (workspaceId && !isGuestUser) {
       const res = await this.collectionService.fetchCollection(workspaceId);
       if (res.isSuccessful) {
         this.collectionRepository.bulkInsertData(
@@ -592,52 +605,95 @@ export default class CollectionsViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-
-    const response = await this.collectionService.addCollection({
-      name: newCollection.name,
-      workspaceId: workspaceId,
-    });
-
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
-      await this.addCollection({
-        ...res,
-        id: res._id,
+    const isGuestUser = await this.getGuestUserState();
+    let response;
+    if (isGuestUser !== true) {
+      response = await this.collectionService.addCollection({
+        name: newCollection.name,
         workspaceId: workspaceId,
+      });
+
+      if (response.isSuccessful && response.data.data) {
+        const res = response.data.data;
+        await this.addCollection({
+          ...res,
+          id: res._id,
+          workspaceId: workspaceId,
+        });
+        let path = {
+          workspaceId: workspaceId,
+          collectionId: response.data.data._id,
+        };
+        // const Samplecollection = generateSampleCollection(
+        //   response.data.data._id,
+        //   new Date().toString(),
+        // );
+        const initCollectionTab = new InitCollectionTab(
+          response.data.data._id,
+          workspaceId,
+        );
+
+        response.data.data.items.map((item) => {
+          if (item.type === ItemType.REQUEST) {
+            totalRequest++;
+          } else {
+            totalFolder++;
+            totalRequest += item.items.length;
+          }
+        });
+
+        // Samplecollection.id = response.data.data._id;
+        // Samplecollection.path = path;
+        // Samplecollection.name = response.data.data.name;
+        // Samplecollection.property.collection.requestCount = totalRequest;
+        // Samplecollection.property.collection.folderCount = totalFolder;
+
+        initCollectionTab.updateId(response.data.data._id);
+        initCollectionTab.updatePath(path);
+        initCollectionTab.updateName(response.data.data.name);
+
+        // this.handleOpenCollection(workspaceId, Samplecollection);
+        this.tabRepository.createTab(initCollectionTab.getValue());
+        moveNavigation("right");
+
+        await this.workspaceRepository.updateCollectionInWorkspace(
+          workspaceId,
+          {
+            id: initCollectionTab.getValue().id,
+            name: newCollection.name,
+          },
+        );
+        notifications.success("New Collection Created");
+        MixpanelEvent(Events.CREATE_COLLECTION, {
+          source: "USER",
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+        });
+      } else {
+        notifications.error(response.message ?? "Failed to create collection!");
+      }
+    } else {
+      await this.addCollection({
+        id: newCollection.id,
+        workspaceId: workspaceId,
+        items: [],
+        createdAt: newCollection.createdAt,
+        createdBy: "guestUser",
+        totalRequests: 0,
+        updatedAt: newCollection.createdAt,
+        updatedBy: "guestUser",
       });
       let path = {
         workspaceId: workspaceId,
-        collectionId: response.data.data._id,
+        collectionId: newCollection.id,
       };
-      // const Samplecollection = generateSampleCollection(
-      //   response.data.data._id,
-      //   new Date().toString(),
-      // );
       const initCollectionTab = new InitCollectionTab(
-        response.data.data._id,
+        newCollection.id,
         workspaceId,
       );
-
-      response.data.data.items.map((item) => {
-        if (item.type === ItemType.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item.items.length;
-        }
-      });
-
-      // Samplecollection.id = response.data.data._id;
-      // Samplecollection.path = path;
-      // Samplecollection.name = response.data.data.name;
-      // Samplecollection.property.collection.requestCount = totalRequest;
-      // Samplecollection.property.collection.folderCount = totalFolder;
-
-      initCollectionTab.updateId(response.data.data._id);
+      initCollectionTab.updateId(newCollection.id);
       initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(response.data.data.name);
-
-      // this.handleOpenCollection(workspaceId, Samplecollection);
+      initCollectionTab.updateName(newCollection.name);
       this.tabRepository.createTab(initCollectionTab.getValue());
       moveNavigation("right");
 
@@ -646,13 +702,6 @@ export default class CollectionsViewModel {
         name: newCollection.name,
       });
       notifications.success("New Collection Created");
-      MixpanelEvent(Events.CREATE_COLLECTION, {
-        source: "USER",
-        collectionName: response.data.data.name,
-        collectionId: response.data.data._id,
-      });
-    } else {
-      notifications.error(response.message ?? "Failed to create collection!");
     }
     return response;
   };
@@ -857,61 +906,45 @@ export default class CollectionsViewModel {
     const response =
       await this.collectionService.importCollectionFromCurl(importCurl);
     if (response.isSuccessful) {
-      const sampleRequest = generateSampleRequest(
-        UntrackedItems.UNTRACKED + uuidv4(),
-        new Date().toString(),
+      const requestTabAdapter = new RequestTabAdapter();
+      const tabId = UntrackedItems.UNTRACKED + uuidv4();
+      const adaptedRequest = requestTabAdapter.adapt(
+        workspaceId || "",
+        "",
+        "",
+        {
+          ...response.data.data,
+          id: tabId,
+        },
       );
-      if (response.data.data.request.selectedRequestBodyType) {
-        const bodyType = this.checkBodyType(
-          response.data.data.request.selectedRequestBodyType,
-        );
-        if (bodyType === RequestDataset.NONE) {
-          sampleRequest.property.request.state.dataset = bodyType;
-        } else if (
-          bodyType !== RequestDataset.URLENCODED &&
-          bodyType !== RequestDataset.FORMDATA
-        ) {
-          sampleRequest.property.request.state.dataset = RequestDataset.RAW;
-          sampleRequest.property.request.state.raw = bodyType;
-        } else {
-          sampleRequest.property.request.state.dataset = bodyType;
-        }
-      }
-      sampleRequest.name = response.data.data.name ?? "";
-      sampleRequest.description = response.data.data.description ?? "";
-      sampleRequest.type = response.data.data.type ?? ItemType.REQUEST;
-      sampleRequest.property.request.method = response.data.data.request.method;
-      sampleRequest.property.request.url = response.data.data.request.url;
-      sampleRequest.property.request.body = response.data.data.request.body;
-      sampleRequest.property.request.headers =
-        response.data.data.request.headers;
-      sampleRequest.property.request.queryParams =
-        response.data.data.request.queryParams;
-      sampleRequest.property.request.auth = response.data.data.request.auth;
-      sampleRequest.property.request.state.auth =
-        response.data.data.request.selectedRequestAuthType;
-
-      const req = new InitRequestTab(sampleRequest.id, workspaceId);
-      req.updateName(sampleRequest.name);
-      req.updateAuth(sampleRequest.property.request?.auth);
-      req.updateMethod(sampleRequest.property.request?.method);
-      req.updateUrl(sampleRequest.property.request?.url);
-      req.updateBody(sampleRequest.property.request?.body);
-      req.updateHeaders(sampleRequest.property.request?.headers);
-      req.updateQueryParams(sampleRequest.property.request?.queryParams);
-
-      this.handleCreateTab(req.getValue());
+      adaptedRequest.isSaved = false;
+      await this.tabRepository.createTab(adaptedRequest);
       moveNavigation("right");
-      notifications.success("API request is imported successfully.");
-      return true;
+
+      notifications.success("cURL imported successfully.");
     } else {
       if (response.message === "Network Error") {
         notifications.error(response.message);
       } else {
-        notifications.error(
-          "Failed to import API request. Please check the cURL text and try again.",
-        );
+        notifications.error("Failed to import cURL. Please try again");
       }
+    }
+    MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+      source: "curl import popup",
+    });
+    return response;
+  };
+
+  /**
+   * Validates Curl
+   * @param importCurl: string - Curl string
+   */
+  public handleValidateCurl = async (importCurl: string) => {
+    const response =
+      await this.collectionService.importCollectionFromCurl(importCurl);
+    if (response.isSuccessful) {
+      return true;
+    } else {
       return false;
     }
   };
@@ -2189,11 +2222,16 @@ export default class CollectionsViewModel {
    * @param args :object - arguments depending on entity type
    */
   public handleImportItem = async (entityType: string, args: any) => {
+    let response;
     switch (entityType) {
       case "curl":
-        this.handleImportCurl(args.workspaceId, args.importCurl);
+        response = await this.handleImportCurl(
+          args.workspaceId,
+          args.importCurl,
+        );
         break;
     }
+    return response;
   };
 
   public handleOpenItem = async (entitytype: string, args: any) => {
@@ -2262,7 +2300,7 @@ export default class CollectionsViewModel {
         collectionId: response.data.data._id,
         importThrough: "ByObject",
       });
-      notifications.success("Collection Imported successfully.");
+      notifications.success("Collection imported successfully.");
     } else {
       notifications.error("Failed to import collection. Please try again.");
     }
@@ -2308,7 +2346,7 @@ export default class CollectionsViewModel {
         id: initCollectionTab.getValue().id,
         name: initCollectionTab.getValue().name,
       });
-      notifications.success("Collection Imported successfully.");
+      notifications.success("Collection imported successfully.");
       MixpanelEvent(Events.IMPORT_COLLECTION, {
         collectionName: response.data.data.name,
         collectionId: response.data.data._id,
@@ -2381,7 +2419,7 @@ export default class CollectionsViewModel {
             name: initCollectionTab.getValue().name,
           },
         );
-        notifications.success("Collection Imported successfully.");
+        notifications.success("Collection imported successfully.");
       }
       // collectionsMethods.handleCreateTab(Samplecollection);
       // moveNavigation("right");
@@ -2398,5 +2436,119 @@ export default class CollectionsViewModel {
       notifications.error("Failed to import collection. Please try again.");
     }
     return response;
+  };
+
+  /**
+   * Fetches the collection guide document.
+   *
+   * @returns - A promise that resolves to the collection guide document.
+   */
+  public fetchCollectionGuide = async (query) => {
+    const data = await this.guideRepository.findOne(query);
+    return data;
+  };
+
+  /**
+   * Updates the collection guide document's active status.
+   *
+   * @param isActive - The new active status to set for the collection guide.
+   * @returns - A promise that resolves when the update is complete.
+   */
+  public updateCollectionGuide = async (query, isActive: boolean) => {
+    await this.guideRepository.update(query, {
+      isActive: isActive,
+    });
+  };
+
+  /**
+   * Handles collection rename
+   * @param collection - collction to rename
+   * @param newCollectionName :string - the new name of the collection
+   */
+  public handleSaveAsRenameCollection = async (
+    workspaceId: string,
+    collectionId: string,
+    newCollectionName: string,
+  ) => {
+    if (newCollectionName) {
+      const response = await this.collectionService.updateCollectionData(
+        collectionId,
+        workspaceId,
+        { name: newCollectionName },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateCollection(
+          collectionId,
+          response.data.data,
+        );
+        notifications.success("Collection renamed successfully!");
+      } else if (response.message === "Network Error") {
+        notifications.error(response.message);
+      } else {
+        notifications.error("Failed to rename collection!");
+      }
+      return response;
+    }
+  };
+
+  /**
+   * Handle folder rename
+   * @param workspaceId - workspace id of the folder
+   * @param collectionId - collection id of the folder
+   * @param folderId  - folder id to be targetted
+   * @param newFolderName - new folder name
+   * @returns
+   */
+  public handleSaveAsRenameFolder = async (
+    workspaceId: string,
+    collectionId: string,
+    folderId: string,
+    newFolderName: string,
+  ) => {
+    const collection =
+      await this.collectionRepository.readCollection(collectionId);
+    const explorer =
+      await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        folderId,
+      );
+    if (newFolderName) {
+      let userSource = {};
+      if (collection.activeSync && explorer?.source === "USER") {
+        userSource = {
+          currentBranch: collection.currentBranch
+            ? collection.currentBranch
+            : collection.primaryBranch,
+          source: "USER",
+        };
+      }
+      const response = await this.collectionService.updateFolderInCollection(
+        workspaceId,
+        collectionId,
+        folderId,
+        {
+          ...userSource,
+          name: newFolderName,
+        },
+      );
+      if (response.isSuccessful) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          folderId,
+          response.data.data,
+        );
+        notifications.success("Folder renamed successfully!");
+      } else {
+        notifications.error("Failed to rename folder!");
+      }
+      return response;
+    }
+  };
+
+  /**
+   * Fetch a specific feature data
+   */
+  public getFeatureStatus = async (query) => {
+    return await this.featureSwitchRepository.findOne(query);
   };
 }

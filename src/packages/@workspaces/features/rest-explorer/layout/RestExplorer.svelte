@@ -2,7 +2,6 @@
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
-
   // ---- Components
   import {
     HttpUrlSection,
@@ -59,6 +58,10 @@
     type RequestTab,
   } from "@common/types/workspace";
   import { requestSplitterDirection } from "../store";
+  import Popover from "@library/ui/popover/Popover.svelte";
+  import { onMount } from "svelte";
+  import { Carousel, Modal } from "@library/ui";
+  import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -85,6 +88,30 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isGuestUser = false;
+  export let isPopoverContainer = true;
+  export let onFetchCollectionGuide: (query) => void;
+  export let onUpdateCollectionGuide: (query, isActive) => void;
+
+  const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
+
+  onMount(async () => {
+    const event = await onFetchCollectionGuide({
+      id: "collection-guide",
+    });
+    event.$.subscribe((e) => {
+      if (e.isActive === false) {
+        isPopoverContainer = false;
+      } else {
+        isPopoverContainer = true;
+      }
+    });
+  });
+  export let onRenameCollection;
+  export let onRenameFolder;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -96,6 +123,7 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+  let isGuidePopup = false;
 </script>
 
 {#if $tab.tabId}
@@ -193,7 +221,33 @@
         {onUpdateRequestMethod}
         {toggleSaveRequest}
         {onSaveRequest}
+        {isGuestUser}
       />
+      <!--Disabling the Quick Help feature, will be taken up in next release-->
+      <!-- <div class="" style="margin-top: 10px;">
+        {#if isPopoverContainer}
+          <Popover
+            onClose={closeCollectionHelpText}
+            heading={`Welcome to Sparrow!`}
+            text={` `}
+          >
+            <p>
+              Your one-stop solution for API testing and management. Start
+              organizing your API requests into collections, utilize environment
+              variables, and streamline your development process. Get started
+              now by creating your first collection or exploring our features
+              <span
+                on:click={() => {
+                  isGuidePopup = true;
+                }}
+                class="link btn p-0 border-0"
+                style="font-size: 12px;"
+                >See how it works.
+              </span>
+            </p>
+          </Popover>
+        {/if}
+      </div> -->
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -214,7 +268,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative bg-secondary-800-important"
+            class="position-relative bg-secondary-850-important"
           >
             <!-- Request Pane -->
             <div
@@ -273,6 +327,11 @@
                   {onUpdateEnvironment}
                   {environmentVariables}
                 />
+              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                <RequestDoc
+                  {onUpdateRequestDescription}
+                  requestStateDoc={$tab.description}
+                />
               {/if}
             </div>
           </Pane>
@@ -280,7 +339,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="bg-secondary-800-important"
+            class="bg-secondary-850-important"
           >
             <!-- Response Pane -->
             <div
@@ -386,13 +445,57 @@
       {onSaveAsRequest}
       {onCreateFolder}
       {onCreateCollection}
+      {onRenameCollection}
+      {onRenameFolder}
     />
   </ModalWrapperV1>
 {/if}
 
+<!--Disabling the Quick Help feature, will be taken up in next release-->
+<!-- <Modal
+  title={""}
+  type={"dark"}
+  width={"474px"}
+  zIndex={10000}
+  isOpen={isGuidePopup}
+  handleModalState={(flag = false) => {
+    isGuidePopup = flag;
+  }}
+>
+  <div style="position: relative;">
+    <Carousel
+      handleClosePopup={(flag = false) => {
+        isGuidePopup = flag;
+      }}
+      data={[
+        {
+          id: 1,
+          heading: "Creating a Collection: Import existing or Start a new one",
+          subheading: `Organize your APIs efficiently within "Collections" for streamlined API management and testing. Click the + Add Collection button in the side panel to create a collection. Choose 'Import Collection' to bring in existing API collections or create an empty Collection. `,
+          gif: `${CreateCollection}`,
+        },
+        {
+          id: 2,
+          heading: "Sending an API Request",
+          subheading:
+            "In the request builder, input your API endpoint URL in the URL field. Click the 'Send' button to dispatch the request. Instantly see the server's response, which includes status codes, response time, and data.",
+          gif: `${SendingApiRequest}`,
+        },
+        {
+          id: 3,
+          heading: "Advanced API Request with Detailed Inputs",
+          subheading:
+            "Enter the endpoint URL in the URL field. Utilize 'Parameters' tab for parameters, 'Body' tab to input data payloads, 'Headers' tab for custom headers, and 'Auth' tab to manage access credentials. After filling in the required fields, click 'Send' to execute the request and view the detailed server response.",
+          gif: `${AdvanceAPI}`,
+        },
+      ]}
+    />
+  </div>
+</Modal> -->
+
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     height: calc(100vh - 80px);
   }
 
@@ -419,5 +522,9 @@
       .rest-splitter .splitpanes__splitter:hover
     ) {
     background-color: var(--bg-primary-200) !important;
+  }
+  .link {
+    color: var(--bg-primary-300);
+    text-decoration: underline;
   }
 </style>
