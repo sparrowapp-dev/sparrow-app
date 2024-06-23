@@ -4,11 +4,12 @@
   export let show = true;
   export let placement: "left" | "right" | "top" | "bottom" = "bottom";
   export let zIndex = 1;
-  export let transitionTime = "0.5s";
+  export let transitionTime = "0.3s";
   export let spacing = "4px 10px";
   export let borderRadius = "2px";
   export let distance = 10;
   export let fontSize = "12px";
+  export let delay = 50;
 
   let top = "unset";
   let left = "unset";
@@ -16,6 +17,7 @@
   let bottom = "unset";
   let tooltipWrapper: HTMLElement;
   let isHover = false;
+  let isDelayed = false;
 
   const toggleTooltip = () => {
     if (placement === "right") {
@@ -81,32 +83,32 @@
 {#if show}
   <span
     class="{isHover
-      ? 'tooltip-text'
-      : ''}  invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center gap-2 opacity-0
+      ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
+      : ''} tooltip-text invisible m-auto text-center bg-tertiary-700 text-lightGray position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} "
     style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:{fontSize}; z-index : {zIndex} ; border-radius: {borderRadius}; {styleProp}"
     >{title}
     {#if placement === "left"}
       <span
-        class="position-absolute tooltip-square"
+        class="position-absolute tooltip-square border-radius-2"
         style="top:50%; right:5px; transform: translateX(100%) translateY(-50%) rotate(45deg);"
       >
       </span>
     {:else if placement === "top"}
       <span
-        class="position-absolute tooltip-square"
+        class="position-absolute tooltip-square border-radius-2"
         style="bottom:5px; left:50%; transform: translateX(-50%) translateY(100%) rotate(45deg);"
       >
       </span>
     {:else if placement === "right"}
       <span
-        class="position-absolute tooltip-square"
+        class="position-absolute tooltip-square border-radius-2"
         style="top:50%; left:5px; transform: translateX(-100%) translateY(-50%) rotate(45deg);"
       >
       </span>
     {:else if placement === "bottom"}
       <span
-        class="position-absolute tooltip-square"
+        class="position-absolute tooltip-square border-radius-2"
         style="top:5px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
       >
       </span>
@@ -116,12 +118,17 @@
 
 <div
   on:mouseenter={() => {
-    isHover = true;
+    isDelayed = true;
+    setTimeout(() => {
+      if (isDelayed) {
+        isHover = true;
+      }
+    }, delay);
     toggleTooltip();
   }}
   on:mouseleave={() => {
     isHover = false;
-    toggleTooltip();
+    isDelayed = false;
   }}
   bind:this={tooltipWrapper}
   class={""}
@@ -131,20 +138,35 @@
 
 <style>
   .top {
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(0.5);
   }
   .left {
-    transform: translateY(-50%);
+    transform: translateY(-50%) scale(0.5);
   }
   .right {
-    transform: translateY(-50%);
+    transform: translateY(-50%) scale(0.5);
   }
   .bottom {
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(0.5);
   }
   .tooltip-text {
+    transform-origin: center;
+  }
+  .tooltip-text-hover {
     visibility: visible !important;
     opacity: 1 !important;
+  }
+  .tooltip-text-hover-top {
+    transform: translateX(-50%) scale(1);
+  }
+  .tooltip-text-hover-left {
+    transform: translateY(-50%) scale(1);
+  }
+  .tooltip-text-hover-right {
+    transform: translateY(-50%) scale(1);
+  }
+  .tooltip-text-hover-bottom {
+    transform: translateX(-50%) scale(1);
   }
   .tooltip-square {
     height: 10px;

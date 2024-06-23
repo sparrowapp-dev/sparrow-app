@@ -2,16 +2,15 @@
   export type SidebarItemObj = {
     route: string;
     heading: string;
-    defaultLogo: any;
-    hoveredLogo?: any;
-    selectedLogo?: any;
+    defaultLogo: string;
+    hoveredLogo?: string;
+    selectedLogo?: string;
     disabled: boolean;
     position: "primary" | "secondary";
   };
 </script>
 
 <script lang="ts">
-  import { onMount } from "svelte";
   import { Link } from "svelte-navigator";
   import { Tooltip } from "@library/ui";
 
@@ -19,23 +18,7 @@
    * List of side bar Items
    */
   export let item: SidebarItemObj;
-  let isHovered = false;
   let isRouteActive = false;
-
-  onMount(() => {
-    const handleMouseEnter = () => {
-      isHovered = true;
-    };
-
-    const handleMouseLeave = () => {
-      isHovered = false;
-    };
-
-    return () => {
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  });
 </script>
 
 <Tooltip placement="right" title={item.disabled ? "Coming Soon" : item.heading}>
@@ -53,22 +36,19 @@
     >
       <div
         class="sidebar-item"
-        on:mouseenter={() => (isHovered = true)}
-        on:mouseleave={() => (isHovered = false)}
+        style="--default-logo: url('{item.defaultLogo}'); --hovered-logo: url('{item.hoveredLogo ||
+          item.defaultLogo}'); --selected-logo: url('{item.selectedLogo ||
+          item.defaultLogo}');"
       >
         <div class="d-flex" style="align-items: center;">
           {#if isRouteActive}
-            <div
-              style="background-color: var(--nav-bar-active-slash); position:fixed; height: 38px; width: 2px; left: 5px;"
-            ></div>
+            <div class="active-indicator"></div>
           {/if}
-          {#if isRouteActive && item.selectedLogo}
-            <img src={item.selectedLogo} alt={item.heading} />
-          {:else if isHovered && item.hoveredLogo && !item.disabled}
-            <img src={item.hoveredLogo} alt={item.heading} />
-          {:else}
-            <img src={item.defaultLogo} alt={item.heading} />
-          {/if}
+          <img
+            class="sidebar-logo {isRouteActive ? 'selected' : ''}"
+            src={item.defaultLogo}
+            alt={item.heading}
+          />
         </div>
       </div>
     </Link>
@@ -84,9 +64,7 @@
   .sidebar-item {
     position: relative;
     padding: 12px;
-    transition:
-      background-color 0.55s ease,
-      padding 0.55s ease;
+    transition: 0.55s ease;
     border-radius: 4px;
   }
 
@@ -98,5 +76,25 @@
   .sidebar-item-parent.disabled {
     pointer-events: none !important;
     opacity: 0.3;
+  }
+
+  .active-indicator {
+    background-color: var(--nav-bar-active-slash);
+    position: fixed;
+    height: 38px;
+    width: 2px;
+    left: 5px;
+  }
+
+  .sidebar-logo {
+    content: var(--default-logo);
+  }
+
+  .sidebar-item:hover .sidebar-logo {
+    content: var(--hovered-logo);
+  }
+
+  .sidebar-item .sidebar-logo.selected {
+    content: var(--selected-logo);
   }
 </style>
