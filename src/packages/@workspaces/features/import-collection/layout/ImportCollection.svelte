@@ -562,7 +562,7 @@
         }}
         placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
         bind:value={importData}
-        class="mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
+        class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
         style={!isValidServerDeployedURL &&
         !isValidServerJSON &&
         !isValidServerURL &&
@@ -822,6 +822,9 @@
 </ModalWrapperV1>
 
 <style lang="scss">
+  .text-area::placeholder{
+    color: var( --text-tertiary-100);
+  }
   #file-input {
     display: none;
   }
@@ -1017,10 +1020,33 @@
     content: "";
     height: 16px;
     width: 16px;
-    background-color: white;
+    background-color: var(--bg-secondary-100);
     transition: 200ms;
   }
-
+  .form-check-input{
+    border: 1px solid var(--border-secondary-100);
+    background-color:  var(--bg-tertiary-300) !important;
+    background-image: none !important;
+  }
+  .form-check-input:checked:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:checked{
+    background-color: var(--bg-tertiary-250) !important;
+    border: 4.5px solid var(--border-primary-300 ) !important;
+  }
+  .form-check-label{
+    color: var(--text-secondary-100);
+  }
   input:checked + .slider {
     background-color: var(--sparrow-input-slider-button);
   }
