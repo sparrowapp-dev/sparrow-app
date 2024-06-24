@@ -204,7 +204,7 @@
     <section class="w-100">
       <!-- Route for Collections -->
       <Route path="/collections/*">
-        <CollectionsPage />
+        <CollectionsPage {isLoginBannerActive} />
       </Route>
 
       <!-- Route for Workspaces -->

@@ -544,8 +544,7 @@
   <br />
   {#if importType === "text"}
     <div>
-      <p class="sparrow-fs-12 mb-1"
-      style="color:var(--text-secondary-1000)">
+      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
         Paste your OAS text or Swagger/Localhost Link
       </p>
     </div>
@@ -586,25 +585,20 @@
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
         Please paste your OpenAPI specification text or Swagger/localhost link.
       </p>
-    {:else if (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Unable to process the specified Swagger link. Please verify the URL for
-        accuracy and accessibility. If the problem persists, contact the API
-        provider for assistance.
-      </p>
-    {:else if (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        We have identified that text you pasted is not written in Open API
-        Specification (OAS). Please visit https://swagger.io/specification/ for
-        more information on OAS.
+        We have identified that the text you have pasted is not written in
+        OpenAPI Specification (OAS). Please visit
+        https://swagger.io/specification/ for more information on OAS.
       </p>
     {/if}
   {/if}
 
   {#if importType === "file"}
     <div>
-      <p class="sparrow-fs-12 mb-1"
-      style="color:var(--text-secondary-1000)">Upload YAML/JSON file</p>
+      <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+        Upload YAML/JSON file
+      </p>
     </div>
     <div>
       <Drop

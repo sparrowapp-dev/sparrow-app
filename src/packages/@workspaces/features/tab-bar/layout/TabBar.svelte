@@ -187,7 +187,7 @@
     <div class="d-inline-flex" style="height:35px; width:35px;">
       <Tooltip
         title={"Add Request"}
-        placement={"right"}
+        placement={"bottom"}
         distance={2}
         zIndex={20}
       >

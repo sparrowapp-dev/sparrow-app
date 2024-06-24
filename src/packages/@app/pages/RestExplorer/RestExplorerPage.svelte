@@ -8,6 +8,7 @@
   import { Debounce } from "@common/utils";
   import { isGuestUserActive } from "$lib/store";
   export let tab;
+  export let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -106,6 +107,7 @@
   bind:requestAuthParameter={_viewModel.authParameter}
   {environmentVariables}
   {isGuestUser}
+  {isLoginBannerActive}
   onSendRequest={_viewModel.sendRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}

@@ -53,6 +53,8 @@
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
 
+  export let isLoginBannerActive = false;
+
   const _viewModel = new CollectionsViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
@@ -259,7 +261,7 @@
         {#if $activeTab?.type === ItemType.REQUEST}
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
-              <RestExplorerPage tab={$activeTab} />
+              <RestExplorerPage tab={$activeTab} {isLoginBannerActive} />
             </div>
           </Motion>
         {:else if $activeTab?.type === ItemType.COLLECTION}
