@@ -83,11 +83,11 @@
   -->
   {#if isMenuOpen}
     <div
+      in:scale={{ start: 0.8, duration: 400 }}
+      out:scale={{ start: 0.8, duration: 400 }}
       class="bg-dropdownContainer dropdown-container p-1 rounded-1 position-fixed
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
-      in:scale={{ start: 0.8, duration: 300, easing: quintOut }}
-      out:scale={{ start: 0.8, duration: 300, easing: backInOut }}
     >
       <!-- 
       Menu item

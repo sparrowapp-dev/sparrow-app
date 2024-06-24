@@ -19,7 +19,6 @@
           placement={"bottom"}
           zIndex={500}
           distance={20}
-          spacing={"8px 10px"}
         >
           <span
             class="statuscode gap-1 d-flex align-items-center position-relative cursor-pointer border-0"
@@ -49,7 +48,6 @@
           placement={"bottom"}
           zIndex={500}
           distance={20}
-          spacing={"8px 10px"}
         >
           <span
             class="d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
@@ -69,7 +67,6 @@
           placement={"bottom"}
           zIndex={500}
           distance={20}
-          spacing={"8px 10px"}
         >
           <span
             class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"

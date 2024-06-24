@@ -61,8 +61,8 @@
 
 <nav
   style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
-  in:scale={{ start: 0.8, duration: 300, easing: quintOut }}
-  out:scale={{ start: 0.8, duration: 300, easing: backInOut }}
+  in:scale={{ start: 0.8, duration: 400 }}
+  out:scale={{ start: 0.8, duration: 400 }}
 >
   <div
     style={`width: ${noOfColumns}px`}
