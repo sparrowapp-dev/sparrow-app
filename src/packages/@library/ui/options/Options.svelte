@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { scale } from "svelte/transition";
+  import { quintOut, backInOut } from "svelte/easing";
   export let xAxis = 0;
   export let yAxis = [0, 0];
   export let menuItems: Array<{
@@ -59,6 +61,8 @@
 
 <nav
   style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
+  in:scale={{ start: 0.8, duration: 300, easing: quintOut }}
+  out:scale={{ start: 0.8, duration: 300, easing: backInOut }}
 >
   <div
     style={`width: ${noOfColumns}px`}
@@ -93,11 +97,15 @@
 <style>
   .navbar {
     height: auto;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
 
   ul li button {
     background-color: var(--bg-tertiary-400);
     border-radius: 2px;
+    transition: 0.2s ease;
   }
 
   ul li button:hover {

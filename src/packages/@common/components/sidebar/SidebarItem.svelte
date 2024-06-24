@@ -21,7 +21,11 @@
   let isRouteActive = false;
 </script>
 
-<Tooltip placement="right" title={item.disabled ? "Coming Soon" : item.heading}>
+<Tooltip
+  placement="right"
+  title={item.disabled ? "Coming Soon" : item.heading}
+  zIndex={600}
+>
   <div class="sidebar-item-parent" class:disabled={item.disabled}>
     <Link
       to={item.route}

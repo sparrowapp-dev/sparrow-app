@@ -471,7 +471,7 @@
       placement={"bottom"}
       distance={13}
       show={!showAddItemMenu}
-      zIndex={10}
+      zIndex={701}
     >
       <button
         id={`add-item-collection-${collection.id}`}
@@ -490,7 +490,7 @@
       title={"More"}
       placement={"bottom"}
       distance={17}
-      zIndex={600}
+      zIndex={701}
       show={!showMenu}
     >
       <button

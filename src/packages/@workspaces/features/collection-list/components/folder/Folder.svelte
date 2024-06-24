@@ -398,7 +398,7 @@
           <Tooltip
             title={"Add Request"}
             placement={"bottom"}
-            zIndex={5}
+            zIndex={701}
             distance={13}
           >
             <button
@@ -423,7 +423,7 @@
           <Tooltip
             title={"More"}
             placement={"bottom"}
-            zIndex={5}
+            zIndex={701}
             distance={17}
             show={!showMenu}
           >

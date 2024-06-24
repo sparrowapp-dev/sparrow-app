@@ -309,6 +309,7 @@
           title={"Add Options"}
           placement={"bottom"}
           distance={12}
+          show={!addButtonMenu}
           zIndex={10}
         >
           <button
