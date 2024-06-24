@@ -275,6 +275,7 @@
             title={"Layout"}
             placement={"left"}
             distance={12}
+            show={!viewChange}
             zIndex={10}
           >
             <button

@@ -201,9 +201,9 @@
 </script>
 
 <Motion {...pagesMotion} let:motion>
-  <div use:motion>
+  <div class="h-100" use:motion>
     <Splitpanes
-      class="collection-splitter"
+      class="collection-splitter h-100"
       style="width: calc(100vw - 54px)"
       on:resize={(e) => {
         leftPanelWidth.set(e.detail[0].size);
@@ -277,7 +277,7 @@
                   <FolderExplorerPage tab={$activeTab} />
                 </div>
               </Motion>
-            {:else}
+            {:else if !$tabList?.length}
               <Motion {...scaleMotionProps} let:motion>
                 <WorkspaceDefault
                   showImportCollectionPopup={() =>
@@ -309,8 +309,7 @@
 />
 
 <svelte:window on:keydown={handleKeyPress} />
-{#if isImportCollectionPopup}
-  <!-- <ImportCollection
+<!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
@@ -330,6 +329,16 @@
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
   /> -->
+<ModalWrapperV1
+  title={"New Collection"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isImportCollectionPopup}
+  handleModalState={(flag = false) => {
+    isImportCollectionPopup = flag;
+  }}
+>
   <ImportCollection
     onClick={() => {
       isImportCollectionPopup = false;
@@ -387,16 +396,27 @@
       return response;
     }}
   />
-{/if}
+</ModalWrapperV1>
 
-{#if isImportCurlPopup}
+<!-- {#if isImportCurlPopup} -->
+<ModalWrapperV1
+  title={"Import cURL"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isImportCurlPopup}
+  handleModalState={(flag = false) => {
+    isImportCurlPopup = flag;
+  }}
+>
   <ImportCurl
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
     onValidateCurl={_viewModel.handleValidateCurl}
   />
-{/if}
+</ModalWrapperV1>
+<!-- {/if} -->
 
 <ModalWrapperV1
   title={"Save Request"}

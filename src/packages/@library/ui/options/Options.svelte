@@ -1,6 +1,5 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { quintOut, backInOut } from "svelte/easing";
   export let xAxis = 0;
   export let yAxis = [0, 0];
   export let menuItems: Array<{
