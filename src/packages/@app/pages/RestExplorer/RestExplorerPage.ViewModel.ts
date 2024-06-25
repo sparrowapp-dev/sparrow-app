@@ -854,6 +854,7 @@ class RestExplorerViewModel
              * Update existing request
              */
             this.updateRequestName(res.data.data.name);
+            this.updateRequestDescription(res.data.data.description);
             this.updateRequestPath(expectedPath);
             this.updateRequestId(res.data.data.id);
             const progressiveTab = this._tab.getValue();
