@@ -1,7 +1,9 @@
 <script lang="ts">
   import { CrossIcon } from "$lib/assets/app.asset";
-  import { fade, fly } from "svelte/transition";
+
+  import { scale, fade } from "svelte/transition";
   import warningIcon from "$lib/assets/download-warning.svg";
+
   export let isOpen = false;
   export let title: string;
   export let type: "primary" | "dark" | "danger" = "primary";
@@ -23,14 +25,13 @@
     class="sparrow-modal-bg-overlay"
     style={`z-index: ${zIndex} !important`}
     on:click={canClose ? handleModalState(false) : null}
-    transition:fade={{ delay: 0, duration: 100 }}
+    transition:fade={{ delay: 0, duration: 200 }}
   />
   <div
     class="sparrow-modal-container gap-2 p-4"
     style={`z-index: ${zIndex + 1}; width: ${width}`}
-    transition:fly={{ y: 50, delay: 0, duration: 100 }}
-    on:introstart
-    on:outroend
+    in:scale={{ start: 0.8, duration: 300 }}
+    out:scale={{ start: 0.8, duration: 300 }}
   >
     <div
       class="sparrow-modal-header justify-content-between d-flex align-items-start"

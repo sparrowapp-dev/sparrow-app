@@ -1,5 +1,7 @@
 <script lang="ts">
   import { afterUpdate, onMount } from "svelte";
+  import { scale } from "svelte/transition";
+  import { quintOut, backInOut } from "svelte/easing";
 
   /**
    * Button ID
@@ -79,36 +81,45 @@
   <!-- 
     the menu container
   -->
-  <div
-    class="bg-dropdownContainer p-1 rounded-1 {isMenuOpen
-      ? 'position-fixed'
-      : 'd-none'}"
-    style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
-  >
-    <!-- 
+  {#if isMenuOpen}
+    <div
+      in:scale={{ start: 0.8, duration: 400 }}
+      out:scale={{ start: 0.8, duration: 400 }}
+      class="bg-dropdownContainer dropdown-container p-1 rounded-1 position-fixed
+      "
+      style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 1000000;"
+    >
+      <!-- 
       Menu item
     -->
-    {#each options as item}
-      <button
-        class="border-0 d-flex p-2 rounded-1 w-100 option-button"
-        on:click={() => item.onclick()}
-      >
-        {#if item.icon}
-          <img
-            src={item.icon}
-            alt=""
-            style="width: 15px; height: 15px; margin: auto 10px auto 5px;"
-          />
-        {/if}
-        <p style="margin-bottom: 0;">{item.name}</p>
-      </button>
-    {/each}
-  </div>
+      {#each options as item}
+        <button
+          class="border-0 d-flex p-2 rounded-1 w-100 option-button"
+          on:click={() => item.onclick()}
+        >
+          {#if item.icon}
+            <img
+              src={item.icon}
+              alt=""
+              style="width: 15px; height: 15px; margin: auto 10px auto 5px;"
+            />
+          {/if}
+          <p style="margin-bottom: 0;">{item.name}</p>
+        </button>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
+  .dropdown-container {
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+  }
   .option-button {
     background-color: transparent;
+    transition: 0.2s ease;
   }
   .option-button:hover {
     background-color: var(--dropdown-option-hover);

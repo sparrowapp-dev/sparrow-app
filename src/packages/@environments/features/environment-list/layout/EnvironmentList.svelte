@@ -98,19 +98,19 @@
     <p class={`mb-0 text-secondary-170 ellipsis text-fs-16`}>
       {currentWorkspace?.name || ""}
     </p>
-    <Tooltip placement="right" title="Add Environment" distance={13}>
-    <WithButtonV2
-      icon={PlusIcon}
-      disable={!hasWorkpaceLevelPermission(
-        loggedUserRoleInWorkspace,
-        workspaceLevelPermissions.ADD_ENVIRONMENT,
-      )}
-      onClick={async () => {
-        await onCreateEnvironment(localEnvironment);
-        scrollList("bottom");
-      }}
-      loader={false}
-    />
+    <Tooltip placement="bottom" title="Add Environment" distance={13}>
+      <WithButtonV2
+        icon={PlusIcon}
+        disable={!hasWorkpaceLevelPermission(
+          loggedUserRoleInWorkspace,
+          workspaceLevelPermissions.ADD_ENVIRONMENT,
+        )}
+        onClick={async () => {
+          await onCreateEnvironment(localEnvironment);
+          scrollList("bottom");
+        }}
+        loader={false}
+      />
     </Tooltip>
   </div>
 
@@ -245,7 +245,7 @@
     border-radius: 2px;
     height: 32px;
   }
-  .add-environment:hover{
+  .add-environment:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
   }

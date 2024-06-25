@@ -7,10 +7,10 @@
 </script>
 
 <div
-  class=" d-flex flex-column justify-content-center align-items-center"
-  style=" padding-top: 102px; padding-right:325px;  padding-left:325px; padding-bottom: 24px; gap: 89px;"
+  class=" d-flex flex-column align-items-center h-100"
+  style=" padding-top: 124px; padding-right:325px;  padding-left:325px; padding-bottom: 24px;"
 >
-  <div style="height: 176px; width: 175px;">
+  <div style="height: 176px; width: 175px; margin-bottom: 24px;">
     <SparrowLogo />
   </div>
   <div class="d-flex" style="gap: 19px;">

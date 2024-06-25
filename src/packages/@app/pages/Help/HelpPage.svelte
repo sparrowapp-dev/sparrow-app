@@ -8,6 +8,8 @@
   import DiscordPost from "@support/features/discord-post/layout/DiscordPost.svelte";
   import HelpPageViewModel from "./HelpPage.ViewModel";
   import { onMount } from "svelte";
+  import { Motion } from "svelte-motion";
+  import { pagesMotion } from "@app/constants";
 
   const _viewModel = new HelpPageViewModel();
 
@@ -34,49 +36,50 @@
       activeTab = "feedback";
     }
   });
-
- 
-
 </script>
 
-<div class="tabs">
-  <div
-    class="tab {activeTab === 'feedback' ? 'active' : ''}"
-    on:click={() => setActiveTab("feedback")}
-  >
-    Feedback
-  </div>
-  <div
-    class="tab {activeTab === 'updates' ? 'active' : ''}"
-    on:click={() => setActiveTab("updates")}
-  >
-    Updates
-  </div>
-</div>
+<Motion {...pagesMotion} let:motion>
+  <div use:motion>
+    <div class="tabs">
+      <div
+        class="tab {activeTab === 'feedback' ? 'active' : ''}"
+        on:click={() => setActiveTab("feedback")}
+      >
+        Feedback
+      </div>
+      <div
+        class="tab {activeTab === 'updates' ? 'active' : ''}"
+        on:click={() => setActiveTab("updates")}
+      >
+        Updates
+      </div>
+    </div>
 
-<div class="w-100 d-flex jutify-content-center bg-secondary-900">
-  <div
-    style="height:calc(100vh - 16px); width: calc(100% - 274px ); overflow-y:scroll"
-  >
-    {#if activeTab === "feedback"}
-      <FeedbackToast />
-      <DiscordPost />
-    {:else if activeTab === "updates"}
-      <UpdateToast {releaseNotesData}   onLearnMore={_viewModel.learnMore} />
-    {/if}
-  </div>
-  <div style="width: 274px;" class="px-3 pt-5">
-    <div>
-      <AddFeedback
-        onAddFeedback={_viewModel.addFeedback}
-        onSendFeedback={_viewModel.sendFeedback}
-      />
+    <div class="w-100 d-flex jutify-content-center bg-secondary-900">
+      <div
+        style="height:calc(100vh - 16px); width: calc(100% - 274px ); overflow-y:scroll"
+      >
+        {#if activeTab === "feedback"}
+          <FeedbackToast />
+          <DiscordPost />
+        {:else if activeTab === "updates"}
+          <UpdateToast {releaseNotesData} onLearnMore={_viewModel.learnMore} />
+        {/if}
+      </div>
+      <div style="width: 274px;" class="px-3 pt-5">
+        <div>
+          <AddFeedback
+            onAddFeedback={_viewModel.addFeedback}
+            onSendFeedback={_viewModel.sendFeedback}
+          />
+        </div>
+        <div>
+          <DiscordCard onJoin={_viewModel.joinDiscord} />
+        </div>
+      </div>
     </div>
-    <div>
-      <DiscordCard onJoin={_viewModel.joinDiscord} />
-    </div>
   </div>
-</div>
+</Motion>
 
 <style>
   .tabs {

@@ -177,6 +177,7 @@
     title={isGuestUser ? "Login to Save" : "Save"}
     placement={"bottom"}
     distance={12}
+    zIndex={10}
   >
     <button
       class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
