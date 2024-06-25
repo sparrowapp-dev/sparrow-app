@@ -686,7 +686,7 @@
           ? `outline: 1px solid #FE8C98`
           : ``}"
         placeholder="Enter request name"
-        class="py-2 ps-3 pe-4 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
+        class="py-2 ps-3 pe-5 bg-tertiary-300 outline-0 border-radius-2 sparrow-fs-12"
         bind:value={tabName}
         autofocus
       />
@@ -723,7 +723,7 @@
               </p>
               <div class="d-flex">
                 <div class="w-50">
-                  <p class="save-as-instructions">Do's:</p>
+                  <p class="save-as-instructions m-0">Do's:</p>
                   <ol class="save-as-instructions">
                     {#each dos as para}
                       <li>{para}</li>
@@ -731,7 +731,7 @@
                   </ol>
                 </div>
                 <div class="w-50">
-                  <p class="save-as-instructions">Don'ts:</p>
+                  <p class="save-as-instructions m-0">Don'ts:</p>
                   <ol class="save-as-instructions">
                     {#each donts as para}
                       <li>{para}</li>
@@ -914,6 +914,9 @@
     color: #999999;
     font-family: monospace;
     align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   input:focus,
   textarea:focus {

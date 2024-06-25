@@ -247,7 +247,14 @@ class RestExplorerViewModel
     progressiveTab.description = _description;
     progressiveTab.isSaved = false;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      notifications.success("Documentation updated");
+    } catch (error) {
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
   };
 
   /**

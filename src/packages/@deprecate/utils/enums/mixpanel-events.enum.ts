@@ -31,4 +31,6 @@ export enum Events {
   ADD_FEEDBACK = "Add_Feedback",
   IMPORT_CURL = "Import_cURL ",
   IMPORT_API_VIA_CURL = "Import_API_Via_cURL",
+  CONTINUE_WITHOUT_SIGNUP = "User_Continue_Without_Signup",
+  LOCAL_SIGNUP = "User_LocalSignup",
 }

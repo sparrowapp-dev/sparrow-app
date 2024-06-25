@@ -12,6 +12,7 @@
   import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
   import { onMount } from "svelte";
 
+  import {Tooltip} from "@library/ui";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -184,7 +185,6 @@
         return "";
       })
       .join("\n");
-    console.log(res);
     bulkText = res;
   });
 </script>
@@ -195,7 +195,7 @@
       class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
     >
       <div
-        class="d-flex gap-3 py-1 align-items-center w-100 ps-2 {mode === 'READ'
+        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {mode === 'READ'
           ? 'd-none'
           : ''}"
         style="height:26px;"
@@ -221,10 +221,20 @@
           class="d-flex pair-title bg-secondary-700 align-items-center w-100"
           style="font-size: 12px; font-weight: 500;"
         >
-          <p class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1">Key</p>
-          <p class="mb-0 w-50 ms-1 text-secondary-200 text-fs-12 p-1 ps-0">Value</p>
+        <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
+        style="font-weight: 1000;"
+      >
+        Key
+      </p>
+      <p
+        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0 ms-3"
+        style="font-weight: 1000;"
+      >
+        Value
+      </p>
           
-          <div class="">
+          <div class="me-2">
             <button class="bg-transparent border-0 mt-1 d-flex" style="">
               <p
                 class="text-nowrap text-primary-300 mb-0 me-1"
@@ -245,7 +255,6 @@
                         return "";
                       })
                       .join("\n");
-                    console.log(res);
                     bulkText = res;
                   }}
                   on:change={toggleBulkEdit}
@@ -253,6 +262,7 @@
               </label>
             </button>
           </div>
+
         </div>
       </div>
       <div
@@ -328,7 +338,7 @@
             >
               <div
                 class="d-flex w-100 align-items-center justify-content-center gap-3 pair-container"
-                style="padding-top:3px; padding-bottom:3px; height:24px;"
+                style="padding-top:3px; padding-bottom:3px; height:24px; padding-bottom:3px;"
               >
                 <img
                   src={dragIcon}
@@ -351,7 +361,7 @@
                   {/if}
                 </div>
 
-                <div class=" d-flex gap-0" style="width:calc(100% - 120px)">
+                <div class=" d-flex gap-0" style="width:calc(100% - 120px);">
                   <div class="w-50 position-relative">
                     <CodeMirrorInput
                       bind:value={element.key}
@@ -460,13 +470,16 @@
                       style="width:40px;"
                     >
                       {#if mode !== "READ"}
+                        <Tooltip title={"Delete"} placement={"left"} distance={10}>
                         <img
+                          class="trash-icon"
                           src={trashIcon}
                           on:click={() => {
                             deleteParam(index);
                           }}
                           alt=""
                         />
+                      </Tooltip>
                       {/if}
                     </button>
                   </div>
@@ -497,7 +510,7 @@
             Bulk Edit
           </div>
 
-          <div class="pe-1   d-flex align-items-center gap-1"
+          <div class="pe-1   d-flex align-items-center gap-1 me-2"
           >
 
             <button class="bg-transparent border-0 mt-2 d-flex" >
@@ -520,7 +533,6 @@
                         return "";
                       })
                       .join("\n");
-                    console.log(res);
                     bulkText = res;
                   }}
                   on:change={toggleBulkEdit}
@@ -528,11 +540,6 @@
               </label>
 
             </button>
-          
-
-            <!-- <div class="h-75 pe-1">
-              <button class="border-0" style="width:0px;" />
-            </div> -->
           </div>
           
         </div>
@@ -586,7 +593,7 @@
     font-weight: 400;
     line-height: 18px;
     text-align: left;
-    color: var(--text-secondary-450);
+    color: var(--text-secondary-550);
     letter-spacing: 1px;
 
   }
@@ -625,7 +632,7 @@
 
   /* When the checkbox is checked */
   .container input:checked ~ .checkmark {
-    background-color: var(--text-primary-200);
+    background-color: var(--bg-primary-300);
     border: none;
   }
 
@@ -704,12 +711,6 @@
   .slider.round:before {
     border-radius: 50%;
   }
-  .bulkEdit-div {
-    /* position: absolute;
-    right: 0; */
-    /* top: 0; */
-    /* border: 1px solid red; */
-  }
 
   .keyValuePair {
     background-color: transparent;
@@ -769,7 +770,7 @@
   /* When the checkbox is checked, add a blue background */
   .container input:checked ~ .checkmark {
     border: none;
-    background-color: var(--text-primary-200);
+    background-color: var(--bg-primary-300);
   }
 
   /* Create the checkmark/indicator (hidden when not checked) */
@@ -795,5 +796,8 @@
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-secondary-500);
   }
 </style>

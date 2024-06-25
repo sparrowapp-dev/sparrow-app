@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { AdvanceAPI, CreateCollection, SendingApiRequest } from "../../../common/videos";
   // ---- Assets
   import floppyDisk from "$lib/assets/floppy-disk.svg";
   import angleDown from "$lib/assets/angle-down.svg";
@@ -62,6 +61,7 @@
   import Popover from "@library/ui/popover/Popover.svelte";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@library/ui";
+  import RequestDoc from "../components/request-doc/RequestDoc.svelte";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -88,9 +88,15 @@
   export let onCreateCollection: CreateCollectionType;
   export let onUpdateEnvironment;
   export let environmentVariables;
+  export let isGuestUser = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
+
+  const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -199,18 +205,29 @@
           />
         </div>
       </div>
-      <div class="">
+
+      <!-- HTTP URL Section -->
+      <HttpUrlSection
+        class=""
+        isSave={$tab.isSaved}
+        requestUrl={$tab.property.request.url}
+        httpMethod={$tab.property.request.method}
+        isSendRequestInProgress={$tab.property.request?.state
+          ?.isSendRequestInProgress}
+        onSendButtonClicked={onSendRequest}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        {onUpdateRequestUrl}
+        {onUpdateRequestMethod}
+        {toggleSaveRequest}
+        {onSaveRequest}
+        {isGuestUser}
+      />
+      <!--Disabling the Quick Help feature, will be taken up in next release-->
+      <!-- <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
-            onClose={() => {
-              isPopoverContainer = false;
-              onUpdateCollectionGuide(
-                {
-                  id: "collection-guide",
-                },
-                false,
-              );
-            }}
+            onClose={closeCollectionHelpText}
             heading={`Welcome to Sparrow!`}
             text={` `}
           >
@@ -230,24 +247,7 @@
             </p>
           </Popover>
         {/if}
-      </div>
-
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSave={$tab.isSaved}
-        requestUrl={$tab.property.request.url}
-        httpMethod={$tab.property.request.method}
-        isSendRequestInProgress={$tab.property.request?.state
-          ?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-      />
+      </div> -->
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -268,7 +268,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestLeftSplitterWidthPercentage}
-            class="position-relative bg-secondary-800-important"
+            class="position-relative bg-secondary-850-important"
           >
             <!-- Request Pane -->
             <div
@@ -333,6 +333,11 @@
                   {onUpdateEnvironment}
                   {environmentVariables}
                 />
+              {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                <RequestDoc
+                  {onUpdateRequestDescription}
+                  requestStateDoc={$tab.description}
+                />
               {/if}
             </div>
           </Pane>
@@ -340,7 +345,7 @@
             minSize={30}
             size={$tab.property.request?.state
               ?.requestRightSplitterWidthPercentage}
-            class="bg-secondary-800-important"
+            class="bg-secondary-850-important"
           >
             <!-- Response Pane -->
             <div
@@ -451,7 +456,9 @@
     />
   </ModalWrapperV1>
 {/if}
-<Modal
+
+<!--Disabling the Quick Help feature, will be taken up in next release-->
+<!-- <Modal
   title={""}
   type={"dark"}
   width={"474px"}
@@ -490,11 +497,11 @@
       ]}
     />
   </div>
-</Modal>
+</Modal> -->
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-800);
+    background-color: var(--bg-secondary-850);
     height: calc(100vh - 80px);
   }
 

@@ -39,6 +39,11 @@
    */
   export let isAppVersionVisible = true;
 
+  /**
+   * Flag to check is user iu guest user
+   */
+  export let isGuestUser = false;
+
   import {
     Collection,
     EmptyCollection,
@@ -157,6 +162,47 @@
 
   let isGithubStarHover = false;
   onDestroy(() => {});
+
+  const addButtonData = isGuestUser
+    ? [
+        {
+          name: "Add New API",
+          icon: CreateRequest,
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+      ]
+    : [
+        {
+          name: "Add New API",
+          icon: CreateRequest,
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Add Collection",
+          icon: CreateCollection,
+          onclick: showImportCollectionPopup,
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+      ];
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -257,28 +303,7 @@
         zIndex={600}
         buttonId="addButton"
         bind:isMenuOpen={addButtonMenu}
-        options={[
-          {
-            name: "Add New API",
-            icon: CreateRequest,
-            onclick: () => onItemCreated("request", {}),
-          },
-          {
-            name: "Add Collection",
-            icon: CreateCollection,
-            onclick: showImportCollectionPopup,
-          },
-          {
-            name: "Import cURL",
-            icon: BubbleIcon,
-            onclick: () => {
-              MixpanelEvent(Events.IMPORT_CURL, {
-                source: "curl import popup",
-              });
-              showImportCurlPopup();
-            },
-          },
-        ]}
+        options={addButtonData}
       >
         <Tooltip
           title={"Add Options"}
@@ -367,6 +392,8 @@
             {userRoleInWorkspace}
             handleCreateApiRequest={() => onItemCreated("request", {})}
             onImportCollectionPopup={showImportCollectionPopup}
+            isAddCollectionDisabled={isGuestUser}
+            onImportCurlPopup={showImportCurlPopup}
           />
         {/if}
       </div>
@@ -408,9 +435,10 @@
         </Tooltip>
 
         <div class="d-flex align-items-center">
-          {#if isAppVersionVisible}
-            <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
-          {/if}
+          <!--Disabling the version feature switch as it was just for testing purpose, can be used for implementation example-->
+          <!-- {#if isAppVersionVisible} -->
+          <span class="text-fs-14 text-secondary-200 pe-2">v{version}</span>
+          <!-- {/if} -->
           <WithButton
             icon={DoubleArrowIcon}
             onClick={() => {
