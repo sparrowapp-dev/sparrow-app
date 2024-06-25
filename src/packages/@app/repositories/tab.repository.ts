@@ -250,24 +250,7 @@ export class TabRepository {
     sub();
   };
 
-  // public updateTab = async (tabId: string, tab: any): Promise<void> => {
-  //   const query = await RxDB.getInstance()
-  //     .rxdb.tab.findOne({
-  //       selector: {
-  //         tabId,
-  //       },
-  //     })
-  //     .exec();
 
-  //   if (query) {
-  //     await query.incrementalModify((value) => {
-  //       // Update only the changed properties while preserving the rest
-  //       return { ...value, ...tab };
-  //     });
-  //   } else {
-  //     throw new Error("Tab not found");
-  //   }
-  // };
 
   public updateTab = async (tabId,tab): Promise<void> => {
     const query = await RxDB.getInstance()
@@ -281,30 +264,5 @@ export class TabRepository {
         return { ...value, ...tab };
       });
   };
-
-  /**
-   * Fetches the current value of bulkEditToggle from the database.
-   * @param tabId The ID of the tab to fetch the bulkEditToggle value from.
-   * @returns Promise<boolean | undefined> The current value of bulkEditToggle.
-   */
-  public getBulkEditToggle = async (tabId: string): Promise<boolean | undefined> => {
-    try {
-      const query = await RxDB.getInstance()
-        .rxdb.tab.findOne({
-          selector: {
-            tabId,
-          },
-        })
-        .exec();
-
-      if (query) {
-        return query.property.request.bulkEdit.bulkEditToggle;
-      } else {
-        throw new Error("Tab not found");
-      }
-    } catch (error) {
-      console.error('Failed to fetch bulkEditToggle:', error);
-      throw new Error('Failed to fetch bulkEditToggle');
-    }
-  }
+  
 }
