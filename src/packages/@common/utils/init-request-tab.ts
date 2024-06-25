@@ -111,6 +111,8 @@ class InitRequestTab {
             isSendRequestInProgress: false,
             isSaveDescriptionInProgress: false,
             isSaveRequestInProgress: false,
+            isBulkParameter: false,
+            isBulkHeader: false,
           },
           auth: {
             bearerToken: "",
@@ -123,10 +125,6 @@ class InitRequestTab {
               authValue: "",
               addTo: AuthSectionEnum.HEADER,
             },
-          },
-          bulkEdit: {
-            bulkEditToggle: false,
-            bulkEditBody: "",
           },
           response: {
             headers: [],

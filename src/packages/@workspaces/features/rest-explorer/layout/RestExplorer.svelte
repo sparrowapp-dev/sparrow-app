@@ -290,12 +290,14 @@
               />
               {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                 <RequestParameters
+                requestStateSection={$tab?.property?.request.state
+                  ?.isBulkParameter}
+                  {onUpdateRequestState}
                   params={$tab.property.request.queryParams}
                   {onUpdateRequestParams}
                   authParameter={$requestAuthParameter}
                   {onUpdateEnvironment}
                   {environmentVariables}
-                  tab={$tab}
                 />
               {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
                 <RequestBody
@@ -309,6 +311,9 @@
                 />
               {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                 <RequestHeaders
+                requestStateSection={$tab?.property?.request.state
+                  ?.isBulkHeader}
+                  {onUpdateRequestState}
                   {environmentVariables}
                   {onUpdateEnvironment}
                   headers={$tab.property.request.headers}

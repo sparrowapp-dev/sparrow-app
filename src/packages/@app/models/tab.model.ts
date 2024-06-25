@@ -153,19 +153,7 @@ export const tabSchemaLiteral = {
                   },
                 },
               },
-            },
-            bulkEdit:{
-              type:"object",
-              properties:{
-                  bulkEditToggle:{
-                    type:"boolean",
-                  },
-                  bulkEditBody:{
-                    type:"string",
-                  },
-            },
-          },
-           
+            },         
             response: {
               type: "object",
               properties: {
@@ -233,6 +221,13 @@ export const tabSchemaLiteral = {
                 isSaveRequestInProgress: {
                   type: "boolean",
                 },
+                isBulkParameter: {
+                  type: "boolean",
+                },
+                isBulkHeader: {
+                  type: "boolean",
+                },
+                
               },
             },
             auth: {

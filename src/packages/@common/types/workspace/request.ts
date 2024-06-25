@@ -136,6 +136,14 @@ export interface IsSaveDescriptionInProgressWrapper {
 export interface IsSaveRequestInProgressWrapper {
   isSaveRequestInProgress: boolean;
 }
+export interface IsBulkHeaderWrapper {
+  isBulkHeader: boolean;
+}
+export interface IsBulkParameterWrapper {
+  isBulkParameter: boolean;
+}
+
+
 export interface UsernameWrapper {
   username: string;
 }
@@ -176,6 +184,7 @@ export interface ResponseTimeWrapper {
 export interface ResponseSizeWrapper {
   size: number;
 }
+
 export interface Response
   extends ResponseStatusWrapper,
     ResponseHeadersWrapper,
@@ -253,7 +262,9 @@ export interface State
     RequestRightSplitterWidthPercentageWrapper,
     IsSendRequestInProgressWrapper,
     IsSaveDescriptionInProgressWrapper,
-    IsSaveRequestInProgressWrapper {}
+    IsSaveRequestInProgressWrapper,
+    IsBulkParameterWrapper,
+    IsBulkHeaderWrapper {}
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
@@ -269,7 +280,9 @@ export interface StatePartial
     Partial<RequestRightSplitterWidthPercentageWrapper>,
     Partial<IsSendRequestInProgressWrapper>,
     Partial<IsSaveDescriptionInProgressWrapper>,
-    Partial<IsSaveRequestInProgressWrapper> {}
+    Partial<IsSaveRequestInProgressWrapper>,
+    Partial<IsBulkParameterWrapper>,
+    Partial<IsBulkHeaderWrapper> {}
 
 export interface StateWrapper {
   state: State;
@@ -296,6 +309,7 @@ export interface AuthWrapper {
 
 export interface HeadersWrapper {
   headers: KeyValueChecked[];
+  isBulkEditEnabled: boolean;
 }
 export interface UrlEncoded extends KeyValueChecked {}
 export interface Headers extends KeyValueChecked {}
@@ -320,7 +334,6 @@ export interface Request
     StateWrapper,
     ResponseWrapper,
     AuthWrapper,
-    BulkEditWrapper,
     UrlWrapper,
     HeadersWrapper {}
 
