@@ -185,12 +185,7 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip
-        title={"Add Request"}
-        placement={"right"}
-        distance={2}
-        zIndex={20}
-      >
+      <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
         <button
           on:click={onNewTabRequested}
           role="button"
@@ -278,8 +273,9 @@
         >
           <Tooltip
             title={"Layout"}
-            placement={"bottom"}
+            placement={"left"}
             distance={12}
+            show={!viewChange}
             zIndex={10}
           >
             <button

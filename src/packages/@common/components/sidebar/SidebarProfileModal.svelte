@@ -83,7 +83,7 @@
     showModal = !showModal;
   }}
 >
-  <div class="d-flex align-iems-center justify-content-center ">
+  <div class="d-flex align-iems-center justify-content-center">
     {#if isHovered && item.hoveredLogo && !item.disabled}
       <img src={item.hoveredLogo} alt={item.heading} />
     {:else if isRouteActive && item.selectedLogo}
@@ -103,7 +103,7 @@
     modalPostion?.height +
     45}px; left: {buttonPosition?.left +
     buttonPosition?.width +
-    10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 10000;"
+    10}px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500;"
 >
   <div class="d-flex align-items-center mb-2 px-1">
     <div
@@ -112,14 +112,11 @@
     >
       {user?.name[0]}
     </div>
-    <div class="d-flex flex-column ms-1 ">
-      <div class="ellipsis"
-      style="max-width: 200px; ">
+    <div class="d-flex flex-column ms-1">
+      <div class="ellipsis" style="max-width: 200px; ">
         {user?.name}
       </div>
-      <div
-      style="max-width: 200px; "
-      class="text-secondary-200 ellipsis">
+      <div style="max-width: 200px; " class="text-secondary-200 ellipsis">
         {user?.email}
       </div>
     </div>
