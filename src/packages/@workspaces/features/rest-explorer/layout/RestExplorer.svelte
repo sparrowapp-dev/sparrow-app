@@ -62,6 +62,11 @@
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
+  import {
+    AdvanceAPI,
+    CreateCollection,
+    SendingApiRequest,
+  } from "@workspaces/common/constants";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -230,7 +235,7 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <!-- <div class="" style="margin-top: 10px;">
+      <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
@@ -253,7 +258,7 @@
             </p>
           </Popover>
         {/if}
-      </div> -->
+      </div>
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -458,7 +463,7 @@
 {/if}
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
-<!-- <Modal
+<Modal
   title={""}
   type={"dark"}
   width={"474px"}
@@ -497,7 +502,7 @@
       ]}
     />
   </div>
-</Modal> -->
+</Modal>
 
 <style>
   .rest-explorer-layout {

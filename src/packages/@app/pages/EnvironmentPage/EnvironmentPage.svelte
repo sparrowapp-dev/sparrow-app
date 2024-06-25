@@ -16,6 +16,7 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import EnvironmentExplorerPage from "../EnvironmentExplorer/EnvironmentExplorerPage.svelte";
   import { Route } from "svelte-navigator";
+  import { pagesMotion } from "@app/constants";
 
   const _viewModel = new EnvironmentViewModel();
   // export let loggedUserRoleInWorkspace: WorkspaceRole;
@@ -56,55 +57,59 @@
   });
 </script>
 
-<Splitpanes
-  class="environment-splitter"
-  style="width: calc(100vw - 54px);"
-  on:resize={(e) => {
-    environmentLeftPanelWidth.set(e.detail[0].size);
-    environmentRightPanelWidth.set(e.detail[1].size);
-  }}
->
-  <Pane
-    minSize={20}
-    size={$environmentLeftPanelWidth}
-    class="bg-secondary-900-important"
-  >
-    <EnvironmentList
-      loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
-      onCreateEnvironment={_viewModel.onCreateEnvironment}
-      onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
-      onDeleteEnvironment={_viewModel.onDeleteEnvironment}
-      onUpdateEnvironment={_viewModel.onUpdateEnvironment}
-      onOpenEnvironment={_viewModel.onOpenEnvironment}
-      onSelectEnvironment={_viewModel.onSelectEnvironment}
-      currentWorkspace={$activeWorkspace}
-      environments={$environments}
-      currentEnvironment={$activeEnvironment}
-    />
-  </Pane>
-  <Pane
-    minSize={60}
-    size={$environmentRightPanelWidth}
-    class="bg-secondary-850-important"
-  >
-    <Route>
-      {#if true}
-        {#if $activeEnvironment}
-          <Motion {...scaleMotionProps} let:motion>
-            <div use:motion>
-              <EnvironmentExplorerPage tab={$activeEnvironment} />
-            </div>
-          </Motion>
-        {/if}
-      {/if}
-    </Route>
-  </Pane>
-</Splitpanes>
+<Motion {...pagesMotion} let:motion>
+  <div use:motion>
+    <Splitpanes
+      class="environment-splitter"
+      style="width: calc(100vw - 54px);"
+      on:resize={(e) => {
+        environmentLeftPanelWidth.set(e.detail[0].size);
+        environmentRightPanelWidth.set(e.detail[1].size);
+      }}
+    >
+      <Pane
+        minSize={20}
+        size={$environmentLeftPanelWidth}
+        class="bg-secondary-900-important"
+      >
+        <EnvironmentList
+          loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
+          onCreateEnvironment={_viewModel.onCreateEnvironment}
+          onOpenGlobalEnvironment={_viewModel.onOpenGlobalEnvironment}
+          onDeleteEnvironment={_viewModel.onDeleteEnvironment}
+          onUpdateEnvironment={_viewModel.onUpdateEnvironment}
+          onOpenEnvironment={_viewModel.onOpenEnvironment}
+          onSelectEnvironment={_viewModel.onSelectEnvironment}
+          currentWorkspace={$activeWorkspace}
+          environments={$environments}
+          currentEnvironment={$activeEnvironment}
+        />
+      </Pane>
+      <Pane
+        minSize={60}
+        size={$environmentRightPanelWidth}
+        class="bg-secondary-850-important"
+      >
+        <Route>
+          {#if true}
+            {#if $activeEnvironment}
+              <Motion {...scaleMotionProps} let:motion>
+                <div use:motion>
+                  <EnvironmentExplorerPage tab={$activeEnvironment} />
+                </div>
+              </Motion>
+            {/if}
+          {/if}
+        </Route>
+      </Pane>
+    </Splitpanes>
+  </div>
+</Motion>
 
 <style>
   :global(.environment-splitter .splitpanes__splitter) {
     width: 10.5px !important;
-    height: 100% !important;
+    height: auto !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-secondary-900) !important;
     border-right: 5px solid var(--border-secondary-800) !important;
