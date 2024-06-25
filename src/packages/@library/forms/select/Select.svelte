@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { tickIcon } from "./svgs";
+  import checkIcon from "$lib/assets/check.svg";
   import { onDestroy, onMount } from "svelte";
+  import { slide } from "svelte/transition";
   import { SearchIcon } from "$lib/assets/icons";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon, DownArrowIcon } from "$lib/assets/icons";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
-  import { ArrowIcon } from "@library/icons";
+  import { ArrowIcon, CheckIcon } from "@library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -439,14 +440,12 @@
 
   <div
     bind:this={selectBodyWrapper}
-    class="select-data {position === 'fixed'
+    class="d-none z-2 select-data {position === 'fixed'
       ? 'position-fixed'
-      : 'position-absolute'}  {selectBodyBackgroundClass} p-1 border-radius-2
-    {isOpen ? 'visible' : 'invisible'}"
+      : 'position-absolute'}  {selectBodyBackgroundClass} p-1 border-radius-2"
+    class:select-active={isOpen}
     style="
-      {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
+      {isOpen ? 'opacity: 1;' : 'opacity: 0;'}
       min-width:{minBodyWidth}; left: {position === 'fixed'
       ? `${bodyLeftDistance}px;`
       : `0px;`} top: {position === 'fixed'
@@ -456,6 +455,7 @@
         }px;`}  right: {position === 'fixed'
       ? `${bodyRightDistance}px;`
       : `0px;`} z-index:{zIndex};"
+    transition:slide={{ duration: 100 }}
   >
     <div
       on:click={() => {
@@ -503,12 +503,12 @@
           on:keydown={() => {}}
         >
           {#if menuItem === "v1"}
-            <MenuItemsV1 {list} {selectedRequest} {tickIcon} {getTextColor} />
+            <MenuItemsV1 {list} {selectedRequest} {checkIcon} {getTextColor} />
           {:else if menuItem === "v2"}
             <MenuItemsv2
               {list}
               {selectedRequest}
-              {tickIcon}
+              {CheckIcon}
               {bodyTheme}
               {getTextColor}
               {highlightTickedItem}
@@ -600,10 +600,6 @@
   .select-data {
     color: white;
     border: 1px solid rgb(44, 44, 44);
-    transition: 0.3s ease;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   }
   .select-body-background-dark {
     background-color: var(--background-dropdown);
@@ -621,6 +617,7 @@
     font-weight: 400;
   }
   .select-active {
+    display: block !important;
   }
   .select-logo-active {
     transform: rotateX(180deg) !important;

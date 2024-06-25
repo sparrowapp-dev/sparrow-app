@@ -307,9 +307,8 @@
       >
         <Tooltip
           title={"Add Options"}
-          placement={"bottom"}
+          placement={"right"}
           distance={12}
-          show={!addButtonMenu}
           zIndex={10}
         >
           <button

@@ -297,25 +297,19 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
-    <Tooltip
-      title={"More"}
-      show={!showMenu}
-      placement={"bottom"}
-      zIndex={701}
-      distance={17}
+  <Tooltip title={"More"} placement={"right"} zIndex={10} distance={17}>
+    <button
+      id={`show-more-api-${api.id}`}
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+        ? 'threedot-active'
+        : ''}"
+      on:click={(e) => {
+        rightClickContextMenu(e);
+      }}
     >
-      <button
-        id={`show-more-api-${api.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
-    </Tooltip>
+      <img src={threedotIcon} alt="threedotIcon" />
+    </button>
+  </Tooltip>
   {/if}
 </div>
 

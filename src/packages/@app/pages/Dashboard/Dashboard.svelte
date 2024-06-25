@@ -199,9 +199,9 @@
   {/if}
 
   <!-- Application Content -->
-  <div class="d-flex h-100">
+  <div class="d-flex">
     <Sidebar {user} onLogout={_viewModel.handleLogout} />
-    <section class="w-100 h-100">
+    <section class="w-100">
       <!-- Route for Collections -->
       <Route path="/collections/*">
         <CollectionsPage />

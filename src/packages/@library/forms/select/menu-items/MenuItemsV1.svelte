@@ -18,7 +18,7 @@
   export let selectedRequest: {
     id: string;
   };
-  export let tickIcon: string;
+  export let checkIcon: string;
   export let getTextColor: (color: string) => {};
 
   let isMenuItemHover = false;
@@ -46,7 +46,7 @@
     {/if}
   </p>
   {#if selectedRequest?.id === list.id}
-    <img src={tickIcon} alt="" />
+    <img src={checkIcon} alt="" />
   {/if}
 </div>
 

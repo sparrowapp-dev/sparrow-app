@@ -52,7 +52,6 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
-  import { pagesMotion } from "@app/constants";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -200,99 +199,94 @@
   }
 </script>
 
-<Motion {...pagesMotion} let:motion>
-  <div class="h-100" use:motion>
-    <Splitpanes
-      class="collection-splitter h-100"
-      style="width: calc(100vw - 54px)"
-      on:resize={(e) => {
-        leftPanelWidth.set(e.detail[0].size);
-        rightPanelWidth.set(e.detail[1].size);
+<Splitpanes
+  class="collection-splitter"
+  style="width: calc(100vw - 54px)"
+  on:resize={(e) => {
+    leftPanelWidth.set(e.detail[0].size);
+    rightPanelWidth.set(e.detail[1].size);
+  }}
+>
+  <Pane
+    size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+    minSize={20}
+    class="bg-secondary-900-important"
+  >
+    <CollectionList
+      bind:scrollList
+      {collectionList}
+      {currentWorkspace}
+      {isAppVersionVisible}
+      {isGuestUser}
+      leftPanelController={{
+        leftPanelCollapse: $leftPanelCollapse,
+        handleCollapseCollectionList,
       }}
-    >
-      <Pane
-        size={$leftPanelCollapse ? 0 : $leftPanelWidth}
-        minSize={20}
-        class="bg-secondary-900-important"
-      >
-        <CollectionList
-          bind:scrollList
-          {collectionList}
-          {currentWorkspace}
-          {isAppVersionVisible}
-          {isGuestUser}
-          leftPanelController={{
-            leftPanelCollapse: $leftPanelCollapse,
-            handleCollapseCollectionList,
-          }}
-          githubRepo={githubRepoData}
-          userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
-          activeTabPath={$activeTab?.path}
-          activeTabId={$activeTab?.id}
-          showImportCollectionPopup={() => (isImportCollectionPopup = true)}
-          showImportCurlPopup={() => (isImportCurlPopup = true)}
-          onItemCreated={_viewModel.handleCreateItem}
-          onItemDeleted={_viewModel.handleDeleteItem}
-          onItemRenamed={_viewModel.handleRenameItem}
-          onItemOpened={_viewModel.handleOpenItem}
-          onBranchSwitched={_viewModel.handleBranchSwitch}
-          onRefetchCollection={_viewModel.handleRefetchCollection}
-          onSearchCollection={_viewModel.handleSearchCollection}
-        />
-      </Pane>
-      <Pane
-        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={60}
-        class="bg-secondary-800-important"
-      >
-        <TabBar
-          tabList={$tabList}
-          onNewTabRequested={_viewModel.createNewTab}
-          onTabClosed={closeTab}
-          onDropEvent={_viewModel.onDropEvent}
-          onDragStart={_viewModel.handleDropOnStart}
-          onDropOver={_viewModel.handleDropOnEnd}
-          onTabSelected={_viewModel.handleActiveTab}
-          onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
-          onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
-          onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
-        />
-        <Route>
-          {#if true}
-            {#if $activeTab?.type === ItemType.REQUEST}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <RestExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if $activeTab?.type === ItemType.COLLECTION}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <CollectionExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if $activeTab?.type === ItemType.FOLDER}
-              <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
-                  <FolderExplorerPage tab={$activeTab} />
-                </div>
-              </Motion>
-            {:else if !$tabList?.length}
-              <Motion {...scaleMotionProps} let:motion>
-                <WorkspaceDefault
-                  showImportCollectionPopup={() =>
-                    (isImportCollectionPopup = true)}
-                  onItemCreated={_viewModel.handleCreateItem}
-                  {isGuestUser}
-                />
-              </Motion>
-            {/if}
-          {/if}
-        </Route>
-      </Pane>
-    </Splitpanes>
-  </div>
-</Motion>
+      githubRepo={githubRepoData}
+      userRoleInWorkspace={_viewModel.getUserRoleInWorspace()}
+      activeTabPath={$activeTab?.path}
+      activeTabId={$activeTab?.id}
+      showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+      showImportCurlPopup={() => (isImportCurlPopup = true)}
+      onItemCreated={_viewModel.handleCreateItem}
+      onItemDeleted={_viewModel.handleDeleteItem}
+      onItemRenamed={_viewModel.handleRenameItem}
+      onItemOpened={_viewModel.handleOpenItem}
+      onBranchSwitched={_viewModel.handleBranchSwitch}
+      onRefetchCollection={_viewModel.handleRefetchCollection}
+      onSearchCollection={_viewModel.handleSearchCollection}
+    />
+  </Pane>
+  <Pane
+    size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+    minSize={60}
+    class="bg-secondary-800-important"
+  >
+    <TabBar
+      tabList={$tabList}
+      onNewTabRequested={_viewModel.createNewTab}
+      onTabClosed={closeTab}
+      onDropEvent={_viewModel.onDropEvent}
+      onDragStart={_viewModel.handleDropOnStart}
+      onDropOver={_viewModel.handleDropOnEnd}
+      onTabSelected={_viewModel.handleActiveTab}
+      onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+      onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+      onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+    />
+    <Route>
+      {#if true}
+        {#if $activeTab?.type === ItemType.REQUEST}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <RestExplorerPage tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else if $activeTab?.type === ItemType.COLLECTION}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <CollectionExplorerPage tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else if $activeTab?.type === ItemType.FOLDER}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <FolderExplorerPage tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else}
+          <Motion {...scaleMotionProps} let:motion>
+            <WorkspaceDefault
+              showImportCollectionPopup={() => (isImportCollectionPopup = true)}
+              onItemCreated={_viewModel.handleCreateItem}
+              {isGuestUser}
+            />
+          </Motion>
+        {/if}
+      {/if}
+    </Route>
+  </Pane>
+</Splitpanes>
 
 <CloseConfirmationPopup
   isOpen={isPopupClosed}
@@ -309,7 +303,8 @@
 />
 
 <svelte:window on:keydown={handleKeyPress} />
-<!-- <ImportCollection
+{#if isImportCollectionPopup}
+  <!-- <ImportCollection
     {collectionList}
     workspaceId={$currentWorkspace._id}
     closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
@@ -329,16 +324,6 @@
     onUploadFile={_viewModel.uploadFormFile}
     onExtractGitBranch={_viewModel.extractGitBranch}
   /> -->
-<ModalWrapperV1
-  title={"New Collection"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isImportCollectionPopup}
-  handleModalState={(flag = false) => {
-    isImportCollectionPopup = flag;
-  }}
->
   <ImportCollection
     onClick={() => {
       isImportCollectionPopup = false;
@@ -396,27 +381,16 @@
       return response;
     }}
   />
-</ModalWrapperV1>
+{/if}
 
-<!-- {#if isImportCurlPopup} -->
-<ModalWrapperV1
-  title={"Import cURL"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isImportCurlPopup}
-  handleModalState={(flag = false) => {
-    isImportCurlPopup = flag;
-  }}
->
+{#if isImportCurlPopup}
   <ImportCurl
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
     onValidateCurl={_viewModel.handleValidateCurl}
   />
-</ModalWrapperV1>
-<!-- {/if} -->
+{/if}
 
 <ModalWrapperV1
   title={"Save Request"}
@@ -468,8 +442,8 @@
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {
-    width: 6px !important;
-    height: auto !important;
+    width: 5.5px !important;
+    height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-secondary-900) !important;
     border-right: 0px solid var(--blackColor) !important;
