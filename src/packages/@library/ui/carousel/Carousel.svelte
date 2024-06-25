@@ -6,14 +6,14 @@
   let n = data.length;
   export let handleClosePopup: (flag: boolean) => void;
 
-  function navigateStep(direction) {
+  const navigateStep = (direction) => {
     if (direction === "next" && currentStep < n - 1) {
       currentStep += 1;
     } else if (direction === "prev" && currentStep > 0) {
       currentStep -= 1;
     }
     stepData = data[currentStep];
-  }
+  };
 </script>
 
 <div style="max-height: 509px;">
