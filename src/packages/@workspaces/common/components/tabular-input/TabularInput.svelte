@@ -12,7 +12,7 @@
   import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
   import { onMount } from "svelte";
 
-  import {Tooltip} from "@library/ui";
+  import { Tooltip } from "@library/ui";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -195,7 +195,8 @@
       class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
     >
       <div
-        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {mode === 'READ'
+        class="d-flex gap-3 py-1 mb-1 align-items-center w-100 ps-2 {mode ===
+        'READ'
           ? 'd-none'
           : ''}"
         style="height:26px;"
@@ -221,19 +222,19 @@
           class="d-flex pair-title bg-secondary-700 align-items-center w-100"
           style="font-size: 12px; font-weight: 500;"
         >
-        <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
-        style="font-weight: 1000;"
-      >
-        Key
-      </p>
-      <p
-        class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0 ms-3"
-        style="font-weight: 1000;"
-      >
-        Value
-      </p>
-          
+          <p
+            class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-1"
+            style="font-weight: 1000;"
+          >
+            Key
+          </p>
+          <p
+            class="mb-0 w-50 text-secondary-200 text-fs-12 p-1 ps-0 ms-3"
+            style="font-weight: 1000;"
+          >
+            Value
+          </p>
+
           <div class="me-2">
             <button class="bg-transparent border-0 mt-1 d-flex" style="">
               <p
@@ -262,7 +263,6 @@
               </label>
             </button>
           </div>
-
         </div>
       </div>
       <div
@@ -464,22 +464,26 @@
                   {/if}
                 </div>
                 {#if pairs.length - 1 != index}
-                  <div class="h-75 pe-1">
+                  <div class="h-70 pe-1 d-flex justify-content-center align-items-center">
                     <button
                       class="bg-secondary-700 border-0"
                       style="width:40px;"
                     >
                       {#if mode !== "READ"}
-                        <Tooltip title={"Delete"} placement={"left"} distance={10}>
-                        <img
-                          class="trash-icon"
-                          src={trashIcon}
-                          on:click={() => {
-                            deleteParam(index);
-                          }}
-                          alt=""
-                        />
-                      </Tooltip>
+                        <Tooltip
+                          title={"Delete"}
+                          placement={"left"}
+                          distance={10}
+                        >
+                          <img
+                            class="trash-icon"
+                            src={trashIcon}
+                            on:click={() => {
+                              deleteParam(index);
+                            }}
+                            alt=""
+                          />
+                        </Tooltip>
                       {/if}
                     </button>
                   </div>
@@ -510,15 +514,13 @@
             Bulk Edit
           </div>
 
-          <div class="pe-1   d-flex align-items-center gap-1 me-2"
-          >
-
-            <button class="bg-transparent border-0 mt-2 d-flex" >
+          <div class="pe-1 d-flex align-items-center gap-1 me-2">
+            <button class="bg-transparent border-0 mt-2 d-flex">
               <p
-                class="text-nowrap text-primary-300 mb-2 "
+                class="text-nowrap text-primary-300 mb-2"
                 style="font-size: 10px; font-weight:400;"
               >
-                Bulk Edit 
+                Bulk Edit
               </p>
               <label class="switch">
                 <input
@@ -538,10 +540,8 @@
                   on:change={toggleBulkEdit}
                 /> <span class="slider round"></span>
               </label>
-
             </button>
           </div>
-          
         </div>
 
         <div style="height:200px;">
@@ -556,10 +556,13 @@
               const res = bulkText.split("\n");
               pairs = res.map((elem) => {
                 if (elem) {
-                  const data = elem.split(":");
+                  // const data = elem.split(":");
+                  const firstColonIndex = elem.indexOf(":");
+                  const key = elem.substring(0, firstColonIndex);
+                  const value = elem.substring(firstColonIndex + 1);
                   return {
-                    key: data[0],
-                    value: data[1],
+                    key: key,
+                    value: value,
                     checked: true,
                   };
                 } else {
@@ -574,19 +577,16 @@
             }}
           />
         </div>
-
-        
       </div>
     </div>
   {/if}
 </div>
+
 <style>
-
-#bulkEditTextarea{
-  color: var(--white-color);
-  font-weight: 400;
-}
-
+  #bulkEditTextarea {
+    color: var(--white-color);
+    font-weight: 400;
+  }
 
   #bulkEditTextarea::placeholder {
     font-size: 12px;
@@ -595,9 +595,8 @@
     text-align: left;
     color: var(--text-secondary-550);
     letter-spacing: 1px;
-
   }
-  
+
   /* Updated checkbox container to fix the styling */
   .container {
     display: inline-block; /* Changed from block to inline-block for better alignment */
