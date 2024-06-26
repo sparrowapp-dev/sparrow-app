@@ -177,6 +177,8 @@ export class RxDB {
             return oldDoc;
           },
           9: function (oldDoc: TabDocument) {
+            oldDoc.property.request.state.isHeaderBulkEditActive = false;
+            oldDoc.property.request.state.isParameterBulkEditActive = false;
             return oldDoc;
           },
         },

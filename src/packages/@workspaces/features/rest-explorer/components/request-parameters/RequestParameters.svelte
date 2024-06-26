@@ -2,7 +2,6 @@
   import { TabularInput } from "@workspaces/common/components";
   import { createDeepCopy } from "$lib/utils/helpers";
   import type { KeyValuePair } from "$lib/utils/interfaces/request.interface";
-  import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
   export let params;
   export let onUpdateRequestParams;
   export let environmentVariables = [];
@@ -11,7 +10,7 @@
 
   export let onUpdateRequestState;
 
-  export let requestStateSection;
+  export let isBulkEditActive ;
 
   let bulkEditParamsPlaceholder=`Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
 Format: Parameter-Key: Parameter-Value
@@ -32,7 +31,7 @@ Example: userID: Sparrow12 `
 >
   <TabularInput
   bulkEditPlaceholder={bulkEditParamsPlaceholder}
-    {requestStateSection}
+    {isBulkEditActive }
     onToggleBulkEdit={toggleBulkEdit}
     readable={authParameter}
     keyValue={createDeepCopy(params)}

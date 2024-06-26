@@ -13,7 +13,7 @@
   export let authHeader;
   export let onUpdateEnvironment;
 
-  export let requestStateSection
+  export let isBulkEditActive
   export let onUpdateRequestState
 
   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
@@ -40,7 +40,7 @@ Example: userID: Sparrow12`
 <section class="w-100" style="height: calc(100% - 45px); overflow-y: scroll;">
   <TabularInput
   bulkEditPlaceholder={placeholderHeader}
-  {requestStateSection}
+  {isBulkEditActive}
       onToggleBulkEdit={toggleBulkEdit}
     keyValue={createDeepCopy(headers)}
     callback={handleHeaderChange}
@@ -48,6 +48,7 @@ Example: userID: Sparrow12`
     {onUpdateEnvironment}
   />
   <div>
+    {#if !isBulkEditActive}
     <div class="d-flex align-items-center py-3">
       <span class="text-primary-200 fw-bold generated-para me-2">
         Show auto-generated headers
@@ -63,9 +64,10 @@ Example: userID: Sparrow12`
         <label class="slider" for="flexSwitchCheckDefault"></label>
       </div>
     </div>
+    {/if}
   </div>
 
-  {#if showGeneratedHeader}
+  {#if showGeneratedHeader && !isBulkEditActive}
     <TabularInput
       mode={"READ"}
       readable={authHeader}

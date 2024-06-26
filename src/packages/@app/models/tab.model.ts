@@ -153,7 +153,7 @@ export const tabSchemaLiteral = {
                   },
                 },
               },
-            },         
+            },
             response: {
               type: "object",
               properties: {
@@ -221,13 +221,12 @@ export const tabSchemaLiteral = {
                 isSaveRequestInProgress: {
                   type: "boolean",
                 },
-                isBulkParameter: {
+                isParameterBulkEditActive: {
                   type: "boolean",
                 },
-                isBulkHeader: {
+                isHeaderBulkEditActive: {
                   type: "boolean",
                 },
-                
               },
             },
             auth: {

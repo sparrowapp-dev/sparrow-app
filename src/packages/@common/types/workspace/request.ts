@@ -197,22 +197,6 @@ export interface ResponseWrapper {
   response: Response;
 }
 
-export interface BulkEditToggleWrapper {
-  bulkEditToggle: boolean;
-}
-
-export interface BulkEditDataWrapper {
-  bulkEditBody: string;
-}
-
-export interface BulkEdit extends
-  BulkEditToggleWrapper,
-  BulkEditDataWrapper {}
-
-export interface BulkEditWrapper{
-  bulkEdit: BulkEdit;
-}
-
 export interface KeyValue extends KeyWrapper, ValueWrapper {}
 export interface KeyValueChecked
   extends KeyWrapper,
@@ -310,7 +294,6 @@ export interface AuthWrapper {
 
 export interface HeadersWrapper {
   headers: KeyValueChecked[];
-  isBulkEditEnabled: boolean;
 }
 export interface UrlEncoded extends KeyValueChecked {}
 export interface Headers extends KeyValueChecked {}

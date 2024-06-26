@@ -295,7 +295,7 @@
               />
               {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                 <RequestParameters
-                requestStateSection={$tab?.property?.request.state
+                isBulkEditActive ={$tab?.property?.request.state
                   ?.isBulkParameter}
                   {onUpdateRequestState}
                   params={$tab.property.request.queryParams}
@@ -316,7 +316,7 @@
                 />
               {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                 <RequestHeaders
-                requestStateSection={$tab?.property?.request.state
+                isBulkEditActive={$tab?.property?.request.state
                   ?.isBulkHeader}
                   {onUpdateRequestState}
                   {environmentVariables}

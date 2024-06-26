@@ -9,8 +9,8 @@
   import close from "$lib/assets/close.svg";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
-  import moreOptions from "@workspaces/features/rest-explorer/assets/icons/moreOptions.svg";
   import { onMount } from "svelte";
+  import Textarea from "@library/forms/textarea/Textarea.svelte";
 
   import { Tooltip } from "@library/ui";
   type Mode = "READ" | "WRITE";
@@ -28,13 +28,13 @@
   let pairs: KeyValuePair[] | KeyValuePairWithBase[] = keyValue;
   let controller: boolean = false;
 
-  export let requestStateSection;
+  export let isBulkEditActive;
   export let onToggleBulkEdit;
 
   export let bulkEditPlaceholder = "";
 
   let bulkText = "";
-  let bulkToggle = requestStateSection;
+  let bulkToggle = isBulkEditActive;
 
   const theme = new TabularInputTheme().build();
 
@@ -166,31 +166,62 @@
 
   let textAreaState: HTMLTextAreaElement | null = null;
 
-  function focusTextarea() {
-    if (textAreaState) {
-      textAreaState.focus();
-    }
-  }
+  const handleBulkTextUpdate = () => {
+  const res = pairs
+    .map((elem) => {
+      if (elem.key) {
+        return elem.key + ":" + elem.value;
+      }
+      return "";
+    })
+    .join("\n");
+  bulkText = res;
+};
 
-  function toggleBulkEdit(event) {
-    onToggleBulkEdit(event.target.checked);
-  }
+  const toggleBulkEdit = (event) => {
+  onToggleBulkEdit(event.target.checked)
+};
+
+const handleBulkTextarea = (event) => {
+    bulkText = event.detail;
+    const res = bulkText.split("\n");
+    pairs = res.map((elem) => {
+      if (elem) {
+        const firstColonIndex = elem.indexOf(":");
+        let key, value;
+
+        if (firstColonIndex !== -1) {
+          key = elem.substring(0, firstColonIndex).trim();
+          value = elem.substring(firstColonIndex + 1).trim();
+        } else {
+          key = elem.trim();
+          value = "";
+        }
+
+        return {
+          key: key,
+          value: value,
+          checked: true,
+        };
+      } else {
+        return {
+          key: "",
+          value: "",
+          checked: false,
+        };
+      }
+    });
+    callback(pairs);
+  };
 
   onMount(() => {
-    const res = pairs
-      .map((elem) => {
-        if (elem.key) {
-          return elem.key + ":" + elem.value;
-        }
-        return "";
-      })
-      .join("\n");
-    bulkText = res;
-  });
+    handleBulkTextUpdate();
+  })
+
 </script>
 
 <div class="outer-section">
-  {#if !requestStateSection}
+  {#if !isBulkEditActive}
     <div
       class="mb-0 me-0 w-100 bg-secondary-700 ps-3 py-0 border-radius-2 section-layout"
     >
@@ -247,17 +278,7 @@
                 <input
                   type="checkbox"
                   bind:checked={bulkToggle}
-                  on:click={() => {
-                    const res = pairs
-                      .map((elem) => {
-                        if (elem.key) {
-                          return elem.key + ":" + elem.value;
-                        }
-                        return "";
-                      })
-                      .join("\n");
-                    bulkText = res;
-                  }}
+                  on:click={handleBulkTextUpdate}
                   on:change={toggleBulkEdit}
                 /> <span class="slider round"></span>
               </label>
@@ -464,7 +485,9 @@
                   {/if}
                 </div>
                 {#if pairs.length - 1 != index}
-                  <div class="h-70 pe-1 d-flex justify-content-center align-items-center">
+                  <div
+                    class="h-70 pe-1 d-flex justify-content-center align-items-center"
+                  >
                     <button
                       class="bg-secondary-700 border-0"
                       style="width:40px;"
@@ -502,18 +525,23 @@
       </div>
     </div>
   {:else}
+
+  <!-- Bulk Edit section Start -->
     <div>
       <div class="d-flex flex-column" style="height: 234px; font-size:12px;">
         <div
           class="d-flex align-items-center"
           style="justify-content: space-between;"
         >
+
+        <!-- Bulk Edit Text  -->
           <div
             style="font-size:12px; font-weight:500; color:var(--sparrow-text-color)"
           >
             Bulk Edit
           </div>
 
+          <!-- Bulk Edit Button -->
           <div class="pe-1 d-flex align-items-center gap-1 me-2">
             <button class="bg-transparent border-0 mt-2 d-flex">
               <p
@@ -526,26 +554,19 @@
                 <input
                   type="checkbox"
                   bind:checked={bulkToggle}
-                  on:click={() => {
-                    const res = pairs
-                      .map((elem) => {
-                        if (elem.key) {
-                          return elem.key + ":" + elem.value;
-                        }
-                        return "";
-                      })
-                      .join("\n");
-                    bulkText = res;
-                  }}
+                  on:click={handleBulkTextUpdate}
                   on:change={toggleBulkEdit}
                 /> <span class="slider round"></span>
               </label>
             </button>
           </div>
+
         </div>
 
-        <div style="height:200px;">
-          <textarea
+
+        <!-- Bulk Edit TextArea starts -->
+        <div style="">
+          <!-- <textarea
             id="bulkEditTextarea"
             class="text-area h-100 w-100 border-0 m fs-12"
             style="background-color:transparent; outline:none; padding-top:4px; padding-left:18px;"
@@ -556,10 +577,17 @@
               const res = bulkText.split("\n");
               pairs = res.map((elem) => {
                 if (elem) {
-                  // const data = elem.split(":");
                   const firstColonIndex = elem.indexOf(":");
-                  const key = elem.substring(0, firstColonIndex);
-                  const value = elem.substring(firstColonIndex + 1);
+                  let key, value;
+
+                  if (firstColonIndex !== -1) {
+                    key = elem.substring(0, firstColonIndex).trim();
+                    value = elem.substring(firstColonIndex + 1).trim();
+                  } else {
+                    key = elem.trim();
+                    value = "";
+                  }
+
                   return {
                     key: key,
                     value: value,
@@ -575,8 +603,20 @@
               });
               callback(pairs);
             }}
-          />
+          /> -->
+         
+          <Textarea
+          height={"200px"}
+          id="bulkEditTextarea"
+          class="text-area h-100 w-100 border-0 m fs-12"
+          style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
+          placeholder={bulkEditPlaceholder}
+          bind:value={bulkText}
+          on:input={handleBulkTextarea}
+        />
+
         </div>
+        <!-- Bulk Edit TextArea end -->
       </div>
     </div>
   {/if}
