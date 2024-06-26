@@ -15,6 +15,7 @@ const constants = {
   GITHUB_API: "https://api.github.com",
   RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_RELEASE_NOTES_PAT_TOKEN,
   RELEASE_NOTES_API: import.meta.env.VITE_RELEASE_NOTES_API,
+  AZURE_CDN_URL: import.meta.env.VITE_AZURE_CDN_URL,
 };
 
 export default constants;

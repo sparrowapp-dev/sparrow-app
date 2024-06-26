@@ -6,7 +6,7 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import Button from "@library/ui/button/Button.svelte";
   import { Options } from "@library/ui";
-    import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
+  import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
 
   /**
    * current workspace to identify the selected environment
@@ -275,20 +275,20 @@
     </div>
     {#if env.id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
-      {:else}
-      <Tooltip placement="right" title="More" distance={17} >
-      <button
-        id={`show-more-environment-${env?.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+    {:else}
+      <Tooltip placement="bottom" title="More" distance={17} show={!showMenu}>
+        <button
+          id={`show-more-environment-${env?.id}`}
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          style="transform: rotate(90deg);"
+          on:click={(e) => {
+            rightClickContextMenu(e);
+          }}
+        >
+          <img src={threedotIcon} alt="threedotIcon" />
+        </button>
       </Tooltip>
     {/if}
   </button>
@@ -318,7 +318,7 @@
       background-color: var(--bg-secondary-400);
     }
     .threedot-icon-container:hover {
-      background-color: var( --text-tertiary-600);
+      background-color: var(--text-tertiary-600);
     }
 
     .btn-primary {
