@@ -89,7 +89,7 @@
 </script>
 
 <div
-  class={` env-sidebar bg-secondary-900 px-2 py-3`}
+  class={`d-flex flex-column env-sidebar bg-secondary-900 h-100 px-2 pt-3 pb-2`}
   style="font-weight: 500;"
 >
   <div
@@ -167,33 +167,24 @@
       </div>
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
-      <ul class={`env-side-tab-list p-0`}>
-        <List
-          bind:scrollList
-          height={"calc(100vh - 195px)"}
-          classProps={"pb-2 pe-2"}
-        >
-          {#each localEnvironment as env}
-            <ListItem
-              {env}
-              {currentWorkspace}
-              {currentEnvironment}
-              {onDeleteEnvironment}
-              {onUpdateEnvironment}
-              {onOpenEnvironment}
-              {onSelectEnvironment}
-            />
-          {/each}
-        </List>
-      </ul>
+      <div class="pe-1" style="flex:1; overflow:auto;">
+        {#each localEnvironment as env}
+          <ListItem
+            {env}
+            {currentWorkspace}
+            {currentEnvironment}
+            {onDeleteEnvironment}
+            {onUpdateEnvironment}
+            {onOpenEnvironment}
+            {onSelectEnvironment}
+          />
+        {/each}
+      </div>
     {/if}
   {/if}
 </div>
 
 <style lang="scss">
-  .env-sidebar {
-    height: calc(100vh - 44px);
-  }
   .curr-workspace {
     max-height: 20vw;
   }

@@ -151,14 +151,13 @@
   const handleSearch = () => {
     collectionFilter = searchCollection(searchData, collectionListDocument);
   };
-  $: {
-    if (collectionList) {
-      collectionList.subscribe((value) => {
-        collectionListDocument = value;
-        collectionFilter = searchCollection(searchData, collectionListDocument);
-      });
+
+  collectionList?.subscribe((value) => {
+    if (value) {
+      collectionListDocument = value;
+      collectionFilter = searchCollection(searchData, collectionListDocument);
     }
-  }
+  });
 
   let isGithubStarHover = false;
   onDestroy(() => {});

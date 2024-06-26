@@ -164,7 +164,7 @@
   };
 </script>
 
-<div class="dashboard vh-100">
+<div class="dashboard d-flex flex-column" style="height: 100vh;">
   <!-- Application Header -->
   <!-- <div style="height: 44px;">Header</div> -->
   <Header
@@ -199,9 +199,9 @@
   {/if}
 
   <!-- Application Content -->
-  <div class="d-flex h-100">
+  <div class="d-flex" style="flex:1; background-color:red; overflow:hidden;">
     <Sidebar {user} onLogout={_viewModel.handleLogout} />
-    <section class="w-100 h-100">
+    <section style="flex:1; overflow:auto;">
       <!-- Route for Collections -->
       <Route path="/collections/*">
         <CollectionsPage />
