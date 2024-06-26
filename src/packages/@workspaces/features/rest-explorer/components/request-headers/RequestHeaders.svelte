@@ -33,7 +33,7 @@ Example: userID: Sparrow12`
 
   
   function toggleBulkEdit(value) {
-    onUpdateRequestState({ isBulkHeader: value });
+    onUpdateRequestState({ isHeaderBulkEditActive: value });
   }
 </script>
 

@@ -138,10 +138,10 @@ export interface IsSaveRequestInProgressWrapper {
   isSaveRequestInProgress: boolean;
 }
 export interface IsBulkHeaderWrapper {
-  isBulkHeader: boolean;
+  isHeaderBulkEditActive: boolean;
 }
 export interface IsBulkParameterWrapper {
-  isBulkParameter: boolean;
+  isParameterBulkEditActive: boolean;
 }
 
 

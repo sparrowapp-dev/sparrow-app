@@ -566,49 +566,9 @@ const handleBulkTextarea = (event) => {
 
         <!-- Bulk Edit TextArea starts -->
         <div style="">
-          <!-- <textarea
-            id="bulkEditTextarea"
-            class="text-area h-100 w-100 border-0 m fs-12"
-            style="background-color:transparent; outline:none; padding-top:4px; padding-left:18px;"
-            placeholder={bulkEditPlaceholder}
-            type="text"
-            bind:value={bulkText}
-            on:input={() => {
-              const res = bulkText.split("\n");
-              pairs = res.map((elem) => {
-                if (elem) {
-                  const firstColonIndex = elem.indexOf(":");
-                  let key, value;
-
-                  if (firstColonIndex !== -1) {
-                    key = elem.substring(0, firstColonIndex).trim();
-                    value = elem.substring(firstColonIndex + 1).trim();
-                  } else {
-                    key = elem.trim();
-                    value = "";
-                  }
-
-                  return {
-                    key: key,
-                    value: value,
-                    checked: true,
-                  };
-                } else {
-                  return {
-                    key: "",
-                    value: "",
-                    checked: false,
-                  };
-                }
-              });
-              callback(pairs);
-            }}
-          /> -->
-         
           <Textarea
           height={"200px"}
-          id="bulkEditTextarea"
-          class="text-area h-100 w-100 border-0 m fs-12"
+          class="text-area h-100 w-100 border-0 m fs-12 bulkEditTextarea"
           style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
           placeholder={bulkEditPlaceholder}
           bind:value={bulkText}

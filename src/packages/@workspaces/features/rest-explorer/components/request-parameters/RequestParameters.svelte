@@ -21,7 +21,7 @@ Example: userID: Sparrow12 `
   };
 
   function toggleBulkEdit(value) {
-    onUpdateRequestState({ isBulkParameter: value });
+    onUpdateRequestState({ isParameterBulkEditActive: value });
   }
 </script>
 
