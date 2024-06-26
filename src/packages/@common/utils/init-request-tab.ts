@@ -111,8 +111,8 @@ class InitRequestTab {
             isSendRequestInProgress: false,
             isSaveDescriptionInProgress: false,
             isSaveRequestInProgress: false,
-            isBulkParameter: false,
-            isBulkHeader: false,
+            isParameterBulkEditActive: false,
+            isHeaderBulkEditActive: false,
           },
           auth: {
             bearerToken: "",
