@@ -30,7 +30,7 @@
 </script>
 
 <div class="mt-3">
-  <p class="sparrow-fs-14 mb-1 text-secondary-200">Paste cURL here</p>
+  <p class="sparrow-fs-14 mb-1 text-secondary-1000">Paste cURL here</p>
 </div>
 <div class="rounded border-0 position-relative">
   <textarea
