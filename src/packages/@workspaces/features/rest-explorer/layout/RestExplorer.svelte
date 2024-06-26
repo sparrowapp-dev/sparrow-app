@@ -62,6 +62,11 @@
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
+  import {
+    AdvanceAPI,
+    CreateCollection,
+    SendingApiRequest,
+  } from "@workspaces/common/constants";
 
   export let tab: Observable<RequestTab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -89,6 +94,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
@@ -127,7 +133,12 @@
 </script>
 
 {#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout">
+  <div
+    class="d-flex rest-explorer-layout"
+    style="height: {isLoginBannerActive
+      ? 'calc(100vh - 126px)'
+      : 'calc(100vh - 80px)'};"
+  >
     <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
@@ -224,7 +235,7 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <!-- <div class="" style="margin-top: 10px;">
+      <div class="" style="margin-top: 10px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
@@ -247,7 +258,7 @@
             </p>
           </Popover>
         {/if}
-      </div> -->
+      </div>
       {#if !isLoading}
         <Splitpanes
           class="rest-splitter w-100"
@@ -452,7 +463,7 @@
 {/if}
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
-<!-- <Modal
+<Modal
   title={""}
   type={"dark"}
   width={"474px"}
@@ -491,12 +502,11 @@
       ]}
     />
   </div>
-</Modal> -->
+</Modal>
 
 <style>
   .rest-explorer-layout {
     background-color: var(--bg-secondary-850);
-    height: calc(100vh - 80px);
   }
 
   :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {

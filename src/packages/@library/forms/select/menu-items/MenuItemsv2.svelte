@@ -27,7 +27,7 @@
   /**
    * Ticked mark icon
    */
-  export let CheckIcon: any;
+  export let tickIcon: any;
   export let getTextColor: (color: any) => {};
   /**
    * marks the tickmark is highlighted
@@ -117,9 +117,10 @@
       class="d-flex align-items-center justify-content-center"
       style="height:16px; width:16px;"
     >
-      <CheckIcon
+      <!-- <CheckIcon
         color={highlightTickedItem ? "var(--text-primary-200)" : "white"}
-      />
+      /> -->
+      <img src={tickIcon} alt="" />
     </span>
   {/if}
 </div>
