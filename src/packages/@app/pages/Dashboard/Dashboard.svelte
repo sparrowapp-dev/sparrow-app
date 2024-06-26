@@ -200,11 +200,15 @@
 
   <!-- Application Content -->
   <div class="d-flex h-100">
-    <Sidebar {user} onLogout={_viewModel.handleLogout} />
+    <Sidebar {user} onLogout={_viewModel.handleLogout}
+    {updaterVisible}
+      {updateAvailable} />
     <section class="w-100 h-100">
       <!-- Route for Collections -->
       <Route path="/collections/*">
-        <CollectionsPage />
+        <CollectionsPage
+        {updaterVisible}
+        {updateAvailable} />
       </Route>
 
       <!-- Route for Workspaces -->

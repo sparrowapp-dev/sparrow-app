@@ -77,6 +77,9 @@
     isGuestUser = value;
   });
 
+  export let updaterVisible ;
+  export let updateAvailable ;
+
   /**
    * @description - handles different key press
    * @param event - keyboard events
@@ -217,6 +220,8 @@
       >
         <CollectionList
           bind:scrollList
+          {updaterVisible}
+          {updateAvailable}
           {collectionList}
           {currentWorkspace}
           {isAppVersionVisible}

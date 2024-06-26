@@ -40,6 +40,9 @@
     isGuestUser = value;
   });
 
+  export let updaterVisible;
+  export let updateAvailable;
+
   let sidebarItems: SidebarItemObj[] = [
     {
       route: "/app/collections",
@@ -105,7 +108,11 @@
 </script>
 
 <div class="sidebar-global">
-  <div class={`sidebar ${componentClass}`}>
+  <div
+    class={`sidebar ${
+      updaterVisible && updateAvailable ? "updater-visible" : "updater-hidden"
+    } ${componentClass}`}
+  >
     <div class="primary-sidebar-items">
       {#each primarySidebarItems as item (item.route)}
         <SidebarItem {item} />
@@ -131,7 +138,7 @@
 
 <style>
   .sidebar {
-    height: calc(100vh - 44px);
+    /* height: calc(100vh - 44px); */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -140,5 +147,13 @@
     background-color: var(--bg-secondary-850);
     margin-right: 1px;
     padding: 5px 0px 10px 0px;
+  }
+
+  .sidebar.updater-visible {
+    height: calc(100vh - 100px); /* Adjusted height when updater is visible */
+  }
+
+  .sidebar.updater-hidden {
+    height: calc(100vh - 44px); /* Default height when updater is not visible */
   }
 </style>

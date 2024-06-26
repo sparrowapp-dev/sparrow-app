@@ -4,6 +4,10 @@
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 
+
+
+
+
 $sparrow-blue: #007bff;
 $sparrow-yellow: #f9b001;
 $sparrow-black: #000000;
@@ -755,10 +759,18 @@ span {
   height: 2px;
 }
 
+// ::-webkit-scrollbar-thumb {
+//   background: #888;
+//   cursor: pointer;
+// }
+
 ::-webkit-scrollbar-thumb {
   background: #888;
-  cursor: pointer;
+  cursor: pointer; 
+  border-radius: 5px; 
 }
+
+
 
 .env-highlight {
 

@@ -44,6 +44,9 @@
    */
   export let isGuestUser = false;
 
+   export let updaterVisible ;
+  export let updateAvailable;
+ 
   import {
     Collection,
     EmptyCollection,
@@ -334,7 +337,7 @@
             {#if collectionFilter.length > 0}
               <List
                 bind:scrollList
-                height={"calc(100vh - 160px)"}
+                height={updaterVisible && updateAvailable ? "calc(100vh - 220px)" : "calc(100vh - 170px)"}
                 classProps={"pb-2 pe-1"}
               >
                 {#each collectionFilter as col}
@@ -356,7 +359,7 @@
             {:else}
               <List
                 bind:scrollList
-                height={"calc(100vh - 160px)"}
+                height={updaterVisible && updateAvailable ? "calc(100vh - 220px)" : "calc(100vh - 170px)"}
                 classProps={"pb-2 pe-1"}
               >
                 <p
@@ -369,7 +372,7 @@
           {:else}
             <List
               bind:scrollList
-              height={"calc(100vh - 160px)"}
+              height={updaterVisible && updateAvailable ? "calc(100vh - 220px)" : "calc(100vh - 170px)"}
               classProps={"pb-2 pe-1"}
             >
               {#each collectionListDocument as col}
