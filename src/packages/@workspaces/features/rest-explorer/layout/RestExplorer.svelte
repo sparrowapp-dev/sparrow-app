@@ -94,6 +94,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
@@ -132,7 +133,12 @@
 </script>
 
 {#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout">
+  <div
+    class="d-flex rest-explorer-layout"
+    style="height: {isLoginBannerActive
+      ? 'calc(100vh - 126px)'
+      : 'calc(100vh - 80px)'};"
+  >
     <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
@@ -507,7 +513,6 @@
 <style>
   .rest-explorer-layout {
     background-color: var(--bg-secondary-850);
-    height: calc(100vh - 80px);
   }
 
   :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {

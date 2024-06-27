@@ -185,7 +185,12 @@
       </div>
     {/if} -->
     <div class="d-inline-flex" style="height:35px; width:35px;">
-      <Tooltip title={"New"} placement={"bottom"} distance={10} zIndex={20}>
+      <Tooltip
+        title={"Add Request"}
+        placement={"bottom"}
+        distance={10}
+        zIndex={20}
+      >
         <button
           on:click={onNewTabRequested}
           role="button"

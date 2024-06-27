@@ -7,7 +7,9 @@
   import { RestExplorer } from "@workspaces/features";
   import { Debounce } from "@common/utils";
   import { isGuestUserActive } from "$lib/store";
+  import { onMount } from "svelte";
   export let tab;
+  let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -97,6 +99,12 @@
       refreshEnvironment();
     }
   }
+  onMount(async () => {
+    const guestUser = await _viewModel.getGuestUser();
+    if (guestUser?.isBannerActive) {
+      isLoginBannerActive = guestUser?.isBannerActive;
+    }
+  });
 </script>
 
 <RestExplorer
@@ -106,6 +114,7 @@
   bind:requestAuthParameter={_viewModel.authParameter}
   {environmentVariables}
   {isGuestUser}
+  {isLoginBannerActive}
   onSendRequest={_viewModel.sendRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}

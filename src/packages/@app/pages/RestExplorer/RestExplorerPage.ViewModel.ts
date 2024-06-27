@@ -79,6 +79,8 @@ import { notifications } from "@library/ui/toast/Toast";
 import { RequestTabAdapter } from "@app/adapter/request-tab";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { CollectionService } from "@app/services/collection.service";
+import { GuestUserRepository } from "@app/repositories/guest-user.repository";
+
 class RestExplorerViewModel
   implements
     UpdateRequestUrl,
@@ -115,6 +117,7 @@ class RestExplorerViewModel
   private tabRepository = new TabRepository();
   private environmentTabRepository = new EnvironmentTabRepository();
   private guideRepository = new GuideRepository();
+  private guestUserRepository = new GuestUserRepository();
 
   /**
    * Service
@@ -190,6 +193,17 @@ class RestExplorerViewModel
   private set authParameter(value: { key: string; value: string }) {
     this._authParameter.next(value);
   }
+
+  /**
+   *
+   * @returns guest user
+   */
+  public getGuestUser = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON();
+  };
 
   /**
    *
