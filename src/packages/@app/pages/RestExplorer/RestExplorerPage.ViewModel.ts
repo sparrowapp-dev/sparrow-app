@@ -430,6 +430,7 @@ class RestExplorerViewModel
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+
   /**
    * @description clear response of a request
    */

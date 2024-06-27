@@ -13,7 +13,7 @@ export const tabSchemaLiteral = {
   // separator: "|",
   // },
   type: "object",
-  version: 8,
+  version: 9,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -219,6 +219,12 @@ export const tabSchemaLiteral = {
                   default: false,
                 },
                 isSaveRequestInProgress: {
+                  type: "boolean",
+                },
+                isParameterBulkEditActive: {
+                  type: "boolean",
+                },
+                isHeaderBulkEditActive: {
                   type: "boolean",
                 },
               },

@@ -250,16 +250,19 @@ export class TabRepository {
     sub();
   };
 
-  public updateTab = async (tabId, tab) => {
-    const query = RxDB.getInstance()
+
+
+  public updateTab = async (tabId,tab): Promise<void> => {
+    const query = await RxDB.getInstance()
       .rxdb.tab.findOne({
         selector: {
           tabId,
         },
       })
       .exec();
-    (await query).incrementalModify((value) => {
-      return { ...value, ...tab };
-    });
+      await query.incrementalModify((value) => {
+        return { ...value, ...tab };
+      });
   };
+  
 }

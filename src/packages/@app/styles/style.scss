@@ -102,6 +102,7 @@ $theme-grey-83899F: #83899F;
 $theme-grey-636566: #636566;
 $theme-grey-484848: #484848;
 $theme-grey-45494D: #45494D;
+$theme-grey-808080: #808080;
 $theme-grey-313233: #313233;
 $theme-grey-4D4D4D: #4D4D4D;
 $theme-grey-272727: #272727;
@@ -261,6 +262,7 @@ $theme-red-230408: #230408;
   --text-secondary-400 : #{$theme-grey-313233};
   --text-secondary-450 : #{$theme-grey-191919};
   --text-secondary-500 : #{$theme-grey-272727};
+  --text-secondary-550 : #{$theme-grey-808080};
   --text-secondary-600 : #{$theme-grey-212222};
   --text-secondary-700 : #{$theme-grey-161617};
   --text-secondary-800 : #{$theme-grey-151515};
@@ -762,6 +764,7 @@ span {
 ::-webkit-scrollbar-thumb {
   background: #888;
   cursor: pointer;
+  border-radius: 5px; 
 }
 
 .env-highlight {

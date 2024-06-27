@@ -301,6 +301,9 @@
                 <div style="flex:1; overflow:auto;" class="p-0">
                   {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                     <RequestParameters
+                      isBulkEditActive={$tab?.property?.request.state
+                        ?.isParameterBulkEditActive}
+                      {onUpdateRequestState}
                       params={$tab.property.request.queryParams}
                       {onUpdateRequestParams}
                       authParameter={$requestAuthParameter}
@@ -319,6 +322,9 @@
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                     <RequestHeaders
+                      isBulkEditActive={$tab?.property?.request.state
+                        ?.isHeaderBulkEditActive}
+                      {onUpdateRequestState}
                       {environmentVariables}
                       {onUpdateEnvironment}
                       headers={$tab.property.request.headers}
