@@ -24,7 +24,7 @@
 <style>
   .request-body {
     max-height: calc(100% - 65px);
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
   }
 </style>

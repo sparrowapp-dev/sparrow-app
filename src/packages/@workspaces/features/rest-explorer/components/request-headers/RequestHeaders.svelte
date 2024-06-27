@@ -24,7 +24,7 @@
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 45px); overflow-y: scroll;">
+<section class="w-100" style="height: calc(100% - 45px); overflow-y: auto;">
   <TabularInput
     keyValue={createDeepCopy(headers)}
     callback={handleHeaderChange}

@@ -37,7 +37,7 @@
     color: var(--white-color);
   }
   .response-header {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
   }
 </style>

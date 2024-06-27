@@ -29,9 +29,9 @@
 
 <div
   class="container1"
-  style="background-color: black ;  overflow-y: scroll !important;"
+  style="background-color: black ;  overflow-y: auto !important;"
 >
-  <div style="overflow-y :scroll;">
+  <div style="overflow-y :auto;">
     <div class="update-section">
       <h3
         class=""

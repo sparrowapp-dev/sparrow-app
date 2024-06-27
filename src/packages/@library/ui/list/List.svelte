@@ -6,7 +6,7 @@
   /**
    * handles overflow vertically
    */
-  export let overflowY = "scroll";
+  export let overflowY = "auto";
   /**
    * handles overflow horizontally
    */

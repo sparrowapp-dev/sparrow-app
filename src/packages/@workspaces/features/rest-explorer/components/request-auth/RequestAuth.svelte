@@ -47,7 +47,7 @@
       </span>
     </div>
   </div>
-  <section class="w-100" style="height: calc(100% - 60px); overflow-y: scroll;">
+  <section class="w-100" style="height: calc(100% - 60px); overflow-y: auto;">
     {#if requestStateAuth === AuthType.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === AuthType.API_KEY}

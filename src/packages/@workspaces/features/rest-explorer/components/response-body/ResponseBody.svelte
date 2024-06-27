@@ -67,7 +67,7 @@
 
 <style>
   .response-body {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
   }
   iframe {
