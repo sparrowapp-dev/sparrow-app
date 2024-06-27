@@ -136,7 +136,7 @@ $theme-violet-272831: #272831;
 $theme-violet-2E2F3D: #2E2F3D;
 $theme-violet-323548: #323548;
 $theme-violet-1c1d27: #1c1d27;
-$theme-violet-1C1D2B: #1C1D2B;
+$theme-violet-1C1D2B: #1c1d2b;
 
 $theme-red-e5acb2: #e5acb2;
 $theme-red-fe8c98: #fe8c98;
@@ -270,12 +270,12 @@ $theme-red-230408: #230408;
 
   --text-tertiary-100 : #{$theme-violet-676A80};
   --text-tertiary-200 : #{$theme-violet-323548};
-  --text-tertiary-250 : #{$theme-violet-1C1D2B};
   --text-tertiary-300 : #{$theme-violet-2A2C3C};
   --text-tertiary-400 : #{$theme-violet-22232E};
   --text-tertiary-500 : #{$theme-violet-272831};
   --text-tertiary-600 : #{$theme-violet-2E2F3D};
   --text-tertiary-700 : #{$theme-violet-1c1d27};
+  --text-tertiary-750 : #{$theme-violet-1C1D2B};
 
   --text-danger-100 : #{$theme-red-e5acb2};
   --text-danger-200 : #{$theme-red-fe8c98};
@@ -330,6 +330,7 @@ $theme-red-230408: #230408;
   --bg-tertiary-600 : #{$theme-violet-2E2F3D};
   --bg-tertiary-650 : #{$theme-violet-323548};
   --bg-tertiary-700 : #{$theme-violet-1c1d27};
+  --bg-tertiary-750 : #{$theme-violet-1C1D2B};
 
   --bg-danger-100 : #{$theme-red-e5acb2};
   --bg-danger-200 : #{$theme-red-fe8c98};
@@ -376,6 +377,7 @@ $theme-red-230408: #230408;
   --border-tertiary-500 : #{$theme-violet-272831};
   --border-tertiary-600 : #{$theme-violet-2E2F3D};
   --border-tertiary-700 : #{$theme-violet-1c1d27};
+  --border-tertiary-750 : #{$theme-violet-1C1D2B};
 
   --border-danger-100 : #{$theme-red-e5acb2};
   --border-danger-200 : #{$theme-red-fe8c98};
@@ -419,6 +421,7 @@ $theme-red-230408: #230408;
   --icon-tertiary-500 : #{$theme-violet-272831};
   --icon-tertiary-600 : #{$theme-violet-2E2F3D};
   --icon-tertiary-700 : #{$theme-violet-1c1d27};
+  --icon-tertiary-750 : #{$theme-violet-1C1D2B};
 
   --icon-danger-100 : #{$theme-red-e5acb2};
   --icon-danger-200 : #{$theme-red-fe8c98};
@@ -561,6 +564,7 @@ $sparrow-text-colors: (
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-700 : $theme-violet-1c1d27,
+  tertiary-750 : $theme-violet-1C1D2B,
 
   danger-100 : $theme-red-e5acb2,
   danger-200 : $theme-red-fe8c98,
@@ -605,6 +609,7 @@ $sparrow-bg-colors: (
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-650 : $theme-violet-323548,
   tertiary-700 : $theme-violet-1c1d27,
+  tertiary-750 : $theme-violet-1C1D2B,
 
   danger-100 : $theme-red-e5acb2,
   danger-200 : $theme-red-fe8c98,
@@ -647,6 +652,7 @@ $sparrow-border-colors: (
   tertiary-500 : $theme-violet-272831,
   tertiary-600 : $theme-violet-2E2F3D,
   tertiary-700 : $theme-violet-1c1d27,
+  tertiary-750 : $theme-violet-1C1D2B,
 
   danger-100 : $theme-red-e5acb2,
   danger-200 : $theme-red-fe8c98,

@@ -25,6 +25,10 @@
   import hoveredProfile from "$lib/assets/profile-hovered.svg";
   import selectedProfile from "$lib/assets/profile-selected.svg";
 
+  import home from "$lib/assets/home-icon.svg";
+  import hoveredHome from "$lib/assets/home-hovered.svg";
+  import selectedHome from "$lib/assets/home-selected.svg";
+
   import SidebarItem, { type SidebarItemObj } from "./SidebarItem.svelte";
   import SidebarProfileModal, {
     type SidebarProfileObj,
@@ -41,6 +45,15 @@
   });
 
   let sidebarItems: SidebarItemObj[] = [
+    {
+      route: "/app/home",
+      heading: "Home",
+      defaultLogo: home,
+      hoveredLogo: hoveredHome,
+      selectedLogo: selectedHome,
+      disabled: isGuestUser ?? false,
+      position: "primary",
+    },
     {
       route: "/app/collections",
       heading: "Collections",
