@@ -167,7 +167,13 @@
       </div>
     {/if}
     {#if localEnvironment && localEnvironment.length > 0}
-      <div class="pe-1" style="flex:1; overflow:auto;">
+      <List
+        bind:scrollList
+        height={"auto"}
+        overflowY={"auto"}
+        classProps={"pe-1"}
+        style={"flex:1;"}
+      >
         {#each localEnvironment as env}
           <ListItem
             {env}
@@ -179,7 +185,7 @@
             {onSelectEnvironment}
           />
         {/each}
-      </div>
+      </List>
     {/if}
   {/if}
 </div>

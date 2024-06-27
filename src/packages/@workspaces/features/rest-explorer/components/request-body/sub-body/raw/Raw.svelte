@@ -20,11 +20,3 @@
     beautifySyntaxCallback={updateBeautifiedState}
   />
 </div>
-
-<style>
-  .request-body {
-    max-height: calc(100% - 65px);
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
-</style>

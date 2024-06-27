@@ -14,7 +14,7 @@
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 50px); overflow-y: scroll;">
+<section class="w-100" style="">
   <TabularInput
     readable={authParameter}
     keyValue={createDeepCopy(params)}

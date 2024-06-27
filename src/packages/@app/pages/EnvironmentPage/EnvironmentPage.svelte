@@ -61,6 +61,7 @@
   <div class="h-100" use:motion>
     <Splitpanes
       class="environment-splitter h-100"
+      style="width: calc(100vw - 54px);"
       on:resize={(e) => {
         environmentLeftPanelWidth.set(e.detail[0].size);
         environmentRightPanelWidth.set(e.detail[1].size);

@@ -22,39 +22,41 @@
   };
 </script>
 
-<div class="ps-0 pe-0 rounded w-100 h-100 position-relative">
+<div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
   <RequestBodyNavigator
     {method}
     {onUpdateRequestState}
     {requestState}
     {updateBeautifiedState}
   />
-  {#if requestState.requestBodyNavigation === RequestDataset.RAW}
-    <Raw
-      {onUpdateRequestBody}
-      lang={requestState.requestBodyLanguage}
-      value={body.raw}
-      {isBodyBeautified}
-      {updateBeautifiedState}
-    />
-  {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
-    <None />
-  {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
-    <UrlEncoded
-      value={body.urlencoded}
-      {onUpdateRequestBody}
-      {onUpdateEnvironment}
-      {environmentVariables}
-    />
-  {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
-    <FormData
-      keyValue={body.formdata}
-      {onUpdateRequestBody}
-      {environmentVariables}
-      {onUpdateEnvironment}
-      formData={body.formdata}
-    />
-  {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
-    <Binary />
-  {/if}
+  <div style="flex:1; overflow:auto;">
+    {#if requestState.requestBodyNavigation === RequestDataset.RAW}
+      <Raw
+        {onUpdateRequestBody}
+        lang={requestState.requestBodyLanguage}
+        value={body.raw}
+        {isBodyBeautified}
+        {updateBeautifiedState}
+      />
+    {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
+      <None />
+    {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
+      <UrlEncoded
+        value={body.urlencoded}
+        {onUpdateRequestBody}
+        {onUpdateEnvironment}
+        {environmentVariables}
+      />
+    {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
+      <FormData
+        keyValue={body.formdata}
+        {onUpdateRequestBody}
+        {environmentVariables}
+        {onUpdateEnvironment}
+        formData={body.formdata}
+      />
+    {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
+      <Binary />
+    {/if}
+  </div>
 </div>
