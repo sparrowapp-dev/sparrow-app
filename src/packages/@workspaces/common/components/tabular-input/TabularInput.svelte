@@ -13,6 +13,7 @@
   import Textarea from "@library/forms/textarea/Textarea.svelte";
 
   import { Tooltip } from "@library/ui";
+  import SliderSwitch from "@library/forms/SliderSwitch/SliderSwitch.svelte";
   type Mode = "READ" | "WRITE";
 
   export let keyValue: KeyValuePair[] | KeyValuePairWithBase[];
@@ -275,14 +276,13 @@
                 >
                   Bulk Edit
                 </p>
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    bind:checked={bulkToggle}
-                    on:click={handleBulkTextUpdate}
-                    on:change={toggleBulkEdit}
-                  /> <span class="slider round"></span>
-                </label>
+               
+                <SliderSwitch
+                bind:checked={bulkToggle}
+                  onClick={handleBulkTextUpdate}
+                  onChange={toggleBulkEdit}
+                />
+               
               </button>
             </div>
           {/if}
@@ -557,14 +557,12 @@
                 >
                   Bulk Edit
                 </p>
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    bind:checked={bulkToggle}
-                    on:click={handleBulkTextUpdate}
-                    on:change={toggleBulkEdit}
-                  /> <span class="slider round"></span>
-                </label>
+
+                <SliderSwitch
+                  bind:checked={bulkToggle}
+                  onChange={toggleBulkEdit}
+                  onClick={handleBulkTextUpdate}
+                />
               </button>
             </div>
           {/if}
@@ -602,119 +600,6 @@
     letter-spacing: 1px;
   }
 
-  /* Updated checkbox container to fix the styling */
-  .container {
-    display: inline-block; /* Changed from block to inline-block for better alignment */
-    position: relative;
-    padding-left: 25px; /* Adjusted padding for smaller checkboxes */
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-size: 22px;
-    user-select: none;
-  }
-
-  /* Hide the default HTML checkbox */
-  .container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-
-  /* Custom checkbox style */
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 14px;
-    width: 14px;
-    border-radius: 3px;
-    background-color: transparent;
-    border: 2px solid var(--text-secondary-500);
-  }
-
-  /* When the checkbox is checked */
-  .container input:checked ~ .checkmark {
-    background-color: var(--bg-primary-300);
-    border: none;
-  }
-
-  /* Checkmark indicator */
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .checkmark:after {
-    left: 5px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid var(--text-secondary-800);
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-
-  /* Corrected styles for the toggle switch */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 22px;
-    height: 12px;
-  }
-
-  .switch input {
-    opacity: 0;
-    width: 22px;
-    height: 12px;
-  }
-
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--text-secondary-500);
-    transition: 0.4s;
-    border-radius: 16px;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 8px;
-    width: 8px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-  }
-
-  input:checked + .slider {
-    width: 22px;
-    height: 12px;
-    background-color: var(--text-primary-200);
-    margin-left: 4px;
-  }
-
-  input:checked + .slider:before {
-    transform: translateX(10px);
-  }
-
-  .slider.round:before {
-    border-radius: 50%;
-  }
 
   .keyValuePair {
     background-color: transparent;
@@ -804,4 +689,5 @@
   .trash-icon:hover {
     background-color: var(--bg-secondary-500);
   }
+
 </style>
