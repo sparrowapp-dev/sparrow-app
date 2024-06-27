@@ -11,10 +11,6 @@ export class TeamsViewModel {
    */
   get teams() {
     const teams = this.teamRepository.getTeams();
-    console.log("teams in repo---->", teams);
-    teams.subscribe((value) => {
-      console.log("value--->", value);
-    });
     return teams;
   }
 
@@ -23,10 +19,13 @@ export class TeamsViewModel {
    */
   get tabs() {
     const tabs = this.tabRepository.getTabList();
-    console.log("teams in repo---->", tabs);
-    tabs.subscribe((value) => {
-      console.log("value--->", value);
-    });
     return tabs;
+  }
+
+  /**
+   * @description - get open team from local db
+   */
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
   }
 }
