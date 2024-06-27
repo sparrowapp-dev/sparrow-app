@@ -15,6 +15,7 @@
 
   export let isBulkEditActive
   export let onUpdateRequestState
+   let isBulkEditRequired=true;
 
   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
 Format: Header-Key: Header-Value
@@ -32,13 +33,14 @@ Example: userID: Sparrow12`
   };
 
   
-  function toggleBulkEdit(value) {
-    onUpdateRequestState({ isHeaderBulkEditActive: value });
-  }
+  const toggleBulkEdit = (value) => {
+  onUpdateRequestState({ isHeaderBulkEditActive: value });
+};
 </script>
 
 <section class="w-100" style="height: calc(100% - 45px); overflow-y: scroll;">
   <TabularInput
+  isBulkEditRequired={isBulkEditRequired}
   bulkEditPlaceholder={placeholderHeader}
   {isBulkEditActive}
       onToggleBulkEdit={toggleBulkEdit}

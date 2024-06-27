@@ -8,6 +8,8 @@
   export let authParameter;
   export let onUpdateEnvironment;
 
+
+    let isBulkEditRequired=true;
   export let onUpdateRequestState;
 
   export let isBulkEditActive ;
@@ -20,9 +22,9 @@ Example: userID: Sparrow12 `
     onUpdateRequestParams(pairs);
   };
 
-  function toggleBulkEdit(value) {
-    onUpdateRequestState({ isParameterBulkEditActive: value });
-  }
+  const toggleBulkEdit = (value) => {
+  onUpdateRequestState({ isParameterBulkEditActive: value });
+};
 </script>
 
 <section
@@ -30,6 +32,7 @@ Example: userID: Sparrow12 `
   style="height: calc(100% - 50px); overflow-y: scroll;"
 >
   <TabularInput
+  isBulkEditRequired={isBulkEditRequired}
   bulkEditPlaceholder={bulkEditParamsPlaceholder}
     {isBulkEditActive }
     onToggleBulkEdit={toggleBulkEdit}

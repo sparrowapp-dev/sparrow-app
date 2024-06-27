@@ -30,6 +30,7 @@
 
   export let isBulkEditActive;
   export let onToggleBulkEdit;
+  export let isBulkEditRequired = false;
 
   export let bulkEditPlaceholder = "";
 
@@ -167,22 +168,22 @@
   let textAreaState: HTMLTextAreaElement | null = null;
 
   const handleBulkTextUpdate = () => {
-  const res = pairs
-    .map((elem) => {
-      if (elem.key) {
-        return elem.key + ":" + elem.value;
-      }
-      return "";
-    })
-    .join("\n");
-  bulkText = res;
-};
+    const res = pairs
+      .map((elem) => {
+        if (elem.key) {
+          return elem.key + ":" + elem.value;
+        }
+        return "";
+      })
+      .join("\n");
+    bulkText = res;
+  };
 
   const toggleBulkEdit = (event) => {
-  onToggleBulkEdit(event.target.checked)
-};
+    onToggleBulkEdit(event.target.checked);
+  };
 
-const handleBulkTextarea = (event) => {
+  const handleBulkTextarea = (event) => {
     bulkText = event.detail;
     const res = bulkText.split("\n");
     pairs = res.map((elem) => {
@@ -216,8 +217,7 @@ const handleBulkTextarea = (event) => {
 
   onMount(() => {
     handleBulkTextUpdate();
-  })
-
+  });
 </script>
 
 <div class="outer-section">
@@ -266,24 +266,32 @@ const handleBulkTextarea = (event) => {
             Value
           </p>
 
-          <div class="me-2">
-            <button class="bg-transparent border-0 mt-1 d-flex" style="">
-              <p
-                class="text-nowrap text-primary-300 mb-0 me-1"
-                style="font-size: 10px; font-weight:400;"
-              >
-                Bulk Edit
-              </p>
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  bind:checked={bulkToggle}
-                  on:click={handleBulkTextUpdate}
-                  on:change={toggleBulkEdit}
-                /> <span class="slider round"></span>
-              </label>
-            </button>
-          </div>
+          {#if bulkEditPlaceholder}
+            <div class="me-2">
+              <button class="bg-transparent border-0 mt-1 d-flex" style="">
+                <p
+                  class="text-nowrap text-primary-300 mb-0 me-1"
+                  style="font-size: 10px; font-weight:400;"
+                >
+                  Bulk Edit
+                </p>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    bind:checked={bulkToggle}
+                    on:click={handleBulkTextUpdate}
+                    on:change={toggleBulkEdit}
+                  /> <span class="slider round"></span>
+                </label>
+              </button>
+            </div>
+          {/if}
+
+          {#if !isBulkEditRequired}
+            <div class="h-75 pe-1">
+              <button class=" border-0" style="width:70px;" />
+            </div>
+          {/if}
         </div>
       </div>
       <div
@@ -525,16 +533,14 @@ const handleBulkTextarea = (event) => {
       </div>
     </div>
   {:else}
-
-  <!-- Bulk Edit section Start -->
+    <!-- Bulk Edit section Start -->
     <div>
       <div class="d-flex flex-column" style="height: 234px; font-size:12px;">
         <div
           class="d-flex align-items-center"
           style="justify-content: space-between;"
         >
-
-        <!-- Bulk Edit Text  -->
+          <!-- Bulk Edit Text  -->
           <div
             style="font-size:12px; font-weight:500; color:var(--sparrow-text-color)"
           >
@@ -542,39 +548,38 @@ const handleBulkTextarea = (event) => {
           </div>
 
           <!-- Bulk Edit Button -->
-          <div class="pe-1 d-flex align-items-center gap-1 me-2">
-            <button class="bg-transparent border-0 mt-2 d-flex">
-              <p
-                class="text-nowrap text-primary-300 mb-2"
-                style="font-size: 10px; font-weight:400;"
-              >
-                Bulk Edit
-              </p>
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  bind:checked={bulkToggle}
-                  on:click={handleBulkTextUpdate}
-                  on:change={toggleBulkEdit}
-                /> <span class="slider round"></span>
-              </label>
-            </button>
-          </div>
-
+          {#if bulkEditPlaceholder}
+            <div class="pe-1 d-flex align-items-center gap-1 me-2">
+              <button class="bg-transparent border-0 mt-2 d-flex">
+                <p
+                  class="text-nowrap text-primary-300 mb-2"
+                  style="font-size: 10px; font-weight:400;"
+                >
+                  Bulk Edit
+                </p>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    bind:checked={bulkToggle}
+                    on:click={handleBulkTextUpdate}
+                    on:change={toggleBulkEdit}
+                  /> <span class="slider round"></span>
+                </label>
+              </button>
+            </div>
+          {/if}
         </div>
-
 
         <!-- Bulk Edit TextArea starts -->
         <div style="">
           <Textarea
-          height={"200px"}
-          class="text-area h-100 w-100 border-0 m fs-12 bulkEditTextarea"
-          style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
-          placeholder={bulkEditPlaceholder}
-          bind:value={bulkText}
-          on:input={handleBulkTextarea}
-        />
-
+            height={"200px"}
+            class="text-area h-100 w-100 border-0 m fs-12 bulkEditTextarea"
+            style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
+            placeholder={bulkEditPlaceholder}
+            bind:value={bulkText}
+            on:input={handleBulkTextarea}
+          />
         </div>
         <!-- Bulk Edit TextArea end -->
       </div>
