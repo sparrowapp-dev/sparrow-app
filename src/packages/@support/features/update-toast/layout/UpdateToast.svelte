@@ -27,11 +27,8 @@
   }
 </script>
 
-<div
-  class="container1"
-  style="background-color: black ;  overflow-y: scroll !important;"
->
-  <div style="overflow-y :scroll;">
+<div class="container1" style="background-color: black;">
+  <div>
     <div class="update-section">
       <h3
         class=""
@@ -52,7 +49,7 @@
           <div class="outer-div item mt-3 d-flex flex-column internal-div">
             <div class="top-line"></div>
 
-            <div class="d-flex ms-4 mt-3">
+            <div class="d-flex mt-3">
               <div class="details d-flex flex-column gap-0">
                 <p class="text-primary">{item.dateCreated}</p>
                 <p class="fs-8 fw-semibold">
@@ -115,21 +112,14 @@
   .container1 {
     background-color: var(--text-danger-850);
     color: var(--text-secondary-100);
-    padding: 20px;
-    padding-top: 0px;
     border-radius: 10px;
     margin: 0 auto;
   }
 
   .update-section {
-    padding: 15px;
     margin-top: 10px;
     border-radius: 4px;
     border-color: var(--bg-primary-600);
-    display: none;
-  }
-
-  .update-section {
     display: block;
   }
 </style>

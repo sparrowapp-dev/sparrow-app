@@ -8,33 +8,29 @@
   export let authParameter;
   export let onUpdateEnvironment;
 
-
-    let isBulkEditRequired=true;
+  let isBulkEditRequired = true;
   export let onUpdateRequestState;
 
-  export let isBulkEditActive ;
+  export let isBulkEditActive;
 
-  let bulkEditParamsPlaceholder=`Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
+  let bulkEditParamsPlaceholder = `Usage: Use bulk edit to manage multiple parameters quickly.Separate each entry with a new line.
 Format: Parameter-Key: Parameter-Value
-Example: userID: Sparrow12 `
+Example: userID: Sparrow12 `;
 
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
     onUpdateRequestParams(pairs);
   };
 
   const toggleBulkEdit = (value) => {
-  onUpdateRequestState({ isParameterBulkEditActive: value });
-};
+    onUpdateRequestState({ isParameterBulkEditActive: value });
+  };
 </script>
 
-<section
-  class="outer-section w-100"
-  style="height: calc(100% - 50px); overflow-y: scroll;"
->
+<section class="w-100" style="">
   <TabularInput
-  isBulkEditRequired={isBulkEditRequired}
-  bulkEditPlaceholder={bulkEditParamsPlaceholder}
-    {isBulkEditActive }
+    {isBulkEditRequired}
+    bulkEditPlaceholder={bulkEditParamsPlaceholder}
+    {isBulkEditActive}
     onToggleBulkEdit={toggleBulkEdit}
     readable={authParameter}
     keyValue={createDeepCopy(params)}

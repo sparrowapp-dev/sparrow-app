@@ -38,7 +38,7 @@ Example: userID: Sparrow12`
 };
 </script>
 
-<section class="w-100" style="height: calc(100% - 45px); overflow-y: scroll;">
+<section class="w-100" style="">
   <TabularInput
   isBulkEditRequired={isBulkEditRequired}
   bulkEditPlaceholder={placeholderHeader}

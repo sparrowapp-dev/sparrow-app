@@ -40,7 +40,7 @@
   };
 </script>
 
-<div class="d-flex flex-column text-fs-14" style="height: 234px; gap: 8px;">
+<div class="d-flex flex-column text-fs-14" style="gap: 8px;">
   <div class="d-flex" style="justify-content: space-between;">
     <div style="font-weight: 600;">Documentation</div>
     {#if !editing}

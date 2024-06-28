@@ -13,7 +13,7 @@
   };
 </script>
 
-<section class="w-100" style="height: calc(100% - 65px); overflow-y: scroll;">
+<section class="w-100">
   <TabularInputFormData
     {keyValue}
     callback={handleFormDataChange}

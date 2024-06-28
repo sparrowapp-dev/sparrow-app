@@ -58,9 +58,9 @@
 </script>
 
 <Motion {...pagesMotion} let:motion>
-  <div use:motion>
+  <div class="h-100" use:motion>
     <Splitpanes
-      class="environment-splitter"
+      class="environment-splitter h-100"
       style="width: calc(100vw - 54px);"
       on:resize={(e) => {
         environmentLeftPanelWidth.set(e.detail[0].size);
@@ -94,7 +94,7 @@
           {#if true}
             {#if $activeEnvironment}
               <Motion {...scaleMotionProps} let:motion>
-                <div use:motion>
+                <div class="h-100" use:motion>
                   <EnvironmentExplorerPage tab={$activeEnvironment} />
                 </div>
               </Motion>
