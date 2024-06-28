@@ -36,8 +36,4 @@
   input::placeholder {
     color: var(--white-color);
   }
-  .response-header {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
 </style>

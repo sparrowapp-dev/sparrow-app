@@ -66,10 +66,6 @@
 </div>
 
 <style>
-  .response-body {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
   iframe {
     pointer-events: none;
   }
