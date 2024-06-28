@@ -32,10 +32,6 @@
 </div>
 
 <style>
-  .response-default {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
   .error-message {
     max-width: 480px;
   }

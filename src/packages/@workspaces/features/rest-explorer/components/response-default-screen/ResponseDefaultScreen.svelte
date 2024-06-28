@@ -109,10 +109,6 @@
 </div>
 
 <style>
-  .response-default {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
   .cursor-pointer {
     cursor: pointer;
   }

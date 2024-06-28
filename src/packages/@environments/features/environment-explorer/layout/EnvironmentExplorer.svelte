@@ -80,8 +80,12 @@
 </script>
 
 {#if $currentEnvironment?.environmentId}
-  <div class={`env-panel d-flex`}>
-    <div class="env-parent w-100 {quickHelp ? 'quick-help-active' : ''}">
+  <div class={`h-100 env-panel d-flex`}>
+    <div
+      class="d-flex flex-column h-100 env-parent w-100 {quickHelp
+        ? 'quick-help-active'
+        : ''}"
+    >
       <header
         class={`env-header justify-content-between d-flex`}
         style="position: relative ;"
@@ -207,7 +211,7 @@
           >
         {/if}
       </div>
-      <section class={`var-value-container`}>
+      <section class={`var-value-container pe-1`} style="flex:1;">
         <TabularInput
           loggedUserRoleInWorkspace={$userWorkspaceLevelRole}
           keyValue={$currentEnvironment.variable}
@@ -217,7 +221,7 @@
       </section>
     </div>
     {#if quickHelp}
-      <div class="quick-help">
+      <div class="quick-help h-100">
         <QuickHelp
           closeQuickHelp={() => {
             quickHelp = false;
@@ -274,7 +278,6 @@
 <style lang="scss">
   .env-panel {
     background-color: var(--bg-secondary-850);
-    height: calc(100vh - 44px);
   }
   .env-header {
     padding: 20px 0px 10px 6px;
@@ -332,12 +335,10 @@
   }
   .var-value-container {
     width: 100%;
-    height: calc(100vh - 130px);
     overflow-y: auto;
   }
   .quick-help {
     width: 280px;
-    overflow-y: auto;
   }
   .env-parent {
     padding: 10px;
