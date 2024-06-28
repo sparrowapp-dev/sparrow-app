@@ -11,7 +11,7 @@
   export let onUpdateEnvironment;
 </script>
 
-<div class="d-flex flex-column ps-1 pe-1 w-100 h-100">
+<div class="d-flex flex-column w-100 h-100">
   <div class="pb-2" style="font-size: 12px; font-weight:500;">
     <div class="">
       <span class="d-flex">
