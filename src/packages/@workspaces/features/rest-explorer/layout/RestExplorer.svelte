@@ -367,52 +367,58 @@
                   : 'ps-2'}"
                 style="overflow:auto;"
               >
-                {#if $tab.property.request?.state?.isSendRequestInProgress}
-                  <ResponseDefaultScreen />
-                  <div
-                    style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
-                  >
-                    <Loader loaderSize={"20px"} />
-                  </div>
-                {:else if !$tab.property.request?.response?.status}
-                  <ResponseDefaultScreen />
-                {:else if $tab.property.request?.response?.status === "Not Found"}
-                  <ResponseErrorScreen />
-                {:else if $tab.property.request?.response?.status}
-                  <div class="h-100 d-flex flex-column">
-                    <ResponseStatus response={$tab.property.request.response} />
-                    <ResponseNavigator
-                      requestStateSection={$tab.property.request.state
-                        ?.responseNavigation}
-                      {onUpdateRequestState}
-                      responseHeadersLength={$tab.property?.request?.response
-                        ?.headers?.length || 0}
-                    />
-                    {#if $tab.property.request.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
-                      {#if $tab.property.request.state?.responseBodyLanguage !== "Image"}
-                        <ResponseBodyNavigator
-                          response={$tab.property.request.response}
-                          apiState={$tab.property.request.state}
-                          {onUpdateRequestState}
-                          {onClearResponse}
-                        />
-                      {/if}
-                      <div style="flex:1; overflow:auto;">
-                        <ResponseBody
-                          response={$tab.property.request.response}
-                          apiState={$tab.property.request.state}
-                        />
+                <div class="h-100 d-flex flex-column">
+                  <div style="flex:1; overflow:auto;">
+                    {#if $tab.property.request?.state?.isSendRequestInProgress}
+                      <ResponseDefaultScreen />
+                      <div
+                        style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
+                      >
+                        <Loader loaderSize={"20px"} />
                       </div>
-                    {:else if $tab.property.request.state?.responseNavigation === ResponseSectionEnum.HEADERS}
-                      <div style="flex:1; overflow:auto;">
-                        <ResponseHeaders
-                          responseHeader={$tab.property.request.response
-                            .headers}
+                    {:else if !$tab.property.request?.response?.status}
+                      <ResponseDefaultScreen />
+                    {:else if $tab.property.request?.response?.status === "Not Found"}
+                      <ResponseErrorScreen />
+                    {:else if $tab.property.request?.response?.status}
+                      <div class="h-100 d-flex flex-column">
+                        <ResponseStatus
+                          response={$tab.property.request.response}
                         />
+                        <ResponseNavigator
+                          requestStateSection={$tab.property.request.state
+                            ?.responseNavigation}
+                          {onUpdateRequestState}
+                          responseHeadersLength={$tab.property?.request
+                            ?.response?.headers?.length || 0}
+                        />
+                        {#if $tab.property.request.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
+                          {#if $tab.property.request.state?.responseBodyLanguage !== "Image"}
+                            <ResponseBodyNavigator
+                              response={$tab.property.request.response}
+                              apiState={$tab.property.request.state}
+                              {onUpdateRequestState}
+                              {onClearResponse}
+                            />
+                          {/if}
+                          <div style="flex:1; overflow:auto;">
+                            <ResponseBody
+                              response={$tab.property.request.response}
+                              apiState={$tab.property.request.state}
+                            />
+                          </div>
+                        {:else if $tab.property.request.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                          <div style="flex:1; overflow:auto;">
+                            <ResponseHeaders
+                              responseHeader={$tab.property.request.response
+                                .headers}
+                            />
+                          </div>
+                        {/if}
                       </div>
                     {/if}
                   </div>
-                {/if}
+                </div>
               </div></Pane
             >
           </Splitpanes>
