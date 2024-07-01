@@ -41,7 +41,15 @@
   export let hoveredBorderColor = "red";
   export let focusedBorderColor = "green";
 
+  /**
+   * max length that textarea holds
+   */
   export let maxlength = 500;
+
+  /**
+   * unique textarea id
+   */
+  export let id = "";
 
   /**
    * input states
@@ -88,6 +96,7 @@
     }}
     class="w-100 {componentClass}"
     {placeholder}
+    {id}
     style=" {componentStyle} height: 100%;  border-color:{extractBorderHighlight(
       isHovered,
       isFocused,
