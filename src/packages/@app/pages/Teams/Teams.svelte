@@ -10,10 +10,14 @@
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import TeamSidePanel from "@teams/features/team-sidepanel/layout/TeamSidePanel.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
+  import { Modal } from "@library/ui/modal";
+  import { CreateTeam } from "@teams/features";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+
+  let isCreateTeamModalOpen: boolean = false;
 </script>
 
 <Splitpanes
@@ -25,7 +29,11 @@
   }}
 >
   <Pane class="sidebar-left-panel" minSize={20} size={$workspaceLeftPanelWidth}>
-    <TeamSidePanel teamList={$teamList} tabList={$tabList} />
+    <TeamSidePanel
+      bind:isCreateTeamModalOpen
+      teamList={$teamList}
+      tabList={$tabList}
+    />
   </Pane>
   <Pane
     class="sidebar-right-panel"
@@ -35,6 +43,24 @@
     <TeamExplorerPage />
   </Pane>
 </Splitpanes>
+
+<Modal
+  title={"New Team"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    isCreateTeamModalOpen = flag;
+  }}
+>
+  <CreateTeam
+    handleModalState={(flag = false) => {
+      isCreateTeamModalOpen = flag;
+    }}
+    onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
 
 <style>
   .warning-text {

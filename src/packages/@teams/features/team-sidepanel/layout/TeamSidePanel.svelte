@@ -8,6 +8,7 @@
   import { PeopleIcon } from "$lib/assets/app.asset";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
+  export let isCreateTeamModalOpen;
 </script>
 
 <div
@@ -20,7 +21,12 @@
       <h6 class="teams-heading">Teams</h6>
       <div>
         <Tooltip title="New Team" placement={"bottom"} styleProp={"left: -50%"}>
-          <button class="new-team-btn rounded border-0">
+          <button
+            class="new-team-btn rounded border-0"
+            on:click={() => {
+              isCreateTeamModalOpen = true;
+            }}
+          >
             <img src={plus} alt="" />
           </button>
         </Tooltip>

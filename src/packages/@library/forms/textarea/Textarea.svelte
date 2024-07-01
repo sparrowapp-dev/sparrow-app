@@ -4,6 +4,7 @@
    * placeholder - dummy text
    */
   export let placeholder = "placeholder";
+  export let placeholderColor = "gray";
   /**
    * height
    */
@@ -90,7 +91,7 @@
     style=" {componentStyle} height: 100%;  border-color:{extractBorderHighlight(
       isHovered,
       isFocused,
-    )};"
+    )}; --placeholder-color: {placeholderColor};"
     {disabled}
     {maxlength}
   />
@@ -100,5 +101,8 @@
   textarea {
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+  }
+  textarea::placeholder {
+    color: var(--placeholder-color);
   }
 </style>
