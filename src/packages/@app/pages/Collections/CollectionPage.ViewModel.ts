@@ -273,7 +273,6 @@ export default class CollectionsViewModel {
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       name: newName,
     });
-    console.log(response);
     
     if (response) {
       const updatedata = {
@@ -305,7 +304,6 @@ export default class CollectionsViewModel {
     const response = await this.workspaceService.updateWorkspace(workspaceId, {
       description : newDescription,
     });
-    console.log(response , "description");
     
     if (response) {
       const updatedata = {
