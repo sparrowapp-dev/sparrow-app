@@ -234,6 +234,7 @@
       if (response.isSuccessful) {
         progressBar.title = ProgressTitle.FETCHING_DATA;
         progressBar.isProgress = true;
+        onClick(false);
       } else {
         progressBar.isLoading = false;
         isSyntaxError = true;
@@ -366,6 +367,7 @@
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
       progressBar.isProgress = true;
+      onClick(false);
     } else {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -384,6 +386,7 @@
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
       progressBar.isProgress = true;
+      onClick(false);
     } else {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -454,374 +457,325 @@
   const debouncedImport = debounce(handleInputField, 1000);
 </script>
 
-{#if progressBar.isLoading}
+<!-- {#if progressBar.isLoading}
   <ProgressBar
     {onClick}
     title={progressBar.title}
     zIndex={10000}
     isProgress={progressBar.isProgress}
   />
+{/if} -->
+
+<div class="d-flex pt-3">
+  <div class="form-check import-type-inp">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="flexRadioDefault"
+      id="flexRadioDefault1"
+      value="text"
+      bind:group={importType}
+      on:click={() => {
+        isInputDataTouched = false;
+      }}
+    />
+    <label class="form-check-label text-fs-14" for="flexRadioDefault1">
+      Paste Text
+    </label>
+  </div>
+  <div class="form-check import-type-inp">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="flexRadioDefault"
+      id="flexRadioDefault2"
+      value="file"
+      bind:group={importType}
+      on:click={() => {
+        isInputDataTouched = false;
+      }}
+    />
+    <label class="form-check-label text-fs-14" for="flexRadioDefault2">
+      Upload File
+    </label>
+  </div>
+</div>
+<br />
+{#if importType === "text"}
+  <div>
+    <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+      Paste your OAS text or Swagger/Localhost Link
+    </p>
+  </div>
+  <div class="textarea-div rounded border-0 position-relative">
+    <textarea
+      on:input={() => {
+        isimportDataLoading = true;
+        isInputDataTouched = true;
+        isTextEmpty = false;
+        debouncedImport();
+      }}
+      on:blur={() => {
+        isInputDataTouched = true;
+      }}
+      placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
+      bind:value={importData}
+      class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
+      style={!isValidServerDeployedURL &&
+      !isValidServerJSON &&
+      !isValidServerURL &&
+      !isValidServerXML &&
+      !isimportDataLoading &&
+      isInputDataTouched
+        ? `border: 1px solid var(--dangerColor) !important;`
+        : ``}
+    />
+    {#if isimportDataLoading}
+      <div class="position-absolute" style="right: 10px; top:10px;">
+        <Spinner size={`16px`} />
+      </div>
+    {:else if (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
+      <div class="position-absolute" style="right: 10px; top:8px;">
+        <TickMark />
+      </div>
+    {/if}
+  </div>
+  {#if !importData && isInputDataTouched && !isimportDataLoading}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      Please paste your OpenAPI specification text or Swagger/localhost link.
+    </p>
+  {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      We have identified that the text you have pasted is not written in OpenAPI
+      Specification (OAS). Please visit https://swagger.io/specification/ for
+      more information on OAS.
+    </p>
+  {/if}
 {/if}
 
-<ModalWrapperV1
-  title={"Incorrect Format"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isSyntaxError}
-  handleModalState={onClick}
->
-  <div class="invalid-type-content">
-    <div>
-      <p class="format-info fw-normal text-start sparrow-fs-12">
-        We have identified that the file you uploaded is not in the right
-        format.
-      </p>
-    </div>
-    <!-- <div class="format-types-container">
-      <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.YAML</p>
-      <p class="format-type fw-normal p-2 text-start sparrow-fs-12">.JSON</p>
-    </div> -->
-    <div class="format-btns">
-      <button
-        class="format-btn px-2 fw-normal sparrow-fs-16 p-1 text-center"
-        on:click={() => {
-          onClick(false);
-        }}>Close</button
-      >
-      <button
-        class="format-btn px-2 collection-btn fw-normal sparrow-fs-16 p-1 text-center"
-        on:click={() => {
-          handleError();
-        }}>+ Collection</button
-      >
-    </div>
+{#if importType === "file"}
+  <div>
+    <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+      Upload YAML/JSON file
+    </p>
   </div>
-</ModalWrapperV1>
-
-<ModalWrapperV1
-  title={"New Collection"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={!progressBar.isLoading && !isSyntaxError}
-  handleModalState={onClick}
->
-  <div class="d-flex pt-3">
-    <div class="form-check import-type-inp">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="flexRadioDefault"
-        id="flexRadioDefault1"
-        value="text"
-        bind:group={importType}
-        on:click={() => {
-          isInputDataTouched = false;
-        }}
-      />
-      <label class="form-check-label text-fs-14" for="flexRadioDefault1">
-        Paste Text
-      </label>
-    </div>
-    <div class="form-check import-type-inp">
-      <input
-        class="form-check-input"
-        type="radio"
-        name="flexRadioDefault"
-        id="flexRadioDefault2"
-        value="file"
-        bind:group={importType}
-        on:click={() => {
-          isInputDataTouched = false;
-        }}
-      />
-      <label class="form-check-label text-fs-14" for="flexRadioDefault2">
-        Upload File
-      </label>
-    </div>
+  <div>
+    <Drop
+      value={uploadCollection.file.value}
+      maxFileSize={10000}
+      onChange={handleFileInputChange}
+      resetValue={handleLogoReset}
+      inputId="upload-collection-file-input"
+      inputPlaceholder="Drag and Drop or"
+      supportedFileTypes={[".yaml", ".json"]}
+      isError={uploadCollection.file.invalid && isInputDataTouched}
+      title={"Drag and Drop your YAML/JSON file or"}
+    />
   </div>
-  <br />
-  {#if importType === "text"}
-    <div>
-      <p class="sparrow-fs-12 mb-1"
-      style="color:var(--text-secondary-1000)">
-        Paste your OAS text or Swagger/Localhost Link
-      </p>
-    </div>
-    <div class="textarea-div rounded border-0 position-relative">
-      <textarea
-        on:input={() => {
-          isimportDataLoading = true;
-          isInputDataTouched = true;
-          isTextEmpty = false;
-          debouncedImport();
-        }}
-        on:blur={() => {
-          isInputDataTouched = true;
-        }}
-        placeholder="Example - OpenAPI JSON text or http://localhost:8080/api-docs"
-        bind:value={importData}
-        class="mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
-        style={!isValidServerDeployedURL &&
-        !isValidServerJSON &&
-        !isValidServerURL &&
-        !isValidServerXML &&
-        !isimportDataLoading &&
-        isInputDataTouched
-          ? `border: 1px solid var(--dangerColor) !important;`
-          : ``}
-      />
-      {#if isimportDataLoading}
-        <div class="position-absolute" style="right: 10px; top:10px;">
-          <Spinner size={`16px`} />
-        </div>
-      {:else if (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
-        <div class="position-absolute" style="right: 10px; top:8px;">
-          <TickMark />
-        </div>
-      {/if}
-    </div>
-    {#if !importData && isInputDataTouched && !isimportDataLoading}
+  <div>
+    {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Please paste your OpenAPI specification text or Swagger/localhost link.
+        Invalid file format. Please upload an OAS file in YAML or JSON format.
       </p>
-    {:else if (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+    {:else if isInputDataTouched && isFileEmpty}
       <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        Unable to process the specified Swagger link. Please verify the URL for
-        accuracy and accessibility. If the problem persists, contact the API
-        provider for assistance.
-      </p>
-    {:else if (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
-      <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-        We have identified that text you pasted is not written in Open API
-        Specification (OAS). Please visit https://swagger.io/specification/ for
-        more information on OAS.
+        Please upload a file to import collection.
       </p>
     {/if}
-  {/if}
-
-  {#if importType === "file"}
+  </div>
+{/if}
+{#if importType === "text" && isValidClientURL && isValidServerURL && false}
+  <div>
     <div>
-      <p class="sparrow-fs-12 mb-1"
-      style="color:var(--text-secondary-1000)">Upload YAML/JSON file</p>
+      <small class="text-textColor sparrow-fs-12"
+        >This link supports Active Sync.</small
+      >
     </div>
-    <div>
-      <Drop
-        value={uploadCollection.file.value}
-        maxFileSize={10000}
-        onChange={handleFileInputChange}
-        resetValue={handleLogoReset}
-        inputId="upload-collection-file-input"
-        inputPlaceholder="Drag and Drop or"
-        supportedFileTypes={[".yaml", ".json"]}
-        isError={uploadCollection.file.invalid && isInputDataTouched}
-        title={"Drag and Drop your YAML/JSON file or"}
-      />
-    </div>
-    <div>
-      {#if isInputDataTouched && uploadCollection.file.invalid && (uploadCollection.file.showFileSizeError || uploadCollection.file.showFileTypeError)}
-        <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-          Invalid file format. Please upload an OAS file in YAML or JSON format.
-        </p>
-      {:else if isInputDataTouched && isFileEmpty}
-        <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-          Please upload a file to import collection.
-        </p>
-      {/if}
-    </div>
-  {/if}
-  {#if importType === "text" && isValidClientURL && isValidServerURL && false}
-    <div>
-      <div>
-        <small class="text-textColor sparrow-fs-12"
-          >This link supports Active Sync.</small
-        >
-      </div>
-      <div class="enable-active-sync">
-        <div class="form-check form-switch ps-0 position-relative">
-          <div class="d-flex justify-content-between flex-column">
-            <span class="sparrow-fs-14 mb-1">Enable Active Sync</span>
-            <small class="text-textColor sparrow-fs-12"
-              >Enabling Active Sync auto-updates APIs via Swagger Link.</small
-            >
-          </div>
-          <div class="custom-switch position-absolute end-0" style="top: 10%;">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              style="cursor: pointer;"
-              bind:checked={activeSync}
-              id="enableActiveSync"
-            />
-            <label class="slider" for="enableActiveSync"></label>
-          </div>
+    <div class="enable-active-sync">
+      <div class="form-check form-switch ps-0 position-relative">
+        <div class="d-flex justify-content-between flex-column">
+          <span class="sparrow-fs-14 mb-1">Enable Active Sync</span>
+          <small class="text-textColor sparrow-fs-12"
+            >Enabling Active Sync auto-updates APIs via Swagger Link.</small
+          >
+        </div>
+        <div class="custom-switch position-absolute end-0" style="top: 10%;">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            style="cursor: pointer;"
+            bind:checked={activeSync}
+            id="enableActiveSync"
+          />
+          <label class="slider" for="enableActiveSync"></label>
         </div>
       </div>
-      <!-- <div class="d-flex align-items-center gap-2 pb-2">
+    </div>
+    <!-- <div class="d-flex align-items-center gap-2 pb-2">
         <img src={linkIcon} alt="" />
         <a class="learn-active-link sparrow-fs-12" href="" on:click={() => {}}
           >Learn more about Active Sync</a
         >
       </div> -->
-      {#if activeSync}
-        <!-- Local repository path -->
-        <div>
-          <p class="sparrow-fs-14 mb-1">
-            Paste or browse local repository path <span class="asterik">*</span>
-          </p>
-          <div class="pb-2">
-            <small class="sparrow-fs-12 text-textColor"
-              >The repository location is required to track your branch.</small
-            >
-          </div>
-          <div class="d-flex justify-content-between pb-2">
-            <div class="position-relative w-100 me-3">
-              <input
-                class="p-2 pe-4 bg-blackColor w-100 rounded border-0 sparrow-fs-12"
-                type="text"
-                style="width:80%; {(!repositoryPath &&
-                  isRepositoryPathTouched) ||
-                (!isRepositoryPath && isRepositoryPathTouched)
-                  ? `border: 1px solid var(--dangerColor) !important`
-                  : ``}"
-                placeholder="Paste or browse path"
-                bind:value={repositoryPath}
-                on:input={() => {
-                  extractGitBranch(repositoryPath);
-                }}
-                on:blur={() => {
-                  isRepositoryPathTouched = true;
-                }}
-              />
-              {#if repositoryPath && isRepositoryPath && isRepositoryPathTouched}
-                <div class="position-absolute" style="right: 10px; top:4px;">
-                  <TickMark />
-                </div>
-              {/if}
-            </div>
-            <Button
-              disable={false}
-              title={"Browse"}
-              textStyleProp={"font-size: var(--base-text);"}
-              type={"dark"}
-              loader={false}
-              onClick={async () => {
-                await uploadFormFile();
+    {#if activeSync}
+      <!-- Local repository path -->
+      <div>
+        <p class="sparrow-fs-14 mb-1">
+          Paste or browse local repository path <span class="asterik">*</span>
+        </p>
+        <div class="pb-2">
+          <small class="sparrow-fs-12 text-textColor"
+            >The repository location is required to track your branch.</small
+          >
+        </div>
+        <div class="d-flex justify-content-between pb-2">
+          <div class="position-relative w-100 me-3">
+            <input
+              class="p-2 pe-4 bg-blackColor w-100 rounded border-0 sparrow-fs-12"
+              type="text"
+              style="width:80%; {(!repositoryPath && isRepositoryPathTouched) ||
+              (!isRepositoryPath && isRepositoryPathTouched)
+                ? `border: 1px solid var(--dangerColor) !important`
+                : ``}"
+              placeholder="Paste or browse path"
+              bind:value={repositoryPath}
+              on:input={() => {
+                extractGitBranch(repositoryPath);
+              }}
+              on:blur={() => {
                 isRepositoryPathTouched = true;
               }}
             />
+            {#if repositoryPath && isRepositoryPath && isRepositoryPathTouched}
+              <div class="position-absolute" style="right: 10px; top:4px;">
+                <TickMark />
+              </div>
+            {/if}
           </div>
-          {#if !repositoryPath && isRepositoryPathTouched}
-            <div>
-              <p
-                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
-              >
-                Please paste or browse local repository path.
-              </p>
-            </div>
-          {:else if !isRepositoryPath && isRepositoryPathTouched}
-            <div>
-              <p
-                class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
-              >
-                Repository is not found at the provided location. Please ensure
-                that the path is accurate and accessible.
-              </p>
-            </div>
-          {/if}
+          <Button
+            disable={false}
+            title={"Browse"}
+            textStyleProp={"font-size: var(--base-text);"}
+            type={"dark"}
+            loader={false}
+            onClick={async () => {
+              await uploadFormFile();
+              isRepositoryPathTouched = true;
+            }}
+          />
         </div>
-        {#if isRepositoryPath}
+        {#if !repositoryPath && isRepositoryPathTouched}
           <div>
-            <div>
-              <p class="sparrow-fs-14 mb-1">
-                Select Primary Branch <span class="asterik">*</span>
-              </p>
-              <div class="pb-2">
-                <small class="sparrow-fs-12 text-textColor"
-                  >The selected primary branch is considered the default branch.</small
-                >
-              </div>
-
-              <div
-                class="bg-blackColor rounded w-100"
-                style="width:80%; {repositoryBranch === 'not exist' &&
-                isRepositoryBranchTouched
-                  ? `border: 1px solid var(--dangerColor) !important`
-                  : ``}"
-              >
-                <Select
-                  isError={repositoryBranch === "not exist" &&
-                    isRepositoryBranchTouched}
-                  id={"select-branch"}
-                  headerHighlight={"hover"}
-                  data={[
-                    {
-                      name: "Select Branch",
-                      id: "not exist",
-                      color: "whiteColor",
-                      default: true,
-                      hide: true,
-                    },
-                    ...getBranchList,
-                  ]}
-                  titleId={repositoryBranch}
-                  onclick={handleDropdown}
-                  maxBodyHeight={"150px"}
-                  maxHeaderWidth={"900px"}
-                />
-              </div>
-              {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
-                <div>
-                  <p
-                    class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
-                  >
-                    Please select primary branch.
-                  </p>
-                </div>
-              {/if}
-            </div>
+            <p
+              class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+            >
+              Please paste or browse local repository path.
+            </p>
+          </div>
+        {:else if !isRepositoryPath && isRepositoryPathTouched}
+          <div>
+            <p
+              class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+            >
+              Repository is not found at the provided location. Please ensure
+              that the path is accurate and accessible.
+            </p>
           </div>
         {/if}
-      {/if}
-    </div>
-  {/if}
+      </div>
+      {#if isRepositoryPath}
+        <div>
+          <div>
+            <p class="sparrow-fs-14 mb-1">
+              Select Primary Branch <span class="asterik">*</span>
+            </p>
+            <div class="pb-2">
+              <small class="sparrow-fs-12 text-textColor"
+                >The selected primary branch is considered the default branch.</small
+              >
+            </div>
 
-  <div
-    class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
-  >
-    <button
-      class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 border-radius-2
-       btn-primary"
-      on:click={() => {
-        handleImport();
-      }}
-      disabled={isLoading}
-    >
-      <span class="me-3">
-        {#if progressBar.isLoading || isLoading}
-          <Spinner size={"16px"} />
-        {:else}
-          Import Collection
-        {/if}</span
-      >
-    </button>
-    <p class="importData-whiteColor my-3 sparrow-fs-14 fw-light">OR</p>
-    <button
-      class="btn-primary border-0 w-100 py-2 fs-6 border-radius-2"
-      on:click={() => {
-        onItemCreated("collection", {
-          workspaceId: currentWorkspaceId,
-          collection: collectionList,
-        });
-        onClick(false);
-      }}>Create Empty Collection</button
-    >
+            <div
+              class="bg-blackColor rounded w-100"
+              style="width:80%; {repositoryBranch === 'not exist' &&
+              isRepositoryBranchTouched
+                ? `border: 1px solid var(--dangerColor) !important`
+                : ``}"
+            >
+              <Select
+                isError={repositoryBranch === "not exist" &&
+                  isRepositoryBranchTouched}
+                id={"select-branch"}
+                headerHighlight={"hover"}
+                data={[
+                  {
+                    name: "Select Branch",
+                    id: "not exist",
+                    color: "whiteColor",
+                    default: true,
+                    hide: true,
+                  },
+                  ...getBranchList,
+                ]}
+                titleId={repositoryBranch}
+                onclick={handleDropdown}
+                maxBodyHeight={"150px"}
+                maxHeaderWidth={"900px"}
+              />
+            </div>
+            {#if repositoryBranch === "not exist" && isRepositoryBranchTouched}
+              <div>
+                <p
+                  class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start"
+                >
+                  Please select primary branch.
+                </p>
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/if}
+    {/if}
   </div>
-</ModalWrapperV1>
+{/if}
+
+<div
+  class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
+>
+  <button
+    class="d-flex align-items-center justify-content-center border-0 w-100 py-2 fs-6 border-radius-2
+       btn-primary"
+    on:click={() => {
+      handleImport();
+    }}
+    disabled={isLoading}
+  >
+    <span class="me-3">
+      {#if progressBar.isLoading || isLoading}
+        <Spinner size={"16px"} />
+      {:else}
+        Import Collection
+      {/if}</span
+    >
+  </button>
+  <p class="importData-whiteColor my-3 sparrow-fs-14 fw-light">OR</p>
+  <button
+    class="btn-primary border-0 w-100 py-2 fs-6 border-radius-2"
+    on:click={() => {
+      onItemCreated("collection", {
+        workspaceId: currentWorkspaceId,
+        collection: collectionList,
+      });
+      onClick(false);
+    }}>Create Empty Collection</button
+  >
+</div>
 
 <style lang="scss">
+  .text-area::placeholder{
+    color: var( --text-tertiary-100);
+  }
   #file-input {
     display: none;
   }
@@ -1017,10 +971,33 @@
     content: "";
     height: 16px;
     width: 16px;
-    background-color: white;
+    background-color: var(--bg-secondary-100);
     transition: 200ms;
   }
-
+  .form-check-input{
+    border: 1px solid var(--border-secondary-100);
+    background-color:  var(--bg-tertiary-300) !important;
+    background-image: none !important;
+  }
+  .form-check-input:checked:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:hover{
+    border: 3px solid var(--border-primary-300 ) ;
+    background-color: var(--bg-tertiary-300);
+    outline :5px solid var(--border-tertiary-300);
+    outline-offset: -1px;
+  }
+  .form-check-input:checked{
+    background-color: var(--bg-tertiary-250) !important;
+    border: 4.5px solid var(--border-primary-300 ) !important;
+  }
+  .form-check-label{
+    color: var(--text-secondary-100);
+  }
   input:checked + .slider {
     background-color: var(--sparrow-input-slider-button);
   }

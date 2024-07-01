@@ -56,6 +56,8 @@
             {value}
             keyClassProp={"text-secondary-200"}
             valueClassProp={"bg-secondary-400 text-secondary-150"}
+            keyStyleProp={"width: 100px;"}
+            valueStyleProp={"width: 90px"}
             type="combo"
           />
         </div>
@@ -72,6 +74,8 @@
             {value}
             keyClassProp={"text-secondary-200"}
             valueClassProp={"bg-secondary-400 text-secondary-150"}
+            keyStyleProp={"width: 100px;"}
+            valueStyleProp={"width: 90px"}
             type="combo"
           />
         </div>
@@ -105,10 +109,6 @@
 </div>
 
 <style>
-  .response-default {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
   .cursor-pointer {
     cursor: pointer;
   }

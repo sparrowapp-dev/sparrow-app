@@ -104,45 +104,33 @@
   );
 </script>
 
-<div class="sidebar-global">
-  <div class={`sidebar ${componentClass}`}>
-    <div class="primary-sidebar-items z-4">
-      {#each primarySidebarItems as item (item.route)}
-        <SidebarItem {item} />
-      {/each}
-    </div>
-    <div class="secondary-sidebar-items z-4">
-      {#each secondarySidebarItems as item (item.route)}
-        <SidebarItem {item} />
-      {/each}
-      {#if !isGuestUser}
-        <Tooltip
-          title="User Profile"
-          placement="right"
-          distance={20}
-          zIndex={5}
-        >
-          <SidebarProfileModal item={sidebarModalItem} {onLogout} />
-        </Tooltip>
-      {/if}
-    </div>
+<div class={`sidebar ${componentClass}`}>
+  <div class="primary-sidebar-items">
+    {#each primarySidebarItems as item (item.route)}
+      <SidebarItem {item} />
+    {/each}
+  </div>
+  <div class="secondary-sidebar-items">
+    {#each secondarySidebarItems as item (item.route)}
+      <SidebarItem {item} />
+    {/each}
+    {#if !isGuestUser}
+      <Tooltip title="User Profile" placement="right" distance={20} zIndex={5}>
+        <SidebarProfileModal item={sidebarModalItem} {onLogout} />
+      </Tooltip>
+    {/if}
   </div>
 </div>
 
 <style>
-  .sidebar-global {
-    padding-top: 2px;
-    background-color: var(--blackColor);
-  }
   .sidebar {
-    height: calc(100vh - 44px);
+    overflow: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     width: 54px;
     background-color: var(--bg-secondary-850);
-    margin-right: 1px;
     padding: 5px 0px 10px 0px;
   }
 </style>
