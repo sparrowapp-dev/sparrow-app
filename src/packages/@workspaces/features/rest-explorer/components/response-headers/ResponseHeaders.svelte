@@ -14,18 +14,20 @@
         <input
           type="text"
           placeholder={header.key}
-          class="form-control bg-keyValuePairColor py-1 border-0"
+          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
           style="font-size: 13px;"
           readonly
+          disabled
         />
       </div>
       <div class="flex-grow-1 w-100">
         <input
           type="text"
           placeholder={header.value}
-          class="form-control bg-keyValuePairColor py-1 border-0"
+          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
           style="font-size: 13px;"
           readonly
+          disabled
         />
       </div>
     </div>
