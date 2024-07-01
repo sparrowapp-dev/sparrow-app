@@ -35,7 +35,7 @@
   .tab-head {
     padding: 8px;
     font-size: var(--small-text);
-    font-weight: 500;
+    font-weight: 700;
     line-height: var(--medium-text);
     color: var(--sparrow-text-color);
     background-color: transparent;

@@ -2,13 +2,13 @@
   import { ThreeDotIcon } from "$lib/assets/app.asset";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
-  import { TeamRole } from "$lib/utils/enums";
+  import { TeamRole, WorkspaceMemberRole } from "$lib/utils/enums";
 
   export let list;
   export let currOpenedTeamRxDoc;
   export let handleOpenCollection;
   export let calculateTimeDifferenceInDays;
-  export let WorkspaceMemberRole;
+  // export let WorkspaceMemberRole;
   export let userType = "";
 
   let pos = { x: 0, y: 0 };
@@ -147,7 +147,7 @@
 
 <style>
   tr:hover {
-    background-color: var(--background-light);
+    background-color: var(--bg-tertiary-600);
   }
   .workspace-list-item td {
     background-color: transparent;
@@ -162,6 +162,11 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--workspace-hover-color);
+    background-color: var(--bg-tertiary-190);
+  }
+  .tab-data {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
   }
 </style>
