@@ -16,19 +16,19 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import { requestResponseStore } from "$lib/store";
   import { notifications } from "@library/ui/toast/Toast";
-  import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel.old";
+  // import { CollectionsViewModel } from "../../../../pages/Collections/Collections.ViewModel.old";
 
   export let workspace: any;
-  export let handleWorkspaceSwitch: any;
-  export let handleWorkspaceTab: any;
-  export let currActiveTeam: CurrentTeam;
-  export let openTeam: CurrentTeam;
-  export let activeSideBarTabMethods: any;
+  // export let handleWorkspaceSwitch: any;
+  // export let handleWorkspaceTab: any;
+  // export let currActiveTeam: CurrentTeam;
+  // export let openTeam: CurrentTeam;
+  // export let activeSideBarTabMethods: any;
   export let isAdminOrOwner: boolean;
-  export let workspaces: WorkspaceDocument[];
-  export let workspaceInvitePermissonMethods: workspaceInviteMethods;
-  export let onDeleteWorkspace: (workspaceId: string) => void;
-  export let userId: string;
+  // export let workspaces: WorkspaceDocument[];
+  // export let workspaceInvitePermissonMethods: workspaceInviteMethods;
+  // export let onDeleteWorkspace: (workspaceId: string) => void;
+  // export let userId: string;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -38,128 +38,128 @@
   let confirmationError = "";
   let activeWorkspaceBeingDeleted = false;
   let workspaceDeletePopupLoader = false;
-  let teamSpecificWorkspace = workspaces.map((elem) => {
-    return {
-      id: elem._id,
-      name: elem.name,
-      dynamicClasses: "text-whiteColor",
-    };
-  });
+  // let teamSpecificWorkspace = workspaces.map((elem) => {
+  //   return {
+  //     id: elem._id,
+  //     name: elem.name,
+  //     dynamicClasses: "text-whiteColor",
+  //   };
+  // });
   const _viewModel = new HeaderDashboardViewModel();
-  const collectionsViewModel = new CollectionsViewModel();
+  // const collectionsViewModel = new CollectionsViewModel();
 
   let menuItems = [];
-  const handleOpenWorkspace = async () => {
-    await handleWorkspaceSwitch(
-      workspace._id,
-      workspace.name,
-      openTeam?.teamId,
-      openTeam?.name,
-    );
-    handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
-    navigate("/dashboard/collections");
-    activeSideBarTabMethods.updateActiveTab("collections");
-  };
+  // const handleOpenWorkspace = async () => {
+  //   await handleWorkspaceSwitch(
+  //     workspace._id,
+  //     workspace.name,
+  //     openTeam?.teamId,
+  //     openTeam?.name,
+  //   );
+  //   handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
+  //   navigate("/dashboard/collections");
+  //   activeSideBarTabMethods.updateActiveTab("collections");
+  // };
 
-  const handleDeleteWorkspaceFlow = async () => {
-    activeWorkspaceBeingDeleted = await _viewModel.checkActiveWorkspace(
-      workspace._id,
-    );
-    if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
-      notifications.error(
-        "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
-      );
-      handleDeletePopup(false);
-      return;
-    }
-    teamSpecificWorkspace = teamSpecificWorkspace.filter(
-      (ws) => ws.id != workspace._id,
-    );
-    if (activeWorkspaceBeingDeleted) {
-      handleDeletePopup(false);
-      handleActivateWorkspacePopup(true);
-      return;
-    } else {
-      const response = await workspaceInvitePermissonMethods.deleteWorkspace(
-        workspace._id,
-      );
-      await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
-        currActiveTeam.id,
-        workspace._id,
-      );
-      if (response && response.data) {
-        notifications.success(
-          `${workspace.name} is removed from ${currActiveTeam.name}`,
-        );
-        await requestResponseStore.removeTab(workspace._id);
-        onDeleteWorkspace(workspace._id);
-      }
-    }
-    handleDeletePopup(false);
-  };
+  // const handleDeleteWorkspaceFlow = async () => {
+  //   activeWorkspaceBeingDeleted = await _viewModel.checkActiveWorkspace(
+  //     workspace._id,
+  //   );
+  //   if (activeWorkspaceBeingDeleted && teamSpecificWorkspace.length === 1) {
+  //     notifications.error(
+  //       "Failed to delete the last workspace. Please create a new workspace before deleting this workspace.",
+  //     );
+  //     handleDeletePopup(false);
+  //     return;
+  //   }
+  //   teamSpecificWorkspace = teamSpecificWorkspace.filter(
+  //     (ws) => ws.id != workspace._id,
+  //   );
+  //   if (activeWorkspaceBeingDeleted) {
+  //     handleDeletePopup(false);
+  //     handleActivateWorkspacePopup(true);
+  //     return;
+  //   } else {
+  //     const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+  //       workspace._id,
+  //     );
+  //     await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+  //       currActiveTeam.id,
+  //       workspace._id,
+  //     );
+  //     if (response && response.data) {
+  //       notifications.success(
+  //         `${workspace.name} is removed from ${currActiveTeam.name}`,
+  //       );
+  //       await requestResponseStore.removeTab(workspace._id);
+  //       onDeleteWorkspace(workspace._id);
+  //     }
+  //   }
+  //   handleDeletePopup(false);
+  // };
 
   const handleWindowClick = (event) => {};
 
   window.addEventListener("click", handleWindowClick);
 
-  const handleDeletePopup = (showPopup: boolean) => {
-    confirmationText = "";
-    isshowDeletePopupOpen = showPopup;
-  };
+  // const handleDeletePopup = (showPopup: boolean) => {
+  //   confirmationText = "";
+  //   isshowDeletePopupOpen = showPopup;
+  // };
 
-  const handleActivateWorkspacePopup = (showPopup: boolean) => {
-    showActivateWorkspacePopup = showPopup;
-  };
+  // const handleActivateWorkspacePopup = (showPopup: boolean) => {
+  //   showActivateWorkspacePopup = showPopup;
+  // };
 
-  const handleActivateWorkspace = async (workspaceId: string) => {
-    const response = await workspaceInvitePermissonMethods.deleteWorkspace(
-      workspace._id,
-    );
-    await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
-      currActiveTeam.id,
-      workspace._id,
-    );
-    if (response && response.data) {
-      teamSpecificWorkspace = teamSpecificWorkspace.filter(
-        (ws) => ws.id != workspace._id,
-      );
-      notifications.success(
-        `${workspace.name} is removed from ${currActiveTeam.name}`,
-      );
-      onDeleteWorkspace(workspace._id);
+  // const handleActivateWorkspace = async (workspaceId: string) => {
+  //   const response = await workspaceInvitePermissonMethods.deleteWorkspace(
+  //     workspace._id,
+  //   );
+  //   await workspaceInvitePermissonMethods.handleWorkspaceDeletion(
+  //     currActiveTeam.id,
+  //     workspace._id,
+  //   );
+  //   if (response && response.data) {
+  //     teamSpecificWorkspace = teamSpecificWorkspace.filter(
+  //       (ws) => ws.id != workspace._id,
+  //     );
+  //     notifications.success(
+  //       `${workspace.name} is removed from ${currActiveTeam.name}`,
+  //     );
+  //     onDeleteWorkspace(workspace._id);
 
-      //Activate new workpsace
-      await _viewModel.activateWorkspace(workspaceId);
-      showActivateWorkspacePopup = false;
-      await requestResponseStore.clearTabs();
-      const workspaceObj = workspaces.find(
-        (ws) => ws._id === workspaceId,
-      ) as any;
+  //     //Activate new workpsace
+  //     await _viewModel.activateWorkspace(workspaceId);
+  //     showActivateWorkspacePopup = false;
+  //     await requestResponseStore.clearTabs();
+  //     const workspaceObj = workspaces.find(
+  //       (ws) => ws._id === workspaceId,
+  //     ) as any;
 
-      const newWorkspaceObj = { ...workspaceObj._data };
-      newWorkspaceObj.isActiveWorkspace = true;
-      newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
-      newWorkspaceObj.type = "WORKSPACE";
-      newWorkspaceObj.save = true;
-      newWorkspaceObj.path = {
-        collectionId: "",
-        workspaceId,
-      };
-      newWorkspaceObj.property = {
-        workspace: {
-          requestCount: 0,
-          collectionCount: 0,
-        },
-      };
-      collectionsViewModel.handleCreateTab(newWorkspaceObj);
-      collectionsViewModel.handleActiveTab(workspaceId);
-      navigate("/dashboard/collections");
-    } else {
-      notifications.error(
-        `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
-      );
-    }
-  };
+  //     const newWorkspaceObj = { ...workspaceObj._data };
+  //     newWorkspaceObj.isActiveWorkspace = true;
+  //     newWorkspaceObj.currentEnvironmentId = workspaceObj?.environmentId;
+  //     newWorkspaceObj.type = "WORKSPACE";
+  //     newWorkspaceObj.save = true;
+  //     newWorkspaceObj.path = {
+  //       collectionId: "",
+  //       workspaceId,
+  //     };
+  //     newWorkspaceObj.property = {
+  //       workspace: {
+  //         requestCount: 0,
+  //         collectionCount: 0,
+  //       },
+  //     };
+  //     // collectionsViewModel.handleCreateTab(newWorkspaceObj);
+  //     // collectionsViewModel.handleActiveTab(workspaceId);
+  //     navigate("/dashboard/collections");
+  //   } else {
+  //     notifications.error(
+  //       `Failed to remove ${workspace.name} from ${currActiveTeam.name}. Please try again`,
+  //     );
+  //   }
+  // };
 
   onDestroy(() => {
     window.removeEventListener("click", handleWindowClick);
@@ -180,26 +180,26 @@
       menuItems = [
         {
           onClick: () => {
-            handleOpenWorkspace();
+            // handleOpenWorkspace();
           },
           displayText: "Open Workspace",
           disabled: false,
         },
-        {
-          onClick: async (e) => {
-            handleDeletePopup(true);
-          },
-          displayText: "Delete Workspace",
-          disabled: !(
-            openTeam?.admins?.includes(userId) || openTeam?.owner == userId
-          ),
-        },
+        // {
+        //   onClick: async (e) => {
+        //     handleDeletePopup(true);
+        //   },
+        //   displayText: "Delete Workspace",
+        //   disabled: !(
+        //     openTeam?.admins?.includes(userId) || openTeam?.owner == userId
+        //   ),
+        // },
       ];
     } else {
       menuItems = [
         {
           onClick: () => {
-            handleOpenWorkspace();
+            // handleOpenWorkspace();
           },
           displayText: "Open Workspace",
           disabled: false,
@@ -242,9 +242,9 @@
       <ThreeDotIcon />
     </button>
     <div
-      class="bg-black workspace-card rounded p-4"
+      class="bg-tertiary-750 workspace-card p-4"
       on:click={() => {
-        handleOpenWorkspace();
+        // handleOpenWorkspace();
       }}
       style={`${
         showMenu ? "background-color: var(--border-color) !important;" : null
@@ -274,7 +274,7 @@
   </Card>
 </div>
 
-<ModalWrapperV1
+<!-- <ModalWrapperV1
   title={"Delete Workspace?"}
   type={"danger"}
   width={"35%"}
@@ -362,9 +362,9 @@
       </div>
     </div>
   </div>
-</ModalWrapperV1>
+</ModalWrapperV1> -->
 
-<ModalWrapperV1
+<!-- <ModalWrapperV1
   title={"Activate Workspace"}
   type={"primary"}
   width={"35%"}
@@ -421,7 +421,7 @@
       ]}
     ></Dropdown>
   </div>
-</ModalWrapperV1>
+</ModalWrapperV1> -->
 
 <style lang="scss">
   .workspace-card-outer {
@@ -432,6 +432,7 @@
   }
   .workspace-card {
     z-index: 0 !important;
+    border-radius: 8px;
   }
   .workspace-card-outer:hover .workspace-card .teams-workspace__para,
   .workspace-card-outer:hover .workspace-card .teams-workspace__date {

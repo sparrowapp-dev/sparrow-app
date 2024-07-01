@@ -162,7 +162,6 @@
                 currOpenedTeamRxDoc={openTeam}
                 {handleOpenCollection}
                 {calculateTimeDifferenceInDays}
-                {WorkspaceMemberRole}
                 {userType}
               />
             {/each}
