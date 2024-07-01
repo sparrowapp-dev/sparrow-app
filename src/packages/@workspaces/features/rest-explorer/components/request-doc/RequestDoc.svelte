@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DiskIcon, EditIcon } from "@library/icons";
+    import { notifications } from "@library/ui/toast/Toast";
   import { onMount } from "svelte";
   let description: string = "";
   let editing = false;
@@ -70,6 +71,7 @@
         style="gap: 3px; padding-left: 4px; padding-right: 4px; border-radius: 2px; cursor: pointer;"
         on:click={() => {
           handleSaveChanges();
+          notifications.success("Documentation updated");
           toggleEditMode();
         }}
       >

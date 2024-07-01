@@ -1,7 +1,7 @@
 <script lang="ts">
   import { DiscordIcon } from "@library/icons";
-  import HelpCenter from "@library/icons/HelpCenter.svelte";
-  import Setting2 from "@library/icons/Setting(2).svelte";
+  import {HelpCenter} from "@library/icons";
+  import {Setting} from "@library/icons";
   import { Tooltip } from "@library/ui";
   import { DiscordIDs } from "@support/common/constants/discord.constants";
   import { open } from "@tauri-apps/plugin-shell";
@@ -55,7 +55,7 @@
     style=" height: 44px;  color:var(--text-secondary-50);  "
   >
     <Tooltip placement="right" title="Coming Soon">
-      <span style=""> <Setting2 color={"var(--text-secondary-50)"} /> </span>
+      <span style=""> <Setting color={"var(--text-secondary-50)"} /> </span>
       <span class="text-fs-14">Support</span>
     </Tooltip>
   </div>

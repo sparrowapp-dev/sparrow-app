@@ -250,7 +250,6 @@ class RestExplorerViewModel
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      notifications.success("Documentation updated");
     } catch (error) {
       notifications.error(
         "Failed to update the documentation. Please try again",

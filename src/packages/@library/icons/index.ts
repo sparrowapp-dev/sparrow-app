@@ -35,3 +35,6 @@ export { default as WorkspaceIcon } from "./Workspace.svelte";
 export { default as EditIcon } from "./Edit.svelte";
 export { default as CloudOffIcon } from "./cloud_off.svelte";
 export { default as Ellipse } from "./Ellipse.svelte";
+export { default as Setting } from "./Setting.svelte";
+export { default as HelpCenter} from "./HelpCenter.svelte";
+export {default as Shimmer} from "./Shimmer.svg";

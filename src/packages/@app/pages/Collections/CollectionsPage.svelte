@@ -17,6 +17,7 @@
     RestExplorerPage,
     CollectionExplorerPage,
     FolderExplorerPage,
+    WorkspaceExplorerPage
   } from "../";
   import {
     TabBar,
@@ -52,6 +53,13 @@
   import ModalWrapperV1 from "@library/ui/modal/Modal.svelte";
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
+
+  export let user;
+  export let modifiedUser;
+  user.subscribe((value) => {
+    modifiedUser = value;
+  });
+  export let handleChange;
 
   const _viewModel = new CollectionsViewModel();
 
@@ -189,6 +197,20 @@
     }
   });
 
+  const updateCurrentWorkspace = async (newName) => {
+    const handleUpdateWorkspace = await _viewModel.updateWorkspaceName(
+      prevWorkspaceId,
+      newName,
+    );
+  };
+
+  const updateCurrentWorkspaceDesc = async (newDescription) => {
+    const handleUpdateWorkspace = await _viewModel.updateWorkspaceDescription(
+      prevWorkspaceId,
+      newDescription,
+    );
+  };
+
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
@@ -272,6 +294,18 @@
           <Motion {...scaleMotionProps} let:motion>
             <div use:motion>
               <FolderExplorerPage tab={$activeTab} />
+            </div>
+          </Motion>
+        {:else if $activeTab?.type === ItemType.WORKSPACE}
+          <Motion {...scaleMotionProps} let:motion>
+            <div use:motion>
+              <WorkspaceExplorerPage
+              updateDescription={updateCurrentWorkspaceDesc}
+                {collectionList}
+                handleChange={updateCurrentWorkspace}
+                {modifiedUser}
+                tab={$activeTab}
+              />
             </div>
           </Motion>
         {:else}
