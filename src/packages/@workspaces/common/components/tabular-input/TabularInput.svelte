@@ -171,11 +171,9 @@
   const handleBulkTextUpdate = () => {
     const res = pairs
       .map((elem) => {
-        if (elem.key) {
-          return elem.key + ":" + elem.value;
-        }
-        return "";
+        return elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
       })
+      .filter((item) => item) 
       .join("\n");
     bulkText = res;
   };
@@ -268,10 +266,10 @@
           </p>
 
           {#if bulkEditPlaceholder}
-            <div class="me-2">
+            <div class="me-3">
               <button class="bg-transparent border-0 mt-1 d-flex" style="">
                 <p
-                  class="text-nowrap text-primary-300 mb-0 me-1"
+                  class="text-nowrap text-primary-300 mb-0 me-0"
                   style="font-size: 10px; font-weight:400;"
                 >
                   Bulk Edit
@@ -549,7 +547,7 @@
 
           <!-- Bulk Edit Button -->
           {#if bulkEditPlaceholder}
-            <div class="pe-1 d-flex align-items-center gap-1 me-2">
+            <div class="pe-1 d-flex align-items-center gap-1 bulkEdit-btn-div">
               <button class="bg-transparent border-0 mt-2 d-flex">
                 <p
                   class="text-nowrap text-primary-300 mb-2"
@@ -571,6 +569,7 @@
         <!-- Bulk Edit TextArea starts -->
         <div style="">
           <Textarea
+           maxlength="2000"
             height={"200px"}
             class="text-area h-100 w-100 border-0 m fs-12 bulkEditTextarea"
             style="background-color:transparent; height:400px; outline:none; padding-top:4px; padding-left:18px;"
@@ -586,6 +585,10 @@
 </div>
 
 <style>
+
+  .bulkEdit-btn-div{
+    margin-right: 12px;
+  }
   #bulkEditTextarea {
     color: var(--white-color);
     font-weight: 400;
