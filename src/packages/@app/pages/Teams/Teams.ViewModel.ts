@@ -1,9 +1,9 @@
-import { user } from "$lib/store";
-import { generateSamepleTeam } from "$lib/utils/sample";
+import { TeamAdapter } from "@app/adapter";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { TeamService } from "@app/services/team.service";
 import { notifications } from "@library/ui/toast/Toast";
+import { user } from "$lib/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -48,39 +48,8 @@ export class TeamsViewModel {
     const response = await this.teamService.fetchTeams(userId);
     if (response?.isSuccessful && response?.data?.data) {
       const data = response.data.data.map((elem) => {
-        const {
-          _id,
-          name,
-          users,
-          logo,
-          workspaces,
-          owner,
-          admins,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
-          workspaceId: workspace.id,
-          name: workspace.name,
-        }));
-        return {
-          teamId: _id,
-          name,
-          users,
-          logo,
-          workspaces: updatedWorkspaces,
-          owner,
-          admins,
-          isActiveTeam: false,
-          createdAt,
-          createdBy,
-          updatedAt,
-          updatedBy,
-          isNewInvite,
-        };
+        const teamAdapter = new TeamAdapter();
+        return teamAdapter.adapt(elem).getValue();
       });
       if (openTeamId) {
         data.forEach((elem) => {
@@ -93,7 +62,6 @@ export class TeamsViewModel {
       } else {
         data[0].isOpen = true;
       }
-
       await this.teamRepository.bulkInsertData(data);
     }
   };
@@ -112,19 +80,25 @@ export class TeamsViewModel {
         userId = value._id;
       }
     })();
-    const teamObj = generateSamepleTeam(name, description, file, userId);
-    const response = await this.teamService.createTeam(teamObj);
 
-    if (response.isSuccessful && response.data.data) {
-      const res = response.data.data;
-      await this.refreshTeams(userId);
+    const team = {
+      name: name,
+      description: description,
+      image: file,
+      owner: userId.toString(),
+      createdAt: new Date().toISOString(),
+      createdBy: userId.toString(),
+    };
+    const response = await this.teamService.createTeam(team);
+
+    if (response?.isSuccessful && response?.data?.data) {
+      const teamAdapter = new TeamAdapter();
+      const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
+      await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
-
-      notifications.success(`New team ${teamObj.name} is created.`);
+      notifications.success(`New team ${team.name} is created.`);
     } else {
-      notifications.error(
-        response.message ?? "Failed to create a new team. Please try again.",
-      );
+      notifications.error("Failed to create a new team. Please try again.");
     }
     return response;
   };
