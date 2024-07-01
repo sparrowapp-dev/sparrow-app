@@ -26,12 +26,23 @@
 </script>
 
 <div class="pb-4">
+  <!-- 
+    -- Title 
+  -->
   <label for={TEXTAREA_ID} class="text-fs-14 text-secondary-1000"
     >{DESCRIPTION_CONFIG.TITLE}</label
   >
+
+  <!-- 
+    -- Description 
+  -->
   <p class="mb-2 text-fs-12 text-secondary-200">
     {DESCRIPTION_CONFIG.DESCRIPTION}
   </p>
+
+  <!-- 
+    -- Textarea 
+  -->
   <Textarea
     id={TEXTAREA_ID}
     bind:value={teamForm.description.value}

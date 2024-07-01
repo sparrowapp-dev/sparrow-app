@@ -103,12 +103,23 @@
 </script>
 
 <div class="pb-1">
+  <!-- 
+    -- Title 
+  -->
   <span class="text-fs-14 text-secondary-1000">{ICON_CONFIG.TITLE}</span>
+
+  <!-- 
+    -- Description 
+  -->
   {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
     <p class="mb-2 text-fs-12 text-secondary-200">
       {ICON_CONFIG.DESCRIPTION}
     </p>
   {/if}
+
+  <!-- 
+    -- Icon Uploader 
+  -->
   <IconUploader
     value={teamForm.file.value}
     maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
@@ -120,6 +131,10 @@
     supportedFileTypes={ICON_CONFIG.FILE_TYPES}
     isError={teamForm.file.invalid}
   />
+
+  <!-- 
+    -- Error Messages 
+  -->
   <div>
     {#if teamForm.file.showFileSizeError}
       <p class="mb-2 mt-1 text-fs-12 text-danger-200">
@@ -129,6 +144,9 @@
       <p class="mb-2 mt-1 text-fs-12 text-danger-200">
         {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
       </p>
+      <!-- 
+        -- Supportes File Types Button 
+      -->
       <div class="d-flex">
         {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
           <span class="me-4">

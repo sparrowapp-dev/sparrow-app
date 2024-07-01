@@ -26,10 +26,17 @@
 </script>
 
 <div class="pb-4 mt-3">
+  <!-- 
+    -- Title 
+  -->
   <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
     >{NAME_CONFIG.TITLE}</label
   >
   <span class="text-danger-200">*</span>
+
+  <!-- 
+    -- Input 
+  -->
   <Input
     bind:value={teamForm.name.value}
     on:blur={() => {
@@ -54,6 +61,10 @@
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
     placeholderColor={"var(--text-secondary-200)"}
   />
+
+  <!-- 
+    -- Error Messages 
+  -->
   {#if !teamForm.name.value && teamForm.name.isTouched}
     <p class="mb-0 mt-1 text-fs-12 text-danger-200">
       {NAME_CONFIG.REQUIRED_ERROR_MESSAGE}

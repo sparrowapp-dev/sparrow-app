@@ -1,14 +1,31 @@
 <script lang="ts">
+  /**
+   * Components
+   */
   import { Button } from "@library/ui";
+
+  /**
+   * Types
+   */
   import type { TeamForm } from "../../types";
+
+  /**
+   * Exports
+   */
   export let teamForm: TeamForm;
   export let onCreateTeam;
   export let handleModalState;
 
+  /**
+   * Data
+   */
   let teamUnderSubmission: boolean = false;
 </script>
 
 <div class="sparrow-modal-footer d-flex justify-content-end mt-4">
+  <!-- 
+    -- Cancel Button 
+  -->
   <Button
     disable={teamUnderSubmission}
     title={`Cancel`}
@@ -18,6 +35,10 @@
       handleModalState(false);
     }}
   />
+
+  <!-- 
+    -- Submit Button 
+  -->
   <Button
     title={"Create Team"}
     type="primary"
