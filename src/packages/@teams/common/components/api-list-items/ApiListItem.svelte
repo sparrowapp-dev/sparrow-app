@@ -7,15 +7,6 @@
   export let collectionsMethods, activeSideBarTabMethods;
   export let onApiClick;
 
- 
-
-  console.log("This is data", data);
-
-  onMount(()=>{
-    data.subscribe((value) => {
-      console.log("This is value", value)
-    });
-  })
   const handleApiClick = (api) => {
     onApiClick(api);
   };
