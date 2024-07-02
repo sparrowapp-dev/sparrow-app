@@ -98,6 +98,7 @@
 
 <style>
   textarea {
+    scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
   }
