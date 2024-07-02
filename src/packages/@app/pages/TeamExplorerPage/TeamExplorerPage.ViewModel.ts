@@ -53,14 +53,23 @@ export class TeamExplorerPageViewModel {
     return this.workspaceRepository.getWorkspaces();
   }
 
+  /**
+   * @description - get the active team tab
+   */
   public get activeTeamTab(): Observable<string> {
     return this._activeTeamTab.asObservable();
   }
 
+  /**
+   * @description - set the active team tab
+   */
   private set activeTeamTab(value: string) {
     this._activeTeamTab.next(value);
   }
 
+  /**
+   * @description - Update the active team tab
+   */
   public updateActiveTeamTab = (tab: string) => {
     this.activeTeamTab = tab;
   };
@@ -97,7 +106,10 @@ export class TeamExplorerPageViewModel {
     return null;
   };
 
-  // sync teams data with backend server
+  /**
+   * sync teams data with backend server
+   * @param userId User id
+   */
   public refreshTeams = async (userId: string): Promise<void> => {
     let openTeamId: string = "";
     const teamsData = await this.teamRepository.getTeamData();
@@ -158,7 +170,10 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  // sync workspace data with backend server
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
   public refreshWorkspaces = async (userId: string): Promise<void> => {
     const workspaces = await this.workspaceRepository.getWorkspacesDocs();
     const idToEnvironmentMap = {};
@@ -209,8 +224,11 @@ export class TeamExplorerPageViewModel {
     }
   };
 
+  /**
+   * Create workspace in the team
+   * @param teamId ID of team where workspace need to be created
+   */
   public handleCreateWorkspace = async (teamId: string) => {
-    console.log("inside handleCreateWorkspace", teamId);
     const workspaces = await this.workspaces;
     let workspaceList: WorkspaceDocument[] = [];
     await workspaces
@@ -245,6 +263,10 @@ export class TeamExplorerPageViewModel {
     }
   };
 
+  /**
+   * Switch from one workspace to another
+   * @param id - Workspace id
+   */
   public handleSwitchWorkspace = async (id: string) => {
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("/dashboard/collections");
