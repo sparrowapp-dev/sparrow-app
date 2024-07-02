@@ -199,7 +199,7 @@
     border-radius: 2px;
   }
   .ellipsis{
-    color: var( --deleted-api-method) ;
+    color: var(--text-secondary-100) ;
   }
   .ellipsis:hover{
     color: var( --text-secondary-100) ;

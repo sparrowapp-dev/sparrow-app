@@ -11,3 +11,4 @@ export * from "./tooltip";
 export * from "./modal";
 export * from "./popover";
 export * from "./carousel";
+export * from "./table";

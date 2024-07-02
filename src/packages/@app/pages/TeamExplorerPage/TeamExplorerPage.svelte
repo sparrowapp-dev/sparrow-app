@@ -2,7 +2,6 @@
   import type { Observable } from "rxjs";
   import { TeamExplorer, TeamInvite } from "@teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
-  //   import type { Observable } from "rxjs";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   import { Modal } from "@library/ui";
@@ -26,6 +25,8 @@
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+  onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
 />
 
 <Modal

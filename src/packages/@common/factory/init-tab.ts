@@ -3,7 +3,9 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitRequestTab,
+  
 } from "@common/utils";
+import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
 
 class InitTab {
   constructor() {}
