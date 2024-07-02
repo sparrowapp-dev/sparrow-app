@@ -179,7 +179,7 @@
               item.name.toLowerCase().startsWith(filterText.toLowerCase()),
             ).length}
           </th>
-          <th class="tab-head" style="">
+          <th class="tab-head tab-change" style="">
             <button
               on:click={() => (currPage = 1)}
               class="bg-transparent border-0"
@@ -293,8 +293,11 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 18px;
-    color: #8a9299;
+    color: var(--text-secondary-200);
     background-color: transparent;
+  }
+  .tab-change {
+    margin-left: 170px;
   }
 
   .table thead,

@@ -40,6 +40,8 @@
   export let workspaces: WorkspaceDocument[] = [];
   export let activeTeamTab: string;
   export let onUpdateActiveTab;
+  export let onCreateWorkspace: (id: string) => void;
+  export let onSwitchWorkspace: (id: string) => void;
   // export let currentTeam: CurrentTeam;
   // export let handleCreateWorkspace: any,
   //   teamServiceMethods: TeamServiceMethods,
@@ -53,7 +55,7 @@
   // export let teams;
 
   let selectedTab = "all-workspace";
-  let selectedView: string;
+  let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
@@ -111,6 +113,10 @@
       // previousTeamId = openTeam?.teamId;
     }
   }
+
+  const handleCreateNewWorkspace = () => {
+    onCreateWorkspace(openTeam.teamId);
+  };
 
   onDestroy(() => {
     selectedViewSubscribe();
@@ -180,6 +186,7 @@
                     textStyleProp={"font-size: var(--small-text)"}
                     buttonClassProp={`my-auto`}
                     buttonStyleProp={`height: 30px;`}
+                    onClick={handleCreateNewWorkspace}
                   />
                 {/if}
               </div>
@@ -276,6 +283,8 @@
           workspaces={workspaces?.filter((elem) => {
             return elem?.team?.teamId === openTeam?.teamId;
           }) || []}
+          {handleCreateNewWorkspace}
+          {onSwitchWorkspace}
         />
         <!-- <WorkspaceCardList
           {userId}

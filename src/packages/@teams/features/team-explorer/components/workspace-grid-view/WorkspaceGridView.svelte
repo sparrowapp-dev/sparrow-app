@@ -28,6 +28,8 @@
   export let workspaces: WorkspaceDocument[] = [];
   //   export let handleWorkspaceSwitch: any;
   export let openTeam: Team;
+  export let handleCreateNewWorkspace;
+  export let onSwitchWorkspace: (id: string) => void;
   //   export let workspaceUnderCreation = false;
 
   //   const _viewModel = new TeamViewModel();
@@ -100,14 +102,15 @@
               .includes(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
-        <WorkspaceGrid {workspace} />
+        <WorkspaceGrid {workspace} {onSwitchWorkspace} />
       {/each}
       {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
         <Button
           title={`+ Add New Workspace`}
           type="other"
-          buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-          buttonStyleProp={"min-height: 132px"}
+          buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
+          buttonStyleProp={"min-height: 132px;"}
+          onClick={handleCreateNewWorkspace}
         />
         <!-- <Button
           disable={workspaceUnderCreation}
@@ -127,11 +130,9 @@
         .filter((item) => typeof item.name === "string" && item.name
               .toLowerCase()
               .includes(filterText.toLowerCase())).length > 0}
-      <div
-        class="justify-content-between bottom-0 position-absolute w-75 bg-backgroundColor d-flex"
-      >
+      <div class="justify-content-between bottom-0 w-75 d-flex">
         <div class="tab-head">
-          showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
+          Showing {(currPage - 1) * workspacePerPage + (currPage == 1 ? 1 : 0)} -
           {Math.min(
             currPage * workspacePerPage - (currPage > 1 ? 1 : 0),
             workspaces
@@ -159,7 +160,7 @@
             )}
             class="bg-transparent border-0"
             ><DoubleLeftIcon
-              color={currPage === 1 ? "#313233" : "white"}
+              color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
             /></button
           >
           <button
@@ -168,7 +169,9 @@
               workspacePerPage = currPage > 1 || !isAdminOrOwner ? 6 : 5;
             }}
             class="bg-transparent border-0"
-            ><LeftIcon color={currPage === 1 ? "#313233" : "white"} /></button
+            ><LeftIcon
+              color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+            /></button
           >
           <button
             disabled={workspaces
@@ -230,7 +233,7 @@
                         .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
-                ? "#313233"
+                ? "var(--border-secondary-200)"
                 : "white"}
             /></button
           >
@@ -297,7 +300,7 @@
                         .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
               )
-                ? "#313233"
+                ? "var(--border-secondary-200)"
                 : "white"}
             /></button
           >
@@ -314,11 +317,11 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 18px;
-    color: #8a9299;
+    color: var(--text-secondary-200);
     background-color: transparent;
   }
   .tab-change {
-    margin-right: 120px;
+    margin-left: 170px;
   }
 
   .search-input-container {
@@ -337,25 +340,26 @@
   }
 
   :global(.add-new-workspace) {
-    border: 2px dashed var(--gradiant-2, #6147ff);
+    border: 2px dashed var(--gradiant-2, var(--border-primary-300));
     background: var(
       --gradiant-2,
-      linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%)
+      linear-gradient(270deg, var(--bg-primary-300) -1.72%, #1193f0 100%)
     );
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     max-width: 47.5%;
     max-height: 32%;
+    border-radius: 8px;
   }
 
   :global(.add-new-workspace.empty) {
     max-width: 80%;
   }
   :global(.add-new-workspace:hover) {
-    border: 2px dashed var(--workspace-hover-color);
-    background: var(--dull-background-color);
-    color: var(--workspace-hover-color);
+    border: 2px dashed var(--border-primary-300);
+    background: var(--bg-tertiary-600);
+    color: var(--text-primary-300);
     background-clip: initial;
     -webkit-background-clip: initial;
     -webkit-text-fill-color: initial;

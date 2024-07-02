@@ -25,6 +25,7 @@
   // export let openTeam: CurrentTeam;
   // export let activeSideBarTabMethods: any;
   export let isAdminOrOwner: boolean;
+  export let onSwitchWorkspace: (id: string) => void;
   // export let workspaces: WorkspaceDocument[];
   // export let workspaceInvitePermissonMethods: workspaceInviteMethods;
   // export let onDeleteWorkspace: (workspaceId: string) => void;
@@ -49,17 +50,10 @@
   // const collectionsViewModel = new CollectionsViewModel();
 
   let menuItems = [];
-  // const handleOpenWorkspace = async () => {
-  //   await handleWorkspaceSwitch(
-  //     workspace._id,
-  //     workspace.name,
-  //     openTeam?.teamId,
-  //     openTeam?.name,
-  //   );
-  //   handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
-  //   navigate("/dashboard/collections");
-  //   activeSideBarTabMethods.updateActiveTab("collections");
-  // };
+  const handleOpenWorkspace = async () => {
+    console.log("onworkspace click--->", workspace);
+    onSwitchWorkspace(workspace._id);
+  };
 
   // const handleDeleteWorkspaceFlow = async () => {
   //   activeWorkspaceBeingDeleted = await _viewModel.checkActiveWorkspace(
@@ -180,7 +174,7 @@
       menuItems = [
         {
           onClick: () => {
-            // handleOpenWorkspace();
+            handleOpenWorkspace();
           },
           displayText: "Open Workspace",
           disabled: false,
@@ -199,7 +193,7 @@
       menuItems = [
         {
           onClick: () => {
-            // handleOpenWorkspace();
+            handleOpenWorkspace();
           },
           displayText: "Open Workspace",
           disabled: false,
@@ -244,10 +238,10 @@
     <div
       class="bg-tertiary-750 workspace-card p-4"
       on:click={() => {
-        // handleOpenWorkspace();
+        handleOpenWorkspace();
       }}
       style={`${
-        showMenu ? "background-color: var(--border-color) !important;" : null
+        showMenu ? "background-color: var(--bg-tertiary-600) !important;" : null
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
@@ -428,7 +422,7 @@
     display: contents;
   }
   .workspace-card-outer:hover .workspace-card {
-    background-color: var(--border-color) !important;
+    background-color: var(--bg-tertiary-600) !important;
   }
   .workspace-card {
     z-index: 0 !important;
@@ -440,19 +434,19 @@
   }
   .teams-workspace__para {
     font-size: 12px;
-    color: #45494d;
+    color: var(--text-secondary-200);
   }
   .teams-workspace__para span {
-    color: #85c2ff;
+    color: var(--text-primary-300);
     font-size: 16px;
   }
   .teams-workspace__date {
-    color: #45494d;
+    color: var(--text-secondary-200);
     font-size: 16px;
   }
   .teams-workspace__date span {
     font-size: 14px;
-    color: white;
+    color: var(--text-secondary-110);
   }
   .threedot-icon-container {
     visibility: hidden;

@@ -23,4 +23,6 @@
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+  onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
 />
