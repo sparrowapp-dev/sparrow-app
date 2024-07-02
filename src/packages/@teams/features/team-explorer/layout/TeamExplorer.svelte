@@ -40,6 +40,7 @@
   export let workspaces: WorkspaceDocument[] = [];
   export let activeTeamTab: string;
   export let onUpdateActiveTab;
+  export let isTeamInviteModalOpen;
   // export let currentTeam: CurrentTeam;
   // export let handleCreateWorkspace: any,
   //   teamServiceMethods: TeamServiceMethods,
@@ -115,7 +116,6 @@
   onDestroy(() => {
     selectedViewSubscribe();
   });
-  let teamInvitePopup = false;
 </script>
 
 {#if openTeam}
@@ -161,21 +161,20 @@
                   </p>
                 {/if}
                 {#if userRole && userRole !== TeamRole.TEAM_MEMBER}
-                  <!--Enable in next phase-->
-                  <!-- <Button
+                  <Button
                     title={`Invite`}
                     type={`dark`}
                     textStyleProp={"font-size: var(--small-text)"}
                     onClick={() => {
-                      teamInvitePopup = true;
+                      isTeamInviteModalOpen = true;
                     }}
                     buttonClassProp={`my-auto px-3 pt-1 me-4`}
                     buttonStyleProp={`height: 30px;`}
-                    disable={true}
-                  /> -->
+                  />
                   <Button
                     title={`New Workspace`}
                     type={`primary`}
+                    onClick={() => {}}
                     loaderSize={17}
                     textStyleProp={"font-size: var(--small-text)"}
                     buttonClassProp={`my-auto`}
