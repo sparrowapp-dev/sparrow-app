@@ -37,4 +37,3 @@ export { default as CloudOffIcon } from "./cloud_off.svelte";
 export { default as Ellipse } from "./Ellipse.svelte";
 export { default as SettingIcon } from "./Setting.svelte";
 export { default as HelpCenterIcon } from "./HelpCenter.svelte";
-export { default as Shimmer } from "./Shimmer.svg";

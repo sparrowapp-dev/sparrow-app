@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Input } from "@library/forms";
-  import { Shimmer } from "@library/icons";
   import { Button, Tooltip } from "@library/ui";
+  import { Shimmer } from "../images";
 
   let search = "";
   export let modifiedUser;
