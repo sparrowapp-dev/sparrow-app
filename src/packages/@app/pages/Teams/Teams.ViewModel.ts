@@ -62,10 +62,12 @@ export class TeamsViewModel {
       await this.workspaceRepository.setActiveWorkspace(id);
       navigate("/dashboard/collections");
     };
-
+ /**
+   * Switch to latest tab on Api Click
+   * @param id - Api id
+   */
   public handleApiClick = (api: any): void => {
-   
-    console.log("Inside handle Click");
+    
     //set new active api req functionality is reamaining
     moveNavigation("right");
     navigate("/dashboard/collections");
