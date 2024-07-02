@@ -1,6 +1,6 @@
 import { user } from "$lib/store";
 import type { InviteBody } from "$lib/utils/dto/team-dto";
-import { UntrackedItems } from "$lib/utils/enums";
+import { UntrackedItems, WorkspaceRole } from "$lib/utils/enums";
 import type { WorkspaceDocument } from "@app/database/database";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -310,5 +310,147 @@ export class TeamExplorerPageViewModel {
       notifications.error("Failed to sent invite. Please try again.");
     }
     return response;
+  };
+
+  public removeMembersAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.removeMembersAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is removed from ${_teamName}`);
+    } else {
+      notifications.error(`Failed to remove ${_userName} from ${_teamName}`);
+    }
+    return response;
+  };
+
+  public demoteToMemberAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.demoteToMemberAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is now a member`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  public promoteToAdminAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.promoteToAdminAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is now an admin`);
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  public promoteToOwnerAtTeam = async (
+    _teamId: string,
+    _teamName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.teamService.promoteToOwnerAtTeam(
+      _teamId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      const responseData = response.data.data;
+      await this.teamRepository.modifyTeam(_teamId, responseData);
+      await this.refreshWorkspaces(_userId);
+      notifications.success(
+        `${_userName} is now the new Owner of ${_teamName}.`,
+      );
+    } else {
+      notifications.error(
+        `Failed to update access of Owner. Please try again.`,
+      );
+    }
+    return response;
+  };
+
+  public removeUserFromWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+  ) => {
+    const response = await this.workspaceService.removeUserFromWorkspace(
+      _workspaceId,
+      _userId,
+    );
+    if (response.isSuccessful === true) {
+      await this.refreshWorkspaces(_userId);
+      notifications.success(`${_userName} is removed from ${_workspaceName}`);
+    } else {
+      notifications.error(
+        `Failed to remove ${_userName} from ${_workspaceName}`,
+      );
+    }
+  };
+
+  public changeUserRoleAtWorkspace = async (
+    _workspaceId: string,
+    _workspaceName: string,
+    _userId: string,
+    _userName: string,
+    _body: WorkspaceRole,
+  ) => {
+    const response = await this.workspaceService.changeUserRoleAtWorkspace(
+      _workspaceId,
+      _userId,
+      _body,
+    );
+    if (response.isSuccessful) {
+      await this.refreshWorkspaces(_userId);
+      if (_body === WorkspaceRole.WORKSPACE_VIEWER) {
+        notifications.success(
+          `${_userName} is now a viewer on ${_workspaceName}`,
+        );
+      } else if (_body === WorkspaceRole.WORKSPACE_EDITOR) {
+        notifications.success(
+          `${_userName} is now a editor on ${_workspaceName}`,
+        );
+      }
+    } else {
+      notifications.error(
+        `Failed to change role for ${_userName}. Please try again.`,
+      );
+    }
   };
 }

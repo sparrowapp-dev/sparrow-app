@@ -27,6 +27,12 @@
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
   onCreateWorkspace={_viewModel.handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
+  onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
+  onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}
+  onPromoteToAdminAtTeam={_viewModel.promoteToAdminAtTeam}
+  onPromoteToOwnerAtTeam={_viewModel.promoteToOwnerAtTeam}
+  onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
+  onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
 />
 
 <Modal
