@@ -2,38 +2,34 @@
   import Input from "@library/forms/Input/Input.svelte";
   import Information from "@library/icons/Information.svelte";
   import Button from "@library/ui/button/Button.svelte";
-  import { InitWorkspaceTab } from "@common/utils/init-workspace-tab";
-  import { Setting } from "@library/icons";
+  import { SettingIcon } from "@library/icons";
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { onMount } from "svelte";
-    import WorkspaceSetting from "./WorkspaceSetting.svelte";
+  import WorkspaceSetting from "./WorkspaceSetting.svelte";
   export let modifiedUser;
-  export let handleChange;
+  export let onUpdateWorkspaceName;
   export let collectionList;
-  export let updateDescription;
+  export let onUpdateWorkspaceDesc;
   export let tab;
 
   let showAbout = true;
   let showWorkspaceSettings = false;
   let workspaceName = tab.name;
   let collectionLength = 0;
-  let workspaceDescription = tab.description
+  let workspaceDescription = tab.description;
 
   $: {
     if (collectionList) {
       collectionList.subscribe((value) => {
         collectionLength = value.length;
-        console.log(collectionLength, "inside $", value);
       });
     }
   }
 
-  
   const saveValue = () => {
- updateDescription(workspaceDescription)
-//  workspaceDescription= tab.description
-  }
+    onUpdateWorkspaceDesc(workspaceDescription);
+  };
 
   const toggleSection = (section: string) => {
     showAbout = section === "about";
@@ -42,9 +38,7 @@
 
   const getvalue = () => {
     if (workspaceName != "") {
-      setTimeout(() => {
-        handleChange(workspaceName);
-      }, 100);
+      onUpdateWorkspaceName(workspaceName);
     } else {
       notifications.error("Please Enter A Workspace Name");
     }
@@ -52,7 +46,9 @@
 </script>
 
 <div class="d-flex" style="width: 100%;">
-  <div style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;">
+  <div
+    style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;"
+  >
     {#if showAbout}
       <div
         class="About d-flex flex-column"
@@ -88,12 +84,11 @@
           </Tooltip>
         </div>
 
-        <div> 
-
+        <div>
           <textarea
-          bind:value={workspaceDescription}
-          on:blur={saveValue}
-            class="text-area w-100 "
+            bind:value={workspaceDescription}
+            on:blur={saveValue}
+            class="text-area w-100"
             style="height: 121px; background-color:transparent; border:none;"
             placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing. "
           ></textarea>
@@ -101,22 +96,26 @@
       </div>
     {/if}
     {#if showWorkspaceSettings}
-    <WorkspaceSetting {modifiedUser}/>
+      <WorkspaceSetting {modifiedUser} />
     {/if}
- 
   </div>
 
   <div
     class="d-flex flex-column"
     style=" width:280px; padding: 24px 16px 24px 16px ;"
   >
-    <div class="d-flex flex-column gap-1" style="color: var(--text-secondary-100);">
+    <div
+      class="d-flex flex-column gap-1"
+      style="color: var(--text-secondary-100);"
+    >
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         on:click={() => toggleSection("about")}
-        class="side-bar-btn d-flex gap-2 "
-        style="height:32px; padding:5px; padding-left:12px; border-radius:4px; font-size:12px; font-weight:700; background-color: {showAbout ? 'var(--bg-tertiary-300)' : 'transparent'};"
+        class="side-bar-btn d-flex gap-2"
+        style="height:32px; padding:5px; padding-left:12px; border-radius:4px; font-size:12px; font-weight:700; background-color: {showAbout
+          ? 'var(--bg-tertiary-300)'
+          : 'transparent'};"
       >
         <div>
           <Information
@@ -132,10 +131,12 @@
       <div
         on:click={() => toggleSection("workspaceSetting")}
         class="side-bar-btn d-flex gap-1"
-        style="padding:5px; padding-left:9px; border-radius:4px; font-size:12px; font-weight:700; background-color: {showWorkspaceSettings ? 'var(--bg-tertiary-300)' : 'transparent'} "
+        style="padding:5px; padding-left:9px; border-radius:4px; font-size:12px; font-weight:700; background-color: {showWorkspaceSettings
+          ? 'var(--bg-tertiary-300)'
+          : 'transparent'} "
       >
         <div>
-          <Setting
+          <SettingIcon
             height={"21px"}
             width={"21px"}
             color={"var(--icon-secondary-200)"}
@@ -158,7 +159,7 @@
         <div
           style="color: var(--text-secondary-100); font-weight:700; font-size:12px;"
         >
-         Last Activity by -
+          Last Activity by -
         </div>
         <div
           class="d-flex"
@@ -190,7 +191,7 @@
     background-color: var(--bg-tertiary-600) !important;
   }
 
-  .search-area{
+  .search-area {
     color: var(--text-secondary-200);
     outline: none;
     font-size: 12px;
@@ -201,4 +202,3 @@
     color: var(--text-secondary-100) !important ;
   }
 </style>
-  

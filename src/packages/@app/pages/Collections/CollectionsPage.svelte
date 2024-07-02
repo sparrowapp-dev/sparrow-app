@@ -54,8 +54,8 @@
   import SaveAsRequest from "@workspaces/features/save-as-request/layout/SaveAsRequest.svelte";
   import { isGuestUserActive } from "$lib/store";
   import { pagesMotion } from "@app/constants";
+ import { user } from "$lib/store";
 
-  export let user;
   export let modifiedUser;
   user.subscribe((value) => {
     modifiedUser = value;
@@ -305,9 +305,9 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div use:motion>
                       <WorkspaceExplorerPage
-                      updateDescription={updateCurrentWorkspaceDesc}
+                      onUpdateWorkspaceDesc={updateCurrentWorkspaceDesc}
                         {collectionList}
-                        handleChange={updateCurrentWorkspace}
+                        onUpdateWorkspaceName={updateCurrentWorkspace}
                         {modifiedUser}
                         tab={$activeTab}
                       />

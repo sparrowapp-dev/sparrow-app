@@ -214,7 +214,7 @@
     <section style="flex:1; overflow:auto;">
       <!-- Route for Collections -->
       <Route path="/collections/*">
-        <CollectionsPage {user} />
+        <CollectionsPage />
       </Route>
 
       <!-- Route for Workspaces -->

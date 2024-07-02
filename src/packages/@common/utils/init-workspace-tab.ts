@@ -9,7 +9,7 @@ class InitWorkspaceTab {
   private _tab: WorkspaceTab;
   /**
    *
-   * @param _id - Collection mongo id
+   * @param _id - Workspace mongo id
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
@@ -55,15 +55,6 @@ class InitWorkspaceTab {
   }
   public updatePath(_path: Path) {
     this._tab.path = _path;
-  }
-  public updateActiveSync(_activeSync: boolean) {
-    this._tab.activeSync = _activeSync;
-  }
-  public updateTotalRequests(_totalRequest: number) {
-    this._tab.property.totalRequests = _totalRequest;
-  }
-  public updateTotalFolder(_totalFolder: number) {
-    this._tab.property.totalFolders = _totalFolder;
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;

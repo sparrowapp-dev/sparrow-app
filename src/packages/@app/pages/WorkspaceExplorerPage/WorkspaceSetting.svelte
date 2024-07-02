@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Input } from "@library/forms";
-  import { Shimmer } from "@library/icons";
   import { Button, Tooltip } from "@library/ui";
 
   let search = "";
@@ -80,11 +79,6 @@
     <div style="width: 100%; border-bottom:2px solid #313233; padding-top:8px; padding-bottom:8px;">
       
     </div>
-    <!-- <div class="outer-div pt-2 w-100" style="height:272px; 
-    background-size: cover !important;
-    ">
-      <img src={Shimmer} alt="" width="" class="skeleton-container" />
-    </div> -->
   </div>
 </div>
 
