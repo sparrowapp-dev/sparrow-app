@@ -2,7 +2,6 @@
   import type { Observable } from "rxjs";
   import { TeamExplorer } from "@teams/features";
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
-  //   import type { Observable } from "rxjs";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "$lib/store";
   const _viewModel = new TeamExplorerPageViewModel();

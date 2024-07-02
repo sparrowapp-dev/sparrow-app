@@ -1,38 +1,23 @@
 <script lang="ts">
   import {
-    SearchIcon,
-    CrossIcon,
     DoubleLeftIcon,
     LeftIcon,
     RightIcon,
     DoubleRightIcon,
-    ShowMoreIcon,
   } from "$lib/assets/app.asset";
-  import { ShowMoreOptions, UserProfileList } from "$lib/components";
   import type { TeamDocument } from "@app/database/database";
-  import { WorkspaceMemberRole } from "$lib/utils/enums";
-  import type { CurrentTeam, Team } from "$lib/utils/interfaces/team.interface";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
-  import type { Observable } from "rxjs";
-  import { navigate } from "svelte-navigator";
   import Table from "../../../../../@deprecate/components/table/Table.svelte";
   import Rows from "../../../../../@deprecate/components/dashboard/rows/Rows.svelte";
 
-  export let userId: string;
   export let data: any;
-  export let handleWorkspaceSwitch: any;
-  export let activeSideBarTabMethods: any;
-  export let handleWorkspaceTab: any;
   export let userType = "";
   export let openTeam: TeamDocument;
+  export let onSwitchWorkspace: (id: string) => void;
 
-  let isShowMoreVisible = undefined;
   let workspacePerPage: number = 10,
     currPage = 1;
   let filterText: string = "";
-  let containerRef;
-  let pos = { x: 0, y: 0 };
-  let showMenu: boolean = false;
   const tableHeaderContent = [
     "Workspace",
     "Collections",
@@ -40,77 +25,8 @@
     "Last Updated",
     "",
   ];
-  const handleOpenCollection = (workspace) => {
-    handleWorkspaceSwitch(
-      workspace._id,
-      workspace.name,
-      openTeam?.teamId,
-      openTeam?.name,
-      openTeam?.logo,
-    );
-    handleWorkspaceTab(workspace._id, workspace.name, workspace.description);
-    navigate("/dashboard/collections");
-    activeSideBarTabMethods.updateActiveTab("collections");
-  };
-  const handleShowMore = (index) => {
-    isShowMoreVisible = index;
-  };
-  const closeShowMore = () => {
-    isShowMoreVisible = undefined;
-  };
-
-  const menuItems = (workspace, index) => [
-    {
-      onClick: () => {
-        handleOpenCollection(workspace);
-        handleShowMore(index);
-      },
-      displayText: "Open Workspace",
-      disabled: false,
-      visible: true,
-    },
-    {
-      onClick: (e) => {
-        e.stopPropagation();
-      },
-      displayText: "Add Members",
-      disabled: false,
-      visible: openTeam?.admins?.includes(userId) || openTeam?.owner == userId,
-    },
-    {
-      onClick: (e) => {
-        e.stopPropagation();
-      },
-      displayText: "Delete Workspace",
-      disabled: false,
-      visible: openTeam?.admins?.includes(userId) || openTeam?.owner == userId,
-    },
-  ];
-
-  const handleFilterTextChange = (e) => {
-    filterText = e.target.value;
-  };
-  const handleEraseSearch = () => {
-    filterText = "";
-  };
-  const rightClickContextMenu = (e, index) => {
-    e.preventDefault();
-    setTimeout(() => {
-      const containerRect = containerRef?.getBoundingClientRect();
-      const mouseX = e.clientX - (containerRect?.left || 0);
-      const mouseY = e.clientY - (containerRect?.top || 0);
-      pos = { x: mouseX, y: mouseY + 20 };
-      showMenu = true;
-      isShowMoreVisible = index;
-    }, 100);
-  };
 </script>
 
-<svelte:window
-  on:click={closeShowMore}
-  on:contextmenu|preventDefault={closeShowMore}
-/>
-<!-- {#if selectedTab == "all-workspace"} -->
 <div class="ps-2">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
@@ -136,8 +52,8 @@
             .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage) as list, index}
             <Rows
               {list}
-              currOpenedTeamRxDoc={openTeam}
-              {handleOpenCollection}
+              activeTeam={openTeam}
+              onOpenCollection={onSwitchWorkspace}
               {calculateTimeDifferenceInDays}
               {userType}
             />
@@ -255,31 +171,12 @@
   {/if}
 </div>
 
-<!-- {/if} -->
-
 <style>
   .not-found-text {
     color: var(--request-arc);
     font-size: 16px;
     font-weight: 400;
     text-align: center;
-  }
-
-  .workspace-table-heading {
-    background-color: var(--background-color) !important;
-  }
-  .search-input-container {
-    border: 1px solid var(--border-secondary-200);
-    background: var(--background-color);
-    width: 27vw;
-    font-size: 12px;
-  }
-  .search-input-container > input:focus {
-    outline: none;
-    caret-color: var(--workspace-hover-color);
-  }
-  .search-input-container:focus-within {
-    border: 1px solid var(--workspace-hover-color);
   }
 
   .tab-data {
@@ -298,36 +195,6 @@
   }
   .tab-change {
     margin-left: 170px;
-  }
-
-  .table thead,
-  .table tfoot {
-    background-color: var(--background-color);
-  }
-
-  .workspace-row:hover {
-    background-color: var(--border-secondary-200);
-  }
-  .show-more-btn {
-    background-color: transparent;
-  }
-  .show-more-btn:hover {
-    background-color: var(--background-color);
-  }
-  .show-more-btn:active {
-    background-color: var(--workspace-hover-color);
-  }
-
-  .show-more-btn:active .workspace-list-item:active {
-    background-color: red !important;
-  }
-  .workspace-list-item:active {
-    background-color: var(--sparrow-input-slider-button) !important;
-  }
-
-  .workspace-list-item:hover {
-    cursor: pointer !important;
-    background-color: var(--border-secondary-200);
   }
   table {
     background-color: transparent;

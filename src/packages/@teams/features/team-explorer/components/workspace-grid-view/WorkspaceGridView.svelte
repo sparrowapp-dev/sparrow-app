@@ -1,83 +1,40 @@
 <script lang="ts">
-  //   import WorkspaceGrid from "../workspace-grid/WorkspaceGrid.svelte";
   import {
-    CrossIcon,
     DoubleLeftIcon,
     DoubleRightIcon,
     LeftIcon,
     RightIcon,
-    SearchIcon,
   } from "$lib/assets/app.asset";
-  import type {
-    CurrentTeam,
-    Team,
-    workspaceInviteMethods,
-  } from "$lib/utils/interfaces";
-  import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
+  import type { Team } from "$lib/utils/interfaces";
+  import type { WorkspaceDocument } from "@app/database/database";
   import Button from "@library/ui/button/Button.svelte";
-  //   import { TeamViewModel } from "../../../../pages/Teams/team.viewModel";
-  import type { Observable } from "rxjs";
-  import { HeaderDashboardViewModel } from "$lib/components/header/header-dashboard/HeaderDashboard.ViewModel";
   import WorkspaceGrid from "$lib/components/dashboard/workspace-grid/WorkspaceGrid.svelte";
 
+  /**
+   * Id of current user
+   */
   export let userId: string;
-  //   export let currActiveTeam: CurrentTeam;
-  //   export let handleWorkspaceTab: any;
-  //   export let activeSideBarTabMethods: any;
-  //   export let handleCreateWorkspace: any;
+  /**
+   * Array of all the workspaces from local DB
+   */
   export let workspaces: WorkspaceDocument[] = [];
-  //   export let handleWorkspaceSwitch: any;
+  /**
+   * Currently active team
+   */
   export let openTeam: Team;
-  export let handleCreateNewWorkspace;
+  /**
+   * Callback for creating new workspace
+   */
+  export let onCreateNewWorkspace;
+  /**
+   * Callback for switching the workspace
+   */
   export let onSwitchWorkspace: (id: string) => void;
-  //   export let workspaceUnderCreation = false;
-
-  //   const _viewModel = new TeamViewModel();
-  //   const headerDashboardViewModel = new HeaderDashboardViewModel();
-  //   //   const openTeamObservable: Observable<TeamDocument> = _viewModel.openTeam;
-  //   const workspaceInvitePermissonMethods: workspaceInviteMethods = {
-  //     deleteWorkspace: headerDashboardViewModel.deleteWorkspace,
-  //     updateRoleInWorkspace: headerDashboardViewModel.updateUserRoleInWorkspace,
-  //     updateUsersInWorkspaceInRXDB:
-  //       headerDashboardViewModel.updateUserRoleInWorkspaceInRXDB,
-  //     checkIfUserIsPartOfMutipleWorkspaces:
-  //       headerDashboardViewModel.isUserInMultipleWorkspaces,
-  //     deleteUserFromWorkspace: headerDashboardViewModel.deleteUserFromWorkspace,
-  //     deleteUserFromWorkspaceRxDB:
-  //       headerDashboardViewModel.removeUserFromWorkspaceRxDB,
-  //     activateWorkspace: headerDashboardViewModel.activateWorkspace,
-  //     handleWorkspaceDeletion: headerDashboardViewModel.handleWorkspaceDeletion,
-  //   };
 
   let filterText = "";
   let workspacePerPage = 5;
   let currPage = 1;
   let isAdminOrOwner: boolean;
-
-  //   openTeamObservable.subscribe((openTeam) => {
-  //     currPage = 1;
-  //     if (!(openTeam?.admins?.includes(userId) || openTeam?.owner == userId)) {
-  //       workspacePerPage = 6;
-  //       isAdminOrOwner = false;
-  //     } else {
-  //       workspacePerPage = 5;
-  //       isAdminOrOwner = true;
-  //     }
-  //   });
-
-  const handleFilterTextChange = (e) => {
-    filterText = e.target.value;
-  };
-  const handleEraseSearch = () => {
-    filterText = "";
-  };
-
-  const onDeleteWorkspace = (workspaceId: string) => {
-    workspaces = workspaces.filter((ws) => ws._id != workspaceId);
-  };
-
-  const hasPermissionToDelete =
-    openTeam?.admins?.includes(userId) || openTeam?.owner == userId;
 </script>
 
 <div class="p-2">
@@ -102,7 +59,7 @@
               .includes(filterText.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
         .slice((currPage - 1) * workspacePerPage - (currPage > 1 ? 1 : 0), currPage * workspacePerPage - (currPage > 1 ? 1 : 0)) as workspace, index}
-        <WorkspaceGrid {workspace} {onSwitchWorkspace} />
+        <WorkspaceGrid {workspace} {onSwitchWorkspace} isAdminOrOwner={true} />
       {/each}
       {#if currPage === 1 && filterText === "" && (openTeam?.admins?.includes(userId) || openTeam?.owner == userId)}
         <Button
@@ -110,17 +67,8 @@
           type="other"
           buttonClassProp={`sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
           buttonStyleProp={"min-height: 132px;"}
-          onClick={handleCreateNewWorkspace}
+          onClick={onCreateNewWorkspace}
         />
-        <!-- <Button
-          disable={workspaceUnderCreation}
-          loader={workspaceUnderCreation}
-          title={`+ Add New Workspace`}
-          type="other"
-          buttonClassProp={`rounded sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace`}
-          onClick={handleCreateWorkspace}
-          buttonStyleProp={"min-height: 132px"}
-        /> -->
         <!-- update later the above width -->
       {/if}
     </div>
@@ -322,21 +270,6 @@
   }
   .tab-change {
     margin-left: 170px;
-  }
-
-  .search-input-container {
-    border: 1px solid var(--border-color);
-    background: var(--background-color);
-    width: 27vw;
-    font-size: 12px;
-  }
-
-  .search-input-container > input:focus {
-    outline: none;
-    caret-color: var(--workspace-hover-color);
-  }
-  .search-input-container:focus-within {
-    border: 1px solid var(--workspace-hover-color);
   }
 
   :global(.add-new-workspace) {

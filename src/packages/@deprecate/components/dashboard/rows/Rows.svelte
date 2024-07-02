@@ -1,14 +1,13 @@
-<script>
+<script lang="ts">
   import { ThreeDotIcon } from "$lib/assets/app.asset";
   import UserProfileList from "$lib/components/profile/UserProfileList.svelte";
   import RightOption from "$lib/components/right-click-menu/RightClickMenuView.svelte";
   import { TeamRole, WorkspaceMemberRole } from "$lib/utils/enums";
 
   export let list;
-  export let currOpenedTeamRxDoc;
-  export let handleOpenCollection;
+  export let activeTeam;
+  export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays;
-  // export let WorkspaceMemberRole;
   export let userType = "";
 
   let pos = { x: 0, y: 0 };
@@ -31,11 +30,12 @@
       menuItems = [
         {
           onClick: () => {
-            handleOpenCollection(list);
+            onOpenCollection(list._id);
           },
           displayText: "Open Workspace",
           disabled: false,
         },
+        // Will be enabled in next phase
         // {
         //   onClick: (e) => {
         //     e.stopPropagation();
@@ -48,7 +48,7 @@
       menuItems = [
         {
           onClick: () => {
-            handleOpenCollection(list);
+            onOpenCollection(list._id);
           },
           displayText: "Open Workspace",
           disabled: false,
@@ -84,7 +84,7 @@
   <td
     on:click={(e) => {
       e.stopPropagation();
-      handleOpenCollection(list);
+      onOpenCollection(list._id);
     }}
     style="max-width: 15vw; padding-right: 10px;"
     class="tab-data rounded-start py-3 overflow-hidden ellipsis"
@@ -94,16 +94,16 @@
   <td
     on:click={(e) => {
       e.stopPropagation();
-      handleOpenCollection(list);
+      onOpenCollection(list._id);
     }}
     class="tab-data py-3"
     >{list?.collections?.length ? list.collections.length : 0}</td
   >
-  {#if currOpenedTeamRxDoc?.users?.length > 1}
+  {#if activeTeam?.users?.length > 1}
     <td
       on:click={(e) => {
         e.stopPropagation();
-        handleOpenCollection(list);
+        onOpenCollection(list._id);
       }}
       class="tab-data py-3"
     >
@@ -126,7 +126,7 @@
   <td
     on:click={(e) => {
       e.stopPropagation();
-      handleOpenCollection(list);
+      onOpenCollection(list._id);
     }}
     class="tab-data py-3"
     >{calculateTimeDifferenceInDays(new Date(), new Date(list?.createdAt))}</td
