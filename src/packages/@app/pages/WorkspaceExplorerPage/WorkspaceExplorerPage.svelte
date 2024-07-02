@@ -53,7 +53,7 @@
     showAbout = section === "about";
     showWorkspaceSettings = section === "workspaceSetting";
   };
-
+ 
   const getvalue = () => {
     if (workspaceName != "") {
       onUpdateWorkspaceName(workspaceName);
