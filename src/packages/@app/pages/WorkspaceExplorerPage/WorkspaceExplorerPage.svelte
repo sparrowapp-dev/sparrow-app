@@ -6,17 +6,21 @@
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { WorkspaceSetting } from "@workspaces/features";
+  import WorkspaceExplorerViewModel from "./WorkspaceExplorerPage.ViewModel";
+
   export let modifiedUser;
-  export let onUpdateWorkspaceName;
   export let collectionList;
-  export let onUpdateWorkspaceDesc;
   export let tab;
+  
 
   let showAbout = true;
   let showWorkspaceSettings = false;
   let workspaceName = tab.name;
   let collectionLength = 0;
   let workspaceDescription = tab.description;
+  let workspaceID = tab._data.path.workspaceId ;
+  const _viewModel = new  WorkspaceExplorerViewModel();
+
 
   $: {
     if (collectionList) {
@@ -25,9 +29,24 @@
       });
     }
   }
+  
+    const onUpdateWorkspaceName = async (newName) => {
+    const handleUpdateWorkspace = await _viewModel.updateWorkspaceName(
+      workspaceID ,
+      newName,
+    );
+  };
+
+  const onUpdateWorkspaceDesc = async (newDescription) => {
+    const handleUpdateWorkspace = await _viewModel.updateWorkspaceDescription(
+      workspaceID,
+      newDescription,
+    );
+  };
 
   const saveValue = () => {
     onUpdateWorkspaceDesc(workspaceDescription);
+
   };
 
   const toggleSection = (section: string) => {

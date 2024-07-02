@@ -198,20 +198,6 @@
     }
   });
 
-  const updateCurrentWorkspace = async (newName) => {
-    const handleUpdateWorkspace = await _viewModel.updateWorkspaceName(
-      prevWorkspaceId,
-      newName,
-    );
-  };
-
-  const updateCurrentWorkspaceDesc = async (newDescription) => {
-    const handleUpdateWorkspace = await _viewModel.updateWorkspaceDescription(
-      prevWorkspaceId,
-      newDescription,
-    );
-  };
-
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
@@ -305,9 +291,7 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div use:motion>
                       <WorkspaceExplorerPage
-                      onUpdateWorkspaceDesc={updateCurrentWorkspaceDesc}
                         {collectionList}
-                        onUpdateWorkspaceName={updateCurrentWorkspace}
                         {modifiedUser}
                         tab={$activeTab}
                       />
