@@ -38,6 +38,7 @@
   const refreshEnv = _viewModel.refreshEnvironment;
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
+  let workspaceDocuments;
 
   let currentEnvironment = {
     id: "none",
@@ -54,12 +55,14 @@
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
+  let currentTeam;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         currentWorkspaceName = activeWorkspaceRxDoc.name;
+        currentTeam = activeWorkspaceRxDoc.team;
         refreshEnv(activeWorkspaceRxDoc?._id);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
@@ -106,6 +109,7 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+    workspaceDocuments = await _viewModel.workspaces();
   });
 
   onDestroy(() => {
@@ -173,9 +177,11 @@
     onInitActiveEnvironmentToWorkspace={_viewModel.initActiveEnvironmentToWorkspace}
     {currentWorkspaceId}
     {currentWorkspaceName}
+    {currentTeam}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
+    {workspaceDocuments}
   />
 
   <!--

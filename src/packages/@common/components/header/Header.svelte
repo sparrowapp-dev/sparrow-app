@@ -7,6 +7,8 @@
   import ArrowUnfilled from "@library/icons/ArrowUnfilled.svelte";
   import { Tooltip } from "@library/ui";
   import { SparrowIcon } from "@library/icons";
+  import constants from "$lib/utils/constants";
+  import type { WorkspaceDocument } from "@app/database/database";
   /**
    * environment list
    */
@@ -37,6 +39,63 @@
   export let isLoginBannerActive = false;
 
   export let onLoginUser;
+
+  export let currentTeam;
+
+  export let workspaceDocuments: WorkspaceDocument[] = [];
+
+  let workspaceData;
+
+  // function createSetFromArray(arr, key) {
+  //   const seen = new Set();
+  //   return arr.filter((obj) => {
+  //     if (!obj.hasOwnProperty(key)) {
+  //       throw new Error(`Object does not have key "${key}"`);
+  //     }
+  //     const keyValue = obj[key];
+  //     return !seen.has(keyValue) && seen.add(keyValue);
+  //   });
+  // }
+
+  // const calculateLimitedWorkspace = () => {
+  //   let workspaces = workspaceDocuments
+  //     .filter((elem) => {
+  //       if (currentTeam?.id === elem?.team?.teamId) return true;
+  //       return false;
+  //     })
+  //     .reverse()
+  //     .slice(0, constants.WORKSPACE_LIMIT)
+  //     .map((workspace) => {
+  //       const workspaceObj = {
+  //         id: workspace._id,
+  //         name: workspace.name,
+  //         description: workspace.team?.teamName,
+  //       };
+  //       return workspaceObj;
+  //     });
+  //   workspaces.push({
+  //     id: currentWorkspaceId,
+  //     name: currentWorkspaceName,
+  //     description: currentTeam?.name,
+  //   });
+  //   const res = createSetFromArray(workspaces, "name");
+  //   if (res.length > constants.WORKSPACE_LIMIT) {
+  //     res.shift();
+  //   }
+  //   workspaceData = res;
+  //   return;
+  // };
+
+  $: {
+    if (currentWorkspaceId || currentTeam) {
+      // calculateLimitedWorkspace();
+    }
+  }
+  $: {
+    if (workspaceDocuments) {
+      console.log("--->workspacedocs", workspaceDocuments);
+    }
+  }
 </script>
 
 <header
@@ -60,7 +119,7 @@
             id: currentWorkspaceName,
           },
         ]}
-        titleId={currentWorkspaceName}
+        titleId={`${currentWorkspaceName}`}
         onclick={handleDropdown}
         minHeaderWidth={"auto"}
         iconRequired={false}
@@ -76,7 +135,14 @@
         bodyTheme={"violet"}
         borderRounded={"2px"}
         position={"absolute"}
-      />
+      >
+        <div slot="pre-select" class="d-none">
+          <hr class="mb-2 mt-2" />
+          <p class="sparrow-fs-12 text-textColor mb-2 ps-2 pe-2">
+            View all Branches
+          </p>
+        </div>
+      </Select>
     </div>
   </div>
 

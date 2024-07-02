@@ -59,6 +59,14 @@ export class DashboardViewModel {
   }
 
   /**
+   * @description - get workspace list from local db
+   */
+  public workspaces = async () => {
+    const workspaces = await this.workspaceRepository.getWorkspacesDocs();
+    return workspaces;
+  };
+
+  /**
    *
    * @returns guest user state
    */
