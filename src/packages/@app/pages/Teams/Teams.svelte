@@ -13,33 +13,32 @@
     leftPanelCollapse,
   } from "@teams/common/stores";
 
-
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "../TeamExplorerPage/TeamExplorerPage.svelte";
   import TeamSidePanel from "@teams/features/team-sidepanel/layout/TeamSidePanel.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
+  import { Modal } from "@library/ui/modal";
+  import { CreateTeam } from "@teams/features";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
   const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+
+  let isCreateTeamModalOpen: boolean = false;
   const collectionList = _viewModel.collection;
-  const onApiClick = _viewModel.handleApiClick
-  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace
-  
+  const onApiClick = _viewModel.handleApiClick;
+  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
-    import { onMount } from "svelte";
-
+  import { onMount } from "svelte";
 
   let githubRepoData: GithubRepoDocType;
 
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
-    splitter = document.querySelector(
-      ".team-splitter .splitpanes__splitter",
-    );
+    splitter = document.querySelector(".team-splitter .splitpanes__splitter");
 
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
@@ -70,10 +69,13 @@
     rightPanelWidth.set(e.detail[1].size);
   }}
 >
-  <Pane  size={$leftPanelCollapse ? 0 : $leftPanelWidth}
-  minSize={20}
-  class="bg-secondary-900-important">
+  <Pane
+    size={$leftPanelCollapse ? 0 : $leftPanelWidth}
+    minSize={20}
+    class="bg-secondary-900-important"
+  >
     <TeamSidePanel
+      bind:isCreateTeamModalOpen
       teamList={$teamList}
       tabList={$tabList}
       data={workspaces}
@@ -82,20 +84,38 @@
         leftPanelCollapse: $leftPanelCollapse,
         handleCollapseCollectionList,
       }}
-       collectionList={$collectionList}
+      collectionList={$collectionList}
       {openTeam}
       {onApiClick}
       {OnWorkspaceSwitch}
     />
   </Pane>
   <Pane
-   size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={20}
-        class="bg-secondary-800-important"
+    size={$leftPanelCollapse ? 100 : $rightPanelWidth}
+    minSize={20}
+    class="bg-secondary-800-important"
   >
     <TeamExplorerPage />
   </Pane>
 </Splitpanes>
+
+<Modal
+  title={"New Team"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateTeamModalOpen}
+  handleModalState={(flag) => {
+    isCreateTeamModalOpen = flag;
+  }}
+>
+  <CreateTeam
+    handleModalState={(flag = false) => {
+      isCreateTeamModalOpen = flag;
+    }}
+    onCreateTeam={_viewModel.createTeam}
+  />
+</Modal>
 
 <style>
   .warning-text {

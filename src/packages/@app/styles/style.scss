@@ -385,6 +385,7 @@ $theme-red-230408: #230408;
 
 
   --border-tertiary-100 : #{$theme-violet-676A80};
+  --border-tertiary-190 : #{$theme-violet-37394E};
   --border-tertiary-250 : #{$theme-violet-1C1D2B};
   --border-tertiary-300 : #{$theme-violet-2A2C3C};
   --border-tertiary-400 : #{$theme-violet-22232E};
@@ -618,7 +619,7 @@ $sparrow-bg-colors: (
   secondary-800 : $theme-grey-151515,
   secondary-850 : $theme-grey-121212,
   secondary-900 : $theme-grey-000000,
-  secondary-1000: $theme-grey-CCCCCC,
+  secondary-1000 : $theme-grey-CCCCCC,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,
@@ -664,6 +665,7 @@ $sparrow-border-colors: (
   secondary-700 : $theme-grey-161617,
   secondary-800 : $theme-grey-151515,
   secondary-900 : $theme-grey-000000,
+  secondary-1000 : $theme-grey-CCCCCC,
 
   tertiary-100 : $theme-violet-676A80,
   tertiary-190 : $theme-violet-37394E,

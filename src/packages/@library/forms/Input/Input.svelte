@@ -11,6 +11,7 @@
    * placeholder - dummy text
    */
   export let placeholder = "placeholder";
+  export let placeholderColor = "gray";
   /**
    * height
    */
@@ -63,15 +64,21 @@
   let isFocused = false;
   const dispatch = createEventDispatcher();
 
-  const extractBorderHighlight = (_isHovered: boolean, _isFocused: boolean) => {
+  const extractBorderHighlight = (
+    _isHovered: boolean,
+    _isFocused: boolean,
+    _defaultBorderColor: string,
+    _hoveredBorderColor: string,
+    _focusedBorderColor: string,
+  ) => {
     if (_isFocused) {
-      return focusedBorderColor;
+      return _focusedBorderColor;
     } else if (_isHovered) {
-      if (disabled) return defaultBorderColor;
-      return hoveredBorderColor;
+      if (disabled) return _defaultBorderColor;
+      return _hoveredBorderColor;
     } else {
-      if (disabled) return defaultBorderColor;
-      return defaultBorderColor;
+      if (disabled) return _defaultBorderColor;
+      return _defaultBorderColor;
     }
   };
 
@@ -120,7 +127,13 @@
       ? 'padding-left:35px !important;'
       : ''} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'
-      : ''} border-color:{extractBorderHighlight(isHovered, isFocused)};"
+      : ''} border-color:{extractBorderHighlight(
+      isHovered,
+      isFocused,
+      defaultBorderColor,
+      hoveredBorderColor,
+      focusedBorderColor,
+    )}; --placeholder-color: {placeholderColor};"
     {disabled}
   />
   {#if type === "search"}
@@ -142,5 +155,8 @@
   input {
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+  }
+  input::placeholder {
+    color: var(--placeholder-color);
   }
 </style>

@@ -8,6 +8,7 @@
   import { version } from "../../../../../../src-tauri/tauri.conf.json";
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
+  export let isCreateTeamModalOpen;
   export let data: any;
   export let collectionList;
   export let openTeam;
@@ -37,10 +38,10 @@
   let isGithubStarHover = false;
 
   let activeIndex = 0;
-  
+
   const handleTeamClick = (index) => {
-  activeIndex = index;
-};
+    activeIndex = index;
+  };
 
   import { DoubleArrowIcon, GithubIcon } from "@library/icons";
   import WithButton from "@workspaces/common/hoc/WithButton.svelte";
@@ -96,7 +97,12 @@
               placement={"bottom"}
               styleProp={"left: -50%"}
             >
-              <button class="new-team-btn rounded border-0">
+              <button
+                class="new-team-btn rounded border-0"
+                on:click={() => {
+                  isCreateTeamModalOpen = true;
+                }}
+              >
                 <img src={plus} alt="" />
               </button>
             </Tooltip>
@@ -151,7 +157,6 @@
       <!-- Recent APIs-->
       <hr class="mb-0 pb-0" />
 
-
       <!-- //deprecate -->
       <!-- <RecentApi
     {tabList}
@@ -161,14 +166,7 @@
     {activeSideBarTabMethods}
   /> -->
 
-  
-      <RecentApi
-        {tabList}
-        {data}
-        {collectionList}
-        {onApiClick}
-      
-      />
+      <RecentApi {tabList} {data} {collectionList} {onApiClick} />
 
       <hr class="mb-0 pb-0" />
 
@@ -182,8 +180,7 @@
     {activeSideBarTabMethods}
   />  -->
 
-      <RecentWorkspace {data} {openTeam}
-      {OnWorkspaceSwitch} />
+      <RecentWorkspace {data} {openTeam} {OnWorkspaceSwitch} />
     </div>
 
     <!-- github repo section -->
