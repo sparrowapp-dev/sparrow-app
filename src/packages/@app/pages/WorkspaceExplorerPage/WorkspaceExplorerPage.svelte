@@ -6,7 +6,7 @@
   import { notifications } from "@library/ui/toast/Toast";
   import Tooltip from "@library/ui/tooltip/Tooltip.svelte";
   import { onMount } from "svelte";
-  import WorkspaceSetting from "./WorkspaceSetting.svelte";
+  import { WorkspaceSetting } from "@workspaces/features";
   export let modifiedUser;
   export let onUpdateWorkspaceName;
   export let collectionList;
