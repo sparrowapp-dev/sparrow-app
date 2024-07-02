@@ -8,7 +8,7 @@
   let textareaRef: HTMLTextAreaElement | null = null;
   let docValue = "";
 
-  function toggleEditMode() {
+  const toggleEditMode = () => {
     editing = !editing;
     if (editing && textareaRef) {
       focusTextarea();
@@ -16,34 +16,31 @@
         textareaRef.focus();
       }, 0);
     }
-  }
+  };
   onMount(() => {
     docValue = requestStateDoc;
-    if (textareaRef) {
-      textareaRef.addEventListener("input", handleFocus);
-    }
   });
 
-  function handleFocus() {
+  const handleFocus = () => {
     if (!editing) {
       toggleEditMode();
     }
-  }
-  function focusTextarea() {
+  };
+  const focusTextarea = () => {
     if (textareaRef) {
       textareaRef.focus();
     }
-  }
+  };
 
-  function handleSaveChanges() {
+  const handleSaveChanges = () => {
     if (textareaRef) {
       description = textareaRef.value;
       onUpdateRequestDescription(description);
     }
-  }
+  };
 </script>
 
-<div class="d-flex flex-column text-fs-14" style="height: 234px; gap: 8px;">
+<div class="d-flex flex-column text-fs-14" style="gap: 8px;">
   <div class="d-flex" style="justify-content: space-between;">
     <div style="font-weight: 600;">Documentation</div>
     {#if !editing}
@@ -87,6 +84,7 @@
   <div style="height: 225px;">
     <textarea
       bind:this={textareaRef}
+      on:input={handleFocus}
       value={docValue}
       class="text-area text-fs-12 h-100 w-100 border-0"
       style="font-weight:400; background-color:transparent; outline: none; border-radius: 2px; padding-bottom:20px; padding-top: 8px; padding-left: 12px; padding-right: 12px;"
@@ -107,6 +105,6 @@
     border: 1px solid var(--border-primary-300) !important;
   }
   .text-area:hover {
-    background-color: var(--text-secondary-450) !important;
+    background-color: var(--bg-secondary-450) !important;
   }
 </style>

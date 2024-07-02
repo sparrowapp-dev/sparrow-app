@@ -138,10 +138,6 @@
     }
   });
 
-  const handleUpdatePopUp = (flag: boolean) => {
-    updateAvailable = flag;
-  };
-
   const initiateUpdate = async () => {
     try {
       updateAvailable = false;
@@ -165,9 +161,10 @@
   };
 </script>
 
-<div class="dashboard vh-100">
-  <!-- Application Header -->
-  <!-- <div style="height: 44px;">Header</div> -->
+<div class="dashboard d-flex flex-column" style="height: 100vh;">
+  <!-- 
+    -- Top Header having app icon and name
+  -->
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -181,16 +178,9 @@
     onLoginUser={handleGuestLogin}
   />
 
-  <!-- <LoginBanner
-    -->
-  <LoginBanner
-    isVisible={isLoginBannerActive}
-    onClick={handleGuestLogin}
-    onClose={handleBannerClose}
-  />
-  {#if showProgressBar === true}
-    <ProgressBar onClick={handleUpdatePopUp} title="Update in progress" />{/if}
-
+  <!--
+    -- App Updater Banner - shows app updater for new version upgrade.
+   -->
   {#if isGuestUser !== true}
     <Updater
       show={updaterVisible && updateAvailable}
@@ -199,10 +189,30 @@
     />
   {/if}
 
-  <!-- Application Content -->
-  <div class="d-flex h-100">
+  <!-- 
+    -- Guest Login Banner - shows login option to guest users.
+    -->
+  <LoginBanner
+    isVisible={isLoginBannerActive}
+    onClick={handleGuestLogin}
+    onClose={handleBannerClose}
+  />
+  {#if showProgressBar === true}
+    <ProgressBar onClick={() => {}} title="Update in progress" />
+  {/if}
+
+  <!-- 
+    -- Application includes collection, environment and help page.
+   -->
+  <div class="d-flex" style="flex:1; overflow:hidden;">
+    <!-- 
+      --Sidebar to naviagte between collection, environment and help page.
+    -->
     <Sidebar {user} onLogout={_viewModel.handleLogout} />
-    <section class="w-100 h-100">
+    <!-- 
+      -- Dashboard renders any of the pages between collection, environment and help.
+    -->
+    <section style="flex:1; overflow:auto;">
       <!-- Route for Collections -->
       <Route path="/collections/*">
         <CollectionsPage />
@@ -229,19 +239,19 @@
       <!-- Route for Profile -->
       <Route path="/profile/*">Profile</Route>
 
-      <!-- Default Route: Navigate to workspaces -->
+      <!-- Default Route: Navigate to collections -->
       <Route path="/*"><Navigate to="collections" /></Route>
     </section>
   </div>
-
-  <LoginPopup
-    isOpen={isPopupOpen}
-    {onModalStateChanged}
-    onCancel={() => {
-      isPopupOpen = false;
-    }}
-    onContinue={handleLogin}
-    title={"Confirm Login?"}
-    description={"After continuing your data will be lost, do you want to continue?"}
-  />
 </div>
+
+<LoginPopup
+  isOpen={isPopupOpen}
+  {onModalStateChanged}
+  onCancel={() => {
+    isPopupOpen = false;
+  }}
+  onContinue={handleLogin}
+  title={"Confirm Login?"}
+  description={"After continuing your data will be lost, do you want to continue?"}
+/>

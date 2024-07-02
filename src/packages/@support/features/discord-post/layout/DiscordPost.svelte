@@ -16,18 +16,6 @@
 <widgetbot
   server={DiscordIDs.ServerID}
   channel={DiscordIDs.ChannelID}
-  width="96%"
-  height="100%"
-  style=" margin-left:2%; margin-bottom:24px; "
+  width="100%"
+  height="500px"
 ></widgetbot>
-
-<style>
-  main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45vh;
-    background-color: transparent;
-    width: 100%;
-  }
-</style>

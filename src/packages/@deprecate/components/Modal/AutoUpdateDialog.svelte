@@ -16,7 +16,7 @@
     try {
       updater = await check();
       if (updater?.available) {
-        notifications.info("Update Available");
+        // notifications.info("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }

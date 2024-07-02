@@ -245,7 +245,7 @@
     {#if path.length > 0}
       {#each path as elem, index}
         <span class="text-secondary-200">/</span>
-        <span
+        <span 
           on:click={() => {
             navigateToDirectory(elem);
           }}
@@ -536,7 +536,7 @@
             -->
           {#if col.type === ItemType.FOLDER}
             <!-- {#if col.source === "USER"} -->
-            <div
+            <div class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -551,7 +551,7 @@
               type={ItemType.REQUEST}
             />
           {:else}
-            <div
+            <div class="item ps-2"
               on:click={() => {
                 navigateToDirectory(col);
               }}
@@ -841,7 +841,8 @@
         }}
         title={"+ Collection"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
+        type={"teritiary"}
+        buttonStyleProp={"font-size: var(--base-text);"}
       />
     {:else if path.length > 0 && path[path.length - 1].type === ItemType.COLLECTION}
       <Button
@@ -850,7 +851,8 @@
         }}
         title={"+ Folder"}
         buttonClassProp={"btn mb-2"}
-        buttonStyleProp={"color: var(--text-primary-300); font-size: var(--base-text); border: 1px solid var(--border-primary-200);"}
+        type={"teritiary"}
+        buttonStyleProp={"font-size: var(--base-text);"}
       />
     {/if}
   </div>
@@ -977,6 +979,9 @@
   .instruction-btn:hover {
     background-color: var(--bg-tertiary-650) !important;
   }
+  .instruction-btn:active {
+    background-color:var(--bg-primary-400) !important;
+  }
   .edit-input {
     padding: 0 8px !important;
     font-size: 14px;
@@ -998,5 +1003,8 @@
   }
   .item-header:hover .edit-pencil {
     display: inline-block !important;
+  }
+  .item:hover{
+    background-color: var(--bg-tertiary-300)  !important ;
   }
 </style>
