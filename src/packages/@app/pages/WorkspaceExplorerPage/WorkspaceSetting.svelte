@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Input } from "@library/forms";
+  import { Shimmer } from "@library/icons";
   import { Button, Tooltip } from "@library/ui";
 
   let search = "";
@@ -56,7 +57,7 @@
     </div>
     <div
       class="d-flex align-items-center"
-      style="height: 46px; width:100%; margin-top:24px;"
+      style="height: 46px; width:100%; margin-top:24px; margin-bottom:8px;"
     >
       <div
         class="rounded-5 me-2 border border-defaultColor d-flex justify-content-center align-items-center"
@@ -72,13 +73,21 @@
           {modifiedUser?.email}
         </div>
       </div>
-      <div  style="color: var(--text-secondary-100); padding:1px; font-size:12px;">
+      <div
+        style="color: var(--text-secondary-100); padding:1px; font-size:12px;"
+      >
         Owner
       </div>
     </div>
-    <div style="width: 100%; border-bottom:2px solid #313233; padding-top:8px; padding-bottom:8px;">
-      
-    </div>
+    <div
+      style="width: 100%; border-bottom:2px solid #313233;  padding-bottom:8px;"
+    ></div>
+    <img
+      src={Shimmer}
+      alt="shimmer effect"
+      width="610px"
+      height="100%"
+      style="margin-left: -5px; margin-top:8px;"
+    />
   </div>
 </div>
-
