@@ -7,8 +7,8 @@
   } from "$lib/assets/app.asset";
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "$lib/utils/workspacetimeUtils";
-  import Table from "../../../../../@deprecate/components/table/Table.svelte";
-  import Rows from "../../../../../@deprecate/components/dashboard/rows/Rows.svelte";
+  import { Table } from "@library/ui";
+  import { Rows } from "@teams/common/compopnents";
 
   export let data: any;
   export let userType = "";

@@ -8,7 +8,7 @@
   import type { Team } from "$lib/utils/interfaces";
   import type { WorkspaceDocument } from "@app/database/database";
   import Button from "@library/ui/button/Button.svelte";
-  import WorkspaceGrid from "$lib/components/dashboard/workspace-grid/WorkspaceGrid.svelte";
+  import { WorkspaceGrid } from "@teams/common/compopnents";
 
   /**
    * Id of current user
